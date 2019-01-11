@@ -23,22 +23,22 @@
 	downcast<nubus_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_NUBUS_OUT_IRQ9_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irq9_callback(DEVCB_##_devcb);
+	devcb = &downcast<nubus_device &>(*device).set_out_irq9_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQA_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqa_callback(DEVCB_##_devcb);
+	devcb = &downcast<nubus_device &>(*device).set_out_irqa_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQB_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqb_callback(DEVCB_##_devcb);
+	devcb = &downcast<nubus_device &>(*device).set_out_irqb_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQC_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqc_callback(DEVCB_##_devcb);
+	devcb = &downcast<nubus_device &>(*device).set_out_irqc_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQD_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqd_callback(DEVCB_##_devcb);
+	devcb = &downcast<nubus_device &>(*device).set_out_irqd_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_OUT_IRQE_CB(_devcb) \
-	downcast<nubus_device &>(*device).set_out_irqe_callback(DEVCB_##_devcb);
+	devcb = &downcast<nubus_device &>(*device).set_out_irqe_callback(DEVCB_##_devcb);
 
 #define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
@@ -62,16 +62,6 @@ class nubus_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	template <typename T>
-	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *nbtag, T &&opts, const char *dflt)
-		: nubus_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_nubus_slot(nbtag, tag);
-	}
-
 	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
@@ -107,12 +97,6 @@ public:
 	template <class Object> devcb_base &set_out_irqc_callback(Object &&cb) { return m_out_irqc_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_irqd_callback(Object &&cb) { return m_out_irqd_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_irqe_callback(Object &&cb) { return m_out_irqe_cb.set_callback(std::forward<Object>(cb)); }
-	auto out_irq9_callback() { return m_out_irq9_cb.bind(); }
-	auto out_irqa_callback() { return m_out_irqa_cb.bind(); }
-	auto out_irqb_callback() { return m_out_irqb_cb.bind(); }
-	auto out_irqc_callback() { return m_out_irqc_cb.bind(); }
-	auto out_irqd_callback() { return m_out_irqd_cb.bind(); }
-	auto out_irqe_callback() { return m_out_irqe_cb.bind(); }
 
 	void add_nubus_card(device_nubus_card_interface *card);
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask=0xffffffff);

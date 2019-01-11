@@ -118,7 +118,7 @@ void dsp56k_device::dsp56156_program_map(address_map &map)
 void dsp56k_device::dsp56156_x_data_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();                              /* 1-5 */
-	map(0xffc0, 0xffff).rw(FUNC(dsp56k_device::peripheral_register_r), FUNC(dsp56k_device::peripheral_register_w));   /* 1-5 On-chip peripheral registers memory mapped in data space */
+	map(0xffc0, 0xffff).rw(this, FUNC(dsp56k_device::peripheral_register_r), FUNC(dsp56k_device::peripheral_register_w));   /* 1-5 On-chip peripheral registers memory mapped in data space */
 }
 
 

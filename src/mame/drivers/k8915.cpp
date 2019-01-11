@@ -14,8 +14,8 @@ When it says DIAGNOSTIC RAZ P, press enter.
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
+#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
-#include "emupal.h"
 #include "screen.h"
 
 class k8915_state : public driver_device
@@ -28,17 +28,14 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	void k8915(machine_config &config);
-
-	void init_k8915();
-
-private:
 	DECLARE_WRITE8_MEMBER(k8915_a8_w);
+	void init_k8915();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void k8915(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-
+private:
 	uint8_t m_framecnt;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -69,7 +66,7 @@ void k8915_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x50, 0x53).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 	map(0x58, 0x5b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xa8, 0xa8).w(FUNC(k8915_state::k8915_a8_w));
+	map(0xa8, 0xa8).w(this, FUNC(k8915_state::k8915_a8_w));
 }
 
 /* Input ports */
@@ -149,21 +146,23 @@ MACHINE_CONFIG_START(k8915_state::k8915)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(4'915'200) / 2));
-	ctc.set_clk<2>(XTAL(4'915'200) / 2);
-	ctc.zc_callback<2>().set("sio", FUNC(z80sio_device::rxtxcb_w));
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'915'200) / 2)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg2))
 
-	z80sio_device& sio(Z80SIO(config, "sio", XTAL(4'915'200) / 2));
-	sio.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	sio.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
-	sio.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'915'200) / 2)
+	MCFG_Z80CTC_ZC2_CB(WRITELINE("sio", z80sio_device, rxtxcb_w))
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
-	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
-	rs232.dcd_handler().set("sio", FUNC(z80sio_device::dcdb_w));
-	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'915'200) / 2)
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 

@@ -16,7 +16,7 @@
 #include "diserial.h"
 
 #define MCFG_MIDIIN_INPUT_CB(_devcb) \
-	downcast<midiin_device &>(*device).set_input_callback(DEVCB_##_devcb);
+	devcb = &downcast<midiin_device &>(*device).set_input_callback(DEVCB_##_devcb);
 
 
 /***************************************************************************

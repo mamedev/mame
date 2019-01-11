@@ -53,22 +53,22 @@ void solomon_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd3ff).ram().w(FUNC(solomon_state::solomon_colorram_w)).share("colorram");
-	map(0xd400, 0xd7ff).ram().w(FUNC(solomon_state::solomon_videoram_w)).share("videoram");
-	map(0xd800, 0xdbff).ram().w(FUNC(solomon_state::solomon_colorram2_w)).share("colorram2");
-	map(0xdc00, 0xdfff).ram().w(FUNC(solomon_state::solomon_videoram2_w)).share("videoram2");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(solomon_state::solomon_colorram_w)).share("colorram");
+	map(0xd400, 0xd7ff).ram().w(this, FUNC(solomon_state::solomon_videoram_w)).share("videoram");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(solomon_state::solomon_colorram2_w)).share("colorram2");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(solomon_state::solomon_videoram2_w)).share("videoram2");
 	map(0xe000, 0xe07f).ram().share("spriteram");
 	map(0xe400, 0xe5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe600, 0xe600).portr("P1");
 	map(0xe601, 0xe601).portr("P2");
 	map(0xe602, 0xe602).portr("SYSTEM");
-	map(0xe603, 0xe603).r(FUNC(solomon_state::solomon_0xe603_r));
+	map(0xe603, 0xe603).r(this, FUNC(solomon_state::solomon_0xe603_r));
 	map(0xe604, 0xe604).portr("DSW1");
 	map(0xe605, 0xe605).portr("DSW2");
 	map(0xe606, 0xe606).nopr(); /* watchdog? */
-	map(0xe600, 0xe600).w(FUNC(solomon_state::nmi_mask_w));
-	map(0xe604, 0xe604).w(FUNC(solomon_state::solomon_flipscreen_w));
-	map(0xe800, 0xe800).w(FUNC(solomon_state::solomon_sh_command_w));
+	map(0xe600, 0xe600).w(this, FUNC(solomon_state::nmi_mask_w));
+	map(0xe604, 0xe604).w(this, FUNC(solomon_state::solomon_flipscreen_w));
+	map(0xe800, 0xe800).w(this, FUNC(solomon_state::solomon_sh_command_w));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -229,19 +229,25 @@ MACHINE_CONFIG_START(solomon_state::solomon)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(solomon_state, screen_update_solomon)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_solomon);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_solomon)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
-	AY8910(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.12);
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+
+	MCFG_DEVICE_ADD("ay3", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_CONFIG_END
 
 /***************************************************************************

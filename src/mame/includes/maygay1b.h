@@ -55,16 +55,6 @@ public:
 	{
 	}
 
-	void maygay_m1_no_oki(machine_config &config);
-	void maygay_m1(machine_config &config);
-	void maygay_m1_nec(machine_config &config);
-	void maygay_m1_empire(machine_config &config);
-
-	void init_m1();
-	void init_m1common();
-	void init_m1nec();
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i80c51_device> m_mcu;
 	optional_device<s16lf01_device> m_vfd;
@@ -143,10 +133,17 @@ private:
 
 	uint8_t m_main_to_mcu;
 
+	void init_m1();
+	void init_m1common();
+	void init_m1nec();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
+	void maygay_m1_no_oki(machine_config &config);
+	void maygay_m1(machine_config &config);
+	void maygay_m1_nec(machine_config &config);
+	void maygay_m1_empire(machine_config &config);
 	void m1_memmap(address_map &map);
 	void m1_nec_memmap(address_map &map);
 };

@@ -10,6 +10,9 @@ typedef device_delegate<uint16_t (uint32_t)> sega_m2_read_delegate;
 
 DECLARE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device)
 
+#define MCFG_SET_READ_CALLBACK( _class, _method) \
+	downcast<sega_315_5881_crypt_device &>(*device).set_read_cb(sega_m2_read_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+
 
 class sega_315_5881_crypt_device :  public device_t
 {
@@ -36,11 +39,6 @@ public:
 	sega_m2_read_delegate m_read;
 
 	template <typename Object> void set_read_cb(Object &&readcb) { m_read = std::forward<Object>(readcb); }
-	void set_read_cb(sega_m2_read_delegate callback) { m_read = callback; }
-	template <class FunctionClass> void set_read_cb(uint16_t (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_read_cb(sega_m2_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
 
 protected:
 	virtual void device_start() override;

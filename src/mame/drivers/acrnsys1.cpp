@@ -62,17 +62,17 @@ class acrnsys1_state : public driver_device
 {
 public:
 	acrnsys1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_ttl74145(*this, "ic8_7445")
-		, m_cass(*this, "cassette")
-		, m_display(*this, "digit%u", 0U)
-		, m_digit(0)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ttl74145(*this, "ic8_7445"),
+		m_cass(*this, "cassette"),
+		m_display(*this, "digit%u", 0U),
+		m_digit(0)
 	{ }
 
 	void acrnsys1(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
 	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
@@ -81,6 +81,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_p);
 	void acrnsys1_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<cassette_image_device> m_cass;
@@ -266,25 +267,22 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 1.008_MHz_XTAL)  /* 1.008 MHz */
+	MCFG_DEVICE_ADD("maincpu", M6502, 1008000)  /* 1.008 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(acrnsys1_map)
 
-	config.set_default_layout(layout_acrnsys1);
+	MCFG_DEFAULT_LAYOUT(layout_acrnsys1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	ins8154_device &b1(INS8154(config, "b1"));
-	b1.in_a().set(FUNC(acrnsys1_state::ins8154_b1_port_a_r));
-	b1.out_a().set(FUNC(acrnsys1_state::ins8154_b1_port_a_w));
-	b1.out_b().set(FUNC(acrnsys1_state::acrnsys1_led_segment_w));
-
-	TTL74145(config, m_ttl74145, 0);
-
+	MCFG_DEVICE_ADD("b1", INS8154, 0)
+	MCFG_INS8154_IN_A_CB(READ8(*this, acrnsys1_state, ins8154_b1_port_a_r))
+	MCFG_INS8154_OUT_A_CB(WRITE8(*this, acrnsys1_state, ins8154_b1_port_a_w))
+	MCFG_INS8154_OUT_B_CB(WRITE8(*this, acrnsys1_state, acrnsys1_led_segment_w))
+	MCFG_DEVICE_ADD("ic8_7445", TTL74145, 0)
 	MCFG_CASSETTE_ADD( "cassette" )
-
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_c", acrnsys1_state, acrnsys1_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_p", acrnsys1_state, acrnsys1_p, attotime::from_hz(40000))
 MACHINE_CONFIG_END
@@ -305,4 +303,4 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME          FLAGS
-COMP( 1979, acrnsys1, 0,      0,      acrnsys1, acrnsys1, acrnsys1_state, empty_init, "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )
+COMP( 1978, acrnsys1, 0,      0,      acrnsys1, acrnsys1, acrnsys1_state, empty_init, "Acorn", "Acorn System 1", MACHINE_SUPPORTS_SAVE )

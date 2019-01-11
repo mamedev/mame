@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -50,7 +50,7 @@ namespace stl = tinystl;
 #define IMAGE_VIEW_ID      1
 
 #define BGFX_TEXTUREV_VERSION_MAJOR 1
-#define BGFX_TEXTUREV_VERSION_MINOR 1
+#define BGFX_TEXTUREV_VERSION_MINOR 0
 
 const float kEvMin = -10.0f;
 const float kEvMax =  20.0f;
@@ -76,7 +76,6 @@ static const char* s_supportedExt[] =
 	"dds",
 	"exr",
 	"gif",
-	"gnf",
 	"jpg",
 	"jpeg",
 	"hdr",
@@ -96,7 +95,6 @@ struct Binding
 		App,
 		View,
 		Help,
-		About,
 
 		Count
 	};
@@ -189,18 +187,11 @@ static const InputBinding s_bindingHelp[] =
 	INPUT_BINDING_END
 };
 
-static const InputBinding s_bindingAbout[] =
-{
-	{ entry::Key::Esc,  entry::Modifier::None,  1, NULL, "view about" },
-	INPUT_BINDING_END
-};
-
 static const char* s_bindingName[] =
 {
 	"App",
 	"View",
 	"Help",
-	"About",
 };
 BX_STATIC_ASSERT(Binding::Count == BX_COUNTOF(s_bindingName) );
 
@@ -209,7 +200,6 @@ static const InputBinding* s_binding[] =
 	s_bindingApp,
 	s_bindingView,
 	s_bindingHelp,
-	s_bindingAbout,
 };
 BX_STATIC_ASSERT(Binding::Count == BX_COUNTOF(s_binding) );
 
@@ -235,21 +225,15 @@ struct View
 		, m_flipH(0.0f)
 		, m_flipV(0.0f)
 		, m_transitionTime(1.0f)
-		, m_width(1280)
-		, m_height(720)
 		, m_filter(true)
 		, m_fit(true)
 		, m_alpha(false)
 		, m_help(false)
-		, m_about(false)
 		, m_info(false)
 		, m_files(false)
 		, m_sdf(false)
-		, m_inLinear(false)
 	{
 		load();
-
-		m_textureInfo.format = bgfx::TextureFormat::Count;
 	}
 
 	~View()
@@ -324,7 +308,7 @@ struct View
 					float ev = m_ev;
 					bx::fromString(&ev, _argv[2]);
 
-					m_ev = bx::clamp(ev, kEvMin, kEvMax);
+					m_ev = bx::fclamp(ev, kEvMin, kEvMax);
 				}
 				else
 				{
@@ -422,7 +406,7 @@ struct View
 						m_zoom = zoom;
 					}
 
-					m_zoom = bx::clamp(m_zoom, 0.01f, 10.0f);
+					m_zoom = bx::fclamp(m_zoom, 0.01f, 10.0f);
 				}
 				else
 				{
@@ -446,7 +430,7 @@ struct View
 						m_angle = bx::toRad(angle);
 					}
 
-					m_angle = bx::wrap(m_angle, bx::kPi*2.0f);
+					m_angle = bx::fwrap(m_angle, bx::kPi*2.0f);
 				}
 				else
 				{
@@ -494,7 +478,7 @@ struct View
 				{
 					float time;
 					bx::fromString(&time, _argv[2]);
-					m_transitionTime = bx::clamp(time, 0.0f, 5.0f);
+					m_transitionTime = bx::fclamp(time, 0.0f, 5.0f);
 				}
 				else
 				{
@@ -590,10 +574,6 @@ struct View
 			{
 				m_help ^= true;
 			}
-			else if (0 == bx::strCmp(_argv[1], "about") )
-			{
-				m_about ^= true;
-			}
 			else if (0 == bx::strCmp(_argv[1], "save") )
 			{
 				save();
@@ -636,11 +616,10 @@ struct View
 			{
 				if (0 == (item->d_type & DT_DIR) )
 				{
-					const bx::StringView fileName(item->d_name);
-					bx::StringView ext = bx::strRFind(fileName, '.');
-					if (!ext.isEmpty() )
+					const char* ext = bx::strRFind(item->d_name, '.');
+					if (NULL != ext)
 					{
-						ext.set(ext.getPtr()+1, fileName.getTerm() );
+						ext += 1;
 						bool supported = false;
 						for (uint32_t ii = 0; ii < BX_COUNTOF(s_supportedExt); ++ii)
 						{
@@ -700,16 +679,6 @@ struct View
 			{
 				m_transitionTime = 1.0f;
 			}
-
-			if (!bx::fromString(&m_width, settings.get("view/width") ) )
-			{
-				m_width = 1280;
-			}
-
-			if (!bx::fromString(&m_height, settings.get("view/height") ) )
-			{
-				m_height = 720;
-			}
 		}
 	}
 
@@ -725,12 +694,6 @@ struct View
 			char tmp[256];
 			bx::toString(tmp, sizeof(tmp), m_transitionTime);
 			settings.set("view/transition", tmp);
-
-			bx::toString(tmp, sizeof(tmp), m_width);
-			settings.set("view/width", tmp);
-
-			bx::toString(tmp, sizeof(tmp), m_height);
-			settings.set("view/height", tmp);
 
 			bx::FileWriter writer;
 			if (bx::open(&writer, filePath) )
@@ -766,17 +729,13 @@ struct View
 	float    m_flipH;
 	float    m_flipV;
 	float    m_transitionTime;
-	uint32_t m_width;
-	uint32_t m_height;
 	bool     m_filter;
 	bool     m_fit;
 	bool     m_alpha;
 	bool     m_help;
-	bool     m_about;
 	bool     m_info;
 	bool     m_files;
 	bool     m_sdf;
-	bool     m_inLinear;
 };
 
 int cmdView(CmdContext* /*_context*/, void* _userData, int _argc, char const* const* _argv)
@@ -998,31 +957,23 @@ struct InterpolatorT
 
 	float getValue()
 	{
-		if (isActive() )
+
+		if (duration > 0.0)
 		{
 			const double freq = double(bx::getHPFrequency() );
 			int64_t now = bx::getHPCounter();
 			float time = (float)(double(now - offset) / freq);
-			float lerp = bx::clamp(time, 0.0f, duration) / duration;
+			float lerp = bx::fclamp(time, 0.0, duration) / duration;
 			return lerpT(from, to, easeT(lerp) );
 		}
 
 		return to;
 	}
-
-	bool isActive() const
-	{
-		const double freq = double(bx::getHPFrequency() );
-		int64_t now = bx::getHPCounter();
-		float time = (float)(double(now - offset) / freq);
-		float lerp = bx::clamp(time, 0.0f, duration) / duration;
-		return lerp < 1.0f;
-	}
 };
 
-typedef InterpolatorT<bx::lerp,      bx::easeInOutQuad>  Interpolator;
+typedef InterpolatorT<bx::flerp,     bx::easeInOutQuad>  Interpolator;
 typedef InterpolatorT<bx::angleLerp, bx::easeInOutCubic> InterpolatorAngle;
-typedef InterpolatorT<bx::lerp,      bx::easeLinear>     InterpolatorLinear;
+typedef InterpolatorT<bx::flerp,     bx::easeLinear>     InterpolatorLinear;
 
 void keyBindingHelp(const char* _bindings, const char* _description)
 {
@@ -1095,8 +1046,6 @@ void associate()
 		bx::stringPrintf(str, "xdg-mime default texturev.desktop image/%s\n", ext);
 	}
 
-	bx::stringPrintf(str, "xdg-mime default texturev.desktop image/x-dds\n");
-
 	str += "\n";
 
 	bx::FileWriter writer;
@@ -1127,7 +1076,7 @@ void help(const char* _error = NULL)
 
 	fprintf(stderr
 		, "texturev, bgfx texture viewer tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2018 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 		, BGFX_TEXTUREV_VERSION_MAJOR
 		, BGFX_TEXTUREV_VERSION_MINOR
@@ -1182,7 +1131,10 @@ int _main_(int _argc, char** _argv)
 		return bx::kExitFailure;
 	}
 
-	uint32_t debug = BGFX_DEBUG_TEXT;
+	uint32_t width  = 1280;
+	uint32_t height = 720;
+	uint32_t debug  = BGFX_DEBUG_TEXT;
+	uint32_t reset  = BGFX_RESET_VSYNC;
 
 	inputAddBindings(s_bindingName[Binding::App],  s_binding[Binding::App]);
 	inputAddBindings(s_bindingName[Binding::View], s_binding[Binding::View]);
@@ -1190,15 +1142,8 @@ int _main_(int _argc, char** _argv)
 	View view;
 	cmdAdd("view", cmdView, &view);
 
-	entry::setWindowFlags(entry::WindowHandle{0}, ENTRY_WINDOW_FLAG_ASPECT_RATIO, false);
-	entry::setWindowSize(entry::WindowHandle{0}, view.m_width, view.m_height);
-
-	bgfx::Init init;
-	init.resolution.width = view.m_width;
-	init.resolution.width = view.m_height;
-	init.resolution.reset = BGFX_RESET_VSYNC;
-
-	bgfx::init(init);
+	bgfx::init();
+	bgfx::reset(width, height, reset);
 
 	// Set view 0 clear state.
 	bgfx::setViewClear(BACKGROUND_VIEW_ID
@@ -1275,9 +1220,9 @@ int _main_(int _argc, char** _argv)
 		checkerBoard = bgfx::createTexture2D(checkerBoardSize, checkerBoardSize, false, 1
 			, bgfx::TextureFormat::BGRA8
 			, 0
-			| BGFX_SAMPLER_MIN_POINT
-			| BGFX_SAMPLER_MIP_POINT
-			| BGFX_SAMPLER_MAG_POINT
+			| BGFX_TEXTURE_MIN_POINT
+			| BGFX_TEXTURE_MIP_POINT
+			| BGFX_TEXTURE_MAG_POINT
 			, mem
 			);
 	}
@@ -1285,7 +1230,6 @@ int _main_(int _argc, char** _argv)
 	float speed = 0.37f;
 	float time  = 0.0f;
 
-	Interpolator menuFade(5.0f);
 	Interpolator mip(0.0f);
 	Interpolator layer(0.0f);
 	InterpolatorLinear ev(0.0f);
@@ -1296,24 +1240,6 @@ int _main_(int _argc, char** _argv)
 	InterpolatorAngle angle(0.0f);
 	InterpolatorAngle angx(0.0f);
 	InterpolatorAngle angy(0.0f);
-
-	auto anyActive = [&]() -> bool
-	{
-		return false
-			|| ImGui::MouseOverArea()
-			|| menuFade.isActive()
-			|| mip.isActive()
-			|| layer.isActive()
-			|| ev.isActive()
-			|| zoom.isActive()
-			|| scale.isActive()
-			|| posx.isActive()
-			|| posy.isActive()
-			|| angle.isActive()
-			|| angx.isActive()
-			|| angy.isActive()
-			;
-	};
 
 	const char* filePath = _argc < 2 ? "" : _argv[1];
 
@@ -1326,88 +1252,106 @@ int _main_(int _argc, char** _argv)
 	int exitcode = bx::kExitSuccess;
 	bgfx::TextureHandle texture = BGFX_INVALID_HANDLE;
 
+	if (view.m_fileList.empty() )
+	{
+		exitcode = bx::kExitFailure;
+		if (2 > _argc)
+		{
+			help("File path is not specified.");
+		}
+		else
+		{
+			fprintf(stderr, "Unable to load '%s' texture.\n", filePath);
+		}
+	}
+	else
 	{
 		uint32_t fileIndex = 0;
 		bool dragging = false;
 
-		entry::WindowState windowState;
 		entry::MouseState mouseStatePrev;
-		while (!entry::processWindowEvents(windowState, debug, init.resolution.reset) )
+		entry::MouseState mouseState;
+		while (!entry::processEvents(width, height, debug, reset, &mouseState) )
 		{
-			const entry::MouseState& mouseState = windowState.m_mouse;
-			view.m_width  = windowState.m_width;
-			view.m_height = windowState.m_height;
-
-			if (!windowState.m_dropFile.isEmpty() )
-			{
-				view.updateFileList(windowState.m_dropFile);
-				windowState.m_dropFile.clear();
-			}
-
 			imguiBeginFrame(mouseState.m_mx
 				,  mouseState.m_my
 				, (mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
 				| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
 				| (mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 				,  mouseState.m_mz
-				,  uint16_t(view.m_width)
-				,  uint16_t(view.m_height)
+				,  uint16_t(width)
+				,  uint16_t(height)
 				);
 
-			bool modalWindow = view.m_help || view.m_about;
-			bool overArea = false
-				|| ImGui::GetMousePos().y <= ImGui::GetTextLineHeightWithSpacing()
-				|| ImGui::MouseOverArea()
-				;
-			overArea &= !modalWindow;
-
-			if (overArea)
+			static bool help = false;
+			static bool mouseDelta = false;
+			if (!mouseDelta)
 			{
-				menuFade.set(5.0f, 0.25f);
-			}
-			else if (modalWindow)
-			{
-				menuFade.reset(0.0f);
-			}
-			else
-			{
-				menuFade.set(0.0f, 2.0f);
+				mouseStatePrev = mouseState;
+				mouseDelta = true;
 			}
 
-			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, bx::clamp(menuFade.getValue(), 0.0f, 1.0f) );
-			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-
-			if (ImGui::BeginMainMenuBar() )
+			int32_t zoomDelta = mouseState.m_mz - mouseStatePrev.m_mz;
+			if (zoomDelta != 0)
 			{
-				if (ImGui::BeginMenu("File"))
+				char exec[64];
+				bx::snprintf(exec, BX_COUNTOF(exec), "view zoom %+f", -zoomDelta*0.1f);
+				cmdExec(exec);
+			}
+
+			const float xDelta = float(mouseStatePrev.m_mx - mouseState.m_mx);
+			const float yDelta = float(mouseStatePrev.m_my - mouseState.m_my);
+
+			if (!ImGui::MouseOverArea()
+			&&  !help
+			&&  mouseState.m_buttons[entry::MouseButton::Left] != mouseStatePrev.m_buttons[entry::MouseButton::Left])
+			{
+				dragging = !!mouseState.m_buttons[entry::MouseButton::Left];
+			}
+
+			if (dragging)
+			{
+				if (view.m_textureInfo.cubeMap
+				&&  Geometry::Quad == view.m_cubeMapGeo)
 				{
-					if (ImGui::MenuItem("Show File List", NULL, view.m_files) )
-					{
-						cmdExec("view files");
-					}
+					char exec[64];
+					bx::snprintf(exec, BX_COUNTOF(exec), "view cubemap %+f %+f", -yDelta, -xDelta);
+					cmdExec(exec);
+				}
+				else
+				{
+					char exec[64];
+					bx::snprintf(exec, BX_COUNTOF(exec), "view pan %+f %+f", xDelta, yDelta);
+					cmdExec(exec);
+				}
+			}
 
-					ImGui::Separator();
-					if (ImGui::MenuItem("Exit") )
-					{
-						cmdExec("exit");
-					}
+			mouseStatePrev = mouseState;
 
-					ImGui::EndMenu();
+			if (ImGui::BeginPopupContextVoid("Menu") )
+			{
+				if (ImGui::MenuItem("Files", NULL, view.m_files) )
+				{
+					cmdExec("view files");
 				}
 
-				if (ImGui::BeginMenu("View") )
+				if (ImGui::MenuItem("Info", NULL, view.m_info) )
 				{
-					if (ImGui::MenuItem("Info", NULL, view.m_info) )
-					{
-						cmdExec("view info");
-					}
+					cmdExec("view info");
+				}
 
-					if (ImGui::MenuItem("Reset") )
-					{
-						cmdExec(s_resetCmd);
-					}
+//				if (ImGui::MenuItem("Save As") )
+				{
+				}
 
-					ImGui::Separator();
+				if (ImGui::MenuItem("Reset") )
+				{
+					cmdExec(s_resetCmd);
+				}
+
+				ImGui::Separator();
+				if (ImGui::BeginMenu("Options"))
+				{
 					bool filter = view.m_filter;
 					if (ImGui::MenuItem("Filter", NULL, &filter) )
 					{
@@ -1480,106 +1424,20 @@ int _main_(int _argc, char** _argv)
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::BeginMenu("Help") )
+				ImGui::Separator();
+				if (ImGui::MenuItem("Help") )
 				{
-					if (ImGui::MenuItem("View Help") )
-					{
-						cmdExec("view help");
-					}
-
-					ImGui::Separator();
-					if (ImGui::MenuItem("About") )
-					{
-						cmdExec("view about");
-					}
-
-					ImGui::EndMenu();
+					cmdExec("view help");
 				}
 
-				if (0 != view.m_fileList.size() )
+				ImGui::Separator();
+				if (ImGui::MenuItem("Exit") )
 				{
-					ImGui::Separator();
-					ImGui::TextColored(
-						  ImVec4(0.0f, 1.0f, 1.0f, 1.0f)
-						, view.m_fileList[view.m_fileIndex].c_str()
-						);
-
-					ImGui::Separator();
-					const char* name = "";
-					if (view.m_textureInfo.cubeMap)
-					{
-						name = " CubeMap";
-					}
-					else if (1 < view.m_textureInfo.depth)
-					{
-						name = " 3D";
-						view.m_textureInfo.numLayers = view.m_textureInfo.depth;
-					}
-					else if (1 < view.m_textureInfo.numLayers)
-					{
-						name = " 2D Array";
-					}
-
-					ImGui::Text("%d x %d%s, mips: %d, layers %d, %s"
-						, view.m_textureInfo.width
-						, view.m_textureInfo.height
-						, name
-						, view.m_textureInfo.numMips
-						, view.m_textureInfo.numLayers
-						, bimg::getName(bimg::TextureFormat::Enum(view.m_textureInfo.format) )
-						);
+					cmdExec("exit");
 				}
 
-				ImGui::EndMainMenuBar();
+				ImGui::EndPopup();
 			}
-
-			ImGui::PopStyleVar(2);
-
-			static bool help = false;
-			static bool about = false;
-			static bool mouseDelta = false;
-			if (!mouseDelta)
-			{
-				mouseStatePrev = mouseState;
-				mouseDelta = true;
-			}
-
-			int32_t zoomDelta = overArea ? 0 : mouseState.m_mz - mouseStatePrev.m_mz;
-			if (zoomDelta != 0)
-			{
-				char exec[64];
-				bx::snprintf(exec, BX_COUNTOF(exec), "view zoom %+f", -zoomDelta*0.1f);
-				cmdExec(exec);
-			}
-
-			const float xDelta = float(mouseStatePrev.m_mx - mouseState.m_mx);
-			const float yDelta = float(mouseStatePrev.m_my - mouseState.m_my);
-
-			if (!overArea
-			&&  !help
-			&&  mouseState.m_buttons[entry::MouseButton::Left] != mouseStatePrev.m_buttons[entry::MouseButton::Left])
-			{
-				dragging = !!mouseState.m_buttons[entry::MouseButton::Left];
-			}
-
-			if (dragging)
-			{
-				if (view.m_textureInfo.cubeMap
-				&&  Geometry::Quad == view.m_cubeMapGeo)
-				{
-					char exec[64];
-					bx::snprintf(exec, BX_COUNTOF(exec), "view cubemap %+f %+f", -yDelta, -xDelta);
-					cmdExec(exec);
-				}
-				else
-				{
-					char exec[64];
-					bx::snprintf(exec, BX_COUNTOF(exec), "view pan %+f %+f", xDelta, yDelta);
-					cmdExec(exec);
-				}
-			}
-
-			mouseStatePrev = mouseState;
 
 			if (help != view.m_help)
 			{
@@ -1598,105 +1456,60 @@ int _main_(int _argc, char** _argv)
 				help = view.m_help;
 			}
 
-			if (about != view.m_about)
-			{
-				if (!about)
-				{
-					ImGui::OpenPopup("About");
-					inputRemoveBindings(s_bindingName[Binding::View]);
-					inputAddBindings(s_bindingName[Binding::About], s_binding[Binding::About]);
-				}
-				else
-				{
-					inputRemoveBindings(s_bindingName[Binding::About]);
-					inputAddBindings(s_bindingName[Binding::View], s_binding[Binding::View]);
-				}
-
-				about = view.m_about;
-			}
-
 			if (view.m_info)
 			{
-				ImGui::SetNextWindowSize(
-					  ImVec2(300.0f, 320.0f)
-					, ImGuiCond_FirstUseEver
-					);
-
-				if (ImGui::Begin("Info", &view.m_info) )
+				if (ImGui::Begin("Info", NULL, ImVec2(300.0f, 200.0f) ) )
 				{
 					if (ImGui::BeginChild("##info", ImVec2(0.0f, 0.0f) ) )
 					{
-						if (!bgfx::isValid(texture) )
-						{
-							ImGui::Text("Texture is not loaded.");
-						}
-						else
-						{
-							ImGui::Text("Name: %s", view.m_fileList[view.m_fileIndex].c_str() );
+						ImGui::Text("Dimensions: %d x %d"
+							, view.m_textureInfo.width
+							, view.m_textureInfo.height
+							);
 
-							ImGui::Text("Dimensions: %d x %d"
-								, view.m_textureInfo.width
-								, view.m_textureInfo.height
-								);
+						ImGui::Text("Format: %s"
+							, bimg::getName(bimg::TextureFormat::Enum(view.m_textureInfo.format) )
+							);
 
-							ImGui::Text("Format: %s"
-								, bimg::getName(bimg::TextureFormat::Enum(view.m_textureInfo.format) )
-								);
+						ImGui::Text("Layers: %d / %d"
+							, view.m_layer
+							, view.m_textureInfo.numLayers - 1
+							);
 
-							uint32_t numLayers = view.m_textureInfo.numLayers;
-							if (1 < view.m_textureInfo.depth)
-							{
-								numLayers = bx::max(1, view.m_textureInfo.depth >> view.m_mip);
-							}
-							view.m_layer = bx::clamp<int32_t>(view.m_layer, 0, numLayers - 1);
-							ImGui::SliderInt("Layer", (int32_t*)&view.m_layer, 0, numLayers - 1);
-							ImGui::SliderInt("Mip",   (int32_t*)&view.m_mip,   0, view.m_textureInfo.numMips - 1);
+						ImGui::Text("Mips: %d / %d"
+							, view.m_mip
+							, view.m_textureInfo.numMips - 1
+							);
 
-							ImGui::Separator();
-
-							ImGui::Checkbox("Input linear", &view.m_inLinear);
-							ImGui::RangeSliderFloat("EV range", &view.m_evMin, &view.m_evMax, kEvMin, kEvMax);
-							ImGui::SliderFloat("EV", &view.m_ev, view.m_evMin, view.m_evMax);
-
-							ImGui::Separator();
-
-							ImGui::Checkbox("Fit to window", &view.m_fit);
-							ImGui::SliderFloat("Scale", &view.m_zoom, 0.01f, 10.0f);
-						}
+						ImGui::RangeSliderFloat("EV range", &view.m_evMin, &view.m_evMax, kEvMin, kEvMax);
+						ImGui::SliderFloat("EV", &view.m_ev, view.m_evMin, view.m_evMax);
 
 						ImGui::EndChild();
 					}
 
+					ImGui::End();
 				}
-
-				ImGui::End();
 			}
 
 			if (view.m_files)
 			{
 				char temp[bx::kMaxFilePath];
 				bx::snprintf(temp, BX_COUNTOF(temp), "%s##File", view.m_path.get() );
-
-				ImGui::SetNextWindowSize(
-					  ImVec2(400.0f, 400.0f)
-					, ImGuiCond_FirstUseEver
-					);
-
-				if (ImGui::Begin(temp, &view.m_files) )
+				if (ImGui::Begin(temp, NULL, ImVec2(400.0f, 400.0f) ) )
 				{
 					if (ImGui::BeginChild("##file_list", ImVec2(0.0f, 0.0f) ) )
 					{
 						ImGui::PushFont(ImGui::Font::Mono);
 						const float itemHeight = ImGui::GetTextLineHeightWithSpacing();
 						const float listHeight =
-							  bx::max(1.0f, bx::floor(ImGui::GetWindowHeight()/itemHeight) )
+							std::max(1.0f, bx::ffloor(ImGui::GetWindowHeight()/itemHeight) )
 							* itemHeight
 							;
 
 						ImGui::PushItemWidth(-1);
 						if (ImGui::ListBoxHeader("##empty", ImVec2(0.0f, listHeight) ) )
 						{
-							const int32_t itemCount = int32_t(view.m_fileList.size() );
+							const int32_t itemCount  = int32_t(view.m_fileList.size() );
 
 							int32_t start, end;
 							ImGui::CalcListClipping(itemCount, itemHeight, &start, &end);
@@ -1734,39 +1547,25 @@ int _main_(int _argc, char** _argv)
 						ImGui::PopFont();
 						ImGui::EndChild();
 					}
-				}
 
-				ImGui::End();
+					ImGui::End();
+				}
 			}
 
-			if (ImGui::BeginPopupModal("About", &view.m_about, ImGuiWindowFlags_AlwaysAutoResize) )
+			if (ImGui::BeginPopupModal("Help", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
 			{
 				ImGui::SetWindowFontScale(1.0f);
 
 				ImGui::Text(
 					"texturev, bgfx texture viewer tool " ICON_KI_WRENCH ", version %d.%d.%d.\n"
-					"Copyright 2011-2018 Branimir Karadzic. All rights reserved.\n"
+					"Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
 					"License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n"
 					, BGFX_TEXTUREV_VERSION_MAJOR
 					, BGFX_TEXTUREV_VERSION_MINOR
 					, BGFX_API_VERSION
 					);
-
-				ImGui::Dummy(ImVec2(0.0f, 0.0f) );
-				ImGui::SameLine(ImGui::GetWindowWidth() - 136.0f);
-				if (ImGui::Button("Close", ImVec2(128.0f, 0.0f) )
-				|| !view.m_about)
-				{
-					view.m_about = false;
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::EndPopup();
-			}
-
-			if (ImGui::BeginPopupModal("Help", &view.m_help, ImGuiWindowFlags_AlwaysAutoResize) )
-			{
-				ImGui::SetWindowFontScale(1.0f);
+				ImGui::Separator();
+				ImGui::NextLine();
 
 				ImGui::Text("Key bindings:\n\n");
 
@@ -1820,8 +1619,8 @@ int _main_(int _argc, char** _argv)
 
 			imguiEndFrame();
 
-			if ( (!bgfx::isValid(texture) || view.m_fileIndex != fileIndex)
-			&&  0 != view.m_fileList.size() )
+			if (!bgfx::isValid(texture)
+			||  view.m_fileIndex != fileIndex)
 			{
 				if (bgfx::isValid(texture) )
 				{
@@ -1836,32 +1635,25 @@ int _main_(int _argc, char** _argv)
 				bimg::Orientation::Enum orientation;
 				texture = loadTexture(fp.get()
 					, 0
-					| BGFX_SAMPLER_U_CLAMP
-					| BGFX_SAMPLER_V_CLAMP
-					| BGFX_SAMPLER_W_CLAMP
+					| BGFX_TEXTURE_U_CLAMP
+					| BGFX_TEXTURE_V_CLAMP
+					| BGFX_TEXTURE_W_CLAMP
 					, 0
 					, &view.m_textureInfo
 					, &orientation
 					);
 
-				bimg::TextureFormat::Enum format = bimg::TextureFormat::Enum(view.m_textureInfo.format);
-
-				if (format < bimg::TextureFormat::Count)
+				switch (orientation)
 				{
-					view.m_inLinear = bimg::isFloat(format);
-
-					switch (orientation)
-					{
-					default:
-					case bimg::Orientation::R0:        cmdExec("view orientation\nview orientation z    0"); break;
-					case bimg::Orientation::R90:       cmdExec("view orientation\nview orientation z  -90"); break;
-					case bimg::Orientation::R180:      cmdExec("view orientation\nview orientation z -180"); break;
-					case bimg::Orientation::R270:      cmdExec("view orientation\nview orientation z -270"); break;
-					case bimg::Orientation::HFlip:     cmdExec("view orientation\nview orientation x -180"); break;
-					case bimg::Orientation::HFlipR90:  cmdExec("view orientation\nview orientation z  -90\nview orientation x -180");  break;
-					case bimg::Orientation::HFlipR270: cmdExec("view orientation\nview orientation z -270\nview orientation x -180"); break;
-					case bimg::Orientation::VFlip:     cmdExec("view orientation\nview orientation y -180"); break;
-					}
+				default:
+				case bimg::Orientation::R0:        cmdExec("view orientation\nview orientation z    0"); break;
+				case bimg::Orientation::R90:       cmdExec("view orientation\nview orientation z  -90"); break;
+				case bimg::Orientation::R180:      cmdExec("view orientation\nview orientation z -180"); break;
+				case bimg::Orientation::R270:      cmdExec("view orientation\nview orientation z -270"); break;
+				case bimg::Orientation::HFlip:     cmdExec("view orientation\nview orientation x -180"); break;
+				case bimg::Orientation::HFlipR90:  cmdExec("view orientation\nview orientation z  -90\nview orientation x -180");  break;
+				case bimg::Orientation::HFlipR270: cmdExec("view orientation\nview orientation z -270\nview orientation x -180"); break;
+				case bimg::Orientation::VFlip:     cmdExec("view orientation\nview orientation y -180"); break;
 				}
 
 				std::string title;
@@ -1896,7 +1688,6 @@ int _main_(int _argc, char** _argv)
 				{
 					bx::stringPrintf(title, "Failed to load %s!", filePath);
 				}
-
 				entry::WindowHandle handle = { 0 };
 				entry::setWindowTitle(handle, title.c_str() );
 			}
@@ -1919,8 +1710,8 @@ int _main_(int _argc, char** _argv)
 			bx::mtxOrtho(
 				  ortho
 				, 0.0f
-				, float(view.m_width)
-				, float(view.m_height)
+				, float(width)
+				, float(height)
 				, 0.0f
 				, 0.0f
 				, 1000.0f
@@ -1928,24 +1719,24 @@ int _main_(int _argc, char** _argv)
 				, caps->homogeneousDepth
 				);
 			bgfx::setViewTransform(BACKGROUND_VIEW_ID, NULL, ortho);
-			bgfx::setViewRect(BACKGROUND_VIEW_ID, 0, 0, uint16_t(view.m_width), uint16_t(view.m_height) );
+			bgfx::setViewRect(BACKGROUND_VIEW_ID, 0, 0, uint16_t(width), uint16_t(height) );
 
 			setGeometry(Geometry::Quad
 				, 0
 				, 0
-				, view.m_width
-				, view.m_height
-				, view.m_alpha || !bgfx::isValid(texture) ? UINT32_MAX : 0
-				, float(view.m_width )/float(checkerBoardSize)
-				, float(view.m_height)/float(checkerBoardSize)
+				, width
+				, height
+				, view.m_alpha ? UINT32_MAX : 0
+				, float(width )/float(checkerBoardSize)
+				, float(height)/float(checkerBoardSize)
 				);
 			bgfx::setTexture(0
 				, s_texColor
 				, checkerBoard
 				);
 			bgfx::setState(0
-				| BGFX_STATE_WRITE_RGB
-				| BGFX_STATE_WRITE_A
+				| BGFX_STATE_RGB_WRITE
+				| BGFX_STATE_ALPHA_WRITE
 				);
 			bgfx::submit(BACKGROUND_VIEW_ID
 				, textureProgram
@@ -1955,17 +1746,17 @@ int _main_(int _argc, char** _argv)
 			float py = posy.getValue();
 			bx::mtxOrtho(
 				  ortho
-				, px-view.m_width/2.0f
-				, px+view.m_width/2.0f
-				, py+view.m_height/2.0f
-				, py-view.m_height/2.0f
+				, px-width/2.0f
+				, px+width/2.0f
+				, py+height/2.0f
+				, py-height/2.0f
 				, -10.0f
 				,  10.0f
 				, 0.0f
 				, caps->homogeneousDepth
 				);
 			bgfx::setViewTransform(IMAGE_VIEW_ID, NULL, ortho);
-			bgfx::setViewRect(IMAGE_VIEW_ID, 0, 0, uint16_t(view.m_width), uint16_t(view.m_height) );
+			bgfx::setViewRect(IMAGE_VIEW_ID, 0, 0, uint16_t(width), uint16_t(height) );
 
 			bgfx::dbgTextClear();
 
@@ -1977,11 +1768,11 @@ int _main_(int _argc, char** _argv)
 				float wh[3] = { float(view.m_textureInfo.width), float(view.m_textureInfo.height), 0.0f };
 				float result[3];
 				bx::vec3MulMtx(result, wh, orientation);
-				result[0] = bx::round(bx::abs(result[0]) );
-				result[1] = bx::round(bx::abs(result[1]) );
+				result[0] = bx::fround(bx::fabs(result[0]) );
+				result[1] = bx::fround(bx::fabs(result[1]) );
 
-				scale.set(bx::min(float(view.m_width)  / result[0]
-					,             float(view.m_height) / result[1])
+				scale.set(bx::fmin(float(width)  / result[0]
+					,              float(height) / result[1])
 					, 0.1f*view.m_transitionTime
 					);
 			}
@@ -2017,22 +1808,22 @@ int _main_(int _argc, char** _argv)
 			layer.set(float(view.m_layer), 0.25f*view.m_transitionTime);
 			ev.set(view.m_ev, 0.5f*view.m_transitionTime);
 
-			float params[4] = { mip.getValue(), layer.getValue(), view.m_inLinear ? 1.0f : 0.0f, ev.getValue() };
+			float params[4] = { mip.getValue(), layer.getValue(), 0.0f, ev.getValue() };
 			if (1 < view.m_textureInfo.depth)
 			{
-				params[1] = layer.getValue()/float(bx::max(1, view.m_textureInfo.depth >> view.m_mip) );
+				params[1] = layer.getValue()/view.m_textureInfo.depth;
 			}
 
 			bgfx::setUniform(u_params, params);
 
 			const uint32_t textureFlags = 0
-				| BGFX_SAMPLER_U_CLAMP
-				| BGFX_SAMPLER_V_CLAMP
-				| BGFX_SAMPLER_W_CLAMP
+				| BGFX_TEXTURE_U_CLAMP
+				| BGFX_TEXTURE_V_CLAMP
+				| BGFX_TEXTURE_W_CLAMP
 				| (view.m_filter ? 0 : 0
-				| BGFX_SAMPLER_MIN_POINT
-				| BGFX_SAMPLER_MIP_POINT
-				| BGFX_SAMPLER_MAG_POINT
+				| BGFX_TEXTURE_MIN_POINT
+				| BGFX_TEXTURE_MIP_POINT
+				| BGFX_TEXTURE_MAG_POINT
 				  )
 				;
 
@@ -2042,8 +1833,8 @@ int _main_(int _argc, char** _argv)
 				, textureFlags
 				);
 			bgfx::setState(0
-				| BGFX_STATE_WRITE_RGB
-				| BGFX_STATE_WRITE_A
+				| BGFX_STATE_RGB_WRITE
+				| BGFX_STATE_ALPHA_WRITE
 				| (view.m_alpha ? BGFX_STATE_BLEND_ALPHA : BGFX_STATE_NONE)
 				);
 
@@ -2075,23 +1866,9 @@ int _main_(int _argc, char** _argv)
 				}
 			}
 
-			if (bgfx::isValid(texture) )
-			{
-				bgfx::submit(IMAGE_VIEW_ID, program);
-			}
-			else
-			{
-				bgfx::discard();
-			}
+			bgfx::submit(IMAGE_VIEW_ID, program);
 
 			bgfx::frame();
-
-			// Slow down when nothing is animating...
-			if (!dragging
-			&&  !anyActive() )
-			{
-				bx::sleep(100);
-			}
 		}
 	}
 
@@ -2109,7 +1886,6 @@ int _main_(int _argc, char** _argv)
 	bgfx::destroy(textureCubeProgram);
 	bgfx::destroy(textureCube2Program);
 	bgfx::destroy(textureSdfProgram);
-	bgfx::destroy(textureMsdfProgram);
 	bgfx::destroy(texture3DProgram);
 
 	imguiDestroy();

@@ -11,6 +11,13 @@
 
 #pragma once
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_MATHBOX_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MATHBOX, 0)
+
 
 /* ----- device interface ----- */
 class mathbox_device : public device_t

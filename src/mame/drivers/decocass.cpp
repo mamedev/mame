@@ -83,41 +83,41 @@ READ8_MEMBER(decocass_state::mirrorcolorram_r)
 void decocass_state::decocass_map(address_map &map)
 {
 	map(0x0000, 0x5fff).ram().share("rambase");
-	map(0x6000, 0xbfff).ram().w(FUNC(decocass_state::decocass_charram_w)).share("charram"); /* still RMS3 RAM */
-	map(0xc000, 0xc3ff).ram().w(FUNC(decocass_state::decocass_fgvideoram_w)).share("fgvideoram");  /* DSP3 RAM */
-	map(0xc400, 0xc7ff).ram().w(FUNC(decocass_state::decocass_colorram_w)).share("colorram");
-	map(0xc800, 0xcbff).rw(FUNC(decocass_state::mirrorvideoram_r), FUNC(decocass_state::mirrorvideoram_w));
-	map(0xcc00, 0xcfff).rw(FUNC(decocass_state::mirrorcolorram_r), FUNC(decocass_state::mirrorcolorram_w));
-	map(0xd000, 0xd7ff).ram().w(FUNC(decocass_state::decocass_tileram_w)).share("tileram");
-	map(0xd800, 0xdbff).ram().w(FUNC(decocass_state::decocass_objectram_w)).share("objectram");
-	map(0xe000, 0xe0ff).ram().w(FUNC(decocass_state::decocass_paletteram_w)).share("paletteram");
-	map(0xe300, 0xe300).portr("DSW1").w(FUNC(decocass_state::decocass_watchdog_count_w));
-	map(0xe301, 0xe301).portr("DSW2").w(FUNC(decocass_state::decocass_watchdog_flip_w));
-	map(0xe302, 0xe302).w(FUNC(decocass_state::decocass_color_missiles_w));
-	map(0xe400, 0xe400).w(FUNC(decocass_state::decocass_reset_w));
+	map(0x6000, 0xbfff).ram().w(this, FUNC(decocass_state::decocass_charram_w)).share("charram"); /* still RMS3 RAM */
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(decocass_state::decocass_fgvideoram_w)).share("fgvideoram");  /* DSP3 RAM */
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(decocass_state::decocass_colorram_w)).share("colorram");
+	map(0xc800, 0xcbff).rw(this, FUNC(decocass_state::mirrorvideoram_r), FUNC(decocass_state::mirrorvideoram_w));
+	map(0xcc00, 0xcfff).rw(this, FUNC(decocass_state::mirrorcolorram_r), FUNC(decocass_state::mirrorcolorram_w));
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(decocass_state::decocass_tileram_w)).share("tileram");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(decocass_state::decocass_objectram_w)).share("objectram");
+	map(0xe000, 0xe0ff).ram().w(this, FUNC(decocass_state::decocass_paletteram_w)).share("paletteram");
+	map(0xe300, 0xe300).portr("DSW1").w(this, FUNC(decocass_state::decocass_watchdog_count_w));
+	map(0xe301, 0xe301).portr("DSW2").w(this, FUNC(decocass_state::decocass_watchdog_flip_w));
+	map(0xe302, 0xe302).w(this, FUNC(decocass_state::decocass_color_missiles_w));
+	map(0xe400, 0xe400).w(this, FUNC(decocass_state::decocass_reset_w));
 
 /* BIO-3 board */
-	map(0xe402, 0xe402).w(FUNC(decocass_state::decocass_mode_set_w));      /* scroll mode regs + various enable regs */
-	map(0xe403, 0xe403).w(FUNC(decocass_state::decocass_back_h_shift_w));  /* back (both)  tilemap x scroll */
-	map(0xe404, 0xe404).w(FUNC(decocass_state::decocass_back_vl_shift_w)); /* back (left)  (top@rot0) tilemap y scroll */
-	map(0xe405, 0xe405).w(FUNC(decocass_state::decocass_back_vr_shift_w)); /* back (right) (bot@rot0) tilemap y scroll */
-	map(0xe406, 0xe406).w(FUNC(decocass_state::decocass_part_h_shift_w)); /* headlight */
-	map(0xe407, 0xe407).w(FUNC(decocass_state::decocass_part_v_shift_w)); /* headlight */
+	map(0xe402, 0xe402).w(this, FUNC(decocass_state::decocass_mode_set_w));      /* scroll mode regs + various enable regs */
+	map(0xe403, 0xe403).w(this, FUNC(decocass_state::decocass_back_h_shift_w));  /* back (both)  tilemap x scroll */
+	map(0xe404, 0xe404).w(this, FUNC(decocass_state::decocass_back_vl_shift_w)); /* back (left)  (top@rot0) tilemap y scroll */
+	map(0xe405, 0xe405).w(this, FUNC(decocass_state::decocass_back_vr_shift_w)); /* back (right) (bot@rot0) tilemap y scroll */
+	map(0xe406, 0xe406).w(this, FUNC(decocass_state::decocass_part_h_shift_w)); /* headlight */
+	map(0xe407, 0xe407).w(this, FUNC(decocass_state::decocass_part_v_shift_w)); /* headlight */
 
-	map(0xe410, 0xe410).w(FUNC(decocass_state::decocass_color_center_bot_w));
-	map(0xe411, 0xe411).w(FUNC(decocass_state::decocass_center_h_shift_space_w));
-	map(0xe412, 0xe412).w(FUNC(decocass_state::decocass_center_v_shift_w));
-	map(0xe413, 0xe413).w(FUNC(decocass_state::decocass_coin_counter_w));
-	map(0xe414, 0xe414).rw(FUNC(decocass_state::decocass_sound_command_main_r), FUNC(decocass_state::decocass_sound_command_w));
-	map(0xe415, 0xe416).w(FUNC(decocass_state::decocass_quadrature_decoder_reset_w));
-	map(0xe417, 0xe417).w(FUNC(decocass_state::decocass_nmi_reset_w));
-	map(0xe420, 0xe42f).w(FUNC(decocass_state::decocass_adc_w));
+	map(0xe410, 0xe410).w(this, FUNC(decocass_state::decocass_color_center_bot_w));
+	map(0xe411, 0xe411).w(this, FUNC(decocass_state::decocass_center_h_shift_space_w));
+	map(0xe412, 0xe412).w(this, FUNC(decocass_state::decocass_center_v_shift_w));
+	map(0xe413, 0xe413).w(this, FUNC(decocass_state::decocass_coin_counter_w));
+	map(0xe414, 0xe414).rw(this, FUNC(decocass_state::decocass_sound_command_main_r), FUNC(decocass_state::decocass_sound_command_w));
+	map(0xe415, 0xe416).w(this, FUNC(decocass_state::decocass_quadrature_decoder_reset_w));
+	map(0xe417, 0xe417).w(this, FUNC(decocass_state::decocass_nmi_reset_w));
+	map(0xe420, 0xe42f).w(this, FUNC(decocass_state::decocass_adc_w));
 
-	map(0xe500, 0xe5ff).rw(FUNC(decocass_state::decocass_e5xx_r), FUNC(decocass_state::decocass_e5xx_w)); /* read data from 8041/status */
+	map(0xe500, 0xe5ff).rw(this, FUNC(decocass_state::decocass_e5xx_r), FUNC(decocass_state::decocass_e5xx_w)); /* read data from 8041/status */
 
-	map(0xe600, 0xe6ff).r(FUNC(decocass_state::decocass_input_r));      /* inputs */
-	map(0xe700, 0xe700).r(FUNC(decocass_state::decocass_sound_data_r)); /* read sound CPU data */
-	map(0xe701, 0xe701).r(FUNC(decocass_state::decocass_sound_ack_r));  /* read sound CPU ack status */
+	map(0xe600, 0xe6ff).r(this, FUNC(decocass_state::decocass_input_r));      /* inputs */
+	map(0xe700, 0xe700).r(this, FUNC(decocass_state::decocass_sound_data_r)); /* read sound CPU data */
+	map(0xe701, 0xe701).r(this, FUNC(decocass_state::decocass_sound_ack_r));  /* read sound CPU ack status */
 
 	map(0xf000, 0xffff).rom();
 }
@@ -125,14 +125,14 @@ void decocass_state::decocass_map(address_map &map)
 void decocass_state::decocass_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x17ff).rw(FUNC(decocass_state::decocass_sound_nmi_enable_r), FUNC(decocass_state::decocass_sound_nmi_enable_w));
-	map(0x1800, 0x1fff).rw(FUNC(decocass_state::decocass_sound_data_ack_reset_r), FUNC(decocass_state::decocass_sound_data_ack_reset_w));
+	map(0x1000, 0x17ff).rw(this, FUNC(decocass_state::decocass_sound_nmi_enable_r), FUNC(decocass_state::decocass_sound_nmi_enable_w));
+	map(0x1800, 0x1fff).rw(this, FUNC(decocass_state::decocass_sound_data_ack_reset_r), FUNC(decocass_state::decocass_sound_data_ack_reset_w));
 	map(0x2000, 0x2fff).w("ay1", FUNC(ay8910_device::data_w));
 	map(0x4000, 0x4fff).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6fff).w("ay2", FUNC(ay8910_device::data_w));
 	map(0x8000, 0x8fff).w("ay2", FUNC(ay8910_device::address_w));
-	map(0xa000, 0xafff).r(FUNC(decocass_state::decocass_sound_command_r));
-	map(0xc000, 0xcfff).w(FUNC(decocass_state::decocass_sound_data_w));
+	map(0xa000, 0xafff).r(this, FUNC(decocass_state::decocass_sound_command_r));
+	map(0xc000, 0xcfff).w(this, FUNC(decocass_state::decocass_sound_data_w));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -939,13 +939,15 @@ static GFXDECODE_START( gfx_decocass )
 	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
 GFXDECODE_END
 
-void decocass_state::decocass_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(decocass_state, decocass)
 {
+	int i;
+
 	// set up 32 colors 1:1 pens and flipped colors for background tiles (D7 of color_center_bot)
-	for (int i = 0; i < 32; i++)
+	for (i = 0; i < 32; i++)
 	{
 		palette.set_pen_indirect(i, i);
-		palette.set_pen_indirect(32 + i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
+		palette.set_pen_indirect(32+i, bitswap<8>(i, 7, 6, 5, 4, 3, 1, 2, 0));
 	}
 }
 
@@ -960,36 +962,40 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	MCFG_DEVICE_PROGRAM_MAP(decocass_sound_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
-	I8041(config, m_mcu, HCLK);
-	m_mcu->p1_in_cb().set(FUNC(decocass_state::i8041_p1_r));
-	m_mcu->p1_out_cb().set(FUNC(decocass_state::i8041_p1_w));
-	m_mcu->p2_in_cb().set(FUNC(decocass_state::i8041_p2_r));
-	m_mcu->p2_out_cb().set(FUNC(decocass_state::i8041_p2_w));
+	MCFG_DEVICE_ADD("mcu", I8041, HCLK)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, decocass_state, i8041_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, decocass_state, i8041_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, decocass_state, i8041_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, decocass_state, i8041_p2_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_WATCHDOG_ADD("watchdog")
 
-	DECOCASS_TAPE(config, m_cassette, 0);
+	MCFG_DECOCASS_TAPE_ADD("cassette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 0*8, 256, 272, 1*8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(decocass_state, screen_update_decocass)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_decocass)
-	PALETTE(config, m_palette, FUNC(decocass_state::decocass_palette), 64, 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_decocass)
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
+	MCFG_PALETTE_INIT_OWNER(decocass_state, decocass)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	AY8910(config, "ay1", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
+	MCFG_DEVICE_ADD("ay1", AY8910, HCLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	AY8910(config, "ay2", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
+	MCFG_DEVICE_ADD("ay2", AY8910, HCLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
@@ -1237,7 +1243,7 @@ MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 
 /************ Version A bios roms *************/

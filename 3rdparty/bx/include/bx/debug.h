@@ -1,12 +1,12 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_DEBUG_H_HEADER_GUARD
 #define BX_DEBUG_H_HEADER_GUARD
 
-#include "string.h"
+#include "bx.h"
 
 namespace bx
 {
@@ -15,9 +15,6 @@ namespace bx
 
 	///
 	void debugOutput(const char* _out);
-
-	///
-	void debugOutput(const StringView& _str);
 
 	///
 	void debugPrintfVargs(const char* _format, va_list _argList);

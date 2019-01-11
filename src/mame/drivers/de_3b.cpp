@@ -22,12 +22,6 @@ public:
 			m_dmdtype3(*this, "decodmd")
 	{ }
 
-	void detest(machine_config &config);
-	void de_3b(machine_config &config);
-
-	void init_de_3b();
-
-private:
 	// devices
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<decodmd_type3_device> m_dmdtype3;
@@ -47,11 +41,22 @@ private:
 	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
 
+	void detest(machine_config &config);
+	void de_3b(machine_config &config);
+protected:
+
 	// driver_device overrides
 	virtual void machine_reset() override;
+public:
+	void init_de_3b();
 
+	uint8_t m_strobe;
 	uint8_t m_kbdrow;
+	uint8_t m_diag;
+	bool m_ca1;
+	bool m_irq_active;
 	uint8_t m_sound_data;
+
 };
 
 
@@ -236,34 +241,30 @@ void de_3b_state::init_de_3b()
 {
 }
 
-void de_3b_state::de_3b(machine_config &config)
-{
+MACHINE_CONFIG_START(de_3b_state::de_3b)
 	/* basic machine hardware */
-	decocpu_type3b_device &decocpu(DECOCPU3B(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
-	decocpu.display_read_callback().set(FUNC(de_3b_state::display_r));
-	decocpu.display_write_callback().set(FUNC(de_3b_state::display_w));
-	decocpu.soundlatch_write_callback().set(FUNC(de_3b_state::sound_w));
-	decocpu.switch_read_callback().set(FUNC(de_3b_state::switch_r));
-	decocpu.switch_write_callback().set(FUNC(de_3b_state::switch_w));
-	decocpu.lamp_write_callback().set(FUNC(de_3b_state::lamps_w));
-	decocpu.dmdstatus_read_callback().set(FUNC(de_3b_state::dmd_status_r));
+	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
+	MCFG_DECOCPU_DISPLAY(READ8(*this, de_3b_state,display_r),WRITE8(*this, de_3b_state,display_w))
+	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_3b_state,sound_w))
+	MCFG_DECOCPU_SWITCH(READ8(*this, de_3b_state,switch_r),WRITE8(*this, de_3b_state,switch_w))
+	MCFG_DECOCPU_LAMP(WRITE8(*this, de_3b_state,lamps_w))
+	MCFG_DECOCPU_DMDSTATUS(READ8(*this, de_3b_state,dmd_status_r))
 
 	genpin_audio(config);
 
 	/* sound hardware */
-	DECOBSMT(config, m_decobsmt, 0);
+	MCFG_DECOBSMT_ADD(DECOBSMT_TAG)
 
-	DECODMD3(config, m_dmdtype3, 0, "cpu3");
-}
+	MCFG_DECODMD_TYPE3_ADD("decodmd",":cpu3")
+MACHINE_CONFIG_END
 
 
-void de_3b_state::detest(machine_config &config)
-{
+MACHINE_CONFIG_START(de_3b_state::detest)
 	/* basic machine hardware */
-	DECOCPU3B(config, "decocpu", XTAL(8'000'000) / 2, "maincpu");
+	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
 
 	genpin_audio(config);
-}
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------
 / Batman Forever 4.0

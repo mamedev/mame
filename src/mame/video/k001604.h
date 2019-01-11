@@ -56,4 +56,20 @@ private:
 
 DECLARE_DEVICE_TYPE(K001604, k001604_device)
 
+
+#define MCFG_K001604_LAYER_SIZE(_size) \
+	downcast<k001604_device &>(*device).set_layer_size(_size);
+
+#define MCFG_K001604_ROZ_SIZE(_size) \
+	downcast<k001604_device &>(*device).set_roz_size(_size);
+
+#define MCFG_K001604_TXT_OFFSET(_offs) \
+	downcast<k001604_device &>(*device).set_txt_mem_offset(_offs);
+
+#define MCFG_K001604_ROZ_OFFSET(_offs) \
+	downcast<k001604_device &>(*device).set_roz_mem_offset(_offs);
+
+#define MCFG_K001604_PALETTE(_palette_tag) \
+	MCFG_GFX_PALETTE(_palette_tag)
+
 #endif // MAME_VIDEO_K001604_H

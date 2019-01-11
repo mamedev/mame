@@ -139,5 +139,5 @@ WRITE8_MEMBER( sv603_device::iorq_w )
 		m_expander->excs_w(space, offset, data);
 
 	if (offset >= 0xe0 && offset <= 0xff)
-		m_snd->write(data);
+		m_snd->write(space, 0, data);
 }

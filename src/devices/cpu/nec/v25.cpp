@@ -50,12 +50,11 @@ DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "NEC V25")
 DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")
 
 
-v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 9, 0, address_map_constructor(FUNC(v25_common_device::ida_sfr_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
-	, m_internal_ram(*this, "internal_ram")
+	, m_fetch_xor(fetch_xor)
 	, m_PCK(8)
 	, m_pt_in(*this)
 	, m_p0_in(*this)
@@ -73,13 +72,13 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 
 
 v25_device::v25_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v25_common_device(mconfig, V25, tag, owner, clock, false, 4, 4, V20_TYPE)
+	: v25_common_device(mconfig, V25, tag, owner, clock, false, 0, 4, 4, V20_TYPE)
 {
 }
 
 
 v35_device::v35_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v25_common_device(mconfig, V35, tag, owner, clock, true, 6, 2, V30_TYPE)
+	: v25_common_device(mconfig, V35, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
 {
 }
 
@@ -87,7 +86,6 @@ device_memory_interface::space_config_vector v25_common_device::memory_space_con
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config),
 		std::make_pair(AS_IO,      &m_io_config)
 	};
 }
@@ -179,6 +177,8 @@ uint8_t v25_common_device::fetchop()
 
 void v25_common_device::device_reset()
 {
+	attotime time;
+
 	m_ip = 0;
 	m_IBRK = 1;
 	m_F0 = 0;
@@ -216,12 +216,10 @@ void v25_common_device::device_reset()
 	m_RAMEN = 1;
 	m_TB = 20;
 	m_PCK = 8;
-	m_RFM = 0xfc;
-	m_WTC = 0xffff;
-	m_IDB = 0xffe00;
+	m_IDB = 0xFFE00;
 
-	unsigned tmp = m_PCK << m_TB;
-	attotime time = clocks_to_attotime(tmp);
+	int tmp = m_PCK << m_TB;
+	time = attotime::from_hz(unscaled_clock()) * tmp;
 	m_timers[3]->adjust(time, INTTB, time);
 
 	m_timers[0]->adjust(attotime::never);
@@ -464,6 +462,7 @@ void v25_common_device::device_start()
 	for (i = 0; i < 4; i++)
 		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v25_common_device::v25_timer_callback),this));
 
+	save_item(NAME(m_ram.w));
 	save_item(NAME(m_intp_state));
 
 	save_item(NAME(m_ip));
@@ -507,8 +506,6 @@ void v25_common_device::device_start()
 	save_item(NAME(m_RAMEN));
 	save_item(NAME(m_TB));
 	save_item(NAME(m_PCK));
-	save_item(NAME(m_RFM));
-	save_item(NAME(m_WTC));
 	save_item(NAME(m_IDB));
 	save_item(NAME(m_prefetch_count));
 	save_item(NAME(m_prefetch_reset));
@@ -521,7 +518,6 @@ void v25_common_device::device_start()
 		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	}
-	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
 	m_pt_in.resolve_safe(0xff);

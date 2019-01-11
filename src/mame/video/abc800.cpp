@@ -139,7 +139,7 @@ READ8_MEMBER( abc800c_state::char_ram_r )
 //  PALETTE_INIT( abc800c )
 //-------------------------------------------------
 
-void abc800c_state::abc800c_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER( abc800c_state, abc800c )
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
@@ -164,11 +164,12 @@ MACHINE_CONFIG_START(abc800c_state::abc800c_video)
 	MCFG_SCREEN_SIZE(480, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 480-1)
 
-	PALETTE(config, m_palette, FUNC(abc800c_state::abc800c_palette), 8);
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(abc800c_state, abc800c)
 
-	SAA5052(config, m_trom, XTAL(12'000'000)/2);
-	m_trom->d_cb().set(FUNC(abc800c_state::char_ram_r));
-	m_trom->set_screen_size(40, 24, 40);
+	MCFG_DEVICE_ADD(SAA5052_TAG, SAA5052, XTAL(12'000'000)/2)
+	MCFG_SAA5050_D_CALLBACK(READ8(*this, abc800c_state, char_ram_r))
+	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 MACHINE_CONFIG_END
 
 
@@ -277,16 +278,15 @@ uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc800m_state::abc800m_video)
-	mc6845_device &mc6845(MC6845(config, MC6845_TAG, ABC800_CCLK));
-	mc6845.set_screen(SCREEN_TAG);
-	mc6845.set_show_border_area(true);
-	mc6845.set_char_width(ABC800_CHAR_WIDTH);
-	mc6845.set_update_row_callback(FUNC(abc800m_state::abc800m_update_row), this);
-	mc6845.out_vsync_callback().set(m_dart, FUNC(z80dart_device::rib_w)).invert();
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
+	MCFG_MC6845_UPDATE_ROW_CB(abc800m_state, abc800m_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(Z80DART_TAG, z80dart_device, rib_w)) MCFG_DEVCB_XOR(1)
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t(0xff, 0xff, 0x00))
 	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END

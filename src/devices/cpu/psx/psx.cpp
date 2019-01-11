@@ -137,10 +137,6 @@
 
 #define CAUSE_EXC ( 31L << 2 )
 #define CAUSE_IP ( 255L << 8 )
-// software interrupts
-#define CAUSE_IP0 ( 1L << 8 )
-#define CAUSE_IP1 ( 1L << 9 )
-// hardware interrupts
 #define CAUSE_IP2 ( 1L << 10 )
 #define CAUSE_IP3 ( 1L << 11 )
 #define CAUSE_IP4 ( 1L << 12 )
@@ -1440,32 +1436,21 @@ void psxcpu_device::update_rom_config()
 	}
 }
 
-void psxcpu_device::update_cop0(int reg)
+void psxcpu_device::update_cop0( int reg )
 {
-	if (reg == CP0_SR)
+	if( reg == CP0_SR )
 	{
 		update_memory_handlers();
 		update_address_masks();
 	}
 
-	if ((reg == CP0_SR || reg == CP0_CAUSE) &&
-		(m_cp0r[CP0_SR] & SR_IEC) != 0)
+	if( ( reg == CP0_SR || reg == CP0_CAUSE ) &&
+		( m_cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
+		( m_cp0r[ CP0_SR ] & m_cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
 	{
-		uint32_t ip = m_cp0r[CP0_SR] & m_cp0r[CP0_CAUSE] & CAUSE_IP;
-		if (ip != 0)
-		{
-			if (ip & CAUSE_IP0) debugger_exception_hook(EXC_INT);
-			if (ip & CAUSE_IP1) debugger_exception_hook(EXC_INT);
-			//if (ip & CAUSE_IP2) debugger_interrupt_hook(PSXCPU_IRQ0);
-			//if (ip & CAUSE_IP3) debugger_interrupt_hook(PSXCPU_IRQ1);
-			//if (ip & CAUSE_IP4) debugger_interrupt_hook(PSXCPU_IRQ2);
-			//if (ip & CAUSE_IP5) debugger_interrupt_hook(PSXCPU_IRQ3);
-			//if (ip & CAUSE_IP6) debugger_interrupt_hook(PSXCPU_IRQ4);
-			//if (ip & CAUSE_IP7) debugger_interrupt_hook(PSXCPU_IRQ5);
-			m_op = m_cache->read_dword(m_pc);
-			execute_unstoppable_instructions(1);
-			exception(EXC_INT);
-		}
+		m_op = m_cache->read_dword( m_pc );
+		execute_unstoppable_instructions( 1 );
+		exception( EXC_INT );
 	}
 }
 
@@ -1603,12 +1588,9 @@ void psxcpu_device::common_exception( int exception, uint32_t romOffset, uint32_
 		m_cp0r[ CP0_EPC ] = m_pc;
 	}
 
-	if (exception != EXC_INT)
+	if( LOG_BIOSCALL && exception != EXC_INT )
 	{
-		if (LOG_BIOSCALL)
-			logerror("%08x: Exception %d\n", m_pc, exception);
-
-		debugger_exception_hook(exception);
+		logerror( "%08x: Exception %d\n", m_pc, exception );
 	}
 
 	m_delayr = 0;
@@ -1745,35 +1727,35 @@ int psxcpu_device::store_data_address_breakpoint( uint32_t address )
 void psxcpu_device::psxcpu_internal_map(address_map &map)
 {
 	map(0x1f800000, 0x1f8003ff).noprw(); /* scratchpad */
-	map(0x1f800400, 0x1f800fff).rw(FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
-	map(0x1f801000, 0x1f801003).rw(FUNC(psxcpu_device::exp_base_r), FUNC(psxcpu_device::exp_base_w));
+	map(0x1f800400, 0x1f800fff).rw(this, FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
+	map(0x1f801000, 0x1f801003).rw(this, FUNC(psxcpu_device::exp_base_r), FUNC(psxcpu_device::exp_base_w));
 	map(0x1f801004, 0x1f801007).ram();
-	map(0x1f801008, 0x1f80100b).rw(FUNC(psxcpu_device::exp_config_r), FUNC(psxcpu_device::exp_config_w));
+	map(0x1f801008, 0x1f80100b).rw(this, FUNC(psxcpu_device::exp_config_r), FUNC(psxcpu_device::exp_config_w));
 	map(0x1f80100c, 0x1f80100f).ram();
-	map(0x1f801010, 0x1f801013).rw(FUNC(psxcpu_device::rom_config_r), FUNC(psxcpu_device::rom_config_w));
+	map(0x1f801010, 0x1f801013).rw(this, FUNC(psxcpu_device::rom_config_r), FUNC(psxcpu_device::rom_config_w));
 	map(0x1f801014, 0x1f80101f).ram();
 	/* 1f801014 spu delay */
 	/* 1f801018 dv delay */
-	map(0x1f801020, 0x1f801023).rw(FUNC(psxcpu_device::com_delay_r), FUNC(psxcpu_device::com_delay_w));
+	map(0x1f801020, 0x1f801023).rw(this, FUNC(psxcpu_device::com_delay_r), FUNC(psxcpu_device::com_delay_w));
 	map(0x1f801024, 0x1f80102f).ram();
 	map(0x1f801040, 0x1f80104f).rw("sio0", FUNC(psxsio_device::read), FUNC(psxsio_device::write));
 	map(0x1f801050, 0x1f80105f).rw("sio1", FUNC(psxsio_device::read), FUNC(psxsio_device::write));
-	map(0x1f801060, 0x1f801063).rw(FUNC(psxcpu_device::ram_config_r), FUNC(psxcpu_device::ram_config_w));
+	map(0x1f801060, 0x1f801063).rw(this, FUNC(psxcpu_device::ram_config_r), FUNC(psxcpu_device::ram_config_w));
 	map(0x1f801064, 0x1f80106f).ram();
 	map(0x1f801070, 0x1f801077).rw("irq", FUNC(psxirq_device::read), FUNC(psxirq_device::write));
 	map(0x1f801080, 0x1f8010ff).rw("dma", FUNC(psxdma_device::read), FUNC(psxdma_device::write));
 	map(0x1f801100, 0x1f80112f).rw("rcnt", FUNC(psxrcnt_device::read), FUNC(psxrcnt_device::write));
-	map(0x1f801800, 0x1f801803).rw(FUNC(psxcpu_device::cd_r), FUNC(psxcpu_device::cd_w));
-	map(0x1f801810, 0x1f801817).rw(FUNC(psxcpu_device::gpu_r), FUNC(psxcpu_device::gpu_w));
+	map(0x1f801800, 0x1f801803).rw(this, FUNC(psxcpu_device::cd_r), FUNC(psxcpu_device::cd_w));
+	map(0x1f801810, 0x1f801817).rw(this, FUNC(psxcpu_device::gpu_r), FUNC(psxcpu_device::gpu_w));
 	map(0x1f801820, 0x1f801827).rw("mdec", FUNC(psxmdec_device::read), FUNC(psxmdec_device::write));
-	map(0x1f801c00, 0x1f801dff).rw(FUNC(psxcpu_device::spu_r), FUNC(psxcpu_device::spu_w));
+	map(0x1f801c00, 0x1f801dff).rw(this, FUNC(psxcpu_device::spu_r), FUNC(psxcpu_device::spu_w));
 	map(0x1f802020, 0x1f802033).ram(); /* ?? */
 	/* 1f802030 int 2000 */
 	/* 1f802040 dip switches */
 	map(0x1f802040, 0x1f802043).nopw();
-	map(0x20000000, 0x7fffffff).rw(FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
-	map(0xc0000000, 0xfffdffff).rw(FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
-	map(0xfffe0130, 0xfffe0133).rw(FUNC(psxcpu_device::biu_r), FUNC(psxcpu_device::biu_w));
+	map(0x20000000, 0x7fffffff).rw(this, FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
+	map(0xc0000000, 0xfffdffff).rw(this, FUNC(psxcpu_device::berr_r), FUNC(psxcpu_device::berr_w));
+	map(0xfffe0130, 0xfffe0133).rw(this, FUNC(psxcpu_device::biu_r), FUNC(psxcpu_device::biu_w));
 }
 
 
@@ -3446,28 +3428,28 @@ device_memory_interface::space_config_vector psxcpu_device::memory_space_config(
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void psxcpu_device::device_add_mconfig(machine_config &config)
-{
-	auto &irq(PSX_IRQ(config, "irq", 0));
-	irq.irq().set_inputline(DEVICE_SELF, PSXCPU_IRQ0);
+MACHINE_CONFIG_START(psxcpu_device::device_add_mconfig)
+	MCFG_DEVICE_ADD( "irq", PSX_IRQ, 0 )
+	MCFG_PSX_IRQ_HANDLER( INPUTLINE( DEVICE_SELF, PSXCPU_IRQ0 ) )
 
-	auto &dma(PSX_DMA(config, "dma", 0));
-	dma.irq().set("irq", FUNC(psxirq_device::intin3));
+	MCFG_DEVICE_ADD( "dma", PSX_DMA, 0 )
+	MCFG_PSX_DMA_IRQ_HANDLER( WRITELINE("irq", psxirq_device, intin3 ) )
 
-	auto &mdec(PSX_MDEC(config, "mdec", 0));
-	dma.install_write_handler(0, psxdma_device::write_delegate(&psxmdec_device::dma_write, &mdec));
-	dma.install_read_handler(1, psxdma_device::write_delegate(&psxmdec_device::dma_read, &mdec));
+	MCFG_DEVICE_ADD( "mdec", PSX_MDEC, 0 )
+	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psxdma_device::write_delegate(&psxmdec_device::dma_write, (psxmdec_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psxdma_device::read_delegate(&psxmdec_device::dma_read, (psxmdec_device *) device ) )
 
-	auto &rcnt(PSX_RCNT(config, "rcnt", 0));
-	rcnt.irq0().set("irq", FUNC(psxirq_device::intin4));
-	rcnt.irq1().set("irq", FUNC(psxirq_device::intin5));
-	rcnt.irq2().set("irq", FUNC(psxirq_device::intin6));
+	MCFG_DEVICE_ADD( "rcnt", PSX_RCNT, 0 )
+	MCFG_PSX_RCNT_IRQ0_HANDLER( WRITELINE( "irq", psxirq_device, intin4 ) )
+	MCFG_PSX_RCNT_IRQ1_HANDLER( WRITELINE( "irq", psxirq_device, intin5 ) )
+	MCFG_PSX_RCNT_IRQ2_HANDLER( WRITELINE( "irq", psxirq_device, intin6 ) )
 
-	auto &sio0(PSX_SIO0(config, "sio0", DERIVED_CLOCK(1, 2)));
-	sio0.irq_handler().set("irq", FUNC(psxirq_device::intin7));
+	MCFG_DEVICE_ADD( "sio0", PSX_SIO0, 0 )
+	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin7 ) )
 
-	auto &sio1(PSX_SIO1(config, "sio1", DERIVED_CLOCK(1, 2)));
-	sio1.irq_handler().set("irq", FUNC(psxirq_device::intin8));
+	MCFG_DEVICE_ADD( "sio1", PSX_SIO1, 0 )
+	MCFG_PSX_SIO_IRQ_HANDLER( WRITELINE( "irq", psxirq_device, intin8 ) )
 
-	RAM(config, "ram").set_default_value(0x00);
-}
+	MCFG_RAM_ADD( "ram" )
+	MCFG_RAM_DEFAULT_VALUE( 0x00 )
+MACHINE_CONFIG_END

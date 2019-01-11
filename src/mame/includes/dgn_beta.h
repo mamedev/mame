@@ -9,14 +9,10 @@
 #ifndef MAME_INCLUDES_DGN_BETA_H
 #define MAME_INCLUDES_DGN_BETA_H
 
-#pragma once
-
 #include "video/mc6845.h"
-#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
-#include "emupal.h"
 
 /* Tags */
 
@@ -85,8 +81,8 @@ struct PageReg
 class dgn_beta_state : public driver_device
 {
 public:
-	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_mc6845(*this, "crtc"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -100,30 +96,8 @@ public:
 		m_floppy1(*this, FDC_TAG ":1"),
 		m_floppy2(*this, FDC_TAG ":2"),
 		m_floppy3(*this, FDC_TAG ":3"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void dgnbeta(machine_config &config);
-
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b0_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b1_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b2_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b3_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b4_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b5_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b6_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b7_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b8_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b9_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bA_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bB_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bC_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bD_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bE_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bF_w);
-	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bG_w);
-
-private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<mc6845_device> m_mc6845;
@@ -193,8 +167,24 @@ private:
 	int m_DrawInterlace;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void dgn_beta_palette(palette_device &palette) const;
-
+	DECLARE_PALETTE_INIT(dgn);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b0_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b1_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b2_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b3_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b4_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b5_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b6_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b7_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b8_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_b9_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bA_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bB_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bC_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bD_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bE_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bF_w);
+	DECLARE_WRITE8_MEMBER(dgnbeta_ram_bG_w);
 	DECLARE_READ8_MEMBER(d_pia0_pa_r);
 	DECLARE_WRITE8_MEMBER(d_pia0_pa_w);
 	DECLARE_READ8_MEMBER(d_pia0_pb_r);
@@ -242,8 +232,9 @@ private:
 
 	offs_t dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
+	void dgnbeta(machine_config &config);
 	void dgnbeta_map(address_map &map);
-
+private:
 	void execute_beta_key_dump(int ref, const std::vector<std::string> &params);
 	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);
 };

@@ -8,17 +8,16 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef MAME_INCLUDES_DRAGON_H
 #define MAME_INCLUDES_DRAGON_H
-
-#pragma once
 
 
 #include "includes/coco12.h"
 #include "imagedev/printer.h"
 #include "machine/mos6551.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 
 
 //**************************************************************************

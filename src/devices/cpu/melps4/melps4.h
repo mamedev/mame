@@ -12,6 +12,43 @@
 #pragma once
 
 
+// I/O ports setup
+
+// K input or A/D input port, up to 16 pins
+#define MCFG_MELPS4_READ_K_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_read_k_callback(DEVCB_##_devcb);
+
+// D discrete I/O port, up to 16 pins - offset 0-15 for bit, 16 for all pins clear
+#define MCFG_MELPS4_READ_D_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_read_d_callback(DEVCB_##_devcb);
+#define MCFG_MELPS4_WRITE_D_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_write_d_callback(DEVCB_##_devcb);
+
+// 8-bit S generic I/O port
+#define MCFG_MELPS4_READ_S_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_read_s_callback(DEVCB_##_devcb);
+#define MCFG_MELPS4_WRITE_S_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_write_s_callback(DEVCB_##_devcb);
+
+// 4-bit F generic I/O port
+#define MCFG_MELPS4_READ_F_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_read_f_callback(DEVCB_##_devcb);
+#define MCFG_MELPS4_WRITE_F_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_write_f_callback(DEVCB_##_devcb);
+
+// 4-bit G generic output port
+#define MCFG_MELPS4_WRITE_G_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_write_g_callback(DEVCB_##_devcb);
+
+// 1-bit U generic output port
+#define MCFG_MELPS4_WRITE_U_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_write_u_callback(DEVCB_##_devcb);
+
+// T timer I/O pin (use execute_set_input for reads)
+#define MCFG_MELPS4_WRITE_T_CB(_devcb) \
+	devcb = &downcast<melps4_cpu_device &>(*device).set_write_t_callback(DEVCB_##_devcb);
+
+
 #define MELPS4_PORTD_CLR 16
 
 // only generic ports here
@@ -64,29 +101,17 @@ class melps4_cpu_device : public cpu_device
 {
 public:
 	// configuration helpers
-	// K input or A/D input port, up to 16 pins
-	auto read_k() { return m_read_k.bind(); }
+	template <class Object> devcb_base &set_read_k_callback(Object &&cb) { return m_read_k.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_d_callback(Object &&cb) { return m_read_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_s_callback(Object &&cb) { return m_read_s.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_f_callback(Object &&cb) { return m_read_f.set_callback(std::forward<Object>(cb)); }
 
-	// D discrete I/O port, up to 16 pins - offset 0-15 for bit, 16 for all pins clear
-	auto read_d() { return m_read_d.bind(); }
-	auto write_d() { return m_write_d.bind(); }
-
-	// 8-bit S generic I/O port
-	auto read_s() { return m_read_s.bind(); }
-	auto write_s() { return m_write_s.bind(); }
-
-	// 4-bit F generic I/O port
-	auto read_f() { return m_read_f.bind(); }
-	auto write_f() { return m_write_f.bind(); }
-
-	// 4-bit G generic output port
-	auto write_g() { return m_write_g.bind(); }
-
-	// 1-bit U generic output port
-	auto write_u() { return m_write_u.bind(); }
-
-	// T timer I/O pin (use execute_set_input for reads)
-	auto write_t() { return m_write_t.bind(); }
+	template <class Object> devcb_base &set_write_d_callback(Object &&cb) { return m_write_d.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_s_callback(Object &&cb) { return m_write_s.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_f_callback(Object &&cb) { return m_write_f.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_g_callback(Object &&cb) { return m_write_g.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_u_callback(Object &&cb) { return m_write_u.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_t_callback(Object &&cb) { return m_write_t.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// construction/destruction

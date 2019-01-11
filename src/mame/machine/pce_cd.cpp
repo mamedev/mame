@@ -134,8 +134,8 @@ void pce_cd_device::device_start()
 
 	// TODO: add proper restore for the cd data...
 	save_item(NAME(m_regs));
-	save_pointer(NAME(m_bram), PCE_BRAM_SIZE * 2);
-	save_pointer(NAME(m_adpcm_ram), PCE_ADPCM_RAM_SIZE);
+	save_pointer(NAME(m_bram.get()), PCE_BRAM_SIZE * 2);
+	save_pointer(NAME(m_adpcm_ram.get()), PCE_ADPCM_RAM_SIZE);
 	save_item(NAME(m_bram_locked));
 	save_item(NAME(m_adpcm_read_ptr));
 	save_item(NAME(m_adpcm_read_buf));
@@ -161,16 +161,16 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_scsi_last_RST));
 	save_item(NAME(m_cd_motor_on));
 	save_item(NAME(m_selected));
-	save_pointer(NAME(m_command_buffer), PCE_CD_COMMAND_BUFFER_SIZE);
+	save_pointer(NAME(m_command_buffer.get()), PCE_CD_COMMAND_BUFFER_SIZE);
 	save_item(NAME(m_command_buffer_index));
 	save_item(NAME(m_status_sent));
 	save_item(NAME(m_message_after_status));
 	save_item(NAME(m_message_sent));
-	save_pointer(NAME(m_data_buffer), 8192);
+	save_pointer(NAME(m_data_buffer.get()), 8192);
 	save_item(NAME(m_data_buffer_size));
 	save_item(NAME(m_data_buffer_index));
 	save_item(NAME(m_data_transferred));
-	save_pointer(NAME(m_acard_ram), PCE_ACARD_RAM_SIZE);
+	save_pointer(NAME(m_acard_ram.get()), PCE_ACARD_RAM_SIZE);
 	save_item(NAME(m_acard_latch));
 	save_item(NAME(m_acard_ctrl));
 	save_item(NAME(m_acard_base_addr));
@@ -183,7 +183,7 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_last_frame));
 	save_item(NAME(m_cdda_status));
 	save_item(NAME(m_cdda_play_mode));
-	save_pointer(NAME(m_subcode_buffer), 96);
+	save_pointer(NAME(m_subcode_buffer.get()), 96);
 	save_item(NAME(m_end_mark));
 	save_item(NAME(m_cdda_volume));
 	save_item(NAME(m_adpcm_volume));
@@ -241,22 +241,23 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 // TODO: left and right speaker tags should be passed from the parent config, instead of using the hard-coded ones below!?!
-void pce_cd_device::device_add_mconfig(machine_config &config)
-{
-	NVRAM(config, m_nvram).set_custom_handler(FUNC(pce_cd_device::nvram_init));
+ MACHINE_CONFIG_START(pce_cd_device::device_add_mconfig)
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("bram", pce_cd_device, nvram_init)
 
-	CDROM(config, m_cdrom).set_interface("pce_cdrom");
+	MCFG_CDROM_ADD("cdrom")
+	MCFG_CDROM_INTERFACE("pce_cdrom")
 
-	MSM5205(config, m_msm, PCE_CD_CLOCK / 6);
-	m_msm->vck_legacy_callback().set(FUNC(pce_cd_device::msm5205_int));	/* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 1/48 prescaler, 4bit data */
-	m_msm->add_route(ALL_OUTPUTS, "^lspeaker", 0.50);
-	m_msm->add_route(ALL_OUTPUTS, "^rspeaker", 0.50);
+	MCFG_DEVICE_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pce_cd_device, msm5205_int)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 1/48 prescaler, 4bit data */
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^rspeaker", 0.50 )
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(0, "^lspeaker", 1.00);
-	m_cdda->add_route(1, "^rspeaker", 1.00);
-}
+	MCFG_DEVICE_ADD( "cdda", CDDA )
+	MCFG_SOUND_ROUTE( 0, "^lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "^rspeaker", 1.00 )
+MACHINE_CONFIG_END
+
 
 void pce_cd_device::adpcm_stop(uint8_t irq_flag)
 {
@@ -296,7 +297,7 @@ WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 	/* Supply new ADPCM data */
 	msm_data = (m_msm_nibble) ? (m_adpcm_ram[m_msm_start_addr] & 0x0f) : ((m_adpcm_ram[m_msm_start_addr] & 0xf0) >> 4);
 
-	m_msm->write_data(msm_data);
+	m_msm->data_w(msm_data);
 	m_msm_nibble ^= 1;
 
 	if (m_msm_nibble == 0)

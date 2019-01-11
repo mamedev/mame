@@ -10,7 +10,8 @@ Described in Electronics Australia magazine in 1982/1983.
 
 - The ROM was keyed in by hand from a printout, so is therefore considered a bad dump.
 - It has routines for adc, dac, cassette, but there's no hardware to support these.
-- The basic machine is fully emulated as per the schematic.
+- The basic machine is fully emulated as per the schematic, but still marked not working
+  until the ROM can be confirmed as ok.
 
 Memory Map:
 0000-007F = RAM inside the cpu
@@ -65,15 +66,14 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void datum(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
-
-private:
 	DECLARE_READ8_MEMBER(pa_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(pb_w);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	void datum(machine_config &config);
 	void datum_mem(address_map &map);
+private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
@@ -188,19 +188,19 @@ MACHINE_CONFIG_START(datum_state::datum)
 	MCFG_DEVICE_PROGRAM_MAP(datum_mem)
 
 	/* video hardware */
-	config.set_default_layout(layout_datum);
+	MCFG_DEFAULT_LAYOUT(layout_datum)
 
 	/* Devices */
-	PIA6821(config, m_pia1, 0); // keyboard & display
-	m_pia1->readpa_handler().set(FUNC(datum_state::pa_r));
-	m_pia1->writepa_handler().set(FUNC(datum_state::pa_w));
-	m_pia1->writepb_handler().set(FUNC(datum_state::pb_w));
-	m_pia1->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
-	m_pia1->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0) // keyboard & display
+	MCFG_PIA_READPA_HANDLER(READ8(*this, datum_state, pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, datum_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, datum_state, pb_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 
-	pia6821_device &pia2(PIA6821(config, "pia2", 0)); // expansion
-	pia2.irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
-	pia2.irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0) // expansion
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6802_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0) // rs232
 MACHINE_CONFIG_END
@@ -213,4 +213,4 @@ ROM_START( datum )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME  FLAGS
-COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NO_SOUND_HW )
+COMP( 1982, datum, 0,      0,      datum,   datum, datum_state, empty_init, "Gammatron", "Datum",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

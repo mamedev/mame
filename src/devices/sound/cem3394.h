@@ -7,6 +7,24 @@
 
 #define CEM3394_EXT_INPUT(_name) void _name(int count, short *buffer)
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CEM3394_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, CEM3394, _clock)
+#define MCFG_CEM3394_REPLACE(_tag, _clock) \
+	MCFG_DEVICE_REPLACE(_tag, CEM3394, _clock)
+
+#define MCFG_CEM3394_EXT_INPUT_CB(_class, _method) \
+	downcast<cem3394_device &>(*device).set_ext_input_callback(cem3394_device::ext_input_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_CEM3394_VCO_ZERO(_freq) \
+	downcast<cem3394_device &>(*device).set_vco_zero_freq(_freq);
+
+#define MCFG_CEM3394_FILTER_ZERO(_freq) \
+	downcast<cem3394_device &>(*device).set_filter_zero_freq(_freq);
+
 
 class cem3394_device : public device_t, public device_sound_interface
 {
@@ -30,7 +48,7 @@ public:
 
 	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_ext_input_callback(T &&... args) { m_ext_cb = ext_input_delegate(std::forward<T>(args)...); }
+	template <typename Object> void set_ext_input_callback(Object &&cb) { m_ext_cb = std::forward<Object>(cb); }
 	void set_vco_zero_freq(double freq) { m_vco_zero_freq = freq; }
 	void set_filter_zero_freq(double freq) { m_filter_zero_freq = freq; }
 

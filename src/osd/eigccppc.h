@@ -9,8 +9,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_OSD_EIGCCPPC_H
-#define MAME_OSD_EIGCCPPC_H
+#ifndef __EIGCCPPC__
+#define __EIGCCPPC__
 
 
 /***************************************************************************
@@ -283,4 +283,4 @@ _count_leading_ones(uint32_t value)
 	return result;
 }
 
-#endif // MAME_OSD_EIGCCPPC_H
+#endif /* __EIGCCPPC__ */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -15,9 +15,10 @@
 #include "platform.h"
 #include "config.h"
 #include "macros.h"
+#include "debug.h"
 
 ///
-#define BX_COUNTOF(_x) sizeof(bx::CountOfRequireArrayArgumentT(_x) )
+#define BX_COUNTOF(_x) sizeof(bx::COUNTOF_REQUIRES_ARRAY_ARGUMENT(_x) )
 
 ///
 #define BX_IGNORE_C4127(_x) bx::ignoreC4127(!!(_x) )
@@ -27,51 +28,47 @@
 
 namespace bx
 {
-	constexpr int32_t kExitSuccess = 0;
-	constexpr int32_t kExitFailure = 1;
+	const int32_t kExitSuccess = 0;
+	const int32_t kExitFailure = 1;
 
 	/// Template for avoiding MSVC: C4127: conditional expression is constant
 	template<bool>
-	constexpr bool isEnabled();
+	bool isEnabled();
 
-	///
-	template<class Ty>
-	constexpr bool isTriviallyCopyable();
-
-	/// Swap two values.
+	/// Exchange two values.
 	template<typename Ty>
-	void swap(Ty& _a, Ty& _b);
+	void xchg(Ty& _a, Ty& _b);
 
-	/// Swap memory.
-	void swap(void* _a, void* _b, size_t _numBytes);
+	/// Exchange memory.
+	void xchg(void* _a, void* _b, size_t _numBytes);
 
 	/// Returns minimum of two values.
 	template<typename Ty>
-	constexpr Ty min(const Ty& _a, const Ty& _b);
+	Ty min(const Ty& _a, const Ty& _b);
 
 	/// Returns maximum of two values.
 	template<typename Ty>
-	constexpr Ty max(const Ty& _a, const Ty& _b);
+	Ty max(const Ty& _a, const Ty& _b);
 
 	/// Returns minimum of three values.
 	template<typename Ty>
-	constexpr Ty min(const Ty& _a, const Ty& _b, const Ty& _c);
+	Ty min(const Ty& _a, const Ty& _b, const Ty& _c);
 
 	/// Returns maximum of three values.
 	template<typename Ty>
-	constexpr Ty max(const Ty& _a, const Ty& _b, const Ty& _c);
+	Ty max(const Ty& _a, const Ty& _b, const Ty& _c);
 
 	/// Returns middle of three values.
 	template<typename Ty>
-	constexpr Ty mid(const Ty& _a, const Ty& _b, const Ty& _c);
+	Ty mid(const Ty& _a, const Ty& _b, const Ty& _c);
 
 	/// Returns clamped value between min/max.
 	template<typename Ty>
-	constexpr Ty clamp(const Ty& _a, const Ty& _min, const Ty& _max);
+	Ty clamp(const Ty& _a, const Ty& _min, const Ty& _max);
 
-	/// Returns true if value is power of 2.
-	template<typename Ty>
-	constexpr bool isPowerOf2(Ty _a);
+	// http://cnicholson.net/2011/01/stupid-c-tricks-a-better-sizeof_array/
+	template<typename T, size_t N>
+	char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]) )[N];
 
 	///
 	void memCopy(void* _dst, const void* _src, size_t _numBytes);

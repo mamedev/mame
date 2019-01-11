@@ -34,11 +34,8 @@ public:
 	void wpc_an_dd(machine_config &config);
 	void wpc_an(machine_config &config);
 	void wpc_an_base(machine_config &config);
-
-	void init_wpc_an();
-
-private:
 	void wpc_an_map(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -54,7 +51,8 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
-
+public:
+	void init_wpc_an();
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
@@ -66,7 +64,7 @@ private:
 	DECLARE_WRITE8_MEMBER(wpc_sound_data_w);
 	DECLARE_WRITE8_MEMBER(wpc_sound_s11_w);
 	DECLARE_WRITE8_MEMBER(wpc_rombank_w);
-
+private:
 	uint16_t m_vblank_count;
 	uint32_t m_irq_count;
 	uint8_t m_bankmask;
@@ -78,7 +76,7 @@ private:
 
 void wpc_an_state::wpc_an_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rw(FUNC(wpc_an_state::ram_r), FUNC(wpc_an_state::ram_w));
+	map(0x0000, 0x2fff).rw(this, FUNC(wpc_an_state::ram_r), FUNC(wpc_an_state::ram_w));
 	map(0x3000, 0x3faf).ram();
 	map(0x3fb0, 0x3fff).rw(m_wpc, FUNC(wpc_device::read), FUNC(wpc_device::write)); // WPC device
 	map(0x4000, 0x7fff).bankr("cpubank");
@@ -330,45 +328,40 @@ void wpc_an_state::init_wpc_an()
 	memcpy(fixed,&ROM[codeoff],0x8000);  // copy static code from end of U6 ROM.
 }
 
-void wpc_an_state::wpc_an_base(machine_config &config)
-{
+MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, XTAL(8'000'000) / 4); // 68B09E
-	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_an_state::wpc_an_map);
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000) / 4) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(wpc_an_map)
 
-	WPCASIC(config, m_wpc, 0);
-	m_wpc->irq_callback().set(FUNC(wpc_an_state::wpc_irq_w));
-	m_wpc->firq_callback().set(FUNC(wpc_an_state::wpc_firq_w));
-	m_wpc->bank_write().set(FUNC(wpc_an_state::wpc_rombank_w));
-	m_wpc->sound_ctrl_read().set(FUNC(wpc_an_state::wpc_sound_ctrl_r));
-	m_wpc->sound_ctrl_write().set(FUNC(wpc_an_state::wpc_sound_ctrl_w));
-	m_wpc->sound_data_read().set(FUNC(wpc_an_state::wpc_sound_data_r));
-	m_wpc->sound_data_write().set(FUNC(wpc_an_state::wpc_sound_data_w));
-	m_wpc->sound_s11_write().set(FUNC(wpc_an_state::wpc_sound_s11_w));
+	MCFG_WMS_WPC_ADD("wpc")
+	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_an_state,wpc_irq_w))
+	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_an_state,wpc_firq_w))
+	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_an_state,wpc_rombank_w))
+	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_an_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_an_state,wpc_sound_ctrl_w))
+	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_an_state,wpc_sound_data_r),WRITE8(*this, wpc_an_state,wpc_sound_data_w))
+	MCFG_WPC_SOUND_S11C(WRITE8(*this, wpc_an_state,wpc_sound_s11_w))
 
-	config.set_default_layout(layout_wpc_an);
-}
+	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
+MACHINE_CONFIG_END
 
-void wpc_an_state::wpc_an(machine_config &config)
-{
+MACHINE_CONFIG_START(wpc_an_state::wpc_an)
 	wpc_an_base(config);
 
 	SPEAKER(config, "speaker").front_center();
-	WPCSND(config, m_wpcsnd);
-	m_wpcsnd->set_romregion("sound1");
-	m_wpcsnd->reply_callback().set(FUNC(wpc_an_state::wpcsnd_reply_w));
-	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
+	MCFG_WPC_ROM_REGION("sound1")
+	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_an_state,wpcsnd_reply_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
 
-void wpc_an_state::wpc_an_dd(machine_config &config)
-{
+MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
 	wpc_an_base(config);
 
 	SPEAKER(config, "speaker").front_center();
-	S11C_BG(config, m_bg);
-	m_bg->set_romregion("sound1");
-	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+	MCFG_DEVICE_ADD("bg", S11C_BG)
+	MCFG_S11C_BG_ROM_REGION(":sound1")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
 
 /*-----------------
 /  Dr. Dude #2016

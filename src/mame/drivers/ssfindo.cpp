@@ -128,7 +128,6 @@ Notes:
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/i2cmem.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -230,15 +229,6 @@ public:
 		m_flashrom(*this, "flash"),
 		m_io_ps7500(*this, "PS7500") { }
 
-	void ssfindo(machine_config &config);
-	void ppcar(machine_config &config);
-	void tetfight(machine_config &config);
-
-	void init_ssfindo();
-	void init_ppcar();
-	void init_tetfight();
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	optional_device<i2cmem_device> m_i2cmem;
@@ -287,6 +277,9 @@ private:
 	DECLARE_WRITE32_MEMBER(tetfight_unk_w);
 
 	void init_common();
+	void init_ssfindo();
+	void init_ppcar();
+	void init_tetfight();
 	virtual void machine_reset() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -303,7 +296,9 @@ private:
 	void PS7500_reset();
 	void ssfindo_speedups();
 	void ppcar_speedups();
-
+	void ssfindo(machine_config &config);
+	void ppcar(machine_config &config);
+	void tetfight(machine_config &config);
 	void ppcar_map(address_map &map);
 	void ssfindo_map(address_map &map);
 	void tetfight_map(address_map &map);
@@ -609,34 +604,34 @@ READ32_MEMBER(ssfindo_state::randomized_r)
 void ssfindo_state::ssfindo_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x03200000, 0x032001ff).rw(FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
+	map(0x03200000, 0x032001ff).rw(this, FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
 	map(0x03012e60, 0x03012e67).noprw();
-	map(0x03012fe0, 0x03012fe3).w(FUNC(ssfindo_state::debug_w));
+	map(0x03012fe0, 0x03012fe3).w(this, FUNC(ssfindo_state::debug_w));
 	map(0x03012ff0, 0x03012ff3).noprw();
-	map(0x03012ff4, 0x03012ff7).nopw().r(FUNC(ssfindo_state::ff4_r)); //status flag ?
+	map(0x03012ff4, 0x03012ff7).nopw().r(this, FUNC(ssfindo_state::ff4_r)); //status flag ?
 	map(0x03012ff8, 0x03012fff).noprw();
 	map(0x03240000, 0x03240003).portr("IN0").nopw();
 	map(0x03241000, 0x03241003).portr("IN1").nopw();
-	map(0x03242000, 0x03242003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
+	map(0x03242000, 0x03242003).r(this, FUNC(ssfindo_state::io_r)).w(this, FUNC(ssfindo_state::io_w));
 	map(0x03243000, 0x03243003).portr("DSW").nopw();
-	map(0x0324f000, 0x0324f003).r(FUNC(ssfindo_state::SIMPLEIO_r));
+	map(0x0324f000, 0x0324f003).r(this, FUNC(ssfindo_state::SIMPLEIO_r));
 	map(0x03245000, 0x03245003).nopw(); /* sound ? */
-	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
+	map(0x03400000, 0x03400003).w(this, FUNC(ssfindo_state::FIFO_w));
 	map(0x10000000, 0x11ffffff).ram().share("vram");
 }
 
 void ssfindo_state::ppcar_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom();
-	map(0x03200000, 0x032001ff).rw(FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
-	map(0x03012b00, 0x03012bff).r(FUNC(ssfindo_state::randomized_r)).nopw();
+	map(0x03200000, 0x032001ff).rw(this, FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
+	map(0x03012b00, 0x03012bff).r(this, FUNC(ssfindo_state::randomized_r)).nopw();
 	map(0x03012e60, 0x03012e67).nopw();
 	map(0x03012ff8, 0x03012ffb).portr("IN0").nopw();
 	map(0x032c0000, 0x032c0003).portr("IN1").nopw();
 	map(0x03340000, 0x03340007).nopw();
 	map(0x03341000, 0x0334101f).nopw();
-	map(0x033c0000, 0x033c0003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
-	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
+	map(0x033c0000, 0x033c0003).r(this, FUNC(ssfindo_state::io_r)).w(this, FUNC(ssfindo_state::io_w));
+	map(0x03400000, 0x03400003).w(this, FUNC(ssfindo_state::FIFO_w));
 	map(0x08000000, 0x08ffffff).ram();
 	map(0x10000000, 0x10ffffff).ram().share("vram");
 }
@@ -655,12 +650,12 @@ WRITE32_MEMBER(ssfindo_state::tetfight_unk_w)
 void ssfindo_state::tetfight_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
-	map(0x03200000, 0x032001ff).rw(FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
-	map(0x03400000, 0x03400003).w(FUNC(ssfindo_state::FIFO_w));
+	map(0x03200000, 0x032001ff).rw(this, FUNC(ssfindo_state::PS7500_IO_r), FUNC(ssfindo_state::PS7500_IO_w));
+	map(0x03400000, 0x03400003).w(this, FUNC(ssfindo_state::FIFO_w));
 	map(0x03240000, 0x03240003).portr("IN0");
 	map(0x03240004, 0x03240007).portr("IN1");
 	map(0x03240008, 0x0324000b).portr("DSW2");
-	map(0x03240020, 0x03240023).rw(FUNC(ssfindo_state::tetfight_unk_r), FUNC(ssfindo_state::tetfight_unk_w));
+	map(0x03240020, 0x03240023).rw(this, FUNC(ssfindo_state::tetfight_unk_r), FUNC(ssfindo_state::tetfight_unk_w));
 	map(0x10000000, 0x14ffffff).ram().share("vram");
 }
 

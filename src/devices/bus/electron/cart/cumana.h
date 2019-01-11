@@ -12,7 +12,6 @@
 #define MAME_BUS_ELECTRON_CART_CUMANA_H
 
 #include "slot.h"
-#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "machine/mc146818.h"
 #include "formats/acorn_dsk.h"

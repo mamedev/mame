@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "romload.h"
 
 
 //**************************************************************************
@@ -99,11 +98,10 @@ constexpr char finder_base::DUMMY_TAG[];
 //  finder_base - constructor
 //-------------------------------------------------
 
-finder_base::finder_base(device_t &base, char const *tag)
+finder_base::finder_base(device_t &base, const char *tag)
 	: m_next(base.register_auto_finder(*this))
 	, m_base(base)
 	, m_tag(tag)
-	, m_resolved(false)
 {
 }
 
@@ -123,7 +121,6 @@ finder_base::~finder_base()
 
 void finder_base::set_tag(char const *tag)
 {
-	assert(!m_resolved);
 	m_base = m_base.get().mconfig().current_device();
 	m_tag = tag;
 }

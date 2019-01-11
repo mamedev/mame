@@ -305,7 +305,6 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -334,17 +333,6 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void winner81(machine_config &config);
-	void winner82(machine_config &config);
-	void rcirulet(machine_config &config);
-	void luckyrlt(machine_config &config);
-	void re800(machine_config &config);
-
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-
-private:
 	DECLARE_WRITE8_MEMBER(blitter_y_w);
 	DECLARE_WRITE8_MEMBER(blitter_unk_w);
 	DECLARE_WRITE8_MEMBER(blitter_x_w);
@@ -358,9 +346,15 @@ private:
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	DECLARE_WRITE8_MEMBER(wc_meters_w);
 	void blitter_execute(int x, int y, int color, int width, int flag);
-	void corona_palette(palette_device &palette) const;
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(corona);
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void winner81(machine_config &config);
+	void winner82(machine_config &config);
+	void rcirulet(machine_config &config);
+	void luckyrlt(machine_config &config);
+	void re800(machine_config &config);
 	void luckyrlt_cpu_io_map(address_map &map);
 	void luckyrlt_map(address_map &map);
 	void luckyrlt_sound_cpu_io_map(address_map &map);
@@ -377,6 +371,9 @@ private:
 	void winner82_map(address_map &map);
 	void winner82_sound_cpu_io_map(address_map &map);
 	void winner82_sound_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
 
 	uint8_t m_blitter_x_reg;
 	uint8_t m_blitter_y_reg;
@@ -398,29 +395,31 @@ private:
 *               Video Hardware               *
 *********************************************/
 
-void corona_state::corona_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(corona_state, corona)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int bit6, bit7, bit0, bit1, r, g, b;
+	int i;
 
-	for (int i = 0; i < 0x20; ++i)
+	for (i = 0; i < 0x20; ++i)
 	{
-		int bit0, bit1;
-		int const bit7 = BIT(color_prom[i], 7);
-		int const bit6 = BIT(color_prom[i], 6);
+		bit7 = (color_prom[0] >> 7) & 0x01;
+		bit6 = (color_prom[0] >> 6) & 0x01;
 
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		int const b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
-		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i], 3);
-		int const g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 2) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
-		bit0 = BIT(color_prom[i], 4);
-		bit1 = BIT(color_prom[i], 5);
-		int const r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 4) & 0x01;
+		bit1 = (color_prom[0] >> 5) & 0x01;
+		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
+		color_prom++;
 	}
 }
 
@@ -458,26 +457,29 @@ READ8_MEMBER(corona_state::blitter_status_r)
 
 void corona_state::blitter_execute(int x, int y, int color, int width, int flag)
 {
-	int const xdir = (flag & 0x10)    ? -1 : 1;
-	int const ydir = (!(flag & 0x20)) ? -1 : 1;
+	int i;
+	int xdir = (flag & 0x10)    ? -1 : 1;
+	int ydir = (!(flag & 0x20)) ? -1 : 1;
 
 	if(width == 0) //ignored
 		return;
 
 	if((flag & 0xc0) == 0) /* square shape / layer clearance */
 	{
+		int xp, yp;
+
 		if(x != 128 || y != 128 || width != 8)
 			printf("%02x %02x %02x %02x %02x\n", x, y, color, width, flag);
 
-		for(int yp = 0; yp < 0x100; yp++)
-			for(int xp = 0; xp < 0x100; xp++)
+		for(yp = 0; yp < 0x100; yp++)
+			for(xp = 0; xp < 0x100; xp++)
 				m_videobuf[(yp & 0x1ff) * 512 + (xp & 0x1ff)] = color;
 	}
 	else /* line shape */
 	{
 		//printf("%02x %02x %02x %02x %02x\n",x,y,color,width,flag);
 
-		for(int i = 0; i < width; i++)
+		for(i = 0; i < width; i++)
 		{
 			m_videobuf[(y & 0x1ff) * 512 + (x & 0x1ff)] = color;
 
@@ -642,15 +644,15 @@ void corona_state::winner81_map(address_map &map)
 void corona_state::winner81_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x70, 0x70).w(FUNC(corona_state::blitter_x_w));
-	map(0x71, 0x71).w(FUNC(corona_state::blitter_unk_w));
-	map(0x72, 0x72).w(FUNC(corona_state::blitter_trig_wdht_w));
-	map(0x74, 0x74).w(FUNC(corona_state::blitter_y_w));
-	map(0x75, 0x75).r(FUNC(corona_state::blitter_status_r));
-	map(0x76, 0x76).w(FUNC(corona_state::blitter_aux_w));
+	map(0x70, 0x70).w(this, FUNC(corona_state::blitter_x_w));
+	map(0x71, 0x71).w(this, FUNC(corona_state::blitter_unk_w));
+	map(0x72, 0x72).w(this, FUNC(corona_state::blitter_trig_wdht_w));
+	map(0x74, 0x74).w(this, FUNC(corona_state::blitter_y_w));
+	map(0x75, 0x75).r(this, FUNC(corona_state::blitter_status_r));
+	map(0x76, 0x76).w(this, FUNC(corona_state::blitter_aux_w));
 
 	map(0xd8, 0xd8).nopw();            /* dunno, but is writing 0's very often */
-	map(0xdf, 0xdf).w(FUNC(corona_state::sound_latch_w));
+	map(0xdf, 0xdf).w(this, FUNC(corona_state::sound_latch_w));
 
 	map(0xe8, 0xe8).portr("IN0");    /* credits for players A, B, C, D */
 	map(0xe9, 0xe9).portr("IN3");
@@ -659,7 +661,7 @@ void corona_state::winner81_cpu_io_map(address_map &map)
 	map(0xec, 0xec).portr("IN4");
 	map(0xed, 0xed).portr("DSW1");   /* DIP switches bank 1 */
 	map(0xee, 0xee).portr("DSW2");
-	map(0xef, 0xef).w(FUNC(corona_state::wc_meters_w));  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
+	map(0xef, 0xef).w(this, FUNC(corona_state::wc_meters_w));  /* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
 }
 
 void corona_state::winner81_sound_map(address_map &map)
@@ -671,7 +673,7 @@ void corona_state::winner81_sound_map(address_map &map)
 void corona_state::winner81_sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
@@ -703,20 +705,20 @@ void corona_state::winner82_map(address_map &map)
 void corona_state::winner82_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
-	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
-	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
-	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
-	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
-	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
+	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
 
 	map(0xf8, 0xf8).portr("DSW1");   /* coinage DIP SW */
 	map(0xf9, 0xf9).portr("IN0");    /* controls for players A & B */
 	map(0xfa, 0xfa).portr("IN1");    /* credits for players A, B, C, D */
 	map(0xfb, 0xfb).portr("IN3");    /* single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters */
-	map(0xfc, 0xfc).w(FUNC(corona_state::wc_meters_w));
+	map(0xfc, 0xfc).w(this, FUNC(corona_state::wc_meters_w));
 	map(0xfd, 0xfd).portr("IN2");    /* controls for players C & D */
-	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
+	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
 	map(0xff, 0xff).portr("DSW2");   /* no idea */
 }
 
@@ -729,7 +731,7 @@ void corona_state::winner82_sound_map(address_map &map)
 void corona_state::winner82_sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).nopw();    /* socket for another ay, inited but never played */
 }
@@ -771,18 +773,18 @@ void corona_state::re800_map(address_map &map)
 void corona_state::re800_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
-	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
-	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
-	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
-	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
-	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
+	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
 	map(0xf8, 0xf8).portr("IN1");
 	map(0xf9, 0xf9).portr("DSW1");
-	map(0xfc, 0xfc).w(FUNC(corona_state::mux_port_w));
-	map(0xfd, 0xfd).r(FUNC(corona_state::mux_port_r));
-	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
-	map(0xff, 0xff).w(FUNC(corona_state::ball_w));
+	map(0xfc, 0xfc).w(this, FUNC(corona_state::mux_port_w));
+	map(0xfd, 0xfd).r(this, FUNC(corona_state::mux_port_r));
+	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
+	map(0xff, 0xff).w(this, FUNC(corona_state::ball_w));
 }
 
 void corona_state::re800_sound_map(address_map &map)
@@ -794,7 +796,7 @@ void corona_state::re800_sound_map(address_map &map)
 void corona_state::re800_sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
@@ -834,19 +836,19 @@ void corona_state::luckyrlt_map(address_map &map)
 void corona_state::luckyrlt_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(corona_state::blitter_x_w));
-	map(0xf1, 0xf1).w(FUNC(corona_state::blitter_y_w));
-	map(0xf2, 0xf2).w(FUNC(corona_state::blitter_trig_wdht_w));
-	map(0xf3, 0xf3).w(FUNC(corona_state::blitter_aux_w));
-	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
-	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
+	map(0xf0, 0xf0).w(this, FUNC(corona_state::blitter_x_w));
+	map(0xf1, 0xf1).w(this, FUNC(corona_state::blitter_y_w));
+	map(0xf2, 0xf2).w(this, FUNC(corona_state::blitter_trig_wdht_w));
+	map(0xf3, 0xf3).w(this, FUNC(corona_state::blitter_aux_w));
+	map(0xf4, 0xf4).w(this, FUNC(corona_state::blitter_unk_w));
+	map(0xf5, 0xf5).r(this, FUNC(corona_state::blitter_status_r));
 
 	map(0xf8, 0xf8).portr("DSW2");
-	map(0xf9, 0xf9).w(FUNC(corona_state::ball_w));
+	map(0xf9, 0xf9).w(this, FUNC(corona_state::ball_w));
 	map(0xfa, 0xfa).portr("DSW1");
-	map(0xfc, 0xfc).w(FUNC(corona_state::mux_port_w));
-	map(0xfd, 0xfd).r(FUNC(corona_state::mux_port_r));
-	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
+	map(0xfc, 0xfc).w(this, FUNC(corona_state::mux_port_w));
+	map(0xfd, 0xfd).r(this, FUNC(corona_state::mux_port_r));
+	map(0xfe, 0xfe).w(this, FUNC(corona_state::sound_latch_w));
 }
 
 void corona_state::luckyrlt_sound_map(address_map &map)
@@ -858,7 +860,7 @@ void corona_state::luckyrlt_sound_map(address_map &map)
 void corona_state::luckyrlt_sound_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
+	map(0x00, 0x00).r(this, FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
@@ -1396,7 +1398,7 @@ MACHINE_CONFIG_START(corona_state::winner81)
 	MCFG_DEVICE_IO_MAP(winner81_sound_cpu_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1408,13 +1410,15 @@ MACHINE_CONFIG_START(corona_state::winner81)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8912(config, "aysnd", AY_CLK1).add_route(ALL_OUTPUTS, "mono", 1.0);    /* measured */
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK1)    /* measured */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1428,7 +1432,7 @@ MACHINE_CONFIG_START(corona_state::winner82)
 	MCFG_DEVICE_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
 	MCFG_DEVICE_IO_MAP(winner82_sound_cpu_io_map)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1440,13 +1444,15 @@ MACHINE_CONFIG_START(corona_state::winner82)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8910(config, "aysnd", AY_CLK2).add_route(ALL_OUTPUTS, "mono", 1.0);    /* measured */
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLK2)    /* measured */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1461,7 +1467,7 @@ MACHINE_CONFIG_START(corona_state::re800)
 	MCFG_DEVICE_IO_MAP(re800_sound_cpu_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1473,13 +1479,15 @@ MACHINE_CONFIG_START(corona_state::re800)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8912(config, "aysnd", AY_CLK2).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1493,7 +1501,7 @@ MACHINE_CONFIG_START(corona_state::rcirulet)
 	MCFG_DEVICE_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
 	MCFG_DEVICE_IO_MAP(winner82_sound_cpu_io_map)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1505,13 +1513,15 @@ MACHINE_CONFIG_START(corona_state::rcirulet)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8912(config, "aysnd", AY_CLK2).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1526,7 +1536,7 @@ MACHINE_CONFIG_START(corona_state::luckyrlt)
 	MCFG_DEVICE_IO_MAP(luckyrlt_sound_cpu_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(corona_state, nmi_line_pulse,  244)    /* 244 Hz (1MHz/16/16/16) */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1538,13 +1548,15 @@ MACHINE_CONFIG_START(corona_state::luckyrlt)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8912(config, "aysnd", AY_CLK1).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("aysnd", AY8912, AY_CLK1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

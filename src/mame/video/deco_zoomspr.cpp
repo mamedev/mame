@@ -93,27 +93,27 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 					y_index = 0;
 				}
 
-				if( sx < clip.left())
+				if( sx < clip.min_x)
 				{ /* clip left */
-					int pixels = clip.left()-sx;
+					int pixels = clip.min_x-sx;
 					sx += pixels;
 					x_index_base += pixels*dx;
 				}
-				if( sy < clip.top() )
+				if( sy < clip.min_y )
 				{ /* clip top */
-					int pixels = clip.top()-sy;
+					int pixels = clip.min_y-sy;
 					sy += pixels;
 					y_index += pixels*dy;
 				}
 				/* NS 980211 - fixed incorrect clipping */
-				if( ex > clip.right()+1 )
+				if( ex > clip.max_x+1 )
 				{ /* clip right */
-					int pixels = ex-clip.right()-1;
+					int pixels = ex-clip.max_x-1;
 					ex -= pixels;
 				}
-				if( ey > clip.bottom()+1 )
+				if( ey > clip.max_y+1 )
 				{ /* clip bottom */
-					int pixels = ey-clip.bottom()-1;
+					int pixels = ey-clip.max_y-1;
 					ey -= pixels;
 				}
 
@@ -236,11 +236,10 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 	        0x8000: Y flip
 	        0x03ff: Y size of block in pixels (for scaling)
 	    Word 6 :
-	        0x0000001f - colour.
-	        0x00000020 - ?  Used for background at 'frog' boss and title screen dragon.
-	        0x00000040 - ?  priority?
-	        0x00000080 - Alpha blending enable
-	        0x40000000 - Additive/Subtractable blend? (dragngun)
+	        0x1f - colour.
+	        0x20 - ?  Used for background at 'frog' boss and title screen dragon.
+	        0x40 - ?  priority?
+	        0x80 - Alpha blending enable
 	    Word 7 :
 
 
@@ -397,12 +396,12 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 		}
 	}
 
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t *src = &temp_bitmap.pix32(y);
 		uint32_t *dst = &bitmap.pix32(y);
 
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint32_t srcpix = src[x];
 

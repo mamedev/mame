@@ -62,22 +62,22 @@
 
 void naomi_board::submap(address_map &map)
 {
-	map(0x00, 0xff).r(FUNC(naomi_board::default_r));
+	map(0x00, 0xff).r(this, FUNC(naomi_board::default_r));
 
-	map(0x00, 0x01).w(FUNC(naomi_board::rom_offseth_w));
-	map(0x02, 0x03).w(FUNC(naomi_board::rom_offsetl_w));
-	map(0x04, 0x05).rw(FUNC(naomi_board::rom_data_r), FUNC(naomi_board::rom_data_w));
-	map(0x06, 0x07).w(FUNC(naomi_board::dma_offseth_w));
-	map(0x08, 0x09).w(FUNC(naomi_board::dma_offsetl_w));
-	map(0x0a, 0x0b).w(FUNC(naomi_board::dma_count_w));
-	map(0x3c, 0x3d).w(FUNC(naomi_board::boardid_w));
-	map(0x3e, 0x3f).r(FUNC(naomi_board::boardid_r));
+	map(0x00, 0x01).w(this, FUNC(naomi_board::rom_offseth_w));
+	map(0x02, 0x03).w(this, FUNC(naomi_board::rom_offsetl_w));
+	map(0x04, 0x05).rw(this, FUNC(naomi_board::rom_data_r), FUNC(naomi_board::rom_data_w));
+	map(0x06, 0x07).w(this, FUNC(naomi_board::dma_offseth_w));
+	map(0x08, 0x09).w(this, FUNC(naomi_board::dma_offsetl_w));
+	map(0x0a, 0x0b).w(this, FUNC(naomi_board::dma_count_w));
+	map(0x3c, 0x3d).w(this, FUNC(naomi_board::boardid_w));
+	map(0x3e, 0x3f).r(this, FUNC(naomi_board::boardid_r));
 }
 
 naomi_board::naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_g1_device(mconfig, type, tag, owner, clock),
-	eeprom(*this, finder_base::DUMMY_TAG)
+	: naomi_g1_device(mconfig, type, tag, owner, clock)
 {
+	eeprom_tag = nullptr;
 }
 
 void naomi_board::device_start()
@@ -90,6 +90,11 @@ void naomi_board::device_start()
 	save_item(NAME(dma_cur_offset));
 	save_item(NAME(pio_ready));
 	save_item(NAME(dma_ready));
+
+	if (eeprom_tag != nullptr)
+		eeprom = owner()->subdevice<x76f100_device>(eeprom_tag);
+	else
+		eeprom = nullptr;
 }
 
 void naomi_board::device_reset()

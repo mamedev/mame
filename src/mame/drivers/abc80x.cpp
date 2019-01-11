@@ -141,9 +141,8 @@ Notes:
 
     TODO:
 
-    - abc802 video is all black
-    - abc850 is broken
-    - abc806 30K banking
+	- abc802 video is all black
+	- abc850 is broken
     - cassette
 
 */
@@ -175,8 +174,8 @@ DISCRETE_SOUND_END
 
 READ8_MEMBER( abc800_state::pling_r )
 {
-	m_discrete->write(NODE_01, 0);
-	m_discrete->write(NODE_01, 1);
+	m_discrete->write(space, NODE_01, 0);
+	m_discrete->write(space, NODE_01, 1);
 
 	return 0xff;
 }
@@ -267,13 +266,13 @@ void abc806_state::read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, boo
 		vr = 1;
 	}
 /*
-    if (!m1l && (offset < 0x7800)
-    {
-        TODO 0..30k read from videoram if fetch opcode from 7800-7fff
-        romd = 1;
-        hre = 1;
-        mux = 0;
-    }
+	if (!m1l && (offset < 0x7800)
+	{
+		TODO 0..30k read from videoram if fetch opcode from 7800-7fff
+		romd = 1;
+		hre = 1;
+		mux = 0;
+	}
 */
 	size_t videoram_mask = m_ram->size() - 0x8001;
 
@@ -479,7 +478,7 @@ WRITE8_MEMBER( abc806_state::mao_w )
 
 void abc800_state::abc800_m1(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(abc800_state::m1_r));
+	map(0x0000, 0xffff).r(this, FUNC(abc800_state::m1_r));
 }
 
 
@@ -498,36 +497,25 @@ void abc800c_state::abc800c_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc800_io )
-//-------------------------------------------------
-
-void abc800_state::abc800_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x00, 0x00).mirror(0xff18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::inp_r), FUNC(abcbus_slot_device::out_w));
-	map(0x01, 0x01).mirror(0xff18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::stat_r), FUNC(abcbus_slot_device::cs_w));
-	map(0x02, 0x02).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c1_w));
-	map(0x03, 0x03).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
-	map(0x04, 0x04).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
-	map(0x05, 0x05).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
-	map(0x05, 0x05).mirror(0xff18).r(FUNC(abc800_state::pling_r));
-	map(0x07, 0x07).mirror(0xff18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r));
-	map(0x20, 0x23).mirror(0xff0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	map(0x40, 0x43).mirror(0xff1c).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0x60, 0x63).mirror(0xff1c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-}
-
-
-//-------------------------------------------------
 //  ADDRESS_MAP( abc800c_io )
 //-------------------------------------------------
 
 void abc800_state::abc800c_io(address_map &map)
 {
-	abc800_io(map);
-
-	map(0x06, 0x06).mirror(0xff18).w(FUNC(abc800_state::hrs_w));
-	map(0x07, 0x07).mirror(0xff18).w(FUNC(abc800_state::hrc_w));
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::inp_r), FUNC(abcbus_slot_device::out_w));
+	map(0x01, 0x01).mirror(0x18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::stat_r), FUNC(abcbus_slot_device::cs_w));
+	map(0x02, 0x02).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c1_w));
+	map(0x03, 0x03).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
+	map(0x04, 0x04).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
+	map(0x05, 0x05).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
+	map(0x05, 0x05).mirror(0x18).r(this, FUNC(abc800_state::pling_r));
+	map(0x06, 0x06).mirror(0x18).w(this, FUNC(abc800_state::hrs_w));
+	map(0x07, 0x07).mirror(0x18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r)).w(this, FUNC(abc800_state::hrc_w));
+	map(0x20, 0x23).mirror(0x0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x40, 0x43).mirror(0x1c).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x60, 0x63).mirror(0x1c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 
@@ -552,10 +540,9 @@ void abc800_state::abc800m_mem(address_map &map)
 void abc800_state::abc800m_io(address_map &map)
 {
 	abc800c_io(map);
-
-	map(0x31, 0x31).mirror(0xff06).r(MC6845_TAG, FUNC(mc6845_device::register_r));
-	map(0x38, 0x38).mirror(0xff06).w(MC6845_TAG, FUNC(mc6845_device::address_w));
-	map(0x39, 0x39).mirror(0xff06).w(MC6845_TAG, FUNC(mc6845_device::register_w));
+	map(0x31, 0x31).mirror(0x06).r(MC6845_TAG, FUNC(mc6845_device::register_r));
+	map(0x38, 0x38).mirror(0x06).w(MC6845_TAG, FUNC(mc6845_device::address_w));
+	map(0x39, 0x39).mirror(0x06).w(MC6845_TAG, FUNC(mc6845_device::register_w));
 }
 
 
@@ -578,11 +565,22 @@ void abc802_state::abc802_mem(address_map &map)
 
 void abc802_state::abc802_io(address_map &map)
 {
-	abc800_io(map);
-
-	map(0x31, 0x31).mirror(0xff06).r(MC6845_TAG, FUNC(mc6845_device::register_r));
-	map(0x38, 0x38).mirror(0xff06).w(MC6845_TAG, FUNC(mc6845_device::address_w));
-	map(0x39, 0x39).mirror(0xff06).w(MC6845_TAG, FUNC(mc6845_device::register_w));
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::inp_r), FUNC(abcbus_slot_device::out_w));
+	map(0x01, 0x01).mirror(0x18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::stat_r), FUNC(abcbus_slot_device::cs_w));
+	map(0x02, 0x02).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c1_w));
+	map(0x03, 0x03).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
+	map(0x04, 0x04).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
+	map(0x05, 0x05).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
+	map(0x05, 0x05).mirror(0x18).r(this, FUNC(abc800_state::pling_r));
+	map(0x07, 0x07).mirror(0x18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r));
+	map(0x20, 0x23).mirror(0x0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x31, 0x31).mirror(0x06).r(m_crtc, FUNC(mc6845_device::register_r));
+	map(0x38, 0x38).mirror(0x06).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x39, 0x39).mirror(0x06).w(m_crtc, FUNC(mc6845_device::register_w));
+	map(0x40, 0x43).mirror(0x1c).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x60, 0x63).mirror(0x1c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 
@@ -592,7 +590,7 @@ void abc802_state::abc802_io(address_map &map)
 
 void abc806_state::abc806_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(abc806_state::read), FUNC(abc806_state::write));
+	map(0x0000, 0xffff).rw(this, FUNC(abc806_state::read), FUNC(abc806_state::write));
 }
 
 
@@ -602,14 +600,26 @@ void abc806_state::abc806_mem(address_map &map)
 
 void abc806_state::abc806_io(address_map &map)
 {
-	abc800m_io(map);
-
-	map(0x06, 0x06).mirror(0xff18).w(FUNC(abc806_state::hrs_w));
-	map(0x07, 0x07).mirror(0xff18).w(FUNC(abc806_state::hrc_w));
-	map(0x34, 0x34).select(0xff00).rw(FUNC(abc806_state::mai_r), FUNC(abc806_state::mao_w));
-	map(0x35, 0x35).mirror(0xff00).rw(FUNC(abc806_state::ami_r), FUNC(abc806_state::amo_w));
-	map(0x36, 0x36).mirror(0xff00).rw(FUNC(abc806_state::sti_r), FUNC(abc806_state::sto_w));
-	map(0x37, 0x37).select(0xff00).rw(FUNC(abc806_state::cli_r), FUNC(abc806_state::sso_w));
+	map.unmap_value_high();
+	map(0x00, 0x00).mirror(0xff18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::inp_r), FUNC(abcbus_slot_device::out_w));
+	map(0x01, 0x01).mirror(0xff18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::stat_r), FUNC(abcbus_slot_device::cs_w));
+	map(0x02, 0x02).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c1_w));
+	map(0x03, 0x03).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
+	map(0x04, 0x04).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
+	map(0x05, 0x05).mirror(0xff18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
+	map(0x05, 0x05).mirror(0xff18).r(this, FUNC(abc800_state::pling_r));
+	map(0x06, 0x06).mirror(0xff18).w(this, FUNC(abc806_state::hrs_w));
+	map(0x07, 0x07).mirror(0xff18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r)).w(this, FUNC(abc806_state::hrc_w));
+	map(0x20, 0x23).mirror(0xff0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x31, 0x31).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::register_r));
+	map(0x34, 0x34).select(0xff00).rw(this, FUNC(abc806_state::mai_r), FUNC(abc806_state::mao_w));
+	map(0x35, 0x35).mirror(0xff00).rw(this, FUNC(abc806_state::ami_r), FUNC(abc806_state::amo_w));
+	map(0x36, 0x36).mirror(0xff00).rw(this, FUNC(abc806_state::sti_r), FUNC(abc806_state::sto_w));
+	map(0x37, 0x37).select(0xff00).rw(this, FUNC(abc806_state::cli_r), FUNC(abc806_state::sso_w));
+	map(0x38, 0x38).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x39, 0x39).mirror(0xff00).w(m_crtc, FUNC(mc6845_device::register_w));
+	map(0x40, 0x43).mirror(0xff1c).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x60, 0x63).mirror(0xff1c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 
@@ -1054,53 +1064,53 @@ QUICKLOAD_LOAD_MEMBER( abc800_state, bac )
 
 MACHINE_CONFIG_START(abc800_state::common)
 	// basic machine hardware
-	Z80(config, m_maincpu, ABC800_X01/2/2);
-	m_maincpu->set_daisy_config(abc800_daisy_chain);
-	m_maincpu->set_addrmap(AS_OPCODES, &abc800_state::abc800_m1);
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
+	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
+	MCFG_DEVICE_OPCODES_MAP(abc800_m1)
 
 	// peripheral hardware
-	Z80CTC(config, m_ctc, ABC800_X01/2/2);
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc->zc_callback<0>().set(FUNC(abc800_state::ctc_z0_w));
-	m_ctc->zc_callback<1>().set(FUNC(abc800_state::ctc_z1_w));
-	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxca_w));
-	m_ctc->zc_callback<2>().append(m_dart, FUNC(z80dart_device::txca_w));
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, ABC800_X01/2/2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, abc800_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, abc800_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_TAG, z80dart_device, txca_w))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CTC_TAG, abc800_state, ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 
-	Z80SIO(config, m_sio, ABC800_X01/2/2);
-	m_sio->out_txda_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
-	m_sio->out_dtra_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
-	m_sio->out_rtsa_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
-	m_sio->out_txdb_callback().set(FUNC(abc800_state::sio_txdb_w));
-	m_sio->out_dtrb_callback().set(FUNC(abc800_state::sio_dtrb_w));
-	m_sio->out_rtsb_callback().set(FUNC(abc800_state::sio_rtsb_w));
-	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, ABC800_X01/2/2)
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(*this, abc800_state, sio_txdb_w))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE(*this, abc800_state, sio_dtrb_w))
+	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(*this, abc800_state, sio_rtsb_w))
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	Z80DART(config, m_dart, ABC800_X01/2/2);
-	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
-	m_dart->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
-	m_dart->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
-	m_dart->out_txdb_callback().set(ABC_KEYBOARD_PORT_TAG, FUNC(abc_keyboard_port_device::txd_w));
-	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, ABC800_X01/2/2)
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(ABC_KEYBOARD_PORT_TAG, abc_keyboard_port_device, txd_w))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CASSETTE_TAG, abc800_state, cassette_input_tick, attotime::from_hz(44100))
 
-	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
-	rs232a.dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
-	rs232a.cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, ctsa_w))
 
-	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
-	rs232b.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
-	rs232b.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
 
 	MCFG_ABC_KEYBOARD_PORT_ADD(ABC_KEYBOARD_PORT_TAG, nullptr)
-	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(m_dart, z80dart_device, rxb_w))
-	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
-	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(m_dart, z80dart_device, dcdb_w))
+	MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
+	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
+	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(Z80DART_TAG, z80dart_device, dcdb_w))
 
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, nullptr)
 
@@ -1126,8 +1136,9 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc800c_state::abc800c_mem);
-	m_maincpu->set_addrmap(AS_IO, &abc800c_state::abc800c_io);
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(abc800c_mem)
+	MCFG_DEVICE_IO_MAP(abc800c_io)
 
 	// video hardware
 	abc800c_video(config);
@@ -1141,7 +1152,9 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	MCFG_SLOT_DEFAULT_OPTION("abc830")
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 
@@ -1153,8 +1166,9 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc800m_state::abc800m_mem);
-	m_maincpu->set_addrmap(AS_IO, &abc800m_state::abc800m_io);
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(abc800m_mem)
+	MCFG_DEVICE_IO_MAP(abc800m_io)
 
 	// video hardware
 	abc800m_video(config);
@@ -1168,7 +1182,9 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	MCFG_SLOT_DEFAULT_OPTION("abc830")
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 
@@ -1180,15 +1196,17 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc802_state::abc802_mem);
-	m_maincpu->set_addrmap(AS_IO, &abc802_state::abc802_io);
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(abc802_mem)
+	MCFG_DEVICE_IO_MAP(abc802_io)
 
 	// video hardware
 	abc802_video(config);
 
 	// peripheral hardware
-	m_dart->out_dtrb_callback().set(FUNC(abc802_state::lrs_w));
-	m_dart->out_rtsb_callback().set(FUNC(abc802_state::mux80_40_w));
+	MCFG_DEVICE_MODIFY(Z80DART_TAG)
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, abc802_state, lrs_w))
+	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(*this, abc802_state, mux80_40_w))
 
 	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
 	MCFG_SLOT_DEFAULT_OPTION("abc55")
@@ -1197,7 +1215,8 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	MCFG_SLOT_DEFAULT_OPTION("abc834")
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("64K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 
@@ -1209,16 +1228,18 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	common(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc806_state::abc806_mem);
-	m_maincpu->set_addrmap(AS_IO, &abc806_state::abc806_io);
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(abc806_mem)
+	MCFG_DEVICE_IO_MAP(abc806_io)
 
 	// video hardware
 	abc806_video(config);
 
 	// peripheral hardware
-	E0516(config, E0516_TAG, ABC806_X02);
+	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
 
-	m_dart->out_dtrb_callback().set(FUNC(abc806_state::keydtr_w));
+	MCFG_DEVICE_MODIFY(Z80DART_TAG)
+	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(*this, abc806_state, keydtr_w))
 
 	MCFG_DEVICE_MODIFY(ABC_KEYBOARD_PORT_TAG)
 	MCFG_SLOT_DEFAULT_OPTION("abc77")
@@ -1227,7 +1248,9 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	MCFG_SLOT_DEFAULT_OPTION("abc832")
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("160K").set_extra_options("544K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("160K")
+	MCFG_RAM_EXTRA_OPTIONS("544K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "abc806")
@@ -1304,11 +1327,11 @@ ROM_START( abc800m )
 	ROM_LOAD( "abc 4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
 	ROM_LOAD( "abc 5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
 	ROM_SYSTEM_BIOS( 0, "13", "ABC-DOS (1982-07-19)" )
-	ROMX_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6), ROM_BIOS(0) )
+	ROMX_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "ufd19", "UFD-DOS v.19 (1983-05-31)" )
-	ROMX_LOAD( "abc 6-11 ufd.2k", 0x6000, 0x1000, CRC(2a45be80) SHA1(bf08a18a74e8bdaee2656a3c8246c0122398b58f), ROM_BIOS(1) ) // is this "ABC 6-5" or "ABC 6-51" instead?
+	ROMX_LOAD( "abc 6-11 ufd.2k", 0x6000, 0x1000, CRC(2a45be80) SHA1(bf08a18a74e8bdaee2656a3c8246c0122398b58f), ROM_BIOS(2) ) // is this "ABC 6-5" or "ABC 6-51" instead?
 	ROM_SYSTEM_BIOS( 2, "ufd20", "UFD-DOS v.20 (1984-03-02)" )
-	ROMX_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(2) )
+	ROMX_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(3) )
 	ROM_LOAD_OPTIONAL( "abc 7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
 
@@ -1334,17 +1357,17 @@ ROM_START( abc802 )
 	ROM_LOAD( "abc 12-11.11f", 0x2000, 0x2000, CRC(3561c671) SHA1(f12a7c0fe5670ffed53c794d96eb8959c4d9f828) )
 	ROM_LOAD( "abc 22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
 	ROM_SYSTEM_BIOS( 0, "abc", "ABC-DOS (1983-05-31)" )
-	ROMX_LOAD( "abc 32-12.14f", 0x6000, 0x2000, CRC(23cd0f43) SHA1(639daec4565dcdb4de408b808d0c6cd97baa35d2), ROM_BIOS(0) )
+	ROMX_LOAD( "abc 32-12.14f", 0x6000, 0x2000, CRC(23cd0f43) SHA1(639daec4565dcdb4de408b808d0c6cd97baa35d2), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "ufd19", "UFD-DOS v.19 (1984-03-02)" )
-	ROMX_LOAD( "abc 32-21.14f", 0x6000, 0x2000, CRC(57050b98) SHA1(b977e54d1426346a97c98febd8a193c3e8259574), ROM_BIOS(1) )
+	ROMX_LOAD( "abc 32-21.14f", 0x6000, 0x2000, CRC(57050b98) SHA1(b977e54d1426346a97c98febd8a193c3e8259574), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "ufd20", "UFD-DOS v.20 (1984-04-03)" )
-	ROMX_LOAD( "abc 32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(2) )
+	ROMX_LOAD( "abc 32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "mica620", "MICA DOS v.20 (1984-03-02)" )
-	ROMX_LOAD( "mica820.14f",   0x6000, 0x2000, CRC(edf998af) SHA1(daae7e1ff6ef3e0ddb83e932f324c56f4a98f79b), ROM_BIOS(3) )
+	ROMX_LOAD( "mica820.14f",   0x6000, 0x2000, CRC(edf998af) SHA1(daae7e1ff6ef3e0ddb83e932f324c56f4a98f79b), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "luxnet01", "LUXNET 01" )
-	ROMX_LOAD( "322n01.14f",   0x6000, 0x2000, CRC(0911bc92) SHA1(bf58b3be40ce07638eb265aa2dd97c5562a0c41b), ROM_BIOS(4) )
+	ROMX_LOAD( "322n01.14f",   0x6000, 0x2000, CRC(0911bc92) SHA1(bf58b3be40ce07638eb265aa2dd97c5562a0c41b), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 5, "luxnet02", "LUXNET 02" )
-	ROMX_LOAD( "322n02.14f",   0x6000, 0x2000, CRC(2384baec) SHA1(8ae0371242c201913b2d33a75f670d2bccf29582), ROM_BIOS(5) )
+	ROMX_LOAD( "322n02.14f",   0x6000, 0x2000, CRC(2384baec) SHA1(8ae0371242c201913b2d33a75f670d2bccf29582), ROM_BIOS(6) )
 
 	ROM_REGION( 0x1000, MC6845_TAG, 0 )
 	ROM_LOAD( "abc t02-1.3g", 0x0000, 0x1000, CRC(4d54eed8) SHA1(04cb5fc5f3d7ba9b9a5ae0ec94241d1fe83647f7) ) // 64 90191-01
@@ -1390,15 +1413,15 @@ ROM_START( abc806 )
 	ROM_LOAD( "abc 46-11.2m",  0x4000, 0x1000, CRC(17a87c7d) SHA1(49a7c33623642b49dea3d7397af5a8b9dde8185b) ) // BASIC PROM ABC 46-11 "64 90235-02"
 	ROM_LOAD( "abc 56-11.2l",  0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) ) // BASIC PROM ABC 56-11 "64 90236-02"
 	ROM_SYSTEM_BIOS( 0, "ufd19", "UFD-DOS v.19 (1984-03-02)" )
-	ROMX_LOAD( "abc 66-21.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(0) ) // DOS PROM ABC 66-21 "64 90314-01"
+	ROMX_LOAD( "abc 66-21.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(1) ) // DOS PROM ABC 66-21 "64 90314-01"
 	ROM_SYSTEM_BIOS( 1, "ufd20", "UFD-DOS v.20 (1984-04-03)" )
-	ROMX_LOAD( "abc 66-31.2k", 0x6000, 0x1000, CRC(a2e38260) SHA1(0dad83088222cb076648e23f50fec2fddc968883), ROM_BIOS(1) )
+	ROMX_LOAD( "abc 66-31.2k", 0x6000, 0x1000, CRC(a2e38260) SHA1(0dad83088222cb076648e23f50fec2fddc968883), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "mica20", "MICA DOS v.20 (1984-04-03)" )
-	ROMX_LOAD( "mica2006.2k",  0x6000, 0x1000, CRC(58bc2aa8) SHA1(0604bd2396f7d15fcf3d65888b4b673f554037c0), ROM_BIOS(2) )
+	ROMX_LOAD( "mica2006.2k",  0x6000, 0x1000, CRC(58bc2aa8) SHA1(0604bd2396f7d15fcf3d65888b4b673f554037c0), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "catnet", "CAT-NET" )
-	ROMX_LOAD( "cmd8_5.2k",    0x6000, 0x1000, CRC(25430ef7) SHA1(03a36874c23c215a19b0be14ad2f6b3b5fb2c839), ROM_BIOS(3) )
+	ROMX_LOAD( "cmd8_5.2k",    0x6000, 0x1000, CRC(25430ef7) SHA1(03a36874c23c215a19b0be14ad2f6b3b5fb2c839), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "luxnet", "LUXNET" )
-	ROMX_LOAD( "ln806.2k",    0x6000, 0x1000, CRC(034b5991) SHA1(ba7f8653f4e516687a4399abef450e361f2bfd20), ROM_BIOS(4) )
+	ROMX_LOAD( "ln806.2k",    0x6000, 0x1000, CRC(034b5991) SHA1(ba7f8653f4e516687a4399abef450e361f2bfd20), ROM_BIOS(5) )
 	ROM_LOAD_OPTIONAL( "abc 76-11.2j",  0x7000, 0x1000, CRC(3eb5f6a1) SHA1(02d4e38009c71b84952eb3b8432ad32a98a7fe16) ) // Options-PROM ABC 76-11 "64 90238-02"
 	ROM_LOAD( "abc 76-xx.2j",  0x7000, 0x1000, CRC(b364cc49) SHA1(9a2c373778856a31902cdbd2ae3362c200a38e24) ) // Enhanced Options-PROM
 

@@ -26,7 +26,6 @@ and an unpopulated position for a YM2413 or UM3567
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -37,8 +36,8 @@ and an unpopulated position for a YM2413 or UM3567
 class fun_tech_corp_state : public driver_device
 {
 public:
-	fun_tech_corp_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	fun_tech_corp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_reel1_ram(*this, "reel1ram"),
 		m_reel2_ram(*this, "reel2ram"),
@@ -50,8 +49,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U)
-	{ }
+		m_lamps(*this, "lamp%u", 0U) { }
 
 	void funtech(machine_config &config);
 
@@ -259,10 +257,10 @@ void fun_tech_corp_state::funtech_map(address_map &map)
 
 	map(0xd800, 0xdfff).ram().share("nvram");
 
-	map(0xe000, 0xefff).ram().w(FUNC(fun_tech_corp_state::fgram_w)).share("fgram");
-	map(0xf000, 0xf1ff).ram().w(FUNC(fun_tech_corp_state::reel1_ram_w)).share("reel1ram");
-	map(0xf200, 0xf3ff).ram().w(FUNC(fun_tech_corp_state::reel2_ram_w)).share("reel2ram");
-	map(0xf400, 0xf5ff).ram().w(FUNC(fun_tech_corp_state::reel3_ram_w)).share("reel3ram");
+	map(0xe000, 0xefff).ram().w(this, FUNC(fun_tech_corp_state::fgram_w)).share("fgram");
+	map(0xf000, 0xf1ff).ram().w(this, FUNC(fun_tech_corp_state::reel1_ram_w)).share("reel1ram");
+	map(0xf200, 0xf3ff).ram().w(this, FUNC(fun_tech_corp_state::reel2_ram_w)).share("reel2ram");
+	map(0xf400, 0xf5ff).ram().w(this, FUNC(fun_tech_corp_state::reel3_ram_w)).share("reel3ram");
 	map(0xf600, 0xf7ff).ram();
 
 	map(0xf840, 0xf87f).ram().share("reel1_scroll");
@@ -323,10 +321,10 @@ void fun_tech_corp_state::funtech_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	// lamps?
-	map(0x00, 0x00).w(FUNC(fun_tech_corp_state::lamps_w));
-	map(0x01, 0x01).w(FUNC(fun_tech_corp_state::coins_w));
+	map(0x00, 0x00).w(this, FUNC(fun_tech_corp_state::lamps_w));
+	map(0x01, 0x01).w(this, FUNC(fun_tech_corp_state::coins_w));
 
-	map(0x03, 0x03).w(FUNC(fun_tech_corp_state::vreg_w));
+	map(0x03, 0x03).w(this, FUNC(fun_tech_corp_state::vreg_w));
 
 	map(0x04, 0x04).portr("IN0");
 	map(0x05, 0x05).portr("IN1");
@@ -504,17 +502,19 @@ MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 	MCFG_SCREEN_UPDATE_DRIVER(fun_tech_corp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_funtech)
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x200);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funtech)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", 1500000).add_route(ALL_OUTPUTS, "mono", 1.00); /* M5255, ? MHz */
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* M5255, ? MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

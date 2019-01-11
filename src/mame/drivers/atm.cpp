@@ -29,26 +29,25 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
-	void atm(machine_config &config);
-	void atmtb2(machine_config &config);
-
-private:
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
 	DECLARE_READ8_MEMBER(beta_neutral_r);
 	DECLARE_READ8_MEMBER(beta_enable_r);
 	DECLARE_READ8_MEMBER(beta_disable_r);
 	DECLARE_MACHINE_RESET(atm);
 
+	void atm(machine_config &config);
+	void atmtb2(machine_config &config);
 	void atm_io(address_map &map);
 	void atm_mem(address_map &map);
 	void atm_switch(address_map &map);
-
+protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 
+private:
 	address_space *m_program;
 	uint8_t *m_p_ram;
 	void atm_update_memory();
@@ -127,18 +126,18 @@ void atm_state::atm_io(address_map &map)
 	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
 	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
 	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
-	map(0x00fe, 0x00fe).rw(FUNC(atm_state::spectrum_port_fe_r), FUNC(atm_state::spectrum_port_fe_w)).select(0xff00);
+	map(0x00fe, 0x00fe).rw(this, FUNC(atm_state::spectrum_port_fe_r), FUNC(atm_state::spectrum_port_fe_w)).select(0xff00);
 	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
-	map(0x4000, 0x4000).w(FUNC(atm_state::atm_port_7ffd_w)).mirror(0x3ffd);
+	map(0x4000, 0x4000).w(this, FUNC(atm_state::atm_port_7ffd_w)).mirror(0x3ffd);
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
 }
 
 void atm_state::atm_switch(address_map &map)
 {
-	map(0x0000, 0x3fff).r(FUNC(atm_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
-	map(0x3d00, 0x3dff).r(FUNC(atm_state::beta_enable_r));
-	map(0x4000, 0xffff).r(FUNC(atm_state::beta_disable_r));
+	map(0x0000, 0x3fff).r(this, FUNC(atm_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
+	map(0x3d00, 0x3dff).r(this, FUNC(atm_state::beta_enable_r));
+	map(0x4000, 0xffff).r(this, FUNC(atm_state::beta_disable_r));
 }
 
 MACHINE_RESET_MEMBER(atm_state,atm)
@@ -189,25 +188,23 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(atm_state::atm)
 	spectrum_128(config);
-
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(atm_mem)
 	MCFG_DEVICE_IO_MAP(atm_io)
 	MCFG_DEVICE_OPCODES_MAP(atm_switch)
 	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
-	BETA_DISK(config, m_beta, 0);
+	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atm)
 
-	config.device_remove("exp");
+	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
-void atm_state::atmtb2(machine_config &config)
-{
+MACHINE_CONFIG_START(atm_state::atmtb2)
 	atm(config);
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atmtb2);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atmtb2)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -219,29 +216,29 @@ void atm_state::atmtb2(machine_config &config)
 ROM_START( atm )
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "v.1.03")
-	ROMX_LOAD( "atm103.rom", 0x010000, 0x10000, CRC(4912e249) SHA1(a4adff05bb215dd126c47201b36956115b8fed76), ROM_BIOS(0))
+	ROMX_LOAD( "atm103.rom", 0x010000, 0x10000, CRC(4912e249) SHA1(a4adff05bb215dd126c47201b36956115b8fed76), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v2", "v.1.06 joined")
-	ROMX_LOAD( "atm106.rom", 0x010000, 0x10000, CRC(75350b37) SHA1(2afc9994f026645c74b6c4b35bcee2e0bc0d6edc), ROM_BIOS(1))
+	ROMX_LOAD( "atm106.rom", 0x010000, 0x10000, CRC(75350b37) SHA1(2afc9994f026645c74b6c4b35bcee2e0bc0d6edc), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v3", "v.1.06")
-	ROMX_LOAD( "atm106-1.rom", 0x010000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(2))
-	ROMX_LOAD( "atm106-2.rom", 0x014000, 0x4000, CRC(8fe367f9) SHA1(56de8fd39061663b9c315b74fd3c31acddae279c), ROM_BIOS(2))
-	ROMX_LOAD( "atm106-3.rom", 0x018000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(2))
-	ROMX_LOAD( "atm106-4.rom", 0x01c000, 0x4000, CRC(f352f2ab) SHA1(6045500ab01be708cef62327e9821b4a358a4673), ROM_BIOS(2))
+	ROMX_LOAD( "atm106-1.rom", 0x010000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(3))
+	ROMX_LOAD( "atm106-2.rom", 0x014000, 0x4000, CRC(8fe367f9) SHA1(56de8fd39061663b9c315b74fd3c31acddae279c), ROM_BIOS(3))
+	ROMX_LOAD( "atm106-3.rom", 0x018000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(3))
+	ROMX_LOAD( "atm106-4.rom", 0x01c000, 0x4000, CRC(f352f2ab) SHA1(6045500ab01be708cef62327e9821b4a358a4673), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "v4", "v.1.03rs")
-	ROMX_LOAD( "atm103rs.rom", 0x010000, 0x10000, CRC(cdec1dfb) SHA1(08190807c6b110cb2e657d8e7d0ad18668915375), ROM_BIOS(3))
+	ROMX_LOAD( "atm103rs.rom", 0x010000, 0x10000, CRC(cdec1dfb) SHA1(08190807c6b110cb2e657d8e7d0ad18668915375), ROM_BIOS(4))
 ROM_END
 
 ROM_START( atmtb2 )
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "v.1.07.12 joined")
-	ROMX_LOAD( "atmtb2.rom",   0x010000, 0x10000,CRC(05218c26) SHA1(71ed9864e7aa85131de97cf1e53dc152e7c79488), ROM_BIOS(0))
+	ROMX_LOAD( "atmtb2.rom",   0x010000, 0x10000,CRC(05218c26) SHA1(71ed9864e7aa85131de97cf1e53dc152e7c79488), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v2", "v.1.07.12")
-	ROMX_LOAD( "atmtb2-1.rom", 0x010000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(1))
-	ROMX_LOAD( "atmtb2-2.rom", 0x014000, 0x4000, CRC(bc3f6b2b) SHA1(afa9df63857141fef270e2c97e12d2edc60cf919), ROM_BIOS(1))
-	ROMX_LOAD( "atmtb2-3.rom", 0x018000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(1))
-	ROMX_LOAD( "atmtb2-4.rom", 0x01c000, 0x4000, CRC(5869d8c4) SHA1(c3e198138f528ac4a8dff3c76cd289fd4713abff), ROM_BIOS(1))
+	ROMX_LOAD( "atmtb2-1.rom", 0x010000, 0x4000, CRC(658c98f1) SHA1(1ec694795aa6cac10147e58f38a9db0bdf7ed89b), ROM_BIOS(2))
+	ROMX_LOAD( "atmtb2-2.rom", 0x014000, 0x4000, CRC(bc3f6b2b) SHA1(afa9df63857141fef270e2c97e12d2edc60cf919), ROM_BIOS(2))
+	ROMX_LOAD( "atmtb2-3.rom", 0x018000, 0x4000, CRC(124ad9e0) SHA1(d07fcdeca892ee80494d286ea9ea5bf3928a1aca), ROM_BIOS(2))
+	ROMX_LOAD( "atmtb2-4.rom", 0x01c000, 0x4000, CRC(5869d8c4) SHA1(c3e198138f528ac4a8dff3c76cd289fd4713abff), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v3", "v.1.07.13")
-	ROMX_LOAD( "atmtb213.rom", 0x010000, 0x10000, CRC(34a91d53) SHA1(8f0af0f3c0ff1644535f20545c73d01576d6e52f), ROM_BIOS(2))
+	ROMX_LOAD( "atmtb213.rom", 0x010000, 0x10000, CRC(34a91d53) SHA1(8f0af0f3c0ff1644535f20545c73d01576d6e52f), ROM_BIOS(3))
 
 	ROM_REGION(0x01000, "keyboard", ROMREGION_ERASEFF)
 	// XT Keyboard

@@ -35,6 +35,11 @@ void vt83c461_device::device_start()
 	save_item(NAME(m_config_register_num));
 }
 
+READ32_MEMBER( vt83c461_device::read_config )
+{
+	return read_config(offset);
+}
+
 uint32_t vt83c461_device::read_config(offs_t offset)
 {
 	uint32_t result = 0;
@@ -66,6 +71,11 @@ uint32_t vt83c461_device::read_config(offs_t offset)
 	}
 
 	return result;
+}
+
+WRITE32_MEMBER( vt83c461_device::write_config )
+{
+	write_config(offset, data);
 }
 
 void vt83c461_device::write_config(offs_t offset, uint32_t data)

@@ -539,7 +539,8 @@ void symbol_table::set_memory_value(const char *name, expression_space space, u3
 //-------------------------------------------------
 
 parsed_expression::parsed_expression(symbol_table *symtable, const char *expression, u64 *result)
-	: m_symtable(symtable)
+	: m_symtable(symtable),
+	m_token_stack_ptr(0)
 {
 	// if we got an expression parse it
 	if (expression != nullptr)
@@ -1209,13 +1210,15 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 
 		// Determine if , refers to a function parameter
 		case TVL_COMMA:
-			for (auto lookback = m_token_stack.rbegin(); lookback != m_token_stack.rend(); ++lookback)
+			for (int lookback = 0; lookback < MAX_STACK_DEPTH; lookback++)
 			{
-				parse_token &peek = *lookback;
+				parse_token *peek = peek_token(lookback);
+				if (peek == nullptr)
+					break;
 
 				// if we hit an execute function operator, or else a left parenthesis that is
 				// already tagged, then tag us as well
-				if (peek.is_operator(TVL_EXECUTEFUNC) || (peek.is_operator(TVL_LPAREN) && peek.is_function_separator()))
+				if (peek->is_operator(TVL_EXECUTEFUNC) || (peek->is_operator(TVL_LPAREN) && peek->is_function_separator()))
 				{
 					thistoken.set_function_separator();
 					break;
@@ -1329,11 +1332,11 @@ void parsed_expression::infix_to_postfix()
 inline void parsed_expression::push_token(parse_token &token)
 {
 	// check for overflow
-	if (m_token_stack.size() >= m_token_stack.max_size())
+	if (m_token_stack_ptr >= MAX_STACK_DEPTH)
 		throw expression_error(expression_error::STACK_OVERFLOW, token.offset());
 
 	// push
-	m_token_stack.push_back(token);
+	m_token_stack[m_token_stack_ptr++] = token;
 }
 
 
@@ -1344,12 +1347,24 @@ inline void parsed_expression::push_token(parse_token &token)
 inline void parsed_expression::pop_token(parse_token &token)
 {
 	// check for underflow
-	if (m_token_stack.empty())
+	if (m_token_stack_ptr == 0)
 		throw expression_error(expression_error::STACK_UNDERFLOW, token.offset());
 
 	// pop
-	token = std::move(m_token_stack.back());
-	m_token_stack.pop_back();
+	token = m_token_stack[--m_token_stack_ptr];
+}
+
+
+//-------------------------------------------------
+//  peek_token - look at a token some number of
+//  entries up the stack
+//-------------------------------------------------
+
+inline parsed_expression::parse_token *parsed_expression::peek_token(int count)
+{
+	if (m_token_stack_ptr <= count)
+		return nullptr;
+	return &m_token_stack[m_token_stack_ptr - count - 1];
 }
 
 
@@ -1397,7 +1412,7 @@ inline void parsed_expression::pop_token_rval(parse_token &token)
 u64 parsed_expression::execute_tokens()
 {
 	// reset the token stack
-	m_token_stack.clear();
+	m_token_stack_ptr = 0;
 
 	// loop over the entire sequence
 	parse_token t1, t2, result;
@@ -1647,7 +1662,7 @@ u64 parsed_expression::execute_tokens()
 	pop_token_rval(result);
 
 	// error if our stack isn't empty
-	if (!m_token_stack.empty())
+	if (peek_token(0) != nullptr)
 		throw expression_error(expression_error::SYNTAX, 0);
 
 	return result.value();
@@ -1726,17 +1741,18 @@ void parsed_expression::execute_function(parse_token &token)
 	while (paramcount < MAX_FUNCTION_PARAMS)
 	{
 		// peek at the next token on the stack
-		if (m_token_stack.empty())
+		parse_token *peek = peek_token(0);
+		if (peek == nullptr)
 			throw expression_error(expression_error::INVALID_PARAM_COUNT, token.offset());
-		parse_token &peek = m_token_stack.back();
 
 		// if it is a function symbol, break out of the loop
-		if (peek.is_symbol())
+		if (peek->is_symbol())
 		{
-			symbol = peek.symbol();
+			symbol = peek->symbol();
 			if (symbol->is_function())
 			{
-				m_token_stack.pop_back();
+				parse_token t1;
+				pop_token(t1);
 				break;
 			}
 		}

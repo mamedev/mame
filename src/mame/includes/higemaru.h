@@ -5,30 +5,21 @@
     Pirate Ship Higemaru
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_HIGEMARU_H
-#define MAME_INCLUDES_HIGEMARU_H
-
-#pragma once
 
 #include "machine/timer.h"
-#include "emupal.h"
 
 class higemaru_state : public driver_device
 {
 public:
-	higemaru_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	higemaru_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void higemaru(machine_config &config);
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -41,14 +32,13 @@ private:
 	DECLARE_WRITE8_MEMBER(higemaru_c800_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	void higemaru_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(higemaru);
 	uint32_t screen_update_higemaru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(higemaru_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void higemaru(machine_config &config);
 	void higemaru_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_HIGEMARU_H

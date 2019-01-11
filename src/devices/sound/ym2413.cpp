@@ -1616,14 +1616,6 @@ void ym2413_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_clock_changed
-//-------------------------------------------------
-void ym2413_device::device_clock_changed()
-{
-	m_stream->set_sample_rate(clock() / 72);
-}
-
-//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 

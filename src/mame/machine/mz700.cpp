@@ -471,13 +471,15 @@ WRITE_LINE_MEMBER(mz_state::pit_irq_2)
 
 READ8_MEMBER(mz_state::pio_port_b_r)
 {
-	const int key_line = m_ls145->read();
+	device_t *device = machine().device("ls145");
+	int key_line = dynamic_cast<ttl74145_device *>(device)->read();
 	const char *const keynames[10] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
+	int i;
 	uint8_t res = 0;
 
-	for (int i = 0; i < 10; i++)
+	for(i=0;i<10;i++)
 	{
-		if (key_line & (1 << i))
+		if(key_line & (1 << i))
 			res |= ioport(keynames[i])->read();
 	}
 
@@ -501,7 +503,7 @@ READ8_MEMBER(mz_state::pio_port_c_r)
 	if ((m_cassette)->input() > 0.0038)
 		data |= 0x20;       /* set the RDATA status */
 
-	data |= m_cursor_bit << 6;
+	data |= m_cursor_timer << 6;
 	data |= m_screen->vblank() << 7;
 
 	LOG(2,"mz700_pio_port_c_r",("%02X\n", data),machine());
@@ -512,13 +514,16 @@ READ8_MEMBER(mz_state::pio_port_c_r)
 
 WRITE8_MEMBER(mz_state::pio_port_a_w)
 {
+	device_t *device = machine().device("ls145");
+	timer_device *timer = machine().device<timer_device>("cursor");
+
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),machine());
 
 	/* the ls145 is connected to PA0-PA3 */
-	m_ls145->write(data & 0x0f);
+	dynamic_cast<ttl74145_device *>(device)->write(data & 0x0f);
 
 	/* ne556 reset is connected to PA7 */
-	m_cursor_timer->enable(BIT(data, 7));
+	timer->enable(BIT(data, 7));
 }
 
 

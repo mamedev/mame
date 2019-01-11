@@ -44,6 +44,7 @@ CS-1 Towns                                                    Unitek Japan      
 Cyber Animater                                                Fujitsu                           1992/7     FD
 CyberMotion                                                   Fujitsu                           1993/3     FD
 D.O. Kaizokuban                                               Brother Kougyou (Takeru)          1993/5     FD×03
+Daisenryaku 3 '90 Map Collection Vol. 1                       Pegasus Japan                     1992/5     FD
 Daisenryaku 3 '90 Map Collection Vol. 2                       Pegasus Japan                     1992/7     FD
 Darwin's Dilemma                                              Starcraft                         1991/8     FD
 Data Townsman                                                 Log                               1991/7     FD
@@ -552,20 +553,6 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1282512">
 				<rom name="columns.d88" size="1282512" crc="ee75f23b" sha1="a6f5593b2ad2b763455784d403fa50ec4f8f64c5" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dai3map1">
-		<!-- Origin: Private dump (r09) -->
-		<description>Daisenryaku III '90 Map Collection Vol. 1</description>
-		<year>1992</year>
-		<publisher>ペガサスジャパン (Pegasus Japan)</publisher>
-		<info name="release" value="199205xx" />
-		<info name="usage" value="Expansion disk for Daisenryaku III '90. Load the main game, insert this disk in any floppy drive, and press F1 in the map screen to select the load option." />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="daisenryaku iii '90 map collection vol. 1.hdm" size="1261568" crc="2828cff9" sha1="d62df199fbac964580aaffd392ff51ce00279395" offset="0" />
 			</dataarea>
 		</part>
 	</software>

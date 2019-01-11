@@ -19,28 +19,21 @@
  *
  *************************************/
 
-void qixmcu_state::machine_start()
-{
-	/* set up save states */
-	save_item(NAME(m_68705_porta_out));
-	save_item(NAME(m_coinctrl));
-}
-
-void qixmcu_state::machine_reset()
+void qix_state::machine_reset()
 {
 	/* reset the coin counter register */
 	m_coinctrl = 0x00;
 }
 
-void zookeep_state::machine_start()
-{
-	qixmcu_state::machine_start();
 
-	/* configure the banking */
-	membank("bank1")->configure_entry(0, memregion("videocpu")->base() + 0xa000);
-	membank("bank1")->configure_entry(1, memregion("videocpu")->base() + 0x10000);
-	membank("bank1")->set_entry(0);
+MACHINE_START_MEMBER(qix_state,qixmcu)
+{
+	/* set up save states */
+	save_item(NAME(m_68705_portA_out));
+	save_item(NAME(m_coinctrl));
 }
+
+
 
 /*************************************
  *
@@ -61,7 +54,7 @@ WRITE_LINE_MEMBER(qix_state::qix_vsync_changed)
  *
  *************************************/
 
-WRITE8_MEMBER(zookeep_state::bankswitch_w)
+WRITE8_MEMBER(qix_state::zookeep_bankswitch_w)
 {
 	membank("bank1")->set_entry((data >> 2) & 1);
 	/* not necessary, but technically correct */
@@ -142,23 +135,23 @@ READ8_MEMBER(qix_state::qix_video_firq_ack_r)
  *
  *************************************/
 
-READ8_MEMBER(qixmcu_state::coin_r)
+READ8_MEMBER(qix_state::qixmcu_coin_r)
 {
-	logerror("qixmcu_state, coin_r = %02X\n", m_68705_porta_out);
-	return m_68705_porta_out;
+	logerror("6809:qixmcu_coin_r = %02X\n", m_68705_portA_out);
+	return m_68705_portA_out;
 }
 
 
-WRITE8_MEMBER(qixmcu_state::coin_w)
+WRITE8_MEMBER(qix_state::qixmcu_coin_w)
 {
-	logerror("qixmcu_state, coin_w = %02X\n", data);
+	logerror("6809:qixmcu_coin_w = %02X\n", data);
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
 	m_mcu->pa_w(space, 0, data, mem_mask);
 }
 
 
-WRITE8_MEMBER(qixmcu_state::coinctrl_w)
+WRITE8_MEMBER(qix_state::qixmcu_coinctrl_w)
 {
 	if (BIT(data, 2))
 	{
@@ -175,7 +168,7 @@ WRITE8_MEMBER(qixmcu_state::coinctrl_w)
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
 	m_coinctrl = data;
-	logerror("qixmcu_state, coinctrl_w = %02X\n", data);
+	logerror("6809:qixmcu_coinctrl_w = %02X\n", data);
 }
 
 
@@ -186,13 +179,13 @@ WRITE8_MEMBER(qixmcu_state::coinctrl_w)
  *
  *************************************/
 
-READ8_MEMBER(qixmcu_state::mcu_portb_r)
+READ8_MEMBER(qix_state::qix_68705_portB_r)
 {
 	return (ioport("COIN")->read() & 0x0f) | ((ioport("COIN")->read() & 0x80) >> 3);
 }
 
 
-READ8_MEMBER(qixmcu_state::mcu_portc_r)
+READ8_MEMBER(qix_state::qix_68705_portC_r)
 {
 	return (m_coinctrl & 0x08) | ((ioport("COIN")->read() & 0x70) >> 4);
 }
@@ -205,14 +198,14 @@ READ8_MEMBER(qixmcu_state::mcu_portc_r)
  *
  *************************************/
 
-WRITE8_MEMBER(qixmcu_state::mcu_porta_w)
+WRITE8_MEMBER(qix_state::qix_68705_portA_w)
 {
 	logerror("68705:portA_w = %02X\n", data);
-	m_68705_porta_out = data;
+	m_68705_portA_out = data;
 }
 
 
-WRITE8_MEMBER(qixmcu_state::mcu_portb_w)
+WRITE8_MEMBER(qix_state::qix_68705_portB_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
 	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
@@ -264,7 +257,7 @@ WRITE8_MEMBER(qix_state::qix_coinctl_w)
 WRITE8_MEMBER(qix_state::slither_76489_0_w)
 {
 	/* write to the sound chip */
-	m_sn1->write(data);
+	m_sn1->write(generic_space(), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	m_pia1->cb1_w(0);
@@ -275,7 +268,7 @@ WRITE8_MEMBER(qix_state::slither_76489_0_w)
 WRITE8_MEMBER(qix_state::slither_76489_1_w)
 {
 	/* write to the sound chip */
-	m_sn2->write(data);
+	m_sn2->write(generic_space(), 0, data);
 
 	/* clock the ready line going back into CB1 */
 	m_pia2->cb1_w(0);

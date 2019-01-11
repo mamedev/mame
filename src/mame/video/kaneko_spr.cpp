@@ -71,7 +71,7 @@ void kaneko16_sprite_device::device_start()
 
 	save_item(NAME(m_sprite_flipx));
 	save_item(NAME(m_sprite_flipy));
-	save_pointer(NAME(m_sprites_regs), 0x20/2);
+	save_pointer(NAME(m_sprites_regs.get()), 0x20/2);
 	save_item(NAME(m_keep_sprites));
 	save_item(NAME(m_sprites_bitmap));
 }

@@ -51,8 +51,8 @@ private:
 		t_OUT  = 1 << 15    /* Debugger step out (RETURN) */
 	}   pps4_token_e;
 
-	static char const *const token_str[t_COUNT];
-	static uint16_t const table[];
+	static const char *token_str[t_COUNT];
+	static const uint16_t table[];
 
 };
 

@@ -102,14 +102,12 @@ DONE:
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "imagedev/floppy.h"
 #include "machine/ay31015.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/tms9927.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -117,6 +115,11 @@ DONE:
 class notetaker_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_FIFOCLK,
+	};
+
 	notetaker_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag) ,
 		m_iop_cpu(*this, "iop_cpu"),
@@ -132,17 +135,6 @@ public:
 		m_floppy(nullptr)
 	{
 	}
-
-	void notetakr(machine_config &config);
-
-	void init_notetakr();
-
-private:
-	enum
-	{
-		TIMER_FIFOCLK,
-	};
-
 // devices
 	required_device<cpu_device> m_iop_cpu;
 	required_device<pic8259_device> m_iop_pic;
@@ -179,6 +171,7 @@ private:
 	// mem map stuff
 	DECLARE_READ16_MEMBER(iop_r);
 	DECLARE_WRITE16_MEMBER(iop_w);
+	void init_notetakr();
 	//variables
 	//  IPConReg
 	uint8_t m_BootSeqDone;
@@ -234,11 +227,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void notetakr(machine_config &config);
 	void iop_io(address_map &map);
 	void iop_mem(address_map &map);
 	void ep_io(address_map &map);
 	void ep_mem(address_map &map);
-
+protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -270,7 +264,7 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 	}
 	m_outfifo_tail_ptr&=0xF;
 	m_dac->write(data);
-	m_FIFO_timer->adjust(attotime::from_hz(((960_kHz_XTAL/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -368,7 +362,7 @@ WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 	m_FrSel2 = (data&0x0400)?1:0;
 	m_TabletXOn = (data&0x0200)?1:0;
 	m_TabletYOn = (data&0x0100)?1:0;
-	m_FIFO_timer->adjust(attotime::from_hz(((960_kHz_XTAL/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 	/* FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter),
 	divided by 4 (mc14568B with divider 1 pins set to 4), divided by
 	1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?)
@@ -551,12 +545,12 @@ void notetaker_state::iop_mem(address_map &map)
 	map(0x01000, 0x3ffff).ram().region("mainram", 0); // 256k of ram (less 8k), shared between both processors. rom goes here if bootseqdone is 0
 	// note 4000-d5ff is the framebuffer for the screen, in two sets of fields for odd/even interlace?
 	map(0xff000, 0xfffe7).rom().region("iop", 0xff000); // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
-	//map(0xfffea, 0xfffeb).w(FUNC(notetaker_state::cpuCtl_w));
-	//map(0xfffec, 0xfffed).r(FUNC(notetaker_state::parityErrHi_r));
+	//map(0xfffea, 0xfffeb).w(this, FUNC(notetaker_state::cpuCtl_w));
+	//map(0xfffec, 0xfffed).r(this, FUNC(notetaker_state::parityErrHi_r));
 	//map(0xfffee, 0xfffef).r(this. FUNC(notetaker_state::parityErrLo_r));
 	map(0xffff0, 0xfffff).rom().region("iop", 0xffff0);
 	*/
-	map(0x00000, 0xfffff).rw(FUNC(notetaker_state::iop_r), FUNC(notetaker_state::iop_w)); // bypass MAME's memory map system as we need finer grained control
+	map(0x00000, 0xfffff).rw(this, FUNC(notetaker_state::iop_r), FUNC(notetaker_state::iop_w)); // bypass MAME's memory map system as we need finer grained control
 }
 
 /* iop memory map comes from http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf
@@ -597,28 +591,28 @@ void notetaker_state::iop_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x03).mirror(0x7e1c).rw(m_iop_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x20, 0x21).mirror(0x7e1e).w(FUNC(notetaker_state::IPConReg_w)); // I/O processor (rom mapping, etc) control register
+	map(0x20, 0x21).mirror(0x7e1e).w(this, FUNC(notetaker_state::IPConReg_w)); // I/O processor (rom mapping, etc) control register
 	map(0x42, 0x42).mirror(0x7e10).r(m_kbduart, FUNC(ay31015_device::receive)); // read keyboard data
-	map(0x44, 0x45).mirror(0x7e10).r(FUNC(notetaker_state::ReadOPStatus_r)); // read keyboard fifo state
-	map(0x48, 0x49).mirror(0x7e10).w(FUNC(notetaker_state::LoadKeyCtlReg_w)); // kbd uart control register
+	map(0x44, 0x45).mirror(0x7e10).r(this, FUNC(notetaker_state::ReadOPStatus_r)); // read keyboard fifo state
+	map(0x48, 0x49).mirror(0x7e10).w(this, FUNC(notetaker_state::LoadKeyCtlReg_w)); // kbd uart control register
 	map(0x4a, 0x4a).mirror(0x7e10).w(m_kbduart, FUNC(ay31015_device::transmit)); // kbd uart data register
-	map(0x4c, 0x4d).mirror(0x7e10).w(FUNC(notetaker_state::KeyDataReset_w)); // kbd uart ddr switch (data reset)
-	map(0x4e, 0x4f).mirror(0x7e10).w(FUNC(notetaker_state::KeyChipReset_w)); // kbd uart reset
-	map(0x60, 0x61).mirror(0x7e1e).w(FUNC(notetaker_state::FIFOReg_w)); // DAC sample and hold and frequency setup
+	map(0x4c, 0x4d).mirror(0x7e10).w(this, FUNC(notetaker_state::KeyDataReset_w)); // kbd uart ddr switch (data reset)
+	map(0x4e, 0x4f).mirror(0x7e10).w(this, FUNC(notetaker_state::KeyChipReset_w)); // kbd uart reset
+	map(0x60, 0x61).mirror(0x7e1e).w(this, FUNC(notetaker_state::FIFOReg_w)); // DAC sample and hold and frequency setup
 	//map(0xa0, 0xa1).mirror(0x7e18).rw("debug8255", FUNC(8255_device::read), FUNC(8255_device::write)); // debugger board 8255
-	map(0xc0, 0xc1).mirror(0x7e1e).w(FUNC(notetaker_state::FIFOBus_w)); // DAC data write to FIFO
-	map(0x100, 0x101).mirror(0x7e1e).w(FUNC(notetaker_state::DiskReg_w)); // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
+	map(0xc0, 0xc1).mirror(0x7e1e).w(this, FUNC(notetaker_state::FIFOBus_w)); // DAC data write to FIFO
+	map(0x100, 0x101).mirror(0x7e1e).w(this, FUNC(notetaker_state::DiskReg_w)); // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
 	map(0x120, 0x127).mirror(0x7e18).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write)).umask16(0x00ff); // floppy controller
 	map(0x140, 0x15f).mirror(0x7e00).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write)).umask16(0x00ff); // crt controller
-	map(0x160, 0x161).mirror(0x7e1e).w(FUNC(notetaker_state::LoadDispAddr_w)); // loads the start address for the display framebuffer
-	map(0x1a0, 0x1a1).mirror(0x7e10).r(FUNC(notetaker_state::ReadEIAStatus_r)); // read eia fifo state
+	map(0x160, 0x161).mirror(0x7e1e).w(this, FUNC(notetaker_state::LoadDispAddr_w)); // loads the start address for the display framebuffer
+	map(0x1a0, 0x1a1).mirror(0x7e10).r(this, FUNC(notetaker_state::ReadEIAStatus_r)); // read eia fifo state
 	map(0x1a2, 0x1a2).mirror(0x7e10).r(m_eiauart, FUNC(ay31015_device::receive)); // read eia data
-	map(0x1a8, 0x1a9).mirror(0x7e10).w(FUNC(notetaker_state::LoadEIACtlReg_w)); // eia uart control register
+	map(0x1a8, 0x1a9).mirror(0x7e10).w(this, FUNC(notetaker_state::LoadEIACtlReg_w)); // eia uart control register
 	map(0x1aa, 0x1aa).mirror(0x7e10).w(m_eiauart, FUNC(ay31015_device::transmit)); // eia uart data register
-	map(0x1ac, 0x1ad).mirror(0x7e10).w(FUNC(notetaker_state::EIADataReset_w)); // eia uart ddr switch (data reset)
-	map(0x1ae, 0x1af).mirror(0x7e10).w(FUNC(notetaker_state::EIAChipReset_w)); // eia uart reset
-	//map(0x1c0, 0x1c1).mirror(0x7e1e).r(FUNC(notetaker_state::SelADCHi_r)); // ADC read
-	//map(0x1e0, 0x1e1).mirror(0x7e1e).r(FUNC(notetaker_state::CRTSwitch_w)); // CRT power enable?
+	map(0x1ac, 0x1ad).mirror(0x7e10).w(this, FUNC(notetaker_state::EIADataReset_w)); // eia uart ddr switch (data reset)
+	map(0x1ae, 0x1af).mirror(0x7e10).w(this, FUNC(notetaker_state::EIAChipReset_w)); // eia uart reset
+	//map(0x1c0, 0x1c1).mirror(0x7e1e).r(this, FUNC(notetaker_state::SelADCHi_r)); // ADC read
+	//map(0x1e0, 0x1e1).mirror(0x7e1e).r(this, FUNC(notetaker_state::CRTSwitch_w)); // CRT power enable?
 }
 
 /* iop_pic8259 interrupts:
@@ -682,7 +676,7 @@ WRITE16_MEMBER(notetaker_state::EPConReg_w)
 	m_EP_LED3 = (data&0x20)?1:0;
 	m_EP_LED4 = (data&0x10)?1:0;
 	m_EP_LED_SelROM_q = (data&0x08)?1:0; // this doesn't appear to be hooked anywhere, andjust drives an LED
-	// originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision in favor of having the IOP write the boot vectors for the EP to the shared ram instead. See below for how the top two address bits are disconnected to allow this to work with the way the shared ram is mapped.
+	// originally, SelROM_q enabled two 2716 EPROMS, later 82s137 PROMS to map code to the FFC00-FFFFF area but this was dropped in the 1979 design revision
 	m_EP_ProcLock = (data&0x04)?1:0; // bus lock for this processor (hold other processor in wait state)
 	m_EP_SetParity_q = (data&0x02)?1:0; // enable parity checking on local ram if low
 	m_EP_DisLMem_q = (data&0x01)?1:0; // if low, the low 8k of local memory is disabled and accesses the shared memory instead.
@@ -691,7 +685,7 @@ WRITE16_MEMBER(notetaker_state::EPConReg_w)
 
 /*
 Emulator cpu mem map:
-(The top two address bits are disconnected, to allow the ram board, which maps itself only at 00000-3ffff, to appear at "ffff0" to the ep processor when /reset is de-asserted by the iop)
+(The top two address bits are disconnected, to allow the ram board, which maps itself only at 00000-3ffff, to appear at "ffff0" to the processor when /reset is de-asserted by the iop)
 a19 a18 a17 a16  a15 a14 a13 a12  a11 a10 a9  a8   a7  a6  a5  a4   a3  a2  a1  a0   DisLMem_q
 x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    0                       RW  Local (fast) RAM
 x   x   0   0    0   0   0   *    *   *   *   *    *   *   *   *    *   *   *   *    1                       RW  System/Shared RAM
@@ -709,8 +703,8 @@ void notetaker_state::ep_mem(address_map &map)
 {
 	map(0x00000, 0x01fff).mirror(0xc0000).ram(); // actually a banked block of ram, 8kb (4kw)
 	map(0x02000, 0x3ffff).mirror(0xc0000).ram().region("mainram", 0x2000); // 256k of ram (less 8k), shared between both processors, mirrored 4 times
-	//map(0xfffc0, 0xfffdf).mirror(0xc0000).rw(FUNC(notetaker_state::proc_illinst_r), FUNC(notetaker_state::proc_illinst_w));
-	//map(0xfffe0, 0xfffef).mirror(0xc0000).rw(FUNC(notetaker_state::proc_control_r), FUNC(notetaker_state::proc_control_w));
+	//map(0xfffc0, 0xfffdf).mirror(0xc0000).rw(this, FUNC(notetaker_state::proc_illinst_r), FUNC(notetaker_state::proc_illinst_w));
+	//map(0xfffe0, 0xfffef).mirror(0xc0000).rw(this, FUNC(notetaker_state::proc_control_r), FUNC(notetaker_state::proc_control_w));
 }
 
 /* note everything in the emulatorcpu's io range is incompletely decoded; so if
@@ -731,7 +725,7 @@ void notetaker_state::ep_io(address_map &map)
 	map.unmap_value_high();
 	map(0x800, 0x803).mirror(0x07fc).rw(m_ep_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	//map(0x1000, 0x1001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
-	map(0x2000, 0x2001).mirror(0x07fe).w(FUNC(notetaker_state::EPConReg_w)); // emu processor control reg & leds
+	map(0x2000, 0x2001).mirror(0x07fe).w(this, FUNC(notetaker_state::EPConReg_w)); // emu processor control reg & leds
 	//map(0x4000, 0x4001) AM_MIRROR(0x07fe) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
 }
 
@@ -801,23 +795,24 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	I8086(config, m_iop_cpu, 24_MHz_XTAL / 3); /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
-	m_iop_cpu->set_addrmap(AS_PROGRAM, &notetaker_state::iop_mem);
-	m_iop_cpu->set_addrmap(AS_IO, &notetaker_state::iop_io);
-	m_iop_cpu->set_irq_acknowledge_callback("iop_pic8259", FUNC(pic8259_device::inta_cb));
+	MCFG_DEVICE_ADD("iop_cpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	MCFG_DEVICE_PROGRAM_MAP(iop_mem)
+	MCFG_DEVICE_IO_MAP(iop_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("iop_pic8259", pic8259_device, inta_cb)
 
-	PIC8259(config, m_iop_pic, 0); // iP8259A-2 @ E6
-	m_iop_pic->out_int_callback().set_inputline(m_iop_cpu, 0);
+	MCFG_DEVICE_ADD("iop_pic8259", PIC8259, 0) // iP8259A-2 @ E6
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iop_cpu", 0))
 
 	/* Emulator CPU: 8086@5MHz */
-	I8086(config, m_ep_cpu, 15_MHz_XTAL / 3);
-	m_ep_cpu->set_disable(); // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
-	m_ep_cpu->set_addrmap(AS_PROGRAM, &notetaker_state::ep_mem);
-	m_ep_cpu->set_addrmap(AS_IO, &notetaker_state::ep_io);
-	m_ep_cpu->set_irq_acknowledge_callback("ep_pic8259", FUNC(pic8259_device::inta_cb));
+	MCFG_DEVICE_ADD("ep_cpu", I8086, XTAL(15'000'000)/3)
+	MCFG_DEVICE_DISABLE() // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
+	MCFG_DEVICE_PROGRAM_MAP(ep_mem)
+	MCFG_DEVICE_IO_MAP(ep_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ep_pic8259", pic8259_device, inta_cb)
 
-	PIC8259(config, m_ep_pic, 0); // iP8259A-2 @ E6
-	m_ep_pic->out_int_callback().set_inputline(m_ep_cpu, 0);
+	MCFG_DEVICE_ADD("ep_pic8259", PIC8259, 0) // iP8259A-2 @ E6
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("ep_cpu", 0))
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -828,10 +823,10 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	CRT5027(config, m_crtc, (36_MHz_XTAL / 4) / 8); // See below
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL(36'000'000)/4)/8) // See below
 	/* the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,
 	   2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably
 	   means divide by 1; documentation at
@@ -841,23 +836,21 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	   on reset, bitclk is 000 so divider is (36mhz/8)/8; during boot it is
 	   written with 101, changing the divider to (36mhz/4)/8 */
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in iop_reset();
-	m_crtc->set_char_width(8); //(8 pixels per column/halfword, 16 pixels per fullword)
+	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
 	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
-	m_crtc->vsyn_callback().set(m_iop_pic, FUNC(pic8259_device::ir4_w)); // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
-	m_crtc->set_screen("screen");
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
-	AY31015(config, m_kbduart); // HD6402, == AY-3-1015D
-	m_kbduart->set_rx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	m_kbduart->set_tx_clock(960_kHz_XTAL); // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	m_kbduart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir6_w)); // DataRecvd = KbdInt
+	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
+	MCFG_AY31015_RX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 
-	AY31015(config, m_eiauart); // HD6402, == AY-3-1015D
-	m_eiauart->set_rx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	m_eiauart->set_tx_clock(((960_kHz_XTAL/10)/4)/5); // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	m_eiauart->write_dav_callback().set(m_iop_pic, FUNC(pic8259_device::ir3_w)); // EIADataReady = EIAInt
+	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
+	MCFG_AY31015_RX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 
 	/* Floppy */
-	FD1791(config, m_fdc, (((24_MHz_XTAL/3)/2)/2)); // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
+	MCFG_FD1791_ADD("wd1791", (((XTAL(24'000'000)/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */
@@ -902,11 +895,11 @@ The 'Z-iop' firmware 1.5 below seems to be a BIOP firmware.
 ROM_START( notetakr )
 	ROM_REGION( 0x1000, "iopload", ROMREGION_ERASEFF ) // load roms here before descrambling
 	ROM_SYSTEM_BIOS( 0, "v2.00", "Bootable IO Monitor v2.00" ) // dumped from Notetaker
-	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0x0000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0x0001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "biop__2.00_hi.b2716.h1", 0x0000, 0x0800, CRC(1119691d) SHA1(4c20b595b554e6f5489ab2c3fb364b4a052f05e3), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "biop__2.00_lo.b2716.g1", 0x0001, 0x0800, CRC(b72aa4c7) SHA1(85dab2399f906c7695dc92e7c18f32e2303c5892), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v1.50", "Bootable IO Monitor v1.50" ) // typed from the source listing at http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19790620_Z-IOP_1.5_ls.pdf and scrambled
-	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(122ffb5b) SHA1(b957fe24620e1aa98b3158dbcf459937dbd54bac), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "z-iop_1.50_hi.h1", 0x0000, 0x0800, CRC(122ffb5b) SHA1(b957fe24620e1aa98b3158dbcf459937dbd54bac), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "z-iop_1.50_lo.g1", 0x0001, 0x0800, CRC(2cb79a67) SHA1(692aafd2aeea27533f6288dbb1cb8678ea08fade), ROM_SKIP(1) | ROM_BIOS(2))
 	ROM_REGION( 0x100000, "iop", ROMREGION_ERASEFF ) // area for descrambled roms
 	ROM_REGION( 0x100000, "mainram", ROMREGION_ERASEFF ) // main ram, on 2 cards with parity/ecc/syndrome/timing/bus arbitration on another 2 cards
 	ROM_REGION( 0x400, "kbmcu", ROMREGION_ERASEFF )

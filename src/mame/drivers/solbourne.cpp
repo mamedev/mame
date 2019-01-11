@@ -15,12 +15,12 @@ class solbourne_state : public driver_device
 public:
 	solbourne_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		//      , m_maincpu(*this, "maincpu")
+//      , m_maincpu(*this, "maincpu")
 	{ }
 
-	void solbourne(machine_config &config);
+void solbourne(machine_config &config);
 private:
-	//  required_device<cpu_device> m_maincpu;
+//  required_device<cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( solbourne )

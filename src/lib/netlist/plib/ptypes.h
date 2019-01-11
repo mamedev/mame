@@ -83,7 +83,7 @@ namespace plib
 		enum E { __VA_ARGS__ }; \
 		ename (E v) : m_v(v) { } \
 		bool set_from_string (const pstring &s) { \
-			static char const *const strings = # __VA_ARGS__; \
+			static const char *strings = # __VA_ARGS__; \
 			int f = from_string_int(strings, s.c_str()); \
 			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
 		} \
@@ -91,7 +91,7 @@ namespace plib
 		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
 		bool operator==(const E &rhs) const {return m_v == rhs;} \
 		const pstring name() const { \
-			static char const *const strings = # __VA_ARGS__; \
+			static const char *strings = # __VA_ARGS__; \
 			return nthstr(static_cast<int>(m_v), strings); \
 		} \
 		private: E m_v; };

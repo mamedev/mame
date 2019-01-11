@@ -6,6 +6,9 @@
 #ifndef MAME_MACHINE_WPC_SHIFT_H
 #define MAME_MACHINE_WPC_SHIFT_H
 
+#define MCFG_WPC_SHIFT_ADD( _tag ) \
+	MCFG_DEVICE_ADD( _tag, WPC_SHIFT, 0 )
+
 class wpc_shift_device : public device_t
 {
 public:

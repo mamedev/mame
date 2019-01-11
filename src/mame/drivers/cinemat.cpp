@@ -58,9 +58,6 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_coin_detected));
 	save_item(NAME(m_coin_last_reset));
 	save_item(NAME(m_mux_select));
-	save_item(NAME(m_vector_color));
-	save_item(NAME(m_lastx));
-	save_item(NAME(m_lasty));
 	m_led.resolve();
 	m_pressed.resolve();
 }
@@ -327,9 +324,9 @@ void qb3_state::data_map_qb3(address_map &map)
 
 void cinemat_state::io_map(address_map &map)
 {
-	map(0x00, 0x0f).r(FUNC(cinemat_state::inputs_r));
-	map(0x10, 0x16).r(FUNC(cinemat_state::switches_r));
-	map(0x17, 0x17).r(FUNC(cinemat_state::coin_input_r));
+	map(0x00, 0x0f).r(this, FUNC(cinemat_state::inputs_r));
+	map(0x10, 0x16).r(this, FUNC(cinemat_state::switches_r));
+	map(0x17, 0x17).r(this, FUNC(cinemat_state::coin_input_r));
 
 	map(0x00, 0x07).w(m_outlatch, FUNC(ls259_device::write_d0));
 }
@@ -338,9 +335,9 @@ void qb3_state::io_map_qb3(address_map &map)
 {
 	io_map(map);
 	// Some of the outputs here are definitely not mapped through the LS259, since they use multiple bits of data
-	map(0x00, 0x00).w(FUNC(qb3_state::qb3_ram_bank_w));
-	map(0x04, 0x04).w(FUNC(qb3_state::qb3_sound_fifo_w));
-	map(0x0f, 0x0f).r(FUNC(qb3_state::qb3_frame_r));
+	map(0x00, 0x00).w(this, FUNC(qb3_state::qb3_ram_bank_w));
+	map(0x04, 0x04).w(this, FUNC(qb3_state::qb3_sound_fifo_w));
+	map(0x0f, 0x0f).r(this, FUNC(qb3_state::qb3_frame_r));
 }
 
 
@@ -771,41 +768,6 @@ static INPUT_PORTS_START( starcas )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state,coin_inserted, 0)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( starcasc )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x07c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SWITCHES")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cinemat_state, coin_inserted, 0)
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( solarq )
 	PORT_START("INPUTS")
@@ -1010,60 +972,66 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void cinemat_state::cinemat_nojmi_4k(machine_config &config)
-{
-	/* basic machine hardware */
-	CCPU(config, m_maincpu, MASTER_CLOCK/4);
-	m_maincpu->set_vector_func(FUNC(cinemat_state::cinemat_vector_callback));
-	m_maincpu->external_func().set(FUNC(cinemat_state::joystick_read));
-	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_4k);
-	m_maincpu->set_addrmap(AS_DATA, &cinemat_state::data_map);
-	m_maincpu->set_addrmap(AS_IO, &cinemat_state::io_map);
+MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_4k)
 
-	LS259(config, m_outlatch); // 7J on CCG-1
-	m_outlatch->q_out_cb<5>().set(FUNC(cinemat_state::coin_reset_w));
-	m_outlatch->q_out_cb<6>().set(FUNC(cinemat_state::vector_control_w));
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", CCPU, MASTER_CLOCK/4)
+	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
+	MCFG_CCPU_EXTERNAL_FUNC(READ8(*this, cinemat_state,joystick_read))
+	MCFG_DEVICE_PROGRAM_MAP(program_map_4k)
+	MCFG_DEVICE_DATA_MAP(data_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 7J on CCG-1
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, cinemat_state, coin_reset_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, cinemat_state, vector_control_w))
 
 	/* video hardware */
-	VECTOR(config, "vector", 0);
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_refresh_hz(MASTER_CLOCK/4/16/16/16/16/2);
-	m_screen->set_size(1024, 768);
-	m_screen->set_visarea(0, 1023, 0, 767);
-	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_cinemat));
-}
+	MCFG_VECTOR_ADD("vector")
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_REFRESH_RATE(MASTER_CLOCK/4/16/16/16/16/2)
+	MCFG_SCREEN_SIZE(1024, 768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1023, 0, 767)
+	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_cinemat)
+MACHINE_CONFIG_END
 
-void cinemat_state::cinemat_jmi_4k(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_4k)
 	cinemat_nojmi_4k(config);
-	m_maincpu->set_vector_func(FUNC(cinemat_state::cinemat_vector_callback));
-	m_maincpu->external_func().set("maincpu", FUNC(ccpu_cpu_device::read_jmi));
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
+	MCFG_CCPU_EXTERNAL_FUNC(READ8("maincpu",ccpu_cpu_device,read_jmi))
+MACHINE_CONFIG_END
 
-void cinemat_state::cinemat_nojmi_8k(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_8k)
 	cinemat_nojmi_4k(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_8k);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(program_map_8k)
+MACHINE_CONFIG_END
 
-void cinemat_state::cinemat_jmi_8k(machine_config &config)
-{
-	cinemat_jmi_4k(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_8k);
-}
 
-void cinemat_state::cinemat_jmi_16k(machine_config &config)
-{
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_8k)
 	cinemat_jmi_4k(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_16k);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(program_map_8k)
+MACHINE_CONFIG_END
 
-void cinemat_state::cinemat_jmi_32k(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_16k)
 	cinemat_jmi_4k(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cinemat_state::program_map_32k);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(program_map_16k)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_32k)
+	cinemat_jmi_4k(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(program_map_32k)
+MACHINE_CONFIG_END
+
 
 
 
@@ -1073,112 +1041,119 @@ void cinemat_state::cinemat_jmi_32k(machine_config &config)
  *
  *************************************/
 
-void cinemat_state::spacewar(machine_config &config)
-{
+MACHINE_CONFIG_START(cinemat_state::spacewar)
 	cinemat_nojmi_4k(config);
 	spacewar_sound(config);
-	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_spacewar));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_spacewar)
+MACHINE_CONFIG_END
 
-void cinemat_state::barrier(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::barrier)
 	cinemat_jmi_4k(config);
 	barrier_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_state::speedfrk(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::speedfrk)
 	cinemat_nojmi_8k(config);
 	speedfrk_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_state::starhawk(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::starhawk)
 	cinemat_jmi_4k(config);
 	starhawk_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_16level_state::sundance(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_16level_state::sundance)
 	cinemat_jmi_8k(config);
 	sundance_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_state::tailg(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::tailg)
 	cinemat_nojmi_8k(config);
 	tailg_sound(config);
 
-	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
-}
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, mux_select_w))
+MACHINE_CONFIG_END
 
-void cinemat_state::warrior(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::warrior)
 	cinemat_jmi_8k(config);
 	warrior_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_state::armora(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::armora)
 	cinemat_jmi_16k(config);
 	armora_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_state::ripoff(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::ripoff)
 	cinemat_jmi_8k(config);
 	ripoff_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_state::starcas(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::starcas)
 	cinemat_jmi_8k(config);
 	starcas_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_64level_state::solarq(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_64level_state::solarq)
 	cinemat_jmi_16k(config);
 	solarq_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_color_state::boxingb(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_color_state::boxingb)
 	cinemat_jmi_32k(config);
 	boxingb_sound(config);
-	m_screen->set_visarea(0, 1024, 0, 788);
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
 
-	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
-}
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, cinemat_state, mux_select_w))
+MACHINE_CONFIG_END
 
-void cinemat_state::wotw(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_state::wotw)
 	cinemat_jmi_16k(config);
-	m_screen->set_visarea(0, 1120, 0, 767);
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 767)
 	wotw_sound(config);
-}
+MACHINE_CONFIG_END
 
-void cinemat_color_state::wotwc(machine_config &config)
-{
+
+MACHINE_CONFIG_START(cinemat_color_state::wotwc)
 	cinemat_jmi_16k(config);
 	wotw_sound(config);
-}
+MACHINE_CONFIG_END
 
-void demon_state::demon(machine_config &config)
-{
+
+MACHINE_CONFIG_START(demon_state::demon)
 	cinemat_jmi_16k(config);
 	demon_sound(config);
-	m_screen->set_visarea(0, 1024, 0, 805);
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 805)
+MACHINE_CONFIG_END
 
-void qb3_state::qb3(machine_config &config)
-{
+
+MACHINE_CONFIG_START(qb3_state::qb3)
 	cinemat_jmi_32k(config);
 	qb3_sound(config);
-	m_maincpu->set_addrmap(AS_DATA, &qb3_state::data_map_qb3);
-	m_maincpu->set_addrmap(AS_IO, &qb3_state::io_map_qb3);
-	m_screen->set_visarea(0, 1120, 0, 780);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_DATA_MAP(data_map_qb3)
+	MCFG_DEVICE_IO_MAP(io_map_qb3)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
+MACHINE_CONFIG_END
 
 
 
@@ -1346,16 +1321,6 @@ ROM_START( starcas )
 	CCPU_PROMS
 ROM_END
 
-ROM_START( starcasc )
-	ROM_REGION( 0x2000, "maincpu", 0 ) // all HN462716G, all labels hand-written
-	ROM_LOAD16_BYTE( "ctsc926_ue_3265.t7", 0x0000, 0x0800, CRC(c140a1bb) SHA1(82c5871af7171408cccb93b4905312856f16a607) )
-	ROM_LOAD16_BYTE( "ctsc926_le_deac.p7", 0x0001, 0x0800, CRC(8a074f6c) SHA1(e6be9897b4e8b94a9a75ab03c39637f499811d3a) )
-	ROM_LOAD16_BYTE( "ctsc926_u0_48e7.u7", 0x1000, 0x0800, CRC(ed136f11) SHA1(75965b79a7e5466fb80b61d3dd024907a9a0248a) )
-	ROM_LOAD16_BYTE( "ctsc926_l0_f707.r7", 0x1001, 0x0800, CRC(1930b1fb) SHA1(8f8370f62536ab7529ad74e51698973ee61b97e2) )
-
-	CCPU_PROMS
-ROM_END
-
 ROM_START( starcasp )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "starcasp.t7", 0x0000, 0x0800, CRC(d2c551a2) SHA1(90b5e1c6988839b812028f1baaea16420c011c08) )
@@ -1501,7 +1466,6 @@ void cinemat_state::init_speedfrk()
 	m_gear = 0xe;
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(cinemat_state::speedfrk_wheel_r),this));
 	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8_delegate(FUNC(cinemat_state::speedfrk_gear_r),this));
-	save_item(NAME(m_gear));
 }
 
 
@@ -1520,16 +1484,9 @@ void cinemat_color_state::init_boxingb()
 void qb3_state::init_qb3()
 {
 	membank("bank1")->configure_entries(0, 4, m_rambase, 0x100*2);
-
-	save_item(NAME(m_qb3_lastx));
-	save_item(NAME(m_qb3_lasty));
 }
 
-void cinemat_64level_state::init_solarq()
-{
-	save_item(NAME(m_target_volume));
-	save_item(NAME(m_current_volume));
-}
+
 
 /*************************************
  *
@@ -1551,12 +1508,11 @@ GAMEL( 1980, armorar,  armora,   armora,   armora,   cinemat_state,         empt
 GAME(  1980, ripoff,   0,        ripoff,   ripoff,   cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Rip Off", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1980, starcas,  0,        starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (version 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, starcas1, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (older)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1980, starcasc, starcas,  starcas,  starcasc, cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, starcasp, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, starcase, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, stellcas, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "bootleg (Elettronolo)", "Stellar Castle (Elettronolo)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1981, spaceftr, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Zaccaria license)", "Space Fortress (Zaccaria)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, init_solarq,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_solarq )
+GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, empty_init,    ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_solarq )
 GAME(  1981, boxingb,  0,        boxingb,  boxingb,  cinemat_color_state,   init_boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1981, wotw,     0,        wotw,     wotw,     cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wotw )
 GAME(  1981, wotwc,    wotw,     wotwc,    wotw,     cinemat_color_state,   empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

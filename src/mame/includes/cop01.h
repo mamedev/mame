@@ -5,20 +5,15 @@
     Cops 01
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_COP01_H
-#define MAME_INCLUDES_COP01_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/nb1412m2.h"
-#include "emupal.h"
 
 class cop01_state : public driver_device
 {
 public:
-	cop01_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	cop01_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
 		m_fgvideoram(*this, "fgvideoram"),
@@ -26,8 +21,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
-	{ }
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bgvideoram;
@@ -68,7 +62,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void cop01_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(cop01);
 	uint32_t screen_update_cop01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cop01(machine_config &config);
@@ -81,18 +75,16 @@ public:
 class mightguy_state : public cop01_state
 {
 public:
-	mightguy_state(const machine_config &mconfig, device_type type, const char *tag) :
-		cop01_state(mconfig, type, tag),
-		m_prot(*this, "prot_chip")
-	{ }
+	mightguy_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cop01_state(mconfig, type, tag)
+		, m_prot(*this, "prot_chip")
+	{}
+
 
 	void mightguy(machine_config &config);
-
 private:
 	void mightguy_io_map(address_map &map);
 	void mightguy_audio_io_map(address_map &map);
 
 	required_device<nb1412m2_device> m_prot;
 };
-
-#endif // MAME_INCLUDES_COP01_H

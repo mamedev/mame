@@ -24,7 +24,6 @@ maybe close to jalmah.cpp?
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -191,11 +190,11 @@ void patapata_state::main_map(address_map &map)
 	map(0x100002, 0x100003).portr("IN1");
 	map(0x100008, 0x100009).portr("DSW1");
 	map(0x10000a, 0x10000b).portr("DSW2");
-	map(0x100015, 0x100015).w(FUNC(patapata_state::flipscreen_w));
+	map(0x100015, 0x100015).w(this, FUNC(patapata_state::flipscreen_w));
 	map(0x110000, 0x1103ff).ram().share("videoregs");
 	map(0x120000, 0x1205ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x130000, 0x13ffff).ram().w(FUNC(patapata_state::fg_videoram_w)).share("fg_videoram");
-	map(0x140000, 0x14ffff).ram().w(FUNC(patapata_state::bg_videoram_w)).share("bg_videoram");
+	map(0x130000, 0x13ffff).ram().w(this, FUNC(patapata_state::fg_videoram_w)).share("fg_videoram");
+	map(0x140000, 0x14ffff).ram().w(this, FUNC(patapata_state::bg_videoram_w)).share("bg_videoram");
 	map(0x150001, 0x150001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x150011, 0x150011).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x150020, 0x15002f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
@@ -292,7 +291,7 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", patapata_state,  irq4_line_hold) // 1 + 4 valid? (4 main VBL)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", patapata_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_patapata)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_patapata)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -302,7 +301,8 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_SCREEN_UPDATE_DRIVER(patapata_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::RRRRGGGGBBBBRGBx, 0x600/2);
+	MCFG_PALETTE_ADD("palette", 0x600/2)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	SPEAKER(config, "mono").front_center();
 
@@ -312,9 +312,9 @@ MACHINE_CONFIG_START(patapata_state::patapata)
 	MCFG_DEVICE_ADD("oki2", OKIM6295, 16_MHz_XTAL / 4, okim6295_device::PIN7_LOW) // not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	nmk112_device &nmk112(NMK112(config, "nmk112", 0)); // or 212? difficult to read (maybe 212 is 2* 112?)
-	nmk112.set_rom0_tag("oki1");
-	nmk112.set_rom1_tag("oki2");
+	MCFG_DEVICE_ADD("nmk112", NMK112, 0) // or 212? difficult to read (maybe 212 is 2* 112?)
+	MCFG_NMK112_ROM0("oki1")
+	MCFG_NMK112_ROM1("oki2")
 MACHINE_CONFIG_END
 
 ROM_START( patapata )

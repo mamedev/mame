@@ -208,7 +208,7 @@ void vt100_video_device::recompute_parameters()
 
 	int vert_pix_visible = m_height * (m_linedoubler ? 20 : 10);
 	int vert_pix_total = m_is_50hz ? (m_interlaced ? 629 : 630/2) : (m_interlaced ? 525 : 524/2);
-	attotime frame_period = clocks_to_attotime(vert_pix_total * 1530);
+	attoseconds_t frame_period = clocks_to_attotime(vert_pix_total * 1530).as_attoseconds();
 
 	// display 1 less filler pixel in 132 char. mode
 	int horiz_pix_visible = m_columns * (m_columns == 132 ? 9 : 10);
@@ -217,10 +217,10 @@ void vt100_video_device::recompute_parameters()
 	// dot clock is divided by 1.5 in 80 column mode
 	screen().set_unscaled_clock(m_columns == 132 ? clock() : clock() * 2 / 3);
 	rectangle visarea(0, horiz_pix_visible - 1, 0, vert_pix_visible - 1);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period.as_attoseconds());
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period);
 
 	LOG("(RECOMPUTE) HPIX: %d (%d) - VPIX: %d (%d)\n", horiz_pix_visible, horiz_pix_total, vert_pix_visible, vert_pix_total);
-	LOG("(RECOMPUTE) FREQUENCY: %f\n", frame_period.as_hz());
+	LOG("(RECOMPUTE) FREQUENCY: %f\n", ATTOSECONDS_TO_HZ(frame_period));
 	if (m_interlaced)
 		LOG("(RECOMPUTE) * INTERLACED *\n");
 	if (m_linedoubler)
@@ -917,10 +917,9 @@ TIMER_CALLBACK_MEMBER(vt100_video_device::lba3_change)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void vt100_video_device::device_add_mconfig(machine_config &config)
-{
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
-}
+MACHINE_CONFIG_START(vt100_video_device::device_add_mconfig)
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rainbow_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 4)

@@ -35,7 +35,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
 #include "video/resnet.h"
@@ -44,25 +43,20 @@
 class sderby2_state : public driver_device
 {
 public:
-	sderby2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	sderby2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_proms(*this, "proms"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void sderby2(machine_config &config);
-
-	void init_sderby2();
-
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void sderby2_palette(palette_device &palette) const;
+	void init_sderby2();
+	DECLARE_PALETTE_INIT(sderby2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(palette_w);
@@ -84,6 +78,7 @@ private:
 	uint8_t sub_data;
 	uint8_t main_data;
 	uint8_t host_io_40;
+	void sderby2(machine_config &config);
 	void main_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sub_io_map(address_map &map);
@@ -97,7 +92,7 @@ private:
  *
  *************************************/
 
-void sderby2_state::sderby2_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(sderby2_state,sderby2)
 {
 
 }
@@ -203,10 +198,10 @@ void sderby2_state::main_program_map(address_map &map)
 void sderby2_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).r(FUNC(sderby2_state::host_r));
-	map(0x20, 0x20).w(FUNC(sderby2_state::sub_nmi));
+	map(0x10, 0x10).r(this, FUNC(sderby2_state::host_r));
+	map(0x20, 0x20).w(this, FUNC(sderby2_state::sub_nmi));
 	map(0x30, 0x30).nopw(); // Written with 0x12 byte sequence at start
-	map(0x40, 0x40).w(FUNC(sderby2_state::host_io_40_w)); // Occasionally written
+	map(0x40, 0x40).w(this, FUNC(sderby2_state::host_io_40_w)); // Occasionally written
 }
 
 
@@ -233,9 +228,9 @@ void sderby2_state::sub_program_map(address_map &map)
 void sderby2_state::sub_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(sderby2_state::sub_io_0_r));
-	map(0x20, 0x20).r(FUNC(sderby2_state::sub_r));
-	map(0x40, 0x40).w(FUNC(sderby2_state::main_nmi));
+	map(0x00, 0x00).r(this, FUNC(sderby2_state::sub_io_0_r));
+	map(0x20, 0x20).r(this, FUNC(sderby2_state::sub_r));
+	map(0x40, 0x40).w(this, FUNC(sderby2_state::main_nmi));
 	map(0x60, 0x60).nopw(); // Written with 0x12 byte sequence at start
 }
 
@@ -317,10 +312,11 @@ MACHINE_CONFIG_START(sderby2_state::sderby2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 256 - 1)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby2_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	PALETTE(config, m_palette, FUNC(sderby2_state::sderby2_palette), 256+256*3);
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_PALETTE_ADD("palette", 256+256*3)
+	MCFG_PALETTE_INIT_OWNER(sderby2_state,sderby2)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby2);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby2)
 
 	// sound hardware
 MACHINE_CONFIG_END

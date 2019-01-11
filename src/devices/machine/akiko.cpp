@@ -17,7 +17,6 @@
 #include "akiko.h"
 #include "imagedev/chd_cd.h"
 #include "coreutil.h"
-#include "romload.h"
 
 
 //**************************************************************************

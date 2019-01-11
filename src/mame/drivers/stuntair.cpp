@@ -86,7 +86,6 @@ Bprom dump by f205v
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -94,8 +93,8 @@ Bprom dump by f205v
 class stuntair_state : public driver_device
 {
 public:
-	stuntair_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	stuntair_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_fgram(*this, "fgram"),
@@ -107,14 +106,6 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void stuntair(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint8_t> m_fgram;
@@ -146,9 +137,13 @@ private:
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 	DECLARE_WRITE_LINE_MEMBER(stuntair_irq);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void stuntair_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(stuntair);
+	void stuntair(machine_config &config);
 	void stuntair_map(address_map &map);
 	void stuntair_sound_map(address_map &map);
 	void stuntair_sound_portmap(address_map &map);
@@ -162,36 +157,36 @@ private:
 
 ***************************************************************************/
 
-void stuntair_state::stuntair_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(stuntair_state, stuntair)
 {
-	// need resistor weights etc
-	uint8_t const *const color_prom = machine().root_device().memregion("proms")->base();
+	/* need resistor weights etc. */
+	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t const data = color_prom[i];
+		uint8_t data = color_prom[i];
 
-		int const b = (data >> 6) & 0x03;
-		int const g = (data >> 3) & 0x07;
-		int const r = (data >> 0) & 0x07;
+		int b = (data&0xc0)>>6;
+		int g = (data&0x38)>>3;
+		int r = (data&0x07)>>0;
 
-		palette.set_pen_color(i, rgb_t(pal3bit(r), pal3bit(g), pal2bit(b)));
+		palette.set_pen_color(i,rgb_t(r<<5,g<<5,b<<6));
 	}
 
 	// just set the FG layer to black and white
-	palette.set_pen_color(0x100, rgb_t::black());
-	palette.set_pen_color(0x101, rgb_t::white());
+	palette.set_pen_color(0x100,rgb_t(0x00,0x00,0x00));
+	palette.set_pen_color(0x101,rgb_t(0xff,0xff,0xff));
 }
 
 
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_fg_tile_info)
 {
-	int const tileno = m_fgram[tile_index];
-	int const opaque = tileno & 0x80;
+	int tileno = m_fgram[tile_index];
+	int opaque = tileno & 0x80;
 
 	// where does the FG palette come from? it's a 1bpp layer..
 
-	SET_TILE_INFO_MEMBER(0, tileno & 0x7f, 0, opaque ? TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
+	SET_TILE_INFO_MEMBER(0, tileno&0x7f, 0, opaque?TILE_FORCE_LAYER0 : TILE_FORCE_LAYER1);
 }
 
 TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
@@ -218,7 +213,7 @@ void stuntair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	/* there seem to be 2 spritelists with something else (fixed values) between them.. is that significant? */
-	for (int i = 0; i < 0x400; i += 16)
+	for (int i=0;i<0x400;i+=16)
 	{
 		// +2, +3, +4(high bits): always 00
 		// +6 to +15: unused
@@ -329,17 +324,17 @@ void stuntair_state::stuntair_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xc000, 0xc7ff).ram().share("nvram");
-	map(0xc800, 0xcbff).ram().w(FUNC(stuntair_state::stuntair_bgattrram_w)).share("bgattrram");
-	map(0xd000, 0xd3ff).ram().w(FUNC(stuntair_state::stuntair_bgram_w)).share("bgram");
+	map(0xc800, 0xcbff).ram().w(this, FUNC(stuntair_state::stuntair_bgattrram_w)).share("bgattrram");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(stuntair_state::stuntair_bgram_w)).share("bgram");
 	map(0xd800, 0xdfff).ram().share("sprram");
-	map(0xe000, 0xe000).portr("DSWB").w(FUNC(stuntair_state::stuntair_coin_w));
-	map(0xe800, 0xe800).portr("DSWA").w(FUNC(stuntair_state::stuntair_bgxscroll_w));
+	map(0xe000, 0xe000).portr("DSWB").w(this, FUNC(stuntair_state::stuntair_coin_w));
+	map(0xe800, 0xe800).portr("DSWA").w(this, FUNC(stuntair_state::stuntair_bgxscroll_w));
 	map(0xf000, 0xf000).portr("IN2");
 	map(0xf002, 0xf002).portr("IN3");
 	map(0xf003, 0xf003).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xf000, 0xf007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xf800, 0xfbff).ram().w(FUNC(stuntair_state::stuntair_fgram_w)).share("fgram");
-	map(0xfc03, 0xfc03).w(FUNC(stuntair_state::stuntair_sound_w));
+	map(0xf800, 0xfbff).ram().w(this, FUNC(stuntair_state::stuntair_fgram_w)).share("fgram");
+	map(0xfc03, 0xfc03).w(this, FUNC(stuntair_state::stuntair_sound_w));
 }
 
 // sound Z80
@@ -529,19 +524,19 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_DEVICE_IO_MAP(stuntair_sound_portmap)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(stuntair_state, irq0_line_hold, 420) // drives music tempo, timing is approximate based on PCB audio recording.. and where is irq ack?
 
-	ls259_device &mainlatch(LS259(config, "mainlatch")); // type and location not verified
-	mainlatch.q_out_cb<0>().set_nop(); // set but never cleared
-	mainlatch.q_out_cb<1>().set(FUNC(stuntair_state::nmi_enable_w));
-	mainlatch.q_out_cb<2>().set_nop(); // cleared at start
-	mainlatch.q_out_cb<3>().set(FUNC(stuntair_state::spritebank1_w));
-	mainlatch.q_out_cb<4>().set_nop(); // cleared at start
-	mainlatch.q_out_cb<5>().set(FUNC(stuntair_state::spritebank0_w));
-	mainlatch.q_out_cb<6>().set_nop(); // cleared at start
-	mainlatch.q_out_cb<7>().set_nop(); // cleared at start
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type and location not verified
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // set but never cleared
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, stuntair_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, stuntair_state, spritebank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, stuntair_state, spritebank0_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // cleared at start
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // cleared at start
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -550,23 +545,26 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stuntair_state, screen_update_stuntair)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, stuntair_state, stuntair_irq))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stuntair);
-	PALETTE(config, m_palette, FUNC(stuntair_state::stuntair_palette), 0x100 + 2);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stuntair)
+	MCFG_PALETTE_ADD("palette", 0x100+2)
+
+	MCFG_PALETTE_INIT_OWNER(stuntair_state, stuntair)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); // stereo?
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(18'432'000)/12));
-	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	ay1.port_b_write_callback().set(FUNC(stuntair_state::ay8910_portb_w));
-	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, stuntair_state, ay8910_portb_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

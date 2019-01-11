@@ -69,23 +69,23 @@ void momoko_state::momoko_map(address_map &map)
 	map(0xc000, 0xcfff).ram();
 	map(0xd064, 0xd0ff).ram().share("spriteram");
 	map(0xd400, 0xd400).portr("IN0").nopw(); /* interrupt ack? */
-	map(0xd402, 0xd402).portr("IN1").w(FUNC(momoko_state::momoko_flipscreen_w));
+	map(0xd402, 0xd402).portr("IN1").w(this, FUNC(momoko_state::momoko_flipscreen_w));
 	map(0xd404, 0xd404).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xd406, 0xd406).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd407, 0xd407).portr("DSW1");
 	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xdc00, 0xdc00).w(FUNC(momoko_state::momoko_fg_scrolly_w));
-	map(0xdc01, 0xdc01).w(FUNC(momoko_state::momoko_fg_scrollx_w));
-	map(0xdc02, 0xdc02).w(FUNC(momoko_state::momoko_fg_select_w));
+	map(0xdc00, 0xdc00).w(this, FUNC(momoko_state::momoko_fg_scrolly_w));
+	map(0xdc01, 0xdc01).w(this, FUNC(momoko_state::momoko_fg_scrollx_w));
+	map(0xdc02, 0xdc02).w(this, FUNC(momoko_state::momoko_fg_select_w));
 	map(0xe000, 0xe3ff).ram().share("videoram");
-	map(0xe800, 0xe800).w(FUNC(momoko_state::momoko_text_scrolly_w));
-	map(0xe801, 0xe801).w(FUNC(momoko_state::momoko_text_mode_w));
+	map(0xe800, 0xe800).w(this, FUNC(momoko_state::momoko_text_scrolly_w));
+	map(0xe801, 0xe801).w(this, FUNC(momoko_state::momoko_text_mode_w));
 	map(0xf000, 0xffff).bankr("bank1");
-	map(0xf000, 0xf001).w(FUNC(momoko_state::momoko_bg_scrolly_w)).share("bg_scrolly");
-	map(0xf002, 0xf003).w(FUNC(momoko_state::momoko_bg_scrollx_w)).share("bg_scrollx");
-	map(0xf004, 0xf004).w(FUNC(momoko_state::momoko_bg_read_bank_w));
-	map(0xf006, 0xf006).w(FUNC(momoko_state::momoko_bg_select_w));
-	map(0xf007, 0xf007).w(FUNC(momoko_state::momoko_bg_priority_w));
+	map(0xf000, 0xf001).w(this, FUNC(momoko_state::momoko_bg_scrolly_w)).share("bg_scrolly");
+	map(0xf002, 0xf003).w(this, FUNC(momoko_state::momoko_bg_scrollx_w)).share("bg_scrollx");
+	map(0xf004, 0xf004).w(this, FUNC(momoko_state::momoko_bg_read_bank_w));
+	map(0xf006, 0xf006).w(this, FUNC(momoko_state::momoko_bg_select_w));
+	map(0xf007, 0xf007).w(this, FUNC(momoko_state::momoko_bg_priority_w));
 }
 
 void momoko_state::momoko_sound_map(address_map &map)
@@ -265,7 +265,7 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/4)  /* 2.5MHz */
 	MCFG_DEVICE_PROGRAM_MAP(momoko_sound_map)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -274,29 +274,30 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 29*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(momoko_state, screen_update_momoko)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_momoko);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 512);
-	m_palette->set_endianness(ENDIANNESS_BIG);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_momoko)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(10'000'000)/8));
-	ym1.add_route(0, "mono", 0.15);
-	ym1.add_route(1, "mono", 0.15);
-	ym1.add_route(2, "mono", 0.15);
-	ym1.add_route(3, "mono", 0.40);
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(10'000'000)/8)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(10'000'000)/8));
-	ym2.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
-	ym2.add_route(0, "mono", 0.15);
-	ym2.add_route(1, "mono", 0.15);
-	ym2.add_route(2, "mono", 0.15);
-	ym2.add_route(3, "mono", 0.40);
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(10'000'000)/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 MACHINE_CONFIG_END
 
 /****************************************************************************/

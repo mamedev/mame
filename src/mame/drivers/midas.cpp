@@ -58,15 +58,14 @@
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
-#include "emupal.h"
 #include "speaker.h"
 
 
 class midas_state : public driver_device
 {
 public:
-	midas_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	midas_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -78,17 +77,6 @@ public:
 		m_zoomram(*this, "zoomtable")
 	{ }
 
-	void hammer(machine_config &config);
-	void livequiz(machine_config &config);
-
-	void init_livequiz();
-
-protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
 	DECLARE_READ16_MEMBER(ret_ffff);
 	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
 	DECLARE_WRITE16_MEMBER(livequiz_coin_w);
@@ -97,6 +85,11 @@ private:
 	DECLARE_WRITE16_MEMBER(hammer_motor_w);
 	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
 	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
+	void init_livequiz();
+	virtual void video_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 
 	uint32_t screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -111,9 +104,13 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
 
+	void hammer(machine_config &config);
+	void livequiz(machine_config &config);
 	void hammer_map(address_map &map);
 	void livequiz_map(address_map &map);
 };
+
+
 
 
 
@@ -208,27 +205,27 @@ void midas_state::livequiz_map(address_map &map)
 	map(0x940000, 0x940001).portr("PLAYER2");
 	map(0x980000, 0x980001).portr("START");
 
-	map(0x980000, 0x980001).w(FUNC(midas_state::livequiz_coin_w));
+	map(0x980000, 0x980001).w(this, FUNC(midas_state::livequiz_coin_w));
 
-	map(0x9a0000, 0x9a0001).w(FUNC(midas_state::midas_eeprom_w));
+	map(0x9a0000, 0x9a0001).w(this, FUNC(midas_state::midas_eeprom_w));
 
-	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::midas_gfxregs_w));
+	map(0x9c0000, 0x9c0005).w(this, FUNC(midas_state::midas_gfxregs_w));
 	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
 	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa40000, 0xa7ffff).ram();
 
-	map(0xb00000, 0xb00001).r(FUNC(midas_state::ret_ffff));
-	map(0xb20000, 0xb20001).r(FUNC(midas_state::ret_ffff));
-	map(0xb40000, 0xb40001).r(FUNC(midas_state::ret_ffff));
-	map(0xb60000, 0xb60001).r(FUNC(midas_state::ret_ffff));
+	map(0xb00000, 0xb00001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb20000, 0xb20001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb40000, 0xb40001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb60000, 0xb60001).r(this, FUNC(midas_state::ret_ffff));
 
 	map(0xb80008, 0xb8000b).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 
 	map(0xba0000, 0xba0001).portr("START3");
 	map(0xbc0000, 0xbc0001).portr("PLAYER3");
 
-	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(this, FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
 
 	map(0xe00000, 0xe3ffff).ram();
 }
@@ -280,31 +277,31 @@ void midas_state::hammer_map(address_map &map)
 	map(0x940000, 0x940001).portr("IN0");
 	map(0x980000, 0x980001).portr("TILT");
 
-	map(0x980000, 0x980001).w(FUNC(midas_state::hammer_coin_w));
+	map(0x980000, 0x980001).w(this, FUNC(midas_state::hammer_coin_w));
 
-	map(0x9a0000, 0x9a0001).w(FUNC(midas_state::midas_eeprom_w));
+	map(0x9a0000, 0x9a0001).w(this, FUNC(midas_state::midas_eeprom_w));
 
-	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::midas_gfxregs_w));
+	map(0x9c0000, 0x9c0005).w(this, FUNC(midas_state::midas_gfxregs_w));
 	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
 	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xa40000, 0xa7ffff).ram();
 
-	map(0xb00000, 0xb00001).r(FUNC(midas_state::ret_ffff));
-	map(0xb20000, 0xb20001).r(FUNC(midas_state::ret_ffff));
-	map(0xb40000, 0xb40001).r(FUNC(midas_state::ret_ffff));
-	map(0xb60000, 0xb60001).r(FUNC(midas_state::ret_ffff));
+	map(0xb00000, 0xb00001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb20000, 0xb20001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb40000, 0xb40001).r(this, FUNC(midas_state::ret_ffff));
+	map(0xb60000, 0xb60001).r(this, FUNC(midas_state::ret_ffff));
 
 	map(0xb80008, 0xb8000b).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
 
 	map(0xba0000, 0xba0001).portr("IN1");
 	map(0xbc0000, 0xbc0001).portr("HAMMER");
 
-	map(0xbc0002, 0xbc0003).w(FUNC(midas_state::hammer_motor_w));
+	map(0xbc0002, 0xbc0003).w(this, FUNC(midas_state::hammer_motor_w));
 
-	map(0xbc0004, 0xbc0005).r(FUNC(midas_state::hammer_sensor_r));
+	map(0xbc0004, 0xbc0005).r(this, FUNC(midas_state::hammer_sensor_r));
 
-	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(this, FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
 
 	map(0xe00000, 0xe3ffff).ram();
 }
@@ -638,7 +635,7 @@ MACHINE_CONFIG_START(midas_state::livequiz)
 	MCFG_DEVICE_PROGRAM_MAP(livequiz_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -648,8 +645,9 @@ MACHINE_CONFIG_START(midas_state::livequiz)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
+	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -666,7 +664,7 @@ MACHINE_CONFIG_START(midas_state::hammer)
 	MCFG_DEVICE_PROGRAM_MAP(hammer_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TICKET_DISPENSER_ADD("prize1", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("prize2", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
@@ -680,8 +678,10 @@ MACHINE_CONFIG_START(midas_state::hammer)
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
+	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_FORMAT(XRGB)
+
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

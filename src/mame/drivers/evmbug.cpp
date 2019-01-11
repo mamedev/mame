@@ -31,16 +31,14 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	void evmbug(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(rs232_r);
 	DECLARE_WRITE8_MEMBER(rs232_w);
 	void kbd_put(u8 data);
 
+	void evmbug(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-
+private:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;
@@ -61,8 +59,8 @@ void evmbug_state::io_map(address_map &map)
 	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x0003) AM_DEVREAD("uart1", tms9902_device, cruread)
 	//AM_RANGE(0x0000, 0x001f) AM_DEVWRITE("uart1", tms9902_device, cruwrite)
-	map(0x0000, 0x0003).r(FUNC(evmbug_state::rs232_r));
-	map(0x0000, 0x001f).w(FUNC(evmbug_state::rs232_w));
+	map(0x0000, 0x0003).r(this, FUNC(evmbug_state::rs232_r));
+	map(0x0000, 0x001f).w(this, FUNC(evmbug_state::rs232_w));
 }
 
 /* Input ports */
@@ -114,21 +112,18 @@ void evmbug_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-void evmbug_state::evmbug(machine_config &config)
-{
+MACHINE_CONFIG_START(evmbug_state::evmbug)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet
-	TMS9995(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &evmbug_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &evmbug_state::io_map);
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map )
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(evmbug_state::kbd_put));
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(evmbug_state, kbd_put))
 
-	//TMS9902(config, "uart1", XTAL(12'000'000) / 4);
-}
+	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL(12'000'000) / 4)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( evmbug )

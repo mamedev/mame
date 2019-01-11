@@ -5,16 +5,12 @@
     Angel Kids
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ANGELKDS_H
-#define MAME_INCLUDES_ANGELKDS_H
-
-#pragma once
 
 class angelkds_state : public driver_device
 {
 public:
-	angelkds_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	angelkds_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_bgtopvideoram(*this, "bgtopvideoram"),
 		m_bgbotvideoram(*this, "bgbotvideoram"),
 		m_txvideoram(*this, "txvideoram"),
@@ -22,8 +18,7 @@ public:
 		m_subcpu(*this, "sub"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes")
-	{ }
+		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_bgtopvideoram;
@@ -79,5 +74,3 @@ public:
 	void sub_map(address_map &map);
 	void sub_portmap(address_map &map);
 };
-
-#endif // MAME_INCLUDES_ANGELKDS_H

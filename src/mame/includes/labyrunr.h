@@ -5,21 +5,16 @@
     Labyrinth Runner
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LABYRUNR_H
-#define MAME_INCLUDES_LABYRUNR_H
-
-#pragma once
 
 #include "video/k007121.h"
 #include "video/k051733.h"
-#include "emupal.h"
 #include "screen.h"
 
 class labyrunr_state : public driver_device
 {
 public:
-	labyrunr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	labyrunr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_k007121(*this, "k007121"),
 		m_maincpu(*this,"maincpu"),
 		m_scrollram(*this, "scrollram"),
@@ -28,12 +23,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void labyrunr(machine_config &config);
-
-private:
 	/* devices */
 	required_device<k007121_device> m_k007121;
 
@@ -61,11 +52,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	void labyrunr_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(labyrunr);
 	uint32_t screen_update_labyrunr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(labyrunr_timer_interrupt);
+	void labyrunr(machine_config &config);
 	void labyrunr_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_LABYRUNR_H

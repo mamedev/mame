@@ -23,16 +23,14 @@ class vectrix_state : public driver_device
 public:
 	vectrix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		//      , m_maincpu(*this, "maincpu")
+//      , m_maincpu(*this, "maincpu")
 	{ }
 
-	void vectrix(machine_config &config);
-
+void vectrix(machine_config &config);
+void io_map(address_map &map);
+void mem_map(address_map &map);
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-
-	//  required_device<cpu_device> m_maincpu;
+//  required_device<cpu_device> m_maincpu;
 };
 
 void vectrix_state::mem_map(address_map &map)
@@ -44,7 +42,8 @@ void vectrix_state::mem_map(address_map &map)
 
 void vectrix_state::io_map(address_map &map)
 {
-	map(0x3000, 0x3001).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x3000, 0x3000).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x3001, 0x3001).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 }
 
 static INPUT_PORTS_START( vectrix )

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni, Lee Taylor, Valerio Verrando, Zsolt Vasvari, Aaron Giles, Jonathan Gevaryahu, hap, Robbbert
+// copyright-holders:Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni,Lee Taylor, Valerio Verrando, Zsolt Vasvari,Aaron Giles,Jonathan Gevaryahu,hap,Robbbert
 // thanks-to:Michael Strutts, Marco Cassili
 /*****************************************************************************
 
@@ -207,7 +207,6 @@
 #include "gunchamp.lh"
 #include "shuttlei.lh"
 #include "spacecom.lh"
-#include "yosakdon.lh"
 
 
 /*******************************************************/
@@ -375,9 +374,9 @@ void _8080bw_state::invadpt2_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -407,29 +406,31 @@ INPUT_PORTS_END
 
 
 /* same as regular invaders, but with a color board added */
-void _8080bw_state::invadpt2(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::invadpt2)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::invadpt2_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(invadpt2_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* 60 Hz signal clocks two LS161. Ripple carry will */
 	/* reset circuit, if LS161 not cleared before.      */
-	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
-}
+MACHINE_CONFIG_END
 
 
 
@@ -444,19 +445,19 @@ void _8080bw_state::spacerng_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::spacerng_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::spacerng_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
-void _8080bw_state::spacerng(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::spacerng)
 	invadpt2(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::spacerng_io_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spacerng_io_map)
+MACHINE_CONFIG_END
 
 
 
@@ -471,9 +472,9 @@ void _8080bw_state::spcewars_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::spcewars_sh_port_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::spcewars_sh_port_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 }
 
 
@@ -493,27 +494,28 @@ static INPUT_PORTS_START( spcewars )
 	PORT_DIPSETTING(    0x08, "2000" )
 INPUT_PORTS_END
 
-void _8080bw_state::spcewars(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::spcewars)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::spcewars_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spcewars_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
 
 	/* extra audio channel */
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -529,24 +531,25 @@ void _8080bw_state::spcewarla_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
-	map(0x04, 0x04).w(FUNC(_8080bw_state::spcewars_sh_port_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x04, 0x04).w(this, FUNC(_8080bw_state::spcewars_sh_port_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 	map(0x06, 0x06).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x08, 0x08).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x0c, 0x0c).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 }
 
-void _8080bw_state::spcewarla(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::spcewarla)
 	spcewars(config);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::spcewarla_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(spcewarla_io_map)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
-
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
-}
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -562,8 +565,8 @@ void _8080bw_state::astropal_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).portr("IN3");
 
-	map(0x03, 0x03).w(FUNC(_8080bw_state::invaders_audio_1_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x03, 0x03).w(this, FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invaders_audio_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -603,13 +606,14 @@ static INPUT_PORTS_START( astropal )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-void _8080bw_state::astropal(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::astropal)
 	invaders(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::astropal_io_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(astropal_io_map)
+
+MACHINE_CONFIG_END
 
 
 
@@ -633,8 +637,8 @@ void _8080bw_state::cosmo_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0").nopw();
 	map(0x01, 0x01).portr("IN1").nopw();
 	map(0x02, 0x02).portr("IN2").nopw();
-	map(0x03, 0x03).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::cosmo_sh_port_2_w));
+	map(0x03, 0x03).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::cosmo_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x07, 0x07).nopw();
 }
@@ -656,25 +660,25 @@ static INPUT_PORTS_START( cosmo )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" ) /* must be HIGH normally or the joystick won't work */
 INPUT_PORTS_END
 
-void _8080bw_state::cosmo(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::cosmo)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::cosmo_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::cosmo_io_map);
-
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cosmo_map)
+	MCFG_DEVICE_IO_MAP(cosmo_io_map)
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_cosmo));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_cosmo)
 
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
-}
+MACHINE_CONFIG_END
 
 
 
@@ -812,34 +816,34 @@ void _8080bw_state::spacecom_map(address_map &map)
 void _8080bw_state::spacecom_io_map(address_map &map)
 {
 	map(0x41, 0x41).portr("IN0");
-	map(0x42, 0x42).portr("IN1").w(FUNC(_8080bw_state::invaders_audio_1_w));
-	map(0x44, 0x44).portr("IN2").w(FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x42, 0x42).portr("IN1").w(this, FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x44, 0x44).portr("IN2").w(this, FUNC(_8080bw_state::invaders_audio_2_w));
 }
 
-void _8080bw_state::spacecom(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::spacecom)
+
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(18'000'000) / 10); // divider guessed
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 10) // divider guessed
 	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::spacecom_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::spacecom_io_map);
+	MCFG_DEVICE_PROGRAM_MAP(spacecom_map)
+	MCFG_DEVICE_IO_MAP(spacecom_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state, mw8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state, mw8080bw)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_spacecom));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_spacecom)
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	invaders_audio(config);
-}
+MACHINE_CONFIG_END
 
 void _8080bw_state::init_spacecom()
 {
@@ -868,10 +872,10 @@ void _8080bw_state::invrvnge_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invrvnge_sh_port_1_w));
+	map(0x02, 0x02).r(this, FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invrvnge_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invrvnge_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invrvnge_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -930,32 +934,35 @@ static INPUT_PORTS_START( invrvnge )
 INPUT_PORTS_END
 
 
-void _8080bw_state::invrvnge(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::invrvnge)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::invrvnge_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(invrvnge_io_map)
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_WATCHDOG_ADD("watchdog")
 
-	M6808(config, "audiocpu", XTAL(4'000'000)/2).set_addrmap(AS_PROGRAM, &_8080bw_state::invrvnge_sound_map); // MC6808P
+	MCFG_DEVICE_ADD("audiocpu", M6808, XTAL(4'000'000)/2) // MC6808P
+	MCFG_DEVICE_PROGRAM_MAP(invrvnge_sound_map)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.5);
-}
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(4'000'000)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
 
 
@@ -1061,17 +1068,17 @@ void _8080bw_state::starw1_io_map(address_map &map)
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
 	map(0x03, 0x03).nopw();    /* writes 9B at boot */
-	map(0x04, 0x04).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x04, 0x04).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x07, 0x07).nopw();    /* writes 89 at boot */
 }
 
-void _8080bw_state::starw1(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::starw1)
 	invadpt2(config);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::starw1_io_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(starw1_io_map)
+MACHINE_CONFIG_END
 
 /*******************************************************/
 /*                                                     */
@@ -1091,9 +1098,9 @@ void _8080bw_state::lrescue_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::lrescue_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::lrescue_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::lrescue_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::lrescue_sh_port_2_w));
 }
 
 
@@ -1109,67 +1116,68 @@ static INPUT_PORTS_START( lrescue )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
 
-void _8080bw_state::lrescue(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::lrescue)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::lrescue_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(lrescue_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(4);
-	m_samples->set_samples_names(lrescue_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.75);
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(lrescue_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* extra audio channel */
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
-void _8080bw_state::escmars(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::escmars)
+
 	/* basic machine hardware */
-	I8080(config, m_maincpu, XTAL(18'000'000) / 10); // divider guessed
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::escmars_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::lrescue_io_map);
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(18'000'000) / 10) // divider guessed
+	MCFG_DEVICE_PROGRAM_MAP(escmars_map)
+	MCFG_DEVICE_IO_MAP(lrescue_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART);
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_mw8080bw));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_mw8080bw)
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(4);
-	m_samples->set_samples_names(lrescue_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.75);
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(lrescue_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* extra audio channel */
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -1227,37 +1235,39 @@ void _8080bw_state::cosmicmo_io_map(address_map &map)
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
-	map(0x02, 0x02).mirror(0x04).r(FUNC(_8080bw_state::invrvnge_02_r));
+	map(0x02, 0x02).mirror(0x04).r(this, FUNC(_8080bw_state::invrvnge_02_r));
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w(FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x03, 0x03).w(this, FUNC(_8080bw_state::invaders_audio_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::cosmicmo_05_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::cosmicmo_05_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
-void _8080bw_state::cosmicmo(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::cosmicmo)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::cosmicmo_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_8080bw_state::irq0_line_hold));
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(cosmicmo_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* sound hardware */
 	invaders_audio(config);
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -1347,19 +1357,19 @@ void _8080bw_state::rollingc_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
 	map(0x4000, 0x5fff).rom();
-	map(0xa000, 0xbfff).rw(FUNC(_8080bw_state::rollingc_scattered_colorram_r), FUNC(_8080bw_state::rollingc_scattered_colorram_w));
-	map(0xe000, 0xffff).rw(FUNC(_8080bw_state::rollingc_scattered_colorram2_r), FUNC(_8080bw_state::rollingc_scattered_colorram2_w));
+	map(0xa000, 0xbfff).rw(this, FUNC(_8080bw_state::rollingc_scattered_colorram_r), FUNC(_8080bw_state::rollingc_scattered_colorram_w));
+	map(0xe000, 0xffff).rw(this, FUNC(_8080bw_state::rollingc_scattered_colorram2_r), FUNC(_8080bw_state::rollingc_scattered_colorram2_w));
 }
 
 
 void _8080bw_state::rollingc_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0").w(FUNC(_8080bw_state::rollingc_sh_port_w));
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(_8080bw_state::rollingc_sh_port_w));
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
 }
 
 
@@ -1388,27 +1398,29 @@ MACHINE_START_MEMBER(_8080bw_state,rollingc)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-void _8080bw_state::rollingc(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::rollingc)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::rollingc_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::rollingc_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rollingc_map)
+	MCFG_DEVICE_IO_MAP(rollingc_io_map)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_rollingc));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_rollingc)
 
-	PALETTE(config, m_palette, FUNC(_8080bw_state::rollingc_palette), 16);
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(_8080bw_state, rollingc)
 
 	/* sound hardware */
 	invaders_samples_audio(config);
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,rollingc)
-}
+MACHINE_CONFIG_END
 
 
 
@@ -1434,7 +1446,7 @@ void _8080bw_state::schaser_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
 	map(0x4000, 0x5fff).rom();
-	map(0xc000, 0xdfff).rw(FUNC(_8080bw_state::schaser_scattered_colorram_r), FUNC(_8080bw_state::schaser_scattered_colorram_w));
+	map(0xc000, 0xdfff).rw(this, FUNC(_8080bw_state::schaser_scattered_colorram_r), FUNC(_8080bw_state::schaser_scattered_colorram_w));
 }
 
 
@@ -1443,9 +1455,9 @@ void _8080bw_state::schaser_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::schaser_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::schaser_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::schaser_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::schaser_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1529,51 +1541,52 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser)
 	MACHINE_RESET_CALL_MEMBER(mw8080bw);
 }
 
-void _8080bw_state::schaser(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::schaser)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::schaser_io_map);
+	MCFG_DEVICE_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_IO_MAP(schaser_io_map)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,schaser)
 
-	TIMER(config, "schaser_sh_555").configure_generic(FUNC(_8080bw_state::schaser_effect_555_cb));
+	MCFG_TIMER_DRIVER_ADD("schaser_sh_555", _8080bw_state, schaser_effect_555_cb)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_schaser));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_schaser)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	sn76477_device &snsnd(SN76477(config, "snsnd"));
-	snsnd.set_noise_params(RES_K(47), RES_K(330), CAP_P(470));
-	snsnd.set_decay_res(RES_M(2.2));
-	snsnd.set_attack_params(CAP_U(1.0), RES_K(4.7));
-	snsnd.set_amp_res(0);
-	snsnd.set_feedback_res(RES_K(33));
-	snsnd.set_vco_params(0, CAP_U(0.1), RES_K(39));
-	snsnd.set_pitch_voltage(5.0);
-	snsnd.set_slf_params(CAP_U(1.0), RES_K(120));
-	snsnd.set_oneshot_params(CAP_U(0.1), RES_K(220));
-	snsnd.set_vco_mode(1);
-	snsnd.set_mixer_params(0, 0, 0);
-	snsnd.set_envelope_params(1, 0);
-	snsnd.set_enable(1);
-	snsnd.add_route(0, "discrete", 1.0, 0);
+	MCFG_DEVICE_ADD("snsnd", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(470)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_M(2.2))                   // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(4.7))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(0)                              // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(33))                 // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(39))    // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                      // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))      // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(220))  // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(1)                             // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                               // enable
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	DISCRETE(config, m_discrete, schaser_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, schaser_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 
@@ -1596,10 +1609,10 @@ void _8080bw_state::schasercv_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(FUNC(_8080bw_state::schasercv_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::schasercv_sh_port_1_w));
+	map(0x02, 0x02).r(this, FUNC(_8080bw_state::schasercv_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::schasercv_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::schasercv_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::schasercv_sh_port_2_w));
 	//map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1607,9 +1620,9 @@ void _8080bw_state::crashrd_io_map(address_map &map)
 {
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::crashrd_port03_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::crashrd_port03_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::crashrd_port05_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::crashrd_port05_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1664,35 +1677,36 @@ MACHINE_START_MEMBER(_8080bw_state,schasercv)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-void _8080bw_state::schasercv(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::schasercv)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::schasercv_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_IO_MAP(schasercv_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, schasercv)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_schasercv));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_schasercv)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
-void _8080bw_state::crashrd(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::crashrd)
 	schaser(config);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::crashrd_io_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(crashrd_io_map)
+MACHINE_CONFIG_END
 
 
 
@@ -1720,7 +1734,7 @@ void _8080bw_state::sflush_map(address_map &map)
 	map(0x801a, 0x801a).nopw();
 	map(0x801c, 0x801c).nopw();
 	map(0x801d, 0x801d).nopw();
-	map(0xa000, 0xbfff).rw(FUNC(_8080bw_state::schaser_scattered_colorram_r), FUNC(_8080bw_state::schaser_scattered_colorram_w));
+	map(0xa000, 0xbfff).rw(this, FUNC(_8080bw_state::schaser_scattered_colorram_r), FUNC(_8080bw_state::schaser_scattered_colorram_w));
 	map(0xd800, 0xffff).rom();
 }
 
@@ -1762,25 +1776,25 @@ MACHINE_START_MEMBER(_8080bw_state,sflush)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-void _8080bw_state::sflush(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::sflush)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	M6800(config.replace(), m_maincpu, 1500000); // ?
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::sflush_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_8080bw_state::irq0_line_hold));
-
+	MCFG_DEVICE_REPLACE("maincpu",M6800,1500000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(sflush_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state, irq0_line_hold)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_sflush));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_sflush)
 
-	PALETTE(config, m_palette, FUNC(_8080bw_state::sflush_palette), 8);
-}
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(_8080bw_state, sflush)
+MACHINE_CONFIG_END
 
 
 
@@ -1803,12 +1817,12 @@ void _8080bw_state::sflush(machine_config &config)
 
 void _8080bw_state::lupin3_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0").w(FUNC(_8080bw_state::lupin3_00_w));
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(_8080bw_state::lupin3_00_w));
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::lupin3_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::lupin3_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::lupin3_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::lupin3_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1867,64 +1881,63 @@ static INPUT_PORTS_START( lupin3a )
 	PORT_DIPSETTING(    0x10, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
-void _8080bw_state::lupin3(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::lupin3)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::lupin3_io_map);
-
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(lupin3_io_map)
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_indianbt));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_indianbt)
 
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	sn76477_device &snsnd(SN76477(config, "snsnd"));
-	snsnd.set_noise_params(0, 0, 0);
-	snsnd.set_decay_res(0);
-	snsnd.set_attack_params(0, RES_K(100));
-	snsnd.set_amp_res(RES_K(56));
-	snsnd.set_feedback_res(RES_K(10));
-	snsnd.set_vco_params(0, CAP_U(0.1), RES_K(8.2));
-	snsnd.set_pitch_voltage(5.0);
-	snsnd.set_slf_params(CAP_U(1.0), RES_K(120));
-	snsnd.set_oneshot_params(0, 0);
-	snsnd.set_vco_mode(1);
-	snsnd.set_mixer_params(0, 0, 0);
-	snsnd.set_envelope_params(1, 0);
-	snsnd.set_enable(1);
-	snsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
+	MCFG_DEVICE_ADD("snsnd", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(4);
-	m_samples->set_samples_names(lupin3_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(lupin3_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	DISCRETE(config, m_discrete, indianbt_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, indianbt_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void _8080bw_state::lupin3a(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::lupin3a)
 	lupin3(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
-
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
-
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_lupin3));
-
-	PALETTE(config.replace(), m_palette, palette_device::RBG_3BIT);
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_lupin3)
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+MACHINE_CONFIG_END
 
 
 
@@ -1970,13 +1983,13 @@ READ8_MEMBER(_8080bw_state::polaris_port00_r)
 // Probably an unfinished feature.
 void _8080bw_state::polaris_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(FUNC(_8080bw_state::polaris_port00_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x00, 0x00).r(this, FUNC(_8080bw_state::polaris_port00_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).portr("IN2").w(FUNC(_8080bw_state::polaris_sh_port_1_w));
+	map(0x02, 0x02).portr("IN2").w(this, FUNC(_8080bw_state::polaris_sh_port_1_w));
 	map(0x03, 0x03).rw(m_mb14241, FUNC(mb14241_device::shift_result_r), FUNC(mb14241_device::shift_data_w));
-	map(0x04, 0x04).w(FUNC(_8080bw_state::polaris_sh_port_2_w));
+	map(0x04, 0x04).w(this, FUNC(_8080bw_state::polaris_sh_port_2_w));
 	map(0x05, 0x05).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x06, 0x06).w(FUNC(_8080bw_state::polaris_sh_port_3_w));
+	map(0x06, 0x06).w(this, FUNC(_8080bw_state::polaris_sh_port_3_w));
 }
 
 
@@ -2034,34 +2047,35 @@ static INPUT_PORTS_START( polaris )
 	PORT_ADJUSTER( 90, "Sub Volume VR3" )
 INPUT_PORTS_END
 
-void _8080bw_state::polaris(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::polaris)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::polaris_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_8080bw_state::polaris_interrupt));
+	MCFG_DEVICE_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_IO_MAP(polaris_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  polaris_interrupt)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,polaris)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_polaris));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_polaris)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, m_discrete, polaris_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, polaris_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 
@@ -2147,11 +2161,11 @@ INPUT_PORTS_END
 void _8080bw_state::ballbomb_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
-	map(0x01, 0x01).portr("IN1").w(FUNC(_8080bw_state::ballbomb_01_w));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(_8080bw_state::ballbomb_01_w));
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::ballbomb_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::ballbomb_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::ballbomb_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::ballbomb_sh_port_2_w));
 }
 
 
@@ -2166,28 +2180,29 @@ static INPUT_PORTS_START( ballbomb )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
 
-void _8080bw_state::ballbomb(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::ballbomb)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::ballbomb_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(ballbomb_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_ballbomb));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_ballbomb)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	DISCRETE(config, m_discrete, ballbomb_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, ballbomb_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 
@@ -2208,8 +2223,8 @@ void _8080bw_state::yosakdon_io_map(address_map &map)
 {
 	map(0x01, 0x01).portr("IN0");
 	map(0x02, 0x02).portr("IN1");
-	map(0x03, 0x03).w(FUNC(_8080bw_state::yosakdon_sh_port_1_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::yosakdon_sh_port_2_w));
+	map(0x03, 0x03).w(this, FUNC(_8080bw_state::yosakdon_sh_port_1_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::yosakdon_sh_port_2_w));
 	map(0x06, 0x06).nopw(); /* character numbers */
 }
 
@@ -2247,21 +2262,22 @@ static INPUT_PORTS_START( yosakdon )
 INPUT_PORTS_END
 
 
-void _8080bw_state::yosakdon(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::yosakdon)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::yosakdon_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::yosakdon_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(yosakdon_map)
+	MCFG_DEVICE_IO_MAP(yosakdon_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* sound hardware */
 	invaders_samples_audio(config);
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
+MACHINE_CONFIG_END
 
 
 
@@ -2389,76 +2405,76 @@ READ8_MEMBER(_8080bw_state::indianbtbr_01_r)
 
 void _8080bw_state::indianbt_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(FUNC(_8080bw_state::indianbt_r));
+	map(0x00, 0x00).r(this, FUNC(_8080bw_state::indianbt_r));
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::indianbt_sh_port_1_w));
+	map(0x02, 0x02).r(this, FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::indianbt_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::indianbt_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::indianbt_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).w(FUNC(_8080bw_state::indianbt_sh_port_3_w));
+	map(0x07, 0x07).w(this, FUNC(_8080bw_state::indianbt_sh_port_3_w));
 }
 
 void _8080bw_state::indianbtbr_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0");
-	map(0x01, 0x01).r(FUNC(_8080bw_state::indianbtbr_01_r));
+	map(0x01, 0x01).r(this, FUNC(_8080bw_state::indianbtbr_01_r));
 	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::indianbtbr_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::indianbtbr_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::indianbtbr_sh_port_2_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::indianbtbr_sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x07, 0x07).nopw();
 }
 
 
-void _8080bw_state::indianbt(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::indianbt)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::indianbt_io_map);
-
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(indianbt_io_map)
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_indianbt));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_indianbt)
 
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
 
-	DISCRETE(config, m_discrete, indianbt_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, indianbt_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
-void _8080bw_state::indianbtbr(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::indianbtbr)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::schaser_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::indianbtbr_io_map);
-
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(schaser_map)
+	MCFG_DEVICE_IO_MAP(indianbtbr_io_map)
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_indianbt));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_indianbt)
 
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
-}
+MACHINE_CONFIG_END
 
 
 
@@ -2476,11 +2492,11 @@ WRITE8_MEMBER(_8080bw_state::steelwkr_sh_port_3_w)
 void _8080bw_state::steelwkr_io_map(address_map &map)
 {
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).r(FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
+	map(0x02, 0x02).r(this, FUNC(_8080bw_state::invrvnge_02_r)).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::invadpt2_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invadpt2_sh_port_2_w));
-	map(0x06, 0x06).w(FUNC(_8080bw_state::steelwkr_sh_port_3_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::invadpt2_sh_port_2_w));
+	map(0x06, 0x06).w(this, FUNC(_8080bw_state::steelwkr_sh_port_3_w));
 }
 
 static INPUT_PORTS_START( steelwkr )
@@ -2514,26 +2530,26 @@ static INPUT_PORTS_START( steelwkr )
 INPUT_PORTS_END
 
 
-void _8080bw_state::steelwkr(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::steelwkr)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::steelwkr_io_map);
-
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(steelwkr_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invadpt2));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
-}
+MACHINE_CONFIG_END
 
 
 
@@ -2708,11 +2724,11 @@ READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
 
 WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
 {
-	/* bit 0 goes high when first coin inserted
-	   bit 1 also goes high when subsequent coins are inserted
-	      These may be for indicator lamps under the start buttons.
-	   bit 2 goes high while player 2 is playing
-	*/
+		/* bit 0 goes high when first coin inserted
+		   bit 1 also goes high when subsequent coins are inserted
+		      These may be for indicator lamps under the start buttons.
+		   bit 2 goes high while player 2 is playing     */
+
 	m_flip_screen = BIT(data, 2) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 }
 
@@ -2728,36 +2744,36 @@ void _8080bw_state::shuttlei_map(address_map &map)
 void _8080bw_state::shuttlei_io_map(address_map &map)
 {
 	map(0xfc, 0xfc).nopw(); /* game writes 0xAA every so often (perhaps when base hit?) */
-	map(0xfd, 0xfd).w(FUNC(_8080bw_state::shuttlei_sh_port_1_w));
-	map(0xfe, 0xfe).portr("DSW").w(FUNC(_8080bw_state::shuttlei_sh_port_2_w));
-	map(0xff, 0xff).rw(FUNC(_8080bw_state::shuttlei_ff_r), FUNC(_8080bw_state::shuttlei_ff_w));
+	map(0xfd, 0xfd).w(this, FUNC(_8080bw_state::shuttlei_sh_port_1_w));
+	map(0xfe, 0xfe).portr("DSW").w(this, FUNC(_8080bw_state::shuttlei_sh_port_2_w));
+	map(0xff, 0xff).rw(this, FUNC(_8080bw_state::shuttlei_ff_r), FUNC(_8080bw_state::shuttlei_ff_w));
 }
 
 
-void _8080bw_state::shuttlei(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::shuttlei)
+
 	/* basic machine hardware */
-	I8080(config, m_maincpu, XTAL(18'000'000) / 9);
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(18'000'000) / 9)
 	// TODO: move irq handling away from mw8080.cpp, this game runs on custom hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::shuttlei_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::shuttlei_io_map);
+	MCFG_DEVICE_PROGRAM_MAP(shuttlei_map)
+	MCFG_DEVICE_IO_MAP(shuttlei_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_shuttlei));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_shuttlei)
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	invaders_samples_audio(config);
-}
+MACHINE_CONFIG_END
 
 
 
@@ -2813,11 +2829,11 @@ void _8080bw_state::darthvdr_map(address_map &map)
 void _8080bw_state::darthvdr_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("P1");
-	map(0x01, 0x01).r(FUNC(_8080bw_state::darthvdr_01_r));
+	map(0x01, 0x01).r(this, FUNC(_8080bw_state::darthvdr_01_r));
 
-	map(0x00, 0x00).w(FUNC(_8080bw_state::darthvdr_00_w)); // flipscreen
+	map(0x00, 0x00).w(this, FUNC(_8080bw_state::darthvdr_00_w)); // flipscreen
 	map(0x04, 0x04).nopw();
-	map(0x08, 0x08).w(FUNC(_8080bw_state::darthvdr_08_w)); // sound
+	map(0x08, 0x08).w(this, FUNC(_8080bw_state::darthvdr_08_w)); // sound
 }
 
 
@@ -2860,14 +2876,14 @@ static INPUT_PORTS_START( darthvdr )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
-void _8080bw_state::darthvdr(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::darthvdr)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::darthvdr_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::darthvdr_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_8080bw_state::irq0_line_hold));
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(darthvdr_map)
+	MCFG_DEVICE_IO_MAP(darthvdr_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _8080bw_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,darthvdr)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,darthvdr)
@@ -2876,8 +2892,9 @@ void _8080bw_state::darthvdr(machine_config &config)
 	invaders_samples_audio(config);
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
+MACHINE_CONFIG_END
 
 
 
@@ -2903,9 +2920,9 @@ void _8080bw_state::vortex_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x00, 0x00).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x01, 0x01).w(FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x01, 0x01).w(this, FUNC(_8080bw_state::invaders_audio_1_w));
 	map(0x06, 0x06).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x07, 0x07).w(FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x07, 0x07).w(this, FUNC(_8080bw_state::invaders_audio_2_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -2934,27 +2951,28 @@ static INPUT_PORTS_START( vortex )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
-void _8080bw_state::vortex(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::vortex)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::vortex_io_map);
-
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(vortex_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_usec(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)));
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* video hardware */
 	// TODO: replace with modified invaders color renderer code allowing midscanline color writes
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
 	invaders_audio(config);
-}
+MACHINE_CONFIG_END
 
 /* decrypt function for vortex */
 void _8080bw_state::init_vortex()
@@ -3184,11 +3202,11 @@ void _8080bw_state::claybust_io_map(address_map &map)
 {
 	//AM_RANGE(0x00, 0x00) AM_WRITENOP // ?
 	map(0x01, 0x01).portr("IN1").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x02, 0x02).r(FUNC(_8080bw_state::claybust_gun_lo_r)).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x02, 0x02).r(this, FUNC(_8080bw_state::claybust_gun_lo_r)).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)); //AM_WRITENOP // port3 write looks sound-related
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	//AM_RANGE(0x05, 0x05) AM_WRITENOP // ?
-	map(0x06, 0x06).r(FUNC(_8080bw_state::claybust_gun_hi_r));
+	map(0x06, 0x06).r(this, FUNC(_8080bw_state::claybust_gun_hi_r));
 }
 
 
@@ -3242,20 +3260,20 @@ MACHINE_START_MEMBER(_8080bw_state, claybust)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-void _8080bw_state::claybust(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::claybust)
 	invaders(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::claybust_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(claybust_io_map)
 
-	TIMER(config, "claybust_gun").configure_generic(FUNC(_8080bw_state::claybust_gun_callback));
+	MCFG_TIMER_DRIVER_ADD("claybust_gun", _8080bw_state, claybust_gun_callback)
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, claybust)
 
 	/* sound hardware */
 	// TODO: discrete sound
-}
+MACHINE_CONFIG_END
 
 
 
@@ -3359,19 +3377,19 @@ static INPUT_PORTS_START( attackfc )
 INPUT_PORTS_END
 
 
-void _8080bw_state::attackfc(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::attackfc)
 	mw8080bw_root(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::attackfc_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(attackfc_io_map)
 
 	/* add shifter */
-	MB14241(config, m_mb14241);
+	MCFG_MB14241_ADD("mb14241")
 
 	/* sound hardware */
 	// TODO: custom discrete
-}
+MACHINE_CONFIG_END
 
 
 void _8080bw_state::init_attackfc()
@@ -3470,8 +3488,8 @@ void _8080bw_state::invmulti_map(address_map &map)
 	map(0x0000, 0x1fff).mirror(0x8000).bankr("bank1");
 	map(0x2000, 0x3fff).mirror(0x8000).ram().share("main_ram");
 	map(0x4000, 0x5fff).mirror(0x8000).bankr("bank2");
-	map(0x6000, 0x6000).mirror(0x1fff).rw(FUNC(_8080bw_state::invmulti_eeprom_r), FUNC(_8080bw_state::invmulti_eeprom_w));
-	map(0xe000, 0xe000).mirror(0x1fff).w(FUNC(_8080bw_state::invmulti_bank_w));
+	map(0x6000, 0x6000).mirror(0x1fff).rw(this, FUNC(_8080bw_state::invmulti_eeprom_r), FUNC(_8080bw_state::invmulti_eeprom_w));
+	map(0xe000, 0xe000).mirror(0x1fff).w(this, FUNC(_8080bw_state::invmulti_bank_w));
 }
 
 READ8_MEMBER(_8080bw_state::invmulti_eeprom_r)
@@ -3499,17 +3517,17 @@ WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
 	membank("bank2")->set_entry(bank);
 }
 
-void _8080bw_state::invmulti(machine_config &config)
-{
+MACHINE_CONFIG_START(_8080bw_state::invmulti)
 	invaders(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::invmulti_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(invmulti_map)
 
-	EEPROM_93C46_8BIT(config, m_eeprom);
+	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
-}
+MACHINE_CONFIG_END
 
 void _8080bw_state::init_invmulti()
 {
@@ -5191,7 +5209,7 @@ GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_i
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,   lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Destination Earth (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAMEL(1980, escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Escape from Mars (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
+GAMEL( 1980,escmars,     lrescue,  escmars,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg", "Escape from Mars (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 
 GAME( 1979, schaser,     0,        schaser,   schaser,   _8080bw_state,  empty_init,    ROT270, "Taito", "Space Chaser (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, schasera,    schaser,  schaser,   schaser,   _8080bw_state,  empty_init,    ROT270, "Taito", "Space Chaser (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -5247,8 +5265,8 @@ GAME( 1979, ozmawarsmr,  ozmawars, invaders,  ozmawars,  mw8080bw_state, empty_i
 GAME( 1979, spaceph,     ozmawars, invaders,  spaceph,   mw8080bw_state, empty_init,    ROT270, "bootleg? (Zilec Games)", "Space Phantoms (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, solfight,    ozmawars, invaders,  ozmawars,  mw8080bw_state, empty_init,    ROT270, "bootleg", "Solar Fight (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1979, yosakdon,    0,        yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_yosakdon )
-GAMEL(1979, yosakdona,   yosakdon, yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_yosakdon )
+GAME( 1979, yosakdon,    0,        yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, yosakdona,   yosakdon, yosakdon,  yosakdon,  _8080bw_state,  empty_init,    ROT270, "Wing", "Yosaku To Donbei (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAMEL(1979, shuttlei,    0,        shuttlei,  shuttlei,  _8080bw_state,  empty_init,    ROT270, "Omori Electric Co., Ltd.", "Shuttle Invader", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_shuttlei )
 

@@ -125,16 +125,16 @@ void dbz_state::dbz_map(address_map &map)
 	map(0x4d4000, 0x4d401f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
 	map(0x4e0000, 0x4e0001).portr("P1_P2");
 	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
-	map(0x4e4000, 0x4e4001).lr8("4e4000", [this]() { return uint8_t(m_dsw2->read()); });
+	map(0x4e4000, 0x4e4001).portr("DSW2");
 	map(0x4e8000, 0x4e8001).nopw();
-	map(0x4ec000, 0x4ec001).w(FUNC(dbz_state::dbzcontrol_w));
-	map(0x4f0000, 0x4f0001).w(FUNC(dbz_state::dbz_sound_command_w));
-	map(0x4f4000, 0x4f4001).w(FUNC(dbz_state::dbz_sound_cause_nmi));
+	map(0x4ec000, 0x4ec001).w(this, FUNC(dbz_state::dbzcontrol_w));
+	map(0x4f0000, 0x4f0001).w(this, FUNC(dbz_state::dbz_sound_command_w));
+	map(0x4f4000, 0x4f4001).w(this, FUNC(dbz_state::dbz_sound_cause_nmi));
 	map(0x4f8000, 0x4f801f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00);      // 251 #1
 	map(0x4fc000, 0x4fc01f).w(m_k053251, FUNC(k053251_device::lsb_w));   // 251 #2
 
-	map(0x500000, 0x501fff).ram().w(FUNC(dbz_state::dbz_bg2_videoram_w)).share("bg2_videoram");
-	map(0x508000, 0x509fff).ram().w(FUNC(dbz_state::dbz_bg1_videoram_w)).share("bg1_videoram");
+	map(0x500000, 0x501fff).ram().w(this, FUNC(dbz_state::dbz_bg2_videoram_w)).share("bg2_videoram");
+	map(0x508000, 0x509fff).ram().w(this, FUNC(dbz_state::dbz_bg1_videoram_w)).share("bg1_videoram");
 	map(0x510000, 0x513fff).rw(m_k053936_1, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
 	map(0x518000, 0x51bfff).rw(m_k053936_2, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
 	map(0x600000, 0x6fffff).nopr();             // PSAC 1 ROM readback window
@@ -213,6 +213,10 @@ static INPUT_PORTS_START( dbz )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
+
+	PORT_START("FAKE")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -344,43 +348,45 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	MCFG_SCREEN_UPDATE_DRIVER(dbz_state, screen_update_dbz)
 	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_dbz);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dbz)
 
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x4000/2).enable_shadows();
+	MCFG_PALETTE_ADD("palette", 0x4000/2)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(dbz_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 1);
-	m_k056832->set_palette("palette");
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(dbz_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1, "none")
+	MCFG_K056832_PALETTE("palette")
 
-	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(dbz_state::sprite_callback), this);
-	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -87, 32); // or -52, 16?
-	m_k053246->set_palette("palette");
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(dbz_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -87, 32) // or -52, 16?
+	MCFG_K053246_PALETTE("palette")
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
-	K053936(config, m_k053936_1, 0);
-	m_k053936_1->set_wrap(1);
-	m_k053936_1->set_offsets(-46, -16);
+	MCFG_DEVICE_ADD("k053936_1", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(-46, -16)
 
-	K053936(config, m_k053936_2, 0);
-	m_k053936_2->set_wrap(1);
-	m_k053936_2->set_offsets(-46, -16);
+	MCFG_DEVICE_ADD("k053936_2", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(-46, -16)
 
-	K053252(config, m_k053252, 16000000/2);
-	m_k053252->int1_ack().set(FUNC(dbz_state::dbz_irq2_ack_w));
+	MCFG_DEVICE_ADD("k053252", K053252, 16000000/2)
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, dbz_state, dbz_irq2_ack_w))
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

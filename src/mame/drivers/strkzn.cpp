@@ -23,13 +23,11 @@ public:
 	{ }
 
 	void strkzn(machine_config &config);
-
-private:
 	void light_io(address_map &map);
 	void light_mem(address_map &map);
 	void main_io(address_map &map);
 	void main_mem(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_lightcpu;
 };

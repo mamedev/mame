@@ -230,14 +230,11 @@ void exidy440_state::exidy440_update_firq()
 }
 
 
-WRITE_LINE_MEMBER(exidy440_state::vblank_interrupt_w)
+INTERRUPT_GEN_MEMBER(exidy440_state::exidy440_vblank_interrupt)
 {
 	/* set the FIRQ line on a VBLANK */
-	if (state)
-	{
-		m_firq_vblank = 1;
-		exidy440_update_firq();
-	}
+	m_firq_vblank = 1;
+	exidy440_update_firq();
 }
 
 
@@ -307,7 +304,7 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		uint8_t *src;
 
 		/* skip if out of range */
-		if (yoffs < cliprect.top() || yoffs >= cliprect.bottom() + 16)
+		if (yoffs < cliprect.min_y || yoffs >= cliprect.max_y + 16)
 			continue;
 
 		/* get a pointer to the source image */
@@ -328,11 +325,11 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				sy += (VBSTART - VBEND);
 
 			/* stop if we get before the current scanline */
-			if (yoffs < cliprect.top())
+			if (yoffs < cliprect.min_y)
 				break;
 
 			/* only draw scanlines that are in this cliprect */
-			if (yoffs <= cliprect.bottom())
+			if (yoffs <= cliprect.max_y)
 			{
 				uint8_t *old = &m_local_videoram[sy * 512 + xoffs];
 				int currx = xoffs;
@@ -389,8 +386,8 @@ void exidy440_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 void exidy440_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision)
 {
 	/* draw any dirty scanlines from the VRAM directly */
-	int sy = scroll_offset + cliprect.top();
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++, sy++)
+	int sy = scroll_offset + cliprect.min_y;
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++, sy++)
 	{
 		/* wrap at the bottom of the screen */
 		if (sy >= VBSTART)
@@ -418,7 +415,7 @@ uint32_t exidy440_state::screen_update_exidy440(screen_device &screen, bitmap_in
 	update_screen(screen, bitmap, cliprect, 0, true);
 
 	/* generate an interrupt once/frame for the beam */
-	if (cliprect.bottom() == screen.visible_area().bottom())
+	if (cliprect.max_y == screen.visible_area().max_y)
 	{
 		int i;
 
@@ -463,13 +460,11 @@ uint32_t topsecex_state::screen_update_topsecex(screen_device &screen, bitmap_in
 MACHINE_CONFIG_START(exidy440_state::exidy440_video)
 	MCFG_PALETTE_ADD("palette", 256)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(exidy440_state::screen_update_exidy440));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(exidy440_state::vblank_interrupt_w));
-	screen.screen_vblank().append(m_custom, FUNC(exidy440_sound_device::sound_interrupt_w));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(exidy440_state, screen_update_exidy440)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 

@@ -28,7 +28,7 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	DECLARE_WRITE8_MEMBER(cruwrite) override;
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
-	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
+	DECLARE_WRITE8_MEMBER(set_gromlines) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;

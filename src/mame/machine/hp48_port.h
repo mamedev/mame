@@ -21,12 +21,6 @@ class hp48_port_image_device :  public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, int module, int max_size)
-		: hp48_port_image_device(mconfig, tag, owner, 0)
-	{
-		set_port_config(module, max_size);
-	}
-
 	hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_port_config(int module, int max_size)
@@ -74,5 +68,9 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(HP48_PORT, hp48_port_image_device)
+
+#define MCFG_HP48_PORT_ADD(_tag, _module, _max_size) \
+	MCFG_DEVICE_ADD(_tag, HP48_PORT, 0) \
+	downcast<hp48_port_image_device &>(*device).set_port_config(_module, _max_size);
 
 #endif // MAME_MACHINE_HP84_PORT_H

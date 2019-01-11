@@ -12,27 +12,28 @@
 #include "emu.h"
 #include "includes/markham.h"
 
-void markham_state::markham_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(markham_state, markham)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	// create a lookup table for the palette
-	for (int i = 0; i < 0x100; i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int const r = pal4bit(color_prom[i | 0x000]);
-		int const g = pal4bit(color_prom[i | 0x100]);
-		int const b = pal4bit(color_prom[i | 0x200]);
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	// color_prom now points to the beginning of the lookup table
+	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x300;
 
-	// sprites lookup table
-	for (int i = 0; i < 0x400; i++)
+	/* sprites lookup table */
+	for (i = 0; i < 0x400; i++)
 	{
-		uint8_t const ctabentry = color_prom[i];
+		uint8_t ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -70,7 +71,6 @@ VIDEO_START_MEMBER(markham_state, strnskil)
 	save_item(NAME(m_irq_source));
 	save_item(NAME(m_irq_scanline_start));
 	save_item(NAME(m_irq_scanline_end));
-	save_item(NAME(m_scroll_ctrl));
 }
 
 void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -135,7 +135,7 @@ uint32_t markham_state::screen_update_markham(screen_device &screen, bitmap_ind1
 
 uint32_t markham_state::screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *scroll_data = (const uint8_t *)memregion("scroll_prom")->base();
+	const uint8_t *scroll_data = memregion("scroll_prom")->base();
 
 	int row;
 

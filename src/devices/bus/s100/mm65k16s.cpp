@@ -235,7 +235,7 @@ void s100_mm65k16s_device::device_reset()
 
 uint8_t s100_mm65k16s_device::s100_smemr_r(address_space &space, offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0;
 
 	if (offset < 0xf800)
 	{

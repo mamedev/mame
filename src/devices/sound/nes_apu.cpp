@@ -101,18 +101,13 @@ static void create_noise(u8 *buf, const int bits, int size)
 DEFINE_DEVICE_TYPE(NES_APU, nesapu_device, "nesapu", "N2A03 APU")
 
 nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nesapu_device(mconfig, tag, NES_APU, owner, clock)
-{
-}
-
-nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_type type, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
+	: device_t(mconfig, NES_APU, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_mem_read_cb(*this)
-	, m_irq_handler(*this)
 	, m_samps_per_sync(0)
 	, m_buffer_size(0)
 	, m_stream(nullptr)
+	, m_irq_handler(*this)
+	, m_mem_read_cb(*this)
 {
 	for (auto & elem : m_noise_lut)
 	{
@@ -133,11 +128,6 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	{
 		elem = 0;
 	}
-}
-
-void nesapu_device::device_reset()
-{
-	write(0x15, 0x00);
 }
 
 void nesapu_device::device_clock_changed()
@@ -170,7 +160,14 @@ void nesapu_device::calculate_rates()
 
 void nesapu_device::device_start()
 {
-	apu_init();
+	// resolve callbacks
+	m_irq_handler.resolve_safe();
+	m_mem_read_cb.resolve_safe(0x00);
+
+	create_noise(m_noise_lut, 13, apu_t::NOISE_LONG);
+
+	calculate_rates();
+
 	/* register for save */
 	for (int i = 0; i < 2; i++)
 	{
@@ -227,18 +224,6 @@ void nesapu_device::device_start()
 	save_item(NAME(m_APU.step_mode));
 	#endif
 }
-
-void nesapu_device::apu_init()
-{
-	// resolve callbacks
-	m_irq_handler.resolve_safe();
-	m_mem_read_cb.resolve_safe(0x00);
-
-	create_noise(m_noise_lut, 13, apu_t::NOISE_LONG);
-
-	calculate_rates();
-}
-
 
 /* TODO: sound channels should *ALL* have DC volume decay */
 
@@ -725,7 +710,7 @@ logerror("invalid apu write: $%02X at $%04X\n", value, address);
 
 
 /* READ VALUES FROM REGISTERS */
-u8 nesapu_device::read(offs_t address)
+inline u8 nesapu_device::apu_read(int address)
 {
 	if (address == 0x15) /*FIXED* Address $4015 has different behaviour*/
 	{
@@ -755,12 +740,18 @@ u8 nesapu_device::read(offs_t address)
 }
 
 /* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
-void nesapu_device::write(offs_t address, u8 value)
+inline void nesapu_device::apu_write(int address, u8 value)
 {
 	m_APU.regs[address]=value;
 	m_stream->update();
 	apu_regwrite(address,value);
 }
+
+/* EXTERNAL INTERFACE FUNCTIONS */
+
+/* REGISTER READ/WRITE FUNCTIONS */
+READ8_MEMBER( nesapu_device::read ) {return apu_read(offset);}
+WRITE8_MEMBER( nesapu_device::write ) {apu_write(offset,data);}
 
 
 //-------------------------------------------------

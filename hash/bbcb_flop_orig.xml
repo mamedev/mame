@@ -2694,7 +2694,7 @@
 				<rom name="303 doctor who and the mines of terror.fsd" size="54004" crc="dc4254fb" sha1="20f65441000054a4b878f033cda49ec6d376a2bd" offset="0" />
 			</dataarea>
 		</part>
-		<part name="rom" interface="bbc_rom">
+		<part name="cart1" interface="bbc_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="DoctorWhoAndTheMinesOfTerror.rom" size="16384" crc="9ce48a7e" sha1="9287aa2c0ef535d008f7d0e7e34a96400098816a" offset="0" />
 			</dataarea>

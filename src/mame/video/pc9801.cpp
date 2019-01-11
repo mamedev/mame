@@ -214,7 +214,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 						tile_data^=0xff;
 
 					if(blink && m_screen->frame_number() & 0x10)
-						tile_data = 0;
+						tile_data^=0xff;
 
 					if(yi >= char_size)
 						pen = -1;

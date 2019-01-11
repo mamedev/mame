@@ -10,13 +10,6 @@ public:
 	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag) { m_protcount = 0;}
 
-	void megadrvb(machine_config &config);
-	void megadrvb_6b(machine_config &config);
-	void md_bootleg(machine_config &config);
-	void puckpkmn(machine_config &config);
-	void jzth(machine_config &config);
-	void puckpkmna(machine_config &config);
-
 	void init_aladmdb();
 	void init_mk3mdb();
 	void init_ssf2mdb();
@@ -24,10 +17,6 @@ public:
 	void init_topshoot();
 	void init_puckpkmn();
 	void init_hshavoc();
-	void init_barek3();
-	void init_twinktmb();
-
-private:
 	DECLARE_WRITE16_MEMBER(bl_710000_w);
 	DECLARE_READ16_MEMBER(bl_710000_r);
 	DECLARE_WRITE16_MEMBER(aladmdb_w);
@@ -41,12 +30,18 @@ private:
 
 	DECLARE_MACHINE_START(md_bootleg) { MACHINE_START_CALL_MEMBER(megadriv); m_vdp->stop_timers(); }
 	DECLARE_MACHINE_START(md_6button);
+	void megadrvb(machine_config &config);
+	void megadrvb_6b(machine_config &config);
+	void md_bootleg(machine_config &config);
+	void puckpkmn(machine_config &config);
+	void jzth(machine_config &config);
+	void puckpkmna(machine_config &config);
 
 	void jzth_map(address_map &map);
 	void md_bootleg_map(address_map &map);
 	void puckpkmn_map(address_map &map);
 	void puckpkmna_map(address_map &map);
-
+private:
 	// bootleg specific
 	int m_aladmdb_mcu_port;
 

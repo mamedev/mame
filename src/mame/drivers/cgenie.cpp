@@ -114,9 +114,9 @@ void cgenie_state::cgenie_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 //  AM_RANGE(0x4000, 0xbfff) AM_RAM // set up in machine_start
 	map(0xc000, 0xefff).noprw(); // cartridge space
-	map(0xf000, 0xf3ff).rw(FUNC(cgenie_state::colorram_r), FUNC(cgenie_state::colorram_w)).share("colorram");
+	map(0xf000, 0xf3ff).rw(this, FUNC(cgenie_state::colorram_r), FUNC(cgenie_state::colorram_w)).share("colorram");
 	map(0xf400, 0xf7ff).ram().share("fontram");
-	map(0xf800, 0xf8ff).mirror(0x300).r(FUNC(cgenie_state::keyboard_r));
+	map(0xf800, 0xf8ff).mirror(0x300).r(this, FUNC(cgenie_state::keyboard_r));
 	map(0xfc00, 0xffff).noprw(); // cartridge space
 }
 
@@ -127,7 +127,7 @@ void cgenie_state::cgenie_io(address_map &map)
 	map(0xf9, 0xf9).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xfa, 0xfa).w(m_crtc, FUNC(hd6845_device::address_w));
 	map(0xfb, 0xfb).rw(m_crtc, FUNC(hd6845_device::register_r), FUNC(hd6845_device::register_w));
-	map(0xff, 0xff).rw(FUNC(cgenie_state::control_r), FUNC(cgenie_state::control_w));
+	map(0xff, 0xff).rw(this, FUNC(cgenie_state::control_r), FUNC(cgenie_state::control_w));
 }
 
 
@@ -449,21 +449,20 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
-	HD6845(config, m_crtc, XTAL(17'734'470) / 16);
-	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(true);
-	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(cgenie_state::crtc_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(cgenie_state::crtc_update_row), this);
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(17'734'470) / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_BEGIN_UPDATE_CB(cgenie_state, crtc_begin_update)
+	MCFG_MC6845_UPDATE_ROW_CB(cgenie_state, crtc_update_row)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(17'734'470) / 8));
-	ay8910.port_a_read_callback().set("par", FUNC(cg_parallel_slot_device::pa_r));
-	ay8910.port_a_write_callback().set("par", FUNC(cg_parallel_slot_device::pa_w));
-	ay8910.port_b_read_callback().set("par", FUNC(cg_parallel_slot_device::pb_r));
-	ay8910.port_b_write_callback().set("par", FUNC(cg_parallel_slot_device::pb_w));
-	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("par", cg_parallel_slot_device, pa_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pa_w))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("par", cg_parallel_slot_device, pb_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("par", cg_parallel_slot_device, pb_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(cgenie_cassette_formats)
@@ -473,9 +472,9 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "cgenie_cass")
 
 	// serial port
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(FUNC(cgenie_state::rs232_rx_w));
-	rs232.dcd_handler().set(FUNC(cgenie_state::rs232_dcd_w));
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, cgenie_state, rs232_rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, cgenie_state, rs232_dcd_w))
 
 	// cartridge expansion slot
 	MCFG_CG_EXP_SLOT_ADD("exp")
@@ -485,7 +484,9 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 	MCFG_CG_PARALLEL_SLOT_ADD("par")
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("32K")
 MACHINE_CONFIG_END
 
 
@@ -510,9 +511,9 @@ ROM_END
 ROM_START( cgenienz )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "old", "Old ROM")
-	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(0))
+	ROMX_LOAD("cg-basic-rom-v1-pal-en.rom", 0x0000, 0x4000, CRC(844aaedd) SHA1(b7f984bc5cd979c7ad11ff909e8134f694aea7aa), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "new", "New ROM")
-	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(1))
+	ROMX_LOAD("cgromv2.rom", 0x0000, 0x4000, CRC(cfb84e09) SHA1(e199e4429bab6f9fca2bb05e71324538928a693a), ROM_BIOS(2))
 
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("cgenie1.fnt", 0x0000, 0x0800, CRC(4fed774a) SHA1(d53df8212b521892cc56be690db0bb474627d2ff))

@@ -55,16 +55,14 @@ public:
 	{ }
 
 	void speeddrv(machine_config &config);
-
-	void init_speeddrv();
-
-private:
 	void speeddrv_io(address_map &map);
 	void speeddrv_map(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
+	void init_speeddrv();
 };
 
 void speeddrv_state::speeddrv_map(address_map &map)

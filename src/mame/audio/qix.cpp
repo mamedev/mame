@@ -31,12 +31,12 @@ Audio handlers
 
 WRITE8_MEMBER(qix_state::qix_dac_w)
 {
-	m_discrete->write(QIX_DAC_DATA, data);
+	m_discrete->write(space, QIX_DAC_DATA, data);
 }
 
 WRITE8_MEMBER(qix_state::qix_vol_w)
 {
-	m_discrete->write(QIX_VOL_DATA, data);
+	m_discrete->write(space, QIX_VOL_DATA, data);
 }
 
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER(qix_state::sndpia_2_warning_w)
 
 TIMER_CALLBACK_MEMBER(qix_state::deferred_sndpia1_porta_w)
 {
-	m_sndpia1->write_porta(param);
+	m_sndpia1->porta_w(param);
 }
 
 
@@ -171,54 +171,53 @@ void qix_state::audio_map(address_map &map)
  *
  *************************************/
 
-void qix_state::qix_audio(machine_config &config)
-{
-	M6802(config, m_audiocpu, SOUND_CLOCK_OSC/2); /* 0.92 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &qix_state::audio_map);
+MACHINE_CONFIG_START(qix_state::qix_audio)
+	MCFG_DEVICE_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)      /* 0.92 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	PIA6821(config, m_sndpia0, 0);
-	m_sndpia0->writepa_handler().set(FUNC(qix_state::sync_sndpia1_porta_w));
-	m_sndpia0->writepb_handler().set(FUNC(qix_state::qix_vol_w));
-	m_sndpia0->ca2_handler().set("sndpia1", FUNC(pia6821_device::ca1_w));
-	m_sndpia0->cb2_handler().set(FUNC(qix_state::qix_flip_screen_w));
-	m_sndpia0->irqa_handler().set(FUNC(qix_state::qix_pia_dint));
-	m_sndpia0->irqb_handler().set(FUNC(qix_state::qix_pia_dint));
+	MCFG_DEVICE_ADD("sndpia0", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, qix_state, sync_sndpia1_porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, qix_vol_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("sndpia1", pia6821_device, ca1_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, qix_state, qix_flip_screen_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, qix_state, qix_pia_dint))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, qix_state, qix_pia_dint))
 
-	PIA6821(config, m_sndpia1, 0);
-	m_sndpia1->writepa_handler().set("sndpia0", FUNC(pia6821_device::porta_w));
-	m_sndpia1->writepb_handler().set(FUNC(qix_state::qix_dac_w));
-	m_sndpia1->ca2_handler().set("sndpia0", FUNC(pia6821_device::ca1_w));
-	m_sndpia1->irqa_handler().set(FUNC(qix_state::qix_pia_sint));
-	m_sndpia1->irqb_handler().set(FUNC(qix_state::qix_pia_sint));
+	MCFG_DEVICE_ADD("sndpia1", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("sndpia0", pia6821_device, porta_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state,qix_dac_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("sndpia0", pia6821_device, ca1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, qix_state, qix_pia_sint))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, qix_state, qix_pia_sint))
 
-	PIA6821(config, m_sndpia2, 0);
-	m_sndpia2->writepa_handler().set(FUNC(qix_state::sndpia_2_warning_w));
-	m_sndpia2->writepb_handler().set(FUNC(qix_state::sndpia_2_warning_w));
-	m_sndpia2->ca2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
-	m_sndpia2->cb2_handler().set(FUNC(qix_state::sndpia_2_warning_w));
+	MCFG_DEVICE_ADD("sndpia2", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, qix_state, sndpia_2_warning_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, sndpia_2_warning_w))
+	MCFG_PIA_CA2_HANDLER(WRITE8(*this, qix_state, sndpia_2_warning_w))
+	MCFG_PIA_CB2_HANDLER(WRITE8(*this, qix_state, sndpia_2_warning_w))
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	DISCRETE(config, m_discrete, qix_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, qix_discrete)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
-void qix_state::slither_audio(machine_config &config)
-{
-	PIA6821(config, m_sndpia0, 0);
-	m_sndpia0->readpa_handler().set_ioport("P2");
-	m_sndpia0->writepb_handler().set(FUNC(qix_state::slither_coinctl_w));
-	m_sndpia0->cb2_handler().set(FUNC(qix_state::qix_flip_screen_w));
-	m_sndpia0->irqa_handler().set(FUNC(qix_state::qix_pia_dint));
-	m_sndpia0->irqb_handler().set(FUNC(qix_state::qix_pia_dint));
+
+MACHINE_CONFIG_START(qix_state::slither_audio)
+	MCFG_DEVICE_ADD("sndpia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("P2"))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, qix_state, slither_coinctl_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, qix_state, qix_flip_screen_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, qix_state, qix_pia_dint))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, qix_state, qix_pia_dint))
 
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, m_sn1, SLITHER_CLOCK_OSC/4/4);
-	m_sn1->add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("sn1", SN76489, SLITHER_CLOCK_OSC/4/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	SN76489(config, m_sn2, SLITHER_CLOCK_OSC/4/4);
-	m_sn2->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("sn2", SN76489, SLITHER_CLOCK_OSC/4/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END

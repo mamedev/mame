@@ -17,6 +17,11 @@
 
 DECLARE_DEVICE_TYPE(TMC0430, tmc0430_device)
 
+#ifndef READ8Z_MEMBER
+#define DECLARE_READ8Z_MEMBER(name)     void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask = 0xff)
+#define READ8Z_MEMBER(name)             void name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t *value, ATTR_UNUSED uint8_t mem_mask)
+#endif
+
 enum
 {
 	GROM_M_LINE = 1,
@@ -26,24 +31,20 @@ enum
 class tmc0430_device : public device_t
 {
 public:
-	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *regionname, int offset, int ident)
-		: tmc0430_device(mconfig, tag, owner, 0)
-	{
-		set_region_and_ident(regionname, offset, ident);
-	}
-
 	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto ready_cb() { return m_gromready.bind(); }
+	template <class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_gromready.set_callback(std::forward<Object>(cb)); }
 
-	void readz(uint8_t *value);
-	void write(uint8_t data);
-	void set_lines(line_state mline, line_state moline, line_state gsq);
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_WRITE_LINE_MEMBER(m_line);
 	DECLARE_WRITE_LINE_MEMBER(mo_line);
 	DECLARE_WRITE_LINE_MEMBER(gsq_line);
+
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+
+	DECLARE_WRITE8_MEMBER( set_lines );
 
 	void set_region_and_ident(const char *regionname, int offset, int ident)
 	{
@@ -106,5 +107,10 @@ private:
 	/* Pointer to the memory region contained in this GROM. */
 	uint8_t *m_memptr;
 };
+
+#define MCFG_GROM_ADD(_tag, _ident, _region, _offset, _ready)    \
+		MCFG_DEVICE_ADD(_tag, TMC0430, 0)  \
+		downcast<tmc0430_device &>(*device).set_region_and_ident(_region, _offset, _ident); \
+		downcast<tmc0430_device &>(*device).set_ready_wr_callback(DEVCB_##_ready);
 
 #endif // MAME_MACHINE_TMC0430_H

@@ -56,34 +56,42 @@ menu_main::menu_main(mame_ui_manager &mui, render_container &container) : menu(m
 
 void menu_main::populate(float &customtop, float &custombottom)
 {
-	/* add main menu items */
+	/* add input menu items */
 	item_append(_("Input (general)"), "", 0, (void *)INPUT_GROUPS);
 
 	item_append(_("Input (this Machine)"), "", 0, (void *)INPUT_SPECIFIC);
 
+	/* add optional input-related menus */
 	if (ui().machine_info().has_analog())
 		item_append(_("Analog Controls"), "", 0, (void *)ANALOG);
 	if (ui().machine_info().has_dips())
 		item_append(_("Dip Switches"), "", 0, (void *)SETTINGS_DIP_SWITCHES);
 	if (ui().machine_info().has_configs())
+	{
 		item_append(_("Machine Configuration"), "", 0, (void *)SETTINGS_DRIVER_CONFIG);
+	}
 
+	/* add bookkeeping menu */
 	item_append(_("Bookkeeping Info"), "", 0, (void *)BOOKKEEPING);
 
+	/* add game info menu */
 	item_append(_("Machine Information"), "", 0, (void *)GAME_INFO);
 
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
 		if (image.user_loadable())
 		{
+			/* add image info menu */
 			item_append(_("Image Information"), "", 0, (void *)IMAGE_MENU_IMAGE_INFO);
 
+			/* add file manager menu */
 			item_append(_("File Manager"), "", 0, (void *)IMAGE_MENU_FILE_MANAGER);
 
 			break;
 		}
 	}
 
+	/* add tape control menu */
 	if (cassette_device_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Tape Control"), "", 0, (void *)TAPE_CONTROL);
 
@@ -93,36 +101,46 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (ui().machine_info().has_bioses())
 		item_append(_("BIOS Selection"), "", 0, (void *)BIOS_SELECTION);
 
+	/* add slot info menu */
 	if (slot_interface_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Slot Devices"), "", 0, (void *)SLOT_DEVICES);
 
+	/* add Barcode reader menu */
 	if (barcode_reader_device_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Barcode Reader"), "", 0, (void *)BARCODE_READ);
 
+	/* add network info menu */
 	if (network_interface_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Network Devices"), "", 0, (void*)NETWORK_DEVICES);
 
+	/* add keyboard mode menu */
 	if (ui().machine_info().has_keyboard() && machine().ioport().natkeyboard().can_post())
 		item_append(_("Keyboard Mode"), "", 0, (void *)KEYBOARD_MODE);
 
+	/* add sliders menu */
 	item_append(_("Slider Controls"), "", 0, (void *)SLIDERS);
 
+	/* add video options menu */
 	item_append(_("Video Options"), "", 0, (machine().render().target_by_index(1) != nullptr) ? (void *)VIDEO_TARGETS : (void *)VIDEO_OPTIONS);
 
+	/* add crosshair options menu */
 	if (machine().crosshair().get_usage())
 		item_append(_("Crosshair Options"), "", 0, (void *)CROSSHAIR);
 
+	/* add cheat menu */
 	if (machine().options().cheat())
 		item_append(_("Cheat"), "", 0, (void *)CHEAT);
 
 	if (machine().options().plugins())
 		item_append(_("Plugin Options"), "", 0, (void *)PLUGINS);
 
+	// add dats menu
 	if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", "", true))
 		item_append(_("External DAT View"), "", 0, (void *)EXTERNAL_DATS);
 
 	item_append(menu_item_type::SEPARATOR);
 
+	/* add favorite menu */
 	if (!mame_machine_manager::instance()->favorite().isgame_favorite())
 		item_append(_("Add To Favorites"), "", 0, (void *)ADD_FAVORITE);
 	else
@@ -132,6 +150,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 //  item_append(_("Quit from Machine"), nullptr, 0, (void *)QUIT_GAME);
 
+	/* add reset and exit menus */
 	item_append(_("Select New Machine"), "", 0, (void *)SELECT_GAME);
 }
 

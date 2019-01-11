@@ -33,7 +33,6 @@ TODO:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -47,8 +46,7 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram")
-	{ }
+		m_videoram(*this, "videoram") { }
 
 	void init_rmhaihai();
 	void rmhaihai(machine_config &config);
@@ -71,6 +69,7 @@ protected:
 	void rmhaihai_io_map(address_map &map);
 	void rmhaihai_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -212,9 +211,9 @@ READ8_MEMBER(rmhaihai_state::samples_r)
 
 WRITE8_MEMBER(rmhaihai_state::adpcm_w)
 {
-	m_msm->write_data(data);        // bit0..3
-	m_msm->reset_w(BIT(data, 5));   // bit 5
-	m_msm->vclk_w(BIT(data, 4));    // bit4
+	m_msm->data_w(data);         /* bit0..3  */
+	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
+	m_msm->vclk_w(BIT(data, 4)); /* bit4     */
 }
 
 WRITE8_MEMBER(rmhaihai_state::ctrl_w)
@@ -256,8 +255,8 @@ void rmhaihai_state::rmhaihai_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xa000, 0xa7ff).ram().share("nvram");
-	map(0xa800, 0xafff).ram().w(FUNC(rmhaihai_state::colorram_w)).share("colorram");
-	map(0xb000, 0xb7ff).ram().w(FUNC(rmhaihai_state::videoram_w)).share("videoram");
+	map(0xa800, 0xafff).ram().w(this, FUNC(rmhaihai_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(this, FUNC(rmhaihai_state::videoram_w)).share("videoram");
 	map(0xb83c, 0xb83c).nopw();    // ??
 	map(0xbc00, 0xbc00).nopw();    // ??
 	map(0xc000, 0xdfff).rom();
@@ -266,13 +265,13 @@ void rmhaihai_state::rmhaihai_map(address_map &map)
 
 void rmhaihai_state::rmhaihai_io_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(FUNC(rmhaihai_state::samples_r));
-	map(0x8000, 0x8000).r(FUNC(rmhaihai_state::keyboard_r)).nopw();    // ??
-	map(0x8001, 0x8001).nopr().w(FUNC(rmhaihai_state::keyboard_w));    // ??
+	map(0x0000, 0x7fff).r(this, FUNC(rmhaihai_state::samples_r));
+	map(0x8000, 0x8000).r(this, FUNC(rmhaihai_state::keyboard_r)).nopw();    // ??
+	map(0x8001, 0x8001).nopr().w(this, FUNC(rmhaihai_state::keyboard_w));    // ??
 	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x8040, 0x8040).w(FUNC(rmhaihai_state::adpcm_w));
-	map(0x8060, 0x8060).w(FUNC(rmhaihai_state::ctrl_w));
+	map(0x8040, 0x8040).w(this, FUNC(rmhaihai_state::adpcm_w));
+	map(0x8060, 0x8060).w(this, FUNC(rmhaihai_state::ctrl_w));
 	map(0x8080, 0x8080).nopw();    // ??
 	map(0xbc04, 0xbc04).nopw();    // ??
 	map(0xbc0c, 0xbc0c).nopw();    // ??
@@ -283,23 +282,23 @@ void themj_state::themj_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xa7ff).ram();
-	map(0xa800, 0xafff).ram().w(FUNC(themj_state::colorram_w)).share("colorram");
-	map(0xb000, 0xb7ff).ram().w(FUNC(themj_state::videoram_w)).share("videoram");
+	map(0xa800, 0xafff).ram().w(this, FUNC(themj_state::colorram_w)).share("colorram");
+	map(0xb000, 0xb7ff).ram().w(this, FUNC(themj_state::videoram_w)).share("videoram");
 	map(0xc000, 0xdfff).bankr("bank2");
 	map(0xe000, 0xffff).rom();
 }
 
 void themj_state::themj_io_map(address_map &map)
 {
-	map(0x0000, 0x7fff).r(FUNC(themj_state::samples_r));
-	map(0x8000, 0x8000).r(FUNC(themj_state::keyboard_r)).nopw();    // ??
-	map(0x8001, 0x8001).nopr().w(FUNC(themj_state::keyboard_w));    // ??
+	map(0x0000, 0x7fff).r(this, FUNC(themj_state::samples_r));
+	map(0x8000, 0x8000).r(this, FUNC(themj_state::keyboard_r)).nopw();    // ??
+	map(0x8001, 0x8001).nopr().w(this, FUNC(themj_state::keyboard_w));    // ??
 	map(0x8020, 0x8020).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x8020, 0x8021).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x8040, 0x8040).w(FUNC(themj_state::adpcm_w));
-	map(0x8060, 0x8060).w(FUNC(themj_state::ctrl_w));
+	map(0x8040, 0x8040).w(this, FUNC(themj_state::adpcm_w));
+	map(0x8060, 0x8060).w(this, FUNC(themj_state::ctrl_w));
 	map(0x8080, 0x8080).nopw();    // ??
-	map(0x80a0, 0x80a0).w(FUNC(themj_state::themj_rombank_w));
+	map(0x80a0, 0x80a0).w(this, FUNC(themj_state::themj_rombank_w));
 	map(0xbc04, 0xbc04).nopw();    // ??
 	map(0xbc0c, 0xbc0c).nopw();    // ??
 }
@@ -503,64 +502,69 @@ static GFXDECODE_START( gfx_themj )
 GFXDECODE_END
 
 
-void rmhaihai_state::rmhaihai(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 20000000/4);		/* 5 MHz ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &rmhaihai_state::rmhaihai_map);
-	m_maincpu->set_addrmap(AS_IO, &rmhaihai_state::rmhaihai_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(rmhaihai_state::irq0_line_hold));
+MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu",Z80,20000000/4)  /* 5 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(rmhaihai_map)
+	MCFG_DEVICE_IO_MAP(rmhaihai_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rmhaihai_state,  irq0_line_hold)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(4*8, 60*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(rmhaihai_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(rmhaihai_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_rmhaihai);
-	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 0x100);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rmhaihai)
+
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000/16));
-	aysnd.port_a_read_callback().set_ioport("DSW2");
-	aysnd.port_b_read_callback().set_ioport("DSW1");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000/16)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MSM5205(config, m_msm, 500000);
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);
-	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 500000)
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void rmhaisei_state::rmhaisei(machine_config &config)
-{
-	rmhaihai(config);
-
-	/* video hardware */
-	m_gfxdecode->set_info(gfx_themj);
-	subdevice<palette_device>("palette")->set_entries(0x200);
-}
-
-void themj_state::themj(machine_config &config)
-{
+MACHINE_CONFIG_START(rmhaisei_state::rmhaisei)
 	rmhaihai(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &themj_state::themj_map);
-	m_maincpu->set_addrmap(AS_IO, &themj_state::themj_io_map);
-
-	config.device_remove("nvram");
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_themj);
-	subdevice<palette_device>("palette")->set_entries(0x200);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(0x200)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(themj_state::themj)
+	rmhaihai(config);
+
+	/* basic machine hardware */
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(themj_map)
+	MCFG_DEVICE_IO_MAP(themj_io_map)
+
+	MCFG_DEVICE_REMOVE("nvram")
+
+	/* video hardware */
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_themj)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(0x200)
+MACHINE_CONFIG_END
 
 
 

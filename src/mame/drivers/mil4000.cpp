@@ -111,7 +111,6 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -127,16 +126,15 @@
 class mil4000_state : public driver_device
 {
 public:
-	mil4000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	mil4000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U)
-	{ }
+		m_lamps(*this, "lamp%u", 0U) { }
 
 	void chewheel(machine_config &config);
 	void mil4000(machine_config &config);
@@ -153,7 +151,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	output_finder<7> m_lamps;
-
+	
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
@@ -446,15 +444,15 @@ WRITE16_MEMBER(mil4000_state::unk_w)
 void mil4000_state::mil4000_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x500000, 0x503fff).ram().w(FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // CY62256L-70, U77
-	map(0x504000, 0x507fff).ram().w(FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // CY62256L-70, U77
-	map(0x508000, 0x50bfff).ram().w(FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // CY62256L-70, U78
-	map(0x50c000, 0x50ffff).ram().w(FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // CY62256L-70, U78
+	map(0x500000, 0x503fff).ram().w(this, FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // CY62256L-70, U77
+	map(0x504000, 0x507fff).ram().w(this, FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // CY62256L-70, U77
+	map(0x508000, 0x50bfff).ram().w(this, FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // CY62256L-70, U78
+	map(0x50c000, 0x50ffff).ram().w(this, FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // CY62256L-70, U78
 	map(0x708000, 0x708001).portr("IN0");
 	map(0x708002, 0x708003).portr("IN1");
-	map(0x708004, 0x708005).r(FUNC(mil4000_state::hvretrace_r));
+	map(0x708004, 0x708005).r(this, FUNC(mil4000_state::hvretrace_r));
 	map(0x708006, 0x708007).portr("IN2");
-	map(0x708008, 0x708009).w(FUNC(mil4000_state::output_w));
+	map(0x708008, 0x708009).w(this, FUNC(mil4000_state::output_w));
 	map(0x708010, 0x708011).noprw(); //touch screen
 	map(0x70801f, 0x70801f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -466,20 +464,20 @@ void mil4000_state::mil4000_map(address_map &map)
 void mil4000_state::chewheel_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x500000, 0x503fff).ram().w(FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // V62C518256L-35P (U7).
-	map(0x504000, 0x507fff).ram().w(FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // V62C518256L-35P (U7).
-	map(0x508000, 0x50bfff).ram().w(FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // V62C518256L-35P (U8).
-	map(0x50c000, 0x50ffff).ram().w(FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // V62C518256L-35P (U8).
+	map(0x500000, 0x503fff).ram().w(this, FUNC(mil4000_state::sc0_vram_w)).share("sc0_vram");  // V62C518256L-35P (U7).
+	map(0x504000, 0x507fff).ram().w(this, FUNC(mil4000_state::sc1_vram_w)).share("sc1_vram");  // V62C518256L-35P (U7).
+	map(0x508000, 0x50bfff).ram().w(this, FUNC(mil4000_state::sc2_vram_w)).share("sc2_vram");  // V62C518256L-35P (U8).
+	map(0x50c000, 0x50ffff).ram().w(this, FUNC(mil4000_state::sc3_vram_w)).share("sc3_vram");  // V62C518256L-35P (U8).
 
-	map(0x51000c, 0x51000f).r(FUNC(mil4000_state::unk_r));     // no idea what's mapped here.
-	map(0x510000, 0x51000f).w(FUNC(mil4000_state::unk_w));    // no idea what's mapped here.
+	map(0x51000c, 0x51000f).r(this, FUNC(mil4000_state::unk_r));     // no idea what's mapped here.
+	map(0x510000, 0x51000f).w(this, FUNC(mil4000_state::unk_w));    // no idea what's mapped here.
 
 	map(0x708000, 0x708001).portr("IN0");
 	map(0x708002, 0x708003).portr("IN1");
-	map(0x708004, 0x708005).r(FUNC(mil4000_state::hvretrace_r));
+	map(0x708004, 0x708005).r(this, FUNC(mil4000_state::hvretrace_r));
 	map(0x708006, 0x708007).portr("IN2");
-	map(0x708008, 0x708009).w(FUNC(mil4000_state::output_w));
-	map(0x708010, 0x708011).rw(FUNC(mil4000_state::chewheel_mcu_r), FUNC(mil4000_state::chewheel_mcu_w));
+	map(0x708008, 0x708009).w(this, FUNC(mil4000_state::output_w));
+	map(0x708010, 0x708011).rw(this, FUNC(mil4000_state::chewheel_mcu_r), FUNC(mil4000_state::chewheel_mcu_w));
 	map(0x70801f, 0x70801f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x780000, 0x780fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -567,7 +565,7 @@ MACHINE_CONFIG_START(mil4000_state::mil4000)
 	// irq 2/4/5 point to the same place, others invalid
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -577,8 +575,10 @@ MACHINE_CONFIG_START(mil4000_state::mil4000)
 	MCFG_SCREEN_UPDATE_DRIVER(mil4000_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::RGBx_555, 0x800);
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_mil4000);
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x800)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mil4000)
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.

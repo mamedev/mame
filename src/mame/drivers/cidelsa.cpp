@@ -114,9 +114,9 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 	    7   CONT. M1
 	*/
 
-	m_leds[0] = BIT(data, 3); // 1P
-	m_leds[1] = BIT(data, 4); // 2P
-	m_leds[2] = BIT(data, 5); // FIRE
+	m_led[0] = BIT(data, 3); // 1P
+	m_led[1] = BIT(data, 4); // 2P
+	m_led[2] = BIT(data, 5); // FIRE
 }
 
 WRITE8_MEMBER( draco_state::out1_w )
@@ -159,9 +159,9 @@ void cidelsa_state::destryera_map(address_map &map)
 
 void cidelsa_state::destryer_io_map(address_map &map)
 {
-	map(0x01, 0x01).portr("IN0").w(FUNC(cidelsa_state::destryer_out1_w));
+	map(0x01, 0x01).portr("IN0").w(this, FUNC(cidelsa_state::destryer_out1_w));
 	map(0x02, 0x02).portr("IN1");
-	map(0x03, 0x07).w(FUNC(cidelsa_state::cdp1869_w));
+	map(0x03, 0x07).w(this, FUNC(cidelsa_state::cdp1869_w));
 }
 
 // Altair
@@ -179,7 +179,7 @@ void cidelsa_state::altair_io_map(address_map &map)
 	map(0x01, 0x01).r("ic23", FUNC(cdp1852_device::read)).w("ic26", FUNC(cdp1852_device::write));
 	map(0x02, 0x02).r("ic24", FUNC(cdp1852_device::read));
 	map(0x04, 0x04).r("ic25", FUNC(cdp1852_device::read));
-	map(0x03, 0x07).w(FUNC(cidelsa_state::cdp1869_w));
+	map(0x03, 0x07).w(this, FUNC(cidelsa_state::cdp1869_w));
 }
 
 // Draco
@@ -197,7 +197,7 @@ void draco_state::draco_io_map(address_map &map)
 	map(0x01, 0x01).r("ic29", FUNC(cdp1852_device::read)).w("ic32", FUNC(cdp1852_device::write));
 	map(0x02, 0x02).r("ic30", FUNC(cdp1852_device::read));
 	map(0x04, 0x04).r("ic31", FUNC(cdp1852_device::read));
-	map(0x03, 0x07).w(FUNC(draco_state::cdp1869_w));
+	map(0x03, 0x07).w(this, FUNC(draco_state::cdp1869_w));
 }
 
 void draco_state::draco_sound_map(address_map &map)
@@ -370,7 +370,7 @@ void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void cidelsa_state::machine_start()
 {
-	m_leds.resolve();
+	m_led.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_reset));
@@ -400,114 +400,102 @@ void cidelsa_state::machine_reset()
 
 /* Machine Drivers */
 
-void cidelsa_state::destryer(machine_config &config)
-{
+MACHINE_CONFIG_START(cidelsa_state::destryer)
 	/* basic system hardware */
-	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DESTRYER_CHR1));
-	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::destryer_map);
-	cpu.set_addrmap(AS_IO, &cidelsa_state::destryer_io_map);
-	cpu.wait_cb().set_constant(1);
-	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
-	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(destryer_map)
+	MCFG_DEVICE_IO_MAP(destryer_io_map)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound and video hardware */
 	destryer_video(config);
-}
+MACHINE_CONFIG_END
 
-void cidelsa_state::destryera(machine_config &config)
-{
+MACHINE_CONFIG_START(cidelsa_state::destryera)
 	/* basic system hardware */
-	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DESTRYER_CHR1));
-	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::destryera_map);
-	cpu.set_addrmap(AS_IO, &cidelsa_state::destryer_io_map);
-	cpu.wait_cb().set_constant(1);
-	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
-	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(destryera_map)
+	MCFG_DEVICE_IO_MAP(destryer_io_map)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound and video hardware */
 	destryer_video(config);
-}
+MACHINE_CONFIG_END
 
-void cidelsa_state::altair(machine_config &config)
-{
+MACHINE_CONFIG_START(cidelsa_state::altair)
 	/* basic system hardware */
-	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, ALTAIR_CHR1));
-	cpu.set_addrmap(AS_PROGRAM, &cidelsa_state::altair_map);
-	cpu.set_addrmap(AS_IO, &cidelsa_state::altair_io_map);
-	cpu.wait_cb().set_constant(1);
-	cpu.clear_cb().set(FUNC(cidelsa_state::clear_r));
-	cpu.q_cb().set(FUNC(cidelsa_state::q_w));
-	cpu.tpb_cb().set("ic26", FUNC(cdp1852_device::clock_w));
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(altair_map)
+	MCFG_DEVICE_IO_MAP(altair_io_map)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* input/output hardware */
-	cdp1852_device &ic23(CDP1852(config, "ic23")); // clock is really tied to CDP1869 CMSEL (pin 37)
-	ic23.mode_cb().set_constant(0);
-	ic23.di_cb().set_ioport("IN0");
-
-	cdp1852_device &ic24(CDP1852(config, "ic24"));
-	ic24.mode_cb().set_constant(0);
-	ic24.di_cb().set_ioport("IN1");
-
-	cdp1852_device &ic25(CDP1852(config, "ic25"));
-	ic25.mode_cb().set_constant(0);
-	ic25.di_cb().set_ioport("IN2");
-
-	cdp1852_device &ic26(CDP1852(config, "ic26")); // clock is CDP1802 TPB
-	ic26.mode_cb().set_constant(1);
-	ic26.do_cb().set(FUNC(cidelsa_state::altair_out1_w));
+	MCFG_DEVICE_ADD("ic23", CDP1852, 0) // clock is really tied to CDP1869 CMSEL (pin 37)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN0"))
+	MCFG_DEVICE_ADD("ic24", CDP1852, 0)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN1"))
+	MCFG_DEVICE_ADD("ic25", CDP1852, 0)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("ic26", CDP1852, ALTAIR_CHR1 / 8) // clock is CDP1802 TPB
+	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, cidelsa_state, altair_out1_w))
 
 	/* sound and video hardware */
 	altair_video(config);
-}
+MACHINE_CONFIG_END
 
-void draco_state::draco(machine_config &config)
-{
+MACHINE_CONFIG_START(draco_state::draco)
 	/* basic system hardware */
-	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, DRACO_CHR1));
-	cpu.set_addrmap(AS_PROGRAM, &draco_state::draco_map);
-	cpu.set_addrmap(AS_IO, &draco_state::draco_io_map);
-	cpu.wait_cb().set_constant(1);
-	cpu.clear_cb().set(FUNC(draco_state::clear_r));
-	cpu.q_cb().set(FUNC(draco_state::q_w));
-	cpu.tpb_cb().set("ic32", FUNC(cdp1852_device::clock_w));
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(draco_map)
+	MCFG_DEVICE_IO_MAP(draco_io_map)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cidelsa_state, clear_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cidelsa_state, q_w))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	cop402_cpu_device &cop(COP402(config, COP402N_TAG, DRACO_SND_CHR1));
-	cop.set_addrmap(AS_PROGRAM, &draco_state::draco_sound_map);
-	cop.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
-	cop.write_d().set(FUNC(draco_state::sound_bankswitch_w));
-	cop.write_g().set(FUNC(draco_state::sound_g_w));
-	cop.read_l().set(FUNC(draco_state::psg_r));
-	cop.write_l().set(FUNC(draco_state::psg_w));
-	cop.read_in().set(FUNC(draco_state::sound_in_r));
+	MCFG_DEVICE_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
+	MCFG_DEVICE_PROGRAM_MAP(draco_sound_map)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, draco_state, sound_bankswitch_w))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, draco_state, sound_g_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, draco_state, psg_r))
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, draco_state, psg_w))
+	MCFG_COP400_READ_IN_CB(READ8(*this, draco_state, sound_in_r))
 
 	/* input/output hardware */
-	cdp1852_device &ic29(CDP1852(config, "ic29")); // clock is really tied to CDP1869 CMSEL (pin 37)
-	ic29.mode_cb().set_constant(0);
-	ic29.di_cb().set_ioport("IN0");
-
-	cdp1852_device &ic30(CDP1852(config, "ic30"));
-	ic30.mode_cb().set_constant(0);
-	ic30.di_cb().set_ioport("IN1");
-
-	cdp1852_device &ic31(CDP1852(config, "ic31"));
-	ic31.mode_cb().set_constant(0);
-	ic31.di_cb().set_ioport("IN2");
-
-	cdp1852_device &ic32(CDP1852(config, "ic32")); // clock is CDP1802 TPB
-	ic32.mode_cb().set_constant(1);
-	ic32.do_cb().set(FUNC(draco_state::out1_w));
+	MCFG_DEVICE_ADD("ic29", CDP1852, 0) // clock is really tied to CDP1869 CMSEL (pin 37)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN0"))
+	MCFG_DEVICE_ADD("ic30", CDP1852, 0)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN1"))
+	MCFG_DEVICE_ADD("ic31", CDP1852, 0)
+	MCFG_CDP1852_MODE_CALLBACK(GND)
+	MCFG_CDP1852_DI_CALLBACK(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("ic32", CDP1852, ALTAIR_CHR1 / 8) // clock is CDP1802 TPB
+	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, draco_state, out1_w))
 
 	/* sound and video hardware */
 	draco_video(config);
-}
+MACHINE_CONFIG_END
 
 /* ROMs */
 

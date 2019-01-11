@@ -12,7 +12,6 @@
 #pragma once
 
 #include "s100.h"
-#include "imagedev/floppy.h"
 #include "machine/com8116.h"
 #include "machine/wd_fdc.h"
 

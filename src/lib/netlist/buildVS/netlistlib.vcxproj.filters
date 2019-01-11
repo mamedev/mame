@@ -177,9 +177,6 @@
     <ClCompile Include="..\devices\nld_2716.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\devices\nld_tms4800.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\devices\nld_74166.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -220,9 +217,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_4316.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\devices\nld_dm9314.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\devices\nld_dm9334.cpp">
@@ -443,9 +437,6 @@
     <ClInclude Include="..\devices\nld_2716.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\devices\nld_tms4800.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\devices\nld_am2847.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -474,9 +465,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_74194.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\devices\nld_dm9314.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\devices\nld_dm9334.h">

@@ -102,52 +102,24 @@ private:
 	pstring m_val;
 };
 
-class option_str_limit_base : public option
+class option_str_limit : public option
 {
 public:
-	option_str_limit_base(options &parent, pstring ashort, pstring along, std::vector<pstring> &&limit, pstring help)
-	: option(parent, ashort, along, help, true)
-	, m_limit(limit)
+	option_str_limit(options &parent, pstring ashort, pstring along, pstring defval, pstring limit, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
+	, m_limit(plib::psplit(limit, ":"))
 	{
 	}
-	const std::vector<pstring> &limit() const { return m_limit; }
+
+	pstring operator ()() { return m_val; }
+	const std::vector<pstring> &limit() { return m_limit; }
 
 protected:
+	virtual int parse(const pstring &argument) override;
 
 private:
+	pstring m_val;
 	std::vector<pstring> m_limit;
-};
-
-
-template <typename T>
-class option_str_limit : public option_str_limit_base
-{
-public:
-	option_str_limit(options &parent, pstring ashort, pstring along, const T &defval, std::vector<pstring> &&limit, pstring help)
-	: option_str_limit_base(parent, ashort, along, std::move(limit), help), m_val(defval)
-	{
-	}
-
-	T operator ()() { return m_val; }
-
-	pstring as_string() const { return limit()[m_val]; }
-
-protected:
-	virtual int parse(const pstring &argument) override
-	{
-		auto raw = plib::container::indexof(limit(), argument);
-
-		if (raw != plib::container::npos)
-		{
-			m_val = static_cast<T>(raw);
-			return 0;
-		}
-		else
-			return 1;
-	}
-
-private:
-	T m_val;
 };
 
 class option_bool : public option
@@ -166,34 +138,36 @@ private:
 	bool m_val;
 };
 
-template <typename T>
-class option_num : public option
+class option_double : public option
 {
 public:
-	option_num(options &parent, pstring ashort, pstring along, T defval,
-			pstring help,
-			T minval = std::numeric_limits<T>::min(),
-			T maxval = std::numeric_limits<T>::max() )
-	: option(parent, ashort, along, help, true)
-	, m_val(defval)
-	, m_min(minval)
-	, m_max(maxval)
+	option_double(options &parent, pstring ashort, pstring along, double defval, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
 	{}
 
-	T operator ()() { return m_val; }
+	double operator ()() { return m_val; }
 
 protected:
-	virtual int parse(const pstring &argument) override
-	{
-		bool err;
-		m_val = pstonum_ne<T>(argument, err);
-		return (err ? 1 : (m_val < m_min || m_val > m_max));
-	}
+	virtual int parse(const pstring &argument) override;
 
 private:
-	T m_val;
-	T m_min;
-	T m_max;
+	double m_val;
+};
+
+class option_long : public option
+{
+public:
+	option_long(options &parent, pstring ashort, pstring along, long defval, pstring help)
+	: option(parent, ashort, along, help, true), m_val(defval)
+	{}
+
+	long operator ()() { return m_val; }
+
+protected:
+	virtual int parse(const pstring &argument) override;
+
+private:
+	long m_val;
 };
 
 class option_vec : public option
@@ -232,17 +206,6 @@ public:
 private:
 	static pstring split_paragraphs(pstring text, unsigned width, unsigned indent,
 			unsigned firstline_indent);
-
-	template <typename T>
-	T *getopt_type()
-	{
-		for (auto & optbase : m_opts )
-		{
-			if (auto opt = dynamic_cast<T *>(optbase))
-				return opt;
-		}
-		return nullptr;
-	}
 
 	option *getopt_short(pstring arg);
 	option *getopt_long(pstring arg);

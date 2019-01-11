@@ -46,18 +46,14 @@ device_midi_port_interface::~device_midi_port_interface()
 
 #include "bus/midi/midiinport.h"
 
-device_slot_interface &midiin_slot(device_slot_interface &device)
+void midiin_slot(device_slot_interface &device)
 {
 	device.option_add("midiin", MIDIIN_PORT);
-	device.set_default_option("midiin");
-	return device;
 }
 
 #include "bus/midi/midioutport.h"
 
-device_slot_interface &midiout_slot(device_slot_interface &device)
+void midiout_slot(device_slot_interface &device)
 {
 	device.option_add("midiout", MIDIOUT_PORT);
-	device.set_default_option("midiout");
-	return device;
 }

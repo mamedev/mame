@@ -29,6 +29,19 @@
 
 #pragma once
 
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_EF9369_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, EF9369, 0) \
+
+#define MCFG_EF9369_COLOR_UPDATE_CB(_class, _method) \
+	downcast<ef9369_device &>(*device).set_color_update_callback(ef9369_device::color_update_delegate(&_class::_method, #_class "::" #_method, this));
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -43,20 +56,10 @@ public:
 	typedef device_delegate<void (int entry, bool m, uint8_t ca, uint8_t cb, uint8_t cc)> color_update_delegate;
 
 	// construction/destruction
-	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
 	template <typename Object> void set_color_update_callback(Object &&cb) { m_color_update_cb = std::forward<Object>(cb); }
-	void set_color_update_callback(color_update_delegate callback) { m_color_update_cb = callback; }
-	template <class FunctionClass> void set_color_update_callback(const char *devname,
-		void (FunctionClass::*callback)(int, bool, uint8_t, uint8_t, uint8_t), const char *name)
-	{
-		set_color_update_callback(color_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_color_update_callback(void (FunctionClass::*callback)(int, bool, uint8_t, uint8_t, uint8_t), const char *name)
-	{
-		set_color_update_callback(color_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);

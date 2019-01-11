@@ -25,7 +25,8 @@
 
 void ym3812_device::irq_handler(int irq)
 {
-	m_timer[2]->adjust(attotime::zero, irq);
+	if (!m_irq_handler.isnull())
+		m_irq_handler(irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -33,17 +34,12 @@ void ym3812_device::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch(id)
 	{
-	case TIMER_A:
+	case 0:
 		ym3812_timer_over(m_chip,0);
 		break;
 
-	case TIMER_B:
+	case 1:
 		ym3812_timer_over(m_chip,1);
-		break;
-
-	case TIMER_IRQ_SYNC:
-		if (!m_irq_handler.isnull())
-			m_irq_handler(param);
 		break;
 	}
 }
@@ -91,9 +87,8 @@ void ym3812_device::device_start()
 	ym3812_set_irq_handler   (m_chip, ym3812_device::static_irq_handler, this);
 	ym3812_set_update_handler(m_chip, ym3812_device::static_update_request, this);
 
-	m_timer[0] = timer_alloc(TIMER_A);
-	m_timer[1] = timer_alloc(TIMER_B);
-	m_timer[2] = timer_alloc(TIMER_IRQ_SYNC);
+	m_timer[0] = timer_alloc(0);
+	m_timer[1] = timer_alloc(1);
 }
 
 void ym3812_device::device_clock_changed()

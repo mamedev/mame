@@ -17,8 +17,6 @@
 #include "solver/nld_solver.h"
 #include "devices/nlid_truthtable.h"
 
-#include <cmath>
-
 // ----------------------------------------------------------------------------------------
 // setup_t
 // ----------------------------------------------------------------------------------------
@@ -80,15 +78,17 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 		log().fatal(MF_1_CLASS_1_NOT_FOUND, classname);
 	/* make sure we parse macro library entries */
 	f->macro_actions(netlist(), name);
-	pstring key = build_fqn(name);
-	if (device_exists(key))
-		log().fatal(MF_1_DEVICE_ALREADY_EXISTS_1, name);
-	m_device_factory[key] = f;
+	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
 }
 
 bool setup_t::device_exists(const pstring &name) const
 {
-	return (m_device_factory.find(name) != m_device_factory.end());
+	for (auto e : m_device_factory)
+	{
+		if (e.first == name)
+			return true;
+	}
+	return false;
 }
 
 
@@ -97,8 +97,8 @@ void setup_t::register_model(const pstring &model_in)
 	auto pos = model_in.find(" ");
 	if (pos == pstring::npos)
 		log().fatal(MF_1_UNABLE_TO_PARSE_MODEL_1, model_in);
-	pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
-	pstring def = plib::trim(model_in.substr(pos + 1));
+	pstring model = model_in.left(pos).trim().ucase();
+	pstring def = model_in.substr(pos + 1).trim();
 	if (!m_models.insert({model, def}).second)
 		log().fatal(MF_1_MODEL_ALREADY_EXISTS_1, model_in);
 }
@@ -159,9 +159,8 @@ double setup_t::get_initial_param_val(const pstring &name, const double def)
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 	{
-		bool err = false;
-		double vald = plib::pstonum_ne<double>(i->second, err);
-		if (err)
+		double vald = 0;
+		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
 			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
 		return vald;
 	}
@@ -174,13 +173,9 @@ int setup_t::get_initial_param_val(const pstring &name, const int def)
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 	{
-		bool err;
-		double vald = plib::pstonum_ne<double>(i->second, err);
-		if (err)
+		double vald = 0;
+		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
 			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-		if (vald - std::floor(vald) != 0.0)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-
 		return static_cast<int>(vald);
 	}
 	else
@@ -802,15 +797,15 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 		pos = model.find("(");
 		if (pos != pstring::npos) break;
 
-		key = plib::ucase(model);
+		key = model.ucase();
 		auto i = m_models.find(key);
 		if (i == m_models.end())
 			log().fatal(MF_1_MODEL_NOT_FOUND, model);
 		model = i->second;
 	}
-	pstring xmodel = plib::left(model, pos);
+	pstring xmodel = model.left(pos);
 
-	if (xmodel == "_")
+	if (xmodel.equals("_"))
 		map["COREMODEL"] = key;
 	else
 	{
@@ -821,11 +816,11 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 			log().fatal(MF_1_MODEL_NOT_FOUND, model_in);
 	}
 
-	pstring remainder = plib::trim(model.substr(pos + 1));
-	if (!plib::endsWith(remainder, ")"))
+	pstring remainder = model.substr(pos + 1).trim();
+	if (!remainder.endsWith(")"))
 		log().fatal(MF_1_MODEL_ERROR_1, model);
 	// FIMXE: Not optimal
-	remainder = plib::left(remainder, remainder.size() - 1);
+	remainder = remainder.left(remainder.length() - 1);
 
 	std::vector<pstring> pairs(plib::psplit(remainder," ", true));
 	for (pstring &pe : pairs)
@@ -833,7 +828,7 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 		auto pose = pe.find("=");
 		if (pose == pstring::npos)
 			log().fatal(MF_1_MODEL_ERROR_ON_PAIR_1, model);
-		map[plib::ucase(plib::left(pe, pose))] = pe.substr(pose + 1);
+		map[pe.left(pose).ucase()] = pe.substr(pose + 1);
 	}
 }
 
@@ -841,7 +836,7 @@ const pstring setup_t::model_value_str(detail::model_map_t &map, const pstring &
 {
 	pstring ret;
 
-	if (entity != plib::ucase(entity))
+	if (entity != entity.ucase())
 		log().fatal(MF_2_MODEL_PARAMETERS_NOT_UPPERCASE_1_2, entity,
 				model_string(map));
 	if (map.find(entity) == map.end())
@@ -857,7 +852,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 	pstring tmp = model_value_str(map, entity);
 
 	nl_double factor = NL_FCONST(1.0);
-	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
+	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.length() - 1));
 	switch (*p)
 	{
 		case 'M': factor = 1e6; break;
@@ -873,9 +868,8 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 			log().fatal(MF_1_UNKNOWN_NUMBER_FACTOR_IN_1, entity);
 	}
 	if (factor != NL_FCONST(1.0))
-		tmp = plib::left(tmp, tmp.size() - 1);
-	// FIXME: check for errors
-	return plib::pstonum<nl_double>(tmp) * factor;
+		tmp = tmp.left(tmp.length() - 1);
+	return tmp.as_double() * factor;
 }
 
 class logic_family_std_proxy_t : public logic_family_desc_t
@@ -976,11 +970,11 @@ bool setup_t::parse_stream(plib::putf8_reader &istrm, const pstring &name)
 	return parser_t(reader2, *this).parse(name);
 }
 
-void setup_t::register_define(const pstring &defstr)
+void setup_t::register_define(pstring defstr)
 {
 	auto p = defstr.find("=");
 	if (p != pstring::npos)
-		register_define(plib::left(defstr, p), defstr.substr(p+1));
+		register_define(defstr.left(p), defstr.substr(p+1));
 	else
 		register_define(defstr, "1");
 }
@@ -1003,12 +997,12 @@ bool source_t::parse(const pstring &name)
 
 std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.mem_t_size());
 }
 
 std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.mem_t_size());
 }
 
 std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)

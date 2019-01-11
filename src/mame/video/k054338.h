@@ -6,7 +6,6 @@
 #pragma once
 
 #include "k055555.h"
-#include "emupal.h"
 
 #define K338_REG_BGC_R      0
 #define K338_REG_BGC_GB     1
@@ -27,15 +26,10 @@ class k054338_device : public device_t,
 						public device_video_interface
 {
 public:
-	template <typename T> k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag)
-		: k054338_device(mconfig, tag, owner, clock)
-	{
-		m_k055555.set_tag(std::forward<T>(mixer_tag));
-	}
-
 	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
+	void set_mixer_tag(const char  *tag) { m_k055555_tag = tag; }
 	void set_alpha_invert(int alpha_inv) { m_alpha_inv = alpha_inv; }
 
 	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
@@ -61,10 +55,20 @@ private:
 	uint16_t      m_regs[32];
 	int         m_shd_rgb[9];
 	int         m_alpha_inv;
+	const char  *m_k055555_tag;
 
-	optional_device<k055555_device> m_k055555;  /* used to fill BG color */
+	k055555_device *m_k055555;  /* used to fill BG color */
 };
 
 DECLARE_DEVICE_TYPE(K054338, k054338_device)
+
+
+#define MCFG_K054338_MIXER(_tag) \
+	downcast<k054338_device &>(*device).set_mixer_tag(_tag);
+
+#define MCFG_K054338_ALPHAINV(_alphainv) \
+	downcast<k054338_device &>(*device).set_alpha_invert(_alphainv);
+
+#define MCFG_K054338_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #endif // MAME_VIDEO_K054338_H

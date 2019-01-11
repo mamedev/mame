@@ -11,16 +11,21 @@
 #include "screen.h"
 
 
-void hcastle_state::hcastle_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(hcastle_state, hcastle)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int chip = 0; chip < 2; chip++)
-	{
-		for (int pal = 0; pal < 8; pal++)
-		{
-			int const clut = (chip << 1) | (pal & 1);
+	const uint8_t *color_prom = memregion("proms")->base();
+	int chip;
 
-			for (int i = 0; i < 0x100; i++)
+	for (chip = 0; chip < 2; chip++)
+	{
+		int pal;
+
+		for (pal = 0; pal < 8; pal++)
+		{
+			int i;
+			int clut = (chip << 1) | (pal & 1);
+
+			for (i = 0; i < 0x100; i++)
 			{
 				uint8_t ctabentry;
 

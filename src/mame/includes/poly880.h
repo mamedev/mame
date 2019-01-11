@@ -30,12 +30,6 @@ public:
 			m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void poly880(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<3> m_ki;
@@ -49,12 +43,15 @@ private:
 	DECLARE_WRITE8_MEMBER( pio1_pa_w );
 	DECLARE_READ8_MEMBER( pio1_pb_r );
 	DECLARE_WRITE8_MEMBER( pio1_pb_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	void update_display();
 
 	/* display state */
 	uint8_t m_digit;
 	uint8_t m_segment;
+	void poly880(machine_config &config);
 	void poly880_io(address_map &map);
 	void poly880_mem(address_map &map);
 };

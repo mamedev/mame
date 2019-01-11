@@ -49,13 +49,13 @@ void konppc_device::device_start()
 		save_item(NAME(dsp_comm_ppc[i]), i);
 		save_item(NAME(dsp_comm_sharc[i]), i);
 		save_item(NAME(dsp_shared_ram_bank[i]), i);
-		save_pointer(NAME(dsp_shared_ram[i]), DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]), i);
+		save_pointer(NAME(dsp_shared_ram[i].get()), DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]), i);
 		save_item(NAME(dsp_state[i]), i);
 		save_item(NAME(nwk_device_sel[i]), i);
 		save_item(NAME(nwk_fifo_read_ptr[i]), i);
 		save_item(NAME(nwk_fifo_write_ptr[i]), i);
-		save_pointer(NAME(nwk_fifo[i]), 0x800, i);
-		save_pointer(NAME(nwk_ram[i]), 0x2000, i);
+		save_pointer(NAME(nwk_fifo[i].get()), 0x800, i);
+		save_pointer(NAME(nwk_ram[i].get()), 0x2000, i);
 	}
 	save_item(NAME(cgboard_id));
 
@@ -125,11 +125,11 @@ READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
 
 WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 {
+	cpu_device &dsp = *m_dsp[cgboard_id];
 //  osd_printf_debug("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context().c_str(), cgboard_id, data, offset, mem_mask);
 
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-		cpu_device &dsp = *m_dsp[cgboard_id];
 		if (offset == 0)
 		{
 			if (ACCESSING_BITS_24_31)
@@ -221,18 +221,22 @@ void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset
 		case CGBOARD_TYPE_NWKTR:
 		case CGBOARD_TYPE_HANGPLT:
 		{
+			const char *dsptag = (board == 0) ? "dsp" : "dsp2";
+			adsp21062_device *device = machine().device<adsp21062_device>(dsptag);
+
 			if (offset == 1)
 			{
 				nwk_device_sel[board] = data;
 
 				if (data & 0x01 || data & 0x10)
 				{
-					m_dsp[board]->set_flag_input(1, ASSERT_LINE);
+					device->set_flag_input(1, ASSERT_LINE);
 				}
 
 				if (texture_bank[board] != nullptr)
 				{
 					int offset = (data & 0x08) ? 1 : 0;
+
 					machine().root_device().membank(texture_bank[board])->set_entry(offset);
 				}
 			}
@@ -332,25 +336,29 @@ WRITE32_MEMBER( konppc_device::cgboard_1_shared_sharc_w )
 
 uint32_t konppc_device::nwk_fifo_r(address_space &space, int board)
 {
+	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
+	adsp21062_device *device = machine().device<adsp21062_device>(dsptag);
+	uint32_t data;
+
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
 	{
-		m_dsp[board]->set_flag_input(1, CLEAR_LINE);
+		device->set_flag_input(1, CLEAR_LINE);
 	}
 	else
 	{
-		m_dsp[board]->set_flag_input(1, ASSERT_LINE);
+		device->set_flag_input(1, ASSERT_LINE);
 	}
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_full)
 	{
-		m_dsp[board]->set_flag_input(2, ASSERT_LINE);
+		device->set_flag_input(2, ASSERT_LINE);
 	}
 	else
 	{
-		m_dsp[board]->set_flag_input(2, CLEAR_LINE);
+		device->set_flag_input(2, CLEAR_LINE);
 	}
 
-	uint32_t data = nwk_fifo[board][nwk_fifo_read_ptr[board]];
+	data = nwk_fifo[board][nwk_fifo_read_ptr[board]];
 	nwk_fifo_read_ptr[board]++;
 	nwk_fifo_read_ptr[board] &= nwk_fifo_mask;
 
@@ -359,16 +367,19 @@ uint32_t konppc_device::nwk_fifo_r(address_space &space, int board)
 
 void konppc_device::nwk_fifo_w(int board, uint32_t data)
 {
+	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
+	adsp21062_device *device = machine().device<adsp21062_device>(dsptag);
+
 	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
-		m_dsp[board]->set_flag_input(1, ASSERT_LINE);
+		device->set_flag_input(1, ASSERT_LINE);
 	}
 	else
 	{
-		m_dsp[board]->set_flag_input(1, CLEAR_LINE);
+		device->set_flag_input(1, CLEAR_LINE);
 	}
 
-	m_dsp[board]->set_flag_input(2, ASSERT_LINE);
+	device->set_flag_input(2, ASSERT_LINE);
 
 	nwk_fifo[board][nwk_fifo_write_ptr[board]] = data;
 	nwk_fifo_write_ptr[board]++;
@@ -381,28 +392,32 @@ void konppc_device::nwk_fifo_w(int board, uint32_t data)
 
 READ32_MEMBER( konppc_device::K033906_0_r )
 {
+	k033906_device *k033906_1 = machine().device<k033906_device>("k033906_1");
 	if (nwk_device_sel[0] & 0x01)
 		return nwk_fifo_r(space, 0);
 	else
-		return m_k033906[0]->read(space, offset, mem_mask);
+		return k033906_1->read(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER( konppc_device::K033906_0_w )
 {
-	m_k033906[0]->write(space, offset, data, mem_mask);
+	k033906_device *k033906_1 = machine().device<k033906_device>("k033906_1");
+	k033906_1->write(space, offset, data, mem_mask);
 }
 
 READ32_MEMBER( konppc_device::K033906_1_r )
 {
+	k033906_device *k033906_2 = machine().device<k033906_device>("k033906_2");
 	if (nwk_device_sel[1] & 0x01)
 		return nwk_fifo_r(space, 1);
 	else
-		return m_k033906[1]->read(space, offset, mem_mask);
+		return k033906_2->read(space, offset, mem_mask);
 }
 
 WRITE32_MEMBER( konppc_device::K033906_1_w)
 {
-	m_k033906[1]->write(space, offset, data, mem_mask);
+	k033906_device *k033906_2 = machine().device<k033906_device>("k033906_2");
+	k033906_2->write(space, offset, data, mem_mask);
 }
 
 /*****************************************************************************/

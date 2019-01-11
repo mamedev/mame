@@ -13,16 +13,23 @@
 
 #include "ram.h"
 
+#define MCFG_VT82C496_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, VT82C496, 0)
+
+#define MCFG_VT82C496_CPU( _tag ) \
+	downcast<vt82c496_device &>(*device).set_cpu(_tag);
+
+#define MCFG_VT82C496_REGION( _tag ) \
+	downcast<vt82c496_device &>(*device).set_region(_tag);
 
 class vt82c496_device :  public device_t
 {
 public:
 	// construction/destruction
-	vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_ramtag(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_isatag(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
+	void set_cpu(const char *tag) { m_cpu_tag = tag; }
+	void set_region(const char *tag) { m_region_tag = tag; }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -32,10 +39,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<cpu_device> m_cpu;
+	const char* m_cpu_tag;
+	const char* m_region_tag;
+//  cpu_device* m_maincpu;
 	address_space* m_space;
-	required_device<ram_device> m_ram;
-	required_region_ptr<uint8_t> m_rom;
+	ram_device* m_ram;
+	uint8_t* m_rom;
 
 	uint8_t m_reg[0x100];
 	uint8_t m_reg_select;

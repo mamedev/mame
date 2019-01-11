@@ -6,7 +6,7 @@
 
     Data East 99 "ACE" Chip Emulation
 
-    Original source (from deco32.cpp) by Bryan McPhail, split by cam900.
+    Original source (from deco32.cpp) by Bryan McPhail, Splited by cam900.
 
 **************************************************************************/
 #ifndef MAME_VIDEO_DECO_ACE_H
@@ -57,5 +57,13 @@ private:
 
 DECLARE_DEVICE_TYPE(DECO_ACE, deco_ace_device)
 
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_DECO_ACE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DECO_ACE, 0)
 
 #endif // MAME_VIDEO_DECO_ACE_H

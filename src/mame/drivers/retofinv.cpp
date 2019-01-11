@@ -107,6 +107,7 @@ Notes:
 #include "includes/retofinv.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "screen.h"
@@ -179,11 +180,11 @@ READ8_MEMBER(retofinv_state::mcu_status_r)
 void retofinv_state::bootleg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x7fff, 0x7fff).w(FUNC(retofinv_state::coincounter_w));
-	map(0x8000, 0x87ff).ram().w(FUNC(retofinv_state::fg_videoram_w)).share("fg_videoram");
+	map(0x7fff, 0x7fff).w(this, FUNC(retofinv_state::coincounter_w));
+	map(0x8000, 0x87ff).ram().w(this, FUNC(retofinv_state::fg_videoram_w)).share("fg_videoram");
 	map(0x8800, 0x9fff).ram().share("sharedram");
-	map(0xa000, 0xa7ff).ram().w(FUNC(retofinv_state::bg_videoram_w)).share("bg_videoram");
-	map(0xb800, 0xb802).w(FUNC(retofinv_state::gfx_ctrl_w));
+	map(0xa000, 0xa7ff).ram().w(this, FUNC(retofinv_state::bg_videoram_w)).share("bg_videoram");
+	map(0xb800, 0xb802).w(this, FUNC(retofinv_state::gfx_ctrl_w));
 	map(0xc000, 0xc000).portr("P1");
 	map(0xc001, 0xc001).portr("P2");
 	map(0xc002, 0xc002).nopr(); /* bit 7 must be 0, otherwise game resets */
@@ -193,14 +194,14 @@ void retofinv_state::bootleg_map(address_map &map)
 	map(0xc007, 0xc007).portr("DSW3");
 	map(0xc800, 0xc807).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xd000, 0xd000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xd800, 0xd800).w(FUNC(retofinv_state::soundcommand_w));
-	map(0xf800, 0xf800).r(FUNC(retofinv_state::cpu0_mf800_r));
+	map(0xd800, 0xd800).w(this, FUNC(retofinv_state::soundcommand_w));
+	map(0xf800, 0xf800).r(this, FUNC(retofinv_state::cpu0_mf800_r));
 }
 
 void retofinv_state::main_map(address_map &map)
 {
 	bootleg_map(map);
-	map(0xc003, 0xc003).r(FUNC(retofinv_state::mcu_status_r));
+	map(0xc003, 0xc003).r(this, FUNC(retofinv_state::mcu_status_r));
 	map(0xe000, 0xe000).r(m_68705, FUNC(taito68705_mcu_device::data_r));
 	map(0xe800, 0xe800).w(m_68705, FUNC(taito68705_mcu_device::data_w));
 }
@@ -208,9 +209,9 @@ void retofinv_state::main_map(address_map &map)
 void retofinv_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(FUNC(retofinv_state::fg_videoram_w)).share("fg_videoram");
+	map(0x8000, 0x87ff).ram().w(this, FUNC(retofinv_state::fg_videoram_w)).share("fg_videoram");
 	map(0x8800, 0x9fff).ram().share("sharedram");
-	map(0xa000, 0xa7ff).ram().w(FUNC(retofinv_state::bg_videoram_w)).share("bg_videoram");
+	map(0xa000, 0xa7ff).ram().w(this, FUNC(retofinv_state::bg_videoram_w)).share("bg_videoram");
 	map(0xc800, 0xc807).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
@@ -219,9 +220,9 @@ void retofinv_state::sound_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x27ff).ram(); /* 6116 sram at IC28 */
 	map(0x4000, 0x4000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x6000, 0x6000).w(FUNC(retofinv_state::cpu2_m6000_w));
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xa000, 0xa000).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x6000, 0x6000).w(this, FUNC(retofinv_state::cpu2_m6000_w));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xa000, 0xa000).w("sn2", FUNC(sn76489a_device::write));
 	map(0xe000, 0xffff).rom();         /* space for diagnostic ROM */
 }
 
@@ -431,15 +432,15 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	LS259(config, m_mainlatch); // IC72 - probably shared between CPUs
-	m_mainlatch->q_out_cb<0>().set(FUNC(retofinv_state::irq0_ack_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(retofinv_state::coinlockout_w));
-	m_mainlatch->q_out_cb<2>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
-	m_mainlatch->q_out_cb<3>().set(m_68705, FUNC(taito68705_mcu_device::reset_w)).invert();
-	m_mainlatch->q_out_cb<4>().set(FUNC(retofinv_state::irq1_ack_w));
-	m_mainlatch->q_out_cb<5>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC72 - probably shared between CPUs
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, retofinv_state, irq0_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, retofinv_state, coinlockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("68705", taito68705_mcu_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, retofinv_state, irq1_ack_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -448,15 +449,17 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(retofinv_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_retofinv);
-	PALETTE(config, m_palette, FUNC(retofinv_state::retofinv_palette), 256*2 + 64*16 + 64*16, 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_retofinv)
+	MCFG_PALETTE_ADD("palette", 256*2+64*16+64*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -468,18 +471,18 @@ MACHINE_CONFIG_END
 /* bootleg which has different palette clut */
 MACHINE_CONFIG_START(retofinv_state::retofinvb1)
 	retofinv(config);
-
-	m_palette->set_init(FUNC(retofinv_state::retofinv_bl_palette));
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv_bl)
 MACHINE_CONFIG_END
 
 /* bootleg which has no mcu */
 MACHINE_CONFIG_START(retofinv_state::retofinvb_nomcu)
 	retofinv(config);
-
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
-	m_mainlatch->q_out_cb<3>().set_nop();
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
 
 	MCFG_DEVICE_REMOVE("68705")
 MACHINE_CONFIG_END
@@ -490,7 +493,8 @@ MACHINE_CONFIG_START(retofinv_state::retofinvb1_nomcu)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
 
-	m_mainlatch->q_out_cb<3>().set_nop();
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)
 
 	MCFG_DEVICE_REMOVE("68705")
 MACHINE_CONFIG_END

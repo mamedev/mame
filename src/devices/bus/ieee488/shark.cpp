@@ -80,17 +80,16 @@ void mshark_device::mshark_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void mshark_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(mshark_device::device_add_mconfig)
 	// basic machine hardware
-	I8085A(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mshark_device::mshark_mem);
-	m_maincpu->set_addrmap(AS_IO, &mshark_device::mshark_io);
+	MCFG_DEVICE_ADD(I8085_TAG, I8085A, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(mshark_mem)
+	MCFG_DEVICE_IO_MAP(mshark_io)
 
 	// devices
-	HARDDISK(config, "harddisk1", 0);
-	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
-}
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

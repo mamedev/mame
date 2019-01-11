@@ -31,17 +31,7 @@ float foo() // float looks like identifier, but can't be part of tbuffer
     return 1.0;
 }
 
-struct id {
-    float4 a;
-};
-
-cbuffer cbufName2 {
-    float4 v24;
-}
-
-id PixelShaderFunction(float4 input : SV_POSITION) : SV_TARGET0  // id looks like id for cbuffer name, but can't be
+float4 PixelShaderFunction(float4 input : SV_POSITION) : SV_TARGET0
 {
-    id ret;
-    ret.a = v24 + (input + v1 + v2 + v3 + v4) * foo();
-    return ret;
+    return (input + v1 + v2 + v3 + v4) * foo();
 }

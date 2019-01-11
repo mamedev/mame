@@ -106,7 +106,7 @@ void leland_state::video_start()
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 
 	save_item(NAME(m_gfx_control));
-	save_pointer(NAME(m_video_ram), VRAM_SIZE);
+	save_pointer(NAME(m_video_ram.get()), VRAM_SIZE);
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
 	save_item(NAME(m_gfxbank));
@@ -130,8 +130,8 @@ void ataxx_state::video_start()
 	/* allocate memory */
 	m_ataxx_qram = make_unique_clear<uint8_t[]>(QRAM_SIZE);
 
-	save_pointer(NAME(m_video_ram), VRAM_SIZE);
-	save_pointer(NAME(m_ataxx_qram), QRAM_SIZE);
+	save_pointer(NAME(m_video_ram.get()), VRAM_SIZE);
+	save_pointer(NAME(m_ataxx_qram.get()), QRAM_SIZE);
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
 	for (uint8_t i = 0; i < 2; i++)
@@ -450,13 +450,13 @@ uint32_t leland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_tilemap->draw(screen, bitmap, cliprect, 0);
 
 	/* for each scanline in the visible region */
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t *const dst = &bitmap.pix16(y);
 		uint8_t const *const fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* build the pen, background is d0-d5 */
 			pen_t pen = dst[x] & 0x3f;
@@ -513,7 +513,8 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(leland_state::leland_video)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_leland)
-	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 1024);
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -521,12 +522,13 @@ MACHINE_CONFIG_START(leland_state::leland_video)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(leland_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ataxx_state::ataxx_video)
 	leland_video(config);
 
 	MCFG_DEVICE_REPLACE("gfxdecode", GFXDECODE, "palette", gfx_ataxx)
-	m_palette->set_format(palette_device::xRGB_444, 1024);
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 MACHINE_CONFIG_END

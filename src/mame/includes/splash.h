@@ -1,21 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, David Haywood
-#ifndef MAME_INCLUDES_SPLASH_H
-#define MAME_INCLUDES_SPLASH_H
-
-#pragma once
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
 #include "sound/msm5205.h"
-#include "emupal.h"
 
 class splash_state : public driver_device
 {
 public:
-	splash_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	splash_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
@@ -29,17 +24,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_protdata(*this, "protdata"),
 		m_bitmap_mode(*this, "bitmap_mode")
-	{ }
+		{ }
 
-	void roldfrog(machine_config &config);
-	void splash(machine_config &config);
-
-	void init_splash10();
-	void init_roldfrog();
-	void init_splash();
-	void init_rebus();
-
-protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<msm5205_device> m_msm;
@@ -90,6 +76,10 @@ protected:
 	//roldfrog and funystrp specific
 	DECLARE_WRITE8_MEMBER(sound_bank_w);
 
+	void init_splash10();
+	void init_roldfrog();
+	void init_splash();
+	void init_rebus();
 	virtual void video_start() override;
 	DECLARE_MACHINE_START(splash);
 	DECLARE_MACHINE_START(roldfrog);
@@ -104,7 +94,8 @@ protected:
 
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void roldfrog_update_irq(  );
-
+	void roldfrog(machine_config &config);
+	void splash(machine_config &config);
 	void funystrp_sound_map(address_map &map);
 	void roldfrog_map(address_map &map);
 	void roldfrog_sound_io_map(address_map &map);
@@ -116,24 +107,16 @@ protected:
 class funystrp_state : public splash_state
 {
 public:
-	funystrp_state(const machine_config &mconfig, device_type type, const char *tag) :
-		splash_state(mconfig, type, tag),
+	funystrp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: splash_state(mconfig, type, tag),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
 		m_eeprom(*this, "eeprom"),
 		m_funystrp_val(0),
 		m_funystrp_ff3cc7_val(0),
 		m_funystrp_ff3cc8_val(0)
-	{ }
+		{ }
 
-	void funystrp(machine_config &config);
-
-	void init_funystrp();
-
-protected:
-	virtual void machine_start() override;
-
-private:
 	DECLARE_READ16_MEMBER(spr_read);
 	DECLARE_WRITE16_MEMBER(spr_write);
 	DECLARE_READ8_MEMBER(int_source_r);
@@ -147,11 +130,16 @@ private:
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
+	void init_funystrp();
+
 	uint32_t screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void funystrp(machine_config &config);
 	void funystrp_map(address_map &map);
 	void funystrp_sound_io_map(address_map &map);
+private:
+	virtual void machine_start() override;
 
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
@@ -168,5 +156,3 @@ private:
 	int m_snd_interrupt_enable1;
 	int m_snd_interrupt_enable2;
 };
-
-#endif // MAME_INCLUDES_SPLASH_H

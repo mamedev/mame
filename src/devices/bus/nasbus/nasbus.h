@@ -114,7 +114,7 @@
 	downcast<nasbus_slot_device &>(*device).set_nasbus_slot(this, NASBUS_TAG);
 
 #define MCFG_NASBUS_RAM_DISABLE_HANDLER(_devcb) \
-	downcast<nasbus_device &>(*device).set_ram_disable_handler(DEVCB_##_devcb);
+	devcb = &downcast<nasbus_device &>(*device).set_ram_disable_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

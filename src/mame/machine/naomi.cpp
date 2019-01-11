@@ -251,7 +251,7 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
 {
 	// TODO: player 2 input reading
-//  const int *tagptr = (const int *)param;
+//	const int *tagptr = (const int *)param;
 	uint8_t retval = 0;
 	static const char *const keynames[] =
 	{
@@ -261,10 +261,10 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
 	for(int i=0;i<5;i++)
 	{
 		uint32_t row;
-
+		
 		// read the current row
 		row = ioport(keynames[i])->read();
-
+		
 		// if anything is pressed, convert the 32-bit raw value to keycode
 		if(row != 0)
 		{

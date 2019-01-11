@@ -41,6 +41,32 @@
 #ifndef __TMS99COMMON_H__
 #define __TMS99COMMON_H__
 
+#define MCFG_TMS99xx_ADD(_tag, _device, _clock, _prgmap, _iomap )       \
+	MCFG_DEVICE_ADD(_tag, _device, _clock)      \
+	MCFG_DEVICE_PROGRAM_MAP(_prgmap)            \
+	MCFG_DEVICE_IO_MAP(_iomap)
+
+#define MCFG_TMS99xx_EXTOP_HANDLER( _extop) \
+	devcb = &downcast<tms99xx_device &>(*device).set_extop_callback(DEVCB_##_extop);
+
+#define MCFG_TMS99xx_INTLEVEL_HANDLER( _intlevel ) \
+	devcb = &downcast<tms99xx_device &>(*device).set_intlevel_callback(DEVCB_##_intlevel);
+
+#define MCFG_TMS99xx_IAQ_HANDLER( _iaq )    \
+	devcb = &downcast<tms99xx_device &>(*device).set_iaq_callback(DEVCB_##_iaq);
+
+#define MCFG_TMS99xx_CLKOUT_HANDLER( _clkout ) \
+	devcb = &downcast<tms99xx_device &>(*device).set_clkout_callback(DEVCB_##_clkout);
+
+#define MCFG_TMS99xx_WAIT_HANDLER( _wait ) \
+	devcb = &downcast<tms99xx_device &>(*device).set_wait_callback(DEVCB_##_wait);
+
+#define MCFG_TMS99xx_HOLDA_HANDLER( _holda ) \
+	devcb = &downcast<tms99xx_device &>(*device).set_holda_callback(DEVCB_##_holda);
+
+#define MCFG_TMS99xx_DBIN_HANDLER( _dbin ) \
+	devcb = &downcast<tms99xx_device &>(*device).set_dbin_callback(DEVCB_##_dbin);
+
 enum
 {
 	TI990_10_ID = 1,

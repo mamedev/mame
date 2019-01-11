@@ -96,6 +96,9 @@ void tecmo_state::video_start()
 
 	m_bg_tilemap->set_scrolldx(-48,256+48);
 	m_fg_tilemap->set_scrolldx(-48,256+48);
+
+	save_item(NAME(m_fgscroll));
+	save_item(NAME(m_bgscroll));
 }
 
 

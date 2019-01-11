@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(namco_53xx_device::read_request)
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	m_irq_cleared_timer->adjust(attotime::from_usec(21), 0);
+	machine().scheduler().timer_set(attotime::from_usec(21), timer_expired_delegate(FUNC(namco_53xx_device::irq_clear),this), 0);
 }
 
 READ8_MEMBER( namco_53xx_device::read )
@@ -161,8 +161,6 @@ void namco_53xx_device::device_start()
 		cb.resolve_safe(0);
 	m_p.resolve_safe();
 
-	m_irq_cleared_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_53xx_device::irq_clear), this));
-
 	save_item(NAME(m_portO));
 }
 
@@ -170,17 +168,16 @@ void namco_53xx_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void namco_53xx_device::device_add_mconfig(machine_config &config)
-{
-	MB8843(config, m_cpu, DERIVED_CLOCK(1,1)); /* parent clock, internally divided by 6 */
-	m_cpu->read_k().set(FUNC(namco_53xx_device::K_r));
-	m_cpu->write_o().set(FUNC(namco_53xx_device::O_w));
-	m_cpu->write_p().set(FUNC(namco_53xx_device::P_w));
-	m_cpu->read_r<0>().set(FUNC(namco_53xx_device::R0_r));
-	m_cpu->read_r<1>().set(FUNC(namco_53xx_device::R1_r));
-	m_cpu->read_r<2>().set(FUNC(namco_53xx_device::R2_r));
-	m_cpu->read_r<3>().set(FUNC(namco_53xx_device::R3_r));
-}
+MACHINE_CONFIG_START(namco_53xx_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))     /* parent clock, internally divided by 6 */
+	MCFG_MB88XX_READ_K_CB(READ8(*this, namco_53xx_device, K_r))
+	MCFG_MB88XX_WRITE_O_CB(WRITE8(*this, namco_53xx_device, O_w))
+	MCFG_MB88XX_WRITE_P_CB(WRITE8(*this, namco_53xx_device, P_w))
+	MCFG_MB88XX_READ_R0_CB(READ8(*this, namco_53xx_device, R0_r))
+	MCFG_MB88XX_READ_R1_CB(READ8(*this, namco_53xx_device, R1_r))
+	MCFG_MB88XX_READ_R2_CB(READ8(*this, namco_53xx_device, R2_r))
+	MCFG_MB88XX_READ_R3_CB(READ8(*this, namco_53xx_device, R3_r))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - return a pointer to the

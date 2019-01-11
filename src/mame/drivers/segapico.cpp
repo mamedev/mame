@@ -139,11 +139,6 @@ public:
 		m_io_peny(*this, "PENY")
 	{ }
 
-	void init_pico();
-	void init_picou();
-	void init_picoj();
-
-protected:
 	optional_device<sega_315_5641_pcm_device> m_sega_315_5641_pcm;
 
 	required_ioport m_io_page;
@@ -158,6 +153,9 @@ protected:
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
 
+	void init_pico();
+	void init_picou();
+	void init_picoj();
 	void pico_mem(address_map &map);
 };
 
@@ -168,12 +166,10 @@ public:
 		: pico_base_state(mconfig, type, tag),
 	m_picocart(*this, "picoslot") { }
 
-	void pico(machine_config &config);
-	void picopal(machine_config &config);
-
-private:
 	required_device<pico_cart_slot_device> m_picocart;
 	DECLARE_MACHINE_START(pico);
+	void pico(machine_config &config);
+	void picopal(machine_config &config);
 };
 
 
@@ -304,9 +300,9 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 	{
 		case 0x10/2:
 			if (mem_mask & 0xFF00)
-				m_sega_315_5641_pcm->port_w((data >> 8) & 0xFF);
+				m_sega_315_5641_pcm->port_w(space, 0, (data >> 8) & 0xFF);
 			if (mem_mask & 0x00FF)
-				m_sega_315_5641_pcm->port_w((data >> 0) & 0xFF);
+				m_sega_315_5641_pcm->port_w(space, 0, (data >> 0) & 0xFF);
 			break;
 		case 0x12/2: // guess
 			// Note about uPD7759 lines:
@@ -318,17 +314,17 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 				// value 8000 resets the FIFO? (always used with low reset line)
 				// value 0800 maps to the uPD7759's reset line (0 = reset, 1 = normal)
 				// value 4000 maps to the uPD7759's start line (0->1 = start)
-				m_sega_315_5641_pcm->reset_w(BIT(data, 11));
-				m_sega_315_5641_pcm->start_w(BIT(data, 14));
-				if (BIT(data, 14))
+				m_sega_315_5641_pcm->reset_w((data >> 8) & 0x08);
+				m_sega_315_5641_pcm->start_w((data >> 8) & 0x40);
+				if (data & 0x4000)
 				{
 					// Somewhere between "Reset Off" and the first sample data,
 					// we need to send a few commands to make the sample stream work.
 					// Doing that when rising the "start" line seems to work fine.
-					m_sega_315_5641_pcm->port_w(0xFF);    // "Last Sample" value (must be >= 0x10)
-					m_sega_315_5641_pcm->port_w(0x00);    // Dummy 1
-					m_sega_315_5641_pcm->port_w(0x00);    // Addr MSB
-					m_sega_315_5641_pcm->port_w(0x00);    // Addr LSB
+					m_sega_315_5641_pcm->port_w(space, 0, 0xFF);    // "Last Sample" value (must be >= 0x10)
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Dummy 1
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Addr MSB
+					m_sega_315_5641_pcm->port_w(space, 0, 0x00);    // Addr LSB
 				}
 			}
 
@@ -348,7 +344,7 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 void pico_base_state::pico_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-	map(0x800000, 0x80001f).rw(FUNC(pico_base_state::pico_68k_io_read), FUNC(pico_base_state::pico_68k_io_write));
+	map(0x800000, 0x80001f).rw(this, FUNC(pico_base_state::pico_68k_io_read), FUNC(pico_base_state::pico_68k_io_write));
 	map(0xc00000, 0xc0001f).rw("gen_vdp", FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
 }
@@ -392,47 +388,47 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_vdp->stop_timers();
 }
 
-void pico_state::pico(machine_config &config)
-{
+MACHINE_CONFIG_START(pico_state::pico)
 	md_ntsc(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pico_mem)
 
-	config.device_remove("genesis_snd_z80");
-	config.device_remove("ymsnd");
+	MCFG_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("pico");
+	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
-	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
-	//m_sega_315_5641_pcm->drq().set(FUNC(pico_state::sound_cause_irq)); FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
-}
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
+MACHINE_CONFIG_END
 
-void pico_state::picopal(machine_config &config)
-{
+MACHINE_CONFIG_START(pico_state::picopal)
 	md_pal(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pico_mem)
 
-	config.device_remove("genesis_snd_z80");
-	config.device_remove("ymsnd");
+	MCFG_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_MACHINE_START_OVERRIDE( pico_state, pico )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("pico");
+	MCFG_PICO_CARTRIDGE_ADD("picoslot", pico_cart, nullptr)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
-	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
-	//m_sega_315_5641_pcm->drq().set(FUNC(pico_state::sound_cause_irq)); FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
-}
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
+MACHINE_CONFIG_END
 
 
 
@@ -578,7 +574,7 @@ void copera_state::copera_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 
-	map(0x800000, 0x80001f).rw(FUNC(copera_state::pico_68k_io_read), FUNC(copera_state::pico_68k_io_write));
+	map(0x800000, 0x80001f).rw(this, FUNC(copera_state::pico_68k_io_read), FUNC(copera_state::pico_68k_io_write));
 
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 
@@ -608,26 +604,26 @@ MACHINE_START_MEMBER(copera_state,copera)
 
 }
 
-void copera_state::copera(machine_config &config)
-{
+MACHINE_CONFIG_START(copera_state::copera)
 	md_ntsc(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &copera_state::copera_mem);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(copera_mem)
 
-	config.device_remove("genesis_snd_z80");
-	config.device_remove("ymsnd");
+	MCFG_DEVICE_REMOVE("genesis_snd_z80")
+	MCFG_DEVICE_REMOVE("ymsnd")
 
 	MCFG_MACHINE_START_OVERRIDE( copera_state, copera )
 	MCFG_MACHINE_RESET_OVERRIDE( pico_base_state, ms_megadriv )
 
-	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr);
-	SOFTWARE_LIST(config, "cart_list").set_original("copera");
+	MCFG_COPERA_CARTRIDGE_ADD("coperaslot", copera_cart, nullptr)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
-	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);
-	//m_sega_315_5641_pcm->drq().set(FUNC(pico_state::sound_cause_irq)); FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
-}
+	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK)
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, copera_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
+MACHINE_CONFIG_END
 
 
 

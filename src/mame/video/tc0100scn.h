@@ -5,16 +5,14 @@
 
 #pragma once
 
-#include "emupal.h"
-
 class tc0100scn_device : public device_t
 {
 public:
 	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 	void set_tx_region(int txregion) { m_txnum = txregion; }
 	void set_multiscr_xoffs(int xoffs) { m_multiscrn_xoffs = xoffs; }
@@ -65,11 +63,12 @@ public:
 	register. Use this function to draw tilemaps in the correct order. */
 	int bottomlayer();
 
+	void postload();
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 private:
 	// internal state
@@ -118,5 +117,33 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)
+
+
+#define MCFG_TC0100SCN_GFX_REGION(_region) \
+	downcast<tc0100scn_device &>(*device).set_gfx_region(_region);
+
+#define MCFG_TC0100SCN_TX_REGION(_region) \
+	downcast<tc0100scn_device &>(*device).set_tx_region(_region);
+
+#define MCFG_TC0100SCN_OFFSETS(_xoffs, _yoffs) \
+	downcast<tc0100scn_device &>(*device).set_offsets(_xoffs, _yoffs);
+
+#define MCFG_TC0100SCN_OFFSETS_FLIP(_xoffs, _yoffs) \
+	downcast<tc0100scn_device &>(*device).set_offsets_flip(_xoffs, _yoffs);
+
+#define MCFG_TC0100SCN_OFFSETS_FLIPTX(_xoffs, _yoffs) \
+	downcast<tc0100scn_device &>(*device).set_offsets_fliptx(_xoffs, _yoffs);
+
+#define MCFG_TC0100SCN_MULTISCR_XOFFS(_xoffs) \
+	downcast<tc0100scn_device &>(*device).set_multiscr_xoffs(_xoffs);
+
+#define MCFG_TC0100SCN_MULTISCR_HACK(_hack) \
+	downcast<tc0100scn_device &>(*device).set_multiscr_hack(_hack);
+
+#define MCFG_TC0100SCN_GFXDECODE(_gfxtag) \
+	downcast<tc0100scn_device &>(*device).set_gfxdecode_tag(_gfxtag);
+
+#define MCFG_TC0100SCN_PALETTE(_palette_tag) \
+	downcast<tc0100scn_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_TC0100SCN_H

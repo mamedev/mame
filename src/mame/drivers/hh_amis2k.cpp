@@ -50,7 +50,7 @@ public:
 
 	void wildfire(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(write_d);
@@ -66,7 +66,8 @@ private:
 	void write_a12(int state);
 	void sound_update();
 
-	required_device<amis2152_cpu_device> m_maincpu;
+private:
+	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<timer_device> m_a12_decay_timer;
 
@@ -312,27 +313,28 @@ static const u8 wildfire_7seg_table[0x10] =
 };
 
 
-void wildfire_state::wildfire(machine_config &config)
-{
+MACHINE_CONFIG_START(wildfire_state::wildfire)
+
 	/* basic machine hardware */
-	AMI_S2152(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_7seg_table(wildfire_7seg_table);
-	m_maincpu->read_i().set_ioport("IN1");
-	m_maincpu->write_d().set(FUNC(wildfire_state::write_d));
-	m_maincpu->write_a().set(FUNC(wildfire_state::write_a));
-	m_maincpu->write_f().set(FUNC(wildfire_state::write_f));
+	MCFG_DEVICE_ADD("maincpu", AMI_S2152, MASTER_CLOCK)
+	MCFG_AMI_S2000_7SEG_DECODER(wildfire_7seg_table)
+	MCFG_AMI_S2000_READ_I_CB(IOPORT("IN1"))
+	MCFG_AMI_S2000_WRITE_D_CB(WRITE8(*this, wildfire_state, write_d))
+	MCFG_AMI_S2000_WRITE_A_CB(WRITE16(*this, wildfire_state, write_a))
+	MCFG_AMI_S2152_FOUT_CB(WRITELINE(*this, wildfire_state, write_f))
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(wildfire_state::display_decay_tick), attotime::from_msec(1));
-	TIMER(config, "a12_decay").configure_generic(FUNC(wildfire_state::reset_q2));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", wildfire_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD("a12_decay", wildfire_state, reset_q2)
 
-	config.set_default_layout(layout_wildfire);
+	MCFG_DEFAULT_LAYOUT(layout_wildfire)
 
 	/* no video! */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 

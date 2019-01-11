@@ -14,6 +14,26 @@
 #pragma once
 
 
+
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_PTM6840_EXTERNAL_CLOCKS(_clk0, _clk1, _clk2) \
+	downcast<ptm6840_device &>(*device).set_external_clocks(_clk0, _clk1, _clk2);
+
+#define MCFG_PTM6840_O1_CB(_devcb) \
+	devcb = &downcast<ptm6840_device &>(*device).set_out_callback(0, DEVCB_##_devcb);
+
+#define MCFG_PTM6840_O2_CB(_devcb) \
+	devcb = &downcast<ptm6840_device &>(*device).set_out_callback(1, DEVCB_##_devcb);
+
+#define MCFG_PTM6840_O3_CB(_devcb) \
+	devcb = &downcast<ptm6840_device &>(*device).set_out_callback(2, DEVCB_##_devcb);
+
+#define MCFG_PTM6840_IRQ_CB(_devcb) \
+	devcb = &downcast<ptm6840_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -28,10 +48,8 @@ public:
 
 	void set_external_clocks(double clock0, double clock1, double clock2) { m_external_clock[0] = clock0; m_external_clock[1] = clock1; m_external_clock[2] = clock2; }
 	void set_external_clocks(const XTAL &clock0, const XTAL &clock1, const XTAL &clock2) { set_external_clocks(clock0.dvalue(), clock1.dvalue(), clock2.dvalue()); }
-	auto o1_callback() { return m_out_cb[0].bind(); }
-	auto o2_callback() { return m_out_cb[1].bind(); }
-	auto o3_callback() { return m_out_cb[2].bind(); }
-	auto irq_callback() { return m_irq_cb.bind(); }
+	template <class Object> devcb_base &set_out_callback(int index, Object &&cb) { return m_out_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
 	int irq_state() const { return m_irq; }                 // get IRQ state
@@ -40,7 +58,9 @@ public:
 	int ext_clock(int counter) const { return m_external_clock[counter]; }  // get clock frequency
 
 	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, uint8_t data) { write(machine().dummy_space(), offset, data); }
 	DECLARE_READ8_MEMBER( read );
+	uint8_t read(offs_t offset) { return read(machine().dummy_space(), offset); }
 
 	void set_gate(int idx, int state);
 	DECLARE_WRITE_LINE_MEMBER( set_g1 );
@@ -127,9 +147,6 @@ private:
 	uint16_t m_counter[3];
 
 	static const char *const opmode[];
-
-	// set in dual 8 bit mode to indicate Output high time cycle
-	bool m_hightime[3];
 };
 
 

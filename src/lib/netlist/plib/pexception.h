@@ -23,7 +23,7 @@ public:
 	explicit pexception(const pstring &text);
 	pexception(const pexception &e) : std::exception(e), m_text(e.m_text) { }
 
-	virtual ~pexception() noexcept override;
+	virtual ~pexception() noexcept;
 
 	const pstring &text() { return m_text; }
 	const char* what() const noexcept override { return m_text.c_str(); }

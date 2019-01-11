@@ -11,7 +11,7 @@
 #include "machine/timer.h"
 #include "sound/cdda.h"
 
-class stvcd_device : public device_t, public device_mixer_interface
+class stvcd_device : public device_t
 {
 	static constexpr unsigned MAX_FILTERS = 24;
 	static constexpr unsigned MAX_BLOCKS = 200;
@@ -22,6 +22,8 @@ public:
 
 	DECLARE_READ32_MEMBER(stvcd_r);
 	DECLARE_WRITE32_MEMBER(stvcd_w);
+
+	DECLARE_READ16_MEMBER(channel_volume_r);
 
 	void set_tray_open();
 	void set_tray_close();

@@ -10,33 +10,31 @@
 
 #pragma once
 
+#include "machine/atarigen.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/atarimo.h"
 #include "video/atarivad.h"
 #include "screen.h"
 
-class relief_state : public driver_device
+class relief_state : public atarigen_state
 {
 public:
 	relief_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
+		atarigen_state(mconfig, type, tag),
 		m_vad(*this, "vad"),
 		m_oki(*this, "oki"),
 		m_ym2413(*this, "ymsnd"),
 		m_okibank(*this, "okibank")
 	{ }
 
+	void init_relief();
 	void relief(machine_config &config);
 
-	void init_relief();
-
-private:
+protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(audio_control_w);
 	DECLARE_WRITE16_MEMBER(audio_volume_w);
@@ -47,9 +45,7 @@ private:
 	void main_map(address_map &map);
 	void oki_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
+private:
 	required_device<atari_vad_device> m_vad;
 	required_device<okim6295_device> m_oki;
 	required_device<ym2413_device> m_ym2413;

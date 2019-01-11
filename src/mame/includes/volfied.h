@@ -18,8 +18,13 @@
 class volfied_state : public driver_device
 {
 public:
-	volfied_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	enum
+	{
+		TIMER_VOLFIED
+	};
+
+	volfied_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_cchip(*this, "cchip"),
@@ -28,19 +33,6 @@ public:
 		m_cchip_irq_clear(*this, "cchip_irq_clear")
 	{ }
 
-	void volfied(machine_config &config);
-
-protected:
-	enum
-	{
-		TIMER_VOLFIED
-	};
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	DECLARE_READ16_MEMBER(video_ram_r);
 	DECLARE_WRITE16_MEMBER(video_ram_w);
 	DECLARE_WRITE16_MEMBER(video_ctrl_w);
@@ -48,15 +40,20 @@ private:
 	DECLARE_WRITE16_MEMBER(video_mask_w);
 	DECLARE_WRITE16_MEMBER(sprite_ctrl_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
 	void refresh_pixel_layer( bitmap_ind16 &bitmap );
 
+	void volfied(machine_config &config);
 	void main_map(address_map &map);
 	void z80_map(address_map &map);
 
+private:
 	/* memory pointers */
 	std::unique_ptr<uint16_t[]>    m_video_ram;
 

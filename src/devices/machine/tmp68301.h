@@ -7,7 +7,21 @@
 
 #include "cpu/m68000/m68000.h"
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
 /* TODO: serial ports, frequency & hook it up with m68k */
+
+// FIXME: M68000 ought to be a parent class, not an external object
+#define MCFG_TMP68301_CPU(_tag) \
+	downcast<tmp68301_device &>(*device).set_cpu_tag(_tag);
+
+#define MCFG_TMP68301_IN_PARALLEL_CB(cb) \
+	devcb = &downcast<tmp68301_device &>(*device).set_in_parallel_callback((DEVCB_##cb));
+
+#define MCFG_TMP68301_OUT_PARALLEL_CB(cb) \
+	devcb = &downcast<tmp68301_device &>(*device).set_out_parallel_callback((DEVCB_##cb));
 
 
 //**************************************************************************
@@ -22,9 +36,9 @@ class tmp68301_device : public device_t,
 public:
 	tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); } // FIXME: M68000 ought to be a parent class, not an external object
-	auto in_parallel_callback() { return m_in_parallel_cb.bind(); }
-	auto out_parallel_callback() { return m_out_parallel_cb.bind(); }
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	template <class Object> devcb_base &set_in_parallel_callback(Object &&cb) { return m_in_parallel_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_parallel_callback(Object &&cb) { return m_out_parallel_cb.set_callback(std::forward<Object>(cb)); }
 
 	// Hardware Registers
 	DECLARE_READ16_MEMBER( regs_r );
@@ -40,8 +54,6 @@ public:
 private:
 	DECLARE_READ16_MEMBER(imr_r);
 	DECLARE_WRITE16_MEMBER(imr_w);
-	DECLARE_READ16_MEMBER(ipr_r);
-	DECLARE_WRITE16_MEMBER(ipr_w);
 	DECLARE_READ16_MEMBER(iisr_r);
 	DECLARE_WRITE16_MEMBER(iisr_w);
 	DECLARE_READ16_MEMBER(scr_r);
@@ -62,10 +74,10 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	TIMER_CALLBACK_MEMBER(timer_callback);
-	void update_timer(int i);
-	void update_ipl();
-	uint8_t serial_interrupt_cause(int channel);
+	TIMER_CALLBACK_MEMBER( timer_callback );
+	void update_timer( int i );
+	void update_irq_state(uint16_t cause);
+	void update_irq_serial(uint16_t cause, uint8_t type);
 
 	static constexpr uint16_t EXT_IRQ0 = 1 << 0;
 	static constexpr uint16_t EXT_IRQ1 = 1 << 1;
@@ -91,10 +103,9 @@ private:
 
 	emu_timer *m_tmp68301_timer[3];        // 3 Timers
 
-	uint8_t m_ipl; // internal interrupt level
+	uint16_t m_irq_vector[8];
 
 	uint16_t m_imr;
-	uint16_t m_ipr;
 	uint16_t m_iisr;
 	uint16_t m_scr;
 	uint16_t m_pdir;

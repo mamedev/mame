@@ -42,6 +42,7 @@ c352_device::c352_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+
 //-------------------------------------------------
 //  rom_bank_updated - the rom bank has changed
 //-------------------------------------------------

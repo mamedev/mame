@@ -614,8 +614,6 @@ void ay31015_device::internal_reset()
 	m_rx_state = PREP_TIME;
 	m_tx_state = IDLE;
 	m_pins[SI] = 1;
-	m_pins[EOC] = 1;
-	m_pins[TBMT] = 1;
 	set_so(1);
 
 	m_rx_data = 0;
@@ -641,8 +639,6 @@ void ay51013_device::internal_reset()
 	m_rx_state = PREP_TIME;
 	m_tx_state = IDLE;
 	m_pins[SI] = 1;
-	m_pins[EOC] = 1;
-	m_pins[TBMT] = 1;
 	set_so(1);
 	// no m_rx_data = 0 in this case
 }

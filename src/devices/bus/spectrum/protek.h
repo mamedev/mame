@@ -31,6 +31,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

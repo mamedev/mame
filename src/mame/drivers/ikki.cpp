@@ -10,7 +10,6 @@ Ikki (c) 1985 Sun Electronics
 
 TODO:
 - understand proper CPU communications and irq firing;
-- merge with markham.cpp
 - timings
 
 *****************************************************************************/
@@ -21,18 +20,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "speaker.h"
-
-#define MASTER_CLOCK (20_MHz_XTAL)
-#define PIXEL_CLOCK  (MASTER_CLOCK/4) // guess
-#define CPU_CLOCK    (8_MHz_XTAL)
-
-/* also a guess */
-#define HTOTAL       (320)
-#define HBEND        (8)
-#define HBSTART      (248)
-#define VTOTAL       (262)
-#define VBEND        (16)
-#define VBSTART      (240)
 
 
 /*************************************
@@ -66,14 +53,14 @@ void ikki_state::ikki_cpu1(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram().share("share1");
 	map(0xd000, 0xd7ff).ram().share("videoram");
-	map(0xe000, 0xe000).r(FUNC(ikki_state::ikki_e000_r));
+	map(0xe000, 0xe000).r(this, FUNC(ikki_state::ikki_e000_r));
 	map(0xe001, 0xe001).portr("DSW1");
 	map(0xe002, 0xe002).portr("DSW2");
 	map(0xe003, 0xe003).portr("SYSTEM");
 	map(0xe004, 0xe004).portr("P1");
 	map(0xe005, 0xe005).portr("P2");
-	map(0xe008, 0xe008).w(FUNC(ikki_state::ikki_scrn_ctrl_w));
-	map(0xe009, 0xe009).w(FUNC(ikki_state::ikki_coin_counters));
+	map(0xe008, 0xe008).w(this, FUNC(ikki_state::ikki_scrn_ctrl_w));
+	map(0xe009, 0xe009).w(this, FUNC(ikki_state::ikki_coin_counters));
 	map(0xe00a, 0xe00b).writeonly().share("scroll");
 }
 
@@ -82,8 +69,8 @@ void ikki_state::ikki_cpu2(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
 }
 
 
@@ -256,33 +243,39 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 MACHINE_CONFIG_START(ikki_state::ikki)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,CPU_CLOCK/2) /* 4.000MHz */
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu1)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ikki_state, ikki_irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("sub", Z80,CPU_CLOCK/2) /* 4.000MHz */
+	MCFG_DEVICE_ADD("sub", Z80,8000000/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*(PIXEL_CLOCK/HTOTAL/VTOTAL))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ikki_state, irq0_line_hold, 2*60)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+//  MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(32*8, 32*8+3*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ikki);
-	PALETTE(config, m_palette, FUNC(ikki_state::ikki_palette), 1024, 256 + 1);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikki)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
+	MCFG_PALETTE_INIT_OWNER(ikki_state, ikki)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, CPU_CLOCK/4)
+	MCFG_DEVICE_ADD("sn1", SN76496, 8000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DEVICE_ADD("sn2", SN76496, CPU_CLOCK/2)
+	MCFG_DEVICE_ADD("sn2", SN76496, 8000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

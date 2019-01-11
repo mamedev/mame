@@ -198,185 +198,196 @@ static const res_net_info radarscp_grid_net_info =
 	}
 };
 
-void dkong_state::dkong2b_palette(palette_device &palette)
+PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-
 	std::vector<rgb_t> rgb;
+	int i;
+
 	compute_res_net_all(rgb, color_prom, dkong_decode_info, dkong_net_info);
 	palette.set_pen_colors(0, rgb);
 
-	// Now treat tri-state black background generation
-	for (int i = 0; i < 256; i++)
-		if ((i & 0x03) == 0x00)  // NOR => CS=1 => Tristate => real black
+	/* Now treat tri-state black background generation */
+
+	for (i=0;i<256;i++)
+		if ( (i & 0x03) == 0x00 )  /*  NOR => CS=1 => Tristate => real black */
 		{
-			int const r = compute_res_net(1, 0, dkong_net_bck_info);
-			int const g = compute_res_net(1, 1, dkong_net_bck_info);
-			int const b = compute_res_net(1, 2, dkong_net_bck_info);
-			palette.set_pen_color(i, r, g, b);
-		}
-
-	palette.palette()->normalize_range(0, 255);
-
-	color_prom += 512;
-	// color_prom now points to the beginning of the character color codes
-	m_color_codes = color_prom; // we'll need it later
-}
-
-#ifdef UNUSED_FUNCTION
-void dkong_state::dkong4b_palette(palette_device &palette)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-
-	for (int i = 0; i < 256; i++)
-	{
-		// red component
-		int const r = compute_res_net((color_prom[256] >> 1) & 0x07, 0, radarscp_net_info);
-		// green component
-		int const g = compute_res_net(((color_prom[256] << 2) & 0x04) | ((color_prom[0] >> 2) & 0x03), 1, radarscp_net_info);
-		// blue component
-		int const b = compute_res_net((color_prom[0] >> 0) & 0x03, 2, radarscp_net_info);
-
-		palette.set_pen_color(i, r, g, b);
-		color_prom++;
-	}
-
-	// Now treat tri-state black background generation
-
-	for (int i = 0; i < 256; i++)
-		if ((i & 0x03) == 0x00)  // NOR => CS=1 => Tristate => real black
-		{
-			int const r = compute_res_net(1, 0, radarscp_net_bck_info);
-			int const g = compute_res_net(1, 1, radarscp_net_bck_info);
-			int const b = compute_res_net(1, 2, radarscp_net_bck_info);
-			palette.set_pen_color(i, r, g, b);
-		}
-
-	palette.palette()->normalize_range(0, 255);
-
-	color_prom += 256;
-	// color_prom now points to the beginning of the character color codes
-	m_color_codes = color_prom; // we'll need it later
-}
-#endif
-
-void dkong_state::radarscp_palette(palette_device &palette)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-
-	for (int i = 0; i < 256; i++)
-	{
-		// red component
-		int const r = compute_res_net((color_prom[256] >> 1) & 0x07, 0, radarscp_net_info);
-		// green component
-		int const g = compute_res_net(((color_prom[256] << 2) & 0x04) | ((color_prom[0] >> 2) & 0x03), 1, radarscp_net_info);
-		// blue component
-		int const b = compute_res_net((color_prom[0] >> 0) & 0x03, 2, radarscp_net_info);
-
-		palette.set_pen_color(i, r, g, b);
-		color_prom++;
-	}
-
-	// Now treat tri-state black background generation
-	for (int i = 0; i < 256; i++)
-		if ((m_vidhw != DKONG_RADARSCP_CONVERSION) && ((i & 0x03) == 0x00)) // NOR => CS=1 => Tristate => real black
-		{
-			int const r = compute_res_net(1, 0, radarscp_net_bck_info);
-			int const g = compute_res_net(1, 1, radarscp_net_bck_info);
-			int const b = compute_res_net(1, 2, radarscp_net_bck_info);
+			int r,g,b;
+			r = compute_res_net( 1, 0, dkong_net_bck_info );
+			g = compute_res_net( 1, 1, dkong_net_bck_info );
+			b = compute_res_net( 1, 2, dkong_net_bck_info );
 			palette.set_pen_color(i,r,g,b);
 		}
 
-	// Star color
-	palette.set_pen_color(RADARSCP_STAR_COL,
-			compute_res_net(1, 0, radarscp_stars_net_info),
-			compute_res_net(0, 1, radarscp_stars_net_info),
-			compute_res_net(0, 2, radarscp_stars_net_info));
+	palette.palette()->normalize_range(0, 255);
 
-	// Oscillating background
-	for (int i = 0; i < 256; i++)
-	{
-		int const r = compute_res_net(0, 0, radarscp_blue_net_info);
-		int const g = compute_res_net(0, 1, radarscp_blue_net_info);
-		int const b = compute_res_net(i, 2, radarscp_blue_net_info);
-
-		palette.set_pen_color(RADARSCP_BCK_COL_OFFSET + i, r, g, b);
-	}
-
-	// Grid
-	for (int i = 0; i < 8; i++)
-	{
-		int const r = compute_res_net(BIT(i, 0), 0, radarscp_grid_net_info);
-		int const g = compute_res_net(BIT(i, 1), 1, radarscp_grid_net_info);
-		int const b = compute_res_net(BIT(i, 2), 2, radarscp_grid_net_info);
-
-		palette.set_pen_color(RADARSCP_GRID_COL_OFFSET + i, r, g, b);
-	}
-
-	palette.palette()->normalize_range(0, RADARSCP_GRID_COL_OFFSET + 7);
-
-	color_prom += 256;
-	// color_prom now points to the beginning of the character color codes
-	m_color_codes = color_prom; // we'll need it later
+	color_prom += 512;
+	/* color_prom now points to the beginning of the character color codes */
+	m_color_codes = color_prom; /* we'll need it later */
 }
 
-void dkong_state::radarscp1_palette(palette_device &palette)
+#ifdef UNUSED_FUNCTION
+PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+	int r,g,b;
 
-	for (int i = 0; i < 256; i++)
+	for (i = 0;i < 256;i++)
 	{
-		// red component
-		int const r = compute_res_net(color_prom[512], 0, radarscp1_net_info);
-		// green component
-		int const g = compute_res_net(color_prom[256], 1, radarscp1_net_info);
-		// blue component
-		int const b = compute_res_net(color_prom[0], 2, radarscp1_net_info);
+		/* red component */
+		r = compute_res_net( (color_prom[256]>>1) & 0x07, 0, radarscp_net_info );
+		/* green component */
+		g = compute_res_net( ((color_prom[256]<<2) & 0x04) | ((color_prom[0]>>2) & 0x03), 1, radarscp_net_info );
+		/* blue component */
+		b = compute_res_net( (color_prom[0]>>0) & 0x03, 2, radarscp_net_info );
 
-		palette.set_pen_color(i, r, g, b);
+		palette.set_pen_color(i,r,g,b);
 		color_prom++;
 	}
 
-	// Now treat tri-state black background generation
-	for (int i = 0; i < 256; i++)
-		if ((i & 0x03) == 0x00)  // NOR => CS=1 => Tristate => real black
+	/* Now treat tri-state black background generation */
+
+	for (i=0;i<256;i++)
+		if ( (i & 0x03) == 0x00 )  /*  NOR => CS=1 => Tristate => real black */
 		{
-			int const r = compute_res_net(0, 0, radarscp1_net_info);
-			int const g = compute_res_net(0, 1, radarscp1_net_info);
-			int const b = compute_res_net(0, 2, radarscp1_net_info);
-			palette.set_pen_color(i, r, g, b);
+			r = compute_res_net( 1, 0, radarscp_net_bck_info );
+			g = compute_res_net( 1, 1, radarscp_net_bck_info );
+			b = compute_res_net( 1, 2, radarscp_net_bck_info );
+			palette.set_pen_color(i,r,g,b);
 		}
 
-	// Star color
-	palette.set_pen_color(RADARSCP_STAR_COL,
-			compute_res_net(1, 0, radarscp_stars_net_info),
-			compute_res_net(0, 1, radarscp_stars_net_info),
-			compute_res_net(0, 2, radarscp_stars_net_info));
+	palette.palette()->normalize_range(0, 255);
+
+	color_prom += 256;
+	/* color_prom now points to the beginning of the character color codes */
+	m_color_codes = color_prom; /* we'll need it later */
+}
+#endif
+
+PALETTE_INIT_MEMBER(dkong_state,radarscp)
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+	int r,g,b;
+
+	for (i = 0;i < 256;i++)
+	{
+		/* red component */
+		r = compute_res_net( (color_prom[256]>>1) & 0x07, 0, radarscp_net_info );
+		/* green component */
+		g = compute_res_net( ((color_prom[256]<<2) & 0x04) | ((color_prom[0]>>2) & 0x03), 1, radarscp_net_info );
+		/* blue component */
+		b = compute_res_net( (color_prom[0]>>0) & 0x03, 2, radarscp_net_info );
+
+		palette.set_pen_color(i,r,g,b);
+		color_prom++;
+	}
+
+	/* Now treat tri-state black background generation */
+
+	for (i=0;i<256;i++)
+		if ( (m_vidhw != DKONG_RADARSCP_CONVERSION) && ( (i & 0x03) == 0x00 ))  /*  NOR => CS=1 => Tristate => real black */
+		{
+			r = compute_res_net( 1, 0, radarscp_net_bck_info );
+			g = compute_res_net( 1, 1, radarscp_net_bck_info );
+			b = compute_res_net( 1, 2, radarscp_net_bck_info );
+			palette.set_pen_color(i,r,g,b);
+		}
+
+	/* Star color */
+	r = compute_res_net( 1, 0, radarscp_stars_net_info );
+	g = compute_res_net( 0, 1, radarscp_stars_net_info );
+	b = compute_res_net( 0, 2, radarscp_stars_net_info );
+	palette.set_pen_color(RADARSCP_STAR_COL,r,g,b);
 
 	/* Oscillating background */
-	for (int i = 0; i < 256; i++)
+	for (i = 0;i < 256;i++)
 	{
-		int const r = compute_res_net(0, 0, radarscp_blue_net_info);
-		int const g = compute_res_net(0, 1, radarscp_blue_net_info);
-		int const b = compute_res_net(i, 2, radarscp_blue_net_info);
+		r = compute_res_net( 0, 0, radarscp_blue_net_info );
+		g = compute_res_net( 0, 1, radarscp_blue_net_info );
+		b = compute_res_net( i, 2, radarscp_blue_net_info );
 
-		palette.set_pen_color(RADARSCP_BCK_COL_OFFSET + i, r, g, b);
+		palette.set_pen_color(RADARSCP_BCK_COL_OFFSET + i,r,g,b);
 	}
 
-	// Grid
-	for (int i = 0; i < 8; i++)
+	/* Grid */
+	for (i = 0;i < 8;i++)
 	{
-		int const r = compute_res_net(BIT(i, 0), 0, radarscp_grid_net_info);
-		int const g = compute_res_net(BIT(i, 1), 1, radarscp_grid_net_info);
-		int const b = compute_res_net(BIT(i, 2), 2, radarscp_grid_net_info);
+		r = compute_res_net( i & 1, 0, radarscp_grid_net_info );
+		g = compute_res_net( (i>>1) & 1, 1, radarscp_grid_net_info );
+		b = compute_res_net( (i>>2) & 1, 2, radarscp_grid_net_info );
 
-		palette.set_pen_color(RADARSCP_GRID_COL_OFFSET + i, r, g, b);
+		palette.set_pen_color(RADARSCP_GRID_COL_OFFSET + i,r,g,b);
 	}
-	palette.palette()->normalize_range(0, RADARSCP_GRID_COL_OFFSET + 7);
+
+	palette.palette()->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
+
+	color_prom += 256;
+	/* color_prom now points to the beginning of the character color codes */
+	m_color_codes = color_prom; /* we'll need it later */
+}
+
+PALETTE_INIT_MEMBER(dkong_state,radarscp1)
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+	int r,g,b;
+
+	for (i = 0;i < 256;i++)
+	{
+		/* red component */
+		r = compute_res_net( color_prom[512], 0, radarscp1_net_info );
+		/* green component */
+		g = compute_res_net( color_prom[256], 1, radarscp1_net_info );
+		/* blue component */
+		b = compute_res_net( color_prom[0], 2, radarscp1_net_info );
+
+		palette.set_pen_color(i,r,g,b);
+		color_prom++;
+	}
+
+	/* Now treat tri-state black background generation */
+
+	for (i=0;i<256;i++)
+		if ( (i & 0x03) == 0x00 )  /*  NOR => CS=1 => Tristate => real black */
+		{
+			r = compute_res_net( 0, 0, radarscp1_net_info );
+			g = compute_res_net( 0, 1, radarscp1_net_info );
+			b = compute_res_net( 0, 2, radarscp1_net_info );
+			palette.set_pen_color(i,r,g,b);
+		}
+
+	/* Star color */
+	r = compute_res_net( 1, 0, radarscp_stars_net_info );
+	g = compute_res_net( 0, 1, radarscp_stars_net_info );
+	b = compute_res_net( 0, 2, radarscp_stars_net_info );
+	palette.set_pen_color(RADARSCP_STAR_COL,r,g,b);
+
+	/* Oscillating background */
+	for (i = 0;i < 256;i++)
+	{
+		r = compute_res_net( 0, 0, radarscp_blue_net_info );
+		g = compute_res_net( 0, 1, radarscp_blue_net_info );
+		b = compute_res_net( i, 2, radarscp_blue_net_info );
+
+		palette.set_pen_color(RADARSCP_BCK_COL_OFFSET + i,r,g,b);
+	}
+
+	/* Grid */
+	for (i = 0;i < 8;i++)
+	{
+		r = compute_res_net( i & 1, 0, radarscp_grid_net_info );
+		g = compute_res_net( (i>>1) & 1, 1, radarscp_grid_net_info );
+		b = compute_res_net( (i>>2) & 1, 2, radarscp_grid_net_info );
+
+		palette.set_pen_color(RADARSCP_GRID_COL_OFFSET + i,r,g,b);
+	}
+	palette.palette()->normalize_range(0, RADARSCP_GRID_COL_OFFSET+7);
 
 	color_prom += 512;
-	// color_prom now points to the beginning of the character color codes
-	m_color_codes = color_prom; // we'll need it later
+	/* color_prom now points to the beginning of the character color codes */
+	m_color_codes = color_prom; /* we'll need it later */
 }
 
 
@@ -416,18 +427,18 @@ void dkong_state::radarscp1_palette(palette_device &palette)
 
 ***************************************************************************/
 
-void dkong_state::dkong3_palette(palette_device &palette)
+PALETTE_INIT_MEMBER(dkong_state,dkong3)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-
 	std::vector<rgb_t> rgb;
+
 	compute_res_net_all(rgb, color_prom, dkong3_decode_info, dkong3_net_info);
 	palette.set_pen_colors(0, rgb);
 	palette.palette()->normalize_range(0, 255);
 
 	color_prom += 1024;
-	// color_prom now points to the beginning of the character color codes
-	m_color_codes = color_prom; // we'll need it later
+	/* color_prom now points to the beginning of the character color codes */
+	m_color_codes = color_prom; /* we'll need it later */
 }
 
 TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
@@ -887,10 +898,10 @@ void dkong_state::check_palette()
 			switch (newset)
 			{
 				case DKONG_RADARSCP_CONVERSION:
-					radarscp_palette(*m_palette);
+					PALETTE_INIT_NAME(radarscp)(*m_palette);
 					break;
 				case DKONG_BOARD:
-					dkong2b_palette(*m_palette);
+					PALETTE_INIT_NAME(dkong2b)(*m_palette);
 					break;
 			}
 		}

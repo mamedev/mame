@@ -33,70 +33,69 @@ void i6300esb_watchdog_device::device_reset()
 void i6300esb_lpc_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x40, 0x43).rw(FUNC(i6300esb_lpc_device::pmbase_r), FUNC(i6300esb_lpc_device::pmbase_w));
-	map(0x44, 0x44).rw(FUNC(i6300esb_lpc_device::acpi_cntl_r), FUNC(i6300esb_lpc_device::acpi_cntl_w));
-	map(0x4e, 0x4f).rw(FUNC(i6300esb_lpc_device::bios_cntl_r), FUNC(i6300esb_lpc_device::bios_cntl_w));
-	map(0x54, 0x54).rw(FUNC(i6300esb_lpc_device::tco_cntl_r), FUNC(i6300esb_lpc_device::tco_cntl_w));
-	map(0x58, 0x5b).rw(FUNC(i6300esb_lpc_device::gpio_base_r), FUNC(i6300esb_lpc_device::gpio_base_w));
-	map(0x5c, 0x5c).rw(FUNC(i6300esb_lpc_device::gpio_cntl_r), FUNC(i6300esb_lpc_device::gpio_cntl_w));
-	map(0x60, 0x63).rw(FUNC(i6300esb_lpc_device::pirq_rout_r), FUNC(i6300esb_lpc_device::pirq_rout_w));
-	map(0x64, 0x64).rw(FUNC(i6300esb_lpc_device::serirq_cntl_r), FUNC(i6300esb_lpc_device::serirq_cntl_w));
-	map(0x68, 0x6b).rw(FUNC(i6300esb_lpc_device::pirq2_rout_r), FUNC(i6300esb_lpc_device::pirq2_rout_w));
-	map(0x88, 0x88).rw(FUNC(i6300esb_lpc_device::d31_err_cfg_r), FUNC(i6300esb_lpc_device::d31_err_cfg_w));
-	map(0x8a, 0x8a).rw(FUNC(i6300esb_lpc_device::d31_err_sts_r), FUNC(i6300esb_lpc_device::d31_err_sts_w));
-	map(0x90, 0x91).rw(FUNC(i6300esb_lpc_device::pci_dma_cfg_r), FUNC(i6300esb_lpc_device::pci_dma_cfg_w));
-	map(0xa0, 0xa1).rw(FUNC(i6300esb_lpc_device::gen_pmcon_1_r), FUNC(i6300esb_lpc_device::gen_pmcon_1_w));
-	map(0xa2, 0xa2).rw(FUNC(i6300esb_lpc_device::gen_pmcon_2_r), FUNC(i6300esb_lpc_device::gen_pmcon_2_w));
-	map(0xa4, 0xa4).rw(FUNC(i6300esb_lpc_device::gen_pmcon_3_r), FUNC(i6300esb_lpc_device::gen_pmcon_3_w));
-	map(0xac, 0xaf).rw(FUNC(i6300esb_lpc_device::rst_cnt2_r), FUNC(i6300esb_lpc_device::rst_cnt2_w));
-	map(0xb2, 0xb2).rw(FUNC(i6300esb_lpc_device::apm_cnt_r), FUNC(i6300esb_lpc_device::apm_cnt_w));
-	map(0xb3, 0xb3).rw(FUNC(i6300esb_lpc_device::apm_sts_r), FUNC(i6300esb_lpc_device::apm_sts_w));
-	map(0xb8, 0xbb).rw(FUNC(i6300esb_lpc_device::gpi_rout_r), FUNC(i6300esb_lpc_device::gpi_rout_w));
-	map(0xc0, 0xc0).rw(FUNC(i6300esb_lpc_device::mon_fwd_en_r), FUNC(i6300esb_lpc_device::mon_fwd_en_w));
-	map(0xc4, 0xcb).rw(FUNC(i6300esb_lpc_device::mon_trp_rng_r), FUNC(i6300esb_lpc_device::mon_trp_rng_w));
-	map(0xcc, 0xcd).rw(FUNC(i6300esb_lpc_device::mon_trp_msk_r), FUNC(i6300esb_lpc_device::mon_trp_msk_w));
-	map(0xd0, 0xd3).rw(FUNC(i6300esb_lpc_device::gen_cntl_r), FUNC(i6300esb_lpc_device::gen_cntl_w));
-	map(0xd4, 0xd4).rw(FUNC(i6300esb_lpc_device::gen_sta_r), FUNC(i6300esb_lpc_device::gen_sta_w));
-	map(0xd5, 0xd5).rw(FUNC(i6300esb_lpc_device::back_cntl_r), FUNC(i6300esb_lpc_device::back_cntl_w));
-	map(0xd8, 0xd8).rw(FUNC(i6300esb_lpc_device::rtc_conf_r), FUNC(i6300esb_lpc_device::rtc_conf_w));
-	map(0xe0, 0xe0).rw(FUNC(i6300esb_lpc_device::lpc_if_com_range_r), FUNC(i6300esb_lpc_device::lpc_if_com_range_w));
-	map(0xe1, 0xe1).rw(FUNC(i6300esb_lpc_device::lpc_if_fdd_lpt_range_r), FUNC(i6300esb_lpc_device::lpc_if_fdd_lpt_range_w));
-	map(0xe2, 0xe2).rw(FUNC(i6300esb_lpc_device::lpc_if_sound_range_r), FUNC(i6300esb_lpc_device::lpc_if_sound_range_w));
-	map(0xe3, 0xe3).rw(FUNC(i6300esb_lpc_device::fwh_dec_en1_r), FUNC(i6300esb_lpc_device::fwh_dec_en1_w));
-	map(0xe4, 0xe5).rw(FUNC(i6300esb_lpc_device::gen1_dec_r), FUNC(i6300esb_lpc_device::gen1_dec_w));
-	map(0xe6, 0xe7).rw(FUNC(i6300esb_lpc_device::lpc_en_r), FUNC(i6300esb_lpc_device::lpc_en_w));
-	map(0xe8, 0xeb).rw(FUNC(i6300esb_lpc_device::fwh_sel1_r), FUNC(i6300esb_lpc_device::fwh_sel1_w));
-	map(0xec, 0xed).rw(FUNC(i6300esb_lpc_device::gen2_dec_r), FUNC(i6300esb_lpc_device::gen2_dec_w));
-	map(0xee, 0xef).rw(FUNC(i6300esb_lpc_device::fwh_sel2_r), FUNC(i6300esb_lpc_device::fwh_sel2_w));
-	map(0xf0, 0xf0).rw(FUNC(i6300esb_lpc_device::fwh_dec_en2_r), FUNC(i6300esb_lpc_device::fwh_dec_en2_w));
-	map(0xf2, 0xf3).rw(FUNC(i6300esb_lpc_device::func_dis_r), FUNC(i6300esb_lpc_device::func_dis_w));
-	map(0xf4, 0xf7).rw(FUNC(i6300esb_lpc_device::etr1_r), FUNC(i6300esb_lpc_device::etr1_w));
-	map(0xf8, 0xfb).r(FUNC(i6300esb_lpc_device::mfid_r));
-	map(0xfc, 0xff).rw(FUNC(i6300esb_lpc_device::unk_fc_r), FUNC(i6300esb_lpc_device::unk_fc_w));
+	map(0x40, 0x43).rw(this, FUNC(i6300esb_lpc_device::pmbase_r), FUNC(i6300esb_lpc_device::pmbase_w));
+	map(0x44, 0x44).rw(this, FUNC(i6300esb_lpc_device::acpi_cntl_r), FUNC(i6300esb_lpc_device::acpi_cntl_w));
+	map(0x4e, 0x4f).rw(this, FUNC(i6300esb_lpc_device::bios_cntl_r), FUNC(i6300esb_lpc_device::bios_cntl_w));
+	map(0x54, 0x54).rw(this, FUNC(i6300esb_lpc_device::tco_cntl_r), FUNC(i6300esb_lpc_device::tco_cntl_w));
+	map(0x58, 0x5b).rw(this, FUNC(i6300esb_lpc_device::gpio_base_r), FUNC(i6300esb_lpc_device::gpio_base_w));
+	map(0x5c, 0x5c).rw(this, FUNC(i6300esb_lpc_device::gpio_cntl_r), FUNC(i6300esb_lpc_device::gpio_cntl_w));
+	map(0x60, 0x63).rw(this, FUNC(i6300esb_lpc_device::pirq_rout_r), FUNC(i6300esb_lpc_device::pirq_rout_w));
+	map(0x64, 0x64).rw(this, FUNC(i6300esb_lpc_device::serirq_cntl_r), FUNC(i6300esb_lpc_device::serirq_cntl_w));
+	map(0x68, 0x6b).rw(this, FUNC(i6300esb_lpc_device::pirq2_rout_r), FUNC(i6300esb_lpc_device::pirq2_rout_w));
+	map(0x88, 0x88).rw(this, FUNC(i6300esb_lpc_device::d31_err_cfg_r), FUNC(i6300esb_lpc_device::d31_err_cfg_w));
+	map(0x8a, 0x8a).rw(this, FUNC(i6300esb_lpc_device::d31_err_sts_r), FUNC(i6300esb_lpc_device::d31_err_sts_w));
+	map(0x90, 0x91).rw(this, FUNC(i6300esb_lpc_device::pci_dma_cfg_r), FUNC(i6300esb_lpc_device::pci_dma_cfg_w));
+	map(0xa0, 0xa1).rw(this, FUNC(i6300esb_lpc_device::gen_pmcon_1_r), FUNC(i6300esb_lpc_device::gen_pmcon_1_w));
+	map(0xa2, 0xa2).rw(this, FUNC(i6300esb_lpc_device::gen_pmcon_2_r), FUNC(i6300esb_lpc_device::gen_pmcon_2_w));
+	map(0xa4, 0xa4).rw(this, FUNC(i6300esb_lpc_device::gen_pmcon_3_r), FUNC(i6300esb_lpc_device::gen_pmcon_3_w));
+	map(0xac, 0xaf).rw(this, FUNC(i6300esb_lpc_device::rst_cnt2_r), FUNC(i6300esb_lpc_device::rst_cnt2_w));
+	map(0xb2, 0xb2).rw(this, FUNC(i6300esb_lpc_device::apm_cnt_r), FUNC(i6300esb_lpc_device::apm_cnt_w));
+	map(0xb3, 0xb3).rw(this, FUNC(i6300esb_lpc_device::apm_sts_r), FUNC(i6300esb_lpc_device::apm_sts_w));
+	map(0xb8, 0xbb).rw(this, FUNC(i6300esb_lpc_device::gpi_rout_r), FUNC(i6300esb_lpc_device::gpi_rout_w));
+	map(0xc0, 0xc0).rw(this, FUNC(i6300esb_lpc_device::mon_fwd_en_r), FUNC(i6300esb_lpc_device::mon_fwd_en_w));
+	map(0xc4, 0xcb).rw(this, FUNC(i6300esb_lpc_device::mon_trp_rng_r), FUNC(i6300esb_lpc_device::mon_trp_rng_w));
+	map(0xcc, 0xcd).rw(this, FUNC(i6300esb_lpc_device::mon_trp_msk_r), FUNC(i6300esb_lpc_device::mon_trp_msk_w));
+	map(0xd0, 0xd3).rw(this, FUNC(i6300esb_lpc_device::gen_cntl_r), FUNC(i6300esb_lpc_device::gen_cntl_w));
+	map(0xd4, 0xd4).rw(this, FUNC(i6300esb_lpc_device::gen_sta_r), FUNC(i6300esb_lpc_device::gen_sta_w));
+	map(0xd5, 0xd5).rw(this, FUNC(i6300esb_lpc_device::back_cntl_r), FUNC(i6300esb_lpc_device::back_cntl_w));
+	map(0xd8, 0xd8).rw(this, FUNC(i6300esb_lpc_device::rtc_conf_r), FUNC(i6300esb_lpc_device::rtc_conf_w));
+	map(0xe0, 0xe0).rw(this, FUNC(i6300esb_lpc_device::lpc_if_com_range_r), FUNC(i6300esb_lpc_device::lpc_if_com_range_w));
+	map(0xe1, 0xe1).rw(this, FUNC(i6300esb_lpc_device::lpc_if_fdd_lpt_range_r), FUNC(i6300esb_lpc_device::lpc_if_fdd_lpt_range_w));
+	map(0xe2, 0xe2).rw(this, FUNC(i6300esb_lpc_device::lpc_if_sound_range_r), FUNC(i6300esb_lpc_device::lpc_if_sound_range_w));
+	map(0xe3, 0xe3).rw(this, FUNC(i6300esb_lpc_device::fwh_dec_en1_r), FUNC(i6300esb_lpc_device::fwh_dec_en1_w));
+	map(0xe4, 0xe5).rw(this, FUNC(i6300esb_lpc_device::gen1_dec_r), FUNC(i6300esb_lpc_device::gen1_dec_w));
+	map(0xe6, 0xe7).rw(this, FUNC(i6300esb_lpc_device::lpc_en_r), FUNC(i6300esb_lpc_device::lpc_en_w));
+	map(0xe8, 0xeb).rw(this, FUNC(i6300esb_lpc_device::fwh_sel1_r), FUNC(i6300esb_lpc_device::fwh_sel1_w));
+	map(0xec, 0xed).rw(this, FUNC(i6300esb_lpc_device::gen2_dec_r), FUNC(i6300esb_lpc_device::gen2_dec_w));
+	map(0xee, 0xef).rw(this, FUNC(i6300esb_lpc_device::fwh_sel2_r), FUNC(i6300esb_lpc_device::fwh_sel2_w));
+	map(0xf0, 0xf0).rw(this, FUNC(i6300esb_lpc_device::fwh_dec_en2_r), FUNC(i6300esb_lpc_device::fwh_dec_en2_w));
+	map(0xf2, 0xf3).rw(this, FUNC(i6300esb_lpc_device::func_dis_r), FUNC(i6300esb_lpc_device::func_dis_w));
+	map(0xf4, 0xf7).rw(this, FUNC(i6300esb_lpc_device::etr1_r), FUNC(i6300esb_lpc_device::etr1_w));
+	map(0xf8, 0xfb).r(this, FUNC(i6300esb_lpc_device::mfid_r));
+	map(0xfc, 0xff).rw(this, FUNC(i6300esb_lpc_device::unk_fc_r), FUNC(i6300esb_lpc_device::unk_fc_w));
 }
 
 void i6300esb_lpc_device::internal_io_map(address_map &map)
 {
 	if(lpc_en & 0x2000) {
-		map(0x004e, 0x004e).rw(FUNC(i6300esb_lpc_device::siu_config_port_r), FUNC(i6300esb_lpc_device::siu_config_port_w));
-		map(0x004f, 0x004f).rw(FUNC(i6300esb_lpc_device::siu_data_port_r), FUNC(i6300esb_lpc_device::siu_data_port_w));
+		map(0x004e, 0x004e).rw(this, FUNC(i6300esb_lpc_device::siu_config_port_r), FUNC(i6300esb_lpc_device::siu_config_port_w));
+		map(0x004f, 0x004f).rw(this, FUNC(i6300esb_lpc_device::siu_data_port_r), FUNC(i6300esb_lpc_device::siu_data_port_w));
 	}
 
-	map(0x0061, 0x0061).rw(FUNC(i6300esb_lpc_device::nmi_sc_r), FUNC(i6300esb_lpc_device::nmi_sc_w));
+	map(0x0061, 0x0061).rw(this, FUNC(i6300esb_lpc_device::nmi_sc_r), FUNC(i6300esb_lpc_device::nmi_sc_w));
 
-	map(0x0080, 0x0080).w(FUNC(i6300esb_lpc_device::nop_w)); // POST/non-existing, used for delays by the bios/os
-	map(0x00ed, 0x00ed).w(FUNC(i6300esb_lpc_device::nop_w)); // Non-existing, used for delays by the bios/os
+	map(0x0080, 0x0080).w(this, FUNC(i6300esb_lpc_device::nop_w)); // POST/non-existing, used for delays by the bios/os
+	map(0x00ed, 0x00ed).w(this, FUNC(i6300esb_lpc_device::nop_w)); // Non-existing, used for delays by the bios/os
 }
 
 
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, I6300ESB_LPC, tag, owner, clock)
-	, acpi(*this, "acpi")
-	, rtc (*this, "rtc")
-	, pit (*this, "pit")
-	, m_region(*this, DEVICE_SELF)
+	: pci_device(mconfig, I6300ESB_LPC, tag, owner, clock),
+		acpi(*this, "acpi"),
+		rtc (*this, "rtc"),
+		pit (*this, "pit"),
+		m_region(*this, DEVICE_SELF)
 {
-	set_ids(0x808625a1, 0x02, 0x060100, 0x00000000);
 }
 
 void i6300esb_lpc_device::device_start()

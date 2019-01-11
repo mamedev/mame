@@ -375,30 +375,30 @@ ROM_END
 
 void sb16_lle_device::sb16_io(address_map &map)
 {
-	map(0x0000, 0x0000).mirror(0xff00).rw(FUNC(sb16_lle_device::dsp_data_r), FUNC(sb16_lle_device::dsp_data_w));
+	map(0x0000, 0x0000).mirror(0xff00).rw(this, FUNC(sb16_lle_device::dsp_data_r), FUNC(sb16_lle_device::dsp_data_w));
 //  AM_RANGE(0x0001, 0x0001) // MIDI related?
 //  AM_RANGE(0x0002, 0x0002)
-	map(0x0004, 0x0004).mirror(0xff00).rw(FUNC(sb16_lle_device::mode_r), FUNC(sb16_lle_device::mode_w));
-	map(0x0005, 0x0005).mirror(0xff00).rw(FUNC(sb16_lle_device::dac_ctrl_r), FUNC(sb16_lle_device::dac_ctrl_w));
-	map(0x0006, 0x0006).mirror(0xff00).r(FUNC(sb16_lle_device::dma_stat_r));
+	map(0x0004, 0x0004).mirror(0xff00).rw(this, FUNC(sb16_lle_device::mode_r), FUNC(sb16_lle_device::mode_w));
+	map(0x0005, 0x0005).mirror(0xff00).rw(this, FUNC(sb16_lle_device::dac_ctrl_r), FUNC(sb16_lle_device::dac_ctrl_w));
+	map(0x0006, 0x0006).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma_stat_r));
 //  AM_RANGE(0x0007, 0x0007) // unknown
-	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(sb16_lle_device::ctrl8_r), FUNC(sb16_lle_device::ctrl8_w));
-	map(0x0009, 0x0009).mirror(0xff00).w(FUNC(sb16_lle_device::rate_w));
-	map(0x000A, 0x000A).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_cnt_lo_r));
-	map(0x000B, 0x000B).mirror(0xff00).w(FUNC(sb16_lle_device::dma8_len_lo_w));
-	map(0x000C, 0x000C).mirror(0xff00).w(FUNC(sb16_lle_device::dma8_len_hi_w));
-	map(0x000D, 0x000D).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_cnt_hi_r));
-	map(0x000E, 0x000E).mirror(0xff00).rw(FUNC(sb16_lle_device::dac_fifo_ctrl_r), FUNC(sb16_lle_device::dac_fifo_ctrl_w));
-	map(0x000F, 0x000F).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_ready_r));
-	map(0x0010, 0x0010).mirror(0xff00).rw(FUNC(sb16_lle_device::ctrl16_r), FUNC(sb16_lle_device::ctrl16_w));
-	map(0x0013, 0x0013).mirror(0xff00).w(FUNC(sb16_lle_device::dma16_len_lo_w));
-	map(0x0014, 0x0014).mirror(0xff00).w(FUNC(sb16_lle_device::dma16_len_hi_w));
-	map(0x0016, 0x0016).mirror(0xff00).rw(FUNC(sb16_lle_device::adc_fifo_ctrl_r), FUNC(sb16_lle_device::adc_fifo_ctrl_w));
-	map(0x0017, 0x0017).mirror(0xff00).r(FUNC(sb16_lle_device::adc_data_ready_r));
-	map(0x0019, 0x0019).mirror(0xff00).w(FUNC(sb16_lle_device::dac_data_w));
-	map(0x001B, 0x001B).mirror(0xff00).r(FUNC(sb16_lle_device::adc_data_r));
-	map(0x001D, 0x001D).mirror(0xff00).w(FUNC(sb16_lle_device::dma8_w));
-	map(0x001F, 0x001F).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_r));
+	map(0x0008, 0x0008).mirror(0xff00).rw(this, FUNC(sb16_lle_device::ctrl8_r), FUNC(sb16_lle_device::ctrl8_w));
+	map(0x0009, 0x0009).mirror(0xff00).w(this, FUNC(sb16_lle_device::rate_w));
+	map(0x000A, 0x000A).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma8_cnt_lo_r));
+	map(0x000B, 0x000B).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma8_len_lo_w));
+	map(0x000C, 0x000C).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma8_len_hi_w));
+	map(0x000D, 0x000D).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma8_cnt_hi_r));
+	map(0x000E, 0x000E).mirror(0xff00).rw(this, FUNC(sb16_lle_device::dac_fifo_ctrl_r), FUNC(sb16_lle_device::dac_fifo_ctrl_w));
+	map(0x000F, 0x000F).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma8_ready_r));
+	map(0x0010, 0x0010).mirror(0xff00).rw(this, FUNC(sb16_lle_device::ctrl16_r), FUNC(sb16_lle_device::ctrl16_w));
+	map(0x0013, 0x0013).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma16_len_lo_w));
+	map(0x0014, 0x0014).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma16_len_hi_w));
+	map(0x0016, 0x0016).mirror(0xff00).rw(this, FUNC(sb16_lle_device::adc_fifo_ctrl_r), FUNC(sb16_lle_device::adc_fifo_ctrl_w));
+	map(0x0017, 0x0017).mirror(0xff00).r(this, FUNC(sb16_lle_device::adc_data_ready_r));
+	map(0x0019, 0x0019).mirror(0xff00).w(this, FUNC(sb16_lle_device::dac_data_w));
+	map(0x001B, 0x001B).mirror(0xff00).r(this, FUNC(sb16_lle_device::adc_data_r));
+	map(0x001D, 0x001D).mirror(0xff00).w(this, FUNC(sb16_lle_device::dma8_w));
+	map(0x001F, 0x001F).mirror(0xff00).r(this, FUNC(sb16_lle_device::dma8_r));
 //  AM_RANGE(0x0080, 0x0080) // ASP comms
 //  AM_RANGE(0x0081, 0x0081)
 //  AM_RANGE(0x0082, 0x0082)
@@ -409,28 +409,27 @@ const tiny_rom_entry *sb16_lle_device::device_rom_region() const
 	return ROM_NAME( sb16 );
 }
 
-void sb16_lle_device::device_add_mconfig(machine_config &config)
-{
-	I80C52(config, m_cpu, XTAL(24'000'000));
-	m_cpu->set_addrmap(AS_IO, &sb16_lle_device::sb16_io);
-	m_cpu->port_in_cb<1>().set(FUNC(sb16_lle_device::p1_r));
-	m_cpu->port_out_cb<1>().set(FUNC(sb16_lle_device::p1_w));
-	m_cpu->port_in_cb<2>().set(FUNC(sb16_lle_device::p2_r));
-	m_cpu->port_out_cb<2>().set(FUNC(sb16_lle_device::p2_w));
+MACHINE_CONFIG_START(sb16_lle_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("sb16_cpu", I80C52, XTAL(24'000'000))
+	MCFG_DEVICE_IO_MAP(sb16_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, sb16_lle_device, p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, sb16_lle_device, p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, sb16_lle_device, p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, sb16_lle_device, p2_w))
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	ymf262_device &ymf262(YMF262(config, "ymf262", XTAL(14'318'181)));
-	ymf262.add_route(0, "lspeaker", 1.00);
-	ymf262.add_route(1, "rspeaker", 1.00);
-	ymf262.add_route(2, "lspeaker", 1.00);
-	ymf262.add_route(3, "rspeaker", 1.00);
+	MCFG_DEVICE_ADD("ymf262", YMF262, XTAL(14'318'181))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 
-	PC_JOY(config, m_joy);
-}
+	MCFG_PC_JOY_ADD("pc_joy")
+MACHINE_CONFIG_END
 
 READ8_MEMBER( sb16_lle_device::host_data_r )
 {

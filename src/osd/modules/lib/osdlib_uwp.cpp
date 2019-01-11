@@ -175,13 +175,3 @@ char *osd_get_clipboard_text(void)
 
 	return result;
 }
-
-//============================================================
-//  osd_getpid
-//============================================================
-
-int osd_getpid(void)
-{
-	return GetCurrentProcessId();
-}
-

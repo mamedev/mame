@@ -59,7 +59,7 @@ void tiki100_8088_device::i8088_mem(address_map &map)
 
 void tiki100_8088_device::i8088_io(address_map &map)
 {
-	map(0x7f, 0x7f).rw(FUNC(tiki100_8088_device::read), FUNC(tiki100_8088_device::write));
+	map(0x7f, 0x7f).rw(this, FUNC(tiki100_8088_device::read), FUNC(tiki100_8088_device::write));
 }
 
 

@@ -18,13 +18,13 @@
 
 WRITE8_MEMBER(canyon_state::canyon_motor_w)
 {
-	m_discrete->write(NODE_RELATIVE(CANYON_MOTOR1_DATA, (offset & 0x01)), data & 0x0f);
+	m_discrete->write(space, NODE_RELATIVE(CANYON_MOTOR1_DATA, (offset & 0x01)), data & 0x0f);
 }
 
 
 WRITE8_MEMBER(canyon_state::canyon_explode_w)
 {
-	m_discrete->write(CANYON_EXPLODE_DATA, data >> 4);
+	m_discrete->write(space, CANYON_EXPLODE_DATA, data >> 4);
 }
 
 

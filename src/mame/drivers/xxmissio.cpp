@@ -103,11 +103,11 @@ void xxmissio_state::map1(address_map &map)
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("STATUS");
-	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_m_w));
-	map(0xa003, 0xa003).w(FUNC(xxmissio_state::flipscreen_w));
+	map(0xa002, 0xa002).w(this, FUNC(xxmissio_state::status_m_w));
+	map(0xa003, 0xa003).w(this, FUNC(xxmissio_state::flipscreen_w));
 
 	map(0xc000, 0xc7ff).ram().share("fgram");
-	map(0xc800, 0xcfff).rw(FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w)).share("bgram");
+	map(0xc800, 0xcfff).rw(this, FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w)).share("bgram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
 
 	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -124,16 +124,16 @@ void xxmissio_state::map2(address_map &map)
 
 	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8006, 0x8006).w(FUNC(xxmissio_state::bank_sel_w));
+	map(0x8006, 0x8006).w(this, FUNC(xxmissio_state::bank_sel_w));
 
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("STATUS");
-	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_s_w));
-	map(0xa003, 0xa003).w(FUNC(xxmissio_state::flipscreen_w));
+	map(0xa002, 0xa002).w(this, FUNC(xxmissio_state::status_s_w));
+	map(0xa003, 0xa003).w(this, FUNC(xxmissio_state::flipscreen_w));
 
 	map(0xc000, 0xc7ff).share("fgram").ram();
-	map(0xc800, 0xcfff).share("bgram").rw(FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w));
+	map(0xc800, 0xcfff).share("bgram").rw(this, FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w));
 	map(0xd000, 0xd7ff).share("spriteram").ram();
 
 	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -284,30 +284,31 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xxmissio_state, interrupt_m))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xxmissio);
-	PALETTE(config, m_palette).set_format(1, &xxmissio_state::BBGGRRII, 768);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xxmissio)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT_CLASS(1, xxmissio_state, BBGGRRII)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ym1(YM2203(config, "ym1", 12000000/8));
-	ym1.port_a_read_callback().set_ioport("DSW1");
-	ym1.port_b_read_callback().set_ioport("DSW2");
-	ym1.add_route(0, "mono", 0.15);
-	ym1.add_route(1, "mono", 0.15);
-	ym1.add_route(2, "mono", 0.15);
-	ym1.add_route(3, "mono", 0.40);
+	MCFG_DEVICE_ADD("ym1", YM2203, 12000000/8)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	ym2203_device &ym2(YM2203(config, "ym2", 12000000/8));
-	ym2.port_a_write_callback().set(FUNC(xxmissio_state::scroll_x_w));
-	ym2.port_b_write_callback().set(FUNC(xxmissio_state::scroll_y_w));
-	ym2.add_route(0, "mono", 0.15);
-	ym2.add_route(1, "mono", 0.15);
-	ym2.add_route(2, "mono", 0.15);
-	ym2.add_route(3, "mono", 0.40);
+	MCFG_DEVICE_ADD("ym2", YM2203, 12000000/8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, xxmissio_state, scroll_x_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, xxmissio_state, scroll_y_w))
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 MACHINE_CONFIG_END
 
 /****************************************************************************/

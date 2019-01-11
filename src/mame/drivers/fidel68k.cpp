@@ -202,23 +202,6 @@ public:
 		m_ram(*this, "ram")
 	{ }
 
-	void fex68k(machine_config &config);
-	void fex68km2(machine_config &config);
-	void fex68km3(machine_config &config);
-
-	void fdes2265(machine_config &config);
-	void fdes2325(machine_config &config);
-	void init_fdes2265();
-
-	void eag_base(machine_config &config);
-	void eag(machine_config &config);
-	void eagv7(machine_config &config);
-	void eagv9(machine_config &config);
-	void eagv10(machine_config &config);
-	void eagv11(machine_config &config);
-	void init_eag();
-
-private:
 	optional_device<ram_device> m_ram;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
@@ -229,15 +212,22 @@ private:
 	void fex68k_map(address_map &map);
 	void fex68km2_map(address_map &map);
 	void fex68km3_map(address_map &map);
+	void fex68k(machine_config &config);
+	void fex68km2(machine_config &config);
+	void fex68km3(machine_config &config);
 
 	// Designer Master
 	DECLARE_WRITE8_MEMBER(fdes68k_control_w);
 	DECLARE_READ8_MEMBER(fdes68k_input_r);
 	DECLARE_WRITE8_MEMBER(fdes68k_lcd_w);
+	void init_fdes2265();
 	void fdes2265_map(address_map &map);
 	void fdes2325_map(address_map &map);
+	void fdes2265(machine_config &config);
+	void fdes2325(machine_config &config);
 
 	// EAG(6114/6117)
+	void init_eag();
 	void eag_prepare_display();
 	DECLARE_READ8_MEMBER(eag_input1_r);
 	DECLARE_WRITE8_MEMBER(eag_leds_w);
@@ -247,6 +237,11 @@ private:
 	void eag_map(address_map &map);
 	void eagv7_map(address_map &map);
 	void eagv11_map(address_map &map);
+	void eag(machine_config &config);
+	void eagv7(machine_config &config);
+	void eagv9(machine_config &config);
+	void eagv10(machine_config &config);
+	void eagv11(machine_config &config);
 };
 
 
@@ -402,11 +397,11 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 void fidel68k_state::fex68k_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(fidel68k_state::eag_leds_w)).umask16(0x00ff);
-	map(0x000000, 0x00000f).mirror(0x00fff0).w(FUNC(fidel68k_state::eag_7seg_w)).umask16(0xff00);
+	map(0x000000, 0x00000f).mirror(0x00fff0).w(this, FUNC(fidel68k_state::eag_leds_w)).umask16(0x00ff);
+	map(0x000000, 0x00000f).mirror(0x00fff0).w(this, FUNC(fidel68k_state::eag_7seg_w)).umask16(0xff00);
 	map(0x044000, 0x047fff).ram();
-	map(0x100000, 0x10000f).mirror(0x03fff0).r(FUNC(fidel68k_state::eag_input1_r)).umask16(0x00ff);
-	map(0x140000, 0x14000f).mirror(0x03fff0).w(FUNC(fidel68k_state::fex68k_mux_w)).umask16(0x00ff);
+	map(0x100000, 0x10000f).mirror(0x03fff0).r(this, FUNC(fidel68k_state::eag_input1_r)).umask16(0x00ff);
+	map(0x140000, 0x14000f).mirror(0x03fff0).w(this, FUNC(fidel68k_state::fex68k_mux_w)).umask16(0x00ff);
 }
 
 void fidel68k_state::fex68km2_map(address_map &map)
@@ -428,20 +423,20 @@ void fidel68k_state::fdes2265_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom();
-	map(0x000000, 0x00000f).w(FUNC(fidel68k_state::fdes68k_lcd_w)).umask16(0x00ff);
+	map(0x000000, 0x00000f).w(this, FUNC(fidel68k_state::fdes68k_lcd_w)).umask16(0x00ff);
 	map(0x044000, 0x047fff).ram();
 	map(0x100000, 0x10ffff).ram();
-	map(0x140000, 0x14000f).r(FUNC(fidel68k_state::fdes68k_input_r)).umask16(0xff00);
-	map(0x140000, 0x14000f).w(FUNC(fidel68k_state::fdes68k_control_w)).umask16(0x00ff);
+	map(0x140000, 0x14000f).r(this, FUNC(fidel68k_state::fdes68k_input_r)).umask16(0xff00);
+	map(0x140000, 0x14000f).w(this, FUNC(fidel68k_state::fdes68k_control_w)).umask16(0x00ff);
 }
 
 void fidel68k_state::fdes2325_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).rom();
-	map(0x100000, 0x10000f).w(FUNC(fidel68k_state::fdes68k_lcd_w)).umask32(0x00ff00ff);
-	map(0x140000, 0x14000f).w(FUNC(fidel68k_state::fdes68k_control_w)).umask32(0x00ff00ff);
-	map(0x180000, 0x18000f).r(FUNC(fidel68k_state::fdes68k_input_r)).umask32(0xff00ff00);
+	map(0x100000, 0x10000f).w(this, FUNC(fidel68k_state::fdes68k_lcd_w)).umask32(0x00ff00ff);
+	map(0x140000, 0x14000f).w(this, FUNC(fidel68k_state::fdes68k_control_w)).umask32(0x00ff00ff);
+	map(0x180000, 0x18000f).r(this, FUNC(fidel68k_state::fdes68k_input_r)).umask32(0xff00ff00);
 	map(0x300000, 0x37ffff).ram();
 	map(0x500000, 0x507fff).ram();
 }
@@ -459,13 +454,13 @@ void fidel68k_state::eag_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x104000, 0x107fff).ram();
-	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(fidel68k_state::eag_7seg_w)).umask16(0xff00).nopr();
-	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask16(0x00ff);
-	map(0x400000, 0x407fff).r(FUNC(fidel68k_state::cartridge_r)).umask16(0xff00);
-	map(0x400001, 0x400001).w(FUNC(fidel68k_state::eag_mux_w));
+	map(0x300000, 0x30000f).mirror(0x000010).w(this, FUNC(fidel68k_state::eag_7seg_w)).umask16(0xff00).nopr();
+	map(0x300000, 0x30000f).mirror(0x000010).rw(this, FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask16(0x00ff);
+	map(0x400000, 0x407fff).r(this, FUNC(fidel68k_state::cartridge_r)).umask16(0xff00);
+	map(0x400001, 0x400001).w(this, FUNC(fidel68k_state::eag_mux_w));
 	map(0x400002, 0x400007).nopw(); // ?
 	map(0x604000, 0x607fff).ram().share("nvram");
-	map(0x700003, 0x700003).r(FUNC(fidel68k_state::eag_input2_r));
+	map(0x700003, 0x700003).r(this, FUNC(fidel68k_state::eag_input2_r));
 }
 
 void fidel68k_state::eagv7_map(address_map &map)
@@ -473,13 +468,13 @@ void fidel68k_state::eagv7_map(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x104000, 0x107fff).ram();
 	map(0x200000, 0x2fffff).ram();
-	map(0x300000, 0x30000f).mirror(0x000010).w(FUNC(fidel68k_state::eag_7seg_w)).umask32(0xff00ff00).nopr();
-	map(0x300000, 0x30000f).mirror(0x000010).rw(FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask32(0x00ff00ff);
-	map(0x400000, 0x407fff).r(FUNC(fidel68k_state::cartridge_r)).umask32(0xff00ff00);
-	map(0x400001, 0x400001).w(FUNC(fidel68k_state::eag_mux_w));
+	map(0x300000, 0x30000f).mirror(0x000010).w(this, FUNC(fidel68k_state::eag_7seg_w)).umask32(0xff00ff00).nopr();
+	map(0x300000, 0x30000f).mirror(0x000010).rw(this, FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask32(0x00ff00ff);
+	map(0x400000, 0x407fff).r(this, FUNC(fidel68k_state::cartridge_r)).umask32(0xff00ff00);
+	map(0x400001, 0x400001).w(this, FUNC(fidel68k_state::eag_mux_w));
 	map(0x400004, 0x400007).nopw(); // ?
 	map(0x604000, 0x607fff).ram().share("nvram");
-	map(0x700003, 0x700003).r(FUNC(fidel68k_state::eag_input2_r));
+	map(0x700003, 0x700003).r(this, FUNC(fidel68k_state::eag_input2_r));
 	map(0x800000, 0x807fff).ram();
 }
 
@@ -487,13 +482,13 @@ void fidel68k_state::eagv11_map(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom();
 	map(0x00200000, 0x003fffff).ram();
-	map(0x00b00000, 0x00b0000f).mirror(0x00000010).w(FUNC(fidel68k_state::eag_7seg_w)).umask32(0xff00ff00).nopr();
-	map(0x00b00000, 0x00b0000f).mirror(0x00000010).rw(FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask32(0x00ff00ff);
-	map(0x00c00000, 0x00c07fff).r(FUNC(fidel68k_state::cartridge_r)).umask32(0xff00ff00);
-	map(0x00c00001, 0x00c00001).w(FUNC(fidel68k_state::eag_mux_w));
+	map(0x00b00000, 0x00b0000f).mirror(0x00000010).w(this, FUNC(fidel68k_state::eag_7seg_w)).umask32(0xff00ff00).nopr();
+	map(0x00b00000, 0x00b0000f).mirror(0x00000010).rw(this, FUNC(fidel68k_state::eag_input1_r), FUNC(fidel68k_state::eag_leds_w)).umask32(0x00ff00ff);
+	map(0x00c00000, 0x00c07fff).r(this, FUNC(fidel68k_state::cartridge_r)).umask32(0xff00ff00);
+	map(0x00c00001, 0x00c00001).w(this, FUNC(fidel68k_state::eag_mux_w));
 	map(0x00c00004, 0x00c00007).nopw(); // ?
 	map(0x00e04000, 0x00e07fff).ram().share("nvram");
-	map(0x00f00003, 0x00f00003).r(FUNC(fidel68k_state::eag_input2_r));
+	map(0x00f00003, 0x00f00003).r(this, FUNC(fidel68k_state::eag_input2_r));
 	map(0x01000000, 0x0101ffff).ram();
 }
 
@@ -572,7 +567,7 @@ MACHINE_CONFIG_START(fidel68k_state::fex68k)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(618))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_fidel_ex_68k);
+	MCFG_DEFAULT_LAYOUT(layout_fidel_ex_68k)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -608,7 +603,7 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(597))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_fidel_desdis_68kr);
+	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kr)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -624,10 +619,10 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2325)
 	MCFG_DEVICE_REPLACE("maincpu", M68EC020, 20_MHz_XTAL) // MC68EC020RP25
 	MCFG_DEVICE_PROGRAM_MAP(fdes2325_map)
 
-	config.set_default_layout(layout_fidel_desdis_68kg);
+	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis_68kg)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(fidel68k_state::eag_base)
+MACHINE_CONFIG_START(fidel68k_state::eag)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
@@ -636,10 +631,14 @@ MACHINE_CONFIG_START(fidel68k_state::eag_base)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(4.9152_MHz_XTAL/0x2000) - attotime::from_nsec(8250)) // active for 8.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel68k_state, irq_off, attotime::from_hz(4.9152_MHz_XTAL/0x2000))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_fidel_eag_68k);
+	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
+
+	MCFG_RAM_ADD("ram")
+	MCFG_RAM_DEFAULT_SIZE("1M")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 512K, 1M")
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -654,17 +653,14 @@ MACHINE_CONFIG_START(fidel68k_state::eag_base)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(fidel68k_state::eag)
-	eag_base(config);
-	RAM(config, "ram").set_default_size("1M").set_extra_options("128K, 512K, 1M");
-MACHINE_CONFIG_END
-
 MACHINE_CONFIG_START(fidel68k_state::eagv7)
-	eag_base(config);
+	eag(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REPLACE("maincpu", M68020, 20_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(eagv7_map)
+
+	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel68k_state::eagv9)

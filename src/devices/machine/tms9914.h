@@ -35,6 +35,44 @@
 
 #pragma once
 
+// Set read and write callbacks to access DIO bus on IEEE-488
+#define MCFG_TMS9914_DIO_READWRITE_CB(_read , _write)                   \
+	downcast<tms9914_device &>(*device).set_dio_read_cb(DEVCB_##_read); \
+	downcast<tms9914_device &>(*device).set_dio_write_cb(DEVCB_##_write);
+
+// Set write callbacks to access uniline signals on IEEE-488
+#define MCFG_TMS9914_EOI_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_EOI , DEVCB_##_write);
+
+#define MCFG_TMS9914_DAV_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_DAV , DEVCB_##_write);
+
+#define MCFG_TMS9914_NRFD_WRITE_CB(_write)                              \
+	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_NRFD , DEVCB_##_write);
+
+#define MCFG_TMS9914_NDAC_WRITE_CB(_write)                              \
+	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_NDAC , DEVCB_##_write);
+
+#define MCFG_TMS9914_IFC_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_IFC , DEVCB_##_write);
+
+#define MCFG_TMS9914_SRQ_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_SRQ , DEVCB_##_write);
+
+#define MCFG_TMS9914_ATN_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_ATN , DEVCB_##_write);
+
+#define MCFG_TMS9914_REN_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_REN , DEVCB_##_write);
+
+// Set write callback for INT signal
+#define MCFG_TMS9914_INT_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_int_write_cb(DEVCB_##_write);
+
+// Set write callback for ACCRQ signal
+#define MCFG_TMS9914_ACCRQ_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_accrq_write_cb(DEVCB_##_write);
+
 class tms9914_device : public device_t
 {
 public:
@@ -54,25 +92,20 @@ public:
 		IEEE_488_SIGNAL_COUNT
 	};
 
-	// Set read and write callbacks to access DIO bus on IEEE-488
-	auto dio_read_cb() { return m_dio_read_func.bind(); }
-	auto dio_write_cb() { return m_dio_write_func.bind(); }
+	template <class Object> devcb_base& set_dio_read_cb(Object &&cb)
+	{ return m_dio_read_func.set_callback(std::forward<Object>(cb)); }
 
-	// Set write callbacks to access uniline signals on IEEE-488
-	auto eoi_write_cb() { return m_signal_wr_fns[IEEE_488_EOI].bind(); }
-	auto dav_write_cb() { return m_signal_wr_fns[IEEE_488_DAV].bind(); }
-	auto nrfd_write_cb() { return m_signal_wr_fns[IEEE_488_NRFD].bind(); }
-	auto ndac_write_cb() { return m_signal_wr_fns[IEEE_488_NDAC].bind(); }
-	auto ifc_write_cb() { return m_signal_wr_fns[IEEE_488_IFC].bind(); }
-	auto srq_write_cb() { return m_signal_wr_fns[IEEE_488_SRQ].bind(); }
-	auto atn_write_cb() { return m_signal_wr_fns[IEEE_488_ATN].bind(); }
-	auto ren_write_cb() { return m_signal_wr_fns[IEEE_488_REN].bind(); }
+	template <class Object> devcb_base& set_dio_write_cb(Object &&cb)
+	{ return m_dio_write_func.set_callback(std::forward<Object>(cb)); }
 
-	// Set write callback for INT signal
-	auto int_write_cb() { return m_int_write_func.bind(); }
+	template <class Object> devcb_base& set_488_signal_write_cb(ieee_488_signal_t signal , Object &&cb)
+	{ return m_signal_wr_fns[ signal ].set_callback(std::forward<Object>(cb)); }
 
-	// Set write callback for ACCRQ signal
-	auto accrq_write_cb() { return m_accrq_write_func.bind(); }
+	template <class Object> devcb_base& set_int_write_cb(Object &&cb)
+	{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> devcb_base& set_accrq_write_cb(Object &&cb)
+	{ return m_accrq_write_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
@@ -270,7 +303,6 @@ private:
 	void update_ifc();
 	void update_ren();
 	void set_accrq(bool state);
-	bool m_next_eoi;
 };
 
 // device type definition

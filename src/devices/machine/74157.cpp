@@ -92,7 +92,12 @@ void ls157_device::device_start()
 //  a_w -- write nibble to A1-A4
 //-------------------------------------------------
 
-void ls157_device::write_a(u8 data)
+WRITE8_MEMBER(ls157_device::a_w)
+{
+	a_w(data);
+}
+
+void ls157_device::a_w(u8 data)
 {
 	m_a = data & m_data_mask;
 	update_output();
@@ -103,7 +108,12 @@ void ls157_device::write_a(u8 data)
 //  b_w -- write nibble to B1-B4
 //-------------------------------------------------
 
-void ls157_device::write_b(u8 data)
+WRITE8_MEMBER(ls157_device::b_w)
+{
+	b_w(data);
+}
+
+void ls157_device::b_w(u8 data)
 {
 	m_b = data & m_data_mask;
 	update_output();
@@ -115,7 +125,12 @@ void ls157_device::write_b(u8 data)
 //  low nibble to B1-B4
 //-------------------------------------------------
 
-void ls157_device::write_ab(u8 data)
+WRITE8_MEMBER(ls157_device::ab_w)
+{
+	ab_w(data);
+}
+
+void ls157_device::ab_w(u8 data)
 {
 	assert(m_data_mask == 0x0f);
 	m_a = data >> 4;
@@ -129,7 +144,12 @@ void ls157_device::write_ab(u8 data)
 //  low nibble to A1-A4
 //-------------------------------------------------
 
-void ls157_device::write_ba(u8 data)
+WRITE8_MEMBER(ls157_device::ba_w)
+{
+	ba_w(data);
+}
+
+void ls157_device::ba_w(u8 data)
 {
 	assert(m_data_mask == 0x0f);
 	m_b = data >> 4;
@@ -143,7 +163,12 @@ void ls157_device::write_ba(u8 data)
 //  A1-A4 and write odd-numbered bits to B1-B4
 //-------------------------------------------------
 
-void ls157_device::write_interleave(u8 data)
+WRITE8_MEMBER(ls157_device::interleave_w)
+{
+	interleave_w(data);
+}
+
+void ls157_device::interleave_w(u8 data)
 {
 	assert(m_data_mask == 0x0f);
 	m_b = bitswap<4>(data, 7, 5, 3, 1);

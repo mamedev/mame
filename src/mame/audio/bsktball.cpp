@@ -14,13 +14,13 @@ Sound handlers
 ***************************************************************************/
 WRITE8_MEMBER(bsktball_state::bsktball_bounce_w)
 {
-	m_discrete->write(BSKTBALL_CROWD_DATA, data & 0x0f);  // Crowd
-	m_discrete->write(BSKTBALL_BOUNCE_EN, data & 0x10);   // Bounce
+	m_discrete->write(space, BSKTBALL_CROWD_DATA, data & 0x0f);  // Crowd
+	m_discrete->write(space, BSKTBALL_BOUNCE_EN, data & 0x10);   // Bounce
 }
 
 WRITE8_MEMBER(bsktball_state::bsktball_note_w)
 {
-	m_discrete->write(BSKTBALL_NOTE_DATA, data);  // Note
+	m_discrete->write(space, BSKTBALL_NOTE_DATA, data);  // Note
 }
 
 

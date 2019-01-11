@@ -184,7 +184,7 @@ WRITE32_MEMBER(bfm_swp_state::bfm_swp_mem_w)
 
 void bfm_swp_state::bfm_swp_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(FUNC(bfm_swp_state::bfm_swp_mem_r), FUNC(bfm_swp_state::bfm_swp_mem_w));
+	map(0x00000000, 0xffffffff).rw(this, FUNC(bfm_swp_state::bfm_swp_mem_r), FUNC(bfm_swp_state::bfm_swp_mem_w));
 	map(0x00000000, 0x000fffff).rom();
 }
 
@@ -204,8 +204,8 @@ void bfm_swp_state::machine_start()
 MACHINE_CONFIG_START(bfm_swp_state::bfm_swp)
 
 	/* basic machine hardware */
-	M68340(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_swp_state::bfm_swp_map);
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(bfm_swp_map)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

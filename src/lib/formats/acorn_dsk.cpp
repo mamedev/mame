@@ -111,26 +111,6 @@ const acorn_ssd_format::format acorn_ssd_format::formats[] =
 		floppy_image::FF_525, floppy_image::DSQD, floppy_image::FM,
 		4000, 10, 80, 2, 256, {}, 0, {}, 40, 10, 10
 	},
-	{ // 100k 40 track single sided single density
-		floppy_image::FF_35, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 40, 1, 256,{}, 0,{}, 40, 10, 10
-	},
-	{ // 200k 80 track single sided single density
-		floppy_image::FF_35, floppy_image::SSDD, floppy_image::FM,
-		4000, 10, 80, 1, 256,{}, 0,{}, 40, 10, 10
-	},
-	{ // 200k 40 track double sided single density
-		floppy_image::FF_35, floppy_image::DSSD, floppy_image::FM,
-		4000, 10, 40, 2, 256,{}, 0,{}, 40, 10, 10
-	},
-	{ // 400k 80 track double sided single density
-		floppy_image::FF_35, floppy_image::DSDD, floppy_image::FM,
-		4000, 10, 80, 2, 256,{}, 0,{}, 40, 10, 10
-	},
-	{ // 100k 40 track single sided single density
-		floppy_image::FF_3, floppy_image::SSSD, floppy_image::FM,
-		4000, 10, 40, 1, 256,{}, 0,{}, 40, 10, 10
-	},
 	{}
 };
 
@@ -220,14 +200,6 @@ const acorn_dsd_format::format acorn_dsd_format::formats[] =
 	{ // 200k 40 track double sided single density (interleaved)
 		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
 		4000, 10, 40, 2, 256, {}, -1, { 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
-	},
-	{ // 400k 80 track double sided single density (interleaved)
-		floppy_image::FF_35, floppy_image::DSDD, floppy_image::FM,
-		4000, 10, 80, 2, 256,{}, -1,{ 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
-	},
-	{ // 200k 40 track double sided single density (interleaved)
-		floppy_image::FF_35, floppy_image::DSSD, floppy_image::FM,
-		4000, 10, 40, 2, 256,{}, -1,{ 0,1,2,3,4,5,6,7,8,9 }, 40, 10, 10
 	},
 	{}
 };

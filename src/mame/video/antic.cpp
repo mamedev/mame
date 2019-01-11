@@ -413,8 +413,8 @@ void antic_device::device_start()
 	save_item(NAME(m_cclock));
 	save_item(NAME(m_pmbits));
 
-	save_pointer(NAME(m_cclk_expand), 21 * 256);
-	save_pointer(NAME(m_used_colors), 21 * 256);
+	save_pointer(NAME(m_cclk_expand.get()), 21 * 256);
+	save_pointer(NAME(m_used_colors.get()), 21 * 256);
 }
 
 

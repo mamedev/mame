@@ -8,7 +8,6 @@
 #include "emu.h"
 #include "machine/serflash.h"
 
-#include <algorithm>
 
 ALLOW_SAVE_TYPE(serflash_device::flash_state_t);
 
@@ -28,8 +27,6 @@ serflash_device::serflash_device(const machine_config &mconfig, const char *tag,
 	, device_nvram_interface(mconfig, *this)
 	, m_length(0)
 	, m_region(nullptr)
-	, m_row_num(0)
-	, m_flash_page_size(2048+64)
 	, m_flash_state()
 	, m_flash_enab(0)
 	, m_flash_cmd_seq(0), m_flash_cmd_prev(0), m_flash_addr_seq(0), m_flash_read_seq(0)
@@ -48,12 +45,8 @@ void serflash_device::device_start()
 	m_length = machine().root_device().memregion(tag())->bytes();
 	m_region = machine().root_device().memregion(tag())->base();
 
-	m_row_num = m_length / m_flash_page_size;
-
-	m_flashwritemap.resize(m_row_num);
-	std::fill(m_flashwritemap.begin(), m_flashwritemap.end(), 0);
-
-	m_flash_page_data.resize(m_flash_page_size);
+	m_flashwritemap.resize(m_length / FLASH_PAGE_SIZE);
+	memset(&m_flashwritemap[0], 0, m_length / FLASH_PAGE_SIZE);
 
 	save_item(NAME(m_flash_state));
 	save_item(NAME(m_flash_enab));
@@ -100,8 +93,8 @@ void serflash_device::nvram_default()
 
 void serflash_device::nvram_read(emu_file &file)
 {
-	if (m_length % m_flash_page_size) return; // region size must be multiple of flash page size
-	int size = m_length / m_flash_page_size;
+	if (m_length % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
+	int size = m_length / FLASH_PAGE_SIZE;
 
 
 	if (file.is_open())
@@ -111,7 +104,7 @@ void serflash_device::nvram_read(emu_file &file)
 		while (page < size)
 		{
 			m_flashwritemap[page] = 1;
-			file.read(m_region + page * m_flash_page_size, m_flash_page_size);
+			file.read(m_region + page * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
 			file.read(&page, 4);
 		}
 	}
@@ -126,8 +119,8 @@ void serflash_device::nvram_read(emu_file &file)
 
 void serflash_device::nvram_write(emu_file &file)
 {
-	if (m_length % m_flash_page_size) return; // region size must be multiple of flash page size
-	int size = m_length / m_flash_page_size;
+	if (m_length % FLASH_PAGE_SIZE) return; // region size must be multiple of flash page size
+	int size = m_length / FLASH_PAGE_SIZE;
 
 	uint32_t page = 0;
 	while (page < size)
@@ -135,7 +128,7 @@ void serflash_device::nvram_write(emu_file &file)
 		if (m_flashwritemap[page])
 		{
 			file.write(&page, 4);
-			file.write(m_region + page * m_flash_page_size, m_flash_page_size);
+			file.write(m_region + page * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
 		}
 		page++;
 	}
@@ -157,7 +150,7 @@ void serflash_device::flash_hard_reset()
 	m_flash_row = 0;
 	m_flash_col = 0;
 
-	std::fill(m_flash_page_data.begin(), m_flash_page_data.end(), 0);
+	memset(m_flash_page_data, 0, FLASH_PAGE_SIZE);
 	m_flash_page_addr = 0;
 	m_flash_page_index = 0;
 }
@@ -199,7 +192,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 				break;
 
 			case 0x60:  // BLOCK ERASE
-				m_flash_addr_seq = 2; // row address only
+				m_flash_addr_seq = 0;
 				break;
 
 			case 0x70:  // READ STATUS
@@ -233,12 +226,10 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 			case 0x00:  // READ
 				if (data == 0x30)
 				{
-					if (m_flash_row < m_row_num)
-					{
-						std::copy_n(&m_region[m_flash_row * m_flash_page_size], m_flash_page_size, m_flash_page_data.begin());
-						m_flash_page_addr = m_flash_col;
-						m_flash_page_index = m_flash_row;
-					}
+					memcpy(m_flash_page_data, m_region + m_flash_row * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
+					m_flash_page_addr = m_flash_col;
+					m_flash_page_index = m_flash_row;
+
 					flash_change_state( flash_state_t::READ );
 
 					//logerror("%08x FLASH: caching page = %04X\n", m_maincpu->pc(), m_flash_row);
@@ -249,12 +240,9 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 				if (data==0xd0)
 				{
 					flash_change_state( flash_state_t::BLOCK_ERASE );
-					if (m_flash_row < m_row_num)
-					{
-						m_flashwritemap[m_flash_row] |= 1;
-						std::fill_n(&m_region[m_flash_row * m_flash_page_size], m_flash_page_size, 0xff);
-					}
-					//logerror("erased block %04x (%08x - %08x)\n", m_flash_col, m_flash_col * m_flash_page_size,  ((m_flash_col+1) * m_flash_page_size)-1);
+					m_flashwritemap[m_flash_col] |= 1;
+					memset(m_region + m_flash_col * FLASH_PAGE_SIZE, 0xff, FLASH_PAGE_SIZE);
+					//logerror("erased block %04x (%08x - %08x)\n", m_flash_col, m_flash_col * FLASH_PAGE_SIZE,  ((m_flash_col+1) * FLASH_PAGE_SIZE)-1);
 				}
 				else
 				{
@@ -265,12 +253,10 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 				if (data==0x10)
 				{
 					flash_change_state( flash_state_t::PAGE_PROGRAM );
-					if (m_flash_row < m_row_num)
-					{
-						m_flashwritemap[m_flash_row] |= (memcmp(m_region + m_flash_row * m_flash_page_size, &m_flash_page_data[0], m_flash_page_size) != 0);
-						std::copy_n(m_flash_page_data.begin(), m_flash_page_size, &m_region[m_flash_row * m_flash_page_size]);
-					}
-					//logerror("re-written block %04x (%08x - %08x)\n", m_flash_row, m_flash_row * m_flash_page_size,  ((m_flash_row+1) * m_flash_page_size)-1);
+					m_flashwritemap[m_flash_row] |= (memcmp(m_region + m_flash_row * FLASH_PAGE_SIZE, m_flash_page_data, FLASH_PAGE_SIZE) != 0);
+					memcpy(m_region + m_flash_row * FLASH_PAGE_SIZE, m_flash_page_data, FLASH_PAGE_SIZE);
+					//logerror("re-written block %04x (%08x - %08x)\n", m_flash_row, m_flash_row * FLASH_PAGE_SIZE,  ((m_flash_row+1) * FLASH_PAGE_SIZE)-1);
+
 				}
 				else
 				{
@@ -293,10 +279,7 @@ WRITE8_MEMBER( serflash_device::flash_data_w )
 		return;
 
 	//logerror("flash data write %04x\n", m_flash_page_addr);
-	if (m_flash_page_addr < m_flash_page_size)
-	{
-		m_flash_page_data[m_flash_page_addr] = data;
-	}
+	m_flash_page_data[m_flash_page_addr] = data;
 	m_flash_page_addr++;
 }
 
@@ -316,21 +299,10 @@ WRITE8_MEMBER( serflash_device::flash_addr_w )
 			m_flash_col = (m_flash_col & 0x00ff) | (data << 8);
 			break;
 		case 2:
-			m_flash_row = (m_flash_row & 0xffff00) | data;
-			if (m_row_num <= 256)
-			{
-				m_flash_addr_seq = 0;
-			}
+			m_flash_row = (m_flash_row & 0xff00) | data;
 			break;
 		case 3:
-			m_flash_row = (m_flash_row & 0xff00ff) | (data << 8);
-			if (m_row_num <= 65536)
-			{
-				m_flash_addr_seq = 0;
-			}
-			break;
-		case 4:
-			m_flash_row = (m_flash_row & 0x00ffff) | (data << 16);
+			m_flash_row = (m_flash_row & 0x00ff) | (data << 8);
 			m_flash_addr_seq = 0;
 			break;
 	}
@@ -370,8 +342,8 @@ READ8_MEMBER( serflash_device::flash_io_r )
 			break;
 
 		case flash_state_t::READ:
-			if (m_flash_page_addr > m_flash_page_size-1)
-				m_flash_page_addr = m_flash_page_size-1;
+			if (m_flash_page_addr > FLASH_PAGE_SIZE-1)
+				m_flash_page_addr = FLASH_PAGE_SIZE-1;
 
 			//old = m_flash_page_addr;
 
@@ -430,11 +402,10 @@ WRITE8_MEMBER(serflash_device::n3d_flash_cmd_w)
 
 	if (data==0x00)
 	{
-		if (m_flash_addr < m_row_num)
-		{
-			std::copy_n(&m_region[m_flash_addr * m_flash_page_size], m_flash_page_size, m_flash_page_data.begin());
-		}
+		memcpy(m_flash_page_data, m_region + m_flash_addr * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
+
 	}
+
 }
 
 WRITE8_MEMBER(serflash_device::n3d_flash_addr_w)
@@ -444,28 +415,16 @@ WRITE8_MEMBER(serflash_device::n3d_flash_addr_w)
 	m_flash_addr_seq++;
 
 	if (m_flash_addr_seq==3)
-	{
 		m_flash_addr = (m_flash_addr & 0xffff00) | data;
-		if (m_row_num <= 256)
-		{
-			m_flash_addr_seq = 0;
-			m_flash_page_addr = 0;
-			logerror("set flash block to %08x\n", m_flash_addr);
-		}
-	}
+
 	if (m_flash_addr_seq==4)
-	{
 		m_flash_addr = (m_flash_addr & 0xff00ff) | data << 8;
-		if (m_row_num <= 65536)
-		{
-			m_flash_addr_seq = 0;
-			m_flash_page_addr = 0;
-			logerror("set flash block to %08x\n", m_flash_addr);
-		}
-	}
+
+	if (m_flash_addr_seq==5)
+		m_flash_addr = (m_flash_addr & 0x00ffff) | data << 16;
+
 	if (m_flash_addr_seq==5)
 	{
-		m_flash_addr = (m_flash_addr & 0x00ffff) | data << 16;
 		m_flash_addr_seq = 0;
 		m_flash_page_addr = 0;
 		logerror("set flash block to %08x\n", m_flash_addr);

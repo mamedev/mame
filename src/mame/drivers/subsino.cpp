@@ -219,14 +219,12 @@ To Do:
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
-#include "machine/nvram.h"
 #include "machine/subsino.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "sound/3812intf.h"
 #include "video/ramdac.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -242,8 +240,8 @@ To Do:
 class subsino_state : public driver_device
 {
 public:
-	subsino_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	subsino_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_reel_scroll(*this, "reel_scroll.%u", 0U),
@@ -322,8 +320,8 @@ private:
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_stbsub_reel_tile_info);
 	DECLARE_VIDEO_START(subsino);
-	void _2proms_palette(palette_device &palette) const;
-	void _3proms_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(_2proms);
+	DECLARE_PALETTE_INIT(_3proms);
 	DECLARE_VIDEO_START(reels);
 	DECLARE_VIDEO_START(stbsub);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -534,55 +532,55 @@ uint32_t subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap
 
 
 
-void subsino_state::_2proms_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(subsino_state, _2proms)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0; i < 256; i++)
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i,r,g,b,val;
+	int bit0,bit1,bit2;
+
+	for (i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2;
-		int const val = color_prom[i | 0x100] | (color_prom[i | 0x000] << 4);
+		val = (color_prom[i+0x100]) | (color_prom[i+0x000]<<4);
 
 		bit0 = 0;
-		bit1 = BIT(val, 6);
-		bit2 = BIT(val, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(val, 3);
-		bit1 = BIT(val, 4);
-		bit2 = BIT(val, 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(val, 0);
-		bit1 = BIT(val, 1);
-		bit2 = BIT(val, 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (val >> 6) & 0x01;
+		bit2 = (val >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 3) & 0x01;
+		bit1 = (val >> 4) & 0x01;
+		bit2 = (val >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 0) & 0x01;
+		bit1 = (val >> 1) & 0x01;
+		bit2 = (val >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-void subsino_state::_3proms_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(subsino_state, _3proms)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0; i < 256; i++)
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i,r,g,b,val;
+	int bit0,bit1,bit2;
+
+	for (i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2;
-		int const val = color_prom[i | 0x000] | (color_prom[i | 0x100] << 3) | (color_prom[i | 0x200] << 6);
+		val = (color_prom[i+0x000]) | (color_prom[i+0x100]<<3) | (color_prom[i+0x200]<<6);
 
 		bit0 = 0;
-		bit1 = BIT(val, 7);
-		bit2 = BIT(val, 6);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(val, 5);
-		bit1 = BIT(val, 4);
-		bit2 = BIT(val, 3);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(val, 2);
-		bit1 = BIT(val, 1);
-		bit2 = BIT(val, 0);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (val >> 7) & 0x01;
+		bit2 = (val >> 6) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 5) & 0x01;
+		bit1 = (val >> 4) & 0x01;
+		bit2 = (val >> 3) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 2) & 0x01;
+		bit1 = (val >> 1) & 0x01;
+		bit2 = (val >> 0) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -781,8 +779,8 @@ void subsino_state::srider_map(address_map &map)
 	map(0x0d000, 0x0d002).r("ppi1", FUNC(i8255_device::read));
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
 
-	map(0x0d009, 0x0d009).w(FUNC(subsino_state::out_b_w));
-	map(0x0d00a, 0x0d00a).w(FUNC(subsino_state::out_a_w));
+	map(0x0d009, 0x0d009).w(this, FUNC(subsino_state::out_b_w));
+	map(0x0d00a, 0x0d00a).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x0d00c, 0x0d00c).portr("INC");
 
@@ -790,10 +788,10 @@ void subsino_state::srider_map(address_map &map)
 
 	map(0x0d018, 0x0d018).w("oki", FUNC(okim6295_device::write));
 
-	map(0x0d01b, 0x0d01b).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x0d01b, 0x0d01b).w(this, FUNC(subsino_state::tiles_offset_w));
 
-	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
 }
 
 
@@ -805,8 +803,8 @@ void subsino_state::sharkpy_map(address_map &map)
 	map(0x09000, 0x09002).r("ppi1", FUNC(i8255_device::read));
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
 
-	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
-	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
+	map(0x09009, 0x09009).w(this, FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x0900c, 0x0900c).portr("INC");
 
@@ -814,11 +812,11 @@ void subsino_state::sharkpy_map(address_map &map)
 
 	map(0x09018, 0x09018).w("oki", FUNC(okim6295_device::write));
 
-	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x0901b, 0x0901b).w(this, FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
 }
 
 /*
@@ -846,11 +844,11 @@ void subsino_state::victor21_map(address_map &map)
 
 	map(0x0900e, 0x0900f).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x0900d, 0x0900d).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x0900d, 0x0900d).w(this, FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom();
 }
@@ -910,7 +908,7 @@ WRITE8_MEMBER(subsino_state::flash_w)
 void subsino_state::victor5_map(address_map &map)
 {
 	victor21_map(map);
-	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
+	map(0x0900a, 0x0900a).rw(this, FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
 	map(0x0900b, 0x0900b).nopr(); //"flash" status, bit 0
 }
 
@@ -932,13 +930,13 @@ void subsino_state::crsbingo_map(address_map &map)
 	map(0x09002, 0x09002).portr("INA");
 	map(0x09003, 0x09003).portr("INB");
 	map(0x09004, 0x09004).portr("INC");
-	map(0x09005, 0x09005).w(FUNC(subsino_state::out_a_w));
+	map(0x09005, 0x09005).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x09008, 0x09008).portr("SW4");
 	map(0x09009, 0x09009).portr("SW3");  // AM_WRITE(out_a_w )
-	map(0x0900a, 0x0900a).rw(FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).rw(this, FUNC(subsino_state::hwcheck_r), FUNC(subsino_state::out_b_w));
 
-	map(0x09010, 0x09010).rw(FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
+	map(0x09010, 0x09010).rw(this, FUNC(subsino_state::flash_r), FUNC(subsino_state::flash_w));
 //  AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 	map(0x0900c, 0x0900d).w("ymsnd", FUNC(ym2413_device::write));
@@ -948,8 +946,8 @@ void subsino_state::crsbingo_map(address_map &map)
 //  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(tiles_offset_w )
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom(); //overlap unmapped regions
 
@@ -966,7 +964,7 @@ WRITE8_MEMBER(subsino_state::out_c_w)
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 		m_reel_tilemap[reel]->mark_all_dirty();
-//  popmessage("data %02x\n",data);
+//	popmessage("data %02x\n",data);
 }
 
 void subsino_state::tisub_map(address_map &map)
@@ -978,9 +976,9 @@ void subsino_state::tisub_map(address_map &map)
 	map(0x09004, 0x09006).r("ppi2", FUNC(i8255_device::read));
 
 	/* 0x09008: is marked as OUTPUT C in the test mode. */
-	map(0x09008, 0x09008).w(FUNC(subsino_state::out_c_w));
-	map(0x09009, 0x09009).w(FUNC(subsino_state::out_b_w));
-	map(0x0900a, 0x0900a).w(FUNC(subsino_state::out_a_w));
+	map(0x09008, 0x09008).w(this, FUNC(subsino_state::out_c_w));
+	map(0x09009, 0x09009).w(this, FUNC(subsino_state::out_b_w));
+	map(0x0900a, 0x0900a).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x0900c, 0x0900c).portr("INC");
 
@@ -988,11 +986,11 @@ void subsino_state::tisub_map(address_map &map)
 
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	map(0x0901b, 0x0901b).w(FUNC(subsino_state::tiles_offset_w));
+	map(0x0901b, 0x0901b).w(this, FUNC(subsino_state::tiles_offset_w));
 
 	map(0x07800, 0x07fff).ram();
-	map(0x08800, 0x08fff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
-	map(0x08000, 0x087ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x08800, 0x08fff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
 
 	map(0x10000, 0x13fff).rom();
 	map(0x14000, 0x14fff).rom(); // reads the card face data here (see rom copy in rom loading)
@@ -1001,9 +999,9 @@ void subsino_state::tisub_map(address_map &map)
 	map(0x15140, 0x1517f).ram().share("reel_scroll.1");
 	map(0x15180, 0x151bf).ram().share("reel_scroll.0");
 
-	map(0x15800, 0x159ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0x15a00, 0x15bff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0x15c00, 0x15dff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0x15800, 0x159ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0x15a00, 0x15bff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0x15c00, 0x15dff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 void subsino_state::ramdac_map(address_map &map)
@@ -1066,15 +1064,15 @@ void subsino_state::stbsub_map(address_map &map)
 {
 	map(0x00000, 0x0bfff).rom();
 
-	map(0x0c000, 0x0cfff).ram().share("nvram");
+	map(0x0c000, 0x0cfff).ram();
 
 	map(0x0d000, 0x0d002).r("ppi1", FUNC(i8255_device::read));
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
 
 	map(0x0d008, 0x0d008).ram().share("stbsub_out_c");
 
-	map(0x0d009, 0x0d009).w(FUNC(subsino_state::out_b_w));
-	map(0x0d00a, 0x0d00a).w(FUNC(subsino_state::out_a_w));
+	map(0x0d009, 0x0d009).w(this, FUNC(subsino_state::out_b_w));
+	map(0x0d00a, 0x0d00a).w(this, FUNC(subsino_state::out_a_w));
 
 	map(0x0d00c, 0x0d00c).portr("INC");
 
@@ -1086,14 +1084,14 @@ void subsino_state::stbsub_map(address_map &map)
 
 //  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(tiles_offset_w )
 
-	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
 
-	map(0xf000, 0xf7ff).rw(FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
+	map(0xf000, 0xf7ff).rw(this, FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
 
-	map(0xf800, 0xf9ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0xfa00, 0xfbff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0xfc00, 0xfdff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0xf800, 0xf9ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0xfa00, 0xfbff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0xfc00, 0xfdff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 
@@ -1105,7 +1103,7 @@ void subsino_state::mtrainnv_map(address_map &map)
 {
 	map(0x00000, 0x0bfff).rom();
 
-	map(0x0c000, 0x0cfff).ram().share("nvram");
+	map(0x0c000, 0x0cfff).ram();
 
 	map(0x0d000, 0x0d002).r("ppi1", FUNC(i8255_device::read));
 	map(0x0d004, 0x0d006).r("ppi2", FUNC(i8255_device::read));
@@ -1126,14 +1124,14 @@ void subsino_state::mtrainnv_map(address_map &map)
 
 //  AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
-	map(0x0e800, 0x0efff).ram().w(FUNC(subsino_state::videoram_w)).share("videoram");
+	map(0x0e000, 0x0e7ff).ram().w(this, FUNC(subsino_state::colorram_w)).share("colorram");
+	map(0x0e800, 0x0efff).ram().w(this, FUNC(subsino_state::videoram_w)).share("videoram");
 
-	map(0xf000, 0xf7ff).rw(FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
+	map(0xf000, 0xf7ff).rw(this, FUNC(subsino_state::reel_scrollattr_r), FUNC(subsino_state::reel_scrollattr_w));
 
-	map(0xf800, 0xf9ff).ram().w(FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
-	map(0xfa00, 0xfbff).ram().w(FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
-	map(0xfc00, 0xfdff).ram().w(FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
+	map(0xf800, 0xf9ff).ram().w(this, FUNC(subsino_state::reel_ram_w<0>)).share("reel_ram.0");
+	map(0xfa00, 0xfbff).ram().w(this, FUNC(subsino_state::reel_ram_w<1>)).share("reel_ram.1");
+	map(0xfc00, 0xfdff).ram().w(this, FUNC(subsino_state::reel_ram_w<2>)).share("reel_ram.2");
 }
 
 
@@ -2710,12 +2708,12 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_DEVICE_PROGRAM_MAP(victor21_map)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set(FUNC(subsino_state::out_a_w));
-	ppi.tri_pa_callback().set_constant(0);
-	ppi.out_pb_callback().set(FUNC(subsino_state::out_b_w));
-	ppi.tri_pb_callback().set_constant(0);
-	ppi.in_pc_callback().set_ioport("INC");
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, subsino_state, out_a_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, subsino_state, out_b_w))
+	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("INC"))
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -2726,11 +2724,12 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth3);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth3)
 
-	PALETTE(config, m_palette, FUNC(subsino_state::_2proms_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2769,11 +2768,12 @@ MACHINE_CONFIG_START(subsino_state::crsbingo)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4)
 
-	PALETTE(config, m_palette, FUNC(subsino_state::_2proms_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(subsino_state, _2proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2791,15 +2791,15 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	MCFG_DEVICE_PROGRAM_MAP(srider_map)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	i8255_device &ppi1(I8255A(config, "ppi1"));
-	ppi1.in_pa_callback().set_ioport("SW1");
-	ppi1.in_pb_callback().set_ioport("SW2");
-	ppi1.in_pc_callback().set_ioport("SW3");
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
 
-	i8255_device &ppi2(I8255A(config, "ppi2"));
-	ppi2.in_pa_callback().set_ioport("SW4");
-	ppi2.in_pb_callback().set_ioport("INA");
-	ppi2.in_pc_callback().set_ioport("INB");
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("INA"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("INB"))
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -2810,11 +2810,12 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4)
 
-	PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,subsino)
 
@@ -2843,15 +2844,15 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	MCFG_DEVICE_PROGRAM_MAP(tisub_map)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	i8255_device &ppi1(I8255A(config, "ppi1"));
-	ppi1.in_pa_callback().set_ioport("SW1");
-	ppi1.in_pb_callback().set_ioport("SW2");
-	ppi1.in_pc_callback().set_ioport("SW3");
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
 
-	i8255_device &ppi2(I8255A(config, "ppi2"));
-	ppi2.in_pa_callback().set_ioport("SW4");
-	ppi2.in_pb_callback().set_ioport("INA");
-	ppi2.in_pc_callback().set_ioport("INB");
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("INA"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("INB"))
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
@@ -2862,11 +2863,12 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_reels)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, subsino_depth4_reels);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_depth4_reels)
 
-	PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state, reels)
 
@@ -2883,17 +2885,16 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_DEVICE_PROGRAM_MAP(stbsub_map)
 	MCFG_DEVICE_IO_MAP(subsino_iomap)
 
-	i8255_device &ppi1(I8255A(config, "ppi1"));
-	ppi1.in_pa_callback().set_ioport("SW1");
-	ppi1.in_pb_callback().set_ioport("SW2");
-	ppi1.in_pc_callback().set_ioport("SW3");
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SW2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("SW3"))
 
-	i8255_device &ppi2(I8255A(config, "ppi2"));
-	ppi2.in_pa_callback().set_ioport("SW4");
-	ppi2.in_pb_callback().set_ioport("INB");
-	ppi2.in_pc_callback().set_ioport("INA");
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("SW4"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("INB"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("INA"))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
@@ -2903,15 +2904,14 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(subsino_state, screen_update_stbsub_reels)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, subsino_stbsub);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", subsino_stbsub)
 
-	PALETTE(config, m_palette).set_entries(0x100);
-	//PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	//MCFG_PALETTE_INIT_OWNER(subsino_state, _3proms)
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
-	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
 
@@ -3166,8 +3166,8 @@ ROM_START( crsbingo )
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x155 * 2, "plds", 0 )
-	ROM_LOAD( "18cv8.u22", 0x000, 0x155, NO_DUMP )
-	ROM_LOAD( "18cv8.u29", 0x155, 0x155, NO_DUMP )
+	ROM_LOAD( "18cv8.u22", 0x000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
+	ROM_LOAD( "18cv8.u29", 0x155, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
 ROM_END
 
 /***************************************************************************
@@ -3803,7 +3803,7 @@ void subsino_state::init_stbsub()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
 	}
 }
 
@@ -3819,7 +3819,7 @@ void subsino_state::init_stisub()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
 	}
 }
 
@@ -3839,7 +3839,7 @@ void subsino_state::init_tesorone()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
 	}
 }
 
@@ -3859,7 +3859,7 @@ void subsino_state::init_tesorone230()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
 	}
 }
 
@@ -3872,7 +3872,7 @@ void subsino_state::init_mtrainnv()
 
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
-		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
+		save_pointer(NAME(m_reel_attr[reel].get()), 0x200, reel);
 	}
 }
 
@@ -3894,7 +3894,7 @@ GAMEL( 1995, stbsub,      0,       stbsub,   stbsub,   subsino_state, init_stbsu
 GAMEL( 1995, stisub,      stbsub,  stbsub,   stbsub,   subsino_state, init_stisub,      ROT0, "Subsino",         "Super Treasure Island (Italy, v1.6)",  MACHINE_NOT_WORKING, layout_stisub   ) // need proper patches
 GAMEL( 1995, tesorone,    stbsub,  stbsub,   tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.41)",   0,               layout_stisub   )
 GAMEL( 1995, tesorone240, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone,    ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.40)",   0,               layout_stisub   )
-GAMEL( 1995, tesorone230, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone230, ROT0, "Subsino",         "Tesorone Dell'Isola (Italy, v2.30)",   0,               layout_stisub   )
+GAMEL( 1995, tesorone230, stbsub,  stbsub,   tesorone, subsino_state, init_tesorone230, ROT0,"Subsino",        "Tesorone Dell'Isola (Italy, v2.30)",   0,               layout_stisub   )
 
 GAMEL( 1996, sharkpy,     0,       sharkpy,  sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,               layout_sharkpy  ) // missing POST messages?
 GAMEL( 1996, sharkpya,    sharkpy, sharkpy,  sharkpy,  subsino_state, init_sharkpy,     ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,               layout_sharkpy  ) // missing POST messages?

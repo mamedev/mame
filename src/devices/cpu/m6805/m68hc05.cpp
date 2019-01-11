@@ -165,7 +165,7 @@ void m68hc05_device::set_port_interrupt(std::array<u8, PORT_COUNT> const &interr
 	if (diff) update_port_irq();
 }
 
-READ8_MEMBER(m68hc05_device::port_read)
+READ8_MEMBER(m68hc05_device::port_r)
 {
 	offset &= PORT_COUNT - 1;
 	if (!machine().side_effects_disabled() && !m_port_cb_r[offset].isnull())
@@ -723,8 +723,8 @@ void m68hc05c4_device::c4_map(address_map &map)
 	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0003).rw(FUNC(m68hc05c4_device::port_read), FUNC(m68hc05c4_device::port_latch_w));
-	map(0x0004, 0x0006).rw(FUNC(m68hc05c4_device::port_ddr_r), FUNC(m68hc05c4_device::port_ddr_w));
+	map(0x0000, 0x0003).rw(this, FUNC(m68hc05c4_device::port_r), FUNC(m68hc05c4_device::port_latch_w));
+	map(0x0004, 0x0006).rw(this, FUNC(m68hc05c4_device::port_ddr_r), FUNC(m68hc05c4_device::port_ddr_w));
 	// 0x0007-0x0009 unused
 	// 0x000a SPCR
 	// 0x000b SPSR
@@ -734,11 +734,11 @@ void m68hc05c4_device::c4_map(address_map &map)
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
-	map(0x0012, 0x0012).rw(FUNC(m68hc05c4_device::tcr_r), FUNC(m68hc05c4_device::tcr_w));
-	map(0x0013, 0x0013).r(FUNC(m68hc05c4_device::tsr_r));
-	map(0x0014, 0x0015).r(FUNC(m68hc05c4_device::icr_r));
-	map(0x0016, 0x0017).rw(FUNC(m68hc05c4_device::ocr_r), FUNC(m68hc05c4_device::ocr_w));
-	map(0x0018, 0x001b).r(FUNC(m68hc05c4_device::timer_r));
+	map(0x0012, 0x0012).rw(this, FUNC(m68hc05c4_device::tcr_r), FUNC(m68hc05c4_device::tcr_w));
+	map(0x0013, 0x0013).r(this, FUNC(m68hc05c4_device::tsr_r));
+	map(0x0014, 0x0015).r(this, FUNC(m68hc05c4_device::icr_r));
+	map(0x0016, 0x0017).rw(this, FUNC(m68hc05c4_device::ocr_r), FUNC(m68hc05c4_device::ocr_w));
+	map(0x0018, 0x001b).r(this, FUNC(m68hc05c4_device::timer_r));
 	// 0x001c-0x001f unused
 	map(0x0020, 0x004f).rom(); // user ROM
 	map(0x0050, 0x00ff).ram(); // RAM/stack
@@ -789,8 +789,8 @@ void m68hc05c8_device::c8_map(address_map &map)
 	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0003).rw(FUNC(m68hc05c8_device::port_read), FUNC(m68hc05c8_device::port_latch_w));
-	map(0x0004, 0x0006).rw(FUNC(m68hc05c8_device::port_ddr_r), FUNC(m68hc05c8_device::port_ddr_w));
+	map(0x0000, 0x0003).rw(this, FUNC(m68hc05c8_device::port_r), FUNC(m68hc05c8_device::port_latch_w));
+	map(0x0004, 0x0006).rw(this, FUNC(m68hc05c8_device::port_ddr_r), FUNC(m68hc05c8_device::port_ddr_w));
 	// 0x0007-0x0009 unused
 	// 0x000a SPCR
 	// 0x000b SPSR
@@ -800,11 +800,11 @@ void m68hc05c8_device::c8_map(address_map &map)
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
-	map(0x0012, 0x0012).rw(FUNC(m68hc05c8_device::tcr_r), FUNC(m68hc05c8_device::tcr_w));
-	map(0x0013, 0x0013).r(FUNC(m68hc05c8_device::tsr_r));
-	map(0x0014, 0x0015).r(FUNC(m68hc05c8_device::icr_r));
-	map(0x0016, 0x0017).rw(FUNC(m68hc05c8_device::ocr_r), FUNC(m68hc05c8_device::ocr_w));
-	map(0x0018, 0x001b).r(FUNC(m68hc05c8_device::timer_r));
+	map(0x0012, 0x0012).rw(this, FUNC(m68hc05c8_device::tcr_r), FUNC(m68hc05c8_device::tcr_w));
+	map(0x0013, 0x0013).r(this, FUNC(m68hc05c8_device::tsr_r));
+	map(0x0014, 0x0015).r(this, FUNC(m68hc05c8_device::icr_r));
+	map(0x0016, 0x0017).rw(this, FUNC(m68hc05c8_device::ocr_r), FUNC(m68hc05c8_device::ocr_w));
+	map(0x0018, 0x001b).r(this, FUNC(m68hc05c8_device::timer_r));
 	// 0x001c-0x001f unused
 	map(0x0020, 0x004f).rom(); // user ROM
 	map(0x0050, 0x00ff).ram(); // RAM/stack
@@ -854,8 +854,8 @@ void m68hc705c8a_device::c8a_map(address_map &map)
 	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0003).rw(FUNC(m68hc705c8a_device::port_read), FUNC(m68hc705c8a_device::port_latch_w));
-	map(0x0004, 0x0006).rw(FUNC(m68hc705c8a_device::port_ddr_r), FUNC(m68hc705c8a_device::port_ddr_w));
+	map(0x0000, 0x0003).rw(this, FUNC(m68hc705c8a_device::port_r), FUNC(m68hc705c8a_device::port_latch_w));
+	map(0x0004, 0x0006).rw(this, FUNC(m68hc705c8a_device::port_ddr_r), FUNC(m68hc705c8a_device::port_ddr_w));
 	// 0x0007-0x0009 unused
 	// 0x000a SPCR
 	// 0x000b SPSR
@@ -865,14 +865,14 @@ void m68hc705c8a_device::c8a_map(address_map &map)
 	// 0x000f SCCR2
 	// 0x0010 SCSR
 	// 0x0011 SCDR
-	map(0x0012, 0x0012).rw(FUNC(m68hc705c8a_device::tcr_r), FUNC(m68hc705c8a_device::tcr_w));
-	map(0x0013, 0x0013).r(FUNC(m68hc705c8a_device::tsr_r));
-	map(0x0014, 0x0015).r(FUNC(m68hc705c8a_device::icr_r));
-	map(0x0016, 0x0017).rw(FUNC(m68hc705c8a_device::ocr_r), FUNC(m68hc705c8a_device::ocr_w));
-	map(0x0018, 0x001b).r(FUNC(m68hc705c8a_device::timer_r));
+	map(0x0012, 0x0012).rw(this, FUNC(m68hc705c8a_device::tcr_r), FUNC(m68hc705c8a_device::tcr_w));
+	map(0x0013, 0x0013).r(this, FUNC(m68hc705c8a_device::tsr_r));
+	map(0x0014, 0x0015).r(this, FUNC(m68hc705c8a_device::icr_r));
+	map(0x0016, 0x0017).rw(this, FUNC(m68hc705c8a_device::ocr_r), FUNC(m68hc705c8a_device::ocr_w));
+	map(0x0018, 0x001b).r(this, FUNC(m68hc705c8a_device::timer_r));
 	// 0x001c PROG
-	map(0x001d, 0x001d).w(FUNC(m68hc705c8a_device::coprst_w));
-	map(0x001e, 0x001e).rw(FUNC(m68hc705c8a_device::copcr_r), FUNC(m68hc705c8a_device::copcr_w));
+	map(0x001d, 0x001d).w(this, FUNC(m68hc705c8a_device::coprst_w));
+	map(0x001e, 0x001e).rw(this, FUNC(m68hc705c8a_device::copcr_r), FUNC(m68hc705c8a_device::copcr_w));
 	// 0x001f unused
 	map(0x0020, 0x004f).rom();                                 // user PROM FIXME: banked with RAM
 	map(0x0050, 0x00ff).ram();                                 // RAM/stack
@@ -881,7 +881,7 @@ void m68hc705c8a_device::c8a_map(address_map &map)
 	map(0x1f00, 0x1fde).rom().region("bootstrap", 0x0000);  // bootloader
 	// 0x1fdf option register FIXME: controls banking
 	map(0x1fe0, 0x1fef).rom().region("bootstrap", 0x00e0);  // boot ROM vectors
-	map(0x1ff0, 0x1ff0).w(FUNC(m68hc705c8a_device::copr_w));
+	map(0x1ff0, 0x1ff0).w(this, FUNC(m68hc705c8a_device::copr_w));
 	map(0x1ff0, 0x1fff).rom();                                 // user vectors
 }
 

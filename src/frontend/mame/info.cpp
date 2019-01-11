@@ -18,7 +18,6 @@
 
 #include "config.h"
 #include "drivenum.h"
-#include "romload.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -108,7 +107,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST display vbstart CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT sound EMPTY>\n"
 "\t\t\t<!ATTLIST sound channels CDATA #REQUIRED>\n"
-"\t\t<!ELEMENT condition EMPTY>\n"
+"\t\t\t<!ELEMENT condition EMPTY>\n"
 "\t\t\t<!ATTLIST condition tag CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST condition mask CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST condition relation (eq|ne|gt|le|lt|ge) #REQUIRED>\n"
@@ -896,32 +895,35 @@ void info_xml_creator::output_display(device_t &device, machine_flags::type cons
 			}
 
 			// output the orientation as a string
-			switch (screendev.orientation())
+			if (flags)
 			{
-			case ORIENTATION_FLIP_X:
-				fprintf(m_output, " rotate=\"0\" flipx=\"yes\"");
-				break;
-			case ORIENTATION_FLIP_Y:
-				fprintf(m_output, " rotate=\"180\" flipx=\"yes\"");
-				break;
-			case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-				fprintf(m_output, " rotate=\"180\"");
-				break;
-			case ORIENTATION_SWAP_XY:
-				fprintf(m_output, " rotate=\"90\" flipx=\"yes\"");
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
-				fprintf(m_output, " rotate=\"90\"");
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
-				fprintf(m_output, " rotate=\"270\"");
-				break;
-			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-				fprintf(m_output, " rotate=\"270\" flipx=\"yes\"");
-				break;
-			default:
-				fprintf(m_output, " rotate=\"0\"");
-				break;
+				switch (*flags & machine_flags::MASK_ORIENTATION)
+				{
+				case ORIENTATION_FLIP_X:
+					fprintf(m_output, " rotate=\"0\" flipx=\"yes\"");
+					break;
+				case ORIENTATION_FLIP_Y:
+					fprintf(m_output, " rotate=\"180\" flipx=\"yes\"");
+					break;
+				case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+					fprintf(m_output, " rotate=\"180\"");
+					break;
+				case ORIENTATION_SWAP_XY:
+					fprintf(m_output, " rotate=\"90\" flipx=\"yes\"");
+					break;
+				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
+					fprintf(m_output, " rotate=\"90\"");
+					break;
+				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
+					fprintf(m_output, " rotate=\"270\"");
+					break;
+				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+					fprintf(m_output, " rotate=\"270\" flipx=\"yes\"");
+					break;
+				default:
+					fprintf(m_output, " rotate=\"0\"");
+					break;
+				}
 			}
 
 			// output width and height only for games that are not vector

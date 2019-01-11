@@ -12,27 +12,22 @@ similar hardware.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class drtomy_state : public driver_device
 {
 public:
-	drtomy_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	drtomy_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_videoram_fg(*this, "videorafg"),
 		m_videoram_bg(*this, "videorabg"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void drtomy(machine_config &config);
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram_fg;
 	required_shared_ptr<uint16_t> m_videoram_bg;
@@ -58,6 +53,7 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void drtomy(machine_config &config);
 	void drtomy_map(address_map &map);
 };
 
@@ -181,15 +177,15 @@ WRITE16_MEMBER(drtomy_state::drtomy_okibank_w)
 void drtomy_state::drtomy_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom(); /* ROM */
-	map(0x100000, 0x100fff).ram().w(FUNC(drtomy_state::drtomy_vram_fg_w)).share("videorafg");   /* Video RAM FG */
-	map(0x101000, 0x101fff).ram().w(FUNC(drtomy_state::drtomy_vram_bg_w)).share("videorabg"); /* Video RAM BG */
+	map(0x100000, 0x100fff).ram().w(this, FUNC(drtomy_state::drtomy_vram_fg_w)).share("videorafg");   /* Video RAM FG */
+	map(0x101000, 0x101fff).ram().w(this, FUNC(drtomy_state::drtomy_vram_bg_w)).share("videorabg"); /* Video RAM BG */
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x440000, 0x440fff).ram().share("spriteram"); /* Sprite RAM */
 	map(0x700000, 0x700001).portr("DSW1");
 	map(0x700002, 0x700003).portr("DSW2");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
-	map(0x70000c, 0x70000d).w(FUNC(drtomy_state::drtomy_okibank_w)); /* OKI banking */
+	map(0x70000c, 0x70000d).w(this, FUNC(drtomy_state::drtomy_okibank_w)); /* OKI banking */
 	map(0x70000f, 0x70000f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)); /* OKI 6295*/
 	map(0xffc000, 0xffffff).ram(); /* Work RAM */
 }
@@ -321,10 +317,12 @@ MACHINE_CONFIG_START(drtomy_state::drtomy)
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drtomy_state, screen_update_drtomy)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drtomy);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drtomy)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

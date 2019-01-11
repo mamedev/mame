@@ -568,42 +568,6 @@ UPDATE_LOW( bitmap16 )
 END_UPDATE
 
 
-/* 160x200, 16-colors, no constraint, alternate encoding, undocumented, tested */
-
-static const unsigned tbl_bit16[4][4] = {
-        {  0,  2,  8, 10 },
-        {  1,  3,  9, 11 },
-        {  4,  6, 12, 14 },
-        {  5,  7, 13, 15 }
-};
-
-UPDATE_HI( bitmap16alt )
-{
-        unsigned p0 = tbl_bit16[ramb >> 6][rama >> 6];
-        unsigned p1 = tbl_bit16[(ramb >> 4) & 3][(rama >> 4) & 3];
-        unsigned p2 = tbl_bit16[(ramb >> 2) & 3][(rama >> 2) & 3];
-        unsigned p3 = tbl_bit16[ramb & 3][rama & 3];
-	dst[ 0] = dst[ 1] = dst[ 2] = dst[ 3] = pal[ p0 ];
-	dst[ 4] = dst[ 5] = dst[ 6] = dst[ 7] = pal[ p1 ];
-	dst[ 8] = dst[ 9] = dst[10] = dst[11] = pal[ p2 ];
-	dst[12] = dst[13] = dst[14] = dst[15] = pal[ p3 ];
-}
-END_UPDATE
-
-UPDATE_LOW( bitmap16alt )
-{
-        unsigned p0 = tbl_bit16[ramb >> 6][rama >> 6];
-        unsigned p1 = tbl_bit16[(ramb >> 4) & 3][(rama >> 4) & 3];
-        unsigned p2 = tbl_bit16[(ramb >> 2) & 3][(rama >> 2) & 3];
-        unsigned p3 = tbl_bit16[ramb & 3][rama & 3];
-	dst[0] = dst[1] = pal[ p0 ];
-	dst[2] = dst[3] = pal[ p1 ];
-	dst[4] = dst[5] = pal[ p2 ];
-	dst[6] = dst[7] = pal[ p3 ];
-}
-END_UPDATE
-
-
 
 /* 640x200 (80 text column), 2-colors, no constraint */
 
@@ -821,8 +785,7 @@ static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 	FUN(to770),    FUN(mo5),    FUN(bitmap4), FUN(bitmap4alt),  FUN(mode80),
 	FUN(bitmap16), FUN(page1),  FUN(page2),   FUN(overlay),     FUN(overlay3),
 	FUN(to9), FUN(mode80_to9),
-        FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
-        FUN(bitmap16alt)
+		FUN(bitmap4althalf), FUN(mo5alt), FUN(overlayhalf),
 };
 
 
@@ -927,7 +890,7 @@ void thomson_state::thom_floppy_active( int write )
 	/* update icon */
 	fnew = FLOP_STATE;
 	if ( fold != fnew )
-		m_floppy_led = fnew;
+		m_floppy = fnew;
 }
 
 
@@ -1078,7 +1041,7 @@ WRITE_LINE_MEMBER(thomson_state::thom_vblank)
 			m_thom_floppy_rcount--;
 		fnew = FLOP_STATE;
 		if ( fnew != fold )
-			m_floppy_led = fnew;
+			m_floppy = fnew;
 
 		/* prepare state for next frame */
 		for ( i = 0; i <= THOM_TOTAL_HEIGHT; i++ )
@@ -1197,7 +1160,7 @@ VIDEO_START_MEMBER( thomson_state, thom )
 	m_thom_floppy_wcount = 0;
 	save_item(NAME(m_thom_floppy_wcount));
 	save_item(NAME(m_thom_floppy_rcount));
-	m_floppy_led.resolve();
+	m_floppy.resolve();
 
 	m_thom_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
@@ -1221,8 +1184,8 @@ VIDEO_START_MEMBER( thomson_state, thom )
 /* sets the fixed palette (for MO5,TO7,TO7/70) and gamma correction */
 void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, palette_device& palette)
 {
-	memcpy(m_thom_last_pal, pal, 32);
-	memcpy(m_thom_pal, pal, 32);
+	memcpy( m_thom_last_pal, pal, 32 );
+	memcpy( m_thom_pal, pal, 32 );
 
 	for ( int i = 0; i < 4097; i++ )
 	{
@@ -1235,31 +1198,31 @@ void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, pa
 }
 
 
-void thomson_state::thom_palette(palette_device &palette)
+PALETTE_INIT_MEMBER(thomson_state, thom)
 {
 	LOG (( "thom: palette init called\n" ));
 
-	/* TO8 and later use an EF9369 color palette chip
-	   The spec shows a built-in gamma correction for gamma=2.8
-	   i.e., output is out = in ^ (1/2.8)
+		/* TO8 and later use an EF9369 color palette chip
+		   The spec shows a built-in gamma correction for gamma=2.8
+		   i.e., output is out = in ^ (1/2.8)
 
-	   For the TO7, the gamma correction is irrelevant.
+		   For the TO7, the gamma correction is irrelevant.
 
-	   For the TO7/70, we use the same palette and gamma has the TO8,
-	   which gives good results (but is not verified).
-	 */
-	thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
+		   For the TO7/70, we use the same palette and gamma has the TO8,
+		   which gives good results (but is not verified).
+		 */
+		thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
 }
 
-void thomson_state::mo5_palette(palette_device &palette)
+PALETTE_INIT_MEMBER(thomson_state, mo5)
 {
 	LOG (( "thom: MO5 palette init called\n" ));
 
-	/* The MO5 has a different fixed palette than the TO7/70.
-	   We use a smaller gamma correction which gives intutively better
-	   results (but is not verified).
-	 */
-	thom_configure_palette(1.0, mo5_pal_init, palette);
+		/* The MO5 has a different fixed palette than the TO7/70.
+		   We use a smaller gamma correction which gives intutively better
+		   results (but is not verified).
+		 */
+		thom_configure_palette(1.0, mo5_pal_init, palette);
 }
 
 

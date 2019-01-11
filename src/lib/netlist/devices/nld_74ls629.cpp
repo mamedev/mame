@@ -231,8 +231,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(SN74LS629)
-	NETLIB_DEVICE_IMPL_DEPRECATED(SN74LS629_dip)
+	NETLIB_DEVICE_IMPL(SN74LS629)
+	NETLIB_DEVICE_IMPL(SN74LS629_dip)
 
 	} //namespace devices
 } // namespace netlist

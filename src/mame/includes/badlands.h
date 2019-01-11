@@ -33,15 +33,15 @@ class badlands_state : public driver_device
 {
 public:
 	badlands_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_soundcomm(*this, "soundcomm")
-		, m_screen(*this, "screen")
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_playfield_tilemap(*this, "playfield")
-		, m_mob(*this, "mob")
-	{ }
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_soundcomm(*this, "soundcomm"),
+			m_screen(*this, "screen"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_playfield_tilemap(*this, "playfield"),
+			m_mob(*this, "mob")
+			{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;

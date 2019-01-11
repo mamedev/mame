@@ -80,7 +80,7 @@ const sm8500_disassembler::sm8500dasm sm8500_disassembler::mnemonic[256] = {
 	/* 50 - 5F */
 		{zCMP,AM_iR},  {zADD,AM_iR},  {zSUB,AM_iR},   {zADC,AM_iR},
 		{zSBC,AM_iR},  {zAND,AM_iR},  {zOR,AM_iR},    {zXOR,AM_iR},
-		{zMOV, AM_iR}, {zINVLD,0},   {z5A,AM_5A},    {z5B,AM_5B},
+		{zMOV, AM_iR}, {zINVLD,0},   {z5A,AM_ii},    {z5B,AM_ii},
 		{zDIV,AM_SS},  {zDIV,AM_iS},   {zMOVM,AM_RiR},  {zMOVM,AM_Rii},
 	/* 60 - 6F */
 		{zCMPW,AM_SS}, {zADDW,AM_SS}, {zSUBW,AM_SS},  {zADCW,AM_SS},
@@ -147,7 +147,6 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	int8_t offset;
 	uint16_t ea;
 	uint16_t ea2;
-	uint16_t ea3;
 	offs_t pos = pc;
 
 	op = opcodes.r8(pos++);
@@ -313,11 +312,11 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			break;
 		case AM_cbr:
 			offset = (int8_t) opcodes.r8(pos++);
-			util::stream_format(stream, "%s,$%04X", sm8500_cond[ op & 0x0F ], pos + offset);
+			util::stream_format(stream, "%s,$%04X", sm8500_cond[ op & 0x0F ], pc + pos + offset);
 			break;
 		case AM_rbr:
 			offset = (int8_t) opcodes.r8(pos++);
-			util::stream_format(stream, "r%02Xh,$%04X", op & 0x07, pos + offset);
+			util::stream_format(stream, "r%02Xh,$%04X", op & 0x07, pc + pos + offset);
 			break;
 		case AM_cjp:
 			ea = opcodes.r8(pos++) << 8;
@@ -371,32 +370,6 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			ea = opcodes.r8(pos++) << 8;
 			ea += opcodes.r8(pos++);
 			util::stream_format(stream, "$%04X", ea);
-			break;
-		case AM_5A:
-			ea = opcodes.r8(pos++);
-			ea2 = opcodes.r8(pos++);
-			switch( ea & 0xC0 ) {
-			case 0x00:
-				util::stream_format(stream, "CMP (rr%02Xh),$%02Xh", ea & 7, ea2); break;
-			case 0x40:
-				util::stream_format(stream, "undef $%04X", ea); break;
-			case 0x80:
-				ea3 = opcodes.r8(pos++);
-				util::stream_format(stream, "CMP (rr%02Xh+%02Xh),$%02Xh", ea & 7, ea2, ea3); break;
-			case 0xC0:
-				util::stream_format(stream, "undef $%04X", ea); break;
-			}
-			break;
-		case AM_5B:
-			ea = opcodes.r8(pos++);
-			ea2 = opcodes.r8(pos++);
-			ea3 = (ea << 8) | ea2;
-			switch( ea & 0xC0 ) {
-			case 0x40:
-				util::stream_format(stream, "MOV (rr%02Xh)+,$%02Xh", ea & 7, ea2); break; // could be AND instead of MOV
-			default:
-				util::stream_format(stream, "undef $%04X", ea3); break;
-			}
 			break;
 		case AM_ss:
 			ea = opcodes.r8(pos++);
@@ -458,7 +431,7 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case AM_Rbr:
 			ea = opcodes.r8(pos++);
 			offset = (int8_t) opcodes.r8(pos++);
-			util::stream_format(stream, "R%02Xh,#%d,$%04X", ea, op & 0x07, pos + offset);
+			util::stream_format(stream, "R%02Xh,#%d,$%04X", ea, op & 0x07, pc + pos + offset);
 			break;
 		case AM_Rb:
 			ea = opcodes.r8(pos++);
@@ -517,7 +490,7 @@ offs_t sm8500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			}
 			util::stream_format(stream, ",#%d,", ea & 0x07);
 			offset = (int8_t) opcodes.r8(pos++);
-			util::stream_format(stream, "$%04X", pos + offset);
+			util::stream_format(stream, "$%04X", pc + pos + offset);
 			break;
 		case AM_1A:
 			ea = opcodes.r8(pos++);

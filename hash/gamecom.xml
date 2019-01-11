@@ -1,37 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-
-<!--
-
-List of games which were planned but never finished or released.
-
-- A Bug's Life
-- Castlevania: Symphony of the Night (71-742)
-- Command and Conquer: Red Alert
-- Deer Hunter
-- Giga Pets Deluxe (71-748)
-- Holyfield Champion Boxing (71-749)
-- Furbyland
-- Godzilla
-- The Legend of the Lost Creator (unknown "Wyvern" game)
-- Madden Football 99   (71-705)
-- Metal Gear Solid
-- Mutoids
-- Name That Tune (71-729)
-- NASCAR Racing
-- NBA Live 99 (71-741)
-- Shadow Madness
-- Small Soldiers (71-743)
-- Sonic 3D Blast
-- Turok: Dinosaur Hunter
-- WCW Whiplash
-- X-Files
-
--->
-
 <softwarelist name="gamecom" description="Tiger Game.com cartridges">
 
-	<software name="batmanr">
+	<software name="batmanr" supported="no">
 		<description>Batman &amp; Robin</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -43,7 +14,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="centiped">
+	<software name="centiped" supported="no">
 		<description>Centipede</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
@@ -55,7 +26,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="dukenuke">
+	<software name="dukenuke" supported="no">
 		<description>Duke Nukem 3D</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -67,7 +38,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="fightmix">
+	<software name="fightmix" supported="no">
 		<description>Fighters Megamix</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -79,7 +50,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="frogger">
+	<software name="frogger" supported="no">
 		<description>Frogger</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
@@ -91,7 +62,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="henry">
+	<software name="henry" supported="no">
 		<description>Henry - Match the Sounds Memory Game</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -103,7 +74,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="indy500">
+	<software name="indy500" supported="no">
 		<description>Indy 500</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -115,7 +86,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="jeopardy">
+	<software name="jeopardy" supported="no">
 		<description>Jeopardy!</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -139,7 +110,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="lostwrld">
+	<software name="lostwrld" supported="no">
 		<description>The Lost World - Jurassic Park</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -151,7 +122,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="monopoly">
+	<software name="monopoly" supported="no">
 		<description>Monopoly</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
@@ -163,7 +134,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="mktrilgy">
+	<software name="mktrilgy" supported="no">
 		<description>Mortal Kombat Trilogy</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -175,7 +146,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="quizwiz">
+	<software name="quizwiz" supported="no">
 		<description>Quiz Wiz - Cyber Trivia</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -187,7 +158,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="re2">
+	<software name="re2" supported="no">
 		<description>Resident Evil 2</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -199,7 +170,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="scrabble">
+	<software name="scrabble" supported="no">
 		<description>Scrabble</description>
 		<year>1999</year>
 		<publisher>Tiger Electronics</publisher>
@@ -211,7 +182,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="sonicjam">
+	<software name="sonicjam" supported="no">
 		<description>Sonic Jam</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -223,7 +194,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="tcasino">
+	<software name="tcasino" supported="no">
 		<description>Tiger Casino</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -235,7 +206,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="wheelfor">
+	<software name="wheelfor" supported="no">
 		<description>Wheel of Fortune</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>
@@ -247,7 +218,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="wheelfo2">
+	<software name="wheelfo2" supported="no">
 		<description>Wheel of Fortune 2</description>
 		<year>1998</year>
 		<publisher>Tiger Electronics</publisher>
@@ -259,7 +230,7 @@ List of games which were planned but never finished or released.
 		</part>
 	</software>
 
-	<software name="arcadecl">
+	<software name="arcadecl" supported="no">
 		<description>Williams Arcade Classics</description>
 		<year>1997</year>
 		<publisher>Tiger Electronics</publisher>

@@ -24,7 +24,7 @@
 //#include "sound/speaker.h"
 
 #include "debugger.h"
-#include "emupal.h"
+#include "rendlay.h"
 #include "screen.h"
 
 
@@ -37,15 +37,6 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
-	void icatel(machine_config &config);
-
-	void init_icatel();
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
 	DECLARE_READ8_MEMBER(magic_string);
 
 	DECLARE_READ8_MEMBER(i80c31_p1_r);
@@ -68,15 +59,19 @@ private:
 	DECLARE_READ8_MEMBER(ci16_r);
 	DECLARE_WRITE8_MEMBER(ci16_w);
 
-	void icatel_palette(palette_device &palette) const;
+	void init_icatel();
+	DECLARE_PALETTE_INIT(icatel);
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
+	void icatel(machine_config &config);
 	void i80c31_data(address_map &map);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
-
-	required_device<i80c31_device> m_maincpu;
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -91,11 +86,11 @@ void icatel_state::i80c31_io(address_map &map)
 	map(0x8000, 0x8002).ram(); /* HACK! */
 	map(0x8040, 0x8040).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::control_write)); // not sure yet. CI12 (73LS273)
 	map(0x8041, 0x8041).mirror(0x3F1E).w(m_lcdc, FUNC(hd44780_device::data_write)); // not sure yet.  CI12
-	map(0x8060, 0x8060).mirror(0x3F1F).rw(FUNC(icatel_state::ci8_r), FUNC(icatel_state::ci8_w));
-	map(0x8080, 0x8080).mirror(0x3F1F).rw(FUNC(icatel_state::ci16_r), FUNC(icatel_state::ci16_w)); // card reader (?)
-	map(0x80C0, 0x80C0).mirror(0x3F1F).rw(FUNC(icatel_state::ci15_r), FUNC(icatel_state::ci15_w)); // 74LS244 (tristate buffer)
-	map(0xC000, 0xCFFF).rw(FUNC(icatel_state::cn8_extension_r), FUNC(icatel_state::cn8_extension_w));
-	map(0xE000, 0xEFFF).rw(FUNC(icatel_state::modem_r), FUNC(icatel_state::modem_w));
+	map(0x8060, 0x8060).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci8_r), FUNC(icatel_state::ci8_w));
+	map(0x8080, 0x8080).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci16_r), FUNC(icatel_state::ci16_w)); // card reader (?)
+	map(0x80C0, 0x80C0).mirror(0x3F1F).rw(this, FUNC(icatel_state::ci15_r), FUNC(icatel_state::ci15_w)); // 74LS244 (tristate buffer)
+	map(0xC000, 0xCFFF).rw(this, FUNC(icatel_state::cn8_extension_r), FUNC(icatel_state::cn8_extension_w));
+	map(0xE000, 0xEFFF).rw(this, FUNC(icatel_state::modem_r), FUNC(icatel_state::modem_w));
 }
 
 void icatel_state::i80c31_data(address_map &map)
@@ -220,7 +215,7 @@ WRITE8_MEMBER(icatel_state::ci16_w)
 
 //----------------------------------------
 
-void icatel_state::icatel_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(icatel_state, icatel)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -256,14 +251,14 @@ HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 
 MACHINE_CONFIG_START(icatel_state::icatel)
 	/* basic machine hardware */
-	I80C31(config, m_maincpu, XTAL(2'097'152));
-	m_maincpu->set_addrmap(AS_PROGRAM, &icatel_state::i80c31_prg);
-	m_maincpu->set_addrmap(AS_DATA, &icatel_state::i80c31_data);
-	m_maincpu->set_addrmap(AS_IO, &icatel_state::i80c31_io);
-	m_maincpu->port_in_cb<1>().set(FUNC(icatel_state::i80c31_p1_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(icatel_state::i80c31_p1_w));
-	m_maincpu->port_in_cb<3>().set(FUNC(icatel_state::i80c31_p3_r));
-	m_maincpu->port_out_cb<3>().set(FUNC(icatel_state::i80c31_p3_w));
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(2'097'152))
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_DATA_MAP(i80c31_data)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, icatel_state, i80c31_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, icatel_state, i80c31_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, icatel_state, i80c31_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, icatel_state, i80c31_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -274,12 +269,14 @@ MACHINE_CONFIG_START(icatel_state::icatel)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(icatel_state::icatel_palette), 2);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_icatel);
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(icatel_state, icatel)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_icatel)
 
-	HD44780(config, m_lcdc, 0);
-	m_lcdc->set_lcd_size(2, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(icatel_state::icatel_pixel_update), this);
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(2, 16)
+	MCFG_HD44780_PIXEL_UPDATE_CB(icatel_state, icatel_pixel_update)
 MACHINE_CONFIG_END
 
 ROM_START( icatel )

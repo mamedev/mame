@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -314,8 +314,7 @@ namespace bx
 			if (p2 < delta)
 			{
 				*K += kappa;
-				const int index = -static_cast<int>(kappa);
-				GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * (index < 9 ? s_kPow10[-static_cast<int>(kappa)] : 0));
+				GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * s_kPow10[-kappa]);
 				return;
 			}
 		}
@@ -467,12 +466,12 @@ namespace bx
 	{
 		for (int32_t ii = 0, jj = _len - 1; ii < jj; ++ii, --jj)
 		{
-			swap(_dst[ii], _dst[jj]);
+			xchg(_dst[ii], _dst[jj]);
 		}
 	}
 
 	template<typename Ty>
-	int32_t toStringSigned(char* _dst, int32_t _max, Ty _value, uint32_t _base, char _separator)
+	int32_t toStringSigned(char* _dst, int32_t _max, Ty _value, uint32_t _base)
 	{
 		if (_base == 10
 		&&  _value < 0)
@@ -483,11 +482,10 @@ namespace bx
 			}
 
 			_max = toString(_dst + 1
-				, _max - 1
-				, typename std::make_unsigned<Ty>::type(-_value)
-				, _base
-				, _separator
-				);
+					, _max - 1
+					, typename std::make_unsigned<Ty>::type(-_value)
+					, _base
+					);
 			if (_max == 0)
 			{
 				return 0;
@@ -498,25 +496,24 @@ namespace bx
 		}
 
 		return toString(_dst
-			, _max
-			, typename std::make_unsigned<Ty>::type(_value)
-			, _base
-			, _separator
-			);
+					, _max
+					, typename std::make_unsigned<Ty>::type(_value)
+					, _base
+					);
 	}
 
-	int32_t toString(char* _dst, int32_t _max, int32_t _value, uint32_t _base, char _separator)
+	int32_t toString(char* _dst, int32_t _max, int32_t _value, uint32_t _base)
 	{
-		return toStringSigned(_dst, _max, _value, _base, _separator);
+		return toStringSigned(_dst, _max, _value, _base);
 	}
 
-	int32_t toString(char* _dst, int32_t _max, int64_t _value, uint32_t _base, char _separator)
+	int32_t toString(char* _dst, int32_t _max, int64_t _value, uint32_t _base)
 	{
-		return toStringSigned(_dst, _max, _value, _base, _separator);
+		return toStringSigned(_dst, _max, _value, _base);
 	}
 
 	template<typename Ty>
-	int32_t toStringUnsigned(char* _dst, int32_t _max, Ty _value, uint32_t _base, char _separator)
+	int32_t toStringUnsigned(char* _dst, int32_t _max, Ty _value, uint32_t _base)
 	{
 		char data[32];
 		int32_t len = 0;
@@ -526,8 +523,6 @@ namespace bx
 		{
 			return 0;
 		}
-
-		uint32_t count = 1;
 
 		do
 		{
@@ -542,16 +537,7 @@ namespace bx
 				data[len++] = char('a' + rem - 10);
 			}
 
-			if ('\0' != _separator
-			&&  0 == count%3
-			&&  0 != _value)
-			{
-				data[len++] = _separator;
-			}
-
-			++count;
-		}
-		while (0 != _value);
+		} while (_value != 0);
 
 		if (_max < len + 1)
 		{
@@ -565,14 +551,14 @@ namespace bx
 		return int32_t(len);
 	}
 
-	int32_t toString(char* _dst, int32_t _max, uint32_t _value, uint32_t _base, char _separator)
+	int32_t toString(char* _dst, int32_t _max, uint32_t _value, uint32_t _base)
 	{
-		return toStringUnsigned(_dst, _max, _value, _base, _separator);
+		return toStringUnsigned(_dst, _max, _value, _base);
 	}
 
-	int32_t toString(char* _dst, int32_t _max, uint64_t _value, uint32_t _base, char _separator)
+	int32_t toString(char* _dst, int32_t _max, uint64_t _value, uint32_t _base)
 	{
-		return toStringUnsigned(_dst, _max, _value, _base, _separator);
+		return toStringUnsigned(_dst, _max, _value, _base);
 	}
 
 	/*
@@ -1120,12 +1106,11 @@ namespace bx
 
 	bool fromString(int32_t* _out, const StringView& _str)
 	{
-		StringView str = bx::strLTrimSpace(_str);
+		const char* str  = _str.getPtr();
+		const char* term = _str.getTerm();
 
-		const char* ptr  = str.getPtr();
-		const char* term = str.getTerm();
-
-		char ch = *ptr++;
+		str = strws(str);
+		char ch = *str++;
 		bool neg = false;
 		switch (ch)
 		{
@@ -1134,13 +1119,13 @@ namespace bx
 			break;
 
 		default:
-			--ptr;
+			--str;
 			break;
 		}
 
 		int32_t result = 0;
 
-		for (ch = *ptr++; isNumeric(ch) && ptr <= term; ch = *ptr++)
+		for (ch = *str++; isNumeric(ch) && str <= term; ch = *str++)
 		{
 			result = 10*result - (ch - '0');
 		}

@@ -115,18 +115,18 @@ void oneshot_state::oneshot_map(address_map &map)
 	map(0x080000, 0x087fff).ram();
 	map(0x0c0000, 0x0c07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x120000, 0x120fff).ram().share("sprites");
-	map(0x180000, 0x180fff).ram().w(FUNC(oneshot_state::oneshot_mid_videoram_w)).share("mid_videoram"); // some people , girl etc.
-	map(0x181000, 0x181fff).ram().w(FUNC(oneshot_state::oneshot_fg_videoram_w)).share("fg_videoram"); // credits etc.
-	map(0x182000, 0x182fff).ram().w(FUNC(oneshot_state::oneshot_bg_videoram_w)).share("bg_videoram"); // credits etc.
+	map(0x180000, 0x180fff).ram().w(this, FUNC(oneshot_state::oneshot_mid_videoram_w)).share("mid_videoram"); // some people , girl etc.
+	map(0x181000, 0x181fff).ram().w(this, FUNC(oneshot_state::oneshot_fg_videoram_w)).share("fg_videoram"); // credits etc.
+	map(0x182000, 0x182fff).ram().w(this, FUNC(oneshot_state::oneshot_bg_videoram_w)).share("bg_videoram"); // credits etc.
 	map(0x188000, 0x18800f).writeonly().share("scroll");    // scroll registers
 	map(0x190003, 0x190003).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x190011, 0x190011).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x190018, 0x190019).w(FUNC(oneshot_state::soundbank_w));
-	map(0x190026, 0x190027).r(FUNC(oneshot_state::oneshot_gun_x_p1_r));
-	map(0x19002e, 0x19002f).r(FUNC(oneshot_state::oneshot_gun_x_p2_r));
-	map(0x190036, 0x190037).r(FUNC(oneshot_state::oneshot_gun_y_p1_r));
-	map(0x19003e, 0x19003f).r(FUNC(oneshot_state::oneshot_gun_y_p2_r));
-	map(0x19c020, 0x19c021).r(FUNC(oneshot_state::oneshot_in0_word_r));
+	map(0x190018, 0x190019).w(this, FUNC(oneshot_state::soundbank_w));
+	map(0x190026, 0x190027).r(this, FUNC(oneshot_state::oneshot_gun_x_p1_r));
+	map(0x19002e, 0x19002f).r(this, FUNC(oneshot_state::oneshot_gun_x_p2_r));
+	map(0x190036, 0x190037).r(this, FUNC(oneshot_state::oneshot_gun_y_p1_r));
+	map(0x19003e, 0x19003f).r(this, FUNC(oneshot_state::oneshot_gun_y_p2_r));
+	map(0x19c020, 0x19c021).r(this, FUNC(oneshot_state::oneshot_in0_word_r));
 	map(0x19c024, 0x19c025).portr("DSW2");
 	map(0x19c02c, 0x19c02d).portr("CREDITS");
 	map(0x19c030, 0x19c031).portr("P1");
@@ -362,44 +362,51 @@ void oneshot_state::machine_reset()
 	m_p2_wobble = 0;
 }
 
-void oneshot_state::oneshot(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &oneshot_state::oneshot_map);
-	m_maincpu->set_vblank_int("screen", FUNC(oneshot_state::irq4_line_hold));
+MACHINE_CONFIG_START(oneshot_state::oneshot)
 
-	Z80(config, "audiocpu", 5000000).set_addrmap(AS_PROGRAM, &oneshot_state::oneshot_sound_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(oneshot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", oneshot_state,  irq4_line_hold)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(oneshot_sound_map)
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*16, 32*16);
-	screen.set_visarea(0*16, 20*16-1, 0*16, 15*16-1);
-	screen.set_screen_update(FUNC(oneshot_state::screen_update_oneshot));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*16, 20*16-1, 0*16, 15*16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(oneshot_state, screen_update_oneshot)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_oneshot);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_oneshot)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3500000));
-	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 3500000)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void oneshot_state::maddonna(machine_config &config)
-{
+MACHINE_CONFIG_START(oneshot_state::maddonna)
 	oneshot(config);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(oneshot_state::screen_update_maddonna));
-}
+
+	/* basic machine hardware */
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(oneshot_state, screen_update_maddonna)
+MACHINE_CONFIG_END
 
 
 ROM_START( oneshot )

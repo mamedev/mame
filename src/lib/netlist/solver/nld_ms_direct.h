@@ -9,7 +9,6 @@
 #define NLD_MS_DIRECT_H_
 
 #include <algorithm>
-#include <cmath>
 
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"
@@ -56,11 +55,15 @@ protected:
 	void LE_back_subst(T * RESTRICT x);
 
 #if (NL_USE_DYNAMIC_ALLOCATION)
-	nl_ext_double &A(const std::size_t r, const std::size_t c) { return m_A[r * m_pitch + c]; }
-	nl_ext_double &RHS(const std::size_t r) { return m_A[r * m_pitch + N()]; }
+	template <typename T1, typename T2>
+	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r * m_pitch + c]; }
+	template <typename T1>
+	nl_ext_double &RHS(const T1 &r) { return m_A[r * m_pitch + N()]; }
 #else
-	nl_ext_double &A(const std::size_t r, const std::size_t c) { return m_A[r][c]; }
-	nl_ext_double &RHS(const std::size_t r) { return m_A[r][N()]; }
+	template <typename T1, typename T2>
+	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
+	template <typename T1>
+	nl_ext_double &RHS(const T1 &r) { return m_A[r][N()]; }
 #endif
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 

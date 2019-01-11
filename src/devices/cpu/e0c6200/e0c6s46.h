@@ -11,6 +11,13 @@
 
 #include "e0c6200.h"
 
+
+// I/O ports setup
+
+// 5 4-bit R output ports
+#define MCFG_E0C6S46_WRITE_R_CB(R, _devcb) \
+	devcb = &downcast<e0c6s46_device &>(*device).set_write_r##R##_callback(DEVCB_##_devcb);
+
 enum
 {
 	E0C6S46_PORT_R0X = 0,
@@ -19,6 +26,12 @@ enum
 	E0C6S46_PORT_R3X,
 	E0C6S46_PORT_R4X
 };
+
+// 4 4-bit P I/O ports
+#define MCFG_E0C6S46_READ_P_CB(R, _devcb) \
+	devcb = &downcast<hmcs40_cpu_device &>(*device).set_read_r##P##_callback(DEVCB_##_devcb);
+#define MCFG_E0C6S46_WRITE_P_CB(R, _devcb) \
+	devcb = &downcast<e0c6s46_device &>(*device).set_write_r##P##_callback(DEVCB_##_devcb);
 
 enum
 {
@@ -43,6 +56,9 @@ enum
 
 
 // lcd driver
+#define MCFG_E0C6S46_PIXEL_UPDATE_CB(_class, _method) \
+	downcast<e0c6s46_device &>(*device).set_pixel_update_cb(e0c6s46_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
+
 #define E0C6S46_PIXEL_UPDATE(name) void name(bitmap_ind16 &bitmap, const rectangle &cliprect, int contrast, int seg, int com, int state)
 
 
@@ -53,24 +69,23 @@ public:
 
 	e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// 5 4-bit R output ports
-	template <std::size_t Port> auto write_r() { return m_write_r[Port].bind(); }
+	// configuration helpers
+	template <class Object> devcb_base &set_write_r0_callback(Object &&cb) { return m_write_r0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r1_callback(Object &&cb) { return m_write_r1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r2_callback(Object &&cb) { return m_write_r2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r3_callback(Object &&cb) { return m_write_r3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_r4_callback(Object &&cb) { return m_write_r4.set_callback(std::forward<Object>(cb)); }
 
-	// 4 4-bit P I/O ports
-	template <std::size_t Port> auto read_p() { return m_read_p[Port].bind(); }
-	template <std::size_t Port> auto write_p() { return m_write_p[Port].bind(); }
+	template <class Object> devcb_base &set_read_p0_callback(Object &&cb) { return m_read_p0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_p1_callback(Object &&cb) { return m_read_p1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_p2_callback(Object &&cb) { return m_read_p2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_read_p3_callback(Object &&cb) { return m_read_p3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_p0_callback(Object &&cb) { return m_write_p0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_p1_callback(Object &&cb) { return m_write_p1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_p2_callback(Object &&cb) { return m_write_p2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_write_p3_callback(Object &&cb) { return m_write_p3.set_callback(std::forward<Object>(cb)); }
 
-	void set_pixel_update_cb(pixel_update_delegate callback) { m_pixel_update_cb = callback; }
-	template <class FunctionClass> void set_pixel_update_cb(const char *devname,
-		void (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, int, int, int, int), const char *name)
-	{
-		set_pixel_update_cb(pixel_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_pixel_update_cb(void (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, int, int, int, int),
-		const char *name)
-	{
-		set_pixel_update_cb(pixel_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename Object> void set_pixel_update_cb(Object &&cb) { m_pixel_update_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -105,9 +120,9 @@ private:
 	pixel_update_delegate m_pixel_update_cb;
 
 	// i/o ports
-	devcb_write8 m_write_r[5];
-	devcb_read8 m_read_p[4];
-	devcb_write8 m_write_p[4];
+	devcb_write8 m_write_r0, m_write_r1, m_write_r2, m_write_r3, m_write_r4;
+	devcb_read8 m_read_p0, m_read_p1, m_read_p2, m_read_p3;
+	devcb_write8 m_write_p0, m_write_p1, m_write_p2, m_write_p3;
 	void write_r(u8 port, u8 data);
 	void write_r4_out();
 	void write_p(u8 port, u8 data);

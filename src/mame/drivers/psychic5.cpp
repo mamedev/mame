@@ -442,11 +442,11 @@ void psychic5_state::psychic5_main_map(address_map &map)
 	map(0xc000, 0xdfff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf000).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf001, 0xf001).nopr().w(FUNC(psychic5_state::psychic5_coin_counter_w));
-	map(0xf002, 0xf002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::psychic5_bankselect_w));
-	map(0xf003, 0xf003).rw(FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
+	map(0xf001, 0xf001).nopr().w(this, FUNC(psychic5_state::psychic5_coin_counter_w));
+	map(0xf002, 0xf002).rw(this, FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::psychic5_bankselect_w));
+	map(0xf003, 0xf003).rw(this, FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
 	map(0xf004, 0xf004).noprw(); // ???
-	map(0xf005, 0xf005).nopr().w(FUNC(psychic5_state::psychic5_title_screen_w));
+	map(0xf005, 0xf005).nopr().w(this, FUNC(psychic5_state::psychic5_title_screen_w));
 	map(0xf006, 0xf1ff).noprw();
 	map(0xf200, 0xf7ff).ram().share("spriteram");
 	map(0xf800, 0xffff).ram();
@@ -455,7 +455,7 @@ void psychic5_state::psychic5_main_map(address_map &map)
 
 void psychic5_state::psychic5_vrambank_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x0000, 0x0fff).ram().w(this, FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
 	map(0x1000, 0x1fff).ram();
 
 	map(0x2000, 0x2000).portr("SYSTEM");
@@ -466,11 +466,11 @@ void psychic5_state::psychic5_vrambank_map(address_map &map)
 
 	map(0x2308, 0x230c).ram().share("bg_control");
 
-	map(0x2400, 0x25ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
-	map(0x2800, 0x29ff).ram().w(FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
-	map(0x2a00, 0x2bff).ram().w(FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
+	map(0x2400, 0x25ff).ram().w(this, FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
+	map(0x2800, 0x29ff).ram().w(this, FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
+	map(0x2a00, 0x2bff).ram().w(this, FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
 
-	map(0x3000, 0x37ff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
 
 }
 
@@ -499,10 +499,10 @@ void psychic5_state::bombsa_main_map(address_map &map)
 	/* ports look like the other games */
 	map(0xd000, 0xd1ff).ram();
 	map(0xd000, 0xd000).w("soundlatch", FUNC(generic_latch_8_device::write)); // confirmed
-	map(0xd001, 0xd001).w(FUNC(psychic5_state::bombsa_flipscreen_w));
-	map(0xd002, 0xd002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::bombsa_bankselect_w));
-	map(0xd003, 0xd003).rw(FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
-	map(0xd005, 0xd005).w(FUNC(psychic5_state::bombsa_unknown_w)); // ?
+	map(0xd001, 0xd001).w(this, FUNC(psychic5_state::bombsa_flipscreen_w));
+	map(0xd002, 0xd002).rw(this, FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::bombsa_bankselect_w));
+	map(0xd003, 0xd003).rw(this, FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
+	map(0xd005, 0xd005).w(this, FUNC(psychic5_state::bombsa_unknown_w)); // ?
 
 	map(0xd200, 0xd7ff).ram().share("spriteram");
 	map(0xd800, 0xdfff).ram();
@@ -527,7 +527,7 @@ void psychic5_state::bombsa_soundport_map(address_map &map)
 
 void psychic5_state::bombsa_vrambank_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
+	map(0x0000, 0x1fff).ram().w(this, FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
 
 	map(0x2000, 0x2000).portr("SYSTEM");
 	map(0x2001, 0x2001).portr("P1");
@@ -537,11 +537,11 @@ void psychic5_state::bombsa_vrambank_map(address_map &map)
 
 	map(0x2308, 0x230c).ram().share("bg_control");
 
-	map(0x3000, 0x31ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
-	map(0x3200, 0x33ff).ram().w(FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
-	map(0x3400, 0x35ff).ram().w(FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
+	map(0x3000, 0x31ff).ram().w(this, FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
+	map(0x3200, 0x33ff).ram().w(this, FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
+	map(0x3400, 0x35ff).ram().w(this, FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
 
-	map(0x2800, 0x2fff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
+	map(0x2800, 0x2fff).ram().w(this, FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
 }
 
 
@@ -720,32 +720,37 @@ static GFXDECODE_START( gfx_bombsa )
 GFXDECODE_END
 
 
-void psychic5_state::psychic5(machine_config &config)
-{
+MACHINE_CONFIG_START(psychic5_state::psychic5)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &psychic5_state::psychic5_main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(psychic5_state::scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_main_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&psychic5_state::psychic5_vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 14, 0x2000);
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_vrambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	Z80(config, m_audiocpu, XTAL(5'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::psychic5_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::psychic5_soundport_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(psychic5_sound_map)
+	MCFG_DEVICE_IO_MAP(psychic5_soundport_map)
 
-	config.m_minimum_quantum = attotime::from_hz(600);      /* Allow time for 2nd cpu to interleave */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))      /* Allow time for 2nd cpu to interleave */
 
 	MCFG_MACHINE_START_OVERRIDE(psychic5_state,psychic5)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240); // was 53.8 Hz before, assume same as Bombs Away
-	screen.set_screen_update(FUNC(psychic5_state::screen_update_psychic5));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
+	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psychic5);
-	PALETTE(config, m_palette).set_entries(768);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psychic5)
+	MCFG_PALETTE_ADD("palette", 768)
 
-	JALECO_BLEND(config, m_blend, 0);
+	MCFG_DEVICE_ADD("blend", JALECO_BLEND, 0)
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
@@ -753,46 +758,51 @@ void psychic5_state::psychic5(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000)/8));
-	ym1.irq_handler().set_inputline(m_audiocpu, 0);
-	ym1.add_route(0, "mono", 0.15);
-	ym1.add_route(1, "mono", 0.15);
-	ym1.add_route(2, "mono", 0.15);
-	ym1.add_route(3, "mono", 0.50);
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(12'000'000)/8));
-	ym2.add_route(0, "mono", 0.15);
-	ym2.add_route(1, "mono", 0.15);
-	ym2.add_route(2, "mono", 0.15);
-	ym2.add_route(3, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void psychic5_state::bombsa(machine_config &config)
-{
+MACHINE_CONFIG_START(psychic5_state::bombsa)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* 6 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &psychic5_state::bombsa_main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(psychic5_state::scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_main_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&psychic5_state::bombsa_vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 14, 0x2000);
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_vrambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	Z80(config, m_audiocpu, XTAL(5'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::bombsa_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::bombsa_soundport_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(bombsa_sound_map)
+	MCFG_DEVICE_IO_MAP(bombsa_soundport_map)
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START_OVERRIDE(psychic5_state,bombsa)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240); /* Measured as: VSync 54Hz, HSync 15.25kHz */
-	screen.set_screen_update(FUNC(psychic5_state::screen_update_bombsa));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
+	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombsa);
-	PALETTE(config, m_palette).set_entries(768);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bombsa)
+	MCFG_PALETTE_ADD("palette", 768)
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
 	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
@@ -800,21 +810,21 @@ void psychic5_state::bombsa(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000)/8));
-	ym1.irq_handler().set_inputline(m_audiocpu, 0);
-	ym1.add_route(0, "mono", 0.30);
-	ym1.add_route(1, "mono", 0.30);
-	ym1.add_route(2, "mono", 0.30);
-	ym1.add_route(3, "mono", 1.0);
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8)
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.30)
+	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	MCFG_SOUND_ROUTE(2, "mono", 0.30)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(12'000'000)/8));
-	ym2.add_route(0, "mono", 0.30);
-	ym2.add_route(1, "mono", 0.30);
-	ym2.add_route(2, "mono", 0.30);
-	ym2.add_route(3, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000)/8)
+	MCFG_SOUND_ROUTE(0, "mono", 0.30)
+	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	MCFG_SOUND_ROUTE(2, "mono", 0.30)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -6,14 +6,14 @@
  *  DM9316: Synchronous 4-Bit Counters
  *
  *          +--------------+
- *   /CLEAR |1     ++    16| VCC
+ *    CLEAR |1     ++    16| VCC
  *    CLOCK |2           15| RC (Ripple Carry)
  *        A |3           14| QA
  *        B |4    9316   13| QB
  *        C |5           12| QC
  *        D |6           11| QD
  * Enable P |7           10| Enable T
- *      GND |8            9| /LOAD
+ *      GND |8            9| LOAD
  *          +--------------+
  *
  *          Counter Sequence

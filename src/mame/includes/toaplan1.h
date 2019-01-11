@@ -4,51 +4,27 @@
                 ToaPlan game hardware from 1988-1991
                 ------------------------------------
 ****************************************************************************/
-#ifndef MAME_INCLUDES_TOAPLAN1_H
-#define MAME_INCLUDES_TOAPLAN1_H
-
-#pragma once
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32010/tms32010.h"
-#include "sound/3812intf.h"
 #include "video/toaplan_scu.h"
-#include "emupal.h"
 #include "screen.h"
 
 class toaplan1_state : public driver_device
 {
 public:
-	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_bgpaletteram(*this, "bgpalette"),
 		m_fgpaletteram(*this, "fgpalette"),
 		m_sharedram(*this, "sharedram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_ymsnd(*this, "ymsnd"),
 		m_dsp(*this, "dsp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void demonwld(machine_config &config);
-	void samesame(machine_config &config);
-	void truxton(machine_config &config);
-	void outzone(machine_config &config);
-	void vimana(machine_config &config);
-	void outzonecv(machine_config &config);
-	void hellfire(machine_config &config);
-	void zerowing(machine_config &config);
-
-	void init_toaplan1();
-	void init_demonwld();
-
-	DECLARE_MACHINE_RESET(toaplan1);
-
-protected:
 	required_shared_ptr<uint16_t> m_bgpaletteram;
 	required_shared_ptr<uint16_t> m_fgpaletteram;
 
@@ -58,7 +34,7 @@ protected:
 
 	/* Demon world */
 	int m_dsp_on;
-	int m_dsp_bio;
+	int m_dsp_BIO;
 	int m_dsp_execute;
 	uint32_t m_dsp_addr_w;
 	uint32_t m_main_ram_seg;
@@ -104,12 +80,14 @@ protected:
 	tilemap_t *m_pf3_tilemap;
 	tilemap_t *m_pf4_tilemap;
 
+
+
 	DECLARE_WRITE16_MEMBER(toaplan1_intenable_w);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_addrsel_w);
 	DECLARE_READ16_MEMBER(demonwld_dsp_r);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_w);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_bio_w);
-	DECLARE_READ_LINE_MEMBER(demonwld_bio_r);
+	DECLARE_READ_LINE_MEMBER(demonwld_BIO_r);
 	DECLARE_WRITE16_MEMBER(demonwld_dsp_ctrl_w);
 	DECLARE_READ16_MEMBER(samesame_port_6_word_r);
 	DECLARE_READ16_MEMBER(toaplan1_shared_r);
@@ -149,11 +127,13 @@ protected:
 	DECLARE_WRITE8_MEMBER(samesame_sound_done_w);
 	DECLARE_READ8_MEMBER(samesame_cmdavailable_r);
 
+	void init_toaplan1();
+	void init_demonwld();
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf4_tile_info);
-
+	DECLARE_MACHINE_RESET(toaplan1);
 	DECLARE_VIDEO_START(toaplan1);
 	DECLARE_MACHINE_RESET(zerowing);
 	DECLARE_MACHINE_RESET(demonwld);
@@ -179,14 +159,20 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(toaplan1_reset_callback);
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<ym3812_device> m_ymsnd;
-	optional_device<tms32010_device> m_dsp;
+	optional_device<cpu_device> m_dsp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
+	void demonwld(machine_config &config);
+	void samesame(machine_config &config);
+	void truxton(machine_config &config);
+	void outzone(machine_config &config);
+	void vimana(machine_config &config);
+	void outzonecv(machine_config &config);
+	void hellfire(machine_config &config);
+	void zerowing(machine_config &config);
+	void DSP_io_map(address_map &map);
+	void DSP_program_map(address_map &map);
 	void demonwld_main_map(address_map &map);
 	void demonwld_sound_io_map(address_map &map);
 	void hellfire_main_map(address_map &map);
@@ -210,15 +196,12 @@ protected:
 class toaplan1_rallybik_state : public toaplan1_state
 {
 public:
-	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag) :
-		toaplan1_state(mconfig, type, tag),
+	toaplan1_rallybik_state(const machine_config &mconfig, device_type type, const char *tag)
+		: toaplan1_state(mconfig, type, tag),
 		m_spritegen(*this, "scu")
 	{
 	}
 
-	void rallybik(machine_config &config);
-
-private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
@@ -229,8 +212,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_rallybik);
 
 	required_device<toaplan_scu_device> m_spritegen;
+	void rallybik(machine_config &config);
 	void rallybik_main_map(address_map &map);
 	void rallybik_sound_io_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_TOAPLAN1_H

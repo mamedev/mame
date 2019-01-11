@@ -12,7 +12,6 @@
 
 #include "emuopts.h"
 #include "drivenum.h"
-#include "romload.h"
 #include "ui/uimain.h"
 #include "zippath.h"
 #include "softlist.h"

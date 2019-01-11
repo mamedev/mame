@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "emupal.h"
 
 
 /***************************************************************************
@@ -26,9 +25,9 @@
 	MCFG_I8244_IRQ_CB(_irq_cb) \
 	MCFG_I8244_POSTPROCESS_CB(_postprocess_cb)
 #define MCFG_I8244_IRQ_CB(_devcb) \
-	downcast<i8244_device &>(*device).set_irq_cb(DEVCB_##_devcb);
+	devcb = &downcast<i8244_device &>(*device).set_irq_cb(DEVCB_##_devcb);
 #define MCFG_I8244_POSTPROCESS_CB(_devcb) \
-	downcast<i8244_device &>(*device).set_postprocess_cb(DEVCB_##_devcb);
+	devcb = &downcast<i8244_device &>(*device).set_postprocess_cb(DEVCB_##_devcb);
 #define MCFG_I8245_ADD(_tag, _clock, _screen_tag, _irq_cb, _postprocess_cb) \
 	MCFG_DEVICE_ADD(_tag, I8245, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
@@ -58,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ_LINE_MEMBER(vblank);
 	DECLARE_READ_LINE_MEMBER(hblank);
-	void i8244_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(i8244);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

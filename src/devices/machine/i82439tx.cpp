@@ -3,30 +3,34 @@
 #include "emu.h"
 #include "i82439tx.h"
 
-DEFINE_DEVICE_TYPE(I82439TX, i82439tx_host_device, "i82439tx", "Intel 82439TX northbridge")
+DEFINE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device, "i82439tx_new", "Intel 82439TX northbridge")
 
 void i82439tx_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
-	map(0x50, 0x50).rw(FUNC(i82439tx_host_device::pcon_r), FUNC(i82439tx_host_device::pcon_w));
-	map(0x52, 0x52).rw(FUNC(i82439tx_host_device::cc_r), FUNC(i82439tx_host_device::cc_w));
-	map(0x56, 0x56).rw(FUNC(i82439tx_host_device::dramec_r), FUNC(i82439tx_host_device::dramec_w));
-	map(0x57, 0x57).rw(FUNC(i82439tx_host_device::dramc_r), FUNC(i82439tx_host_device::dramc_w));
-	map(0x58, 0x5f).rw(FUNC(i82439tx_host_device::pam_r), FUNC(i82439tx_host_device::pam_w));
-	map(0x58, 0x58).rw(FUNC(i82439tx_host_device::dramt_r), FUNC(i82439tx_host_device::dramt_w));
-	map(0x60, 0x67).rw(FUNC(i82439tx_host_device::drb_r), FUNC(i82439tx_host_device::drb_w));
-	map(0x68, 0x68).rw(FUNC(i82439tx_host_device::drt_r), FUNC(i82439tx_host_device::drt_w));
-	map(0x69, 0x69).rw(FUNC(i82439tx_host_device::drat_r), FUNC(i82439tx_host_device::drat_w));
-	map(0x72, 0x72).rw(FUNC(i82439tx_host_device::smram_r), FUNC(i82439tx_host_device::smram_w));
-	map(0x90, 0x90).rw(FUNC(i82439tx_host_device::errcmd_r), FUNC(i82439tx_host_device::errcmd_w));
-	map(0x91, 0x91).rw(FUNC(i82439tx_host_device::errsts_r), FUNC(i82439tx_host_device::errsts_w));
-	map(0x92, 0x92).r(FUNC(i82439tx_host_device::errsyn_r));
+	map(0x50, 0x50).rw(this, FUNC(i82439tx_host_device::pcon_r), FUNC(i82439tx_host_device::pcon_w));
+	map(0x52, 0x52).rw(this, FUNC(i82439tx_host_device::cc_r), FUNC(i82439tx_host_device::cc_w));
+	map(0x56, 0x56).rw(this, FUNC(i82439tx_host_device::dramec_r), FUNC(i82439tx_host_device::dramec_w));
+	map(0x57, 0x57).rw(this, FUNC(i82439tx_host_device::dramc_r), FUNC(i82439tx_host_device::dramc_w));
+	map(0x58, 0x5f).rw(this, FUNC(i82439tx_host_device::pam_r), FUNC(i82439tx_host_device::pam_w));
+	map(0x58, 0x58).rw(this, FUNC(i82439tx_host_device::dramt_r), FUNC(i82439tx_host_device::dramt_w));
+	map(0x60, 0x67).rw(this, FUNC(i82439tx_host_device::drb_r), FUNC(i82439tx_host_device::drb_w));
+	map(0x68, 0x68).rw(this, FUNC(i82439tx_host_device::drt_r), FUNC(i82439tx_host_device::drt_w));
+	map(0x69, 0x69).rw(this, FUNC(i82439tx_host_device::drat_r), FUNC(i82439tx_host_device::drat_w));
+	map(0x72, 0x72).rw(this, FUNC(i82439tx_host_device::smram_r), FUNC(i82439tx_host_device::smram_w));
+	map(0x90, 0x90).rw(this, FUNC(i82439tx_host_device::errcmd_r), FUNC(i82439tx_host_device::errcmd_w));
+	map(0x91, 0x91).rw(this, FUNC(i82439tx_host_device::errsts_r), FUNC(i82439tx_host_device::errsts_w));
+	map(0x92, 0x92).r(this, FUNC(i82439tx_host_device::errsyn_r));
 }
 
 i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, I82439TX, tag, owner, clock)
-	, cpu(*this, finder_base::DUMMY_TAG)
+	: pci_host_device(mconfig, I82439TX_NEW, tag, owner, clock)
 {
+}
+
+void i82439tx_host_device::set_cpu_tag(const char *_cpu_tag)
+{
+	cpu_tag = _cpu_tag;
 }
 
 void i82439tx_host_device::set_ram_size(int _ram_size)
@@ -37,6 +41,7 @@ void i82439tx_host_device::set_ram_size(int _ram_size)
 void i82439tx_host_device::device_start()
 {
 	pci_host_device::device_start();
+	cpu = machine().device<cpu_device>(cpu_tag);
 	memory_space = &cpu->space(AS_PROGRAM);
 	io_space = &cpu->space(AS_IO);
 

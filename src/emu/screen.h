@@ -91,22 +91,19 @@ private:
 public:
 	// construction/destruction
 	screen_bitmap()
-		: m_format(BITMAP_FORMAT_RGB32)
-		, m_texformat(TEXFORMAT_RGB32)
-		, m_live(&m_rgb32)
-	{ }
+		: m_format(BITMAP_FORMAT_RGB32),
+			m_texformat(TEXFORMAT_RGB32),
+			m_live(&m_rgb32) { }
 	screen_bitmap(bitmap_ind16 &orig)
-		: m_format(BITMAP_FORMAT_IND16)
-		, m_texformat(TEXFORMAT_PALETTE16)
-		, m_live(&m_ind16)
-		, m_ind16(orig, orig.cliprect())
-	{ }
+		: m_format(BITMAP_FORMAT_IND16),
+			m_texformat(TEXFORMAT_PALETTE16),
+			m_live(&m_ind16),
+			m_ind16(orig, orig.cliprect()) { }
 	screen_bitmap(bitmap_rgb32 &orig)
-		: m_format(BITMAP_FORMAT_RGB32)
-		, m_texformat(TEXFORMAT_RGB32)
-		, m_live(&m_rgb32)
-		, m_rgb32(orig, orig.cliprect())
-	{ }
+		: m_format(BITMAP_FORMAT_RGB32),
+			m_texformat(TEXFORMAT_RGB32),
+			m_live(&m_rgb32),
+			m_rgb32(orig, orig.cliprect()) { }
 
 	// resizing
 	void resize(int width, int height) { live().resize(width, height); }
@@ -171,18 +168,10 @@ class screen_device : public device_t
 public:
 	// construction/destruction
 	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, screen_type_enum type)
-		: screen_device(mconfig, tag, owner, u32(0))
-	{
-		set_type(type);
-	}
 	~screen_device();
 
 	// configuration readers
 	screen_type_enum screen_type() const { return m_type; }
-	int orientation() const { assert(configured()); return m_orientation; }
-	std::pair<unsigned, unsigned> physical_aspect() const;
 	int width() const { return m_width; }
 	int height() const { return m_height; }
 	const rectangle &visible_area() const { return m_visarea; }
@@ -195,13 +184,10 @@ public:
 	float yoffset() const { return m_yoffset; }
 	float xscale() const { return m_xscale; }
 	float yscale() const { return m_yscale; }
-	bool has_screen_update() const { return !m_screen_update_ind16.isnull() || !m_screen_update_rgb32.isnull(); }
+	bool have_screen_update() const { return !m_screen_update_ind16.isnull() && !m_screen_update_rgb32.isnull(); }
 
 	// inline configuration helpers
-	void set_type(screen_type_enum type) { assert(!configured()); m_type = type; }
-	void set_orientation(int orientation) { assert(!configured()); m_orientation = orientation; }
-	void set_physical_aspect(unsigned x, unsigned y) { assert(!configured()); m_phys_aspect = std::make_pair(x, y); }
-	void set_native_aspect() { assert(!configured()); m_phys_aspect = std::make_pair(~0U, ~0U); }
+	void set_type(screen_type_enum type) { m_type = type; }
 	void set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
 	{
 		m_clock = pixclock;
@@ -213,7 +199,6 @@ public:
 	}
 	void set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart) { set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart); }
 	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
-	template <typename T> void set_refresh_hz(T &&hz) { set_refresh(HZ_TO_ATTOSECONDS(std::forward<T>(hz))); }
 	void set_vblank_time(attoseconds_t time) { m_vblank = time; m_oldstyle_vblank_supplied = true; }
 	void set_size(u16 width, u16 height) { m_width = width; m_height = height; }
 	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_visarea.set(minx, maxx, miny, maxy); }
@@ -222,28 +207,6 @@ public:
 		m_xoffset = xoffs;
 		m_yscale = yscale;
 		m_yoffset = yoffs;
-	}
-
-	// FIXME: these should be aware of current device for resolving the tag
-	template <class FunctionClass>
-	void set_screen_update(u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
-	{
-		set_screen_update(screen_update_ind16_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_screen_update(u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
-	{
-		set_screen_update(screen_update_rgb32_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_screen_update(const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
-	{
-		set_screen_update(screen_update_ind16_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_screen_update(const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
-	{
-		set_screen_update(screen_update_rgb32_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
 	}
 	void set_screen_update(screen_update_ind16_delegate callback)
 	{
@@ -255,11 +218,8 @@ public:
 		m_screen_update_ind16 = screen_update_ind16_delegate();
 		m_screen_update_rgb32 = callback;
 	}
-
 	template<class Object> devcb_base &set_screen_vblank(Object &&object) { return m_screen_vblank.set_callback(std::forward<Object>(object)); }
-	auto screen_vblank() { return m_screen_vblank.bind(); }
-	auto scanline() { m_video_attributes |= VIDEO_UPDATE_SCANLINE; return m_scanline_cb.bind(); }
-	template<typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	void set_palette(const char *tag) { m_palette_tag = tag; }
 	void set_video_attributes(u32 flags) { m_video_attributes = flags; }
 	void set_color(rgb_t color) { m_color = color; }
 	void set_svg_region(const char *region) { m_svg_region = region; }
@@ -269,7 +229,6 @@ public:
 	bitmap_ind8 &priority() { return m_priority; }
 	device_palette_interface &palette() const { assert(m_palette != nullptr); return *m_palette; }
 	bool has_palette() const { return m_palette != nullptr; }
-	screen_bitmap &curbitmap() { return m_bitmap[m_curtexture]; }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -280,21 +239,18 @@ public:
 	// beam positioning and state
 	int vpos() const;
 	int hpos() const;
-	DECLARE_READ_LINE_MEMBER(vblank) const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
-	DECLARE_READ_LINE_MEMBER(hblank) const { int const curpos = hpos(); return (curpos < m_visarea.left() || curpos > m_visarea.right()) ? 1 : 0; }
+	bool vblank() const { return (machine().time() < m_vblank_end_time); }
+	DECLARE_READ_LINE_MEMBER(vblank) { return (machine().time() < m_vblank_end_time) ? ASSERT_LINE : CLEAR_LINE; }
+	DECLARE_READ_LINE_MEMBER(hblank) { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x) ? ASSERT_LINE : CLEAR_LINE; }
 
 	// timing
 	attotime time_until_pos(int vpos, int hpos = 0) const;
-	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.bottom() + 1); }
+	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.max_y + 1); }
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
 	attotime frame_period() const { return attotime(0, m_frame_period); }
 	u64 frame_number() const { return m_frame_number; }
-
-	// pixel-level access
-	u32 pixel(s32 x, s32 y);
-	void pixels(u32* buffer);
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
@@ -328,7 +284,6 @@ private:
 
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_config_complete() override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -346,8 +301,6 @@ private:
 
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen
-	int                 m_orientation;              // orientation flags combined with system flags
-	std::pair<unsigned, unsigned> m_phys_aspect;    // physical aspect ratio
 	bool                m_oldstyle_vblank_supplied; // MCFG_SCREEN_VBLANK_TIME macro used
 	attoseconds_t       m_refresh;                  // default refresh period
 	attoseconds_t       m_vblank;                   // duration of a VBLANK
@@ -356,8 +309,8 @@ private:
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	devcb_write_line    m_screen_vblank;            // screen vblank line callback
-	devcb_write32       m_scanline_cb;              // screen scanline callback
-	optional_device<device_palette_interface> m_palette;      // our palette
+	device_palette_interface *m_palette;            // our palette
+	const char *        m_palette_tag;              // configured tag for palette device
 	u32                 m_video_attributes;         // flags describing the video system
 	const char *        m_svg_region;               // the region in which the svg data is in
 
@@ -518,7 +471,8 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
  */
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
-	MCFG_DEVICE_ADD(_tag, SCREEN, SCREEN_TYPE_##_type)
+	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
+	MCFG_SCREEN_TYPE(_type)
 
 #define MCFG_SCREEN_ADD_MONOCHROME(_tag, _type, _color) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
@@ -553,18 +507,43 @@ typedef device_type_iterator<screen_device> screen_device_iterator;
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
 	downcast<screen_device &>(*device).set_default_position(_xscale, _xoffs, _yscale, _yoffs);
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
-	downcast<screen_device &>(*device).set_screen_update(&_class::_method, #_class "::" #_method);
+	downcast<screen_device &>(*device).set_screen_update(screen_update_delegate_smart(&_class::_method, #_class "::" #_method, nullptr));
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
-	downcast<screen_device &>(*device).set_screen_update(_device, &_class::_method, #_class "::" #_method);
+	downcast<screen_device &>(*device).set_screen_update(screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
 #define MCFG_SCREEN_VBLANK_CALLBACK(_devcb) \
-	downcast<screen_device &>(*device).set_screen_vblank(DEVCB_##_devcb);
+	devcb = &downcast<screen_device &>(*device).set_screen_vblank(DEVCB_##_devcb);
 #define MCFG_SCREEN_PALETTE(_palette_tag) \
 	downcast<screen_device &>(*device).set_palette(_palette_tag);
 #define MCFG_SCREEN_NO_PALETTE \
-	downcast<screen_device &>(*device).set_palette(finder_base::DUMMY_TAG);
+	downcast<screen_device &>(*device).set_palette(nullptr);
 #define MCFG_SCREEN_VIDEO_ATTRIBUTES(_flags) \
 	downcast<screen_device &>(*device).set_video_attributes(_flags);
 #define MCFG_SCREEN_COLOR(_color) \
 	downcast<screen_device &>(*device).set_color(_color);
 
-#endif // MAME_EMU_SCREEN_H
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  screen_update_delegate_smart - collection of
+//  inline helpers which create the appropriate
+//  screen_update_delegate based on the input
+//  function type
+//-------------------------------------------------
+
+template<class _FunctionClass>
+inline screen_update_ind16_delegate screen_update_delegate_smart(u32 (_FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name, const char *devname)
+{
+	return screen_update_ind16_delegate(callback, name, devname, (_FunctionClass *)nullptr);
+}
+
+template<class _FunctionClass>
+inline screen_update_rgb32_delegate screen_update_delegate_smart(u32 (_FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name, const char *devname)
+{
+	return screen_update_rgb32_delegate(callback, name, devname, (_FunctionClass *)nullptr);
+}
+
+
+#endif  /* MAME_EMU_SCREEN_H */

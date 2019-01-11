@@ -56,20 +56,40 @@
 
 #pragma once
 
+
+// handlers
+
+#define MCFG_DS1386_INTA_HANDLER(_devcb) \
+	devcb = &downcast<ds1386_device &>(*device).set_inta_cb(DEVCB_##_devcb);
+
+#define MCFG_DS1386_INTB_HANDLER(_devcb) \
+	devcb = &downcast<ds1386_device &>(*device).set_inta_cb(DEVCB_##_devcb);
+
+#define MCFG_DS1386_SQW_HANDLER(_devcb) \
+	devcb = &downcast<ds1386_device &>(*device).set_sqw_cb(DEVCB_##_devcb);
+
+// devices
+
+#define MCFG_DS1386_8K_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, DS1386_8K, _clock)
+
+#define MCFG_DS1386_32K_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, DS1386_32K, _clock)
+
 class ds1386_device : public device_t,
 					  public device_nvram_interface
 {
 public:
-	auto inta() { return m_inta_cb.bind(); }
-	auto intb() { return m_intb_cb.bind(); }
-	auto sqw() { return m_sqw_cb.bind(); }
-
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_READ8_MEMBER( data_r );
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 	DECLARE_WRITE_LINE_MEMBER( we_w );
+
+	template <class Object> devcb_base &set_inta_cb(Object &&cb) { return m_inta_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intb_cb(Object &&cb) { return m_intb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sqw_cb(Object &&cb) { return m_sqw_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	enum
@@ -171,15 +191,18 @@ protected:
 class ds1386_8k_device : public ds1386_device
 {
 public:
+	// construction/destruction
 	ds1386_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ds1386_32k_device : public ds1386_device
 {
 public:
+	// construction/destruction
 	ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+// device type definition
 DECLARE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device)
 DECLARE_DEVICE_TYPE(DS1386_32K, ds1386_32k_device)
 

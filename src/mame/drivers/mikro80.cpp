@@ -15,7 +15,6 @@
 #include "includes/mikro80.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -34,8 +33,8 @@ void mikro80_state::mikro80_mem(address_map &map)
 void mikro80_state::mikro80_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).rw(FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
-	map(0x04, 0x07).rw(FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
+	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x07).rw(this, FUNC(mikro80_state::mikro80_keyboard_r), FUNC(mikro80_state::mikro80_keyboard_w));
 }
 
 void mikro80_state::kristall_io(address_map &map)
@@ -47,11 +46,11 @@ void mikro80_state::kristall_io(address_map &map)
 void mikro80_state::radio99_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x01, 0x01).rw(FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
-	map(0x04, 0x04).w(FUNC(mikro80_state::radio99_sound_w));
-	map(0x05, 0x05).rw(FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
-	map(0x06, 0x06).r(FUNC(mikro80_state::mikro80_8255_portb_r));
-	map(0x07, 0x07).w(FUNC(mikro80_state::mikro80_8255_porta_w));
+	map(0x01, 0x01).rw(this, FUNC(mikro80_state::mikro80_tape_r), FUNC(mikro80_state::mikro80_tape_w));
+	map(0x04, 0x04).w(this, FUNC(mikro80_state::radio99_sound_w));
+	map(0x05, 0x05).rw(this, FUNC(mikro80_state::mikro80_8255_portc_r), FUNC(mikro80_state::mikro80_8255_portc_w));
+	map(0x06, 0x06).r(this, FUNC(mikro80_state::mikro80_8255_portb_r));
+	map(0x07, 0x07).w(this, FUNC(mikro80_state::mikro80_8255_porta_w));
 }
 
 /* Input ports */
@@ -171,10 +170,10 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_DEVICE_PROGRAM_MAP(mikro80_mem)
 	MCFG_DEVICE_IO_MAP(mikro80_io)
 
-	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(mikro80_state::mikro80_8255_porta_w));
-	m_ppi8255->in_pb_callback().set(FUNC(mikro80_state::mikro80_8255_portb_r));
-	m_ppi8255->in_pc_callback().set(FUNC(mikro80_state::mikro80_8255_portc_r));
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mikro80_state, mikro80_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mikro80_state, mikro80_8255_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mikro80_state, mikro80_8255_portc_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -186,7 +185,7 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikro80)
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	SPEAKER(config, "speaker").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);

@@ -40,6 +40,7 @@ protected:
 
 private:
 	cpc_expansion_slot_device *m_slot;
+	cpu_device* m_cpu;
 	address_space* m_space;
 	std::unique_ptr<uint8_t[]> m_ram;  // 8kB internal RAM
 	bool m_rom_active;

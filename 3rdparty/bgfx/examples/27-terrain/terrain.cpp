@@ -76,13 +76,8 @@ public:
 		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable m_debug text.
 		bgfx::setDebug(m_debug);
@@ -261,7 +256,7 @@ public:
 			}
 
 			mem = bgfx::makeRef(&m_terrain.m_vertices[0], sizeof(PosTexCoord0Vertex) * m_terrain.m_vertexCount);
-			bgfx::update(m_dvbh, 0, mem);
+			bgfx::updateDynamicVertexBuffer(m_dvbh, 0, mem);
 
 			if (!bgfx::isValid(m_dibh) )
 			{
@@ -269,7 +264,7 @@ public:
 			}
 
 			mem = bgfx::makeRef(&m_terrain.m_indices[0], sizeof(uint16_t) * m_terrain.m_indexCount);
-			bgfx::update(m_dibh, 0, mem);
+			bgfx::updateDynamicIndexBuffer(m_dibh, 0, mem);
 			break;
 
 		case 2: // Height Texture: Update a height texture that is sampled in the terrain vertex shader.
@@ -321,15 +316,15 @@ public:
 				// Brush attenuation
 				float a2 = (float)(area_x * area_x);
 				float b2 = (float)(area_y * area_y);
-				float brushAttn = m_brush.m_size - bx::sqrt(a2 + b2);
+				float brushAttn = m_brush.m_size - bx::fsqrt(a2 + b2);
 
 				// Raise/Lower and scale by brush power.
-				height += 0.0f < bx::clamp(brushAttn*m_brush.m_power, 0.0f, m_brush.m_power) && m_brush.m_raise
+				height += 0.0f < bx::fclamp(brushAttn*m_brush.m_power, 0.0f, m_brush.m_power) && m_brush.m_raise
 					?  1.0f
 					: -1.0f
 					;
 
-				m_terrain.m_heightMap[heightMapPos] = (uint8_t)bx::clamp(height, 0.0f, 255.0f);
+				m_terrain.m_heightMap[heightMapPos] = (uint8_t)bx::fclamp(height, 0.0f, 255.0f);
 				m_terrain.m_dirty = true;
 			}
 		}
@@ -411,15 +406,12 @@ public:
 
 			ImGui::SetNextWindowPos(
 				  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_width / 5.0f, m_height / 3.0f)
-				, ImGuiCond_FirstUseEver
+				, ImGuiSetCond_FirstUseEver
 				);
 			ImGui::Begin("Settings"
 				, NULL
-				, 0
+				, ImVec2(m_width / 5.0f, m_height / 3.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
 			ImGui::Separator();

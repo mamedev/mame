@@ -17,7 +17,6 @@
 #include "bus/vic10/exp.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6510.h"
-#include "machine/input_merger.h"
 #include "machine/mos6526.h"
 #include "machine/ram.h"
 #include "sound/mos6581.h"
@@ -49,12 +48,12 @@ public:
 		m_color_ram(*this, "color_ram"),
 		m_row(*this, "ROW%u", 0),
 		m_restore(*this, "RESTORE"),
-		m_lock(*this, "LOCK")
+		m_lock(*this, "LOCK"),
+		m_cia_irq(CLEAR_LINE),
+		m_vic_irq(CLEAR_LINE),
+		m_exp_irq(CLEAR_LINE)
 	{ }
 
-	void vic10(machine_config &config);
-
-private:
 	required_device<m6510_device> m_maincpu;
 	required_device<mos6566_device> m_vic;
 	required_device<mos6581_device> m_sid;
@@ -72,15 +71,19 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void check_interrupts();
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
 	DECLARE_READ8_MEMBER( sid_potx_r );
 	DECLARE_READ8_MEMBER( sid_poty_r );
 
+	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_READ8_MEMBER( cia_pb_r );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
@@ -88,12 +91,33 @@ private:
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
+	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
+	// interrupt state
+	int m_cia_irq;
+	int m_vic_irq;
+	int m_exp_irq;
+	void vic10(machine_config &config);
 	void vic10_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
 };
+
+
+//**************************************************************************
+//  INTERRUPTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  check_interrupts -
+//-------------------------------------------------
+
+void vic10_state::check_interrupts()
+{
+	m_maincpu->set_input_line(M6502_IRQ_LINE, m_cia_irq || m_vic_irq || m_exp_irq);
+}
+
 
 
 //**************************************************************************
@@ -223,7 +247,7 @@ READ8_MEMBER( vic10_state::vic_colorram_r )
 
 void vic10_state::vic10_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(vic10_state::read), FUNC(vic10_state::write));
+	map(0x0000, 0xffff).rw(this, FUNC(vic10_state::read), FUNC(vic10_state::write));
 }
 
 
@@ -233,7 +257,7 @@ void vic10_state::vic10_mem(address_map &map)
 
 void vic10_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(FUNC(vic10_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(this, FUNC(vic10_state::vic_videoram_r));
 }
 
 
@@ -243,7 +267,7 @@ void vic10_state::vic_videoram_map(address_map &map)
 
 void vic10_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(FUNC(vic10_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(this, FUNC(vic10_state::vic_colorram_r));
 }
 
 
@@ -352,6 +376,18 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
+//  vic2_interface vic_intf
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
+{
+	m_vic_irq = state;
+
+	check_interrupts();
+}
+
+
+//-------------------------------------------------
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
@@ -359,22 +395,22 @@ READ8_MEMBER( vic10_state::sid_potx_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia->read_pa() >> 6)
+	switch (m_cia->pa_r() >> 6)
 	{
-	case 1: data = m_joy1->read_pot_x(); break;
-	case 2: data = m_joy2->read_pot_x(); break;
+	case 1: data = m_joy1->pot_x_r(); break;
+	case 2: data = m_joy2->pot_x_r(); break;
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
+			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
 		}
 		else if (m_joy1->has_pot_x())
 		{
-			data = m_joy1->read_pot_x();
+			data = m_joy1->pot_x_r();
 		}
 		else if (m_joy2->has_pot_x())
 		{
-			data = m_joy2->read_pot_x();
+			data = m_joy2->pot_x_r();
 		}
 		break;
 	}
@@ -386,22 +422,22 @@ READ8_MEMBER( vic10_state::sid_poty_r )
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia->read_pa() >> 6)
+	switch (m_cia->pa_r() >> 6)
 	{
-	case 1: data = m_joy1->read_pot_y(); break;
-	case 2: data = m_joy2->read_pot_y(); break;
+	case 1: data = m_joy1->pot_y_r(); break;
+	case 2: data = m_joy2->pot_y_r(); break;
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
+			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
 		}
 		else if (m_joy1->has_pot_y())
 		{
-			data = m_joy1->read_pot_y();
+			data = m_joy1->pot_y_r();
 		}
 		else if (m_joy2->has_pot_y())
 		{
-			data = m_joy2->read_pot_y();
+			data = m_joy2->pot_y_r();
 		}
 		break;
 	}
@@ -413,6 +449,13 @@ READ8_MEMBER( vic10_state::sid_poty_r )
 //-------------------------------------------------
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
+
+WRITE_LINE_MEMBER( vic10_state::cia_irq_w )
+{
+	m_cia_irq = state;
+
+	check_interrupts();
+}
 
 READ8_MEMBER( vic10_state::cia_pa_r )
 {
@@ -434,13 +477,13 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_b = m_joy2->read_joy();
+	uint8_t joy_b = m_joy2->joy_r();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia_pb = m_cia->read_pb();
+	uint8_t cia_pb = m_cia->pb_r();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -482,13 +525,13 @@ READ8_MEMBER( vic10_state::cia_pb_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy_a = m_joy1->read_joy();
+	uint8_t joy_a = m_joy1->joy_r();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia_pa = m_cia->read_pa();
+	uint8_t cia_pa = m_cia->pa_r();
 
 	if (!BIT(cia_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia_pa, 6)) data &= m_row[6]->read();
@@ -585,6 +628,13 @@ WRITE8_MEMBER( vic10_state::cpu_w )
 //  VIC10_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( vic10_state::exp_irq_w )
+{
+	m_exp_irq = state;
+
+	check_interrupts();
+}
+
 WRITE_LINE_MEMBER( vic10_state::exp_reset_w )
 {
 	if (state == ASSERT_LINE)
@@ -616,6 +666,11 @@ void vic10_state::machine_start()
 		m_ram->pointer()[offset] = data;
 		if (!(offset % 64)) data ^= 0xff;
 	}
+
+	// state saving
+	save_item(NAME(m_cia_irq));
+	save_item(NAME(m_vic_irq));
+	save_item(NAME(m_exp_irq));
 }
 
 
@@ -640,69 +695,61 @@ void vic10_state::machine_reset()
 //  MACHINE_CONFIG( vic10 )
 //-------------------------------------------------
 
-void vic10_state::vic10(machine_config &config)
-{
+MACHINE_CONFIG_START(vic10_state::vic10)
 	// basic hardware
-	M6510(config, m_maincpu, XTAL(8'000'000)/8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vic10_state::vic10_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
-	m_maincpu->read_callback().set(FUNC(vic10_state::cpu_r));
-	m_maincpu->write_callback().set(FUNC(vic10_state::cpu_w));
-	m_maincpu->set_pulls(0x10, 0x20);
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
-
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	MCFG_DEVICE_ADD(M6510_TAG, M6510, XTAL(8'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(vic10_mem)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_M6510_PORT_CALLBACKS(READ8(*this, vic10_state, cpu_r), WRITE8(*this, vic10_state, cpu_w))
+	MCFG_M6510_PORT_PULLS(0x10, 0x20)
+	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	mos8566_device &mos8566(MOS8566(config, MOS6566_TAG, XTAL(8'000'000)/8));
-	mos8566.set_cpu(M6510_TAG);
-	mos8566.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
-	mos8566.set_screen(SCREEN_TAG);
-	mos8566.set_addrmap(0, &vic10_state::vic_videoram_map);
-	mos8566.set_addrmap(1, &vic10_state::vic_colorram_map);
-
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(VIC6566_VRETRACERATE);
-	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
-	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
-	screen.set_screen_update(MOS6566_TAG, FUNC(mos6566_device::screen_update));
+	MCFG_DEVICE_ADD(MOS6566_TAG, MOS6566, XTAL(8'000'000)/8)
+	MCFG_MOS6566_CPU(M6510_TAG)
+	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(*this, vic10_state, vic_irq_w))
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_REFRESH_RATE(VIC6566_VRETRACERATE)
+	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
+	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
+	MCFG_SCREEN_UPDATE_DEVICE(MOS6566_TAG, mos6566_device, screen_update)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MOS6581(config, m_sid, XTAL(8'000'000)/8);
-	m_sid->potx().set(FUNC(vic10_state::sid_potx_r));
-	m_sid->poty().set(FUNC(vic10_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD(MOS6581_TAG, MOS6581, XTAL(8'000'000)/8)
+	MCFG_MOS6581_POTX_CALLBACK(READ8(*this, vic10_state, sid_potx_r))
+	MCFG_MOS6581_POTY_CALLBACK(READ8(*this, vic10_state, sid_poty_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MOS6526(config, m_cia, XTAL(8'000'000)/8);
-	m_cia->set_tod_clock(60);
-	m_cia->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
-	m_cia->cnt_wr_callback().set(m_exp, FUNC(vic10_expansion_slot_device::cnt_w));
-	m_cia->sp_wr_callback().set(m_exp, FUNC(vic10_expansion_slot_device::sp_w));
-	m_cia->pa_rd_callback().set(FUNC(vic10_state::cia_pa_r));
-	m_cia->pb_rd_callback().set(FUNC(vic10_state::cia_pb_r));
-	m_cia->pb_wr_callback().set(FUNC(vic10_state::cia_pb_w));
-
-	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
-	m_cassette->read_handler().set(m_cia, FUNC(mos6526_device::flag_w));
-
-	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
-	m_joy1->trigger_wr_callback().set(MOS6566_TAG, FUNC(mos6566_device::lp_w));
-	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
-
-	VIC10_EXPANSION_SLOT(config, m_exp, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr);
-	m_exp->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
-	m_exp->res_callback().set(FUNC(vic10_state::exp_reset_w));
-	m_exp->cnt_callback().set(m_cia, FUNC(mos6526_device::cnt_w));
-	m_exp->sp_callback().set(m_cia, FUNC(mos6526_device::sp_w));
+	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526, XTAL(8'000'000)/8)
+	MCFG_MOS6526_TOD(60)
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, vic10_state, cia_irq_w))
+	MCFG_MOS6526_CNT_CALLBACK(WRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, cnt_w))
+	MCFG_MOS6526_SP_CALLBACK(WRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, sp_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, vic10_state, cia_pa_r))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, vic10_state, cia_pb_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, vic10_state, cia_pb_w))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", WRITELINE(MOS6526_TAG, mos6526_device, flag_w))
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(MOS6566_TAG, mos6566_device, lp_w))
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
+	MCFG_DEVICE_ADD(VIC10_EXPANSION_SLOT_TAG, VIC10_EXPANSION_SLOT, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr)
+	MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, vic10_state, exp_irq_w))
+	MCFG_VIC10_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic10_state, exp_reset_w))
+	MCFG_VIC10_EXPANSION_SLOT_CNT_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, cnt_w))
+	MCFG_VIC10_EXPANSION_SLOT_SP_CALLBACK(WRITELINE(MOS6526_TAG, mos6526_device, sp_w))
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("vic10");
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic10")
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("4K");
-}
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4K")
+MACHINE_CONFIG_END
 
 
 

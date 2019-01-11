@@ -19,6 +19,15 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+#define MCFG_MACPDS_BUS_ADD(_tag, _cputag) \
+	MCFG_DEVICE_ADD(_tag, MACPDS, 0) \
+	downcast<macpds_device &>(*device).set_cputag(_cputag);
+
+#define MCFG_MACPDS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, MACPDS_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
+	downcast<macpds_slot_device &>(*device).set_macpds_slot(_nbtag, _tag);
+
 #define MCFG_MACPDS_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 
@@ -41,16 +50,6 @@ class macpds_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *nbtag, T &&opts, const char *dflt)
-		: macpds_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_macpds_slot(nbtag, tag);
-	}
-
 	macpds_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
@@ -77,14 +76,7 @@ class macpds_device : public device_t
 {
 public:
 	// construction/destruction
-	macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *cputag)
-		: macpds_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		set_cputag(cputag);
-	}
-
 	macpds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	~macpds_device() { m_device_list.detach_all(); }
 	// inline configuration
 	void set_cputag(const char *tag) { m_cputag = tag; }

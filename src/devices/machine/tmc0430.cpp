@@ -166,19 +166,25 @@ WRITE_LINE_MEMBER( tmc0430_device::gsq_line )
 
 /*
     Combined select lines. Avoids separate calls to the chip.
+    Address:
+    0 -> MO=0, M=0
+    1 -> MO=0, M=1
+    2 -> MO=1, M=0
+    3 -> MO=1, M=1
+    Data: gsq line (ASSERT, CLEAR)
 */
-void tmc0430_device::set_lines(line_state mline, line_state moline, line_state gsq)
+WRITE8_MEMBER( tmc0430_device::set_lines )
 {
-	m_read_mode = (mline==ASSERT_LINE);
-	m_address_mode = (moline==ASSERT_LINE);
+	m_read_mode = ((offset & GROM_M_LINE)!=0);
+	m_address_mode = ((offset & GROM_MO_LINE)!=0);
 
-	if (gsq!=CLEAR_LINE && !m_selected)        // check for edge
+	if (data!=CLEAR_LINE && !m_selected)        // check for edge
 	{
 		LOGMASKED(LOG_READY, "GROM %d selected, pulling down READY\n", m_ident>>13);
 		m_gromready(CLEAR_LINE);
 		m_phase = 4; // set for three full GROM clock ticks (and a fraction at the start)
 	}
-	m_selected = (gsq!=CLEAR_LINE);
+	m_selected = (data!=CLEAR_LINE);
 }
 
 /*
@@ -267,7 +273,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gclock_in )
     Read operation. For MO=Address, delivers the address register (and destroys its contents).
     For MO=Data, delivers the byte inside the buffer and prefetches the next one.
 */
-void tmc0430_device::readz(uint8_t *value)
+READ8Z_MEMBER( tmc0430_device::readz )
 {
 	if (!m_selected) return;
 
@@ -304,7 +310,7 @@ void tmc0430_device::readz(uint8_t *value)
     This operation occurs in parallel to phase 4. The real GROM will pick up
     the value from the data bus some phases later.
 */
-void tmc0430_device::write(uint8_t data)
+WRITE8_MEMBER( tmc0430_device::write )
 {
 	if (!m_selected) return;
 

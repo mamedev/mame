@@ -15,6 +15,12 @@
 #define M1AUDIO_MPCM1_REGION "m1audio:pcm1"
 #define M1AUDIO_MPCM2_REGION "m1audio:pcm2"
 
+#define MCFG_SEGAM1AUDIO_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGAM1AUDIO, 0)
+
+#define MCFG_SEGAM1AUDIO_RXD_HANDLER(_devcb) \
+	devcb = &downcast<segam1audio_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,7 +33,7 @@ public:
 	segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	auto rxd_handler() { return m_rxd_handler.bind(); }
+	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
 	DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);

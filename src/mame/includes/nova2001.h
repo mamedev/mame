@@ -1,36 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Howie Cohen, Frank Palazzolo, Alex Pasadyn, David Haywood, Phil Stroffolino, Uki
-#ifndef MAME_INCLUDES_NOVA2001_H
-#define MAME_INCLUDES_NOVA2001_H
-
-#pragma once
-
-#include "emupal.h"
-
 class nova2001_state : public driver_device
 {
 public:
-	nova2001_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	nova2001_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram")
-	{ }
+		m_spriteram(*this, "spriteram")  { }
 
-	void raiders5(machine_config &config);
-	void ninjakun(machine_config &config);
-	void nova2001(machine_config &config);
-	void pkunwar(machine_config &config);
-
-	void init_raiders5();
-	void init_pkunwar();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -55,9 +36,13 @@ private:
 	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
+
+	void init_raiders5();
+	void init_pkunwar();
 	DECLARE_VIDEO_START(nova2001);
-	void nova2001_palette(palette_device &palette) const;
-	static rgb_t BBGGRRII(uint32_t raw);
+	DECLARE_PALETTE_INIT(nova2001);
+	DECLARE_PALETTE_DECODER(BBGGRRII);
 	DECLARE_MACHINE_START(ninjakun);
 	DECLARE_VIDEO_START(ninjakun);
 	DECLARE_VIDEO_START(pkunwar);
@@ -78,6 +63,10 @@ private:
 	void nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void lineswap_gfx_roms(const char *region, const int bit);
+	void raiders5(machine_config &config);
+	void ninjakun(machine_config &config);
+	void nova2001(machine_config &config);
+	void pkunwar(machine_config &config);
 	void ninjakun_cpu1_map(address_map &map);
 	void ninjakun_cpu2_map(address_map &map);
 	void nova2001_map(address_map &map);
@@ -87,5 +76,3 @@ private:
 	void raiders5_cpu2_map(address_map &map);
 	void raiders5_io(address_map &map);
 };
-
-#endif // MAME_INCLUDES_NOVA2001_H

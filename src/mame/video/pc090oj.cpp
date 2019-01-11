@@ -98,8 +98,8 @@ void pc090oj_device::device_start()
 	m_ram = make_unique_clear<uint16_t[]>(PC090OJ_RAM_SIZE / 2);
 	m_ram_buffered = make_unique_clear<uint16_t[]>(PC090OJ_RAM_SIZE / 2);
 
-	save_pointer(NAME(m_ram), PC090OJ_RAM_SIZE / 2);
-	save_pointer(NAME(m_ram_buffered), PC090OJ_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), PC090OJ_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram_buffered.get()), PC090OJ_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_sprite_ctrl));  // should this be set in intf?!?
 }

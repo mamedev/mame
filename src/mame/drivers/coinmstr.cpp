@@ -133,7 +133,6 @@
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -344,10 +343,10 @@ void coinmstr_state::coinmstr_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(FUNC(coinmstr_state::quizmstr_bg_w)).share("videoram");
-	map(0xe800, 0xefff).ram().w(FUNC(coinmstr_state::quizmstr_attr1_w)).share("attr_ram1");
-	map(0xf000, 0xf7ff).ram().w(FUNC(coinmstr_state::quizmstr_attr2_w)).share("attr_ram2");
-	map(0xf800, 0xffff).ram().w(FUNC(coinmstr_state::quizmstr_attr3_w)).share("attr_ram3");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(coinmstr_state::quizmstr_bg_w)).share("videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr1_w)).share("attr_ram1");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr2_w)).share("attr_ram2");
+	map(0xf800, 0xffff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr3_w)).share("attr_ram3");
 }
 
 /* 2x 6462 hardware C000-DFFF & E000-FFFF */
@@ -355,10 +354,10 @@ void coinmstr_state::jpcoin_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();     /* 2x 6462 hardware */
-	map(0xe000, 0xe7ff).ram().w(FUNC(coinmstr_state::quizmstr_bg_w)).share("videoram");
-	map(0xe800, 0xefff).ram().w(FUNC(coinmstr_state::quizmstr_attr1_w)).share("attr_ram1");
-	map(0xf000, 0xf7ff).ram().w(FUNC(coinmstr_state::quizmstr_attr2_w)).share("attr_ram2");
-	map(0xf800, 0xffff).ram().w(FUNC(coinmstr_state::quizmstr_attr3_w)).share("attr_ram3");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(coinmstr_state::quizmstr_bg_w)).share("videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr1_w)).share("attr_ram1");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr2_w)).share("attr_ram2");
+	map(0xf800, 0xffff).ram().w(this, FUNC(coinmstr_state::quizmstr_attr3_w)).share("attr_ram3");
 }
 
 // Different I/O mappping for every game
@@ -367,8 +366,8 @@ void coinmstr_state::quizmstr_io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(coinmstr_state::question_r));
-	map(0x00, 0x03).w(FUNC(coinmstr_state::question_w));
+	map(0x00, 0x00).r(this, FUNC(coinmstr_state::question_r));
+	map(0x00, 0x03).w(this, FUNC(coinmstr_state::question_w));
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x41, 0x41).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x48, 0x4b).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -384,8 +383,8 @@ void coinmstr_state::quizmstr_io_map(address_map &map)
 void coinmstr_state::trailblz_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(coinmstr_state::question_r));
-	map(0x00, 0x03).w(FUNC(coinmstr_state::question_w));
+	map(0x00, 0x00).r(this, FUNC(coinmstr_state::question_r));
+	map(0x00, 0x03).w(this, FUNC(coinmstr_state::question_w));
 	map(0x40, 0x40).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x41, 0x41).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x48, 0x49).w("aysnd", FUNC(ay8910_device::address_data_w));
@@ -428,8 +427,8 @@ E0-E1 CRTC
 */
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(coinmstr_state::question_r));
-	map(0x00, 0x03).w(FUNC(coinmstr_state::question_w));
+	map(0x00, 0x00).r(this, FUNC(coinmstr_state::question_r));
+	map(0x00, 0x03).w(this, FUNC(coinmstr_state::question_w));
 	map(0x48, 0x48).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x49, 0x49).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x40, 0x43).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -471,7 +470,7 @@ E0-E1 CRTC
 	map(0x58, 0x5b).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); /* confirmed */
 	map(0x68, 0x6b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); /* confirmed */
 	map(0x78, 0x7b).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); /* confirmed */
-	map(0xc0, 0xc1).r(FUNC(coinmstr_state::ff_r));  /* needed to boot */
+	map(0xc0, 0xc1).r(this, FUNC(coinmstr_state::ff_r));  /* needed to boot */
 }
 
 void coinmstr_state::jpcoin_io_map(address_map &map)
@@ -501,7 +500,7 @@ E0-E1 CRTC
 	map(0xd0, 0xd3).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd8, 0xdb).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));    /* confirmed */
 //  AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)  /* needed to boot */
-	map(0xc4, 0xc4).r(FUNC(coinmstr_state::ff_r));  /* needed to boot */
+	map(0xc4, 0xc4).r(this, FUNC(coinmstr_state::ff_r));  /* needed to boot */
 }
 
 
@@ -1260,17 +1259,17 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_DEVICE_PROGRAM_MAP(coinmstr_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
-	pia0.readpa_handler().set_ioport("PIA0.A");
-	pia0.readpb_handler().set_ioport("PIA0.B");
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("PIA0.A"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("PIA0.B"))
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
-	pia1.readpa_handler().set_ioport("PIA1.A");
-	pia1.readpb_handler().set_ioport("PIA1.B");
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("PIA1.A"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("PIA1.B"))
 
-	pia6821_device &pia2(PIA6821(config, "pia2", 0));
-	pia2.readpa_handler().set_ioport("PIA2.A");
-	pia2.readpb_handler().set_ioport("PIA2.B");
+	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("PIA2.A"))
+	MCFG_PIA_READPB_HANDLER(IOPORT("PIA2.B"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1284,17 +1283,16 @@ MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmstr)
 	MCFG_PALETTE_ADD("palette", 46*32*4)
 
-	h46505_device &crtc(H46505(config, "crtc", 14000000 / 16));
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 14000000 / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
-	aysnd.port_a_read_callback().set_ioport("DSW1");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coinmstr_state::quizmstr)
@@ -1326,7 +1324,7 @@ MACHINE_CONFIG_START(coinmstr_state::jpcoin)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(jpcoin_map)
 	MCFG_DEVICE_IO_MAP(jpcoin_io_map)
-//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  MCFG_NVRAM_ADD_0FILL("attr_ram3")
 MACHINE_CONFIG_END
 
 /*

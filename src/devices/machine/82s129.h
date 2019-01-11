@@ -46,14 +46,51 @@
 #pragma once
 
 
+#define MCFG_82S126_OUTPUT_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_out_cb(DEVCB_##_devcb);
+
+#define MCFG_82S126_O1_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_o1_cb(DEVCB_##_devcb);
+
+#define MCFG_82S126_O2_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_o2_cb(DEVCB_##_devcb);
+
+#define MCFG_82S126_O3_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_o3_cb(DEVCB_##_devcb);
+
+#define MCFG_82S126_O4_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_o4_cb(DEVCB_##_devcb);
+
+#define MCFG_82S129_OUTPUT_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_out_cb(DEVCB_##_devcb);
+
+#define MCFG_82S129_O1_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_o1_cb(DEVCB_##_devcb);
+
+#define MCFG_82S129_O2_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_o2_cb(DEVCB_##_devcb);
+
+#define MCFG_82S129_O3_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_o3_cb(DEVCB_##_devcb);
+
+#define MCFG_82S129_O4_CB(_devcb) \
+	devcb = &downcast<prom82s129_base_device &>(*device).set_o4_cb(DEVCB_##_devcb);
+
+#define MCFG_82S129_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PROM82S129, 0)
+
+#define MCFG_82S126_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PROM82S126, 0)
+
 class prom82s129_base_device : public device_t
 {
 public:
-	auto out_callback() { return m_out_func.bind(); }
-	auto o1_callback() { return m_o1_func.bind(); }
-	auto o2_callback() { return m_o2_func.bind(); }
-	auto o3_callback() { return m_o3_func.bind(); }
-	auto o4_callback() { return m_o4_func.bind(); }
+	// static configuration helpers
+	template <class Object> devcb_base &set_out_cb(Object &&cb) { return m_out_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_o1_cb(Object &&cb) { return m_o1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_o2_cb(Object &&cb) { return m_o2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_o3_cb(Object &&cb) { return m_o3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_o4_cb(Object &&cb) { return m_o4_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( ce1_w );
 	DECLARE_WRITE_LINE_MEMBER( ce2_w );

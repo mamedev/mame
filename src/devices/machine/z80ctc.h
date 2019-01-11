@@ -32,6 +32,27 @@
 
 
 //**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_Z80CTC_INTR_CB(_devcb) \
+	devcb = &downcast<z80ctc_device &>(*device).set_intr_callback(DEVCB_##_devcb);
+
+#define MCFG_Z80CTC_ZC0_CB(_devcb) \
+	devcb = &downcast<z80ctc_device &>(*device).set_zc_callback<0>(DEVCB_##_devcb);
+
+#define MCFG_Z80CTC_ZC1_CB(_devcb) \
+	devcb = &downcast<z80ctc_device &>(*device).set_zc_callback<1>(DEVCB_##_devcb);
+
+#define MCFG_Z80CTC_ZC2_CB(_devcb) \
+	devcb = &downcast<z80ctc_device &>(*device).set_zc_callback<2>(DEVCB_##_devcb);
+
+// not supported on a standard ctc, only used for the tmpz84c015
+#define MCFG_Z80CTC_ZC3_CB(_devcb) \
+	devcb = &downcast<z80ctc_device &>(*device).set_zc_callback<3>(DEVCB_##_devcb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -47,7 +68,7 @@ class z80ctc_channel_device : public device_t
 
 public:
 	// construction/destruction
-	z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	z80ctc_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -82,10 +103,8 @@ public:
 	// construction/destruction
 	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto intr_callback() { return m_intr_cb.bind(); }
-	template <int Channel> auto zc_callback() { return m_zc_cb[Channel].bind(); } // m_zc_cb[3] not supported on a standard ctc, only used for the tmpz84c015
-	template <int Channel> void set_clk(u32 clock) { channel_config(Channel).set_clock(clock); }
-	template <int Channel> void set_clk(const XTAL &xtal) { channel_config(Channel).set_clock(xtal); }
+	template <class Object> devcb_base &set_intr_callback(Object &&cb) { return m_intr_cb.set_callback(std::forward<Object>(cb)); }
+	template <int Channel, class Object> devcb_base &set_zc_callback(Object &&cb) { return m_zc_cb[Channel].set_callback(std::forward<Object>(cb)); }
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );
@@ -95,7 +114,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( trg2 );
 	DECLARE_WRITE_LINE_MEMBER( trg3 );
 
-	u16 get_channel_constant(int ch) const { return m_channel[ch]->m_tconst; }
+	u16 get_channel_constant(u8 channel) const { return m_channel[channel]->m_tconst; }
 
 protected:
 	// device-level overrides
@@ -112,8 +131,6 @@ protected:
 private:
 	// internal helpers
 	void interrupt_check();
-
-	z80ctc_channel_device &channel_config(int ch) { return *subdevice<z80ctc_channel_device>(m_channel[ch].finder_tag()); }
 
 	// internal state
 	devcb_write_line   m_intr_cb;              // interrupt callback

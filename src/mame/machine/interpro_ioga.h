@@ -6,6 +6,32 @@
 
 #pragma once
 
+#define MCFG_INTERPRO_IOGA_NMI_CB(_out_nmi) \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_nmi_callback(DEVCB_##_out_nmi);
+
+#define MCFG_INTERPRO_IOGA_IRQ_CB(_out_irq) \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_irq_callback(DEVCB_##_out_irq);
+
+#define MCFG_INTERPRO_IOGA_IVEC_CB(_out_ivec) \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_out_ivec_callback(DEVCB_##_out_ivec);
+
+#define MCFG_INTERPRO_IOGA_DMA_CB(_channel, _dma_r, _dma_w) \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_dma_r_callback(_channel, DEVCB_##_dma_r); \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_dma_w_callback(_channel, DEVCB_##_dma_w);
+
+#define MCFG_INTERPRO_IOGA_SERIAL_DMA_CB(_channel, _dma_r, _dma_w) \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_serial_dma_r_callback(_channel, DEVCB_##_dma_r); \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_serial_dma_w_callback(_channel, DEVCB_##_dma_w);
+
+#define MCFG_INTERPRO_IOGA_FDCTC_CB(_tc) \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_fdc_tc_callback(DEVCB_##_tc);
+
+#define MCFG_INTERPRO_IOGA_ETH_CA_CB(_ca) \
+	devcb = &downcast<interpro_ioga_device &>(*device).set_eth_ca_callback(DEVCB_##_ca);
+
+#define MCFG_INTERPRO_IOGA_MEMORY(_tag, _spacenum) \
+	downcast<interpro_ioga_device &>(*device).set_memory(_tag, _spacenum);
+
 class interpro_ioga_device : public device_t
 {
 protected:
@@ -13,33 +39,63 @@ protected:
 
 	enum interrupt_type
 	{
-		INT_NONE = 0,
-		INT_HARD = 1,
-		INT_SOFT = 2,
+		INT_HARD_IN, // hardware internal
+		INT_HARD_EX, // hardware external
+		INT_SOFT_LO, // soft low type
+		INT_SOFT_HI  // soft high type
 	};
 
 	enum interrupt_number
 	{
-		IRQ_SCSI     =  0, // external int  0 (offset 0x60)
-		IRQ_FLOPPY   =  1, // external int  1 (offset 0x62)
-		IRQ_PLOTTER  =  2, // external int  2 (offset 0x64)
-		IRQ_SRXCBUS0 =  3, // external int  3 (offset 0x66)
-		IRQ_SRXCBUS1 =  4, // external int  4 (offset 0x68)
-		IRQ_SRXCBUS2 =  5, // external int  5 (offset 0x6a)
-		IRQ_VB       =  6, // external int  6 (offset 0x6c)
-		IRQ_7        =  7, // external int  7 (offset 0x6e)
-		IRQ_CBUS3    =  8, // external int  8 (offset 0x70)
-		IRQ_RTC      =  9, // external int  9 (offset 0x72)
-		IRQ_60HZ     = 10, // external int 10 (offset 0x74)
-		IRQ_MOUSE    = 11, // internal int  0 (offset 0x76)
-		IRQ_TIMER0   = 12, // internal int  1 (offset 0x78)
-		IRQ_TIMER1   = 13, // internal int  2 (offset 0x7a)
-		IRQ_SERDMA   = 14, // internal int  3 (offset 0x7c) // Sapphire internal int 5
-		IRQ_SERIAL   = 15, // external int 11 (offset 0x7e)
-		IRQ_ETHERNET = 16, // external int 12 (offset 0x80)
+		IRQ_TIMER2   =  0, // internal int  3 (5c)
+		IRQ_TIMER3   =  1, // internal int  4 (5e)
+		IRQ_SCSI     =  2, // external int  0 (60)
+		IRQ_FLOPPY   =  3, // external int  1 (62)
+		IRQ_PLOTTER  =  4, // external int  2 (64)
+		IRQ_SRXCBUS0 =  5, // external int  3 (66)
+		IRQ_SRXCBUS1 =  6, // external int  4 (68)
+		IRQ_SRXCBUS2 =  7, // external int  5 (6a)
+		IRQ_VB       =  8, // external int  6 (6c)
+		IRQ_9        =  9, // external int  7 (6e)
+		IRQ_CBUS3    = 10, // external int  8 (70)
+		IRQ_RTC      = 11, // external int  9 (72)
+		IRQ_60HZ     = 12, // external int 10 (74)
+		IRQ_MOUSE    = 13, // internal int  0 (76)
+		IRQ_TIMER0   = 14, // internal int  1 (78)
+		IRQ_TIMER1   = 15, // internal int  2 (7a)
+		IRQ_SERDMA   = 16, // internal int  5 (7c)
+		IRQ_SERIAL   = 17, // external int 11 (7e)
+		IRQ_ETHERNET = 18, // external int 12 (80)
 
-		IRQ_TIMER2   = 17, // internal int  3 (offset 0x5c) // Sapphire only
-		IRQ_TIMER3   = 18, // internal int  4 (offset 0x5e) // Sapphire only
+		// soft interrupts (low type)
+		IRQ_SOFT0 = 0,
+		IRQ_SOFT1 = 1,
+		IRQ_SOFT2 = 2,
+		IRQ_SOFT3 = 3,
+		IRQ_SOFT4 = 4,
+		IRQ_SOFT5 = 5,
+		IRQ_SOFT6 = 6,
+		IRQ_SOFT7 = 7,
+
+		// soft interrupts (high type)
+		IRQ_SOFT8  = 0,
+		IRQ_SOFT9  = 1,
+		IRQ_SOFT10 = 2,
+		IRQ_SOFT11 = 3,
+		IRQ_SOFT12 = 4,
+		IRQ_SOFT13 = 5,
+		IRQ_SOFT14 = 6,
+		IRQ_SOFT15 = 7
+	};
+
+	struct interrupt_data_t
+	{
+		const interrupt_type type;
+		const interrupt_number number;
+		const u16 mask;
+
+		const char *const name;
+		const char *const source;
 	};
 
 	enum dma_channel
@@ -50,40 +106,41 @@ protected:
 	};
 
 public:
-	auto out_nmi_callback() { return m_out_nmi_func.bind(); }
-	auto out_irq_callback() { return m_out_irq_func.bind(); }
-	auto out_irq_vector_callback() { return m_out_irq_vector_func.bind(); }
-	template <unsigned Chan> auto dma_r_callback() { return m_dma_channel[Chan].device_r.bind(); }
-	template <unsigned Chan> auto dma_w_callback() { return m_dma_channel[Chan].device_w.bind(); }
-	template <unsigned Chan> auto serial_dma_r_callback() { return m_serial_dma_channel[Chan].device_r.bind(); }
-	template <unsigned Chan> auto serial_dma_w_callback() { return m_serial_dma_channel[Chan].device_w.bind(); }
-	auto fdc_tc_callback() { return m_fdc_tc_func.bind(); }
-	auto eth_ca_callback() { return m_eth_ca_func.bind(); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_ivec_callback(Object &&cb) { return m_out_ivec_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_r_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_w_callback(int channel, Object &&cb) { return m_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_serial_dma_r_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_serial_dma_w_callback(int channel, Object &&cb) { return m_serial_dma_channel[channel].device_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fdc_tc_callback(Object &&cb) { return m_fdc_tc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_eth_ca_callback(Object &&cb) { return m_eth_ca_func.set_callback(std::forward<Object>(cb)); }
 
-	template <typename T> void set_memory(T &&tag, int spacenum)
+	void set_memory(const char *const tag, const int spacenum)
 	{
-		m_memory_device.set_tag(std::forward<T>(tag));
+		m_memory_tag = tag;
 		m_memory_spacenum = spacenum;
 	}
 
 	virtual void map(address_map &map) = 0;
 
 	// interrupt request lines
-	DECLARE_WRITE_LINE_MEMBER(ir0_w) { set_int_line(IRQ_SCSI, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir1_w) { set_int_line(IRQ_FLOPPY, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir2_w) { set_int_line(IRQ_PLOTTER, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir3_w) { set_int_line(IRQ_SRXCBUS0, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir4_w) { set_int_line(IRQ_SRXCBUS1, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir5_w) { set_int_line(IRQ_SRXCBUS2, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir6_w) { set_int_line(IRQ_VB, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir7_w) { set_int_line(IRQ_7, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_int_line(IRQ_CBUS3, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(IRQ_RTC, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(IRQ_60HZ, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_int_line(IRQ_SERIAL, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_int_line(IRQ_ETHERNET, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir0_w) { set_int_line(INT_HARD_EX, IRQ_SCSI, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir1_w) { set_int_line(INT_HARD_EX, IRQ_FLOPPY, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir2_w) { set_int_line(INT_HARD_EX, IRQ_PLOTTER, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir3_w) { set_int_line(INT_HARD_EX, IRQ_SRXCBUS0, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir4_w) { set_int_line(INT_HARD_EX, IRQ_SRXCBUS1, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir5_w) { set_int_line(INT_HARD_EX, IRQ_SRXCBUS2, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir6_w) { set_int_line(INT_HARD_EX, IRQ_VB, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir7_w) { set_int_line(INT_HARD_EX, IRQ_9, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_int_line(INT_HARD_EX, IRQ_CBUS3, state); }
+	// FIXME: mc146818 inverts the normal irq state convention
+	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(INT_HARD_EX, IRQ_RTC, !state); }
+	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(INT_HARD_EX, IRQ_60HZ, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_int_line(INT_HARD_EX, IRQ_SERIAL, state); }
+	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_int_line(INT_HARD_EX, IRQ_ETHERNET, state); }
 
-	virtual IRQ_CALLBACK_MEMBER(acknowledge_interrupt);
+	IRQ_CALLBACK_MEMBER(acknowledge_interrupt);
 
 	// interrupt control
 	enum icr_mask
@@ -94,15 +151,15 @@ public:
 		IRQ_FLAGS           = 0xff00,
 
 		IRQ_PENDING         = 0x0100,
-		IRQ_ENABLE          = 0x0200,
+		IRQ_ENABLE_EXTERNAL = 0x0200,
 		IRQ_EDGE            = 0x0400,
 		IRQ_NEGPOL          = 0x0800,
-		IRQ_ENABLE_INT      = 0x1000,
-
-		IRQ_ENABLE_SERDMA   = 0x0e00,
+		IRQ_ENABLE_INTERNAL = 0x1000
 	};
-	DECLARE_READ16_MEMBER(hardint_r) { return m_hwicr[offset]; }
-	DECLARE_WRITE16_MEMBER(hardint_w);
+	DECLARE_READ16_MEMBER(icr_r) { return m_hwicr[offset]; }
+	DECLARE_WRITE16_MEMBER(icr_w);
+	DECLARE_READ16_MEMBER(icr18_r) { return icr_r(space, 18, mem_mask); }
+	DECLARE_WRITE16_MEMBER(icr18_w) { icr_w(space, 18, data, mem_mask); }
 
 	enum nmictrl_mask
 	{
@@ -119,6 +176,8 @@ public:
 
 	DECLARE_READ8_MEMBER(softint_r) { return m_softint; }
 	DECLARE_WRITE8_MEMBER(softint_w);
+	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
+	DECLARE_WRITE16_MEMBER(softint_vector_w);
 
 	// dma request lines
 	DECLARE_WRITE_LINE_MEMBER(drq_plotter) { drq(state, DMA_PLOTTER); }
@@ -132,7 +191,6 @@ public:
 	enum dma_ctrl_mask
 	{
 		DMA_CTRL_TCZERO  = 0x00000001, // transfer count zero
-
 		DMA_CTRL_TAG     = 0x00000e00, // bus tag
 		DMA_CTRL_BERR    = 0x00400000, // bus error
 		DMA_CTRL_ERR     = 0x00800000, // checked for in scsi isr
@@ -209,7 +267,7 @@ public:
 	DECLARE_READ32_MEMBER(bus_timeout_r) { return m_bus_timeout; }
 	DECLARE_WRITE32_MEMBER(bus_timeout_w) { m_bus_timeout = data; }
 
-	DECLARE_WRITE32_MEMBER(bus_error);
+	DECLARE_WRITE32_MEMBER(bus_error) { m_error_address = data; m_error_businfo = offset; }
 
 	// timers
 	DECLARE_READ32_MEMBER(timer0_r);
@@ -223,6 +281,20 @@ public:
 	};
 	DECLARE_READ32_MEMBER(timer1_r);
 	DECLARE_WRITE32_MEMBER(timer1_w);
+
+	DECLARE_READ32_MEMBER(timer2_count_r);
+	DECLARE_WRITE32_MEMBER(timer2_count_w);
+	DECLARE_READ32_MEMBER(timer2_value_r);
+	DECLARE_WRITE32_MEMBER(timer2_value_w);
+
+	enum timer3_mask
+	{
+		TIMER3_COUNT   = 0x3fffffff,
+		TIMER3_START   = 0x40000000,
+		TIMER3_EXPIRED = 0x80000000
+	};
+	DECLARE_READ32_MEMBER(timer3_r);
+	DECLARE_WRITE32_MEMBER(timer3_w);
 
 	DECLARE_READ32_MEMBER(prescaler_r);
 	DECLARE_WRITE32_MEMBER(prescaler_w);
@@ -246,49 +318,39 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	required_device<device_memory_interface> m_memory_device;
+	const char *m_memory_tag;
 	int m_memory_spacenum;
-	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_memory;
+	address_space *m_memory_space;
 
 	// callbacks
 	devcb_write_line m_out_nmi_func;
 	devcb_write_line m_out_irq_func;
-	devcb_write8 m_out_irq_vector_func;
+	devcb_write8 m_out_ivec_func;
 	devcb_write_line m_fdc_tc_func;
 	devcb_write_line m_eth_ca_func;
 
 	void set_nmi_line(int state);
-	void set_int_line(int number, int state);
+	void set_int_line(interrupt_type type, int number, int state);
 
-	virtual TIMER_CALLBACK_MEMBER(interrupt_check);
+	TIMER_CALLBACK_MEMBER(interrupt_check);
+	TIMER_CALLBACK_MEMBER(set_ivec);
 	TIMER_CALLBACK_MEMBER(dma);
 	TIMER_CALLBACK_MEMBER(serial_dma);
 	TIMER_CALLBACK_MEMBER(timer0);
 	TIMER_CALLBACK_MEMBER(timer1);
+	TIMER_CALLBACK_MEMBER(timer2) {}
+	TIMER_CALLBACK_MEMBER(timer3);
 	TIMER_CALLBACK_MEMBER(timer_60hz);
+	TIMER_CALLBACK_MEMBER(mouse_timer);
 
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) = 0;
-
-	emu_timer *m_interrupt_timer;
 	emu_timer *m_eth_reset_timer;
 
-	std::unique_ptr<u16 []> m_hwicr;
-	u32 m_force_state;
-	u8 m_softint;
-
-	interrupt_type m_active_interrupt_type;
-	u8 m_active_interrupt_number;
-
-	void nmi(int state);
-	void irq(int state, u8 ivec);
-	u8 get_irq_vector() const { return m_irq_vector; }
-
-	virtual u8 get_int_count() const { return 17; }
-	virtual u8 get_reg_offset(u8 const number) const { return number; }
-	virtual u8 get_int_number(u8 const offset) const { return offset; }
-
 private:
-	TIMER_CALLBACK_MEMBER(set_irq_vector) { m_out_irq_vector_func(m_irq_vector); }
+	bool nmi(int state);
+	bool irq(int state, u8 ivec);
+	u16 get_icr(interrupt_type type, int number) const;
+	void set_pending(interrupt_type type, int number, bool pending);
 
 	void drq(int state, int channel);
 	void serial_drq(int state, int channel);
@@ -296,18 +358,12 @@ private:
 	u32 dma_r(address_space &space, offs_t offset, u32 mem_mask, dma_channel channel) const;
 	void dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, dma_channel channel);
 
-	enum serial_dma_ctrl_mask : u32
+	enum serial_dma_ctrl_mask
 	{
-		SDMA_COUNT   = 0x000000ff,
-		SDMA_TAG     = 0x0000ff00, // bus tag?
-
+		SDMA_COUNT   = 0x0000ffff,
 		SDMA_TCZERO  = 0x00200000,
-
-		SDMA_WRITE   = 0x01000000, // transfer from memory to device
-		SDMA_ENABLE  = 0x02000000,
-		SDMA_0400    = 0x04000000,
-
-		SDMA_1000    = 0x10000000, // set on Sapphire systems?
+		SDMA_SEND    = 0x04000000, // transfer from memory to device
+		SDMA_CONTROL = 0xffff0000,
 	};
 	u32 serial_dma_addr_r(address_space &space, offs_t offset, u32 mem_mask, int channel) const { return m_serial_dma_channel[channel].address; }
 	void serial_dma_addr_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel);
@@ -315,13 +371,20 @@ private:
 	void serial_dma_ctrl_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel);
 
 	// interrupt state
+	static const interrupt_data_t m_interrupt_data[];
+	interrupt_data_t const *m_active_interrupt;
 	int m_nmi_state;
 	int m_irq_state;
-	u8 m_irq_vector;
+	u8 m_ivec;
+	u32 m_hwint_forced;
 	u32 m_line_state;
 
 	// interrupt control
+	static const int INTERRUPT_COUNT = 19;
+	u16 m_hwicr[INTERRUPT_COUNT];
+	u8 m_softint;
 	u8 m_nmictrl;
+	u16 m_swicr[8];
 
 	// dma state
 	static const int DMA_CHANNEL_COUNT = 3;
@@ -361,12 +424,18 @@ private:
 	// timers
 	u8 m_timer0_count;
 	u16 m_timer1_count;
+	u32 m_timer2_count;
+	u32 m_timer2_value;
+	u32 m_timer3_count;
 	u32 m_prescaler;
 
+	emu_timer *m_interrupt_timer;
 	emu_timer *m_dma_timer;
 	emu_timer *m_serial_dma_timer;
 	emu_timer *m_timer0;
 	emu_timer *m_timer1;
+	emu_timer *m_timer2;
+	emu_timer *m_timer3;
 	emu_timer *m_timer_60hz;
 
 	// bus arbitration and control
@@ -377,48 +446,7 @@ private:
 
 	// mouse
 	u32 m_mouse_status;
-};
-
-class emerald_ioga_device : public interpro_ioga_device
-{
-public:
-	emerald_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void map(address_map &map) override;
-
-	DECLARE_WRITE16_MEMBER(eth_w);
-	DECLARE_READ16_MEMBER(eth_r);
-
-protected:
-	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;
-
-	enum eth_base_mask
-	{
-		ETH_BASE_MASK = 0xffe00000
-	};
-	DECLARE_READ32_MEMBER(eth_base_r) { return m_eth_base; }
-	DECLARE_WRITE32_MEMBER(eth_base_w);
-
-	enum eth_control_mask
-	{
-		ETH_CA    = 0x0001, // channel attention
-		ETH_FLUSH = 0x0002,
-		ETH_BUF   = 0x0004,
-		ETH_QUAD  = 0x0008,
-		ETH_BERR  = 0x0010, // bus error
-		ETH_PERR  = 0x0020, // parity error
-		ETH_RESET = 0x0040,
-		ETH_WTAG  = 0x0600,
-		ETH_RTAG  = 0x3000,
-
-		//ETH_MASK     = 0x4ff2  // channel attention and error bits not persistent
-	};
-	DECLARE_READ16_MEMBER(eth_control_r) { return m_eth_control; }
-	DECLARE_WRITE16_MEMBER(eth_control_w);
-
-private:
-	u32 m_eth_base;
-	u16 m_eth_control;
+	emu_timer *m_mouse_timer;
 };
 
 class turquoise_ioga_device : public interpro_ioga_device
@@ -473,32 +501,7 @@ public:
 	DECLARE_WRITE16_MEMBER(eth_w);
 	DECLARE_READ16_MEMBER(eth_r);
 
-	DECLARE_READ32_MEMBER(timer2_count_r);
-	DECLARE_WRITE32_MEMBER(timer2_count_w);
-	DECLARE_READ32_MEMBER(timer2_value_r);
-	DECLARE_WRITE32_MEMBER(timer2_value_w);
-
-	enum timer3_mask
-	{
-		TIMER3_COUNT   = 0x3fffffff,
-		TIMER3_START   = 0x40000000,
-		TIMER3_EXPIRED = 0x80000000
-	};
-	DECLARE_READ32_MEMBER(timer3_r);
-	DECLARE_WRITE32_MEMBER(timer3_w);
-
-
-	DECLARE_READ16_MEMBER(softint_vector_r) { return m_swicr[offset]; }
-	DECLARE_WRITE16_MEMBER(softint_vector_w);
-
-	virtual IRQ_CALLBACK_MEMBER(acknowledge_interrupt) override;
-
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	virtual TIMER_CALLBACK_MEMBER(interrupt_check) override;
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) override;
 
 	enum eth_remap_mask
@@ -542,32 +545,13 @@ protected:
 	DECLARE_READ32_MEMBER(eth_control_r);
 	DECLARE_WRITE32_MEMBER(eth_control_w);
 
-	TIMER_CALLBACK_MEMBER(timer2) {}
-	TIMER_CALLBACK_MEMBER(timer3);
-
-	virtual u8 get_int_count() const override { return INTERRUPT_COUNT; }
-	virtual u8 get_reg_offset(u8 const number) const override { return (number + 2) % INTERRUPT_COUNT; }
-	virtual u8 get_int_number(u8 const offset) const override { return (offset + INTERRUPT_COUNT - 2) % INTERRUPT_COUNT; }
-
 private:
-	static const u8 INTERRUPT_COUNT = 19;
-
 	u32 m_eth_remap;
 	u32 m_eth_mappg;
 	u32 m_eth_control;
-
-	u32 m_timer2_count;
-	u32 m_timer2_value;
-	u32 m_timer3_count;
-
-	emu_timer *m_timer2;
-	emu_timer *m_timer3;
-
-	u16 m_swicr[8];
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(EMERALD_IOGA, emerald_ioga_device)
 DECLARE_DEVICE_TYPE(TURQUOISE_IOGA, turquoise_ioga_device)
 DECLARE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device)
 

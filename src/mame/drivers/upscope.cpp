@@ -37,18 +37,13 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_prev_cia1_porta(0xff),
-		m_parallel_data(0xff),
-		m_ppi(*this, "ppi")
+	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag),
+	m_prev_cia1_porta(0xff),
+	m_parallel_data(0xff),
+	m_ppi(*this, "ppi")
 	{ }
 
-	void upscope(machine_config &config);
-
-	void init_upscope();
-
-private:
 	uint8_t m_nvram[0x100];
 	uint8_t m_prev_cia1_porta;
 	uint8_t m_parallel_data;
@@ -63,13 +58,16 @@ private:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 
+	void init_upscope();
 
+	void upscope(machine_config &config);
 	void a500_mem(address_map &map);
 	void main_map(address_map &map);
 	void overlay_512kb_map(address_map &map);
-
+protected:
 	virtual void machine_reset() override;
 
+private:
 	required_device<i8255_device> m_ppi;
 };
 
@@ -146,7 +144,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		/* if SEL == 1 && BUSY == 1, we write data to internal registers */
 		else if ((data & 5) == 5)
 		{
-			m_ppi->write(m_nvram_address_latch & 0x03, m_parallel_data);
+			m_ppi->write(space, m_nvram_address_latch & 0x03, m_parallel_data);
 		}
 
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
@@ -170,7 +168,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
-			m_nvram_data_latch = m_ppi->read(m_nvram_address_latch & 0x03);
+			m_nvram_data_latch = m_ppi->read(space, m_nvram_address_latch & 0x03);
 		}
 
 		/* if SEL == 0, we read NVRAM */
@@ -220,12 +218,12 @@ void upscope_state::a500_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
-	map(0xa00000, 0xbfffff).rw(FUNC(upscope_state::cia_r), FUNC(upscope_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xa00000, 0xbfffff).rw(this, FUNC(upscope_state::cia_r), FUNC(upscope_state::cia_w));
+	map(0xc00000, 0xd7ffff).rw(this, FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
-	map(0xe00000, 0xe7ffff).nopw().r(FUNC(upscope_state::rom_mirror_r));
+	map(0xde0000, 0xdeffff).rw(this, FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xdf0000, 0xdfffff).rw(this, FUNC(upscope_state::custom_chip_r), FUNC(upscope_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).nopw().r(this, FUNC(upscope_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
 }
@@ -271,14 +269,20 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	ntsc_video(config);
 
-	PALETTE(config, m_palette, FUNC(upscope_state::amiga_palette), 4096);
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_INIT_OWNER(upscope_state,amiga)
 
 	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 
@@ -286,13 +290,13 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
-	paula.add_route(0, "rspeaker", 0.50);
-	paula.add_route(1, "lspeaker", 0.50);
-	paula.add_route(2, "lspeaker", 0.50);
-	paula.add_route(3, "rspeaker", 0.50);
-	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
-	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
+	MCFG_DEVICE_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 0.50)
+	MCFG_PAULA_MEM_READ_CB(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(*this, amiga_state, paula_int_w))
 
 	/* cia */
 	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
@@ -306,18 +310,18 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_1_porta_w))
 
 	/* fdc */
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
-	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
-	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
-	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
-	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
-	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
+	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
+	MCFG_AMIGA_FDC_INDEX_CALLBACK(WRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(*this, amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(*this, amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(*this, amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(*this, amiga_state, fdc_dsksyn_w))
 
 	// i/o extension
-	I8255(config, m_ppi);
-	m_ppi->in_pa_callback().set_ioport("IO0");
-	m_ppi->out_pb_callback().set(FUNC(upscope_state::lamps_w));
-	m_ppi->out_pc_callback().set(FUNC(upscope_state::coin_counter_w));
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IO0"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, upscope_state, lamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, upscope_state, coin_counter_w))
 MACHINE_CONFIG_END
 
 
@@ -364,7 +368,7 @@ void upscope_state::init_upscope()
 	m_denise_id = DENISE;
 
 	// allocate nvram
-	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
+	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
 

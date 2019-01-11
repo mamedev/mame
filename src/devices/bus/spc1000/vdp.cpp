@@ -23,14 +23,14 @@ WRITE_LINE_MEMBER(spc1000_vdp_exp_device::vdp_interrupt)
 //  device_add_mconfig
 //-------------------------------------------------
 
-void spc1000_vdp_exp_device::device_add_mconfig(machine_config &config)
-{
-	TMS9928A(config, m_vdp, XTAL(10'738'635)); // TODO: which clock?
-	m_vdp->set_vram_size(0x4000);
-	m_vdp->int_callback().set(FUNC(spc1000_vdp_exp_device::vdp_interrupt));
-	m_vdp->set_screen("tms_screen");
-	SCREEN(config, "tms_screen", SCREEN_TYPE_RASTER);
-}
+MACHINE_CONFIG_START(spc1000_vdp_exp_device::device_add_mconfig)
+
+	MCFG_DEVICE_ADD("tms", TMS9928A, XTAL(10'738'635) / 2) // TODO: which clock?
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, spc1000_vdp_exp_device, vdp_interrupt))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC("tms_screen")
+	MCFG_SCREEN_UPDATE_DEVICE("tms", tms9928a_device, screen_update)
+MACHINE_CONFIG_END
 
 
 //**************************************************************************
@@ -80,9 +80,9 @@ READ8_MEMBER(spc1000_vdp_exp_device::read)
 		return 0xff;
 
 	if (offset & 1)
-		return m_vdp->register_read();
+		return m_vdp->register_read(space, offset);
 	else
-		return m_vdp->vram_read();
+		return m_vdp->vram_read(space, offset);
 }
 
 //-------------------------------------------------
@@ -94,8 +94,8 @@ WRITE8_MEMBER(spc1000_vdp_exp_device::write)
 	if (offset & 0x800)
 	{
 		if (offset & 1)
-			m_vdp->register_write(data);
+			m_vdp->register_write(space, offset, data);
 		else
-			m_vdp->vram_write(data);
+			m_vdp->vram_write(space, offset, data);
 	}
 }

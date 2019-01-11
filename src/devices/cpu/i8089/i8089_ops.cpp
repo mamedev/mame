@@ -378,7 +378,7 @@ void i8089_channel_device::setb(int m, int b, int o)
 
 
 // set interrupt service flip-flop
-void i8089_channel_device::do_sintr()
+void i8089_channel_device::sintr()
 {
 	if (BIT(m_r[PSW].w, 4))
 	{

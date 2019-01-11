@@ -15,8 +15,6 @@
 #include "ui/menu.h"
 #include "ui/inputmap.h"
 
-#include <algorithm>
-
 
 namespace ui {
 /***************************************************************************
@@ -355,6 +353,23 @@ void menu_input_specific::update_input(struct input_item_data *seqchangeditem)
 
 
 /*-------------------------------------------------
+    menu_input_compare_items - compare two
+    items for quicksort
+-------------------------------------------------*/
+
+int menu_input::compare_items(const void *i1, const void *i2)
+{
+	const input_item_data * const *data1 = (const input_item_data * const *)i1;
+	const input_item_data * const *data2 = (const input_item_data * const *)i2;
+	if ((*data1)->sortorder < (*data2)->sortorder)
+		return -1;
+	if ((*data1)->sortorder > (*data2)->sortorder)
+		return 1;
+	return 0;
+}
+
+
+/*-------------------------------------------------
     menu_input_populate_and_sort - take a list
     of input_item_data objects and build up the
     menu from them
@@ -363,7 +378,7 @@ void menu_input_specific::update_input(struct input_item_data *seqchangeditem)
 void menu_input::populate_and_sort(input_item_data *itemlist)
 {
 	const char *nameformat[INPUT_TYPE_TOTAL] = { nullptr };
-	input_item_data *item;
+	input_item_data **itemarray, *item;
 	int numitems = 0, curitem;
 	std::string subtext;
 	std::string prev_owner;
@@ -380,14 +395,12 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 		numitems++;
 
 	/* now allocate an array of items and fill it up */
-	std::vector<input_item_data *> itemarray(numitems);
+	itemarray = (input_item_data **)m_pool_alloc(sizeof(*itemarray) * numitems);
 	for (item = itemlist, curitem = 0; item != nullptr; item = item->next)
 		itemarray[curitem++] = item;
 
 	/* sort it */
-	std::sort(itemarray.begin(), itemarray.end(), [](const input_item_data *i1, const input_item_data *i2) {
-		return i1->sortorder < i2->sortorder;
-	});
+	qsort(itemarray, numitems, sizeof(*itemarray), compare_items);
 
 	/* build the menu */
 	for (curitem = 0; curitem < numitems; curitem++)

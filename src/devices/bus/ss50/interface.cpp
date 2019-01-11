@@ -203,9 +203,6 @@ WRITE_LINE_MEMBER(ss50_interface_port_device::f600_1200_w)
 //  SS-50 CARD INTERFACE
 //**************************************************************************
 
-template class device_finder<ss50_card_interface, false>;
-template class device_finder<ss50_card_interface, true>;
-
 //-------------------------------------------------
 //  ss50_card_interface - construction
 //-------------------------------------------------

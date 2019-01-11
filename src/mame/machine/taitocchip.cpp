@@ -85,15 +85,9 @@ C-chip EXTERNAL memory map (it acts as a device mapped to ram; dtack is asserted
 0x000-0x3FF = RW ram window, a 1k window into the 8k byte sram inside the c-chip; the 'bank' visible is selected by 0x600 below
 0x400-0x403 = "ASIC RAM", 4 bytes of ram on the asic
 0x400 = unknown, no idea if /DTACK is asserted for R or W here
-0x401 = RW 'test command/status register', writing a 0x02 here starts test mode, will return 0x01 set if ok/ready for
-    command and 0x04 set if error; this register is very likely handled by the internal rom in the upd78c11 itself rather
-    than the eprom, and probably tests the sram and the 78c11 internal ram, among other things.
-    * Current guess: 0x401 is actually attached to the high 2 bits of the PF register; bit 0 is pf6 out, bit 1 is pf6 in
-	  (attached to pf6 thru a resistor?), bit 2 is pf7 out, bit 3 is pf7 in (attached to pf7 through a resistor).
-	  The 78c11 (I'm guessing) reads pf6 and pf7 once per int; if pf6-in is set it reruns the startup selftest,
-	  clears pf6-out, then re-sets it. if there is an error, it also sets pf7.
-    * Alternate guess: pf4 selects between rom and ram but pf5,6,7 are all mapped to 0x401. a memory mapped register in
-	  upd78c11 space selects low vs high half of rom/ram access
+0x401 = RW 'test command/status register', writing a 0x02 here starts test mode, will return 0x01 set if ok/ready for command and 0x04 set if error; this register is very likely handled by the internal rom in the upd78c11 itself rather than the eprom, and probably tests the sram and the 78c11 internal ram, among other things.
+Current guess: 0x401 is actually attached to the high 2 bits of the PF register; bit 0 is pf6 out, bit 1 is pf6 in (attached to pf6 thru a resistor?), bit 2 is pf7 out, bit 3 is pf7 in (attached to pf7 through a resistor). The 78c11 (I'm guessing) reads pf6 and pf7 once per int; if pf6-in is set it reruns the startup selftest, clears pf6-out, then re-sets it. if there is an error, it also sets pf7.
+Alternate guess: pf4 selects between rom and ram but pf5,6,7 are all mapped to 0x401. a memory mapped register in upd78c11 space selects low vs high half of rom/ram access
 0x402-0x5ff = unknown (may be mirror of 0x400 and 0x401?) no idea if /DTACK is asserted for R or W here
 0x600 = ?W ram window bank select, selects one of 8 1k banks to be accessible at 0x000-0x3ff , only low 3 bits are valid on this register. not sure if readable.
 0x601-0x7ff = unknown, no idea if /DTACK is asserted for R or W here
@@ -105,13 +99,10 @@ This chip *ALWAYS* has a bypass capacitor (ceramic, 104, 0.10 uF) soldered on to
 #include "emu.h"
 #include "machine/taitocchip.h"
 
-#include "cpu/upd7810/upd7811.h"
-
-
 DEFINE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device, "cchip", "Taito TC0030CMD (C-Chip)")
 
-taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, TAITO_CCHIP, tag, owner, clock),
+taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TAITO_CCHIP, tag, owner, clock),
 	m_upd7811(*this, "upd7811"),
 	m_upd4464_bank(*this, "upd4464_bank"),
 	m_upd4464_bank68(*this, "upd4464_bank68"),
@@ -159,108 +150,178 @@ READ8_MEMBER(taito_cchip_device::asic_r)
 
 WRITE8_MEMBER(taito_cchip_device::asic_w)
 {
-	//logerror("%s: asic_w %04x %02x\n", machine().describe_context(), offset, data);
+	logerror("%s: asic_w %04x %02x\n", machine().describe_context(), offset, data);
 	if (offset == 0x200)
 	{
-		//logerror("cchip set bank to %02x\n", data & 0x7);
+		logerror("cchip set bank to %02x\n", data & 0x7);
 		m_upd4464_bank->set_bank(data & 0x7);
 	}
 	else
-	{
-		m_asic_ram[offset & 3] = data;
-	}
+		m_asic_ram[offset&3] = data;
 }
 
 WRITE8_MEMBER(taito_cchip_device::asic68_w)
 {
-	//logerror("%s: asic68_w %04x %02x\n", machine().describe_context(), offset, data);
+	logerror("%s: asic68_w %04x %02x\n", machine().describe_context(), offset, data);
 	if (offset == 0x200)
 	{
-		//logerror("cchip (68k side) set bank to %02x\n", data & 0x7);
+		logerror("cchip (68k side) set bank to %02x\n", data & 0x7);
 		m_upd4464_bank68->set_bank(data & 0x7);
 	}
 	else
-	{
-		m_asic_ram[offset & 3] = data;
-	}
+		m_asic_ram[offset&3] = data;
 }
 
 READ8_MEMBER(taito_cchip_device::mem_r)
 {
-	return m_upd4464_bank->read8(space, offset & 0x03ff);
+	offset &= 0x3ff;
+	return m_upd4464_bank->read8(space,offset);
 }
 
 WRITE8_MEMBER(taito_cchip_device::mem_w)
 {
-	return m_upd4464_bank->write8(space, offset & 0x03ff, data);
+	offset &= 0x3ff;
+	return m_upd4464_bank->write8(space,offset,data);
 }
 
 READ8_MEMBER(taito_cchip_device::mem68_r)
 {
-	return m_upd4464_bank68->read8(space, offset & 0x03ff);
+	offset &= 0x3ff;
+	return m_upd4464_bank68->read8(space,offset);
 }
 
 WRITE8_MEMBER(taito_cchip_device::mem68_w)
 {
-	return m_upd4464_bank68->write8(space, offset & 0x03ff, data);
+	offset &= 0x3ff;
+	return m_upd4464_bank68->write8(space,offset,data);
 }
 
 void taito_cchip_device::cchip_map(address_map &map)
 {
 	//AM_RANGE(0x0000, 0x0fff) AM_ROM // internal ROM of uPD7811
-	map(0x1000, 0x13ff).m(m_upd4464_bank, FUNC(address_map_bank_device::amap8));
-	map(0x1400, 0x17ff).rw(FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic_w));
+	map(0x1000, 0x13ff).m("upd4464_bank", FUNC(address_map_bank_device::amap8));
+	map(0x1400, 0x17ff).rw(this, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic_w));
 	map(0x2000, 0x3fff).rom().region("cchip_eprom", 0);
 }
 
 
 
-void taito_cchip_device::device_add_mconfig(machine_config &config)
-{
-	upd7811_device &upd(UPD7811(config, m_upd7811, DERIVED_CLOCK(1, 1)));
-	upd.set_addrmap(AS_PROGRAM, &taito_cchip_device::cchip_map);
-	upd.pa_in_cb().set([this] { return m_in_pa_cb(); });
-	upd.pb_in_cb().set([this] { return m_in_pb_cb(); });
-	upd.pc_in_cb().set([this] { return m_in_pc_cb(); });
-	upd.pa_out_cb().set([this] (u8 data) { m_out_pa_cb(data); });
-	upd.pb_out_cb().set([this] (u8 data) { m_out_pb_cb(data); });
-	upd.pc_out_cb().set([this] (u8 data) { m_out_pc_cb(data); });
-	upd.pf_out_cb().set([this] (u8 data) { logerror("%s port F written %.2x\n", machine().describe_context(), data); }); // internal? related to locking out the 68k?
-	upd.an0_func().set([this] { return BIT(m_in_ad_cb(), 0); });
-	upd.an1_func().set([this] { return BIT(m_in_ad_cb(), 1); });
-	upd.an2_func().set([this] { return BIT(m_in_ad_cb(), 2); });
-	upd.an3_func().set([this] { return BIT(m_in_ad_cb(), 3); });
-	upd.an4_func().set([this] { return BIT(m_in_ad_cb(), 4); });
-	upd.an5_func().set([this] { return BIT(m_in_ad_cb(), 5); });
-	upd.an6_func().set([this] { return BIT(m_in_ad_cb(), 6); });
-	upd.an7_func().set([this] { return BIT(m_in_ad_cb(), 7); });
 
-	ADDRESS_MAP_BANK(config, m_upd4464_bank, 0);
-	m_upd4464_bank->set_map(&taito_cchip_device::cchip_ram_bank);
-	m_upd4464_bank->set_endianness(ENDIANNESS_LITTLE);
-	m_upd4464_bank->set_data_width(8);
-	m_upd4464_bank->set_addr_width(13);
-	m_upd4464_bank->set_stride(0x400);
+WRITE8_MEMBER(taito_cchip_device::porta_w)
+{
+	m_out_pa_cb(data);
+}
+
+WRITE8_MEMBER(taito_cchip_device::portb_w)
+{
+	m_out_pb_cb(data);
+}
+
+WRITE8_MEMBER(taito_cchip_device::portc_w)
+{
+	m_out_pc_cb(data);
+}
+
+WRITE8_MEMBER(taito_cchip_device::portf_w)
+{
+	// internal? related to locking out the 68k?
+	logerror("%s port F written %.2x\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(taito_cchip_device::porta_r)
+{
+	return m_in_pa_cb();
+}
+
+READ8_MEMBER(taito_cchip_device::portb_r)
+{
+	return m_in_pb_cb();
+}
+
+READ8_MEMBER(taito_cchip_device::portc_r)
+{
+	return m_in_pc_cb();
+}
+
+
+READ_LINE_MEMBER( taito_cchip_device::an0_r )
+{
+	return BIT(m_in_ad_cb(), 0);
+}
+
+READ_LINE_MEMBER( taito_cchip_device::an1_r )
+{
+	return BIT(m_in_ad_cb(), 1);
+}
+
+READ_LINE_MEMBER( taito_cchip_device::an2_r )
+{
+	return BIT(m_in_ad_cb(), 2);
+}
+
+
+READ_LINE_MEMBER( taito_cchip_device::an3_r )
+{
+	return BIT(m_in_ad_cb(), 3);
+}
+
+READ_LINE_MEMBER( taito_cchip_device::an4_r )
+{
+	return BIT(m_in_ad_cb(), 4);
+}
+
+READ_LINE_MEMBER( taito_cchip_device::an5_r )
+{
+	return BIT(m_in_ad_cb(), 5);
+}
+
+READ_LINE_MEMBER( taito_cchip_device::an6_r )
+{
+	return BIT(m_in_ad_cb(), 6);
+}
+
+READ_LINE_MEMBER( taito_cchip_device::an7_r )
+{
+	return BIT(m_in_ad_cb(), 7);
+}
+
+
+
+MACHINE_CONFIG_START(taito_cchip_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("upd7811", UPD7811, DERIVED_CLOCK(1,1))
+	MCFG_DEVICE_PROGRAM_MAP(cchip_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, taito_cchip_device, porta_r))
+	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, taito_cchip_device, portb_r))
+	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, taito_cchip_device, portc_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, taito_cchip_device, porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, taito_cchip_device, portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, taito_cchip_device, portc_w))
+	MCFG_UPD7810_PORTF_WRITE_CB(WRITE8(*this, taito_cchip_device, portf_w))
+	MCFG_UPD7810_AN0(READLINE(*this, taito_cchip_device, an0_r))
+	MCFG_UPD7810_AN1(READLINE(*this, taito_cchip_device, an1_r))
+	MCFG_UPD7810_AN2(READLINE(*this, taito_cchip_device, an2_r))
+	MCFG_UPD7810_AN3(READLINE(*this, taito_cchip_device, an3_r))
+	MCFG_UPD7810_AN4(READLINE(*this, taito_cchip_device, an4_r))
+	MCFG_UPD7810_AN5(READLINE(*this, taito_cchip_device, an5_r))
+	MCFG_UPD7810_AN6(READLINE(*this, taito_cchip_device, an6_r))
+	MCFG_UPD7810_AN7(READLINE(*this, taito_cchip_device, an7_r))
+
+	MCFG_DEVICE_ADD("upd4464_bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(cchip_ram_bank)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	// the 68k has a different view into the banked memory?
-	ADDRESS_MAP_BANK(config, m_upd4464_bank68, 0);
-	m_upd4464_bank68->set_map(&taito_cchip_device::cchip_ram_bank68);
-	m_upd4464_bank68->set_endianness(ENDIANNESS_LITTLE);
-	m_upd4464_bank68->set_data_width(8);
-	m_upd4464_bank68->set_addr_width(13);
-	m_upd4464_bank68->set_stride(0x400);
-}
+	MCFG_DEVICE_ADD("upd4464_bank68", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(cchip_ram_bank68)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
+MACHINE_CONFIG_END
 
-void taito_cchip_device::device_resolve_objects()
-{
-	m_in_pa_cb.resolve_safe(0);
-	m_in_pb_cb.resolve_safe(0);
-	m_in_pc_cb.resolve_safe(0);
-	m_in_ad_cb.resolve_safe(0);
-	m_out_pa_cb.resolve_safe();
-	m_out_pb_cb.resolve_safe();
-	m_out_pc_cb.resolve_safe();
-}
 
 void taito_cchip_device::device_start()
 {
@@ -269,6 +330,14 @@ void taito_cchip_device::device_start()
 
 	save_item(NAME(m_asic_ram));
 	m_asic_ram[0] = m_asic_ram[1] = m_asic_ram[2] = m_asic_ram[3] = 0;
+
+	m_in_pa_cb.resolve_safe(0);
+	m_in_pb_cb.resolve_safe(0);
+	m_in_pc_cb.resolve_safe(0);
+	m_in_ad_cb.resolve_safe(0);
+	m_out_pa_cb.resolve_safe();
+	m_out_pb_cb.resolve_safe();
+	m_out_pc_cb.resolve_safe();
 }
 
 void taito_cchip_device::device_reset()

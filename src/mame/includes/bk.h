@@ -5,23 +5,20 @@
  * includes/bk.h
  *
  ****************************************************************************/
+
 #ifndef MAME_INCLUDES_BK_H
 #define MAME_INCLUDES_BK_H
 
-#pragma once
-
-#include "cpu/t11/t11.h"
 #include "imagedev/cassette.h"
 
 class bk_state : public driver_device
 {
 public:
-	bk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	bk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_bk0010_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette")
-	{ }
+		m_cassette(*this, "cassette") { }
 
 	uint16_t m_scrool;
 	required_shared_ptr<uint16_t> m_bk0010_video_ram;
@@ -48,7 +45,7 @@ public:
 	uint32_t screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);
-	required_device<t11_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	void bk0010(machine_config &config);
 	void bk0010fd(machine_config &config);

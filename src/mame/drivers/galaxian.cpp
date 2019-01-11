@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert, Robbbert
+// copyright-holders:Aaron Giles, Couriersud,Stephane Humbert
 /***************************************************************************
 
     Galaxian-derived hardware
@@ -662,10 +662,16 @@ TODO:
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
+#include "sound/discrete.h"
 #include "sound/sn76496.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+#define KONAMI_SOUND_CLOCK      XTAL(14'318'181)
+
+
 
 /*************************************
  *
@@ -673,17 +679,17 @@ TODO:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(galaxian_state::vblank_interrupt_w)
+INTERRUPT_GEN_MEMBER(galaxian_state::interrupt_gen)
 {
 	/* interrupt line is clocked at VBLANK */
 	/* a flip-flop at 6F is held in the preset state based on the NMI ON signal */
-	if (state && m_irq_enabled)
-		m_maincpu->set_input_line(m_irq_line, ASSERT_LINE);
+	if (m_irq_enabled)
+		device.execute().set_input_line(m_irq_line, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(galaxian_state::tenspot_interrupt_w)
+INTERRUPT_GEN_MEMBER(galaxian_state::fakechange_interrupt_gen)
 {
-	vblank_interrupt_w(state);
+	interrupt_gen(device);
 
 	if (m_fake_select.read_safe(0x00))
 	{
@@ -714,7 +720,7 @@ WRITE8_MEMBER(galaxian_state::start_lamp_w)
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
-	m_lamps[offset] = BIT(data, 0);
+	m_lamp[offset] = BIT(data, 0);
 }
 
 
@@ -822,26 +828,23 @@ READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 
 WRITE8_MEMBER(galaxian_state::konami_sound_filter_w)
 {
-	if (m_discrete != nullptr)
-	{
-		/* the offset is used as data, 6 channels * 2 bits each */
-		/* AV0 .. AV5 ==> AY8910 #2 */
-		/* AV6 .. AV11 ==> AY8910 #1 */
-		for (int which = 0; which < 2; which++)
-		{
-			if (m_ay8910[which] != nullptr)
-			{
-				for (int chan = 0; chan < 3; chan++)
-				{
-					uint8_t bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
+	discrete_device *discrete = machine().device<discrete_device>("konami");
+	static const char *const ayname[2] = { "8910.0", "8910.1" };
+	int which, chan;
 
-					/* low bit goes to 0.22uF capacitor = 220000pF  */
-					/* high bit goes to 0.047uF capacitor = 47000pF */
-					m_discrete->write(NODE(3 * which + chan + 11), bits);
-				}
+	/* the offset is used as data, 6 channels * 2 bits each */
+	/* AV0 .. AV5 ==> AY8910 #2 */
+	/* AV6 .. AV11 ==> AY8910 #1 */
+	for (which = 0; which < 2; which++)
+		if (machine().device(ayname[which]) != nullptr)
+			for (chan = 0; chan < 3; chan++)
+			{
+				uint8_t bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
+
+				/* low bit goes to 0.22uF capacitor = 220000pF  */
+				/* high bit goes to 0.047uF capacitor = 47000pF */
+				discrete->write(space, NODE(3 * which + chan + 11), bits);
 			}
-		}
-	}
 }
 
 
@@ -867,8 +870,8 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x0100) result &= m_ppi8255[0]->read(offset & 3);
-	if (offset & 0x0200) result &= m_ppi8255[1]->read(offset & 3);
+	if (offset & 0x0100) result &= m_ppi8255[0]->read(space, offset & 3);
+	if (offset & 0x0200) result &= m_ppi8255[1]->read(space, offset & 3);
 	return result;
 }
 
@@ -876,8 +879,8 @@ READ8_MEMBER(galaxian_state::theend_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::theend_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) m_ppi8255[0]->write(offset & 3, data);
-	if (offset & 0x0200) m_ppi8255[1]->write(offset & 3, data);
+	if (offset & 0x0100) m_ppi8255[0]->write(space, offset & 3, data);
+	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
 }
 
 
@@ -887,57 +890,48 @@ WRITE8_MEMBER(galaxian_state::theend_coin_counter_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::theend_protection_w)
+/*************************************
+ *
+ *  Scramble I/O
+ *
+ *************************************/
+
+WRITE8_MEMBER(galaxian_state::scramble_protection_w)
 {
 	/*
-	    Handled by a PAL16VR8(?) at 6J. Both inputs and outputs are a nibble.
-	    Logic is not exactly known, but this implementation works well enough.
+	    This is not fully understood; the low 4 bits of port C are
+	    inputs; the upper 4 bits are outputs. Scramble main set always
+	    writes sequences of 3 or more nibbles to the low port and
+	    expects certain results in the upper nibble afterwards.
 	*/
 	m_protection_state = (m_protection_state << 4) | (data & 0x0f);
-
-	const uint8_t num1 = (m_protection_state >> 8) & 0x0f;
-	const uint8_t num2 = (m_protection_state >> 4) & 0x0f;
-	const uint8_t op = m_protection_state & 0x0f;
-
-	/* TODO: theend writes several, other mystery sequences */
-	switch (op)
+	switch (m_protection_state & 0xfff)
 	{
-	case 0x6:
-		/* scrambles */
-		m_protection_result ^= 0x80;
-		break;
-	case 0x9:
 		/* scramble */
-		m_protection_result = std::min(num1 + 1, 0xf) << 4; // does not want overflow
-		break;
-	case 0xb:
-		/* theend */
-		m_protection_result = std::max(num2 - num1, 0) << 4; // assume no underflow
-		break;
-	case 0xa:
-		/* theend */
-		m_protection_result = 0x00; // needs this to avoid glitches after first round
-		break;
-	case 0xf:
-		/* scrambles */
-		m_protection_result = std::max(num1 - num2, 0) << 4; // assume no underflow
-		break;
+		case 0xf09:     m_protection_result = 0xff; break;
+		case 0xa49:     m_protection_result = 0xbf; break;
+		case 0x319:     m_protection_result = 0x4f; break;
+		case 0x5c9:     m_protection_result = 0x6f; break;
+
+		/* scrambls */
+		case 0x246:     m_protection_result ^= 0x80;    break;
+		case 0xb5f:     m_protection_result = 0x6f; break;
 	}
 }
 
 
-READ8_MEMBER(galaxian_state::theend_protection_r)
+READ8_MEMBER(galaxian_state::scramble_protection_r)
 {
 	return m_protection_result;
 }
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::theend_protection_alt_r)
+CUSTOM_INPUT_MEMBER(galaxian_state::scramble_protection_alt_r)
 {
 	/*
-	    Handled by a custom IC. Holds two bits derived from the upper bit of
-	    the nibble that the IC at 6J returns; scrambles reads this area and
-	    expects said behavior, or else it will crash.
+	    There are two additional bits that are derived from bit 7 of
+	    the protection result. This is just a guess but works well enough
+	    to boot scrambls.
 	*/
 	return (m_protection_result >> 7) & 1;
 }
@@ -972,7 +966,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x04) result &= m_ppi8255[2]->read(offset & 3);
+	if (offset & 0x04) result &= m_ppi8255[2]->read(space, offset & 3);
 	return result;
 }
 
@@ -980,7 +974,7 @@ READ8_MEMBER(galaxian_state::sfx_sample_io_r)
 WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) m_ppi8255[2]->write(offset & 3, data);
+	if (offset & 0x04) m_ppi8255[2]->write(space, offset & 3, data);
 	if (offset & 0x10) m_dac->write(data);
 }
 
@@ -1064,8 +1058,8 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x1000) result &= m_ppi8255[1]->read((offset >> 1) & 3);
-	if (offset & 0x2000) result &= m_ppi8255[0]->read((offset >> 1) & 3);
+	if (offset & 0x1000) result &= m_ppi8255[1]->read(space, (offset >> 1) & 3);
+	if (offset & 0x2000) result &= m_ppi8255[0]->read(space, (offset >> 1) & 3);
 	return result;
 }
 
@@ -1073,8 +1067,8 @@ READ8_MEMBER(galaxian_state::frogger_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::frogger_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) m_ppi8255[1]->write((offset >> 1) & 3, data);
-	if (offset & 0x2000) m_ppi8255[0]->write((offset >> 1) & 3, data);
+	if (offset & 0x1000) m_ppi8255[1]->write(space, (offset >> 1) & 3, data);
+	if (offset & 0x2000) m_ppi8255[0]->write(space, (offset >> 1) & 3, data);
 }
 
 
@@ -1129,8 +1123,8 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	uint8_t result = 0xff;
-	if (offset & 0x1000) result &= m_ppi8255[0]->read((offset >> 3) & 3);
-	if (offset & 0x2000) result &= m_ppi8255[1]->read((offset >> 3) & 3);
+	if (offset & 0x1000) result &= m_ppi8255[0]->read(space, (offset >> 3) & 3);
+	if (offset & 0x2000) result &= m_ppi8255[1]->read(space, (offset >> 3) & 3);
 	return result;
 }
 
@@ -1138,8 +1132,8 @@ READ8_MEMBER(galaxian_state::frogf_ppi8255_r)
 WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) m_ppi8255[0]->write((offset >> 3) & 3, data);
-	if (offset & 0x2000) m_ppi8255[1]->write((offset >> 3) & 3, data);
+	if (offset & 0x1000) m_ppi8255[0]->write(space, (offset >> 3) & 3, data);
+	if (offset & 0x2000) m_ppi8255[1]->write(space, (offset >> 3) & 3, data);
 }
 
 
@@ -1150,10 +1144,10 @@ WRITE8_MEMBER(galaxian_state::frogf_ppi8255_w)
  *
  *************************************/
 
-READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255[0]->read((offset >> 4) & 3); }
-READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255[1]->read((offset >> 4) & 3); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255[0]->write((offset >> 4) & 3, data); }
-WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write((offset >> 4) & 3, data); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_0_r){ return m_ppi8255[0]->read(space, (offset >> 4) & 3); }
+READ8_MEMBER(galaxian_state::turtles_ppi8255_1_r){ return m_ppi8255[1]->read(space, (offset >> 4) & 3); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_0_w){ m_ppi8255[0]->write(space, (offset >> 4) & 3, data); }
+WRITE8_MEMBER(galaxian_state::turtles_ppi8255_1_w){ m_ppi8255[1]->write(space, (offset >> 4) & 3, data); }
 
 
 
@@ -1567,20 +1561,20 @@ void galaxian_state::galaxian_map_base(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).mirror(0x0400).ram();
-	map(0x5000, 0x53ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5800, 0x58ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x5000, 0x53ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
-	map(0x6000, 0x6001).mirror(0x07f8).w(FUNC(galaxian_state::start_lamp_w));
-	map(0x6002, 0x6002).mirror(0x07f8).w(FUNC(galaxian_state::coin_lock_w));
-	map(0x6003, 0x6003).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x6000, 0x6001).mirror(0x07f8).w(this, FUNC(galaxian_state::start_lamp_w));
+	map(0x6002, 0x6002).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_lock_w));
+	map(0x6003, 0x6003).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
 	//AM_RANGE(0x6004, 0x6007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
 	//AM_RANGE(0x6800, 0x6807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
 	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
-	map(0x7001, 0x7001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x7004, 0x7004).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x7006, 0x7006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	//AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	map(0x7800, 0x7800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
@@ -1589,26 +1583,6 @@ void galaxian_state::galaxian_map(address_map &map)
 {
 	galaxian_map_base(map);
 	galaxian_map_discrete(map);
-}
-
-void galaxian_state::frogg_map(address_map &map)
-{
-	galaxian_map(map);
-	map(0x4000, 0x47ff).ram(); // needs a full 2k of RAM
-}
-
-void galaxian_state::mandingarf_map(address_map &map)
-{
-	galaxian_map(map);
-	map(0x4000, 0x47ff).ram(); // needs a full 2k of RAM
-	map(0xc000, 0xc7ff).rom().region("maincpu", 0xc000); // extend ROM
-}
-
-void galaxian_state::victoryc_map(address_map &map)
-{
-	galaxian_map(map);
-	map(0x7004, 0x7004).mirror(0x07f8).nopw(); // disable the stars
-	map(0x8000, 0x87ff).ram(); // needs a full 2k of RAM
 }
 
 /* map derived from schematics */
@@ -1625,19 +1599,19 @@ void galaxian_state::mooncrst_map_base(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x83ff).mirror(0x0400).ram();
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9800, 0x98ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0xa000, 0xa000).mirror(0x07ff).portr("IN0");
-	map(0xa000, 0xa002).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_gfxbank_w));
-	map(0xa003, 0xa003).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0xa000, 0xa002).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_gfxbank_w));
+	map(0xa003, 0xa003).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
 //  AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 	map(0xa800, 0xa800).mirror(0x07ff).portr("IN1");
 //  AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_DEVWRITE("cust", galaxian_sound_device, sound_w)
 	map(0xb000, 0xb000).mirror(0x07ff).portr("IN2");
-	map(0xb000, 0xb000).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xb004, 0xb004).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0xb006, 0xb006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0xb007, 0xb007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xb000, 0xb000).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb004, 0xb004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0xb006, 0xb006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xb007, 0xb007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 //  AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
@@ -1653,48 +1627,6 @@ void galaxian_state::mooncrst_map(address_map &map)
 	mooncrst_map_discrete(map);
 }
 
-void galaxian_state::froggermc_map(address_map &map)
-{
-	mooncrst_map_base(map); // no discrete sound
-	map(0x8000, 0x87ff).ram(); // actually needs 2k of RAM
-	map(0xa800, 0xa800).mirror(0x7ff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::froggermc_sound_control_w));
-}
-
-void galaxian_state::thepitm_map(address_map &map)
-{
-	mooncrst_map(map);
-	map(0x0000, 0x47ff).rom().region("maincpu", 0); // extend ROM
-	map(0xb000, 0xb000).mirror(0x7f8).nopw(); // interrupt enable moved
-	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xb004, 0xb004).mirror(0x7f8).nopw(); // disable the stars
-}
-
-void galaxian_state::skybase_map(address_map &map)
-{
-	mooncrst_map(map);
-	map(0x0000, 0x5fff).rom().region("maincpu", 0); // extend ROM
-	map(0x8000, 0x87ff).ram(); // needs a full 2k of RAM
-	map(0xa002, 0xa002).mirror(0x7f8).w(FUNC(galaxian_state::galaxian_gfxbank_w)); // coin lockout replaced by graphics bank
-}
-
-void galaxian_state::kong_map(address_map &map)
-{
-	mooncrst_map(map);
-	map(0x0000, 0x7fff).rom().region("maincpu", 0); // extend ROM
-	map(0x8000, 0x87ff).ram(); // needs a full 2k of RAM
-}
-
-void galaxian_state::scorpnmc_map(address_map &map)
-{
-	mooncrst_map(map);
-	map(0x4000, 0x47ff).ram();
-	map(0x5000, 0x67ff).rom().region("maincpu", 0x5000); // extra ROM
-	map(0x8000, 0x87ff).unmaprw(); // doesn't appear to use original RAM
-	map(0xb000, 0xb000).mirror(0x7f8).nopw(); // interrupt enable moved
-	map(0xb001, 0xb001).mirror(0x7f8).w(FUNC(galaxian_state::irq_enable_w));
-}
-
 
 void galaxian_state::fantastc_map(address_map &map)
 {
@@ -1702,21 +1634,38 @@ void galaxian_state::fantastc_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x8803, 0x8803).w("8910.0", FUNC(ay8910_device::address_w));
-	map(0x8807, 0x8807).r("8910.0", FUNC(ay8910_device::data_r));
 	map(0x880b, 0x880b).w("8910.0", FUNC(ay8910_device::data_w));
 	map(0x880c, 0x880c).w("8910.1", FUNC(ay8910_device::address_w));
-	map(0x880d, 0x880d).r("8910.1", FUNC(ay8910_device::data_r));
 	map(0x880e, 0x880e).w("8910.1", FUNC(ay8910_device::data_w));
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0xa000, 0xa000).mirror(0x07ff).portr("IN0");
 	map(0xa800, 0xa800).mirror(0x07ff).portr("IN1");
 	map(0xb000, 0xb000).mirror(0x07ff).portr("IN2");
-	map(0xb000, 0xb000).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
+	map(0xb000, 0xb000).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
 	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xfffe, 0xfffe).noprw(); // ?
+}
+
+void galaxian_state::timefgtr_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8803, 0x8803).w("8910.0", FUNC(ay8910_device::address_w));
+	map(0x880b, 0x880b).w("8910.0", FUNC(ay8910_device::data_w));
+	map(0x880c, 0x880c).w("8910.1", FUNC(ay8910_device::address_w));
+	map(0x880e, 0x880e).w("8910.1", FUNC(ay8910_device::data_w));
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).mirror(0x07ff).portr("IN0");
+	map(0xa800, 0xa800).mirror(0x07ff).portr("IN1");
+	map(0xb000, 0xb000).mirror(0x07ff).portr("IN2");
+	map(0xb000, 0xb000).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb004, 0xb004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 //  AM_RANGE(0xb800, 0xb800) AM_WRITENOP // ?
-//  AM_RANGE(0xfff8, 0xffff) AM_WRITENOP // timefgtr, sound related?
+//  AM_RANGE(0xfff8, 0xffff) AM_WRITENOP // sound related?
 }
 
 void galaxian_state::zigzag_map(address_map &map)
@@ -1726,19 +1675,19 @@ void galaxian_state::zigzag_map(address_map &map)
 	map(0x2000, 0x2fff).bankr("bank1");
 	map(0x3000, 0x3fff).bankr("bank2");
 	map(0x4000, 0x43ff).mirror(0x0400).ram();
-	map(0x4800, 0x4fff).w(FUNC(galaxian_state::zigzag_ay8910_w));
-	map(0x5000, 0x53ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5800, 0x58ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x4800, 0x4fff).w(this, FUNC(galaxian_state::zigzag_ay8910_w));
+	map(0x5000, 0x53ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
-	map(0x6000, 0x6001).mirror(0x07f8).w(FUNC(galaxian_state::start_lamp_w));
-	map(0x6003, 0x6003).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x6000, 0x6001).mirror(0x07f8).w(this, FUNC(galaxian_state::start_lamp_w));
+	map(0x6003, 0x6003).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
 	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
 	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
-	map(0x7001, 0x7001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x7002, 0x7002).mirror(0x07f8).w(FUNC(galaxian_state::zigzag_bankswap_w));
-	map(0x7004, 0x7004).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x7006, 0x7006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7002, 0x7002).mirror(0x07f8).w(this, FUNC(galaxian_state::zigzag_bankswap_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x7800, 0x7800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -1749,23 +1698,17 @@ void galaxian_state::theend_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x6803, 0x6803).mirror(0x07f8).w(FUNC(galaxian_state::scramble_background_enable_w));
-	map(0x6804, 0x6804).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6801, 0x6801).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
 	map(0x6805, 0x6805).mirror(0x07f8); //POUT2
-	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x6806, 0x6806).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x7000, 0x7000).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0x8000, 0xffff).rw(FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
-}
-
-void galaxian_state::froggervd_map(address_map &map)
-{
-	theend_map(map);
-	map(0x7800, 0x7800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0xffff).rw(this, FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
 }
 
 /* map not derived from schematics. Used by explorer and takeoff */
@@ -1774,23 +1717,23 @@ void galaxian_state::explorer_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0x6800, 0x6800).mirror(0x07f8).nopw(); // ????
-	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x6803, 0x6803).mirror(0x07f8).nopw();
-	map(0x6804, 0x6804).mirror(0x07f8).nopw();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6800, 0x6800).nopw(); // ????
+	map(0x6801, 0x6801).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
 	map(0x6805, 0x6805).mirror(0x07f8); //POUT2
-	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x6806, 0x6806).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x7000, 0x7000).mirror(0x07ff).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w)); /* watchdog works for writes as well? (or is it just disabled?) */
 	map(0x8000, 0x8000).mirror(0x0ffc).portr("IN0");
 	map(0x8000, 0x8000).mirror(0x0fff).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x8001, 0x8001).mirror(0x0ffc).portr("IN1");
 	map(0x8002, 0x8002).mirror(0x0ffc).portr("IN2");
 	map(0x8003, 0x8003).mirror(0x0ffc).portr("IN3");
-	map(0x9000, 0x9000).mirror(0x0fff).w(FUNC(galaxian_state::explorer_sound_control_w));
+	map(0x9000, 0x9000).mirror(0x0fff).w(this, FUNC(galaxian_state::explorer_sound_control_w));
 }
 
 /* map derived from schematics */
@@ -1799,26 +1742,18 @@ void galaxian_state::scobra_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).mirror(0x4000).ram();
-	map(0x8800, 0x8bff).mirror(0x4400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9000, 0x90ff).mirror(0x4700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x8800, 0x8bff).mirror(0x4400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).mirror(0x4700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0x9800, 0x9803).mirror(0x47fc).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa000, 0xa003).mirror(0x47fc).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa801, 0xa801).mirror(0x47f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xa802, 0xa802).mirror(0x47f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0xa803, 0xa803).mirror(0x47f8).w(FUNC(galaxian_state::scramble_background_enable_w));
-	map(0xa804, 0xa804).mirror(0x47f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0xa801, 0xa801).mirror(0x47f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa802, 0xa802).mirror(0x47f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xa803, 0xa803).mirror(0x47f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0xa804, 0xa804).mirror(0x47f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
 	map(0xa805, 0xa805).mirror(0x47f8); /* POUT2 */
-	map(0xa806, 0xa806).mirror(0x47f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0xa807, 0xa807).mirror(0x47f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa806, 0xa806).mirror(0x47f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa807, 0xa807).mirror(0x47f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0xb000, 0xb000).mirror(0x47ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-}
-
-
-void galaxian_state::scorpion_map(address_map &map)
-{
-	theend_map(map);
-	map(0x5800, 0x67ff).rom().region("maincpu", 0x5800); // extra ROM
-	//map(0x6803, 0x6803).nopw(); // no background related
 }
 
 
@@ -1827,15 +1762,15 @@ void galaxian_state::anteateruk_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();
 	map(0x0400, 0x0bff).ram();
-	map(0x0c00, 0x0fff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x1001, 0x1001).mirror(0x01f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x1002, 0x1002).mirror(0x01f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x1003, 0x1003).mirror(0x01f8).w(FUNC(galaxian_state::scramble_background_enable_w));
-	map(0x1004, 0x1004).mirror(0x01f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x1001, 0x1001).mirror(0x01f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x1002, 0x1002).mirror(0x01f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x1003, 0x1003).mirror(0x01f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x1004, 0x1004).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
 	map(0x1005, 0x1005).mirror(0x01f8); //POUT2
-	map(0x1006, 0x1006).mirror(0x01f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x1007, 0x1007).mirror(0x01f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0x1200, 0x12ff).mirror(0x0100).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x1006, 0x1006).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x1007, 0x1007).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x1200, 0x12ff).mirror(0x0100).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0x1400, 0x1400).mirror(0x03ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x4000, 0xbfff).rom();
 	map(0xc000, 0xc003).mirror(0x3efc).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -1849,7 +1784,7 @@ void galaxian_state::spactrai_map(address_map &map)
 	map(0x0000, 0x01ff).rom();
 	map(0x0200, 0x05ff).ram(); // this sits over ROM, does the 0x400 bytes of ROM underneath bank or appear elsewhere?
 	map(0x0600, 0x11ff).rom();
-	map(0x1200, 0x15ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram"); // see above comment
+	map(0x1200, 0x15ff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram"); // see above comment
 	map(0x1600, 0x4fff).rom();
 
 // cleared on startup
@@ -1862,10 +1797,10 @@ void galaxian_state::spactrai_map(address_map &map)
 	map(0x6800, 0x6807).mirror(0x07f8).w("cust", FUNC(galaxian_sound_device::sound_w));
 	map(0x7800, 0x7800).mirror(0x07ff).w("cust", FUNC(galaxian_sound_device::pitch_w));
 
-	map(0x7001, 0x7001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x7004, 0x7004).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x7006, 0x7006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 
 
 	map(0x6000, 0x6000).portr("IN0");
@@ -1874,7 +1809,7 @@ void galaxian_state::spactrai_map(address_map &map)
 	map(0x7000, 0x7000).portr("IN2");
 	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 
-	map(0xfe00, 0xfeff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xfe00, 0xfeff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 
 }
 
@@ -1883,18 +1818,18 @@ void galaxian_state::anteaterg_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();
 	map(0x0400, 0x0bff).ram();
-	map(0x0c00, 0x0fff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x2000, 0x20ff).mirror(0x0300).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x2000, 0x20ff).mirror(0x0300).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0x2400, 0x2403).mirror(0x01fc).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x2601, 0x2601).mirror(0x01f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x2602, 0x2602).mirror(0x01f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x2603, 0x2603).mirror(0x01f8).w(FUNC(galaxian_state::scramble_background_enable_w));
-	map(0x2604, 0x2604).mirror(0x01f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x2601, 0x2601).mirror(0x01f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x2602, 0x2602).mirror(0x01f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x2603, 0x2603).mirror(0x01f8).w(this, FUNC(galaxian_state::scramble_background_enable_w));
+	map(0x2604, 0x2604).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
 	map(0x2605, 0x2605).mirror(0x01f8); //POUT2
-	map(0x2606, 0x2606).mirror(0x01f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x2607, 0x2607).mirror(0x01f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x2606, 0x2606).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x2607, 0x2607).mirror(0x01f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x4000, 0x7bff).rom();
-	map(0x7c00, 0x7fff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram"); /* mirror! */
+	map(0x7c00, 0x7fff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram"); /* mirror! */
 	map(0x8000, 0xbfff).rom();
 	map(0xf400, 0xf400).mirror(0x01ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xf600, 0xf603).mirror(0x01fc).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -1906,8 +1841,8 @@ void galaxian_state::anteatergg_map(address_map &map)
 	galaxian_map_discrete(map);
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4fff).ram();
-	map(0x5000, 0x53ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5800, 0x58ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x5000, 0x53ff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 //  AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
 //  AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
@@ -1915,10 +1850,10 @@ void galaxian_state::anteatergg_map(address_map &map)
 //  AM_RANGE(0x6003, 0x6003) AM_MIRROR(0x07f8) AM_WRITE(coin_count_0_w)
 	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
 	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
-	map(0x7001, 0x7001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x7004, 0x7004).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x7006, 0x7006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -1927,17 +1862,17 @@ void galaxian_state::jungsub_map(address_map &map) // TODO: preliminary
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4fff).ram();
-	map(0x5000, 0x53ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5800, 0x58ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram"); // but also at 0x5900-059ff and 0x5a00-5aff?
+	map(0x5000, 0x53ff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram"); // but also at 0x5900-059ff and 0x5a00-5aff?
 	map(0x5900, 0x5aff).nopr().nopw();
 	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0"); // seems ok
 	map(0x6003, 0x6003).nopw(); // always 0x01?
-	map(0x6184, 0x6184).w(FUNC(galaxian_state::coin_count_0_w)); // seems ok
-	map(0x6186, 0x6186).w(FUNC(galaxian_state::coin_count_1_w)); // seems ok
+	map(0x6184, 0x6184).w(this, FUNC(galaxian_state::coin_count_0_w)); // seems ok
+	map(0x6186, 0x6186).w(this, FUNC(galaxian_state::coin_count_1_w)); // seems ok
 	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1"); // seems ok
-	map(0x7001, 0x7001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w)); // seems ok
-	map(0x7006, 0x7006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w)); // seems ok
-	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w)); // seems ok
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w)); // seems ok
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w)); // seems ok
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w)); // seems ok
 	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r)); // seems ok
 	map(0x7800, 0x7800).nopw(); // always 0xff?
 }
@@ -1956,14 +1891,14 @@ void galaxian_state::frogger_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xa800, 0xabff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0xb000, 0xb0ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0xb808, 0xb808).mirror(0x07e3).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xb80c, 0xb80c).mirror(0x07e3).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0xb810, 0xb810).mirror(0x07e3).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0xb818, 0xb818).mirror(0x07e3).w(FUNC(galaxian_state::coin_count_0_w)); /* IOPC7 */
-	map(0xb81c, 0xb81c).mirror(0x07e3).w(FUNC(galaxian_state::coin_count_1_w)); /* POUT1 */
-	map(0xc000, 0xffff).rw(FUNC(galaxian_state::frogger_ppi8255_r), FUNC(galaxian_state::frogger_ppi8255_w));
+	map(0xa800, 0xabff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0xb000, 0xb0ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xb808, 0xb808).mirror(0x07e3).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb80c, 0xb80c).mirror(0x07e3).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xb810, 0xb810).mirror(0x07e3).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xb818, 0xb818).mirror(0x07e3).w(this, FUNC(galaxian_state::coin_count_0_w)); /* IOPC7 */
+	map(0xb81c, 0xb81c).mirror(0x07e3).w(this, FUNC(galaxian_state::coin_count_1_w)); /* POUT1 */
+	map(0xc000, 0xffff).rw(this, FUNC(galaxian_state::frogger_ppi8255_r), FUNC(galaxian_state::frogger_ppi8255_w));
 }
 
 
@@ -1973,19 +1908,19 @@ void galaxian_state::turtles_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).mirror(0x4000).ram();
-	map(0x9000, 0x93ff).mirror(0x4400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9800, 0x98ff).mirror(0x4700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0xa000, 0xa000).mirror(0x47c7).w(FUNC(galaxian_state::scramble_background_red_w));
-	map(0xa008, 0xa008).mirror(0x47c7).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xa010, 0xa010).mirror(0x47c7).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0xa018, 0xa018).mirror(0x47c7).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0xa020, 0xa020).mirror(0x47c7).w(FUNC(galaxian_state::scramble_background_green_w));
-	map(0xa028, 0xa028).mirror(0x47c7).w(FUNC(galaxian_state::scramble_background_blue_w));
-	map(0xa030, 0xa030).mirror(0x47c7).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0xa038, 0xa038).mirror(0x47c7).w(FUNC(galaxian_state::coin_count_1_w));
+	map(0x9000, 0x93ff).mirror(0x4400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).mirror(0x4700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).mirror(0x47c7).w(this, FUNC(galaxian_state::scramble_background_red_w));
+	map(0xa008, 0xa008).mirror(0x47c7).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa010, 0xa010).mirror(0x47c7).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa018, 0xa018).mirror(0x47c7).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa020, 0xa020).mirror(0x47c7).w(this, FUNC(galaxian_state::scramble_background_green_w));
+	map(0xa028, 0xa028).mirror(0x47c7).w(this, FUNC(galaxian_state::scramble_background_blue_w));
+	map(0xa030, 0xa030).mirror(0x47c7).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xa038, 0xa038).mirror(0x47c7).w(this, FUNC(galaxian_state::coin_count_1_w));
 	map(0xa800, 0xa800).mirror(0x47ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xb000, 0xb03f).mirror(0x47c0).rw(FUNC(galaxian_state::turtles_ppi8255_0_r), FUNC(galaxian_state::turtles_ppi8255_0_w));
-	map(0xb800, 0xb83f).mirror(0x47c0).rw(FUNC(galaxian_state::turtles_ppi8255_1_r), FUNC(galaxian_state::turtles_ppi8255_1_w));
+	map(0xb000, 0xb03f).mirror(0x47c0).rw(this, FUNC(galaxian_state::turtles_ppi8255_0_r), FUNC(galaxian_state::turtles_ppi8255_0_w));
+	map(0xb800, 0xb83f).mirror(0x47c0).rw(this, FUNC(galaxian_state::turtles_ppi8255_1_r), FUNC(galaxian_state::turtles_ppi8255_1_w));
 }
 
 
@@ -1997,18 +1932,18 @@ void galaxian_state::amigo2_map(address_map &map)
 	map(0x4001, 0x4001).portr("IN1");
 	map(0x4002, 0x4002).portr("IN2");
 	map(0x4003, 0x4003).portr("IN3");
-	map(0x5000, 0x5000).w(FUNC(galaxian_state::konami_sound_control_w));
+	map(0x5000, 0x5000).w(this, FUNC(galaxian_state::konami_sound_control_w));
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9000, 0x90ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0xa000, 0xa000).w(FUNC(galaxian_state::scramble_background_red_w));
-	map(0xa008, 0xa008).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xa010, 0xa010).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0xa018, 0xa018).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0xa020, 0xa020).w(FUNC(galaxian_state::scramble_background_green_w));
-	map(0xa028, 0xa028).w(FUNC(galaxian_state::scramble_background_blue_w));
-	map(0xa030, 0xa030).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0xa038, 0xa038).w(FUNC(galaxian_state::coin_count_1_w));
+	map(0x8800, 0x8bff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa000, 0xa000).w(this, FUNC(galaxian_state::scramble_background_red_w));
+	map(0xa008, 0xa008).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa010, 0xa010).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa018, 0xa018).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa020, 0xa020).w(this, FUNC(galaxian_state::scramble_background_green_w));
+	map(0xa028, 0xa028).w(this, FUNC(galaxian_state::scramble_background_blue_w));
+	map(0xa030, 0xa030).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xa038, 0xa038).w(this, FUNC(galaxian_state::coin_count_1_w));
 	map(0xa800, 0xa800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -2016,14 +1951,14 @@ void galaxian_state::turpins_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9800, 0x98ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0xa000, 0xa003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa030, 0xa030).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0xa038, 0xa038).w(FUNC(galaxian_state::coin_count_1_w));
-	map(0xa801, 0xa801).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xa806, 0xa806).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0xa807, 0xa807).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa030, 0xa030).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xa038, 0xa038).w(this, FUNC(galaxian_state::coin_count_1_w));
+	map(0xa801, 0xa801).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa806, 0xa806).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa807, 0xa807).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xc000, 0xc003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -2036,18 +1971,18 @@ void galaxian_state::sfx_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0x6800, 0x6800).mirror(0x07f8).w(FUNC(galaxian_state::scramble_background_red_w));
-	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x6803, 0x6803).mirror(0x07f8).w(FUNC(galaxian_state::scramble_background_blue_w));
-	map(0x6804, 0x6804).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x6805, 0x6805).mirror(0x07f8).w(FUNC(galaxian_state::scramble_background_green_w));
-	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6800, 0x6800).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_red_w));
+	map(0x6801, 0x6801).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_blue_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_green_w));
+	map(0x6806, 0x6806).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x7000, 0x7fff).rom();
-	map(0x8000, 0xbfff).rw(FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
+	map(0x8000, 0xbfff).rw(this, FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
 	map(0xc000, 0xefff).rom();
 }
 
@@ -2057,19 +1992,19 @@ void galaxian_state::monsterz_map(address_map &map)
 	map(0x0000, 0x37ff).rom();
 	map(0x3800, 0x3fff).ram(); // extra RAM used by protection
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0x6800, 0x6800).mirror(0x07f8).w(FUNC(galaxian_state::scramble_background_red_w));
-	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x6803, 0x6803).mirror(0x07f8).w(FUNC(galaxian_state::scramble_background_blue_w));
-	map(0x6804, 0x6804).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x6805, 0x6805).mirror(0x07f8).w(FUNC(galaxian_state::scramble_background_green_w));
-	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0x8000, 0xbfff).rw(FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x6800, 0x6800).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_red_w));
+	map(0x6801, 0x6801).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_blue_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8).w(this, FUNC(galaxian_state::scramble_background_green_w));
+	map(0x6806, 0x6806).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x8000, 0xbfff).rw(this, FUNC(galaxian_state::theend_ppi8255_r), FUNC(galaxian_state::theend_ppi8255_w));
 	map(0xc000, 0xd7ff).rom();
-	map(0xd800, 0xd800).r(FUNC(galaxian_state::monsterz_protection_r));
+	map(0xd800, 0xd800).r(this, FUNC(galaxian_state::monsterz_protection_r));
 }
 
 
@@ -2087,21 +2022,21 @@ void galaxian_state::jumpbug_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0x5800, 0x5800).mirror(0x00ff).w("8910.0", FUNC(ay8910_device::data_w));
 	map(0x5900, 0x5900).mirror(0x00ff).w("8910.0", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
-	map(0x6002, 0x6006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_gfxbank_w));
+	map(0x6002, 0x6006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_gfxbank_w));
 	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1");
 	map(0x7000, 0x7000).mirror(0x07ff).portr("IN2");
-	map(0x7001, 0x7001).mirror(0x07f8).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x7002, 0x7002).mirror(0x07f8).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x7004, 0x7004).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x7006, 0x7006).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x7007, 0x7007).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0x7002, 0x7002).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x7004, 0x7004).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x8000, 0xafff).rom();
-	map(0xb000, 0xbfff).r(FUNC(galaxian_state::jumpbug_protection_r));
+	map(0xb000, 0xbfff).r(this, FUNC(galaxian_state::jumpbug_protection_r));
 }
 
 
@@ -2110,15 +2045,15 @@ void galaxian_state::frogf_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9000, 0x90ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0xa802, 0xa802).mirror(0x07f1).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0xa804, 0xa804).mirror(0x07f1).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xa806, 0xa806).mirror(0x07f1).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0xa808, 0xa808).mirror(0x07f1).w(FUNC(galaxian_state::coin_count_1_w));
-	map(0xa80e, 0xa80e).mirror(0x07f1).w(FUNC(galaxian_state::coin_count_0_w));
+	map(0x8800, 0x8bff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9000, 0x90ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xa802, 0xa802).mirror(0x07f1).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
+	map(0xa804, 0xa804).mirror(0x07f1).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa806, 0xa806).mirror(0x07f1).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
+	map(0xa808, 0xa808).mirror(0x07f1).w(this, FUNC(galaxian_state::coin_count_1_w));
+	map(0xa80e, 0xa80e).mirror(0x07f1).w(this, FUNC(galaxian_state::coin_count_0_w));
 	map(0xb800, 0xb800).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xc000, 0xffff).rw(FUNC(galaxian_state::frogf_ppi8255_r), FUNC(galaxian_state::frogf_ppi8255_w));
+	map(0xc000, 0xffff).rw(this, FUNC(galaxian_state::frogf_ppi8255_r), FUNC(galaxian_state::frogf_ppi8255_w));
 }
 
 
@@ -2128,14 +2063,14 @@ void galaxian_state::mshuttle_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram();
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x9800, 0x98ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x9800, 0x98ff).mirror(0x0700).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 	map(0xa000, 0xa000).portr("IN0");
-	map(0xa000, 0xa000).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xa001, 0xa001).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0xa002, 0xa002).w(FUNC(galaxian_state::galaxian_flip_screen_xy_w));
+	map(0xa000, 0xa000).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xa001, 0xa001).w(this, FUNC(galaxian_state::galaxian_stars_enable_w));
+	map(0xa002, 0xa002).w(this, FUNC(galaxian_state::galaxian_flip_screen_xy_w));
 	map(0xa004, 0xa004).w("cclimber_audio", FUNC(cclimber_audio_device::sample_trigger_w));
-	map(0xa007, 0xa007).w(FUNC(galaxian_state::mshuttle_ay8910_cs_w));
+	map(0xa007, 0xa007).w(this, FUNC(galaxian_state::mshuttle_ay8910_cs_w));
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xa800, 0xa800).w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
 	map(0xb000, 0xb000).portr("IN2");
@@ -2152,57 +2087,9 @@ void galaxian_state::mshuttle_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x0f);
-	map(0x08, 0x08).w(FUNC(galaxian_state::mshuttle_ay8910_control_w));
-	map(0x09, 0x09).w(FUNC(galaxian_state::mshuttle_ay8910_data_w));
-	map(0x0c, 0x0c).r(FUNC(galaxian_state::mshuttle_ay8910_data_r));
-}
-
-void galaxian_state::fourplay_map(address_map &map)
-{
-	map(0x0000,0x3fff).bankr("bank1");
-	map(0x4000,0x47ff).ram();
-	map(0x5000,0x53ff).mirror(0x0400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5800,0x58ff).mirror(0x0700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0x6000,0x6000).portr("IN0");
-	map(0x6800,0x6800).portr("IN1");
-	map(0x7000,0x7000).portr("IN2");
-	map(0x7800,0x7fff).r("watchdog",FUNC(watchdog_timer_device::reset_r));
-	map(0x6000,0x6001).w(FUNC(galaxian_state::start_lamp_w));
-	map(0x6002,0x6002).nopw();  // AM_WRITE(coin_lock_w)
-	map(0x6003,0x6003).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x6004,0x6007).w("cust",FUNC(galaxian_sound_device::lfo_freq_w));
-	map(0x6800,0x6807).w("cust",FUNC(galaxian_sound_device::sound_w));
-	map(0x7001,0x7001).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x7002,0x7003).w(FUNC(galaxian_state::fourplay_rombank_w));
-	map(0x7004,0x7004).w(FUNC(galaxian_state::galaxian_stars_enable_w));
-	map(0x7005,0x7005).nopw();  /* bit 3 of rombank select - always 0 */
-	map(0x7006,0x7006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x7007,0x7007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0x7008,0x7008).nopw();  /* bit 4 of rombank select - always 0 */
-	map(0x7800,0x7800).w("cust",FUNC(galaxian_sound_device::pitch_w));
-}
-
-void galaxian_state::videight_map(address_map &map)
-{
-	map(0x0000,0x3fff).bankr("bank1");
-	map(0x4000,0x47ff).ram();
-	map(0x5000,0x53ff).mirror(0x400).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5800,0x58ff).mirror(0x700).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0x6000,0x6000).portr("IN0");
-	map(0x6800,0x6800).portr("IN1");
-	map(0x7000,0x7000).portr("IN2");
-	map(0x7800,0x7fff).r("watchdog",FUNC(watchdog_timer_device::reset_r));
-	map(0x6000,0x6002).w(FUNC(galaxian_state::videight_gfxbank_w));
-	map(0x6003,0x6003).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0x6004,0x6007).w("cust",FUNC(galaxian_sound_device::lfo_freq_w));
-	map(0x6800,0x6807).w("cust",FUNC(galaxian_sound_device::sound_w));
-	map(0x6808,0x68ff).nopw();
-	map(0x7001,0x7001).w(FUNC(galaxian_state::irq_enable_w));
-	map(0x7002,0x7005).w(FUNC(galaxian_state::videight_rombank_w));
-	map(0x7006,0x7006).w(FUNC(galaxian_state::galaxian_flip_screen_x_w));
-	map(0x7007,0x7007).w(FUNC(galaxian_state::galaxian_flip_screen_y_w));
-	map(0x7008,0x7008).nopw();  /* bit 4 of rombank select - always 0 */
-	map(0x7800,0x7800).w("cust",FUNC(galaxian_sound_device::pitch_w));
+	map(0x08, 0x08).w(this, FUNC(galaxian_state::mshuttle_ay8910_control_w));
+	map(0x09, 0x09).w(this, FUNC(galaxian_state::mshuttle_ay8910_data_w));
+	map(0x0c, 0x0c).r(this, FUNC(galaxian_state::mshuttle_ay8910_data_r));
 }
 
 
@@ -2227,11 +2114,11 @@ void galaxian_state::tenspot_select_map(address_map &map)
 	map(0x0000, 0x07ff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x4000, 0x4000).portr("SELECT2");
-	map(0x6000, 0x6000).w(FUNC(galaxian_state::tenspot_unk_6000_w));
+	map(0x6000, 0x6000).w(this, FUNC(galaxian_state::tenspot_unk_6000_w));
 	map(0xc000, 0xc000).portr("SELECT");
-	map(0x8000, 0x8000).w(FUNC(galaxian_state::tenspot_unk_8000_w));
+	map(0x8000, 0x8000).w(this, FUNC(galaxian_state::tenspot_unk_8000_w));
 	map(0xa000, 0xa03f).ram();
-	map(0xe000, 0xe000).w(FUNC(galaxian_state::tenspot_unk_e000_w));
+	map(0xe000, 0xe000).w(this, FUNC(galaxian_state::tenspot_unk_e000_w));
 }
 
 
@@ -2239,8 +2126,8 @@ READ8_MEMBER(galaxian_state::froggeram_ppi8255_r)
 {
 	// same as theend, but accesses are scrambled
 	uint8_t result = 0xff;
-	if (offset & 0x0100) result &= m_ppi8255[0]->read(offset & 3);
-	if (offset & 0x0200) result &= m_ppi8255[1]->read(offset & 3);
+	if (offset & 0x0100) result &= m_ppi8255[0]->read(space, offset & 3);
+	if (offset & 0x0200) result &= m_ppi8255[1]->read(space, offset & 3);
 	return bitswap<8>(result, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
@@ -2248,23 +2135,23 @@ WRITE8_MEMBER(galaxian_state::froggeram_ppi8255_w)
 {
 	// same as theend, but accesses are scrambled
 	data = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
-	if (offset & 0x0100) m_ppi8255[0]->write(offset & 3, data);
-	if (offset & 0x0200) m_ppi8255[1]->write(offset & 3, data);
+	if (offset & 0x0100) m_ppi8255[0]->write(space, offset & 3, data);
+	if (offset & 0x0200) m_ppi8255[1]->write(space, offset & 3, data);
 }
 
 void galaxian_state::froggeram_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x2fff).rom();
-	map(0x4000, 0x43ff).rw(FUNC(galaxian_state::froggeram_ppi8255_r), FUNC(galaxian_state::froggeram_ppi8255_w));
+	map(0x4000, 0x43ff).rw(this, FUNC(galaxian_state::froggeram_ppi8255_r), FUNC(galaxian_state::froggeram_ppi8255_w));
 	map(0x8000, 0x87ff).ram();
 	map(0x8800, 0x8800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xa800, 0xabff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0xb000, 0xb0ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
-	map(0xb801, 0xb801).w(FUNC(galaxian_state::irq_enable_w));
-	map(0xb802, 0xb802).w(FUNC(galaxian_state::coin_count_0_w));
-	map(0xb806, 0xb806).w(FUNC(galaxian_state::galaxian_flip_screen_x_w)); // always set to 0?
-	map(0xb807, 0xb807).w(FUNC(galaxian_state::galaxian_flip_screen_y_w)); // always set to 0?
+	map(0xa800, 0xabff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0xb000, 0xb0ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xb801, 0xb801).w(this, FUNC(galaxian_state::irq_enable_w));
+	map(0xb802, 0xb802).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0xb806, 0xb806).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w)); // always set to 0?
+	map(0xb807, 0xb807).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w)); // always set to 0?
 }
 
 /*************************************
@@ -2273,41 +2160,38 @@ void galaxian_state::froggeram_map(address_map &map)
  *
  *************************************/
 
-// Konami Frogger with 1 x AY-8910A
-
+/* Konami Frogger with 1 x AY-8910A */
 void galaxian_state::frogger_sound_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).mirror(0x1c00).ram();
-	map(0x6000, 0x6fff).mirror(0x1000).w(FUNC(galaxian_state::konami_sound_filter_w));
+	map(0x6000, 0x6fff).mirror(0x1000).w(this, FUNC(galaxian_state::konami_sound_filter_w));
 }
 
 void galaxian_state::frogger_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(FUNC(galaxian_state::frogger_ay8910_r), FUNC(galaxian_state::frogger_ay8910_w));
+	map(0x00, 0xff).rw(this, FUNC(galaxian_state::frogger_ay8910_r), FUNC(galaxian_state::frogger_ay8910_w));
 }
 
 
-// Konami generic with 2 x AY-8910A
-
+/* Konami generic with 2 x AY-8910A */
 void galaxian_state::konami_sound_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x8000, 0x83ff).mirror(0x6c00).ram();
-	map(0x9000, 0x9fff).mirror(0x6000).w(FUNC(galaxian_state::konami_sound_filter_w));
+	map(0x9000, 0x9fff).mirror(0x6000).w(this, FUNC(galaxian_state::konami_sound_filter_w));
 }
 
 void galaxian_state::konami_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(FUNC(galaxian_state::konami_ay8910_r), FUNC(galaxian_state::konami_ay8910_w));
+	map(0x00, 0xff).rw(this, FUNC(galaxian_state::konami_ay8910_r), FUNC(galaxian_state::konami_ay8910_w));
 }
 
 
-// Checkman with 1 x AY-8910A
-
+/* Checkman with 1 x AY-8910A */
 void galaxian_state::checkman_sound_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2325,8 +2209,7 @@ void galaxian_state::checkman_sound_portmap(address_map &map)
 }
 
 
-// Checkman alternate with 1 x AY-8910A
-
+/* Checkman alternate with 1 x AY-8910A */
 void galaxian_state::checkmaj_sound_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -2337,7 +2220,7 @@ void galaxian_state::checkmaj_sound_map(address_map &map)
 }
 
 
-// Take Off with 1 x AY-8912
+/* Take Off with 1x AY-8912*/
 
 void galaxian_state::takeoff_sound_map(address_map &map)
 {
@@ -2349,47 +2232,29 @@ void galaxian_state::takeoff_sound_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x20, 0x20).r(FUNC(galaxian_state::konami_sound_timer_r));
+	map(0x20, 0x20).r(this, FUNC(galaxian_state::konami_sound_timer_r));
 	map(0x40, 0x40).w("8912", FUNC(ay8912_device::address_w));
 	map(0x80, 0x80).rw("8912", FUNC(ay8912_device::data_r), FUNC(ay8912_device::data_w));
 }
 
-
-// Scorpion with 3 x AY-8910A and Digitalker
-
-void galaxian_state::scorpion_sound_map(address_map &map)
-{
-	konami_sound_map(map);
-	map(0x3000, 0x3000).r(FUNC(galaxian_state::scorpion_digitalker_intr_r));
-}
-
-void galaxian_state::scorpion_sound_portmap(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x00, 0xff).rw(FUNC(galaxian_state::scorpion_ay8910_r), FUNC(galaxian_state::scorpion_ay8910_w));
-}
-
-
-// King and Balloon with DAC
-
+/* King and Balloon with DAC */
 void galaxian_state::kingball_sound_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x3fff);
-	map(0x0000, 0x03ff).mirror(0x1c00).ram();
 	map(0x0000, 0x1fff).rom();
+	map(0x0000, 0x03ff).mirror(0x1c00).ram();
 }
 
 void galaxian_state::kingball_sound_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).mirror(0xff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(galaxian_state::kingball_dac_w));
+	map(0x00, 0x00).mirror(0xff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(galaxian_state::kingball_dac_w));
 }
 
 
-// SF-X sample player
-
+/* SF-X sample player */
 void galaxian_state::sfx_sample_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
@@ -2399,13 +2264,13 @@ void galaxian_state::sfx_sample_map(address_map &map)
 void galaxian_state::sfx_sample_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(FUNC(galaxian_state::sfx_sample_io_r), FUNC(galaxian_state::sfx_sample_io_w));
+	map(0x00, 0xff).rw(this, FUNC(galaxian_state::sfx_sample_io_r), FUNC(galaxian_state::sfx_sample_io_w));
 }
 
 void galaxian_state::turpins_sound_map(address_map &map)
 {
 	konami_sound_map(map);
-	map(0x9000, 0x9000).r(FUNC(galaxian_state::konami_sound_timer_r)); // why does it read it here AND from the AY port?
+	map(0x9000, 0x9000).r(this, FUNC(galaxian_state::konami_sound_timer_r)); // why does it read it here AND from the AY port?
 }
 
 
@@ -4728,71 +4593,9 @@ static INPUT_PORTS_START( amidars )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( mandingarf )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // unused?
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	/* the rest appear to be unused, except for Lives? */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0xc0, "2" )
-	PORT_DIPSETTING(    0x40, "3" ) // skips the self test checks?
-	PORT_DIPSETTING(    0x80, "4" )
-	PORT_DIPSETTING(    0x00, "255 (Cheat)" ) // skips the self test checks?
-
-	/* these two are reversed for some reason... */
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "30000 70000" )
-	PORT_DIPSETTING(    0x02, "50000 80000" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "A 1/1 B 1/6" )
-	PORT_DIPSETTING(    0x04, "A 2/1 B 1/3" )
-	/* the rest appear to be unused? */
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( theend )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -4815,7 +4618,7 @@ static INPUT_PORTS_START( theend )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -4824,10 +4627,7 @@ static INPUT_PORTS_START( theend )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)0) /* protection bit */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)1) /* protection bit */
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )     /* output bits */
 
 	PORT_START("IN3")   /* need for some PPI accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -4869,9 +4669,9 @@ static INPUT_PORTS_START( scramble )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)0)  /* protection bit */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, scramble_protection_alt_r, (void *)0)  /* protection bit */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, theend_protection_alt_r, (void *)1)  /* protection bit */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxian_state, scramble_protection_alt_r, (void *)1)  /* protection bit */
 
 	PORT_START("IN3")   /* need for some PPI accesses */
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
@@ -5898,11 +5698,6 @@ static GFXDECODE_START(gfx_galaxian)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
-static GFXDECODE_START(gfx_sidam)
-	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 8, SIDAM_XSCALE,1)
-	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 8, SIDAM_XSCALE,1)
-GFXDECODE_END
-
 static GFXDECODE_START(gfx_gmgalax)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 16, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 16, GALAXIAN_XSCALE,1)
@@ -5917,11 +5712,6 @@ GFXDECODE_END
 static GFXDECODE_START(gfx_tenspot)
 	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout_0x200,   0, 8, GALAXIAN_XSCALE,1)
 	GFXDECODE_SCALE("gfx2", 0x0000, galaxian_spritelayout_0x80, 0, 8, GALAXIAN_XSCALE,1)
-GFXDECODE_END
-
-static GFXDECODE_START(gfx_videight)
-	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout,   0, 8*32, GALAXIAN_XSCALE,1)
-	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_spritelayout, 0, 8*32, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
 
@@ -5993,17 +5783,20 @@ MACHINE_CONFIG_START(galaxian_state::galaxian_base)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
 	MCFG_DEVICE_PROGRAM_MAP(galaxian_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state,  interrupt_gen)
 
-	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
-	PALETTE(config, m_palette, FUNC(galaxian_state::galaxian_palette), 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxian)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxian_state, screen_update_galaxian)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxian_state, vblank_interrupt_w))
+
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -6011,37 +5804,21 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_START(galaxian_state::sidam_bootleg_base)
+MACHINE_CONFIG_START(galaxian_state::konami_base)
 	galaxian_base(config);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(12_MHz_XTAL / 2 / 2)
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, konami_portc_0_w))
 
-	/* video hardware */
-	m_gfxdecode->set_info(gfx_sidam);
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, SIDAM_HTOTAL, SIDAM_HBEND, SIDAM_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("soundlatch", generic_latch_8_device, write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, galaxian_state, konami_sound_control_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, konami_portc_1_w))
 MACHINE_CONFIG_END
-
-
-void galaxian_state::konami_base(machine_config &config)
-{
-	galaxian_base(config);
-
-	I8255A(config, m_ppi8255[0]);
-	m_ppi8255[0]->in_pa_callback().set_ioport("IN0");
-	m_ppi8255[0]->in_pb_callback().set_ioport("IN1");
-	m_ppi8255[0]->in_pc_callback().set_ioport("IN2");
-	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_0_w));
-
-	I8255A(config, m_ppi8255[1]);
-	m_ppi8255[1]->out_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::write));
-	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::konami_sound_control_w));
-	m_ppi8255[1]->in_pc_callback().set_ioport("IN3");
-	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::konami_portc_1_w));
-}
 
 
 MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
@@ -6051,17 +5828,17 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
 	MCFG_DEVICE_PROGRAM_MAP(frogger_sound_map)
 	MCFG_DEVICE_IO_MAP(frogger_sound_portmap)
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
-	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
-	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
-	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
-	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
+	MCFG_DEVICE_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, frogger_sound_timer_r))
+	MCFG_SOUND_ROUTE(0, "konami", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
 
 	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
@@ -6075,24 +5852,24 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[0]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[0]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
-	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
-	m_ay8910[0]->add_route(0, "konami", 1.0, 0);
-	m_ay8910[0]->add_route(1, "konami", 1.0, 1);
-	m_ay8910[0]->add_route(2, "konami", 1.0, 2);
+	MCFG_DEVICE_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
+	MCFG_SOUND_ROUTE(0, "konami", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
 
-	AY8910(config, m_ay8910[1], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[1]->set_flags(AY8910_DISCRETE_OUTPUT);
-	m_ay8910[1]->set_resistors_load(RES_K(5.1), RES_K(5.1), RES_K(5.1));
-	m_ay8910[1]->add_route(0, "konami", 1.0, 3);
-	m_ay8910[1]->add_route(1, "konami", 1.0, 4);
-	m_ay8910[1]->add_route(2, "konami", 1.0, 5);
+	MCFG_DEVICE_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
+	MCFG_SOUND_ROUTE(0, "konami", 1.0, 3)
+	MCFG_SOUND_ROUTE(1, "konami", 1.0, 4)
+	MCFG_SOUND_ROUTE(2, "konami", 1.0, 5)
 
 	MCFG_DEVICE_ADD("konami", DISCRETE, konami_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -6117,18 +5894,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::galaxian)
 	galaxian_base(config);
-
-	MCFG_DEVICE_ADD("cust", GALAXIAN, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
-
-	MCFG_DEVICE_ADD(GAL_AUDIO, DISCRETE, galaxian_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::victoryc)
-	galaxian(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(victoryc_map)
+	galaxian_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::spactrai)
@@ -6138,28 +5904,19 @@ MACHINE_CONFIG_START(galaxian_state::spactrai)
 	MCFG_DEVICE_PROGRAM_MAP(spactrai_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(galaxian_state::frogg)
-	galaxian(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(frogg_map)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(galaxian_state::mandingarf)
-	galaxian(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mandingarf_map)
-MACHINE_CONFIG_END
-
-void galaxian_state::pacmanbl(machine_config &config)
-{
+MACHINE_CONFIG_START(galaxian_state::pacmanbl)
 	galaxian(config);
 
 	/* separate tile/sprite ROMs */
-	m_gfxdecode->set_info(gfx_pacmanbl);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pacmanbl)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::tenspot)
 	galaxian(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state,  fakechange_interrupt_gen)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("selectcpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2) // ?? mhz
@@ -6167,38 +5924,34 @@ MACHINE_CONFIG_START(galaxian_state::tenspot)
 	//MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* separate tile/sprite ROMs */
-	m_gfxdecode->set_info(gfx_tenspot);
-	// MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
-
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galaxian_state, tenspot_interrupt_w))
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_tenspot)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::zigzag)
 	galaxian_base(config);
 
 	/* separate tile/sprite ROMs */
-	m_gfxdecode->set_info(gfx_pacmanbl);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pacmanbl)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(zigzag_map)
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.5); /* matches PCB video - unconfirmed */
+	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) /* matches PCB video - unconfirmed */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
-void galaxian_state::gmgalax(machine_config &config)
-{
+MACHINE_CONFIG_START(galaxian_state::gmgalax)
 	galaxian(config);
 
 	/* banked video hardware */
-	m_gfxdecode->set_info(gfx_gmgalax);
-	m_palette->set_entries(64);
-	m_palette->set_init(FUNC(galaxian_state::galaxian_palette));
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gmgalax)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64)
+	MCFG_PALETTE_INIT_OWNER(galaxian_state, galaxian)
+MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(galaxian_state::mooncrst)
@@ -6208,39 +5961,13 @@ MACHINE_CONFIG_START(galaxian_state::mooncrst)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map)
 
-	GALAXIAN(config, "cust", 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
-
-	DISCRETE(config, GAL_AUDIO, mooncrst_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	mooncrst_audio(config);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::moonqsr)
 	mooncrst(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_OPCODES_MAP(moonqsr_decrypted_opcodes_map)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::thepitm)
-	mooncrst(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(thepitm_map)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::skybase)
-	mooncrst(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(skybase_map)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::kong)
-	mooncrst(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kong_map)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::scorpnmc)
-	mooncrst(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(scorpnmc_map)
 MACHINE_CONFIG_END
 
 
@@ -6252,9 +5979,11 @@ MACHINE_CONFIG_START(galaxian_state::fantastc)
 	MCFG_DEVICE_PROGRAM_MAP(fantastc_map)
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
+	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	AY8910(config, m_ay8910[1], GALAXIAN_PIXEL_CLOCK/3/2).add_route(ALL_OUTPUTS, "speaker", 0.25); // 3.072MHz
+	MCFG_DEVICE_ADD("8910.1", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -6272,9 +6001,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
 }
 
 MACHINE_CONFIG_START(galaxian_state::timefgtr)
-	fantastc(config);
+	galaxian_base(config);
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galaxian_state, timefgtr_scanline, "screen", 0, 1)
+
+	/* alternate memory map */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(timefgtr_map)
+
+	/* sound hardware */
+	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+
+	MCFG_DEVICE_ADD("8910.1", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -6288,7 +6028,8 @@ MACHINE_CONFIG_START(galaxian_state::jumpbug)
 	MCFG_DEVICE_PROGRAM_MAP(jumpbug_map)
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "speaker", 0.5);   /* matches PCB video - unconfirmed */
+	MCFG_DEVICE_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2/2)    /* matches PCB video - unconfirmed */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -6301,10 +6042,11 @@ MACHINE_CONFIG_START(galaxian_state::checkman)
 	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state,  irq0_line_hold)   /* NMIs are triggered by the main CPU */
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], 1789750).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	MCFG_DEVICE_ADD("8910.0", AY8910, 1789750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -6321,12 +6063,12 @@ MACHINE_CONFIG_START(galaxian_state::checkmaj)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq0", galaxian_state, checkmaj_irq0_gen, "screen", 0, 8)
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], 1620000);
-	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 2);
+	MCFG_DEVICE_ADD("8910.0", AY8910, 1620000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 2)
 MACHINE_CONFIG_END
 
 
@@ -6340,7 +6082,7 @@ MACHINE_CONFIG_START(galaxian_state::mshuttle)
 	MCFG_DEVICE_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("cclimber_audio", CCLIMBER_AUDIO, 0)
+	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
 
 
@@ -6352,7 +6094,7 @@ MACHINE_CONFIG_START(galaxian_state::kingball)
 	MCFG_DEVICE_PROGRAM_MAP(kingball_sound_map)
 	MCFG_DEVICE_IO_MAP(kingball_sound_portmap)
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.53) // unknown DAC
@@ -6377,7 +6119,7 @@ MACHINE_CONFIG_START(galaxian_state::froggermc)
 
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(froggermc_map)
+	MCFG_DEVICE_PROGRAM_MAP(mooncrst_map_base)     /* no discrete sound ! */
 
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, galaxian_state, froggermc_audiocpu_irq_ack)
@@ -6391,16 +6133,6 @@ MACHINE_CONFIG_START(galaxian_state::froggers)
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(theend_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(galaxian_state::froggervd)
-	konami_base(config);
-	konami_sound_1x_ay8910(config);
-
-	/* alternate memory map */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(froggervd_map)
 MACHINE_CONFIG_END
 
 
@@ -6423,6 +6155,29 @@ MACHINE_CONFIG_START(galaxian_state::turtles)
 	MCFG_DEVICE_PROGRAM_MAP(turtles_map)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(galaxian_state::amigo2) // bootleg has no i8255s
+	galaxian_base(config);
+
+	/* alternate memory map */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amigo2_map)
+
+	konami_sound_2x_ay8910(config);
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(galaxian_state::turpins)
+	turtles(config);
+
+	// the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
+
+	/* alternate memory map */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(turpins_map)
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(turpins_sound_map)
+MACHINE_CONFIG_END
+
 
 MACHINE_CONFIG_START(galaxian_state::theend)
 	konami_base(config);
@@ -6432,22 +6187,20 @@ MACHINE_CONFIG_START(galaxian_state::theend)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(theend_map)
 
-	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::theend_coin_counter_w));
-
-	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::theend_protection_r));
-	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::theend_protection_w));
+	MCFG_DEVICE_MODIFY("ppi8255_0")
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, theend_coin_counter_w))
 MACHINE_CONFIG_END
 
 
-/* TODO: should be derived from theend, resort machine configs later */
 MACHINE_CONFIG_START(galaxian_state::scramble)
 	scramble_base(config);
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(theend_map)
 
-	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::theend_protection_r));
-	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::theend_protection_w));
+	MCFG_DEVICE_MODIFY("ppi8255_1")
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, scramble_protection_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, scramble_protection_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::jungsub)
@@ -6458,101 +6211,82 @@ MACHINE_CONFIG_START(galaxian_state::jungsub)
 	MCFG_DEVICE_PROGRAM_MAP(jungsub_map)
 	MCFG_DEVICE_IO_MAP(jungsub_io_map)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, GALAXIAN_PIXEL_CLOCK / 3 / 2) // clock not verified
+	MCFG_DEVICE_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8) // clock not verified
 	MCFG_DEVICE_PROGRAM_MAP(checkman_sound_map)
 	MCFG_DEVICE_IO_MAP(checkman_sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxian_state, irq0_line_hold)
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
-	AY8910(config, m_ay8910[0], GALAXIAN_PIXEL_CLOCK / 3 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified
+	MCFG_DEVICE_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8) // clock not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(galaxian_state::explorer) // Sidam 10800
-	sidam_bootleg_base(config);
+MACHINE_CONFIG_START(galaxian_state::explorer)
+	galaxian_base(config);
 
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(explorer_map)
 
 	/* 2nd CPU to drive sound */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
+	MCFG_DEVICE_ADD("audiocpu", Z80,KONAMI_SOUND_CLOCK/8)
 	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
 	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware is a pair of AY-3-8912 */
-	AY8912(config, m_ay8910[0], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
-	m_ay8910[0]->port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("8910.0", AY8912, KONAMI_SOUND_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, explorer_sound_latch_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	AY8912(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
-	m_ay8910[0]->port_a_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("8910.1", AY8912, KONAMI_SOUND_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, konami_sound_timer_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(galaxian_state::takeoff) // Sidam 10900, with 1 x AY-3-8912
+MACHINE_CONFIG_START(galaxian_state::takeoff) // takeoff shares the same main map as explorer, but uses only one AY8912 for sound.
 	explorer(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000) / 8) // XTAL verified, divider not verified
 
 	/* 2nd CPU to drive sound */
 	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000) / 8)
 	MCFG_DEVICE_PROGRAM_MAP(takeoff_sound_map)
 	MCFG_DEVICE_IO_MAP(takeoff_sound_portmap)
 
 	/* sound hardware */
-	config.device_remove("8910.0");
-	config.device_remove("8910.1");
+	MCFG_DEVICE_REMOVE("8910.0")
+	MCFG_DEVICE_REMOVE("8910.1")
 
-	ay8912_device &ay8912(AY8912(config, "8912", XTAL(12'000'000) / 8));
-	ay8912.port_a_read_callback().set(FUNC(galaxian_state::explorer_sound_latch_r));
-	ay8912.add_route(ALL_OUTPUTS, "speaker", 0.25);
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::amigo2) // marked "AMI", but similar to above
-	sidam_bootleg_base(config);
-
-	/* alternate memory map */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(amigo2_map)
-
-	/* 2nd CPU to drive sound */
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL / 2 / 2 / 2) /* clock not verified */
-	MCFG_DEVICE_PROGRAM_MAP(konami_sound_map)
-	MCFG_DEVICE_IO_MAP(konami_sound_portmap)
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	/* sound hardware */
-	AY8910(config, m_ay8910[0], 12_MHz_XTAL / 2 / 2 / 2); /* matches PCB, needs verification */
-	m_ay8910[0]->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::konami_sound_timer_r));
-	m_ay8910[0]->add_route(ALL_OUTPUTS, "speaker", 0.25);
-
-	AY8910(config, m_ay8910[1], 12_MHz_XTAL / 2 / 2 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25); /* matches PCB, needs verification */
+	MCFG_DEVICE_ADD("8912", AY8912, XTAL(12'000'000) / 8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, galaxian_state, explorer_sound_latch_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::scorpion)
 	scramble_base(config);
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(scorpion_map)
+	MCFG_DEVICE_PROGRAM_MAP(theend_map)
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(scorpion_sound_map)
-	MCFG_DEVICE_IO_MAP(scorpion_sound_portmap)
-
-	m_ppi8255[1]->in_pc_callback().set(FUNC(galaxian_state::scorpion_protection_r));
-	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::scorpion_protection_w));
+	MCFG_DEVICE_MODIFY("ppi8255_1")
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, galaxian_state, scorpion_protection_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, scorpion_protection_w))
 
 	/* extra AY8910 with I/O ports */
-	AY8910(config, m_ay8910[2], KONAMI_SOUND_CLOCK/8);
-	m_ay8910[2]->port_a_write_callback().set(m_digitalker, FUNC(digitalker_device::digitalker_data_w));
-	m_ay8910[2]->port_b_write_callback().set(FUNC(galaxian_state::scorpion_digitalker_control_w));
-	m_ay8910[2]->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("digitalker", digitalker_device, digitalker_data_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, galaxian_state, scorpion_digitalker_control_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	DIGITALKER(config, m_digitalker, 4_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.16);
+	MCFG_DIGITALKER_ADD("digitalker", 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.16)
 MACHINE_CONFIG_END
 
 
@@ -6569,14 +6303,15 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 	MCFG_DEVICE_PROGRAM_MAP(sfx_sample_map)
 	MCFG_DEVICE_IO_MAP(sfx_sample_portmap)
 
-	I8255A(config, m_ppi8255[2]);
-	m_ppi8255[2]->in_pa_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
+	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8("soundlatch2", generic_latch_8_device, read))
 
-	GENERIC_LATCH_8(config, "soundlatch2");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	/* port on 2nd 8910 is used for communication */
-	m_ay8910[1]->port_a_write_callback().set("soundlatch2", FUNC(generic_latch_8_device::write));
-	m_ay8910[1]->port_b_write_callback().set(FUNC(galaxian_state::sfx_sample_control_w));
+	MCFG_DEVICE_MODIFY("8910.1")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("soundlatch2", generic_latch_8_device, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, galaxian_state, sfx_sample_control_w))
 
 	/* DAC for the sample player */
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // 16-pin IC (not identified by schematics)
@@ -6593,9 +6328,9 @@ MACHINE_CONFIG_START(galaxian_state::monsterz)
 	MCFG_DEVICE_PROGRAM_MAP(monsterz_map)
 
 	MCFG_DEVICE_MODIFY("ppi8255_1")
-	m_ppi8255[1]->out_pa_callback().set(FUNC(galaxian_state::monsterz_porta_1_w));
-	m_ppi8255[1]->out_pb_callback().set(FUNC(galaxian_state::monsterz_portb_1_w));
-	m_ppi8255[1]->out_pc_callback().set(FUNC(galaxian_state::monsterz_portc_1_w));
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, galaxian_state, monsterz_porta_1_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, galaxian_state, monsterz_portb_1_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, monsterz_portc_1_w))
 
 	/* there are likely other differences too, but those can wait until after protection is sorted out */
 
@@ -6669,7 +6404,8 @@ MACHINE_CONFIG_START(galaxian_state::quaak)
 	konami_base(config);
 	konami_sound_2x_ay8910(config);
 
-	m_ay8910[0]->port_b_read_callback().set(FUNC(galaxian_state::frogger_sound_timer_r));
+	MCFG_DEVICE_MODIFY("8910.0")
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, frogger_sound_timer_r))
 
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -6677,23 +6413,15 @@ MACHINE_CONFIG_START(galaxian_state::quaak)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::froggeram)
-	quaak(config);
+	konami_base(config);
+	konami_sound_2x_ay8910(config);
+
+	MCFG_DEVICE_MODIFY("8910.0")
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, galaxian_state, frogger_sound_timer_r))
 
 	/* alternate memory map */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(froggeram_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(galaxian_state::turpins) // the ROMs came from a blister, so there aren't PCB infos available. Chip types and clocks are guessed.
-	scobra(config);
-
-	/* alternate memory map */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(turpins_map)
-
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(turpins_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -6728,33 +6456,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(galaxian_state::moonwar)
 	scobra(config);
 
-	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::moonwar_port_select_w));
+	MCFG_DEVICE_MODIFY("ppi8255_0")
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, galaxian_state, moonwar_port_select_w))
 
-	m_palette->set_init(FUNC(galaxian_state::moonwar_palette)); // bullets are less yellow
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::fourplay)
-	galaxian(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(fourplay_map)
-
-	/* video hardware */
-	m_gfxdecode->set_info(gfx_gmgalax);
-	m_palette->set_entries(64);
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(galaxian_state::videight)
-	galaxian(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(videight_map)
-
-	/* video hardware */
-	m_gfxdecode->set_info(gfx_videight);
-	m_palette->set_entries(8 * 32);
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(galaxian_state,moonwar) // bullets are less yellow
 MACHINE_CONFIG_END
 
 
@@ -6766,15 +6472,16 @@ MACHINE_CONFIG_END
 
 void galaxian_state::decode_mooncrst(int length, uint8_t *dest)
 {
-	uint8_t const *const rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	int offs;
 
-	for (int offs = 0; offs < length; offs++)
+	for (offs = 0; offs < length; offs++)
 	{
-		uint8_t const data = rom[offs];
+		uint8_t data = rom[offs];
 		uint8_t res = data;
-		if (BIT(data, 1)) res ^= 0x40;
-		if (BIT(data, 5)) res ^= 0x04;
-		if (!BIT(offs, 0)) res = bitswap<8>(res,7,2,5,4,3,6,1,0);
+		if (BIT(data,1)) res ^= 0x40;
+		if (BIT(data,5)) res ^= 0x04;
+		if ((offs & 1) == 0) res = bitswap<8>(res,7,2,5,4,3,6,1,0);
 		dest[offs] = res;
 	}
 }
@@ -6994,8 +6701,6 @@ void galaxian_state::decode_victoryc()
 void galaxian_state::common_init(galaxian_draw_bullet_func draw_bullet,galaxian_draw_background_func draw_background,
 	galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info)
 {
-	m_x_scale = GALAXIAN_XSCALE;
-	m_h0_start = GALAXIAN_H0START;
 	m_irq_enabled = 0;
 	m_irq_line = INPUT_LINE_NMI;
 	m_numspritegens = 1;
@@ -7105,36 +6810,34 @@ void galaxian_state::init_batman2()
 
 void galaxian_state::init_frogg()
 {
-	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
-}
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
+	/* same as galaxian... */
+	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
+
+	/* ...but needs a full 2k of RAM */
+	space.install_ram(0x4000, 0x47ff);
+}
 
 void galaxian_state::init_victoryc()
 {
-	init_galaxian();
+	init_victorycb();
 
 	decode_victoryc();
 }
 
-
-void galaxian_state::init_fourplay()
+void galaxian_state::init_victorycb()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank1")->set_entry(0);
+	init_galaxian();
 
-	/* video extensions */
-	common_init(NULL, NULL, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	/* needs a full 2k of RAM */
+	space.install_ram(0x8000, 0x87ff);
+
+	/* disable the stars */
+	space.unmap_write(0x7004, 0x7004, 0x7f8);
 }
-
-void galaxian_state::init_videight()
-{
-	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank1")->set_entry(0);
-
-	/* video extensions */
-	common_init(NULL, NULL, &galaxian_state::videight_extend_tile_info, &galaxian_state::videight_extend_sprite_info);
-}
-
 
 /*************************************
  *
@@ -7242,7 +6945,7 @@ void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 	dstregion = memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	galaxian_palette(*m_palette);
+	PALETTE_INIT_NAME(galaxian)(*m_palette);
 }
 
 void galaxian_state::init_tenspot()
@@ -7383,15 +7086,34 @@ void galaxian_state::init_dingoe()
 
 void galaxian_state::init_skybase()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
+
+	/* coin lockout replaced by graphics bank */
+	space.install_write_handler(0xa002, 0xa002, 0, 0x7f8, 0, write8_delegate(FUNC(galaxian_state::galaxian_gfxbank_w),this));
+
+	/* needs a full 2k of RAM */
+	space.install_ram(0x8000, 0x87ff);
+
+	/* extend ROM */
+	space.install_rom(0x0000, 0x5fff, memregion("maincpu")->base());
 }
 
 
 void galaxian_state::init_kong()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, &galaxian_state::upper_extend_sprite_info);
+
+	/* needs a full 2k of RAM */
+	space.install_ram(0x8000, 0x87ff);
+
+	/* extend ROM */
+	space.install_rom(0x0000, 0x7fff, memregion("maincpu")->base());
 }
 
 
@@ -7536,8 +7258,41 @@ void galaxian_state::init_kingball()
 
 void galaxian_state::init_scorpnmc()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
+
+	/* move the interrupt enable from $b000 to $b001 */
+	space.unmap_write(0xb000, 0xb000, 0x7f8);
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
+
+	/* extra ROM */
+	space.install_rom(0x5000, 0x67ff, memregion("maincpu")->base() + 0x5000);
+
+	/* install RAM at $4000-$4800 */
+	space.install_ram(0x4000, 0x47ff);
+
+	/* doesn't appear to use original RAM */
+	space.unmap_readwrite(0x8000, 0x87ff);
+}
+
+void galaxian_state::init_thepitm()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	/* video extensions */
+	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
+
+	/* move the interrupt enable from $b000 to $b001 */
+	space.unmap_write(0xb000, 0xb000, 0x7f8);
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(FUNC(galaxian_state::irq_enable_w),this));
+
+	/* disable the stars */
+	space.unmap_write(0xb004, 0xb004, 0x7f8);
+
+	/* extend ROM */
+	space.install_rom(0x0000, 0x47ff, memregion("maincpu")->base());
 }
 
 /*************************************
@@ -7564,6 +7319,12 @@ void galaxian_state::init_scramble()
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
 }
 
+void galaxian_state::init_explorer()
+{
+	// not sure how stars work here, but there is definitely no 555 timer
+	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, nullptr);
+}
+
 void galaxian_state::init_mandinga()
 {
 	init_scramble();
@@ -7578,7 +7339,7 @@ void galaxian_state::init_mandinga()
 void galaxian_state::init_sfx()
 {
 	/* basic configuration */
-	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::sfx_draw_background, &galaxian_state::upper_extend_tile_info, nullptr);
+	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, &galaxian_state::upper_extend_tile_info, nullptr);
 	m_sfx_tilemap = true;
 
 	/* sound board has space for extra ROM */
@@ -7601,26 +7362,7 @@ void galaxian_state::init_atlantis()
 }
 
 
-void galaxian_state::init_sidam()
-{
-	/* adjust for 12 MHz pixel clock */
-	m_x_scale = SIDAM_XSCALE;
-	m_h0_start = SIDAM_H0START;
-}
 
-void galaxian_state::init_explorer()
-{
-	/* video extensions */
-	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::null_draw_background, nullptr, nullptr); // no 555 timer; there might be no stars at all
-	init_sidam();
-}
-
-void galaxian_state::init_amigo2()
-{
-	/* video extensions */
-	init_turtles();
-	init_sidam();
-}
 
 
 void galaxian_state::init_scobra()
@@ -7682,14 +7424,22 @@ void galaxian_state::init_frogger()
 void galaxian_state::init_quaak()
 {
 	/* video extensions */
-	common_init(nullptr, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
+	common_init(nullptr, &galaxian_state::quaak_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
 }
 
 
 void galaxian_state::init_froggermc()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
+
+	space.install_write_handler(0xa800, 0xa800, 0, 0x7ff, 0, write8_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
+	space.install_write_handler(0xb001, 0xb001, 0, 0x7f8, 0, write8_delegate(FUNC(galaxian_state::froggermc_sound_control_w),this));
+
+	/* actually needs 2k of RAM */
+	space.install_ram(0x8000, 0x87ff);
 
 	/* decrypt */
 	decode_froggermc_sound();
@@ -7725,7 +7475,21 @@ void galaxian_state::init_amidar()
 
 void galaxian_state::init_scorpion()
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
+
+	/* hook up AY8910 */
+	m_audiocpu->space(AS_IO).install_readwrite_handler(0x00, 0xff, read8_delegate(FUNC(galaxian_state::scorpion_ay8910_r),this), write8_delegate(FUNC(galaxian_state::scorpion_ay8910_w),this));
+
+	/* extra ROM */
+	space.install_read_bank(0x5800, 0x67ff, "bank1");
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x5800);
+
+	/* no background related */
+//  space.nop_write(0x6803, 0x6803);
+
+	m_audiocpu->space(AS_PROGRAM).install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),this));
 
 	save_item(NAME(m_protection_state));
 /*
@@ -8156,24 +7920,6 @@ ROM_START( zerotimed )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
-/* Marti Colls (Falgas) bootleg */
-ROM_START( zerotimemc )
-	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "4_7k.bin", 0x0000, 0x0800, CRC(ac64aabe) SHA1(1cd834bf8b387428639dffd5e4b0ee72fa8aafdf) )
-	ROM_LOAD( "5_7j.bin", 0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
-	ROM_LOAD( "6_7h.bin", 0x1000, 0x0800, CRC(7c86fc8a) SHA1(ea7e16cfd765fb992bd476796e2e3a5f87e8360c) )
-	ROM_LOAD( "7_7f.bin", 0x1800, 0x0800, CRC(786d690a) SHA1(50c5c07941006e3b71afbf057d27daa2f2274925) )
-	ROM_LOAD( "3_7l.bin", 0x2000, 0x0800, CRC(af9260d7) SHA1(955e466a8989993351dc69d73ca322c1c9af7b63) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "2_1hj.bin", 0x0000, 0x0800, CRC(bc7d0985) SHA1(550a44c9ddc8da66a29405591a590f91d2675cdf) )
-	ROM_LOAD( "1_1kl.bin", 0x0800, 0x0800, CRC(c48b88d0) SHA1(dc79f596395af0f3137eb932fe224ab8307d8771) )
-
-	/* Not dumped on the Marti Colls PCB, taken from the parent set */
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
-ROM_END
-
 
 ROM_START( starfght )
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -8562,23 +8308,6 @@ ROM_START( redufob )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
-ROM_END
-
-ROM_START( redufob2 )
-	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "5049.7f",      0x0000, 0x0800, CRC(ad9930d3) SHA1(63a892670e40257539a79e12caabe341509dc73e) )
-	ROM_LOAD( "5049.7h",      0x0800, 0x0800, CRC(9ad86f24) SHA1(8da49ddc931c4771cbe8654a7f4400e2ec6f29a2) )
-	ROM_LOAD( "5049.7k",      0x1000, 0x0800, CRC(e1030d1c) SHA1(80640fbbfa7f84c016366b1084e7f8a7acdcd440) )
-	ROM_LOAD( "5049.7m",      0x1800, 0x0800, CRC(75db0aea) SHA1(316e5cbf6c68b67dacc309b9942590751fd0055b) )
-	ROM_LOAD( "5049.5",       0x2000, 0x0800, CRC(f1e46275) SHA1(9e08dbaae4f0f944cc9613090c60000bf2eeb869) )
-	ROM_LOAD( "5049.6",       0x2800, 0x0800, CRC(e1a9f58e) SHA1(4fc7489fca057156a7cf5efcb01058ce4f0db69e) )
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "5049.1h",      0x0000, 0x0800, CRC(8a422b0d) SHA1(b886157518f73e7115a225ba230e456179f6e18f) )
-	ROM_LOAD( "5049.1k",      0x0800, 0x0800, CRC(1eb84cb1) SHA1(08f360802a90039c0499a1417d06b6eb5f89d67e) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "5049.6l",      0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
 ROM_START( exodus )
@@ -9231,29 +8960,6 @@ ROM_START( pacmanbla ) /* content is the same as the above bootleg, but arranged
 	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* same as pisces */
 ROM_END
 
-ROM_START( pacmanblv ) /* Video Dens */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pacvideodens-1-2516.bin",  0x0000, 0x0800, CRC(590de3f3) SHA1(99cf9711d9bd4f5750533cdf9c88a9c88c6e531a) ) // Dumped as Intel 2716
-	ROM_LOAD( "pacvideodens-2-2516.bin",  0x0800, 0x0800, CRC(3954e41c) SHA1(4b3f838d55ab4b5b93e1bcb26b3661f090a9124f) ) // Dumped as Intel 2716
-	ROM_LOAD( "pacvideodens-3-2516.bin",  0x1000, 0x0800, CRC(f98c0ceb) SHA1(4faf8b2fb3f109d1196a9ea256328485074a31b9) ) // Dumped as Intel 2716
-	ROM_LOAD( "pacvideodens-4-2516.bin",  0x1800, 0x0800, CRC(a9cd0082) SHA1(f44ff1ad15d5ee3096f8f44f9c605f32ae2737d9) ) // Dumped as Intel 2716
-	ROM_LOAD( "pacvideodens-9-2516.bin",  0x2000, 0x0800, CRC(42f08538) SHA1(a5ce713921771c7b253fc01b6dd6aa1f1af38fc0) ) // Dumped as Intel 2716
-	ROM_LOAD( "pacvideodens-10-2516.bin", 0x2800, 0x0800, CRC(7aa90d69) SHA1(2271ea03d1d98415bf5121ada4daa0f829f969b1) ) // Dumped as Intel 2716
-	ROM_LOAD( "pacvideodens-11-2716.bin", 0x3000, 0x0800, CRC(2bbed46e) SHA1(96648411af4ab7c43a9b91f7d0bc25f772fb5177) )
-	/*              0x3800, 0x0800 not populated */
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "pacvideodens-15-2716.bin", 0x0000, 0x0800, CRC(b2ed320b) SHA1(680a6fdcb65cc2d88d10bc85e0b2628f43375c5c) )
-	ROM_LOAD( "pacvideodens-14-2716.bin", 0x0800, 0x0800, CRC(ab88b2c4) SHA1(d0c829ea8021eae81a2b82d36c35ad8258b115e0) )
-
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "pacvideodens-17-2716.bin", 0x0000, 0x0800, CRC(44a45b72) SHA1(8abd0684a01d6c23ef5cf5f0765458f982316acf) )
-	ROM_LOAD( "pacvideodens-16-2716.bin", 0x0800, 0x0800, CRC(fa84659f) SHA1(20c212723f9062f052539190dfe3fc41577543eb) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "pacvideodens-im5610cpe.6l", 0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) ) // Dumped as 82s123
-ROM_END
-
 ROM_START( ghostmun )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pac1.bin",     0x0000, 0x1000, CRC(19338c70) SHA1(cc2665b7d534d324627d12025ee099ff415d4214) )
@@ -9509,32 +9215,6 @@ ROM_START( tenspot )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASEFF )
 	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
 	ROM_END
-
-
-ROM_START( fourplay )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "fourplay.bin", 0x10000, 0x10000, CRC(b42b2c2c) SHA1(f3b6f136b39e7a6adadecb9acf906fcfe649f398) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "graph1.bin",   0x0000, 0x1000, CRC(359c0c1f) SHA1(9e39baae4ab5763db236d0a49a6665d2e69cba11) )
-	ROM_LOAD( "graph2.bin",   0x1000, 0x1000, CRC(b22a51c9) SHA1(cccfbab0c92dba81e3451de72d1f1899226e30e2) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
-ROM_END
-
-ROM_START( videight )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "videight.bin", 0x10000, 0x20000, CRC(0601db09) SHA1(0c9cd1afb0034946261219bf42b2f9b1ed5bdb17) )
-
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "v8g1.bin",     0x0000, 0x8000, CRC(af771e33) SHA1(cdc960c5f548e19da4eabdaf8b789ca8ffb6a29f) )
-	ROM_LOAD( "v8g2.bin",     0x8000, 0x8000, CRC(776c34e6) SHA1(de70a29f73469a58ab15acb95aaad1efeb4de08d) )
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "v8c.bin",      0x0000, 0x0100, CRC(b35a6ca8) SHA1(d9195215bf2482a1b02a019bb708a9981eb0bdf8) )
-ROM_END
-
 
 /*************************************
  *
@@ -10877,36 +10557,6 @@ ROM_START( froggrs )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
-/* Hermatic Frogger, found on a Video Dens PCB */
-ROM_START( froggervd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "frogvd_r1-libro-s1.ac9", 0x0000, 0x0800, CRC(81c2020e) SHA1(8c9292b399a408795e78b7dc5c706d3b526d3751) ) // 2716
-	ROM_LOAD( "frogvd_r2-libro-s2.ae9", 0x0800, 0x0800, CRC(a892ab61) SHA1(828cc04d73738ea17055c152098d592b776f4fb1) BAD_DUMP ) // 2716 (hand-patched at XX0)
-	ROM_LOAD( "frogvd_r3-libro-s3.af9", 0x1000, 0x0800, CRC(637a2ff8) SHA1(e9b9fc692ca5d8deb9cd30d9d73ad25c8d8bafe1) ) // 2716
-	ROM_LOAD( "frogvd_r4-libro-s4.ah9", 0x1800, 0x0800, CRC(1dc9ab15) SHA1(94b327dd2eaf0ffb19fee86a2a890a0012d52849) ) // 2716
-	ROM_LOAD( "frogvd_r5-libro-s5.aj9", 0x2000, 0x0800, CRC(35e11cd2) SHA1(c2d01324c052d79ad9de00d13ddc4322f9c44292) ) // 2716
-	ROM_LOAD( "frogvd_r6-libro-s6.al9", 0x2800, 0x0800, CRC(5db899ed) SHA1(e8d75daba8dfdb89078068a29a0ccf040dfca4da) ) // 2716
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "frogvd_r11-ot1.bc5", 0x0000, 0x0800, CRC(79326efe) SHA1(087cd61ba9c09be6ff71be8f89933a4a0f620650) ) // 2716
-	ROM_LOAD( "frogvd_r12-ot2.bd5", 0x0800, 0x0800, CRC(7380a48f) SHA1(75582a94b696062cbdb66a4c5cf0bc0bb94f81ee) BAD_DUMP ) // 2716 (hand-patched at XXe)
-	ROM_LOAD( "frogvd_r13-ot3.be5", 0x1000, 0x0800, CRC(31d7eb27) SHA1(2e1d34ae4da385fd7cac94707d25eeddf4604e1a) ) // 2716
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "frogvd_r9-libro-c1.af9",  0x0000, 0x0800, CRC(05f7d883) SHA1(78831fd287da18928651a8adb7e578d291493eff) ) // 2716
-	ROM_LOAD( "frogvd_r10-libro-c2.ah9", 0x0800, 0x0800, CRC(658745f8) SHA1(e4e5c3e011c8a7233a36d29e10e08905873500aa) ) // 2716
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "frogvd.5e", 0x0000, 0x0004, CRC(c5f12bc3) SHA1(b746ba06b596d4227fdc730a23bdf495f84e6a72) ) // 74s288n dumped as 82s123
-	ROM_CONTINUE( 0x0010, 0x0004 )
-	ROM_CONTINUE( 0x0004, 0x0004 )
-	ROM_CONTINUE( 0x0014, 0x0004 )
-	ROM_CONTINUE( 0x0008, 0x0004 )
-	ROM_CONTINUE( 0x0018, 0x0004 )
-	ROM_CONTINUE( 0x000c, 0x0004 )
-	ROM_CONTINUE( 0x001c, 0x0004 )
-ROM_END
-
 ROM_START( quaak )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1f.bin",   0x0000, 0x0800, CRC(5d0e2716) SHA1(c484ae162bfe5ef9d5d2a6930c9c476394e70bbd) )
@@ -11008,7 +10658,7 @@ ROM_START( turpins )
 	ROM_LOAD( "tur.4f",  0x0000, 0x0800, CRC(e5999d52) SHA1(bc3f52cf6c6e19dfd2dacd1e8c9128f437e995fc) )
 	ROM_LOAD( "tur.5f",  0x0800, 0x0800, CRC(c3ffd655) SHA1(dee51d77be262a2944488e381541c10a2b6e5d83) )
 
-	ROM_REGION( 0x0020, "proms", 0 ) // missing, but the original hw is so close to scobra that the original prom works
+	ROM_REGION( 0x0020, "proms", 0 ) // missing, but the original hw is so close to scramble that the original prom works
 	ROM_LOAD( "turtles.clr",     0x0000, 0x0020, BAD_DUMP CRC(f3ef02dd) SHA1(09fd795170d7d30f101d579f57553da5ff3800ab) )
 ROM_END
 
@@ -11217,8 +10867,8 @@ ROM_START( mandinga )
 	ROM_LOAD( "8.bin",        0x3800, 0x0800, CRC(049855ad) SHA1(b455e1ed0183559014722467b0f1c208b06167c3) ) // 2716
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "11.bin",       0x0000, 0x1000, BAD_DUMP CRC(8ca7b750) SHA1(4f4c2915503b85abe141d717fd254ee10c9da99e) ) // 2732; original was bad dump, but using ROM from amidar due to first half being identical
-	ROM_LOAD( "12.bin",       0x1000, 0x1000, BAD_DUMP CRC(9b5bdc0a) SHA1(84d953618c8bf510d23b42232a856ac55f1baff5) ) // 2732; original was bad dump, but using ROM from amidar due to first half being identical
+	ROM_LOAD( "11.bin",       0x0000, 0x1000, BAD_DUMP CRC(25da6487) SHA1(6805a6a5e4ccedb0d35c56ea3301122b03253a0e) ) // 2732, 1st and 2nd half identical and identical to 1st half of amidar's rom
+	ROM_LOAD( "12.bin",       0x1000, 0x1000, BAD_DUMP CRC(e7eba6e9) SHA1(8b58d7ec12ca569bb28e45b3ff78bd4b926aeb0a) ) // 2732, 1st and 2nd half identical and identical to 1st half of amidar's rom
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(09ed5818) SHA1(69dce85228b2c9176d4be429f530410350a1c76c) ) // 2716
@@ -11226,46 +10876,6 @@ ROM_START( mandinga )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6e.bin",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // 82s123
-ROM_END
-
-ROM_START( mandingarf )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2716-mg1.bin",  0x0000, 0x0800, CRC(a684a494) SHA1(76885bb3bdab09f46c7daa25164a2fdaa744742f) ) // 2716
-	ROM_LOAD( "2716-mg2.bin",  0x0800, 0x0800, CRC(f4038373) SHA1(8823b9816fc4ea03b92e08776c13610980f5ea7a) ) // 2716
-	ROM_LOAD( "2716-mg3.bin",  0x1000, 0x0800, CRC(96842877) SHA1(043ce4ed2628a209ca21cc42516c02366cd9f1fa) ) // 2716
-	ROM_LOAD( "2716-mg4.bin",  0x1800, 0x0800, CRC(29873461) SHA1(7d0ee9a82f02163b4cc6a7097e88ae34e96ebf58) ) // 2716
-	ROM_LOAD( "2716-mg5.bin",  0x2000, 0x0800, CRC(400cf1bb) SHA1(06c891f7581b0c1036f6845ea847cd20b6f5dedc) ) // 2716
-	ROM_LOAD( "2716-mg6.bin",  0x2800, 0x0800, CRC(5382f7ed) SHA1(425ec2c2caf404fc8ab13ee38d6567413022e1a1) ) // 2716
-	ROM_LOAD( "2716-mg7.bin",  0x3000, 0x0800, CRC(e78d0c6d) SHA1(947ac20463384ca0721875954d59ec4ae15b0670) ) // 2716
-	ROM_LOAD( "2716-mg8.bin",  0x3800, 0x0800, CRC(8a4018ae) SHA1(9aba6f4527c59b0b016038236d5a6074e65966f6) ) // 2716
-	ROM_LOAD( "2716-mg11.bin", 0xc000, 0x0800, BAD_DUMP CRC(d8bf57e7) SHA1(421a0fa02fccbc52d460fafec6437bd2b7564056) ) // 2716(?), taken from mandingac
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "2716-mg9.bin",  0x0000, 0x0800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) ) // 2716
-	ROM_LOAD( "2716-mg10.bin", 0x0800, 0x0800, CRC(1891fc68) SHA1(6d03f5092fd73462c9d81c1a64e39120d9f10aea) ) // 2716
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "6e.bin",        0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // not present, using mandinga PROM
-ROM_END
-
-ROM_START( mandingac )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2716-4.bin",  0x0000, 0x0800, CRC(a684a494) SHA1(76885bb3bdab09f46c7daa25164a2fdaa744742f) ) // 2716
-	ROM_LOAD( "2716-3.bin",  0x0800, 0x0800, CRC(f4038373) SHA1(8823b9816fc4ea03b92e08776c13610980f5ea7a) ) // 2716
-	ROM_LOAD( "2716-1.bin",  0x1000, 0x0800, CRC(96842877) SHA1(043ce4ed2628a209ca21cc42516c02366cd9f1fa) ) // 2716
-	ROM_LOAD( "2716-9.bin",  0x1800, 0x0800, CRC(b69f9f71) SHA1(cb781d61a481c493e89605bc0edc6a092d8b4d56) ) // 2716
-	ROM_LOAD( "2716-8.bin",  0x2000, 0x0800, CRC(400cf1bb) SHA1(06c891f7581b0c1036f6845ea847cd20b6f5dedc) ) // 2716
-	ROM_LOAD( "2716-7.bin",  0x2800, 0x0800, CRC(5382f7ed) SHA1(425ec2c2caf404fc8ab13ee38d6567413022e1a1) ) // 2716
-	ROM_LOAD( "2716-6.bin",  0x3000, 0x0800, CRC(c4e63305) SHA1(e03aed5ad89305ffc243cff8ff147ec82419c7bc) ) // 2716
-	ROM_LOAD( "2716-5.bin",  0x3800, 0x0800, CRC(8a4018ae) SHA1(9aba6f4527c59b0b016038236d5a6074e65966f6) ) // 2716
-	ROM_LOAD( "2716-2.bin",  0xc000, 0x0800, CRC(d8bf57e7) SHA1(421a0fa02fccbc52d460fafec6437bd2b7564056) ) // 2716
-
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "2716-10.bin", 0x0000, 0x0800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) ) // 2716
-	ROM_LOAD( "2716-11.bin", 0x0800, 0x0800, CRC(1891fc68) SHA1(6d03f5092fd73462c9d81c1a64e39120d9f10aea) ) // 2716
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "82s123.bin",  0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // 82s123
 ROM_END
 
 ROM_START( theend )
@@ -12519,9 +12129,8 @@ GAME( 1979, supergs,     galaxian, galaxian,   superg,     galaxian_state, init_
 GAME( 1979, galturbo,    galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack", "Galaxian Turbo (superg hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galap1,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack", "Space Invaders Galactica (galaxiana hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galap4,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack (G.G.I)", "Galaxian Part 4 (hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, zerotime,    galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg? (Petaco S.A.)", "Zero Time (Petaco S.A.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, zerotime,    galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg? (Petaco S.A.)", "Zero Time", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotimed,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Datamat)", "Zero Time (Datamat)", MACHINE_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
-GAME( 1979, zerotimemc,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Marti Colls)", "Zero Time (Marti Colls)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starfght,    galaxian, galaxian,   swarm,      galaxian_state, init_galaxian,   ROT90,  "bootleg (Jeutel)", "Star Fighter", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf,    galaxian, galaxian,   galaxian,   galaxian_state, init_galaxian,   ROT90,  "bootleg", "Galaxian (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaxianbl,  galaxian, galaxian,   galaxianbl, galaxian_state, init_galaxian,   ROT90,  "bootleg", "Galaxian (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
@@ -12555,8 +12164,8 @@ GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, init_
 GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, init_galaxian,   ROT270, "bootleg?", "Omega (bootleg?)", MACHINE_SUPPORTS_SAVE )
 
 /* basic hardware + extra RAM */
-GAME( 1982, victoryc,    0,        victoryc,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, victorycb,   victoryc, victoryc,   victoryc,   galaxian_state, init_galaxian,   ROT270, "bootleg", "Victory (Comsoft) (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victoryc,    0,        galaxian,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, victorycb,   victoryc, galaxian,   victoryc,   galaxian_state, init_victorycb,  ROT270, "bootleg", "Victory (Comsoft) (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these games require the coin lockout mechanism to be disabled */
 GAME( 1981, warofbug,    0,        galaxian,   warofbug,   galaxian_state, init_nolock,     ROT90,  "Armenia / Food and Fun Corp", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze", MACHINE_SUPPORTS_SAVE )
@@ -12564,8 +12173,7 @@ GAME( 1981, warofbugu,   warofbug, galaxian,   warofbug,   galaxian_state, init_
 GAME( 1981, warofbugg,   warofbug, galaxian,   warofbug,   galaxian_state, init_warofbugg,  ROT90,  "Armenia", "War of the Bugs or Monsterous Manouvers in a Mushroom Maze (German)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, spactrai,    warofbug, spactrai,   spactrai,   galaxian_state, init_nolock,     ROT90,  "Celv",    "Space Train", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redufo,      0,        galaxian,   redufo,     galaxian_state, init_nolock,     ROT270, "Artic", "Defend the Terra Attack on the Red UFO", MACHINE_SUPPORTS_SAVE ) // is this the original?
-GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO (bootleg, set 1)", MACHINE_SUPPORTS_SAVE ) // rev A?
-GAME( 1981, redufob2,    redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO (bootleg)", MACHINE_SUPPORTS_SAVE ) // rev A?
 GAME( 19??, exodus,      redufo,   galaxian,   redufo,     galaxian_state, init_nolock,     ROT90,  "bootleg? (Subelectro)", "Exodus (bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "hack", "Kamakazi III (superg hack)", MACHINE_SUPPORTS_SAVE )
@@ -12598,7 +12206,6 @@ GAME( 1980, streaknga,   streakng, pacmanbl,   streakng,   galaxian_state, init_
 GAME( 1981, pacmanbl,    puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanbla,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacmanblb,   puckman,  pacmanbl,   pacmanblb,  galaxian_state, init_pacmanbl,   ROT90,  "bootleg", "Pac-Man (Moon Alien 'AL-10A1' hardware)", MACHINE_SUPPORTS_SAVE ) // doesn't have separate tile / sprite roms, probably should move it
-GAME( 1981, pacmanblv,   puckman,  pacmanbl,   pacmanbl,   galaxian_state, init_pacmanbl,   ROT270, "bootleg (Video Dens)", "Pac-Man (Video Dens, Spanish bootleg on Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenxp2,    phoenix,  galaxian,   phoenxp2,   galaxian_state, init_batman2,    ROT270, "bootleg", "Phoenix Part 2", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, batman2,     phoenix,  galaxian,   batman2,    galaxian_state, init_batman2,    ROT270, "bootleg", "Batman Part 2", MACHINE_SUPPORTS_SAVE ) /* similar to pisces, but with different video banking characteristics */
@@ -12617,10 +12224,6 @@ GAME( 1982, zigzagb2,    zigzagb,  zigzag,     zigzag,     galaxian_state, init_
 
 /* multi-game select via external switch */
 GAME( 1981, gmgalax,     0,        gmgalax,    gmgalax,    galaxian_state, init_gmgalax,    ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", MACHINE_SUPPORTS_SAVE )
-
-// Multigames
-GAME( 2002, fourplay,    0,        fourplay,   galaxian,   galaxian_state, init_fourplay,   ROT90, "Macro", "Four Play", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, videight,    0,        videight,   warofbug,   galaxian_state, init_videight,   ROT90, "Macro", "Video Eight", MACHINE_SUPPORTS_SAVE )
 
 
 
@@ -12670,11 +12273,11 @@ GAME( 1980, moonal2,     0,        mooncrst,   moonal2,    galaxian_state, init_
 GAME( 1980, moonal2b,    moonal2,  mooncrst,   moonal2,    galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu", "Moon Alien Part 2 (older version)", MACHINE_SUPPORTS_SAVE )
 
 /* larger romspace, interrupt enable moved */
-GAME( 198?, thepitm,     thepit,   thepitm,    thepitm,    galaxian_state, init_mooncrsu,   ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
+GAME( 198?, thepitm,     thepit,   mooncrst,   thepitm,    galaxian_state, init_thepitm,    ROT90,  "bootleg (KZH)", "The Pit (bootleg on Moon Quasar hardware)", MACHINE_SUPPORTS_SAVE ) // on an original MQ-2FJ pcb, even if the memory map appears closer to Moon Cresta
 
 /* other games on basic mooncrst hardware */
-GAME( 1982, skybase,     0,        skybase,    skybase,    galaxian_state, init_skybase,    ROT90,  "Omori Electric Co., Ltd.", "Sky Base", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, kong,        0,        kong,       kong,       galaxian_state, init_kong,       ROT90,  "Taito do Brasil", "Kong (Donkey Kong conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
+GAME( 1982, skybase,     0,        mooncrst,   skybase,    galaxian_state, init_skybase,    ROT90,  "Omori Electric Co., Ltd.", "Sky Base", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, kong,        0,        mooncrst,   kong,       galaxian_state, init_kong,       ROT90,  "Taito do Brasil", "Kong (Donkey Kong conversion on Galaxian hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 
 /* larger romspace, 2*AY8910, based on Super Star Crest board? */
 // there may be an alternate version called "Fantasy" according to flyers; is it the same?
@@ -12722,9 +12325,8 @@ GAME( 1981, froggers3,   frogger,  frogger,    frogger,    galaxian_state, init_
 GAME( 1981, froggermc,   frogger,  froggermc,  froggermc,  galaxian_state, init_froggermc,  ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg", "Frog", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, frogg,       frogger,  frogg,      frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, froggrs,     frogger,  froggers,   frogger,    galaxian_state, init_froggrs,    ROT90,  "bootleg (Coin Music)", "Frogger (Coin Music, bootleg on Scramble hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, froggervd,   frogger,  froggervd,  frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg (Hermatic)", "Frogger (Hermatic, bootleg on Scramble hardware from Video Dens)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, frogg,       frogger,  galaxian,   frogg,      galaxian_state, init_frogg,      ROT90,  "bootleg", "Frog (Galaxian hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggrs,     frogger,  froggers,   frogger,    galaxian_state, init_froggrs,    ROT90,  "bootleg (Coin Music)", "Frogger (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, quaak,       frogger,  quaak,      frogger,    galaxian_state, init_quaak,      ROT90,  "bootleg", "Quaak (bootleg of Frogger)", MACHINE_SUPPORTS_SAVE ) // closest to Super Cobra hardware, presumably a bootleg from Germany (Quaak is the German frog sound)
 GAME( 1981, froggeram,   frogger,  froggeram,  froggeram,  galaxian_state, init_quaak,      ROT90,  "bootleg", "Frogger (bootleg on Amigo? hardware)", MACHINE_SUPPORTS_SAVE ) // meant to be Amigo hardware, but maybe a different bootleg than the one we have?
 
@@ -12738,7 +12340,7 @@ GAME( 1981, froggeram,   frogger,  froggeram,  froggeram,  galaxian_state, init_
 GAME( 1981, turtles,     0,        turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Turtles", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, turpin,      turtles,  turtles,    turpin,     galaxian_state, init_turtles,    ROT90,  "Konami (Sega license)", "Turpin", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, 600,         turtles,  turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami", "600", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, turpins,     turtles,  turpins,    turtles,    galaxian_state, init_turtles,    ROT90,  "bootleg", "Turpin (bootleg on Super Cobra hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
+GAME( 1981, turpins,     turtles,  turpins,    turtles,    galaxian_state, init_turtles,    ROT90,  "bootleg", "Turpin (bootleg on Scramble hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // tempo is way too fast
 
 GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami", "Amidar", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami", "Amidar (older)", MACHINE_SUPPORTS_SAVE )
@@ -12746,23 +12348,21 @@ GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, init_
 GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, init_turtles,    ROT90,  "Konami (Olympia license)", "Amidar (Olympia)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg", "Amidar (bootleg)", MACHINE_SUPPORTS_SAVE ) /* similar to Amigo bootleg */
 GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg", "Amigo (bootleg of Amidar, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_amigo2,     ROT90,  "bootleg", "Amigo (bootleg of Amidar, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound timer might be different?
+GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg", "Amigo (bootleg of Amidar, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami", "Amidar (Scramble hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)", "Mandinga (bootleg of Amidar)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
-GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)", "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
-GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)", "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)", MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
+GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)", "Mandinga (bootleg of Amidar)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // sound ROMs have identical halves, reference for color http://www.youtube.com/watch?v=6uGK4AZxV2U
 
 
 /* The End/Scramble based hardware */
 GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami", "The End", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, theends,     theend,   theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, takeoff,     theend,   takeoff,    explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)", "Take Off (bootleg of The End)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors likely need bitswap<8> somewhere; needs different sound timer. reference: https://www.youtube.com/watch?v=iPYX3yJORTE
+GAME( 1980, takeoff,     theend,   takeoff,    explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)", "Take Off (bootleg of The End)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // tempo is way too fast
 
 GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami", "Scramble", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambles2,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, strfbomb,    scramble, scramble,   strfbomb,   galaxian_state, init_scramble,   ROT90,  "bootleg (Omni)",                     "Strafe Bomb (bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, explorer,    scramble, explorer,   explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Explorer (bootleg of Scramble)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
+GAME( 1981, explorer,    scramble, explorer,   explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Explorer (bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scramblebf,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Karateco)",                 "Scramble (Karateco, French bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambp,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Billport S.A.)",            "Impacto (Billport S.A., Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE ) // similar to the Karateco set above
 GAME( 1981, scramce,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Centromatic S.A.)",         "Scramble (Centromatic S.A., Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // similar to above
@@ -12784,8 +12384,8 @@ GAME( 1981, jungsub,    jungler,   jungsub,    jungsub,    galaxian_state, init_
 GAME( 1982, scorpion,    0,        scorpion,   scorpion,   galaxian_state, init_scorpion,   ROT90,  "Zaccaria", "Scorpion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 GAME( 1982, scorpiona,   scorpion, scorpion,   scorpion,   galaxian_state, init_scorpion,   ROT90,  "Zaccaria", "Scorpion (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 GAME( 1982, scorpionb,   scorpion, scorpion,   scorpion,   galaxian_state, init_scorpion,   ROT90,  "Zaccaria", "Scorpion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 19??, scorpionmc,  scorpion, scorpnmc,   scorpnmc,   galaxian_state, init_scorpnmc,   ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, aracnis,     scorpion, scorpnmc,   aracnis,    galaxian_state, init_scorpnmc,   ROT90,  "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 19??, scorpionmc,  scorpion, mooncrst,   scorpnmc,   galaxian_state, init_scorpnmc,   ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, aracnis,     scorpion, mooncrst,   aracnis,    galaxian_state, init_scorpnmc,   ROT90,  "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
 GAME( 1983, sfx,         0,        sfx,        sfx,        galaxian_state, init_sfx,        ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", MACHINE_SUPPORTS_SAVE )
@@ -12842,4 +12442,3 @@ GAME( 1982, losttombh,   losttomb, scobra,     losttomb,   galaxian_state, init_
 GAME( 1984, spdcoin,     0,        scobra,     spdcoin,    galaxian_state, init_scobra,     ROT90,  "Stern Electronics", "Speed Coin (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, superbon,    0,        scobra,     superbon,   galaxian_state, init_superbon,   ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-

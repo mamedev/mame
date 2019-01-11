@@ -108,15 +108,15 @@ void suprslam_state::suprslam_map(address_map &map)
 	map(0xfb0000, 0xfb1fff).ram().share("spriteram");
 	map(0xfc0000, 0xfcffff).ram().share("sp_videoram");
 	map(0xfd0000, 0xfdffff).ram();
-	map(0xfe0000, 0xfe0fff).ram().w(FUNC(suprslam_state::suprslam_screen_videoram_w)).share("screen_videoram");
-	map(0xff0000, 0xff1fff).ram().w(FUNC(suprslam_state::suprslam_bg_videoram_w)).share("bg_videoram");
+	map(0xfe0000, 0xfe0fff).ram().w(this, FUNC(suprslam_state::suprslam_screen_videoram_w)).share("screen_videoram");
+	map(0xff0000, 0xff1fff).ram().w(this, FUNC(suprslam_state::suprslam_bg_videoram_w)).share("bg_videoram");
 	map(0xff2000, 0xff203f).ram().share("screen_vregs");
 	map(0xff3000, 0xff3001).nopw(); // sprite buffer trigger?
 	map(0xff8000, 0xff8fff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
 	map(0xff9001, 0xff9001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xffa000, 0xffafff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffd000, 0xffd01f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0xffe000, 0xffe001).w(FUNC(suprslam_state::suprslam_bank_w));
+	map(0xffe000, 0xffe001).w(this, FUNC(suprslam_state::suprslam_bank_w));
 	map(0xfff000, 0xfff01f).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
 }
 
@@ -130,7 +130,7 @@ void suprslam_state::sound_map(address_map &map)
 void suprslam_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(suprslam_state::suprslam_sh_bankswitch_w));
+	map(0x00, 0x00).w(this, FUNC(suprslam_state::suprslam_sh_bankswitch_w));
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
@@ -268,60 +268,61 @@ void suprslam_state::machine_reset()
 	m_bg_bank = 0;
 }
 
-void suprslam_state::suprslam(machine_config &config)
-{
-	M68000(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &suprslam_state::suprslam_map);
-	m_maincpu->set_vblank_int("screen", FUNC(suprslam_state::irq1_line_hold));
+MACHINE_CONFIG_START(suprslam_state::suprslam)
 
-	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &suprslam_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &suprslam_state::sound_io_map);
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(suprslam_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprslam_state,  irq1_line_hold)
 
-	vs9209_device &io(VS9209(config, "io", 0));
-	io.porta_input_cb().set_ioport("P1");
-	io.portb_input_cb().set_ioport("P2");
-	io.portc_input_cb().set_ioport("SYSTEM");
-	io.portd_input_cb().set_ioport("DSW1");
-	io.porte_input_cb().set_ioport("DSW2");
-	io.porth_output_cb().set(FUNC(suprslam_state::spr_ctrl_w));
+	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2) /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprslam);
+	MCFG_DEVICE_ADD("io", VS9209, 0)
+	MCFG_VS9209_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_VS9209_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_VS9209_IN_PORTC_CB(IOPORT("SYSTEM"))
+	MCFG_VS9209_IN_PORTD_CB(IOPORT("DSW1"))
+	MCFG_VS9209_IN_PORTE_CB(IOPORT("DSW2"))
+	MCFG_VS9209_OUT_PORTG_CB(WRITE8(*this, suprslam_state, spr_ctrl_w))
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300)); /* hand-tuned */
-	screen.set_size(64*8, 64*8);
-	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(suprslam_state::screen_update_suprslam));
-	screen.set_palette(m_palette);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprslam)
 
-	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 0x800);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2300) /* hand-tuned */)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(suprslam_state, screen_update_suprslam)
+	MCFG_SCREEN_PALETTE("palette")
 
-	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::suprslam_tile_callback), this);
-	m_spr->set_gfx_region(1);
-	m_spr->set_gfxdecode_tag(m_gfxdecode);
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
 
-	K053936(config, m_k053936, 0);
-	m_k053936->set_wrap(1);
-	m_k053936->set_offsets(-45, -21);
+	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
+	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( suprslam_state, suprslam_tile_callback )
+	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
+	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
+
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(-45, -21)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	m_soundlatch->set_separate_acknowledge(true);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 /*** ROM LOADING *************************************************************/
 

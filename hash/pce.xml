@@ -324,9 +324,9 @@
 		<description>Blodia</description>
 		<year>1990</year>
 		<publisher>Hudson</publisher>
-		<info name="serial" value="HC90027"/>
+		<info name="serial" value="ブロディア"/>
 		<info name="release" value="19900223"/>
-		<info name="alt_title" value="ブロディア"/>
+		<info name="alt_title" value="HC90027"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="blodia (japan).pce" size="131072" crc="958bcd09" sha1="bcb3070f617059c9d0d781ece2aee9ae74951f6a" offset="000000" />

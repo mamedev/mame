@@ -51,7 +51,6 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "emupal.h"
 #include "screen.h"
 
 class shtzone_state : public driver_device
@@ -59,14 +58,11 @@ class shtzone_state : public driver_device
 public:
 	shtzone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-
-	void shtzone(machine_config &config);
-
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void shtzone(machine_config &config);
 	void shtzone_map(address_map &map);
 };
 

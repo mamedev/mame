@@ -67,10 +67,10 @@ READ8_MEMBER(galeb_state::tape_data_r)
 void galeb_state::galeb_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();  // RAM
-	map(0xbfe0, 0xbfe7).r(FUNC(galeb_state::keyboard_r));
-	map(0xbfe0, 0xbfe0).w(FUNC(galeb_state::dac_w));
-	map(0xbffe, 0xbffe).r(FUNC(galeb_state::tape_status_r));
-	map(0xbfff, 0xbfff).rw(FUNC(galeb_state::tape_data_r), FUNC(galeb_state::tape_data_w));
+	map(0xbfe0, 0xbfe7).r(this, FUNC(galeb_state::keyboard_r));
+	map(0xbfe0, 0xbfe0).w(this, FUNC(galeb_state::dac_w));
+	map(0xbffe, 0xbffe).r(this, FUNC(galeb_state::tape_status_r));
+	map(0xbfff, 0xbfff).rw(this, FUNC(galeb_state::tape_data_r), FUNC(galeb_state::tape_data_w));
 	map(0xb000, 0xb3ff).ram().share("video_ram"); // video ram
 	map(0xc000, 0xc7ff).rom();  // BASIC 01 ROM
 	map(0xc800, 0xcfff).rom();  // BASIC 02 ROM
@@ -176,11 +176,11 @@ MACHINE_CONFIG_START(galeb_state::galeb)
 	MCFG_SCREEN_SIZE(48*8, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 16*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galeb_state, screen_update_galeb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galeb )
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* audio hardware */

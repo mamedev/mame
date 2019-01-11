@@ -26,6 +26,30 @@
 
 #pragma once
 
+#include "screen.h"
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CDP1861_IRQ_CALLBACK(_write) \
+	devcb = &downcast<cdp1861_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+
+#define MCFG_CDP1861_DMA_OUT_CALLBACK(_write) \
+	devcb = &downcast<cdp1861_device &>(*device).set_dma_out_wr_callback(DEVCB_##_write);
+
+#define MCFG_CDP1861_EFX_CALLBACK(_write) \
+	devcb = &downcast<cdp1861_device &>(*device).set_efx_wr_callback(DEVCB_##_write);
+
+
+#define MCFG_CDP1861_SCREEN_ADD(_cdptag, _tag, _clock) \
+	MCFG_VIDEO_SET_SCREEN(_tag) \
+	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1861_device, screen_update) \
+	MCFG_SCREEN_RAW_PARAMS(_clock, cdp1861_device::SCREEN_WIDTH, cdp1861_device::HBLANK_END, cdp1861_device::HBLANK_START, cdp1861_device::TOTAL_SCANLINES, cdp1861_device::SCANLINE_VBLANK_END, cdp1861_device::SCANLINE_VBLANK_START)
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -64,9 +88,9 @@ public:
 	// construction/destruction
 	cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto int_cb() { return m_write_int.bind(); }
-	auto dma_out_cb() { return m_write_dma_out.bind(); }
-	auto efx_cb() { return m_write_efx.bind(); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_out_wr_callback(Object &&cb) { return m_write_dma_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_efx_wr_callback(Object &&cb) { return m_write_efx.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_WRITE_LINE_MEMBER( disp_on_w );
@@ -78,7 +102,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -91,7 +114,7 @@ private:
 		TIMER_DMA
 	};
 
-	devcb_write_line m_write_int;
+	devcb_write_line m_write_irq;
 	devcb_write_line m_write_dma_out;
 	devcb_write_line m_write_efx;
 

@@ -6,14 +6,12 @@
     Heavy Smash
     World Cup Volleyball 95
 
-    See also deco32.cpp, deco_mlc.cpp, backfire.cpp
-
-    How to get the version and region:
-    Heavy Smash: Exit test mode
-    World Cup Volleyball 95: Boot the game holding down player 2 button 1
+    See also deco32.c, deco_mlc.c, backfire.c
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 */
+
+#define DE156CPU ARM
 
 #include "emu.h"
 #include "cpu/arm/arm.h"
@@ -24,7 +22,6 @@
 #include "sound/ymz280b.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -34,7 +31,7 @@ public:
 	deco156_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_deco_tilegen(*this, "tilegen")
+		, m_deco_tilegen1(*this, "tilegen1")
 		, m_oki1(*this, "oki1")
 		, m_oki2(*this, "oki2")
 		, m_sprgen(*this, "spritegen")
@@ -47,7 +44,7 @@ public:
 	void hvysmsh(machine_config &config);
 	void wcvol95(machine_config &config);
 
-private:
+protected:
 	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
 	DECLARE_READ32_MEMBER(pf1_rowscroll_r);
 	DECLARE_READ32_MEMBER(pf2_rowscroll_r);
@@ -66,9 +63,10 @@ private:
 	void hvysmsh_map(address_map &map);
 	void wcvol95_map(address_map &map);
 
+private:
 	/* devices */
 	required_device<arm_cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_deco_tilegen1;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
 	optional_device<decospr_device> m_sprgen;
@@ -88,7 +86,7 @@ void deco156_state::video_start()
 	/* and register the allocated ram so that save states still work */
 	save_item(NAME(m_pf1_rowscroll));
 	save_item(NAME(m_pf2_rowscroll));
-	save_pointer(NAME(m_spriteram), 0x2000/2);
+	save_pointer(NAME(m_spriteram.get()), 0x2000/2);
 }
 
 
@@ -100,11 +98,11 @@ uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	screen.priority().fill(0);
 	bitmap.fill(0);
 
-	m_deco_tilegen->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram.get(), 0x800);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -138,33 +136,33 @@ void deco156_state::hvysmsh_map(address_map &map)
 	map(0x100000, 0x107fff).ram();
 	map(0x120000, 0x120003).portr("INPUTS");
 	map(0x120000, 0x120003).nopw(); // Volume control in low byte
-	map(0x120004, 0x120007).w(FUNC(deco156_state::hvysmsh_eeprom_w));
+	map(0x120004, 0x120007).w(this, FUNC(deco156_state::hvysmsh_eeprom_w));
 	map(0x120008, 0x12000b).nopw(); // IRQ ack?
-	map(0x12000c, 0x12000f).w(FUNC(deco156_state::hvysmsh_oki_0_bank_w));
+	map(0x12000c, 0x12000f).w(this, FUNC(deco156_state::hvysmsh_oki_0_bank_w));
 	map(0x140000, 0x140000).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x160000, 0x160000).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x180000, 0x18001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x190000, 0x191fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x194000, 0x195fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x1a0000, 0x1a0fff).rw(FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
-	map(0x1a4000, 0x1a4fff).rw(FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
+	map(0x180000, 0x18001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x190000, 0x191fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x194000, 0x195fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x1a0000, 0x1a0fff).rw(this, FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
+	map(0x1a4000, 0x1a4fff).rw(this, FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
 	map(0x1c0000, 0x1c0fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x1d0010, 0x1d002f).nopr(); // Check for DMA complete?
-	map(0x1e0000, 0x1e1fff).rw(FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
+	map(0x1e0000, 0x1e1fff).rw(this, FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
 }
 
 void deco156_state::wcvol95_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10001f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
-	map(0x110000, 0x111fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
-	map(0x114000, 0x115fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
-	map(0x120000, 0x120fff).rw(FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
-	map(0x124000, 0x124fff).rw(FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
+	map(0x100000, 0x10001f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_dword_r), FUNC(deco16ic_device::pf_control_dword_w));
+	map(0x110000, 0x111fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_dword_r), FUNC(deco16ic_device::pf1_data_dword_w));
+	map(0x114000, 0x115fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w));
+	map(0x120000, 0x120fff).rw(this, FUNC(deco156_state::pf1_rowscroll_r), FUNC(deco156_state::pf1_rowscroll_w));
+	map(0x124000, 0x124fff).rw(this, FUNC(deco156_state::pf2_rowscroll_r), FUNC(deco156_state::pf2_rowscroll_w));
 	map(0x130000, 0x137fff).ram();
 	map(0x140000, 0x140003).portr("INPUTS");
 	map(0x150000, 0x150003).portw("EEPROMOUT");
-	map(0x160000, 0x161fff).rw(FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
+	map(0x160000, 0x161fff).rw(this, FUNC(deco156_state::spriteram_r), FUNC(deco156_state::spriteram_w));
 	map(0x170000, 0x170003).noprw(); // Irq ack?
 	map(0x180000, 0x180fff).readonly().w(m_palette, FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x1a0000, 0x1a0007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
@@ -336,7 +334,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_DEVICE_PROGRAM_MAP(hvysmsh_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -346,28 +344,29 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(XBGR)
 
-	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(deco156_state, bank_callback)
+	MCFG_DECO16IC_BANK2_CB(deco156_state, bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DECO_SPRITE_GFX_REGION(2)
+	MCFG_DECO_SPRITE_PRIORITY_CB(deco156_state, pri_callback)
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -389,7 +388,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_DEVICE_PROGRAM_MAP(wcvol95_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deco156_state,  deco32_vbl_interrupt)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -399,28 +398,29 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hvysmsh)
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(deco156_state::bank_callback), this);
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_BANK1_CB(deco156_state, bank_callback)
+	MCFG_DECO16IC_BANK2_CB(deco156_state, bank_callback)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_pri_callback(FUNC(deco156_state::pri_callback), this);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DECO_SPRITE_GFX_REGION(2)
+	MCFG_DECO_SPRITE_PRIORITY_CB(deco156_state, pri_callback)
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -603,30 +603,6 @@ Notes:
 
 ROM_START( wcvol95 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
-	ROM_LOAD32_WORD( "pw00-0.2f",    0x000002, 0x080000, CRC(86765209) SHA1(f78d073610b630ba6aa2352da9b394ef8b8ef628) )
-	ROM_LOAD32_WORD( "pw01-0.4f",    0x000000, 0x080000, CRC(3a0ee861) SHA1(568ab26e9985b0a63b10bb0f57d45e1f15593047) )
-
-	ROM_REGION( 0x080000, "gfx1", 0 )
-	ROM_LOAD( "mbx-00.9a",    0x000000, 0x080000, CRC(a0b24204) SHA1(cec8089c6c635f23b3a4aeeef2c43f519568ad70) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "mbx-01.12a",    0x000000, 0x100000, CRC(73deb3f1) SHA1(c0cabecfd88695afe0f27c5bb115b4973907207d) )
-	ROM_LOAD16_BYTE( "mbx-02.13a",    0x000001, 0x100000, CRC(3204d324) SHA1(44102f71bae44bf3a9bd2de7e5791d959a2c9bdd) )
-
-	ROM_REGION( 0x200000, "ymz", 0 ) /* YMZ280B-F samples */
-	ROM_LOAD( "mbx-03.13j",    0x00000, 0x200000,  CRC(061632bc) SHA1(7900ac56e59f4a4e5768ce72f4a4b7c5875f5ae8) )
-
-//  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
-//  ROM_LOAD( "93c46.3k",    0x00, 0x80, CRC(88f8e270) SHA1(cb82203ad38e0c12ea998562b7b785979726afe5) )
-
-	ROM_REGION( 0x200, "gals", 0 )
-	ROM_LOAD( "gal16v8b.10j.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
-	ROM_LOAD( "gal16v8b.5d.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
-ROM_END
-
-
-ROM_START( wcvol95j )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "pn00-0.2f",    0x000002, 0x080000, CRC(c9ed2006) SHA1(cee93eafc42c4de7a1453c85e7d6bca8d62cdc7b) )
 	ROM_LOAD32_WORD( "pn01-0.4f",    0x000000, 0x080000, CRC(1c3641c3) SHA1(60dddc3585e4dedb485f7505fee03495f615c0c0) )
 
@@ -647,6 +623,7 @@ ROM_START( wcvol95j )
 	ROM_LOAD( "gal16v8b.10j.bin",    0x000, 0x117,  CRC(06bbcbd5) SHA1(f7adb4bca13bb799bc42411eb178edfdc11a76c7) )
 	ROM_LOAD( "gal16v8b.5d.bin",     0x000, 0x117,  CRC(117784f0) SHA1(daf3720740621fc3af49333c96795718b693f4d2))
 ROM_END
+
 
 
 ROM_START( wcvol95x )
@@ -717,6 +694,5 @@ void deco156_state::init_wcvol95()
 GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, deco156_state, init_hvysmsh, ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 (Asia v1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wcvol95j, wcvol95, wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wcvol95x, wcvol95, wcvol95, wcvol95, deco156_state, init_wcvol95, ROT0, "Data East Corporation", "World Cup Volley '95 Extra Version (Asia v2.0B)", MACHINE_SUPPORTS_SAVE )

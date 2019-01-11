@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_Z80, bbc_tube_z80_device, "bbc_tube_z80", "Acorn Z80
 
 void bbc_tube_z80_device::tube_z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(bbc_tube_z80_device::mem_r), FUNC(bbc_tube_z80_device::mem_w));
+	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_z80_device::mem_r), FUNC(bbc_tube_z80_device::mem_w));
 }
 
 //-------------------------------------------------
@@ -36,7 +36,7 @@ void bbc_tube_z80_device::tube_z80_mem(address_map &map)
 
 void bbc_tube_z80_device::tube_z80_fetch(address_map &map)
 {
-	map(0x000, 0xffff).r(FUNC(bbc_tube_z80_device::opcode_r));
+	map(0x000, 0xffff).r(this, FUNC(bbc_tube_z80_device::opcode_r));
 }
 
 //-------------------------------------------------
@@ -61,25 +61,26 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void bbc_tube_z80_device::device_add_mconfig(machine_config &config)
-{
-	Z80(config, m_z80, 12_MHz_XTAL / 2);
-	m_z80->set_addrmap(AS_PROGRAM, &bbc_tube_z80_device::tube_z80_mem);
-	m_z80->set_addrmap(AS_OPCODES, &bbc_tube_z80_device::tube_z80_fetch);
-	m_z80->set_addrmap(AS_IO, &bbc_tube_z80_device::tube_z80_io);
-	m_z80->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bbc_tube_z80_device::irq_callback), this));
+MACHINE_CONFIG_START(bbc_tube_z80_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("z80", Z80, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tube_z80_mem)
+	MCFG_DEVICE_OPCODES_MAP(tube_z80_fetch)
+	MCFG_DEVICE_IO_MAP(tube_z80_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, bbc_tube_z80_device, irq_callback)
 
-	TUBE(config, m_ula);
-	m_ula->hirq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
-	m_ula->pnmi_handler().set(FUNC(bbc_tube_z80_device::nmi_w));
-	m_ula->pirq_handler().set_inputline(m_z80, INPUT_LINE_IRQ0);
+	MCFG_TUBE_ADD("ula")
+	MCFG_TUBE_HIRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
+	MCFG_TUBE_PNMI_HANDLER(WRITELINE(*this, bbc_tube_z80_device, nmi_w))
+	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("z80", INPUT_LINE_IRQ0))
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("64K").set_default_value(0);
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_z80").set_original("bbc_flop_z80");
-}
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_z80", "bbc_flop_z80")
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

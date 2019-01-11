@@ -24,7 +24,7 @@ k054338_device::k054338_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K054338, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_alpha_inv(0),
-	m_k055555(*this, finder_base::DUMMY_TAG)
+	m_k055555_tag(nullptr)
 {
 	memset(&m_regs, 0, sizeof(m_regs));
 	memset(&m_shd_rgb, 0, sizeof(m_shd_rgb));
@@ -36,6 +36,8 @@ k054338_device::k054338_device(const machine_config &mconfig, const char *tag, d
 
 void k054338_device::device_start()
 {
+	m_k055555 = m_k055555_tag ? machine().device<k055555_device>(m_k055555_tag) : nullptr;
+
 	save_item(NAME(m_regs));
 	save_item(NAME(m_shd_rgb));
 }
@@ -148,7 +150,7 @@ void k054338_device::fill_backcolor(bitmap_rgb32 &bitmap, const rectangle &clipr
 	}
 }
 
-// addition blending unimplemented (requires major changes to drawgfx and tilemap.cpp)
+// addition blending unimplemented (requires major changes to drawgfx and tilemap.c)
 int k054338_device::set_alpha_level( int pblend )
 {
 	uint16_t *regs;

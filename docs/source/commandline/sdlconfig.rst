@@ -23,13 +23,13 @@ Video Options
 
 **-[no]centerh**
 
-	Center horizontally within the view area. Default is ON (**-centerh**).
+	Center horizontally within the view area. Default is ON (*-centerh*).
 
 .. _mame-scommandline-centerv:
 
 **-[no]centerv**
 
-	Center vertically within the view area. Default is ON (**-centerv**).
+	Center vertically within the view area. Default is ON (*-centerv*).
 
 
 Video Soft-Specific Options
@@ -39,7 +39,7 @@ Video Soft-Specific Options
 
 **-scalemode**
 
-	Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (**-video soft** only). Default is *none*.
+	Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (**-video soft** only). Default is '*none*'.
 
 
 SDL Keyboard Mapping
@@ -49,13 +49,13 @@ SDL Keyboard Mapping
 
 **-keymap**
 
-	Enable keymap. Default is OFF (**-nokeymap**)
+	Enable keymap. Default is OFF (*-nokeymap*)
 
 .. _mame-scommandline-keymapfile:
 
 **-keymap_file** *<file>*
-
-	Keymap Filename. Default is ``keymap.dat``.
+	
+	Keymap Filename. Default is '*keymap.dat*'.
 
 
 SDL Joystick Mapping
@@ -77,7 +77,7 @@ Name of joystick mapped to a given joystick slot, default is *auto*.
 
 **-sixaxis**
 
-	Use special handling for PS3 SixAxis controllers. Default is OFF (**-nosixaxis**)
+	Use special handling for PS3 SixAxis controllers. Default is OFF (*-nosixaxis*)
 
 
 SDL Low-level Driver Options
@@ -100,3 +100,4 @@ SDL Low-level Driver Options
 **-gl_lib** *<driver>*
 
 	Alternative **libGL.so** to use; '*auto*' for system default
+

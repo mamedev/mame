@@ -206,27 +206,27 @@ ROM_START( c1541 )
 
 	ROM_DEFAULT_BIOS("r6")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "901229-01.uab5", 0x2000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77), ROM_BIOS(0) )
+	ROMX_LOAD( "901229-01.uab5", 0x2000, 0x2000, CRC(9a48d3f0) SHA1(7a1054c6156b51c25410caec0f609efb079d3a77), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "901229-02.uab5", 0x2000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000), ROM_BIOS(1) )
+	ROMX_LOAD( "901229-02.uab5", 0x2000, 0x2000, CRC(b29bab75) SHA1(91321142e226168b1139c30c83896933f317d000), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "r3", "Revision 3" )
-	ROMX_LOAD( "901229-03.uab5", 0x2000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744), ROM_BIOS(2) )
+	ROMX_LOAD( "901229-03.uab5", 0x2000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "r4", "Revision 4" )
-	ROMX_LOAD( "901229-04.uab5", 0x2000, 0x2000, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "901229-04.uab5", 0x2000, 0x2000, NO_DUMP, ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "r5", "Revision 5" )
-	ROMX_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b), ROM_BIOS(4) )
+	ROMX_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 5, "r6", "Revision 6" )
-	ROMX_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0), ROM_BIOS(5) )
+	ROMX_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 6, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos 1541.uab5", 0x2000, 0x2000, CRC(bc7e4aeb) SHA1(db6cfaa6d9b78d58746c811de29f3b1f44d99ddf), ROM_BIOS(6) )
+	ROMX_LOAD( "jiffydos 1541.uab5", 0x2000, 0x2000, CRC(bc7e4aeb) SHA1(db6cfaa6d9b78d58746c811de29f3b1f44d99ddf), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 7, "speeddos", "SpeedDOS-Plus+" )
-	ROMX_LOAD( "speed-dosplus.uab5", 0x0000, 0x4000, CRC(f9db1eac) SHA1(95407e59a9c1d26a0e4bcf2c244cfe8942576e2c), ROM_BIOS(7) )
+	ROMX_LOAD( "speed-dosplus.uab5", 0x0000, 0x4000, CRC(f9db1eac) SHA1(95407e59a9c1d26a0e4bcf2c244cfe8942576e2c), ROM_BIOS(8) )
 	ROM_SYSTEM_BIOS( 8, "rolo27", "Rolo DOS v2.7" )
-	ROMX_LOAD( "rolo27.uab5", 0x0000, 0x2000, CRC(171c7962) SHA1(04c892c4b3d7c74750576521fa081f07d8ca8557), ROM_BIOS(8) )
+	ROMX_LOAD( "rolo27.uab5", 0x0000, 0x2000, CRC(171c7962) SHA1(04c892c4b3d7c74750576521fa081f07d8ca8557), ROM_BIOS(9) )
 	ROM_SYSTEM_BIOS( 9, "tt34", "TurboTrans v3.4" )
-	ROMX_LOAD( "ttd34.uab5", 0x0000, 0x8000, CRC(518d34a1) SHA1(4d6ffdce6ab122e9627b0a839861687bcd4e03ec), ROM_BIOS(9) )
+	ROMX_LOAD( "ttd34.uab5", 0x0000, 0x8000, CRC(518d34a1) SHA1(4d6ffdce6ab122e9627b0a839861687bcd4e03ec), ROM_BIOS(10) )
 	ROM_SYSTEM_BIOS( 10, "digidos", "DigiDOS" )
-	ROMX_LOAD( "digidos.uab5", 0x0000, 0x2000, CRC(b3f05ea3) SHA1(99d3d848344c68410b686cda812f3788b41fead3), ROM_BIOS(10) )
+	ROMX_LOAD( "digidos.uab5", 0x0000, 0x2000, CRC(b3f05ea3) SHA1(99d3d848344c68410b686cda812f3788b41fead3), ROM_BIOS(11) )
 ROM_END
 
 
@@ -248,9 +248,9 @@ ROM_START( c1541c )
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "251968-01.ua2", 0x0000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765), ROM_BIOS(0) )
+	ROMX_LOAD( "251968-01.ua2", 0x0000, 0x4000, CRC(1b3ca08d) SHA1(8e893932de8cce244117fcea4c46b7c39c6a7765), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-	ROMX_LOAD( "251968-02.ua2", 0x0000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704), ROM_BIOS(1) )
+	ROMX_LOAD( "251968-02.ua2", 0x0000, 0x4000, CRC(2d862d20) SHA1(38a7a489c7bbc8661cf63476bf1eb07b38b1c704), ROM_BIOS(2) )
 ROM_END
 
 
@@ -274,9 +274,9 @@ ROM_START( c1541ii )
 
 	ROM_DEFAULT_BIOS("r1")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "355640-01.u4", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0), ROM_BIOS(0) )
+	ROMX_LOAD( "355640-01.u4", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos 1541-ii.u4", 0x0000, 0x4000, CRC(dd409902) SHA1(b1a5b826304d3df2a27d7163c6a81a532e040d32), ROM_BIOS(1) )
+	ROMX_LOAD( "jiffydos 1541-ii.u4", 0x0000, 0x4000, CRC(dd409902) SHA1(b1a5b826304d3df2a27d7163c6a81a532e040d32), ROM_BIOS(2) )
 ROM_END
 
 
@@ -300,11 +300,11 @@ ROM_START( sx1541 )
 
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r5", "Revision 5" )
-	ROMX_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b), ROM_BIOS(0) )
+	ROMX_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos sx1541",   0x0000, 0x4000, CRC(783575f6) SHA1(36ccb9ff60328c4460b68522443ecdb7f002a234), ROM_BIOS(1) )
+	ROMX_LOAD( "jiffydos sx1541",   0x0000, 0x4000, CRC(783575f6) SHA1(36ccb9ff60328c4460b68522443ecdb7f002a234), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "flash", "1541 FLASH!" )
-	ROMX_LOAD( "1541 flash.uab5",   0x2000, 0x2000, CRC(22f7757e) SHA1(86a1e43d3d22b35677064cca400a6bd06767a3dc), ROM_BIOS(2) )
+	ROMX_LOAD( "1541 flash.uab5",   0x2000, 0x2000, CRC(22f7757e) SHA1(86a1e43d3d22b35677064cca400a6bd06767a3dc), ROM_BIOS(3) )
 ROM_END
 
 
@@ -346,13 +346,13 @@ ROM_START( fsd2 )
 	ROM_REGION( 0x4000, M6502_TAG, 0 ) // data lines D3 and D4 are swapped
 	ROM_DEFAULT_BIOS("rb")
 	ROM_SYSTEM_BIOS( 0, "ra", "Revision A" )
-	ROMX_LOAD( "fsd2a.u3", 0x0000, 0x4000, CRC(edf18265) SHA1(47a7c4bdcc20ecc5e59d694b151f493229becaea), ROM_BIOS(0) )
+	ROMX_LOAD( "fsd2a.u3", 0x0000, 0x4000, CRC(edf18265) SHA1(47a7c4bdcc20ecc5e59d694b151f493229becaea), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "rb", "Revision B" )
-	ROMX_LOAD( "fsd2b.u3", 0x0000, 0x4000, CRC(b39e4600) SHA1(991132fcc6e70e9a428062ae76055a150f2f7ac6), ROM_BIOS(1) )
+	ROMX_LOAD( "fsd2b.u3", 0x0000, 0x4000, CRC(b39e4600) SHA1(991132fcc6e70e9a428062ae76055a150f2f7ac6), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v5.0" )
-	ROMX_LOAD( "jiffydos v5.0.u3", 0x0000, 0x4000, CRC(46c3302c) SHA1(e3623658cb7af30c9d3bce2ba3b6ad5ee89ac1b8), ROM_BIOS(2) )
+	ROMX_LOAD( "jiffydos v5.0.u3", 0x0000, 0x4000, CRC(46c3302c) SHA1(e3623658cb7af30c9d3bce2ba3b6ad5ee89ac1b8), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "rexdos", "REX-DOS" )
-	ROMX_LOAD( "rdos.bin", 0x0000, 0x4000, CRC(8ad6dba1) SHA1(f279d327d5e16ea1b62fb18514fb679d0b442941), ROM_BIOS(3) )
+	ROMX_LOAD( "rdos.bin", 0x0000, 0x4000, CRC(8ad6dba1) SHA1(f279d327d5e16ea1b62fb18514fb679d0b442941), ROM_BIOS(4) )
 ROM_END
 
 
@@ -544,7 +544,7 @@ void c1541_device_base::c1541pd_mem(address_map &map)
 
 void c1541_prologic_dos_classic_device::c1541pdc_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(c1541_prologic_dos_classic_device::read), FUNC(c1541_prologic_dos_classic_device::write));
+	map(0x0000, 0xffff).rw(this, FUNC(c1541_prologic_dos_classic_device::read), FUNC(c1541_prologic_dos_classic_device::write));
 /*  AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("share1")
     AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
     AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
@@ -726,7 +726,7 @@ WRITE8_MEMBER( c1541_device_base::via1_pb_w )
 	m_ga->stp_w(data & 0x03);
 
 	// activity LED
-	m_leds[LED_ACT] = BIT(data, 3);
+	m_led[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -747,6 +747,16 @@ WRITE_LINE_MEMBER( c1541_device_base::byte_w )
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
 
 	m_via1->write_ca1(state);
+}
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( c1540_floppies )
+//-------------------------------------------------
+
+static void c1540_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", ALPS_3255190X);
 }
 
 
@@ -797,7 +807,7 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 {
 	m_parallel_data = data;
 
-	m_cent_data_out->write(data);
+	m_cent_data_out->write(space, 0, data);
 }
 
 
@@ -805,79 +815,72 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_device::pia_pb_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void c1541_device_base::device_add_mconfig(machine_config &config)
-{
-	M6502(config, m_maincpu, XTAL(16'000'000)/16);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_device_base::c1541_mem);
-	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
+MACHINE_CONFIG_START(c1541_device_base::device_add_mconfig)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
+	MCFG_DEVICE_PROGRAM_MAP(c1541_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-	VIA6522(config, m_via0, XTAL(16'000'000)/16);
-	m_via0->readpa_handler().set(FUNC(c1541_device_base::via0_pa_r));
-	m_via0->readpb_handler().set(FUNC(c1541_device_base::via0_pb_r));
-	m_via0->writepa_handler().set(FUNC(c1541_device_base::via0_pa_w));
-	m_via0->writepb_handler().set(FUNC(c1541_device_base::via0_pb_w));
-	m_via0->cb2_handler().set(FUNC(c1541_device_base::via0_ca2_w));
-	m_via0->irq_handler().set(FUNC(c1541_device_base::via0_irq_w));
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c1541_device_base, via0_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1541_device_base, via0_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c1541_device_base, via0_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1541_device_base, via0_pb_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, c1541_device_base, via0_ca2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1541_device_base, via0_irq_w))
 
-	VIA6522(config, m_via1, XTAL(16'000'000)/16);
-	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
-	m_via1->readpb_handler().set(FUNC(c1541_device_base::via1_pb_r));
-	m_via1->writepa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
-	m_via1->writepb_handler().set(FUNC(c1541_device_base::via1_pb_w));
-	m_via1->ca2_handler().set(C64H156_TAG, FUNC(c64h156_device::soe_w));
-	m_via1->cb2_handler().set(C64H156_TAG, FUNC(c64h156_device::oe_w));
-	m_via1->irq_handler().set(FUNC(c1541_device_base::via1_irq_w));
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c1541_device_base, via1_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c1541_device_base, via1_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, soe_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c1541_device_base, via1_irq_w))
 
-	C64H156(config, m_ga, XTAL(16'000'000));
-	m_ga->atn_callback().set(FUNC(c1541_device_base::atn_w));
-	m_ga->byte_callback().set(FUNC(c1541_device_base::byte_w));
-
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
-	connector.option_add("525ssqd", ALPS_3255190X);
-	connector.set_default_option("525ssqd");
-	connector.set_fixed(true);
-	connector.set_formats(c1541_device_base::floppy_formats);
-}
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
+	MCFG_64H156_ATN_CALLBACK(WRITELINE(*this, c1541_device_base, atn_w))
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c1541_device_base, byte_w))
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1540_floppies, "525ssqd", c1541_device_base::floppy_formats)
+MACHINE_CONFIG_END
 
 
-void c1541c_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(c1541c_device::device_add_mconfig)
 	c1541_device_base::device_add_mconfig(config);
-}
+MACHINE_CONFIG_END
 
 
-void c1541_dolphin_dos_device::device_add_mconfig(machine_config &config)
-{
-	c1541_device_base::device_add_mconfig(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_dolphin_dos_device::c1541dd_mem);
-}
-
-
-void c1541_professional_dos_v1_device::device_add_mconfig(machine_config &config)
-{
-	c1541_device_base::device_add_mconfig(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_professional_dos_v1_device::c1541pd_mem);
-}
-
-
-void c1541_prologic_dos_classic_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(c1541_dolphin_dos_device::device_add_mconfig)
 	c1541_device_base::device_add_mconfig(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_prologic_dos_classic_device::c1541pdc_mem);
+	MCFG_DEVICE_MODIFY(M6502_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(c1541dd_mem)
+MACHINE_CONFIG_END
 
-	PIA6821(config, m_pia, 0);
-	m_pia->readpb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_r));
-	m_pia->writepa_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pa_w));
-	m_pia->writepb_handler().set(FUNC(c1541_prologic_dos_classic_device::pia_pb_w));
-	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
 
-	centronics_device &centronics(CENTRONICS(config, CENTRONICS_TAG, centronics_devices, "printer"));
-	centronics.ack_handler().set(MC6821_TAG, FUNC(pia6821_device::ca1_w));
+MACHINE_CONFIG_START(c1541_professional_dos_v1_device::device_add_mconfig)
+	c1541_device_base::device_add_mconfig(config);
 
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out", 0));
-	centronics.set_output_latch(cent_data_out);
-}
+	MCFG_DEVICE_MODIFY(M6502_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(c1541pd_mem)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(c1541_prologic_dos_classic_device::device_add_mconfig)
+	c1541_device_base::device_add_mconfig(config);
+
+	MCFG_DEVICE_MODIFY(M6502_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(c1541pdc_mem)
+
+	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
+	MCFG_PIA_READPB_HANDLER(READ8(*this, c1541_prologic_dos_classic_device, pia_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, c1541_prologic_dos_classic_device, pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, c1541_prologic_dos_classic_device, pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+
+	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(MC6821_TAG, pia6821_device, ca1_w))
+	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -940,7 +943,7 @@ c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type 
 	m_via1(*this, M6522_1_TAG),
 	m_ga(*this, C64H156_TAG),
 	m_address(*this, "ADDRESS"),
-	m_leds(*this, "led%u", 0U),
+	m_led(*this, "led%u", 0U),
 	m_data_out(1),
 	m_via0_irq(CLEAR_LINE),
 	m_via1_irq(CLEAR_LINE)
@@ -1055,7 +1058,7 @@ indus_gt_device::indus_gt_device(const machine_config &mconfig, const char *tag,
 
 void c1541_device_base::device_start()
 {
-	m_leds.resolve();
+	m_led.resolve();
 
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);

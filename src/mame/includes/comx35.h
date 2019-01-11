@@ -81,13 +81,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( comx );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( comx35_comx );
 	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
 	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
 	CDP1869_PCB_READ_MEMBER(comx35_pcb_r);
 
-	void base(machine_config &config, const XTAL clock);
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 	void comx35_pal_video(machine_config &config);

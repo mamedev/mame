@@ -7,10 +7,10 @@
     Controls execution of the core MAME system.
 ***************************************************************************/
 
-#ifndef MAME_FRONTEND_MAME_MAME_H
-#define MAME_FRONTEND_MAME_MAME_H
-
 #pragma once
+
+#ifndef __MAME_H__
+#define __MAME_H__
 
 class plugin_options;
 class osd_interface;
@@ -87,4 +87,4 @@ private:
 extern const char build_version[];
 extern const char bare_build_version[];
 
-#endif // MAME_FRONTEND_MAME_MAME_H
+#endif  /* __MAME_H__ */

@@ -24,7 +24,6 @@ ToDo:
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -42,13 +41,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void gts3a(machine_config &config);
-
 	void init_gts3a();
-
-	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
-
-private:
 	DECLARE_WRITE8_MEMBER(segbank_w);
 	DECLARE_READ8_MEMBER(u4a_r);
 	DECLARE_READ8_MEMBER(u4b_r);
@@ -56,12 +49,14 @@ private:
 	DECLARE_READ8_MEMBER(dmd_r);
 	DECLARE_WRITE8_MEMBER(dmd_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void palette_init(palette_device &palette);
+	DECLARE_PALETTE_INIT(gts3a);
 	required_device<palette_device> m_palette;
+	void gts3a(machine_config &config);
 	void gts3a_dmd_map(address_map &map);
 	void gts3a_map(address_map &map);
-
+private:
 	bool m_dispclk;
 	bool m_lampclk;
 	uint8_t m_digit;
@@ -85,7 +80,7 @@ void gts3a_state::gts3a_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x200f).rw(m_u4, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x2010, 0x201f).rw(m_u5, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x2020, 0x2023).mirror(0x0c).w(FUNC(gts3a_state::segbank_w));
+	map(0x2020, 0x2023).mirror(0x0c).w(this, FUNC(gts3a_state::segbank_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -96,8 +91,8 @@ void gts3a_state::gts3a_dmd_map(address_map &map)
 	map(0x2001, 0x2001).r("crtc", FUNC(mc6845_device::register_r));
 	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x3000, 0x3000).r(FUNC(gts3a_state::dmd_r));
-	map(0x3800, 0x3800).w(FUNC(gts3a_state::dmd_w));
+	map(0x3000, 0x3000).r(this, FUNC(gts3a_state::dmd_r));
+	map(0x3800, 0x3800).w(this, FUNC(gts3a_state::dmd_w));
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom().region("dmdcpu", 0x78000);
 }
@@ -313,7 +308,7 @@ WRITE8_MEMBER( gts3a_state::dmd_w )
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-void gts3a_state::palette_init(palette_device &palette)
+PALETTE_INIT_MEMBER( gts3a_state, gts3a )
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(1, rgb_t(0xf7, 0x00, 0x00));
@@ -343,52 +338,50 @@ MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 	}
 }
 
-void gts3a_state::gts3a(machine_config &config)
-{
-	M65C02(config, m_maincpu, XTAL(4'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gts3a_state::gts3a_map);
+MACHINE_CONFIG_START(gts3a_state::gts3a)
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(gts3a_map)
+	MCFG_NVRAM_ADD_0FILL("nvram") // 6116LP + DS1210
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 6116LP + DS1210
-
-	M65C02(config, m_dmdcpu, XTAL(3'579'545) / 2);
-	m_dmdcpu->set_addrmap(AS_PROGRAM, &gts3a_state::gts3a_dmd_map);
+	MCFG_DEVICE_ADD("dmdcpu", M65C02, XTAL(3'579'545) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(gts3a_dmd_map)
 
 	/* Video */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	screen.set_size(128, 32);
-	screen.set_visarea(0, 127, 0, 31);
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	MCFG_SCREEN_SIZE(128, 32)
+	MCFG_SCREEN_VISIBLE_AREA(0, 127, 0, 31)
+	MCFG_PALETTE_ADD( "palette", 2 )
+	MCFG_PALETTE_INIT_OWNER(gts3a_state, gts3a)
 
-	PALETTE(config, m_palette, FUNC(gts3a_state::palette_init), 2);
-
-	mc6845_device &crtc(MC6845(config, "crtc", XTAL(3'579'545) / 2));
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(gts3a_state::crtc_update_row), this);
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(3'579'545) / 2)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(gts3a_state, crtc_update_row)
 
 	/* Sound */
 	genpin_audio(config);
 
-	VIA6522(config, m_u4, XTAL(4'000'000) / 2);
-	m_u4->irq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
-	m_u4->readpa_handler().set(FUNC(gts3a_state::u4a_r));
-	m_u4->readpb_handler().set(FUNC(gts3a_state::u4b_r));
-	m_u4->writepb_handler().set(FUNC(gts3a_state::u4b_w));
-	//m_u4->ca2_handler().set(FUNC(gts3a_state::u4ca2_w));
-	m_u4->cb2_handler().set(FUNC(gts3a_state::nmi_w));
+	MCFG_DEVICE_ADD("u4", VIA6522, XTAL(4'000'000) / 2)
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, gts3a_state, u4a_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, gts3a_state, u4b_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, gts3a_state, u4b_w))
+	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gts3a_state, u4ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, gts3a_state, nmi_w))
 
-	VIA6522(config, m_u5, XTAL(4'000'000) / 2);
-	m_u5->irq_handler().set_inputline(m_maincpu, M65C02_IRQ_LINE);
-	//m_u5->readpa_handler().set(FUNC(gts3a_state::u5a_r));
-	//m_u5->readpb_handler().set(FUNC(gts3a_state::u5b_r));
-	//m_u5->writepb_Handler().set(FUNC(gts3a_state::u5b_w));
-	//m_u5->ca2_Handler().set(FUNC(gts3a_state::u5ca2_w));
-	//m_u5->cb1_Handler().set(FUNC(gts3a_state::u5cb1_w));
-	//m_u5->cb2_Handler().set(FUNC(gts3a_state::u5cb2_w));
-}
+	MCFG_DEVICE_ADD("u5", VIA6522, XTAL(4'000'000) / 2)
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
+	//MCFG_VIA6522_READPA_HANDLER(READ8(*this, gts3a_state, u5a_r))
+	//MCFG_VIA6522_READPB_HANDLER(READ8(*this, gts3a_state, u5b_r))
+	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, gts3a_state, u5b_w))
+	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gts3a_state, u5ca2_w))
+	//MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, gts3a_state, u5cb1_w))
+	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, gts3a_state, u5cb2_w))
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
 / Barb Wire (#748)

@@ -7,10 +7,10 @@ DEFINE_DEVICE_TYPE(LPC_PIT, lpc_pit_device, "lpc_pit", "LPC PIT")
 
 void lpc_pit_device::map(address_map &map)
 {
-	map(0x40, 0x42).rw(FUNC(lpc_pit_device::status_r), FUNC(lpc_pit_device::access_w));
-	map(0x43, 0x43).w(FUNC(lpc_pit_device::control_w));
-	map(0x50, 0x52).rw(FUNC(lpc_pit_device::status_r), FUNC(lpc_pit_device::access_w));
-	map(0x53, 0x53).w(FUNC(lpc_pit_device::control_w));
+	map(0x40, 0x42).rw(this, FUNC(lpc_pit_device::status_r), FUNC(lpc_pit_device::access_w));
+	map(0x43, 0x43).w(this, FUNC(lpc_pit_device::control_w));
+	map(0x50, 0x52).rw(this, FUNC(lpc_pit_device::status_r), FUNC(lpc_pit_device::access_w));
+	map(0x53, 0x53).w(this, FUNC(lpc_pit_device::control_w));
 }
 
 lpc_pit_device::lpc_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

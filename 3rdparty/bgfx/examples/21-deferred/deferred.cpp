@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -204,16 +204,11 @@ public:
 
 		m_width  = _width;
 		m_height = _height;
-		m_debug  = BGFX_DEBUG_TEXT;
+		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable m_debug text.
 		bgfx::setDebug(m_debug);
@@ -392,7 +387,7 @@ public:
 				// When multiple render targets (MRT) is not supported by GPU,
 				// implement alternative code path that doesn't use MRT.
 				bool blink = uint32_t(time*3.0f)&1;
-				bgfx::dbgTextPrintf(0, 0, blink ? 0x4f : 0x04, " MRT not supported by GPU. ");
+				bgfx::dbgTextPrintf(0, 0, blink ? 0x1f : 0x01, " MRT not supported by GPU. ");
 
 				// Set view 0 default viewport.
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
@@ -418,17 +413,17 @@ public:
 						bgfx::destroy(m_gbuffer);
 					}
 
-					const uint64_t tsFlags = 0
+					const uint32_t samplerFlags = 0
 						| BGFX_TEXTURE_RT
-						| BGFX_SAMPLER_MIN_POINT
-						| BGFX_SAMPLER_MAG_POINT
-						| BGFX_SAMPLER_MIP_POINT
-						| BGFX_SAMPLER_U_CLAMP
-						| BGFX_SAMPLER_V_CLAMP
+						| BGFX_TEXTURE_MIN_POINT
+						| BGFX_TEXTURE_MAG_POINT
+						| BGFX_TEXTURE_MIP_POINT
+						| BGFX_TEXTURE_U_CLAMP
+						| BGFX_TEXTURE_V_CLAMP
 						;
-					m_gbufferTex[0] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::BGRA8, tsFlags);
-					m_gbufferTex[1] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::BGRA8, tsFlags);
-					m_gbufferTex[2] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::D24S8, tsFlags);
+					m_gbufferTex[0] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+					m_gbufferTex[1] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+					m_gbufferTex[2] = bgfx::createTexture2D(uint16_t(m_width), uint16_t(m_height), false, 1, bgfx::TextureFormat::D24,   samplerFlags);
 					m_gbuffer = bgfx::createFrameBuffer(BX_COUNTOF(m_gbufferTex), m_gbufferTex, true);
 
 					if (bgfx::isValid(m_lightBuffer) )
@@ -436,20 +431,17 @@ public:
 						bgfx::destroy(m_lightBuffer);
 					}
 
-					m_lightBuffer = bgfx::createFrameBuffer(uint16_t(m_width), uint16_t(m_height), bgfx::TextureFormat::BGRA8, tsFlags);
+					m_lightBuffer = bgfx::createFrameBuffer(uint16_t(m_width), uint16_t(m_height), bgfx::TextureFormat::BGRA8, samplerFlags);
 				}
 
 				ImGui::SetNextWindowPos(
 					  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
-					, ImGuiCond_FirstUseEver
-					);
-				ImGui::SetNextWindowSize(
-					  ImVec2(m_width / 5.0f, m_height / 3.0f)
-					, ImGuiCond_FirstUseEver
+					, ImGuiSetCond_FirstUseEver
 					);
 				ImGui::Begin("Settings"
 					, NULL
-					, 0
+					, ImVec2(m_width / 5.0f, m_height / 3.0f)
+					, ImGuiWindowFlags_AlwaysAutoResize
 					);
 
 				ImGui::SliderInt("Num lights", &m_numLights, 1, 2048);
@@ -536,9 +528,9 @@ public:
 
 						// Set render states.
 						bgfx::setState(0
-								| BGFX_STATE_WRITE_RGB
-								| BGFX_STATE_WRITE_A
-								| BGFX_STATE_WRITE_Z
+								| BGFX_STATE_RGB_WRITE
+								| BGFX_STATE_ALPHA_WRITE
+								| BGFX_STATE_DEPTH_WRITE
 								| BGFX_STATE_DEPTH_TEST_LESS
 								| BGFX_STATE_MSAA
 								);
@@ -553,25 +545,25 @@ public:
 				{
 					Sphere lightPosRadius;
 
-					float lightTime = time * m_lightAnimationSpeed * (bx::sin(light/float(m_numLights) * bx::kPiHalf ) * 0.5f + 0.5f);
-					lightPosRadius.m_center.x = bx::sin( ( (lightTime + light*0.47f) + bx::kPiHalf*1.37f ) )*offset;
-					lightPosRadius.m_center.y = bx::cos( ( (lightTime + light*0.69f) + bx::kPiHalf*1.49f ) )*offset;
-					lightPosRadius.m_center.z = bx::sin( ( (lightTime + light*0.37f) + bx::kPiHalf*1.57f ) )*2.0f;
-					lightPosRadius.m_radius   = 2.0f;
+					float lightTime = time * m_lightAnimationSpeed * (bx::fsin(light/float(m_numLights) * bx::kPiHalf ) * 0.5f + 0.5f);
+					lightPosRadius.m_center[0] = bx::fsin( ( (lightTime + light*0.47f) + bx::kPiHalf*1.37f ) )*offset;
+					lightPosRadius.m_center[1] = bx::fcos( ( (lightTime + light*0.69f) + bx::kPiHalf*1.49f ) )*offset;
+					lightPosRadius.m_center[2] = bx::fsin( ( (lightTime + light*0.37f) + bx::kPiHalf*1.57f ) )*2.0f;
+					lightPosRadius.m_radius = 2.0f;
 
 					Aabb aabb;
 					toAabb(aabb, lightPosRadius);
 
 					float box[8][3] =
 					{
-						{ aabb.m_min.x, aabb.m_min.y, aabb.m_min.z },
-						{ aabb.m_min.x, aabb.m_min.y, aabb.m_max.z },
-						{ aabb.m_min.x, aabb.m_max.y, aabb.m_min.z },
-						{ aabb.m_min.x, aabb.m_max.y, aabb.m_max.z },
-						{ aabb.m_max.x, aabb.m_min.y, aabb.m_min.z },
-						{ aabb.m_max.x, aabb.m_min.y, aabb.m_max.z },
-						{ aabb.m_max.x, aabb.m_max.y, aabb.m_min.z },
-						{ aabb.m_max.x, aabb.m_max.y, aabb.m_max.z },
+						{ aabb.m_min[0], aabb.m_min[1], aabb.m_min[2] },
+						{ aabb.m_min[0], aabb.m_min[1], aabb.m_max[2] },
+						{ aabb.m_min[0], aabb.m_max[1], aabb.m_min[2] },
+						{ aabb.m_min[0], aabb.m_max[1], aabb.m_max[2] },
+						{ aabb.m_max[0], aabb.m_min[1], aabb.m_min[2] },
+						{ aabb.m_max[0], aabb.m_min[1], aabb.m_max[2] },
+						{ aabb.m_max[0], aabb.m_max[1], aabb.m_min[2] },
+						{ aabb.m_max[0], aabb.m_max[1], aabb.m_max[2] },
 					};
 
 					float xyz[3];
@@ -585,20 +577,20 @@ public:
 					for (uint32_t ii = 1; ii < 8; ++ii)
 					{
 						bx::vec3MulMtxH(xyz, box[ii], vp);
-						minx = bx::min(minx, xyz[0]);
-						miny = bx::min(miny, xyz[1]);
-						maxx = bx::max(maxx, xyz[0]);
-						maxy = bx::max(maxy, xyz[1]);
-						maxz = bx::max(maxz, xyz[2]);
+						minx = bx::fmin(minx, xyz[0]);
+						miny = bx::fmin(miny, xyz[1]);
+						maxx = bx::fmax(maxx, xyz[0]);
+						maxy = bx::fmax(maxy, xyz[1]);
+						maxz = bx::fmax(maxz, xyz[2]);
 					}
 
 					// Cull light if it's fully behind camera.
 					if (maxz >= 0.0f)
 					{
-						float x0 = bx::clamp( (minx * 0.5f + 0.5f) * m_width,  0.0f, (float)m_width);
-						float y0 = bx::clamp( (miny * 0.5f + 0.5f) * m_height, 0.0f, (float)m_height);
-						float x1 = bx::clamp( (maxx * 0.5f + 0.5f) * m_width,  0.0f, (float)m_width);
-						float y1 = bx::clamp( (maxy * 0.5f + 0.5f) * m_height, 0.0f, (float)m_height);
+						float x0 = bx::fclamp( (minx * 0.5f + 0.5f) * m_width,  0.0f, (float)m_width);
+						float y0 = bx::fclamp( (miny * 0.5f + 0.5f) * m_height, 0.0f, (float)m_height);
+						float x1 = bx::fclamp( (maxx * 0.5f + 0.5f) * m_width,  0.0f, (float)m_width);
+						float y1 = bx::fclamp( (maxy * 0.5f + 0.5f) * m_height, 0.0f, (float)m_height);
 
 						if (m_showScissorRects)
 						{
@@ -645,7 +637,7 @@ public:
 								bgfx::setVertexBuffer(0, &tvb);
 								bgfx::setIndexBuffer(&tib);
 								bgfx::setState(0
-										| BGFX_STATE_WRITE_RGB
+										| BGFX_STATE_RGB_WRITE
 										| BGFX_STATE_PT_LINES
 										| BGFX_STATE_BLEND_ALPHA
 										);
@@ -671,8 +663,8 @@ public:
 						bgfx::setTexture(0, s_normal, bgfx::getTexture(m_gbuffer, 1) );
 						bgfx::setTexture(1, s_depth,  bgfx::getTexture(m_gbuffer, 2) );
 						bgfx::setState(0
-								| BGFX_STATE_WRITE_RGB
-								| BGFX_STATE_WRITE_A
+								| BGFX_STATE_RGB_WRITE
+								| BGFX_STATE_ALPHA_WRITE
 								| BGFX_STATE_BLEND_ADD
 								);
 						screenSpaceQuad( (float)m_width, (float)m_height, s_texelHalf, m_caps->originBottomLeft);
@@ -684,8 +676,8 @@ public:
 				bgfx::setTexture(0, s_albedo, bgfx::getTexture(m_gbuffer,     0) );
 				bgfx::setTexture(1, s_light,  bgfx::getTexture(m_lightBuffer, 0) );
 				bgfx::setState(0
-						| BGFX_STATE_WRITE_RGB
-						| BGFX_STATE_WRITE_A
+						| BGFX_STATE_RGB_WRITE
+						| BGFX_STATE_ALPHA_WRITE
 						);
 				screenSpaceQuad( (float)m_width, (float)m_height, s_texelHalf, m_caps->originBottomLeft);
 				bgfx::submit(RENDER_PASS_COMBINE_ID, m_combineProgram);
@@ -708,7 +700,7 @@ public:
 						bgfx::setVertexBuffer(0, m_vbh);
 						bgfx::setIndexBuffer(m_ibh, 0, 6);
 						bgfx::setTexture(0, s_texColor, m_gbufferTex[ii]);
-						bgfx::setState(BGFX_STATE_WRITE_RGB);
+						bgfx::setState(BGFX_STATE_RGB_WRITE);
 						bgfx::submit(RENDER_PASS_DEBUG_GBUFFER_ID, m_debugProgram);
 					}
 				}

@@ -83,15 +83,14 @@ Bugs (all of these looks BTANBs):
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "video/snk68_spr.h"
-#include "emupal.h"
 #include "speaker.h"
 
 
 class blackt96_state : public driver_device
 {
 public:
-	blackt96_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_tilemapram(*this, "tilemapram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -99,7 +98,7 @@ public:
 		m_sprites(*this, "sprites"),
 		m_oki(*this, "oki%u", 1U),
 		m_oki1bank(*this, "oki1bank")
-	{ }
+		{ }
 
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER(output_w);
@@ -245,15 +244,15 @@ void blackt96_state::blackt96_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x080001).portr("P1_P2");
-	map(0x080000, 0x080000).w(FUNC(blackt96_state::sound_cmd_w)); // soundlatch
+	map(0x080000, 0x080000).w(this, FUNC(blackt96_state::sound_cmd_w)); // soundlatch
 	map(0x0c0000, 0x0c0001).portr("IN1");  // COIN INPUT
-	map(0x0c0001, 0x0c0001).w(FUNC(blackt96_state::output_w));
-	map(0x0e0000, 0x0e0001).r(FUNC(blackt96_state::random_r)); // unk, from sound? - called in tandem with result discarded, watchdog?
-	map(0x0e8000, 0x0e8001).r(FUNC(blackt96_state::random_r)); // unk, from sound? /
+	map(0x0c0001, 0x0c0001).w(this, FUNC(blackt96_state::output_w));
+	map(0x0e0000, 0x0e0001).r(this, FUNC(blackt96_state::random_r)); // unk, from sound? - called in tandem with result discarded, watchdog?
+	map(0x0e8000, 0x0e8001).r(this, FUNC(blackt96_state::random_r)); // unk, from sound? /
 	map(0x0f0000, 0x0f0001).portr("DSW1");
 	map(0x0f0008, 0x0f0009).portr("DSW2").nopw(); // service mode, left-over?
 
-	map(0x100000, 0x100fff).ram().w(FUNC(blackt96_state::tx_vram_w)).share("tilemapram"); // text tilemap
+	map(0x100000, 0x100fff).ram().w(this, FUNC(blackt96_state::tx_vram_w)).share("tilemapram"); // text tilemap
 	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
@@ -482,12 +481,12 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_DEVICE_PROGRAM_MAP(blackt96_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
 
-	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8000000)); /* ? */
-	audiocpu.write_a().set(FUNC(blackt96_state::blackt96_soundio_port_a_w));
-	audiocpu.read_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_r));
-	audiocpu.write_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_w));
-	audiocpu.read_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_r));
-	audiocpu.write_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_w));
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 8000000) /* ? */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_a_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, blackt96_state, blackt96_soundio_port_b_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_b_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, blackt96_state, blackt96_soundio_port_c_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_c_w))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blackt96)
 
@@ -498,14 +497,15 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 2*8, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blackt96_state, screen_update_blackt96)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
-	SNK68_SPR(config, m_sprites, 0);
-	m_sprites->set_gfxdecode_tag(m_gfxdecode);
-	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback), this);
-	m_sprites->set_no_partial();
+	MCFG_DEVICE_ADD("sprites", SNK68_SPR, 0)
+	MCFG_SNK68_SPR_GFXDECODE("gfxdecode")
+	MCFG_SNK68_SPR_SET_TILE_INDIRECT( blackt96_state, tile_callback )
+	MCFG_SNK68_SPR_NO_PARTIAL
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -21,12 +20,10 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void segapm(machine_config &config);
-
-private:
 	virtual void video_start() override;
 	uint32_t screen_update_segapm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void segapm(machine_config &config);
 	void segapm_map(address_map &map);
 };
 
@@ -73,7 +70,8 @@ MACHINE_CONFIG_START(segapm_state::segapm)
 	MCFG_SCREEN_UPDATE_DRIVER(segapm_state, screen_update_segapm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 MACHINE_CONFIG_END
 
 

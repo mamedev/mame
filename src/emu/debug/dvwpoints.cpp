@@ -79,7 +79,7 @@ static int cTypeAscending(const void* a, const void* b)
 {
 	const device_debug::watchpoint* left = *(device_debug::watchpoint**)a;
 	const device_debug::watchpoint* right = *(device_debug::watchpoint**)b;
-	return int(left->type()) - int(right->type());
+	return left->type() - right->type();
 }
 
 static int cTypeDescending(const void* a, const void* b)
@@ -229,8 +229,8 @@ void debug_view_watchpoints::gather_watchpoints()
 		device_debug &debugInterface = *source.device()->debug();
 		for (int spacenum = 0; spacenum < debugInterface.watchpoint_space_count(); ++spacenum)
 		{
-			for (const auto &wp : debugInterface.watchpoint_vector(spacenum))
-				m_buffer.push_back(wp.get());
+			for (device_debug::watchpoint *wp = debugInterface.watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
+				m_buffer.push_back(wp);
 		}
 	}
 
@@ -330,7 +330,7 @@ void debug_view_watchpoints::view_update()
 			linebuf.put('-');
 			util::stream_format(linebuf, "%0*X", wp->space().addrchars(), wp->address() + wp->length() - 1);
 			pad_ostream_to_length(linebuf, tableBreaks[4]);
-			linebuf << types[int(wp->type())];
+			linebuf << types[wp->type() & 3];
 			pad_ostream_to_length(linebuf, tableBreaks[5]);
 			if (strcmp(wp->condition(), "1"))
 				linebuf << wp->condition();

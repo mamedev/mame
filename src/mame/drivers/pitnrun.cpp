@@ -69,6 +69,7 @@ K1000233A
 #include "emu.h"
 #include "includes/pitnrun.h"
 
+#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 
 #include "machine/74259.h"
@@ -108,20 +109,20 @@ void pitnrun_state::pitnrun_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8fff).ram().w(FUNC(pitnrun_state::videoram_w)).share("videoram");
-	map(0x9000, 0x9fff).ram().w(FUNC(pitnrun_state::videoram2_w)).share("videoram2");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(pitnrun_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9fff).ram().w(this, FUNC(pitnrun_state::videoram2_w)).share("videoram2");
 	map(0xa000, 0xa0ff).ram().share("spriteram");
 	map(0xa800, 0xa800).portr("SYSTEM");
 	map(0xa800, 0xa807).w("noiselatch", FUNC(ls259_device::write_d0)); /* Analog Sound */
 	map(0xb000, 0xb000).portr("DSW");
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).portr("INPUTS").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc800, 0xc801).w(FUNC(pitnrun_state::scroll_w));
-	map(0xc802, 0xc802).w(FUNC(pitnrun_state::scroll_y_w));
+	map(0xc800, 0xc801).w(this, FUNC(pitnrun_state::scroll_w));
+	map(0xc802, 0xc802).w(this, FUNC(pitnrun_state::scroll_y_w));
 	//AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
-	map(0xc805, 0xc805).w(FUNC(pitnrun_state::h_heed_w));
-	map(0xc806, 0xc806).w(FUNC(pitnrun_state::v_heed_w));
-	map(0xc807, 0xc807).w(FUNC(pitnrun_state::ha_w));
+	map(0xc805, 0xc805).w(this, FUNC(pitnrun_state::h_heed_w));
+	map(0xc806, 0xc806).w(this, FUNC(pitnrun_state::v_heed_w));
+	map(0xc807, 0xc807).w(this, FUNC(pitnrun_state::ha_w));
 	//AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
 	//AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
 	map(0xf000, 0xf000).r("watchdog", FUNC(watchdog_timer_device::reset_r));
@@ -130,9 +131,9 @@ void pitnrun_state::pitnrun_map(address_map &map)
 void pitnrun_state::pitnrun_map_mcu(address_map &map)
 {
 	pitnrun_map(map);
-	map(0xc804, 0xc804).w(FUNC(pitnrun_state::mcu_data_w));
-	map(0xd000, 0xd000).r(FUNC(pitnrun_state::mcu_data_r));
-	map(0xd800, 0xd800).r(FUNC(pitnrun_state::mcu_status_r));
+	map(0xc804, 0xc804).w(this, FUNC(pitnrun_state::mcu_data_w));
+	map(0xd000, 0xd000).r(this, FUNC(pitnrun_state::mcu_data_r));
+	map(0xd800, 0xd800).r(this, FUNC(pitnrun_state::mcu_status_r));
 }
 
 void pitnrun_state::pitnrun_sound_map(address_map &map)
@@ -277,72 +278,71 @@ static GFXDECODE_START( gfx_pitnrun )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 4 )
 GFXDECODE_END
 
-void pitnrun_state::pitnrun(machine_config &config)
-{
-	Z80(config, m_maincpu, XTAL(18'432'000)/6); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pitnrun_state::pitnrun_map);
-	m_maincpu->set_vblank_int("screen", FUNC(pitnrun_state::nmi_source));
+MACHINE_CONFIG_START(pitnrun_state::pitnrun)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(18'432'000)/6)       /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
 
-	ls259_device &mainlatch(LS259(config, "mainlatch")); // 7B (mislabeled LS156 on schematic)
-	mainlatch.q_out_cb<0>().set(FUNC(pitnrun_state::nmi_enable_w)); // NMION
-	mainlatch.q_out_cb<1>().set(FUNC(pitnrun_state::color_select_w));
-	mainlatch.q_out_cb<4>().set_nop(); // COLOR SEL 2 - not used ?
-	mainlatch.q_out_cb<5>().set(FUNC(pitnrun_state::char_bank_select_w));
-	mainlatch.q_out_cb<6>().set(FUNC(pitnrun_state::hflip_w)); // HFLIP
-	mainlatch.q_out_cb<7>().set(FUNC(pitnrun_state::vflip_w)); // VFLIP
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 7B (mislabeled LS156 on schematic)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pitnrun_state, nmi_enable_w)) // NMION
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pitnrun_state, color_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // COLOR SEL 2 - not used ?
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pitnrun_state, char_bank_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, pitnrun_state, hflip_w)) // HFLIP
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, pitnrun_state, vflip_w)) // VFLIP
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(5'000'000)/2)); /* verified on pcb */
-	audiocpu.set_addrmap(AS_PROGRAM, &pitnrun_state::pitnrun_sound_map);
-	audiocpu.set_addrmap(AS_IO, &pitnrun_state::pitnrun_sound_io_map);
-	audiocpu.set_vblank_int("screen", FUNC(pitnrun_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000)/2)          /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_sound_map)
+	MCFG_DEVICE_IO_MAP(pitnrun_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(pitnrun_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pitnrun_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pitnrun);
-	PALETTE(config, m_palette, FUNC(pitnrun_state::pitnrun_palette), 32 * 3);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pitnrun)
+	MCFG_PALETTE_ADD("palette", 32*3)
+	MCFG_PALETTE_INIT_OWNER(pitnrun_state, pitnrun)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(18'432'000)/12));    /* verified on pcb */
-	ay1.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
-	ay1.port_b_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
-	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(18'432'000)/12));    /* verified on pcb */
-	ay2.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
-	ay2.port_b_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
-	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	LS259(config, "noiselatch"); // 1J
-}
+	MCFG_DEVICE_ADD("noiselatch", LS259, 0) // 1J
+MACHINE_CONFIG_END
 
-void pitnrun_state::pitnrun_mcu(machine_config &config)
-{
+MACHINE_CONFIG_START(pitnrun_state::pitnrun_mcu)
 	pitnrun(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pitnrun_map_mcu)
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &pitnrun_state::pitnrun_map_mcu);
-
-	M68705P5(config, m_mcu, XTAL(18'432'000)/6); /* verified on pcb */
-	m_mcu->porta_r().set(FUNC(pitnrun_state::m68705_porta_r));
-	m_mcu->portb_r().set(FUNC(pitnrun_state::m68705_portb_r));
-	m_mcu->portc_r().set(FUNC(pitnrun_state::m68705_portc_r));
-	m_mcu->porta_w().set(FUNC(pitnrun_state::m68705_porta_w));
-	m_mcu->portb_w().set(FUNC(pitnrun_state::m68705_portb_w));
-}
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(18'432'000)/6)     /* verified on pcb */
+	MCFG_M68705_PORTA_R_CB(READ8(*this, pitnrun_state, m68705_portA_r))
+	MCFG_M68705_PORTB_R_CB(READ8(*this, pitnrun_state, m68705_portB_r))
+	MCFG_M68705_PORTC_R_CB(READ8(*this, pitnrun_state, m68705_portC_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, pitnrun_state, m68705_portA_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, pitnrun_state, m68705_portB_w))
+MACHINE_CONFIG_END
 
 ROM_START( pitnrun )
 	ROM_REGION( 0x10000, "maincpu", 0 )

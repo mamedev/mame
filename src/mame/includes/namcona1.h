@@ -5,24 +5,19 @@
     Namco NA-1 System hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_NAMCONA1_H
-#define MAME_INCLUDES_NAMCONA1_H
-
-#pragma once
 
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
 #include "machine/msm6242.h"
 #include "sound/c140.h"
-#include "emupal.h"
 #include "screen.h"
 
 
 class namcona1_state : public driver_device
 {
 public:
-	namcona1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	namcona1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -39,27 +34,9 @@ public:
 		m_scroll(*this, "scroll"),
 		m_spriteram(*this, "spriteram"),
 		m_prgrom(*this, "maincpu"),
-		m_maskrom(*this, "maskrom"),
-		m_scan_timer(nullptr)
+		m_maskrom(*this, "maskrom")
 	{ }
 
-	void namcona_base(machine_config &config);
-	void c69(machine_config &config);
-	void namcona1(machine_config &config);
-
-	void init_bkrtmaq();
-	void init_fa();
-	void init_cgangpzl();
-	void init_tinklpit();
-	void init_swcourt();
-	void init_exvania();
-	void init_emeraldj();
-	void init_swcourtb();
-
-	void namcona1_mcu_io_map(address_map &map);
-	void namcona1_mcu_map(address_map &map);
-
-protected:
 	DECLARE_READ16_MEMBER(custom_key_r);
 	DECLARE_WRITE16_MEMBER(custom_key_w);
 	DECLARE_WRITE16_MEMBER(vreg_w);
@@ -86,14 +63,25 @@ protected:
 	DECLARE_READ16_MEMBER(snd_r);
 	DECLARE_WRITE16_MEMBER(snd_w);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void init_bkrtmaq();
+	void init_fa();
+	void init_cgangpzl();
+	void init_tinklpit();
+	void init_swcourt();
+	void init_exvania();
+	void init_emeraldj();
+	void init_swcourtb();
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void scanline_interrupt(int scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	void namcona1(machine_config &config);
 
 	void namcona1_main_map(address_map &map);
-	void namcona1_c140_map(address_map &map);
-
+	void namcona1_mcu_io_map(address_map &map);
+	void namcona1_mcu_map(address_map &map);
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -114,12 +102,9 @@ protected:
 		NAMCO_SWCOURTB
 	};
 
-	enum
-	{
-		TIMER_SCANLINE
-	};
-
 	int m_gametype;
+
+private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -142,7 +127,6 @@ protected:
 	required_region_ptr<uint16_t> m_prgrom;
 	required_region_ptr<uint16_t> m_maskrom;
 
-	emu_timer * m_scan_timer;
 	// this has to be uint8_t to be in the right byte order for the tilemap system
 	std::vector<uint8_t> m_shaperam;
 
@@ -183,40 +167,34 @@ protected:
 class namcona2_state : public namcona1_state
 {
 public:
-	namcona2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		namcona1_state(mconfig, type, tag)
+	namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: namcona1_state(mconfig, type, tag)
 	{}
-
-	void c70(machine_config &config);
-	void namcona2(machine_config &config);
 
 	void init_knckhead();
 	void init_emeralda();
 	void init_numanath();
 	void init_quiztou();
+
+	void namcona2(machine_config &config);
 };
 
 class xday2_namcona2_state : public namcona2_state
 {
 public:
-	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		namcona2_state(mconfig, type, tag),
+	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: namcona2_state(mconfig, type, tag),
 		m_rtc(*this, "rtc")
 	{}
 
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
-	void xday2(machine_config &config);
-
-	void init_xday2();
-
-private:
 	required_device <msm6242_device> m_rtc;
 
 	DECLARE_READ8_MEMBER(printer_r);
 	DECLARE_WRITE8_MEMBER(printer_w);
 
+	void init_xday2();
+	void xday2(machine_config &config);
 	void xday2_main_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_NAMCONA1_H

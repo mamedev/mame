@@ -137,7 +137,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mips/mips1.h"
+#include "machine/atarigen.h"
+#include "cpu/mips/r3000.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/jaguar.h"
 #include "jagblit.h"
@@ -203,8 +204,8 @@ inline void jaguar_state::get_crosshair_xy(int player, int &x, int &y)
 	const rectangle &visarea = m_screen->visible_area();
 
 	/* only 2 lightguns are connected */
-	x = visarea.left() + (((ioport(player ? "FAKE2_X" : "FAKE1_X")->read() & 0xff) * visarea.width()) >> 8);
-	y = visarea.top() + (((ioport(player ? "FAKE2_Y" : "FAKE1_Y")->read() & 0xff) * visarea.height()) >> 8);
+	x = visarea.min_x + (((ioport(player ? "FAKE2_X" : "FAKE1_X")->read() & 0xff) * visarea.width()) >> 8);
+	y = visarea.min_y + (((ioport(player ? "FAKE2_Y" : "FAKE1_Y")->read() & 0xff) * visarea.height()) >> 8);
 }
 
 
@@ -269,9 +270,9 @@ inline bool jaguar_state::adjust_object_timer(int vc)
 void jaguar_state::update_cpu_irq()
 {
 	if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
-		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+		m_maincpu->set_input_line(m_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+		m_maincpu->set_input_line(m_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
 }
 
 
@@ -751,7 +752,7 @@ void jaguar_state::scanline_update(int param)
 	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff))
 	{
 		uint32_t *dest = &m_screen_bitmap.pix32(vc >> 1);
-		int maxx = visarea.right();
+		int maxx = visarea.max_x;
 		int hde = effective_hvalue(m_gpu_regs[HDE]) >> 1;
 		uint16_t x,scanline[760];
 		uint8_t y,pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
@@ -760,7 +761,7 @@ void jaguar_state::scanline_update(int param)
 		if (ENABLE_BORDERS && vc % 2 == 0)
 		{
 			rgb_t border = rgb_t(m_gpu_regs[BORD1] & 0xff, m_gpu_regs[BORD1] >> 8, m_gpu_regs[BORD2] & 0xff);
-			for (x = visarea.left(); x <= visarea.right(); x++)
+			for (x = visarea.min_x; x <= visarea.max_x; x++)
 				dest[x] = border;
 		}
 

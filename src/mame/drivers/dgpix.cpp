@@ -154,29 +154,17 @@ Notes:
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/nvram.h"
-#include "emupal.h"
 #include "screen.h"
 
 
 class dgpix_state : public driver_device
 {
 public:
-	dgpix_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	dgpix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_vblank(*this, "VBLANK")
-	{ }
+		m_vblank(*this, "VBLANK") { }
 
-	void dgpix(machine_config &config);
-
-	void init_elfin();
-	void init_jumpjump();
-	void init_xfiles();
-	void init_xfilesk();
-	void init_kdynastg();
-	void init_fmaniac3();
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_vblank;
 
@@ -195,11 +183,19 @@ private:
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(vblank_r);
 
+	void init_elfin();
+	void init_jumpjump();
+	void init_xfiles();
+	void init_xfilesk();
+	void init_kdynastg();
+	void init_fmaniac3();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void dgpix(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -331,18 +327,18 @@ READ32_MEMBER(dgpix_state::vblank_r)
 void dgpix_state::cpu_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram();
-	map(0x40000000, 0x4003ffff).rw(FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
-	map(0xe0000000, 0xe1ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
-	map(0xe2000000, 0xe3ffffff).rw(FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
+	map(0x40000000, 0x4003ffff).rw(this, FUNC(dgpix_state::vram_r), FUNC(dgpix_state::vram_w));
+	map(0xe0000000, 0xe1ffffff).rw(this, FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
+	map(0xe2000000, 0xe3ffffff).rw(this, FUNC(dgpix_state::flash_r), FUNC(dgpix_state::flash_w));
 	map(0xffc00000, 0xffffffff).rom().region("flash", 0x1c00000).share("nvram");
 }
 
 void dgpix_state::io_map(address_map &map)
 {
 	map(0x0200, 0x0203).nopr(); // used to sync with the protecion PIC? tested bits 0 and 1
-	map(0x0400, 0x0403).rw(FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
+	map(0x0400, 0x0403).rw(this, FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
 	map(0x0a10, 0x0a13).portr("INPUTS");
-	map(0x0200, 0x0203).w(FUNC(dgpix_state::coin_w));
+	map(0x0200, 0x0203).w(this, FUNC(dgpix_state::coin_w));
 	map(0x0c00, 0x0c03).nopw(); // writes only: 1, 0, 1 at startup
 	map(0x0c80, 0x0c83).nopw(); // sound commands / latches
 	map(0x0c80, 0x0c83).nopr(); //read at startup -> cmp 0xFE
@@ -388,7 +384,7 @@ void dgpix_state::video_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(0x40000*2/4);
 
-	save_pointer(NAME(m_vram), 0x40000*2/4);
+	save_pointer(NAME(m_vram.get()), 0x40000*2/4);
 }
 
 uint32_t dgpix_state::screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -441,7 +437,7 @@ MACHINE_CONFIG_START(dgpix_state::dgpix)
     running at 16.9MHz
 */
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -452,7 +448,8 @@ MACHINE_CONFIG_START(dgpix_state::dgpix)
 	MCFG_SCREEN_UPDATE_DRIVER(dgpix_state, screen_update_dgpix)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::BGR_555);
+	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
+
 
 	/* sound hardware */
 	// KS0164 sound chip

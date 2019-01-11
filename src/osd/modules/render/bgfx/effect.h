@@ -15,7 +15,6 @@
 
 #include <vector>
 #include <map>
-#include <string>
 
 class bgfx_uniform;
 

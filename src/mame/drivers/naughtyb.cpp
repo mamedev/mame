@@ -252,12 +252,12 @@ void naughtyb_state::naughtyb_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x8fff).ram().share("videoram2");
-	map(0x9000, 0x97ff).w(FUNC(naughtyb_state::naughtyb_videoreg_w));
+	map(0x9000, 0x97ff).w(this, FUNC(naughtyb_state::naughtyb_videoreg_w));
 	map(0x9800, 0x9fff).ram().share("scrollreg");
 	map(0xa000, 0xa7ff).w(m_naughtyb_custom, FUNC(naughtyb_sound_device::control_a_w));
 	map(0xa800, 0xafff).w(m_naughtyb_custom, FUNC(naughtyb_sound_device::control_b_w));
-	map(0xb000, 0xb7ff).r(FUNC(naughtyb_state::in0_port_r));    // IN0
-	map(0xb800, 0xbfff).r(FUNC(naughtyb_state::dsw0_port_r));   // DSW0
+	map(0xb000, 0xb7ff).r(this, FUNC(naughtyb_state::in0_port_r));    // IN0
+	map(0xb800, 0xbfff).r(this, FUNC(naughtyb_state::dsw0_port_r));   // DSW0
 }
 
 void naughtyb_state::popflame_map(address_map &map)
@@ -266,12 +266,12 @@ void naughtyb_state::popflame_map(address_map &map)
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0x87ff).ram().share("videoram");
 	map(0x8800, 0x8fff).ram().share("videoram2");
-	map(0x9000, 0x97ff).w(FUNC(naughtyb_state::popflame_videoreg_w));
+	map(0x9000, 0x97ff).w(this, FUNC(naughtyb_state::popflame_videoreg_w));
 	map(0x9800, 0x9fff).ram().share("scrollreg");
 	map(0xa000, 0xa7ff).w(m_popflame_custom, FUNC(popflame_sound_device::control_a_w));
 	map(0xa800, 0xafff).w(m_popflame_custom, FUNC(popflame_sound_device::control_b_w));
-	map(0xb000, 0xb7ff).r(FUNC(naughtyb_state::in0_port_r));    // IN0
-	map(0xb800, 0xbfff).r(FUNC(naughtyb_state::dsw0_port_r));   // DSW0
+	map(0xb000, 0xb7ff).r(this, FUNC(naughtyb_state::in0_port_r));    // IN0
+	map(0xb800, 0xbfff).r(this, FUNC(naughtyb_state::dsw0_port_r));   // DSW0
 }
 
 
@@ -407,57 +407,78 @@ static GFXDECODE_START( gfx_naughtyb )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
 
-void naughtyb_state::naughtyb_base(machine_config &config)
-{
+
+MACHINE_CONFIG_START(naughtyb_state::naughtyb)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, CLOCK_XTAL / 4); /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MCFG_DEVICE_PROGRAM_MAP(naughtyb_map)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(36*8, 28*8);
-	m_screen->set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(naughtyb_state::screen_update));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_naughtyb);
-	PALETTE(config, m_palette, FUNC(naughtyb_state::naughtyb_palette), 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_naughtyb)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
 
 	/* sound hardware */
 	/* uses the TMS3615NS for sound */
 	SPEAKER(config, "mono").front_center();
 
-	tms36xx_device &tms(TMS36XX(config, "tms", 350));
-	tms.set_subtype(tms36xx_device::subtype::TMS3615);
-	tms.set_decays(0.15, 0.20, 0, 0, 0, 0);
+	MCFG_TMS36XX_ADD("tms", 350)
+	MCFG_TMS36XX_TYPE(TMS3615)
+	MCFG_TMS36XX_DECAY_TIMES(0.15, 0.20, 0, 0, 0, 0)
 	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
 	// A wav taken from Pop Flamer sounds like there are at least no 'odd'
 	// harmonics (5 1/3' and 2 2/3')
-	tms.add_route(0, "mono", 0.60);
-}
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 
-void naughtyb_state::naughtyb(machine_config &config)
-{
-	naughtyb_base(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &naughtyb_state::naughtyb_map);
-
-	NAUGHTYB_SOUND(config, m_naughtyb_custom);
-	m_naughtyb_custom->add_route(0, "mono", 0.40);
-}
+	MCFG_DEVICE_ADD("naughtyb_custom", NAUGHTYB_SOUND)
+	MCFG_SOUND_ROUTE(0, "mono", 0.40)
+MACHINE_CONFIG_END
 
 
 /* Exactly the same but for certain address writes */
-void naughtyb_state::popflame(machine_config &config)
-{
-	naughtyb_base(config);
+MACHINE_CONFIG_START(naughtyb_state::popflame)
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &naughtyb_state::popflame_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MCFG_DEVICE_PROGRAM_MAP(popflame_map)
 
-	POPFLAME_SOUND(config, m_popflame_custom);
-	m_popflame_custom->add_route(0, "mono", 1.0);
-}
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(naughtyb_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_naughtyb)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(naughtyb_state, naughtyb)
+
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	MCFG_TMS36XX_ADD("tms", 350)
+	MCFG_TMS36XX_TYPE(TMS3615)
+	MCFG_TMS36XX_DECAY_TIMES(0.15, 0.20, 0, 0, 0, 0)
+	// NOTE: it's unknown if the TMS3615 mixes more than one voice internally.
+	// A wav taken from Pop Flamer sounds like there are at least no 'odd'
+	// harmonics (5 1/3' and 2 2/3')
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+
+	MCFG_DEVICE_ADD("popflame_custom", POPFLAME_SOUND)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 

@@ -45,7 +45,7 @@ void pgm2_memcard_device::device_start()
 
 image_init_result pgm2_memcard_device::call_load()
 {
-	m_authenticated = false;
+	authenticated = false;
 	if(length() != 0x108)
 		return image_init_result::FAIL;
 
@@ -65,7 +65,7 @@ image_init_result pgm2_memcard_device::call_load()
 
 void pgm2_memcard_device::call_unload()
 {
-	m_authenticated = false;
+	authenticated = false;
 	fseek(0, SEEK_SET);
 	fwrite(m_memcard_data, 0x100);
 	fwrite(m_protection_data, 4);
@@ -74,7 +74,7 @@ void pgm2_memcard_device::call_unload()
 
 image_init_result pgm2_memcard_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	m_authenticated = false;
+	authenticated = false;
 	// cards must contain valid defaults for each game / region or they don't work?
 	memory_region *rgn = memregion("^default_card");
 
@@ -92,16 +92,16 @@ image_init_result pgm2_memcard_device::call_create(int format_type, util::option
 	return image_init_result::PASS;
 }
 
-void pgm2_memcard_device::auth(u8 p1, u8 p2, u8 p3)
+void pgm2_memcard_device::auth(uint8_t p1, uint8_t p2, uint8_t p3)
 {
 	if (m_security_data[0] & 7)
 	{
 		if (m_security_data[1] == p1 && m_security_data[2] == p2 && m_security_data[3] == p3) {
-			m_authenticated = true;
+			authenticated = true;
 			m_security_data[0] = 7;
 		}
 		else {
-			m_authenticated = false;
+			authenticated = false;
 			m_security_data[0] >>= 1; // hacky
 			if (m_security_data[0] & 7)
 				popmessage("Wrong IC Card password !!!\n");
@@ -111,39 +111,39 @@ void pgm2_memcard_device::auth(u8 p1, u8 p2, u8 p3)
 	}
 }
 
-u8 pgm2_memcard_device::read(offs_t offset)
+READ8_MEMBER(pgm2_memcard_device::read)
 {
 	return m_memcard_data[offset];
 }
 
-void pgm2_memcard_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER(pgm2_memcard_device::write)
 {
-	if (m_authenticated && (offset >= 0x20 || (m_protection_data[offset>>3] & (1 <<(offset & 7)))))
+	if (authenticated && (offset >= 0x20 || (m_protection_data[offset>>3] & (1 <<(offset & 7)))))
 	{
 		m_memcard_data[offset] = data;
 	}
 }
 
-u8 pgm2_memcard_device::read_prot(offs_t offset)
+READ8_MEMBER(pgm2_memcard_device::read_prot)
 {
 	return m_protection_data[offset];
 }
 
-void pgm2_memcard_device::write_prot(offs_t offset, u8 data)
+WRITE8_MEMBER(pgm2_memcard_device::write_prot)
 {
-	if (m_authenticated)
+	if (authenticated)
 		m_protection_data[offset] &= data;
 }
 
-u8 pgm2_memcard_device::read_sec(offs_t offset)
+READ8_MEMBER(pgm2_memcard_device::read_sec)
 {
-	if (!m_authenticated)
+	if (!authenticated)
 		return 0xff; // guess
 	return m_security_data[offset];
 }
 
-void pgm2_memcard_device::write_sec(offs_t offset, u8 data)
+WRITE8_MEMBER(pgm2_memcard_device::write_sec)
 {
-	if (m_authenticated)
+	if (authenticated)
 		m_security_data[offset] = data;
 }

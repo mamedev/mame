@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_BITSTREAM_H
-#define MAME_UTIL_BITSTREAM_H
-
 #pragma once
+
+#ifndef __BITSTREAM_H__
+#define __BITSTREAM_H__
 
 #include "osdcore.h"
 
@@ -238,4 +238,5 @@ inline uint32_t bitstream_out::flush()
 	return m_doffset;
 }
 
-#endif // MAME_UTIL_BITSTREAM_H
+
+#endif

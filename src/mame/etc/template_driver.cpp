@@ -10,7 +10,6 @@ Template for skeleton drivers
 #include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -25,22 +24,20 @@ public:
 	{
 	}
 
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(xxx);
+
 	void xxx(machine_config &config);
 
+	void xxx_io(address_map &map);
+	void xxx_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void xxx_palette(palette_device *palette) const;
-
-	void xxx_io(address_map &map);
-	void xxx_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -146,36 +143,38 @@ void xxx_state::machine_reset()
 }
 
 
-void xxx_state::xxx_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(xxx_state, xxx)
 {
 }
 
-void xxx_state::xxx(machine_config &config)
-{
+MACHINE_CONFIG_START(xxx_state::xxx)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CLOCK/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &xxx_state::xxx_map);
-	m_maincpu->set_addrmap(AS_IO, &xxx_state::xxx_io);
+	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(xxx_map)
+	MCFG_DEVICE_IO_MAP(xxx_io)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(xxx_state::screen_update));
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	screen.set_raw(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240);          /* generic NTSC video timing at 320x240 */
-//  screen.set_raw(XTAL(12'000'000)/2, 384, 0, 256, 264, 16, 240);  /* generic NTSC video timing at 256x224 */
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_UPDATE_DRIVER(xxx_state, screen_update)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240)          /* generic NTSC video timing at 320x240 */
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 264, 16, 240)  /* generic NTSC video timing at 256x224 */
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_xxx);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xxx)
 
-	PALETTE(config, "palette", FUNC(xxx_state::xxx_palette), 8);
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(xxx_state, xxx)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-}
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

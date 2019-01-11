@@ -124,7 +124,6 @@
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "video/ramdac.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -158,21 +157,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
-		m_lamps(*this, "lamp%u", 1U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	void neraidou(machine_config &config);
-	void sstar97(machine_config &config);
-	void bdream97(machine_config &config);
-	void skylncr(machine_config &config);
-	void mbutrfly(machine_config &config);
-
-	void init_miaction();
-	void init_sonikfig();
-
-	READ_LINE_MEMBER(mbutrfly_prot_r);
-
-private:
 	DECLARE_WRITE8_MEMBER(skylncr_videoram_w);
 	DECLARE_WRITE8_MEMBER(skylncr_colorram_w);
 	DECLARE_WRITE8_MEMBER(reeltiles_1_w);
@@ -191,8 +178,10 @@ private:
 	DECLARE_READ8_MEMBER(ret_ff);
 	DECLARE_WRITE8_MEMBER(skylncr_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
+	READ_LINE_MEMBER(mbutrfly_prot_r);
 	DECLARE_READ8_MEMBER(bdream97_opcode_r);
-
+	void init_miaction();
+	void init_sonikfig();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
@@ -200,6 +189,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
 	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
+	void neraidou(machine_config &config);
+	void sstar97(machine_config &config);
+	void bdream97(machine_config &config);
+	void skylncr(machine_config &config);
+	void mbutrfly(machine_config &config);
 	void bdream97_opcode_map(address_map &map);
 	void io_map_mbutrfly(address_map &map);
 	void io_map_skylncr(address_map &map);
@@ -207,7 +201,8 @@ private:
 	void ramdac2_map(address_map &map);
 	void ramdac_map(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void video_start() override;
 
 	tilemap_t *m_tmap;
@@ -235,7 +230,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
-	output_finder<7> m_lamps;
+	output_finder<8> m_lamp;
 };
 
 
@@ -440,13 +435,13 @@ WRITE8_MEMBER(skylncr_state::skylncr_nmi_enable_w)
 
 WRITE8_MEMBER(skylncr_state::mbutrfly_prot_w)
 {
-	m_lamps[0] = BIT(data, 0); // Slot Stop 2
-	m_lamps[1] = BIT(data, 1); // Slot Stop 1
-	m_lamps[2] = BIT(data, 2); // Take
-	m_lamps[3] = BIT(data, 3); // Bet
-	m_lamps[4] = BIT(data, 4); // Slot Stop 3
-	m_lamps[5] = BIT(data, 5); // Start
-	m_lamps[6] = BIT(data, 6); // Payout
+	m_lamp[1] = BIT(data, 0); // Slot Stop 2
+	m_lamp[2] = BIT(data, 1); // Slot Stop 1
+	m_lamp[3] = BIT(data, 2); // Take
+	m_lamp[4] = BIT(data, 3); // Bet
+	m_lamp[5] = BIT(data, 4); // Slot Stop 3
+	m_lamp[6] = BIT(data, 5); // Start
+	m_lamp[7] = BIT(data, 6); // Payout
 	m_mbutrfly_prot = BIT(data, 7);
 }
 
@@ -471,55 +466,55 @@ void skylncr_state::mem_map_skylncr(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
 
-	map(0x8800, 0x8fff).ram().w(FUNC(skylncr_state::skylncr_videoram_w)).share("videoram");
-	map(0x9000, 0x97ff).ram().w(FUNC(skylncr_state::skylncr_colorram_w)).share("colorram");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(skylncr_state::skylncr_videoram_w)).share("videoram");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(skylncr_state::skylncr_colorram_w)).share("colorram");
 
-	map(0x9800, 0x99ff).ram().w(FUNC(skylncr_state::reeltiles_1_w)).share("reeltiles_1_ram");
-	map(0x9a00, 0x9bff).ram().w(FUNC(skylncr_state::reeltiles_2_w)).share("reeltiles_2_ram");
-	map(0x9c00, 0x9dff).ram().w(FUNC(skylncr_state::reeltiles_3_w)).share("reeltiles_3_ram");
-	map(0x9e00, 0x9fff).ram().w(FUNC(skylncr_state::reeltiles_4_w)).share("reeltiles_4_ram");
-	map(0xa000, 0xa1ff).ram().w(FUNC(skylncr_state::reeltileshigh_1_w)).share("rthigh_1_ram");
-	map(0xa200, 0xa3ff).ram().w(FUNC(skylncr_state::reeltileshigh_2_w)).share("rthigh_2_ram");
-	map(0xa400, 0xa5ff).ram().w(FUNC(skylncr_state::reeltileshigh_3_w)).share("rthigh_3_ram");
-	map(0xa600, 0xa7ff).ram().w(FUNC(skylncr_state::reeltileshigh_4_w)).share("rthigh_4_ram");
+	map(0x9800, 0x99ff).ram().w(this, FUNC(skylncr_state::reeltiles_1_w)).share("reeltiles_1_ram");
+	map(0x9a00, 0x9bff).ram().w(this, FUNC(skylncr_state::reeltiles_2_w)).share("reeltiles_2_ram");
+	map(0x9c00, 0x9dff).ram().w(this, FUNC(skylncr_state::reeltiles_3_w)).share("reeltiles_3_ram");
+	map(0x9e00, 0x9fff).ram().w(this, FUNC(skylncr_state::reeltiles_4_w)).share("reeltiles_4_ram");
+	map(0xa000, 0xa1ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_1_w)).share("rthigh_1_ram");
+	map(0xa200, 0xa3ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_2_w)).share("rthigh_2_ram");
+	map(0xa400, 0xa5ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_3_w)).share("rthigh_3_ram");
+	map(0xa600, 0xa7ff).ram().w(this, FUNC(skylncr_state::reeltileshigh_4_w)).share("rthigh_4_ram");
 
-	map(0xaa55, 0xaa55).r(FUNC(skylncr_state::ret_ff));
+	map(0xaa55, 0xaa55).r(this, FUNC(skylncr_state::ret_ff));
 
-	map(0xb000, 0xb03f).ram().w(FUNC(skylncr_state::reelscroll1_w)).share("reelscroll1");
-	map(0xb040, 0xb07f).ram().w(FUNC(skylncr_state::reelscroll1_w));
-	map(0xb080, 0xb0bf).ram().w(FUNC(skylncr_state::reelscroll1_w));
-	map(0xb0c0, 0xb0ff).ram().w(FUNC(skylncr_state::reelscroll1_w));
-	map(0xb100, 0xb13f).ram().w(FUNC(skylncr_state::reelscroll1_w));
-	map(0xb140, 0xb17f).ram().w(FUNC(skylncr_state::reelscroll1_w));
-	map(0xb180, 0xb1bf).ram().w(FUNC(skylncr_state::reelscroll1_w));
-	map(0xb1c0, 0xb1ff).ram().w(FUNC(skylncr_state::reelscroll1_w));
+	map(0xb000, 0xb03f).ram().w(this, FUNC(skylncr_state::reelscroll1_w)).share("reelscroll1");
+	map(0xb040, 0xb07f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb080, 0xb0bf).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb0c0, 0xb0ff).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb100, 0xb13f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb140, 0xb17f).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb180, 0xb1bf).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
+	map(0xb1c0, 0xb1ff).ram().w(this, FUNC(skylncr_state::reelscroll1_w));
 
-	map(0xb200, 0xb23f).ram().w(FUNC(skylncr_state::reelscroll2_w)).share("reelscroll2");
-	map(0xb240, 0xb27f).ram().w(FUNC(skylncr_state::reelscroll2_w));
-	map(0xb280, 0xb2bf).ram().w(FUNC(skylncr_state::reelscroll2_w));
-	map(0xb2c0, 0xb2ff).ram().w(FUNC(skylncr_state::reelscroll2_w));
-	map(0xb300, 0xb33f).ram().w(FUNC(skylncr_state::reelscroll2_w));
-	map(0xb340, 0xb37f).ram().w(FUNC(skylncr_state::reelscroll2_w));
-	map(0xb380, 0xb3bf).ram().w(FUNC(skylncr_state::reelscroll2_w));
-	map(0xb3c0, 0xb3ff).ram().w(FUNC(skylncr_state::reelscroll2_w));
+	map(0xb200, 0xb23f).ram().w(this, FUNC(skylncr_state::reelscroll2_w)).share("reelscroll2");
+	map(0xb240, 0xb27f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb280, 0xb2bf).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb2c0, 0xb2ff).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb300, 0xb33f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb340, 0xb37f).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb380, 0xb3bf).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
+	map(0xb3c0, 0xb3ff).ram().w(this, FUNC(skylncr_state::reelscroll2_w));
 
-	map(0xb400, 0xb43f).ram().w(FUNC(skylncr_state::reelscroll3_w)).share("reelscroll3");
-	map(0xb440, 0xb47f).ram().w(FUNC(skylncr_state::reelscroll3_w));
-	map(0xb480, 0xb4bf).ram().w(FUNC(skylncr_state::reelscroll3_w));
-	map(0xb4c0, 0xb4ff).ram().w(FUNC(skylncr_state::reelscroll3_w));
-	map(0xb500, 0xb53f).ram().w(FUNC(skylncr_state::reelscroll3_w));
-	map(0xb540, 0xb57f).ram().w(FUNC(skylncr_state::reelscroll3_w));
-	map(0xb580, 0xb5bf).ram().w(FUNC(skylncr_state::reelscroll3_w));
-	map(0xb5c0, 0xb5ff).ram().w(FUNC(skylncr_state::reelscroll3_w));
+	map(0xb400, 0xb43f).ram().w(this, FUNC(skylncr_state::reelscroll3_w)).share("reelscroll3");
+	map(0xb440, 0xb47f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb480, 0xb4bf).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb4c0, 0xb4ff).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb500, 0xb53f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb540, 0xb57f).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb580, 0xb5bf).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
+	map(0xb5c0, 0xb5ff).ram().w(this, FUNC(skylncr_state::reelscroll3_w));
 
-	map(0xb600, 0xb63f).ram().w(FUNC(skylncr_state::reelscroll4_w)).share("reelscroll4");
-	map(0xb640, 0xb67f).ram().w(FUNC(skylncr_state::reelscroll4_w));
-	map(0xb680, 0xb6bf).ram().w(FUNC(skylncr_state::reelscroll4_w));
-	map(0xb6c0, 0xb6ff).ram().w(FUNC(skylncr_state::reelscroll4_w));
-	map(0xb700, 0xb73f).ram().w(FUNC(skylncr_state::reelscroll4_w));
-	map(0xb740, 0xb77f).ram().w(FUNC(skylncr_state::reelscroll4_w));
-	map(0xb780, 0xb7bf).ram().w(FUNC(skylncr_state::reelscroll4_w));
-	map(0xb7c0, 0xb7ff).ram().w(FUNC(skylncr_state::reelscroll4_w));
+	map(0xb600, 0xb63f).ram().w(this, FUNC(skylncr_state::reelscroll4_w)).share("reelscroll4");
+	map(0xb640, 0xb67f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb680, 0xb6bf).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb6c0, 0xb6ff).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb700, 0xb73f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb740, 0xb77f).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb780, 0xb7bf).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
+	map(0xb7c0, 0xb7ff).ram().w(this, FUNC(skylncr_state::reelscroll4_w));
 
 	map(0xc000, 0xffff).rom();
 }
@@ -532,7 +527,7 @@ void skylncr_state::io_map_skylncr(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 	map(0x10, 0x13).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* Input Ports */
 
-	map(0x20, 0x20).w(FUNC(skylncr_state::skylncr_coin_w));
+	map(0x20, 0x20).w(this, FUNC(skylncr_state::skylncr_coin_w));
 
 	map(0x30, 0x31).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x31, 0x31).r("aysnd", FUNC(ay8910_device::data_r));
@@ -545,7 +540,7 @@ void skylncr_state::io_map_skylncr(address_map &map)
 	map(0x51, 0x51).w("ramdac2", FUNC(ramdac_device::pal_w));
 	map(0x52, 0x52).w("ramdac2", FUNC(ramdac_device::mask_w));
 
-	map(0x70, 0x70).w(FUNC(skylncr_state::skylncr_nmi_enable_w));
+	map(0x70, 0x70).w(this, FUNC(skylncr_state::skylncr_nmi_enable_w));
 }
 
 
@@ -553,13 +548,13 @@ void skylncr_state::io_map_mbutrfly(address_map &map)
 {
 	map.global_mask(0xff);
 	io_map_skylncr(map);
-	map(0x60, 0x60).w(FUNC(skylncr_state::mbutrfly_prot_w));
+	map(0x60, 0x60).w(this, FUNC(skylncr_state::mbutrfly_prot_w));
 }
 
 
 void skylncr_state::bdream97_opcode_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(skylncr_state::bdream97_opcode_r));
+	map(0x0000, 0xffff).r(this, FUNC(skylncr_state::bdream97_opcode_r));
 }
 
 
@@ -1653,18 +1648,18 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_DEVICE_IO_MAP(io_map_skylncr)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* 1x M5M82C255, or 2x PPI8255 */
-	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
-	ppi0.in_pa_callback().set_ioport("IN1");
-	ppi0.in_pb_callback().set_ioport("IN2");
-	ppi0.in_pc_callback().set_ioport("DSW1");
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
 
-	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
-	ppi1.in_pa_callback().set_ioport("DSW2");
-	ppi1.in_pb_callback().set_ioport("IN3");
-	ppi1.in_pc_callback().set_ioport("IN4");
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
@@ -1677,23 +1672,21 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skylncr);
-	PALETTE(config, m_palette).set_entries(0x200);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
+	MCFG_PALETTE_ADD("palette", 0x200)
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
-	ramdac.set_addrmap(0, &skylncr_state::ramdac_map);
-	ramdac.set_color_base(0);
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	MCFG_RAMDAC_COLOR_BASE(0)
 
-	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette));
-	ramdac2.set_addrmap(0, &skylncr_state::ramdac2_map);
-	ramdac2.set_color_base(0x100);
+	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette")
+	MCFG_RAMDAC_COLOR_BASE(0x100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/8));
-	aysnd.port_a_read_callback().set_ioport("DSW3");
-	aysnd.port_b_read_callback().set_ioport("DSW4");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1705,20 +1698,22 @@ MACHINE_CONFIG_START(skylncr_state::mbutrfly)
 MACHINE_CONFIG_END
 
 
-void skylncr_state::neraidou(machine_config &config)
-{
+MACHINE_CONFIG_START(skylncr_state::neraidou)
 	skylncr(config);
 
-	m_gfxdecode->set_info(gfx_neraidou);
-}
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_neraidou)
+MACHINE_CONFIG_END
 
 
-void skylncr_state::sstar97(machine_config &config)
-{
+MACHINE_CONFIG_START(skylncr_state::sstar97)
 	skylncr(config);
 
-	m_gfxdecode->set_info(gfx_sstar97);
-}
+	/* basic machine hardware */
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sstar97)
+MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(skylncr_state::bdream97)
@@ -1728,7 +1723,7 @@ MACHINE_CONFIG_START(skylncr_state::bdream97)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
 
-	m_gfxdecode->set_info(gfx_bdream97);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bdream97)
 MACHINE_CONFIG_END
 
 

@@ -292,9 +292,19 @@ void menu_autofire::populate(float &customtop, float &custombottom)
 					item_append(menu_item_type::SEPARATOR);
 					is_first_button = false;
 				}
-
 				/* add an autofire item */
-				item_append_on_off(field.name(), settings.autofire, (autofire_toggle ? FLAG_DISABLE | FLAG_INVERT : 0), (void *)&field);
+				if (!autofire_toggle)
+				{
+					// item is enabled and can be switched to values on/off
+					item_append(field.name(), (settings.autofire ? _("On") : _("Off")),
+							(settings.autofire ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW), (void *)&field);
+				}
+				else
+				{
+					// item is disabled
+					item_append(field.name(), (settings.autofire ? _("On") : _("Off")),
+							FLAG_DISABLE | FLAG_INVERT, nullptr);
+				}
 			}
 		}
 	}

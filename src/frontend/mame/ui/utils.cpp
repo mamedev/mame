@@ -19,7 +19,6 @@
 
 #include "drivenum.h"
 #include "rendfont.h"
-#include "romload.h"
 #include "softlist.h"
 
 #include <bitset>

@@ -67,13 +67,13 @@ msm5205_device::msm5205_device(const machine_config &mconfig, const char *tag, d
 }
 
 msm5205_device::msm5205_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_s1(false)
-	, m_s2(false)
-	, m_bitwidth(4)
-	, m_vck_cb(*this)
-	, m_vck_legacy_cb(*this)
+	: device_t(mconfig, type, tag, owner, clock),
+		device_sound_interface(mconfig, *this),
+		m_s1(false),
+		m_s2(false),
+		m_bitwidth(4),
+		m_vck_cb(*this),
+		m_vck_legacy_cb(*this)
 {
 }
 
@@ -262,12 +262,17 @@ WRITE_LINE_MEMBER(msm5205_device::reset_w)
  *    Handle an update of the data to the chip
  */
 
-void msm5205_device::write_data(int data)
+void msm5205_device::data_w(int data)
 {
 	if (m_bitwidth == 4)
 		m_data = data & 0x0f;
 	else
 		m_data = (data & 0x07) << 1; /* unknown */
+}
+
+WRITE8_MEMBER(msm5205_device::data_w)
+{
+	data_w(data);
 }
 
 int msm5205_device::get_prescaler() const

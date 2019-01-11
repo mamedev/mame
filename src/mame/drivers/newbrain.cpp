@@ -580,7 +580,7 @@ READ_LINE_MEMBER( newbrain_state::tdi_r )
 void newbrain_state::newbrain_mreq(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(newbrain_state::mreq_r), FUNC(newbrain_state::mreq_w));
+	map(0x0000, 0xffff).rw(this, FUNC(newbrain_state::mreq_r), FUNC(newbrain_state::mreq_w));
 }
 
 
@@ -591,7 +591,7 @@ void newbrain_state::newbrain_mreq(address_map &map)
 void newbrain_state::newbrain_iorq(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(newbrain_state::iorq_r), FUNC(newbrain_state::iorq_w));
+	map(0x0000, 0xffff).rw(this, FUNC(newbrain_state::iorq_r), FUNC(newbrain_state::iorq_w));
 }
 
 
@@ -811,19 +811,19 @@ void newbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 MACHINE_CONFIG_START(newbrain_state::newbrain)
 	// basic system hardware
-	Z80(config, m_maincpu, XTAL(16'000'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &newbrain_state::newbrain_mreq);
-	m_maincpu->set_addrmap(AS_IO, &newbrain_state::newbrain_iorq);
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(newbrain_mreq)
+	MCFG_DEVICE_IO_MAP(newbrain_iorq)
 
-	COP420(config, m_cop, XTAL(16'000'000)/4);
-	m_cop->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
-	m_cop->read_g().set(FUNC(newbrain_state::cop_g_r));
-	m_cop->write_g().set(FUNC(newbrain_state::cop_g_w));
-	m_cop->write_d().set(FUNC(newbrain_state::cop_d_w));
-	m_cop->read_in().set(FUNC(newbrain_state::cop_in_r));
-	m_cop->write_so().set(FUNC(newbrain_state::k1_w));
-	m_cop->write_sk().set(FUNC(newbrain_state::k2_w));
-	m_cop->read_si().set(FUNC(newbrain_state::tdi_r));
+	MCFG_DEVICE_ADD(COP420_TAG, COP420, XTAL(16'000'000)/4)
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true)
+	MCFG_COP400_READ_G_CB(READ8(*this, newbrain_state, cop_g_r))
+	MCFG_COP400_WRITE_G_CB(WRITE8(*this, newbrain_state, cop_g_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, newbrain_state, cop_d_w))
+	MCFG_COP400_READ_IN_CB(READ8(*this, newbrain_state, cop_in_r))
+	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, newbrain_state, k1_w))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, newbrain_state, k2_w))
+	MCFG_COP400_READ_SI_CB(READLINE(*this, newbrain_state, tdi_r))
 
 	// video hardware
 	newbrain_video(config);
@@ -831,17 +831,18 @@ MACHINE_CONFIG_START(newbrain_state::newbrain)
 	// devices
 	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim")
 
-	CASSETTE(config, m_cassette1);
-	m_cassette1->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	MCFG_CASSETTE_ADD(CASSETTE_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	CASSETTE(config, m_cassette2);
-	m_cassette2->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED));
+	MCFG_CASSETTE_ADD(CASSETTE2_TAG)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 
-	RS232_PORT(config, RS232_V24_TAG, default_rs232_devices, nullptr);
-	RS232_PORT(config, RS232_PRN_TAG, default_rs232_devices, nullptr);
+	MCFG_DEVICE_ADD(RS232_V24_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD(RS232_PRN_TAG, RS232_PORT, default_rs232_devices, nullptr)
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("32K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
 
 
@@ -849,33 +850,30 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_ad )
 //-------------------------------------------------
 
-void newbrain_state::newbrain_ad(machine_config &config)
-{
+MACHINE_CONFIG_START(newbrain_state::newbrain_ad)
 	newbrain(config);
-	config.set_default_layout(layout_newbrain);
-}
+	MCFG_DEFAULT_LAYOUT(layout_newbrain)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( newbrain_a )
 //-------------------------------------------------
 
-void newbrain_state::newbrain_a(machine_config &config)
-{
+MACHINE_CONFIG_START(newbrain_state::newbrain_a)
 	newbrain(config);
-	config.set_default_layout(layout_newbraina);
-}
+	MCFG_DEFAULT_LAYOUT(layout_newbraina)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
 //  MACHINE_CONFIG( newbrain_md )
 //-------------------------------------------------
 
-void newbrain_state::newbrain_md(machine_config &config)
-{
+MACHINE_CONFIG_START(newbrain_state::newbrain_md)
 	newbrain(config);
-	config.set_default_layout(layout_newbrain);
-}
+	MCFG_DEFAULT_LAYOUT(layout_newbrain)
+MACHINE_CONFIG_END
 
 
 
@@ -892,28 +890,28 @@ ROM_START( newbrain )
 	ROM_DEFAULT_BIOS( "rom20" )
 
 	ROM_SYSTEM_BIOS( 0, "issue1", "Issue 1 (v?)" )
-	ROMX_LOAD( "aben.ic6",     0x0000, 0x2000, CRC(308f1f72) SHA1(a6fd9945a3dca47636887da2125fde3f9b1d4e25), ROM_BIOS(0) )
-	ROMX_LOAD( "cd iss 1.ic7", 0x2000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(0) )
-	ROMX_LOAD( "ef iss 1.ic8", 0x4000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(0) )
-
-	ROM_SYSTEM_BIOS( 1, "issue2", "Issue 2 (v1.9)" )
-	ROMX_LOAD( "aben19.ic6",   0x0000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(1) )
-	ROMX_LOAD( "cdi2.ic7",     0x2000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(1) )
+	ROMX_LOAD( "aben.ic6",     0x0000, 0x2000, CRC(308f1f72) SHA1(a6fd9945a3dca47636887da2125fde3f9b1d4e25), ROM_BIOS(1) )
+	ROMX_LOAD( "cd iss 1.ic7", 0x2000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(1) )
 	ROMX_LOAD( "ef iss 1.ic8", 0x4000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS( 2, "issue3", "Issue 3 (v1.91)" )
-	ROMX_LOAD( "aben191.ic6",  0x0000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(2) )
-	ROMX_LOAD( "cdi3.ic7",     0x2000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 1, "issue2", "Issue 2 (v1.9)" )
+	ROMX_LOAD( "aben19.ic6",   0x0000, 0x2000, CRC(d0283eb1) SHA1(351d248e69a77fa552c2584049006911fb381ff0), ROM_BIOS(2) )
+	ROMX_LOAD( "cdi2.ic7",     0x2000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(2) )
 	ROMX_LOAD( "ef iss 1.ic8", 0x4000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(2) )
 
+	ROM_SYSTEM_BIOS( 2, "issue3", "Issue 3 (v1.91)" )
+	ROMX_LOAD( "aben191.ic6",  0x0000, 0x2000, CRC(b7be8d89) SHA1(cce8d0ae7aa40245907ea38b7956c62d039d45b7), ROM_BIOS(3) )
+	ROMX_LOAD( "cdi3.ic7",     0x2000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
+	ROMX_LOAD( "ef iss 1.ic8", 0x4000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6), ROM_BIOS(3) )
+
 	ROM_SYSTEM_BIOS( 3, "series2", "Series 2 (v?)" )
-	ROMX_LOAD( "abs2.ic6",     0x0000, 0x2000, CRC(9a042acb) SHA1(80d83a2ea3089504aa68b6cf978d80d296cd9bda), ROM_BIOS(3) )
-	ROMX_LOAD( "cds2.ic7",     0x2000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(3) )
-	ROMX_LOAD( "efs2.ic8",     0x4000, 0x2000, CRC(b222d798) SHA1(c0c816b4d4135b762f2c5f1b24209d0096f22e56), ROM_BIOS(3) )
+	ROMX_LOAD( "abs2.ic6",     0x0000, 0x2000, CRC(9a042acb) SHA1(80d83a2ea3089504aa68b6cf978d80d296cd9bda), ROM_BIOS(4) )
+	ROMX_LOAD( "cds2.ic7",     0x2000, 0x2000, CRC(6b4d9429) SHA1(ef688be4e75aced61f487c928258c8932a0ae00a), ROM_BIOS(4) )
+	ROMX_LOAD( "efs2.ic8",     0x4000, 0x2000, CRC(b222d798) SHA1(c0c816b4d4135b762f2c5f1b24209d0096f22e56), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 4, "rom20", "? (v2.0)" )
-	ROMX_LOAD( "aben20.rom",   0x0000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(4) )
-	ROMX_LOAD( "cd20tci.rom",  0x2000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(4) )
+	ROMX_LOAD( "aben20.rom",   0x0000, 0x2000, CRC(3d76d0c8) SHA1(753b4530a518ad832e4b81c4e5430355ba3f62e0), ROM_BIOS(5) )
+	ROMX_LOAD( "cd20tci.rom",  0x2000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(5) )
 
 	ROM_REGION( 0x400, COP420_TAG, 0 )
 	ROM_LOAD( "cop420-guw.ic419", 0x000, 0x400, CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) ) // COP420-GUW/N

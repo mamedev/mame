@@ -37,11 +37,12 @@
 #include "machine/nvram.h"
 #include "machine/pc_lpt.h"
 #include "sound/beep.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
+#define UART0_TAG       "ns16450_0"
+#define UART1_TAG       "ns16450_1"
 #define RS232A_TAG      "rs232a"
 #define RS232B_TAG      "rs232b"
 #define LPT_TAG         "lpt"
@@ -49,12 +50,13 @@
 class tv990_state : public driver_device
 {
 public:
-	tv990_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	tv990_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vram(*this, "vram"),
 		m_fontram(*this, "fontram"),
-		m_uart(*this, "ns16450_%u", 0U),
+		m_uart0(*this, UART0_TAG),
+		m_uart1(*this, UART1_TAG),
 		m_screen(*this, "screen"),
 		m_kbdc(*this, "pc_kbdc"),
 		m_palette(*this, "palette"),
@@ -62,15 +64,10 @@ public:
 	{
 	}
 
-	void tv990(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(color);
-
-private:
 	required_device<m68000_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint16_t> m_fontram;
-	required_device_array<ns16450_device, 2> m_uart;
+	required_device<ns16450_device> m_uart0, m_uart1;
 	required_device<screen_device> m_screen;
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<palette_device> m_palette;
@@ -91,23 +88,22 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(uart0_irq);
 	DECLARE_WRITE_LINE_MEMBER(uart1_irq);
 	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
+	INTERRUPT_GEN_MEMBER(vblank);
+	DECLARE_INPUT_CHANGED_MEMBER(color);
+	void tv990(machine_config &config);
 	void tv990_mem(address_map &map);
-
+private:
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
 	int m_rowh, m_width, m_height;
 };
 
-WRITE_LINE_MEMBER(tv990_state::vblank_irq)
+INTERRUPT_GEN_MEMBER(tv990_state::vblank)
 {
-	if (state)
-	{
-		m_rowtimer->adjust(m_screen->time_until_pos(m_rowh));
-		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
-		tvi1111_regs[0x1d] |= 4;
-	}
+	m_rowtimer->adjust(m_screen->time_until_pos(m_rowh));
+	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+	tvi1111_regs[0x1d] |= 4;
 }
 
 void tv990_state::machine_start()
@@ -319,11 +315,11 @@ void tv990_state::tv990_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x060000, 0x06ffff).ram().share("vram"); // character/attribute RAM
 	map(0x080000, 0x087fff).ram().share("fontram"); // font RAM
-	map(0x090000, 0x0900ff).rw(FUNC(tv990_state::tvi1111_r), FUNC(tv990_state::tvi1111_w));
-	map(0x0a0000, 0x0a000f).rw(m_uart[0], FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff);
-	map(0x0a0010, 0x0a001f).rw(m_uart[1], FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff);
+	map(0x090000, 0x0900ff).rw(this, FUNC(tv990_state::tvi1111_r), FUNC(tv990_state::tvi1111_w));
+	map(0x0a0000, 0x0a000f).rw(m_uart0, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff);
+	map(0x0a0010, 0x0a001f).rw(UART1_TAG, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask16(0x00ff);
 	map(0x0a0028, 0x0a002d).rw(LPT_TAG, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
-	map(0x0b0000, 0x0b0003).rw(FUNC(tv990_state::kbdc_r), FUNC(tv990_state::kbdc_w)).umask16(0x00ff);
+	map(0x0b0000, 0x0b0003).rw(this, FUNC(tv990_state::kbdc_r), FUNC(tv990_state::kbdc_w)).umask16(0x00ff);
 	map(0x0c0000, 0x0c7fff).ram().share("nvram");// work RAM
 }
 
@@ -374,56 +370,54 @@ void tv990_state::device_post_load()
 	m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
 }
 
-void tv990_state::tv990(machine_config &config)
-{
+MACHINE_CONFIG_START(tv990_state::tv990)
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14967500);   // verified (59.86992/4)
-	m_maincpu->set_addrmap(AS_PROGRAM, &tv990_state::tv990_mem);
+	MCFG_DEVICE_ADD("maincpu", M68000, 14967500)   // verified (59.86992/4)
+	MCFG_DEVICE_PROGRAM_MAP(tv990_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tv990_state, vblank)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_color(rgb_t::green());
-	m_screen->set_screen_update(FUNC(tv990_state::screen_update));
-	m_screen->set_size(132*16, 50*16);
-	m_screen->set_visarea(0, (80*16)-1, 0, (50*16)-1);
-	m_screen->set_refresh_hz(60);
-	m_screen->screen_vblank().set(FUNC(tv990_state::vblank_irq));
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_UPDATE_DRIVER(tv990_state, screen_update)
+	MCFG_SCREEN_SIZE(132*16, 50*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, (80*16)-1, 0, (50*16)-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
+	MCFG_DEVICE_ADD( UART0_TAG, NS16450, XTAL(3'686'400) )
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, tv990_state, uart0_irq))
 
-	NS16450(config, m_uart[0], 3.6864_MHz_XTAL);
-	m_uart[0]->out_dtr_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_dtr));
-	m_uart[0]->out_rts_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_rts));
-	m_uart[0]->out_tx_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
-	m_uart[0]->out_int_callback().set(FUNC(tv990_state::uart0_irq));
+	MCFG_DEVICE_ADD( UART1_TAG, NS16450, XTAL(3'686'400) )
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, tv990_state, uart1_irq))
 
-	NS16450(config, m_uart[1], 3.6864_MHz_XTAL);
-	m_uart[1]->out_dtr_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_dtr));
-	m_uart[1]->out_rts_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_rts));
-	m_uart[1]->out_tx_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
-	m_uart[1]->out_int_callback().set(FUNC(tv990_state::uart1_irq));
+	MCFG_DEVICE_ADD(LPT_TAG, PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, tv990_state, lpt_irq))
 
-	pc_lpt_device &lpt(PC_LPT(config, LPT_TAG));
-	lpt.irq_handler().set(FUNC(tv990_state::lpt_irq));
+	MCFG_DEVICE_ADD(RS232A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(UART0_TAG, ns16450_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(UART0_TAG, ns16450_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(UART0_TAG, ns16450_device, cts_w))
 
-	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
-	rs232a.rxd_handler().set(m_uart[0], FUNC(ns16450_device::rx_w));
-	rs232a.dcd_handler().set(m_uart[0], FUNC(ns16450_device::dcd_w));
-	rs232a.cts_handler().set(m_uart[0], FUNC(ns16450_device::cts_w));
+	MCFG_DEVICE_ADD(RS232B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(UART1_TAG, ns16450_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(UART1_TAG, ns16450_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(UART1_TAG, ns16450_device, cts_w))
 
-	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
-	rs232b.rxd_handler().set(m_uart[1], FUNC(ns16450_device::rx_w));
-	rs232b.dcd_handler().set(m_uart[1], FUNC(ns16450_device::dcd_w));
-	rs232b.cts_handler().set(m_uart[1], FUNC(ns16450_device::cts_w));
+	MCFG_DEVICE_ADD("pc_kbdc", KBDC8042, 0)
+	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(INPUTLINE("maincpu", M68K_IRQ_2))
 
-	KBDC8042(config, m_kbdc);
-	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
-	m_kbdc->input_buffer_full_callback().set_inputline("maincpu", M68K_IRQ_2);
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beep", 1000).add_route(ALL_OUTPUTS, "mono", 1.0); //whats the freq?
-}
+	MCFG_DEVICE_ADD("beep", BEEP, 1000); //whats the freq?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( tv990 )

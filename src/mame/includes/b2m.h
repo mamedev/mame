@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -19,7 +18,6 @@
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
-#include "emupal.h"
 
 class b2m_state : public driver_device
 {
@@ -32,7 +30,6 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_palette(*this, "palette")
 		, m_fdc(*this, "fd1793")
-		, m_fd(*this, "fd%u", 0U)
 		, m_pic(*this, "pic8259")
 	{ }
 
@@ -43,7 +40,7 @@ public:
 	DECLARE_READ8_MEMBER(b2m_localmachine_r);
 	void init_b2m();
 
-	void b2m_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(b2m);
 	uint32_t screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(b2m_vblank_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(bm2_pit_out1);
@@ -93,7 +90,6 @@ protected:
 
 	/* devices */
 	optional_device<fd1793_device> m_fdc;
-	optional_device_array<floppy_connector, 2> m_fd;
 	optional_device<pic8259_device> m_pic;
 };
 

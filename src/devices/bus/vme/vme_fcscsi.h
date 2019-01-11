@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "imagedev/floppy.h"
 #include "machine/68230pit.h"
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h" // compatible with MC68450

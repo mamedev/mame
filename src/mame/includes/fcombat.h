@@ -1,22 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
-#ifndef MAME_INCLUDES_FCOMBAT_H
-#define MAME_INCLUDES_FCOMBAT_H
-
-#pragma once
-
-#include "emupal.h"
 
 
-// this is copied from Exerion, but it should be correct
+/* this is compied from Exerion, but it should be correct */
 #define FCOMBAT_MASTER_CLOCK        (20000000)
 #define FCOMBAT_CPU_CLOCK           (FCOMBAT_MASTER_CLOCK / 6)
 #define FCOMBAT_AY8910_CLOCK        (FCOMBAT_CPU_CLOCK / 2)
 #define FCOMBAT_PIXEL_CLOCK         (FCOMBAT_MASTER_CLOCK / 3)
 #define FCOMBAT_HCOUNT_START        (0x58)
 #define FCOMBAT_HTOTAL              (512-FCOMBAT_HCOUNT_START)
-#define FCOMBAT_HBEND               (12*8)  // ??
-#define FCOMBAT_HBSTART             (52*8)  //
+#define FCOMBAT_HBEND               (12*8)  /* ?? */
+#define FCOMBAT_HBSTART             (52*8)  /* ?? */
 #define FCOMBAT_VTOTAL              (256)
 #define FCOMBAT_VBEND               (16)
 #define FCOMBAT_VBSTART             (240)
@@ -33,22 +27,14 @@
 class fcombat_state : public driver_device
 {
 public:
-	fcombat_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	fcombat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void fcombat(machine_config &config);
-
-	void init_fcombat();
-
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -81,14 +67,15 @@ private:
 	DECLARE_READ8_MEMBER(e300_r);
 	DECLARE_WRITE8_MEMBER(ee00_w);
 	DECLARE_WRITE8_MEMBER(fcombat_videoreg_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void init_fcombat();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void fcombat_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(fcombat);
 	uint32_t screen_update_fcombat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void fcombat(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_FCOMBAT_H

@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese,Carl
-#ifndef MAME_INCLUDES_PC9801_H
-#define MAME_INCLUDES_PC9801_H
 
 #pragma once
+
+#ifndef MAME_INCLUDES_PC9801_H
+#define MAME_INCLUDES_PC9801_H
 
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
 
-#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
 #include "machine/buffer.h"
@@ -47,7 +47,6 @@
 #include "machine/idehd.h"
 
 #include "debugger.h"
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -85,8 +84,6 @@ public:
 		m_pit8253(*this, "pit8253"),
 		m_pic1(*this, "pic8259_master"),
 		m_pic2(*this, "pic8259_slave"),
-		m_ppi_sys(*this, "ppi8255_sys"),
-		m_ppi_prn(*this, "ppi8255_prn"),
 		m_fdc_2hd(*this, "upd765_2hd"),
 		m_fdc_2dd(*this, "upd765_2dd"),
 		m_rtc(*this, UPD1990A_TAG),
@@ -121,7 +118,6 @@ public:
 	void pc9801rs(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
-	void init_pc9801vm_kanji();
 
 protected:
 	virtual void video_start() override;
@@ -134,8 +130,6 @@ private:
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
-	required_device<i8255_device> m_ppi_sys;
-	required_device<i8255_device> m_ppi_prn;
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
 	required_device<upd1990a_device> m_rtc;
@@ -278,7 +272,7 @@ private:
 	DECLARE_MACHINE_RESET(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9821);
 
-	void pc9801_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(pc9801);
 	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
@@ -416,4 +410,5 @@ private:
 	uint16_t egc_shift(int plane, uint16_t val);
 };
 
-#endif // MAME_INCLUDES_PC9801_H
+
+#endif

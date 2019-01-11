@@ -38,11 +38,6 @@ nes_nanjing_device::nes_nanjing_device(const machine_config &mconfig, const char
 	, m_count(0)
 	, m_latch1(0)
 	, m_latch2(0)
-	, m_ppu(*this, ":ppu") // FIXME: this dependency should not exist
-{
-}
-
-nes_nanjing_device::~nes_nanjing_device()
 {
 }
 
@@ -143,7 +138,7 @@ WRITE8_MEMBER(nes_nanjing_device::write_l)
 		case 0x000:
 		case 0x200:
 			m_reg[BIT(offset, 9)] = data;
-			if (!BIT(m_reg[0], 7) && m_ppu->get_current_scanline() <= 127)
+			if (!BIT(m_reg[0], 7) && machine().device<ppu2c0x_device>("ppu")->get_current_scanline() <= 127)
 				chr8(0, CHRRAM);
 			break;
 		case 0x300:

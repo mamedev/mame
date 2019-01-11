@@ -18,7 +18,7 @@ public:
 
 	DECLARE_READ8_MEMBER( cru_r );
 	DECLARE_WRITE8_MEMBER( cru_w );
-	auto int_cb() { return m_int_line.bind(); }
+	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_line.set_callback(std::forward<Object>(cb)); }
 
 private:
 	enum buf_mode_t
@@ -67,5 +67,8 @@ private:
 };
 
 // LEGACY_FLOPPY_OPTIONS_EXTERN(fd800);
+
+#define MCFG_FD800_INT_HANDLER( _intcallb ) \
+	devcb = &downcast<fd800_legacy_device &>(*device).set_int_callback(DEVCB_##_intcallb);
 
 #endif // MAME_BUS_TI99X_990_DK_H

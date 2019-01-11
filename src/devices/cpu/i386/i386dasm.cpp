@@ -269,8 +269,8 @@ const i386_disassembler::I386_OPCODE i386_disassembler::i386_opcode_table1[256] 
 	// 0xf0
 	{"lock",            0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"repne",           PREFIX,         0,                  0,                  0,              STEP_OVER},
-	{"rep",             PREFIX,         0,                  0,                  0,              STEP_OVER},
+	{"repne",           PREFIX,         0,                  0,                  0               },
+	{"rep",             PREFIX,         0,                  0,                  0               },
 	{"hlt",             0,              0,                  0,                  0               },
 	{"cmc",             0,              0,                  0,                  0               },
 	{"groupF6",         GROUP,          0,                  0,                  0               },
@@ -2842,7 +2842,6 @@ void i386_disassembler::decode_opcode(std::ostream &stream, const I386_OPCODE *o
 			if ((op2 == 0x90) && !pre0f)
 				pre0f = op1;
 			decode_opcode(stream, &i386_opcode_table1[op2], op2, base_pc, pc, opcodes);
-			dasm_flags |= op->dasm_flags;
 			return;
 
 		case GROUP:

@@ -13,7 +13,6 @@
 
 #include "exp.h"
 #include "formats/ep64_dsk.h"
-#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
 

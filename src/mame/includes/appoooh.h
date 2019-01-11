@@ -6,7 +6,6 @@
 #pragma once
 
 #include "sound/msm5205.h"
-#include "emupal.h"
 
 class appoooh_state : public driver_device
 {
@@ -44,8 +43,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void appoooh_palette(palette_device &palette) const;
-	void robowres_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(appoooh);
+	DECLARE_PALETTE_INIT(robowres);
 	uint32_t screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robowres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);

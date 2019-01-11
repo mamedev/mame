@@ -112,40 +112,41 @@ static INPUT_PORTS_START( bingowav )
 INPUT_PORTS_END
 
 
-void bingowav_state::bingowav(machine_config &config)
-{
-	M68000(config, m_maincpu, 12000000); // actually TMP63803F-16
-	m_maincpu->set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_main_map);
+MACHINE_CONFIG_START(bingowav_state::bingowav)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000) // actually TMP63803F-16
+	MCFG_DEVICE_PROGRAM_MAP(bingowav_main_map)
 
-	tmp68301_device &tmp68301(TMP68301(config, "maintmp", 0)); // wrong
-	tmp68301.set_cputag(m_maincpu);
+	MCFG_DEVICE_ADD("maintmp", TMP68301, 0) // wrong
+	MCFG_TMP68301_CPU("maincpu")
 
-	te7750_device &mainioh(TE7750(config, "mainioh"));
-	mainioh.ios_cb().set_constant(5);
+	MCFG_DEVICE_ADD("mainioh", TE7750, 0)
+	MCFG_TE7750_IOS_CB(CONSTANT(5))
 
-	te7750_device &mainiol(TE7750(config, "mainiol"));
-	mainiol.ios_cb().set_constant(4);
+	MCFG_DEVICE_ADD("mainiol", TE7750, 0)
+	MCFG_TE7750_IOS_CB(CONSTANT(4))
 
-	Z80(config, "audiocpu", 4000000).set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_audio_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(bingowav_audio_map)
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
-	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "mono", 0.25);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag("audiocpu");
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 
-	m68000_device &termcpu(M68000(config, "termcpu", 12000000)); // actually TMP63803F-16
-	termcpu.set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_drive_map);
-	termcpu.set_disable();
+	MCFG_DEVICE_ADD("termcpu", M68000, 12000000) // actually TMP63803F-16
+	MCFG_DEVICE_PROGRAM_MAP(bingowav_drive_map)
+	MCFG_DEVICE_DISABLE()
 
-	Z80(config, "ctrlcpu", XTAL(16'000'000) / 4).set_addrmap(AS_PROGRAM, &bingowav_state::bingowav_control_map);
-}
+	MCFG_DEVICE_ADD("ctrlcpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(bingowav_control_map)
+MACHINE_CONFIG_END
 
 
 ROM_START( bingowav )

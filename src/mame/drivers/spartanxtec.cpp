@@ -25,7 +25,6 @@ probably an original bug?
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,13 +47,13 @@ public:
 
 	void spartanxtec(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void spartanxtec_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(spartanxtec);
 
 	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
@@ -66,6 +65,7 @@ private:
 	void spartanxtec_sound_io(address_map &map);
 	void spartanxtec_sound_map(address_map &map);
 
+private:
 	required_shared_ptr<uint8_t> m_m62_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll_lo;
@@ -194,14 +194,14 @@ void spartanxtec_state::spartanxtec_map(address_map &map)
 	map(0x8102, 0x8102).portr("SYSTEM");
 	map(0x8103, 0x8103).portr("P1");
 
-	map(0x8200, 0x8200).w(FUNC(spartanxtec_state::irq_ack));
+	map(0x8200, 0x8200).w(this, FUNC(spartanxtec_state::irq_ack));
 
-	map(0xA801, 0xA801).w(FUNC(spartanxtec_state::a801_w));
+	map(0xA801, 0xA801).w(this, FUNC(spartanxtec_state::a801_w));
 
 	map(0xa900, 0xa903).ram().share("scroll_lo");
 	map(0xa980, 0xa983).ram().share("scroll_hi");
 
-	map(0xd000, 0xdfff).ram().w(FUNC(spartanxtec_state::kungfum_tileram_w)).share("m62_tileram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(spartanxtec_state::kungfum_tileram_w)).share("m62_tileram");
 
 	map(0xe000, 0xefff).ram();
 
@@ -227,7 +227,7 @@ void spartanxtec_state::spartanxtec_sound_map(address_map &map)
 void spartanxtec_state::spartanxtec_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0000).w(FUNC(spartanxtec_state::sound_irq_ack));
+	map(0x0000, 0x0000).w(this, FUNC(spartanxtec_state::sound_irq_ack));
 
 	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
 	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));
@@ -343,17 +343,19 @@ void spartanxtec_state::machine_reset()
 {
 }
 
-void spartanxtec_state::spartanxtec_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 {
-	// TODO proper weights for this bootleg PCB
-	uint8_t const *const color_prom = memregion("cprom")->base();
+	// todo, proper weights for this bootleg PCB
+	const uint8_t *color_prom = memregion("cprom")->base();
 	for (int i = 0; i < 0x200; i++)
 	{
-		int const b = pal4bit(color_prom[i + 0x000] & 0x0f);
-		int const g = pal4bit(color_prom[i + 0x200] & 0x0f);
-		int const r = pal4bit(color_prom[i + 0x400] & 0x0f);
+		int r, g, b;
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		b = (color_prom[i+0x000]&0x0f)<<4;
+		g = (color_prom[i+0x200]&0x0f)<<4;
+		r = (color_prom[i+0x400]&0x0f)<<4;
+
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 
@@ -380,23 +382,25 @@ MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(spartanxtec_state, screen_update_spartanxtec)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette, FUNC(spartanxtec_state::spartanxtec_palette), 0x200);
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(spartanxtec_state,spartanxtec)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_news)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_news)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	AY8912(config, "ay1", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	AY8912(config, "ay3", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay1", AY8912, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_DEVICE_ADD("ay3", AY8912, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 

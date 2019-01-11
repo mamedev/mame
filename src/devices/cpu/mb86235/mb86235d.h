@@ -15,17 +15,17 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	static char const *const regname[128];
-	static char const *const db_mnemonic[64];
-	static char const *const dbn_mnemonic[64];
-	static char const *const dc_mnemonic[64];
-	static char const *const dcn_mnemonic[64];
-	static char const *const mi1_field[16];
-	static char const *const mi2_field[32];
-	static char const *const mo_field[32];
-	static char const *const ai1_field[16];
-	static char const *const ai2_field[32];
-	static char const *const ai2f_field[32];
+	static const char *regname[128];
+	static const char *db_mnemonic[64];
+	static const char *dbn_mnemonic[64];
+	static const char *dc_mnemonic[64];
+	static const char *dcn_mnemonic[64];
+	static const char *mi1_field[16];
+	static const char *mi2_field[32];
+	static const char *mo_field[32];
+	static const char *ai1_field[16];
+	static const char *ai2_field[32];
+	static const char *ai2f_field[32];
 
 	void dasm_ea(std::ostream &stream, int md, int arx, int ary, int disp);
 	void dasm_alu_mul(std::ostream &stream, uint64_t opcode, bool twoop);

@@ -279,6 +279,10 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 
 void mos7360_device::device_start()
 {
+	// get the CPU device
+	m_cpu = machine().device<cpu_device>(m_cpu_tag);
+	assert(m_cpu != nullptr);
+
 	// resolve callbacks
 	m_write_irq.resolve_safe();
 	m_read_k.resolve_safe(0xff);

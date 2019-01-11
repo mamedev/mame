@@ -80,12 +80,6 @@
  *   Y3    33.3333MHz crystal
  *   Y4?   40.0MHz crystal
  *
- *         TMS44C256-80SD            256Kx4 Fast Page DRAM (total 6MiB)
- *   U242-U253                       12 parts
- *   U256-U267                       12 parts
- *   U275-U286                       12 parts
- *   U289-U300                       12 parts
- *
  * EDGE-2 Plus Frame Buffer (PCB896)
  *
  *   Ref   Part                      Function
@@ -97,15 +91,8 @@
  *   U360  164.609300MHz crystal     Pixel clock
  *
  *         MCM6294P20                16Kx4 Bit Synchronous Static RAM (total 256KiB)
- *   U233-240                        8 parts
- *   U300-323                        24 parts
- *
- *         M5M442256AL-8             256Kx4 Video DRAM (total 9MiB)
- *   U73-U80                         8 parts
- *   U82-U97                         16 parts
- *   U99-U114                        16 parts
- *   U116-U131                       16 parts
- *   U133-U148                       16 parts
+ *   U233-240                        group 1, 8 parts = 16Kx32
+ *   U300-323                        group 2, 24 parts = 16Kx32x3
  *
  * Processor board idprom feature byte 0 contains various flags:
  *
@@ -207,8 +194,7 @@
 #include "emu.h"
 #include "edge.h"
 
-#define LOG_GENERAL   (1U << 0)
-#define LOG_INTERRUPT (1U << 1)
+#define LOG_GENERAL (1U << 0)
 
 #define VERBOSE (LOG_GENERAL)
 
@@ -221,53 +207,10 @@ DEFINE_DEVICE_TYPE(MPCBA63, mpcba63_device, "mpcba63", "EDGE-2 Frame Buffer f/1M
 DEFINE_DEVICE_TYPE(MSMT094, msmt094_device, "msmt094", "EDGE-2 Plus Processor f/1 2Mp-FB")
 DEFINE_DEVICE_TYPE(MPCB896, mpcb896_device, "mpcb896", "EDGE-2/Plus Frame Buffer f/2Mp Monitor (V-60)")
 
-// TODO: move masks to the header when finalised
-enum control_mask
-{
-	NO_HOLD      = 0x01, // release DSP hold
-	DSP_1_HOLD_L = 0x02, // hold DSP 1
-	// 0x04 maybe reset?
-	FIFO_LW_ENB  = 0x08, // fifo low water interrupt enable
-	HOLD_ENB     = 0x10, // DSP hold interrupt enable
-	HOLDA_INT_H  = 0x20, // DSP hold interrupt asserted (aka HOLD_INTR)
-	FIFO_LW_INTR = 0x40, // fifo low water interrupt asserted (ififo)
-	FIFO_HW_INTR = 0x80, // fifo high water interrupt asserted (ififo)
-};
-
-enum status_mask
-{
-	DSP_1_HOLDA_H = 0x01, // aka DSP_HOLDA
-	FIFO_EMPTY    = 0x02, // aka IFIFO_EMPTY?
-	FIFO_HFULL    = 0x04,
-	KREG_OUT_FULL = 0x08,
-	KREG_IN_FULL  = 0x10,
-
-	// SRX_INT0_H
-	// SRX_PORT_RDY
-};
-
-enum attention_mask
-{
-	ATN_TRACK = 0x00010000, // cursor change
-	ATN_DISP  = 0x00020000, // changing contrast or blanking
-	ATN_MMOUT = 0x00040000, // request for memory-mapped output
-	ATN_KREQ  = 0x00080000, // verify following request is from kernel
-};
-
-enum reg0_mask
-{
-/*
-    0x08,
-    0x10, // mouse button interrupt?
-    0x20,
-    0x40,
-*/
-	SCC_INT = 0x80, // serial controller
-	VBLANK = 0x1000, // vertical blank?
-};
-
 void edge1_device_base::map(address_map &map)
 {
+	srx_card_device_base::map(map);
+
 	/*
 	 * ODT reports
 	 * 000 user 1 mouse/interrupt
@@ -283,19 +226,19 @@ void edge1_device_base::map(address_map &map)
 	 * 110 mapping (W/O)
 	 * 114 attention
 	 */
-	map(0x000, 0x003).rw(FUNC(edge1_device_base::reg0_r), FUNC(edge1_device_base::reg0_w));
+	map(0x000, 0x003).rw(this, FUNC(edge1_device_base::reg0_r), FUNC(edge1_device_base::reg0_w));
 
 	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
 
-	map(0x100, 0x103).rw(FUNC(edge1_device_base::control_r), FUNC(edge1_device_base::control_w));
-	map(0x104, 0x107).rw(FUNC(edge1_device_base::status_r), FUNC(edge1_device_base::status_w));
-	map(0x108, 0x10b).rw(FUNC(edge1_device_base::fifo_r), FUNC(edge1_device_base::fifo_w));
-	map(0x10c, 0x10f).rw(FUNC(edge1_device_base::kernel_r), FUNC(edge1_device_base::kernel_w));
+	map(0x100, 0x103).rw(this, FUNC(edge1_device_base::control_r), FUNC(edge1_device_base::control_w));
+	map(0x104, 0x107).rw(this, FUNC(edge1_device_base::status_r), FUNC(edge1_device_base::status_w));
+	map(0x108, 0x10b).rw(this, FUNC(edge1_device_base::fifo_r), FUNC(edge1_device_base::fifo_w));
+	map(0x10c, 0x10f).rw(this, FUNC(edge1_device_base::kernel_r), FUNC(edge1_device_base::kernel_w));
 
-	map(0x114, 0x117).rw(FUNC(edge1_device_base::attention_r), FUNC(edge1_device_base::attention_w));
+	map(0x114, 0x117).rw(this, FUNC(edge1_device_base::attention_r), FUNC(edge1_device_base::attention_w));
 
-	map(0x130, 0x133).w(FUNC(edge1_device_base::ififo_lwm_w));
-	map(0x134, 0x137).w(FUNC(edge1_device_base::ififo_hwm_w));
+	map(0x130, 0x133).w(this, FUNC(edge1_device_base::ififo_lwm_w));
+	map(0x134, 0x137).w(this, FUNC(edge1_device_base::ififo_hwm_w));
 }
 
 void edge1_device_base::map_dynamic(address_map &map)
@@ -305,14 +248,12 @@ void edge1_device_base::map_dynamic(address_map &map)
 		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
 		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
 
-
 	map(0x01000000, 0x013fffff).lrw8("vram",
 		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read((offset >> 2) | (offset & 0x3)); },
 		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write((offset >> 2) | (offset & 0x3), data); });
 
 	//map(0x02028200, 0x0202827f).lr32("idprom",
-	//  [this](address_space &space, offs_t offset, u8 mem_mask) { return memregion("idprom")->as_u32(offset); });
-	map(0x02028508, 0x0202850b).rw(FUNC(edge1_device_base::srx_master_control_r), FUNC(edge1_device_base::srx_master_control_w));
+	//	[this](address_space &space, offs_t offset, u8 mem_mask) { return memregion("idprom")->as_u32(offset); });
 
 	map(0x02410000, 0x0241000f).m("ramdac", FUNC(bt458_device::map)).umask32(0x000000ff);
 
@@ -324,13 +265,13 @@ void edge1_device_base::map_dynamic(address_map &map)
 
 	// 0x02410014
 	// 0x02410018 - ramdac/screen/buffer select?
-	map(0x02410018, 0x0241001b).noprw();
 	// 0x02410040 - reg0?
-	map(0x02410040, 0x02410043).noprw();
 }
 
 void edge2_processor_device_base::map(address_map &map)
 {
+	srx_card_device_base::map(map);
+
 	map(0x100, 0x103).nopr(); // control
 	map(0x104, 0x107).nopr(); // status/attention
 	map(0x108, 0x10b).nopr(); // fifo
@@ -348,22 +289,21 @@ void edge2_processor_device_base::map(address_map &map)
 
 void edge2plus_processor_device_base::map(address_map &map)
 {
-	map(0x000, 0x003).rw(FUNC(edge2plus_processor_device_base::reg0_r), FUNC(edge2plus_processor_device_base::reg0_w));
+	srx_card_device_base::map(map);
 
-	map(0x008, 0x008).lr8("mouse_x", []() { return 0; });
-	map(0x00c, 0x00c).lr8("mouse_y", []() { return 0; });
+	map(0x000, 0x003).rw(this, FUNC(edge2plus_processor_device_base::reg0_r), FUNC(edge2plus_processor_device_base::reg0_w));
 
 	map(0x010, 0x01f).rw("scc", FUNC(z80scc_device::cd_ab_r), FUNC(z80scc_device::cd_ab_w)).umask32(0x000000ff);
 
-	map(0x100, 0x103).rw(FUNC(edge2plus_processor_device_base::control_r), FUNC(edge2plus_processor_device_base::control_w));
-	map(0x104, 0x107).rw(FUNC(edge2plus_processor_device_base::status_r), FUNC(edge2plus_processor_device_base::status_w));
+	map(0x100, 0x103).rw(this, FUNC(edge2plus_processor_device_base::control_r), FUNC(edge2plus_processor_device_base::control_w));
+	map(0x104, 0x107).rw(this, FUNC(edge2plus_processor_device_base::status_r), FUNC(edge2plus_processor_device_base::status_w));
 
-	map(0x10c, 0x10f).rw(FUNC(edge2plus_processor_device_base::kernel_r), FUNC(edge2plus_processor_device_base::kernel_w));
-	map(0x110, 0x113).w(FUNC(edge2plus_processor_device_base::mapping_w));
-	map(0x114, 0x117).rw(FUNC(edge2plus_processor_device_base::attention_r), FUNC(edge2plus_processor_device_base::attention_w));
+	map(0x10c, 0x10f).rw(this, FUNC(edge2plus_processor_device_base::kernel_r), FUNC(edge2plus_processor_device_base::kernel_w));
+	map(0x110, 0x113).w(this, FUNC(edge2plus_processor_device_base::mapping_w));
+	map(0x114, 0x117).rw(this, FUNC(edge2plus_processor_device_base::attention_r), FUNC(edge2plus_processor_device_base::attention_w));
 
-	map(0x130, 0x133).w(FUNC(edge2plus_processor_device_base::ififo_lwm_w));
-	map(0x134, 0x137).w(FUNC(edge2plus_processor_device_base::ififo_hwm_w));
+	map(0x130, 0x133).w(this, FUNC(edge2plus_processor_device_base::ififo_lwm_w));
+	map(0x134, 0x137).w(this, FUNC(edge2plus_processor_device_base::ififo_hwm_w));
 
 	// 0x300 fifo
 
@@ -381,26 +321,28 @@ void edge2plus_framebuffer_device_base::map_dynamic(address_map &map)
 	[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
 		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
 
-	map(0x01000000, 0x01ffffff).lrw8("vram",
+	map(0x01000000, 0x01ffffff).lrw8("vram", 
 		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_vram->read(offset); },
 		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_vram->write(offset, data); });
 
-	map(0x02028088, 0x0202808b).w(FUNC(edge2plus_framebuffer_device_base::select_w));
+	map(0x02028088, 0x0202808b).w(this, FUNC(edge2plus_framebuffer_device_base::select_w));
 
 	map(0x02028200, 0x0202827f).lr32("idprom",
 		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_select == 0 ? memregion("idprom")->as_u32(offset) : space.unmap(); });
 
-	map(0x02028290, 0x02028293).w(FUNC(edge2plus_framebuffer_device_base::lut_select_w));
-	map(0x02028300, 0x02028303).w(FUNC(edge2plus_framebuffer_device_base::unk_300_w));
-	map(0x02028304, 0x02028307).r(FUNC(edge2plus_framebuffer_device_base::unk_304_r));
+	map(0x02028290, 0x02028293).w(this, FUNC(edge2plus_framebuffer_device_base::lut_select_w));
+	map(0x02028300, 0x02028303).w(this, FUNC(edge2plus_framebuffer_device_base::unk_300_w));
+	map(0x02028304, 0x02028307).r(this, FUNC(edge2plus_framebuffer_device_base::unk_304_r));
 }
 
 void edge2_framebuffer_device_base::map(address_map &map)
 {
+	srx_card_device_base::map(map);
 }
 
 void edge2plus_framebuffer_device_base::map(address_map &map)
 {
+	srx_card_device_base::map(map);
 }
 
 ROM_START(mpcb828)
@@ -426,24 +368,6 @@ ROM_END
 ROM_START(msmt094)
 	ROM_REGION(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt0940.bin", 0x0, 0x20, CRC(55493b9e) SHA1(6e0668f7e85e1bb5b2ecc6e5a5ab53e5281f22e9))
-
-	// 40 and 70 are sequential and have same date stamp
-	ROM_REGION(0x40000, "prg1", 0)
-	ROMX_LOAD("mprgp040b_apr_02_92.u313", 0, 0x10000, CRC(3b3fce3d) SHA1(077ddf9124d1cbca4be1f1deffa39b10f6a80fb2), ROM_SKIP(3))
-	ROMX_LOAD("mprgp070b_apr_02_92.u310", 2, 0x10000, CRC(29020df3) SHA1(e3c20d361acf5a9d496c3057a9baa108bd840acc), ROM_SKIP(3))
-	ROMX_LOAD("mprgp080b_apr_02_92.u306", 3, 0x10000, CRC(61efb8f7) SHA1(4f70230d01b9e1ee76b187a2d6653601b120578e), ROM_SKIP(3))
-	ROMX_LOAD("mprgp050b_apr_02_92.u239", 1, 0x10000, CRC(866975b2) SHA1(b8caa30bd2824ee28bb82afe9275268822ac8f40), ROM_SKIP(3))
-
-	// 64k treated as 256k?
-	ROM_REGION(0x40000, "mprgp060b", 0)
-	ROM_LOAD32_BYTE("mprgp060b_16_mar_92.u222", 0, 0x10000, CRC(9bac2c00) SHA1(b31b8930d501277dd2a8d3438ac8422de412c8f6))
-
-	ROM_REGION(0x4000, "mprgp010a", 0)
-	ROM_LOAD("mprgp010a_04_01_92.u207", 0, 0x4000, CRC(e461ab92) SHA1(ddf0a9ed635e54f2b32e54b39850204a3532f9f9))
-
-	ROM_REGION(0x4000, "mprgp020a", 0)
-	ROM_LOAD("mprgp020a_31_mar_92.u206", 0, 0x4000, CRC(38c129b4) SHA1(a33cd5c0f3e45fdd7e22df2ff1648f4d73b09b19))
-
 ROM_END
 
 ROM_START(mpcb896)
@@ -452,38 +376,41 @@ ROM_START(mpcb896)
 ROM_END
 
 /*
- * MPCB828: EDGE-1 graphics, 1 megapixel, single screen, 60Hz refresh.
- *
- * Screen timings to match PCB963.
- *
- * "9 planes (1 for highlights) of double-buffered graphics, 256 colours from 16.7 million"
- * 1024x1024x10x2 == 2621440 bytes == 2560KiB == 2.5MiB
- * FIXME: diag reports 128KiB static ram, 1MiB video ram, 4 screens, 1 user, z-buffer absent
- *
- */
-void mpcb828_device::device_add_mconfig(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
-	//m_screen->set_raw(83'020'800, 1184, 0, 1184, 884, 0, 884);
-	m_screen->set_screen_update(FUNC(mpcb828_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(mpcb828_device::vblank));
+* MPCB828: EDGE-1 graphics, 1 megapixel, single screen, 60Hz refresh.
+*
+* Screen timings to match PCB963.
+*
+* "9 planes (1 for highlights) of double-buffered graphics, 256 colours from 16.7 million"
+* 1024x1024x10x2 == 2621440 bytes == 2560KiB == 2.5MiB
+* FIXME: diag reports 128KiB static ram, 1MiB video ram, 4 screens, 1 user, z-buffer absent
+* 
+*/
+MACHINE_CONFIG_START(mpcb828_device::device_add_mconfig)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34)
+	//MCFG_SCREEN_RAW_PARAMS(83'020'800, 1184, 0, 1184, 884, 0, 884)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb828_device, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, vblank))
 
-	RAM(config, "sram").set_default_size("128KiB").set_default_value(0);
-	RAM(config, "vram").set_default_size("2560KiB").set_default_value(0);
+	MCFG_DEVICE_ADD("sram", RAM, 0)
+	MCFG_RAM_DEFAULT_SIZE("128KiB")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
-	TMS32030(config, m_dsp, 30_MHz_XTAL);
-	m_dsp->holda().set(FUNC(mpcb828_device::holda));
-	m_dsp->set_disable();
-	//MCFG_DEVICE_ADDRESS_MAP(0, map_dynamic<2>)
+	MCFG_DEVICE_ADD("vram", RAM, 0)
+	MCFG_RAM_DEFAULT_SIZE("2560KiB")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
-	BT458(config, "ramdac", 83'020'800);
+	MCFG_DEVICE_ADD("dsp", TMS32030, 1) // 30_MHz_XTAL
+	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, mpcb828_device, holda))
 
-	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
-	m_scc->out_int_callback().set(FUNC(mpcb828_device::scc_irq));
-	m_scc->out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
+	MCFG_DEVICE_ADD("ramdac", BT458, 83'020'800)
 
-	INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "hle_en_us").rxd_handler_cb().set(m_scc, FUNC(z80scc_device::rxa_w));
+	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, mpcb828_device, scc_irq))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
+
+	MCFG_INTERPRO_KEYBOARD_PORT_ADD("kbd", interpro_keyboard_devices, "hle_en_us")
+	MCFG_INTERPRO_KEYBOARD_RXD_HANDLER(WRITELINE("scc", z80scc_device, rxa_w))
 MACHINE_CONFIG_END
 
 /*
@@ -494,28 +421,32 @@ MACHINE_CONFIG_END
  *
  * Inputs htotal=? (1664+?) and vtotal=? (1248+?) give hsync=?kHz.
  */
-void mpcb849_device::device_add_mconfig(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(164'609'300, 2112, 0, 1664, 1299, 0, 1248);
-	m_screen->set_screen_update(FUNC(mpcb849_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
+MACHINE_CONFIG_START(mpcb849_device::device_add_mconfig)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(164'609'300, 2112, 0, 1664, 1299, 0, 1248)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb849_device, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, vblank))
 
-	RAM(config, "sram").set_default_size("128KiB").set_default_value(0);
-	RAM(config, "vram").set_default_size("5120KiB").set_default_value(0); // size is a guess
+	MCFG_DEVICE_ADD("sram", RAM, 0)
+	MCFG_RAM_DEFAULT_SIZE("128KiB")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
-	TMS32030(config, m_dsp, 30_MHz_XTAL);
-	m_dsp->holda().set(FUNC(mpcb828_device::holda));
-	m_dsp->set_disable();
+	MCFG_DEVICE_ADD("vram", RAM, 0)
+	MCFG_RAM_DEFAULT_SIZE("5120KiB") // guess
+	MCFG_RAM_DEFAULT_VALUE(0)
 
-	BT458(config, "ramdac", 0); // unconfirmed clock
+	MCFG_DEVICE_ADD("dsp", TMS32030, 1) // 30_MHz_XTAL
+	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, mpcb828_device, holda))
 
-	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
-	m_scc->out_int_callback().set(FUNC(mpcb849_device::scc_irq));
-	m_scc->out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
+	MCFG_DEVICE_ADD("ramdac", BT458, 0) // unconfirmed clock
 
-	INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "hle_en_us").rxd_handler_cb().set(m_scc, FUNC(z80scc_device::rxa_w));
-}
+	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, mpcb849_device, scc_irq))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
+
+	MCFG_INTERPRO_KEYBOARD_PORT_ADD("kbd", interpro_keyboard_devices, "hle_en_us")
+	MCFG_INTERPRO_KEYBOARD_RXD_HANDLER(WRITELINE("scc", z80scc_device, rxa_w))
+MACHINE_CONFIG_END
 
 /*
  * MPCB030/MPCBA63: EDGE-2 graphics, 1 megapixel, single/dual screen, 60Hz refresh.
@@ -525,21 +456,19 @@ void mpcb849_device::device_add_mconfig(machine_config &config)
  *
  * Inputs htotal=? (1184+?) and vtotal=? (884+?) give hsync=?kHz.
  */
-void mpcb030_device::device_add_mconfig(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(mpcb030_device::device_add_mconfig)
+MACHINE_CONFIG_END
 
-void mpcba63_device::device_add_mconfig(machine_config &config)
-{
-	//SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+MACHINE_CONFIG_START(mpcba63_device::device_add_mconfig)
+	//MCFG_SCREEN_ADD("screen", RASTER)
 	// screen params copied from GT
-	//m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
-	//m_screen->set_screen_update().set(FUNC(mpcba63_device::screen_update));
-	//m_screen->screen_vblank().set(FUNC(?, vblank));
-	//BT457(config, "ramdac0", 0); // PS045701-165
-	//BT457(config, "ramdac1", 0);
-	//BT457(config, "ramdac2", 0);
-}
+	//MCFG_SCREEN_RAW_PARAMS(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34)
+	//MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcba63_device, screen_update)
+	//MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(?, vblank))
+	//MCFG_DEVICE_ADD("ramdac0", BT457, 0) // PS045701-165
+	//MCFG_DEVICE_ADD("ramdac0", BT457, 0)
+	//MCFG_DEVICE_ADD("ramdac0", BT457, 0)
+MACHINE_CONFIG_END
 
 /*
  * MSMT094/MPCB896: EDGE-2 Plus graphics, 2 megapixels, single screen, 60Hz refresh.
@@ -549,44 +478,44 @@ void mpcba63_device::device_add_mconfig(machine_config &config)
  *
  * Inputs htotal=2112 (1664+448) and vtotal=1299 (1248+51) give hsync=77.940kHz.
  */
-void msmt094_device::device_add_mconfig(machine_config &config)
-{
-	TMS32030(config, m_dsp1, 33.333_MHz_XTAL);
-	m_dsp1->holda().set(FUNC(msmt094_device::holda));
-	m_dsp1->set_addrmap(0, &msmt094_device::dsp1_map);
-	m_dsp1->set_disable();
-
-	RAM(config, "ram").set_default_size("6MiB").set_default_value(0);
-
-	//TMS32030(config, m_dsp2, 40_MHz_XTAL);
-	//TMS32030(config, m_dsp3, 40_MHz_XTAL);
+MACHINE_CONFIG_START(msmt094_device::device_add_mconfig)
+	// FIXME: actually 33.333_MHz_XTAL
+	MCFG_DEVICE_ADD("dsp1", TMS32030, 1)
+	MCFG_TMS3203X_HOLDA_CB(WRITELINE(DEVICE_SELF, msmt094_device, holda))
+	//MCFG_DEVICE_ADD("dsp2", TMS32030, 40_MHz_XTAL)
+	//MCFG_DEVICE_ADD("dsp3", TMS32030, 40_MHz_XTAL)
 
 	// FIXME: actually Z0853006VSC
-	scc8530_device& scc(SCC8530N(config, "scc", 4.9152_MHz_XTAL));
-	scc.out_int_callback().set(FUNC(msmt094_device::scc_irq));
-	scc.out_txda_callback().set("kbd", FUNC(interpro_keyboard_port_device::write_txd));
+	MCFG_SCC8530_ADD("scc", 4.9152_MHz_XTAL, 0, 0, 0, 0)
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(DEVICE_SELF, msmt094_device, scc_irq))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("kbd", interpro_keyboard_port_device, write_txd))
 
-	INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "hle_en_us").rxd_handler_cb().set("scc", FUNC(z80scc_device::rxa_w));
-}
+	MCFG_INTERPRO_KEYBOARD_PORT_ADD("kbd", interpro_keyboard_devices, "hle_en_us")
+	MCFG_INTERPRO_KEYBOARD_RXD_HANDLER(WRITELINE("scc", z80scc_device, rxa_w))
+MACHINE_CONFIG_END
 
-void mpcb896_device::device_add_mconfig(machine_config &config)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(164'609'300, 2112, 0, 1664, 1299, 0, 1248);
-	m_screen->set_screen_update(FUNC(mpcb896_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
+MACHINE_CONFIG_START(mpcb896_device::device_add_mconfig)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(164'609'300, 2112, 0, 1664, 1299, 0, 1248)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, mpcb896_device, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(DEVICE_SELF, device_srx_card_interface, vblank))
 
-	RAM(config, "sram").set_default_size("256KiB").set_default_value(0);
-	RAM(config, "vram").set_default_size("18MiB").set_default_value(0);
+	MCFG_DEVICE_ADD("sram", RAM, 0)
+	MCFG_RAM_DEFAULT_SIZE("256KiB")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
-	BT457(config, "ramdac0", 164'609'300);
-	BT457(config, "ramdac1", 164'609'300);
-	BT457(config, "ramdac2", 164'609'300);
-}
+	MCFG_DEVICE_ADD("vram", RAM, 0)
+	MCFG_RAM_DEFAULT_SIZE("18MiB")
+	MCFG_RAM_DEFAULT_VALUE(0)
+
+	MCFG_DEVICE_ADD("ramdac0", BT457, 164'609'300)
+	MCFG_DEVICE_ADD("ramdac1", BT457, 164'609'300)
+	MCFG_DEVICE_ADD("ramdac2", BT457, 164'609'300)
+MACHINE_CONFIG_END
 
 edge1_device_base::edge1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_srx_card_interface(mconfig, *this)
+	, srx_card_device_base(mconfig, *this)
 	, m_screen(*this, "screen")
 	, m_sram(*this, "sram")
 	, m_vram(*this, "vram")
@@ -598,13 +527,13 @@ edge1_device_base::edge1_device_base(const machine_config &mconfig, device_type 
 
 edge2_processor_device_base::edge2_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_srx_card_interface(mconfig, *this)
+	, srx_card_device_base(mconfig, *this)
 {
 }
 
 edge2plus_processor_device_base::edge2plus_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_srx_card_interface(mconfig, *this)
+	, srx_card_device_base(mconfig, *this)
 	, m_dsp1(*this, "dsp1")
 	, m_screen(nullptr)
 {
@@ -612,13 +541,13 @@ edge2plus_processor_device_base::edge2plus_processor_device_base(const machine_c
 
 edge2_framebuffer_device_base::edge2_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_srx_card_interface(mconfig, *this)
+	, srx_card_device_base(mconfig, *this)
 {
 }
 
 edge2plus_framebuffer_device_base::edge2plus_framebuffer_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_srx_card_interface(mconfig, *this)
+	, srx_card_device_base(mconfig, *this)
 	, m_screen(*this, "screen")
 	, m_sram(*this, "sram")
 	, m_vram(*this, "vram")
@@ -688,26 +617,42 @@ const tiny_rom_entry *mpcb896_device::device_rom_region() const
 
 void edge1_device_base::device_start()
 {
+	set_bus_device();
+
 	// FIXME: dynamically allocate SR region 4
 	m_bus->install_map(*this, 0x90000000, 0x93ffffff, &edge1_device_base::map_dynamic);
 }
 
+void edge2_processor_device_base::device_start()
+{
+	set_bus_device();
+}
+
+void edge2plus_processor_device_base::device_start()
+{
+	set_bus_device();
+}
+
+void edge2_framebuffer_device_base::device_start()
+{
+	set_bus_device();
+}
 
 void edge2plus_framebuffer_device_base::device_start()
 {
+	set_bus_device();
+
 	// find the processor board and notify it of our screen
 	edge2plus_processor_device_base *processor = m_bus->get_card<edge2plus_processor_device_base>();
 	if (processor != nullptr)
 	{
 		LOG("found processor device %s\n", processor->tag());
 
-		processor->register_screen(m_screen, m_sram);
+		processor->register_screen(m_screen);
 	}
 
 	// FIXME: dynamically allocate SR region 4
 	m_bus->install_map(*this, 0x90000000, 0x93ffffff, &edge2plus_framebuffer_device_base::map_dynamic);
-
-	processor->m_dsp1->set_addrmap(0, address_map_constructor(&edge2plus_framebuffer_device_base::map_dynamic, processor->m_dsp1->tag(), this));
 }
 
 u32 mpcb849_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -718,18 +663,6 @@ u32 mpcb849_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 u32 mpcba63_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
-}
-
-WRITE_LINE_MEMBER(edge1_device_base::vblank)
-{
-	if (state)
-	{
-		// TODO: set vblank status
-		m_bus->irq3_w(ASSERT_LINE);
-		m_bus->irq3_w(CLEAR_LINE);
-	}
-	else
-		; // TODO: clear vblank status
 }
 
 u32 edge1_device_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -765,10 +698,6 @@ u32 edge2plus_framebuffer_device_base::screen_update(screen_device &screen, bitm
 
 WRITE32_MEMBER(edge1_device_base::control_w)
 {
-	// clear interrupt
-	if (m_control & HOLDA_INT_H && !(data & HOLDA_INT_H))
-		irq0(CLEAR_LINE);
-
 	COMBINE_DATA(&m_control);
 
 	// release dsp 1 hold
@@ -782,7 +711,7 @@ WRITE32_MEMBER(edge1_device_base::control_w)
 
 WRITE_LINE_MEMBER(edge1_device_base::holda)
 {
-	LOGMASKED(LOG_INTERRUPT, "hold acknowledge %d\n", state);
+	LOG("hold acknowledge %d\n", state);
 
 	if (state)
 	{
@@ -814,7 +743,7 @@ WRITE32_MEMBER(edge2plus_processor_device_base::control_w)
 
 WRITE_LINE_MEMBER(edge2plus_processor_device_base::holda)
 {
-	LOGMASKED(LOG_INTERRUPT, "hold acknowledge %d\n", state);
+	LOG("hold acknowledge %d\n", state);
 
 	if (state)
 	{
@@ -830,73 +759,16 @@ WRITE_LINE_MEMBER(edge2plus_processor_device_base::holda)
 		m_status &= ~DSP_1_HOLDA_H;
 }
 
-void edge2plus_processor_device_base::dsp1_map(address_map &map)
-{
-	map(0x00000, 0x3ffff).lrw8("sram",
-		[this](address_space &space, offs_t offset, u8 mem_mask) { return m_sram->read(offset); },
-		[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) { m_sram->write(offset, data); });
-
-	map(0x40000, 0x7ffff).lr32("prg1",
-		[this](address_space &space, offs_t offset, u32 mem_mask) { return memregion("prg1")->as_u32(offset); });
-}
-
-
 WRITE32_MEMBER(edge2plus_framebuffer_device_base::lut_select_w)
 {
 	LOG("select ramdac %d\n", data);
 
-	//void (bt457_device::*map)(address_map &) = &bt457_device::map;
+	void (bt457_device::*map)(address_map &) = &bt457_device::map;
 
 	// TODO: not sure what should happen for values > 2
 	// FIXME: this should probably be some kind of bank device, including the idprom
-	//m_bus->main_space()->install_device(0x92028280U, 0x9202828fU, *m_ramdac[data % 3], map, 0xff, 8);
-	//m_bus->io_space()->install_device(0x92028280U, 0x9202828fU, *m_ramdac[data % 3], map, 0xff, 8);
+	m_bus->main_space()->install_device(0x92028280U, 0x9202828fU, *m_ramdac[data % 3], map, 0xff, 8);
+	m_bus->io_space()->install_device(0x92028280U, 0x9202828fU, *m_ramdac[data % 3], map, 0xff, 8);
 
 	// lookup table 3 enables address range 92030000-92030fff, written with zeroes
-}
-
-WRITE_LINE_MEMBER(edge1_device_base::scc_irq)
-{
-	if (state)
-		m_reg0 |= SCC_INT;
-	else
-		m_reg0 &= ~SCC_INT;
-
-	irq0(state);
-}
-
-READ32_MEMBER(edge1_device_base::reg0_r)
-{
-	return ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0));
-}
-
-WRITE32_MEMBER(edge1_device_base::kernel_w)
-{
-	COMBINE_DATA(&m_kernel);
-
-	m_status |= KREG_IN_FULL; // FIXME: what clears this?
-}
-
-WRITE_LINE_MEMBER(edge2plus_processor_device_base::scc_irq)
-{
-	if (state)
-		m_reg0 |= SCC_INT;
-	else
-		m_reg0 &= ~SCC_INT;
-
-	irq0(state);
-}
-
-WRITE32_MEMBER(edge2plus_processor_device_base::kernel_w)
-{
-	COMBINE_DATA(&m_kernel);
-
-	m_status |= KREG_IN_FULL;  // FIXME: what clears this?
-}
-
-READ32_MEMBER(edge2plus_processor_device_base::reg0_r)
-{
-	LOG("reg0_r vblank %d\n", m_screen->vblank());
-
-	return (m_screen == nullptr) ? (m_reg0 & ~VBLANK) : ((m_reg0 & ~VBLANK) | (m_screen->vblank() ? VBLANK : 0));
 }

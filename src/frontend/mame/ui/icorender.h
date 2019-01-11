@@ -10,10 +10,10 @@
     http://vitiy.info/Code/ico.cpp
 
 ***************************************************************************/
-#ifndef MAME_FRONTEND_MAME_UI_ICORENDER_H
-#define MAME_FRONTEND_MAME_UI_ICORENDER_H
-
 #pragma once
+
+#ifndef __UI_ICORENDER_H__
+#define __UI_ICORENDER_H__
 
 // These next two structs represent how the icon information is stored
 // in an ICO file.
@@ -230,4 +230,4 @@ inline void render_load_ico(bitmap_argb32 &bitmap, emu_file &file, const char *d
 	global_free_array(buffer);
 }
 
-#endif // MAME_FRONTEND_MAME_UI_ICORENDER_H
+#endif /* __UI_ICORENDER_H__ */

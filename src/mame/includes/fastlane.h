@@ -5,23 +5,18 @@
     Fast Lane
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_FASTLANE_H
-#define MAME_INCLUDES_FASTLANE_H
-
-#pragma once
 
 #include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k007121.h"
 #include "video/k051733.h"
-#include "emupal.h"
 #include "screen.h"
 
 class fastlane_state : public driver_device
 {
 public:
-	fastlane_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	fastlane_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_k007121_regs(*this, "k007121_regs"),
 		m_videoram1(*this, "videoram1"),
@@ -32,12 +27,8 @@ public:
 		m_k007121(*this, "k007121"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void fastlane(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 
 	/* memory pointers */
@@ -72,12 +63,11 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	void fastlane_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(fastlane);
 	uint32_t screen_update_fastlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(fastlane_scanline);
 	DECLARE_WRITE8_MEMBER(volume_callback0);
 	DECLARE_WRITE8_MEMBER(volume_callback1);
+	void fastlane(machine_config &config);
 	void fastlane_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_FASTLANE_H

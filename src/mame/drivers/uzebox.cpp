@@ -43,9 +43,6 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
-	void uzebox(machine_config &config);
-
-private:
 	required_device<avr8_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
@@ -68,10 +65,11 @@ private:
 	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
+	void uzebox(machine_config &config);
 	void uzebox_data_map(address_map &map);
 	void uzebox_io_map(address_map &map);
 	void uzebox_prg_map(address_map &map);
-
+private:
 	int             m_vpos;
 	uint64_t          m_line_start_cycles;
 	uint32_t          m_line_pos_cycles;
@@ -213,10 +211,10 @@ void uzebox_state::uzebox_data_map(address_map &map)
 
 void uzebox_state::uzebox_io_map(address_map &map)
 {
-	map(AVR8_REG_A, AVR8_REG_A).rw(FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
-	map(AVR8_REG_B, AVR8_REG_B).rw(FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
-	map(AVR8_REG_C, AVR8_REG_C).rw(FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
-	map(AVR8_REG_D, AVR8_REG_D).rw(FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
+	map(AVR8_REG_A, AVR8_REG_A).rw(this, FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
+	map(AVR8_REG_B, AVR8_REG_B).rw(this, FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
+	map(AVR8_REG_C, AVR8_REG_C).rw(this, FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
+	map(AVR8_REG_D, AVR8_REG_D).rw(this, FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
 }
 
 /****************************************************\
@@ -284,36 +282,38 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 * Machine definition                                 *
 \****************************************************/
 
-void uzebox_state::uzebox(machine_config &config)
-{
+MACHINE_CONFIG_START(uzebox_state::uzebox)
+
 	/* basic machine hardware */
-	ATMEGA644(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::uzebox_prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::uzebox_data_map);
-	m_maincpu->set_addrmap(AS_IO, &uzebox_state::uzebox_io_map);
-	m_maincpu->set_eeprom_tag("eeprom");
+	MCFG_DEVICE_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(uzebox_prg_map)
+	MCFG_DEVICE_DATA_MAP(uzebox_data_map)
+	MCFG_DEVICE_IO_MAP(uzebox_io_map)
+	MCFG_CPU_AVR8_EEPROM("eeprom")
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.99);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1395));
-	m_screen->set_size(870, 525);
-	m_screen->set_visarea(150, 870-1, 40, 488-1);
-	m_screen->set_screen_update(FUNC(uzebox_state::screen_update_uzebox));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.99)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395))
+	MCFG_SCREEN_SIZE(870, 525)
+	MCFG_SCREEN_VISIBLE_AREA(150, 870-1, 40, 488-1)
+	MCFG_SCREEN_UPDATE_DRIVER(uzebox_state, screen_update_uzebox)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "uzebox", "bin,uze");
-	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(device_image_load_delegate(&uzebox_state::device_image_load_uzebox_cart, this));
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "uzebox")
+	MCFG_GENERIC_EXTENSIONS("bin,uze")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(uzebox_state, uzebox_cart)
 
-	SNES_CONTROL_PORT(config, m_ctrl1, snes_control_port_devices, "joypad");
-	SNES_CONTROL_PORT(config, m_ctrl2, snes_control_port_devices, "joypad");
+	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")
+	MCFG_SNES_CONTROL_PORT_ADD("ctrl2", snes_control_port_devices, "joypad")
 
-	SOFTWARE_LIST(config, "eprom_list").set_original("uzebox");
-}
+	MCFG_SOFTWARE_LIST_ADD("eprom_list","uzebox")
+MACHINE_CONFIG_END
 
 ROM_START( uzebox )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )  /* Main program store */

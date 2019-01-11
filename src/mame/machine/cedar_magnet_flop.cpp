@@ -16,10 +16,9 @@ cedar_magnet_flop_device::cedar_magnet_flop_device(const machine_config &mconfig
 }
 
 
-void cedar_magnet_flop_device::device_add_mconfig(machine_config &config)
-{
-	NVRAM(config, "floppy_nvram", nvram_device::DEFAULT_NONE);
-}
+MACHINE_CONFIG_START(cedar_magnet_flop_device::device_add_mconfig)
+	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
+MACHINE_CONFIG_END
 
 
 void cedar_magnet_flop_device::device_start()

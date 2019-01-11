@@ -86,12 +86,11 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/lkage.h"
 
+#include "includes/lkage.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-
 #include "screen.h"
 #include "speaker.h"
 
@@ -124,7 +123,7 @@ void lkage_state::lkage_map(address_map &map)
 	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf000, 0xf003).ram().share("vreg"); /* video registers */
 	map(0xf060, 0xf060).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf061, 0xf061).nopw().r(FUNC(lkage_state::sound_status_r));
+	map(0xf061, 0xf061).nopw().r(this, FUNC(lkage_state::sound_status_r));
 	map(0xf063, 0xf063).nopw(); /* pulsed; nmi on sound cpu? */
 	map(0xf080, 0xf080).portr("DSW1");
 	map(0xf081, 0xf081).portr("DSW2");
@@ -137,21 +136,21 @@ void lkage_state::lkage_map(address_map &map)
 	map(0xf0e1, 0xf0e1).nopw(); /* pulsed */
 	map(0xf100, 0xf15f).ram().share("spriteram");
 	map(0xf160, 0xf1ff).ram(); /* unknown - no valid sprite data */
-	map(0xf400, 0xffff).ram().w(FUNC(lkage_state::lkage_videoram_w)).share("videoram");
+	map(0xf400, 0xffff).ram().w(this, FUNC(lkage_state::lkage_videoram_w)).share("videoram");
 }
 
 void lkage_state::lkage_map_mcu(address_map &map)
 {
 	lkage_map(map);
 	map(0xf062, 0xf062).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xf087, 0xf087).r(FUNC(lkage_state::mcu_status_r));
+	map(0xf087, 0xf087).r(this, FUNC(lkage_state::mcu_status_r));
 }
 
 void lkage_state::lkage_map_boot(address_map &map)
 {
 	lkage_map(map);
-	map(0xf062, 0xf062).rw(FUNC(lkage_state::fake_mcu_r), FUNC(lkage_state::fake_mcu_w));
-	map(0xf087, 0xf087).r(FUNC(lkage_state::fake_status_r));
+	map(0xf062, 0xf062).rw(this, FUNC(lkage_state::fake_mcu_r), FUNC(lkage_state::fake_mcu_w));
+	map(0xf087, 0xf087).r(this, FUNC(lkage_state::fake_status_r));
 }
 
 
@@ -162,7 +161,7 @@ READ8_MEMBER(lkage_state::port_fetch_r)
 
 void lkage_state::lkage_io_map(address_map &map)
 {
-	map(0x4000, 0x7fff).r(FUNC(lkage_state::port_fetch_r));
+	map(0x4000, 0x7fff).r(this, FUNC(lkage_state::port_fetch_r));
 }
 
 
@@ -177,8 +176,8 @@ void lkage_state::lkage_sound_map(address_map &map)
 	map(0x9000, 0x9001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw(); /* ??? */
-	map(0xb001, 0xb001).nopr() /* ??? */ .w(FUNC(lkage_state::lkage_sh_nmi_enable_w));
-	map(0xb002, 0xb002).w(FUNC(lkage_state::lkage_sh_nmi_disable_w));
+	map(0xb001, 0xb001).nopr() /* ??? */ .w(this, FUNC(lkage_state::lkage_sh_nmi_enable_w));
+	map(0xb002, 0xb002).w(this, FUNC(lkage_state::lkage_sh_nmi_disable_w));
 	map(0xb003, 0xb003).nopw();
 	map(0xe000, 0xefff).rom(); /* space for diagnostic ROM? */
 }
@@ -488,95 +487,108 @@ void lkage_state::machine_reset()
 	m_soundnmi->in_w<1>(0);
 }
 
-void lkage_state::lkage(machine_config &config)
-{
+MACHINE_CONFIG_START(lkage_state::lkage)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_map_mcu);
-	m_maincpu->set_addrmap(AS_IO, &lkage_state::lkage_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lkage_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_map_mcu)
+	MCFG_DEVICE_IO_MAP(lkage_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_sound_map);	/* IRQs are triggered by the YM2203 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_sound_map)
+								/* IRQs are triggered by the YM2203 */
 
-	TAITO68705_MCU(config, m_bmcu, MCU_CLOCK);
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,MCU_CLOCK)
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(2*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(lkage_state::screen_update_lkage));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lkage);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lkage)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
-	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ym2203_device &ym1(YM2203(config, "ym1", AUDIO_CLOCK));
-	ym1.irq_handler().set_inputline(m_audiocpu, 0);
-	ym1.add_route(0, "mono", 0.15);
-	ym1.add_route(1, "mono", 0.15);
-	ym1.add_route(2, "mono", 0.15);
-	ym1.add_route(3, "mono", 0.40);
+	MCFG_DEVICE_ADD("ym1", YM2203, AUDIO_CLOCK )
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	ym2203_device &ym2(YM2203(config, "ym2", AUDIO_CLOCK));
-	ym2.add_route(0, "mono", 0.15);
-	ym2.add_route(1, "mono", 0.15);
-	ym2.add_route(2, "mono", 0.15);
-	ym2.add_route(3, "mono", 0.40);
-}
+	MCFG_DEVICE_ADD("ym2", YM2203, AUDIO_CLOCK )
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+MACHINE_CONFIG_END
 
-void lkage_state::lkageb(machine_config &config)
-{
+
+MACHINE_CONFIG_START(lkage_state::lkageb)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_map_boot);
-	m_maincpu->set_addrmap(AS_IO, &lkage_state::lkage_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(lkage_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_map_boot)
+	MCFG_DEVICE_IO_MAP(lkage_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_sound_map); /* IRQs are triggered by the YM2203 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_sound_map)
+								/* IRQs are triggered by the YM2203 */
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(2*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(lkage_state::screen_update_lkage));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lkage);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lkage)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
-	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ym2203_device &ym1(YM2203(config, "ym1", AUDIO_CLOCK));
-	ym1.irq_handler().set_inputline("audiocpu", 0);
-	ym1.add_route(0, "mono", 0.15);
-	ym1.add_route(1, "mono", 0.15);
-	ym1.add_route(2, "mono", 0.15);
-	ym1.add_route(3, "mono", 0.40);
+	MCFG_DEVICE_ADD("ym1", YM2203, AUDIO_CLOCK)
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	ym2203_device &ym2(YM2203(config, "ym2", AUDIO_CLOCK));
-	ym2.add_route(0, "mono", 0.15);
-	ym2.add_route(1, "mono", 0.15);
-	ym2.add_route(2, "mono", 0.15);
-	ym2.add_route(3, "mono", 0.40);
-}
+	MCFG_DEVICE_ADD("ym2", YM2203, AUDIO_CLOCK)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+MACHINE_CONFIG_END
 
 ROM_START( lkage )
 	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 code (main CPU) */

@@ -98,7 +98,7 @@ void bionicc_state::video_start()
 	m_bg_tilemap->set_transparent_pen(15);
 }
 
-rgb_t bionicc_state::RRRRGGGGBBBBIIII(uint32_t raw)
+PALETTE_DECODER_MEMBER( bionicc_state, RRRRGGGGBBBBIIII )
 {
 	uint8_t bright = (raw & 0x0f);
 

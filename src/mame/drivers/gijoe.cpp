@@ -212,12 +212,12 @@ void gijoe_state::gijoe_map(address_map &map)
 	map(0x1a0000, 0x1a001f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x1b0000, 0x1b003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x1c0000, 0x1c001f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x1d0000, 0x1d0001).w(FUNC(gijoe_state::sound_irq_w));
+	map(0x1d0000, 0x1d0001).w(this, FUNC(gijoe_state::sound_irq_w));
 	map(0x1e0000, 0x1e0001).portr("P1_P2");
 	map(0x1e0002, 0x1e0003).portr("P3_P4");
 	map(0x1e4000, 0x1e4001).portr("SYSTEM");
 	map(0x1e4002, 0x1e4003).portr("START");
-	map(0x1e8000, 0x1e8001).rw(FUNC(gijoe_state::control2_r), FUNC(gijoe_state::control2_w));
+	map(0x1e8000, 0x1e8001).rw(this, FUNC(gijoe_state::control2_r), FUNC(gijoe_state::control2_w));
 	map(0x1f0000, 0x1f0001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
 #if JOE_DEBUG
 	map(0x110000, 0x110007).r(m_k053246, FUNC(k053247_device::k053246_reg_word_r));
@@ -291,53 +291,55 @@ void gijoe_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-void gijoe_state::gijoe(machine_config &config)
-{
+MACHINE_CONFIG_START(gijoe_state::gijoe)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);   /* 16MHz Confirmed */
-	m_maincpu->set_addrmap(AS_PROGRAM, &gijoe_state::gijoe_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gijoe_state::gijoe_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 16MHz Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(gijoe_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/4);     /* Amuse & confirmed. Z80E at 8MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gijoe_state::sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(24, 24+288-1, 16, 16+224-1);
-	screen.set_screen_update(FUNC(gijoe_state::screen_update_gijoe));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gijoe_state, screen_update_gijoe)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(gijoe_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
-	m_k056832->set_palette(m_palette);
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(gijoe_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
+	MCFG_K056832_PALETTE("palette")
 
-	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(gijoe_state::sprite_callback), this);
-	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -37, 20);
-	m_k053246->set_palette(m_palette);
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(gijoe_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -37, 20)
+	MCFG_K053246_PALETTE("palette")
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
-	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
-	k054539.timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
-	k054539.add_route(0, "rspeaker", 1.0);
-	k054539.add_route(1, "lspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
+	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 
 ROM_START( gijoe )

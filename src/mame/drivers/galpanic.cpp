@@ -138,15 +138,15 @@ void galpanic_state::galpanic_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x400001, 0x400001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x500000, 0x51ffff).ram().share("fgvideoram");
-	map(0x520000, 0x53ffff).ram().w(FUNC(galpanic_state::bgvideoram_w)).share("bgvideoram");  /* + work RAM */
+	map(0x520000, 0x53ffff).ram().w(this, FUNC(galpanic_state::bgvideoram_w)).share("bgvideoram");  /* + work RAM */
 	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  /* 1024 colors, but only 512 seem to be used */
 	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
 	map(0x702000, 0x704fff).ram();
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
 	map(0x800004, 0x800005).portr("SYSTEM");
-	map(0x900000, 0x900001).w(FUNC(galpanic_state::m6295_bankswitch_w));
-	map(0xa00000, 0xa00001).w(FUNC(galpanic_state::coin_w));  /* coin counters */
+	map(0x900000, 0x900001).w(this, FUNC(galpanic_state::m6295_bankswitch_w));
+	map(0xa00000, 0xa00001).w(this, FUNC(galpanic_state::coin_w));  /* coin counters */
 	map(0xb00000, 0xb00001).nopw();    /* ??? */
 	map(0xc00000, 0xc00001).nopw();    /* ??? */
 	map(0xd00000, 0xd00001).nopw();    /* ??? */
@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_DEVICE_PROGRAM_MAP(galpanic_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpanic_state, scanline, "screen", 0, 1)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -249,15 +249,16 @@ MACHINE_CONFIG_START(galpanic_state::galpanic)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galpanic_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, galpanic_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galpanic);
-	// fg palette RAM, bit 0 seems to be a transparency flag for the front bitmap
-	PALETTE(config, m_palette, FUNC(galpanic_state::galpanic_palette)).set_format(palette_device::GRBx_555, 1024 + 32768);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galpanic)
+	MCFG_PALETTE_ADD("palette", 1024 + 32768)
+	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx) // fg palette ram, bit 0 seems to be a transparency flag for the front bitmap
+	MCFG_PALETTE_INIT_OWNER(galpanic_state, galpanic)
 
-	KANEKO_PANDORA(config, m_pandora, 0);
-	m_pandora->set_offsets(0, -16);
-	m_pandora->set_gfxdecode_tag(m_gfxdecode);
+	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
+	MCFG_KANEKO_PANDORA_OFFSETS(0, -16)
+	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -274,10 +275,12 @@ MACHINE_CONFIG_START(galpanic_state::galpanica)
 	MCFG_DEVICE_PROGRAM_MAP(galpanica_map)
 
 	/* basic machine hardware */
-	KANEKO_HIT(config, "calc1_mcu").set_type(0);
+	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
+	MCFG_KANEKO_HIT_TYPE(0)
 
 	/* arm watchdog */
-	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
+	MCFG_WATCHDOG_MODIFY("watchdog")
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
 

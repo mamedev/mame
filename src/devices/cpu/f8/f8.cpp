@@ -7,27 +7,6 @@
  *  This work is based on Frank Palazzolo's F8 emulation in a standalone
  *  Fairchild Channel F emulator and the 'Fairchild F3850 CPU' data sheets.
  *
- *  The 3850 CPU itself does not include the address bus, pointer registers
- *  or an interrupt controller. Those functions are provided by at least one
- *  of the following devices:
- *
- *  - 3851 Program Storage Unit (PSU)
- *  - 3852 Dynamic Memory Interface (DMI)
- *  - 3853 Static Memory Interface (SMI)
- *  - 3856 Program Storage Unit (PSU)
- *  - 3861 Peripheral Input/Output (PIO)
- *  - 3871 Peripheral Input/Output (PIO)
- *
- *  Of these support devices, the 3851 PSU includes 1024 bytes of mask ROM,
- *  and the 3856 PSU includes 2048 bytes of mask ROM; addressing for the PSU
- *  is also determined by mask option. The 3853 SMI may be used with external
- *  program ROMs.
- *
- *  The PSU does not have DC0 and DC1, only DC0; as a result, it does not
- *  respond to the main CPU's DC0/DC1 swap instruction.  This may lead to two
- *  devices responding to the same DC0 address and attempting to place their
- *  bytes on the data bus simultaneously!
- *
  *****************************************************************************/
 
 #include "emu.h"
@@ -959,9 +938,8 @@ void f8_cpu_device::f8_com()
  ***************************************************/
 void f8_cpu_device::f8_lnk()
 {
-	bool c = (m_w & C) != 0;
 	CLR_OZCS();
-	if (c)
+	if (m_w & C)
 		m_a = do_add(m_a,1);
 	SET_SZ(m_a);
 }

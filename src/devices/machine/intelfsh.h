@@ -9,6 +9,113 @@
 
 #pragma once
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_INTEL_28F016S5_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_28F016S5, 0)
+
+#define MCFG_SHARP_LH28F016S_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SHARP_LH28F016S, 0)
+
+#define MCFG_SHARP_LH28F016S_16BIT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SHARP_LH28F016S_16BIT, 0)
+
+#define MCFG_ATMEL_29C010_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ATMEL_29C010, 0)
+
+#define MCFG_ATMEL_49F4096_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ATMEL_49F4096, 0)
+
+#define MCFG_AMD_29F010_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F010, 0)
+
+#define MCFG_AMD_29F040_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F040, 0)
+
+#define MCFG_AMD_29F080_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F080, 0)
+
+#define MCFG_AMD_29F400T_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F400T, 0)
+
+#define MCFG_AMD_29F800T_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F800T, 0)
+
+#define MCFG_AMD_29F800B_16BIT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29F800B_16BIT, 0)
+
+#define MCFG_AMD_29LV200T_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AMD_29LV200T, 0)
+
+#define MCFG_FUJITSU_29F160T_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, FUJITSU_29F160T, 0)
+
+#define MCFG_FUJITSU_29F016A_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, FUJITSU_29F016A, 0)
+
+#define MCFG_FUJITSU_29DL16X_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, FUJITSU_29DL16X, 0)
+
+#define MCFG_INTEL_E28F400B_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_E28F400B, 0)
+
+#define MCFG_MACRONIX_29L001MC_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MACRONIX_29L001MC, 0)
+
+#define MCFG_MACRONIX_29LV160TMC_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MACRONIX_29LV160TMC, 0)
+
+#define MCFG_PANASONIC_MN63F805MNP_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PANASONIC_MN63F805MNP, 0)
+
+#define MCFG_SANYO_LE26FV10N1TS_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SANYO_LE26FV10N1TS, 0)
+
+#define MCFG_SST_28SF040_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SST_28SF040, 0)
+
+#define MCFG_SST_39VF020_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SST_39VF020, 0)
+
+#define MCFG_SHARP_LH28F400_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SHARP_LH28F400, 0)
+
+#define MCFG_INTEL_E28F008SA_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_E28F008SA, 0)
+
+#define MCFG_INTEL_TE28F160_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_TE28F160, 0)
+
+#define MCFG_INTEL_TE28F320_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_TE28F320, 0)
+
+#define MCFG_SHARP_UNK128MBIT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SHARP_UNK128MBIT, 0)
+
+#define MCFG_INTEL_28F320J3D_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_28F320J3D, 0)
+
+#define MCFG_INTEL_28F320J5_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTEL_28F320J5, 0)
+
+#define MCFG_SST_39VF400A_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SST_39VF400A, 0)
+
+#define MCFG_TMS_29F040_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, TMS_29F040, 0)
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class intelfsh_device;
+
+
+// ======================> intelfsh_device
+
 class intelfsh_device : public device_t,
 						public device_nvram_interface
 {
@@ -102,6 +209,8 @@ class intelfsh8_device : public intelfsh_device
 {
 public:
 	// public interface
+	uint8_t read(offs_t offset) { return read_full(offset); }
+	void write(offs_t offset, uint8_t data) { write_full(offset, data); }
 	DECLARE_READ8_MEMBER(read) { return read_full(offset); }
 	DECLARE_WRITE8_MEMBER(write) { write_full(offset, data); }
 
@@ -120,6 +229,8 @@ class intelfsh16_device : public intelfsh_device
 {
 public:
 	// public interface
+	uint16_t read(offs_t offset) { return read_full(offset); }
+	void write(offs_t offset, uint16_t data) { write_full(offset, data); }
 	DECLARE_READ16_MEMBER(read) { return read_full(offset); }
 	DECLARE_WRITE16_MEMBER(write) { write_full(offset, data); }
 
@@ -138,188 +249,188 @@ protected:
 class intel_28f016s5_device : public intelfsh8_device
 {
 public:
-	intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_28f016s5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class fujitsu_29f160t_device : public intelfsh8_device
 {
 public:
-	fujitsu_29f160t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29f160t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class fujitsu_29f016a_device : public intelfsh8_device
 {
 public:
-	fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class fujitsu_29dl16x_device : public intelfsh8_device
 {
 public:
-	fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	fujitsu_29dl16x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class atmel_29c010_device : public intelfsh8_device
 {
 public:
-	atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	atmel_29c010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class amd_29f010_device : public intelfsh8_device
 {
 public:
-	amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class amd_29f040_device : public intelfsh8_device
 {
 public:
-	amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class amd_29f080_device : public intelfsh8_device
 {
 public:
-	amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class amd_29f400t_device : public intelfsh8_device
 {
 public:
-	amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class amd_29f800t_device : public intelfsh8_device
 {
 public:
-	amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f800t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class amd_29f800b_16bit_device : public intelfsh16_device
 {
 public:
-	amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class amd_29lv200t_device : public intelfsh8_device
 {
 public:
-	amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class sharp_lh28f016s_device : public intelfsh8_device
 {
 public:
-	sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class sharp_lh28f016s_16bit_device : public intelfsh16_device
 {
 public:
-	sharp_lh28f016s_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f016s_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class intel_e28f008sa_device : public intelfsh8_device
 {
 public:
-	intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_e28f008sa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class macronix_29l001mc_device : public intelfsh8_device
 {
 public:
-	macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class macronix_29lv160tmc_device : public intelfsh8_device
 {
 public:
-	macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	macronix_29lv160tmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class panasonic_mn63f805mnp_device : public intelfsh8_device
 {
 public:
-	panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class sanyo_le26fv10n1ts_device : public intelfsh8_device
 {
 public:
-	sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class sst_28sf040_device : public intelfsh8_device
 {
 public:
-	sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class sst_39vf020_device : public intelfsh8_device
 {
 public:
-	sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class tms_29f040_device : public intelfsh8_device
 {
 public:
-	tms_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tms_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 // 16-bit variants
 class sharp_lh28f400_device : public intelfsh16_device
 {
 public:
-	sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class intel_te28f160_device : public intelfsh16_device
 {
 public:
-	intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class intel_te28f320_device : public intelfsh16_device
 {
 public:
-	intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class intel_e28f400b_device : public intelfsh16_device
 {
 public:
-	intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class sharp_unk128mbit_device : public intelfsh16_device
 {
 public:
-	sharp_unk128mbit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sharp_unk128mbit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class intel_28f320j3d_device : public intelfsh16_device
 {
 public:
-	intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class intel_28f320j5_device : public intelfsh16_device
 {
 public:
-	intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	intel_28f320j5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class sst_39vf400a_device : public intelfsh16_device
 {
 public:
-	sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class atmel_49f4096_device : public intelfsh16_device
 {
 public:
-	atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	atmel_49f4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

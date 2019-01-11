@@ -108,14 +108,14 @@ WRITE8_MEMBER(hng64_state::hng64_comm_mmu_w)
 
 void hng64_state::hng_comm_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(hng64_state::hng64_comm_space_r), FUNC(hng64_state::hng64_comm_space_w));
+	map(0x0000, 0xffff).rw(this, FUNC(hng64_state::hng64_comm_space_r), FUNC(hng64_state::hng64_comm_space_w));
 }
 
 void hng64_state::hng_comm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	/* Reserved for the KL5C80 internal hardware */
-	map(0x00, 0x07).rw(FUNC(hng64_state::hng64_comm_mmu_r), FUNC(hng64_state::hng64_comm_mmu_w));
+	map(0x00, 0x07).rw(this, FUNC(hng64_state::hng64_comm_mmu_r), FUNC(hng64_state::hng64_comm_mmu_w));
 //  AM_RANGE(0x08,0x1f) AM_NOP              /* Reserved */
 //  AM_RANGE(0x20,0x25) AM_READWRITE        /* Timer/Counter B */           /* hng64 writes here */
 //  AM_RANGE(0x27,0x27) AM_NOP              /* Reserved */
@@ -128,7 +128,7 @@ void hng64_state::hng_comm_io_map(address_map &map)
 //  AM_RANGE(0x3c,0x3f) AM_NOP              /* Reserved */
 
 	/* General IO */
-	map(0x50, 0x57).rw(FUNC(hng64_state::hng64_com_share_r), FUNC(hng64_state::hng64_com_share_w));
+	map(0x50, 0x57).rw(this, FUNC(hng64_state::hng64_com_share_r), FUNC(hng64_state::hng64_com_share_w));
 //  AM_RANGE(0x72,0x72) AM_WRITE            /* dunno yet */
 }
 

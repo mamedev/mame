@@ -20,6 +20,32 @@
 #pragma once
 
 
+
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_DECO_RMC3_ADD(_tag, _entries) \
+	MCFG_DEVICE_ADD(_tag, DECO_RMC3, 0) \
+	MCFG_DECO_RMC3_SET_PALETTE_SIZE(_entries)
+
+#define MCFG_DECO_RMC3_MODIFY MCFG_DEVICE_MODIFY
+
+#define MCFG_DECO_RMC3_SET_PALETTE_SIZE(_entries) \
+	downcast<deco_rmc3_device &>(*device).set_entries(_entries);
+
+#define MCFG_DECO_RMC3_INDIRECT_ENTRIES(_entries) \
+	downcast<deco_rmc3_device &>(*device).set_indirect_entries( _entries);
+
+// other standard palettes
+#define MCFG_DECO_RMC3_ADD_PROMS(_tag, _region, _entries) \
+	MCFG_DECO_RMC3_ADD(_tag, _entries) \
+	downcast<deco_rmc3_device &>(*device).set_prom_region(_region); \
+	downcast<deco_rmc3_device &>(*device).set_init(deco_rmc3_palette_init_delegate(FUNC(deco_rmc3_device::palette_init_proms), downcast<deco_rmc3_device *>(device)));
+
+//#define MCFG_DECO_RMC3_INIT_OWNER(_class, _method)
+//  downcast<deco_rmc3_device &>(*device).set_init(deco_rmc3_palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -33,26 +59,15 @@ class deco_rmc3_device : public device_t, public device_palette_interface
 {
 public:
 	// construction/destruction
-	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, u32 entries)
-		: deco_rmc3_device(mconfig, tag, owner, clock)
-	{
-		set_entries(entries);
-	}
-
 	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
 	void set_init(deco_rmc3_palette_init_delegate init) { m_init = init; }
-	template <class FunctionClass> void set_init(const char *devname, void (FunctionClass::*callback)(deco_rmc3_device &), const char *name)
-	{
-		set_init(deco_rmc3_palette_init_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
 //  void set_membits(int membits);
 //  void set_endianness(endianness_t endianness);
 	void set_entries(u32 entries) { m_entries = entries; }
 	void set_indirect_entries(u32 entries) { m_indirect_entries = entries; }
 	void set_prom_region(const char *region) { m_prom_region.set_tag(region); }
-	template <typename T> void set_prom_region(T &&tag) { m_prom_region.set_tag(std::forward<T>(tag)); }
 
 	// palette RAM accessors
 	memory_array &basemem() { return m_paletteram; }

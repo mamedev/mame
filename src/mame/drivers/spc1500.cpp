@@ -233,7 +233,6 @@ TODO:
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -261,11 +260,7 @@ public:
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
-	{ }
-
-	void spc1500(machine_config &config);
-
-private:
+	{}
 	DECLARE_READ8_MEMBER(psga_r);
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -291,15 +286,15 @@ private:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
-	void spc_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(spc);
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
-
+	void spc1500(machine_config &config);
 	void spc1500_double_io(address_map &map);
 	void spc1500_mem(address_map &map);
-
+private:
 	uint8_t *m_p_ram;
 	uint8_t m_ipl;
 	uint8_t m_palet[3];
@@ -507,7 +502,7 @@ WRITE8_MEMBER( spc1500_state::palet_w)
 	}
 }
 
-void spc1500_state::spc_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(spc1500_state,spc)
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1,rgb_t(0x00,0x00,0xff));
@@ -647,7 +642,7 @@ WRITE8_MEMBER( spc1500_state::double_w)
 		if (offset < 0x1800) { pcg_w(space, offset, data); } else
 		if (offset < 0x1900) { crtc_w(space, offset, data); } else
 		if (offset < 0x1a00) {} else
-		if (offset < 0x1b00) { m_pio->write(offset, data); } else
+		if (offset < 0x1b00) { m_pio->write(space, offset, data);} else
 		if (offset < 0x1c00) { m_sound->data_w(space, offset, data);} else
 		if (offset < 0x1d00) { m_sound->address_w(space, offset, data);} else
 		if (offset < 0x1e00) { romsel(space, offset, data);} else
@@ -674,7 +669,7 @@ READ8_MEMBER( spc1500_state::io_r)
 	if (offset < 0x1800) { return pcg_r(space, offset); } else
 	if (offset < 0x1900) { return crtc_r(space, offset); } else
 	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
-	if (offset < 0x1b00) { return m_pio->read(offset); } else
+	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
 	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
 	if (offset < 0x2000) {} else
 	if (offset < 0x10000){
@@ -689,7 +684,7 @@ void spc1500_state::spc1500_double_io(address_map &map)
 	map.unmap_value_high();
 	map(0x2000, 0xffff).ram().share("videoram");
 	map(0x0000, 0x17ff).ram().share("pcgram");
-	map(0x0000, 0xffff).rw(FUNC(spc1500_state::io_r), FUNC(spc1500_state::double_w));
+	map(0x0000, 0xffff).rw(this, FUNC(spc1500_state::io_r), FUNC(spc1500_state::double_w));
 }
 
 /* Input ports */
@@ -893,35 +888,32 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
-
-	PALETTE(config, m_palette, FUNC(spc1500_state::spc_palette), 8);
-
-	MC6845(config, m_vdg, (VDP_CLOCK/48)); //unknown divider
-	m_vdg->set_screen("screen");
-	m_vdg->set_show_border_area(false);
-	m_vdg->set_char_width(8);
-	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row), this);
-	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig), this);
-
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
+	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
-	I8255(config, m_pio);
-	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	m_pio->in_pb_callback().set(FUNC(spc1500_state::portb_r));
-	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
-	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, spc1500_state, portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, spc1500_state, portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, spc1500_state, portc_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, m_sound, XTAL(4'000'000) / 2);
-	m_sound->port_a_read_callback().set(FUNC(spc1500_state::psga_r));
-	m_sound->port_b_write_callback().set(FUNC(spc1500_state::psgb_w));
-	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 2)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1500_state, psga_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, spc1500_state, psgb_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1500_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
@@ -934,7 +926,8 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 /* ROM definition */

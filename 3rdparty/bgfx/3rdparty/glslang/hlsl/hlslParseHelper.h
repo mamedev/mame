@@ -38,12 +38,12 @@
 
 #include "../glslang/MachineIndependent/parseVersions.h"
 #include "../glslang/MachineIndependent/ParseHelper.h"
-#include "../glslang/MachineIndependent/attribute.h"
 
 #include <array>
 
 namespace glslang {
 
+class TAttributeMap; // forward declare
 class TFunctionDeclarator;
 
 class HlslParseContext : public TParseContextBase {
@@ -80,10 +80,10 @@ public:
     bool isBuiltInMethod(const TSourceLoc&, TIntermTyped* base, const TString& field);
     void assignToInterface(TVariable& variable);
     void handleFunctionDeclarator(const TSourceLoc&, TFunction& function, bool prototype);
-    TIntermAggregate* handleFunctionDefinition(const TSourceLoc&, TFunction&, const TAttributes&, TIntermNode*& entryPointTree);
-    TIntermNode* transformEntryPoint(const TSourceLoc&, TFunction&, const TAttributes&);
-    void handleEntryPointAttributes(const TSourceLoc&, const TAttributes&);
-    void transferTypeAttributes(const TSourceLoc&, const TAttributes&, TType&, bool allowEntry = false);
+    TIntermAggregate* handleFunctionDefinition(const TSourceLoc&, TFunction&, const TAttributeMap&, TIntermNode*& entryPointTree);
+    TIntermNode* transformEntryPoint(const TSourceLoc&, TFunction&, const TAttributeMap&);
+    void handleEntryPointAttributes(const TSourceLoc&, const TAttributeMap&);
+    void transferTypeAttributes(const TAttributeMap&, TType&);
     void handleFunctionBody(const TSourceLoc&, TFunction&, TIntermNode* functionBody, TIntermNode*& node);
     void remapEntryPointIO(TFunction& function, TVariable*& returnValue, TVector<TVariable*>& inputs, TVector<TVariable*>& outputs);
     void remapNonEntryPointIO(TFunction& function);
@@ -93,7 +93,6 @@ public:
     TIntermTyped* handleAssignToMatrixSwizzle(const TSourceLoc&, TOperator, TIntermTyped* left, TIntermTyped* right);
     TIntermTyped* handleFunctionCall(const TSourceLoc&, TFunction*, TIntermTyped*);
     TIntermAggregate* assignClipCullDistance(const TSourceLoc&, TOperator, int semanticId, TIntermTyped* left, TIntermTyped* right);
-    TIntermTyped* assignPosition(const TSourceLoc&, TOperator, TIntermTyped* left, TIntermTyped* right);
     void decomposeIntrinsic(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
     void decomposeSampleMethods(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
     void decomposeStructBufferMethods(const TSourceLoc&, TIntermTyped*& node, TIntermNode* arguments);
@@ -122,9 +121,11 @@ public:
     void integerCheck(const TIntermTyped* node, const char* token);
     void globalCheck(const TSourceLoc&, const char* token);
     bool constructorError(const TSourceLoc&, TIntermNode*, TFunction&, TOperator, TType&);
+    bool constructorTextureSamplerError(const TSourceLoc&, const TFunction&);
     void arraySizeCheck(const TSourceLoc&, TIntermTyped* expr, TArraySize&);
     void arraySizeRequiredCheck(const TSourceLoc&, const TArraySizes&);
     void structArrayCheck(const TSourceLoc&, const TType& structure);
+    void arrayDimMerge(TType& type, const TArraySizes* sizes);
     bool voidErrorCheck(const TSourceLoc&, const TString&, TBasicType);
     void globalQualifierFix(const TSourceLoc&, TQualifier&);
     bool structQualifierErrorCheck(const TSourceLoc&, const TPublicType& pType);
@@ -136,12 +137,10 @@ public:
 
     void setLayoutQualifier(const TSourceLoc&, TQualifier&, TString&);
     void setLayoutQualifier(const TSourceLoc&, TQualifier&, TString&, const TIntermTyped*);
-    void setSpecConstantId(const TSourceLoc&, TQualifier&, int value);
     void mergeObjectLayoutQualifiers(TQualifier& dest, const TQualifier& src, bool inheritOnly);
     void checkNoShaderLayouts(const TSourceLoc&, const TShaderQualifiers&);
 
     const TFunction* findFunction(const TSourceLoc& loc, TFunction& call, bool& builtIn, int& thisDepth, TIntermTyped*& args);
-    void addGenMulArgumentConversion(const TSourceLoc& loc, TFunction& call, TIntermTyped*& args);
     void declareTypedef(const TSourceLoc&, const TString& identifier, const TType&);
     void declareStruct(const TSourceLoc&, TString& structName, TType&);
     TSymbol* lookupUserType(const TString&, TType&);
@@ -152,16 +151,18 @@ public:
     TIntermTyped* convertArray(TIntermTyped*, const TType&);
     TIntermTyped* constructAggregate(TIntermNode*, const TType&, int, const TSourceLoc&);
     TIntermTyped* constructBuiltIn(const TType&, TOperator, TIntermTyped*, const TSourceLoc&, bool subset);
-    void declareBlock(const TSourceLoc&, TType&, const TString* instanceName = 0);
+    void declareBlock(const TSourceLoc&, TType&, const TString* instanceName = 0, TArraySizes* arraySizes = 0);
     void declareStructBufferCounter(const TSourceLoc& loc, const TType& bufferType, const TString& name);
     void fixBlockLocations(const TSourceLoc&, TQualifier&, TTypeList&, bool memberWithLocation, bool memberWithoutLocation);
-    void fixXfbOffsets(TQualifier&, TTypeList&);
+    void fixBlockXfbOffsets(TQualifier&, TTypeList&);
     void fixBlockUniformOffsets(const TQualifier&, TTypeList&);
     void addQualifierToExisting(const TSourceLoc&, TQualifier, const TString& identifier);
     void addQualifierToExisting(const TSourceLoc&, TQualifier, TIdentifierList&);
     void updateStandaloneQualifierDefaults(const TSourceLoc&, const TPublicType&);
     void wrapupSwitchSubsequence(TIntermAggregate* statements, TIntermNode* branchNode);
-    TIntermNode* addSwitch(const TSourceLoc&, TIntermTyped* expression, TIntermAggregate* body, const TAttributes&);
+    TIntermNode* addSwitch(const TSourceLoc&, TIntermTyped* expression, TIntermAggregate* body, TSelectionControl control);
+
+    void updateImplicitArraySize(const TSourceLoc&, TIntermNode*, int index);
 
     void nestLooping()       { ++loopNestingLevel; }
     void unnestLooping()     { --loopNestingLevel; }
@@ -199,11 +200,10 @@ public:
     bool handleInputGeometry(const TSourceLoc&, const TLayoutGeometry& geometry);
 
     // Determine selection control from attributes
-    void handleSelectionAttributes(const TSourceLoc& loc, TIntermSelection*, const TAttributes& attributes);
-    void handleSwitchAttributes(const TSourceLoc& loc, TIntermSwitch*, const TAttributes& attributes);
+    TSelectionControl handleSelectionControl(const TAttributeMap& attributes) const;
 
     // Determine loop control from attributes
-    void handleLoopAttributes(const TSourceLoc& loc, TIntermLoop*, const TAttributes& attributes);
+    TLoopControl handleLoopControl(const TAttributeMap& attributes) const;
 
     // Share struct buffer deep types
     void shareStructBufferType(TType&);
@@ -213,8 +213,6 @@ public:
 
     // Obtain the sampler return type of the given sampler in retType.
     void getTextureReturnType(const TSampler& sampler, TType& retType) const;
-
-    TAttributeType attributeFromName(const TString& nameSpace, const TString& name) const;
 
 protected:
     struct TFlattenData {
@@ -265,7 +263,6 @@ protected:
     TVariable* getSplitNonIoVar(int id) const;
     void addPatchConstantInvocation();
     void fixTextureShadowModes();
-    void finalizeAppendMethods();
     TIntermTyped* makeIntegerIndex(TIntermTyped*);
 
     void fixBuiltInIoType(TType&);
@@ -402,7 +399,7 @@ protected:
     // may fit in TSampler::structReturnIndex.
     TVector<TTypeList*> textureReturnStruct;
     
-    TMap<TString, bool> structBufferCounter;  // true if counter buffer is in use
+    TMap<TString, bool> structBufferCounter;
 
     // The built-in interstage IO map considers e.g, EvqPosition on input and output separately, so that we
     // can build the linkage correctly if position appears on both sides.  Otherwise, multiple positions
@@ -459,17 +456,6 @@ protected:
     };
 
     TVector<tMipsOperatorData> mipsOperatorMipArg;
-
-    // The geometry output stream is not copied out from the entry point as a typical output variable
-    // is.  It's written via EmitVertex (hlsl=Append), which may happen in arbitrary control flow.
-    // For this we need the real output symbol.  Since it may not be known at the time and Append()
-    // method is parsed, the sequence will be patched during finalization.
-    struct tGsAppendData {
-        TIntermAggregate* node;
-        TSourceLoc loc;
-    };
-
-    TVector<tGsAppendData> gsAppends;
 
     // A texture object may be used with shadow and non-shadow samplers, but both may not be
     // alive post-DCE in the same shader.  We do not know at compilation time which are alive: that's

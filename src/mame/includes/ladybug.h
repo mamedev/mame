@@ -11,7 +11,6 @@
 #pragma once
 
 #include "video/ladybug.h"
-#include "emupal.h"
 
 
 class ladybug_base_state : public driver_device
@@ -19,11 +18,7 @@ class ladybug_base_state : public driver_device
 protected:
 	using driver_device::driver_device;
 
-	void palette_init_common(
-			palette_device &palette, const uint8_t *color_prom,
-			int r_bit0, int r_bit1,
-			int g_bit0, int g_bit1,
-			int b_bit0, int b_bit1) const;
+	void palette_init_common(palette_device &palette, const uint8_t *color_prom, int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1);
 };
 
 
@@ -48,7 +43,7 @@ public:
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	void ladybug_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(ladybug);
 	uint32_t screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ladybug_map(address_map &map);
@@ -102,7 +97,7 @@ protected:
 	DECLARE_READ8_MEMBER(sraider_8005_r);
 	DECLARE_WRITE8_MEMBER(sraider_misc_w);
 	DECLARE_WRITE8_MEMBER(sraider_io_w);
-	void sraider_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(sraider);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sraider);
 	TILE_GET_INFO_MEMBER(get_grid_tile_info);
 

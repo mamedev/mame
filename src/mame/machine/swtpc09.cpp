@@ -31,13 +31,19 @@
 /* 6840 PTM handlers */
 WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
 {
+	// RH 3 Oct. 2016 FIXME: Does the hardware actually work this way, incrementing a counter any time
+	// the O1 line on the PTM changes? This seems unlikely, as the current implementation will increment
+	// m_pia_counter on both 0->1 and 1->0 transitions. Is that really correct?
+	pia6821_device *pia = machine().device<pia6821_device>("pia");
+
 	m_pia_counter++;
 	//pia_counter = pia_counter && 0xff;
-	if (m_pia_counter & 0x80) m_pia->ca1_w(1);
+	if (m_pia_counter & 0x80) pia->ca1_w(1);
 }
 
 WRITE_LINE_MEMBER( swtpc09_state::ptm_o3_callback )
 {
+	//ptm6840_device *ptm = machine().device<ptm6840_device>("ptm");
 	/* the output from timer3 is the input clock for timer2 */
 	//m_ptm->set_c2(state);
 }
@@ -65,10 +71,13 @@ READ8_MEMBER( swtpc09_state::pia0_ca1_r )
 
 WRITE_LINE_MEMBER( swtpc09_state::pia0_irq_a )
 {
-	if ( m_pia->irq_a_state())
-		swtpc09_irq_handler(PIA_IRQ, ASSERT_LINE);
-	else
-		swtpc09_irq_handler(PIA_IRQ, CLEAR_LINE);
+		pia6821_device *pia = machine().device<pia6821_device>("pia");
+
+		if ( pia->irq_a_state())
+			swtpc09_irq_handler(PIA_IRQ, ASSERT_LINE);
+		else
+			swtpc09_irq_handler(PIA_IRQ, CLEAR_LINE);
+
 }
 
 
@@ -79,12 +88,12 @@ WRITE_LINE_MEMBER( swtpc09_state::acia_interrupt )
 	if (state)
 	{
 		swtpc09_irq_handler(ACIA_IRQ, ASSERT_LINE);
-		logerror("swtpc09_acia_irq_assert\n");
+		LOG(("swtpc09_acia_irq_assert\n"));
 	}
 	else
 	{
 		swtpc09_irq_handler(ACIA_IRQ, CLEAR_LINE);
-		logerror("swtpc09_acia_irq_clear\n");
+		LOG(("swtpc09_acia_irq_clear\n"));
 	}
 }
 
@@ -106,19 +115,19 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_dma_address_reg_w )
 	if ((m_fdc_dma_address_reg & 0x10) && (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2))
 		swtpc09_irq_handler(FDC_IRQ, CLEAR_LINE); //then clear the irq to cpu
 
-	logerror("swtpc09_dmf2_dma_address_reg_w %02X\n", data);
+	LOG(("swtpc09_dmf2_dma_address_reg_w %02X\n", data));
 }
 
 /* DMF2 fdc control register */
 READ8_MEMBER ( swtpc09_state::dmf2_control_reg_r )
 {
-	//logerror("swtpc09_dmf2_control_reg_r $%02X\n", m_fdc_status);
+	//LOG(("swtpc09_dmf2_control_reg_r $%02X\n", m_fdc_status));
 	return m_fdc_status;
 }
 
 WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
 {
-	logerror("swtpc09_dmf2_control_reg_w $%02X\n", data);
+	LOG(("swtpc09_dmf2_control_reg_w $%02X\n", data));
 
 	floppy_image_device *floppy = nullptr;
 
@@ -150,17 +159,17 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 	{
 		if (!(m_m6844_channel[0].control & 0x01))  // dma write to memory
 		{
-			uint8_t data = m_fdc->data_r();
+			uint8_t data = m_fdc->data_r(space, 0);
 
-			logerror("swtpc09_dma_write_mem %05X %02X\n", m_m6844_channel[0].address + offset, data);
+			LOG(("swtpc09_dma_write_mem %05X %02X\n", m_m6844_channel[0].address + offset, data));
 			space.write_byte(m_m6844_channel[0].address + offset, data);
 		}
 		else
 		{
 			uint8_t data = space.read_byte(m_m6844_channel[0].address + offset);
 
-			m_fdc->data_w(data);
-			//logerror("swtpc09_dma_read_mem %04X %02X\n", m_m6844_channel[0].address, data);
+			m_fdc->data_w(space, 0, data);
+			//LOG(("swtpc09_dma_read_mem %04X %02X\n", m_m6844_channel[0].address, data));
 		}
 
 		m_m6844_channel[0].address++;
@@ -182,7 +191,7 @@ void swtpc09_state::swtpc09_fdc_dma_transfer()
 /* common interrupt handler */
 void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 {
-	logerror("swtpc09_irq_handler peripheral:%02X state:%02X\n", peripheral, state);
+	LOG(("swtpc09_irq_handler peripheral:%02X state:%02X\n", peripheral, state));
 
 	switch (state)
 	{
@@ -199,12 +208,12 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_active_interrupt=true;
-		logerror("swtpc09_irq_assert %02X\n", peripheral);
+		LOG(("swtpc09_irq_assert %02X\n", peripheral));
 	}
 	else if (m_active_interrupt && !m_interrupt)  //active interrupt and it needs to be cleared
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-		logerror("swtpc09_irq_clear %02X\n", peripheral);
+		LOG(("swtpc09_irq_clear %02X\n", peripheral));
 		m_active_interrupt=false;
 	}
 }
@@ -212,7 +221,7 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 /* handlers for fdc */
 WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 {
-	logerror("swtpc09_fdc_intrq_w %02X\n", state);
+	LOG(("swtpc09_fdc_intrq_w %02X\n", state));
 	if ( m_system_type == UNIFLEX_DMF3 )  //IRQ from 1791 is connect into VIA ca2
 	{
 		if (state)
@@ -250,7 +259,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 			m_fdc_status |= 0x40;
 			if (!(m_fdc_dma_address_reg & 0x10))  // is dmf2 fdc irq enabled
 			{
-				logerror("swtpc09_fdc_int ** assert\n");
+				LOG(("swtpc09_fdc_int ** assert\n"));
 				swtpc09_irq_handler(FDC_IRQ, ASSERT_LINE);
 			}
 		}
@@ -259,7 +268,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 			m_fdc_status &= ~0x40;
 			if (!(m_fdc_dma_address_reg & 0x10)) // is dmf2 fdc irq enabled
 			{
-				logerror("swtpc09_fdc_int ** clear\n");
+				LOG(("swtpc09_fdc_int ** clear\n"));
 				swtpc09_irq_handler(FDC_IRQ, CLEAR_LINE);
 			}
 		}
@@ -312,7 +321,7 @@ WRITE8_MEMBER( swtpc09_state::dmf3_via_write_porta )
 //WRITE_LINE_MEMBER( swtpc09_state::dmf3_via_write_ca1 )
 //{
 //  return m_via_ca1_input;
-//    logerror("swtpc09_dmf3_via_write_ca1 %02X\n", state);
+//    LOG(("swtpc09_dmf3_via_write_ca1 %02X\n", state));
 
 //}
 
@@ -333,19 +342,19 @@ READ8_MEMBER ( swtpc09_state::dmf3_dma_address_reg_r )
 WRITE8_MEMBER ( swtpc09_state::dmf3_dma_address_reg_w )
 {
 	m_fdc_dma_address_reg = data;
-	logerror("swtpc09_dmf3_dma_address_reg_w %02X\n", data);
+	LOG(("swtpc09_dmf3_dma_address_reg_w %02X\n", data));
 }
 
 /* DMF3 fdc control register */
 READ8_MEMBER ( swtpc09_state::dmf3_control_reg_r )
 {
-	//logerror("swtpc09_dmf3_control_reg_r $%02X\n", m_fdc_status);
+	//LOG(("swtpc09_dmf3_control_reg_r $%02X\n", m_fdc_status));
 	return m_fdc_status;
 }
 
 WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
 {
-	logerror("swtpc09_dmf3_control_reg_w $%02X\n", data);
+	LOG(("swtpc09_dmf3_control_reg_w $%02X\n", data));
 
 	floppy_image_device *floppy = nullptr;
 
@@ -369,7 +378,7 @@ WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
 
 WRITE8_MEMBER ( swtpc09_state::dc4_control_reg_w )
 {
-	logerror("swtpc09_dc4_control_reg_w $%02X\n", data);
+	LOG(("swtpc09_dc4_control_reg_w $%02X\n", data));
 
 	floppy_image_device *floppy = nullptr;
 
@@ -412,13 +421,13 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 		if (!(data & 0x02))  //rd line bit 1
 		{
 			tempidedata = m_ide->read_cs0((data&0x1c)>>2);
-			logerror("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata);
+			LOG(("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata));
 			m_piaide_porta = tempidedata & 0x00ff;
 		}
 		else if (!(data & 0x01))  //wr line bit 0
 		{
 			m_ide->write_cs0((data&0x1c)>>2, m_piaide_porta);
-			logerror("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta);
+			LOG(("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta));
 		}
 	}
 	else if ((data & 0x20)&&(!(data&0x40)))  //cs0=1 cs1=0 bit 5&6
@@ -426,13 +435,13 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 		if (!(data & 0x02))  //rd line bit 1
 		{
 			tempidedata = m_ide->read_cs1((data&0x1c)>>2);
-			logerror("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata);
+			LOG(("swtpc09_ide_bus_r: offset $%02X data %04X\n", (data&0x1c)>>2, tempidedata));
 			m_piaide_porta = tempidedata & 0x00ff;
 		}
 		else if (!(data & 0x01))  //wr line bit 0
 		{
 			m_ide->write_cs1((data&0x1c)>>2, m_piaide_porta);
-			logerror("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta);
+			LOG(("swtpc09_ide_bus_w: offset $%02X data %04X\n", (data&0x1c)>>2, m_piaide_porta));
 		}
 	}
 }
@@ -514,7 +523,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 			{
 				swtpc09_irq_handler(0x01, CLEAR_LINE);
 				m_m6844_interrupt &= 0x7f;  // clear interrupt indication bit 7
-				logerror("swtpc09_6844_r interrupt cleared \n");
+				LOG(("swtpc09_6844_r interrupt cleared \n"));
 			}
 			break;
 
@@ -536,7 +545,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 		/* 0x17-0x1f not used */
 		default: break;
 	}
-	//logerror("swtpc09_6844_r %02X %02X\n", offset, result & 0xff);
+	//LOG(("swtpc09_6844_r %02X %02X\n", offset, result & 0xff));
 
 	if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 controller data bus is inverted to 6844
 	{
@@ -556,7 +565,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 	if (m_system_type == UNIFLEX_DMF2 || m_system_type == FLEX_DMF2)   // if DMF2 controller data bus is inverted to 6844
 		data = ~data & 0xff;
 
-	logerror("swtpc09_6844_w %02X %02X\n", offset, data);
+	LOG(("swtpc09_6844_w %02X %02X\n", offset, data));
 	/* switch off the offset we were given */
 	switch (offset)
 	{
@@ -612,7 +621,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 				{
 					/* mark us active */
 					m_m6844_channel[i].active = 1;
-					logerror("swtpc09_dma_channel active %02X\n", i);
+					LOG(("swtpc09_dma_channel active %02X\n", i));
 
 					/* set the DMA busy bit and clear the DMA end bit */
 					m_m6844_channel[i].control |= 0x40;
@@ -639,7 +648,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 		/* interrupt control */
 		case 0x15:
 			m_m6844_interrupt = (m_m6844_interrupt & 0x80) | (data & 0x7f);
-			logerror("swtpc09_m_m6844_interrupt_w %02X\n", m_m6844_interrupt);
+			LOG(("swtpc09_m_m6844_interrupt_w %02X\n", m_m6844_interrupt));
 			break;
 
 		/* chaining control */
@@ -656,6 +665,7 @@ WRITE8_MEMBER( swtpc09_state::m6844_w )
 void swtpc09_state::machine_start()
 {
 	m_pia_counter = 0;  // init ptm/pia counter to 0
+	m_term_data = 0;    // terminal keyboard input
 	m_fdc_status = 0;    // for floppy controller
 	m_interrupt = 0;
 	m_active_interrupt = false;

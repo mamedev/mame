@@ -13,7 +13,6 @@
 
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/floppy.h"
 #include "machine/64h156.h"
 #include "machine/6522via.h"
 
@@ -63,13 +62,13 @@ private:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	required_device<m6502_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
-	output_finder<2> m_leds;
+	output_finder<2> m_led;
 
 	// IEEE-488 bus
 	int m_nrfd_out;             // not ready for data

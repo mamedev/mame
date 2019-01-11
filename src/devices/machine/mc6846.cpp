@@ -129,7 +129,7 @@ inline uint16_t mc6846_device::counter()
 	if ( m_timer_started )
 	{
 		attotime delay = m_interval ->remaining( );
-		return attotime_to_clocks(delay) / FACTOR;
+		return delay.as_ticks(1000000) / FACTOR;
 	}
 	else
 		return m_preset;
@@ -201,7 +201,7 @@ inline void mc6846_device::timer_launch()
 
 	case 0x20: /* single-shot */
 		m_cto = 0;
-		m_one_shot->reset(clocks_to_attotime(FACTOR));
+		m_one_shot->reset( attotime::from_usec(FACTOR) );
 		break;
 
 	case 0x30:  /* cascaded single-shot */
@@ -214,7 +214,7 @@ inline void mc6846_device::timer_launch()
 		return;
 	}
 
-	m_interval->reset(clocks_to_attotime(delay));
+	m_interval->reset( attotime::from_usec(delay) );
 	m_timer_started = 1;
 
 	m_csr &= ~1;
@@ -255,12 +255,12 @@ TIMER_CALLBACK_MEMBER( mc6846_device::timer_expire )
 
 	default:
 		logerror( "mc6846 timer mode %i not implemented\n", MODE );
-		m_interval->reset();
+		m_interval->reset(  );
 		m_timer_started = 0;
 		return;
 	}
 
-	m_interval->reset(clocks_to_attotime(delay));
+	m_interval->reset( attotime::from_usec(delay) );
 
 	m_csr |= 1;
 	update_cto();

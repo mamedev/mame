@@ -40,7 +40,7 @@ void cloud9_state::video_start()
 	m_screen->register_screen_bitmap(m_spritebitmap);
 
 	/* register for savestates */
-	save_pointer(NAME(m_videoram), 0x8000);
+	save_pointer(NAME(m_videoram.get()), 0x8000);
 	save_item(NAME(m_bitmode_addr));
 }
 
@@ -246,14 +246,14 @@ uint32_t cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 
 		}
 
 	/* draw the bitmap to the screen, looping over Y */
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (~m_syncprom[y] & 2)
 		{
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				dst[x] = black;
 		}
 
@@ -269,7 +269,7 @@ uint32_t cloud9_state::screen_update_cloud9(screen_device &screen, bitmap_ind16 
 			src[1] = &m_videoram[0x0000 | (effy * 64)];
 
 			/* loop over X */
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				/* if we're in the HBLANK region, just store black */
 				if (x >= 256)

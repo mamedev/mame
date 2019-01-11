@@ -38,12 +38,13 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "includes/trucocl.h"
 
 
-void trucocl_state::trucocl_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(trucocl_state, trucocl)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 32; i++)
-		palette.set_pen_color(i, pal4bit(color_prom[i] >> 0), pal4bit(color_prom[i + 32] >> 0), pal4bit(color_prom[i + 32] >> 4));
+	for (i = 0;i < 32;i++)
+		palette.set_pen_color(i,pal4bit(color_prom[i] >> 0),pal4bit(color_prom[i+32] >> 0),pal4bit(color_prom[i+32] >> 4));
 }
 
 WRITE8_MEMBER(trucocl_state::trucocl_videoram_w)

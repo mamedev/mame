@@ -155,6 +155,41 @@ struct sh4_utlb
 
 typedef void (*sh4_ftcsr_callback)(uint32_t);
 
+
+#define MCFG_SH4_MD0(_md0) \
+	downcast<sh34_base_device &>(*device).set_md0(_md0);
+
+#define MCFG_SH4_MD1(_md1) \
+	downcast<sh34_base_device &>(*device).set_md1(_md1);
+
+#define MCFG_SH4_MD2(_md2) \
+	downcast<sh34_base_device &>(*device).set_md2(_md2);
+
+#define MCFG_SH4_MD3(_md3) \
+	downcast<sh34_base_device &>(*device).set_md3(_md3);
+
+#define MCFG_SH4_MD4(_md4) \
+	downcast<sh34_base_device &>(*device).set_md4(_md4);
+
+#define MCFG_SH4_MD5(_md5) \
+	downcast<sh34_base_device &>(*device).set_md5(_md5);
+
+#define MCFG_SH4_MD6(_md6) \
+	downcast<sh34_base_device &>(*device).set_md6(_md6);
+
+#define MCFG_SH4_MD7(_md7) \
+	downcast<sh34_base_device &>(*device).set_md7(_md7);
+
+#define MCFG_SH4_MD8(_md8) \
+	downcast<sh34_base_device &>(*device).set_md8(_md8);
+
+#define MCFG_SH4_CLOCK(_clock) \
+	downcast<sh34_base_device &>(*device).set_sh4_clock(_clock);
+
+
+#define MCFG_MMU_HACK_TYPE(_hacktype) \
+	downcast<sh34_base_device &>(*device).set_mmu_hacktype(_hacktype);
+
 class sh4_frontend;
 class sh4be_frontend;
 
@@ -162,8 +197,16 @@ class sh34_base_device : public sh_common_execution
 {
 public:
 
-	void set_md(int bit, int md) { m_md[bit] = md; }
-	void set_sh4_clock(int clock) { m_clock = clock; }
+	void set_md0(int md0) { c_md0 = md0; }
+	void set_md1(int md0) { c_md1 = md0; }
+	void set_md2(int md0) { c_md2 = md0; }
+	void set_md3(int md0) { c_md3 = md0; }
+	void set_md4(int md0) { c_md4 = md0; }
+	void set_md5(int md0) { c_md5 = md0; }
+	void set_md6(int md0) { c_md6 = md0; }
+	void set_md7(int md0) { c_md7 = md0; }
+	void set_md8(int md0) { c_md8 = md0; }
+	void set_sh4_clock(int clock) { c_clock = clock; }
 	void set_sh4_clock(const XTAL &xtal) { set_sh4_clock(xtal.value()); }
 
 	void set_mmu_hacktype(int hacktype) { m_mmuhack = hacktype; }
@@ -285,8 +328,16 @@ protected:
 	uml::parameter m_fs_regmap[16];
 	uml::parameter m_fd_regmap[16];
 
-	int m_md[9];
-	int m_clock;
+	int c_md2;
+	int c_md1;
+	int c_md0;
+	int c_md6;
+	int c_md4;
+	int c_md3;
+	int c_md5;
+	int c_md7;
+	int c_md8;
+	int c_clock;
 
 	// hack 1 = Naomi hack, hack 2 = Work in Progress implementation
 	int m_mmuhack;

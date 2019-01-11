@@ -111,8 +111,8 @@ namespace netlist
 		m_data = 0xFF;
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(74175)
-	NETLIB_DEVICE_IMPL_DEPRECATED(74175_dip)
+	NETLIB_DEVICE_IMPL(74175)
+	NETLIB_DEVICE_IMPL(74175_dip)
 
 	} //namespace devices
 } // namespace netlist

@@ -6,6 +6,26 @@
 #pragma once
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_TMS36XX_ADD(tag, clock) \
+	MCFG_DEVICE_ADD((tag), TMS36XX, (clock))
+
+#define MCFG_TMS36XX_REPLACE(tag, clock) \
+	MCFG_DEVICE_REPLACE((tag), TMS36XX, (clock))
+
+#define MCFG_TMS36XX_TYPE(type) \
+	downcast<tms36xx_device &>(*device).set_subtype((tms36xx_device::subtype::type));
+
+#define MCFG_TMS36XX_DECAY_TIMES(_dec0, _dec1, _dec2, _dec3, _dec4, _dec5) \
+	downcast<tms36xx_device &>(*device).set_decays(_dec0, _dec1, _dec2, _dec3, _dec4, _dec5);
+
+#define MCFG_TMS36XX_TUNE_SPEED(_speed) \
+	downcast<tms36xx_device &>(*device).set_tune_speed(_speed);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

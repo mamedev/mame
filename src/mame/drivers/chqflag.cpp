@@ -132,11 +132,11 @@ void chqflag_state::chqflag_map(address_map &map)
 	map(0x1000, 0x1fff).m(m_bank1000, FUNC(address_map_bank_device::amap8));
 	map(0x2000, 0x2007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));            /* Sprite control registers */
 	map(0x2400, 0x27ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));            /* Sprite RAM */
-	map(0x2800, 0x2fff).r(FUNC(chqflag_state::k051316_ramrom_r<1>)).w(m_k051316[1], FUNC(k051316_device::write)); /* 051316 zoom/rotation (chip 2) */
+	map(0x2800, 0x2fff).r(this, FUNC(chqflag_state::k051316_ramrom_r<1>)).w(m_k051316[1], FUNC(k051316_device::write)); /* 051316 zoom/rotation (chip 2) */
 	map(0x3000, 0x3000).w("soundlatch", FUNC(generic_latch_8_device::write));                    /* sound code # */
 	map(0x3001, 0x3001).w("soundlatch2", FUNC(generic_latch_8_device::write));                  /* cause interrupt on audio CPU */
-	map(0x3002, 0x3002).w(FUNC(chqflag_state::chqflag_bankswitch_w));                     /* bankswitch control */
-	map(0x3003, 0x3003).w(FUNC(chqflag_state::chqflag_vreg_w));                           /* enable K051316 ROM reading */
+	map(0x3002, 0x3002).w(this, FUNC(chqflag_state::chqflag_bankswitch_w));                     /* bankswitch control */
+	map(0x3003, 0x3003).w(this, FUNC(chqflag_state::chqflag_vreg_w));                           /* enable K051316 ROM reading */
 	map(0x3100, 0x3100).portr("DSW1");                               /* DIPSW #1  */
 	map(0x3200, 0x3200).portr("IN1");                                /* COINSW, STARTSW, test mode */
 	map(0x3201, 0x3201).portr("IN0");                                /* DIPSW #3, SW 4 */
@@ -145,9 +145,9 @@ void chqflag_state::chqflag_map(address_map &map)
 	map(0x3400, 0x341f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));                    /* 051733 (protection) */
 	map(0x3500, 0x350f).w(m_k051316[0], FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 1) */
 	map(0x3600, 0x360f).w(m_k051316[1], FUNC(k051316_device::ctrl_w));                            /* 051316 control registers (chip 2) */
-	map(0x3700, 0x3700).w(FUNC(chqflag_state::select_analog_ctrl_w));                     /* select accelerator/wheel */
+	map(0x3700, 0x3700).w(this, FUNC(chqflag_state::select_analog_ctrl_w));                     /* select accelerator/wheel */
 	map(0x3701, 0x3701).portr("IN2");                                /* Brake + Shift + ? */
-	map(0x3702, 0x3702).rw(FUNC(chqflag_state::analog_read_r), FUNC(chqflag_state::select_analog_ctrl_w));  /* accelerator/wheel */
+	map(0x3702, 0x3702).rw(this, FUNC(chqflag_state::analog_read_r), FUNC(chqflag_state::select_analog_ctrl_w));  /* accelerator/wheel */
 	map(0x4000, 0x7fff).bankr("rombank");                              /* banked ROM */
 	map(0x8000, 0xffff).rom().region("maincpu", 0x48000);               /* ROM */
 }
@@ -155,7 +155,7 @@ void chqflag_state::chqflag_map(address_map &map)
 void chqflag_state::bank1000_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x17ff).r(FUNC(chqflag_state::k051316_ramrom_r<0>)).w(m_k051316[0], FUNC(k051316_device::write));
+	map(0x1000, 0x17ff).r(this, FUNC(chqflag_state::k051316_ramrom_r<0>)).w(m_k051316[0], FUNC(k051316_device::write));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
@@ -179,9 +179,9 @@ void chqflag_state::chqflag_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* ROM */
 	map(0x8000, 0x87ff).ram(); /* RAM */
-	map(0x9000, 0x9000).w(FUNC(chqflag_state::k007232_bankswitch_w)); /* 007232 bankswitch */
+	map(0x9000, 0x9000).w(this, FUNC(chqflag_state::k007232_bankswitch_w)); /* 007232 bankswitch */
 	map(0xa000, 0xa00d).rw(m_k007232[0], FUNC(k007232_device::read), FUNC(k007232_device::write));  /* 007232 (chip 1) */
-	map(0xa01c, 0xa01c).w(FUNC(chqflag_state::k007232_extvolume_w));  /* extra volume, goes to the 007232 w/ A4 */
+	map(0xa01c, 0xa01c).w(this, FUNC(chqflag_state::k007232_extvolume_w));  /* extra volume, goes to the 007232 w/ A4 */
 															/* selecting a different latch for the external port */
 	map(0xb000, 0xb00d).rw(m_k007232[1], FUNC(k007232_device::read), FUNC(k007232_device::write));  /* 007232 (chip 2) */
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));   /* YM2151 */
@@ -316,78 +316,85 @@ WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
 	}
 }
 
-void chqflag_state::chqflag(machine_config &config)
-{
+MACHINE_CONFIG_START(chqflag_state::chqflag)
+
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4);    /* 052001 (verified on pcb) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_map);
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(chqflag_map)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(chqflag_sound_map)
 
-	ADDRESS_MAP_BANK(config, m_bank1000).set_map(&chqflag_state::bank1000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
+	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank1000_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/3, 528, 96, 400, 256, 16, 240); // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 96, 400, 256, 16, 240) // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
-	screen.set_screen_update(FUNC(chqflag_state::screen_update_chqflag));
-	screen.set_palette(m_palette);
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
-	m_palette->enable_shadows();
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	K051960(config, m_k051960, 0);
-	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback), this);
-	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
-	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_k051960->vreg_contrast_handler().set(FUNC(chqflag_state::background_brt_w));
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(chqflag_state, sprite_callback)
+	MCFG_K051960_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
+	MCFG_K051960_NMI_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_K051960_VREG_CONTRAST_HANDLER(WRITELINE(*this, chqflag_state,background_brt_w))
 
-	K051316(config, m_k051316[0], 0);
-	m_k051316[0]->set_palette(m_palette);
-	m_k051316[0]->set_offsets(7, 0);
-	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1), this);
+	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_OFFSETS(7, 0)
+	MCFG_K051316_CB(chqflag_state, zoom_callback_1)
 
-	K051316(config, m_k051316[1], 0);
-	m_k051316[1]->set_palette(m_palette);
-	m_k051316[1]->set_bpp(8);
-	m_k051316[1]->set_layermask(0xc0);
-	m_k051316[1]->set_wrap(1);
-	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2), this);
+	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_BPP(8)
+	MCFG_K051316_LAYER_MASK(0xc0)
+	MCFG_K051316_WRAP(1)
+	MCFG_K051316_CB(chqflag_state, zoom_callback_2)
 
-	K051733(config, "k051733", 0);
+	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_audiocpu, 0);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
-	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	ymsnd.add_route(0, "lspeaker", 1.00);
-	ymsnd.add_route(1, "rspeaker", 1.00);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	K007232(config, m_k007232[0], XTAL(3'579'545)); /* verified on pcb */
-	m_k007232[0]->port_write().set(FUNC(chqflag_state::volume_callback0));
-	m_k007232[0]->add_route(0, "lspeaker", 0.20);
-	m_k007232[0]->add_route(1, "rspeaker", 0.20);
+	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, chqflag_state, volume_callback0))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	K007232(config, m_k007232[1], XTAL(3'579'545)); /* verified on pcb */
-	m_k007232[1]->port_write().set(FUNC(chqflag_state::volume_callback1));
-	m_k007232[1]->add_route(0, "lspeaker", 0.20);
-	m_k007232[1]->add_route(0, "rspeaker", 0.20);
-	m_k007232[1]->add_route(1, "lspeaker", 0.20);
-	m_k007232[1]->add_route(1, "rspeaker", 0.20);
-}
+	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, chqflag_state, volume_callback1))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+MACHINE_CONFIG_END
 
 ROM_START( chqflag )
 	ROM_REGION( 0x50000, "maincpu", 0 ) /* 052001 code */

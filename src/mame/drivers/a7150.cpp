@@ -22,13 +22,11 @@
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
-#include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/bankdev.h"
-#include "machine/input_merger.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
@@ -38,7 +36,6 @@
 #include "machine/isbc_215g.h"
 #include "machine/keyboard.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -61,15 +58,11 @@ public:
 		, m_pic8259(*this, "pic8259")
 		, m_gfxcpu(*this, "gfxcpu")
 		, m_ctc(*this, Z80CTC_TAG)
-		, m_rs232(*this, "rs232")
 		, m_video_ram(*this, "video_ram")
 		, m_video_bankdev(*this, "video_bankdev")
 		, m_palette(*this, "palette")
 	{ }
 
-	void a7150(machine_config &config);
-
-private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -79,35 +72,29 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(a7150_tmr2_w);
 	DECLARE_WRITE8_MEMBER(ppi_c_w);
 
-	DECLARE_WRITE_LINE_MEMBER(ifss_write_txd);
-	DECLARE_WRITE_LINE_MEMBER(ifss_write_dtr);
-
 	DECLARE_READ8_MEMBER(kgs_host_r);
 	DECLARE_WRITE8_MEMBER(kgs_host_w);
 	DECLARE_WRITE_LINE_MEMBER(kgs_iml_w);
-	DECLARE_WRITE_LINE_MEMBER(ifss_loopback_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	void kgs_memory_remap();
 
 	bool m_kgs_msel, m_kgs_iml;
 	uint8_t m_kgs_datao, m_kgs_datai, m_kgs_ctrl;
-	bool m_ifss_loopback;
 
 	uint32_t screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 
-	required_device<i8086_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart8251;
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic8259;
 
 	required_device<z80_device> m_gfxcpu;
 	required_device<z80ctc_device> m_ctc;
-	required_device<rs232_port_device> m_rs232;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
-
+	void a7150(machine_config &config);
 	void a7150_io(address_map &map);
 	void a7150_mem(address_map &map);
 	void k7070_cpu_banked(address_map &map);
@@ -149,33 +136,15 @@ WRITE_LINE_MEMBER(a7150_state::a7150_tmr2_w)
 	m_uart8251->write_txc(state);
 }
 
-WRITE_LINE_MEMBER(a7150_state::ifss_loopback_w)
-{
-	m_ifss_loopback = !state;
-}
-
-WRITE_LINE_MEMBER(a7150_state::ifss_write_txd)
-{
-	if (m_ifss_loopback)
-		m_uart8251->write_rxd(state);
-	else
-		m_rs232->write_txd(state);
-}
-
-WRITE_LINE_MEMBER(a7150_state::ifss_write_dtr)
-{
-	if (m_ifss_loopback)
-		m_uart8251->write_dsr(state);
-	else
-		m_rs232->write_dtr(state);
-}
-
 WRITE8_MEMBER(a7150_state::ppi_c_w)
 {
 	// b0 -- INTR(B)
 	// b1 -- /OBF(B)
 	// m_centronics->write_ack(BIT(data, 2));
 	// m_centronics->write_strobe(BIT(data, 3));
+	// b4 -- serial loopback?
+	// b6
+	// b7
 }
 
 #define KGS_ST_OBF  0x01
@@ -326,8 +295,9 @@ void a7150_state::a7150_io(address_map &map)
 	map(0x00c0, 0x00c3).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-	map(0x0200, 0x0203).rw(FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
+	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0200, 0x0203).rw(this, FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
 	map(0x0300, 0x031f).unmaprw(); // ASP board #1
 	map(0x0320, 0x033f).unmaprw(); // ASP board #2
 }
@@ -365,7 +335,7 @@ void a7150_state::k7070_cpu_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x0000, 0x0003).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x0008, 0x000b).rw(Z80SIO_TAG, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-	map(0x0010, 0x0017).rw(FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
+	map(0x0010, 0x0017).rw(this, FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
 
 	map(0x0020, 0x0021).noprw(); // address register
 	map(0x0022, 0x0022).noprw(); // function register (p. 6 of ABG-K7072.pdf)
@@ -441,7 +411,6 @@ void a7150_state::machine_reset()
 	m_kgs_ctrl = 3;
 	m_kgs_datao = m_kgs_datai = 0;
 	m_kgs_iml = m_kgs_msel = 0;
-	m_ifss_loopback = false;
 	kgs_memory_remap();
 }
 
@@ -465,105 +434,89 @@ static const z80_daisy_config k7070_daisy_chain[] =
  *
  * (framebuffer and terminal should be slot devices.)
  */
-void a7150_state::a7150(machine_config &config)
-{
-	I8086(config, m_maincpu, XTAL(9'832'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
-	m_maincpu->set_addrmap(AS_IO, &a7150_state::a7150_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
-	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
-	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
+MACHINE_CONFIG_START(a7150_state::a7150)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(9'832'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(a7150_mem)
+	MCFG_DEVICE_IO_MAP(a7150_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000)/2));
-	i8087.set_addrmap(AS_PROGRAM, &a7150_state::a7150_mem);
-	i8087.set_data_width(16);
-	i8087.irq().set(m_pic8259, FUNC(pic8259_device::ir0_w));
-	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
-
-	PIC8259(config, m_pic8259, 0);
-	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	// IFSP port on processor card
-	i8255_device &ppi(I8255(config, "ppi8255"));
-//  ppi.in_pa_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
-//  ppi.out_pb_callback().set("cent_data_out", output_latch_device::bus_w));
-	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+//  MCFG_I8255_IN_PORTA_CB(READ8("cent_status_in", input_buffer_device, read))
+//  MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a7150_state, ppi_c_w))
 
-	PIT8253(config, m_pit8253, 0);
-	m_pit8253->set_clk<0>(14.7456_MHz_XTAL/4);
-	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
-	m_pit8253->set_clk<1>(14.7456_MHz_XTAL/4);
-	m_pit8253->set_clk<2>(14.7456_MHz_XTAL/4);
-	m_pit8253->out_handler<2>().set(FUNC(a7150_state::a7150_tmr2_w));
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL(14'745'600)/4)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_PIT8253_CLK1(XTAL(14'745'600)/4)
+	MCFG_PIT8253_CLK2(XTAL(14'745'600)/4)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, a7150_state, a7150_tmr2_w))
 
-	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(m_pic8259, FUNC(pic8259_device::ir4_w));
-
-	I8251(config, m_uart8251, 0);
-	m_uart8251->txd_handler().set(FUNC(a7150_state::ifss_write_txd));
-	m_uart8251->dtr_handler().set(FUNC(a7150_state::ifss_write_dtr));
-	m_uart8251->rts_handler().set(FUNC(a7150_state::ifss_loopback_w));
-	m_uart8251->rxrdy_handler().set("uart_irq", FUNC(input_merger_device::in_w<0>));
-	m_uart8251->txrdy_handler().set("uart_irq", FUNC(input_merger_device::in_w<1>));
+	MCFG_DEVICE_ADD("uart8251", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
 
 	// IFSS port on processor card -- keyboard runs at 28800 8N2
-	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard");
-	m_rs232->rxd_handler().set(m_uart8251, FUNC(i8251_device::write_rxd));
-	m_rs232->cts_handler().set(m_uart8251, FUNC(i8251_device::write_cts));
-	m_rs232->dsr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
-	m_rs232->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard") // "loopback" allows ACT to pass
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
-	ISBC_215G(config, "isbc_215g", 0, 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	MCFG_ISBC_215_ADD("isbc_215g", 0x4a, "maincpu")
+	MCFG_ISBC_215_IRQ(WRITELINE("pic8259", pic8259_device, ir5_w))
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
-	Z80(config, m_gfxcpu, XTAL(16'000'000)/4);
-	m_gfxcpu->set_addrmap(AS_PROGRAM, &a7150_state::k7070_cpu_mem);
-	m_gfxcpu->set_addrmap(AS_IO, &a7150_state::k7070_cpu_io);
-	m_gfxcpu->set_daisy_config(k7070_daisy_chain);
+	MCFG_DEVICE_ADD("gfxcpu", Z80, XTAL(16'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(k7070_cpu_mem)
+	MCFG_DEVICE_IO_MAP(k7070_cpu_io)
+	MCFG_Z80_DAISY_CHAIN(k7070_daisy_chain)
 
-	ADDRESS_MAP_BANK(config, m_video_bankdev, 0);
-	m_video_bankdev->set_map(&a7150_state::k7070_cpu_banked);
-	m_video_bankdev->set_endianness(ENDIANNESS_BIG);
-	m_video_bankdev->set_addr_width(18);
-	m_video_bankdev->set_data_width(8);
-	m_video_bankdev->set_stride(0x10000);
+	MCFG_DEVICE_ADD("video_bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(k7070_cpu_banked)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
-	Z80CTC(config, m_ctc, 16_MHz_XTAL/3);
-	m_ctc->intr_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
-	m_ctc->set_clk<0>(1230750);
-	m_ctc->set_clk<1>(1230750);
-	m_ctc->set_clk<2>(1230750);
-	m_ctc->set_clk<3>(1230750);
-	m_ctc->zc_callback<0>().set(Z80SIO_TAG, FUNC(z80sio_device::rxca_w));
-	m_ctc->zc_callback<0>().append(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
-	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(16'000'000)/3)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80SIO_TAG, z80sio_device, txca_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80SIO_TAG, z80sio_device, rxtxcb_w))
 
-	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, XTAL(16'000'000)/4));
-	sio.out_int_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
-	sio.out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
-	sio.out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
-	sio.out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
-	sio.out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
-	sio.out_dtrb_callback().set(FUNC(a7150_state::kgs_iml_w));
-	//sio.out_rtsb_callback().set(FUNC(a7150_state::kgs_ifss_loopback_w));
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, 4800)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("gfxcpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_TXDA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(WRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE(*this, a7150_state, kgs_iml_w))
+//  MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE(*this, a7150_state, kgs_ifss_loopback_w))
 
 	// V.24 port (graphics tablet)
-	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, "loopback"));
-	rs232a.rxd_handler().set(Z80SIO_TAG, FUNC(z80sio_device::rxa_w));
-	rs232a.dcd_handler().set(Z80SIO_TAG, FUNC(z80sio_device::dcda_w));
-	rs232a.cts_handler().set(Z80SIO_TAG, FUNC(z80sio_device::ctsa_w));
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
 
 	// IFSS (current loop) port (keyboard)
-	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, "loopback"));
-	rs232b.rxd_handler().set(Z80SIO_TAG, FUNC(z80sio_device::rxb_w));
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(Z80SIO_TAG, z80sio_device, rxb_w))
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_color(rgb_t::green());
-	screen.set_raw(XTAL(16'000'000), 737,0,640, 431,0,400);
-	screen.set_screen_update(FUNC(a7150_state::screen_update_k7072));
-	screen.set_palette(m_palette);
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
-}
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
+	MCFG_SCREEN_RAW_PARAMS( XTAL(16'000'000), 737,0,640, 431,0,400 )
+	MCFG_SCREEN_UPDATE_DRIVER(a7150_state, screen_update_k7072)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( a7150 )
@@ -572,29 +525,29 @@ ROM_START( a7150 )
 
 	// A7100
 	ROM_SYSTEM_BIOS(0, "1.1", "ACT 1.1")
-	ROMX_LOAD("q259.bin", 0x4001, 0x2000, CRC(fb5b547b) SHA1(1d17fcededa91cad321a7b237a46a308142d902b), ROM_BIOS(0) | ROM_SKIP(1))
-	ROMX_LOAD("q260.bin", 0x0001, 0x2000, CRC(b51f8ed6) SHA1(9aa6291bf8ab49a343741717366992649e2957b3), ROM_BIOS(0) | ROM_SKIP(1))
-	ROMX_LOAD("q261.bin", 0x4000, 0x2000, CRC(43c08ea3) SHA1(ea697180b415b71d834968be84431a6efe9490c2), ROM_BIOS(0) | ROM_SKIP(1))
-	ROMX_LOAD("q262.bin", 0x0000, 0x2000, CRC(9df1c396) SHA1(a627889e1162e5b2fe95804de52bb78e41aaf7cc), ROM_BIOS(0) | ROM_SKIP(1))
+	ROMX_LOAD("q259.bin", 0x4001, 0x2000, CRC(fb5b547b) SHA1(1d17fcededa91cad321a7b237a46a308142d902b),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q260.bin", 0x0001, 0x2000, CRC(b51f8ed6) SHA1(9aa6291bf8ab49a343741717366992649e2957b3),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q261.bin", 0x4000, 0x2000, CRC(43c08ea3) SHA1(ea697180b415b71d834968be84431a6efe9490c2),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q262.bin", 0x0000, 0x2000, CRC(9df1c396) SHA1(a627889e1162e5b2fe95804de52bb78e41aaf7cc),ROM_BIOS(1)|ROM_SKIP(1))
 
 	// A7150
 	ROM_SYSTEM_BIOS(1, "2.1", "ACT 2.1")
-	ROMX_LOAD("265.bin",  0x4001, 0x2000, CRC(a5fb5f35) SHA1(9d9501441cad0ef724dec7b5ffb52b17a678a9f8), ROM_BIOS(1) | ROM_SKIP(1))
-	ROMX_LOAD("266.bin",  0x0001, 0x2000, CRC(f5898eb7) SHA1(af3fd82813fbea7883dea4d7e23a9b5e5b2b844a), ROM_BIOS(1) | ROM_SKIP(1))
-	ROMX_LOAD("267.bin",  0x4000, 0x2000, CRC(c1873a01) SHA1(77f15cc217cd854732fbe33d395e1ea9867fedd7), ROM_BIOS(1) | ROM_SKIP(1))
-	ROMX_LOAD("268.bin",  0x0000, 0x2000, CRC(e3f09213) SHA1(1e2d69061f8e84697440b219181e0b870fe21835), ROM_BIOS(1) | ROM_SKIP(1))
+	ROMX_LOAD("265.bin",  0x4001, 0x2000, CRC(a5fb5f35) SHA1(9d9501441cad0ef724dec7b5ffb52b17a678a9f8),ROM_BIOS(2)|ROM_SKIP(1))
+	ROMX_LOAD("266.bin",  0x0001, 0x2000, CRC(f5898eb7) SHA1(af3fd82813fbea7883dea4d7e23a9b5e5b2b844a),ROM_BIOS(2)|ROM_SKIP(1))
+	ROMX_LOAD("267.bin",  0x4000, 0x2000, CRC(c1873a01) SHA1(77f15cc217cd854732fbe33d395e1ea9867fedd7),ROM_BIOS(2)|ROM_SKIP(1))
+	ROMX_LOAD("268.bin",  0x0000, 0x2000, CRC(e3f09213) SHA1(1e2d69061f8e84697440b219181e0b870fe21835),ROM_BIOS(2)|ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(2, "2.2", "ACT 2.2")
-	ROMX_LOAD("269.bin",  0x4001, 0x2000, CRC(f137f94b) SHA1(7cb79f332db48cb66dae04c1ce1bdd169a6ab561), ROM_BIOS(2) | ROM_SKIP(1))
-	ROMX_LOAD("270.bin",  0x0001, 0x2000, CRC(1ea44a33) SHA1(f5708d1f6a9dc109979a9a91a80f2a4e4956d1eb), ROM_BIOS(2) | ROM_SKIP(1))
-	ROMX_LOAD("271.bin",  0x4000, 0x2000, CRC(de2222c9) SHA1(e02225c93b49f0380dfb2d996b63370141359199), ROM_BIOS(2) | ROM_SKIP(1))
-	ROMX_LOAD("272.bin",  0x0000, 0x2000, CRC(5001c528) SHA1(ce67c35326fbfd17f086a37ffe81b79aefaef0cb), ROM_BIOS(2) | ROM_SKIP(1))
+	ROMX_LOAD("269.bin",  0x4001, 0x2000, CRC(f137f94b) SHA1(7cb79f332db48cb66dae04c1ce1bdd169a6ab561),ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("270.bin",  0x0001, 0x2000, CRC(1ea44a33) SHA1(f5708d1f6a9dc109979a9a91a80f2a4e4956d1eb),ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("271.bin",  0x4000, 0x2000, CRC(de2222c9) SHA1(e02225c93b49f0380dfb2d996b63370141359199),ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("272.bin",  0x0000, 0x2000, CRC(5001c528) SHA1(ce67c35326fbfd17f086a37ffe81b79aefaef0cb),ROM_BIOS(3)|ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(3, "2.3", "ACT 2.3")
-	ROMX_LOAD("273.rom",  0x4001, 0x2000, CRC(67ca9b78) SHA1(bcb6221f6df28b24b602846b149ac12e93b5e356), ROM_BIOS(3) | ROM_SKIP(1))
-	ROMX_LOAD("274.rom",  0x0001, 0x2000, CRC(6fa68834) SHA1(49abe48bbb5ae151f977a9c63b27336c15e8a08d), ROM_BIOS(3) | ROM_SKIP(1))
-	ROMX_LOAD("275.rom",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60), ROM_BIOS(3) | ROM_SKIP(1))
-	ROMX_LOAD("276.rom",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946), ROM_BIOS(3) | ROM_SKIP(1))
+	ROMX_LOAD("273.rom",  0x4001, 0x2000, CRC(67ca9b78) SHA1(bcb6221f6df28b24b602846b149ac12e93b5e356),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("274.rom",  0x0001, 0x2000, CRC(6fa68834) SHA1(49abe48bbb5ae151f977a9c63b27336c15e8a08d),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("275.rom",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("276.rom",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946),ROM_BIOS(4)|ROM_SKIP(1))
 
 	ROM_REGION( 0x10000, "user2", ROMREGION_ERASEFF )
 	// ROM from A7100

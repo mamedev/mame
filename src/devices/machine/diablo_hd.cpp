@@ -1324,9 +1324,11 @@ void diablo_hd_device::device_start()
 void diablo_hd_device::device_reset()
 {
 	// free previous page cache
-	for (int page = 0; page < m_pages; page++)
-		if (m_cache[page])
-			m_cache[page] = nullptr;
+	if (m_cache) {
+		for (int page = 0; page < m_pages; page++)
+			if (m_cache[page])
+				m_cache[page] = nullptr;
+	}
 	// free previous bits cache
 	if (m_bits) {
 		for (int page = 0; page < m_pages; page++)

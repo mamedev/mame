@@ -31,6 +31,32 @@ DECLARE_DEVICE_TYPE(ATARI_JSA_III,  atari_jsa_iii_device)
 DECLARE_DEVICE_TYPE(ATARI_JSA_IIIS, atari_jsa_iiis_device)
 
 
+
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_ATARI_JSA_I_ADD(_tag, _intcb) \
+	MCFG_DEVICE_ADD(_tag, ATARI_JSA_I, 0) \
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
+
+#define MCFG_ATARI_JSA_II_ADD(_tag, _intcb) \
+	MCFG_DEVICE_ADD(_tag, ATARI_JSA_II, 0) \
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
+
+#define MCFG_ATARI_JSA_III_ADD(_tag, _intcb) \
+	MCFG_DEVICE_ADD(_tag, ATARI_JSA_III, 0) \
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
+
+#define MCFG_ATARI_JSA_IIIS_ADD(_tag, _intcb) \
+	MCFG_DEVICE_ADD(_tag, ATARI_JSA_IIIS, 0) \
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_main_int_cb(DEVCB_##_intcb);
+
+#define MCFG_ATARI_JSA_TEST_PORT(_port, _bitnum) \
+	devcb = &downcast<atari_jsa_base_device &>(*device).set_test_read_cb(DEVCB_IOPORT(_port)); \
+	MCFG_DEVCB_RSHIFT(_bitnum);
+
+
 //**************************************************************************
 //  I/O PORT BIT HELPERS
 //**************************************************************************
@@ -58,8 +84,8 @@ protected:
 
 public:
 	// configuration
-	auto test_read_cb() { return m_test_read_cb.bind(); }
-	auto main_int_cb() { return m_main_int_cb.bind(); }
+	template <class Object> devcb_base &set_test_read_cb(Object &&cb) { return m_test_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_main_int_cb(Object &&cb) { return m_main_int_cb.set_callback(std::forward<Object>(cb)); }
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }

@@ -54,7 +54,6 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
@@ -63,7 +62,6 @@
 #include "machine/upd765.h"
 #include "sound/upd1771.h"
 #include "video/upd7220.h"
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -74,57 +72,40 @@
 class apc_state : public driver_device
 {
 public:
-	apc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	apc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
 		m_rtc(*this, "upd1990a"),
-		m_cmos(*this, "cmos"),
 		m_i8259_m(*this, "pic8259_master"),
 		m_i8259_s(*this, "pic8259_slave"),
 		m_fdc(*this, "upd765"),
-		m_fdc_connector(*this, "upd765:%u", 0U),
 		m_dmac(*this, "i8237"),
 		m_pit(*this, "pit8253"),
-		m_speaker(*this, "mono"),
-		m_sound(*this, "upd1771c"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
-		m_screen(*this, "screen"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
-	void apc(machine_config &config);
-
-	void init_apc();
-
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 	required_device<upd1990a_device> m_rtc;
-	required_device<nvram_device> m_cmos;
 	required_device<pic8259_device> m_i8259_m;
 	required_device<pic8259_device> m_i8259_s;
 	required_device<upd765a_device> m_fdc;
-	required_device_array<floppy_connector, 2> m_fdc_connector;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
 	uint8_t *m_char_rom;
 	uint8_t *m_aux_pcg;
 
-	required_device<speaker_device> m_speaker;
-	required_device<upd1771c_device> m_sound;
-
 	required_shared_ptr<uint16_t> m_video_ram_1;
 	required_shared_ptr<uint16_t> m_video_ram_2;
-	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
+
 	required_device<palette_device> m_palette;
 
 	// screen updates
@@ -152,6 +133,7 @@ private:
 		uint8_t sig; //switch signal port
 		uint8_t sh; //shift switches
 	}m_keyb;
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
@@ -165,17 +147,20 @@ private:
 	DECLARE_READ8_MEMBER(apc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
+	void init_apc();
+
 	int m_dack;
 	uint8_t m_dma_offset[4];
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void apc(machine_config &config);
 	void apc_io(address_map &map);
 	void apc_map(address_map &map);
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
-
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -310,7 +295,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 	uint8_t res;
 
 	if(offset & 1)
-		res = m_pit->read((offset & 6) >> 1);
+		res = m_pit->read(space, (offset & 6) >> 1);
 	else
 	{
 		if(offset & 4)
@@ -319,7 +304,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 			res = 0xff;
 		}
 		else
-			res = m_i8259_s->read((offset & 2) >> 1);
+			res = m_i8259_s->read(space, (offset & 2) >> 1);
 	}
 
 	return res;
@@ -328,13 +313,13 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 WRITE8_MEMBER(apc_state::apc_port_28_w)
 {
 	if(offset & 1)
-		m_pit->write((offset & 6) >> 1, data);
+		m_pit->write(space, (offset & 6) >> 1, data);
 	else
 	{
 		if(offset & 4)
 			printf("Write undefined port %02x\n",offset+0x28);
 		else
-			m_i8259_s->write((offset & 2) >> 1, data);
+			m_i8259_s->write(space, (offset & 2) >> 1, data);
 	}
 }
 
@@ -365,7 +350,7 @@ READ8_MEMBER(apc_state::apc_kbd_r)
 
 	switch(offset & 3)
 	{
-		case 0: res = m_keyb.data; m_i8259_m->ir4_w(0); break; // according to the source, reading there acks the irq
+		case 0: res = m_keyb.data; machine().device<pic8259_device>("pic8259_master")->ir4_w(0); break; // according to the source, reading there acks the irq
 		case 1: res = m_keyb.status; break;
 		case 2: res = m_keyb.sig; break; // bit 0: CTRL bit 1: function key (or reversed)
 		case 3: res = ioport("KEY_MOD")->read() & 0xff; break; // sh
@@ -433,7 +418,7 @@ WRITE8_MEMBER(apc_state::apc_irq_ack_w)
 	    ---x CRT
 	*/
 	if(data & 4)
-		m_i8259_m->ir3_w(0);
+		machine().device<pic8259_device>("pic8259_master")->ir3_w(0);
 
 	if(data & ~4)
 		logerror("IRQ ACK %02x\n",data);
@@ -499,21 +484,21 @@ void apc_state::apc_map(address_map &map)
 void apc_state::apc_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0x00, 0x1f).rw(FUNC(apc_state::apc_dma_r), FUNC(apc_state::apc_dma_w)).umask16(0xff00);
+	map(0x00, 0x1f).rw(this, FUNC(apc_state::apc_dma_r), FUNC(apc_state::apc_dma_w)).umask16(0xff00);
 	map(0x20, 0x23).rw(m_i8259_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
-	map(0x28, 0x2f).rw(FUNC(apc_state::apc_port_28_r), FUNC(apc_state::apc_port_28_w)); // i8259 (even) / pit8253 (odd)
+	map(0x28, 0x2f).rw(this, FUNC(apc_state::apc_port_28_r), FUNC(apc_state::apc_port_28_w)); // i8259 (even) / pit8253 (odd)
 //  0x30, 0x37 serial port 0/1 (i8251) (even/odd)
-	map(0x38, 0x3f).w(FUNC(apc_state::apc_dma_segments_w)).umask16(0x00ff);
-	map(0x40, 0x43).rw(FUNC(apc_state::apc_gdc_r), FUNC(apc_state::apc_gdc_w));
-	map(0x46, 0x46).w(FUNC(apc_state::apc_irq_ack_w));
-	map(0x48, 0x4f).rw(FUNC(apc_state::apc_kbd_r), FUNC(apc_state::apc_kbd_w)).umask16(0x00ff);
+	map(0x38, 0x3f).w(this, FUNC(apc_state::apc_dma_segments_w)).umask16(0x00ff);
+	map(0x40, 0x43).rw(this, FUNC(apc_state::apc_gdc_r), FUNC(apc_state::apc_gdc_w));
+	map(0x46, 0x46).w(this, FUNC(apc_state::apc_irq_ack_w));
+	map(0x48, 0x4f).rw(this, FUNC(apc_state::apc_kbd_r), FUNC(apc_state::apc_kbd_w)).umask16(0x00ff);
 	map(0x50, 0x53).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // upd765
-	map(0x58, 0x58).rw(FUNC(apc_state::apc_rtc_r), FUNC(apc_state::apc_rtc_w));
+	map(0x58, 0x58).rw(this, FUNC(apc_state::apc_rtc_r), FUNC(apc_state::apc_rtc_w));
 //  0x59 CMOS enable
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5b, Power Off
 //  0x5e  APU status/command
-	map(0x60, 0x60).rw(m_sound, FUNC(upd1771c_device::read), FUNC(upd1771c_device::write));
+	map(0x60, 0x60).rw("upd1771c", FUNC(upd1771c_device::read), FUNC(upd1771c_device::write));
 //  AM_RANGE(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
 //  0x70, 0x76 AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
 //  0x71, 0x77 IDA Controller
@@ -528,7 +513,7 @@ INPUT_CHANGED_MEMBER(apc_state::key_stroke)
 	{
 		m_keyb.data = (uint8_t)(uintptr_t)(param) & 0xff;
 		//m_keyb.status &= ~1;
-		m_i8259_m->ir4_w(1);
+		machine().device<pic8259_device>("pic8259_master")->ir4_w(1);
 	}
 
 	if(oldval && !newval)
@@ -811,12 +796,12 @@ GFXDECODE_END
 
 void apc_state::upd7220_1_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).ram().share(m_video_ram_1);
+	map(0x00000, 0x3ffff).ram().share("video_ram_1");
 }
 
 void apc_state::upd7220_2_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).ram().share(m_video_ram_2);
+	map(0x00000, 0x3ffff).ram().share("video_ram_2");
 }
 
 /*
@@ -848,7 +833,7 @@ ir7 APU
 READ8_MEMBER(apc_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
-		return m_i8259_s->acknowledge();
+		return machine().device<pic8259_device>( "pic8259_slave" )->acknowledge();
 	}
 	return 0x00;
 }
@@ -939,72 +924,72 @@ static void apc_floppies(device_slot_interface &device)
 MACHINE_CONFIG_START(apc_state::apc)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,I8086,MAIN_CLOCK)
+	MCFG_DEVICE_ADD("maincpu",I8086,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(apc_map)
 	MCFG_DEVICE_IO_MAP(apc_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
-	PIT8253(config, m_pit, 0);
-	m_pit->set_clk<0>(MAIN_CLOCK); // heartbeat IRQ
-	m_pit->out_handler<0>().set(m_i8259_m, FUNC(pic8259_device::ir3_w));
-	m_pit->set_clk<1>(MAIN_CLOCK); // Memory Refresh
-	m_pit->set_clk<2>(MAIN_CLOCK); // RS-232c
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(MAIN_CLOCK) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir3_w))
+	MCFG_PIT8253_CLK1(MAIN_CLOCK) /* Memory Refresh */
+	MCFG_PIT8253_CLK2(MAIN_CLOCK) /* RS-232c */
 
-	PIC8259(config, m_i8259_m, 0);
-	m_i8259_m->out_int_callback().set_inputline(m_maincpu, 0);
-	m_i8259_m->in_sp_callback().set_constant(1);
-	m_i8259_m->read_slave_ack_callback().set(FUNC(apc_state::get_slave_ack));
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, apc_state, get_slave_ack))
 
-	PIC8259(config, m_i8259_s, 0);
-	m_i8259_s->out_int_callback().set(m_i8259_m, FUNC(pic8259_device::ir7_w)); // TODO: check ir7_w
-	m_i8259_s->in_sp_callback().set_constant(0);
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w)) // TODO: check ir7_w
+	MCFG_PIC8259_IN_SP_CB(GND)
 
-	AM9517A(config, m_dmac, MAIN_CLOCK);
-	m_dmac->out_hreq_callback().set(FUNC(apc_state::apc_dma_hrq_changed));
-	m_dmac->out_eop_callback().set(FUNC(apc_state::apc_tc_w));
-	m_dmac->in_memr_callback().set(FUNC(apc_state::apc_dma_read_byte));
-	m_dmac->out_memw_callback().set(FUNC(apc_state::apc_dma_write_byte));
-	m_dmac->in_ior_callback<1>().set(FUNC(apc_state::fdc_r));
-	m_dmac->out_iow_callback<1>().set(FUNC(apc_state::fdc_w));
-	m_dmac->out_dack_callback<0>().set(FUNC(apc_state::apc_dack0_w));
-	m_dmac->out_dack_callback<1>().set(FUNC(apc_state::apc_dack1_w));
-	m_dmac->out_dack_callback<2>().set(FUNC(apc_state::apc_dack2_w));
-	m_dmac->out_dack_callback<3>().set(FUNC(apc_state::apc_dack3_w));
+	MCFG_DEVICE_ADD("i8237", AM9517A, MAIN_CLOCK)
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, apc_state, apc_dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, apc_state, apc_tc_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, apc_state, apc_dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, apc_state, apc_dma_write_byte))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, apc_state, fdc_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, apc_state, fdc_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, apc_state, apc_dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, apc_state, apc_dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, apc_state, apc_dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, apc_state, apc_dack3_w))
 
-	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
-	UPD1990A(config, m_rtc);
+	MCFG_NVRAM_ADD_1FILL("cmos")
+	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 
-	UPD765A(config, m_fdc, 8'000'000, true, true);
-	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
-	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
-	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats)
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("i8237", am9517a_device, dreq1_w))
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", apc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8", apc_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_screen_update(FUNC(apc_state::screen_update));
-	m_screen->set_size(640, 494);
-	m_screen->set_visarea(0*8, 640-1, 0*8, 494-1);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_UPDATE_DRIVER(apc_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 494)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 494-1)
 
-	PALETTE(config, m_palette, palette_device::BRG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_apc)
 
-	UPD7220(config, m_hgdc1, 3579545); // unk clock
-	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
-	m_hgdc1->set_draw_text_callback(FUNC(apc_state::hgdc_draw_text), this);
+	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 3579545) // unk clock
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
 
-	UPD7220(config, m_hgdc2, 3579545); // unk clock
-	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
-	m_hgdc2->set_display_pixels_callback(FUNC(apc_state::hgdc_display_pixels), this);
+	MCFG_DEVICE_ADD("upd7220_btm", UPD7220, 3579545) // unk clock
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
 
 	/* sound hardware */
-	SPEAKER(config, m_speaker).front_center();
-	MCFG_DEVICE_ADD(m_sound, UPD1771C, MAIN_CLOCK) //uPD1771C-006
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD( "upd1771c", UPD1771C, MAIN_CLOCK ) //uPD1771C-006
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 

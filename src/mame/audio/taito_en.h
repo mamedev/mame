@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, Aaron Giles, R. Belmont, Philip Bennett
+// copyright-holders:Bryan McPhail, Aaron Giles, R. Belmont, hap, Philip Bennett
 /***************************************************************************
 
     Taito Ensoniq ES5505-based sound hardware
@@ -54,7 +54,7 @@ private:
 
 	uint32_t m_bankmask;
 
-	IRQ_CALLBACK_MEMBER(duart_iack);
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);

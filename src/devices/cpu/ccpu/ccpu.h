@@ -20,6 +20,15 @@
     REGISTER ENUMERATION
 ***************************************************************************/
 
+
+
+#define MCFG_CCPU_EXTERNAL_FUNC(_devcb) \
+	downcast<ccpu_cpu_device &>(*device).set_external_func(DEVCB_##_devcb);
+
+#define MCFG_CCPU_VECTOR_FUNC(d) \
+	downcast<ccpu_cpu_device &>(*device).set_vector_func(d);
+
+
 class ccpu_cpu_device : public cpu_device
 {
 public:
@@ -45,19 +54,8 @@ public:
 	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto external_func() { return m_external_input.bind(); }
-
+	template <class Object> devcb_base &set_external_func(Object &&cb) { return m_external_input.set_callback(std::forward<Object>(cb)); }
 	template <typename Object> void set_vector_func(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
-	void set_vector_func(vector_delegate callback) { m_vector_callback = callback; }
-	template <class FunctionClass> void set_vector_func(const char *devname,
-		void (FunctionClass::*callback)(int16_t, int16_t, int16_t, int16_t, uint8_t), const char *name)
-	{
-		set_vector_func(vector_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_vector_func(void (FunctionClass::*callback)(int16_t, int16_t, int16_t, int16_t, uint8_t), const char *name)
-	{
-		set_vector_func(vector_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
 
 	DECLARE_READ8_MEMBER( read_jmi );
 	void wdt_timer_trigger();

@@ -349,30 +349,29 @@ WRITE8_MEMBER(galpani2_state::galpani2_oki2_bank_w)
 
 void galpani2_state::galpani2_mem1(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                  // ROM
-	map(0x100000, 0x10ffff).ram().share("ram");                     // Work RAM
-	map(0x110000, 0x11000f).ram();                                  // ? corrupted? stack dumper on POST failure, pc+sr on gp2se
-	map(0x300000, 0x301fff).ram();                                  // ?
-	map(0x302000, 0x303fff).ram().share("spriteram");               // Sprites
+	map(0x000000, 0x0fffff).rom();                                             // ROM
+	map(0x100000, 0x10ffff).ram().share("ram");     // Work RAM
+	map(0x110000, 0x11000f).ram();                                             // ? corrupted? stack dumper on POST failure, pc+sr on gp2se
+	map(0x300000, 0x301fff).ram();                                             // ?
+	map(0x302000, 0x303fff).ram().share("spriteram");   // Sprites
 	map(0x304000, 0x30401f).rw(m_kaneko_spr, FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_r), FUNC(kaneko16_sprite_device::kaneko16_sprites_regs_w));
-//  map(0x308000, 0x308001).nopw();                                 // ? 0 at startup
-	map(0x30c000, 0x30c001).nopw();                                 // ? hblank effect ?
+//  AM_RANGE(0x308000, 0x308001) AM_WRITENOP                                        // ? 0 at startup
+//  AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
 	map(0x310000, 0x3101ff).ram().w(m_bg8palette, FUNC(palette_device::write16)).share("bg8palette");    // ?
-	map(0x314000, 0x314001).nopw();                                 // ? flip backgrounds ?
-	map(0x318000, 0x318001).rw(FUNC(galpani2_state::galpani2_eeprom_r), FUNC(galpani2_state::galpani2_eeprom_w)); // EEPROM
-	// TODO: writes fadeout palettes for gal select after selection!?
-	map(0x380000, 0x387fff).ram();                                  // Palette?
+	map(0x314000, 0x314001).nopw();                                        // ? flip backgrounds ?
+	map(0x318000, 0x318001).rw(this, FUNC(galpani2_state::galpani2_eeprom_r), FUNC(galpani2_state::galpani2_eeprom_w)); // EEPROM
+	map(0x380000, 0x387fff).ram();                                             // Palette?
 	map(0x388000, 0x38ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
-//  map(0x390000, 0x3901ff).nopw();                                 // ? at startup of service mode
+//  AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
 
-	map(0x400000, 0x43ffff).ram().share("bg8.0");                   // Background 0
+	map(0x400000, 0x43ffff).ram().share("bg8.0");    // Background 0
 	map(0x440000, 0x440001).ram().share("bg8_scrolly.0");           // Background 0 Scroll Y
 	map(0x480000, 0x480001).ram().share("bg8_scrollx.0");           // Background 0 Scroll X
-//  map(0x4c0000, 0x4c0001).nopw();                                 // ? 0 at startup only
-	map(0x500000, 0x53ffff).ram().share("bg8.1");                   // Background 1
+//  AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP                                        // ? 0 at startup only
+	map(0x500000, 0x53ffff).ram().share("bg8.1");    // Background 1
 	map(0x540000, 0x540001).ram().share("bg8_scrolly.1");           // Background 1 Scroll Y
 	map(0x580000, 0x580001).ram().share("bg8_scrollx.1");           // Background 1 Scroll X
-//  map(0x5c0000, 0x5c0001).nopw();                                 // ? 0 at startup only
+//  AM_RANGE(0x5c0000, 0x5c0001) AM_WRITENOP                                        // ? 0 at startup only
 
 	map(0x540572, 0x540573).nopr();                                         // ? galpani2 at F0A4
 	map(0x54057a, 0x54057b).nopr();                                         // ? galpani2 at F148
@@ -385,17 +384,17 @@ void galpani2_state::galpani2_mem1(address_map &map)
 	map(0x5405ca, 0x5405cb).nopr();                                         // ? galpani2 at F148
 
 	map(0x600000, 0x600001).noprw();                                        // Watchdog
-	map(0x640001, 0x640001).w(FUNC(galpani2_state::galpani2_mcu_init_w));   // ? 0 before resetting and at startup, Reset mcu ?
-	map(0x680001, 0x680001).w(FUNC(galpani2_state::galpani2_mcu_nmi1_w));             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
-	map(0x6c0000, 0x6c0000).w(FUNC(galpani2_state::galpani2_coin_lockout_w));   // Coin + Card Lockout
+	map(0x640001, 0x640001).w(this, FUNC(galpani2_state::galpani2_mcu_init_w));   // ? 0 before resetting and at startup, Reset mcu ?
+	map(0x680001, 0x680001).w(this, FUNC(galpani2_state::galpani2_mcu_nmi1_w));             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
+	map(0x6c0000, 0x6c0000).w(this, FUNC(galpani2_state::galpani2_coin_lockout_w));   // Coin + Card Lockout
 	map(0x780000, 0x780001).portr("DSW1_P1");
 	map(0x780002, 0x780003).portr("DSW2_P2");
 	map(0x780004, 0x780005).portr("SPECIAL");
 	map(0x780006, 0x780007).portr("SERVICE");
 	map(0xc00001, 0xc00001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // 2 x OKIM6295
 	map(0xc40001, 0xc40001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   //
-	map(0xc80001, 0xc80001).w(FUNC(galpani2_state::galpani2_oki1_bank_w));   //
-	map(0xcc0001, 0xcc0001).w(FUNC(galpani2_state::galpani2_oki2_bank_w));   //
+	map(0xc80001, 0xc80001).w(this, FUNC(galpani2_state::galpani2_oki1_bank_w));   //
+	map(0xcc0001, 0xcc0001).w(this, FUNC(galpani2_state::galpani2_oki2_bank_w));   //
 }
 
 
@@ -422,14 +421,14 @@ void galpani2_state::galpani2_mem2(address_map &map)
 	map(0x000000, 0x03ffff).rom();                                                             // ROM
 	map(0x100000, 0x13ffff).ram().share("ram2");                                        // Work RAM
 	map(0x400000, 0x5fffff).ram().share("bg15");  // bg15
-//  map(0x600000, 0x600001).noprw();                               // ? 0 at startup only
-//  map(0x640000, 0x640001).nopw();                                // ? 0 at startup only
-//  map(0x680000, 0x680001).nopw();                                // ? 0 at startup only
-//  map(0x6c0000, 0x6c0001).nopw();                                // ? 0 at startup only
-	map(0x700000, 0x700001).noprw();                               // Watchdog
-//  map(0x740000, 0x740001).nopw();                                // ? Reset mcu
-	map(0x780001, 0x780001).w(FUNC(galpani2_state::galpani2_mcu_nmi2_w));    // ? 0 -> 1 -> 0 (lev 5)
-	map(0x7c0000, 0x7c0001).w(FUNC(galpani2_state::subdatabank_select_w));   // Rom Bank
+//  AM_RANGE(0x600000, 0x600001) AM_NOP // ? 0 at startup only
+//  AM_RANGE(0x640000, 0x640001) AM_WRITENOP                                // ? 0 at startup only
+//  AM_RANGE(0x680000, 0x680001) AM_WRITENOP                                // ? 0 at startup only
+//  AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP                                // ? 0 at startup only
+	map(0x700000, 0x700001).noprw();                                 // Watchdog
+//  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
+	map(0x780001, 0x780001).w(this, FUNC(galpani2_state::galpani2_mcu_nmi2_w));             // ? 0 -> 1 -> 0 (lev 5)
+	map(0x7c0000, 0x7c0001).w(this, FUNC(galpani2_state::subdatabank_select_w));   // Rom Bank
 	map(0x800000, 0xffffff).bankr("subdatabank");
 }
 
@@ -634,7 +633,7 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_DEVICE_PROGRAM_MAP(galpani2_mem2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", galpani2_state, galpani2_interrupt2, "screen", 0, 1)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -644,14 +643,21 @@ MACHINE_CONFIG_START(galpani2_state::galpani2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(galpani2_state, screen_update_galpani2)
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_galpani2);
-	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000); // sprites
-	PALETTE(config, m_bg8palette).set_format(palette_device::xGRB_555, 0x200 / 2); // bg8
-	PALETTE(config, m_bg15palette, palette_device::GRB_555); // 32768 static colors for the bg
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galpani2)
+	MCFG_PALETTE_ADD("palette", 0x4000)    // sprites
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	KANEKO_KC002_SPRITE(config, m_kaneko_spr);
-	m_kaneko_spr->set_offsets(0x10000 - 0x16c0 + 0xc00, 0);
-	m_kaneko_spr->set_gfxdecode_tag("gfxdecode");
+	MCFG_PALETTE_ADD("bg8palette", 0x200/2) // bg8
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+
+	MCFG_PALETTE_ADD("bgpalette", 32768) /* 32768 static colors for the bg */
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	MCFG_PALETTE_INIT_OWNER(galpani2_state,galpani2)
+
+	MCFG_DEVICE_ADD_KC002_SPRITES
+	MCFG_KANEKO16_SPRITE_OFFSETS(0x10000 - 0x16c0 + 0xc00, 0)
+	MCFG_KANEKO16_SPRITE_GFXDECODE("gfxdecode")
+
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

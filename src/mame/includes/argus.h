@@ -3,7 +3,6 @@
 
 #include "machine/timer.h"
 #include "video/jalblend.h"
-#include "emupal.h"
 #include "screen.h"
 
 class argus_state : public driver_device
@@ -49,7 +48,9 @@ public:
 	uint16_t m_palette_intensity;
 
 	// argus specific
-	uint8_t m_vrom_offset;
+	std::unique_ptr<uint8_t[]> m_dummy_bg0ram;
+	int m_lowbitscroll;
+	int m_prvscrollx;
 
 	// butasan specific
 	uint8_t *m_butasan_txram;
@@ -96,15 +97,14 @@ public:
 	DECLARE_WRITE8_MEMBER(valtric_paletteram_w);
 	DECLARE_WRITE8_MEMBER(valtric_unknown_w);
 
-	template<int Gfx> TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	TILE_GET_INFO_MEMBER(argus_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(argus_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(argus_get_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(valtric_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(valtric_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(butasan_get_bg1_tile_info);
-	TILEMAP_MAPPER_MEMBER(butasan_bg_scan);
-	TILEMAP_MAPPER_MEMBER(butasan_tx_scan);
 
 	virtual void machine_start() override;
 	DECLARE_VIDEO_START(argus);
@@ -127,6 +127,8 @@ public:
 	void bg_setting();
 
 	// argus specific
+	void argus_bg0_scroll_handle();
+	void argus_write_dummy_rams(int dramoffs, int vromoffs);
 	void argus_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
 
 	// butasan specific

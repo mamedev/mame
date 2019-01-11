@@ -7,6 +7,13 @@
 
 /* Kaneko Sprites */
 
+/* berlwall, blazeon etc. */
+#define MCFG_DEVICE_ADD_VU002_SPRITES \
+	MCFG_DEVICE_ADD("kan_spr", KANEKO_VU002_SPRITE, 0)
+/* gtmr, gtmr2, bloodwar etc. */
+#define MCFG_DEVICE_ADD_KC002_SPRITES \
+	MCFG_DEVICE_ADD("kan_spr", KANEKO_KC002_SPRITE, 0)
+
 
 struct kaneko16_priority_t
 {
@@ -28,7 +35,7 @@ class kaneko16_sprite_device : public device_t, public device_video_interface
 {
 public:
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_fliptype(int fliptype) { m_sprite_fliptype = fliptype; }
 	void set_offsets(int xoffs, int yoffs)
 	{
@@ -117,16 +124,19 @@ private:
 
 //extern const device_type KANEKO16_SPRITE;
 
+#define MCFG_KANEKO16_SPRITE_GFXDECODE(_gfxtag) \
+	downcast<kaneko16_sprite_device &>(*device).set_gfxdecode_tag(_gfxtag);
+#define MCFG_KANEKO16_SPRITE_PRIORITIES(_pri0, _pri1, _pri2, _pri3) \
+	downcast<kaneko16_sprite_device &>(*device).set_priorities(_pri0, _pri1, _pri2, _pri3);
+#define MCFG_KANEKO16_SPRITE_OFFSETS(_xoffs, _yoffs) \
+	downcast<kaneko16_sprite_device &>(*device).set_offsets(_xoffs, _yoffs);
+#define MCFG_KANEKO16_SPRITE_FLIPTYPE(_fliptype) \
+	downcast<kaneko16_sprite_device &>(*device).set_fliptype(_fliptype);
 
-/* berlwall, blazeon etc. */
+
 class kaneko_vu002_sprite_device : public kaneko16_sprite_device
 {
 public:
-	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: kaneko_vu002_sprite_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
 	kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void get_sprite_attributes(struct kan_tempsprite *s, uint16_t attr) override;
 	int get_sprite_type(void) override{ return 0; };
@@ -134,15 +144,9 @@ public:
 
 DECLARE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device)
 
-/* gtmr, gtmr2, bloodwar etc. */
 class kaneko_kc002_sprite_device : public kaneko16_sprite_device
 {
 public:
-	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: kaneko_kc002_sprite_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
 	kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void get_sprite_attributes(struct kan_tempsprite *s, uint16_t attr) override;
 	int get_sprite_type(void) override{ return 1; };

@@ -8,7 +8,6 @@
 #include "machine/timekpr.h"
 #include "machine/watchdog.h"
 #include "machine/ticket.h"
-#include "emupal.h"
 #include "screen.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000
@@ -25,12 +24,25 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_hopper(*this, "hopper"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	void rollfr(machine_config &config);
-	void igrosoft_gamble(machine_config &config);
-
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_bank_w);
+	DECLARE_READ8_MEMBER(bankedram_r);
+	DECLARE_WRITE8_MEMBER(bankedram_w);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_rambank_w);
+	DECLARE_READ8_MEMBER(ray_r);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_hopper_w);
+	DECLARE_WRITE8_MEMBER(rollfr_hopper_w);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps1_w);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps2_w);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps3_w);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_counters_w);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_f3_w);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_dispenable_w);
+	DECLARE_READ8_MEMBER(igrosoft_gamble_timekeeper_r);
+	DECLARE_WRITE8_MEMBER(igrosoft_gamble_timekeeper_w);
 	void init_customl();
 	void init_island2l();
 	void init_keksl();
@@ -53,31 +65,16 @@ public:
 	void init_crzmon2();
 	void init_crzmon2lot();
 	void init_crzmon2ent();
-
-private:
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_bank_w);
-	DECLARE_READ8_MEMBER(bankedram_r);
-	DECLARE_WRITE8_MEMBER(bankedram_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_rambank_w);
-	DECLARE_READ8_MEMBER(ray_r);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_hopper_w);
-	DECLARE_WRITE8_MEMBER(rollfr_hopper_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps1_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps2_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_lamps3_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_counters_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_f3_w);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_dispenable_w);
-	DECLARE_READ8_MEMBER(igrosoft_gamble_timekeeper_r);
-	DECLARE_WRITE8_MEMBER(igrosoft_gamble_timekeeper_w);
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_tile_info);
 	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_reel_tile_info);
 	uint32_t screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void rollfr(machine_config &config);
+	void igrosoft_gamble(machine_config &config);
 	void igrosoft_gamble_map(address_map &map);
 	void igrosoft_gamble_portmap(address_map &map);
 	void rollfr_portmap(address_map &map);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -102,7 +99,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
-	output_finder<13> m_lamps;
+	output_finder<13> m_lamp;
 };
 
 

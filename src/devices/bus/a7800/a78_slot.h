@@ -12,7 +12,6 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-#define A78SLOT_ROM_REGION_TAG ":cart:rom"
 
 /* PCB */
 enum
@@ -90,16 +89,7 @@ class a78_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	a78_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: a78_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
-	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a78_cart_slot_device();
 
 	// device-level overrides
@@ -148,5 +138,17 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(A78_CART_SLOT, a78_cart_slot_device)
+
+
+/***************************************************************************
+ DEVICE CONFIGURATION MACROS
+ ***************************************************************************/
+
+#define A78SLOT_ROM_REGION_TAG ":cart:rom"
+
+#define MCFG_A78_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
+	MCFG_DEVICE_ADD(_tag, A78_CART_SLOT, 0)  \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
 
 #endif // MAME_BUS_A7800_A78_SLOT_H

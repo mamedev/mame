@@ -99,6 +99,7 @@
 #include "includes/pcw.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/i8243.h"
 #include "machine/upd765.h"
 // pcw/pcw16 beeper
@@ -408,6 +409,7 @@ WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
 
 WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 {
+	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -493,14 +495,14 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* set fdc terminal count */
 		case 5:
 		{
-			m_fdc->tc_w(true);
+			fdc->tc_w(true);
 		}
 		break;
 
 		/* clear fdc terminal count */
 		case 6:
 		{
-			m_fdc->tc_w(false);
+			fdc->tc_w(false);
 		}
 		break;
 
@@ -520,10 +522,10 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		case 9:
 		{
 			floppy_image_device *floppy;
-			floppy = m_floppy[0]->get_device();
+			floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
 			if(floppy)
 				floppy->mon_w(0);
-			floppy = m_floppy[1]->get_device();
+			floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
 			if(floppy)
 				floppy->mon_w(0);
 		}
@@ -533,10 +535,10 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		case 10:
 		{
 			floppy_image_device *floppy;
-			floppy = m_floppy[0]->get_device();
+			floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
 			if(floppy)
 				floppy->mon_w(1);
-			floppy = m_floppy[1]->get_device();
+			floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
 			if(floppy)
 				floppy->mon_w(1);
 		}
@@ -639,6 +641,20 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 //      m_printer_headpos++;
 }
 
+WRITE8_MEMBER(pcw_state::pcw_printer_data_w)
+{
+	m_printer_data = data;
+	machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_w(space,0,data);
+	logerror("PRN [0xFC]: Sent command %02x\n",data);
+}
+
+WRITE8_MEMBER(pcw_state::pcw_printer_command_w)
+{
+	m_printer_command = data;
+	machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_w(space,1,data);
+	logerror("PRN [0xFD]: Sent command %02x\n",data);
+}
+
 // print error type
 // should return 0xF8 if there are no errors
 // 0 = underrun
@@ -646,6 +662,10 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 // 3 = bad command
 // 5 = print error
 // anything else = no printer
+READ8_MEMBER(pcw_state::pcw_printer_data_r)
+{
+	return machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_r(space,0);
+}
 
 // printer status
 // bit 7 - bail bar in
@@ -656,6 +676,10 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 // bit 2 - paper is present
 // bit 1 - busy
 // bit 0 - controller fault
+READ8_MEMBER(pcw_state::pcw_printer_status_r)
+{
+	return machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_r(space,1);
+}
 
 /* MCU handlers */
 /* I/O ports: (likely to be completely wrong...)
@@ -929,14 +953,15 @@ void pcw_state::pcw_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x000, 0x001).mirror(0x7e).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x080, 0x0ef).rw(FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
-	map(0x0f0, 0x0f3).w(FUNC(pcw_state::pcw_bank_select_w));
-	map(0x0f4, 0x0f4).rw(FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
-	map(0x0f5, 0x0f5).w(FUNC(pcw_state::pcw_roller_ram_addr_w));
-	map(0x0f6, 0x0f6).w(FUNC(pcw_state::pcw_pointer_table_top_scan_w));
-	map(0x0f7, 0x0f7).w(FUNC(pcw_state::pcw_vdu_video_control_register_w));
-	map(0x0f8, 0x0f8).rw(FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
-	map(0x0fc, 0x0fd).rw(m_printer_mcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0x080, 0x0ef).rw(this, FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
+	map(0x0f0, 0x0f3).w(this, FUNC(pcw_state::pcw_bank_select_w));
+	map(0x0f4, 0x0f4).rw(this, FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
+	map(0x0f5, 0x0f5).w(this, FUNC(pcw_state::pcw_roller_ram_addr_w));
+	map(0x0f6, 0x0f6).w(this, FUNC(pcw_state::pcw_pointer_table_top_scan_w));
+	map(0x0f7, 0x0f7).w(this, FUNC(pcw_state::pcw_vdu_video_control_register_w));
+	map(0x0f8, 0x0f8).rw(this, FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
+	map(0x0fc, 0x0fc).rw(this, FUNC(pcw_state::pcw_printer_data_r), FUNC(pcw_state::pcw_printer_data_w));
+	map(0x0fd, 0x0fd).rw(this, FUNC(pcw_state::pcw_printer_status_r), FUNC(pcw_state::pcw_printer_command_w));
 }
 
 
@@ -945,14 +970,14 @@ void pcw_state::pcw9512_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x000, 0x001).mirror(0x7e).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x080, 0x0ef).rw(FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
-	map(0x0f0, 0x0f3).w(FUNC(pcw_state::pcw_bank_select_w));
-	map(0x0f4, 0x0f4).rw(FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
-	map(0x0f5, 0x0f5).w(FUNC(pcw_state::pcw_roller_ram_addr_w));
-	map(0x0f6, 0x0f6).w(FUNC(pcw_state::pcw_pointer_table_top_scan_w));
-	map(0x0f7, 0x0f7).w(FUNC(pcw_state::pcw_vdu_video_control_register_w));
-	map(0x0f8, 0x0f8).rw(FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
-	map(0x0fc, 0x0fd).rw(FUNC(pcw_state::pcw9512_parallel_r), FUNC(pcw_state::pcw9512_parallel_w));
+	map(0x080, 0x0ef).rw(this, FUNC(pcw_state::pcw_expansion_r), FUNC(pcw_state::pcw_expansion_w));
+	map(0x0f0, 0x0f3).w(this, FUNC(pcw_state::pcw_bank_select_w));
+	map(0x0f4, 0x0f4).rw(this, FUNC(pcw_state::pcw_interrupt_counter_r), FUNC(pcw_state::pcw_bank_force_selection_w));
+	map(0x0f5, 0x0f5).w(this, FUNC(pcw_state::pcw_roller_ram_addr_w));
+	map(0x0f6, 0x0f6).w(this, FUNC(pcw_state::pcw_pointer_table_top_scan_w));
+	map(0x0f7, 0x0f7).w(this, FUNC(pcw_state::pcw_vdu_video_control_register_w));
+	map(0x0f8, 0x0f8).rw(this, FUNC(pcw_state::pcw_system_status_r), FUNC(pcw_state::pcw_system_control_w));
+	map(0x0fc, 0x0fd).rw(this, FUNC(pcw_state::pcw9512_parallel_r), FUNC(pcw_state::pcw9512_parallel_w));
 }
 
 
@@ -995,6 +1020,9 @@ void pcw_state::machine_reset()
 	/* and hack our way past the MCU side of the boot process */
 	code[0x01] = 0x40;
 
+	m_printer_status = 0xff;
+	m_printer_command = 0xff;
+	m_printer_data = 0x00;
 	m_printer_headpos = 0x00; // bring printer head to left margin
 	m_printer_shift = 0;
 	m_printer_shift_output = 0;
@@ -1218,92 +1246,104 @@ static void pcw_floppies(device_slot_interface &device)
 }
 
 /* PCW8256, PCW8512, PCW9256 */
-void pcw_state::pcw(machine_config &config)
-{
+MACHINE_CONFIG_START(pcw_state::pcw)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);       /* clock supplied to chip, but in reality it is 3.4 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &pcw_state::pcw_map);
-	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw_io);
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pcw_map)
+	MCFG_DEVICE_IO_MAP(pcw_io)
 
-	I8041(config, m_printer_mcu, 11000000);  // 11MHz
-	m_printer_mcu->p2_in_cb().set(FUNC(pcw_state::mcu_printer_p2_r));
-	m_printer_mcu->p2_out_cb().set(FUNC(pcw_state::mcu_printer_p2_w));
-	m_printer_mcu->p1_in_cb().set(FUNC(pcw_state::mcu_printer_p1_r));
-	m_printer_mcu->p1_out_cb().set(FUNC(pcw_state::mcu_printer_p1_w));
-	m_printer_mcu->t1_in_cb().set(FUNC(pcw_state::mcu_printer_t1_r));
-	m_printer_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_printer_t0_r));
+	MCFG_DEVICE_ADD("printer_mcu", I8041, 11000000)  // 11MHz
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, pcw_state, mcu_printer_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcw_state, mcu_printer_p2_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcw_state, mcu_printer_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, pcw_state, mcu_printer_p1_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcw_state, mcu_printer_t1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, pcw_state, mcu_printer_t0_r))
 
-	I8048(config, m_keyboard_mcu, 5000000); // 5MHz
-	m_keyboard_mcu->p1_in_cb().set(FUNC(pcw_state::mcu_kb_scan_r));
-	m_keyboard_mcu->p1_out_cb().set(FUNC(pcw_state::mcu_kb_scan_w));
-	m_keyboard_mcu->p2_in_cb().set(FUNC(pcw_state::mcu_kb_scan_high_r));
-	m_keyboard_mcu->p2_out_cb().set(FUNC(pcw_state::mcu_kb_scan_high_w));
-	m_keyboard_mcu->t1_in_cb().set(FUNC(pcw_state::mcu_kb_t1_r));
-	m_keyboard_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_kb_t0_r));
-	m_keyboard_mcu->bus_in_cb().set(FUNC(pcw_state::mcu_kb_data_r));
+	MCFG_DEVICE_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcw_state, mcu_kb_scan_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, pcw_state, mcu_kb_scan_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, pcw_state, mcu_kb_scan_high_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcw_state, mcu_kb_scan_high_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcw_state, mcu_kb_t1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, pcw_state, mcu_kb_t0_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, pcw_state, mcu_kb_data_r))
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(50))
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT);
-	m_screen->set_visarea(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1);
-	m_screen->set_screen_update(FUNC(pcw_state::screen_update_pcw));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(PCW_SCREEN_WIDTH, PCW_SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(0, PCW_SCREEN_WIDTH-1, 0, PCW_SCREEN_HEIGHT-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette, FUNC(pcw_state::pcw_colours), PCW_NUM_COLOURS);
+	MCFG_PALETTE_ADD("palette", PCW_NUM_COLOURS)
+	MCFG_PALETTE_INIT_OWNER(pcw_state, pcw)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 3750).add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	UPD765A(config, m_fdc, 4'000'000, true, true);
-	m_fdc->intrq_wr_callback().set(FUNC(pcw_state::pcw_fdc_interrupt));
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pcw_state, pcw_fdc_interrupt))
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats);
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
 
-	SOFTWARE_LIST(config, "disk_list").set_original("pcw");
+	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw")
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("256K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
 
-	TIMER(config, "pcw_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(pcw_state::pcw_timer_interrupt), this), attotime::from_hz(300));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("pcw_timer", pcw_state, pcw_timer_interrupt, attotime::from_hz(300))
+MACHINE_CONFIG_END
 
-void pcw_state::pcw8256(machine_config &config)
-{
+MACHINE_CONFIG_START(pcw_state::pcw8256)
 	pcw(config);
-	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
-	printer.set_refresh_hz(50);
-	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
-	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
-	printer.set_screen_update(FUNC(pcw_state::screen_update_pcw_printer));
-	printer.set_palette(m_palette);
+	MCFG_SCREEN_ADD("printer",RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
+	MCFG_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
+	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_pcw);
-}
+	MCFG_DEFAULT_LAYOUT( layout_pcw )
 
-void pcw_state::pcw8512(machine_config &config)
-{
-	pcw8256(config);
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(pcw_state::pcw8512)
+	pcw(config);
+	MCFG_SCREEN_ADD("printer",RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE( PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT )
+	MCFG_SCREEN_VISIBLE_AREA(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1)
+	MCFG_SCREEN_UPDATE_DRIVER(pcw_state, screen_update_pcw_printer)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEFAULT_LAYOUT( layout_pcw )
 
 	/* internal ram */
-	m_ram->set_default_size("512K");
-}
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+MACHINE_CONFIG_END
 
 /* PCW9512, PCW9512+, PCW10 */
-void pcw_state::pcw9512(machine_config &config)
-{
+MACHINE_CONFIG_START(pcw_state::pcw9512)
 	pcw(config);
-	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_IO_MAP(pcw9512_io)
 
 	/* internal ram */
-	m_ram->set_default_size("512K");
-}
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

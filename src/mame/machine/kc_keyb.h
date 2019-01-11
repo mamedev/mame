@@ -11,6 +11,8 @@
 
 #pragma once
 
+#define MCFG_KC_KEYBOARD_OUT_CALLBACK(_write) \
+	devcb = &downcast<kc_keyboard_device &>(*device).set_out_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -25,7 +27,7 @@ public:
 	kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~kc_keyboard_device();
 
-	auto out_wr_callback() { return m_write_out.bind(); }
+	template <class Object> devcb_base &set_out_wr_callback(Object &&cb) { return m_write_out.set_callback(std::forward<Object>(cb)); }
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

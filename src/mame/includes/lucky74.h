@@ -1,12 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
-#ifndef MAME_INCLUDES_LUCKY74_H
-#define MAME_INCLUDES_LUCKY74_H
-
-#pragma once
-
 #include "sound/msm5205.h"
-#include "emupal.h"
 
 class lucky74_state : public driver_device
 {
@@ -20,18 +14,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	void lucky74(machine_config &config);
-
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-	virtual void machine_reset() override;
-	virtual void sound_start() override;
-
-private:
 	DECLARE_READ8_MEMBER(custom_09R81P_port_r);
 	DECLARE_WRITE8_MEMBER(custom_09R81P_port_w);
 	DECLARE_READ8_MEMBER(usart_8251_r);
@@ -47,12 +32,19 @@ private:
 	DECLARE_WRITE8_MEMBER(lamps_b_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void lucky74_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(lucky74);
 	uint32_t screen_update_lucky74(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nmi_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(lucky74_adpcm_int);
+	void lucky74(machine_config &config);
 	void lucky74_map(address_map &map);
 	void lucky74_portmap(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	virtual void sound_start() override;
 
 	uint8_t m_ym2149_portb;
 	uint8_t m_usart_8251;
@@ -71,7 +63,5 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<12> m_lamps;
+	output_finder<12> m_lamp;
 };
-
-#endif // MAME_INCLUDES_LUCKY74_H

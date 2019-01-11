@@ -27,11 +27,11 @@
 
 
 #define MCFG_SMS_CONTROL_PORT_TH_INPUT_HANDLER(_devcb) \
-	downcast<sms_control_port_device &>(*device).set_th_input_handler(DEVCB_##_devcb);
+	devcb = &downcast<sms_control_port_device &>(*device).set_th_input_handler(DEVCB_##_devcb);
 
 
 #define MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(_devcb) \
-	downcast<sms_control_port_device &>(*device).set_pixel_handler(DEVCB_##_devcb);
+	devcb = &downcast<sms_control_port_device &>(*device).set_pixel_handler(DEVCB_##_devcb);
 
 
 

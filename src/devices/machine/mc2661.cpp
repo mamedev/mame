@@ -212,10 +212,6 @@ void mc2661_device::rcv_complete()
 	receive_register_extract();
 	m_rhr = get_received_char();
 	m_sr |= STATUS_RXRDY;
-	if (is_receive_parity_error())
-		m_sr |= STATUS_PE;
-	if (is_receive_framing_error())
-		m_sr |= STATUS_FE;
 	m_write_rxrdy(ASSERT_LINE);
 }
 
@@ -224,7 +220,7 @@ void mc2661_device::rcv_complete()
 //  read - register read
 //-------------------------------------------------
 
-uint8_t mc2661_device::read(offs_t offset)
+READ8_MEMBER( mc2661_device::read )
 {
 	uint8_t data = 0;
 
@@ -232,11 +228,8 @@ uint8_t mc2661_device::read(offs_t offset)
 	{
 	case REGISTER_HOLDING:
 		data = m_rhr;
-		if (!machine().side_effects_disabled())
-		{
-			m_sr &= ~STATUS_RXRDY;
-			m_write_rxrdy(CLEAR_LINE);
-		}
+		m_sr &= ~STATUS_RXRDY;
+		m_write_rxrdy(CLEAR_LINE);
 		break;
 
 	case REGISTER_STATUS:
@@ -246,20 +239,14 @@ uint8_t mc2661_device::read(offs_t offset)
 	case REGISTER_MODE:
 		data = m_mr[m_mode_index];
 
-		if (!machine().side_effects_disabled())
-		{
-			m_mode_index++;
-			m_mode_index &= 0x01;
-		}
+		m_mode_index++;
+		m_mode_index &= 0x01;
 
 		break;
 
 	case REGISTER_COMMAND:
-		if (!machine().side_effects_disabled())
-		{
-			m_mode_index = 0;
-			m_sync_index = 0;
-		}
+		m_mode_index = 0;
+		m_sync_index = 0;
 
 		data = m_cr;
 		break;
@@ -273,7 +260,7 @@ uint8_t mc2661_device::read(offs_t offset)
 //  write - register write
 //-------------------------------------------------
 
-void mc2661_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( mc2661_device::write )
 {
 	switch (offset & 0x03)
 	{
@@ -428,7 +415,7 @@ void mc2661_device::write(offs_t offset, uint8_t data)
 		}
 		if (!COMMAND_RXEN)
 		{
-			m_sr &= ~(STATUS_RXRDY | STATUS_FE | STATUS_OVERRUN | STATUS_PE);
+			m_sr &= ~STATUS_RXRDY;
 			m_write_rxrdy(CLEAR_LINE);
 		}
 		if (COMMAND_RESET)

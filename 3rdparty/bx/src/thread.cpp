@@ -1,16 +1,12 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "bx_p.h"
 #include <bx/thread.h>
 
-#if BX_CONFIG_SUPPORTS_THREADING
-
-#if BX_CRT_NONE
-#	include "crt0.h"
-#elif  BX_PLATFORM_ANDROID \
+#if    BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
@@ -36,6 +32,8 @@ using namespace Windows::System::Threading;
 #	endif // BX_PLATFORM_WINRT
 #endif // BX_PLATFORM_
 
+#if BX_CONFIG_SUPPORTS_THREADING
+
 namespace bx
 {
 	static AllocatorI* getAllocator()
@@ -46,10 +44,7 @@ namespace bx
 
 	struct ThreadInternal
 	{
-#if BX_CRT_NONE
-		static int32_t threadFunc(void* _arg);
-		int32_t m_handle;
-#elif  BX_PLATFORM_WINDOWS \
+#if    BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
 		static DWORD WINAPI threadFunc(LPVOID _arg);
@@ -61,14 +56,7 @@ namespace bx
 #endif // BX_PLATFORM_
 	};
 
-#if BX_CRT_NONE
-	int32_t ThreadInternal::threadFunc(void* _arg)
-	{
-		Thread* thread = (Thread*)_arg;
-		int32_t result = thread->entry();
-		return result;
-	}
-#elif  BX_PLATFORM_WINDOWS \
+#if    BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 	DWORD WINAPI ThreadInternal::threadFunc(LPVOID _arg)
@@ -102,9 +90,7 @@ namespace bx
 		BX_STATIC_ASSERT(sizeof(ThreadInternal) <= sizeof(m_internal) );
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
-#if BX_CRT_NONE
-		ti->m_handle = INT32_MIN;
-#elif  BX_PLATFORM_WINDOWS \
+#if    BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
 		ti->m_handle   = INVALID_HANDLE_VALUE;
@@ -132,9 +118,7 @@ namespace bx
 		m_running = true;
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
-#if BX_CRT_NONE
-		ti->m_handle = crt0::threadCreate(&ti->threadFunc, _userData, m_stackSize, _name);
-#elif  BX_PLATFORM_WINDOWS \
+#if    BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_XBOXONE
 		ti->m_handle = ::CreateThread(NULL
 				, m_stackSize
@@ -186,9 +170,7 @@ namespace bx
 	{
 		BX_CHECK(m_running, "Not running!");
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
-#if BX_CRT_NONE
-		crt0::threadJoin(ti->m_handle, NULL);
-#elif BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS
 		WaitForSingleObject(ti->m_handle, INFINITE);
 		GetExitCodeThread(ti->m_handle, (DWORD*)&m_exitCode);
 		CloseHandle(ti->m_handle);
@@ -225,21 +207,18 @@ namespace bx
 	{
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 		BX_UNUSED(ti);
-#if BX_CRT_NONE
-		BX_UNUSED(_name);
-#elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS
+#if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 		pthread_setname_np(_name);
 #elif (BX_CRT_GLIBC >= 21200) && ! BX_PLATFORM_HURD
 		pthread_setname_np(ti->m_handle, _name);
 #elif BX_PLATFORM_LINUX
 		prctl(PR_SET_NAME,_name, 0, 0, 0);
 #elif BX_PLATFORM_BSD
-#	if defined(__NetBSD__)
+#	ifdef __NetBSD__
 		pthread_setname_np(ti->m_handle, "%s", (void*)_name);
 #	else
 		pthread_set_name_np(ti->m_handle, _name);
-#	endif // defined(__NetBSD__)
+#	endif // __NetBSD__
 #elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
 #	pragma pack(push, 8)
 		struct ThreadName
@@ -297,42 +276,14 @@ namespace bx
 
 	struct TlsDataInternal
 	{
-#if BX_CRT_NONE
-#elif BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS
 		uint32_t m_id;
 #elif !(BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT)
 		pthread_key_t m_id;
 #endif // BX_PLATFORM_*
 	};
 
-#if BX_CRT_NONE
-	TlsData::TlsData()
-	{
-		BX_STATIC_ASSERT(sizeof(TlsDataInternal) <= sizeof(m_internal) );
-
-		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
-		BX_UNUSED(ti);
-	}
-
-	TlsData::~TlsData()
-	{
-		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
-		BX_UNUSED(ti);
-	}
-
-	void* TlsData::get() const
-	{
-		return NULL;
-	}
-
-	void TlsData::set(void* _ptr)
-	{
-		BX_UNUSED(_ptr);
-
-		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
-		BX_UNUSED(ti);
-	}
-#elif BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS
 	TlsData::TlsData()
 	{
 		BX_STATIC_ASSERT(sizeof(TlsDataInternal) <= sizeof(m_internal) );

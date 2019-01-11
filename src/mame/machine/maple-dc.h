@@ -7,25 +7,19 @@
 
 #include "cpu/sh/sh4.h"
 
+#define MCFG_MAPLE_DC_ADD(_tag, _maincpu_tag, _irq_cb)  \
+	MCFG_DEVICE_ADD(_tag, MAPLE_DC, 0) \
+	downcast<maple_dc_device &>(*device).set_maincpu_tag(_maincpu_tag); \
+	downcast<maple_dc_device &>(*device).set_irq_cb(_irq_cb);
+
 class maple_device;
 
 class maple_dc_device : public device_t
 {
 public:
-	enum {
-		DMA_MAPLE_IRQ
-	};
-
-	template <typename T>
-	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: maple_dc_device(mconfig, tag, owner, clock)
-	{
-		set_maincpu_tag(std::forward<T>(cpu_tag));
-	}
-
 	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <typename T> void set_maincpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
-	auto irq_callback() { return irq_cb.bind(); }
+	void set_maincpu_tag(const char *new_maincpu_tag) { maincpu_tag = new_maincpu_tag; }
+	void set_irq_cb(void (*new_irq_cb)(running_machine &)) { irq_cb = new_irq_cb; }
 
 	DECLARE_READ32_MEMBER(sb_mdstar_r);  // 5f6c04
 	DECLARE_WRITE32_MEMBER(sb_mdstar_w);
@@ -65,7 +59,7 @@ private:
 
 	maple_device *devices[4];
 
-	required_device<sh4_device> cpu;
+	sh4_device *cpu;
 	emu_timer *timer;
 
 	uint32_t mdstar, mden, mdst, msys;
@@ -73,9 +67,11 @@ private:
 
 	uint32_t dma_state, dma_adr, dma_port, dma_dest;
 	bool dma_endflag;
-	devcb_write8 irq_cb;
+	void (*irq_cb)(running_machine &);
 
 	void dma_step();
+
+	const char *maincpu_tag;
 };
 
 DECLARE_DEVICE_TYPE(MAPLE_DC, maple_dc_device)

@@ -6,23 +6,18 @@
     Bionic Commando
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_BIONICC_H
-#define MAME_INCLUDES_BIONICC_H
 
-#pragma once
-
-#include "cpu/mcs51/mcs51.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
-#include "emupal.h"
+#include "cpu/mcs51/mcs51.h"
 
 class bionicc_state : public driver_device
 {
 public:
-	bionicc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	bionicc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -40,6 +35,7 @@ public:
 	void bionicc(machine_config &config);
 
 private:
+
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void mcu_io(address_map &map);
@@ -50,7 +46,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
+	DECLARE_PALETTE_DECODER(RRRRGGGGBBBBIIII);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
@@ -76,7 +72,7 @@ private:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<i8751_device> m_mcu;
+	required_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<tigeroad_spr_device> m_spritegen;
@@ -92,5 +88,3 @@ private:
 	/* misc */
 	int m_old_p3;
 };
-
-#endif // MAME_INCLUDES_BIONICC_H

@@ -16,6 +16,15 @@
 #pragma once
 
 /***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+#define UPD7002_GET_ANALOGUE(name)  int name(int channel_number)
+
+#define UPD7002_EOC(name)   void name(int data)
+
+
+/***************************************************************************
     MACROS
 ***************************************************************************/
 
@@ -27,8 +36,8 @@ public:
 
 	upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_get_analogue_callback(T &&... args) { m_get_analogue_cb = get_analogue_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_eoc_callback(T &&... args) { m_eoc_cb = eoc_delegate(std::forward<T>(args)...); }
+	template <typename Object> void set_get_analogue_callback(Object &&cb) { m_get_analogue_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_eoc_callback(Object &&cb) { m_eoc_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER(eoc_r);
 	DECLARE_READ8_MEMBER(read);
@@ -84,5 +93,16 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(UPD7002, upd7002_device)
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_UPD7002_GET_ANALOGUE_CB(_class, _method) \
+	downcast<upd7002_device &>(*device).set_get_analogue_callback(upd7002_device::get_analogue_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_UPD7002_EOC_CB(_class, _method) \
+	downcast<upd7002_device &>(*device).set_eoc_callback(upd7002_device::eoc_delegate(&_class::_method, #_class "::" #_method, this));
 
 #endif // MAME_MACHINE_UPD7002_H

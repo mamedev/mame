@@ -121,21 +121,21 @@ void ladyfrog_state::ladyfrog_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc07f).ram();
-	map(0xc080, 0xc87f).rw(FUNC(ladyfrog_state::ladyfrog_videoram_r), FUNC(ladyfrog_state::ladyfrog_videoram_w)).share("videoram");
-	map(0xd000, 0xd000).w(FUNC(ladyfrog_state::ladyfrog_gfxctrl2_w));
-	map(0xd400, 0xd400).rw(FUNC(ladyfrog_state::from_snd_r), FUNC(ladyfrog_state::sound_command_w));
-	map(0xd401, 0xd401).r(FUNC(ladyfrog_state::snd_flag_r));
-	map(0xd403, 0xd403).w(FUNC(ladyfrog_state::sound_cpu_reset_w));
+	map(0xc080, 0xc87f).rw(this, FUNC(ladyfrog_state::ladyfrog_videoram_r), FUNC(ladyfrog_state::ladyfrog_videoram_w)).share("videoram");
+	map(0xd000, 0xd000).w(this, FUNC(ladyfrog_state::ladyfrog_gfxctrl2_w));
+	map(0xd400, 0xd400).rw(this, FUNC(ladyfrog_state::from_snd_r), FUNC(ladyfrog_state::sound_command_w));
+	map(0xd401, 0xd401).r(this, FUNC(ladyfrog_state::snd_flag_r));
+	map(0xd403, 0xd403).w(this, FUNC(ladyfrog_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSW1");
 	map(0xd801, 0xd801).portr("DSW2");
 	map(0xd804, 0xd804).portr("INPUTS");
 	map(0xd806, 0xd806).portr("SYSTEM");
-	map(0xdc00, 0xdc9f).rw(FUNC(ladyfrog_state::ladyfrog_spriteram_r), FUNC(ladyfrog_state::ladyfrog_spriteram_w));
-	map(0xdca0, 0xdcbf).rw(FUNC(ladyfrog_state::ladyfrog_scrlram_r), FUNC(ladyfrog_state::ladyfrog_scrlram_w)).share("scrlram");
+	map(0xdc00, 0xdc9f).rw(this, FUNC(ladyfrog_state::ladyfrog_spriteram_r), FUNC(ladyfrog_state::ladyfrog_spriteram_w));
+	map(0xdca0, 0xdcbf).rw(this, FUNC(ladyfrog_state::ladyfrog_scrlram_r), FUNC(ladyfrog_state::ladyfrog_scrlram_w)).share("scrlram");
 	map(0xdcc0, 0xdcff).ram();
-	map(0xdd00, 0xdeff).rw(FUNC(ladyfrog_state::ladyfrog_palette_r), FUNC(ladyfrog_state::ladyfrog_palette_w));
+	map(0xdd00, 0xdeff).rw(this, FUNC(ladyfrog_state::ladyfrog_palette_r), FUNC(ladyfrog_state::ladyfrog_palette_w));
 	map(0xd0d0, 0xd0d0).nopr(); /* code jumps to ASCII text "Alfa tecnology"  @ $b7 */
-	map(0xdf03, 0xdf03).w(FUNC(ladyfrog_state::ladyfrog_gfxctrl_w));
+	map(0xdf03, 0xdf03).w(this, FUNC(ladyfrog_state::ladyfrog_gfxctrl_w));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -149,10 +149,10 @@ void ladyfrog_state::ladyfrog_sound_map(address_map &map)
 	map(0xca00, 0xca00).nopw();
 	map(0xcb00, 0xcb00).nopw();
 	map(0xcc00, 0xcc00).nopw();
-	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(ladyfrog_state::to_main_w));
-	map(0xd200, 0xd200).nopr().w(FUNC(ladyfrog_state::nmi_enable_w));
-	map(0xd400, 0xd400).w(FUNC(ladyfrog_state::nmi_disable_w));
-	map(0xd600, 0xd600).nopr().w("dac", FUNC(dac_byte_interface::data_w));       /* signed 8-bit DAC - unknown read */
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(ladyfrog_state::to_main_w));
+	map(0xd200, 0xd200).nopr().w(this, FUNC(ladyfrog_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(this, FUNC(ladyfrog_state::nmi_disable_w));
+	map(0xd600, 0xd600).nopr().w("dac", FUNC(dac_byte_interface::write));       /* signed 8-bit DAC - unknown read */
 	map(0xe000, 0xefff).noprw();
 }
 
@@ -288,68 +288,67 @@ void ladyfrog_state::machine_reset()
 	m_snd_data = 0;
 }
 
-void ladyfrog_state::ladyfrog(machine_config &config)
-{
+MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(8'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ladyfrog_state::ladyfrog_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ladyfrog_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ladyfrog_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ladyfrog_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, XTAL(8'000'000)/2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &ladyfrog_state::ladyfrog_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(ladyfrog_state::irq0_line_hold), attotime::from_hz(2*60));
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ladyfrog_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ladyfrog_state, irq0_line_hold, 2*60)
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1); // black borders in ladyfrog gameplay are correct
-	screen.set_raw(XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8); // pixel clock appears to run at 8 MHz
-	screen.set_screen_update(FUNC(ladyfrog_state::screen_update_ladyfrog));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) // black borders in ladyfrog gameplay are correct
+	MCFG_SCREEN_RAW_PARAMS( XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
+	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ladyfrog);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladyfrog)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(8'000'000)/4));
-	aysnd.port_a_write_callback().set(FUNC(ladyfrog_state::unk_w));
-	aysnd.port_b_write_callback().set(FUNC(ladyfrog_state::unk_w));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.15);
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ladyfrog_state, unk_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ladyfrog_state, unk_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MSM5232(config, m_msm, XTAL(8'000'000)/4);
-	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6);
-	m_msm->add_route(0, "mono", 1.0);   // pin 28  2'-1
-	m_msm->add_route(1, "mono", 1.0);   // pin 29  4'-1
-	m_msm->add_route(2, "mono", 1.0);   // pin 30  8'-1
-	m_msm->add_route(3, "mono", 1.0);   // pin 31 16'-1
-	m_msm->add_route(4, "mono", 1.0);   // pin 36  2'-2
-	m_msm->add_route(5, "mono", 1.0);   // pin 35  4'-2
-	m_msm->add_route(6, "mono", 1.0);   // pin 34  8'-2
-	m_msm->add_route(7, "mono", 1.0);   // pin 33 16'-2
+	MCFG_DEVICE_ADD("msm", MSM5232, XTAL(8'000'000)/4)
+	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)    // pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)    // pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)    // pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)    // pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)    // pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)    // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
-void ladyfrog_state::toucheme(machine_config &config)
-{
+MACHINE_CONFIG_START(ladyfrog_state::toucheme)
 	ladyfrog(config);
 	MCFG_VIDEO_START_OVERRIDE(ladyfrog_state,toucheme)
-}
+MACHINE_CONFIG_END
 
 
 ROM_START( ladyfrog )

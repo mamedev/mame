@@ -1364,7 +1364,7 @@ void segaic16_video_device::rotate_init(int which, int type, int colorbase)
 	info->buffer = std::make_unique<uint16_t[]>(info->ramsize/2);
 
 	save_item(NAME(info->colorbase), which);
-	save_pointer(NAME(info->buffer), info->ramsize/2, which);
+	save_pointer(NAME((uint8_t *) info->buffer.get()), info->ramsize, which);
 }
 
 

@@ -238,31 +238,29 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_dvg(*this, "dvg")
 		, m_soundlatch(*this, "soundlatch")
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void omegrace(machine_config &config);
-
-	void init_omegrace();
-
-private:
 	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
 	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
+	void init_omegrace();
+	void omegrace(machine_config &config);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_port(address_map &map);
 
-	virtual void machine_start() override { m_leds.resolve(); }
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dvg_device> m_dvg;
 	required_device<generic_latch_8_device> m_soundlatch;
-	output_finder<4> m_leds;
+	output_finder<4> m_led;
 };
 
 
@@ -345,10 +343,10 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 	machine().bookkeeping().coin_counter_w(1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	m_leds[0] = BIT(~data, 2);
-	m_leds[1] = BIT(~data, 3);
-	m_leds[2] = BIT(~data, 4);
-	m_leds[3] = BIT(~data, 5);
+	m_led[0] = BIT(~data, 2);
+	m_led[1] = BIT(~data, 3);
+	m_led[2] = BIT(~data, 4);
+	m_led[3] = BIT(~data, 5);
 
 	/* bit 6 flips screen (not supported) */
 }
@@ -381,7 +379,7 @@ void omegrace_state::main_map(address_map &map)
 void omegrace_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x08, 0x08).r(FUNC(omegrace_state::omegrace_vg_go_r));
+	map(0x08, 0x08).r(this, FUNC(omegrace_state::omegrace_vg_go_r));
 	map(0x09, 0x09).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x0a, 0x0a).w(m_dvg, FUNC(dvg_device::reset_w));
 	map(0x0b, 0x0b).portr("AVGDVG");             /* vg_halt */
@@ -389,9 +387,9 @@ void omegrace_state::port_map(address_map &map)
 	map(0x17, 0x17).portr("DSW2");               /* DIP SW C6 */
 	map(0x11, 0x11).portr("IN0");                /* Player 1 input */
 	map(0x12, 0x12).portr("IN1");                /* Player 2 input */
-	map(0x13, 0x13).w(FUNC(omegrace_state::omegrace_leds_w));          /* coin counters, leds, flip screen */
-	map(0x14, 0x14).w(FUNC(omegrace_state::omegrace_soundlatch_w));    /* Sound command */
-	map(0x15, 0x15).r(FUNC(omegrace_state::omegrace_spinner1_r));       /* 1st controller */
+	map(0x13, 0x13).w(this, FUNC(omegrace_state::omegrace_leds_w));          /* coin counters, leds, flip screen */
+	map(0x14, 0x14).w(this, FUNC(omegrace_state::omegrace_soundlatch_w));    /* Sound command */
+	map(0x15, 0x15).r(this, FUNC(omegrace_state::omegrace_spinner1_r));       /* 1st controller */
 	map(0x16, 0x16).portr("SPIN1");              /* 2nd controller (cocktail) */
 }
 
@@ -534,31 +532,33 @@ MACHINE_CONFIG_START(omegrace_state::omegrace)
 	MCFG_DEVICE_IO_MAP(sound_port)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	VECTOR(config, "vector", 0);
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	DVG(config, m_dvg, 0);
-	m_dvg->set_vector_tag("vector");
+	MCFG_DEVICE_ADD("dvg", DVG, 0)
+	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS92, Pin 8 = divide by 12 */
-	AY8912(config, "ay1", XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(12'000'000)/12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	AY8912(config, "ay2", XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(12'000'000)/12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

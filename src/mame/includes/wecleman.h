@@ -8,12 +8,16 @@
 #include "machine/timer.h"
 #include "sound/k007232.h"
 #include "video/k051316.h"
-#include "emupal.h"
 #include "screen.h"
 
 class wecleman_state : public driver_device
 {
 public:
+	enum
+	{
+		WECLEMAN_ID = 0,
+		HOTCHASE_ID
+	};
 	wecleman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videostatus(*this, "videostatus")
@@ -36,20 +40,7 @@ public:
 		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void hotchase(machine_config &config);
-	void wecleman(machine_config &config);
-
-	void init_wecleman();
-	void init_hotchase();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(hotchase_sound_status_r);
-
-private:
-	enum
-	{
-		WECLEMAN_ID = 0,
-		HOTCHASE_ID
-	};
+	// [RH] TODO: Make this less awful and put stuff behind protected and private wherever possible.
 
 	optional_shared_ptr<uint16_t> m_videostatus;
 	optional_shared_ptr<uint16_t> m_protection_ram;
@@ -106,7 +97,8 @@ private:
 	DECLARE_WRITE8_MEMBER(wecleman_volume_callback);
 	template<int Chip> DECLARE_READ8_MEMBER(hotchase_k007232_r);
 	template<int Chip> DECLARE_WRITE8_MEMBER(hotchase_k007232_w);
-
+	void init_wecleman();
+	void init_hotchase();
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
@@ -134,7 +126,7 @@ private:
 	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(hotchase_zoom_callback_1);
 	K051316_CB_MEMBER(hotchase_zoom_callback_2);
-
+	DECLARE_CUSTOM_INPUT_MEMBER(hotchase_sound_status_r);
 	DECLARE_WRITE8_MEMBER(hotchase_sound_hs_w);
 
 	required_device<cpu_device> m_maincpu;
@@ -148,6 +140,8 @@ private:
 
 	output_finder<1> m_led;
 
+	void hotchase(machine_config &config);
+	void wecleman(machine_config &config);
 	void hotchase_map(address_map &map);
 	void hotchase_sound_map(address_map &map);
 	void hotchase_sub_map(address_map &map);
@@ -155,6 +149,8 @@ private:
 	void wecleman_sound_map(address_map &map);
 	void wecleman_sub_map(address_map &map);
 
+
+private:
 	struct sprite_t
 	{
 		sprite_t() { }

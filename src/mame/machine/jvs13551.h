@@ -7,23 +7,28 @@
 
 #include "machine/jvsdev.h"
 
+#define MCFG_SEGA_837_13551_DEVICE_ADD(_tag, _host, tilt, d0, d1, a0, a1, a2, a3, a4, a5, a6, a7, out) \
+	MCFG_JVS_DEVICE_ADD(_tag, SEGA_837_13551, _host) \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(0, tilt);  \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(1, d0); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(2, d1); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(3, a0); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(4, a1); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(5, a2); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(6, a3); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(7, a4); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(8, a5); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(9, a6); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(10, a7); \
+	downcast<sega_837_13551_device &>(*device).set_port_tag(11, out);
 
 class jvs_host;
 
 class sega_837_13551_device : public jvs_device
 {
 public:
-	template <typename T>
-	sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&jvs_host_tag)
-		: sega_837_13551_device(mconfig, tag, owner, clock)
-	{
-		host.set_tag(std::forward<T>(jvs_host_tag));
-	}
-
 	sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template <uint8_t Which, typename T>
-	void set_port_tag(T &&port_tag) { port[Which].set_tag(std::forward<T>(port_tag)); }
+	void set_port_tag(int port, const char *tag) { port_tag[port] = tag; }
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -52,7 +57,8 @@ protected:
 	virtual bool swoutputs(uint8_t id, uint8_t val) override;
 
 private:
-	optional_ioport_array<12> port;
+	const char *port_tag[12];
+	ioport_port *port[12];
 	uint16_t coin_counter[2];
 };
 

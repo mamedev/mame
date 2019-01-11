@@ -29,7 +29,7 @@
 	MCFG_VIDEO_SET_SCREEN(_screen_tag)
 
 #define MCFG_FIXFREQ_MONITOR_CLOCK(_clock) \
-	downcast<fixedfreq_device &>(*device).set_monitor_clock(_clock);
+	downcast<fixedfreq_device &>(*device).set_minitor_clock(_clock);
 
 #define MCFG_FIXFREQ_HORZ_PARAMS(_visible, _frontporch, _sync, _backporch) \
 	downcast<fixedfreq_device &>(*device).set_horz_params(_visible, _frontporch, _sync, _backporch);
@@ -74,7 +74,7 @@ public:
 	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	void set_monitor_clock(uint32_t clock) { m_monitor_clock = clock; }
+	void set_minitor_clock(uint32_t clock) { m_monitor_clock = clock; }
 	void set_fieldcount(int count) { m_fieldcount = count; }
 	void set_threshold(double threshold) { m_sync_threshold = threshold; }
 	void set_gain(double gain) { m_gain = gain; }
@@ -95,17 +95,9 @@ public:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	NETDEV_ANALOG_CALLBACK_MEMBER(update_composite_monochrome);
-	NETDEV_ANALOG_CALLBACK_MEMBER(update_red);
-	NETDEV_ANALOG_CALLBACK_MEMBER(update_green);
-	NETDEV_ANALOG_CALLBACK_MEMBER(update_blue);
-	NETDEV_ANALOG_CALLBACK_MEMBER(update_sync);
-
+	NETDEV_ANALOG_CALLBACK_MEMBER(update_vid);
 
 protected:
-
-	typedef double time_type;
-
 	fixedfreq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -114,28 +106,25 @@ protected:
 	virtual void device_post_load() override;
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	void update_screen_parameters(const time_type &refresh);
+	void recompute_parameters(bool postload);
+	void update_screen_parameters(const attotime &refresh);
 
 private:
 
-	void update_sync_channel(const time_type &time, const double newval);
-	void update_bm(const time_type &time);
-	void recompute_parameters();
+	int sync_separator(const attotime &time, double newval);
 
 	int m_htotal;
 	int m_vtotal;
-	int m_hscale;
 
-	double m_sync_signal;
-	rgb_t m_col;
+	double m_vid;
 	int m_last_x;
 	int m_last_y;
-	time_type m_last_sync_time;
-	time_type m_line_time;
-	time_type m_last_hsync_time;
-	time_type m_last_vsync_time;
-	time_type m_refresh_period;
-	time_type m_clock_period;
+	attotime m_last_time;
+	attotime m_line_time;
+	attotime m_last_hsync_time;
+	attotime m_last_vsync_time;
+	attotime m_refresh;
+	attotime  m_clock_period;
 	std::unique_ptr<bitmap_rgb32> m_bitmap[2];
 	int m_cur_bm;
 
@@ -154,9 +143,9 @@ private:
 	double m_gain;
 
 	/* sync separator */
-	double m_vsync_filter;
-	double m_vsync_threshold;
-	double m_vsync_filter_timeconst;
+	double m_vint;
+	double m_int_trig;
+	double m_mult;
 
 	int m_sig_vsync;
 	int m_sig_composite;

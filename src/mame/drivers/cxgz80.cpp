@@ -272,8 +272,8 @@ void cxgz80_state::ch2001_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).mirror(0x3800).ram();
-	map(0x8000, 0x8000).mirror(0x3fff).rw(FUNC(cxgz80_state::ch2001_input_r), FUNC(cxgz80_state::ch2001_leds_w));
-	map(0xc000, 0xc000).mirror(0x3fff).w(FUNC(cxgz80_state::ch2001_speaker_on_w));
+	map(0x8000, 0x8000).mirror(0x3fff).rw(this, FUNC(cxgz80_state::ch2001_input_r), FUNC(cxgz80_state::ch2001_leds_w));
+	map(0xc000, 0xc000).mirror(0x3fff).w(this, FUNC(cxgz80_state::ch2001_speaker_on_w));
 }
 
 
@@ -407,7 +407,7 @@ MACHINE_CONFIG_START(cxgz80_state::ch2001)
 	MCFG_TIMER_DRIVER_ADD("speaker_off", cxgz80_state, speaker_off_callback)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", cxgz80_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_cxg_ch2001);
+	MCFG_DEFAULT_LAYOUT(layout_cxg_ch2001)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

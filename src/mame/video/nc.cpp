@@ -39,9 +39,9 @@ static const rgb_t nc_palette[NC_NUM_COLOURS] =
 
 
 /* Initialise the palette */
-void nc_state::nc_colours(palette_device &palette) const
+PALETTE_INIT_MEMBER(nc_state, nc)
 {
-	palette.set_pen_colors(0, nc_palette);
+	palette.set_pen_colors(0, nc_palette, ARRAY_LENGTH(nc_palette));
 }
 
 

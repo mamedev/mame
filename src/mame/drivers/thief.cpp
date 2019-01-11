@@ -137,20 +137,20 @@ void thief_state::sharkatt_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();     /* 2114 */
-	map(0xc000, 0xdfff).rw(FUNC(thief_state::thief_videoram_r), FUNC(thief_state::thief_videoram_w));   /* 4116 */
+	map(0xc000, 0xdfff).rw(this, FUNC(thief_state::thief_videoram_r), FUNC(thief_state::thief_videoram_w));   /* 4116 */
 }
 
 void thief_state::thief_main_map(address_map &map)
 {
-	map(0x0000, 0x0000).w(FUNC(thief_state::thief_blit_w));
+	map(0x0000, 0x0000).w(this, FUNC(thief_state::thief_blit_w));
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();     /* 2114 */
 	map(0xa000, 0xafff).rom();     /* NATO Defense diagnostic ROM */
-	map(0xc000, 0xdfff).rw(FUNC(thief_state::thief_videoram_r), FUNC(thief_state::thief_videoram_w));   /* 4116 */
-	map(0xe000, 0xe008).rw(FUNC(thief_state::thief_coprocessor_r), FUNC(thief_state::thief_coprocessor_w));
+	map(0xc000, 0xdfff).rw(this, FUNC(thief_state::thief_videoram_r), FUNC(thief_state::thief_videoram_w));   /* 4116 */
+	map(0xe000, 0xe008).rw(this, FUNC(thief_state::thief_coprocessor_r), FUNC(thief_state::thief_coprocessor_w));
 	map(0xe010, 0xe02f).rom();
-	map(0xe080, 0xe0bf).rw(FUNC(thief_state::thief_context_ram_r), FUNC(thief_state::thief_context_ram_w));
-	map(0xe0c0, 0xe0c0).w(FUNC(thief_state::thief_context_bank_w));
+	map(0xe080, 0xe0bf).rw(this, FUNC(thief_state::thief_context_ram_r), FUNC(thief_state::thief_context_ram_w));
+	map(0xe0c0, 0xe0c0).w(this, FUNC(thief_state::thief_context_bank_w));
 }
 
 
@@ -158,15 +158,15 @@ void thief_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).nopw(); /* watchdog */
-	map(0x10, 0x10).w(FUNC(thief_state::thief_video_control_w));
+	map(0x10, 0x10).w(this, FUNC(thief_state::thief_video_control_w));
 	map(0x30, 0x33).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x41).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x41, 0x41).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x42, 0x43).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x43, 0x43).r("ay2", FUNC(ay8910_device::data_r));
-	map(0x50, 0x50).w(FUNC(thief_state::thief_color_plane_w));
+	map(0x50, 0x50).w(this, FUNC(thief_state::thief_color_plane_w));
 	map(0x60, 0x6f).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
-	map(0x70, 0x7f).w(FUNC(thief_state::thief_color_map_w));
+	map(0x70, 0x7f).w(this, FUNC(thief_state::thief_color_map_w));
 }
 
 
@@ -393,58 +393,60 @@ static const char *const natodef_sample_names[] =
 };
 
 
-void thief_state::thief(machine_config &config)
-{
-	Z80(config, m_maincpu, XTAL(8'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &thief_state::thief_main_map);
-	m_maincpu->set_addrmap(AS_IO, &thief_state::io_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(thief_state::iack));
+MACHINE_CONFIG_START(thief_state::thief)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(thief_main_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(thief_state, iack)
 
-	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set(FUNC(thief_state::thief_input_select_w));
-	ppi.in_pb_callback().set(FUNC(thief_state::thief_io_r));
-	ppi.out_pc_callback().set(FUNC(thief_state::tape_control_w));
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, thief_state, thief_input_select_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, thief_state, thief_io_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, thief_state, tape_control_w))
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(20'000'000)/4, 320, 0, 256, 272, 0, 256);
-	m_screen->set_screen_update(FUNC(thief_state::screen_update_thief));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/4, 320, 0, 256, 272, 0, 256)
+	MCFG_SCREEN_UPDATE_DRIVER(thief_state, screen_update_thief)
+	MCFG_SCREEN_PALETTE("palette")
 
-	TMS9927(config, m_tms, XTAL(20'000'000)/4/8);
-	m_tms->set_char_width(8);
-	m_tms->vsyn_callback().set_inputline("maincpu", 0, ASSERT_LINE);
-
-	PALETTE(config, m_palette).set_entries(16);
+	MCFG_DEVICE_ADD("tms", TMS9927, XTAL(20'000'000)/4/8)
+	MCFG_TMS9927_CHAR_WIDTH(8)
+	MCFG_TMS9927_VSYN_CALLBACK(ASSERTLINE("maincpu", 0))
+	MCFG_PALETTE_ADD("palette", 16)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(8'000'000)/2/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(8'000'000)/2/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	AY8910(config, "ay2", XTAL(8'000'000)/2/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(8'000'000)/2/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(2);
-	m_samples->set_samples_names(thief_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(thief_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void thief_state::sharkatt(machine_config &config)
-{
+MACHINE_CONFIG_START(thief_state::sharkatt)
 	thief(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &thief_state::sharkatt_main_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sharkatt_main_map)
 
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 
-	m_samples->set_samples_names(sharkatt_sample_names);
-}
+	MCFG_DEVICE_MODIFY("samples")
+	MCFG_SAMPLES_NAMES(sharkatt_sample_names)
+MACHINE_CONFIG_END
 
-void thief_state::natodef(machine_config &config)
-{
+MACHINE_CONFIG_START(thief_state::natodef)
 	thief(config);
-	m_samples->set_samples_names(natodef_sample_names);
-}
+	MCFG_DEVICE_MODIFY("samples")
+	MCFG_SAMPLES_NAMES(natodef_sample_names)
+MACHINE_CONFIG_END
 
 
 /**********************************************************/

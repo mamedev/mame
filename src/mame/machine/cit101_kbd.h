@@ -17,6 +17,14 @@
 
 
 //**************************************************************************
+//  CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CIT101_HLE_KEYBOARD_TXD_CALLBACK(_devcb) \
+	devcb = &downcast<cit101_hle_keyboard_device &>(*device).set_txd_callback(DEVCB_##_devcb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -26,10 +34,10 @@ class cit101_hle_keyboard_device : public device_t, public device_matrix_keyboar
 {
 public:
 	// construction/destruction
-	cit101_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	cit101_hle_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	auto txd_callback() { return m_txd_callback.bind(); }
+	template <class Object> devcb_base &set_txd_callback(Object &&cb) { return m_txd_callback.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 

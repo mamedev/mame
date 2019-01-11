@@ -40,7 +40,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	uint16_t *srcline1, *srcline2;
 	uint8_t *srcpriline;
 
-	for (y=cliprect.top();y<=cliprect.bottom();y++)
+	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
 		srcline1=&sprite_bitmap1->pix16(y,0);
 		srcline2=&sprite_bitmap2->pix16(y,0);
@@ -48,7 +48,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 		dstline=&bitmap.pix32(y,0);
 
-		for (x=cliprect.left();x<=cliprect.right();x++)
+		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			uint16_t pix1 = srcline1[x];
 			uint16_t pix2 = srcline2[x];

@@ -166,7 +166,7 @@ void sdlc_logger_device::device_start()
 	save_item(NAME(m_current_clock));
 	save_item(NAME(m_frame_bits));
 	save_item(NAME(m_expected_fcs));
-	save_pointer(NAME(m_buffer), BUFFER_BYTES);
+	save_pointer(NAME(m_buffer.get()), BUFFER_BYTES);
 }
 
 void sdlc_logger_device::device_reset()

@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
-#ifndef MAME_INCLUDES_TOAPLAN2_H
-#define MAME_INCLUDES_TOAPLAN2_H
 
-#pragma once
+/**************** Machine stuff ******************/
+//#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
 #include "cpu/m68000/m68000.h"
 #include "machine/bankdev.h"
@@ -14,10 +13,10 @@
 #include "machine/upd4992.h"
 #include "video/gp9001.h"
 #include "sound/okim6295.h"
-#include "emupal.h"
 #include "screen.h"
 
-/**************** Machine stuff ******************/
+// We encode priority with colour in the tilemaps, so need a larger palette
+#define T2PALETTE_LENGTH 0x10000
 
 class toaplan2_state : public driver_device
 {
@@ -25,11 +24,12 @@ public:
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_shared_ram(*this, "shared_ram")
+		, m_paletteram(*this, "palette")
 		, m_tx_videoram(*this, "tx_videoram")
 		, m_tx_lineselect(*this, "tx_lineselect")
 		, m_tx_linescroll(*this, "tx_linescroll")
-		, m_tx_gfxram(*this, "tx_gfxram")
-		, m_mainram(*this, "mainram")
+		, m_tx_gfxram16(*this, "tx_gfxram16")
+		, m_mainram16(*this, "mainram16")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_vdp(*this, "gp9001_%u", 0U)
@@ -49,54 +49,13 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
-	void dogyuun(machine_config &config);
-	void othldrby(machine_config &config);
-	void snowbro2(machine_config &config);
-	void bgareggabl(machine_config &config);
-	void pwrkick(machine_config &config);
-	void mahoudai(machine_config &config);
-	void tekipaki(machine_config &config);
-	void bbakraid(machine_config &config);
-	void fixeightbl(machine_config &config);
-	void fixeight(machine_config &config);
-	void ghox(machine_config &config);
-	void bgaregga(machine_config &config);
-	void batrider(machine_config &config);
-	void shippumd(machine_config &config);
-	void kbash(machine_config &config);
-	void pipibibs(machine_config &config);
-	void pipibibsbl(machine_config &config);
-	void batsugun(machine_config &config);
-	void enmadaio(machine_config &config);
-	void truxton2(machine_config &config);
-	void vfive(machine_config &config);
-	void kbash2(machine_config &config);
-
-	void init_bbakraid();
-	void init_pipibibsbl();
-	void init_dogyuun();
-	void init_fixeight();
-	void init_bgaregga();
-	void init_fixeightbl();
-	void init_vfive();
-	void init_batrider();
-	void init_enmadaio();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
-
-protected:
-	virtual void device_post_load() override;
-
-private:
-	// We encode priority with colour in the tilemaps, so need a larger palette
-	static constexpr unsigned T2PALETTE_LENGTH = 0x10000;
-
 	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	optional_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_tx_videoram;
 	optional_shared_ptr<uint16_t> m_tx_lineselect;
 	optional_shared_ptr<uint16_t> m_tx_linescroll;
-	optional_shared_ptr<uint16_t> m_tx_gfxram;
-	optional_shared_ptr<uint16_t> m_mainram;
+	optional_shared_ptr<uint16_t> m_tx_gfxram16;
+	optional_shared_ptr<uint16_t> m_mainram16;
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -153,17 +112,24 @@ private:
 	DECLARE_WRITE8_MEMBER(batrider_clear_nmi_w);
 	DECLARE_READ16_MEMBER(bbakraid_eeprom_r);
 	DECLARE_WRITE16_MEMBER(bbakraid_eeprom_w);
-	DECLARE_WRITE16_MEMBER(tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(tx_linescroll_w);
-	DECLARE_WRITE16_MEMBER(tx_gfxram_w);
-	DECLARE_WRITE16_MEMBER(batrider_tx_gfxram_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_tx_linescroll_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_tx_gfxram16_w);
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_pal_text_dma_w);
 	DECLARE_WRITE8_MEMBER(batrider_objectbank_w);
-
+	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
 	template<int Chip> DECLARE_WRITE8_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(enmadaio_oki_bank_w);
-
+	void init_bbakraid();
+	void init_pipibibsbl();
+	void init_dogyuun();
+	void init_fixeight();
+	void init_bgaregga();
+	void init_fixeightbl();
+	void init_vfive();
+	void init_batrider();
+	void init_enmadaio();
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(toaplan2);
@@ -183,17 +149,39 @@ private:
 	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan2);
 	IRQ_CALLBACK_MEMBER(fixeightbl_irq_ack);
 	IRQ_CALLBACK_MEMBER(pipibibsbl_irq_ack);
 	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
+	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_w);
 	DECLARE_WRITE8_MEMBER(pwrkick_coin_lockout_w);
 
 	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
-
+	void dogyuun(machine_config &config);
+	void othldrby(machine_config &config);
+	void snowbro2(machine_config &config);
+	void bgareggabl(machine_config &config);
+	void pwrkick(machine_config &config);
+	void mahoudai(machine_config &config);
+	void tekipaki(machine_config &config);
+	void bbakraid(machine_config &config);
+	void fixeightbl(machine_config &config);
+	void fixeight(machine_config &config);
+	void ghox(machine_config &config);
+	void bgaregga(machine_config &config);
+	void batrider(machine_config &config);
+	void shippumd(machine_config &config);
+	void kbash(machine_config &config);
+	void pipibibs(machine_config &config);
+	void pipibibsbl(machine_config &config);
+	void batsugun(machine_config &config);
+	void enmadaio(machine_config &config);
+	void truxton2(machine_config &config);
+	void vfive(machine_config &config);
+	void kbash2(machine_config &config);
 	void batrider_68k_mem(address_map &map);
 	void batrider_dma_mem(address_map &map);
 	void batrider_sound_z80_mem(address_map &map);
@@ -233,5 +221,3 @@ private:
 	void vfive_68k_mem(address_map &map);
 	void vfive_v25_mem(address_map &map);
 };
-
-#endif // MAME_INCLUDES_TOAPLAN2_H

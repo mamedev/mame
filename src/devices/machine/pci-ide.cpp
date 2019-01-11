@@ -5,47 +5,46 @@
 
 DEFINE_DEVICE_TYPE(IDE_PCI, ide_pci_device, "ide_pci", "PCI IDE interface")
 
-ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pci_device(mconfig, IDE_PCI, tag, owner, clock),
+ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, IDE_PCI, tag, owner, clock),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),
+	m_irq_num(-1),
 	m_irq_handler(*this),
 	m_legacy_top(0x000),
-	m_pif(0x8a),
-	m_bus_master_tag(":pci:00.0"),
-	m_bus_master_space(AS_DATA)
+	m_pif(0x8a)
 {
 }
 
 void ide_pci_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x09, 0x09).w(FUNC(ide_pci_device::prog_if_w));
-	map(0x10, 0x1f).rw(FUNC(ide_pci_device::address_base_r), FUNC(ide_pci_device::address_base_w));
-	map(0x2c, 0x2f).w(FUNC(ide_pci_device::subsystem_id_w));
-	map(0x40, 0x5f).rw(FUNC(ide_pci_device::pcictrl_r), FUNC(ide_pci_device::pcictrl_w));
+	map(0x09, 0x09).w(this, FUNC(ide_pci_device::prog_if_w));
+	map(0x10, 0x1f).rw(this, FUNC(ide_pci_device::address_base_r), FUNC(ide_pci_device::address_base_w));
+	map(0x2c, 0x2f).w(this, FUNC(ide_pci_device::subsystem_id_w));
+	map(0x40, 0x5f).rw(this, FUNC(ide_pci_device::pcictrl_r), FUNC(ide_pci_device::pcictrl_w));
 	map(0x70, 0x77).rw("ide", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w)); // PCI646
 	map(0x78, 0x7f).rw("ide2", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w)); // PCI646
 }
 
 void ide_pci_device::chan1_data_command_map(address_map &map)
 {
-	map(0x0, 0x7).rw("ide", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
+	map(0x0, 0x7).rw("ide", FUNC(bus_master_ide_controller_device::read_cs0), FUNC(bus_master_ide_controller_device::write_cs0));
 }
 
 void ide_pci_device::chan1_control_map(address_map &map)
 {
-	map(0x0, 0x3).rw(FUNC(ide_pci_device::ide_read_cs1), FUNC(ide_pci_device::ide_write_cs1));
+	map(0x0, 0x3).rw(this, FUNC(ide_pci_device::ide_read_cs1), FUNC(ide_pci_device::ide_write_cs1));
 }
 
 void ide_pci_device::chan2_data_command_map(address_map &map)
 {
-	map(0x0, 0x7).rw("ide2", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
+	map(0x0, 0x7).rw("ide2", FUNC(bus_master_ide_controller_device::read_cs0), FUNC(bus_master_ide_controller_device::write_cs0));
 }
 
 void ide_pci_device::chan2_control_map(address_map &map)
 {
-	map(0x0, 0x3).rw(FUNC(ide_pci_device::ide2_read_cs1), FUNC(ide_pci_device::ide2_write_cs1));
+	map(0x0, 0x3).rw(this, FUNC(ide_pci_device::ide2_read_cs1), FUNC(ide_pci_device::ide2_write_cs1));
 }
 
 void ide_pci_device::bus_master_map(address_map &map)
@@ -54,19 +53,28 @@ void ide_pci_device::bus_master_map(address_map &map)
 	map(0x8, 0xf).rw("ide2", FUNC(bus_master_ide_controller_device::bmdma_r), FUNC(bus_master_ide_controller_device::bmdma_w));
 }
 
-void ide_pci_device::device_add_mconfig(machine_config &config)
-{
-	BUS_MASTER_IDE_CONTROLLER(config, m_ide).options(ata_devices, "hdd", "cdrom", true);
-	m_ide->irq_handler().set(FUNC(ide_pci_device::ide_interrupt));
-	m_ide->set_bus_master_space(m_bus_master_tag, m_bus_master_space);
+MACHINE_CONFIG_START(ide_pci_device::device_add_mconfig)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", "cdrom", true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, ide_pci_device, ide_interrupt))
+	//MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":pci:00.0", AS_DATA)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "hdd", "cdrom", true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, ide_pci_device, ide_interrupt))
+	//MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":pci:00.0", AS_DATA)
+MACHINE_CONFIG_END
 
-	BUS_MASTER_IDE_CONTROLLER(config, m_ide2).options(ata_devices, "hdd", "cdrom", true);
-	m_ide2->irq_handler().set(FUNC(ide_pci_device::ide_interrupt));
-	m_ide2->set_bus_master_space(m_bus_master_tag, m_bus_master_space);
+void ide_pci_device::set_irq_info(const char *tag, const int irq_num)
+{
+	m_cpu_tag = tag;
+	m_irq_num = irq_num;
 }
 
 void ide_pci_device::device_start()
 {
+	if (m_irq_num != -1)
+		m_cpu = machine().device<cpu_device>(m_cpu_tag);
+
 	pci_device::device_start();
 
 	add_map(8,    M_IO,  FUNC(ide_pci_device::chan1_data_command_map));
@@ -143,6 +151,10 @@ WRITE32_MEMBER(ide_pci_device::ide2_write_cs1)
 
 WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 {
+	// Assert/Clear the interrupt if the irq num is set.
+	if (m_irq_num != -1) {
+		m_cpu->set_input_line(m_irq_num, state);
+	}
 	// Call the callback
 	m_irq_handler(state);
 
@@ -154,7 +166,7 @@ WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 			m_config_data[0x10 / 4] &= ~0x4;
 	}
 	if (0)
-		logerror("%s:ide_interrupt set to %i\n", machine().describe_context(), state);
+		logerror("%s:ide_interrupt %i set to %i\n", machine().describe_context(), m_irq_num, state);
 }
 
 WRITE8_MEMBER(ide_pci_device::prog_if_w)

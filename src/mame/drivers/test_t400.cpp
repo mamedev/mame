@@ -18,12 +18,10 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
+	DECLARE_WRITE8_MEMBER( port_l_w );
+	required_device<cpu_device> m_maincpu;
 	void test_t410(machine_config &config);
 	void test_t420(machine_config &config);
-
-private:
-	DECLARE_WRITE8_MEMBER( port_l_w );
-	required_device<cop400_cpu_device> m_maincpu;
 };
 
 WRITE8_MEMBER( t400_test_suite_state::port_l_w )
@@ -31,19 +29,17 @@ WRITE8_MEMBER( t400_test_suite_state::port_l_w )
 //  printf("L: %u\n", data);
 }
 
-void t400_test_suite_state::test_t410(machine_config &config)
-{
-	COP410(config, m_maincpu, 1000000);
-	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
-	m_maincpu->write_l().set(FUNC(t400_test_suite_state::port_l_w));
-}
+MACHINE_CONFIG_START(t400_test_suite_state::test_t410)
+	MCFG_DEVICE_ADD("maincpu", COP410, 1000000)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, t400_test_suite_state, port_l_w))
+MACHINE_CONFIG_END
 
-void t400_test_suite_state::test_t420(machine_config &config)
-{
-	COP420(config, m_maincpu, 1000000);
-	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
-	m_maincpu->write_l().set(FUNC(t400_test_suite_state::port_l_w));
-}
+MACHINE_CONFIG_START(t400_test_suite_state::test_t420)
+	MCFG_DEVICE_ADD("maincpu", COP420, 1000000)
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
+	MCFG_COP400_WRITE_L_CB(WRITE8(*this, t400_test_suite_state, port_l_w))
+MACHINE_CONFIG_END
 
 ROM_START( test410 )
 	ROM_REGION( 0x200, "maincpu", 0 )

@@ -6,24 +6,24 @@
 
 void naomi_g1_device::amap(address_map &map)
 {
-	map(0x04, 0x07).rw(FUNC(naomi_g1_device::sb_gdstar_r), FUNC(naomi_g1_device::sb_gdstar_w));
-	map(0x08, 0x0b).rw(FUNC(naomi_g1_device::sb_gdlen_r), FUNC(naomi_g1_device::sb_gdlen_w));
-	map(0x0c, 0x0f).rw(FUNC(naomi_g1_device::sb_gddir_r), FUNC(naomi_g1_device::sb_gddir_w));
-	map(0x14, 0x17).rw(FUNC(naomi_g1_device::sb_gden_r), FUNC(naomi_g1_device::sb_gden_w));
-	map(0x18, 0x1b).rw(FUNC(naomi_g1_device::sb_gdst_r), FUNC(naomi_g1_device::sb_gdst_w));
-	map(0x80, 0x83).w(FUNC(naomi_g1_device::sb_g1rrc_w));
-	map(0x84, 0x87).w(FUNC(naomi_g1_device::sb_g1rwc_w));
-	map(0x88, 0x8b).w(FUNC(naomi_g1_device::sb_g1frc_w));
-	map(0x8c, 0x8f).w(FUNC(naomi_g1_device::sb_g1fwc_w));
-	map(0x90, 0x93).w(FUNC(naomi_g1_device::sb_g1crc_w));
-	map(0x94, 0x97).w(FUNC(naomi_g1_device::sb_g1cwc_w));
-	map(0xa0, 0xa3).w(FUNC(naomi_g1_device::sb_g1gdrc_w));
-	map(0xa4, 0xa7).w(FUNC(naomi_g1_device::sb_g1gdwc_w));
-	map(0xb0, 0xb3).r(FUNC(naomi_g1_device::sb_g1sysm_r));
-	map(0xb4, 0xb7).w(FUNC(naomi_g1_device::sb_g1crdyc_w));
-	map(0xb8, 0xbb).w(FUNC(naomi_g1_device::sb_gdapro_w));
-	map(0xf4, 0xf7).r(FUNC(naomi_g1_device::sb_gdstard_r));
-	map(0xf8, 0xfb).r(FUNC(naomi_g1_device::sb_gdlend_r));
+	map(0x04, 0x07).rw(this, FUNC(naomi_g1_device::sb_gdstar_r), FUNC(naomi_g1_device::sb_gdstar_w));
+	map(0x08, 0x0b).rw(this, FUNC(naomi_g1_device::sb_gdlen_r), FUNC(naomi_g1_device::sb_gdlen_w));
+	map(0x0c, 0x0f).rw(this, FUNC(naomi_g1_device::sb_gddir_r), FUNC(naomi_g1_device::sb_gddir_w));
+	map(0x14, 0x17).rw(this, FUNC(naomi_g1_device::sb_gden_r), FUNC(naomi_g1_device::sb_gden_w));
+	map(0x18, 0x1b).rw(this, FUNC(naomi_g1_device::sb_gdst_r), FUNC(naomi_g1_device::sb_gdst_w));
+	map(0x80, 0x83).w(this, FUNC(naomi_g1_device::sb_g1rrc_w));
+	map(0x84, 0x87).w(this, FUNC(naomi_g1_device::sb_g1rwc_w));
+	map(0x88, 0x8b).w(this, FUNC(naomi_g1_device::sb_g1frc_w));
+	map(0x8c, 0x8f).w(this, FUNC(naomi_g1_device::sb_g1fwc_w));
+	map(0x90, 0x93).w(this, FUNC(naomi_g1_device::sb_g1crc_w));
+	map(0x94, 0x97).w(this, FUNC(naomi_g1_device::sb_g1cwc_w));
+	map(0xa0, 0xa3).w(this, FUNC(naomi_g1_device::sb_g1gdrc_w));
+	map(0xa4, 0xa7).w(this, FUNC(naomi_g1_device::sb_g1gdwc_w));
+	map(0xb0, 0xb3).r(this, FUNC(naomi_g1_device::sb_g1sysm_r));
+	map(0xb4, 0xb7).w(this, FUNC(naomi_g1_device::sb_g1crdyc_w));
+	map(0xb8, 0xbb).w(this, FUNC(naomi_g1_device::sb_gdapro_w));
+	map(0xf4, 0xf7).r(this, FUNC(naomi_g1_device::sb_gdstard_r));
+	map(0xf8, 0xfb).r(this, FUNC(naomi_g1_device::sb_gdlend_r));
 }
 
 naomi_g1_device::naomi_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

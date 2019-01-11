@@ -27,13 +27,12 @@ MACHINE_CONFIG_START(nascom_avc_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(16250000, 1024, 0, 768, 320, 0, 256)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
 
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MC6845(config, m_crtc, XTAL(16'000'000) / 8);
-	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(6);
-	m_crtc->set_update_row_callback(FUNC(nascom_avc_device::crtc_update_row), this);
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(6)
+	MCFG_MC6845_UPDATE_ROW_CB(nascom_avc_device, crtc_update_row)
 MACHINE_CONFIG_END
 
 

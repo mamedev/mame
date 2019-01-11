@@ -55,11 +55,10 @@ DEFINE_DEVICE_TYPE(WANGPC_MCC, wangpc_mcc_device, "wangpc_mcc", "Wang PC-PM043 M
 //  MACHINE_CONFIG_START( wangpc_mcc )
 //-------------------------------------------------
 
-void wangpc_mcc_device::device_add_mconfig(machine_config &config)
-{
-	Z80SIO2(config, m_sio, 4000000);
-	Z80DART(config, m_dart, 4000000);
-}
+MACHINE_CONFIG_START(wangpc_mcc_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO2, 4000000)
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, 4000000)
+MACHINE_CONFIG_END
 
 
 

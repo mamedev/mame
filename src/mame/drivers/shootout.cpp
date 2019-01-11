@@ -106,14 +106,14 @@ WRITE8_MEMBER(shootout_state::coincounter_w)
 void shootout_state::shootout_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1000).portr("DSW1").w(FUNC(shootout_state::bankswitch_w));
-	map(0x1001, 0x1001).portr("P1").w(FUNC(shootout_state::flipscreen_w));
-	map(0x1002, 0x1002).portr("P2").w(FUNC(shootout_state::coincounter_w));
-	map(0x1003, 0x1003).portr("DSW2").w(FUNC(shootout_state::sound_cpu_command_w));
+	map(0x1000, 0x1000).portr("DSW1").w(this, FUNC(shootout_state::bankswitch_w));
+	map(0x1001, 0x1001).portr("P1").w(this, FUNC(shootout_state::flipscreen_w));
+	map(0x1002, 0x1002).portr("P2").w(this, FUNC(shootout_state::coincounter_w));
+	map(0x1003, 0x1003).portr("DSW2").w(this, FUNC(shootout_state::sound_cpu_command_w));
 	map(0x1004, 0x17ff).ram();
 	map(0x1800, 0x19ff).ram().share("spriteram");
-	map(0x2000, 0x27ff).ram().w(FUNC(shootout_state::textram_w)).share("textram");
-	map(0x2800, 0x2fff).ram().w(FUNC(shootout_state::videoram_w)).share("videoram");
+	map(0x2000, 0x27ff).ram().w(this, FUNC(shootout_state::textram_w)).share("textram");
+	map(0x2800, 0x2fff).ram().w(this, FUNC(shootout_state::videoram_w)).share("videoram");
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom().region("maincpu", 0x0000);
 }
@@ -126,11 +126,11 @@ void shootout_state::shootouj_map(address_map &map)
 	map(0x1002, 0x1002).portr("P2");
 	map(0x1003, 0x1003).portr("DSW2");
 	map(0x1004, 0x17ff).ram();
-	map(0x1800, 0x1800).w(FUNC(shootout_state::coincounter_w));
+	map(0x1800, 0x1800).w(this, FUNC(shootout_state::coincounter_w));
 	map(0x2000, 0x21ff).ram().share("spriteram");
 	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x3000, 0x37ff).ram().w(FUNC(shootout_state::textram_w)).share("textram");
-	map(0x3800, 0x3fff).ram().w(FUNC(shootout_state::videoram_w)).share("videoram");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(shootout_state::textram_w)).share("textram");
+	map(0x3800, 0x3fff).ram().w(this, FUNC(shootout_state::videoram_w)).share("videoram");
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom().region("maincpu", 0x0000);
 }
@@ -142,7 +142,7 @@ void shootout_state::shootout_sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xa000, 0xa000).r(FUNC(shootout_state::sound_cpu_command_r));
+	map(0xa000, 0xa000).r(this, FUNC(shootout_state::sound_cpu_command_r));
 	map(0xc000, 0xffff).rom().region("audiocpu", 0x0000);
 	map(0xd000, 0xd000).nopw(); // Unknown, NOT irq/nmi mask (Always 0x80 ???)
 }
@@ -292,19 +292,20 @@ MACHINE_CONFIG_START(shootout_state::shootout)
 	MCFG_SCREEN_RAW_PARAMS (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248)
 
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_shootout)
-	PALETTE(config, m_palette, FUNC(shootout_state::shootout_palette), 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 MHz
-	ymsnd.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -321,21 +322,22 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_SCREEN_RAW_PARAMS (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248)
 
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_shootout)
-	PALETTE(config, m_palette, FUNC(shootout_state::shootout_palette), 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
-	ymsnd.irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
-	ymsnd.port_a_write_callback().set(FUNC(shootout_state::bankswitch_w));
-	ymsnd.port_b_write_callback().set(FUNC(shootout_state::flipscreen_w));
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shootout_state, bankswitch_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shootout_state, flipscreen_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(shootout_state::shootouk)

@@ -59,7 +59,7 @@ Infinite loop is reached at address 0x7699
 #include "cpu/mcs51/mcs51.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
-#include "emupal.h"
+#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -72,25 +72,20 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(henry_p1_w);
+	DECLARE_WRITE8_MEMBER(henry_p3_w);
+	void init_hprot1();
+	DECLARE_PALETTE_INIT(hprot1);
+	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void hprotr8a(machine_config &config);
 	void hprot2r6(machine_config &config);
 	void hprot1(machine_config &config);
-
-	void init_hprot1();
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
-	DECLARE_WRITE8_MEMBER(henry_p1_w);
-	DECLARE_WRITE8_MEMBER(henry_p3_w);
-	void hprot1_palette(palette_device &palette) const;
-	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
-
-	required_device<i80c31_device> m_maincpu;
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -211,7 +206,7 @@ WRITE8_MEMBER(hprot1_state::henry_p3_w)
 		logerror("Write to P3: %02X\n", data);
 }
 
-void hprot1_state::hprot1_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(hprot1_state, hprot1)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -247,12 +242,12 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 
 MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* basic machine hardware */
-	I80C31(config, m_maincpu, XTAL(10'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
-	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
-	m_maincpu->port_in_cb<1>().set_ioport("inputs");
-	m_maincpu->port_out_cb<1>().set(FUNC(hprot1_state::henry_p1_w));
-	m_maincpu->port_out_cb<3>().set(FUNC(hprot1_state::henry_p3_w));
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("inputs"))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, hprot1_state, henry_p1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hprot1_state, henry_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -263,12 +258,14 @@ MACHINE_CONFIG_START(hprot1_state::hprot1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(hprot1_state::hprot1_palette), 2);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_hprot1);
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hprot1)
 
-	HD44780(config, m_lcdc, 0);
-	m_lcdc->set_lcd_size(2, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update), this);
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(2, 16)
+	MCFG_HD44780_PIXEL_UPDATE_CB(hprot1_state,hprot1_pixel_update)
 
 	/* TODO: figure out which RTC chip is in use. */
 
@@ -277,7 +274,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hprot1_state::hprotr8a)
 	hprot1(config);
-
 	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
 	MCFG_DEVICE_IO_MAP(i80c31_io)
@@ -295,7 +291,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hprot1_state::hprot2r6)
 	hprot1(config);
-
 	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
 	MCFG_DEVICE_IO_MAP(i80c31_io)

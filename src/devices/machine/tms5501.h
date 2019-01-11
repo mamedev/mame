@@ -39,6 +39,24 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_TMS5501_IRQ_CALLBACK(_write) \
+	devcb = &downcast<tms5501_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+
+#define MCFG_TMS5501_XMT_CALLBACK(_write) \
+	devcb = &downcast<tms5501_device &>(*device).set_xmt_wr_callback(DEVCB_##_write);
+
+#define MCFG_TMS5501_XI_CALLBACK(_read) \
+	devcb = &downcast<tms5501_device &>(*device).set_xi_rd_callback(DEVCB_##_read);
+
+#define MCFG_TMS5501_XO_CALLBACK(_write) \
+	devcb = &downcast<tms5501_device &>(*device).set_xo_wr_callback(DEVCB_##_write);
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -51,10 +69,10 @@ public:
 	// construction/destruction
 	tms5501_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto int_callback() { return m_write_int.bind(); }
-	auto xmt_callback() { return m_write_xmt.bind(); }
-	auto xi_callback() { return m_read_xi.bind(); }
-	auto xo_callback() { return m_write_xo.bind(); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xmt_wr_callback(Object &&cb) { return m_write_xmt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xi_rd_callback(Object &&cb) { return m_read_xi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xo_wr_callback(Object &&cb) { return m_write_xo.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( rcv_w );
 
@@ -149,7 +167,7 @@ private:
 	void set_interrupt(uint8_t mask);
 	void check_interrupt();
 
-	devcb_write_line m_write_int;
+	devcb_write_line m_write_irq;
 	devcb_write_line m_write_xmt;
 	devcb_read8 m_read_xi;
 	devcb_write8 m_write_xo;

@@ -470,16 +470,6 @@ protected:
 class ohci_usb_connector : public device_t, public device_slot_interface
 {
 public:
-	template <typename T>
-	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed)
-		: ohci_usb_connector(mconfig, tag, owner, 0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
-	}
-
 	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ohci_usb_connector();
 
@@ -490,6 +480,10 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector)
+
+#define MCFG_USB_PORT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
+	MCFG_DEVICE_ADD(_tag, OHCI_USB_CONNECTOR, 0)                   \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
 
 /*
  * Game controller usb device

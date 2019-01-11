@@ -299,23 +299,6 @@ struct snes_cart_info
 class snes_state : public driver_device
 {
 public:
-	snes_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_spc700(*this, "spc700"),
-		m_ppu(*this, "ppu"),
-		m_screen(*this, "screen")
-	{ }
-
-	void init_snes();
-	void init_snes_hirom();
-	void init_snes_mess();
-	void init_snesst();
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-protected:
 	enum
 	{
 		TIMER_NMI_TICK,
@@ -327,6 +310,14 @@ protected:
 		TIMER_HBLANK_TICK,
 		TIMER_SNES_LAST
 	};
+
+	snes_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_spc700(*this, "spc700"),
+		m_ppu(*this, "ppu"),
+		m_screen(*this, "screen") { }
 
 	/* misc */
 	uint16_t                m_hblank_offset;
@@ -383,12 +374,20 @@ protected:
 	snes_cart_info m_cart;   // used by NSS/SFCBox only! to be moved in a derived class!
 	void rom_map_setup(uint32_t size);
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	/* devices */
 	required_device<_5a22_device> m_maincpu;
 	required_device<spc700_device> m_soundcpu;
 	required_device<snes_sound_device> m_spc700;
 	required_device<snes_ppu_device> m_ppu;
 	required_device<screen_device> m_screen;
+
+
+	void init_snes();
+	void init_snes_hirom();
+	void init_snes_mess();
+	void init_snesst();
 
 	inline int dma_abus_valid(uint32_t address);
 	inline uint8_t abus_read(address_space &space, uint32_t abus);
@@ -436,6 +435,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 

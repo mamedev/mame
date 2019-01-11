@@ -17,27 +17,15 @@ set(HEADERS
     hlslGrammar.h
     hlslParseables.h)
 
-glslang_pch(SOURCES pch.cpp)
-
-add_library(HLSL ${LIB_TYPE} ${SOURCES} ${HEADERS})
+add_library(HLSL STATIC ${SOURCES} ${HEADERS})
 set_property(TARGET HLSL PROPERTY FOLDER hlsl)
 set_property(TARGET HLSL PROPERTY POSITION_INDEPENDENT_CODE ON)
-
-if(WIN32 AND BUILD_SHARED_LIBS)
-    set_target_properties(HLSL PROPERTIES PREFIX "")
-endif()
 
 if(WIN32)
     source_group("Source" FILES ${SOURCES} ${HEADERS})
 endif(WIN32)
 
 if(ENABLE_GLSLANG_INSTALL)
-    if(BUILD_SHARED_LIBS)
-        install(TARGETS HLSL
-                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    else()
-        install(TARGETS HLSL
-                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-    endif()
+    install(TARGETS HLSL
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif(ENABLE_GLSLANG_INSTALL)

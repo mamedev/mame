@@ -5,8 +5,12 @@
 
 #pragma once
 
-#include "cpu/mcs48/mcs48.h"
 #include "sound/spkrdev.h"
+
+
+#define MCFG_KAYPRO10KBD_RXD_CB(cb) \
+		devcb = &downcast<kaypro_10_keyboard_device &>(*device).set_rxd_cb(DEVCB_##cb);
+
 
 class kaypro_10_keyboard_device : public device_t
 {
@@ -15,9 +19,9 @@ public:
 			machine_config const &mconfig,
 			char const *tag,
 			device_t *owner,
-			std::uint32_t clock = 0);
+			std::uint32_t clock);
 
-	auto rxd_cb() { return m_rxd_cb.bind(); }
+	template <class Object> devcb_base &set_rxd_cb(Object &&cb) { return m_rxd_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(txd_w) { m_txd = state ? 1U : 0U; }
 
@@ -35,7 +39,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(bus_w);
 
 private:
-	required_device<i8049_device>           m_mcu;
+	required_device<cpu_device>             m_mcu;
 	required_device<speaker_sound_device>   m_bell;
 	required_ioport_array<16>               m_matrix;
 	required_ioport                         m_modifiers;

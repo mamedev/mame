@@ -382,20 +382,6 @@ end
 
 
 ---------------------------------------------------
--- Hudsonsoft HuC6230 SoundBox
---@src/devices/sound/huc6230.h,SOUNDS["HUC6230"] = true
----------------------------------------------------
-
-if (SOUNDS["HUC6230"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/huc6230.cpp",
-		MAME_DIR .. "src/devices/sound/huc6230.h",
-	}
-end
-
-
-
----------------------------------------------------
 -- Hudsonsoft C6280 sound chip
 --@src/devices/sound/c6280.h,SOUNDS["C6280"] = true
 ---------------------------------------------------
@@ -642,7 +628,6 @@ end
 ---------------------------------------------------
 -- Nintendo custom sound chips
 --@src/devices/sound/nes_apu.h,SOUNDS["NES_APU"] = true
---@src/devices/sound/nes_vt_apu.h,SOUNDS["NES_APU"] = true
 ---------------------------------------------------
 
 if (SOUNDS["NES_APU"]~=null) then
@@ -650,8 +635,6 @@ if (SOUNDS["NES_APU"]~=null) then
 		MAME_DIR .. "src/devices/sound/nes_apu.cpp",
 		MAME_DIR .. "src/devices/sound/nes_apu.h",
 		MAME_DIR .. "src/devices/sound/nes_defs.h",
-		MAME_DIR .. "src/devices/sound/nes_vt_apu.cpp",
-		MAME_DIR .. "src/devices/sound/nes_vt_apu.h"
 	}
 end
 
@@ -1486,29 +1469,5 @@ if (SOUNDS["UPD934G"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/upd934g.cpp",
 		MAME_DIR .. "src/devices/sound/upd934g.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/sound/iopspu.h,SOUNDS["IOPSPU"] = true
----------------------------------------------------
-
-if (SOUNDS["IOPSPU"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/iopspu.cpp",
-		MAME_DIR .. "src/devices/sound/iopspu.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/sound/swp30.h,SOUNDS["SWP30"] = true
----------------------------------------------------
-
-if (SOUNDS["SWP30"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/swp30.cpp",
-		MAME_DIR .. "src/devices/sound/swp30.h",
 	}
 end

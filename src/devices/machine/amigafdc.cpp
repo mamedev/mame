@@ -38,7 +38,7 @@ void amiga_fdc_device::device_start()
 	m_write_dsksyn.resolve_safe();
 	m_leds.resolve();
 
-	static char const *const names[] = { "0", "1", "2", "3" };
+	static const char *names[] = { "0", "1", "2", "3" };
 	for(int i=0; i != 4; i++) {
 		floppy_connector *con = subdevice<floppy_connector>(names[i]);
 		if(con)
@@ -442,7 +442,7 @@ void amiga_fdc_device::setup_leds()
 		machine().output().set_value("drive_2_led", drive == 2);
 		machine().output().set_value("drive_3_led", drive == 3);
 
-		m_leds[0] = drive == 0 ? 1 : 0; // update internal drive led
+		m_leds[0] = drive == 0 ? 1 : 0;	// update internal drive led
 		m_leds[1] = drive == 1 ? 1 : 0;  // update external drive led
 	}
 }
@@ -567,15 +567,15 @@ int amiga_fdc_device::pll_t::get_next_bit(attotime &tm, floppy_image_device *flo
 	int bit = transition_time != 0xffff;
 
 	if(transition_time != 0xffff) {
-		static uint8_t const pha[8] = { 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 };
-		static uint8_t const phs[8] = { 0, 0, 0, 0, 0x1, 0x3, 0x7, 0xf };
-		static uint8_t const freqa[4][8] = {
+		static const uint8_t pha[8] = { 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 };
+		static const uint8_t phs[8] = { 0, 0, 0, 0, 0x1, 0x3, 0x7, 0xf };
+		static const uint8_t freqa[4][8] = {
 			{ 0xf, 0x7, 0x3, 0x1, 0, 0, 0, 0 },
 			{ 0x7, 0x3, 0x1, 0, 0, 0, 0, 0 },
 			{ 0x7, 0x3, 0x1, 0, 0, 0, 0, 0 },
 			{ 0, 0, 0, 0, 0, 0, 0, 0 }
 		};
-		static uint8_t const freqs[4][8] = {
+		static const uint8_t freqs[4][8] = {
 			{ 0, 0, 0, 0, 0, 0, 0, 0 },
 			{ 0, 0, 0, 0, 0, 0x1, 0x3, 0x7 },
 			{ 0, 0, 0, 0, 0, 0x1, 0x3, 0x7 },

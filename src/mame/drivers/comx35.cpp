@@ -48,10 +48,10 @@ void comx35_state::image_fread_memory(device_image_interface &image, uint16_t ad
 }
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD_MEMBER( comx35_state, comx )
+    QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( comx35_state, comx )
+QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -295,7 +295,7 @@ WRITE8_MEMBER( comx35_state::io_w )
 void comx35_state::comx35_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(comx35_state::mem_r), FUNC(comx35_state::mem_w));
+	map(0x0000, 0xffff).rw(this, FUNC(comx35_state::mem_r), FUNC(comx35_state::mem_w));
 }
 
 
@@ -306,7 +306,7 @@ void comx35_state::comx35_mem(address_map &map)
 void comx35_state::comx35_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).rw(FUNC(comx35_state::io_r), FUNC(comx35_state::io_w));
+	map(0x00, 0x07).rw(this, FUNC(comx35_state::io_r), FUNC(comx35_state::io_w));
 }
 
 
@@ -595,62 +595,100 @@ void comx35_state::machine_reset()
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-void comx35_state::base(machine_config &config, const XTAL clock)
-{
+MACHINE_CONFIG_START(comx35_state::pal)
 	// basic system hardware
-	CDP1802(config, m_maincpu, clock);
-	m_maincpu->set_addrmap(AS_PROGRAM, &comx35_state::comx35_mem);
-	m_maincpu->set_addrmap(AS_IO, &comx35_state::comx35_io);
-	m_maincpu->wait_cb().set_constant(1);
-	m_maincpu->clear_cb().set(FUNC(comx35_state::clear_r));
-	m_maincpu->ef2_cb().set(FUNC(comx35_state::ef2_r));
-	m_maincpu->ef4_cb().set(FUNC(comx35_state::ef4_r));
-	m_maincpu->q_cb().set(FUNC(comx35_state::q_w));
-	m_maincpu->sc_cb().set(FUNC(comx35_state::sc_w));
-	m_maincpu->sc_cb().append(EXPANSION_TAG, FUNC(comx_expansion_slot_device::sc_w));
-	m_maincpu->tpb_cb().set(EXPANSION_TAG, FUNC(comx_expansion_slot_device::tpb_w));
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_PAL)
+	MCFG_DEVICE_PROGRAM_MAP(comx35_mem)
+	MCFG_DEVICE_IO_MAP(comx35_io)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, comx35_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, comx35_state, ef2_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, comx35_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, comx35_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, comx35_state, sc_w))
+
+	// sound and video hardware
+	comx35_pal_video(config);
 
 	// peripheral hardware
-	CDP1871(config, m_kbe, cdp1869_device::CPU_CLK_PAL/8);
-	m_kbe->d1_callback().set_ioport("D1");
-	m_kbe->d2_callback().set_ioport("D2");
-	m_kbe->d3_callback().set_ioport("D3");
-	m_kbe->d4_callback().set_ioport("D4");
-	m_kbe->d5_callback().set_ioport("D5");
-	m_kbe->d6_callback().set_ioport("D6");
-	m_kbe->d7_callback().set_ioport("D7");
-	m_kbe->d8_callback().set_ioport("D8");
-	m_kbe->d9_callback().set_ioport("D9");
-	m_kbe->d10_callback().set_ioport("D10");
-	m_kbe->d11_callback().set_ioport("D11");
-	m_kbe->da_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF3);
-
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(comx35_state, comx), this), "comx", 0);
-
-	CASSETTE(config, m_cassette).set_default_state((cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED));
+	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, cdp1869_device::CPU_CLK_PAL/8)
+	MCFG_CDP1871_D1_CALLBACK(IOPORT("D1"))
+	MCFG_CDP1871_D2_CALLBACK(IOPORT("D2"))
+	MCFG_CDP1871_D3_CALLBACK(IOPORT("D3"))
+	MCFG_CDP1871_D4_CALLBACK(IOPORT("D4"))
+	MCFG_CDP1871_D5_CALLBACK(IOPORT("D5"))
+	MCFG_CDP1871_D6_CALLBACK(IOPORT("D6"))
+	MCFG_CDP1871_D7_CALLBACK(IOPORT("D7"))
+	MCFG_CDP1871_D8_CALLBACK(IOPORT("D8"))
+	MCFG_CDP1871_D9_CALLBACK(IOPORT("D9"))
+	MCFG_CDP1871_D10_CALLBACK(IOPORT("D10"))
+	MCFG_CDP1871_D11_CALLBACK(IOPORT("D11"))
+	MCFG_CDP1871_DA_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3))
+	MCFG_QUICKLOAD_ADD("quickload", comx35_state, comx35_comx, "comx", 0)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
 	// expansion bus
-	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));
+	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, comx_expansion_cards, "eb")
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, comx35_state, irq_w))
 
 	// internal ram
-	RAM(config, m_ram).set_default_size("32K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
 
 	// software lists
-	SOFTWARE_LIST(config, "flop_list").set_original("comx35_flop");
-}
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "comx35_flop")
+MACHINE_CONFIG_END
 
-void comx35_state::pal(machine_config &config)
-{
-	base(config, cdp1869_device::CPU_CLK_PAL);
-	comx35_pal_video(config);
-}
 
-void comx35_state::ntsc(machine_config &config)
-{
-	base(config, cdp1869_device::CPU_CLK_NTSC);
+//-------------------------------------------------
+//  MACHINE_CONFIG( ntsc )
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(comx35_state::ntsc)
+	// basic system hardware
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, cdp1869_device::CPU_CLK_NTSC)
+	MCFG_DEVICE_PROGRAM_MAP(comx35_mem)
+	MCFG_DEVICE_IO_MAP(comx35_io)
+	MCFG_COSMAC_WAIT_CALLBACK(VCC)
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, comx35_state, clear_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, comx35_state, ef2_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, comx35_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, comx35_state, q_w))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, comx35_state, sc_w))
+
+	// sound and video hardware
 	comx35_ntsc_video(config);
-}
+
+	// peripheral hardware
+	MCFG_DEVICE_ADD(CDP1871_TAG, CDP1871, cdp1869_device::CPU_CLK_PAL/8)
+	MCFG_CDP1871_D1_CALLBACK(IOPORT("D1"))
+	MCFG_CDP1871_D2_CALLBACK(IOPORT("D2"))
+	MCFG_CDP1871_D3_CALLBACK(IOPORT("D3"))
+	MCFG_CDP1871_D4_CALLBACK(IOPORT("D4"))
+	MCFG_CDP1871_D5_CALLBACK(IOPORT("D5"))
+	MCFG_CDP1871_D6_CALLBACK(IOPORT("D6"))
+	MCFG_CDP1871_D7_CALLBACK(IOPORT("D7"))
+	MCFG_CDP1871_D8_CALLBACK(IOPORT("D8"))
+	MCFG_CDP1871_D9_CALLBACK(IOPORT("D9"))
+	MCFG_CDP1871_D10_CALLBACK(IOPORT("D10"))
+	MCFG_CDP1871_D11_CALLBACK(IOPORT("D11"))
+	MCFG_CDP1871_DA_CALLBACK(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF3))
+	MCFG_QUICKLOAD_ADD("quickload", comx35_state, comx35_comx, "comx", 0)
+	MCFG_CASSETTE_ADD("cassette")
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+
+	// expansion bus
+	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, comx_expansion_cards, "eb")
+	MCFG_COMX_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(*this, comx35_state, irq_w))
+
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "comx35_flop")
+MACHINE_CONFIG_END
 
 
 
@@ -666,9 +704,9 @@ ROM_START( comx35p )
 	ROM_REGION( 0x4000, CDP1802_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic100" )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
-	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(0) )
+	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "basic101", "COMX BASIC V1.01" )
-	ROMX_LOAD( "comx_11.u21", 0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(1) )
+	ROMX_LOAD( "comx_11.u21", 0x0000, 0x4000, CRC(609d89cd) SHA1(799646810510d8236fbfafaff7a73d5170990f16), ROM_BIOS(2) )
 ROM_END
 
 

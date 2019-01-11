@@ -35,7 +35,6 @@ void srx_cards(device_slot_interface &device)
 	device.option_add("mpcb849", MPCB849);
 	device.option_add("mpcb896", MPCB896);
 	device.option_add("mpcba63", MPCBA63);
-	device.option_add("mpcbb68", MPCBB68);
 	device.option_add("mpcbb92", MPCBB92);
 	device.option_add("msmt094", MSMT094);
 }

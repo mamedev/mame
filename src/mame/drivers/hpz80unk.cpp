@@ -57,18 +57,16 @@ public:
 		, m_uart(*this, "uart%u", 1)
 	{ }
 
-	void hpz80unk(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port02_r);
 	DECLARE_READ8_MEMBER(port03_r);
 	DECLARE_READ8_MEMBER(port0d_r);
 	DECLARE_READ8_MEMBER(portfc_r);
 
+	void hpz80unk(machine_config &config);
 	void hpz80unk_io(address_map &map);
 	void hpz80unk_mem(address_map &map);
-
+private:
 	uint8_t m_port02_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -113,16 +111,16 @@ void hpz80unk_state::hpz80unk_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(hpz80unk_state::port00_r)); // uart1 status
+	map(0x00, 0x00).r(this, FUNC(hpz80unk_state::port00_r)); // uart1 status
 	map(0x01, 0x01).rw("uart1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit)); // uart1 data
-	map(0x02, 0x02).r(FUNC(hpz80unk_state::port02_r));
-	map(0x03, 0x03).r(FUNC(hpz80unk_state::port03_r)); // uart2 status
+	map(0x02, 0x02).r(this, FUNC(hpz80unk_state::port02_r));
+	map(0x03, 0x03).r(this, FUNC(hpz80unk_state::port03_r)); // uart2 status
 	map(0x04, 0x04).rw("uart2", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit)); // uart2 data
-	map(0x0d, 0x0d).r(FUNC(hpz80unk_state::port0d_r)); // uart3 status
+	map(0x0d, 0x0d).r(this, FUNC(hpz80unk_state::port0d_r)); // uart3 status
 	map(0x0e, 0x0e).w("uart3", FUNC(ay31015_device::transmit)); // uart3 data
 	map(0x1d, 0x1e); // top of memory is written here, big-endian
 	map(0x1f, 0x1f).portr("DSW"); // select which uarts to use
-	map(0xfc, 0xfc).r(FUNC(hpz80unk_state::portfc_r));
+	map(0xfc, 0xfc).r(this, FUNC(hpz80unk_state::portfc_r));
 }
 
 /* Input ports */
@@ -162,38 +160,37 @@ void hpz80unk_state::machine_reset()
 }
 
 
-void hpz80unk_state::hpz80unk(machine_config &config)
-{
+MACHINE_CONFIG_START(hpz80unk_state::hpz80unk)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &hpz80unk_state::hpz80unk_mem);
-	m_maincpu->set_addrmap(AS_IO, &hpz80unk_state::hpz80unk_io);
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hpz80unk_mem)
+	MCFG_DEVICE_IO_MAP(hpz80unk_io)
 
 	/* video hardware */
-	AY51013(config, m_uart[0]); // COM2502
-	m_uart[0]->set_tx_clock(153600);
-	m_uart[0]->set_rx_clock(153600);
-	m_uart[0]->read_si_callback().set("rs232a", FUNC(rs232_port_device::rxd_r));
-	m_uart[0]->write_so_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
-	m_uart[0]->set_auto_rdav(true);
-	RS232_PORT(config, "rs232a", default_rs232_devices, "terminal");
+	MCFG_DEVICE_ADD("uart1", AY51013, 0) // COM2502
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232a", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_AY51013_AUTO_RDAV(true)
+	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, "terminal")
 
-	AY51013(config, m_uart[1]); // COM2502
-	m_uart[1]->set_tx_clock(153600);
-	m_uart[1]->set_rx_clock(153600);
-	m_uart[1]->read_si_callback().set("rs232b", FUNC(rs232_port_device::rxd_r));
-	m_uart[1]->write_so_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
-	m_uart[1]->set_auto_rdav(true);
-	RS232_PORT(config, "rs232b", default_rs232_devices, nullptr);
+	MCFG_DEVICE_ADD("uart2", AY51013, 0) // COM2502
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232b", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_AY51013_AUTO_RDAV(true)
+	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, nullptr)
 
-	AY51013(config, m_uart[2]); // COM2502
-	m_uart[2]->set_tx_clock(153600);
-	m_uart[2]->set_rx_clock(153600);
-	m_uart[2]->read_si_callback().set("rs232c", FUNC(rs232_port_device::rxd_r));
-	m_uart[2]->write_so_callback().set("rs232c", FUNC(rs232_port_device::write_txd));
-	m_uart[2]->set_auto_rdav(true);
-	RS232_PORT(config, "rs232c", default_rs232_devices, nullptr);
-}
+	MCFG_DEVICE_ADD("uart3", AY51013, 0) // COM2502
+	MCFG_AY51013_TX_CLOCK(153600)
+	MCFG_AY51013_RX_CLOCK(153600)
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232c", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232c", rs232_port_device, write_txd))
+	MCFG_AY51013_AUTO_RDAV(true)
+	MCFG_DEVICE_ADD("rs232c", RS232_PORT, default_rs232_devices, nullptr)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( hpz80unk )

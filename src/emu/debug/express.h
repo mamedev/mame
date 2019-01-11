@@ -15,7 +15,6 @@
 
 #include "emucore.h"
 
-#include <deque>
 #include <functional>
 #include <unordered_map>
 
@@ -367,6 +366,7 @@ private:
 	// execution helpers
 	void push_token(parse_token &token);
 	void pop_token(parse_token &token);
+	parse_token *peek_token(int count);
 	void pop_token_lval(parse_token &token);
 	void pop_token_rval(parse_token &token);
 	u64 execute_tokens();
@@ -374,13 +374,15 @@ private:
 
 	// constants
 	static const int MAX_FUNCTION_PARAMS = 16;
+	static const int MAX_STACK_DEPTH = 16;
 
 	// internal state
 	symbol_table *      m_symtable;                     // symbol table
 	std::string         m_original_string;              // original string (prior to parsing)
 	simple_list<parse_token> m_tokenlist;               // token list
 	simple_list<expression_string> m_stringlist;        // string list
-	std::deque<parse_token> m_token_stack;              // token stack (used during execution)
+	int                 m_token_stack_ptr;              // stack pointer (used during execution)
+	parse_token         m_token_stack[MAX_STACK_DEPTH]; // token stack (used during execution)
 };
 
 #endif // MAME_EMU_DEBUG_EXPRESS_H

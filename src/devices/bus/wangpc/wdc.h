@@ -64,7 +64,7 @@ private:
 	void wangpc_wdc_io(address_map &map);
 	void wangpc_wdc_mem(address_map &map);
 
-	required_device<z80_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 
 	uint8_t m_status;

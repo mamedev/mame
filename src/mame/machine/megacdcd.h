@@ -12,16 +12,27 @@ typedef device_delegate<void (int&, uint8_t*, uint16_t&, uint16_t&)> segacd_dma_
 
 typedef device_delegate<void (void)> interrupt_delegate;
 
+#define MCFG_SEGACD_HACK_SET_CDC_DO_DMA( _class, _method) \
+	downcast<lc89510_temp_device &>(*device).set_CDC_Do_DMA(segacd_dma_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+#define MCFG_SEGACD_HACK_SET_NEOCD \
+	downcast<lc89510_temp_device &>(*device).set_is_neoCD(true);
+#define MCFG_SET_TYPE1_INTERRUPT_CALLBACK( _class, _method) \
+	downcast<lc89510_temp_device &>(*device).set_type1_interrupt_callback(interrupt_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+#define MCFG_SET_TYPE2_INTERRUPT_CALLBACK( _class, _method) \
+	downcast<lc89510_temp_device &>(*device).set_type2_interrupt_callback(interrupt_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+#define MCFG_SET_TYPE3_INTERRUPT_CALLBACK( _class, _method) \
+	downcast<lc89510_temp_device &>(*device).set_type3_interrupt_callback(interrupt_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+
 class lc89510_temp_device : public device_t
 {
 public:
 	void set_is_neoCD(bool new_is_neoCD) { is_neoCD = new_is_neoCD; }
 
-	template <typename... T> void set_type1_interrupt_callback(T &&... args) { type1_interrupt_callback = interrupt_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_type2_interrupt_callback(T &&... args) { type2_interrupt_callback = interrupt_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_type3_interrupt_callback(T &&... args) { type3_interrupt_callback = interrupt_delegate(std::forward<T>(args)...); }
+	template <typename Object> void set_type1_interrupt_callback(Object &&callback) { type1_interrupt_callback = std::forward<Object>(callback); }
+	template <typename Object> void set_type2_interrupt_callback(Object &&callback) { type2_interrupt_callback = std::forward<Object>(callback); }
+	template <typename Object> void set_type3_interrupt_callback(Object &&callback) { type3_interrupt_callback = std::forward<Object>(callback); }
 
-	template <typename... T> void set_cdc_do_dma_callback(T &&... args) { segacd_dma_callback = segacd_dma_delegate(std::forward<T>(args)...); }
+	template <typename Object> void set_CDC_Do_DMA(Object &&callback) { segacd_dma_callback = std::forward<Object>(callback); }
 
 
 	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

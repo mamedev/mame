@@ -32,15 +32,16 @@ WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
 		m_tilemap->set_flip((data & 2) ? TILEMAP_FLIPX : 0);
 }
 
-void ksayakyu_state::ksayakyu_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(ksayakyu_state, ksayakyu)
 {
-	uint8_t const *const prom = memregion("proms")->base();
+	const uint8_t *prom = memregion("proms")->base();
+	int r, g, b, i;
 
-	for (int i = 0; i < 0x100; i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		int const r = (prom[i] >> 0) & 0x07;
-		int const g = (prom[i] >> 3) & 0x07;
-		int const b = (prom[i] >> 6) & 0x03;
+		r = (prom[i] & 0x07) >> 0;
+		g = (prom[i] & 0x38) >> 3;
+		b = (prom[i] & 0xc0) >> 6;
 
 		palette.set_pen_color(i, pal3bit(r), pal3bit(g), pal2bit(b));
 	}

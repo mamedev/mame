@@ -19,7 +19,6 @@
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -177,14 +176,14 @@ void bmjr_state::bmjr_mem(address_map &map)
 //  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color
 //  AM_RANGE(0xe891, 0xe891) W MP-1710 background color
 //  AM_RANGE(0xe892, 0xe892) W MP-1710 monochrome / color setting
-	map(0xee00, 0xee00).r(FUNC(bmjr_state::tape_stop_r)); //R stop tape
-	map(0xee20, 0xee20).r(FUNC(bmjr_state::tape_start_r)); //R start tape
-	map(0xee40, 0xee40).w(FUNC(bmjr_state::xor_display_w)); //W Picture reverse
-	map(0xee80, 0xee80).rw(FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
-	map(0xeec0, 0xeec0).rw(FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
-	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); //R timer
-	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); //R unknown
-	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); //R unknown
+	map(0xee00, 0xee00).r(this, FUNC(bmjr_state::tape_stop_r)); //R stop tape
+	map(0xee20, 0xee20).r(this, FUNC(bmjr_state::tape_start_r)); //R start tape
+	map(0xee40, 0xee40).w(this, FUNC(bmjr_state::xor_display_w)); //W Picture reverse
+	map(0xee80, 0xee80).rw(this, FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
+	map(0xeec0, 0xeec0).rw(this, FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
+	map(0xef00, 0xef00).r(this, FUNC(bmjr_state::ff_r)); //R timer
+	map(0xef40, 0xef40).r(this, FUNC(bmjr_state::ff_r)); //R unknown
+	map(0xef80, 0xef80).r(this, FUNC(bmjr_state::unk_r)); //R unknown
 //  AM_RANGE(0xefe0, 0xefe0) W screen mode
 	map(0xf000, 0xffff).rom();
 }
@@ -353,7 +352,7 @@ MACHINE_CONFIG_START(bmjr_state::bmjr)
 	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::BRG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_BRG("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bmjr)
 
 	/* Audio */

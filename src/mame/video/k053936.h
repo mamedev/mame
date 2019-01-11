@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 
 void K053936_0_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,uint32_t priority, int glfgreat_hack);
 void K053936_wraparound_enable(int chip, int status);
@@ -54,5 +52,11 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K053936, k053936_device)
+
+#define MCFG_K053936_WRAP(_wrap) \
+	downcast<k053936_device &>(*device).set_wrap(_wrap);
+
+#define MCFG_K053936_OFFSETS(_xoffs, _yoffs) \
+	downcast<k053936_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #endif // MAME_VIDEO_K053936_H

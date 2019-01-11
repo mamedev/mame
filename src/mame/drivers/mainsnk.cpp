@@ -135,12 +135,12 @@ void mainsnk_state::main_map(address_map &map)
 	map(0xc300, 0xc300).portr("IN3");
 	map(0xc400, 0xc400).portr("DSW1");
 	map(0xc500, 0xc500).portr("DSW2");
-	map(0xc600, 0xc600).w(FUNC(mainsnk_state::c600_w));
+	map(0xc600, 0xc600).w(this, FUNC(mainsnk_state::c600_w));
 	map(0xc700, 0xc700).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd800, 0xdbff).ram().w(FUNC(mainsnk_state::bgram_w)).share("bgram");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(mainsnk_state::bgram_w)).share("bgram");
 	map(0xdc00, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().share("spriteram");
-	map(0xf000, 0xf7ff).ram().w(FUNC(mainsnk_state::fgram_w)).share("fgram");    // + work RAM
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(mainsnk_state::fgram_w)).share("fgram");    // + work RAM
 }
 
 void mainsnk_state::sound_map(address_map &map)
@@ -157,7 +157,7 @@ void mainsnk_state::sound_map(address_map &map)
 void mainsnk_state::sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(mainsnk_state::sound_ack_r));
+	map(0x00, 0x00).r(this, FUNC(mainsnk_state::sound_ack_r));
 }
 
 
@@ -331,9 +331,9 @@ static INPUT_PORTS_START( canvas )
 	PORT_DIPSETTING(    0x10, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x08, "Infinite Lives (Cheat)" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -392,24 +392,28 @@ MACHINE_CONFIG_START(mainsnk_state::mainsnk)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mainsnk_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mainsnk);
-	PALETTE(config, m_palette, FUNC(mainsnk_state::mainsnk_palette), 0x400);
-	m_palette->enable_shadows();
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mainsnk)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_INIT_OWNER(mainsnk_state, mainsnk)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	m_soundlatch->set_separate_acknowledge(true);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
-	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 
-ROM_START(mainsnk)
+ROM_START( mainsnk)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "snk.p01",      0x0000, 0x2000, CRC(00db1ca2) SHA1(efe83488cf88adc185e6024b8f6ad5f8ef7f4cfd) )
 	ROM_LOAD( "snk.p02",      0x2000, 0x2000, CRC(df5c86b5) SHA1(e9c854524e3d8231c874314cdff321e66ec7f0c4) )
@@ -475,5 +479,5 @@ ROM_START( canvas )
 ROM_END
 
 
-GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT180, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0,   "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mainsnk, 0, mainsnk, mainsnk, mainsnk_state, empty_init, ROT0, "SNK", "Main Event (1984)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, canvas,  0, mainsnk, canvas,  mainsnk_state, empty_init, ROT0, "SNK", "Canvas Croquis", MACHINE_SUPPORTS_SAVE )

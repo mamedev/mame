@@ -37,11 +37,10 @@ VIDEO_START_MEMBER(spectrum_state,spectrum)
 
 	m_screen_location = m_video_ram;
 
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
-
 	m_CyclesPerLine = SPEC_CYCLES_PER_LINE;
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
+	timer_set(m_maincpu->cycles_to_attotime(m_CyclesPerLine), TIMER_SCANLINE);
+
 }
 
 VIDEO_START_MEMBER(spectrum_state,spectrum_128)
@@ -59,11 +58,9 @@ VIDEO_START_MEMBER(spectrum_state,spectrum_128)
 
 	m_screen_location = m_ram->pointer() + (5 << 14);
 
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
-
 	m_CyclesPerLine = SPEC128_CYCLES_PER_LINE;
 	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
+	timer_set(m_maincpu->cycles_to_attotime(m_CyclesPerLine), TIMER_SCANLINE);
 }
 
 
@@ -187,28 +184,28 @@ uint32_t spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_in
 }
 
 
-static constexpr rgb_t spectrum_pens[16] = {
-	{ 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0xbf },
-	{ 0xbf, 0x00, 0x00 },
-	{ 0xbf, 0x00, 0xbf },
-	{ 0x00, 0xbf, 0x00 },
-	{ 0x00, 0xbf, 0xbf },
-	{ 0xbf, 0xbf, 0x00 },
-	{ 0xbf, 0xbf, 0xbf },
-	{ 0x00, 0x00, 0x00 },
-	{ 0x00, 0x00, 0xff },
-	{ 0xff, 0x00, 0x00 },
-	{ 0xff, 0x00, 0xff },
-	{ 0x00, 0xff, 0x00 },
-	{ 0x00, 0xff, 0xff },
-	{ 0xff, 0xff, 0x00 },
-	{ 0xff, 0xff, 0xff }
+static const rgb_t spectrum_palette[16] = {
+	rgb_t(0x00, 0x00, 0x00),
+	rgb_t(0x00, 0x00, 0xbf),
+	rgb_t(0xbf, 0x00, 0x00),
+	rgb_t(0xbf, 0x00, 0xbf),
+	rgb_t(0x00, 0xbf, 0x00),
+	rgb_t(0x00, 0xbf, 0xbf),
+	rgb_t(0xbf, 0xbf, 0x00),
+	rgb_t(0xbf, 0xbf, 0xbf),
+	rgb_t(0x00, 0x00, 0x00),
+	rgb_t(0x00, 0x00, 0xff),
+	rgb_t(0xff, 0x00, 0x00),
+	rgb_t(0xff, 0x00, 0xff),
+	rgb_t(0x00, 0xff, 0x00),
+	rgb_t(0x00, 0xff, 0xff),
+	rgb_t(0xff, 0xff, 0x00),
+	rgb_t(0xff, 0xff, 0xff)
 };
-// Initialise the palette
-void spectrum_state::spectrum_palette(palette_device &palette) const
+/* Initialise the palette */
+PALETTE_INIT_MEMBER(spectrum_state,spectrum)
 {
-	palette.set_pen_colors(0, spectrum_pens);
+	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }
 
 void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)

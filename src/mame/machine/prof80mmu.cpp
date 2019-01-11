@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(PROF80_MMU, prof80_mmu_device, "prof80_mmu", "PROF80 MMU")
 
 void prof80_mmu_device::z80_program_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(prof80_mmu_device::program_r), FUNC(prof80_mmu_device::program_w));
+	map(0x0000, 0xffff).rw(this, FUNC(prof80_mmu_device::program_r), FUNC(prof80_mmu_device::program_w));
 }
 
 void prof80_mmu_device::program_map(address_map &map)

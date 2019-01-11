@@ -40,9 +40,8 @@ protected:
 	virtual uint8_t pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel) override;
 	virtual void pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel) override;
 
-	required_device<ef9365_device> m_gdc;
-
 private:
+	required_device<ef9365_device> m_gdc;
 	required_memory_region m_9000;
 	required_memory_region m_a000;
 };

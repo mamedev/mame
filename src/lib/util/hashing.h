@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_HASHING_H
-#define MAME_UTIL_HASHING_H
-
 #pragma once
+
+#ifndef __HASHING_H__
+#define __HASHING_H__
 
 #include "osdcore.h"
 #include "corestr.h"
@@ -260,4 +260,4 @@ template <> struct hash<::util::crc16_t>
 
 } // namespace std
 
-#endif // MAME_UTIL_HASHING_H
+#endif // __HASHING_H__

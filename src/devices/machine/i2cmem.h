@@ -89,15 +89,15 @@ class i2cmem_device :
 {
 public:
 	// construction/destruction
-	i2cmem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
-	i2cmem_device & set_address(int address) { m_slave_address = address; return *this; }
-	i2cmem_device & set_page_size(int page_size) { m_page_size = page_size; return *this; }
-	i2cmem_device & set_data_size(int data_size) { m_data_size = data_size; return *this; }
-	i2cmem_device & set_e0(int e0) { m_e0 = e0; return *this; }
-	i2cmem_device & set_e1(int e1) { m_e1 = e1; return *this; }
-	i2cmem_device & set_e2(int e2) { m_e2 = e2; return *this; }
-	i2cmem_device & set_wc(int wc) { m_wc = wc; return *this; }
+	void set_address(int address) { m_slave_address = address; }
+	void set_page_size(int page_size) { m_page_size = page_size; }
+	void set_data_size(int data_size) { m_data_size = data_size; }
+	void set_e0(int e0) { m_e0 = e0; }
+	void set_e1(int e1) { m_e1 = e1; }
+	void set_e2(int e2) { m_e2 = e2; }
+	void set_wc(int wc) { m_wc = wc; }
 
 	// I/O operations
 	DECLARE_WRITE_LINE_MEMBER( write_e0 );
@@ -109,9 +109,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( read_sda );
 
 protected:
-	// construction/destruction
-	i2cmem_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -149,15 +146,8 @@ protected:
 	int m_page_offset;
 };
 
-class x2404p_device : public i2cmem_device
-{
-public:
-	// construction/destruction
-	x2404p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-};
 
 // device type definition
 DECLARE_DEVICE_TYPE(I2CMEM, i2cmem_device)
-DECLARE_DEVICE_TYPE(X2404P, x2404p_device)
 
 #endif // MAME_MACHINE_I2CMEM_H

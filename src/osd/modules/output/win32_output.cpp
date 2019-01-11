@@ -54,7 +54,7 @@ static UINT                 om_mame_register_client;
 static UINT                 om_mame_unregister_client;
 static UINT                 om_mame_get_id_string;
 
-static UINT                 im_mame_message;
+static UINT					im_mame_message;
 
 //============================================================
 //  FUNCTION PROTOTYPES
@@ -220,7 +220,7 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 	// get a string for an ID
 	else if (message == om_mame_get_id_string)
 		return output.send_id_string((HWND)wparam, lparam);
-
+	
 	// received a message
 	else if (message == im_mame_message)
 	{
@@ -238,7 +238,7 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 				output.machine().schedule_save("auto");
 			break;
 		}
-
+		
 		return 0;
 	}
 

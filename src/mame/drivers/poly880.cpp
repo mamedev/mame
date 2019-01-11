@@ -78,7 +78,7 @@ void poly880_state::poly880_io(address_map &map)
 	map(0x80, 0x83).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x84, 0x87).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x88, 0x8b).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xa0, 0xa0).mirror(0x0f).w(FUNC(poly880_state::cldig_w));
+	map(0xa0, 0xa0).mirror(0x0f).w(this, FUNC(poly880_state::cldig_w));
 }
 
 /* Input Ports */
@@ -252,29 +252,30 @@ MACHINE_CONFIG_START(poly880_state::poly880)
 	MCFG_DEVICE_IO_MAP(poly880_io)
 
 	/* video hardware */
-	config.set_default_layout(layout_poly880);
+	MCFG_DEFAULT_LAYOUT( layout_poly880 )
 
 	/* devices */
-	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(7'372'800)/16));
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set(FUNC(poly880_state::ctc_z0_w));
-	ctc.zc_callback<1>().set(FUNC(poly880_state::ctc_z1_w));
-	ctc.zc_callback<2>().set(Z80CTC_TAG, FUNC(z80ctc_device::trg3));
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(7'372'800)/16)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, poly880_state, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, poly880_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 
-	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, XTAL(7'372'800)/16));
-	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio1.out_pa_callback().set(FUNC(poly880_state::pio1_pa_w));
-	pio1.in_pb_callback().set(FUNC(poly880_state::pio1_pb_r));
-	pio1.out_pb_callback().set(FUNC(poly880_state::pio1_pb_w));
+	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, XTAL(7'372'800)/16)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, poly880_state, pio1_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, poly880_state, pio1_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, poly880_state, pio1_pb_w))
 
-	z80pio_device& pio2(Z80PIO(config, Z80PIO2_TAG, XTAL(7'372'800)/16));
-	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, XTAL(7'372'800)/16)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("1K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("1K")
 MACHINE_CONFIG_END
 
 /* ROMs */

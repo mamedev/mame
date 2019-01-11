@@ -5,13 +5,6 @@
     Space Firebird hardware
 
 ****************************************************************************/
-
-#ifndef MAME_INCLUDES_SPACEFB
-#define MAME_INCLUDES_SPACEFB
-
-#pragma once
-
-#include "cpu/mcs48/mcs48.h"
 #include "sound/samples.h"
 #include "screen.h"
 /*
@@ -45,17 +38,8 @@ public:
 		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram") { }
 
-	void spacefb(machine_config &config);
-	void spacefb_audio(machine_config &config);
-
-private:
-	enum
-	{
-		TIMER_INTERRUPT
-	};
-
 	required_device<cpu_device> m_maincpu;
-	required_device<i8035_device> m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
 
@@ -93,11 +77,17 @@ private:
 	void draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip);
 	void draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void spacefb(machine_config &config);
+	void spacefb_audio(machine_config &config);
 	void spacefb_audio_map(address_map &map);
 	void spacefb_main_io_map(address_map &map);
 	void spacefb_main_map(address_map &map);
+protected:
+
+	enum
+	{
+		TIMER_INTERRUPT
+	};
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
-
-#endif // MAME_INCLUDES_SPACEFB

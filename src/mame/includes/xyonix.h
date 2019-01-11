@@ -1,30 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_XYONIX_H
-#define MAME_INCLUDES_XYONIX_H
-
-#pragma once
-
-#include "emupal.h"
-
 class xyonix_state : public driver_device
 {
 public:
-	xyonix_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	xyonix_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_vidram(*this, "vidram")
-	{ }
+		m_vidram(*this, "vidram") { }
 
-	void xyonix(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -45,13 +29,15 @@ private:
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_WRITE8_MEMBER(vidram_w);
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void xyonix_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(xyonix);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void handle_coins(int coin);
+	void xyonix(machine_config &config);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_XYONIX_H

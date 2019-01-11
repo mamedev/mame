@@ -12,13 +12,17 @@
 
 #include "legscsi.h"
 
+#define MCFG_AM53CF96_IRQ_HANDLER(_devcb) \
+	devcb = &downcast<am53cf96_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+
 class am53cf96_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
 	am53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto irq_handler() { return m_irq_handler.bind(); }
+	// static configuration helpers
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

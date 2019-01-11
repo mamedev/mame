@@ -41,33 +41,40 @@ enum
 	M6801_MODE_7
 };
 
+enum
+{
+	M6801_PORT1 = 0x100,
+	M6801_PORT2,
+	M6801_PORT3,
+	M6801_PORT4
+};
+
+
+#define MCFG_M6801_SC2(_devcb) \
+	devcb = &downcast<m6801_cpu_device &>(*device).set_out_sc2_func(DEVCB_##_devcb);
+#define MCFG_M6801_SER_TX(_devcb) \
+	devcb = &downcast<m6801_cpu_device &>(*device).set_out_sertx_func(DEVCB_##_devcb);
+
 
 class m6801_cpu_device : public m6800_cpu_device
 {
 public:
 	m6801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto in_p1_cb() { return m_in_port_func[0].bind(); }
-	auto out_p1_cb() { return m_out_port_func[0].bind(); }
-	auto in_p2_cb() { return m_in_port_func[1].bind(); }
-	auto out_p2_cb() { return m_out_port_func[1].bind(); }
-	auto in_p3_cb() { return m_in_port_func[2].bind(); }
-	auto out_p3_cb() { return m_out_port_func[2].bind(); }
-	auto in_p4_cb() { return m_in_port_func[3].bind(); }
-	auto out_p4_cb() { return m_out_port_func[3].bind(); }
-
-	auto out_sc2_cb() { return m_out_sc2_func.bind(); }
-	auto out_ser_tx_cb() { return m_out_sertx_func.bind(); }
+	// configuration helpers
+	template<class Object> devcb_base &set_out_sc2_func(Object &&cb) { return m_out_sc2_func.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_out_sertx_func(Object &&cb) { return m_out_sertx_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( m6801_io_r );
 	DECLARE_WRITE8_MEMBER( m6801_io_w );
 
 	void m6801_clock_serial();
+
+	void m6803_mem(address_map &map);
 protected:
 	m6801_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles, address_map_constructor internal = address_map_constructor());
 
 	// device-level overrides
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -76,20 +83,28 @@ protected:
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
 	virtual void execute_set_input(int inputnum, int state) override;
 
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void m6803_mem(address_map &map);
-
-	devcb_read8 m_in_port_func[4];
-	devcb_write8 m_out_port_func[4];
+	address_space_config m_io_config;
 
 	devcb_write_line m_out_sc2_func;
 	devcb_write_line m_out_sertx_func;
 
+	address_space *m_io;
+
 	/* internal registers */
-	uint8_t   m_port_ddr[4];
-	uint8_t   m_port_data[4];
+	uint8_t   m_port1_ddr;
+	uint8_t   m_port2_ddr;
+	uint8_t   m_port3_ddr;
+	uint8_t   m_port4_ddr;
+	uint8_t   m_port1_data;
+	uint8_t   m_port2_data;
+	uint8_t   m_port3_data;
+	uint8_t   m_port4_data;
 	uint8_t   m_p3csr;          // Port 3 Control/Status Register
 	uint8_t   m_tcsr;           /* Timer Control and Status Register */
 	uint8_t   m_pending_tcsr;   /* pending IRQ flag for clear IRQflag process */

@@ -30,12 +30,12 @@ DEFINE_DEVICE_TYPE(DAVE, dave_device, "dave", "Inteligent Designs DAVE")
 
 void dave_device::z80_program_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(dave_device::program_r), FUNC(dave_device::program_w));
+	map(0x0000, 0xffff).rw(this, FUNC(dave_device::program_r), FUNC(dave_device::program_w));
 }
 
 void dave_device::z80_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(dave_device::io_r), FUNC(dave_device::io_w));
+	map(0x0000, 0xffff).rw(this, FUNC(dave_device::io_r), FUNC(dave_device::io_w));
 }
 
 

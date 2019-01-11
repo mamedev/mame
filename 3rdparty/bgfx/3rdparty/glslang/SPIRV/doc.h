@@ -190,6 +190,7 @@ protected:
 class EnumParameters {
 public:
     EnumParameters() : desc(0) { }
+    EnumCaps caps;
     const char* desc;
 };
 
@@ -234,6 +235,7 @@ public:
     bool hasType()   const { return typePresent != 0; }
 
     const char* opDesc;
+    EnumCaps capabilities;
     OpcodeClass opClass;
     OperandParameters operands;
 
@@ -241,6 +243,8 @@ protected:
     int typePresent   : 1;
     int resultPresent : 1;
 };
+
+const int OpcodeCeiling = 321;
 
 // The set of objects that hold all the instruction/operand
 // parameterization information.

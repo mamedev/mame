@@ -1,18 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
-#ifndef MAME_INCLUDES_GALASTRM_H
-#define MAME_INCLUDES_GALASTRM_H
-
-#pragma once
-
 #include "machine/eepromser.h"
 
 #include "video/poly.h"
 #include "video/tc0100scn.h"
-#include "video/tc0110pcr.h"
 #include "video/tc0480scp.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -39,23 +32,31 @@ private:
 };
 
 
+struct gs_tempsprite
+{
+	int gfx;
+	int code,color;
+	int flipx,flipy;
+	int x,y;
+	int zoomx,zoomy;
+	int primask;
+};
+
 class galastrm_state : public driver_device
 {
 	friend class galastrm_renderer;
 public:
-	galastrm_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_spriteram(*this,"spriteram"),
-		m_spritemap_rom(*this, "sprmaprom"),
+	galastrm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_ram(*this,"ram"),
+		m_spriteram(*this,"spriteram") ,
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_tc0100scn(*this, "tc0100scn"),
-		m_tc0110pcr(*this, "tc0110pcr"),
 		m_tc0480scp(*this, "tc0480scp"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
 	void galastrm(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
@@ -64,31 +65,22 @@ protected:
 	virtual void video_start() override;
 
 private:
+	required_shared_ptr<uint32_t> m_ram;
 	required_shared_ptr<uint32_t> m_spriteram;
-
-	required_region_ptr<uint16_t> m_spritemap_rom;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<tc0100scn_device> m_tc0100scn;
-	required_device<tc0110pcr_device> m_tc0110pcr;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	struct gs_tempsprite
-	{
-		int gfx;
-		int code,color;
-		int flipx,flipy;
-		int x,y;
-		int zoomx,zoomy;
-		int primask;
-	};
-
 	uint16_t m_frame_counter;
-	int m_tc0610_addr[2];
+	int m_tc0110pcr_addr;
+	int m_tc0610_0_addr;
+	int m_tc0610_1_addr;
+	uint32_t m_mem[2];
 	int16_t m_tc0610_ctrl_reg[2][8];
 	std::unique_ptr<gs_tempsprite[]> m_spritelist;
 	struct gs_tempsprite *m_sprite_ptr_pre;
@@ -100,14 +92,14 @@ private:
 	int m_rsxoffs;
 	int m_rsyoffs;
 
-	template<int Chip> DECLARE_WRITE16_MEMBER(tc0610_w);
+	DECLARE_WRITE32_MEMBER(galastrm_palette_w);
+	DECLARE_WRITE32_MEMBER(galastrm_tc0610_0_w);
+	DECLARE_WRITE32_MEMBER(galastrm_tc0610_1_w);
 	DECLARE_WRITE8_MEMBER(coin_word_w);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 
-	void main_map(address_map &map);
+	void galastrm_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_GALASTRM_H

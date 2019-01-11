@@ -53254,7 +53254,7 @@
 		<extrainfo>185 1 2 1</extrainfo>
 
 	</hash>
-	<hash crc32="87da4bd0" sha1="f4c45173772e2012ab39f3d321bc157b06d2a9d2" name="Sansuu 3 Nen - Keisan Game (J)">
+	<hash crc32="87DA4BD0" sha1="F4C45173772E2012AB39F3D321BC157B06D2A9D2" name="Sansuu 3 Nen - Keisan Game (J)">
 		<status>Verified Image</status> <!-- This is bootgod's new dump (the old image does not require crc_hack, this one does!) -->
 		<extrainfo>185 129 2 1</extrainfo>
 

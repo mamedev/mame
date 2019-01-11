@@ -19,12 +19,6 @@ public:
 	{
 	}
 
-	void pass(machine_config &config);
-
-protected:
-	virtual void video_start() override;
-
-private:
 	DECLARE_WRITE16_MEMBER(pass_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(pass_fg_videoram_w);
 	TILE_GET_INFO_MEMBER(get_pass_bg_tile_info);
@@ -32,10 +26,14 @@ private:
 
 	uint32_t screen_update_pass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void pass(machine_config &config);
 	void pass_map(address_map &map);
 	void pass_sound_io_map(address_map &map);
 	void pass_sound_map(address_map &map);
+protected:
+	virtual void video_start() override;
 
+private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 

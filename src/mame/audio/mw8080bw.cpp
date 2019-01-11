@@ -84,9 +84,9 @@ static const discrete_op_amp_tvca_info midway_music_tvca_info =
 
 WRITE8_MEMBER(mw8080bw_state::midway_tone_generator_lo_w)
 {
-	m_discrete->write(MIDWAY_TONE_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, MIDWAY_TONE_EN, (data >> 0) & 0x01);
 
-	m_discrete->write(MIDWAY_TONE_DATA_L, (data >> 1) & 0x1f);
+	m_discrete->write(space, MIDWAY_TONE_DATA_L, (data >> 1) & 0x1f);
 
 	/* D6 and D7 are not connected */
 }
@@ -94,7 +94,7 @@ WRITE8_MEMBER(mw8080bw_state::midway_tone_generator_lo_w)
 
 WRITE8_MEMBER(mw8080bw_state::midway_tone_generator_hi_w)
 {
-	m_discrete->write(MIDWAY_TONE_DATA_H, data & 0x3f);
+	m_discrete->write(space, MIDWAY_TONE_DATA_H, data & 0x3f);
 
 	/* D6 and D7 are not connected */
 }
@@ -144,16 +144,15 @@ static const char *const seawolf_sample_names[] =
 	nullptr
 };
 
-void mw8080bw_state::seawolf_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::seawolf_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "mono").front_center();
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(5);
-	m_samples->set_samples_names(seawolf_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.6);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(5)
+	MCFG_SAMPLES_NAMES(seawolf_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::seawolf_audio_w)
@@ -199,23 +198,22 @@ static const char *const gunfight_sample_names[] =
 };
 
 
-void mw8080bw_state::gunfight_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::gunfight_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SAMPLES(config, m_samples1);
-	m_samples1->set_channels(1);
-	m_samples1->set_samples_names(gunfight_sample_names);
-	m_samples1->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	MCFG_DEVICE_ADD("samples1", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gunfight_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	SAMPLES(config, m_samples2);
-	m_samples2->set_channels(1);
-	m_samples2->set_samples_names(gunfight_sample_names);
-	m_samples2->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
-}
+	MCFG_DEVICE_ADD("samples2", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gunfight_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::gunfight_audio_w)
@@ -310,21 +308,20 @@ static DISCRETE_SOUND_START(tornbase_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::tornbase_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::tornbase_audio)
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, tornbase_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, tornbase_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
 {
-	m_discrete->write(TORNBASE_TONE_240_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, TORNBASE_TONE_240_EN, (data >> 0) & 0x01);
 
-	m_discrete->write(TORNBASE_TONE_960_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, TORNBASE_TONE_960_EN, (data >> 1) & 0x01);
 
-	m_discrete->write(TORNBASE_TONE_120_EN, (data >> 2) & 0x01);
+	m_discrete->write(space, TORNBASE_TONE_120_EN, (data >> 2) & 0x01);
 
 	/* if (data & 0x08)  enable SIREN sound */
 
@@ -354,10 +351,9 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
  *
  *************************************/
 
-void mw8080bw_state::zzzap_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::zzzap_audio )
 	SPEAKER(config, "mono").front_center();
-}
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::zzzap_audio_1_w)
@@ -557,12 +553,11 @@ static DISCRETE_SOUND_START(maze_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::maze_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::maze_audio)
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, maze_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, maze_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 void mw8080bw_state::maze_write_discrete(uint8_t maze_tone_timing_state)
@@ -570,17 +565,18 @@ void mw8080bw_state::maze_write_discrete(uint8_t maze_tone_timing_state)
 	/* controls need to be active low */
 	int controls = ~ioport("IN0")->read() & 0xff;
 
-	m_discrete->write(MAZE_TONE_TIMING, maze_tone_timing_state);
-	m_discrete->write(MAZE_P1_DATA, controls & 0x0f);
-	m_discrete->write(MAZE_P2_DATA, (controls >> 4) & 0x0f);
-	m_discrete->write(MAZE_JOYSTICK_IN_USE, controls != 0xff);
+	address_space &space = machine().dummy_space();
+	m_discrete->write(space, MAZE_TONE_TIMING, maze_tone_timing_state);
+	m_discrete->write(space, MAZE_P1_DATA, controls & 0x0f);
+	m_discrete->write(space, MAZE_P2_DATA, (controls >> 4) & 0x0f);
+	m_discrete->write(space, MAZE_JOYSTICK_IN_USE, controls != 0xff);
 
 	/* The coin line is connected directly to the discrete circuit. */
 	/* We can't really do that, so updating it with the tone timing is close enough. */
 	/* A better option might be to update it at vblank or set a timer to do it. */
 	/* The only noticeable difference doing it here, is that the controls don't */
 	/* immediately start making tones if pressed right after the coin is inserted. */
-	m_discrete->write(MAZE_COIN, (~ioport("IN1")->read() >> 3) & 0x01);
+	m_discrete->write(space, MAZE_COIN, (~ioport("IN1")->read() >> 3) & 0x01);
 }
 
 
@@ -803,14 +799,13 @@ static DISCRETE_SOUND_START(boothill_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::boothill_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::boothill_audio)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DISCRETE(config, m_discrete, boothill_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, boothill_discrete)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::boothill_audio_w)
@@ -819,15 +814,15 @@ WRITE8_MEMBER(mw8080bw_state::boothill_audio_w)
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
-	m_discrete->write(BOOTHILL_GAME_ON_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, BOOTHILL_GAME_ON_EN, (data >> 3) & 0x01);
 
-	m_discrete->write(BOOTHILL_LEFT_SHOT_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, BOOTHILL_LEFT_SHOT_EN, (data >> 4) & 0x01);
 
-	m_discrete->write(BOOTHILL_RIGHT_SHOT_EN, (data >> 5) & 0x01);
+	m_discrete->write(space, BOOTHILL_RIGHT_SHOT_EN, (data >> 5) & 0x01);
 
-	m_discrete->write(BOOTHILL_LEFT_HIT_EN, (data >> 6) & 0x01);
+	m_discrete->write(space, BOOTHILL_LEFT_HIT_EN, (data >> 6) & 0x01);
 
-	m_discrete->write(BOOTHILL_RIGHT_HIT_EN, (data >> 7) & 0x01);
+	m_discrete->write(space, BOOTHILL_RIGHT_HIT_EN, (data >> 7) & 0x01);
 }
 
 
@@ -1034,26 +1029,25 @@ static DISCRETE_SOUND_START(checkmat_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::checkmat_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::checkmat_audio)
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, checkmat_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.4);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, checkmat_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::checkmat_audio_w)
 {
-	m_discrete->write(CHECKMAT_TONE_EN, data & 0x01);
+	m_discrete->write(space, CHECKMAT_TONE_EN, data & 0x01);
 
-	m_discrete->write(CHECKMAT_BOOM_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, CHECKMAT_BOOM_EN, (data >> 1) & 0x01);
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	machine().sound().system_enable((data >> 3) & 0x01);
 
-	m_discrete->write(CHECKMAT_TONE_DATA_45, (data >> 4) & 0x03);
-	m_discrete->write(CHECKMAT_TONE_DATA_67, (data >> 6) & 0x03);
+	m_discrete->write(space, CHECKMAT_TONE_DATA_45, (data >> 4) & 0x03);
+	m_discrete->write(space, CHECKMAT_TONE_DATA_67, (data >> 6) & 0x03);
 }
 
 
@@ -1245,12 +1239,11 @@ static DISCRETE_SOUND_START(desertgu_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::desertgu_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::desertgu_audio)
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, desertgu_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.8);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, desertgu_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::desertgu_audio_1_w)
@@ -1259,23 +1252,23 @@ WRITE8_MEMBER(mw8080bw_state::desertgu_audio_1_w)
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
-	m_discrete->write(DESERTGU_GAME_ON_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, DESERTGU_GAME_ON_EN, (data >> 3) & 0x01);
 
-	m_discrete->write(DESERTGU_RIFLE_SHOT_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, DESERTGU_RIFLE_SHOT_EN, (data >> 4) & 0x01);
 
-	m_discrete->write(DESERTGU_BOTTLE_HIT_EN, (data >> 5) & 0x01);
+	m_discrete->write(space, DESERTGU_BOTTLE_HIT_EN, (data >> 5) & 0x01);
 
-	m_discrete->write(DESERTGU_ROAD_RUNNER_HIT_EN, (data >> 6) & 0x01);
+	m_discrete->write(space, DESERTGU_ROAD_RUNNER_HIT_EN, (data >> 6) & 0x01);
 
-	m_discrete->write(DESERTGU_CREATURE_HIT_EN, (data >> 7) & 0x01);
+	m_discrete->write(space, DESERTGU_CREATURE_HIT_EN, (data >> 7) & 0x01);
 }
 
 
 WRITE8_MEMBER(mw8080bw_state::desertgu_audio_2_w)
 {
-	m_discrete->write(DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
 
-	m_discrete->write(DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
 
 	output().set_value("Player1_Gun_Recoil", (data >> 2) & 0x01);
 
@@ -1510,25 +1503,24 @@ static DISCRETE_SOUND_START(dplay_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::dplay_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::dplay_audio)
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, dplay_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.8);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, dplay_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::dplay_audio_w)
 {
-	m_discrete->write(DPLAY_TONE_ON_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, DPLAY_TONE_ON_EN, (data >> 0) & 0x01);
 
-	m_discrete->write(DPLAY_CHEER_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, DPLAY_CHEER_EN, (data >> 1) & 0x01);
 
-	m_discrete->write(DPLAY_SIREN_EN, (data >> 2) & 0x01);
+	m_discrete->write(space, DPLAY_SIREN_EN, (data >> 2) & 0x01);
 
-	m_discrete->write(DPLAY_WHISTLE_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, DPLAY_WHISTLE_EN, (data >> 3) & 0x01);
 
-	m_discrete->write(DPLAY_GAME_ON_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, DPLAY_GAME_ON_EN, (data >> 4) & 0x01);
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 0x01);
 
@@ -1551,23 +1543,22 @@ static const char *const gmissile_sample_names[] =
 	nullptr
 };
 
-void mw8080bw_state::gmissile_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::gmissile_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SAMPLES(config, m_samples1);
-	m_samples1->set_channels(1);
-	m_samples1->set_samples_names(gmissile_sample_names);
-	m_samples1->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	MCFG_DEVICE_ADD("samples1", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gmissile_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.9)
 
-	SAMPLES(config, m_samples2);
-	m_samples2->set_channels(1);
-	m_samples2->set_samples_names(gmissile_sample_names);
-	m_samples2->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("samples2", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(gmissile_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.9)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::gmissile_audio_1_w)
@@ -1646,23 +1637,22 @@ static const char *const m4_sample_names[] =
 };
 
 
-void mw8080bw_state::m4_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::m4_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SAMPLES(config, m_samples1);
-	m_samples1->set_channels(2);
-	m_samples1->set_samples_names(m4_sample_names);
-	m_samples1->add_route(ALL_OUTPUTS, "lspeaker", 1);
+	MCFG_DEVICE_ADD("samples1", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(m4_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
 
-	SAMPLES(config, m_samples2);
-	m_samples2->set_channels(2);
-	m_samples2->set_samples_names(m4_sample_names);
-	m_samples2->add_route(ALL_OUTPUTS, "rspeaker", 1);
-}
+	MCFG_DEVICE_ADD("samples2", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(m4_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::m4_audio_1_w)
@@ -1903,20 +1893,19 @@ static const char *const clowns_sample_names[] =
 	nullptr
 };
 
-void mw8080bw_state::clowns_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::clowns_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_names(clowns_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.70);
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(clowns_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	DISCRETE(config, m_discrete, clowns_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, clowns_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::clowns_audio_1_w)
@@ -1933,15 +1922,15 @@ WRITE8_MEMBER(mw8080bw_state::clowns_audio_2_w)
 {
 	uint8_t rising_bits = data & ~m_port_2_last;
 
-	m_discrete->write(CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
 
-	m_discrete->write(CLOWNS_POP_MIDDLE_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, CLOWNS_POP_MIDDLE_EN, (data >> 1) & 0x01);
 
-	m_discrete->write(CLOWNS_POP_TOP_EN, (data >> 2) & 0x01);
+	m_discrete->write(space, CLOWNS_POP_TOP_EN, (data >> 2) & 0x01);
 
 	machine().sound().system_enable((data >> 3) & 0x01);
 
-	m_discrete->write(CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
 
 	if (rising_bits & 0x20) m_samples->start(0, 0);  /* springboard miss */
 
@@ -2276,13 +2265,12 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 	DISCRETE_OUTPUT(NODE_90, 11000)
 DISCRETE_SOUND_END
 
-void mw8080bw_state::spacwalk_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::spacwalk_audio)
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, m_discrete, spacwalk_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, spacwalk_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::spacwalk_audio_1_w)
 {
@@ -2292,22 +2280,22 @@ WRITE8_MEMBER(mw8080bw_state::spacwalk_audio_1_w)
 
 	machine().sound().system_enable((data >> 2) & 0x01);
 
-	m_discrete->write(SPACWALK_SPACE_SHIP_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, SPACWALK_SPACE_SHIP_EN, (data >> 3) & 0x01);
 }
 
 WRITE8_MEMBER(mw8080bw_state::spacwalk_audio_2_w)
 {
-	m_discrete->write(SPACWALK_TARGET_HIT_BOTTOM_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, SPACWALK_TARGET_HIT_BOTTOM_EN, (data >> 0) & 0x01);
 
-	m_discrete->write(SPACWALK_TARGET_HIT_MIDDLE_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, SPACWALK_TARGET_HIT_MIDDLE_EN, (data >> 1) & 0x01);
 
-	m_discrete->write(SPACWALK_TARGET_HIT_TOP_EN, (data >> 2) & 0x01);
+	m_discrete->write(space, SPACWALK_TARGET_HIT_TOP_EN, (data >> 2) & 0x01);
 
-	m_discrete->write(SPACWALK_SPRINGBOARD_HIT1_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, SPACWALK_SPRINGBOARD_HIT1_EN, (data >> 3) & 0x01);
 
-	m_discrete->write(SPACWALK_SPRINGBOARD_HIT2_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, SPACWALK_SPRINGBOARD_HIT2_EN, (data >> 4) & 0x01);
 
-	m_discrete->write(SPACWALK_SPRINGBOARD_MISS_EN, (data >> 5) & 0x01);
+	m_discrete->write(space, SPACWALK_SPRINGBOARD_MISS_EN, (data >> 5) & 0x01);
 }
 
 
@@ -2505,28 +2493,27 @@ static DISCRETE_SOUND_START(shuffle_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::shuffle_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::shuffle_audio)
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, m_discrete, shuffle_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, shuffle_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::shuffle_audio_1_w)
 {
-	m_discrete->write(SHUFFLE_CLICK_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, SHUFFLE_CLICK_EN, (data >> 0) & 0x01);
 
-	m_discrete->write(SHUFFLE_ROLLOVER_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, SHUFFLE_ROLLOVER_EN, (data >> 1) & 0x01);
 
 	machine().sound().system_enable((data >> 2) & 0x01);
 
-	m_discrete->write(NODE_29, (data >> 3) & 0x07);
+	m_discrete->write(space, NODE_29, (data >> 3) & 0x07);
 
-	m_discrete->write(SHUFFLE_ROLLING_3_EN, (data >> 3) & 0x01);
-	m_discrete->write(SHUFFLE_ROLLING_2_EN, (data >> 4) & 0x01);
-	m_discrete->write(SHUFFLE_ROLLING_1_EN, (data >> 5) & 0x01);
+	m_discrete->write(space, SHUFFLE_ROLLING_3_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, SHUFFLE_ROLLING_2_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, SHUFFLE_ROLLING_1_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }
@@ -2534,7 +2521,7 @@ WRITE8_MEMBER(mw8080bw_state::shuffle_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::shuffle_audio_2_w)
 {
-	m_discrete->write(SHUFFLE_FOUL_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, SHUFFLE_FOUL_EN, (data >> 0) & 0x01);
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 1) & 0x01);
 
@@ -2685,14 +2672,13 @@ static DISCRETE_SOUND_START(dogpatch_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::dogpatch_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::dogpatch_audio)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DISCRETE(config, m_discrete, dogpatch_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, dogpatch_discrete)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::dogpatch_audio_w)
@@ -2702,13 +2688,13 @@ WRITE8_MEMBER(mw8080bw_state::dogpatch_audio_w)
 	machine().bookkeeping().coin_counter_w(0, (data >> 2) & 0x01);
 
 	machine().sound().system_enable((data >> 3) & 0x01);
-	m_discrete->write(DOGPATCH_GAME_ON_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, DOGPATCH_GAME_ON_EN, (data >> 3) & 0x01);
 
-	m_discrete->write(DOGPATCH_LEFT_SHOT_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, DOGPATCH_LEFT_SHOT_EN, (data >> 4) & 0x01);
 
-	m_discrete->write(DOGPATCH_RIGHT_SHOT_EN, (data >> 5) & 0x01);
+	m_discrete->write(space, DOGPATCH_RIGHT_SHOT_EN, (data >> 5) & 0x01);
 
-	m_discrete->write(DOGPATCH_HIT_EN, (data >> 6) & 0x01);
+	m_discrete->write(space, DOGPATCH_HIT_EN, (data >> 6) & 0x01);
 }
 
 
@@ -3191,29 +3177,28 @@ static DISCRETE_SOUND_START(spcenctr_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::spcenctr_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::spcenctr_audio)
 	SPEAKER(config, "mono").front_center();
 
-	SN76477(config, m_sn);
-	m_sn->set_noise_params(0, 0, 0);
-	m_sn->set_decay_res(0);
-	m_sn->set_attack_params(0, RES_K(100));
-	m_sn->set_amp_res(RES_K(56));
-	m_sn->set_feedback_res(RES_K(10));
-	m_sn->set_vco_params(0, CAP_U(0.047), RES_K(56));
-	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(1.0), RES_K(150));
-	m_sn->set_oneshot_params(0, 0);
-	m_sn->set_vco_mode(1);
-	m_sn->set_mixer_params(0, 0, 0);
-	m_sn->set_envelope_params(1, 0);
-	m_sn->set_enable(1);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.20);
+	MCFG_DEVICE_ADD("snsnd", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.047), RES_K(56)) // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(150))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	DISCRETE(config, m_discrete, spcenctr_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.45);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, spcenctr_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+MACHINE_CONFIG_END
 
 
 
@@ -3224,7 +3209,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_1_w)
 	/* D1 is marked as 'OPTIONAL SWITCH VIDEO FOR COCKTAIL',
 	   but it is never set by the software */
 
-	m_discrete->write(SPCENCTR_CRASH_EN, (data >> 2) & 0x01);
+	m_discrete->write(space, SPCENCTR_CRASH_EN, (data >> 2) & 0x01);
 
 	/* D3-D7 are not connected */
 }
@@ -3234,9 +3219,9 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_2_w)
 {
 	/* set WIND SOUND FREQ(data & 0x0f)  0, if no wind */
 
-	m_discrete->write(SPCENCTR_EXPLOSION_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, SPCENCTR_EXPLOSION_EN, (data >> 4) & 0x01);
 
-	m_discrete->write(SPCENCTR_PLAYER_SHOT_EN, (data >> 5) & 0x01);
+	m_discrete->write(space, SPCENCTR_PLAYER_SHOT_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 
@@ -3248,13 +3233,13 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_3_w)
 {
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
-	m_discrete->write(SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
 
 	m_spcenctr_strobe_state = (data >> 2) & 0x01;
 
 	output().set_value("LAMP", (data >> 3) & 0x01);
 
-	m_discrete->write(SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
+	m_discrete->write(space, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
 
 	m_sn->enable_w((data >> 5) & 0x01); /* saucer sound */
 
@@ -3277,16 +3262,15 @@ static const char *const phantom2_sample_names[] =
 	nullptr
 };
 
-void mw8080bw_state::phantom2_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::phantom2_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "mono").front_center();
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(2);
-	m_samples->set_samples_names(phantom2_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(phantom2_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::phantom2_audio_1_w)
@@ -3408,13 +3392,12 @@ static DISCRETE_SOUND_START(bowler_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::bowler_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::bowler_audio)
 	SPEAKER(config, "mono").front_center();
 
-	DISCRETE(config, m_discrete, bowler_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 1);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, bowler_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::bowler_audio_1_w)
@@ -3425,7 +3408,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_audio_1_w)
 
 	machine().sound().system_enable((data >> 2) & 0x01);
 
-	m_discrete->write(BOWLER_FOWL_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, BOWLER_FOWL_EN, (data >> 3) & 0x01);
 
 	/* D4 - appears to be a screen flip, but it's
 	        shown unconnected on the schematics for both the
@@ -3523,33 +3506,32 @@ static const char *const invaders_sample_names[] =
 
 
 /* left in for all games that hack into invaders samples for audio */
-void mw8080bw_state::invaders_samples_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::invaders_samples_audio)
 	MCFG_SOUND_START_OVERRIDE(mw8080bw_state, samples)
 
 	SPEAKER(config, "mono").front_center();
 
-	SN76477(config, m_sn);
-	m_sn->set_noise_params(0, 0, 0);
-	m_sn->set_decay_res(0);
-	m_sn->set_attack_params(0, RES_K(100));
-	m_sn->set_amp_res(RES_K(56));
-	m_sn->set_feedback_res(RES_K(10));
-	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
-	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
-	m_sn->set_oneshot_params(0, 0);
-	m_sn->set_vco_mode(1);
-	m_sn->set_mixer_params(0, 0, 0);
-	m_sn->set_envelope_params(1, 0);
-	m_sn->set_enable(1);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
+	MCFG_DEVICE_ADD("snsnd", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(invaders_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(invaders_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 /* nodes - inputs */
@@ -4106,39 +4088,38 @@ static DISCRETE_SOUND_START(invaders_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::invaders_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::invaders_audio)
 	SPEAKER(config, "mono").front_center();
 
-	SN76477(config, m_sn);
-	m_sn->set_noise_params(0, 0, 0);
-	m_sn->set_decay_res(0);
-	m_sn->set_attack_params(0, RES_K(100));
-	m_sn->set_amp_res(RES_K(56));
-	m_sn->set_feedback_res(RES_K(10));
-	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
-	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
-	m_sn->set_oneshot_params(0, 0);
-	m_sn->set_vco_mode(1);
-	m_sn->set_mixer_params(0, 0, 0);
-	m_sn->set_envelope_params(1, 0);
-	m_sn->set_enable(1);
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
+	MCFG_DEVICE_ADD("snsnd", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	DISCRETE(config, m_discrete, invaders_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.5);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, invaders_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::invaders_audio_1_w)
 {
 	m_sn->enable_w((~data >> 0) & 0x01);    /* saucer sound */
 
-	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
-	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
-	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
-	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
 
 	machine().sound().system_enable(data & 0x20);
 
@@ -4148,8 +4129,8 @@ WRITE8_MEMBER(mw8080bw_state::invaders_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::invaders_audio_2_w)
 {
-	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
-	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
 
 	/* the flip screen line is only connected on the cocktail PCB */
 	if (invaders_is_cabinet_cocktail())
@@ -4524,28 +4505,27 @@ static DISCRETE_SOUND_START(blueshrk_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::blueshrk_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::blueshrk_audio)
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete, blueshrk_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, blueshrk_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::blueshrk_audio_w)
 {
-	m_discrete->write(BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
+	m_discrete->write(space, BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
 
-	m_discrete->write(BLUESHRK_SHOT_EN, (data >> 1) & 0x01);
+	m_discrete->write(space, BLUESHRK_SHOT_EN, (data >> 1) & 0x01);
 
-	m_discrete->write(BLUESHRK_HIT_EN, (data >> 2) & 0x01);
+	m_discrete->write(space, BLUESHRK_HIT_EN, (data >> 2) & 0x01);
 
-	m_discrete->write(BLUESHRK_SHARK_EN, (data >> 3) & 0x01);
+	m_discrete->write(space, BLUESHRK_SHARK_EN, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable KILLED DIVER sound, this circuit
 	   doesn't appear to be on the schematics */
 
-	m_discrete->write(BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01);
+	m_discrete->write(space, BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }
@@ -4686,57 +4666,56 @@ static DISCRETE_SOUND_START(invad2ct_discrete)
 DISCRETE_SOUND_END
 
 
-void mw8080bw_state::invad2ct_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(mw8080bw_state::invad2ct_audio)
 	SPEAKER(config, "spk1").front_left();
 	SPEAKER(config, "spk2").front_right();
 
-	DISCRETE(config, m_discrete, invad2ct_discrete);
-	m_discrete->add_route(0, "spk1", 0.5);
-	m_discrete->add_route(1, "spk2", 0.5);
+	MCFG_DEVICE_ADD("discrete", DISCRETE, invad2ct_discrete)
+	MCFG_SOUND_ROUTE(0, "spk1", 0.5)
+	MCFG_SOUND_ROUTE(1, "spk2", 0.5)
 
-	SN76477(config, m_sn1);
-	m_sn1->set_noise_params(0, 0, 0);
-	m_sn1->set_decay_res(0);
-	m_sn1->set_attack_params(0, RES_K(100));
-	m_sn1->set_amp_res(RES_K(56));
-	m_sn1->set_feedback_res(RES_K(10));
-	m_sn1->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
-	m_sn1->set_pitch_voltage(5.0);
-	m_sn1->set_slf_params(CAP_U(1.0), RES_K(120));
-	m_sn1->set_oneshot_params(0, 0);
-	m_sn1->set_vco_mode(1);
-	m_sn1->set_mixer_params(0, 0, 0);
-	m_sn1->set_envelope_params(1, 0);
-	m_sn1->set_enable(1);
-	m_sn1->add_route(ALL_OUTPUTS, "spk1", 0.3);
+	MCFG_DEVICE_ADD("sn1", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spk1", 0.3)
 
-	SN76477(config, m_sn2);
-	m_sn2->set_noise_params(0, 0, 0);
-	m_sn2->set_decay_res(0);
-	m_sn2->set_attack_params(0, RES_K(100));
-	m_sn2->set_amp_res(RES_K(56));
-	m_sn2->set_feedback_res(RES_K(10));
-	m_sn2->set_vco_params(0, CAP_U(0.047),  RES_K(39));
-	m_sn2->set_pitch_voltage(5.0);
-	m_sn2->set_slf_params(CAP_U(1.0), RES_K(120));
-	m_sn2->set_oneshot_params(0, 0);
-	m_sn2->set_vco_mode(1);
-	m_sn2->set_mixer_params(0, 0, 0);
-	m_sn2->set_envelope_params(1, 0);
-	m_sn2->set_enable(1);
-	m_sn2->add_route(ALL_OUTPUTS, "spk2", 0.3);
-}
+	MCFG_DEVICE_ADD("sn2", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
+	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
+	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
+	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.047),  RES_K(39))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
+	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                              // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "spk2", 0.3)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_1_w)
 {
 	m_sn1->enable_w((~data >> 0) & 0x01);   /* saucer sound */
 
-	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
-	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
-	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
-	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
 
 	machine().sound().system_enable(data & 0x20);
 
@@ -4746,8 +4725,8 @@ WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_2_w)
 {
-	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
-	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
 
 	/* D5-D7 are not connected */
 }
@@ -4757,10 +4736,10 @@ WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_3_w)
 {
 	m_sn2->enable_w((~data >> 0) & 0x01);   /* saucer sound */
 
-	m_discrete->write(INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
-	m_discrete->write(INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);
-	m_discrete->write(INVADERS_NODE(INVADERS_INVADER_HIT_EN, 2), data & 0x08);
-	m_discrete->write(INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 2), data & 0x10);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 2), data & 0x08);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 2), data & 0x10);
 
 	/* D5-D7 are not connected */
 }
@@ -4768,8 +4747,8 @@ WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_3_w)
 
 WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_4_w)
 {
-	m_discrete->write(INVADERS_NODE(INVADERS_FLEET_DATA, 2), data & 0x0f);
-	m_discrete->write(INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 2), data & 0x10);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_FLEET_DATA, 2), data & 0x0f);
+	m_discrete->write(space, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 2), data & 0x10);
 
 	/* D5-D7 are not connected */
 }

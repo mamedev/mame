@@ -105,9 +105,10 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 		}
 	}
 
-	m_discrete->write(SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
-	m_discrete->write(SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
-	m_discrete->write(SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_discrete->write(space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
+	m_discrete->write(space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
+	m_discrete->write(space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -217,31 +218,31 @@ WRITE8_MEMBER(sprint2_state::output_latch_w)
 
 WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 {
-	m_discrete->write(SPRINT2_NOISE_RESET, 0);
+	m_discrete->write(space, SPRINT2_NOISE_RESET, 0);
 }
 
 
 void sprint2_state::sprint2_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x03ff).rw(FUNC(sprint2_state::sprint2_wram_r), FUNC(sprint2_state::sprint2_wram_w));
-	map(0x0400, 0x07ff).ram().w(FUNC(sprint2_state::sprint2_video_ram_w)).share("video_ram");
-	map(0x0818, 0x081f).r(FUNC(sprint2_state::sprint2_input_A_r));
-	map(0x0828, 0x082f).r(FUNC(sprint2_state::sprint2_input_B_r));
-	map(0x0830, 0x0837).r(FUNC(sprint2_state::sprint2_dip_r));
+	map(0x0000, 0x03ff).rw(this, FUNC(sprint2_state::sprint2_wram_r), FUNC(sprint2_state::sprint2_wram_w));
+	map(0x0400, 0x07ff).ram().w(this, FUNC(sprint2_state::sprint2_video_ram_w)).share("video_ram");
+	map(0x0818, 0x081f).r(this, FUNC(sprint2_state::sprint2_input_A_r));
+	map(0x0828, 0x082f).r(this, FUNC(sprint2_state::sprint2_input_B_r));
+	map(0x0830, 0x0837).r(this, FUNC(sprint2_state::sprint2_dip_r));
 	map(0x0840, 0x087f).portr("COIN");
-	map(0x0880, 0x08bf).r(FUNC(sprint2_state::sprint2_steering1_r));
-	map(0x08c0, 0x08ff).r(FUNC(sprint2_state::sprint2_steering2_r));
-	map(0x0c00, 0x0fff).r(FUNC(sprint2_state::sprint2_sync_r));
-	map(0x0c00, 0x0c7f).w(FUNC(sprint2_state::output_latch_w));
+	map(0x0880, 0x08bf).r(this, FUNC(sprint2_state::sprint2_steering1_r));
+	map(0x08c0, 0x08ff).r(this, FUNC(sprint2_state::sprint2_steering2_r));
+	map(0x0c00, 0x0fff).r(this, FUNC(sprint2_state::sprint2_sync_r));
+	map(0x0c00, 0x0c7f).w(this, FUNC(sprint2_state::output_latch_w));
 	map(0x0c80, 0x0cff).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x0d00, 0x0d7f).w(FUNC(sprint2_state::sprint2_collision_reset1_w));
-	map(0x0d80, 0x0dff).w(FUNC(sprint2_state::sprint2_collision_reset2_w));
-	map(0x0e00, 0x0e7f).w(FUNC(sprint2_state::sprint2_steering_reset1_w));
-	map(0x0e80, 0x0eff).w(FUNC(sprint2_state::sprint2_steering_reset2_w));
-	map(0x0f00, 0x0f7f).w(FUNC(sprint2_state::sprint2_noise_reset_w));
-	map(0x1000, 0x13ff).r(FUNC(sprint2_state::sprint2_collision1_r));
-	map(0x1400, 0x17ff).r(FUNC(sprint2_state::sprint2_collision2_r));
+	map(0x0d00, 0x0d7f).w(this, FUNC(sprint2_state::sprint2_collision_reset1_w));
+	map(0x0d80, 0x0dff).w(this, FUNC(sprint2_state::sprint2_collision_reset2_w));
+	map(0x0e00, 0x0e7f).w(this, FUNC(sprint2_state::sprint2_steering_reset1_w));
+	map(0x0e80, 0x0eff).w(this, FUNC(sprint2_state::sprint2_steering_reset2_w));
+	map(0x0f00, 0x0f7f).w(this, FUNC(sprint2_state::sprint2_noise_reset_w));
+	map(0x1000, 0x13ff).r(this, FUNC(sprint2_state::sprint2_collision1_r));
+	map(0x1400, 0x17ff).r(this, FUNC(sprint2_state::sprint2_collision2_r));
 	map(0x1800, 0x1800).nopr();  /* debugger ROM location? */
 	map(0x2000, 0x3fff).rom();
 }
@@ -492,33 +493,38 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sprint2_state::sprint2)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
 	MCFG_DEVICE_PROGRAM_MAP(sprint2_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL, 768, 0, 512, 262, 0, 224)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(512, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint2_state, screen_update_sprint2)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint2_state, screen_vblank_sprint2))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sprint2)
-	PALETTE(config, m_palette, FUNC(sprint2_state::sprint2_palette), 12, 4);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint2)
+	MCFG_PALETTE_ADD("palette", 12)
+	MCFG_PALETTE_INDIRECT_ENTRIES(4)
+	MCFG_PALETTE_INIT_OWNER(sprint2_state, sprint2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	F9334(config, m_outlatch); // at H8
-	m_outlatch->q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<SPRINT2_ATTRACT_EN>)); // also DOMINOS_ATTRACT_EN
-	m_outlatch->q_out_cb<1>().set("discrete", FUNC(discrete_device::write_line<SPRINT2_SKIDSND1_EN>)); // also DOMINOS_TUMBLE_EN
-	m_outlatch->q_out_cb<2>().set("discrete", FUNC(discrete_device::write_line<SPRINT2_SKIDSND2_EN>));
-	m_outlatch->q_out_cb<3>().set_output("led0"); // START LAMP1
-	m_outlatch->q_out_cb<4>().set_output("led1"); // START LAMP2
-	//m_outlatch->q_out_cb<6>().set(FUNC(sprint2_state::sprint2_spare_w));
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // at H8
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT2_ATTRACT_EN>)) // also DOMINOS_ATTRACT_EN
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT2_SKIDSND1_EN>)) // also DOMINOS_TUMBLE_EN
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT2_SKIDSND2_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) // START LAMP1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) // START LAMP2
+	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sprint2_state, sprint2_spare_w))
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, sprint2_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -555,12 +561,12 @@ MACHINE_CONFIG_START(sprint2_state::dominos)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-void sprint2_state::dominos4(machine_config &config)
-{
+MACHINE_CONFIG_START(sprint2_state::dominos4)
 	dominos(config);
-	m_outlatch->q_out_cb<5>().set_output("led2"); // START LAMP3
-	m_outlatch->q_out_cb<6>().set_output("led3"); // START LAMP4
-}
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led2")) // START LAMP3
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led3")) // START LAMP4
+MACHINE_CONFIG_END
 
 ROM_START( sprint1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

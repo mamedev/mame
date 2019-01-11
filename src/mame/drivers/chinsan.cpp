@@ -26,7 +26,6 @@
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,14 +37,14 @@
 class chinsan_state : public driver_device
 {
 public:
-	chinsan_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	chinsan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_video_ram(*this, "video_ram"), m_color_ram(*this, "color_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_adpcm(*this, "adpcm"),
-		m_inputs_p1(*this, "p1_%u", 0U),
-		m_inputs_p2(*this, "p2_%u", 0U),
+		m_inputs_p1{ {*this, "p1_0"}, {*this, "p1_1"}, {*this, "p1_2"}, {*this, "p1_3"}, {*this, "p1_4"} },
+		m_inputs_p2{ {*this, "p2_0"}, {*this, "p2_1"}, {*this, "p2_2"}, {*this, "p2_3"}, {*this, "p2_4"} },
 		m_bank1(*this, "bank1"), m_bank0d(*this, "bank0d"), m_bank1d(*this, "bank1d"),
 		m_tilemap(nullptr),
 		m_int_enabled(false),
@@ -83,8 +82,8 @@ private:
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<msm5205_device> m_adpcm;
-	required_ioport_array<5> m_inputs_p1;
-	required_ioport_array<5> m_inputs_p2;
+	required_ioport m_inputs_p1[5];
+	required_ioport m_inputs_p2[5];
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
@@ -126,14 +125,14 @@ void chinsan_state::chinsan_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x20, 0x20).w(FUNC(chinsan_state::adpcm_w));
-	map(0x30, 0x30).w(FUNC(chinsan_state::ctrl_w));
+	map(0x20, 0x20).w(this, FUNC(chinsan_state::adpcm_w));
+	map(0x30, 0x30).w(this, FUNC(chinsan_state::ctrl_w));
 }
 
 void chinsan_state::mayumi_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x30, 0x30).portr("extra").w(FUNC(chinsan_state::ctrl_w));
+	map(0x30, 0x30).portr("extra").w(this, FUNC(chinsan_state::ctrl_w));
 	map(0xc0, 0xc3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xd0, 0xd1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
@@ -419,7 +418,7 @@ WRITE_LINE_MEMBER( chinsan_state::adpcm_int_w )
 		uint8_t *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		m_adpcm->write_data(m_adpcm_data & 0xf);
+		m_adpcm->data_w(m_adpcm_data & 0xf);
 		m_trigger ^= 1;
 		if (m_trigger == 0)
 		{
@@ -506,62 +505,61 @@ void chinsan_state::init_chinsan()
 //**************************************************************************
 
 // C1-00114-B
-void chinsan_state::chinsan(machine_config &config)
-{
-	MC8123(config, m_maincpu, XTAL(10'000'000)/2); // 317-5012
-	m_maincpu->set_addrmap(AS_PROGRAM, &chinsan_state::chinsan_map);
-	m_maincpu->set_addrmap(AS_IO, &chinsan_state::chinsan_io_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &chinsan_state::decrypted_opcodes_map);
-	m_maincpu->set_vblank_int("screen", FUNC(chinsan_state::vblank_int));
+MACHINE_CONFIG_START(chinsan_state::chinsan)
+	MCFG_DEVICE_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
+	MCFG_DEVICE_PROGRAM_MAP(chinsan_map)
+	MCFG_DEVICE_IO_MAP(chinsan_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set(FUNC(chinsan_state::input_select_w));
-	ppi.in_pb_callback().set(FUNC(chinsan_state::input_p2_r));
-	ppi.in_pc_callback().set(FUNC(chinsan_state::input_p1_r));
+	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, chinsan_state, input_select_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, chinsan_state, input_p2_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, chinsan_state, input_p1_r))
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(24, 512-24-1, 16, 256-16-1);
-	screen.set_screen_update(FUNC(chinsan_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VISIBLE_AREA(24, 512-24-1, 16, 256-16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(chinsan_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_chinsan);
-	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinsan)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(10'000'000)/8));
-	ymsnd.port_a_read_callback().set_ioport("DSW1");
-	ymsnd.port_b_read_callback().set_ioport("DSW2");
-	ymsnd.add_route(0, "mono", 0.15);
-	ymsnd.add_route(1, "mono", 0.15);
-	ymsnd.add_route(2, "mono", 0.15);
-	ymsnd.add_route(3, "mono", 0.10);
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MSM5205(config, m_adpcm, XTAL(384'000));
-	m_adpcm->vck_legacy_callback().set(FUNC(chinsan_state::adpcm_int_w));
-	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B); // 8kHz
-	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("adpcm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinsan_state, adpcm_int_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 8kHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void chinsan_state::mayumi(machine_config &config)
-{
+MACHINE_CONFIG_START(chinsan_state::mayumi)
 	chinsan(config);
 	// standard Z80 instead of MC-8123
-	Z80(config.replace(), m_maincpu, XTAL(10'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &chinsan_state::chinsan_map);
-	m_maincpu->set_addrmap(AS_IO, &chinsan_state::mayumi_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(chinsan_state::vblank_int));
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(chinsan_map)
+	MCFG_DEVICE_IO_MAP(mayumi_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
 	// no ADPCM
-	config.device_remove("adpcm");
-}
+	MCFG_DEVICE_REMOVE("adpcm")
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

@@ -49,13 +49,13 @@ void gomoku_state::gomoku_map(address_map &map)
 {
 	map(0x0000, 0x47ff).rom();
 	map(0x4800, 0x4fff).ram();
-	map(0x5000, 0x53ff).ram().w(FUNC(gomoku_state::gomoku_videoram_w)).share("videoram");
-	map(0x5400, 0x57ff).ram().w(FUNC(gomoku_state::gomoku_colorram_w)).share("colorram");
-	map(0x5800, 0x58ff).ram().w(FUNC(gomoku_state::gomoku_bgram_w)).share("bgram");
+	map(0x5000, 0x53ff).ram().w(this, FUNC(gomoku_state::gomoku_videoram_w)).share("videoram");
+	map(0x5400, 0x57ff).ram().w(this, FUNC(gomoku_state::gomoku_colorram_w)).share("colorram");
+	map(0x5800, 0x58ff).ram().w(this, FUNC(gomoku_state::gomoku_bgram_w)).share("bgram");
 	map(0x6000, 0x601f).w("gomoku", FUNC(gomoku_sound_device::sound1_w));
 	map(0x6800, 0x681f).w("gomoku", FUNC(gomoku_sound_device::sound2_w));
 	map(0x7000, 0x7007).w("latch", FUNC(ls259_device::write_d1));
-	map(0x7800, 0x7807).r(FUNC(gomoku_state::input_port_r));
+	map(0x7800, 0x7807).r(this, FUNC(gomoku_state::input_port_r));
 	map(0x7800, 0x7800).nopw();
 }
 
@@ -128,10 +128,10 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	MCFG_DEVICE_PROGRAM_MAP(gomoku_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
 
-	ls259_device &latch(LS259(config, "latch")); // 7J
-	latch.q_out_cb<1>().set(FUNC(gomoku_state::flipscreen_w));
-	latch.q_out_cb<2>().set(FUNC(gomoku_state::bg_dispsw_w));
-	latch.q_out_cb<7>().set_nop(); // start LED?
+	MCFG_DEVICE_ADD("latch", LS259, 0) // 7J
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gomoku_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gomoku_state, bg_dispsw_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // start LED?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -142,8 +142,9 @@ MACHINE_CONFIG_START(gomoku_state::gomoku)
 	MCFG_SCREEN_UPDATE_DRIVER(gomoku_state, screen_update_gomoku)
 	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_gomoku);
-	PALETTE(config, "palette", FUNC(gomoku_state::gomoku_palette), 64);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gomoku)
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_INIT_OWNER(gomoku_state, gomoku)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

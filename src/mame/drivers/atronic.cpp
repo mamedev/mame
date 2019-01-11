@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -28,13 +27,12 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	void atronic(machine_config &config);
-
-private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void atronic(machine_config &config);
 	void atronic_map(address_map &map);
 	void atronic_portmap(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

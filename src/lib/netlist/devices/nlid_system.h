@@ -130,15 +130,13 @@ namespace netlist
 				unsigned long pati[32];
 				for (int pI = 0; pI < 32; pI++)
 				{
-					pati[pI] = 0;
+				    pati[pI] = 0;
 				}
 				m_size = static_cast<std::uint8_t>(pat.size());
 				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
-					// FIXME: use pstonum_ne
-					//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
-					pati[i] = plib::pstonum<unsigned long>(pat[i]);
+					pati[i] = static_cast<unsigned long>(pat[i].as_long());
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();

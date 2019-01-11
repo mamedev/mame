@@ -162,14 +162,14 @@ void pirates_state::pirates_map(address_map &map)
 //  AM_RANGE(0x500000, 0x5007ff) AM_RAM
 	map(0x500000, 0x5007ff).writeonly().share("spriteram");
 //  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
-	map(0x600000, 0x600001).w(FUNC(pirates_state::out_w));
+	map(0x600000, 0x600001).w(this, FUNC(pirates_state::out_w));
 	map(0x700000, 0x700001).writeonly().share("scroll");    // scroll reg
 	map(0x800000, 0x803fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x900000, 0x90017f).ram();  // more of tilemaps ?
-	map(0x900180, 0x90137f).ram().w(FUNC(pirates_state::tx_tileram_w)).share("tx_tileram");
-	map(0x901380, 0x902a7f).ram().w(FUNC(pirates_state::fg_tileram_w)).share("fg_tileram");
+	map(0x900180, 0x90137f).ram().w(this, FUNC(pirates_state::tx_tileram_w)).share("tx_tileram");
+	map(0x901380, 0x902a7f).ram().w(this, FUNC(pirates_state::fg_tileram_w)).share("fg_tileram");
 //  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
-	map(0x902a80, 0x904187).ram().w(FUNC(pirates_state::bg_tileram_w)).share("bg_tileram");
+	map(0x902a80, 0x904187).ram().w(this, FUNC(pirates_state::bg_tileram_w)).share("bg_tileram");
 //  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
 	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -257,9 +257,10 @@ MACHINE_CONFIG_START(pirates_state::pirates)
 	MCFG_DEVICE_PROGRAM_MAP(pirates_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pirates_state,  irq1_line_hold)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pirates);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pirates)
+
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -267,9 +268,11 @@ MACHINE_CONFIG_START(pirates_state::pirates)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pirates_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000);
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
 
 	SPEAKER(config, "mono").front_center();
 

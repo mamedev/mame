@@ -108,8 +108,8 @@ void pgm_arm_type2_state::kov2_mem(address_map &map)
 {
 	pgm_mem(map);
 	map(0x100000, 0x5fffff).bankr("bank1"); /* Game ROM */
-	map(0xd00000, 0xd0ffff).rw(FUNC(pgm_arm_type2_state::arm7_ram_r), FUNC(pgm_arm_type2_state::arm7_ram_w)); /* ARM7 Shared RAM */
-	map(0xd10000, 0xd10001).rw(FUNC(pgm_arm_type2_state::arm7_latch_68k_r), FUNC(pgm_arm_type2_state::arm7_latch_68k_w)); /* ARM7 Latch */
+	map(0xd00000, 0xd0ffff).rw(this, FUNC(pgm_arm_type2_state::arm7_ram_r), FUNC(pgm_arm_type2_state::arm7_ram_w)); /* ARM7 Shared RAM */
+	map(0xd10000, 0xd10001).rw(this, FUNC(pgm_arm_type2_state::arm7_latch_68k_r), FUNC(pgm_arm_type2_state::arm7_latch_68k_w)); /* ARM7 Latch */
 }
 
 
@@ -119,8 +119,8 @@ void pgm_arm_type2_state::_55857F_arm7_map(address_map &map)
 	map(0x08000000, 0x083fffff).rom().region("user1", 0);
 	map(0x10000000, 0x100003ff).ram();
 	map(0x18000000, 0x1800ffff).ram().share("arm_ram");
-	map(0x38000000, 0x38000003).rw(FUNC(pgm_arm_type2_state::arm7_latch_arm_r), FUNC(pgm_arm_type2_state::arm7_latch_arm_w)); /* 68k Latch */
-	map(0x48000000, 0x4800ffff).rw(FUNC(pgm_arm_type2_state::arm7_shareram_r), FUNC(pgm_arm_type2_state::arm7_shareram_w)).share("arm7_shareram");
+	map(0x38000000, 0x38000003).rw(this, FUNC(pgm_arm_type2_state::arm7_latch_arm_r), FUNC(pgm_arm_type2_state::arm7_latch_arm_w)); /* 68k Latch */
+	map(0x48000000, 0x4800ffff).rw(this, FUNC(pgm_arm_type2_state::arm7_shareram_r), FUNC(pgm_arm_type2_state::arm7_shareram_w)).share("arm7_shareram");
 	map(0x50000000, 0x500003ff).ram();
 }
 
@@ -306,7 +306,7 @@ INPUT_PORTS_START( martmast )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
-	PORT_CONFSETTING(      0x0006, "USA (Andamiro USA license)" )
+	PORT_CONFSETTING(      0x0006, DEF_STR( USA ) )
 	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
 INPUT_PORTS_END
 

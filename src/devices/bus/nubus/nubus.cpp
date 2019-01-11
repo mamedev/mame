@@ -112,7 +112,7 @@ void nubus_device::add_nubus_card(device_nubus_card_interface *card)
 void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 	switch(buswidth)
 	{
 		case 32:
@@ -129,7 +129,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 	switch(buswidth)
 	{
 		case 32:
@@ -146,7 +146,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read16_delegate rhan
 void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 	switch(buswidth)
 	{
 		case 32:
@@ -163,7 +163,7 @@ void nubus_device::install_device(offs_t start, offs_t end, read32_delegate rhan
 void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_delegate rhandler, uint32_t mask)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 	switch(buswidth)
 	{
 		case 32:
@@ -180,7 +180,7 @@ void nubus_device::install_readonly_device(offs_t start, offs_t end, read32_dele
 void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_delegate whandler, uint32_t mask)
 {
 	m_maincpu = machine().device<cpu_device>(m_cputag);
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
+	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 	switch(buswidth)
 	{
 		case 32:

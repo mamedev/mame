@@ -153,12 +153,6 @@ bool TParseContextBase::lValueErrorCheck(const TSourceLoc& loc, const char* op, 
         if (node->getQualifier().readonly)
             message = "can't modify a readonly buffer";
         break;
-#ifdef NV_EXTENSIONS
-    case EvqHitAttrNV:
-        if (language != EShLangIntersectNV)
-            message = "cannot modify hitAttributeNV in this stage";
-        break;
-#endif
 
     default:
         //
@@ -174,11 +168,6 @@ bool TParseContextBase::lValueErrorCheck(const TSourceLoc& loc, const char* op, 
         case EbtVoid:
             message = "can't modify void";
             break;
-#ifdef NV_EXTENSIONS
-        case EbtAccStructNV:
-            message = "can't modify accelerationStructureNV";
-            break;
-#endif
         default:
             break;
         }
@@ -239,7 +228,6 @@ void TParseContextBase::rValueErrorCheck(const TSourceLoc& loc, const char* op, 
 // must still be valid.
 // It is okay if the symbol's type will be subsequently edited;
 // the modifications will be tracked.
-// Order is preserved, to avoid creating novel forward references.
 void TParseContextBase::trackLinkage(TSymbol& symbol)
 {
     if (!parsingBuiltins)
@@ -254,7 +242,7 @@ void TParseContextBase::checkIndex(const TSourceLoc& loc, const TType& type, int
         error(loc, "", "[", "index out of range '%d'", index);
         index = 0;
     } else if (type.isArray()) {
-        if (type.isSizedArray() && index >= type.getOuterArraySize()) {
+        if (type.isExplicitlySizedArray() && index >= type.getOuterArraySize()) {
             error(loc, "", "[", "array index out of range '%d'", index);
             index = type.getOuterArraySize() - 1;
         }
@@ -614,7 +602,7 @@ void TParseContextBase::finish()
     if (parsingBuiltins)
         return;
 
-    // Transfer the linkage symbols to AST nodes, preserving order.
+    // Transfer the linkage symbols to AST nodes
     TIntermAggregate* linkage = new TIntermAggregate;
     for (auto i = linkageSymbols.begin(); i != linkageSymbols.end(); ++i)
         intermediate.addSymbolLinkageNode(linkage, **i);

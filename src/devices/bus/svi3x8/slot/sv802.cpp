@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(SV802, sv802_device, "sv802", "SV-802 Centronics Printer Inte
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sv802_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, sv802_device, busy_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
@@ -72,7 +72,7 @@ WRITE8_MEMBER( sv802_device::iorq_w )
 {
 	switch (offset)
 	{
-	case 0x10: m_cent_data_out->write(data); break;
+	case 0x10: m_cent_data_out->write(space, 0, data); break;
 	case 0x11: m_centronics->write_strobe(BIT(data, 0)); break;
 	}
 }

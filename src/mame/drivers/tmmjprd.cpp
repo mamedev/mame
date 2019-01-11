@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* tmmjprd.cpp
+/* tmmjprd.c
 
- - split from rabbit.cpp (it uses the same GFX chip, but is otherwise a different PCB, and until the methods
+ - split from rabbit.c  (it uses the same GFX chip, but is otherwise a different PCB, and until the methods
    of configuring the graphic chip are understood it's easier to work on them here)
 
- - in 16x16 tile mode, the offset into tileram doesn't necessarily align to 16x16 tiles! This makes using the
+ - in 16x16 tile mode, the offset into tileram doesn't neccessarily align to 16x16 tiles!  This makes using the
    tilemap system excessively difficult, as it expects predecoded tiles which simply isn't possible here.
    This is used for the girls in the intro at least, they specify 16x16 tiles on non 16x16 boundaries.
    (basically the physical tile rom addressing doesn't change between modes even if the data type does)
@@ -19,6 +19,9 @@
 
  - Video has a 'blitter' but it isn't used by these games, it is used by Rabbit
 
+ - tmpdoki isn't a dual screen game, we should remove the dual screen layout from VIDEO_UPDATE and from the MACHINE_DRIVER, also notice that MAME
+   doesn't have a macro for removing previously declared screens.
+
  - sprites from one screen are overlapping on the other, probably there's a way to limit them to a single screen
 
  - priority is wrong.
@@ -31,43 +34,24 @@
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "sound/i5000.h"
-#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define EMULATE_BLITTER 0 // FIXME: code is incomplete
-
 class tmmjprd_state : public driver_device
 {
 public:
-	tmmjprd_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	tmmjprd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_tilemap_regs(*this, "tilemap_regs.%u", 0),
 		m_spriteregs(*this, "spriteregs"),
-#if EMULATE_BLITTER
-		m_blitterregs(*this, "blitterregs"),
-#endif
-		m_spriteram(*this, "spriteram"),
-		m_gfxroms(*this, "gfx2"),
-		m_pl1(*this, "PL1.%u", 1),
-		m_pl2(*this, "PL2.%u", 1),
-		m_system(*this, "SYSTEM")
-	{ }
+		m_spriteram(*this, "spriteram") { }
 
-	void tmmjprd(machine_config &config);
-	void tmpdoki(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -75,64 +59,72 @@ private:
 
 	required_shared_ptr_array<uint32_t, 4> m_tilemap_regs;
 	required_shared_ptr<uint32_t> m_spriteregs;
-#if EMULATE_BLITTER
-	required_shared_ptr<uint32_t> m_blitterregs;
-#endif
 	required_shared_ptr<uint32_t> m_spriteram;
-
-	required_region_ptr<uint8_t> m_gfxroms;
-
-	required_ioport_array<5> m_pl1;
-	required_ioport_array<5> m_pl2;
-	required_ioport m_system;
 
 	std::unique_ptr<uint32_t[]> m_tilemap_ram[4];
 	uint8_t m_mux_data;
 	uint8_t m_system_in;
-	double m_old_brt[2];
-#if EMULATE_BLITTER
-	tilemap_t *m_tilemap[4];
-	emu_timer *m_blit_done_timer;
-#endif
+	double m_old_brt1;
+	double m_old_brt2;
 
-	template<uint8_t Tilemap> DECLARE_WRITE32_MEMBER(tilemap_w);
-	template<uint8_t Tilemap> DECLARE_READ32_MEMBER(tilemap_r);
+	DECLARE_WRITE32_MEMBER(tilemap0_w);
+	DECLARE_WRITE32_MEMBER(tilemap1_w);
+	DECLARE_WRITE32_MEMBER(tilemap2_w);
+	DECLARE_WRITE32_MEMBER(tilemap3_w);
+	DECLARE_READ32_MEMBER(tilemap0_r);
+	DECLARE_READ32_MEMBER(tilemap1_r);
+	DECLARE_READ32_MEMBER(tilemap2_r);
+	DECLARE_READ32_MEMBER(tilemap3_r);
 	DECLARE_READ32_MEMBER(randomtmmjprds);
 	DECLARE_READ32_MEMBER(mux_r);
-	template<uint8_t Number> DECLARE_WRITE32_MEMBER(brt_w);
+	DECLARE_WRITE32_MEMBER(brt_1_w);
+	DECLARE_WRITE32_MEMBER(brt_2_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
 
-#if EMULATE_BLITTER
-	DECLARE_WRITE32_MEMBER(blitter_w);
-	void do_blit();
-#endif
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-#if EMULATE_BLITTER
-	TIMER_CALLBACK_MEMBER(blit_done);
-#endif
-
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
 	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, uint32_t tiledata, uint8_t* rom);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t*tileram, uint32_t*tileregs, uint8_t*rom );
-
-	void main_map(address_map &map);
+	void tmmjprd(machine_config &config);
+	void tmpdoki(machine_config &config);
+	void tmmjprd_map(address_map &map);
 };
 
-template<uint8_t Tilemap>
-WRITE32_MEMBER(tmmjprd_state::tilemap_w)
+
+WRITE32_MEMBER(tmmjprd_state::tilemap0_w)
 {
-	COMBINE_DATA(&m_tilemap_ram[Tilemap][offset]);
+	COMBINE_DATA(&m_tilemap_ram[0][offset]);
+}
+
+
+
+WRITE32_MEMBER(tmmjprd_state::tilemap1_w)
+{
+	COMBINE_DATA(&m_tilemap_ram[1][offset]);
+}
+
+WRITE32_MEMBER(tmmjprd_state::tilemap2_w)
+{
+	COMBINE_DATA(&m_tilemap_ram[2][offset]);
+}
+
+WRITE32_MEMBER(tmmjprd_state::tilemap3_w)
+{
+	COMBINE_DATA(&m_tilemap_ram[3][offset]);
 }
 
 void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen)
 {
-	int xpos,ypos;
+	int xpos,ypos,tileno,xflip,yflip, colr;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
+	int xoffs;
 	//  int todraw = (m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
 //  uint32_t *source = (m_spriteram+ (todraw*2))-2;
@@ -140,7 +132,7 @@ void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	uint32_t *source = m_spriteram+(0xc000/4)-2;
 	uint32_t *finish = m_spriteram;
-	int xoffs = (screen & 1)*320;
+	xoffs = (screen & 1)*320;
 
 	for(;source>finish;source-=2)
 	{
@@ -191,10 +183,10 @@ void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			ypos&=0x7ff;
 		}
 
-		int xflip =  (source[0]&0x00008000)>>15;
-		int yflip =  (source[0]&0x00004000)>>14;
-		int tileno = (source[1]&0x0003ffff);
-		int colr =   (source[1]&0x0ff00000)>>20;
+		xflip =  (source[0]&0x00008000)>>15;
+		yflip =  (source[0]&0x00004000)>>14;
+		tileno = (source[1]&0x0003ffff);
+		colr =   (source[1]&0x0ff00000)>>20;
 
 		// the tiles in this are 8bpp, it can probably do the funky sub-tile addressing for them too tho..
 		tileno >>=1;
@@ -211,7 +203,8 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 	int colour   = (tiledata&0x0ff00000)>>20;
 	int depth    = (tiledata&0x10000000)>>28;
 	//int flipxy   = (tiledata&0x60000000)>>29;
-	//                       0x80000000   (blank tile like metro.cpp?)
+	//                       0x80000000   (blank tile like metro.c?)
+	int drawx,drawy;
 	int count;
 
 	// entirely off right
@@ -231,9 +224,9 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 		return;
 
 	count = 0;
-	for (int drawy=y;drawy<y+sizey;drawy++)
+	for (drawy=y;drawy<y+sizey;drawy++)
 	{
-		for (int drawx=x;drawx<x+sizex;drawx++)
+		for (drawx=x;drawx<x+sizex;drawx++)
 		{
 			uint16_t dat;
 			uint16_t* dst;
@@ -284,6 +277,9 @@ void tmmjprd_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 
 void tmmjprd_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t*tileram, uint32_t*tileregs, uint8_t*rom )
 {
+	int y,x;
+	int count;
+
 	int tilemap_sizex = 64;
 	int tilemap_sizey = 64;
 
@@ -306,10 +302,10 @@ void tmmjprd_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 	scrolly = (tileregs[2] & 0xfff00000) >> 20;
 	scrollx = (tileregs[2] & 0x0000fff0) >> 4;
 
-	int count = 0;
-	for (int y=0;y<tilemap_sizey;y++)
+	count = 0;
+	for (y=0;y<tilemap_sizey;y++)
 	{
-		for (int x=0;x<tilemap_sizex;x++)
+		for (x=0;x<tilemap_sizex;x++)
 		{
 			uint32_t tiledata = tileram[count];
 			// todo: handle wraparound
@@ -322,11 +318,13 @@ void tmmjprd_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t tmmjprd_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	uint8_t* gfxroms = memregion("gfx2")->base();
+
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	draw_tilemap(bitmap, cliprect, m_tilemap_ram[3].get(), m_tilemap_regs[3], m_gfxroms );
+	draw_tilemap(bitmap, cliprect, m_tilemap_ram[3].get(), m_tilemap_regs[3], gfxroms );
 	draw_sprites(bitmap,cliprect, 1);
-	draw_tilemap(bitmap, cliprect, m_tilemap_ram[2].get(), m_tilemap_regs[2], m_gfxroms );
+	draw_tilemap(bitmap, cliprect, m_tilemap_ram[2].get(), m_tilemap_regs[2], gfxroms );
 
 	/*
 	popmessage("%08x %08x %08x %08x %08x %08x",
@@ -354,11 +352,13 @@ uint32_t tmmjprd_state::screen_update_left(screen_device &screen, bitmap_ind16 &
 
 uint32_t tmmjprd_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	uint8_t* gfxroms = memregion("gfx2")->base();
+
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	draw_tilemap(bitmap, cliprect, m_tilemap_ram[1].get(), m_tilemap_regs[1], m_gfxroms );
+	draw_tilemap(bitmap, cliprect, m_tilemap_ram[1].get(), m_tilemap_regs[1], gfxroms );
 	draw_sprites(bitmap,cliprect, 0);
-	draw_tilemap(bitmap, cliprect, m_tilemap_ram[0].get(), m_tilemap_regs[0], m_gfxroms );
+	draw_tilemap(bitmap, cliprect, m_tilemap_ram[0].get(), m_tilemap_regs[0], gfxroms );
 
 	return 0;
 }
@@ -373,18 +373,33 @@ void tmmjprd_state::video_start()
 	m_tilemap_ram[3] = make_unique_clear<uint32_t[]>(0x8000);
 
 
-	save_pointer(NAME(m_tilemap_ram[0]), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[1]), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[2]), 0x8000);
-	save_pointer(NAME(m_tilemap_ram[3]), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[0].get()), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[1].get()), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[2].get()), 0x8000);
+	save_pointer(NAME(m_tilemap_ram[3].get()), 0x8000);
 
-	save_item(NAME(m_old_brt));
+	save_item(NAME(m_old_brt1));
+	save_item(NAME(m_old_brt2));
 }
 
-template<uint8_t Tilemap>
-READ32_MEMBER(tmmjprd_state::tilemap_r)
+READ32_MEMBER(tmmjprd_state::tilemap0_r)
 {
-	return m_tilemap_ram[Tilemap][offset];
+	return m_tilemap_ram[0][offset];
+}
+
+READ32_MEMBER(tmmjprd_state::tilemap1_r)
+{
+	return m_tilemap_ram[1][offset];
+}
+
+READ32_MEMBER(tmmjprd_state::tilemap2_r)
+{
+	return m_tilemap_ram[2][offset];
+}
+
+READ32_MEMBER(tmmjprd_state::tilemap3_r)
+{
+	return m_tilemap_ram[3][offset];
 }
 
 READ32_MEMBER(tmmjprd_state::randomtmmjprds)
@@ -396,7 +411,7 @@ READ32_MEMBER(tmmjprd_state::randomtmmjprds)
 #define BLITCMDLOG 0
 #define BLITLOG 0
 
-#if EMULATE_BLITTER
+#if 0
 TIMER_CALLBACK_MEMBER(tmmjprd_state::blit_done)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
@@ -446,7 +461,7 @@ void tmmjprd_state::do_blit()
 				if (!blt_amount)
 				{
 					if(BLITLOG) osd_printf_debug("end of blit list\n");
-					m_blit_done_timer->adjust(attotime::from_usec(500));
+					machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(tmmjprd_state::blit_done),this));
 					return;
 				}
 
@@ -510,10 +525,6 @@ WRITE32_MEMBER(tmmjprd_state::blitter_w)
 
 void tmmjprd_state::machine_start()
 {
-#if EMULATE_BLITTER
-	m_blit_done_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmmjprd_state::blit_done), this));
-#endif
-
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_system_in));
 }
@@ -540,15 +551,15 @@ WRITE32_MEMBER(tmmjprd_state::eeprom_write)
 
 READ32_MEMBER(tmmjprd_state::mux_r)
 {
-	m_system_in = m_system->read();
+	m_system_in = ioport("SYSTEM")->read();
 
 	switch(m_mux_data)
 	{
-		case 0x01: return (m_system_in & 0xff) | m_pl1[0]->read()<<8 | m_pl2[0]->read()<<16 | 0xff000000;
-		case 0x02: return (m_system_in & 0xff) | m_pl1[1]->read()<<8 | m_pl2[1]->read()<<16 | 0xff000000;
-		case 0x04: return (m_system_in & 0xff) | m_pl1[2]->read()<<8 | m_pl2[2]->read()<<16 | 0xff000000;
-		case 0x08: return (m_system_in & 0xff) | m_pl1[3]->read()<<8 | m_pl2[3]->read()<<16 | 0xff000000;
-		case 0x10: return (m_system_in & 0xff) | m_pl1[4]->read()<<8 | m_pl2[4]->read()<<16 | 0xff000000;
+		case 0x01: return (m_system_in & 0xff) | (ioport("PL1_1")->read()<<8) | (ioport("PL2_1")->read()<<16) | 0xff000000;
+		case 0x02: return (m_system_in & 0xff) | (ioport("PL1_2")->read()<<8) | (ioport("PL2_2")->read()<<16) | 0xff000000;
+		case 0x04: return (m_system_in & 0xff) | (ioport("PL1_3")->read()<<8) | (ioport("PL2_3")->read()<<16) | 0xff000000;
+		case 0x08: return (m_system_in & 0xff) | (ioport("PL1_4")->read()<<8) | (ioport("PL2_4")->read()<<16) | 0xff000000;
+		case 0x10: return (m_system_in & 0xff) | (ioport("PL1_5")->read()<<8) | (ioport("PL2_5")->read()<<16) | 0xff000000;
 	}
 
 	return (m_system_in & 0xff) | 0xffffff00;
@@ -565,7 +576,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // CHECK!
 
-	PORT_START("PL1.1")
+	PORT_START("PL1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(1)
@@ -574,7 +585,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL1.2")
+	PORT_START("PL1_2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(1)
@@ -583,7 +594,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //bet button
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL1.3")
+	PORT_START("PL1_3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(1)
@@ -592,17 +603,17 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL1.4")
+	PORT_START("PL1_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL1.5")
+	PORT_START("PL1_5")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL2.1")
+	PORT_START("PL2_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
@@ -611,7 +622,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL2.2")
+	PORT_START("PL2_2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
@@ -620,7 +631,7 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //bet button
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL2.3")
+	PORT_START("PL2_3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
@@ -629,14 +640,14 @@ static INPUT_PORTS_START( tmmjprd )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL2.4")
+	PORT_START("PL2_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PL2.5")
+	PORT_START("PL2_5")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -645,54 +656,72 @@ INPUT_PORTS_END
 
 /* notice that data & 0x4 is always cleared on brt_1 and set on brt_2.        *
  * My wild guess is that bits 0,1 and 2 controls what palette entries to dim. */
-template<uint8_t Number>
-WRITE32_MEMBER(tmmjprd_state::brt_w)
+WRITE32_MEMBER(tmmjprd_state::brt_1_w)
 {
-	data>>=24;
-	double brt = ((data & 0x78)>>3) / 15.0;
-	int bank = data & 0x4 ? 0x800 : 0; //guess
+	int i;
+	double brt;
+	int bank;
 
-	if(data & 0x80 && m_old_brt[Number] != brt)
+	data>>=24;
+	brt = ((data & 0x78)>>3) / 15.0;
+	bank = data & 0x4 ? 0x800 : 0; //guess
+
+	if(data & 0x80 && m_old_brt1 != brt)
 	{
-		m_old_brt[Number] = brt;
-		for (int i = bank; i < 0x800+bank; i++)
+		m_old_brt1 = brt;
+		for (i = bank; i < 0x800+bank; i++)
 			m_palette->set_pen_contrast(i, brt);
 	}
 }
 
+WRITE32_MEMBER(tmmjprd_state::brt_2_w)
+{
+	int i;
+	double brt;
+	int bank;
 
-void tmmjprd_state::main_map(address_map &map)
+	data>>=24;
+	brt = ((data & 0x78)>>3) / 15.0;
+	bank = data & 0x4 ? 0x800 : 0; //guess
+
+	if(data & 0x80 && m_old_brt2 != brt)
+	{
+		m_old_brt2 = brt;
+		for (i = bank; i < 0x800+bank; i++)
+			m_palette->set_pen_contrast(i, brt);
+	}
+}
+
+void tmmjprd_state::tmmjprd_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x200010, 0x200013).r(FUNC(tmmjprd_state::randomtmmjprds)); // gfx chip status?
+	map(0x200010, 0x200013).r(this, FUNC(tmmjprd_state::randomtmmjprds)); // gfx chip status?
 	/* check these are used .. */
 //  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_SHARE("viewregs0")
-	map(0x200100, 0x200117).writeonly().share(m_tilemap_regs[0]); // tilemap regs1
-	map(0x200120, 0x200137).writeonly().share(m_tilemap_regs[1]); // tilemap regs2
-	map(0x200140, 0x200157).writeonly().share(m_tilemap_regs[2]); // tilemap regs3
-	map(0x200160, 0x200177).writeonly().share(m_tilemap_regs[3]); // tilemap regs4
-	map(0x200200, 0x20021b).writeonly().share(m_spriteregs); // sprregs?
+	map(0x200100, 0x200117).writeonly().share("tilemap_regs.0"); // tilemap regs1
+	map(0x200120, 0x200137).writeonly().share("tilemap_regs.1"); // tilemap regs2
+	map(0x200140, 0x200157).writeonly().share("tilemap_regs.2"); // tilemap regs3
+	map(0x200160, 0x200177).writeonly().share("tilemap_regs.3"); // tilemap regs4
+	map(0x200200, 0x20021b).writeonly().share("spriteregs"); // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE(rombank_w) // used during rom testing, rombank/area select + something else?
-	map(0x20040c, 0x20040f).w(FUNC(tmmjprd_state::brt_w<0>));
-	map(0x200410, 0x200413).w(FUNC(tmmjprd_state::brt_w<1>));
+	map(0x20040c, 0x20040f).w(this, FUNC(tmmjprd_state::brt_1_w));
+	map(0x200410, 0x200413).w(this, FUNC(tmmjprd_state::brt_2_w));
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("viewregs7")
-#if EMULATE_BLITTER
-	map(0x200700, 0x20070f).w(FUNC(tmmjprd_state::blitter_w)).share(m_blitterregs);
-#endif
+//  AM_RANGE(0x200700, 0x20070f) AM_WRITE(blitter_w) AM_SHARE("blitterregs")
 //  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("viewregs9") // never changes?
 	map(0x200900, 0x2009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
 //  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("viewregs10")
 	/* tilemaps */
-	map(0x280000, 0x283fff).rw(FUNC(tmmjprd_state::tilemap_r<0>), FUNC(tmmjprd_state::tilemap_w<0>));
-	map(0x284000, 0x287fff).rw(FUNC(tmmjprd_state::tilemap_r<1>), FUNC(tmmjprd_state::tilemap_w<1>));
-	map(0x288000, 0x28bfff).rw(FUNC(tmmjprd_state::tilemap_r<2>), FUNC(tmmjprd_state::tilemap_w<2>));
-	map(0x28c000, 0x28ffff).rw(FUNC(tmmjprd_state::tilemap_r<3>), FUNC(tmmjprd_state::tilemap_w<3>));
+	map(0x280000, 0x283fff).rw(this, FUNC(tmmjprd_state::tilemap0_r), FUNC(tmmjprd_state::tilemap0_w));
+	map(0x284000, 0x287fff).rw(this, FUNC(tmmjprd_state::tilemap1_r), FUNC(tmmjprd_state::tilemap1_w));
+	map(0x288000, 0x28bfff).rw(this, FUNC(tmmjprd_state::tilemap2_r), FUNC(tmmjprd_state::tilemap2_w));
+	map(0x28c000, 0x28ffff).rw(this, FUNC(tmmjprd_state::tilemap3_r), FUNC(tmmjprd_state::tilemap3_w));
 	/* ?? is palette ram shared with sprites in this case or just a different map */
-	map(0x290000, 0x29bfff).ram().share(m_spriteram);
+	map(0x290000, 0x29bfff).ram().share("spriteram");
 	map(0x29c000, 0x29ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
-	map(0x400000, 0x400003).r(FUNC(tmmjprd_state::mux_r)).w(FUNC(tmmjprd_state::eeprom_write));
+	map(0x400000, 0x400003).r(this, FUNC(tmmjprd_state::mux_r)).w(this, FUNC(tmmjprd_state::eeprom_write));
 	map(0xf00000, 0xffffff).ram();
 }
 
@@ -739,50 +768,63 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 
 }
 
-void tmmjprd_state::tmpdoki(machine_config &config)
-{
-	M68EC020(config, m_maincpu, 24000000); /* 24 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmmjprd_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(tmmjprd_state::scanline), "lscreen", 0, 1);
+MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
+	MCFG_DEVICE_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(tmmjprd_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
 
-	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tmmjprd);
-	PALETTE(config, m_palette).set_format(palette_device::xGRB_888, 0x1000);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tmmjprd)
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	lscreen.set_size(64*16, 64*16);
-	lscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
-	//lscreen.set_visarea(0*8, 64*16-1, 0*8, 64*16-1);
-	lscreen.set_screen_update(FUNC(tmmjprd_state::screen_update_left));
-	lscreen.set_palette(m_palette);
+//  MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update)
+//  MCFG_SCREEN_SIZE(64*16, 64*16)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	MCFG_PALETTE_ADD("palette", 0x1000)
+	MCFG_PALETTE_FORMAT(XGRB)
+
+
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*16, 64*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_left)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*16, 64*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
+	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_right)
+	MCFG_SCREEN_PALETTE("palette")
+
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	i5000snd_device &i5000snd(I5000_SND(config, "i5000snd", XTAL(40'000'000)));
-	i5000snd.add_route(0, "rspeaker", 1.0);
-	i5000snd.add_route(1, "lspeaker", 1.0);
-}
+	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
+MACHINE_CONFIG_END
 
-void tmmjprd_state::tmmjprd(machine_config &config)
-{
-	tmpdoki(config);
+MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
+	tmmjprd(config);
+	MCFG_DEFAULT_LAYOUT(layout_horizont)
+MACHINE_CONFIG_END
 
-	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	rscreen.set_size(64*16, 64*16);
-	rscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
-	//rscreen.set_visarea(0*8, 64*16-1, 0*8, 64*16-1);
-	rscreen.set_screen_update(FUNC(tmmjprd_state::screen_update_right));
-	rscreen.set_palette(m_palette);
-}
+
 
 ROM_START( tmmjprd )
 	ROM_REGION( 0x200000, "maincpu", 0 )

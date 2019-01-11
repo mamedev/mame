@@ -22,9 +22,6 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ti990_hd );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hd );
-
-	auto int_cb() { return m_interrupt_callback.bind(); }
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -76,6 +73,9 @@ private:
 
 	hd_unit_t m_d[MAX_DISK_UNIT];
 };
+
+#define MCFG_TI990_HDC_INT_CALLBACK( _write ) \
+	devcb = &downcast<ti990_hdc_device &>(*device).set_int_callback(DEVCB_##_write);
 
 DECLARE_DEVICE_TYPE(TI990_HDC, ti990_hdc_device)
 

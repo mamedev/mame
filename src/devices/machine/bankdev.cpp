@@ -28,22 +28,22 @@ device_memory_interface::space_config_vector address_map_bank_device::memory_spa
 
 void address_map_bank_device::amap8(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x00000000, 0xffffffff).rw(this, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 }
 
 void address_map_bank_device::amap16(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(FUNC(address_map_bank_device::read16), FUNC(address_map_bank_device::write16));
+	map(0x00000000, 0xffffffff).rw(this, FUNC(address_map_bank_device::read16), FUNC(address_map_bank_device::write16));
 }
 
 void address_map_bank_device::amap32(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(FUNC(address_map_bank_device::read32), FUNC(address_map_bank_device::write32));
+	map(0x00000000, 0xffffffff).rw(this, FUNC(address_map_bank_device::read32), FUNC(address_map_bank_device::write32));
 }
 
 void address_map_bank_device::amap64(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(FUNC(address_map_bank_device::read64), FUNC(address_map_bank_device::write64));
+	map(0x00000000, 0xffffffff).rw(this, FUNC(address_map_bank_device::read64), FUNC(address_map_bank_device::write64));
 }
 
 WRITE8_MEMBER(address_map_bank_device::write8)

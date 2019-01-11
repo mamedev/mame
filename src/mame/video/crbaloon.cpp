@@ -25,16 +25,24 @@
 
 ***************************************************************************/
 
-void crbaloon_state::crbaloon_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(crbaloon_state, crbaloon)
 {
-	for (int i = 0; i < palette.entries(); i++)
-	{
-		uint8_t const pen = BIT(i, 0) ? (i >> 1) : 0x0f;
+	int i;
 
-		int const h = BIT(~pen, 3) ? 0xff : 0x55;
-		int const r = h * BIT(~pen, 0);
-		int const g = h * BIT(~pen, 1);
-		int const b = h * BIT(~pen, 2);
+	for (i = 0; i < palette.entries(); i++)
+	{
+		uint8_t pen;
+		int h, r, g, b;
+
+		if (i & 0x01)
+			pen = i >> 1;
+		else
+			pen = 0x0f;
+
+		h = (~pen & 0x08) ? 0xff : 0x55;
+		r = h * ((~pen >> 0) & 1);
+		g = h * ((~pen >> 1) & 1);
+		b = h * ((~pen >> 2) & 1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

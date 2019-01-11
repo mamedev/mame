@@ -27,6 +27,22 @@
 #pragma once
 
 
+
+
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
+
+#define MCFG_COM8116_FX4_HANDLER(_devcb) \
+	devcb = &downcast<com8116_device &>(*device).set_fx4_handler(DEVCB_##_devcb);
+
+#define MCFG_COM8116_FR_HANDLER(_devcb) \
+	devcb = &downcast<com8116_device &>(*device).set_fr_handler(DEVCB_##_devcb);
+
+#define MCFG_COM8116_FT_HANDLER(_devcb) \
+	devcb = &downcast<com8116_device &>(*device).set_ft_handler(DEVCB_##_devcb);
+
+
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
@@ -39,16 +55,14 @@ public:
 	// construction/destruction
 	com8116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto fx4_handler() { return m_fx4_handler.bind(); }
-	auto fr_handler() { return m_fr_handler.bind(); }
-	auto ft_handler() { return m_ft_handler.bind(); }
+	template <class Object> devcb_base &set_fx4_handler(Object &&cb) { return m_fx4_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_fr_handler(Object &&cb) { return m_fr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ft_handler(Object &&cb) { return m_ft_handler.set_callback(std::forward<Object>(cb)); }
 
-	void write_str(uint8_t data);
-	void write_stt(uint8_t data);
-	DECLARE_WRITE8_MEMBER(str_w) { write_str(data); }
-	DECLARE_WRITE8_MEMBER(stt_w) { write_stt(data); }
-	DECLARE_WRITE8_MEMBER(str_stt_w);
-	DECLARE_WRITE8_MEMBER(stt_str_w);
+	void str_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER( str_w );
+	void stt_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER( stt_w );
 
 protected:
 	com8116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int *divisors);

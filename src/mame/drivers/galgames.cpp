@@ -41,7 +41,6 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/cesblit.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -158,10 +157,9 @@ protected:
 
 DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios_cart", "Galaxy Games BIOS Cartridge")
 
-void galgames_bios_cart_device::device_add_mconfig(machine_config &config)
-{
-	EEPROM_93C76_8BIT(config, "eeprom");
-}
+MACHINE_CONFIG_START(galgames_bios_cart_device::device_add_mconfig)
+	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_BIOS_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_BIOS_CART, 0) \
@@ -185,14 +183,13 @@ protected:
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starpak2_cart", "Galaxy Games StarPak 2 Cartridge")
 
-void galgames_starpak2_cart_device::device_add_mconfig(machine_config &config)
-{
-	pic16c56_device &pic(PIC16C56(config, "pic", XTAL(4'000'000)));  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
-	pic.read_b().set(FUNC(galgames_cart_device::int_pic_data_r));
-	pic.write_b().set(FUNC(galgames_cart_device::int_pic_data_w));
+MACHINE_CONFIG_START(galgames_starpak2_cart_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("pic", PIC16C56, XTAL(4'000'000))  // !! PIC12C508 !! 4MHz internal RC oscillator (selected by the configuration word)
+	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
 
-	EEPROM_93C76_8BIT(config, "eeprom");
-}
+	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_STARPAK2_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK2_CART, 0) \
@@ -217,15 +214,14 @@ protected:
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device, "starpak3_cart", "Galaxy Games StarPak 3 Cartridge")
 
-void galgames_starpak3_cart_device::device_add_mconfig(machine_config &config)
-{
-	pic16c56_device &pic(PIC16C56(config, "pic", XTAL(4'000'000)));
-	pic.write_a().set(FUNC(galgames_cart_device::int_pic_bank_w));
-	pic.read_b().set(FUNC(galgames_cart_device::int_pic_data_r));
-	pic.write_b().set(FUNC(galgames_cart_device::int_pic_data_w));
+MACHINE_CONFIG_START(galgames_starpak3_cart_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("pic", PIC16C56, XTAL(4'000'000))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, galgames_cart_device, int_pic_bank_w))
+	MCFG_PIC16C5x_READ_B_CB( READ8( *this, galgames_cart_device, int_pic_data_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, galgames_cart_device, int_pic_data_w))
 
-	EEPROM_93C76_8BIT(config, "eeprom");
-}
+	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
+MACHINE_CONFIG_END
 
 #define MCFG_GALGAMES_STARPAK3_CART_ADD(_tag, _cart) \
 	MCFG_DEVICE_ADD(_tag, GALGAMES_STARPAK3_CART, 0) \
@@ -565,10 +561,10 @@ WRITE_LINE_MEMBER(galgames_cart_device::eeprom_cs_write)
 
 void galgames_slot_device::slot_map(address_map &map)
 {
-	map( 0x000000, 0x1fffff ).r(FUNC(galgames_slot_device::rom0_r));
-	map( 0x000000, 0x03ffff ).rw(FUNC(galgames_slot_device::rom0_or_ram_r), FUNC(galgames_slot_device::ram_w)).share("ram");
-	map( 0x200000, 0x3fffff ).r(FUNC(galgames_slot_device::rom_r));
-	map( 0x200000, 0x23ffff ).rw(FUNC(galgames_slot_device::rom_or_ram_r), FUNC(galgames_slot_device::ram_w));
+	map( 0x000000, 0x1fffff ).r(this, FUNC(galgames_slot_device::rom0_r));
+	map( 0x000000, 0x03ffff ).rw(this, FUNC(galgames_slot_device::rom0_or_ram_r), FUNC(galgames_slot_device::ram_w)).share("ram");
+	map( 0x200000, 0x3fffff ).r(this, FUNC(galgames_slot_device::rom_r));
+	map( 0x200000, 0x23ffff ).rw(this, FUNC(galgames_slot_device::rom_or_ram_r), FUNC(galgames_slot_device::ram_w));
 }
 
 galgames_slot_device::galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -729,8 +725,8 @@ WRITE_LINE_MEMBER(galgames_slot_device::eeprom_cs_write)
 class galgames_state : public driver_device
 {
 public:
-	galgames_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	galgames_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -873,16 +869,16 @@ void galgames_state::galgames_map(address_map &map)
 	map(0x400014, 0x400015).w(m_blitter, FUNC(cesblit_device::color_w));
 	map(0x400020, 0x400021).r(m_blitter, FUNC(cesblit_device::status_r));
 
-	map(0x600000, 0x600001).r(FUNC(galgames_state::fpga_status_r));
-	map(0x700000, 0x700001).r(FUNC(galgames_state::fpga_status_r)).nopw();
+	map(0x600000, 0x600001).r(this, FUNC(galgames_state::fpga_status_r));
+	map(0x700000, 0x700001).r(this, FUNC(galgames_state::fpga_status_r)).nopw();
 	map(0x800020, 0x80003f).noprw();   // ?
 	map(0x900000, 0x900001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 
 	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xb00000, 0xb7ffff).rw(FUNC(galgames_state::galgames_okiram_r), FUNC(galgames_state::galgames_okiram_w)); // (only low bytes tested) 4x N341024SJ-15
+	map(0xb00000, 0xb7ffff).rw(this, FUNC(galgames_state::galgames_okiram_r), FUNC(galgames_state::galgames_okiram_w)); // (only low bytes tested) 4x N341024SJ-15
 
-	map(0xc00000, 0xc00001).w(FUNC(galgames_state::galgames_palette_offset_w));
-	map(0xc00002, 0xc00003).w(FUNC(galgames_state::galgames_palette_data_w));
+	map(0xc00000, 0xc00001).w(this, FUNC(galgames_state::galgames_palette_offset_w));
+	map(0xc00002, 0xc00003).w(this, FUNC(galgames_state::galgames_palette_data_w));
 
 	map(0xd00000, 0xd00001).portr("TRACKBALL_1_X");
 	map(0xd00000, 0xd00001).nopw();  // bit 0: FPGA programming serial in (lsb first)
@@ -891,7 +887,7 @@ void galgames_state::galgames_map(address_map &map)
 	map(0xd00006, 0xd00007).portr("TRACKBALL_2_Y");
 	map(0xd00008, 0xd00009).portr("P1");
 	map(0xd0000a, 0xd0000b).portr("P2");
-	map(0xd0000c, 0xd0000d).portr("SYSTEM").w(FUNC(galgames_state::outputs_w));
+	map(0xd0000c, 0xd0000d).portr("SYSTEM").w(this, FUNC(galgames_state::outputs_w));
 
 	map(0xd0000e, 0xd0000f).nopr();
 	map(0xd0000f, 0xd0000f).w(m_slot, FUNC(galgames_slot_device::cart_sel_w));
@@ -985,7 +981,7 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_GALGAMES_SLOT_ADD("slot")
 	MCFG_GALGAMES_BIOS_CART_ADD( "cart0", 0)
@@ -997,14 +993,15 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galgames_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	CESBLIT(config, m_blitter, XTAL(24'000'000), m_screen);
-	m_blitter->set_addrmap(AS_PROGRAM, &galgames_state::blitter_map);
-	m_blitter->set_compute_addr(galgames_compute_addr);
-	m_blitter->irq_callback().set(FUNC(galgames_state::blitter_irq_callback));
+	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(24'000'000))
+	MCFG_CESBLIT_MAP(blitter_map)
+	MCFG_CESBLIT_COMPUTE_ADDR(galgames_compute_addr)
+	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, galgames_state, blitter_irq_callback))
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000); // only 0x100 used
+	MCFG_PALETTE_ADD("palette", 0x1000) // only 0x100 used
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1084,7 +1081,7 @@ Copyright notice in rom states: Creative Electronics & Software Written by Keith
 ***************************************************************************/
 
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
+	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define GALGAMES_BIOS_ROMS \
 	ROM_SYSTEM_BIOS( 0, "1.90",   "v1.90 12/01/98" ) \

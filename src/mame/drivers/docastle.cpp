@@ -117,11 +117,8 @@ Notes:
 
 TODO:
 -----
+
 - third CPU
-- docastle schematics say that maincpu(and cpu3) interrupt comes from the 6845
-  CURSOR pin. The cursor is configured at scanline 0, and causes the games to
-  update the next video frame during active display. What is the culprit here?
-  For now, it's simply hooked up to vsync.
 - dip switch reading bug. dorunrun and docastle are VERY timing sensitive, and
   dip switch reading will fail if timing is not completely accurate.
 - the dorunrun attract mode sequence is also very timing sensitive. The behaviour
@@ -168,6 +165,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 #include "speaker.h"
 
 
+
 /* Read/Write Handlers */
 WRITE_LINE_MEMBER(docastle_state::docastle_tint)
 {
@@ -180,6 +178,24 @@ WRITE_LINE_MEMBER(docastle_state::docastle_tint)
 	}
 }
 
+WRITE_LINE_MEMBER(docastle_state::stx_on_w)
+{
+	if (state)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_cpu3->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER(docastle_state::stx_off_w)
+{
+	if (!state)
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_cpu3->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
 WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 {
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
@@ -189,13 +205,13 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	}
 	else if (m_adpcm_data != -1)
 	{
-		m_msm->write_data(m_adpcm_data & 0x0f);
+		m_msm->data_w(m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos++];
-		m_msm->write_data(m_adpcm_data >> 4);
+		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 
@@ -227,30 +243,30 @@ void docastle_state::docastle_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x97ff).ram();
 	map(0x9800, 0x99ff).ram().share("spriteram");
-	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(FUNC(docastle_state::docastle_videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(FUNC(docastle_state::docastle_colorram_w)).share("colorram");
-	map(0xe000, 0xe000).w(FUNC(docastle_state::docastle_nmitrigger_w));
+	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xe000, 0xe000).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
 }
 
 void docastle_state::docastle_map2(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
-	map(0xc000, 0xc007).select(0x0080).rw(FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
-	map(0xe000, 0xe000).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xe400, 0xe400).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xe800, 0xe800).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xec00, 0xec00).w("sn4", FUNC(sn76489a_device::command_w));
+	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
+	map(0xc000, 0xc007).select(0x0080).rw(this, FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
+	map(0xe000, 0xe000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xe400, 0xe400).w("sn2", FUNC(sn76489a_device::write));
+	map(0xe800, 0xe800).w("sn3", FUNC(sn76489a_device::write));
+	map(0xec00, 0xec00).w("sn4", FUNC(sn76489a_device::write));
 }
 
 void docastle_state::docastle_map3(address_map &map)
 {
 	map(0x0000, 0x00ff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8008).r(FUNC(docastle_state::docastle_shared1_r));    // ???
+	map(0x8000, 0x8008).r(this, FUNC(docastle_state::docastle_shared1_r));    // ???
 	map(0xc003, 0xc003).noprw(); // EP according to schematics
 	map(0xc432, 0xc435).noprw(); // ???
 }
@@ -269,23 +285,23 @@ void docastle_state::dorunrun_map(address_map &map)
 	map(0x2000, 0x37ff).ram();
 	map(0x3800, 0x39ff).ram().share("spriteram");
 	map(0x4000, 0x9fff).rom();
-	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).ram().w(FUNC(docastle_state::docastle_videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).ram().w(FUNC(docastle_state::docastle_colorram_w)).share("colorram");
-	map(0xb800, 0xb800).w(FUNC(docastle_state::docastle_nmitrigger_w));
+	map(0xb000, 0xb3ff).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xb800, 0xb800).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
 }
 
 void docastle_state::dorunrun_map2(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa000).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0xa400, 0xa400).w("sn2", FUNC(sn76489a_device::command_w));
-	map(0xa800, 0xa800).w("sn3", FUNC(sn76489a_device::command_w));
-	map(0xac00, 0xac00).w("sn4", FUNC(sn76489a_device::command_w));
-	map(0xc000, 0xc007).select(0x0080).rw(FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
-	map(0xe000, 0xe008).rw(FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
+	map(0xa000, 0xa000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xa400, 0xa400).w("sn2", FUNC(sn76489a_device::write));
+	map(0xa800, 0xa800).w("sn3", FUNC(sn76489a_device::write));
+	map(0xac00, 0xac00).w("sn4", FUNC(sn76489a_device::write));
+	map(0xc000, 0xc007).select(0x0080).rw(this, FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
+	map(0xe000, 0xe008).rw(this, FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
 }
 
 
@@ -295,12 +311,12 @@ void docastle_state::idsoccer_map(address_map &map)
 	map(0x4000, 0x57ff).ram();
 	map(0x5800, 0x59ff).ram().share("spriteram");
 	map(0x6000, 0x9fff).rom();
-	map(0xa000, 0xa008).rw(FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(FUNC(docastle_state::docastle_videoram_w)).share("videoram");
-	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(FUNC(docastle_state::docastle_colorram_w)).share("colorram");
-	map(0xc000, 0xc000).rw(FUNC(docastle_state::idsoccer_adpcm_status_r), FUNC(docastle_state::idsoccer_adpcm_w));
-	map(0xe000, 0xe000).w(FUNC(docastle_state::docastle_nmitrigger_w));
+	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xc000, 0xc000).rw(this, FUNC(docastle_state::idsoccer_adpcm_status_r), FUNC(docastle_state::idsoccer_adpcm_w));
+	map(0xe000, 0xe000).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
 }
 
 /* Input Ports */
@@ -580,99 +596,111 @@ void docastle_state::machine_start()
 	save_item(NAME(m_buffer1));
 }
 
-void docastle_state::docastle(machine_config &config)
-{
+MACHINE_CONFIG_START(docastle_state::docastle)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &docastle_state::docastle_map);
-	m_maincpu->set_addrmap(AS_IO, &docastle_state::docastle_io_map);
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(docastle_map)
+	MCFG_DEVICE_IO_MAP(docastle_io_map)
 
-	Z80(config, m_slave, XTAL(4'000'000));
-	m_slave->set_addrmap(AS_PROGRAM, &docastle_state::docastle_map2);
+	MCFG_DEVICE_ADD("slave", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(docastle_map2)
 
-	Z80(config, m_cpu3, XTAL(4'000'000));
-	m_cpu3->set_addrmap(AS_PROGRAM, &docastle_state::docastle_map3);
+	MCFG_DEVICE_ADD("cpu3", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(docastle_map3)
 
-	TMS1025(config, m_inp[0]);
-	m_inp[0]->read_port1_callback().set_ioport("DSW2");
-	m_inp[0]->read_port2_callback().set_ioport("DSW1");
-	m_inp[0]->read_port3_callback().set_ioport("JOYS");
-	m_inp[0]->read_port5_callback().set_ioport("BUTTONS");
-	m_inp[0]->read_port7_callback().set_ioport("SYSTEM");
+	MCFG_DEVICE_ADD("inp1", TMS1025, 0)
+	MCFG_TMS1025_READ_PORT_CB(PORT1, IOPORT("DSW2"))
+	MCFG_TMS1025_READ_PORT_CB(PORT2, IOPORT("DSW1"))
+	MCFG_TMS1025_READ_PORT_CB(PORT3, IOPORT("JOYS"))
+	MCFG_TMS1025_READ_PORT_CB(PORT5, IOPORT("BUTTONS"))
+	MCFG_TMS1025_READ_PORT_CB(PORT7, IOPORT("SYSTEM"))
 
-	TMS1025(config, m_inp[1]);
-	m_inp[1]->read_port1_callback().set_ioport("DSW2").rshift(4);
-	m_inp[1]->read_port2_callback().set_ioport("DSW1").rshift(4);
-	m_inp[1]->read_port3_callback().set_ioport("JOYS").rshift(4);
-	m_inp[1]->read_port5_callback().set_ioport("BUTTONS").rshift(4);
-	m_inp[1]->read_port7_callback().set_ioport("SYSTEM").rshift(4);
+	MCFG_DEVICE_ADD("inp2", TMS1025, 0)
+	MCFG_TMS1025_READ_PORT_CB(PORT1, IOPORT("DSW2")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT2, IOPORT("DSW1")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT3, IOPORT("JOYS")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT5, IOPORT("BUTTONS")) MCFG_DEVCB_RSHIFT(4)
+	MCFG_TMS1025_READ_PORT_CB(PORT7, IOPORT("SYSTEM")) MCFG_DEVCB_RSHIFT(4)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	H46505(config, m_crtc, XTAL(9'828'000) / 16);
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(9'828'000) / 16)
 	/*
 	The games program the CRTC for a width of 32 characters (256 pixels).
 	However, the DE output from the CRTC is first ANDed with the NAND of
 	MA1 through MA4, and then delayed by 8 pixel clocks; this effectively
 	blanks the first 8 pixels and last 8 pixels of each line.
 	*/
-	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_visarea_adjust(8,-8,0,0);
-	m_crtc->set_char_width(8);
-	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_crtc->out_vsync_callback().append_inputline(m_cpu3, INPUT_LINE_NMI);
-	m_crtc->out_hsync_callback().set(FUNC(docastle_state::docastle_tint));
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_VISAREA_ADJUST(8,-8,0,0)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, docastle_state, docastle_tint))
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, docastle_state, stx_on_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, docastle_state, stx_off_w))
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0); // from CRTC
-	screen.set_screen_update(FUNC(docastle_state::screen_update_docastle));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
+	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_docastle);
-	PALETTE(config, m_palette, FUNC(docastle_state::docastle_palette), 512);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_docastle)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(docastle_state, docastle)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "sn1", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
-	SN76489A(config, "sn2", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
-	SN76489A(config, "sn3", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
-	SN76489A(config, "sn4", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(4'000'000))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-void docastle_state::dorunrun(machine_config &config)
-{
+	MCFG_DEVICE_ADD("sn2", SN76489A, XTAL(4'000'000))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_DEVICE_ADD("sn3", SN76489A, XTAL(4'000'000))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_DEVICE_ADD("sn4", SN76489A, XTAL(4'000'000))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(docastle_state::dorunrun)
 	docastle(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &docastle_state::dorunrun_map);
-	m_slave->set_addrmap(AS_PROGRAM, &docastle_state::dorunrun_map2);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dorunrun_map)
+
+	MCFG_DEVICE_MODIFY("slave")
+	MCFG_DEVICE_PROGRAM_MAP(dorunrun_map2)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
-}
+MACHINE_CONFIG_END
 
-void docastle_state::idsoccer(machine_config &config)
-{
+MACHINE_CONFIG_START(docastle_state::idsoccer)
 	docastle(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &docastle_state::idsoccer_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(idsoccer_map)
 
-	m_inp[0]->read_port4_callback().set_ioport("JOYS_RIGHT");
-	m_inp[1]->read_port4_callback().set_ioport("JOYS_RIGHT").rshift(4);
+	MCFG_DEVICE_MODIFY("inp1")
+	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT"))
+
+	MCFG_DEVICE_MODIFY("inp2")
+	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT")) MCFG_DEVCB_RSHIFT(4)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 
 	/* sound hardware */
-	MSM5205(config, m_msm, XTAL(384'000)); // Crystal verified on American Soccer board.
-	m_msm->vck_legacy_callback().set(FUNC(docastle_state::idsoccer_adpcm_int)); // interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S64_4B); // 6 kHz ???
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.40);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, docastle_state, idsoccer_adpcm_int)) // interrupt function
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)      // 6 kHz    ???
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+MACHINE_CONFIG_END
 
 /* ROMs */
 

@@ -90,7 +90,6 @@ Technology = NMOS
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -107,9 +106,6 @@ public:
 		m_palette(*this, "palette"),
 		m_generic_paletteram_8(*this, "paletteram") { }
 
-	void trvmadns(machine_config &config);
-
-private:
 	tilemap_t *m_bg_tilemap;
 	required_shared_ptr<uint8_t> m_gfxram;
 	required_shared_ptr<uint8_t> m_tileram;
@@ -128,6 +124,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	void trvmadns(machine_config &config);
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -264,12 +261,12 @@ void trvmadns_state::cpu_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).bankr("bank1");
 	map(0x7000, 0x7fff).bankr("bank2");
-	map(0x6000, 0x7fff).w(FUNC(trvmadns_state::trvmadns_gfxram_w)).share("gfxram");
+	map(0x6000, 0x7fff).w(this, FUNC(trvmadns_state::trvmadns_gfxram_w)).share("gfxram");
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa7ff).ram().w(FUNC(trvmadns_state::trvmadns_tileram_w)).share("tileram");
-	map(0xc000, 0xc01f).ram().w(FUNC(trvmadns_state::trvmadns_palette_w)).share("paletteram");
-	map(0xe000, 0xe000).w(FUNC(trvmadns_state::w2));//NOP
-	map(0xe004, 0xe004).w(FUNC(trvmadns_state::w3));//NOP
+	map(0xa000, 0xa7ff).ram().w(this, FUNC(trvmadns_state::trvmadns_tileram_w)).share("tileram");
+	map(0xc000, 0xc01f).ram().w(this, FUNC(trvmadns_state::trvmadns_palette_w)).share("paletteram");
+	map(0xe000, 0xe000).w(this, FUNC(trvmadns_state::w2));//NOP
+	map(0xe004, 0xe004).w(this, FUNC(trvmadns_state::w3));//NOP
 }
 
 void trvmadns_state::io_map(address_map &map)
@@ -277,7 +274,7 @@ void trvmadns_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x02).portr("IN0");
-	map(0x80, 0x80).w(FUNC(trvmadns_state::trvmadns_banking_w));
+	map(0x80, 0x80).w(this, FUNC(trvmadns_state::trvmadns_banking_w));
 }
 
 static INPUT_PORTS_START( trvmadns )
@@ -410,7 +407,8 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", XTAL(10'000'000)/2/4).add_route(ALL_OUTPUTS, "mono", 1.0); //?
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

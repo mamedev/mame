@@ -44,7 +44,6 @@ READ8_MEMBER( m68307_cpu_device::m68307_internal_mbus_r )
 		case m68307BUS_MBDR:
 			logerror("%08x m68307_internal_mbus_r %08x (MBDR - M-Bus Data I/O Register)\n", m_ppc, offset);
 			mbus.m_intpend = true;
-			mbus_interrupt(1);
 			return 0xff;//machine().rand();
 
 		default:
@@ -78,7 +77,6 @@ WRITE8_MEMBER( m68307_cpu_device::m68307_internal_mbus_w )
 			{
 				mbus.m_busy = false;
 				mbus.m_intpend = false;
-				mbus_interrupt(0);
 			}
 			if (data & 0x20) mbus.m_busy = true;
 
@@ -92,7 +90,6 @@ WRITE8_MEMBER( m68307_cpu_device::m68307_internal_mbus_w )
 			logerror("%08x m68307_internal_mbus_w %08x, %02x (MBDR - M-Bus Data I/O Register)\n", m_ppc, offset,data);
 
 			mbus.m_intpend = true;
-			mbus_interrupt(1);
 
 			break;
 

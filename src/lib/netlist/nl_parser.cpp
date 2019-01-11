@@ -29,8 +29,7 @@ bool parser_t::parse(const pstring &nlname)
 {
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
 	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
-	set_whitespace(pstring("") + ' ' + static_cast<char>(9) + static_cast<char>(10) + static_cast<char>(13));
+	set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
 	set_comment("/*", "*/", "//");
 	m_tok_param_left = register_token("(");
 	m_tok_param_right = register_token(")");
@@ -361,7 +360,7 @@ void parser_t::device(const pstring &dev_type)
 	for (pstring tp : paramlist)
 	{
 		require_token(m_tok_comma);
-		if (plib::startsWith(tp, "+"))
+		if (tp.startsWith("+"))
 		{
 			pstring output_name = get_identifier();
 			m_setup.log().debug("Link: {1} {2}\n", tp, output_name);
@@ -402,10 +401,12 @@ nl_double parser_t::eval_param(const token_t tok)
 	static nl_double facs[6] = {1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	int i;
 	int f=0;
+	bool e;
 	nl_double ret;
+	pstring val;
 
 	for (i=1; i<6;i++)
-		if (tok.str() == macs[i])
+		if (tok.str().equals(macs[i]))
 			f = i;
 	if (f>0)
 	{
@@ -415,10 +416,10 @@ nl_double parser_t::eval_param(const token_t tok)
 	}
 	else
 	{
-		bool err;
-		ret = plib::pstonum_ne<nl_double>(tok.str(), err);
-		if (err)
-			error(plib::pfmt("Parameter value <{1}> not double \n")(tok.str()));
+		val = tok.str();
+		ret = val.as_double(&e);
+		if (e)
+			error(plib::pfmt("Parameter value <{1}> not double \n")(val));
 	}
 	return ret * facs[f];
 

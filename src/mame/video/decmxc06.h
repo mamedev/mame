@@ -12,7 +12,7 @@ public:
 	deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_gfx_region(int region) { m_gfxregion = region; }
 	void set_ram_size(int size) { m_ramsize = size; }
 
@@ -36,5 +36,14 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device)
+
+#define MCFG_DECO_MXC06_GFXDECODE(_gfxtag) \
+	downcast<deco_mxc06_device &>(*device).set_gfxdecode_tag(_gfxtag);
+
+#define MCFG_DECO_MXC06_GFX_REGION(_region) \
+	downcast<deco_mxc06_device &>(*device).set_gfx_region(_region);
+
+#define MCFG_DECO_MXC06_RAMSIZE(_size) \
+	downcast<deco_mxc06_device &>(*device).set_ram_size(_size);
 
 #endif // MAME_VIDEO_DECMXC06_H

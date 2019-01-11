@@ -49,14 +49,18 @@ private:
 	DECLARE_WRITE16_MEMBER(gfxram_bank_w);
 
 	// blitter
-	optional_region_ptr<uint8_t> m_rom_ptr;
+	uint8_t *m_rom_ptr;
+	size_t m_rom_size;
 	DECLARE_WRITE16_MEMBER(do_blit_w);
 
 	// tilemaps
 	tilemap_t *m_tmap[4];
+	void get_tile_info_i(int i, tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	TILEMAP_MAPPER_MEMBER(scan_16x16);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	TILE_GET_INFO_MEMBER(get_tile_info_2);
+	TILE_GET_INFO_MEMBER(get_tile_info_3);
 
 	int tmap_offset(int i);
 	int tmap_priority(int i);
@@ -70,5 +74,13 @@ private:
 
 DECLARE_DEVICE_TYPE(ST0020_SPRITES, st0020_device)
 
+#define MCFG_ST0020_SPRITES_PALETTE(_palette_tag) \
+	MCFG_GFX_PALETTE(_palette_tag)
+
+#define MCFG_ST0020_IS_ST0032(_st0032) \
+	downcast<st0020_device &>(*device).set_is_st0032(_st0032);
+
+#define MCFG_ST0020_IS_JCLUB2(_jclub2) \
+	downcast<st0020_device &>(*device).set_is_jclub2(_jclub2);
 
 #endif // MAME_VIDEO_ST0020_H

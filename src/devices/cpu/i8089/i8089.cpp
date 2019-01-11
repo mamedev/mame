@@ -208,11 +208,12 @@ void i8089_device::state_string_export(const device_state_entry &entry, std::str
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void i8089_device::device_add_mconfig(machine_config &config)
-{
-	I8089_CHANNEL(config, m_ch1, 0).sintr().set(FUNC(i8089_device::ch1_sintr_w));
-	I8089_CHANNEL(config, m_ch2, 0).sintr().set(FUNC(i8089_device::ch2_sintr_w));
-}
+MACHINE_CONFIG_START(i8089_device::device_add_mconfig)
+	MCFG_I8089_CHANNEL_ADD("1")
+	MCFG_I8089_CHANNEL_SINTR(WRITELINE(*this, i8089_device, ch1_sintr_w))
+	MCFG_I8089_CHANNEL_ADD("2")
+	MCFG_I8089_CHANNEL_SINTR(WRITELINE(*this, i8089_device, ch2_sintr_w))
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

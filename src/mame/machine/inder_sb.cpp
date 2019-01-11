@@ -67,7 +67,7 @@ static const z80_daisy_config daisy_chain[] =
 void inder_sb_device::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x0020, 0x0020).select(0x0006).r(FUNC(inder_sb_device::vec_bankswitch_r));
+	map(0x0020, 0x0020).select(0x0006).r(this, FUNC(inder_sb_device::vec_bankswitch_r));
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0xffff).bankr("snddata");
 }
@@ -125,40 +125,40 @@ WRITE8_MEMBER(inder_sb_device::dac3_rombank_write)
 void inder_sb_device::sound_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("dac0", FUNC(dac_byte_interface::data_w));
-	map(0x01, 0x01).w("dac0vol", FUNC(dac_byte_interface::data_w));
-	map(0x02, 0x02).w("dac1", FUNC(dac_byte_interface::data_w));
-	map(0x03, 0x03).w("dac1vol", FUNC(dac_byte_interface::data_w));
-	map(0x04, 0x04).w("dac2", FUNC(dac_byte_interface::data_w));
-	map(0x05, 0x05).w("dac2vol", FUNC(dac_byte_interface::data_w));
-	map(0x06, 0x06).w("dac3", FUNC(dac_byte_interface::data_w));
-	map(0x07, 0x07).w("dac3vol", FUNC(dac_byte_interface::data_w));
+	map(0x00, 0x00).w("dac0", FUNC(dac_byte_interface::write));
+	map(0x01, 0x01).w("dac0vol", FUNC(dac_byte_interface::write));
+	map(0x02, 0x02).w("dac1", FUNC(dac_byte_interface::write));
+	map(0x03, 0x03).w("dac1vol", FUNC(dac_byte_interface::write));
+	map(0x04, 0x04).w("dac2", FUNC(dac_byte_interface::write));
+	map(0x05, 0x05).w("dac2vol", FUNC(dac_byte_interface::write));
+	map(0x06, 0x06).w("dac3", FUNC(dac_byte_interface::write));
+	map(0x07, 0x07).w("dac3vol", FUNC(dac_byte_interface::write));
 
 	// not 100% sure how rom banking works.. but each channel can specify a different bank for the 0x8000 range.  Maybe the bank happens when the interrupt triggers so each channel reads the correct data? (so we'd need to put the actual functions in the CTC callbacks)
-	map(0x10, 0x10).w(FUNC(inder_sb_device::dac0_rombank_write));
-	map(0x11, 0x11).w(FUNC(inder_sb_device::dac1_rombank_write));
-	map(0x12, 0x12).w(FUNC(inder_sb_device::dac2_rombank_write));
-	map(0x13, 0x13).w(FUNC(inder_sb_device::dac3_rombank_write));
+	map(0x10, 0x10).w(this, FUNC(inder_sb_device::dac0_rombank_write));
+	map(0x11, 0x11).w(this, FUNC(inder_sb_device::dac1_rombank_write));
+	map(0x12, 0x12).w(this, FUNC(inder_sb_device::dac2_rombank_write));
+	map(0x13, 0x13).w(this, FUNC(inder_sb_device::dac3_rombank_write));
 
 
 
 
 	map(0x20, 0x23).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
-	map(0x30, 0x30).rw(FUNC(inder_sb_device::megaphx_sound_cmd_r), FUNC(inder_sb_device::megaphx_sound_to_68k_w));
-	map(0x31, 0x31).r(FUNC(inder_sb_device::megaphx_sound_sent_r));
+	map(0x30, 0x30).rw(this, FUNC(inder_sb_device::megaphx_sound_cmd_r), FUNC(inder_sb_device::megaphx_sound_to_68k_w));
+	map(0x31, 0x31).r(this, FUNC(inder_sb_device::megaphx_sound_sent_r));
 }
 
 
 MACHINE_CONFIG_START(inder_sb_device::device_add_mconfig)
-	Z80(config, m_audiocpu, 8000000); // unk freq
-	m_audiocpu->set_daisy_config(daisy_chain);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_sb_device::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &inder_sb_device::sound_io);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // unk freq
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io)
 
-	Z80CTC(config, m_ctc, 4000000); // unk freq
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000) // unk freq
 	// runs in IM2 , vector set to 0x20 , values there are 0xCC, 0x02, 0xE6, 0x02, 0x09, 0x03, 0x23, 0x03  (so 02cc, 02e6, 0309, 0323, all of which are valid irq handlers)
-	m_ctc->intr_callback().set_inputline(m_audiocpu, 0);
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", 0))
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("dac0", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC

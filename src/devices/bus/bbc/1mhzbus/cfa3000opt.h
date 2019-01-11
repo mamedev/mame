@@ -28,14 +28,15 @@ public:
 	// construction/destruction
 	cfa3000_opt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_READ8_MEMBER(option_r);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
-
-	virtual DECLARE_READ8_MEMBER(fred_r) override;
 
 private:
 	required_ioport m_opt;

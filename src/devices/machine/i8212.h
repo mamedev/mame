@@ -26,6 +26,33 @@
 
 #pragma once
 
+
+
+
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
+
+#define MCFG_I8212_INT_CALLBACK(_write) \
+	devcb = &downcast<i8212_device &>(*device).set_int_wr_callback(DEVCB_##_write);
+
+#define MCFG_I8212_DI_CALLBACK(_read) \
+	devcb = &downcast<i8212_device &>(*device).set_di_rd_callback(DEVCB_##_read);
+
+#define MCFG_I8212_DO_CALLBACK(_write) \
+	devcb = &downcast<i8212_device &>(*device).set_do_wr_callback(DEVCB_##_write);
+
+#define MCFG_I8212_MD_CALLBACK(_read) \
+	devcb = &downcast<i8212_device &>(*device).set_md_rd_callback(DEVCB_##_read);
+
+
+
+///*************************************************************************
+//  TYPE DEFINITIONS
+///*************************************************************************
+
+// ======================> i8212_device
+
 class i8212_device : public device_t
 {
 	enum class mode : u8
@@ -36,16 +63,12 @@ class i8212_device : public device_t
 
 public:
 	// construction/destruction
-	i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	i8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_di_rd_callback(Object &&cb) { return m_read_di.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_do_wr_callback(Object &&cb) { return m_write_do.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_md_rd_callback(Object &&cb) { return m_read_md.set_callback(std::forward<Object>(cb)); }
-	auto int_wr_callback() { return m_write_int.bind(); }
-	auto di_rd_callback() { return m_read_di.bind(); }
-	auto do_wr_callback() { return m_write_do.bind(); }
-	auto md_rd_callback() { return m_read_md.bind(); }
 
 	// data read handlers
 	DECLARE_READ8_MEMBER(read);
@@ -56,6 +79,7 @@ public:
 	DECLARE_WRITE8_MEMBER(strobe);
 
 	// line write handlers
+	DECLARE_WRITE_LINE_MEMBER(md_w);
 	DECLARE_WRITE_LINE_MEMBER(stb_w);
 
 protected:

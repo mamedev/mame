@@ -46,13 +46,11 @@ INPUT_PORTS_END
 class sc55_state : public driver_device
 {
 public:
-	sc55_state(const machine_config &mconfig, device_type type, const char *tag);
-
-	void sc55(machine_config &config);
-
-private:
 	required_device<i8x9x_device> m_maincpu;
 
+	sc55_state(const machine_config &mconfig, device_type type, const char *tag);
+	void sc55(machine_config &config);
+	void sc55_io(address_map &map);
 	void sc55_map(address_map &map);
 };
 
@@ -67,11 +65,15 @@ void sc55_state::sc55_map(address_map &map)
 	map(0x1000, 0x3fff).rom().region("maincpu", 0x1000);
 }
 
-void sc55_state::sc55(machine_config &config)
+void sc55_state::sc55_io(address_map &map)
 {
-	P8098(config, m_maincpu, XTAL(20'000'000));    // probably not?
-	m_maincpu->set_addrmap(AS_PROGRAM, &sc55_state::sc55_map);
 }
+
+MACHINE_CONFIG_START(sc55_state::sc55)
+	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(20'000'000) )    // probably not?
+	MCFG_DEVICE_PROGRAM_MAP( sc55_map )
+	MCFG_DEVICE_IO_MAP( sc55_io )
+MACHINE_CONFIG_END
 
 ROM_START( sc55 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // additional H8/532 code and patch data - revisions match main CPU revisions

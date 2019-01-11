@@ -51,17 +51,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pcpage_w);
 	DECLARE_WRITE_LINE_MEMBER(ekrpg_w);
 
-	void debugger_read(address_space& space, uint16_t addr, uint8_t& value);
-
-	required_device_array<tmc0430_device, 8> m_groms;
-
+	void                debugger_read(address_space& space, uint16_t addr, uint8_t& value);
+	tmc0430_device*     m_grom[8];
+	uint8_t*              m_rom;
 	required_device<ls259_device> m_crulatch;
-
-	uint8_t* m_rom;
-	int      m_bank_select;
-	bool     m_active;
-	int      m_clock_count;
-	bool     m_clockhigh;
+	int                 m_bank_select;
+	bool                m_active;
+	int                 m_clock_count;
+	bool                m_clockhigh;
 
 	// Address in card area
 	bool    m_inDsrArea;

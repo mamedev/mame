@@ -10,7 +10,6 @@
 #ifndef MAME_FRONTEND_MEDIA_IDENT_H
 #define MAME_FRONTEND_MEDIA_IDENT_H
 
-#include "romload.h"
 #include <vector>
 
 

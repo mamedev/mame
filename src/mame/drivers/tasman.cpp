@@ -29,7 +29,6 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "machine/eepromser.h"
-#include "emupal.h"
 #include "speaker.h"
 
 
@@ -38,8 +37,8 @@
 class kongambl_state : public driver_device
 {
 public:
-	kongambl_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_k053252(*this, "k053252"),
 		m_k055673(*this, "k055673"),
@@ -51,13 +50,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram")
-	{ }
+		{ }
 
-	void kongambl(machine_config &config);
-
-	void init_kingtut();
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
 	required_device<k055673_device> m_k055673;
@@ -75,7 +69,7 @@ private:
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
 	DECLARE_READ32_MEMBER(test_r);
 	// DECLARE_READ32_MEMBER(rng_r);
-
+	void init_kingtut();
 	DECLARE_VIDEO_START(kongambl);
 	uint8_t m_irq_mask;
 
@@ -86,7 +80,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
-
+	void kongambl(machine_config &config);
 	void kongamaud_map(address_map &map);
 	void kongambl_map(address_map &map);
 };
@@ -250,21 +244,21 @@ void kongambl_state::kongambl_map(address_map &map)
 
 	map(0x4cc000, 0x4cc00f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 
-	map(0x4d0000, 0x4d0000).w(FUNC(kongambl_state::kongambl_ff_w));
+	map(0x4d0000, 0x4d0000).w(this, FUNC(kongambl_state::kongambl_ff_w));
 
 	map(0x500000, 0x5007ff).ram();
-	map(0x500380, 0x500383).r(FUNC(kongambl_state::test_r));
+	map(0x500380, 0x500383).r(this, FUNC(kongambl_state::test_r));
 //  AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
 //  AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
 //  AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
-	map(0x580000, 0x580007).r(FUNC(kongambl_state::test_r));
+	map(0x580000, 0x580007).r(this, FUNC(kongambl_state::test_r));
 
-	map(0x600000, 0x60000f).r(FUNC(kongambl_state::test_r));
+	map(0x600000, 0x60000f).r(this, FUNC(kongambl_state::test_r));
 
-	map(0x700000, 0x700003).r(FUNC(kongambl_state::eeprom_r));
+	map(0x700000, 0x700003).r(this, FUNC(kongambl_state::eeprom_r));
 	map(0x700004, 0x700007).portr("IN1");
 	map(0x700008, 0x70000b).portr("IN3");
-	map(0x780000, 0x780003).w(FUNC(kongambl_state::eeprom_w));
+	map(0x780000, 0x780003).w(this, FUNC(kongambl_state::eeprom_w));
 	//AM_RANGE(0x780004, 0x780007) AM_WRITENOP
 }
 
@@ -654,38 +648,39 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_DEVICE_PROGRAM_MAP(kongamaud_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(kongambl_state, irq2_line_hold,  480)
 
-	K053252(config, m_k053252, 25000000);
-	m_k053252->set_offsets(0, 16); // TBD
-	m_k053252->int1_ack().set(FUNC(kongambl_state::vblank_irq_ack_w));
-	m_k053252->int2_ack().set(FUNC(kongambl_state::hblank_irq_ack_w));
-	m_k053252->set_screen("screen");
+	MCFG_DEVICE_ADD("k053252", K053252, 25000000)
+	MCFG_K053252_OFFSETS(0, 16) // TBD
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, kongambl_state, vblank_irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, kongambl_state, hblank_irq_ack_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // fake, they'll be changed by CCU anyway, TBD
 	MCFG_SCREEN_UPDATE_DRIVER(kongambl_state, screen_update_kongambl)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
+	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
-	K055555(config, m_k055555, 0);
+	MCFG_K055555_ADD("k055555")
 
-	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback), this);
-	m_k055673->set_config("gfx2", K055673_LAYOUT_LE2, -48+1, -23);
-	m_k055673->set_palette(m_palette);
+	MCFG_DEVICE_ADD("k055673", K055673, 0)
+	MCFG_K055673_CB(kongambl_state, sprite_callback)
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -48+1, -23)
+	MCFG_K055673_PALETTE("palette")
 
 #if CUSTOM_DRAW
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tasman);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)
 #endif
 
-	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(kongambl_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_8TASMAN, 0, 0);
-	m_k056832->set_palette(m_palette);
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(kongambl_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0, "none")
+	MCFG_K056832_PALETTE("palette")
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

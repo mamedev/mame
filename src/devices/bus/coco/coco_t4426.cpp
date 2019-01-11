@@ -148,31 +148,31 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-void coco_t4426_device::device_add_mconfig(machine_config &config)
-{
-	PIA6821(config, m_pia, 0);
-	m_pia->writepa_handler().set(FUNC(coco_t4426_device::pia_A_w));
+MACHINE_CONFIG_START(coco_t4426_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, coco_t4426_device, pia_A_w))
 
-	ACIA6850(config, m_uart, 0);
-	m_uart->txd_handler().set(SERIAL_TAG, FUNC(rs232_port_device::write_txd));
-	m_uart->rts_handler().set(SERIAL_TAG, FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
 
-	rs232_port_device &rs232(RS232_PORT(config, SERIAL_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(UART_TAG, FUNC(acia6850_device::write_rxd));
-	rs232.cts_handler().set(UART_TAG, FUNC(acia6850_device::write_cts));
+	MCFG_ACIA6850_TXD_HANDLER (WRITELINE (SERIAL_TAG, rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER (WRITELINE (SERIAL_TAG, rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD (SERIAL_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE (UART_TAG, acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER (WRITELINE (UART_TAG, acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
-	MC14411(config, m_brg, 1.8432_MHz_XTAL);
-	m_brg->out_f<1>().set(FUNC(coco_t4426_device::write_f1_clock));
-	m_brg->out_f<3>().set(FUNC(coco_t4426_device::write_f3_clock));
-	m_brg->out_f<5>().set(FUNC(coco_t4426_device::write_f5_clock));
-	m_brg->out_f<7>().set(FUNC(coco_t4426_device::write_f7_clock));
-	m_brg->out_f<8>().set(FUNC(coco_t4426_device::write_f8_clock));
-	m_brg->out_f<9>().set(FUNC(coco_t4426_device::write_f9_clock));
-	m_brg->out_f<11>().set(FUNC(coco_t4426_device::write_f11_clock));
-	m_brg->out_f<13>().set(FUNC(coco_t4426_device::write_f13_clock));
-	m_brg->out_f<15>().set(FUNC(coco_t4426_device::write_f15_clock));
-}
+	MCFG_MC14411_ADD (BRG_TAG, XTAL(1'843'200))
+	MCFG_MC14411_F1_CB(WRITELINE (*this, coco_t4426_device, write_f1_clock))
+	MCFG_MC14411_F3_CB(WRITELINE (*this, coco_t4426_device, write_f3_clock))
+	MCFG_MC14411_F5_CB(WRITELINE (*this, coco_t4426_device, write_f5_clock))
+	MCFG_MC14411_F7_CB(WRITELINE (*this, coco_t4426_device, write_f7_clock))
+	MCFG_MC14411_F8_CB(WRITELINE (*this, coco_t4426_device, write_f8_clock))
+	MCFG_MC14411_F9_CB(WRITELINE (*this, coco_t4426_device, write_f9_clock))
+	MCFG_MC14411_F11_CB(WRITELINE (*this, coco_t4426_device, write_f11_clock))
+	MCFG_MC14411_F13_CB(WRITELINE (*this, coco_t4426_device, write_f13_clock))
+	MCFG_MC14411_F15_CB(WRITELINE (*this, coco_t4426_device, write_f15_clock))
+MACHINE_CONFIG_END
 
 ROM_START( coco_t4426 )
 	// Part of this region is filled by set_bank
@@ -226,6 +226,8 @@ INPUT_PORTS_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_T4426, device_cococart_interface, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
 
 //**************************************************************************
 //  LIVE DEVICE

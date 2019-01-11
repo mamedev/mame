@@ -14,18 +14,20 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 
+#define MCFG_DECODMD_TYPE1_ADD(_tag, _region) \
+	MCFG_DEVICE_ADD(_tag, DECODMD1, 0) \
+	downcast<decodmd_type1_device &>(*device).set_gfxregion(_region);
 
 class decodmd_type1_device : public device_t
 {
 public:
-	template <typename T>
-	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gfxregion_tag)
-		: decodmd_type1_device(mconfig, tag, owner, clock)
-	{
-		set_gfxregion(std::forward<T>(gfxregion_tag));
-	}
-
 	decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	required_device<cpu_device> m_cpu;
+	required_memory_bank m_rombank1;
+	required_memory_bank m_rombank2;
+	required_device<ram_device> m_ram;
+	required_device<hc259_device> m_bitlatch;
+	memory_region* m_rom;
 
 	DECLARE_READ8_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(data_w);
@@ -33,6 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ8_MEMBER(ctrl_r);
 	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_READ8_MEMBER(dmd_port_r);
 	DECLARE_WRITE8_MEMBER(dmd_port_w);
 
@@ -42,7 +45,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(rowclock_w);
 	DECLARE_WRITE_LINE_MEMBER(test_w);
 
-	template <typename T> void set_gfxregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
+	void set_gfxregion(const char *tag) { m_gfxtag = tag; }
 
 	void decodmd1_io_map(address_map &map);
 	void decodmd1_map(address_map &map);
@@ -73,13 +76,7 @@ private:
 	uint32_t m_pixels[0x200];
 	uint8_t m_busy_lines;
 	uint32_t m_prevrow;
-
-	required_device<cpu_device> m_cpu;
-	required_memory_bank m_rombank1;
-	required_memory_bank m_rombank2;
-	required_device<ram_device> m_ram;
-	required_device<hc259_device> m_bitlatch;
-	required_region_ptr<uint8_t> m_rom;
+	const char* m_gfxtag;
 
 	void output_data();
 	void set_busy(uint8_t input, uint8_t val);

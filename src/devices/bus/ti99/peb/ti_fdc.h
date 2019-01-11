@@ -116,6 +116,9 @@ private:
 
 	// Currently selected floppy drive
 	int  m_current;
+
+	// Debugging
+	bool m_debug_dataout;
 };
 
 } } } // end namespace bus::ti99::peb

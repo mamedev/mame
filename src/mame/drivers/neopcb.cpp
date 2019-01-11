@@ -34,12 +34,13 @@ protected:
 	// device overrides
 	virtual void machine_start() override;
 
-	virtual void device_post_load() override;
+	virtual void neogeo_postload() override;
 
 	DECLARE_WRITE16_MEMBER(write_bankpvc);
 
 	void install_common();
 	void install_banked_bios();
+	void neopcb_postload();
 
 	// non-carts
 	void svcpcb_gfx_decrypt();
@@ -62,9 +63,9 @@ void neopcb_state::machine_start()
 	m_sprgen->set_screen(m_screen);
 }
 
-void neopcb_state::device_post_load()
+void neopcb_state::neogeo_postload()
 {
-	ngarcade_base_state::device_post_load();
+	ngarcade_base_state::neogeo_postload();
 
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
 }
@@ -552,6 +553,6 @@ void neopcb_state::init_kf2k3pcb()
 
 
 GAME( 2003, ms5pcb,     0,        neopcb,   dualbios, neopcb_state, init_ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, svcpcb,     0,        neopcb,   dualbios, neopcb_state, init_svcpcb,   ROT0, "Playmore / Capcom", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 2003, svcpcba,    svcpcb,   neopcb,   dualbios, neopcb_state, init_svcpcb,   ROT0, "Playmore / Capcom", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code */
+GAME( 2003, svcpcb,     0,        neopcb,   dualbios, neopcb_state, init_svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 2003, svcpcba,    svcpcb,   neopcb,   dualbios, neopcb_state, init_svcpcb,   ROT0, "SNK Playmore", "SNK vs. Capcom - SVC Chaos (JAMMA PCB, set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code */
 GAME( 2003, kf2k3pcb,   0,        neopcb,   neogeo,   neopcb_state, init_kf2k3pcb, ROT0, "SNK Playmore", "The King of Fighters 2003 (Japan, JAMMA PCB)", MACHINE_SUPPORTS_SAVE )

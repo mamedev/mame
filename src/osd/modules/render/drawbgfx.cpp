@@ -55,10 +55,10 @@
 //  CONSTANTS
 //============================================================
 
-uint16_t const renderer_bgfx::CACHE_SIZE = 1024;
-uint32_t const renderer_bgfx::PACKABLE_SIZE = 128;
-uint32_t const renderer_bgfx::WHITE_HASH = 0x87654321;
-char const *const renderer_bgfx::WINDOW_PREFIX = "Window 0, ";
+const uint16_t renderer_bgfx::CACHE_SIZE = 1024;
+const uint32_t renderer_bgfx::PACKABLE_SIZE = 128;
+const uint32_t renderer_bgfx::WHITE_HASH = 0x87654321;
+const char* renderer_bgfx::WINDOW_PREFIX = "Window 0, ";
 
 //============================================================
 //  MACROS
@@ -244,40 +244,35 @@ int renderer_bgfx::create()
 		sdlSetWindow(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window());
 #endif
 		std::string backend(m_options.bgfx_backend());
-		bgfx::Init init;
-		init.type = bgfx::RendererType::Count;
-		init.vendorId = BGFX_PCI_ID_NONE;
-		init.resolution.width = wdim.width();
-		init.resolution.height = wdim.height();
-		init.resolution.reset = BGFX_RESET_NONE;
 		if (backend == "auto")
 		{
+			bgfx::init();
 		}
 		else if (backend == "dx9" || backend == "d3d9")
 		{
-			init.type = bgfx::RendererType::Direct3D9;
+			bgfx::init(bgfx::RendererType::Direct3D9);
 		}
 		else if (backend == "dx11" || backend == "d3d11")
 		{
-			init.type = bgfx::RendererType::Direct3D11;
+			bgfx::init(bgfx::RendererType::Direct3D11);
 		}
 		else if (backend == "gles")
 		{
-			init.type = bgfx::RendererType::OpenGLES;
+			bgfx::init(bgfx::RendererType::OpenGLES);
 		}
 		else if (backend == "glsl" || backend == "opengl")
 		{
-			init.type = bgfx::RendererType::OpenGL;
+			bgfx::init(bgfx::RendererType::OpenGL);
 		}
 		else if (backend == "metal")
 		{
-			init.type = bgfx::RendererType::Metal;
+			bgfx::init(bgfx::RendererType::Metal);
 		}
 		else
 		{
 			printf("Unknown backend type '%s', going with auto-detection\n", backend.c_str());
+			bgfx::init();
 		}
-		bgfx::init(init);
 		bgfx::reset(m_width[win->m_index], m_height[win->m_index], video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
 		// Enable debug text.
 		bgfx::setDebug(m_options.bgfx_debug() ? BGFX_DEBUG_STATS : BGFX_DEBUG_TEXT);
@@ -326,7 +321,7 @@ int renderer_bgfx::create()
 	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->m_index, *this);
 	m_sliders_dirty = true;
 
-	uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
+	uint32_t flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::RGBA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
 
 	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
@@ -495,10 +490,10 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 	vertex(&vertices[4], x[2], y[2], 0, 0xffffffff, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, 0xffffffff, u[0], v[0]);
 
-	uint32_t texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
 	if (video_config.filter == 0)
 	{
-		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
+		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	}
 
 	uint32_t blend = PRIMFLAG_GET_BLENDMODE(prim->flags);
@@ -555,18 +550,19 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	vertex(&vertices[4], x[2], y[2], 0, rgba, u[2], v[2]);
 	vertex(&vertices[5], x[0], y[0], 0, rgba, u[0], v[0]);
 
-	uint32_t texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
+	uint32_t texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
 	if (video_config.filter == 0)
 	{
-		texture_flags |= BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
+		texture_flags |= BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT;
 	}
 
 	uint16_t tex_width(prim->texture.width);
 	uint16_t tex_height(prim->texture.height);
 
-	bgfx::TextureHandle texture = m_textures->create_or_update_mame_texture(prim->flags & PRIMFLAG_TEXFORMAT_MASK
-		, tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base, prim->texture.seqid
-		, texture_flags, prim->texture.unique_id, prim->texture.old_id);
+	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(prim->flags & PRIMFLAG_TEXFORMAT_MASK,
+		tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
+
+	bgfx::TextureHandle texture = bgfx::createTexture2D(tex_width, tex_height, false, 1, bgfx::TextureFormat::RGBA8, texture_flags, mem);
 
 	bgfx_effect** effects = PRIMFLAG_GET_SCREENTEX(prim->flags) ? m_screen_effect : m_gui_effect;
 
@@ -574,6 +570,8 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	bgfx::setVertexBuffer(0,buffer);
 	bgfx::setTexture(0, effects[blend]->uniform("s_tex")->handle(), texture);
 	effects[blend]->submit(m_ortho_view->get_index());
+
+	bgfx::destroy(texture);
 }
 
 #define MAX_TEMP_COORDS 100
@@ -952,9 +950,8 @@ bool renderer_bgfx::update_dimensions()
 #else
 			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window()), width, height);
 #endif
-			if (m_ortho_view)
-				m_ortho_view->set_backbuffer(m_framebuffer);
 
+			m_ortho_view->set_backbuffer(m_framebuffer);
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
 			bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x00000000, 1.0f, 0);
 			bgfx::setViewMode(s_current_view, bgfx::ViewMode::Sequential);
@@ -1066,7 +1063,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 
 void renderer_bgfx::set_bgfx_state(uint32_t blend)
 {
-	uint64_t flags = BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_DEPTH_TEST_ALWAYS;
+	uint64_t flags = BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_DEPTH_TEST_ALWAYS;
 	bgfx::setState(flags | bgfx_util::get_blend_state(blend));
 }
 

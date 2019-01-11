@@ -556,7 +556,7 @@ READ_LINE_MEMBER(k053250ps_device::dmairq_r)
 WRITE16_MEMBER(k053250ps_device::reg_w)
 {
 #if 0
-	static char const *const regnames[] =
+	static const char * regnames[] =
 	{
 		"SCROLL_X_L",
 		"SCROLL_X_H",

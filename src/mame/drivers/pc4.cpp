@@ -30,6 +30,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/rp5c01.h"
 
+#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,17 +72,17 @@ void pc4_state::pc4_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
-	map(0x1000, 0x1000).w(FUNC(pc4_state::beep_w));
-	map(0x1fff, 0x1fff).w(FUNC(pc4_state::bank_w));
+	map(0x1000, 0x1000).w(this, FUNC(pc4_state::beep_w));
+	map(0x1fff, 0x1fff).w(this, FUNC(pc4_state::bank_w));
 
-	map(0x3000, 0x3000).w(FUNC(pc4_state::lcd_control_w));
-	map(0x3001, 0x3001).w(FUNC(pc4_state::lcd_data_w));
-	map(0x3002, 0x3002).r(FUNC(pc4_state::lcd_control_r));
-	map(0x3003, 0x3003).r(FUNC(pc4_state::lcd_data_r));
-	map(0x3005, 0x3005).w(FUNC(pc4_state::lcd_offset_w));
+	map(0x3000, 0x3000).w(this, FUNC(pc4_state::lcd_control_w));
+	map(0x3001, 0x3001).w(this, FUNC(pc4_state::lcd_data_w));
+	map(0x3002, 0x3002).r(this, FUNC(pc4_state::lcd_control_r));
+	map(0x3003, 0x3003).r(this, FUNC(pc4_state::lcd_data_r));
+	map(0x3005, 0x3005).w(this, FUNC(pc4_state::lcd_offset_w));
 
 	//keyboard read, offset used as matrix
-	map(0x5000, 0x50ff).r(FUNC(pc4_state::kb_r));
+	map(0x5000, 0x50ff).r(this, FUNC(pc4_state::kb_r));
 }
 
 static INPUT_PORTS_START( pc4 )
@@ -166,7 +167,7 @@ static INPUT_PORTS_START( pc4 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-void pc4_state::pc4_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(pc4_state, pc4)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -231,14 +232,17 @@ MACHINE_CONFIG_START(pc4_state::pc4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 36-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(pc4_state::pc4_palette), 2);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_pc4);
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(pc4_state, pc4)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	RP5C01(config, "rtc", XTAL(32'768));
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 MACHINE_CONFIG_END
 
 ROM_START( pc4 )

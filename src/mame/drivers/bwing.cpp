@@ -125,17 +125,17 @@ void bwing_state::bwp1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("sharedram");
 	map(0x0800, 0x0fff).ram();
-	map(0x1000, 0x13ff).ram().w(FUNC(bwing_state::videoram_w)).share("videoram");
+	map(0x1000, 0x13ff).ram().w(this, FUNC(bwing_state::videoram_w)).share("videoram");
 	map(0x1400, 0x17ff).ram();
 	map(0x1800, 0x19ff).ram().share("spriteram");
-	map(0x1a00, 0x1aff).ram().w(FUNC(bwing_state::paletteram_w)).share("paletteram");
+	map(0x1a00, 0x1aff).ram().w(this, FUNC(bwing_state::paletteram_w)).share("paletteram");
 	map(0x1b00, 0x1b00).portr("DSW0");
 	map(0x1b01, 0x1b01).portr("DSW1");
 	map(0x1b02, 0x1b02).portr("IN0");
 	map(0x1b03, 0x1b03).portr("IN1");
 	map(0x1b04, 0x1b04).portr("IN2");
-	map(0x1b00, 0x1b07).w(FUNC(bwing_state::scrollreg_w));
-	map(0x1c00, 0x1c07).ram().w(FUNC(bwing_state::bwp1_ctrl_w));
+	map(0x1b00, 0x1b07).w(this, FUNC(bwing_state::scrollreg_w));
+	map(0x1c00, 0x1c07).ram().w(this, FUNC(bwing_state::bwp1_ctrl_w));
 	map(0x2000, 0x3fff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xffff).rom(); // "B-Wings US" writes to 9631-9632(debug?)
 }
@@ -143,9 +143,9 @@ void bwing_state::bwp1_map(address_map &map)
 // Banked video RAM
 void bwing_state::bank_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(FUNC(bwing_state::fgscrollram_w)).share("fgscrollram");
-	map(0x1000, 0x1fff).ram().w(FUNC(bwing_state::bgscrollram_w)).share("bgscrollram");
-	map(0x2000, 0x7fff).ram().w(FUNC(bwing_state::gfxram_w)).share("gfxram");
+	map(0x0000, 0x0fff).ram().w(this, FUNC(bwing_state::fgscrollram_w)).share("fgscrollram");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(bwing_state::bgscrollram_w)).share("bgscrollram");
+	map(0x2000, 0x7fff).ram().w(this, FUNC(bwing_state::gfxram_w)).share("gfxram");
 }
 
 // Sub CPU
@@ -153,7 +153,7 @@ void bwing_state::bwp2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("sharedram");
 	map(0x0800, 0x0fff).ram();
-	map(0x1800, 0x1803).w(FUNC(bwing_state::bwp2_ctrl_w));
+	map(0x1800, 0x1803).w(this, FUNC(bwing_state::bwp2_ctrl_w));
 	map(0xa000, 0xffff).rom();
 }
 
@@ -162,21 +162,21 @@ void bwing_state::bwp2_map(address_map &map)
 void bwing_state::bwp3_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x0200).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x1000, 0x1000).w(FUNC(bwing_state::bwp3_nmiack_w));
+	map(0x0200, 0x0200).w("dac", FUNC(dac_byte_interface::write));
+	map(0x1000, 0x1000).w(this, FUNC(bwing_state::bwp3_nmiack_w));
 	map(0x2000, 0x2000).w("ay1", FUNC(ay8912_device::data_w));
 	map(0x4000, 0x4000).w("ay1", FUNC(ay8912_device::address_w));
 	map(0x6000, 0x6000).w("ay2", FUNC(ay8912_device::data_w));
 	map(0x8000, 0x8000).w("ay2", FUNC(ay8912_device::address_w));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xd000, 0xd000).w(FUNC(bwing_state::bwp3_nmimask_w));
+	map(0xd000, 0xd000).w(this, FUNC(bwing_state::bwp3_nmimask_w));
 	map(0xe000, 0xffff).rom().region("audiocpu", 0);
 }
 
 
 void bwing_state::bwp3_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("VBLANK").w(FUNC(bwing_state::bwp3_u8F_w));
+	map(0x00, 0x00).portr("VBLANK").w(this, FUNC(bwing_state::bwp3_u8F_w));
 }
 
 //****************************************************************************
@@ -379,7 +379,12 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(18000))     // high enough?
 
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&bwing_state::bank_map).set_options(ENDIANNESS_BIG, 8, 15, 0x2000);
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -398,11 +403,13 @@ MACHINE_CONFIG_START(bwing_state::bwing)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8912(config, "ay1", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(24'000'000) / 2 / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	AY8912(config, "ay2", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(24'000'000) / 2 / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_DEVICE_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

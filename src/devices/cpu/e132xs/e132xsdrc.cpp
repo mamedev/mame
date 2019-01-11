@@ -865,11 +865,8 @@ void hyperstone_device::log_add_disasm_comment(drcuml_block &block, uint32_t pc,
     generate_branch
 ------------------------------------------------------------------*/
 
-void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter targetpc, const opcode_desc *desc, bool update_cycles)
+void hyperstone_device::generate_branch(drcuml_block &block, uml::parameter targetpc, bool update_cycles)
 {
-	if (desc)
-		UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT), 0, ILC_MASK);
-
 	if (update_cycles)
 		generate_update_cycles(block);
 
@@ -913,6 +910,8 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		UML_DEBUG(block, desc->pc);
 	}
 
+	UML_ROLINS(block, DRC_SR, (1<<19), 0, ILC_MASK);
+
 	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
 	{
 		/* compile the instruction */
@@ -931,6 +930,7 @@ bool hyperstone_device::generate_opcode(drcuml_block &block, compiler_state &com
 {
 	uint32_t op = (uint32_t)desc->opptr.w[0];
 
+	//UML_MOV(block, I0, op);
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 
 	switch (op >> 8)
@@ -1193,8 +1193,6 @@ bool hyperstone_device::generate_opcode(drcuml_block &block, compiler_state &com
 		case 0xff: generate_trap_op(block, compiler, desc); break;
 	}
 
-	UML_ROLINS(block, DRC_SR, ((desc->length >> 1) << ILC_SHIFT), 0, ILC_MASK);
-
 	int no_delay_taken = compiler.m_labelnum++;
 	UML_TEST(block, mem(&m_core->delay_slot_taken), ~0);
 	UML_JMPc(block, uml::COND_Z, no_delay_taken);
@@ -1211,5 +1209,6 @@ bool hyperstone_device::generate_opcode(drcuml_block &block, compiler_state &com
 	UML_EXHc(block, uml::COND_E, *m_exception[EXCEPTION_TRACE], 0);
 
 	UML_LABEL(block, done);
+
 	return true;
 }

@@ -14,9 +14,9 @@ public:
 	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	//  configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_gfxnum(int gfxnum) { m_gfxnum = gfxnum; }
-	template <typename... T> void set_tile_callback(T &&... args) { m_callback = k007342_delegate(std::forward<T>(args)...); }
+	void set_callback(k007342_delegate callback) { m_callback = callback; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -57,6 +57,20 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K007342, k007342_device)
+
+#define MCFG_K007342_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K007342, 0)
+#define MCFG_K007342_GFXDECODE(_gfxtag) \
+	downcast<k007342_device &>(*device).set_gfxdecode_tag(_gfxtag);
+
+#define MCFG_K007342_GFXNUM(_gfxnum) \
+	downcast<k007342_device &>(*device).set_gfxnum(_gfxnum);
+
+#define MCFG_K007342_CALLBACK_OWNER(_class, _method) \
+	downcast<k007342_device &>(*device).set_callback(k007342_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_K007342_CALLBACK_DEVICE(_tag, _class, _method) \
+	downcast<k007342_device &>(*device).set_callback(k007342_delegate(&_class::_method, #_class "::" #_method, _tag));
 
 // function definition for a callback
 #define K007342_CALLBACK_MEMBER(_name)     void _name(int layer, int bank, int *code, int *color, int *flags)

@@ -4,7 +4,7 @@
 
     hp9845_io.h
 
-    I/O bus of HP9825/HP9845 systems
+    I/O bus of HP9845 systems
 
 *********************************************************************/
 
@@ -12,6 +12,20 @@
 #define MAME_BUS_HP9845_IO_HP9845_IO_H
 
 #pragma once
+
+
+#define MCFG_HP9845_IO_SLOT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, HP9845_IO_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(hp9845_io_slot_devices, nullptr, false)
+
+#define MCFG_HP9845_IO_IRQ_CB(_devcb) \
+	devcb = &downcast<hp9845_io_slot_device &>(*device).set_irq_cb_func(DEVCB_##_devcb);
+
+#define MCFG_HP9845_IO_STS_CB(_devcb) \
+	devcb = &downcast<hp9845_io_slot_device &>(*device).set_sts_cb_func(DEVCB_##_devcb);
+
+#define MCFG_HP9845_IO_FLG_CB(_devcb) \
+	devcb = &downcast<hp9845_io_slot_device &>(*device).set_flg_cb_func(DEVCB_##_devcb);
 
 #define HP9845_IO_FIRST_SC  1   // Lowest SC used by I/O cards
 
@@ -43,26 +57,23 @@ public:
 	virtual void device_start() override;
 
 	// Callback setups
-	auto irq() { return m_irq_cb_func.bind(); }
-	auto sts() { return m_sts_cb_func.bind(); }
-	auto flg() { return m_flg_cb_func.bind(); }
-	auto dmar() { return m_dmar_cb_func.bind(); }
+	template <class Object> devcb_base &set_irq_cb_func(Object &&cb) { return m_irq_cb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sts_cb_func(Object &&cb) { return m_sts_cb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_flg_cb_func(Object &&cb) { return m_flg_cb_func.set_callback(std::forward<Object>(cb)); }
 
-	// irq/sts/flg/dmar signal handlers for card devices
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sts_w);
-	DECLARE_WRITE_LINE_MEMBER(flg_w);
-	DECLARE_WRITE_LINE_MEMBER(dmar_w);
+	// irq/sts/flg signal handlers
+	void irq_w(uint8_t sc , int state);
+	void sts_w(uint8_t sc , int state);
+	void flg_w(uint8_t sc , int state);
 
 	// getter for r/w handlers
 	// return value is SC (negative if no card is attached to slot)
 	int get_rw_handlers(read16_delegate& rhandler , write16_delegate& whandler);
 
 private:
-	devcb_write_line m_irq_cb_func;
-	devcb_write_line m_sts_cb_func;
-	devcb_write_line m_flg_cb_func;
-	devcb_write_line m_dmar_cb_func;
+	devcb_write8 m_irq_cb_func;
+	devcb_write8 m_sts_cb_func;
+	devcb_write8 m_flg_cb_func;
 };
 
 class hp9845_io_card_device : public device_t,
@@ -82,17 +93,22 @@ protected:
 	hp9845_io_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~hp9845_io_card_device();
 
+	// device-level overrides
+	virtual void device_reset() override;
+
 	hp9845_io_slot_device *m_slot_dev;
 	required_ioport m_select_code_port;
+	uint8_t m_my_sc;
 
 	// card device handling
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(sts_w);
-	DECLARE_WRITE_LINE_MEMBER(flg_w);
-	DECLARE_WRITE_LINE_MEMBER(dmar_w);
+	void irq_w(int state);
+	void sts_w(int state);
+	void flg_w(int state);
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(HP9845_IO_SLOT, hp9845_io_slot_device)
+
+void hp9845_io_slot_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_HP9845_IO_HP9845_IO_H

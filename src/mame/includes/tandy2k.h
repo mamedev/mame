@@ -8,11 +8,9 @@
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "formats/tandy2k_dsk.h"
-#include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
-#include "machine/pckeybrd.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
@@ -23,7 +21,6 @@
 #include "video/crt9007.h"
 #include "video/crt9021.h"
 #include "video/crt9212.h"
-#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define I80186_TAG      "u76"
@@ -69,7 +66,6 @@ public:
 		m_kb(*this, TANDY2K_KEYBOARD_TAG),
 		m_hires_ram(*this, "hires_ram"),
 		m_char_ram(*this, "char_ram"),
-		m_pc_keyboard(*this, "pc_keyboard"),
 		m_dma_mux(0),
 		m_kbdclk(0),
 		m_kbddat(0),
@@ -106,10 +102,6 @@ public:
 		}
 	}
 
-	void tandy2k_hd(machine_config &config);
-	void tandy2k(machine_config &config);
-
-private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8255_device> m_i8255a;
@@ -132,7 +124,6 @@ private:
 	required_device<tandy2k_keyboard_device> m_kb;
 	required_shared_ptr<uint16_t> m_hires_ram;
 	optional_shared_ptr<uint8_t> m_char_ram;
-	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
 
 	virtual void machine_start() override;
 	virtual void device_reset_after_children() override;
@@ -233,7 +224,8 @@ private:
 	int m_centronics_select;
 	int m_centronics_perror;
 	int m_centronics_busy;
-
+	void tandy2k_hd(machine_config &config);
+	void tandy2k(machine_config &config);
 	void tandy2k_hd_io(address_map &map);
 	void tandy2k_io(address_map &map);
 	void tandy2k_mem(address_map &map);

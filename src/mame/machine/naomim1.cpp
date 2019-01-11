@@ -9,7 +9,7 @@ DEFINE_DEVICE_TYPE(NAOMI_M1_BOARD, naomi_m1_board, "naomi_m1_board", "Sega NAOMI
 void naomi_m1_board::submap(address_map &map)
 {
 	naomi_board::submap(map);
-	map(0x0a, 0x0b).r(FUNC(naomi_m1_board::actel_id_r));
+	map(0x0a, 0x0b).r(this, FUNC(naomi_m1_board::actel_id_r));
 }
 
 naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -45,11 +45,9 @@ void naomi_m1_board::device_start()
 		actel_id = 0;
 	}
 
-	key = swapendian_int32(key);
-
 	buffer = std::make_unique<uint8_t[]>(BUFFER_SIZE);
 
-	save_pointer(NAME(buffer), BUFFER_SIZE);
+	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
 	save_item(NAME(dict));
 	save_item(NAME(hist));
 	save_item(NAME(rom_cur_address));

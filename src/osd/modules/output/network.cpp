@@ -63,7 +63,7 @@ private:
 	char *msg_value = strtok(NULL, equals_delimiter);
 
 	//printf("handle_message: msg_name [%s] msg_value [%s]\n", msg_name, msg_value);
-
+	
 	if (std::strcmp(msg_name, "mame_message") == 0)
 	{
 		const char *comma_delimiter = ",";
@@ -71,7 +71,7 @@ private:
 		msg_value = strtok(NULL, comma_delimiter);
 		int id = atoi(msg_name);
 		int value = atoi(msg_value);
-
+		
 		switch(id)
 		{
 		case IM_MAME_PAUSE:

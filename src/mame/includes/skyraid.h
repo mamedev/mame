@@ -6,7 +6,6 @@
 #pragma once
 
 #include "sound/discrete.h"
-#include "emupal.h"
 
 class skyraid_state : public driver_device
 {
@@ -25,14 +24,14 @@ public:
 
 	void skyraid(machine_config &config);
 
-private:
+protected:
 	DECLARE_READ8_MEMBER(skyraid_port_0_r);
 	DECLARE_WRITE8_MEMBER(skyraid_range_w);
 	DECLARE_WRITE8_MEMBER(skyraid_offset_w);
 	DECLARE_WRITE8_MEMBER(skyraid_scroll_w);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	void skyraid_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(skyraid);
 	uint32_t screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(skyraid_sound_w);
 	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -43,6 +42,7 @@ private:
 
 	void skyraid_map(address_map &map);
 
+private:
 	int m_analog_range;
 	int m_analog_offset;
 

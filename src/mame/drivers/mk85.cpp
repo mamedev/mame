@@ -21,7 +21,6 @@ Models:
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -34,17 +33,12 @@ public:
 	{
 	}
 
-	void mk85(machine_config &config);
-
-private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-	void mk85_mem(address_map &map);
-
 	uint32_t screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	required_device<k1801vm2_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
+	void mk85(machine_config &config);
+	void mk85_mem(address_map &map);
 };
 
 
@@ -73,24 +67,24 @@ uint32_t mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-void mk85_state::mk85(machine_config &config)
-{
+MACHINE_CONFIG_START(mk85_state::mk85)
 	/* basic machine hardware */
-	K1801VM2(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_initial_mode(0);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mk85_state::mk85_mem);
+	MCFG_DEVICE_ADD("maincpu", K1801VM2, XTAL(4'000'000))
+	MCFG_T11_INITIAL_MODE(0)
+	MCFG_DEVICE_PROGRAM_MAP(mk85_mem)
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(mk85_state::screen_update_mk85));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DRIVER(mk85_state, screen_update_mk85)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-}
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mk85 )

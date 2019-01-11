@@ -40,9 +40,8 @@
 *********************************************************************/
 
 #include "emu.h" // fatalerror
-#include "cbm_crt.h"
-
 #include "corefile.h"
+#include "cbm_crt.h"
 
 
 //**************************************************************************
@@ -53,7 +52,7 @@
 
 
 // slot names for the C64 cartridge types
-static char const *const CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
+static const char * CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 {
 	"standard",         //  0 - Normal cartridge
 	UNSUPPORTED,        //  1 - Action Replay

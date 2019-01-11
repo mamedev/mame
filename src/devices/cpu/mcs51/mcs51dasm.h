@@ -63,14 +63,11 @@ public:
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
-protected:
-	virtual offs_t disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op);
-
-	std::string get_data_address( uint8_t arg ) const;
-	std::string get_bit_address( uint8_t arg ) const;
 private:
 	std::unordered_map<offs_t, const char *> m_names;
 
+	std::string get_data_address( uint8_t arg ) const;
+	std::string get_bit_address( uint8_t arg ) const;
 };
 
 class i8051_disassembler : public mcs51_disassembler

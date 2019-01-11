@@ -211,13 +211,13 @@ void megasys1_state::megasys1Z_map(address_map &map)
 	map(0x080006, 0x080007).portr("DSW");
 	map(0x084200, 0x084205).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x084208, 0x08420d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x084300, 0x084301).w(FUNC(megasys1_state::screen_flag_w));
-	map(0x084308, 0x084309).w(FUNC(megasys1_state::soundlatch_z_w));
+	map(0x084300, 0x084301).w(this, FUNC(megasys1_state::screen_flag_w));
+	map(0x084308, 0x084309).w(this, FUNC(megasys1_state::soundlatch_z_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08e000, 0x08ffff).ram().share("objectram");
 	map(0x090000, 0x093fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x094000, 0x097fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
+	map(0x0f0000, 0x0fffff).ram().w(this, FUNC(megasys1_state::ram_w)).share("ram");
 }
 
 void megasys1_state::megasys1A_map(address_map &map)
@@ -225,10 +225,10 @@ void megasys1_state::megasys1A_map(address_map &map)
 	map.global_mask(0xfffff);
 	megasys1Z_map(map);
 	map(0x080008, 0x080009).r(m_soundlatch2, FUNC(generic_latch_16_device::read));    /* from sound cpu */
-	map(0x084000, 0x084001).w(FUNC(megasys1_state::active_layers_w));
+	map(0x084000, 0x084001).w(this, FUNC(megasys1_state::active_layers_w));
 	map(0x084008, 0x08400d).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x084100, 0x084101).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x084308, 0x084309).w(FUNC(megasys1_state::soundlatch_w));
+	map(0x084100, 0x084101).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
+	map(0x084308, 0x084309).w(this, FUNC(megasys1_state::soundlatch_w));
 	map(0x098000, 0x09bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 }
 
@@ -305,21 +305,21 @@ void megasys1_state::megasys1B_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x03ffff).rom();
-	map(0x044000, 0x044001).w(FUNC(megasys1_state::active_layers_w));
+	map(0x044000, 0x044001).w(this, FUNC(megasys1_state::active_layers_w));
 	map(0x044008, 0x04400d).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x044100, 0x044101).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
+	map(0x044100, 0x044101).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
 	map(0x044200, 0x044205).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x044208, 0x04420d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x044300, 0x044301).w(FUNC(megasys1_state::screen_flag_w));
-	map(0x044308, 0x044309).w(FUNC(megasys1_state::soundlatch_w));
+	map(0x044300, 0x044301).w(this, FUNC(megasys1_state::screen_flag_w));
+	map(0x044308, 0x044309).w(this, FUNC(megasys1_state::soundlatch_w));
 	map(0x048000, 0x0487ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x04e000, 0x04ffff).ram().share("objectram");
 	map(0x050000, 0x053fff).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x054000, 0x057fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x058000, 0x05bfff).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
-	map(0x060000, 0x07ffff).ram().w(FUNC(megasys1_state::ram_w)).share("ram");
+	map(0x060000, 0x07ffff).ram().w(this, FUNC(megasys1_state::ram_w)).share("ram");
 	map(0x080000, 0x0bffff).rom();
-	map(0x0e0000, 0x0e0001).rw(FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
+	map(0x0e0000, 0x0e0001).rw(this, FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
 }
 
 void megasys1_state::megasys1B_edfbl_map(address_map &map)
@@ -338,8 +338,8 @@ void megasys1_state::megasys1B_monkelf_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	megasys1B_map(map);
-	map(0x044200, 0x044205).w(FUNC(megasys1_state::monkelf_scroll0_w));
-	map(0x044208, 0x04420d).w(FUNC(megasys1_state::monkelf_scroll1_w));
+	map(0x044200, 0x044205).w(this, FUNC(megasys1_state::monkelf_scroll0_w));
+	map(0x044208, 0x04420d).w(this, FUNC(megasys1_state::monkelf_scroll1_w));
 	map(0x0e0002, 0x0e0003).portr("P1");
 	map(0x0e0004, 0x0e0005).portr("P2");
 	map(0x0e0006, 0x0e0007).portr("DSW1");
@@ -376,19 +376,19 @@ void megasys1_state::megasys1C_map(address_map &map)
 	map(0x0c2000, 0x0c2005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2008, 0x0c200d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2100, 0x0c2105).w("scroll2", FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x0c2108, 0x0c2109).w(FUNC(megasys1_state::sprite_bank_w));
-	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_state::active_layers_w));
-	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
-	map(0x0c8000, 0x0c8001).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(FUNC(megasys1_state::soundlatch_c_w));
+	map(0x0c2108, 0x0c2109).w(this, FUNC(megasys1_state::sprite_bank_w));
+	map(0x0c2200, 0x0c2201).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
+	map(0x0c2208, 0x0c2209).w(this, FUNC(megasys1_state::active_layers_w));
+	map(0x0c2308, 0x0c2309).w(this, FUNC(megasys1_state::screen_flag_w));
+	map(0x0c8000, 0x0c8001).r(m_soundlatch2, FUNC(generic_latch_16_device::read)).w(this, FUNC(megasys1_state::soundlatch_c_w));
 	map(0x0d2000, 0x0d3fff).ram().share("objectram");
-	map(0x0d8000, 0x0d8001).rw(FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
+	map(0x0d8000, 0x0d8001).rw(this, FUNC(megasys1_state::ip_select_r), FUNC(megasys1_state::ip_select_w));
 	// 64th Street actively uses 0xe4*** for breakable objects.
 	map(0x0e0000, 0x0e3fff).mirror(0x4000).ram().w("scroll0", FUNC(megasys1_tilemap_device::write)).share("scroll0");
 	map(0x0e8000, 0x0ebfff).mirror(0x4000).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x0f0000, 0x0f3fff).mirror(0x4000).ram().w("scroll2", FUNC(megasys1_tilemap_device::write)).share("scroll2");
 	map(0x0f8000, 0x0f87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x1c0000, 0x1cffff).mirror(0x30000).ram().w(FUNC(megasys1_state::ram_w)).share("ram"); //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+	map(0x1c0000, 0x1cffff).mirror(0x30000).ram().w(this, FUNC(megasys1_state::ram_w)).share("ram"); //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 }
 
 
@@ -407,9 +407,9 @@ void megasys1_state::megasys1D_map(address_map &map)
 	map(0x0c2000, 0x0c2005).w("scroll0", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2008, 0x0c200d).w("scroll1", FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2108, 0x0c2109).nopw(); //AM_WRITE(sprite_bank_w)
-	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
-	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_state::active_layers_w));
-	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
+	map(0x0c2200, 0x0c2201).rw(this, FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
+	map(0x0c2208, 0x0c2209).w(this, FUNC(megasys1_state::active_layers_w));
+	map(0x0c2308, 0x0c2309).w(this, FUNC(megasys1_state::screen_flag_w));
 	map(0x0ca000, 0x0cbfff).ram().share("objectram");
 	map(0x0d0000, 0x0d3fff).ram().w("scroll1", FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x0d8000, 0x0d87ff).mirror(0x3000).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -418,7 +418,7 @@ void megasys1_state::megasys1D_map(address_map &map)
 	map(0x0f0000, 0x0f0001).portr("SYSTEM");
 	map(0x0f8001, 0x0f8001).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0x100000, 0x100001); // protection
-	map(0x1f0000, 0x1fffff).ram() /*.w(FUNC(megasys1_state::ram_w))*/ .share("ram");
+	map(0x1f0000, 0x1fffff).ram() /*.w(this, FUNC(megasys1_state::ram_w))*/ .share("ram");
 }
 
 void megasys1_state::megasys1D_oki_map(address_map &map)
@@ -517,9 +517,9 @@ void megasys1_state::megasys1A_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
 	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_state::oki_status_2_r));
+	map(0x0c0001, 0x0c0001).r(this, FUNC(megasys1_state::oki_status_2_r));
 	map(0x0c0000, 0x0c0003).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();
 }
@@ -530,7 +530,7 @@ void megasys1_state::kickoffb_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch2, FUNC(generic_latch_16_device::write));   // to main cpu
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
 	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0fffff).ram();
 }
@@ -547,9 +547,9 @@ void megasys1_state::megasys1B_sound_map(address_map &map)
 	map(0x040000, 0x040001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write)); /* from/to main cpu */
 	map(0x060000, 0x060001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(m_soundlatch2, FUNC(generic_latch_16_device::write)); /* from/to main cpu */
 	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x0a0001, 0x0a0001).r(FUNC(megasys1_state::oki_status_1_r));
+	map(0x0a0001, 0x0a0001).r(this, FUNC(megasys1_state::oki_status_1_r));
 	map(0x0a0000, 0x0a0003).w(m_oki1, FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_state::oki_status_2_r));
+	map(0x0c0001, 0x0c0001).r(this, FUNC(megasys1_state::oki_status_2_r));
 	map(0x0c0000, 0x0c0003).w(m_oki2, FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0e0000, 0x0effff).ram();
 }
@@ -1681,174 +1681,183 @@ GFXDECODE_END
 
 /* Provided by Jim Hernandez: 3.5MHz for FM, 30KHz (!) for ADPCM */
 
-void megasys1_state::system_A(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::system_A)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, SYS_A_CPU_CLOCK); /* 6MHz verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1A_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
 
-	M68000(config, m_audiocpu, SOUND_CPU_CLOCK); /* 7MHz verified */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1A_sound_map)
 
-	config.m_minimum_quantum = attotime::from_hz(120000);
+	MCFG_QUANTUM_TIME(attotime::from_hz(120000))
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	//m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
-	m_screen->set_raw(SYS_A_CPU_CLOCK,406,0,256,263,16,240);
-	m_screen->set_screen_update(FUNC(megasys1_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(megasys1_state::screen_vblank));
-	m_screen->set_palette(m_palette);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	//MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
+	MCFG_SCREEN_RAW_PARAMS(SYS_A_CPU_CLOCK,406,0,256,263,16,240)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_abc);
-	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
-	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
-	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_16(config, m_soundlatch);
-	GENERIC_LATCH_16(config, m_soundlatch2);
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CPU_CLOCK/2)); /* 3.5MHz (7MHz / 2) verified */
-	ymsnd.irq_handler().set(FUNC(megasys1_state::sound_irq));
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, megasys1_state,sound_irq))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	OKIM6295(config, m_oki1, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH); /* 4MHz verified */
-	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	MCFG_DEVICE_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH) /* 4MHz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	OKIM6295(config, m_oki2, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH); /* 4MHz verified */
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
-}
+	MCFG_DEVICE_ADD("oki2", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH) /* 4MHz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+MACHINE_CONFIG_END
 
-void megasys1_state::system_A_hachoo(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::system_A_hachoo)
 	system_A(config);
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1_hachoo)
-}
+MACHINE_CONFIG_END
 
-void megasys1_state::system_A_iganinju(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::system_A_iganinju)
 	system_A(config);
-	TIMER(config.replace(), m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_iganinju_scanline), "screen", 0, 1);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_REMOVE("scantimer")
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_iganinju_scanline, "screen", 0, 1)
+MACHINE_CONFIG_END
 
-void megasys1_state::system_A_soldam(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::system_A_soldam)
 	system_A(config);
+	MCFG_DEVICE_MODIFY("scroll1")
+	MCFG_MEGASYS1_TILEMAP_8X8_SCROLL_FACTOR(4)
+MACHINE_CONFIG_END
 
-	m_tmap[1]->set_8x8_scroll_factor(4);
-}
-
-void megasys1_state::kickoffb(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::kickoffb)
 	system_A(config);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::kickoffb_sound_map);
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(kickoffb_sound_map)
 
-	config.device_remove("ymsnd");
-	config.device_remove("oki2");
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("oki2")
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", SOUND_CPU_CLOCK / 2));
-	ymsnd.irq_handler().set(FUNC(megasys1_state::sound_irq)); // TODO: needs to be checked
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2203, SOUND_CPU_CLOCK / 2)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, megasys1_state, sound_irq)) // TODO: needs to be checked
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+MACHINE_CONFIG_END
 
-void megasys1_state::system_B(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::system_B)
 	system_A(config);
 
 	/* basic machine hardware */
 
-	m_maincpu->set_clock(SYS_B_CPU_CLOCK); /* 8MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_map);
-	m_scantimer->set_callback(FUNC(megasys1_state::megasys1B_scanline));
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_map)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_DRIVER_CALLBACK(megasys1_state, megasys1B_scanline)
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
-}
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_sound_map)
+MACHINE_CONFIG_END
 
-void megasys1_state::system_B_monkelf(machine_config &config)
-{
+
+MACHINE_CONFIG_START(megasys1_state::system_B_monkelf)
 	system_B(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_monkelf_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_monkelf_map)
+MACHINE_CONFIG_END
 
-void megasys1_state::system_Bbl(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::system_Bbl)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, SYS_B_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_edfbl_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1B_scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_edfbl_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1B_scanline, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(megasys1_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(megasys1_state::screen_vblank));
-	m_screen->set_palette(m_palette);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_abc);
-	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
-	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
-	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 256*2);
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll2", "palette", 256*2)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
 	/* just the one OKI, used for sound and music */
-	OKIM6295(config, m_oki1, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH);
-	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
-}
+	MCFG_DEVICE_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+MACHINE_CONFIG_END
 
-void megasys1_state::system_B_hayaosi1(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::system_B_hayaosi1)
 	system_B(config);
 
 	/* basic machine hardware */
 
-	OKIM6295(config.replace(), m_oki1, 2000000, okim6295_device::PIN7_HIGH); /* correct speed, but unknown OSC + divider combo */
-	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	MCFG_DEVICE_REPLACE("oki1", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	OKIM6295(config.replace(), m_oki2, 2000000, okim6295_device::PIN7_HIGH); /* correct speed, but unknown OSC + divider combo */
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
-}
+	MCFG_DEVICE_REPLACE("oki2", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+MACHINE_CONFIG_END
 
-void megasys1_state::system_C(machine_config &config)
-{
+
+MACHINE_CONFIG_START(megasys1_state::system_C)
 	system_A(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(SYS_C_CPU_CLOCK); /* 12MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1C_map);
-	m_scantimer->set_callback(FUNC(megasys1_state::megasys1B_scanline));
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1C_map)
+	MCFG_TIMER_MODIFY("scantimer")
+	MCFG_TIMER_DRIVER_CALLBACK(megasys1_state, megasys1B_scanline)
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1B_sound_map);
-}
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(megasys1B_sound_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1862,39 +1871,41 @@ void megasys1_state::system_C(machine_config &config)
 ***************************************************************************/
 
 
-void megasys1_state::system_D(machine_config &config)
-{
+MACHINE_CONFIG_START(megasys1_state::system_D)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, SYS_D_CPU_CLOCK);    /* 8MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1D_map);
-	m_maincpu->set_vblank_int("screen", FUNC(megasys1_state::megasys1D_irq));
+	MCFG_DEVICE_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)    /* 8MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1D_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", megasys1_state,  megasys1D_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(megasys1_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(megasys1_state::screen_vblank));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, megasys1_state, screen_vblank))
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_abc);
-	PALETTE(config, m_palette, FUNC(megasys1_state::megasys1_palette)).set_format(palette_device::RGBx_555, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_abc)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
+	MCFG_PALETTE_INIT_OWNER(megasys1_state,megasys1)
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
-	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*1);
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki1, SYS_D_CPU_CLOCK/4, okim6295_device::PIN7_HIGH);    /* 2MHz (8MHz / 4) */
-	m_oki1->set_addrmap(0, &megasys1_state::megasys1D_oki_map);
-	m_oki1->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("oki1", OKIM6295, SYS_D_CPU_CLOCK/4, okim6295_device::PIN7_HIGH)    /* 2MHz (8MHz / 4) */
+	MCFG_DEVICE_ADDRESS_MAP(0, megasys1D_oki_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 
@@ -1910,43 +1921,44 @@ void megasys1_state::system_D(machine_config &config)
 ***************************************************************************/
 
 
-void megasys1_state::system_Z(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, SYS_A_CPU_CLOCK); /* 6MHz (12MHz / 2) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1Z_map);
-	TIMER(config, m_scantimer).configure_scanline(FUNC(megasys1_state::megasys1A_scanline), "screen", 0, 1);
+MACHINE_CONFIG_START(megasys1_state::system_Z)
 
-	Z80(config, m_audiocpu, 3000000); /* OSC 12MHz divided by 4 ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::z80_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &megasys1_state::z80_sound_io_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
+	MCFG_DEVICE_PROGRAM_MAP(megasys1Z_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	MCFG_DEVICE_IO_MAP(z80_sound_io_map)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(megasys1_state::screen_update));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56.18) // same as nmk16.cpp based on YT videos.
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(megasys1_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_z);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(megasys1_state,megasys1)
 
-	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 256*0);
-	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 256*2);
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll0", "palette", 256*0)
+	MCFG_MEGASYS1_TILEMAP_ADD("scroll1", "palette", 256*2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch_z);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch_z")
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -3051,57 +3063,6 @@ ROM_START( iganinju )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 	ROM_LOAD( "iga.131",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
-ROM_END
-
-ROM_START( iganinjub )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code, c and b identical to the original */
-	ROM_LOAD16_BYTE( "19.a12", 0x000000, 0x010000, CRC(6b4c16ac) SHA1(edb5fe3b3e4e94e59348c0a7034df9df6ef157d3) )
-	ROM_LOAD16_BYTE( "23.13",  0x000001, 0x010000, CRC(03bfda29) SHA1(ced6ddcbb86d3109bcfb8e1982a5f666ca7dc10e) )
-	ROM_LOAD16_BYTE( "20.a13", 0x020000, 0x010000, CRC(fa0705fb) SHA1(110ebca62a57f9d8e355a339a99819faf1fe57f1) )
-	ROM_LOAD16_BYTE( "24.12",  0x020001, 0x010000, CRC(2de40303) SHA1(5c841295c0d804163a7da3c122dd40af7780d1f2) )
-	ROM_LOAD16_BYTE( "c",      0x040000, 0x010000, CRC(de5937ad) SHA1(d3039e5391feb925ea10f33a1363bf3ffc1ebb3d) )
-	ROM_LOAD16_BYTE( "b",      0x040001, 0x010000, CRC(afaf0480) SHA1(b8d0ec859a94941650bdd2b01e98d054d49fef67) )
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code, identical to the original */
-	ROM_LOAD16_BYTE( "5.9.c", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
-	ROM_LOAD16_BYTE( "4.6.c", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
-
-	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0, identical to the original but half size ROMs */
-	ROM_LOAD( "15.20", 0x000000, 0x010000, CRC(e2583bcd) SHA1(1401007196b2211c6d155a0cc73b63c38fae7183) )
-	ROM_LOAD( "16.a21",0x010000, 0x010000, CRC(2f9fd524) SHA1(ece514b72644c72e0193f6c2dd152ccd90ccb9ce) )
-	ROM_LOAD( "14.19", 0x020000, 0x010000, CRC(ec835d5c) SHA1(fad4da044e74240d702148e569e8f4e9ebe6664c) )
-	ROM_LOAD( "17",    0x030000, 0x010000, CRC(24751b73) SHA1(eb8f618ca91c73d1c613dedf4e8a5d1fa635abfe) )
-
-	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1, identical to the original but half size ROMs except 21.a16 */
-	ROM_LOAD( "25.a12", 0x000000, 0x010000, CRC(c41a4c20) SHA1(35cc21fda02aa318eda3a5f6c3e061c07c8c10a3) )
-	ROM_LOAD( "a.a15",  0x010000, 0x010000, CRC(69b3716b) SHA1(d444591a61f6ad86c013ff2bfa56a29cfd1f5b1d) )
-	ROM_LOAD( "d",      0x020000, 0x010000, CRC(71941062) SHA1(d29e627d12d1dd4976b0380009305f6a82177bb9) )
-	ROM_LOAD( "e",      0x030000, 0x010000, CRC(89c4d42b) SHA1(b8a2348318877a9f8d50256ec1b96bc5afa4b4ba) )
-	ROM_LOAD( "22.a17", 0x040000, 0x010000, CRC(5589325d) SHA1(35356106f7301147b049c104c36f58278760bcf4) )
-	ROM_LOAD( "21.a16", 0x050000, 0x010000, CRC(5c42be93) SHA1(e01dbeab85ba205086f0512745f096493ed66ee2) ) // 94.371033% kazan.17 [2/2], 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "f",      0x060000, 0x010000, CRC(a7a2aea7) SHA1(68df0f8351aa3da8bca8347bda2f62ba53ab86fa) )
-	ROM_LOAD( "h",      0x070000, 0x010000, CRC(d609e379) SHA1(b83fc8922967702fbb2b6576b8787913c13a5640) ) // 1xxxxxxxxxxxxxxx = 0xFF
-
-	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2, identical to the original */
-	ROM_LOAD( "18.18", 0x000000, 0x010000, CRC(b3a9a4ae) SHA1(bccef0f6ea17c2f0f8d61da4d174389084252d13) )
-
-	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites, identical to the original but half size ROMs */
-	ROM_LOAD( "7.2.q",  0x000000, 0x010000, CRC(db4e04c7) SHA1(4285f4fa9fe2e1b957b96ef51ea3388e303d7c55) )
-	ROM_LOAD( "8.1.r",  0x010000, 0x010000, CRC(1b7a0c3f) SHA1(6d5fd07e9f84f4a0a06d5427f111ff4d48e5c2fa) )
-	ROM_LOAD( "10.5.q", 0x020000, 0x010000, CRC(0f8e66d6) SHA1(aff1c51928d2689a274960f4e680ae3201271d5d) )
-	ROM_LOAD( "11.4.r", 0x030000, 0x010000, CRC(37f6277f) SHA1(b9737e248c9b92bc72be3e5335d8ef7bf38a7e9c) )
-	ROM_LOAD( "6.p",    0x040000, 0x010000, CRC(41d7ccaf) SHA1(ae79c91ca12ecb766d5cd9ce4f1d8c9ef0aba10a) )
-	ROM_LOAD( "9.p",    0x050000, 0x010000, CRC(3178fac1) SHA1(4574a5956920feb31b95bbb4c8a5dc023e7d793a) )
-	ROM_LOAD( "12.8.q", 0x060000, 0x010000, CRC(b8bdc11d) SHA1(f9ffe998021fabde382aae4ee7bb4b93cc60c788) )
-	ROM_LOAD( "13.7.r", 0x070000, 0x010000, CRC(78449e50) SHA1(0e42e31570fd5923a26e7d5f143172ee9a713cbb) )
-
-	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples, only 1 OKI present even though PCB can host 2 */
-	ROM_LOAD( "1.a",  0x000000, 0x010000, CRC(64f13da0) SHA1(d47e0032f852f11b38b3c052fa2b82decd02e7a3) )
-	ROM_LOAD( "2.a",  0x010000, 0x010000, CRC(d33a8268) SHA1(4511c3f6baf0d193c028cc7e863c72dbc33baebe) )
-	ROM_LOAD( "3.a",  0x030000, 0x010000, CRC(e7268807) SHA1(a20a352ee021e2f066c72d9d9784092ab76e6177) ) // identical to kazan.8 [2/2], where's the first half?
-
-	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM, not dumped for this set */
-	ROM_LOAD( "kazan.14m",    0x0000, 0x0200, BAD_DUMP CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
 ROM_START( inyourfa )
@@ -4877,7 +4838,6 @@ GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, ini
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, iganinjub,kazan,    system_A_iganinju, kazan,    megasys1_state, empty_init   , ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, init_astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )

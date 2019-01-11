@@ -9,7 +9,6 @@
 
 #include "emuopts.h"
 #include "harddisk.h"
-#include "romload.h"
 
 
 OPTION_GUIDE_START(dsk_option_guide)
@@ -20,7 +19,7 @@ OPTION_GUIDE_START(dsk_option_guide)
 	OPTION_INT('K', "hunksize",         "Hunk Bytes")
 OPTION_GUIDE_END
 
-static char const *const dsk_option_spec =
+static const char *dsk_option_spec =
 	"C1-[203]-1024;H1/[2]/4/8;S1-[12]-64;L267;K6408";
 
 

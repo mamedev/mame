@@ -151,11 +151,19 @@ WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
  *
  *************************************/
 
-void m10_state::m10_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(m10_state,m10)
 {
-	for (int i = 0; i < 0x10; i++)
+	int i;
+
+	for (i = 0; i < 0x10; i++)
 	{
-		rgb_t const color = BIT(i, 0) ? rgb_t(pal1bit(~i >> 3), pal1bit(~i >> 2), pal1bit(~i >> 1)) : rgb_t::black();
+		rgb_t color;
+
+		if (i & 0x01)
+			color = rgb_t(pal1bit(~i >> 3), pal1bit(~i >> 2), pal1bit(~i >> 1));
+		else
+			color = rgb_t::black();
+
 		palette.set_pen_color(i, color);
 	}
 }
@@ -522,13 +530,13 @@ void m10_state::m10_main(address_map &map)
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
 	map(0x1000, 0x2fff).rom().share("rom");
 	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
-	map(0x5000, 0x53ff).ram().w(FUNC(m10_state::m10_chargen_w)).share("chargen"); /* background ????? */
+	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x53ff).ram().w(this, FUNC(m10_state::m10_chargen_w)).share("chargen"); /* background ????? */
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
-	map(0xa400, 0xa400).w(FUNC(m10_state::m10_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
-	map(0xa500, 0xa500).w(FUNC(m10_state::m10_a500_w));   /* ??? */
-	map(0xa700, 0xa700).r(FUNC(m10_state::m10_a700_r));
+	map(0xa400, 0xa400).w(this, FUNC(m10_state::m10_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa500, 0xa500).w(this, FUNC(m10_state::m10_a500_w));   /* ??? */
+	map(0xa700, 0xa700).r(this, FUNC(m10_state::m10_a700_r));
 	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
@@ -537,13 +545,13 @@ void m10_state::m11_main(address_map &map)
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
 	map(0x1000, 0x2fff).rom().share("rom");
 	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
 	map(0x5000, 0x53ff).ram().share("chargen"); /* background ????? */
-	map(0xa100, 0xa100).w(FUNC(m10_state::m11_a100_w)); /* sound writes ???? */
+	map(0xa100, 0xa100).w(this, FUNC(m10_state::m11_a100_w)); /* sound writes ???? */
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
-	map(0xa400, 0xa400).w(FUNC(m10_state::m11_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
-	map(0xa700, 0xa700).r(FUNC(m10_state::m11_a700_r));
+	map(0xa400, 0xa400).w(this, FUNC(m10_state::m11_ctrl_w));   /* line at bottom of screen?, sound, flip screen */
+	map(0xa700, 0xa700).r(this, FUNC(m10_state::m11_a700_r));
 	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
@@ -552,13 +560,13 @@ void m10_state::m15_main(address_map &map)
 	map(0x0000, 0x02ff).ram().share("memory"); /* scratch ram */
 	map(0x1000, 0x33ff).rom().share("rom");
 	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4800, 0x4bff).ram().w(FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
-	map(0x5000, 0x57ff).ram().w(FUNC(m10_state::m15_chargen_w)).share("chargen"); /* background ????? */
+	map(0x4800, 0x4bff).ram().w(this, FUNC(m10_state::m10_colorram_w)).share("colorram"); /* foreground colour  */
+	map(0x5000, 0x57ff).ram().w(this, FUNC(m10_state::m15_chargen_w)).share("chargen"); /* background ????? */
 	map(0xa000, 0xa000).portr("P2");
-	map(0xa100, 0xa100).w(FUNC(m10_state::m15_a100_w)); /* sound writes ???? */
+	map(0xa100, 0xa100).w(this, FUNC(m10_state::m15_a100_w)); /* sound writes ???? */
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("P1");
-	map(0xa400, 0xa400).w(FUNC(m10_state::m15_ctrl_w));   /* sound, flip screen */
+	map(0xa400, 0xa400).w(this, FUNC(m10_state::m15_ctrl_w));   /* sound, flip screen */
 	map(0xfc00, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
@@ -804,99 +812,109 @@ static const char *const m10_sample_names[] =
  *
  *************************************/
 
-void m10_state::m10(machine_config &config)
-{
+MACHINE_CONFIG_START(m10_state::m10)
+
 	/* basic machine hardware */
-	M6502(config, m_maincpu, IREMM10_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m10_main);
+	MCFG_DEVICE_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(m10_main)
 
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m10_interrupt)
+
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART);
-	m_screen->set_screen_update(FUNC(m10_state::screen_update_m10));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m10)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m10);
-	PALETTE(config, m_palette, FUNC(m10_state::m10_palette), 2 * 8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m10)
+	MCFG_PALETTE_ADD("palette", 2*8)
 
+	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
 	MCFG_VIDEO_START_OVERRIDE(m10_state,m10)
 
 	/* 74LS123 */
 
-	TTL74123(config, m_ic8j1, 0); /* completely illegible */
-	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  /* the hook up type */
-	m_ic8j1->set_resistor_value(RES_K(1));                      /* resistor connected to RCext */
-	m_ic8j1->set_capacitor_value(CAP_U(1));                     /* capacitor connected to Cext and RCext */
-	m_ic8j1->set_a_pin_value(1);                                /* A pin - driven by the CRTC */
-	m_ic8j1->set_b_pin_value(1);                                /* B pin - pulled high */
-	m_ic8j1->set_clear_pin_value(1);                            /* Clear pin - pulled high */
-	m_ic8j1->out_cb().set(FUNC(m10_state::ic8j1_output_changed));
-
-	TTL74123(config, m_ic8j2, 0);
-	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  /* the hook up type */
+	MCFG_DEVICE_ADD("ic8j1", TTL74123, 0) /* completely illegible */
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
+	MCFG_TTL74123_RESISTOR_VALUE(RES_K(1))               /* resistor connected to RCext */
+	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(1))               /* capacitor connected to Cext and RCext */
+	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
+	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
+	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, m10_state, ic8j1_output_changed))
+	MCFG_DEVICE_ADD("ic8j2", TTL74123, 0)
+	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
 	/* 10k + 20k variable resistor */
-	m_ic8j2->set_resistor_value(RES_K(22));                     /* resistor connected to RCext */
-	m_ic8j2->set_capacitor_value(CAP_U(2.2));                   /* capacitor connected to Cext and RCext */
-	m_ic8j2->set_a_pin_value(1);                                /* A pin - driven by the CRTC */
-	m_ic8j2->set_b_pin_value(1);                                /* B pin - pulled high */
-	m_ic8j2->set_clear_pin_value(1);                            /* Clear pin - pulled high */
-	m_ic8j2->out_cb().set(FUNC(m10_state::ic8j2_output_changed));
+	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
+	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(2.2))               /* capacitor connected to Cext and RCext */
+	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
+	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
+	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, m10_state, ic8j2_output_changed))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(m10_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(m10_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-void m10_state::m11(machine_config &config)
-{
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(m10_state::m11)
 	m10(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m11_main);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(m11_main)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m11_interrupt)
 
-void m10_state::m15(machine_config &config)
-{
+	/* sound hardware */
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(m10_state::m15)
+
 	/* basic machine hardware */
-	M6502(config, m_maincpu, IREMM15_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m15_main);
-	m_maincpu->set_vblank_int("screen", FUNC(m10_state::m15_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(m15_main)
 
 	MCFG_MACHINE_START_OVERRIDE(m10_state,m10)
 	MCFG_MACHINE_RESET_OVERRIDE(m10_state,m10)
 
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m10_state,  m15_interrupt)
+
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART);
-	m_screen->set_screen_update(FUNC(m10_state::screen_update_m15));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(m10_state, screen_update_m15)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
-	PALETTE(config, m_palette, FUNC(m10_state::m10_palette), 2 * 8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	MCFG_PALETTE_ADD("palette", 2*8)
 
-	MCFG_VIDEO_START_OVERRIDE(m10_state, m15)
+	MCFG_PALETTE_INIT_OWNER(m10_state,m10)
+	MCFG_VIDEO_START_OVERRIDE(m10_state, m15 )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(m10_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(m10_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-void m10_state::headoni(machine_config &config)
-{
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(m10_state::headoni)
 	m15(config);
-	m_maincpu->set_clock(11730000/16);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(11730000/16)
+MACHINE_CONFIG_END
 
 /*************************************
  *

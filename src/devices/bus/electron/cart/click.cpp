@@ -23,12 +23,11 @@ DEFINE_DEVICE_TYPE(ELECTRON_CLICK, electron_click_device, "electron_click", "Slo
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void electron_click_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(electron_click_device::device_add_mconfig)
 	/* rtc */
-	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq().set(FUNC(electron_click_device::irq_w));
-}
+	MCFG_MC146818_ADD("rtc", 32.768_kHz_XTAL)
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, electron_click_device, irq_w))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  INPUT_PORTS( click )

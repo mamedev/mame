@@ -71,7 +71,7 @@ void gameplan_state::cpu_map(address_map &map)
 	map(0x3830, 0x3831).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x3840, 0x3841).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x3850, 0x3850).nopr(); //watchdog_reset_r ?
-	map(0x8000, 0x9fff).r(FUNC(gameplan_state::trvquest_question_r));
+	map(0x8000, 0x9fff).r(this, FUNC(gameplan_state::trvquest_question_r));
 	map(0xa000, 0xa000).writeonly().share("trvquest_q");
 	map(0xa000, 0xa000).nopr(); // bogus read from the game code when reads question roms
 	map(0xb000, 0xffff).rom();
@@ -178,14 +178,13 @@ INTERRUPT_GEN_MEMBER(gameplan_state::trvquest_interrupt)
 	m_via_2->write_ca1(0);
 }
 
-void gameplan_state::trvquest(machine_config &config)
-{
-	M6809(config, m_maincpu, XTAL(6'000'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gameplan_state::cpu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gameplan_state::trvquest_interrupt));
+MACHINE_CONFIG_START(gameplan_state::trvquest)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	MCFG_DEVICE_ADD("maincpu", M6809,XTAL(6'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gameplan_state, trvquest_interrupt)
 
+	MCFG_NVRAM_ADD_1FILL("nvram")
 	MCFG_MACHINE_START_OVERRIDE(gameplan_state,trvquest)
 	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,trvquest)
 
@@ -195,26 +194,29 @@ void gameplan_state::trvquest(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(6'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, "ay2", XTAL(6'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* via */
-	VIA6522(config, m_via_0, XTAL(6'000'000)/4);
-	m_via_0->writepa_handler().set(FUNC(gameplan_state::video_data_w));
-	m_via_0->writepb_handler().set(FUNC(gameplan_state::gameplan_video_command_w));
-	m_via_0->ca2_handler().set(FUNC(gameplan_state::video_command_trigger_w));
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(6'000'000)/4)
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, gameplan_state, video_data_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, gameplan_state, gameplan_video_command_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gameplan_state, video_command_trigger_w))
 
-	VIA6522(config, m_via_1, XTAL(6'000'000)/4);
-	m_via_1->readpa_handler().set_ioport("IN0");
-	m_via_1->readpb_handler().set_ioport("IN1");
-	m_via_1->ca2_handler().set(FUNC(gameplan_state::trvquest_coin_w));
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(6'000'000)/4)
+	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN0"))
+	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gameplan_state, trvquest_coin_w))
 
-	VIA6522(config, m_via_2, XTAL(6'000'000)/4);
-	m_via_2->readpa_handler().set_ioport("UNK");
-	m_via_2->readpb_handler().set_ioport("DSW");
-	m_via_2->ca2_handler().set(FUNC(gameplan_state::trvquest_misc_w));
-	m_via_2->irq_handler().set(FUNC(gameplan_state::via_irq));
-}
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, XTAL(6'000'000)/4)
+	MCFG_VIA6522_READPA_HANDLER(IOPORT("UNK"))
+	MCFG_VIA6522_READPB_HANDLER(IOPORT("DSW"))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gameplan_state, trvquest_misc_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, gameplan_state, via_irq))
+MACHINE_CONFIG_END
 
 ROM_START( trvquest )
 	ROM_REGION( 0x10000, "maincpu", 0 )

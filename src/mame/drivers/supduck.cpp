@@ -28,7 +28,6 @@ All clock timing comes from crystal 1
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -49,9 +48,6 @@ public:
 			m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void supduck(machine_config &config);
-
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
@@ -85,9 +81,11 @@ private:
 
 	DECLARE_WRITE8_MEMBER(okibank_w);
 
+	void supduck(machine_config &config);
 	void main_map(address_map &map);
 	void oki_map(address_map &map);
 	void sound_map(address_map &map);
+protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -253,16 +251,16 @@ void supduck_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().nopw();
 	map(0xfe0000, 0xfe1fff).ram().share("spriteram");
 
-	map(0xfe4000, 0xfe4001).portr("P1_P2").w(FUNC(supduck_state::supduck_4000_w));
-	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(supduck_state::supduck_4002_w));
+	map(0xfe4000, 0xfe4001).portr("P1_P2").w(this, FUNC(supduck_state::supduck_4000_w));
+	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(this, FUNC(supduck_state::supduck_4002_w));
 	map(0xfe4004, 0xfe4005).portr("DSW");
 
-	map(0xfe8000, 0xfe8007).w(FUNC(supduck_state::supduck_scroll_w));
+	map(0xfe8000, 0xfe8007).w(this, FUNC(supduck_state::supduck_scroll_w));
 	map(0xfe800e, 0xfe800f).nopw(); // watchdog or irqack
 
-	map(0xfec000, 0xfecfff).ram().w(FUNC(supduck_state::text_videoram_w)).share("textvideoram");
-	map(0xff0000, 0xff3fff).ram().w(FUNC(supduck_state::back_videoram_w)).share("backvideoram");
-	map(0xff4000, 0xff7fff).ram().w(FUNC(supduck_state::fore_videoram_w)).share("forevideoram");
+	map(0xfec000, 0xfecfff).ram().w(this, FUNC(supduck_state::text_videoram_w)).share("textvideoram");
+	map(0xff0000, 0xff3fff).ram().w(this, FUNC(supduck_state::back_videoram_w)).share("backvideoram");
+	map(0xff4000, 0xff7fff).ram().w(this, FUNC(supduck_state::fore_videoram_w)).share("forevideoram");
 	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffc000, 0xffffff).ram(); /* working RAM */
 }
@@ -271,7 +269,7 @@ void supduck_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(FUNC(supduck_state::okibank_w));
+	map(0x9000, 0x9000).w(this, FUNC(supduck_state::okibank_w));
 	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -474,7 +472,7 @@ MACHINE_CONFIG_START(supduck_state::supduck)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

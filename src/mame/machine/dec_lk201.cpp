@@ -197,11 +197,11 @@ ROM_END
 
 void lk201_device::lk201_map(address_map &map)
 {
-	map(0x0000, 0x0002).rw(FUNC(lk201_device::ports_r), FUNC(lk201_device::ports_w));
-	map(0x0004, 0x0006).rw(FUNC(lk201_device::ddr_r), FUNC(lk201_device::ddr_w));
-	map(0x000a, 0x000c).rw(FUNC(lk201_device::spi_r), FUNC(lk201_device::spi_w));
-	map(0x000d, 0x0011).rw(FUNC(lk201_device::sci_r), FUNC(lk201_device::sci_w));
-	map(0x0012, 0x001b).rw(FUNC(lk201_device::timer_r), FUNC(lk201_device::timer_w));
+	map(0x0000, 0x0002).rw(this, FUNC(lk201_device::ports_r), FUNC(lk201_device::ports_w));
+	map(0x0004, 0x0006).rw(this, FUNC(lk201_device::ddr_r), FUNC(lk201_device::ddr_w));
+	map(0x000a, 0x000c).rw(this, FUNC(lk201_device::spi_r), FUNC(lk201_device::spi_w));
+	map(0x000d, 0x0011).rw(this, FUNC(lk201_device::sci_r), FUNC(lk201_device::sci_w));
+	map(0x0012, 0x001b).rw(this, FUNC(lk201_device::timer_r), FUNC(lk201_device::timer_w));
 	map(0x0050, 0x00ff).ram();
 	map(0x0100, 0x1fff).rom().region(LK201_CPU_TAG, 0x100);
 }

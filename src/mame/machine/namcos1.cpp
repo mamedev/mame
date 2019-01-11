@@ -455,8 +455,7 @@ READ8_MEMBER( namcos1_state::key_type3_r )
 	if (op == m_key_bottom4) return (offset << 4) | (m_key[m_key_swap4_arg] & 0x0f);
 	if (op == m_key_top4)    return (offset << 4) | (m_key[m_key_swap4_arg] >> 4);
 
-	// rompers triggers this between certain stages, check if values are used, it might still need the above mapping properly in the game init
-	logerror("%s: unhandled keychip read %04x", machine().describe_context(), offset);
+	popmessage("%s: keychip read %04x", machine().describe_context(), offset);
 
 	return 0;
 }

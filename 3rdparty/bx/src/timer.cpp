@@ -1,14 +1,12 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "bx_p.h"
 #include <bx/timer.h>
 
-#if BX_CRT_NONE
-#	include "crt0.h"
-#elif BX_PLATFORM_ANDROID
+#if BX_PLATFORM_ANDROID
 #	include <time.h> // clock, clock_gettime
 #elif BX_PLATFORM_EMSCRIPTEN
 #	include <emscripten.h>
@@ -22,12 +20,12 @@ namespace bx
 {
 	int64_t getHPCounter()
 	{
-#if    BX_CRT_NONE
-		int64_t i64 = crt0::getHPCounter();
-#elif  BX_PLATFORM_WINDOWS \
+#if    BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 		LARGE_INTEGER li;
+		// Performance counter value may unexpectedly leap forward
+		// http://support.microsoft.com/kb/274323
 		QueryPerformanceCounter(&li);
 		int64_t i64 = li.QuadPart;
 #elif BX_PLATFORM_ANDROID
@@ -49,9 +47,7 @@ namespace bx
 
 	int64_t getHPFrequency()
 	{
-#if    BX_CRT_NONE
-		return INT64_C(1000000000);
-#elif  BX_PLATFORM_WINDOWS \
+#if    BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 		LARGE_INTEGER li;

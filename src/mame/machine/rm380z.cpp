@@ -287,7 +287,7 @@ void rm380z_state::machine_reset()
 	memset(m_vram,0,RM380Z_SCREENSIZE);
 
 	config_memory_map();
-	m_fdc->reset();
+	machine().device("wd1771")->reset();
 
 	init_graphic_chars();
 }

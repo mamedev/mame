@@ -119,7 +119,7 @@ Displays a list of samples referenced by the specified game.
 .TP
 .B \-verifyroms \fR[\fIgamename\fR|\fIwildcard\fR]
 Checks for invalid or missing ROM images. By default all drivers that
-have valid ZIP files or directories in the rom path are verified;
+have valid ZIP files or directories in the rompath are verified;
 however, you can limit this list by specifying a driver name or
 wildcard after the \-verifyroms command.
 .TP
@@ -429,7 +429,7 @@ MAME will create snapshots at the game's current resolution in raw
 pixels, and will create movies at the game's starting resolution in
 raw pixels. If you specify this option, then MAME will create both
 snapshots and movies at the size specified, and will bilinear filter
-the result. Note that this size does not automatically rotate if the
+the result. Note that this size does not automatically rotate if the 
 game is vertically oriented. The default is 'auto'.
 .TP
 .B \-snapview internal\fR|\fBauto\fR|\fIviewname
@@ -440,8 +440,8 @@ specifying this option, you can override this default behavior and
 select a single view that will apply to all snapshots and movies.
 Note that \fIviewname\fP does not need to be a perfect match; rather, it
 will select the first view whose name matches all the characters
-specified by \fIviewname\fP. For example, \-snapview native will match the
-"Native (15:14)" view even though it is not a perfect match.
+specified by \fIviewname\fP. For example, \-snapview native will match the 
+"Native (15:14)" view even though it is not a perfect match. 
 \fIviewname\fP can also be 'auto', which selects the first view with all
 screens present. The default value is 'internal'.
 .TP
@@ -458,17 +458,17 @@ platform (even Windows); the literal \fB%g\fP represents the driver name of
 the current game. The default is '%g', which creates a separate folder
 for each game. Example: if you use
 .B mame robby \-statename foo/%g
-save states will be stored inside \fBsta/foo/robby/\fP.
+save states will be stored inside \fBsta/foo/robby/\fP. 
 .TP
 .B \-[no]burnin
-Tracks brightness of the screen during play and at the end of
+Tracks brightness of the screen during play and at the end of 
 emulation generates a PNG that can be used to simulate burn\-in
 effects on other games. The resulting PNG is created such that the
-least\-used areas of the screen are fully white (since burned\-in areas
+least used\-areas of the screen are fully white (since burned\-in areas 
 are darker, all other areas of the screen must be lightened a touch).
 The intention is that this PNG can be loaded via an artwork file with
 a low alpha (e.g, 0.1\-0.2 seems to work well) and blended over the
-entire screen. The PNG files are saved in the snap directory under
+entire screen. The PNG files are saved in the snap directory under 
 the gamename\\burnin\-<screen.name>.png. The default is OFF (\-noburnin).
 .\"
 .\" *******************************************************
@@ -490,10 +490,10 @@ requires more horsepower than your computer has. The default value is 0,
 which skips no frames.
 .TP
 .B \-seconds_to_run, \-str \fIvalue
-This option can be used for benchmarking and automated testing. It tells
-MAME to stop execution after a fixed number of seconds. By combining
-this with a fixed set of other command line options, you can set up a
-consistent environment for benchmarking MAME performance. In addition,
+This option can be used for benchmarking and automated testing. It tells 
+MAME to stop execution after a fixed number of seconds. By combining 
+this with a fixed set of other command line options, you can set up a 
+consistent environment for benchmarking MAME performance. In addition, 
 upon exit, the \-str option will write a screenshot called final.png
 to the game's snapshot directory.
 .TP
@@ -668,7 +668,7 @@ needs adjustment. This option requires a float argument in the range of
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
-.B \-video\fR [\fIsoft\fR|\fIopengl\fR|\fIbgfx\fR|\fInone\fR]
+.B \-video\fR [\fIsoft\fR|\fIopengl\fR|\fInone\fR]
 Specifies which video subsystem to use for drawing:
 .br
 \fBsoft\fR  uses software rendering, which is slower but more compatible.
@@ -676,13 +676,11 @@ Specifies which video subsystem to use for drawing:
 \fBopengl\fR  uses OpenGL and your graphics accelerator to speed up many
 aspects of drawing MAME including compositing artwork, overlays, and
 bezels, as well as stretching the image to fit your screen.
-.br
-\fBbgfx\fR  uses the bgfx renderer which supports portable shaders and
-multiple graphics APIs including OpenGL, OpenGL ES and DirectX.
+output on some cards.
 .br
 \fBnone\fR  does no drawing and is intended for CPU benchmarking.
 .br
-Default is 'soft' on Linux or 'opengl' on macOS.
+Default is 'soft'.
 .TP
 .B \-numscreens \fR[\fI1-4\fR]
 Number of screens to create; usually, you want just one. Default is '1'.
@@ -697,7 +695,7 @@ The default is OFF (\-nowindow).
 Controls initial window size in windowed mode. If it is set on, the
 window will initially be set to the maximum supported size when you
 start MAME. If it is turned off, the window will start out at the
-smallest supported size. This option only has an effect when the
+smallest supported size. This option only has an effect when the 
 \-window option is used. The default is ON (\-maximize).
 .TP
 .B \-[no]keepaspect, \-[no]ka
@@ -745,7 +743,7 @@ Default is OFF (\-nosyncrefresh).
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .B NOTE:
-All the options in this group are available only with softare video
+All the options in this group are available only with softare video 
 rendering subsystem, i.e \fB\-video soft\fR.
 .TP
 .B \-prescale\fR [\fIvalue\fR]
@@ -775,7 +773,7 @@ Default is NONE.
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .B NOTE:
-All the options in this group are available only with OpenGL video
+All the options in this group are available only with OpenGL video 
 rendering subsystem, i.e \fB\-video opengl\fR.
 .TP
 .B \-[no]filter, \-[no]glfilter, \-[no]flt
@@ -846,7 +844,7 @@ Preferred view for the first|second|third|fourth screen.
 .SS BGFX post\-processing options
 .\" *******************************************************
 .B NOTE:
-All the options in this group are available only when BGFX video
+All the options in this group are available only when BGFX video 
 post\-processing is enabled, i.e \fB\-video bgfx\fR. For full info on BGFX
 please visit official MAME documentation page:
 .br
@@ -907,27 +905,8 @@ Split full screen image across monitors. Default is OFF (\-nouseallheads).
 .SS Sound options
 .\" *******************************************************
 .TP
-.B \-sound\fR [\fIsdl\fR|\fIportaudio\fR|\fIcoreaudio\fR|\fIdsound\fR|\fIxaudio2\fR|\fInone\fR]
-Specifies which sound subsystem to use for audio output:
-.br
-\fBsdl\fR  uses the Simple DirectMedia Layer audio output system
-(not available on Windows by default).
-.br
-\fBportaudio\fR  uses the PortAudio library which supports low-latency
-output and multiple audio APIs.
-.br
-\fBcoreaudio\fR  uses the Core Audio API which supports low-latency
-output and AudioUnit effects (only available on macOS).
-.br
-\fBdsound\fR  uses the DirectSound API (only available on Windows).
-.br
-\fBxaudio2\fR  uses the XAudio2 API which supports low-latency output
-(only available on Windows).
-.br
-\fBnone\fR  produces no audio output.
-.br
-Default is 'dsound' on Windows, 'coreaudio' on macOS or 'sdl' on other
-platforms.
+.B \-[no]sound
+Enable or disable sound altogether. The default is ON (\-sound).
 .TP
 .B \-samplerate, \-srf \fIvalue
 Sets the audio sample rate. Smaller values (e.g. 11025) cause lower
@@ -948,11 +927,10 @@ Sets the startup volume. It can later be changed with the user interface
 .TP
 .B \-audio_latency \fIvalue
 This controls the amount of latency built into the audio streaming.
-The exact behavior depends on the selected audio output module (see
-the \-sound option).  Smaller values provide less audio delay while
-requiring better system performance.  Higher values increase audio
-delay but may help avoid buffer under-runs and audio interruptions.
-The default is 1.
+The latency parameter controls the lower threshold. The default is 1
+(meaning lower=1/5 and upper=2/5). Set it to 2 (\-audio_latency 2) to keep
+the sound buffer between 2/5 and 3/5 full. If you crank it up to 4,
+you can definitely notice the lag.
 .\"
 .\" *******************************************************
 .SS Input options
@@ -996,15 +974,15 @@ Determines whether MAME differentiates between multiple keyboards.
 Some systems may report more than one keyboard; by default, the data
 from all of these keyboards is combined so that it looks like a single
 keyboard. Turning this option on will enable MAME to report keypresses
-on different keyboards independently. The default is OFF
+on different keyboards independently. The default is OFF 
 (\-nomultikeyboard).
 .TP
 .B \-[no]multimouse
-Determines whether MAME differentiates between multiple mice. Some
+Determines whether MAME differentiates between multiple mice. Some 
 systems may report more than one mouse device; by default, the data
 from all of these mice is combined so that it looks like a single
-mouse. Turning this option on will enable MAME to report mouse
-movement and button presses on different mice independently. The
+mouse. Turning this option on will enable MAME to report mouse 
+movement and button presses on different mice independently. The 
 default is OFF (\-nomultimouse).
 .TP
 .B \-[no]steadykey, \-[no]steady
@@ -1018,16 +996,14 @@ default is OFF (\-nosteadykey).
 .TP
 .B \-[no]ui_active
 Enable MAME user interface on top of emulated keyboard (if present).
-User interface may be toggled during execution by pressing the key
-defined with \-ui_modekey.
 Default is OFF (\-noui_active).
 .TP
 .B \-[no]offscreen_reload, \-[no]reload
 Controls whether or not MAME treats a second button input from a
 lightgun as a reload signal. In this case, MAME will report the gun's
 position as (0,MAX) with the trigger held, which is equivalent to an
-offscreen reload. This is only needed for games that required you to
-shoot offscreen to reload, and then only if your gun does not support
+offscreen reload. This is only needed for games that required you to 
+shoot offscreen to reload, and then only if your gun does not support 
 off screen reloads. The default is OFF (\-nooffscreen_reload).
 .TP
 .B \-joystick_map, \-joymap \fImap
@@ -1043,9 +1019,9 @@ limit. The default is 0.3.
 .TP
 .B \-joystick_saturation, \-joy_saturation, \-jsat \fIvalue
 If you play with an analog joystick, the ends can drift a little,
-and may not match in the +/\- directions. joystick_saturation tells how
-far along an axis movement change will be accepted before it reaches
-the maximum range. This option expects a float in the range of 0.0 to
+and may not match in the +/\- directions. joystick_saturation tells how 
+far along an axis movement change will be accepted before it reaches 
+the maximum range. This option expects a float in the range of 0.0 to 
 1.0, where 0 is the center of the joystick and 1 is the outer limit.
 The default is 0.85.
 .TP
@@ -1097,7 +1073,7 @@ Specifies the full path to the keymap file to be used. A few
 keymap files are available in \fB/usr/share/games/mess/keymaps\fR.
 .TP
 .B \-joy_idx[0\-8] \fIjoystick
-With these options you can assign a joystick to a
+With these options you can assign a joystick to a 
 specific index in MAME. Even if the kernel will list the joysticks
 in a different order on the next boot, MAME will still see the joystick
 as e.g. "Joystick 2". Use mame \-v to see which joysticks are recognized.
@@ -1144,8 +1120,8 @@ Alternative libGL.so to use; 'auto' selects SDL default.
 .B \-positional_device \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
 .TP
 .B \-mouse_device \fR[\fInone\fR|\fIkeyboard\fR|\fImouse\fR|\fIlightgun\fR|\fIjoystick\fR]
-Each of these options controls automatically enabling the mouse, or
-joystick depending on the presence of a particular class of analog
+Each of these options controls autoenabling the mouse, or joystick
+depending on the presence of a particular class of analog
 control for a particular game. For example, if you specify the option
 \-paddle mouse, then any game that has a paddle control will automatically
 enable mouse controls just as if you had explicitly specified \-mouse.
@@ -1172,8 +1148,8 @@ useful for debuggin in some scenarios (and gets in the way in others).
 Default is OFF (\-noupdate_in_pause).
 .TP
 .B \-[no]debug, \-[no]d
-Activates the integrated debugger. By default, the debugger is entered
-by pressing the tilde (~) key during emulation. It is also entered
+Activates the integrated debugger. By default, the debugger is entered 
+by pressing the tilde (~) key during emulation. It is also entered 
 immediately at startup. The default is OFF (\-nodebug).
 .TP
 .B \-debugscript \fIfilename
@@ -1248,7 +1224,7 @@ Forces MAME to skip displaying the game info screen. The default is OFF
 Specifies the name of a BDF font file to use for the UI font. If this
 font cannot be found or cannot be loaded, the system will fall back
 to its built\-in UI font. On some platforms \fIfontname\fP can be a system
-font name instead of a BDF font file. The default is 'default' (use
+font name instead of a BDF font file. The default is 'default' (use 
 the OSD\-determined default font).
 .TP
 .B \-ui \fIsimple\fR|\fIcabinet
@@ -1291,6 +1267,9 @@ List of plugins to disable.
 .TP
 .B \-language, \-lang \fIvalue
 Display language. Default is 'English'.
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
 .B \-watchdog \fIvalue
 Specifies a number of seconds after which MAME should automatically exit

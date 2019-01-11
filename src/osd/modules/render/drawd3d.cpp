@@ -453,8 +453,7 @@ void d3d_texture_manager::create_resources()
 		texture.height = m_default_bitmap.height();
 		texture.palette = nullptr;
 		texture.seqid = 0;
-		texture.unique_id = ~0ULL;
-		texture.old_id = ~0ULL;
+		texture.osddata = 0;
 
 		// now create it
 		auto tex = std::make_unique<texture_info>(this, &texture, win->prescale(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
@@ -485,10 +484,10 @@ texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, u
 	// find a match
 	for (auto it = m_texture_list.begin(); it != m_texture_list.end(); it++)
 	{
-		uint32_t test_screen = (uint32_t)((*it)->get_texinfo().unique_id >> 57);
-		uint32_t test_page = (uint32_t)((*it)->get_texinfo().unique_id >> 56) & 1;
-		uint32_t prim_screen = (uint32_t)(texinfo->unique_id >> 57);
-		uint32_t prim_page = (uint32_t)(texinfo->unique_id >> 56) & 1;
+		uint32_t test_screen = (uint32_t)(*it)->get_texinfo().osddata >> 1;
+		uint32_t test_page = (uint32_t)(*it)->get_texinfo().osddata & 1;
+		uint32_t prim_screen = (uint32_t)texinfo->osddata >> 1;
+		uint32_t prim_page = (uint32_t)texinfo->osddata & 1;
 		if (test_screen != prim_screen || test_page != prim_page)
 			continue;
 
@@ -2214,7 +2213,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 //  copyline_palette16
 //============================================================
 
-inline void texture_info::copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*src];
@@ -2229,7 +2228,7 @@ inline void texture_info::copyline_palette16(uint32_t *dst, const uint16_t *src,
 //  copyline_palettea16
 //============================================================
 
-inline void texture_info::copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (xborderpix)
 		*dst++ = palette[*src];
@@ -2244,7 +2243,7 @@ inline void texture_info::copyline_palettea16(uint32_t *dst, const uint16_t *src
 //  copyline_rgb32
 //============================================================
 
-inline void texture_info::copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (palette != nullptr)
 	{
@@ -2280,7 +2279,7 @@ inline void texture_info::copyline_rgb32(uint32_t *dst, const uint32_t *src, int
 //  copyline_argb32
 //============================================================
 
-inline void texture_info::copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
+static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette, int xborderpix)
 {
 	if (palette != nullptr)
 	{
@@ -2317,7 +2316,7 @@ inline void texture_info::copyline_argb32(uint32_t *dst, const uint32_t *src, in
 //  copyline_yuy16_to_yuy2
 //============================================================
 
-inline void texture_info::copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+static inline void copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 
@@ -2348,7 +2347,7 @@ inline void texture_info::copyline_yuy16_to_yuy2(uint16_t *dst, const uint16_t *
 //  copyline_yuy16_to_uyvy
 //============================================================
 
-inline void texture_info::copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+static inline void copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 
@@ -2375,7 +2374,7 @@ inline void texture_info::copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *
 //  copyline_yuy16_to_argb
 //============================================================
 
-inline void texture_info::copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
+static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette)
 {
 	assert(width % 2 == 0);
 

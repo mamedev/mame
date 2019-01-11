@@ -22,26 +22,30 @@
  *
  *************************************/
 
-void arabian_state::arabian_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(arabian_state, arabian)
 {
-	// there are 13 color table bits
-	for (int i = 0; i < (1 << 13); i++)
-	{
-		int const ena = BIT(i, 12);
-		int const enb = BIT(i, 11);
-		int const abhf = BIT(~i, 10);
-		int const aghf = BIT(~i, 9);
-		int const arhf = BIT(~i, 8);
-		int const az = BIT(i, 7);
-		int const ar = BIT(i, 6);
-		int const ag = BIT(i, 5);
-		int const ab = BIT(i, 4);
-		int const bz = BIT(i, 3);
-		int const br = BIT(i, 2);
-		int const bg = BIT(i, 1);
-		int const bb = BIT(i, 0);
+	int i;
 
-		int const planea = (az | ar | ag | ab) & ena;
+	/* there are 13 color table bits */
+	for (i = 0; i < (1 << 13); i++)
+	{
+		int r, g, b;
+
+		int ena = (i >> 12) & 1;
+		int enb = (i >> 11) & 1;
+		int abhf = (~i >> 10) & 1;
+		int aghf = (~i >> 9) & 1;
+		int arhf = (~i >> 8) & 1;
+		int az = (i >> 7) & 1;
+		int ar = (i >> 6) & 1;
+		int ag = (i >> 5) & 1;
+		int ab = (i >> 4) & 1;
+		int bz = (i >> 3) & 1;
+		int br = (i >> 2) & 1;
+		int bg = (i >> 1) & 1;
+		int bb = (i >> 0) & 1;
+
+		int planea = (az | ar | ag | ab) & ena;
 
 		/*-------------------------------------------------------------------------
 		    red derivation:
@@ -70,8 +74,8 @@ void arabian_state::arabian_palette(palette_device &palette) const
 		    red.base = (red.hi | red.lo)
 		-------------------------------------------------------------------------*/
 
-		int const rhi = planea ? ar : enb ? bz : 0;
-		int const rlo = planea ? (((!arhf) & az) ? 0 : ar) : enb ? br : 0;
+		int rhi = planea ? ar : enb ? bz : 0;
+		int rlo = planea ? (((!arhf) & az) ? 0 : ar) : enb ? br : 0;
 
 		/*-------------------------------------------------------------------------
 		    green derivation:
@@ -101,8 +105,8 @@ void arabian_state::arabian_palette(palette_device &palette) const
 		    grn.base = (grn.hi | grn.lo)
 		-------------------------------------------------------------------------*/
 
-		int const ghi = planea ? ag : enb ? bb : 0;
-		int const glo = planea ? (((!aghf) & az) ? 0 : ag) : enb ? bg : 0;
+		int ghi = planea ? ag : enb ? bb : 0;
+		int glo = planea ? (((!aghf) & az) ? 0 : ag) : enb ? bg : 0;
 
 		/*-------------------------------------------------------------------------
 		    blue derivation:
@@ -122,20 +126,20 @@ void arabian_state::arabian_palette(palette_device &palette) const
 		    blu.base = ((!abhf & az) ? 0 : ab);
 		-------------------------------------------------------------------------*/
 
-		int const bhi = ab;
-		int const bbase = ((!abhf) & az) ? 0 : ab;
+		int bhi = ab;
+		int bbase = ((!abhf) & az) ? 0 : ab;
 
 		/* convert an RGB color -
 		   there are effectively 6 bits of color: 2 red, 2 green, 2 blue */
-		int const r = ( rhi * (int)(((153.0 * 192) / 255) + 0.5)) +
-			          ( rlo * int(((102.0 * 192) / 255) + 0.5)) +
-			          ((rhi | rlo) ? 63 : 0);
+		r = ( rhi * (int)(((153.0 * 192) / 255) + 0.5)) +
+			( rlo * (int)(((102.0 * 192) / 255) + 0.5)) +
+			((rhi | rlo) ? 63 : 0);
 
-		int const g = ( ghi * (int)(((156.0 * 192) / 255) + 0.5)) +
-			          ( glo * int((( 99.0 * 192) / 255) + 0.5)) +
-			          ((ghi | glo) ? 63 : 0);
+		g = ( ghi * (int)(((156.0 * 192) / 255) + 0.5)) +
+			( glo * (int)((( 99.0 * 192) / 255) + 0.5)) +
+			((ghi | glo) ? 63 : 0);
 
-		int const b = (bhi * 192) + (bbase * 63);
+		b = (bhi * 192) + (bbase * 63);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -203,8 +207,8 @@ void arabian_state::video_start()
 		m_converted_gfx[offs * 4 + 0] = p4;
 	}
 
-	save_pointer(NAME(m_main_bitmap), BITMAP_WIDTH * BITMAP_HEIGHT);
-	save_pointer(NAME(m_converted_gfx), 0x8000 * 2);
+	save_pointer(NAME(m_main_bitmap.get()), BITMAP_WIDTH * BITMAP_HEIGHT);
+	save_pointer(NAME(m_converted_gfx.get()), 0x8000 * 2);
 	save_item(NAME(m_video_control));
 	save_item(NAME(m_flip_screen));
 }

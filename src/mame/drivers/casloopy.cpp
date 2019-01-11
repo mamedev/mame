@@ -153,7 +153,6 @@ PCB 'Z545-1 A240570-1'
 #include "cpu/sh/sh2.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -297,7 +296,7 @@ uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	count = test;
 
-	for (y=cliprect.top(); y<cliprect.bottom(); y++) // FIXME: off-by-one?
+	for (y=cliprect.min_y;y<cliprect.max_y;y++)
 	{
 		for(x=0;x<256;x++)
 		{
@@ -429,18 +428,18 @@ void casloopy_state::casloopy_map(address_map &map)
 {
 	map(0x00000000, 0x00007fff).ram().share("bios_rom");
 	map(0x01000000, 0x0107ffff).ram().share("wram");// stack pointer points here
-	map(0x04000000, 0x0401ffff).rw(FUNC(casloopy_state::bitmap_r), FUNC(casloopy_state::bitmap_w));
-	map(0x04040000, 0x0404ffff).rw(FUNC(casloopy_state::vram_r), FUNC(casloopy_state::vram_w)); // tilemap + PCG
+	map(0x04000000, 0x0401ffff).rw(this, FUNC(casloopy_state::bitmap_r), FUNC(casloopy_state::bitmap_w));
+	map(0x04040000, 0x0404ffff).rw(this, FUNC(casloopy_state::vram_r), FUNC(casloopy_state::vram_w)); // tilemap + PCG
 	map(0x04050000, 0x040503ff).ram(); // ???
-	map(0x04051000, 0x040511ff).rw(FUNC(casloopy_state::pal_r), FUNC(casloopy_state::pal_w));
-	map(0x04058000, 0x04058007).rw(FUNC(casloopy_state::vregs_r), FUNC(casloopy_state::vregs_w));
+	map(0x04051000, 0x040511ff).rw(this, FUNC(casloopy_state::pal_r), FUNC(casloopy_state::pal_w));
+	map(0x04058000, 0x04058007).rw(this, FUNC(casloopy_state::vregs_r), FUNC(casloopy_state::vregs_w));
 	map(0x0405b000, 0x0405b00f).ram().share("vregs"); // RGB555 brightness control plus scrolling
 //  AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
 //  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
-	map(0x06000000, 0x062fffff).r(FUNC(casloopy_state::cart_r));
+	map(0x06000000, 0x062fffff).r(this, FUNC(casloopy_state::cart_r));
 	map(0x07000000, 0x070003ff).ram().share("oram");// on-chip RAM, actually at 0xf000000 (1 kb)
 	map(0x09000000, 0x0907ffff).ram().share("wram");
-	map(0x0e000000, 0x0e2fffff).r(FUNC(casloopy_state::cart_r));
+	map(0x0e000000, 0x0e2fffff).r(this, FUNC(casloopy_state::cart_r));
 	map(0x0f000000, 0x0f0003ff).ram().share("oram");
 }
 

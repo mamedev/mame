@@ -283,10 +283,11 @@ void tc0100scn_device::device_start()
 	set_colbanks(0, 0, 0);  /* standard values, only Wgp & multiscreen games change them */
 									/* we call this here, so that they can be modified at video_start*/
 
-	save_pointer(NAME(m_ram), TC0100SCN_RAM_SIZE / 2);
+	save_pointer(NAME(m_ram.get()), TC0100SCN_RAM_SIZE / 2);
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_dblwidth));
 	save_item(NAME(m_gfxbank));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0100scn_device::postload), this));
 }
 
 //-------------------------------------------------
@@ -420,11 +421,8 @@ void tc0100scn_device::restore_scroll()
 	m_tilemap[2][1]->set_flip(flip);
 }
 
-//-------------------------------------------------
-//  device_post_load - device-specific postload
-//-------------------------------------------------
 
-void tc0100scn_device::device_post_load()
+void tc0100scn_device::postload()
 {
 	set_layer_ptrs();
 	restore_scroll();

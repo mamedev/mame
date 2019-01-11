@@ -59,21 +59,27 @@ void adam_keyboard_device::adam_kb_mem(address_map &map)
 
 
 //-------------------------------------------------
+//  ADDRESS_MAP( adam_kb_io )
+//-------------------------------------------------
+
+void adam_keyboard_device::adam_kb_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).r(this, FUNC(adam_keyboard_device::p1_r));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_keyboard_device::p2_r), FUNC(adam_keyboard_device::p2_w));
+	map(M6801_PORT3, M6801_PORT3).rw(this, FUNC(adam_keyboard_device::p3_r), FUNC(adam_keyboard_device::p3_w));
+	map(M6801_PORT4, M6801_PORT4).rw(this, FUNC(adam_keyboard_device::p4_r), FUNC(adam_keyboard_device::p4_w));
+}
+
+
+//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void adam_keyboard_device::device_add_mconfig(machine_config &config)
-{
-	M6801(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &adam_keyboard_device::adam_kb_mem);
-	m_maincpu->in_p1_cb().set(FUNC(adam_keyboard_device::p1_r));
-	m_maincpu->in_p2_cb().set(FUNC(adam_keyboard_device::p2_r));
-	m_maincpu->out_p2_cb().set(FUNC(adam_keyboard_device::p2_w));
-	m_maincpu->in_p3_cb().set(FUNC(adam_keyboard_device::p3_r));
-	m_maincpu->out_p3_cb().set(FUNC(adam_keyboard_device::p3_w));
-	m_maincpu->in_p4_cb().set(FUNC(adam_keyboard_device::p4_r));
-	m_maincpu->out_p4_cb().set(FUNC(adam_keyboard_device::p4_w));
-}
+MACHINE_CONFIG_START(adam_keyboard_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(adam_kb_mem)
+	MCFG_DEVICE_IO_MAP(adam_kb_io)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

@@ -39,21 +39,17 @@
 #include "evpc.h"
 #include "speaker.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CRU         (1U<<2)   // CRU access
-#define LOG_MEM         (1U<<3)   // Memory access
-#define LOG_ADDRESS     (1U<<4)   // Addresses
-
-#define VERBOSE ( LOG_GENERAL | LOG_WARN )
-
-#include "logmacro.h"
-
 DEFINE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device, "ti99_evpc", "SNUG Enhanced Video Processor Card")
 
 namespace bus { namespace ti99 { namespace peb {
 
-#define NOVRAM_SIZE 256
 #define EVPC_CRU_BASE 0x1400
+
+#define TRACE_ADDRESS 0
+#define TRACE_CRU 0
+#define TRACE_MEM 0
+
+#define NOVRAM_SIZE 256
 
 snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	device_t(mconfig, TI99_EVPC, tag, owner, clock),
@@ -71,8 +67,7 @@ snug_enhanced_video_device::snug_enhanced_video_device(const machine_config &mco
 	m_novram(nullptr),
 	m_video(*this, TI_VDP_TAG),
 	m_sound(*this, TI_SOUNDCHIP_TAG),
-	m_colorbus(*this, COLORBUS_TAG),
-	m_console_conn(*this, ":" TI99_EVPC_CONN_TAG)
+	m_colorbus(*this, COLORBUS_TAG)
 {
 }
 
@@ -82,7 +77,7 @@ SETADDRESS_DBIN_MEMBER( snug_enhanced_video_device::setaddress_dbin )
 	// setaddress/memory access pairs when the CPU enters wait states.
 	if (machine().side_effects_disabled()) return;
 
-	LOGMASKED(LOG_ADDRESS, "set address %04x, %s\n", offset, (state==ASSERT_LINE)? "read" : "write");
+	if (TRACE_ADDRESS) logerror("set address %04x, %s\n", offset, (state==ASSERT_LINE)? "read" : "write");
 
 	m_address = offset;
 	bool reading = (state==ASSERT_LINE);
@@ -230,12 +225,12 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
 		if (m_palette_accessed)
 		{
 			// Palette
-			LOGMASKED(LOG_MEM, "palette write %04x <- %02x\n", offset&0xffff, data);
+			if (TRACE_MEM) logerror("palette write %04x <- %02x\n", offset&0xffff, data);
 			switch (m_address & 0x000f)
 			{
 			case 0x08:
 				// Palette Write Address Register
-				LOGMASKED(LOG_MEM, "EVPC palette address write (for write access)\n");
+				if (TRACE_MEM) logerror("EVPC palette address write (for write access)\n");
 				m_palette.write_index = data;
 				m_palette.state = 0;
 				m_palette.read = 0;
@@ -243,7 +238,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
 
 			case 0x0a:
 				// Palette Write Color Value
-				LOGMASKED(LOG_MEM, "EVPC palette color write\n");
+				if (TRACE_MEM) logerror("EVPC palette color write\n");
 				if (!m_palette.read)
 				{
 					switch (m_palette.state)
@@ -270,13 +265,13 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
 
 			case 0x0c:
 				// Palette Write Pixel Mask
-				LOGMASKED(LOG_MEM, "EVPC palette mask write\n");
+				if (TRACE_MEM) logerror("EVPC palette mask write\n");
 				m_palette.mask = data;
 				break;
 
 			case 0x0e:
 				// Palette Write Address Register for Color Value
-				LOGMASKED(LOG_MEM, "EVPC palette address write (for read access)\n");
+				if (TRACE_MEM) logerror("EVPC palette address write (for read access)\n");
 				m_palette.read_index = data;
 				m_palette.state = 0;
 				m_palette.read = 1;
@@ -301,7 +296,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
 
 	if (m_sound_accessed)
 	{
-		m_sound->write(data);
+		m_sound->write(space, 0, data);
 	}
 }
 
@@ -349,7 +344,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
 		{
 		case 0:
 			m_selected = (data!=0);
-			LOGMASKED(LOG_CRU, "Map DSR = %d\n", m_selected);
+			if (TRACE_CRU) logerror("Map DSR = %d\n", m_selected);
 			break;
 
 		case 1:
@@ -397,6 +392,7 @@ void snug_enhanced_video_device::device_start()
 {
 	m_dsrrom = memregion(TI99_DSRROM)->base();
 	m_novram = std::make_unique<uint8_t[]>(NOVRAM_SIZE);
+	m_console_conn = downcast<bus::ti99::internal::evpc_clock_connector*>(machine().device(TI99_EVPC_CONN_TAG));
 	save_item(NAME(m_address));
 	save_item(NAME(m_dsr_page));
 	save_item(NAME(m_inDsrArea));
@@ -482,33 +478,21 @@ ioport_constructor snug_enhanced_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti99_evpc);
 }
 
-void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
-{
+MACHINE_CONFIG_START(snug_enhanced_video_device::device_add_mconfig)
 	// video hardware
-	V9938(config, m_video, XTAL(21'477'272)); // typical 9938 clock, not verified
-	m_video->set_vram_size(0x20000);
-	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
-	m_video->set_screen(TI_SCREEN_TAG);
-	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(21'477'272),
-		v99x8_device::HTOTAL,
-		0,
-		v99x8_device::HVISIBLE - 1,
-		v99x8_device::VTOTAL_NTSC * 2,
-		v99x8_device::VERTICAL_ADJUST * 2,
-		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
-	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
+	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL(21'477'272))  /* typical 9938 clock, not verified */
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, snug_enhanced_video_device, video_interrupt_in))
+	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
-	soundgen.ready_cb().set(FUNC(snug_enhanced_video_device::ready_line));
-	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
+	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
+	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, snug_enhanced_video_device, ready_line) )
 
 	// Mouse connected to the color bus of the v9938
-	TI99_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, "busmouse");
-}
+	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
+
+MACHINE_CONFIG_END
 
 } } } // end namespace bus::ti99::peb
-
-

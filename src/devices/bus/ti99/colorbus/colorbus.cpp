@@ -64,7 +64,7 @@ void device_ti99_colorbus_interface::interface_config_complete()
 
 } } } // end namespace bus::ti99::colorbus
 
-void ti99_colorbus_options(device_slot_interface &device)
+void ti99_colorbus_port(device_slot_interface &device)
 {
 	device.option_add("busmouse", TI99_BUSMOUSE);
 }

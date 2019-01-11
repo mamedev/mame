@@ -151,8 +151,8 @@ void spbactn_state::spbactn_map(address_map &map)
 	map(0x00000, 0x3ffff).rom();
 	map(0x40000, 0x43fff).ram();   // main ram
 	map(0x50000, 0x50fff).ram().share("spvideoram");
-	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
-	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
+	map(0x60000, 0x67fff).ram().w(this, FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
+	map(0x70000, 0x77fff).ram().w(this, FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
 	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x90000, 0x90001).portr("IN0");
 	map(0x90010, 0x90011).portr("IN1");
@@ -163,7 +163,7 @@ void spbactn_state::spbactn_map(address_map &map)
 	/* this are an awful lot of unknowns */
 	map(0x90000, 0x90001).nopw();
 	map(0x90011, 0x90011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x90020, 0x90021).w(FUNC(spbactn_state::main_irq_ack_w));
+	map(0x90020, 0x90021).w(this, FUNC(spbactn_state::main_irq_ack_w));
 	map(0x90030, 0x90031).nopw();
 	map(0x90050, 0x90051).nopw();
 
@@ -201,22 +201,22 @@ void spbactn_state::spbactnp_map(address_map &map)
 	map(0x00000, 0x3ffff).rom();
 	map(0x40000, 0x43fff).ram();   // main ram
 	map(0x50000, 0x50fff).ram().share("spvideoram");
-	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
-	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
+	map(0x60000, 0x67fff).ram().w(this, FUNC(spbactn_state::fg_videoram_w)).share("fgvideoram");
+	map(0x70000, 0x77fff).ram().w(this, FUNC(spbactn_state::bg_videoram_w)).share("bgvideoram");
 	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // yes R and G are swapped vs. the released version
 
-	map(0x90002, 0x90003).w(FUNC(spbactn_state::main_irq_ack_w));
-	map(0x90006, 0x90007).w(FUNC(spbactn_state::spbatnp_90006_w));
-	map(0x9000a, 0x9000b).w(FUNC(spbactn_state::spbatnp_9000a_w));
-	map(0x9000c, 0x9000d).w(FUNC(spbactn_state::spbatnp_9000c_w));
-	map(0x9000e, 0x9000f).w(FUNC(spbactn_state::spbatnp_9000e_w));
+	map(0x90002, 0x90003).w(this, FUNC(spbactn_state::main_irq_ack_w));
+	map(0x90006, 0x90007).w(this, FUNC(spbactn_state::spbatnp_90006_w));
+	map(0x9000a, 0x9000b).w(this, FUNC(spbactn_state::spbatnp_9000a_w));
+	map(0x9000c, 0x9000d).w(this, FUNC(spbactn_state::spbatnp_9000c_w));
+	map(0x9000e, 0x9000f).w(this, FUNC(spbactn_state::spbatnp_9000e_w));
 
-	map(0x90124, 0x90125).w(FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
-	map(0x9012c, 0x9012d).w(FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
+	map(0x90124, 0x90125).w(this, FUNC(spbactn_state::spbatnp_90124_w)); // bg scroll
+	map(0x9012c, 0x9012d).w(this, FUNC(spbactn_state::spbatnp_9012c_w)); // bg scroll
 
 
 
-	map(0x90000, 0x900ff).r(FUNC(spbactn_state::temp_read_handler_r)); // temp
+	map(0x90000, 0x900ff).r(this, FUNC(spbactn_state::temp_read_handler_r)); // temp
 
 }
 
@@ -238,7 +238,7 @@ void spbactn_state::spbactnp_extra_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share("extraram2");
 	map(0xe000, 0xefff).ram();
-	map(0xd000, 0xd1ff).ram().w(FUNC(spbactn_state::extraram_w)).share("extraram");
+	map(0xd000, 0xd1ff).ram().w(this, FUNC(spbactn_state::extraram_w)).share("extraram");
 	map(0xd200, 0xd200).ram();
 }
 
@@ -365,9 +365,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_spbactn )
-	GFXDECODE_ENTRY( "gfx1", 0, fgtilelayout, 0x0200, 16 + 240 )
-	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout, 0x0300, 16 + 128 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x0000,    0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0, fgtilelayout,   0x0200, 16 + 240 )
+	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout,   0x0300, 16 + 128 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x0000, 0x1000 )
 GFXDECODE_END
 
 
@@ -406,112 +406,111 @@ static GFXDECODE_START( gfx_spbactnp )
 GFXDECODE_END
 
 
-void spbactn_state::spbactn(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spbactn_state::spbactn_map);
-	m_maincpu->set_vblank_int("screen", FUNC(spbactn_state::irq3_line_assert));
+MACHINE_CONFIG_START(spbactn_state::spbactn)
 
-	Z80(config, m_audiocpu, XTAL(4'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactn_state::spbactn_sound_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_sound_map)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	MCFG_SCREEN_ADD("screen", RASTER)
 #if 0
 	// actual blanking frequencies unknown, but should be close to NTSC
-	m_screen->set_raw(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240);
+	MCFG_SCREEN_RAW_PARAMS(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240)
 #else
 	// MCFG_SCREEN_RAW_PARAMS breaks sprites; keeping this in for now
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 #endif
-	m_screen->set_screen_update(FUNC(spbactn_state::screen_update_spbactn));
-
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
+	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactn);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800/2);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactn)
+	MCFG_PALETTE_ADD("palette", 0x2800/2)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-
-	TECMO_MIXER(config, m_mixer, 0);
-	m_mixer->set_mixer_shifts(8,10,4);
-	m_mixer->set_blendcols(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
-	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );
-	m_mixer->set_blendsource( 0x1000 + 0x000, 0x1000 + 0x100);
-	m_mixer->set_bgpen(0x800 + 0x300, 0x000 + 0x300);
+	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+	MCFG_TECMO_SPRITE_GFX_REGION(2)
+	MCFG_DEVICE_ADD("mixer", TECMO_MIXER, 0)
+	MCFG_TECMO_MIXER_SHIFTS(8,10,4)
+	MCFG_TECMO_MIXER_BLENDCOLS(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
+	MCFG_TECMO_MIXER_REGULARCOLS( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 )
+	MCFG_TECMO_MIXER_BLENDSOURCE( 0x1000 + 0x000, 0x1000 + 0x100)
+	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000))); /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
-	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	/* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(4'000'000) / 4, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void spbactn_state::spbactnp(machine_config &config)
-{
+
+MACHINE_CONFIG_START(spbactn_state::spbactnp)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &spbactn_state::spbactnp_map);
-	m_maincpu->set_vblank_int("screen", FUNC(spbactn_state::irq3_line_assert));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactnp_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	Z80(config, m_audiocpu, XTAL(4'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactn_state::spbactn_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactn_sound_map)
 
 	// yes another cpu..
-	z80_device &extracpu(Z80(config, "extracpu", XTAL(4'000'000)));
-	extracpu.set_addrmap(AS_PROGRAM, &spbactn_state::spbactnp_extra_map);
-	extracpu.set_vblank_int("screen", FUNC(spbactn_state::irq0_line_hold));
-//  extracpu.set_vblank_int("screen", FUNC(spbactn_state::nmi_line_pulse));
+	MCFG_DEVICE_ADD("extracpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(spbactnp_extra_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
+
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(spbactn_state::screen_update_spbactnp));
-
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
+	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactnp);
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800/2);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spbactnp)
+	MCFG_PALETTE_ADD("palette", 0x2800/2)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	TECMO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-
-	TECMO_MIXER(config, m_mixer, 0);
-	m_mixer->set_mixer_shifts(12,14,8);
-	m_mixer->set_blendcols(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
-	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );
-	m_mixer->set_blendsource( 0x1000 + 0x000, 0x1000 + 0x100);
-	m_mixer->set_bgpen(0x800 + 0x300, 0x000 + 0x300);
+	MCFG_DEVICE_ADD("spritegen", TECMO_SPRITE, 0)
+	MCFG_TECMO_SPRITE_GFX_REGION(2)
+	MCFG_DEVICE_ADD("mixer", TECMO_MIXER, 0)
+	MCFG_TECMO_MIXER_SHIFTS(12,14,8)
+	MCFG_TECMO_MIXER_BLENDCOLS(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
+	MCFG_TECMO_MIXER_REGULARCOLS( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 )
+	MCFG_TECMO_MIXER_BLENDSOURCE( 0x1000 + 0x000, 0x1000 + 0x100)
+	MCFG_TECMO_MIXER_BGPEN(0x800 + 0x300)
 
 	/* sound hardware  - different? */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(4'000'000)));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(4'000'000))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 
 ROM_START( spbactn )

@@ -108,8 +108,8 @@ void jedi_state::do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	get_pens(pens);
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
-		for(x = cliprect.left(); x <= cliprect.right(); x++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for(x = cliprect.min_x; x <= cliprect.max_x; x++)
 			bitmap.pix32(y, x) = pens[bitmap.pix32(y, x)];
 }
 
@@ -158,12 +158,12 @@ void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle 
 
 	memset(background_line_buffer, 0, 0x200 * sizeof(int));
 
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		int x;
 		int bg_last_col = 0;
 
-		for (x = cliprect.left(); x <= cliprect.right(); x += 2)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
 		{
 			int tx_col1, tx_col2, bg_col;
 			int bg_tempcol;
@@ -285,7 +285,7 @@ void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			int i;
 			uint16_t x = spriteram[offs + 0x100] + ((spriteram[offs + 0x40] & 0x01) << 8) - 2;
 
-			if ((y < cliprect.top()) || (y > cliprect.bottom()))
+			if ((y < cliprect.min_y) || (y > cliprect.max_y))
 				continue;
 
 			if (flip_x)

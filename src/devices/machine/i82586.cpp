@@ -2,32 +2,32 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * An implementation of the Intel 82586 and 82596 Ethernet controller devices.
- *
- * This driver covers the following devices:
- *
- *   - 82586 - 16/24 data/address bus, 6/8/10 MHz
- *   - 82596SX - 16/32 data/address bus, 16/20 MHz
- *   - 82596DX - 32/32 data/address bus, 25/33 MHz
- *   - 82596CA - 32/32 data/address bus, 16/20/25/33 MHz
- *
- * This implementation should cover all of the above reasonably well, but
- * no testing of big endian mode in particular, and very limited testing
- * of the 82596 in non-linear modes has been done so far.
- *
- * Sources:
- *
- *   http://bitsavers.org/pdf/intel/_dataBooks/1991_Microcommunications.pdf
- *   http://bitsavers.org/pdf/intel/_dataBooks/1996_Networking.pdf
- *   https://www.intel.com/assets/pdf/general/82596ca.pdf
- *
- * TODO
- *   - testing for 82596 big endian and non-linear modes
- *   - more complete statistics capture
- *   - 82596 monitor mode
- *   - throttle timers and diagnostic command
- *   - special case handling for different 82596 steppings in big endian mode
- */
+* An implementation of the Intel 82586 and 82596 Ethernet controller devices.
+*
+* This driver covers the following devices:
+*
+*   - 82586 - 16/24 data/address bus, 6/8/10 MHz
+*   - 82596SX - 16/32 data/address bus, 16/20 MHz
+*   - 82596DX - 32/32 data/address bus, 25/33 MHz
+*   - 82596CA - 32/32 data/address bus, 16/20/25/33 MHz
+*
+* This implementation should cover all of the above reasonably well, but
+* no testing of big endian mode in particular, and very limited testing
+* of the 82596 in non-linear modes has been done so far.
+*
+* Some documents covering the above include:
+*
+*   http://bitsavers.org/pdf/intel/_dataBooks/1991_Microcommunications.pdf
+*   http://bitsavers.org/pdf/intel/_dataBooks/1996_Networking.pdf
+*   https://www.intel.com/assets/pdf/general/82596ca.pdf
+*
+* TODO
+*   - testing for 82596 big endian and non-linear modes
+*   - more complete statistics capturing
+*   - 82596 monitor mode
+*   - throttle timers and diagnostic command
+*   - special case handling for different 82596 steppings in big endian mode
+*/
 
 #include "emu.h"
 #include "i82586.h"
@@ -42,7 +42,7 @@
 
 #include "logmacro.h"
 
-// disable FCS insertion on transmit
+// disable FCS insertion (on transmit) and checking (on receive) because pcap doesn't expose them
 #define I82586_FCS 0
 
 ALLOW_SAVE_TYPE(i82586_base_device::cu_state);
@@ -112,53 +112,46 @@ CFG_PARAMS[] =
 };
 
 i82586_base_device::i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, device_network_interface(mconfig, *this, 10.0f)
-	, m_space_config("shared", endian, datawidth, addrwidth)
-	, m_out_irq(*this)
-	, m_cx(false)
-	, m_fr(false)
-	, m_cna(false)
-	, m_rnr(false)
-	, m_initialised(false)
-	, m_irq_assert(1)
-	, m_cu_state(CU_IDLE)
-	, m_ru_state(RU_IDLE)
-	, m_scp_address(SCP_ADDRESS)
-	, m_lb_length(0)
-{
-}
+	: device_t(mconfig, type, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	device_network_interface(mconfig, *this, 10.0f),
+	m_space_config("shared", endian, datawidth, addrwidth),
+	m_out_irq(*this),
+	m_cx(false),
+	m_fr(false),
+	m_cna(false),
+	m_rnr(false),
+	m_irq_state(false),
+	m_initialised(false),
+	m_cu_state(CU_IDLE),
+	m_ru_state(RU_IDLE),
+	m_scp_address(SCP_ADDRESS),
+	m_lb_length(0)
+{}
 
 i82586_device::i82586_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82586_base_device(mconfig, I82586, tag, owner, clock, ENDIANNESS_LITTLE, 16, 24)
-{
-}
+{}
 
 i82596_device::i82596_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth)
 	: i82586_base_device(mconfig, type, tag, owner, clock, endian, datawidth, 32)
-{
-}
+{}
 
 i82596_le16_device::i82596_le16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82596_device(mconfig, I82596_LE16, tag, owner, clock, ENDIANNESS_LITTLE, 16)
-{
-}
+{}
 
 i82596_be16_device::i82596_be16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82596_device(mconfig, I82596_BE16, tag, owner, clock, ENDIANNESS_BIG, 16)
-{
-}
+{}
 
 i82596_le32_device::i82596_le32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82596_device(mconfig, I82596_LE32, tag, owner, clock, ENDIANNESS_LITTLE, 32)
-{
-}
+{}
 
 i82596_be32_device::i82596_be32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82596_device(mconfig, I82596_BE32, tag, owner, clock, ENDIANNESS_BIG, 32)
-{
-}
+{}
 
 // shared implementation
 void i82586_base_device::device_start()
@@ -176,6 +169,7 @@ void i82586_base_device::device_start()
 	save_item(NAME(m_fr));
 	save_item(NAME(m_cna));
 	save_item(NAME(m_rnr));
+	save_item(NAME(m_irq_state));
 	save_item(NAME(m_initialised));
 
 	save_item(NAME(m_cu_state));
@@ -203,6 +197,7 @@ void i82586_base_device::device_reset()
 	m_fr = false;
 	m_cna = false;
 	m_rnr = false;
+	m_irq_state = false;
 	m_initialised = false;
 
 	m_cu_state = CU_IDLE;
@@ -218,6 +213,7 @@ void i82586_base_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	{
 		case CU_TIMER:
 			cu_execute();
+			update_scb();
 			break;
 
 		case RU_TIMER:
@@ -241,7 +237,7 @@ device_memory_interface::space_config_vector i82586_base_device::memory_space_co
 
 WRITE_LINE_MEMBER(i82586_base_device::ca)
 {
-	LOG("channel attention %s (%s)\n", state ? "asserted" : "cleared", machine().describe_context());
+	LOG("channel attention %s (%s)\n", state ? "asserted" : "deasserted", machine().describe_context());
 
 	if (state)
 	{
@@ -253,7 +249,7 @@ WRITE_LINE_MEMBER(i82586_base_device::ca)
 	}
 }
 
-int i82586_base_device::recv_start_cb(u8 *buf, int length)
+void i82586_base_device::recv_cb(u8 *buf, int length)
 {
 	switch (m_ru_state)
 	{
@@ -268,7 +264,9 @@ int i82586_base_device::recv_start_cb(u8 *buf, int length)
 			LOG("recv_cb receiving frame length %d\n", length);
 			dump_bytes(buf, length);
 
-			return ru_execute(buf, length);
+			ru_execute(buf, length);
+
+			update_scb();
 		}
 		break;
 
@@ -277,15 +275,6 @@ int i82586_base_device::recv_start_cb(u8 *buf, int length)
 		// TODO: accumulate statistics
 		break;
 	}
-
-	return 0;
-}
-
-void i82586_base_device::recv_complete_cb(int result)
-{
-	ru_complete(result);
-
-	update_scb();
 }
 
 void i82586_base_device::process_scb()
@@ -293,20 +282,12 @@ void i82586_base_device::process_scb()
 	// fetch current command and status
 	m_scb_cs = m_space->read_dword(m_scb_address);
 
-	// handle reset
-	if (m_scb_cs & RESET)
-	{
-		LOG("process_scb reset\n");
-
-		device_reset();
-		return;
-	}
-
 	static const char *const CUC_NAME[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "THROTTLE_D", "THROTTLE_I", "reserved" };
 	static const char *const RUC_NAME[] = { "NOP", "START", "RESUME", "SUSPEND", "ABORT", "reserved", "reserved", "reserved" };
-	LOG("process_scb command/status 0x%08x (cuc %s, ruc %s)\n", m_scb_cs,
+	LOG("process_scb command/status 0x%08x (cuc %s, ruc %s%s)\n", m_scb_cs,
 		CUC_NAME[(m_scb_cs & CUC) >> 24],
-		RUC_NAME[(m_scb_cs & RUC) >> 20]);
+		RUC_NAME[(m_scb_cs & RUC) >> 20],
+		m_scb_cs & RESET ? ", reset" : "");
 
 	// clear interrupt flags when acknowledged
 	if (m_scb_cs & ACK_CX)
@@ -398,8 +379,6 @@ void i82586_base_device::update_scb()
 		(m_cu_state << 8) |
 		(m_ru_state << 4));
 
-	LOG("update_scb%s%s%s%s\n", m_cx ? " CX" : "", m_fr ? " FR" : "", m_cna ? " CNA" : "", m_rnr ? " RNR" : "");
-
 	// update interrupt status
 	set_irq(m_cx || m_fr || m_cna || m_rnr);
 }
@@ -407,8 +386,7 @@ void i82586_base_device::update_scb()
 void i82586_base_device::cu_execute()
 {
 	// fetch the command block command/status
-	const u32 cb_cs = m_space->read_dword(m_cba);
-	u16 status = 0;
+	u32 cb_cs = m_space->read_dword(m_cba);
 
 	// set busy status
 	m_space->write_dword(m_cba, cb_cs | CB_B);
@@ -422,57 +400,52 @@ void i82586_base_device::cu_execute()
 		switch (cb_cs & CB_CMD)
 		{
 		case CB_NOP:
-			status |= CB_OK;
+			cb_cs |= CB_OK;
 			break;
 
 		case CB_IASETUP:
 			if (cu_iasetup())
-				status |= CB_OK;
+				cb_cs |= CB_OK;
 			break;
 
 		case CB_CONFIGURE:
 			if (cu_configure())
-				status |= CB_OK;
+				cb_cs |= CB_OK;
 			break;
 
 		case CB_MCSETUP:
 			if (cu_mcsetup())
-				status |= CB_OK;
+				cb_cs |= CB_OK;
 			break;
 
 		case CB_TRANSMIT:
+			// always turn on the heartbeat indicator status after a successful transmission; not
+			// strictly correct, but allows one InterPro 2000 diagnostic to pass
 			if (cu_transmit(cb_cs))
-				return;
+				cb_cs |= CB_OK | CB_S6;
 			break;
 
 		case CB_TDREFLECT:
 			if (cu_tdreflect())
-				status |= CB_OK;
+				cb_cs |= CB_OK;
 			break;
 
 		case CB_DUMP:
 			if (cu_dump())
-				status |= CB_OK;
+				cb_cs |= CB_OK;
 			break;
 
 		case CB_DIAGNOSE:
-			status |= CB_OK;
+			cb_cs |= CB_OK;
 			break;
 		}
 	}
 	else
 		// abort status
-		status |= CB_A;
+		cb_cs |= CB_A;
 
-	// complete command
-	cu_complete(status);
-}
-
-void i82586_base_device::cu_complete(const u16 status)
-{
 	// clear busy status and set completion status
-	const u32 cb_cs = m_space->read_dword(m_cba);
-	m_space->write_dword(m_cba, (cb_cs & ~0xffffU) | CB_C | status);
+	m_space->write_dword(m_cba, cb_cs | CB_C);
 
 	// chain to next command
 	if (!(cb_cs & CB_EL))
@@ -506,9 +479,7 @@ void i82586_base_device::cu_complete(const u16 status)
 	LOG("cu_execute complete state %s\n", CU_STATE_NAME[m_cu_state]);
 
 	// set command executed status
-	m_cx = (cb_cs & CB_I) && (status & CB_OK);
-
-	update_scb();
+	m_cx = (cb_cs & CB_I) && (cb_cs & CB_OK);
 }
 
 bool i82586_base_device::address_filter(u8 *mac)
@@ -560,12 +531,15 @@ bool i82586_base_device::address_filter(u8 *mac)
 // shared helpers
 void i82586_base_device::set_irq(bool irq)
 {
-	if (irq)
+	if (m_irq_state != irq)
 	{
-		LOG("irq asserted\n");
-
-		m_out_irq(m_irq_assert);
-		m_out_irq(!m_irq_assert);
+		m_irq_state = irq;
+		m_out_irq(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else if (m_irq_state && irq)
+	{
+		m_out_irq(CLEAR_LINE);
+		m_out_irq(ASSERT_LINE);
 	}
 }
 
@@ -773,7 +747,6 @@ void i82586_device::device_start()
 {
 	i82586_base_device::device_start();
 
-	save_item(NAME(m_rbd_offset));
 	save_item(NAME(m_cfg_bytes));
 }
 
@@ -1014,15 +987,8 @@ bool i82586_device::cu_transmit(u32 command)
 		LOG("cu_transmit sending frame length %d\n", length);
 		dump_bytes(buf, length);
 
-		return send(buf, length) == length;
+		return send(buf, length) == 0;
 	}
-}
-
-void i82586_base_device::send_complete_cb(int result)
-{
-	// always turn on the heartbeat indicator status after a successful transmit; not
-	// strictly correct, but allows one InterPro 2000 diagnostic to pass
-	cu_complete(result ? (CB_OK | CB_S6) : CB_S9);
 }
 
 bool i82586_device::cu_tdreflect()
@@ -1070,11 +1036,10 @@ bool i82586_device::address_filter(u8 *mac)
 	return false;
 }
 
-u16 i82586_device::ru_execute(u8 *buf, int length)
+void i82586_device::ru_execute(u8 *buf, int length)
 {
 	// fetch receive frame descriptor command/status
 	u32 rfd_cs = m_space->read_dword(m_rfd);
-	u16 status = 0;
 
 	// current buffer position and bytes remaining
 	int position = 0, remaining = length;
@@ -1086,8 +1051,9 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 
 	// set short frame status
 	if (length < cfg_min_frame_length())
-		status |= RFD_S_SHORT;
+		rfd_cs |= RFD_S_SHORT;
 
+#if I82586_FCS
 	// set crc status
 	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
@@ -1097,14 +1063,15 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 		// increment crc error count
 		m_space->write_word(m_scb_address + 8, m_space->read_word(m_scb_address + 8) + 1);
 
-		status |= RFD_S_CRC;
+		rfd_cs |= RFD_S_CRC;
 	}
+#endif
 
 	// TODO: alignment error (crc in misaligned frame), status bit 10
 	// TODO: increment alignment error counter
 
 	// fetch initial rbd offset from rfd
-	m_rbd_offset = m_space->read_word(m_rfd + 6);
+	u16 rbd_offset = m_space->read_word(m_rfd + 6);
 
 	if (!cfg_no_src_add_ins())
 	{
@@ -1120,11 +1087,11 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 	}
 
 	// store remaining bytes in receive buffers
-	while (remaining && m_rbd_offset != RBD_EMPTY)
+	while (remaining && rbd_offset != RBD_EMPTY)
 	{
 		// fetch the count and address for this buffer
-		u32 rb_address = m_space->read_dword(m_scb_base + m_rbd_offset + 4);
-		u16 rbd_size = m_space->read_word(m_scb_base + m_rbd_offset + 8);
+		u32 rb_address = m_space->read_dword(m_scb_base + rbd_offset + 4);
+		u16 rbd_size = m_space->read_word(m_scb_base + rbd_offset + 8);
 
 		// compute number of bytes to store in buffer
 		int actual = remaining > (rbd_size & RB_SIZE) ? (rbd_size & RB_SIZE) : remaining;
@@ -1137,17 +1104,17 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 		remaining -= actual;
 
 		// store actual count
-		m_space->write_word(m_scb_base + m_rbd_offset + 0, actual | RB_F | (remaining ? 0 : RB_EOF));
+		m_space->write_word(m_scb_base + rbd_offset + 0, actual | RB_F | (remaining ? 0 : RB_EOF));
 
 		// check if buffers exhausted
 		if ((rbd_size & RB_EL))
 		{
-			m_rbd_offset = RBD_EMPTY;
+			rbd_offset = RBD_EMPTY;
 
 			if (remaining)
 			{
 				// set buffers exhausted status
-				status |= RFD_S_BUFFER;
+				rfd_cs |= RFD_S_BUFFER;
 
 				m_ru_state = RU_NR;
 				m_rnr = true;
@@ -1155,33 +1122,28 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 		}
 		else
 			// fetch next rbd offset
-			m_rbd_offset = m_space->read_word(m_scb_base + m_rbd_offset + 2);
+			rbd_offset = m_space->read_word(m_scb_base + rbd_offset + 2);
 	}
 
 	if (remaining == 0 || cfg_save_bad_frames())
 		// set frame received status
-		status |= RFD_C;
+		rfd_cs |= RFD_C;
 
 	// frame received without errors
-	if (!(status & RFD_ERROR_82586))
-		status |= RFD_OK;
+	if (!(rfd_cs & RFD_ERROR_82586))
+	{
+		LOG("ru_execute frame received without error\n");
 
-	return status;
-}
-
-void i82586_device::ru_complete(const u16 status)
-{
-	if (status & RFD_OK)
-		LOG("ru_complete frame received without error\n");
+		rfd_cs |= RFD_OK;
+	}
 	else
-		LOG("ru_complete frame received with errors status 0x%04x\n", status);
+		LOG("ru_execute frame received with errors status 0x%04x\n", rfd_cs);
 
-	// update receive frame descriptor status
-	u32 rfd_cs = m_space->read_dword(m_rfd);
-	m_space->write_dword(m_rfd, (rfd_cs & ~0xffffU) | status);
+	// store status
+	m_space->write_dword(m_rfd, rfd_cs);
 
 	// if we received without error, or we're saving bad frames, advance to the next rfd
-	if ((status & RFD_OK) || cfg_save_bad_frames())
+	if ((rfd_cs & RFD_OK) || cfg_save_bad_frames())
 	{
 		if (!(rfd_cs & RFD_EL))
 		{
@@ -1189,8 +1151,8 @@ void i82586_device::ru_complete(const u16 status)
 			m_rfd = m_scb_base + m_space->read_word(m_rfd + 4);
 
 			// store next free rbd address into rfd
-			if (m_rbd_offset != RBD_EMPTY)
-				m_space->write_word(m_rfd + 6, m_rbd_offset);
+			if (rbd_offset != RBD_EMPTY)
+				m_space->write_word(m_rfd + 6, rbd_offset);
 		}
 		else
 		{
@@ -1210,7 +1172,7 @@ void i82586_device::ru_complete(const u16 status)
 	}
 
 	static const char *const RU_STATE_NAME[] = { "IDLE", "SUSPENDED", "NO RESOURCES", nullptr, "READY" };
-	LOG("ru_complete complete state %s\n", RU_STATE_NAME[m_ru_state]);
+	LOG("ru_execute complete state %s\n", RU_STATE_NAME[m_ru_state]);
 }
 
 u32 i82586_device::address(u32 base, int offset, int address, u16 empty)
@@ -1229,8 +1191,6 @@ void i82596_device::device_start()
 
 	save_item(NAME(m_sysbus));
 
-	save_item(NAME(m_irq_assert));
-	save_item(NAME(m_rbd_address));
 	save_item(NAME(m_mac_multi_ia));
 }
 
@@ -1306,9 +1266,6 @@ void i82596_device::initialise()
 		LOG("initialise scb address 0x%08x\n", m_scb_address);
 		break;
 	}
-
-	// configure interrupt polarity
-	m_irq_assert = (m_sysbus & SYSBUS_INT) ? 0 : 1;
 
 	// clear iscp busy byte
 	m_space->write_byte(iscp_address, 0);
@@ -1695,7 +1652,7 @@ bool i82596_device::cu_transmit(u32 command)
 		LOG("cu_transmit sending frame length %d\n", length);
 		dump_bytes(buf, length);
 
-		return send(buf, length) == length;
+		return send(buf, length) == 0;
 	}
 }
 
@@ -1786,11 +1743,10 @@ bool i82596_device::address_filter(u8 *mac)
 	return false;
 }
 
-u16 i82596_device::ru_execute(u8 *buf, int length)
+void i82596_device::ru_execute(u8 *buf, int length)
 {
 	// fetch receive frame descriptor command/status
-	const u32 rfd_cs = m_space->read_dword(m_rfd);
-	u16 status = 0;
+	u32 rfd_cs = m_space->read_dword(m_rfd);
 
 	// offset into rfd/rbd for linear mode
 	int linear_offset = mode() == MODE_LINEAR ? 4 : 0;
@@ -1826,9 +1782,10 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 		if (mode() != MODE_82586)
 			m_space->write_dword(m_scb_address + 28 + linear_offset, m_space->read_dword(m_scb_address + 28 + linear_offset) + 1);
 
-		status |= RFD_S_SHORT;
+		rfd_cs |= RFD_S_SHORT;
 	}
 
+#if I82586_FCS
 	// set crc status
 	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
@@ -1841,18 +1798,19 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 		else
 			m_space->write_dword(m_scb_address + 8 + linear_offset, m_space->read_dword(m_scb_address + 8 + linear_offset) + 1);
 
-		status |= RFD_S_CRC;
+		rfd_cs |= RFD_S_CRC;
 	}
+#endif
 
 	// TODO: alignment error (crc in misaligned frame), status bit 10
 	// TODO: increment alignment error counter
 
 	// set multicast status
 	if (mode() != MODE_82586 && memcmp(buf, get_mac(), cfg_address_length()))
-		status |= RFD_S_MULTICAST;
+		rfd_cs |= RFD_S_MULTICAST;
 
 	// fetch initial rbd address from rfd
-	m_rbd_address = address(m_rfd, 6, 8, RBD_EMPTY);
+	u32 rbd_address = address(m_rfd, 6, 8, RBD_EMPTY);
 
 	// check for simplified mode
 	if (mode() != MODE_82586 && !(rfd_cs & RFD_SF))
@@ -1881,7 +1839,7 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 			m_space->write_word(m_rfd + 8 + linear_offset, actual | RB_F | RB_EOF);
 
 			// set frame received and truncated frame status
-			status |= RFD_C | (actual < length ? RFD_S_TRUNCATED : 0);
+			rfd_cs |= RFD_C | (actual < length ? RFD_S_TRUNCATED : 0);
 		}
 		else
 			LOG("ru_execute discarding %d byte frame exceeding rfd size %d\n", length, rfd_size);
@@ -1921,11 +1879,11 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 		}
 
 		// store remaining bytes in receive buffers
-		while (remaining && m_rbd_address != RBD_EMPTY)
+		while (remaining && rbd_address != RBD_EMPTY)
 		{
 			// fetch the count and address for this buffer
-			u32 rb_address = m_space->read_dword(m_rbd_address + 4 + linear_offset);
-			u16 rbd_size = m_space->read_word(m_rbd_address + 8 + linear_offset);
+			u32 rb_address = m_space->read_dword(rbd_address + 4 + linear_offset);
+			u16 rbd_size = m_space->read_word(rbd_address + 8 + linear_offset);
 
 			// compute number of bytes to store in buffer
 			int actual = remaining > (rbd_size & RB_SIZE) ? (rbd_size & RB_SIZE) : remaining;
@@ -1938,17 +1896,17 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 			remaining -= actual;
 
 			// store actual count
-			m_space->write_word(m_rbd_address + 0, actual | RB_F | (remaining ? 0 : RB_EOF));
+			m_space->write_word(rbd_address + 0, actual | RB_F | (remaining ? 0 : RB_EOF));
 
 			// check if buffers exhausted
 			if ((rbd_size & RB_EL))
 			{
-				m_rbd_address = RBD_EMPTY;
+				rbd_address = RBD_EMPTY;
 
 				if (remaining)
 				{
 					// set buffers exhausted status
-					status |= RFD_S_BUFFER;
+					rfd_cs |= RFD_S_BUFFER;
 
 					m_ru_state = mode() == MODE_82586 ? RU_NR : RU_NR_RBD;
 					m_rnr = true;
@@ -1956,30 +1914,26 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 			}
 			else
 				// fetch next rbd address
-				m_rbd_address = address(m_rbd_address, 2, 4);
+				rbd_address = address(rbd_address, 2, 4);
 		}
 
 		if (remaining == 0 || cfg_save_bad_frames())
 			// set frame received status
-			status |= RFD_C;
+			rfd_cs |= RFD_C;
 	}
 
-	if (!(status & (mode() == MODE_82586 ? RFD_ERROR_82586 : RFD_ERROR)))
-		status |= RFD_OK;
+	// frame received without errors
+	if (!(rfd_cs & (mode() == MODE_82586 ? RFD_ERROR_82586 : RFD_ERROR)))
+	{
+		LOG("ru_execute frame received without error\n");
 
-	return status;
-}
-
-void i82596_device::ru_complete(const u16 status)
-{
-	if (status & RFD_OK)
-		LOG("ru_complete frame received without error\n");
+		rfd_cs |= RFD_OK;
+	}
 	else
-		LOG("ru_complete frame received with errors status 0x%04x\n", status);
+		LOG("ru_execute frame received with errors status 0x%04x\n", rfd_cs);
 
 	// store status
-	const u32 rfd_cs = m_space->read_dword(m_rfd);
-	m_space->write_dword(m_rfd, (rfd_cs & ~0xffffU) | status);
+	m_space->write_dword(m_rfd, rfd_cs);
 
 	// if we received without error, or we're saving bad frames, advance to the next rfd
 	if ((rfd_cs & RFD_OK) || cfg_save_bad_frames())
@@ -1990,12 +1944,12 @@ void i82596_device::ru_complete(const u16 status)
 			m_rfd = address(m_rfd, 4, 4);
 
 			// store next free rbd address into rfd
-			if (m_rbd_address != RBD_EMPTY)
+			if (rbd_address != RBD_EMPTY)
 			{
 				if (mode() == MODE_LINEAR)
-					m_space->write_dword(m_rfd + 8, m_rbd_address);
+					m_space->write_dword(m_rfd + 8, rbd_address);
 				else
-					m_space->write_word(m_rfd + 6, m_rbd_address - m_scb_base);
+					m_space->write_word(m_rfd + 6, rbd_address - m_scb_base);
 			}
 		}
 		else
@@ -2016,7 +1970,7 @@ void i82596_device::ru_complete(const u16 status)
 	}
 
 	static const char *const RU_STATE_NAME[] = { "IDLE", "SUSPENDED", "NO RESOURCES", nullptr, "READY", nullptr, nullptr, nullptr, nullptr, nullptr, "NO RESOURCES (RFD)", nullptr, "NO RESOURCES (RBD)" };
-	LOG("ru_complete complete state %s\n", RU_STATE_NAME[m_ru_state]);
+	LOG("ru_execute complete state %s\n", RU_STATE_NAME[m_ru_state]);
 }
 
 u32 i82596_device::address(u32 base, int offset, int address, u16 empty)

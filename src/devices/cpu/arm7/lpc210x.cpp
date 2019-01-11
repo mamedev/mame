@@ -19,25 +19,25 @@ DEFINE_DEVICE_TYPE(LPC2103, lpc210x_device, "lpc2103", "NXP LPC2103")
 
 void lpc210x_device::lpc2103_map(address_map &map)
 {
-	map(0x00000000, 0x00007fff).rw(FUNC(lpc210x_device::flash_r), FUNC(lpc210x_device::flash_w)); // 32kb internal FLASH rom
+	map(0x00000000, 0x00007fff).rw(this, FUNC(lpc210x_device::flash_r), FUNC(lpc210x_device::flash_w)); // 32kb internal FLASH rom
 
-	map(0x3FFFC000, 0x3FFFC01f).rw(FUNC(lpc210x_device::fio_r), FUNC(lpc210x_device::fio_w)); // GPIO
+	map(0x3FFFC000, 0x3FFFC01f).rw(this, FUNC(lpc210x_device::fio_r), FUNC(lpc210x_device::fio_w)); // GPIO
 
 
 	map(0x40000000, 0x40001fff).ram(); // 8kb internal SROM (writes should actually latch - see docs)
 
-	map(0xE0004000, 0xE000407f).rw(FUNC(lpc210x_device::timer0_r), FUNC(lpc210x_device::timer0_w));
+	map(0xE0004000, 0xE000407f).rw(this, FUNC(lpc210x_device::timer0_r), FUNC(lpc210x_device::timer0_w));
 
-	map(0xE0008000, 0xE000807f).rw(FUNC(lpc210x_device::timer1_r), FUNC(lpc210x_device::timer1_w));
+	map(0xE0008000, 0xE000807f).rw(this, FUNC(lpc210x_device::timer1_r), FUNC(lpc210x_device::timer1_w));
 
-	map(0xE002C000, 0xE002C007).rw(FUNC(lpc210x_device::pin_r), FUNC(lpc210x_device::pin_w));
+	map(0xE002C000, 0xE002C007).rw(this, FUNC(lpc210x_device::pin_r), FUNC(lpc210x_device::pin_w));
 
-	map(0xE01FC000, 0xE01FC007).rw(FUNC(lpc210x_device::mam_r), FUNC(lpc210x_device::mam_w));
-	map(0xE01FC080, 0xE01FC08f).rw(FUNC(lpc210x_device::pll_r), FUNC(lpc210x_device::pll_w)); // phase locked loop
-	map(0xE01FC100, 0xE01FC103).rw(FUNC(lpc210x_device::apbdiv_r), FUNC(lpc210x_device::apbdiv_w));
-	map(0xE01FC1a0, 0xE01FC1a3).rw(FUNC(lpc210x_device::scs_r), FUNC(lpc210x_device::scs_w));
+	map(0xE01FC000, 0xE01FC007).rw(this, FUNC(lpc210x_device::mam_r), FUNC(lpc210x_device::mam_w));
+	map(0xE01FC080, 0xE01FC08f).rw(this, FUNC(lpc210x_device::pll_r), FUNC(lpc210x_device::pll_w)); // phase locked loop
+	map(0xE01FC100, 0xE01FC103).rw(this, FUNC(lpc210x_device::apbdiv_r), FUNC(lpc210x_device::apbdiv_w));
+	map(0xE01FC1a0, 0xE01FC1a3).rw(this, FUNC(lpc210x_device::scs_r), FUNC(lpc210x_device::scs_w));
 
-	map(0xFFFFF000, 0xFFFFF2ff).rw(FUNC(lpc210x_device::vic_r), FUNC(lpc210x_device::vic_w)); // interrupt controller
+	map(0xFFFFF000, 0xFFFFF2ff).rw(this, FUNC(lpc210x_device::vic_r), FUNC(lpc210x_device::vic_w)); // interrupt controller
 }
 
 

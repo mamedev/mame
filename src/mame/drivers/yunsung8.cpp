@@ -73,9 +73,9 @@ WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
 void yunsung8_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x0001, 0x0001).w(FUNC(yunsung8_state::bankswitch_w));    // ROM Bank (again?)
+	map(0x0001, 0x0001).w(this, FUNC(yunsung8_state::bankswitch_w));    // ROM Bank (again?)
 	map(0x8000, 0xbfff).bankr("mainbank");    // Banked ROM
-	map(0xc000, 0xdfff).rw(FUNC(yunsung8_state::videoram_r), FUNC(yunsung8_state::videoram_w)); // Video RAM (Banked)
+	map(0xc000, 0xdfff).rw(this, FUNC(yunsung8_state::videoram_r), FUNC(yunsung8_state::videoram_w)); // Video RAM (Banked)
 	map(0xe000, 0xffff).ram();
 }
 
@@ -83,13 +83,13 @@ void yunsung8_state::main_map(address_map &map)
 void yunsung8_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(FUNC(yunsung8_state::videobank_w));  // video RAM bank
-	map(0x01, 0x01).portr("P1").w(FUNC(yunsung8_state::bankswitch_w)); // ROM Bank + Layers Enable
+	map(0x00, 0x00).portr("SYSTEM").w(this, FUNC(yunsung8_state::videobank_w));  // video RAM bank
+	map(0x01, 0x01).portr("P1").w(this, FUNC(yunsung8_state::bankswitch_w)); // ROM Bank + Layers Enable
 	map(0x02, 0x02).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write)); // To Sound CPU
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x06, 0x06).w(FUNC(yunsung8_state::flipscreen_w));    // Flip Screen
-	map(0x07, 0x07).w(FUNC(yunsung8_state::main_irq_ack_w));
+	map(0x06, 0x06).w(this, FUNC(yunsung8_state::flipscreen_w));    // Flip Screen
+	map(0x07, 0x07).w(this, FUNC(yunsung8_state::main_irq_ack_w));
 }
 
 
@@ -118,7 +118,7 @@ void yunsung8_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");      // Banked ROM
-	map(0xe000, 0xe000).w(FUNC(yunsung8_state::sound_bankswitch_w)); // ROM Bank
+	map(0xe000, 0xe000).w(this, FUNC(yunsung8_state::sound_bankswitch_w)); // ROM Bank
 	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
 	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xf000, 0xf7ff).ram();
@@ -341,45 +341,47 @@ void yunsung8_state::machine_reset()
 }
 
 
-void yunsung8_state::yunsung8(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/2);		/* Z80B @ 8MHz? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &yunsung8_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &yunsung8_state::port_map);
-	m_maincpu->set_vblank_int("screen", FUNC(yunsung8_state::irq0_line_assert));	/* No nmi routine */
+MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 
-	Z80(config, m_audiocpu, XTAL(16'000'000)/4);	/* ? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &yunsung8_state::sound_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/2)           /* Z80B @ 8MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(port_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", yunsung8_state, irq0_line_assert)   /* No nmi routine */
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4)          /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(16'000'000)/2, 512, 64, 512-64, 262, 8, 256-8); /* TODO: completely inaccurate */
-	screen.set_screen_update(FUNC(yunsung8_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 64, 512-64, 262, 8, 256-8) /* TODO: completely inaccurate */
+	MCFG_SCREEN_UPDATE_DRIVER(yunsung8_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_yunsung8);
-	PALETTE(config, m_palette).set_entries(2048);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yunsung8)
+	MCFG_PALETTE_ADD("palette", 2048)
+
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(16'000'000)/4));
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	LS157(config, m_adpcm_select, 0);
-	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
-	MSM5205(config, m_msm, XTAL(400'000)); /* verified on pcb */
-	m_msm->vck_legacy_callback().set(FUNC(yunsung8_state::adpcm_int)); /* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);	/* 4KHz, 4 Bits */
-	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, yunsung8_state, adpcm_int)) /* interrupt function */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -392,10 +394,10 @@ void yunsung8_state::yunsung8(machine_config &config)
 
 /***************************************************************************
 
-Magix
+                                    Magix
+
 Yun Sung, 1995
 
-YS-ROCK-970712
 +-------------------------------------+
 |VOL YM3014      6116               04|
 |     M5205 400KHz                  03|
@@ -404,10 +406,10 @@ YS-ROCK-970712
 |    MCM2018AN45                      |
 |J   MCM2018AN45                      |
 |A DSW1       +--------+              |
-|M            | Quick  |              |
-|M DSW2*      | Logic  |              |
-|A            |QL12x16B|              |
-|             | OPL84C |              |
+|M            |        |              |
+|M DSW2*      | Quick  |              |
+|A            | Logic  |              |
+|             |        |              |
 | U66         +--------+            06|
 |    HM6264                         05|
 |     07     HM6264                   |
@@ -417,7 +419,7 @@ YS-ROCK-970712
  Main CPU: Z80B
 Sound CPU: Z80A
     Sound: Yamaha YM3812 + Oki M5205 + YM3014 DAC
-    Video: QuickLogic QL12x16B-OPL84C FPGA
+    Video: QuickLogic FPGA - unknown type / model
       OSC: 16MHz + 400Khz resonator
    Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
      Misc: DSW1 is a 8 position dipswitch
@@ -475,7 +477,7 @@ ROM_END
 
 /***************************************************************************
 
-Cannon Ball
+                                Cannon Ball
 Yun Sung, 1995
 
 Cannon Ball (vertical)
@@ -555,43 +557,28 @@ ROM_END
 
 Rock Tris by Yunsung
 
-YS-ROCK-970712
-+-------------------------------------+
-|VOL YM3014      6116               04|
-|     M5205 400KHz                  03|
-|     Z80A      CXK5118PN-15L       02|
-|      08       GM76C28-10          01|
-|    MCM2018AN45                      |
-|J   MCM2018AN45                      |
-|A DSW1       +--------+              |
-|M            | Quick  |              |
-|M DSW2*      | Logic  |              |
-|A            |QL12x16B|              |
-|             | OPL84C |              |
-| U66         +--------+            06|
-|    HM6264                         05|
-|     07     HM6264                   |
-|    Z80B    YM3812           16MHz   |
-+-------------------------------------+
+Pcb marked Ys-rock 940712
 
- Main CPU: Z80B
-Sound CPU: Z80A
-    Sound: Yamaha YM3812 (marked as UA010) + Oki M5205 + YM3014 DAC
-    Video: QuickLogic QL12x16B-OPL84C FPGA
-      OSC: 16MHz + 400Khz resonator
-   Memory: 2 x MCM2018AN45, 2 x HM6264, CXK5118PN-15L, GM76C28-10 & 6116
-     Misc: DSW1 is a 8 position dipswitch
-           DSW2 is not populated
-           VOL Volume pot
+pcb has no sound, the osc for the msm5205 has been cut so I don't know the frequency
+
+Pcb has no markings in the sockets and eproms have anonymous stickers
+
+2x z80
+1x 16mhz
+1x UA010
+1x msm5205
+1x fpga
+1x dipswitch (there is place for another one, but the space is empty and
+they jumpered the first position)
 
 ***************************************************************************/
 
 ROM_START( rocktris )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* Main Z80 Code */
-	ROM_LOAD( "cpu07.bin", 0x00000, 0x20000, CRC(46e3b79c) SHA1(81a587b9f986c4e39b1888ec6ed6b86d1469b9a0) )
+	ROM_LOAD( "cpu.bin", 0x00000, 0x20000, CRC(46e3b79c) SHA1(81a587b9f986c4e39b1888ec6ed6b86d1469b9a0) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound Z80 Code */
-	ROM_LOAD( "cpu08.bin", 0x00000, 0x20000, CRC(3a78a4cf) SHA1(f643c7a217cbb71f3a03f1f4a16545c546332819) )
+	ROM_LOAD( "cpu2.bin", 0x00000, 0x20000, CRC(3a78a4cf) SHA1(f643c7a217cbb71f3a03f1f4a16545c546332819) )
 
 	ROM_REGION( 0x200000, "bgfx", 0 )   /* Background */
 	ROM_LOAD( "gfx4.bin", 0x000000, 0x80000, CRC(abb49cac) SHA1(e2d766e950df398a8ec8b6888e128ffc3bdf1ce9) )

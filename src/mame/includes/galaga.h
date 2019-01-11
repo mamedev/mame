@@ -9,7 +9,6 @@
 #include "sound/discrete.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
-#include "emupal.h"
 #include "screen.h"
 
 class galaga_state : public driver_device
@@ -29,7 +28,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(bosco_dsw_r);
@@ -48,7 +47,7 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_VIDEO_START(galaga);
-	void galaga_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(galaga);
 	uint32_t screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_galaga);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -80,7 +79,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<2> m_leds;
+	output_finder<2> m_led;
 	emu_timer *m_cpu3_interrupt_timer;
 
 	/* machine state */
@@ -107,7 +106,7 @@ protected:
 		uint8_t col,set;
 	};
 
-	static star const s_star_seed_tab[];
+	static struct star m_star_seed_tab[];
 
 };
 

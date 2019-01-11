@@ -44,19 +44,18 @@ DEFINE_DEVICE_TYPE(C8280, c8280_device, "c8280", "Commodore 8280")
 //-------------------------------------------------
 
 ROM_START( c8280 )
+	ROM_REGION( 0x4000, M6502_DOS_TAG, 0 )
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROMX_LOAD( "300542-001.10c", 0x0000, 0x2000, CRC(3c6eee1e) SHA1(0726f6ab4de4fc9c18707fe87780ffd9f5ed72ab), ROM_BIOS(1) )
+	ROMX_LOAD( "300543-001.10d", 0x2000, 0x2000, CRC(f58e665e) SHA1(9e58b47c686c91efc6ef1a27f72dbb5e26c485ec), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
-
-	ROM_REGION( 0x4000, M6502_DOS_TAG, 0 )
-	ROMX_LOAD( "300542-001.10c", 0x0000, 0x2000, CRC(3c6eee1e) SHA1(0726f6ab4de4fc9c18707fe87780ffd9f5ed72ab), ROM_BIOS(0) )
-	ROMX_LOAD( "300543-001.10d", 0x2000, 0x2000, CRC(f58e665e) SHA1(9e58b47c686c91efc6ef1a27f72dbb5e26c485ec), ROM_BIOS(0) )
-	ROMX_LOAD( "300542-reva.10c", 0x0000, 0x2000, CRC(6f32ccfb) SHA1(6926c049f1635e6769ec69891de8c92941ff880e), ROM_BIOS(1) )
-	ROMX_LOAD( "300543-reva.10d", 0x2000, 0x2000, CRC(1af93f2c) SHA1(ad197b1d5dfa273487b33f473403ebd20dd15b2b), ROM_BIOS(1) )
+	ROMX_LOAD( "300542-reva.10c", 0x0000, 0x2000, CRC(6f32ccfb) SHA1(6926c049f1635e6769ec69891de8c92941ff880e), ROM_BIOS(2) )
+	ROMX_LOAD( "300543-reva.10d", 0x2000, 0x2000, CRC(1af93f2c) SHA1(ad197b1d5dfa273487b33f473403ebd20dd15b2b), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, M6502_FDC_TAG, 0 )
-	ROMX_LOAD( "300541-001.3c", 0x000, 0x800, BAD_DUMP CRC(cb07b2db) SHA1(a1f9c5a7bd3798f5a97dc0b465c3bf5e3513e148), ROM_BIOS(0) )
-	ROMX_LOAD( "300541-revb.3c", 0x000, 0x800, CRC(403e632c) SHA1(a0994c80025240d2b49ffd209dbfe8a4de3975b0), ROM_BIOS(1) )
+	ROMX_LOAD( "300541-001.3c", 0x000, 0x800, BAD_DUMP CRC(cb07b2db) SHA1(a1f9c5a7bd3798f5a97dc0b465c3bf5e3513e148), ROM_BIOS(1) )
+	ROMX_LOAD( "300541-revb.3c", 0x000, 0x800, CRC(403e632c) SHA1(a0994c80025240d2b49ffd209dbfe8a4de3975b0), ROM_BIOS(2) )
 ROM_END
 
 
@@ -101,7 +100,7 @@ void c8280_device::c8280_fdc_mem(address_map &map)
 	map(0x0800, 0x0bff).ram().share("share2");
 	map(0x0c00, 0x0fff).ram().share("share3");
 	map(0x1000, 0x13ff).ram().share("share4");
-	map(0x1400, 0x1400).mirror(0x3ff).rw(FUNC(c8280_device::fk5_r), FUNC(c8280_device::fk5_w));
+	map(0x1400, 0x1400).mirror(0x3ff).rw(this, FUNC(c8280_device::fk5_r), FUNC(c8280_device::fk5_w));
 	map(0x1800, 0x1fff).rom().region(M6502_FDC_TAG, 0);
 }
 
@@ -127,7 +126,7 @@ READ8_MEMBER( c8280_device::dio_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
 WRITE8_MEMBER( c8280_device::dio_w )
@@ -270,13 +269,13 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 	*/
 
 	// activity led 1
-	m_leds[LED_ACT1] = BIT(data, 3);
+	m_led[LED_ACT1] = BIT(data, 3);
 
 	// activity led 0
-	m_leds[LED_ACT0] = BIT(data, 4);
+	m_led[LED_ACT0] = BIT(data, 4);
 
 	// error led
-	m_leds[LED_ERR] = BIT(data, 5);
+	m_led[LED_ERR] = BIT(data, 5);
 }
 
 static void c8280_floppies(device_slot_interface &device)
@@ -311,11 +310,11 @@ MACHINE_CONFIG_START(c8280_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(M6502_FDC_TAG, M6502, XTAL(12'000'000)/8)
 	MCFG_DEVICE_PROGRAM_MAP(c8280_fdc_mem)
 
-	FD1797(config, m_fdc, XTAL(12'000'000)/6);
-	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, M6502_IRQ_LINE);
-	m_fdc->drq_wr_callback().set_inputline(m_fdccpu, M6502_SET_OVERFLOW);
-	FLOPPY_CONNECTOR(config, m_floppy0, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, c8280_floppies, "8dsdd", c8280_device::floppy_formats);
+	MCFG_FD1797_ADD(WD1797_TAG, XTAL(12'000'000)/6)
+	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_IRQ_LINE))
+	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE(M6502_FDC_TAG, M6502_SET_OVERFLOW))
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG ":0", c8280_floppies, "8dsdd", c8280_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG ":1", c8280_floppies, "8dsdd", c8280_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -388,7 +387,7 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 	m_floppy1(*this, WD1797_TAG ":1"),
 	m_address(*this, "ADDRESS"),
 	m_floppy(nullptr),
-	m_leds(*this, "led%u", 0U),
+	m_led(*this, "led%u", 0U),
 	m_rfdo(1),
 	m_daco(1),
 	m_atna(1), m_ifc(0), m_fk5(0)
@@ -402,7 +401,7 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
-	m_leds.resolve();
+	m_led.resolve();
 
 	// state saving
 	save_item(NAME(m_rfdo));

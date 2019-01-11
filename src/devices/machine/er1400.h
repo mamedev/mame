@@ -32,7 +32,7 @@ class er1400_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// line handlers
 	DECLARE_WRITE_LINE_MEMBER(data_w);

@@ -89,8 +89,8 @@ void dynduke_state::master_map(address_map &map)
 	map(0x0b000, 0x0b001).portr("P1_P2");
 	map(0x0b002, 0x0b003).portr("DSW");
 	map(0x0b004, 0x0b005).nopw();
-	map(0x0b006, 0x0b007).w(FUNC(dynduke_state::control_w));
-	map(0x0c000, 0x0c7ff).ram().w(FUNC(dynduke_state::text_w)).share("videoram");
+	map(0x0b006, 0x0b007).w(this, FUNC(dynduke_state::control_w));
+	map(0x0c000, 0x0c7ff).ram().w(this, FUNC(dynduke_state::text_w)).share("videoram");
 	map(0x0d000, 0x0d00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0xa0000, 0xfffff).rom();
 }
@@ -98,11 +98,11 @@ void dynduke_state::master_map(address_map &map)
 void dynduke_state::slave_map(address_map &map)
 {
 	map(0x00000, 0x05fff).ram();
-	map(0x06000, 0x067ff).ram().w(FUNC(dynduke_state::background_w)).share("back_data");
-	map(0x06800, 0x06fff).ram().w(FUNC(dynduke_state::foreground_w)).share("fore_data");
+	map(0x06000, 0x067ff).ram().w(this, FUNC(dynduke_state::background_w)).share("back_data");
+	map(0x06800, 0x06fff).ram().w(this, FUNC(dynduke_state::foreground_w)).share("fore_data");
 	map(0x07000, 0x07fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08000, 0x08fff).ram().share("share1");
-	map(0x0a000, 0x0a001).w(FUNC(dynduke_state::gfxbank_w));
+	map(0x0a000, 0x0a001).w(this, FUNC(dynduke_state::gfxbank_w));
 	map(0x0c000, 0x0c001).nopw();
 	map(0xc0000, 0xfffff).rom();
 }
@@ -112,14 +112,14 @@ void dynduke_state::masterj_map(address_map &map)
 {
 	map(0x00000, 0x06fff).ram();
 	map(0x07000, 0x07fff).ram().share("spriteram");
-	map(0x08000, 0x087ff).ram().w(FUNC(dynduke_state::text_w)).share("videoram");
+	map(0x08000, 0x087ff).ram().w(this, FUNC(dynduke_state::text_w)).share("videoram");
 	map(0x09000, 0x0900d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0x0c000, 0x0c0ff).ram().share("scroll_ram");
 	map(0x0e000, 0x0efff).ram().share("share1");
 	map(0x0f000, 0x0f001).portr("P1_P2");
 	map(0x0f002, 0x0f003).portr("DSW");
 	map(0x0f004, 0x0f005).nopw();
-	map(0x0f006, 0x0f007).w(FUNC(dynduke_state::control_w));
+	map(0x0f006, 0x0f007).w(this, FUNC(dynduke_state::control_w));
 	map(0xa0000, 0xfffff).rom();
 }
 
@@ -314,64 +314,64 @@ WRITE_LINE_MEMBER(dynduke_state::vblank_irq)
 
 /* Machine Driver */
 
-void dynduke_state::dynduke(machine_config &config)
-{
+MACHINE_CONFIG_START(dynduke_state::dynduke)
 	// basic machine hardware
-	V30(config, m_maincpu, 16000000/2); // NEC V30-8 CPU
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::master_map);
+	MCFG_DEVICE_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 
-	V30(config, m_slave, 16000000/2); // NEC V30-8 CPU
-	m_slave->set_addrmap(AS_PROGRAM, &dynduke_state::slave_map);
+	MCFG_DEVICE_ADD("slave", V30, 16000000/2) // NEC V30-8 CPU
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 14318180/4));
-	audiocpu.set_addrmap(AS_PROGRAM, &dynduke_state::sound_map);
-	audiocpu.set_addrmap(AS_OPCODES, &dynduke_state::sound_decrypted_opcodes_map);
-	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
+	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
 
-	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
-	sei80bu.set_addrmap(AS_PROGRAM, &dynduke_state::sei80bu_encrypted_full_map);
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
 
-	config.m_minimum_quantum = attotime::from_hz(3600);
+	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
 	// video hardware
-	BUFFERED_SPRITERAM16(config, m_spriteram);
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(dynduke_state::screen_update));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
-	screen.screen_vblank().append(FUNC(dynduke_state::vblank_irq));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(dynduke_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dynduke_state, vblank_irq))
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dynduke);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynduke)
+
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
-	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
-	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
-	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank1");
-	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
-	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
-}
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym3812_device, write))
+MACHINE_CONFIG_END
 
-void dynduke_state::dbldyn(machine_config &config)
-{
+MACHINE_CONFIG_START(dynduke_state::dbldyn)
 	dynduke(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::masterj_map);
-}
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(masterj_map)
+MACHINE_CONFIG_END
 
 /* ROMs */
 

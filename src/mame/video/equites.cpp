@@ -18,43 +18,45 @@
  *
  *************************************/
 
-void equites_state::equites_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(equites_state,equites)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	// point to the CLUT
 	color_prom += 0x380;
 
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 		palette.set_pen_indirect(i, i);
 
-	for (int i = 0; i < 0x80; i++)
+	for (i = 0; i < 0x80; i++)
 		palette.set_pen_indirect(i + 0x100, color_prom[i]);
 }
 
-void splndrbt_state::splndrbt_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(splndrbt_state,splndrbt)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 0x100; i++)
+	for (i = 0; i < 0x100; i++)
 		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
-	for (int i = 0; i < 0x100; i++)
+	for (i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i, i);
 
 	// point to the bg CLUT
 	color_prom += 0x300;
 
-	for (int i = 0; i < 0x80; i++)
+	for (i = 0; i < 0x80; i++)
 		palette.set_pen_indirect(i + 0x100, color_prom[i] + 0x10);
 
 	// point to the sprite CLUT
 	color_prom += 0x100;
 
-	for (int i = 0; i < 0x100; i++)
+	for (i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i + 0x180, color_prom[i]);
 }
 
@@ -118,7 +120,7 @@ TILE_GET_INFO_MEMBER(splndrbt_state::splndrbt_bg_info)
 VIDEO_START_MEMBER(equites_state,equites)
 {
 	m_fg_videoram = std::make_unique<uint8_t[]>(0x800);
-	save_pointer(NAME(m_fg_videoram), 0x800);
+	save_pointer(NAME(m_fg_videoram.get()), 0x800);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::equites_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -133,7 +135,7 @@ VIDEO_START_MEMBER(splndrbt_state,splndrbt)
 	assert(m_screen->format() == BITMAP_FORMAT_IND16);
 
 	m_fg_videoram = std::make_unique<uint8_t[]>(0x800);
-	save_pointer(NAME(m_fg_videoram), 0x800);
+	save_pointer(NAME(m_fg_videoram.get()), 0x800);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(splndrbt_state::splndrbt_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -336,13 +338,13 @@ void splndrbt_state::splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 			{
 				int const y = yhalf ? sy + 1 + yy : sy - yy;
 
-				if (y >= cliprect.top() && y <= cliprect.bottom())
+				if (y >= cliprect.min_y && y <= cliprect.max_y)
 				{
 					for (x = 0; x <= (scalex << 1); ++x)
 					{
 						int bx = (sx + x) & 0xff;
 
-						if (bx >= cliprect.left() && bx <= cliprect.right())
+						if (bx >= cliprect.min_x && bx <= cliprect.max_x)
 						{
 							int xx = scalex ? (x * 29 + scalex) / (scalex << 1) + 1 : 16;   // FIXME This is wrong. Should use the PROM.
 							int const offset = (fx ? (31 - xx) : xx) + ((fy ^ yhalf) ? (16 + line) : (15 - line)) * gfx->rowbytes();
@@ -380,7 +382,7 @@ void splndrbt_state::splndrbt_copy_bg(bitmap_ind16 &dst_bitmap, const rectangle 
 
 	for (dst_y = 32; dst_y < 256-32; ++dst_y)
 	{
-		if (dst_y >= cliprect.top() && dst_y <= cliprect.bottom())
+		if (dst_y >= cliprect.min_y && dst_y <= cliprect.max_y)
 		{
 			const uint8_t * const romline = &xrom[(dst_y ^ dinvert) << 5];
 			const uint16_t * const src_line = &src_bitmap.pix16((src_y + scroll_y) & 0x1ff);

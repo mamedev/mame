@@ -82,7 +82,6 @@ Configuration Options
 Core Search Path Options
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-| :ref:`homepath <mame-commandline-homepath>`
 | :ref:`rompath <mame-commandline-rompath>`
 | :ref:`hashpath <mame-commandline-hashpath>`
 | :ref:`samplepath <mame-commandline-samplepath>`
@@ -94,7 +93,6 @@ Core Search Path Options
 | :ref:`crosshairpath <mame-commandline-crosshairpath>`
 | :ref:`pluginspath <mame-commandline-pluginspath>`
 | :ref:`languagepath <mame-commandline-languagepath>`
-| :ref:`swpath <mame-commandline-swpath>`
 
 
 Core Output Directory Options
@@ -196,8 +194,6 @@ Core Artwork Options
 | :ref:`[no]use_bezels <mame-commandline-nousebezels>`
 | :ref:`[no]use_cpanels <mame-commandline-nousecpanels>`
 | :ref:`[no]use_marquees <mame-commandline-nousemarquees>`
-| :ref:`fallback_artwork <mame-commandline-fallbackartwork>`
-| :ref:`override_artwork <mame-commandline-overrideartwork>`
 
 
 Core Screen Options
@@ -213,9 +209,8 @@ Core Screen Options
 Core Vector Options
 ~~~~~~~~~~~~~~~~~~~
 
-| :ref:`beam_width_min <mame-commandline-beamwidthmin>`
-| :ref:`beam_width_max <mame-commandline-beamwidthmax>`
-| :ref:`beam_intensity_weight <mame-commandline-beamintensityweight>`
+| :ref:`[no]antialias <mame-commandline-noantialias>`
+| :ref:`beam <mame-commandline-beam>`
 | :ref:`flicker <mame-commandline-flicker>`
 
 
@@ -304,7 +299,6 @@ Core Communication Options
 | :ref:`comm_localport <mame-commandline-commlocalport>`
 | :ref:`comm_remotehost <mame-commandline-commremotehost>`
 | :ref:`comm_remoteport <mame-commandline-commremoteport>`
-| :ref:`[no]comm_framesync <mame-commandline-commframesync>`
 
 
 Core Misc Options
@@ -318,32 +312,13 @@ Core Misc Options
 | :ref:`[no]cheat <mame-commandline-cheat>`
 | :ref:`[no]skip_gameinfo <mame-commandline-skipgameinfo>`
 | :ref:`uifont <mame-commandline-uifont>`
-| :ref:`ui <mame-commandline-ui>`
 | :ref:`ramsize <mame-commandline-ramsize>`
 | :ref:`confirm_quit <mame-commandline-confirmquit>`
 | :ref:`ui_mouse <mame-commandline-uimouse>`
-| :ref:`language <mame-commandline-language>`
-| :ref:`[no]nvram_save <mame-commandline-nvramsave>`
-
-
-Scripting Options
------------------
-
 | :ref:`autoboot_command <mame-commandline-autobootcommand>`
 | :ref:`autoboot_delay <mame-commandline-autobootdelay>`
 | :ref:`autoboot_script <mame-commandline-autobootscript>`
-| :ref:`[no]console <mame-commandline-console>`
-| :ref:`[no]plugins <mame-commandline-plugins>`
-| :ref:`plugin <mame-commandline-plugin>`
-| :ref:`noplugin <mame-commandline-noplugin>`
-
-
-HTTP Server Options
--------------------
-
-| :ref:`http <mame-commandline-http>`
-| :ref:`http_port <mame-commandline-httpport>`
-| :ref:`http_root <mame-commandline-httproot>`
+| :ref:`language <mame-commandline-language>`
 
 
 Windows-Specific Commandline Options

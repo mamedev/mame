@@ -24,6 +24,14 @@
 #define MDV_2 "mdv2"
 
 
+#define MCFG_MICRODRIVE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MICRODRIVE, 0)
+
+#define MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(_write) \
+	devcb = &downcast<microdrive_image_device &>(*device).set_comms_out_wr_callback(DEVCB_##_write);
+
+
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -38,7 +46,7 @@ public:
 	microdrive_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~microdrive_image_device();
 
-	auto comms_out_wr_callback() { return m_write_comms_out.bind(); }
+	template <class Object> devcb_base &set_comms_out_wr_callback(Object &&cb) { return m_write_comms_out.set_callback(std::forward<Object>(cb)); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

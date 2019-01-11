@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -188,7 +188,7 @@ namespace bx
 	template<typename HashT, typename Ty>
 	inline uint32_t hash(const Ty& _data)
 	{
-		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		return hash<HashT>(&_data, sizeof(Ty) );
 	}
 

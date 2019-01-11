@@ -48,17 +48,15 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	void sacstate(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	void kbd_put(u8 data);
+	void sacstate(machine_config &config);
 	void sacstate_io(address_map &map);
 	void sacstate_mem(address_map &map);
-
+private:
 	uint8_t m_term_data;
 	uint8_t m_val;
 	virtual void machine_reset() override;
@@ -106,10 +104,11 @@ void sacstate_state::sacstate_mem(address_map &map)
 void sacstate_state::sacstate_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).r(FUNC(sacstate_state::port00_r));
-	map(0x01, 0x01).r(FUNC(sacstate_state::port01_r));
-	map(0x04, 0x04).r(FUNC(sacstate_state::port04_r));
-	map(0x08, 0x08).w(FUNC(sacstate_state::port08_w));
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(sacstate_state::port00_r));
+	map(0x01, 0x01).r(this, FUNC(sacstate_state::port01_r));
+	map(0x04, 0x04).r(this, FUNC(sacstate_state::port04_r));
+	map(0x08, 0x08).w(this, FUNC(sacstate_state::port08_w));
 	map(0x16, 0x16).w(m_terminal, FUNC(generic_terminal_device::write));
 	map(0x17, 0x1f).nopw();
 }
@@ -133,17 +132,16 @@ void sacstate_state::machine_reset()
 	m_val = ioport("CONFIG")->read();
 }
 
-void sacstate_state::sacstate(machine_config &config)
-{
+MACHINE_CONFIG_START(sacstate_state::sacstate)
 	/* basic machine hardware */
-	I8008(config, m_maincpu, 800000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sacstate_state::sacstate_mem);
-	m_maincpu->set_addrmap(AS_IO, &sacstate_state::sacstate_io);
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(sacstate_mem)
+	MCFG_DEVICE_IO_MAP(sacstate_io)
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(sacstate_state::kbd_put));
-}
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(sacstate_state, kbd_put))
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sacstate )

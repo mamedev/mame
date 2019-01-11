@@ -70,8 +70,8 @@ Revision History:
 */
 
 #include "emu.h"
-#include "fmopl.h"
 #include "ymdeltat.h"
+#include "fmopl.h"
 
 
 
@@ -1631,7 +1631,7 @@ void FM_OPL::initialize()
 	/*logerror("freqbase=%f\n", freqbase);*/
 
 	/* Timer base time */
-	TimerBase = clock ? attotime::from_hz(clock) * 72 : attotime::zero;
+	TimerBase = attotime::from_hz(clock) * 72;
 
 	/* make fnumber -> increment counter table */
 	for( i=0 ; i < 1024 ; i++ )
@@ -2408,11 +2408,6 @@ static void Y8950_deltat_status_reset(void *chip, uint8_t changebits)
 	Y8950->STATUS_RESET(changebits);
 }
 
-void y8950_clock_changed(void *chip, uint32_t clock, uint32_t rate)
-{
-	reinterpret_cast<FM_OPL *>(chip)->clock_changed(clock, rate);
-}
-
 void *y8950_init(device_t *device, uint32_t clock, uint32_t rate)
 {
 	/* emulator create */
@@ -2477,11 +2472,11 @@ void y8950_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,device_
 	reinterpret_cast<FM_OPL *>(chip)->SetUpdateHandler(UpdateHandler, device);
 }
 
-void y8950_set_delta_t_memory(void *chip, FM_READBYTE read_byte, FM_WRITEBYTE write_byte)
+void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_size )
 {
 	FM_OPL      *OPL = (FM_OPL *)chip;
-	OPL->deltat->read_byte = read_byte;
-	OPL->deltat->write_byte = write_byte;
+	OPL->deltat->memory = (uint8_t *)(deltat_mem_ptr);
+	OPL->deltat->memory_size = deltat_mem_size;
 }
 
 /*

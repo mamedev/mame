@@ -59,22 +59,22 @@ WRITE8_MEMBER(tryout_state::bankswitch_w)
 void tryout_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x17ff).ram().w(FUNC(tryout_state::videoram_w)).share("videoram");
+	map(0x1000, 0x17ff).ram().w(this, FUNC(tryout_state::videoram_w)).share("videoram");
 	map(0x2000, 0x3fff).bankr("bank1");
 	map(0x4000, 0xbfff).rom();
 	map(0xc800, 0xc87f).ram().share("spriteram");
 	map(0xcc00, 0xcc7f).ram().share("spriteram2");
-	map(0xd000, 0xd7ff).rw(FUNC(tryout_state::vram_r), FUNC(tryout_state::vram_w));
+	map(0xd000, 0xd7ff).rw(this, FUNC(tryout_state::vram_r), FUNC(tryout_state::vram_w));
 	map(0xe000, 0xe000).portr("DSW");
 	map(0xe001, 0xe001).portr("P1");
 	map(0xe002, 0xe002).portr("P2");
 	map(0xe003, 0xe003).portr("SYSTEM");
-	map(0xe301, 0xe301).w(FUNC(tryout_state::flipscreen_w));
-	map(0xe302, 0xe302).w(FUNC(tryout_state::bankswitch_w));
-	map(0xe401, 0xe401).w(FUNC(tryout_state::vram_bankswitch_w));
+	map(0xe301, 0xe301).w(this, FUNC(tryout_state::flipscreen_w));
+	map(0xe302, 0xe302).w(this, FUNC(tryout_state::bankswitch_w));
+	map(0xe401, 0xe401).w(this, FUNC(tryout_state::vram_bankswitch_w));
 	map(0xe402, 0xe404).writeonly().share("gfx_control");
-	map(0xe414, 0xe414).w(FUNC(tryout_state::sound_w));
-	map(0xe417, 0xe417).w(FUNC(tryout_state::nmi_ack_w));
+	map(0xe414, 0xe414).w(this, FUNC(tryout_state::sound_w));
+	map(0xe417, 0xe417).w(this, FUNC(tryout_state::nmi_ack_w));
 	map(0xfff0, 0xffff).rom().region("maincpu", 0xbff0); /* reset vectors */
 }
 
@@ -83,7 +83,7 @@ void tryout_state::sound_cpu(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xd000, 0xd000).w(FUNC(tryout_state::sound_irq_ack_w));
+	map(0xd000, 0xd000).w(this, FUNC(tryout_state::sound_irq_ack_w));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -207,15 +207,16 @@ MACHINE_CONFIG_START(tryout_state::tryout)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tryout_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_tryout)
-	PALETTE(config, m_palette, FUNC(tryout_state::tryout_palette), 0x20);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tryout)
+	MCFG_PALETTE_ADD("palette", 0x20)
+	MCFG_PALETTE_INIT_OWNER(tryout_state, tryout)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

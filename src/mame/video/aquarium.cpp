@@ -80,12 +80,12 @@ void aquarium_state::video_start()
 
 void aquarium_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_mask, int priority_value)
 {
-	for (int y = cliprect.top();y <= cliprect.bottom();y++)
+	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
 	{
 		uint16_t* srcline = &m_temp_sprite_bitmap.pix16(y);
 		uint16_t* dstline = &bitmap.pix16(y);
 
-		for (int x = cliprect.left();x <= cliprect.right();x++)
+		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
 		{
 			uint16_t pixel = srcline[x];
 

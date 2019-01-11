@@ -10,7 +10,6 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -19,16 +18,13 @@ class multi16_state : public driver_device
 public:
 	multi16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pic(*this, "pic8259"),
-		m_crtc(*this, "crtc"),
-		m_palette(*this, "palette"),
-		m_p_vram(*this, "p_vram")
-	{ }
+	m_maincpu(*this, "maincpu"),
+	m_pic(*this, "pic8259"),
+	m_crtc(*this, "crtc"),
+		m_palette(*this, "palette")
+	,
+		m_p_vram(*this, "p_vram"){ }
 
-	void multi16(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<mc6845_device> m_crtc;
@@ -36,11 +32,12 @@ private:
 	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
 	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);
 	required_shared_ptr<uint16_t> m_p_vram;
-	uint8_t m_crtc_vreg[0x100], m_crtc_index;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void multi16(machine_config &config);
 	void multi16_io(address_map &map);
 	void multi16_map(address_map &map);
 };
@@ -120,8 +117,8 @@ void multi16_state::multi16_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x02, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)); // i8259
-	map(0x40, 0x40).w(FUNC(multi16_state::multi16_6845_address_w));
-	map(0x41, 0x41).w(FUNC(multi16_state::multi16_6845_data_w));
+	map(0x40, 0x40).w(this, FUNC(multi16_state::multi16_6845_address_w));
+	map(0x41, 0x41).w(this, FUNC(multi16_state::multi16_6845_data_w));
 }
 
 /* Input ports */
@@ -140,10 +137,10 @@ void multi16_state::machine_reset()
 
 MACHINE_CONFIG_START(multi16_state::multi16)
 	/* basic machine hardware */
-	I8086(config, m_maincpu, 8000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &multi16_state::multi16_map);
-	m_maincpu->set_addrmap(AS_IO, &multi16_state::multi16_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(multi16_map)
+	MCFG_DEVICE_IO_MAP(multi16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -157,13 +154,12 @@ MACHINE_CONFIG_START(multi16_state::multi16)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* devices */
-	H46505(config, m_crtc, 16000000/5);    /* unknown clock, hand tuned to get ~60 fps */
-	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(8);
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
-	PIC8259(config, m_pic, 0);
-	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -57,14 +57,13 @@ bool mm1_keyboard_device::first_time = true;
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void mm1_keyboard_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(mm1_keyboard_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(2);
-	m_samples->set_samples_names(mm1_kb_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.7);
-}
+	MCFG_DEVICE_ADD("keyboard_and_chassis_sounds", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(2)
+	MCFG_SAMPLES_NAMES(mm1_kb_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

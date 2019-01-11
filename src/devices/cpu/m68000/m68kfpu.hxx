@@ -1119,13 +1119,6 @@ void WRITE_EA_FPE(int ea, floatx80 fpr)
 			break;
 		}
 
-		case 5:     // (d16,An)
-		{
-			uint32_t ea = EA_AY_DI_32();
-			store_extended_float80(ea, fpr);
-			break;
-		}
-
 		case 7:
 		{
 			switch (reg)

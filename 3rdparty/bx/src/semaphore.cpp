@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -8,9 +8,8 @@
 
 #if BX_CONFIG_SUPPORTS_THREADING
 
-#if BX_CRT_NONE
-#elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS
+#if BX_PLATFORM_OSX \
+||  BX_PLATFORM_IOS
 #	include <dispatch/dispatch.h>
 #elif BX_PLATFORM_POSIX
 #	include <errno.h>
@@ -31,10 +30,8 @@ namespace bx
 {
 	struct SemaphoreInternal
 	{
-#if BX_CRT_NONE
-
-#elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS
+#if BX_PLATFORM_OSX \
+||  BX_PLATFORM_IOS
 		dispatch_semaphore_t m_handle;
 #elif BX_PLATFORM_POSIX
 		pthread_mutex_t m_mutex;
@@ -47,28 +44,8 @@ namespace bx
 #endif // BX_PLATFORM_
 	};
 
-#if BX_CRT_NONE
-	Semaphore::Semaphore()
-	{
-		BX_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal) );
-	}
-
-	Semaphore::~Semaphore()
-	{
-	}
-
-	void Semaphore::post(uint32_t _count)
-	{
-		BX_UNUSED(_count);
-	}
-
-	bool Semaphore::wait(int32_t _msecs)
-	{
-		BX_UNUSED(_msecs);
-		return false;
-	}
-#elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS
+#if BX_PLATFORM_OSX \
+||  BX_PLATFORM_IOS
 
 	Semaphore::Semaphore()
 	{
@@ -101,7 +78,7 @@ namespace bx
 
 		dispatch_time_t dt = 0 > _msecs
 			? DISPATCH_TIME_FOREVER
-			: dispatch_time(DISPATCH_TIME_NOW, int64_t(_msecs)*1000000)
+			: dispatch_time(DISPATCH_TIME_NOW, _msecs*1000000)
 			;
 		return !dispatch_semaphore_wait(si->m_handle, dt);
 	}
@@ -121,13 +98,13 @@ namespace bx
 
 	void toTimespecMs(timespec& _ts, int32_t _msecs)
 	{
-		toTimespecNs(_ts, uint64_t(_msecs)*1000000);
+		toTimespecNs(_ts, _msecs*1000000);
 	}
 
 	void add(timespec& _ts, int32_t _msecs)
 	{
 		uint64_t ns = toNs(_ts);
-		toTimespecNs(_ts, ns + uint64_t(_msecs)*1000000);
+		toTimespecNs(_ts, ns + _msecs*1000000);
 	}
 
 	Semaphore::Semaphore()

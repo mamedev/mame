@@ -41,7 +41,6 @@ uses s24 style tilemaps (ram based?)
 #include "machine/mb8421.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -53,8 +52,6 @@ public:
 	segam1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_m1comm(*this, "m1comm")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_paletteram(*this, "paletteram")
@@ -63,10 +60,6 @@ public:
 		, m_ymsnd(*this, "ymsnd")
 	{ }
 
-	void unkm1(machine_config &config);
-	void segam1(machine_config &config);
-
-private:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_WRITE8_MEMBER(sound_a0_bank_w);
 
@@ -75,14 +68,14 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<z80_device> m_audiocpu;
-	required_device<z80_device> m_m1comm;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u16> m_paletteram;
 	required_device<segas24_tile_device> m_tile;
 	required_device<segas24_mixer_device> m_mixer;
 	required_device<ym3438_device> m_ymsnd;
+	void unkm1(machine_config &config);
+	void segam1(machine_config &config);
 	void segam1_comms_map(address_map &map);
 	void segam1_map(address_map &map);
 	void segam1_sound_io_map(address_map &map);
@@ -201,7 +194,7 @@ void segam1_state::segam1_map(address_map &map)
 	map(0xb60000, 0xb60001).nopw();        /* Frame trigger position (XVOUT) */
 	map(0xb70000, 0xb70001).nopw();        /* Synchronization mode */
 	map(0xb80000, 0xbfffff).rw(m_tile, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
-	map(0xc00000, 0xc03fff).ram().w(FUNC(segam1_state::paletteram_w)).share("paletteram");
+	map(0xc00000, 0xc03fff).ram().w(this, FUNC(segam1_state::paletteram_w)).share("paletteram");
 	map(0xc04000, 0xc0401f).rw(m_mixer, FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
 	map(0xe00000, 0xe0001f).rw("io1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0xe40000, 0xe40001).portr("INX");
@@ -230,7 +223,7 @@ void segam1_state::segam1_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x80, 0x83).rw(m_ymsnd, FUNC(ym3438_device::read), FUNC(ym3438_device::write));
-	map(0xa0, 0xa0).w(FUNC(segam1_state::sound_a0_bank_w));
+	map(0xa0, 0xa0).w(this, FUNC(segam1_state::sound_a0_bank_w));
 	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read)).nopw();
 }
 
@@ -239,7 +232,8 @@ void segam1_state::segam1_comms_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa7ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
-	map(0xc000, 0xc001).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xc000, 0xc000).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc001, 0xc001).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xe003, 0xe003).nopw(); // ???
 }
 
@@ -352,63 +346,66 @@ INPUT_PORTS_END
 
 
 
-void segam1_state::segam1(machine_config &config)
-{
-	M68000(config, m_maincpu, XTAL(20'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &segam1_state::segam1_map);
-	m_maincpu->set_vblank_int("screen", FUNC(segam1_state::irq4_line_hold));
+MACHINE_CONFIG_START(segam1_state::segam1)
 
-	Z80(config, m_audiocpu, 4000000); // unknown clock
-	m_audiocpu->set_addrmap(AS_PROGRAM, &segam1_state::segam1_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &segam1_state::segam1_sound_io_map);
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(segam1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
 
-	Z80(config, m_m1comm, 4000000); // unknown clock
-	m_m1comm->set_addrmap(AS_PROGRAM, &segam1_state::segam1_comms_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(segam1_sound_map)
+	MCFG_DEVICE_IO_MAP(segam1_sound_io_map)
 
-	sega_315_5296_device &io1(SEGA_315_5296(config, "io1", 0)); // unknown clock
-	io1.in_pa_callback().set_ioport("INA");
-	io1.in_pb_callback().set_ioport("INB");
-	io1.in_pc_callback().set_ioport("INC");
-	io1.in_pd_callback().set_ioport("IND");
-	io1.in_pe_callback().set_ioport("INE");
-	io1.in_pf_callback().set_ioport("INF");
+	MCFG_DEVICE_ADD("m1comm", Z80, 4000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(segam1_comms_map)
 
-	sega_315_5296_device &io2(SEGA_315_5296(config, "io2", 0)); // unknown clock
-	io2.in_pg_callback().set_ioport("ING");
+	MCFG_DEVICE_ADD("io1", SEGA_315_5296, 0) // unknown clock
+	MCFG_315_5296_IN_PORTA_CB(IOPORT("INA"))
+	MCFG_315_5296_IN_PORTB_CB(IOPORT("INB"))
+	MCFG_315_5296_IN_PORTC_CB(IOPORT("INC"))
+	MCFG_315_5296_IN_PORTD_CB(IOPORT("IND"))
+	MCFG_315_5296_IN_PORTE_CB(IOPORT("INE"))
+	MCFG_315_5296_IN_PORTF_CB(IOPORT("INF"))
 
-	I8251(config, "uart", 4000000); // unknown clock
+	MCFG_DEVICE_ADD("io2", SEGA_315_5296, 0) // unknown clock
+	MCFG_315_5296_IN_PORTG_CB(IOPORT("ING"))
 
-	mb8421_device &dpram(MB8421(config, "dpram"));
-	dpram.intl_callback().set_inputline("m1comm", 0);
+	MCFG_DEVICE_ADD("uart", I8251, 4000000) // unknown clock
 
-	S24TILE(config, m_tile, 0, 0x3fff).set_palette(m_palette);
-	S24MIXER(config, m_mixer, 0);
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
+	MCFG_MB8421_INTL_HANDLER(INPUTLINE("m1comm", 0))
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_raw(16000000, 656, 0, 496, 424, 0, 384); // copied from segas24.cpp; may not be accurate
-	m_screen->set_screen_update(FUNC(segam1_state::screen_update));
-	m_screen->set_palette(m_palette);
+	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
+	MCFG_S24TILE_DEVICE_PALETTE("palette")
+	MCFG_S24MIXER_DEVICE_ADD("mixer")
 
-	PALETTE(config, m_palette).set_entries(8192*2);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_RAW_PARAMS(16000000, 656, 0, 496, 424, 0, 384) // copied from segas24.cpp; may not be accurate
+	MCFG_SCREEN_UPDATE_DRIVER(segam1_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 8192*2)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	YM3438(config, m_ymsnd, 8000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.40);
-	//m_ymsnd->irq_handler().set(FUNC(segam1_state::ym3438_irq_handler));
-}
+	MCFG_DEVICE_ADD("ymsnd", YM3438, 8000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	//MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segam1_state, ym3438_irq_handler))
+MACHINE_CONFIG_END
 
-void segam1_state::unkm1(machine_config &config)
-{
+MACHINE_CONFIG_START(segam1_state::unkm1)
 	segam1(config);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &segam1_state::unkm1_sound_map);
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(unkm1_sound_map)
 
-	m_m1comm->set_disable(); // not dumped yet
-}
+	MCFG_DEVICE_MODIFY("m1comm")
+	MCFG_DEVICE_DISABLE() // not dumped yet
+MACHINE_CONFIG_END
 
 
 ROM_START( bingpty ) // 1994/05/01 string

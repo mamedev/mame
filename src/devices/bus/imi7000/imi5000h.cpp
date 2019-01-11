@@ -87,7 +87,7 @@ void imi5000h_device::imi5000h_io(address_map &map)
 	map(0x10, 0x10).mirror(0x03); // BEGRDY
 	map(0x14, 0x14).mirror(0x03); // HSXCLR
 	map(0x18, 0x18).mirror(0x03); // XFERSTB
-	map(0x1c, 0x1f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1c, 0x1f).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 
@@ -342,46 +342,45 @@ WRITE8_MEMBER( imi5000h_device::pio3_pb_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void imi5000h_device::device_add_mconfig(machine_config & config)
-{
-	Z80(config, m_maincpu, XTAL(8'000'000)/2);
-	m_maincpu->set_daisy_config(z80_daisy_chain);
-	m_maincpu->set_addrmap(AS_PROGRAM, &imi5000h_device::imi5000h_mem);
-	m_maincpu->set_addrmap(AS_IO, &imi5000h_device::imi5000h_io);
+MACHINE_CONFIG_START(imi5000h_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
+	MCFG_DEVICE_PROGRAM_MAP(imi5000h_mem)
+	MCFG_DEVICE_IO_MAP(imi5000h_io)
 
-	Z80CTC(config, m_ctc, XTAL(8'000'000) / 2);
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc->zc_callback<0>().set(FUNC(imi5000h_device::ctc_z0_w));
-	m_ctc->zc_callback<1>().set(FUNC(imi5000h_device::ctc_z1_w));
-	m_ctc->zc_callback<2>().set(FUNC(imi5000h_device::ctc_z2_w));
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000) / 2)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, imi5000h_device, ctc_z0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, imi5000h_device, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, imi5000h_device, ctc_z2_w))
 
-	z80pio_device& pio0(Z80PIO(config, Z80PIO_0_TAG, XTAL(8'000'000)/2));
-	pio0.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio0.in_pa_callback().set(FUNC(imi5000h_device::pio0_pa_r));
-	pio0.out_pa_callback().set(FUNC(imi5000h_device::pio0_pa_w));
-	pio0.out_ardy_callback().set(Z80PIO_0_TAG, FUNC(z80pio_device::strobe_a));
-	pio0.in_pb_callback().set(FUNC(imi5000h_device::pio0_pb_r));
-	pio0.out_pb_callback().set(FUNC(imi5000h_device::pio0_pb_w));
-	pio0.out_brdy_callback().set(Z80PIO_0_TAG, FUNC(z80pio_device::strobe_b));
+	MCFG_DEVICE_ADD(Z80PIO_0_TAG, Z80PIO, XTAL(8'000'000)/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, imi5000h_device, pio0_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, imi5000h_device, pio0_pa_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(Z80PIO_0_TAG, z80pio_device, strobe_a))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, imi5000h_device, pio0_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, imi5000h_device, pio0_pb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(Z80PIO_0_TAG, z80pio_device, strobe_b))
 
-	z80pio_device& pio2(Z80PIO(config, Z80PIO_2_TAG, XTAL(8'000'000)/2));
-	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio2.in_pa_callback().set(FUNC(imi5000h_device::pio2_pa_r));
-	pio2.out_pa_callback().set(FUNC(imi5000h_device::pio2_pa_w));
-	pio2.out_ardy_callback().set(Z80PIO_2_TAG, FUNC(z80pio_device::strobe_a));
-	pio2.in_pb_callback().set(FUNC(imi5000h_device::pio2_pb_r));
-	pio2.out_pb_callback().set(FUNC(imi5000h_device::pio2_pb_w));
+	MCFG_DEVICE_ADD(Z80PIO_2_TAG, Z80PIO, XTAL(8'000'000)/2)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, imi5000h_device, pio2_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, imi5000h_device, pio2_pa_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(Z80PIO_2_TAG, z80pio_device, strobe_a))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, imi5000h_device, pio2_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, imi5000h_device, pio2_pb_w))
 
-	z80pio_device& pio3(Z80PIO(config, Z80PIO_3_TAG, XTAL(8'000'000)/2));
-	pio3.in_pa_callback().set(FUNC(imi5000h_device::pio3_pa_r));
-	pio3.out_pa_callback().set(FUNC(imi5000h_device::pio3_pa_w));
-	pio3.out_ardy_callback().set(Z80PIO_3_TAG, FUNC(z80pio_device::strobe_a));
-	pio3.in_pb_callback().set(FUNC(imi5000h_device::pio3_pb_r));
-	pio3.out_pb_callback().set(FUNC(imi5000h_device::pio3_pb_w));
-	pio3.out_brdy_callback().set(Z80PIO_3_TAG, FUNC(z80pio_device::strobe_b));
+	MCFG_DEVICE_ADD(Z80PIO_3_TAG, Z80PIO, XTAL(8'000'000)/2)
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, imi5000h_device, pio3_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, imi5000h_device, pio3_pa_w))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(Z80PIO_3_TAG, z80pio_device, strobe_a))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, imi5000h_device, pio3_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, imi5000h_device, pio3_pb_w))
+	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(Z80PIO_3_TAG, z80pio_device, strobe_b))
 
-	//HARDDISK(config, "harddisk1", 0);
-}
+	//MCFG_HARDDISK_ADD("harddisk1")
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------

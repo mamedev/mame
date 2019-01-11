@@ -32,6 +32,15 @@ device_bbc_fdc_interface::device_bbc_fdc_interface(const machine_config &mconfig
 }
 
 
+//-------------------------------------------------
+//  ~device_bbc_fdc_interface - destructor
+//-------------------------------------------------
+
+device_bbc_fdc_interface::~device_bbc_fdc_interface()
+{
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -44,8 +53,17 @@ bbc_fdc_slot_device::bbc_fdc_slot_device(const machine_config &mconfig, const ch
 	device_t(mconfig, BBC_FDC_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_card(nullptr),
-	m_intrq_cb(*this),
-	m_drq_cb(*this)
+	m_intrq_handler(*this),
+	m_drq_handler(*this)
+{
+}
+
+
+//-------------------------------------------------
+//  bbc_fdc_slot_device - destructor
+//-------------------------------------------------
+
+bbc_fdc_slot_device::~bbc_fdc_slot_device()
 {
 }
 
@@ -68,13 +86,12 @@ void bbc_fdc_slot_device::device_validity_check(validity_checker &valid) const
 void bbc_fdc_slot_device::device_start()
 {
 	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_bbc_fdc_interface *>(get_card_device());
-	if (carddev && !m_card)
+	if (carddev && !dynamic_cast<device_bbc_fdc_interface *>(carddev))
 		osd_printf_error("Card device %s (%s) does not implement device_bbc_fdc_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
-	m_intrq_cb.resolve_safe();
-	m_drq_cb.resolve_safe();
+	m_intrq_handler.resolve_safe();
+	m_drq_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -85,27 +102,6 @@ void bbc_fdc_slot_device::device_reset()
 {
 }
 
-//-------------------------------------------------
-//  read
-//-------------------------------------------------
-
-READ8_MEMBER(bbc_fdc_slot_device::read)
-{
-	if (m_card)
-		return m_card->read(space, offset);
-	else
-		return 0xff;
-}
-
-//-------------------------------------------------
-//  write
-//-------------------------------------------------
-
-WRITE8_MEMBER(bbc_fdc_slot_device::write)
-{
-	if (m_card)
-		m_card->write(space, offset, data);
-}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( bbc_fdc_devices )
@@ -114,24 +110,23 @@ WRITE8_MEMBER(bbc_fdc_slot_device::write)
 
 // slot devices
 #include "acorn.h"
-#include "ams.h"
 #include "cumana.h"
 #include "cv1797.h"
-#include "microware.h"
+//#include "microware.h"
 #include "opus.h"
 //#include "solidisk.h"
 #include "watford.h"
+//#include "zdfs.h"
 
 
 void bbc_fdc_devices(device_slot_interface &device)
 {
 	device.option_add("acorn8271", BBC_ACORN8271);
 	device.option_add("acorn1770", BBC_ACORN1770);
-	device.option_add("ams3",      BBC_AMS3);
 	device.option_add("cumana1",   BBC_CUMANA1);
 	device.option_add("cumana2",   BBC_CUMANA2);
 	device.option_add("cv1797",    BBC_CV1797);
-	device.option_add("microware", BBC_MICROWARE);
+	//device.option_add("microware", BBC_MICROWARE);
 	device.option_add("opus8272",  BBC_OPUS8272);
 	device.option_add("opus2791",  BBC_OPUS2791);
 	device.option_add("opus2793",  BBC_OPUS2793);
@@ -141,4 +136,5 @@ void bbc_fdc_devices(device_slot_interface &device)
 	//device.option_add("stl1770_2", BBC_STL1770_2);
 	device.option_add("weddb2",    BBC_WEDDB2);
 	device.option_add("weddb3",    BBC_WEDDB3);
+	//device.option_add("zdfs",      BBC_ZDFS);
 }

@@ -299,7 +299,7 @@ Atlas::Atlas(uint16_t _textureSize, const uint8_t* _textureBuffer, uint16_t _reg
 		, false
 		, 1
 		, bgfx::TextureFormat::BGRA8
-		, BGFX_SAMPLER_NONE
+		, BGFX_TEXTURE_NONE
 		, bgfx::makeRef(m_textureBuffer, getTextureBufferSize() )
 		);
 }

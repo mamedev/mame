@@ -5,41 +5,25 @@
     Galivan - Cosmo Police
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GALIVAN_H
-#define MAME_INCLUDES_GALIVAN_H
-
-#pragma once
 
 #include "machine/nb1412m2.h"
 #include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
-#include "emupal.h"
 
 class galivan_state : public driver_device
 {
 public:
-	galivan_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	galivan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_nb1414m4(*this, "nb1414m4"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
-	{ }
+		m_soundlatch(*this, "soundlatch") { }
 
-	void galivan(machine_config &config);
-	void ninjemak(machine_config &config);
-	void youmab(machine_config &config);
-
-	void init_youmab();
-
-protected:
-	void io_map(address_map &map);
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -70,11 +54,12 @@ private:
 	DECLARE_WRITE8_MEMBER(ninjemak_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrollx_w);
 	DECLARE_WRITE8_MEMBER(galivan_scrolly_w);
+	void init_youmab();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_tx_tile_info);
-	void galivan_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(galivan);
 	DECLARE_MACHINE_START(galivan);
 	DECLARE_MACHINE_RESET(galivan);
 	DECLARE_VIDEO_START(galivan);
@@ -89,8 +74,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-
+	void galivan(machine_config &config);
+	void ninjemak(machine_config &config);
+	void youmab(machine_config &config);
 	void galivan_map(address_map &map);
+	void io_map(address_map &map);
 	void ninjemak_io_map(address_map &map);
 	void ninjemak_map(address_map &map);
 	void sound_io_map(address_map &map);
@@ -100,11 +88,10 @@ private:
 class dangarj_state : public galivan_state
 {
 public:
-	dangarj_state(const machine_config &mconfig, device_type type, const char *tag) :
-		galivan_state(mconfig, type, tag),
+	dangarj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galivan_state(mconfig, type, tag),
 		m_prot(*this, "prot_chip")
-	{ }
-
+		{}
 	void dangarj(machine_config &config);
 
 private:
@@ -112,5 +99,3 @@ private:
 
 	void dangarj_io_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_GALIVAN_H

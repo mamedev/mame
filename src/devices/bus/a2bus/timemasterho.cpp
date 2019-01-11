@@ -93,16 +93,15 @@ ioport_constructor a2bus_timemasterho_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void a2bus_timemasterho_device::device_add_mconfig(machine_config &config)
-{
-	PIA6821(config, m_pia, 1021800);
-	m_pia->writepa_handler().set(FUNC(a2bus_timemasterho_device::pia_out_a));
-	m_pia->writepb_handler().set(FUNC(a2bus_timemasterho_device::pia_out_b));
-	m_pia->irqa_handler().set(FUNC(a2bus_timemasterho_device::pia_irqa_w));
-	m_pia->irqb_handler().set(FUNC(a2bus_timemasterho_device::pia_irqb_w));
+MACHINE_CONFIG_START(a2bus_timemasterho_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(TIMEMASTER_PIA_TAG, PIA6821, 1021800)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, a2bus_timemasterho_device, pia_out_a))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, a2bus_timemasterho_device, pia_out_b))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, a2bus_timemasterho_device, pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, a2bus_timemasterho_device, pia_irqb_w))
 
-	MSM5832(config, m_msm5832, 32768);
-}
+	MCFG_DEVICE_ADD(TIMEMASTER_M5832_TAG, MSM5832, 32768)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -225,7 +224,7 @@ WRITE8_MEMBER(a2bus_timemasterho_device::pia_out_b)
 	// if it's a read, poke it into the PIA
 	if ((data>>5) & 1)
 	{
-		m_pia->write_porta(m_msm5832->data_r(space, 0));
+		m_pia->porta_w(m_msm5832->data_r(space, 0));
 	}
 }
 

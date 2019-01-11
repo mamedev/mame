@@ -4,7 +4,6 @@
 #include "video/decospr.h"
 #include "machine/deco146.h"
 #include "machine/gen_latch.h"
-#include "emupal.h"
 
 class lemmings_state : public driver_device
 {
@@ -27,9 +26,6 @@ public:
 	{
 	}
 
-	void lemmings(machine_config &config);
-
-private:
 	/* video-related */
 	bitmap_ind16 m_bitmap0;
 	tilemap_t *m_vram_tilemap;
@@ -67,6 +63,7 @@ private:
 
 	DECLARE_READ16_MEMBER( lem_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( lem_protection_region_0_146_w );
+	void lemmings(machine_config &config);
 	void lemmings_map(address_map &map);
 	void sound_map(address_map &map);
 };

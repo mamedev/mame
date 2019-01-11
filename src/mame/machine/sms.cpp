@@ -528,13 +528,13 @@ WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
 
 WRITE8_MEMBER(sms_state::sms_psg_w)
 {
-	m_psg_sms->write(data);
+	m_psg_sms->write(space, offset, data, mem_mask);
 }
 
 
 WRITE8_MEMBER(sms_state::gg_psg_w)
 {
-	m_psg_gg->write(data);
+	m_psg_gg->write(space, offset, data, mem_mask);
 }
 
 
@@ -1044,7 +1044,7 @@ void sms_state::machine_start()
 	if (m_mainram == nullptr)
 	{
 		m_mainram = make_unique_clear<uint8_t[]>(0x2000);
-		save_pointer(NAME(m_mainram), 0x2000);
+		save_pointer(NAME(m_mainram.get()), 0x2000);
 
 		// alibaba and blockhol are ports of games for the MSX system. The
 		// MSX bios usually initializes callback "vectors" at the top of RAM.
@@ -1259,6 +1259,9 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 
 VIDEO_START_MEMBER(sms_state,sms1)
 {
+	m_left_lcd = machine().device("left_lcd");
+	m_right_lcd = machine().device("right_lcd");
+
 	m_main_scr->register_screen_bitmap(m_prevleft_bitmap);
 	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
 	save_item(NAME(m_prevleft_bitmap));
@@ -1313,65 +1316,81 @@ WRITE_LINE_MEMBER(sms_state::screen_vblank_sms1)
 	}
 }
 
+
 uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_vdp->screen_update(screen, bitmap, cliprect);
-	return 0;
-}
+	uint8_t sscope = 0;
+	uint8_t sscope_binocular_hack;
+	uint8_t occluded_view = 0;
 
-uint32_t sms_state::screen_update_sms1_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t sscope = m_port_scope->read();
-
-	// without SegaScope, both LCDs for glasses go black
-	// with SegaScope, state 0 = left screen OFF, right screen ON
-	if (sscope && BIT(m_frame_sscope_state, 0))
+	if (&screen != m_main_scr)
 	{
-		m_vdp->screen_update(screen, bitmap, cliprect);
-
-		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
-		// save a copy of current bitmap for the binocular hack
-		if (BIT(m_port_scope_binocular->read(), 0))
-			copybitmap(m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-	}
-	else
-	{
-		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
-		// use the copied bitmap for the binocular hack
-		if (sscope && BIT(m_port_scope_binocular->read(), 0))
+		sscope = m_port_scope->read();
+		if (!sscope)
 		{
-			copybitmap(bitmap, m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
-			return 0;
+			// without SegaScope, both LCDs for glasses go black
+			occluded_view = 1;
 		}
-		bitmap.fill(rgb_t::black(), cliprect);
+		else if (&screen == m_left_lcd)
+		{
+			// with SegaScope, state 0 = left screen OFF, right screen ON
+			if (!(m_frame_sscope_state & 0x01))
+				occluded_view = 1;
+		}
+		else // it's right LCD
+		{
+			// with SegaScope, state 1 = left screen ON, right screen OFF
+			if (m_frame_sscope_state & 0x01)
+				occluded_view = 1;
+		}
 	}
 
-	return 0;
-}
-
-uint32_t sms_state::screen_update_sms1_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t sscope = m_port_scope->read();
-
-	// without SegaScope, both LCDs for glasses go black
-	// with SegaScope, state 1 = left screen ON, right screen OFF
-	if (sscope && !BIT(m_frame_sscope_state, 0))
+	if (!occluded_view)
 	{
 		m_vdp->screen_update(screen, bitmap, cliprect);
 
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// save a copy of current bitmap for the binocular hack
-		if (BIT(m_port_scope_binocular->read(), 1))
-			copybitmap(m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+		if (sscope)
+		{
+			sscope_binocular_hack = m_port_scope_binocular->read();
+
+			if (&screen == m_left_lcd)
+			{
+				if (sscope_binocular_hack & 0x01)
+					copybitmap(m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+			}
+			else // it's right LCD
+			{
+				if (sscope_binocular_hack & 0x02)
+					copybitmap(m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+			}
+		}
 	}
 	else
 	{
 		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
 		// use the copied bitmap for the binocular hack
-		if (sscope && BIT(m_port_scope_binocular->read(), 1))
+		if (sscope)
 		{
-			copybitmap(bitmap, m_prevright_bitmap, 0, 0, 0, 0, cliprect);
-			return 0;
+			sscope_binocular_hack = m_port_scope_binocular->read();
+
+			if (&screen == m_left_lcd)
+			{
+				if (sscope_binocular_hack & 0x01)
+				{
+					copybitmap(bitmap, m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
+					return 0;
+				}
+			}
+			else // it's right LCD
+			{
+				if (sscope_binocular_hack & 0x02)
+				{
+					copybitmap(bitmap, m_prevright_bitmap, 0, 0, 0, 0, cliprect);
+					return 0;
+				}
+			}
 		}
 		bitmap.fill(rgb_t::black(), cliprect);
 	}
@@ -1395,7 +1414,7 @@ VIDEO_START_MEMBER(sms_state,gamegear)
 	save_item(NAME(m_prev_bitmap_copied));
 	save_item(NAME(m_prev_bitmap));
 	save_item(NAME(m_gg_sms_mode_bitmap));
-	save_pointer(NAME(m_line_buffer), 160 * 4);
+	save_pointer(NAME(m_line_buffer.get()), 160 * 4);
 }
 
 VIDEO_RESET_MEMBER(sms_state,gamegear)

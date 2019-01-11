@@ -157,6 +157,10 @@ public:
 	void irq7_line_hold(device_t &device);
 	void irq7_line_assert(device_t &device);
 
+
+	// generic input port helpers
+	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
+
 	virtual void driver_init();
 
 protected:

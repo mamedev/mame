@@ -5,21 +5,16 @@
     Exed Exes
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_EXEDEXES_H
-#define MAME_INCLUDES_EXEDEXES_H
-
-#pragma once
 
 #include "machine/timer.h"
 #include "video/bufsprite.h"
-#include "emupal.h"
 
 class exedexes_state : public driver_device
 {
 public:
-	exedexes_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
+	exedexes_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_spriteram(*this, "spriteram") ,
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_nbg_yscroll(*this, "nbg_yscroll"),
@@ -27,12 +22,8 @@ public:
 		m_bg_scroll(*this, "bg_scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void exedexes(machine_config &config);
-
-private:
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -62,15 +53,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void exedexes_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(exedexes);
 	uint32_t screen_update_exedexes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(exedexes_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void exedexes(machine_config &config);
 	void exedexes_map(address_map &map);
 	void sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_EXEDEXES_H

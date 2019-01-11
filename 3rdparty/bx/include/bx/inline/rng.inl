@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -60,45 +60,48 @@ namespace bx
 	}
 
 	template <typename Rng>
-	inline bx::Vec3 randUnitCircle(Rng* _rng)
+	inline void randUnitCircle(float _result[3], Rng* _rng)
 	{
 		const float angle = frnd(_rng) * kPi2;
 
-		return
-		{
-			cos(angle),
-			0.0f,
-			sin(angle),
-		};
+		_result[0] = fcos(angle);
+		_result[1] = 0.0f;
+		_result[2] = fsin(angle);
 	}
 
 	template <typename Rng>
-	inline bx::Vec3 randUnitSphere(Rng* _rng)
+	inline void randUnitSphere(float _result[3], Rng* _rng)
 	{
 		const float rand0  = frnd(_rng) * 2.0f - 1.0f;
 		const float rand1  = frnd(_rng) * kPi2;
-		const float sqrtf1 = sqrt(1.0f - rand0*rand0);
+		const float sqrtf1 = fsqrt(1.0f - rand0*rand0);
 
-		return
-		{
-			sqrtf1 * cos(rand1),
-			sqrtf1 * sin(rand1),
-			rand0,
-		};
+		_result[0] = sqrtf1 * fcos(rand1);
+		_result[1] = sqrtf1 * fsin(rand1);
+		_result[2] = rand0;
 	}
 
 	template <typename Ty>
-	inline bx::Vec3 randUnitHemisphere(Ty* _rng, const bx::Vec3& _normal)
+	inline void randUnitHemisphere(float _result[3], Ty* _rng, const float _normal[3])
 	{
-		const bx::Vec3 dir = randUnitSphere(_rng);
-		const float ddotn  = bx::dot(dir, _normal);
+		float dir[3];
+		randUnitSphere(dir, _rng);
 
-		if (0.0f > ddotn)
+		float DdotN = dir[0]*_normal[0]
+					+ dir[1]*_normal[1]
+					+ dir[2]*_normal[2]
+					;
+
+		if (0.0f > DdotN)
 		{
-			return bx::neg(dir);
+			dir[0] = -dir[0];
+			dir[1] = -dir[1];
+			dir[2] = -dir[2];
 		}
 
-		return dir;
+		_result[0] = dir[0];
+		_result[1] = dir[1];
+		_result[2] = dir[2];
 	}
 
 	inline void generateSphereHammersley(void* _data, uint32_t _stride, uint32_t _num, float _scale)
@@ -119,13 +122,13 @@ namespace bx
 
 			const float phi    = (ii + 0.5f) / _num;
 			const float phirad =  phi * kPi2;
-			const float st     = sqrt(1.0f-tt*tt) * _scale;
+			const float st     = fsqrt(1.0f-tt*tt) * _scale;
 
 			float* xyz = (float*)data;
 			data += _stride;
 
-			xyz[0] = st * cos(phirad);
-			xyz[1] = st * sin(phirad);
+			xyz[0] = st * fcos(phirad);
+			xyz[1] = st * fsin(phirad);
 			xyz[2] = tt * _scale;
 		}
 	}
@@ -138,7 +141,7 @@ namespace bx
 		for (uint32_t ii = 0, num = _num-1; ii < num; ++ii)
 		{
 			uint32_t jj = ii + 1 + _rng->gen() % (num - ii);
-			bx::swap(_array[ii], _array[jj]);
+			bx::xchg(_array[ii], _array[jj]);
 		}
 	}
 

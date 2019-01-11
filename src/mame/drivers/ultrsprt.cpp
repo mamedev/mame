@@ -13,7 +13,6 @@
 #include "machine/upd4701.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -21,8 +20,8 @@
 class ultrsprt_state : public driver_device
 {
 public:
-	ultrsprt_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	ultrsprt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k056800(*this, "k056800"),
@@ -30,12 +29,8 @@ public:
 		m_palette(*this, "palette"),
 		m_eeprom(*this, "eeprom"),
 		m_upd(*this, "upd%u", 1),
-		m_service(*this, "SERVICE")
-	{ }
+		m_service(*this, "SERVICE") { }
 
-	void ultrsprt(machine_config &config);
-
-private:
 	static const uint32_t VRAM_PAGES      = 2;
 	static const uint32_t VRAM_PAGE_BYTES = 512 * 1024;
 
@@ -57,12 +52,14 @@ private:
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void ultrsprt(machine_config &config);
 	void sound_map(address_map &map);
 	void ultrsprt_map(address_map &map);
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	uint32_t m_cpu_vram_page;
 };
@@ -154,12 +151,12 @@ READ16_MEMBER(ultrsprt_state::upd2_r)
 void ultrsprt_state::ultrsprt_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).bankrw("vram");
-	map(0x70000000, 0x70000000).rw(FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
-	map(0x70000020, 0x70000023).r(FUNC(ultrsprt_state::upd1_r));
-	map(0x70000040, 0x70000043).r(FUNC(ultrsprt_state::upd2_r));
+	map(0x70000000, 0x70000000).rw(this, FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
+	map(0x70000020, 0x70000023).r(this, FUNC(ultrsprt_state::upd1_r));
+	map(0x70000040, 0x70000043).r(this, FUNC(ultrsprt_state::upd2_r));
 	map(0x70000080, 0x7000008f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x700000c0, 0x700000cf).nopw(); // Written following DMA interrupt - unused int ack?
-	map(0x700000e0, 0x700000e3).w(FUNC(ultrsprt_state::int_ack_w));
+	map(0x700000e0, 0x700000e3).w(this, FUNC(ultrsprt_state::int_ack_w));
 	map(0x7f000000, 0x7f01ffff).ram().share("workram");
 	map(0x7f700000, 0x7f703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x7f800000, 0x7f9fffff).mirror(0x00600000).rom().region("program", 0);
@@ -222,7 +219,7 @@ void ultrsprt_state::machine_start()
 
 	membank("vram")->configure_entries(0, VRAM_PAGES, m_vram.get(), VRAM_PAGE_BYTES);
 
-	save_pointer(NAME(m_vram), VRAM_PAGE_BYTES * VRAM_PAGES);
+	save_pointer(NAME(m_vram.get()), VRAM_PAGE_BYTES * VRAM_PAGES);
 	save_item(NAME(m_cpu_vram_page));
 }
 
@@ -237,48 +234,48 @@ void ultrsprt_state::machine_reset()
 
 /*****************************************************************************/
 
-void ultrsprt_state::ultrsprt(machine_config &config)
-{
+MACHINE_CONFIG_START(ultrsprt_state::ultrsprt)
 	/* basic machine hardware */
-	PPC403GA(config, m_maincpu, 25000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ultrsprt_state::ultrsprt_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ultrsprt_state::irq1_line_assert));
+	MCFG_DEVICE_ADD("maincpu", PPC403GA, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(ultrsprt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ultrsprt_state, irq1_line_assert)
 
-	M68000(config, m_audiocpu, 8000000); // Unconfirmed
-	m_audiocpu->set_addrmap(AS_PROGRAM, &ultrsprt_state::sound_map);
+	MCFG_DEVICE_ADD("audiocpu", M68000, 8000000) // Unconfirmed
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	UPD4701A(config, m_upd[0]);
-	m_upd[0]->set_portx_tag("P1X");
-	m_upd[0]->set_porty_tag("P1Y");
+	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("P1X")
+	MCFG_UPD4701_PORTY("P1Y")
 
-	UPD4701A(config, m_upd[1]);
-	m_upd[1]->set_portx_tag("P2X");
-	m_upd[1]->set_porty_tag("P2Y");
+	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("P2X")
+	MCFG_UPD4701_PORTY("P2Y")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60); // TODO: Determine correct timings
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 511, 0, 399);
-	screen.set_screen_update(FUNC(ultrsprt_state::screen_update_ultrsprt));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60) // TODO: Determine correct timings
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
+	MCFG_SCREEN_UPDATE_DRIVER(ultrsprt_state, screen_update_ultrsprt)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
+	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	/* sound hardware */
-	K056800(config, m_k056800, XTAL(18'432'000));
-	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_6);
+	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
+	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_6))
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
-	k054539.timer_handler().set_inputline("audiocpu", M68K_IRQ_5);
-	k054539.add_route(0, "lspeaker", 1.0);
-	k054539.add_route(1, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
+	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_5))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************/

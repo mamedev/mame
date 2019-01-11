@@ -1,9 +1,3 @@
-#if defined(__has_warning)
-#	if __has_warning("-Wcomma")
-#		pragma GCC diagnostic ignored "-Wcomma" // Possible misuse of comma operator here
-#	endif
-#endif
-
 #if defined(_MSC_VER)
 #	pragma warning(disable:4244) // warning C4244: '=': conversion from 'int' to 'stbi__uint16', possible loss of data
 #	pragma warning(disable:4245) // warning C4245: 'argument': conversion from 'int' to 'char', signed/unsigned mismatch

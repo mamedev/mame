@@ -55,18 +55,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
-	void k1003(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(disp_1_w);
 	DECLARE_WRITE8_MEMBER(disp_2_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 
+	void k1003(machine_config &config);
 	void k1003_io(address_map &map);
 	void k1003_mem(address_map &map);
-
+private:
 	uint8_t m_disp_1;
 	uint8_t m_disp_2;
 	uint8_t bit_to_dec(uint8_t val);
@@ -130,12 +128,12 @@ WRITE8_MEMBER( k1003_state::disp_w )
 void k1003_state::k1003_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).r(FUNC(k1003_state::key_r));
-	map(0x02, 0x02).r(FUNC(k1003_state::port2_r));
+	map(0x00, 0x00).r(this, FUNC(k1003_state::key_r));
+	map(0x02, 0x02).r(this, FUNC(k1003_state::port2_r));
 
-	map(0x08, 0x08).w(FUNC(k1003_state::disp_w));
-	map(0x09, 0x09).w(FUNC(k1003_state::disp_2_w));
-	map(0x10, 0x10).w(FUNC(k1003_state::disp_1_w));
+	map(0x08, 0x08).w(this, FUNC(k1003_state::disp_w));
+	map(0x09, 0x09).w(this, FUNC(k1003_state::disp_2_w));
+	map(0x10, 0x10).w(this, FUNC(k1003_state::disp_1_w));
 }
 
 /* Input ports */
@@ -154,7 +152,7 @@ MACHINE_CONFIG_START(k1003_state::k1003)
 	MCFG_DEVICE_IO_MAP(k1003_io)
 
 	/* video hardware */
-	config.set_default_layout(layout_k1003);
+	MCFG_DEFAULT_LAYOUT(layout_k1003)
 MACHINE_CONFIG_END
 
 

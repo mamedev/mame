@@ -171,11 +171,11 @@ WRITE8_MEMBER( vicdual_state::pulsar_audio_2_w )
 }
 
 
-void vicdual_state::pulsar_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(vicdual_state::pulsar_audio)
+
 	/* samples */
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(12);
-	m_samples->set_samples_names(pulsar_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(12)
+	MCFG_SAMPLES_NAMES(pulsar_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END

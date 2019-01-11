@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:
 /***********************************************************************************************************************************
 
 Skeleton driver for Visual 102 display terminal.
@@ -7,20 +7,17 @@ Skeleton driver for Visual 102 display terminal.
 ************************************************************************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/eeprompar.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/z80sio.h"
-//#include "video/crt9006.h"
-#include "video/crt9007.h"
+//#include "video/crt9007.h"
 //#include "video/crt9021.h"
 #include "screen.h"
-
-#include "machine/v102_kbd.h"
 
 class v102_state : public driver_device
 {
@@ -28,47 +25,24 @@ public:
 	v102_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_mpsc(*this, "mpsc")
-		, m_chargen(*this, "chargen")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
-	void v102(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-
-private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(hs_w);
-
+	void v102(machine_config &config);
 	void io_map(address_map &map);
+	void kbd_map(address_map &map);
 	void mem_map(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
-	required_device<upd7201_new_device> m_mpsc;
-	required_region_ptr<u8> m_chargen;
-
-	bool m_hs_state;
-	bool m_kb_clock;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
 u32 v102_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
-}
-
-WRITE_LINE_MEMBER(v102_state::hs_w)
-{
-	if (state && !m_hs_state)
-	{
-		m_kb_clock = !m_kb_clock;
-		m_mpsc->txca_w(m_kb_clock);
-		m_mpsc->rxca_w(m_kb_clock);
-	}
-
-	m_hs_state = bool(state);
 }
 
 
@@ -84,85 +58,55 @@ void v102_state::mem_map(address_map &map)
 void v102_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).rw("vpac", FUNC(crt9007_device::read), FUNC(crt9007_device::write));
+	//AM_RANGE(0x00, 0x3f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
+	map(0x18, 0x19).nopw();
 	map(0x40, 0x43).rw("mpsc", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w));
-	map(0x60, 0x61).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x60, 0x60).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x61, 0x61).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x80, 0x83).w("pit", FUNC(pit8253_device::write));
 	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	//AM_RANGE(0xbf, 0xbf) ???
 }
 
-void v102_state::machine_start()
+void v102_state::kbd_map(address_map &map)
 {
-	m_hs_state = false;
-	m_kb_clock = false;
-
-	m_mpsc->ctsa_w(0);
-	m_mpsc->ctsb_w(0);
-
-	save_item(NAME(m_hs_state));
-	save_item(NAME(m_kb_clock));
+	map(0x000, 0x7ff).rom().region("keyboard", 0);
 }
 
-static INPUT_PORTS_START(v102)
+static INPUT_PORTS_START( v102 )
 INPUT_PORTS_END
 
-void v102_state::v102(machine_config &config)
-{
-	Z80(config, m_maincpu, 18.575_MHz_XTAL / 5); // divider not verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &v102_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &v102_state::io_map);
+MACHINE_CONFIG_START(v102_state::v102)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(18.575_MHz_XTAL, 970, 0, 800, 319, 0, 300);
-	//screen.set_raw(18.575_MHz_XTAL, 948, 0, 792, 319, 0, 300);
-	screen.set_screen_update(FUNC(v102_state::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'575'000), 970, 0, 800, 319, 0, 300)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(18'575'000), 948, 0, 792, 319, 0, 300)
+	MCFG_SCREEN_UPDATE_DRIVER(v102_state, screen_update)
 
-	crt9007_device &vpac(CRT9007(config, "vpac", 18.575_MHz_XTAL / 10));
-	vpac.set_character_width(10); // 6 in 132-column mode
-	vpac.int_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
-	vpac.hs_callback().set(FUNC(v102_state::hs_w));
-	vpac.set_screen("screen");
+	//MCFG_DEVICE_ADD("vpac", CRT9007, CRTC_CLOCK)
+	//MCFG_CRT9007_CHARACTER_WIDTH(6 or 10)
 
-	EEPROM_2804(config, "eeprom");
+	MCFG_EEPROM_2804_ADD("eeprom")
 
-	UPD7201_NEW(config, m_mpsc, 18.575_MHz_XTAL / 5); // divider not verified
-	m_mpsc->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
-	m_mpsc->out_txda_callback().set("keyboard", FUNC(v102_keyboard_device::write_rxd));
-	m_mpsc->out_txdb_callback().set("aux", FUNC(rs232_port_device::write_txd));
-	m_mpsc->out_dtrb_callback().set("aux", FUNC(rs232_port_device::write_dtr));
-	m_mpsc->out_rtsb_callback().set("aux", FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("mainirq", input_merger_device, in_w<0>))
 
-	i8251_device &usart(I8251(config, "usart", 18.575_MHz_XTAL / 5)); // divider not verified
-	usart.rxrdy_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
-	usart.txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
-	usart.dtr_handler().set("modem", FUNC(rs232_port_device::write_dtr));
-	usart.rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
 
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
-	pit.set_clk<0>(18.575_MHz_XTAL / 6);
-	pit.set_clk<1>(18.575_MHz_XTAL / 6);
-	pit.set_clk<2>(18.575_MHz_XTAL / 6);
-	pit.out_handler<0>().set("usart", FUNC(i8251_device::write_txc));
-	pit.out_handler<1>().set("usart", FUNC(i8251_device::write_rxc));
-	pit.out_handler<2>().set(m_mpsc, FUNC(upd7201_new_device::txcb_w));
-	pit.out_handler<2>().append(m_mpsc, FUNC(upd7201_new_device::rxcb_w));
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 
-	I8255(config, "ppi");
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
 
-	v102_keyboard_device &keyboard(V102_KEYBOARD(config, "keyboard"));
-	keyboard.txd_callback().set(m_mpsc, FUNC(upd7201_new_device::rxa_w));
-
-	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
-	modem.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));
-	modem.cts_handler().set("usart", FUNC(i8251_device::write_cts));
-	modem.dcd_handler().set("usart", FUNC(i8251_device::write_dsr));
-
-	rs232_port_device &aux(RS232_PORT(config, "aux", default_rs232_devices, nullptr));
-	aux.rxd_handler().set(m_mpsc, FUNC(upd7201_new_device::rxb_w));
-	aux.dcd_handler().set(m_mpsc, FUNC(upd7201_new_device::dcdb_w)); // DTR (printer busy)
-}
+	MCFG_DEVICE_ADD("kbdcpu", I8039, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(kbd_map)
+MACHINE_CONFIG_END
 
 
 /**************************************************************************************************************
@@ -180,6 +124,9 @@ ROM_START( v102 )
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "260-001.u50", 0x0000, 0x1000, CRC(732f5b99) SHA1(d105bf9f3ed41109d7181bcf0223bb280afe3f0a) )
+
+	ROM_REGION(0x0800, "keyboard", 0)
+	ROM_LOAD( "150.kbd",     0x0000, 0x0800, CRC(afe55cff) SHA1(b26ebdde63ec0e94c08780285def39a282e128b3) )
 ROM_END
 
 COMP( 1984, v102, 0, 0, v102, v102, v102_state, empty_init, "Visual Technology", "Visual 102", MACHINE_IS_SKELETON )

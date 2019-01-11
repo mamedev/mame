@@ -51,7 +51,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/msm5832.h"
 #include "machine/timer.h"
@@ -59,7 +58,6 @@
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -85,11 +83,6 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	void mycom(machine_config &config);
-
-	void init_mycom();
-
-private:
 	DECLARE_READ8_MEMBER(mycom_upper_r);
 	DECLARE_WRITE8_MEMBER(mycom_upper_w);
 	DECLARE_READ8_MEMBER(vram_data_r);
@@ -101,13 +94,15 @@ private:
 	DECLARE_READ8_MEMBER(mycom_05_r);
 	DECLARE_READ8_MEMBER(mycom_06_r);
 	DECLARE_READ8_MEMBER(mycom_08_r);
+	void init_mycom();
 	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
 	DECLARE_WRITE8_MEMBER(mycom_rtc_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void mycom(machine_config &config);
 	void mycom_io(address_map &map);
 	void mycom_map(address_map &map);
-
+private:
 	uint8_t m_0a;
 	uint16_t m_i_videoram;
 	uint8_t m_keyb_press;
@@ -226,14 +221,14 @@ void mycom_state::mycom_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).bankrw("boot");
 	map(0x1000, 0xbfff).ram();
-	map(0xc000, 0xffff).rw(FUNC(mycom_state::mycom_upper_r), FUNC(mycom_state::mycom_upper_w));
+	map(0xc000, 0xffff).rw(this, FUNC(mycom_state::mycom_upper_r), FUNC(mycom_state::mycom_upper_w));
 }
 
 void mycom_state::mycom_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(mycom_state::mycom_00_w));
-	map(0x01, 0x01).rw(FUNC(mycom_state::vram_data_r), FUNC(mycom_state::vram_data_w));
+	map(0x00, 0x00).w(this, FUNC(mycom_state::mycom_00_w));
+	map(0x01, 0x01).rw(this, FUNC(mycom_state::vram_data_r), FUNC(mycom_state::vram_data_w));
 	map(0x02, 0x02).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x03, 0x03).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x04, 0x07).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -417,7 +412,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 
 	// if WE & CE are low, pass sound command to audio chip
 	if ((data & 0x30)==0)
-		m_audio->write(m_sn_we);
+		m_audio->write(space, 0, m_sn_we);
 }
 
 WRITE8_MEMBER(mycom_state::mycom_rtc_w)
@@ -510,24 +505,24 @@ void mycom_state::init_mycom()
 
 MACHINE_CONFIG_START(mycom_state::mycom)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 10_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(10'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(mycom_map)
 	MCFG_DEVICE_IO_MAP(mycom_io)
 
-	I8255(config, m_ppi0);
-	m_ppi0->out_pa_callback().set(FUNC(mycom_state::mycom_04_w));
-	m_ppi0->in_pb_callback().set(FUNC(mycom_state::mycom_05_r));
-	m_ppi0->in_pc_callback().set(FUNC(mycom_state::mycom_06_r));
-	m_ppi0->out_pc_callback().set(FUNC(mycom_state::mycom_06_w));
+	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mycom_state, mycom_04_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mycom_state, mycom_05_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mycom_state, mycom_06_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_06_w))
 
-	I8255(config, m_ppi1);
-	m_ppi1->in_pa_callback().set(FUNC(mycom_state::mycom_08_r));
-	m_ppi1->out_pc_callback().set(FUNC(mycom_state::mycom_0a_w));
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mycom_state, mycom_08_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_0a_w))
 
-	I8255(config, m_ppi2);
-	m_ppi2->in_pb_callback().set("rtc", FUNC(msm5832_device::data_r));
-	m_ppi2->out_pb_callback().set("rtc", FUNC(msm5832_device::data_w));
-	m_ppi2->out_pc_callback().set(FUNC(mycom_state::mycom_rtc_w));
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_IN_PORTB_CB(READ8("rtc", msm5832_device, data_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8("rtc", msm5832_device, data_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_rtc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -536,30 +531,27 @@ MACHINE_CONFIG_START(mycom_state::mycom)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mycom)
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
 	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MC6845(config, m_crtc, 1008000);
-	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(mycom_state, crtc_update_row)
 
 	SPEAKER(config, "mono").front_center();
 
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_DEVICE_ADD("sn1", SN76489, 10_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("sn1", SN76489, XTAL(10'000'000) / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
-
-	MCFG_CASSETTE_ADD("cassette")
-
-	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
+	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_FD1771_ADD("fdc", XTAL(16'000'000) / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
@@ -573,11 +565,11 @@ ROM_START( mycom )
 	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("mycom")
 	ROM_SYSTEM_BIOS(0, "mycom", "40 column")
-	ROMX_LOAD("bios0.rom", 0x10000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a), ROM_BIOS(0))
-	ROMX_LOAD("basic0.rom",0x13000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1), ROM_BIOS(0))
+	ROMX_LOAD( "bios0.rom", 0x10000, 0x3000, CRC(e6f50355) SHA1(5d3acea360c0a8ab547db03a43e1bae5125f9c2a), ROM_BIOS(1))
+	ROMX_LOAD( "basic0.rom",0x13000, 0x1000, CRC(3b077465) SHA1(777427182627f371542c5e0521ed3ca1466a90e1), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "takeda", "80 column")
-	ROMX_LOAD("bios1.rom", 0x10000, 0x3000, CRC(c51d7fcb) SHA1(31d39db43b77cca4d49ff9814d531e056924e716), ROM_BIOS(1))
-	ROMX_LOAD("basic1.rom",0x13000, 0x1000, CRC(30a573f1) SHA1(e3fe2e73644e831b52e2789dc7c181989cc30b82), ROM_BIOS(1))
+	ROMX_LOAD( "bios1.rom", 0x10000, 0x3000, CRC(c51d7fcb) SHA1(31d39db43b77cca4d49ff9814d531e056924e716), ROM_BIOS(2))
+	ROMX_LOAD( "basic1.rom",0x13000, 0x1000, CRC(30a573f1) SHA1(e3fe2e73644e831b52e2789dc7c181989cc30b82), ROM_BIOS(2))
 	/* Takeda bios has no cursor. Use the next lines to turn on cursor, but you must comment out when done. */
 	//ROM_FILL( 0x11eb6, 1, 0x47 )
 	//ROM_FILL( 0x11eb7, 1, 0x07 )

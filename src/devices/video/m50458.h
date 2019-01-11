@@ -12,6 +12,16 @@ Mitsubishi M50458 OSD chip
 #pragma once
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_M50458_ADD(_tag,_freq,_screen) \
+	MCFG_DEVICE_ADD(_tag, M50458,_freq) \
+	MCFG_VIDEO_SET_SCREEN(_screen)
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -24,13 +34,6 @@ class m50458_device :   public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag)
-		: m50458_device(mconfig, tag, owner, clock)
-	{
-		set_screen(std::forward<T>(screen_tag));
-	}
-
 	m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations

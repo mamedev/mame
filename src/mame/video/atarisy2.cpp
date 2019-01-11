@@ -159,25 +159,25 @@ WRITE16_MEMBER( atarisy2_state::yscroll_w )
  *
  *************************************/
 
-rgb_t atarisy2_state::RRRRGGGGBBBBIIII(uint32_t raw)
+PALETTE_DECODER_MEMBER( atarisy2_state, RRRRGGGGBBBBIIII )
 {
-	static constexpr int ZB = 115, Z3 = 78, Z2 = 37, Z1 = 17, Z0 = 9;
+	static const int ZB = 115, Z3 = 78, Z2 = 37, Z1 = 17, Z0 = 9;
 
-	static constexpr int intensity_table[16] =
+	static const int intensity_table[16] =
 	{
 		0, ZB+Z0, ZB+Z1, ZB+Z1+Z0, ZB+Z2, ZB+Z2+Z0, ZB+Z2+Z1, ZB+Z2+Z1+Z0,
 		ZB+Z3, ZB+Z3+Z0, ZB+Z3+Z1, ZB+Z3+Z1+Z0,ZB+ Z3+Z2, ZB+Z3+Z2+Z0, ZB+Z3+Z2+Z1, ZB+Z3+Z2+Z1+Z0
 	};
 
-	static constexpr int color_table[16] =
+	static const int color_table[16] =
 	{
 		0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xe, 0xf, 0xf
 	};
 
-	int const i = intensity_table[raw & 15];
-	uint8_t const r = (color_table[(raw >> 12) & 15] * i) >> 4;
-	uint8_t const g = (color_table[(raw >> 8) & 15] * i) >> 4;
-	uint8_t const b = (color_table[(raw >> 4) & 15] * i) >> 4;
+	int i = intensity_table[raw & 15];
+	uint8_t r = (color_table[(raw >> 12) & 15] * i) >> 4;
+	uint8_t g = (color_table[(raw >> 8) & 15] * i) >> 4;
+	uint8_t b = (color_table[(raw >> 4) & 15] * i) >> 4;
 
 	return rgb_t(r, g, b);
 }
@@ -248,12 +248,12 @@ uint32_t atarisy2_state::screen_update_atarisy2(screen_device &screen, bitmap_in
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
+		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
 			uint8_t *pri = &priority_bitmap.pix8(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
+			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{
 					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;

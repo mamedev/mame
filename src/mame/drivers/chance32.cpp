@@ -22,7 +22,6 @@
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,17 +37,9 @@ public:
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	void chance32(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
 	{
 		m_fgram[offset] = data;
@@ -68,8 +59,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void chance32(machine_config &config);
 	void chance32_map(address_map &map);
 	void chance32_portmap(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -80,7 +77,7 @@ private:
 	uint8_t mux_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<13> m_lamps;
+	output_finder<13> m_lamp;
 };
 
 
@@ -180,14 +177,15 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 
 */
 	if (data & 1)   // bit 0 is the mux selector.
+
 	{
-		m_lamps[0] = BIT(data, 1);  /* Lamp 0 - Small / Big */
-		m_lamps[1] = BIT(data, 2);  /* Lamp 1 - Big / Small */
-		m_lamps[2] = BIT(data, 3);  /* Lamp 2 - Hold 5 */
-		m_lamps[3] = BIT(data, 4);  /* Lamp 3 - Hold 4 */
-		m_lamps[4] = BIT(data, 5);  /* Lamp 4 - Hold 3 */
-		m_lamps[5] = BIT(data, 6);  /* Lamp 5 - Hold 2 */
-		m_lamps[6] = BIT(data, 7);  /* Lamp 6 - Hold 1 */
+		m_lamp[0] = BIT(data, 1);  /* Lamp 0 - Small / Big */
+		m_lamp[1] = BIT(data, 2);  /* Lamp 1 - Big / Small */
+		m_lamp[2] = BIT(data, 3);  /* Lamp 2 - Hold 5 */
+		m_lamp[3] = BIT(data, 4);  /* Lamp 3 - Hold 4 */
+		m_lamp[4] = BIT(data, 5);  /* Lamp 4 - Hold 3 */
+		m_lamp[5] = BIT(data, 6);  /* Lamp 5 - Hold 2 */
+		m_lamp[6] = BIT(data, 7);  /* Lamp 6 - Hold 1 */
 
 		logerror("Lamps A: %02x\n", data);
 	}
@@ -195,12 +193,12 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 	else
 	{
 		// bit 1 is unknown...
-		m_lamps[7] = BIT(data, 2);  /* Lamp 7 - Fever! */
-		m_lamps[8] = BIT(data, 3);  /* Lamp 8 - Cancel */
-		m_lamps[9] = BIT(data, 4);  /* Lamp 9 - D-Up / Take */
-		m_lamps[10] = BIT(data, 5); /* Lamp 10 - Take / D-Up */
-		m_lamps[11] = BIT(data, 6); /* Lamp 11 - Deal */
-		m_lamps[12] = BIT(data, 7); /* Lamp 12 - Bet */
+		m_lamp[7] = BIT(data, 2);  /* Lamp 7 - Fever! */
+		m_lamp[8] = BIT(data, 3);  /* Lamp 8 - Cancel */
+		m_lamp[9] = BIT(data, 4);  /* Lamp 9 - D-Up / Take */
+		m_lamp[10] = BIT(data, 5); /* Lamp 10 - Take / D-Up */
+		m_lamp[11] = BIT(data, 6); /* Lamp 11 - Deal */
+		m_lamp[12] = BIT(data, 7); /* Lamp 12 - Bet */
 
 		logerror("Lamps B: %02x\n", data);
 	}
@@ -212,26 +210,26 @@ void chance32_state::chance32_map(address_map &map)
 	map(0x0000, 0xcfff).rom();
 	map(0xd800, 0xdfff).ram();
 	map(0xe000, 0xefff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-	map(0xf000, 0xf7ff).ram().w(FUNC(chance32_state::chance32_fgram_w)).share("fgram");
-	map(0xf800, 0xffff).ram().w(FUNC(chance32_state::chance32_bgram_w)).share("bgram");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(chance32_state::chance32_fgram_w)).share("fgram");
+	map(0xf800, 0xffff).ram().w(this, FUNC(chance32_state::chance32_bgram_w)).share("bgram");
 }
 
 void chance32_state::chance32_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x10).nopw();        // writing bit3 constantly... watchdog?
-	map(0x13, 0x13).w(FUNC(chance32_state::mux_w));
+	map(0x13, 0x13).w(this, FUNC(chance32_state::mux_w));
 	map(0x20, 0x20).portr("DSW0");
 	map(0x21, 0x21).portr("DSW1");
 	map(0x22, 0x22).portr("DSW2");
 	map(0x23, 0x23).portr("DSW3");
 	map(0x24, 0x24).portr("DSW4");
-	map(0x25, 0x25).r(FUNC(chance32_state::mux_r));
+	map(0x25, 0x25).r(this, FUNC(chance32_state::mux_r));
 	map(0x26, 0x26).portr("UNK"); // vblank (other bits are checked for different reasons)
 	map(0x30, 0x30).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x31, 0x31).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x50, 0x50).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x60).w(FUNC(chance32_state::muxout_w));
+	map(0x60, 0x60).w(this, FUNC(chance32_state::muxout_w));
 }
 
 
@@ -450,7 +448,7 @@ GFXDECODE_END
 
 void chance32_state::machine_start()
 {
-	m_lamps.resolve();
+	m_lamp.resolve();
 }
 
 void chance32_state::machine_reset()
@@ -476,13 +474,13 @@ MACHINE_CONFIG_START(chance32_state::chance32)
 	MCFG_SCREEN_UPDATE_DRIVER(chance32_state, screen_update_chance32)
 	MCFG_SCREEN_PALETTE("palette")
 
-	h46505_device &crtc(H46505(config, "crtc", 12000000/16));   /* 52.786 Hz (similar to Major Poker) */
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(16);
+	MCFG_MC6845_ADD("crtc", H46505, "screen", 12000000/16)   /* 52.786 Hz (similar to Major Poker) */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(16)
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_chance32);
-	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x800);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chance32)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

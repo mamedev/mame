@@ -13,8 +13,13 @@
 
 #pragma once
 
-#include "emupal.h"
 
+///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
+
+#define MCFG_HD66421_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, HD66421, 0)
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -30,7 +35,7 @@ public:
 	static constexpr unsigned HEIGHT  = 100;
 
 	// construction/destruction
-	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( reg_idx_r );
 	DECLARE_WRITE8_MEMBER( reg_idx_w );
@@ -62,7 +67,7 @@ private:
 
 	void hd66421(address_map &map);
 
-	void hd66421_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(hd66421);
 };
 
 

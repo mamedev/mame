@@ -9,13 +9,13 @@
 #include "emu.h"
 #include "includes/88games.h"
 
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -75,15 +75,18 @@ WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
 
 WRITE8_MEMBER(_88games_state::speech_control_w)
 {
-	m_speech_chip = BIT(data, 2);
+	m_speech_chip = (data & 4) ? 1 : 0;
+	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
 
-	m_upd7759[m_speech_chip]->reset_w(BIT(data, 1));
-	m_upd7759[m_speech_chip]->start_w(BIT(data, 0));
+	upd->reset_w(data & 2);
+	upd->start_w(data & 1);
 }
 
 WRITE8_MEMBER(_88games_state::speech_msg_w)
 {
-	m_upd7759[m_speech_chip]->port_w(data);
+	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
+
+	upd->port_w(space, 0, data);
 }
 
 /* special handlers to combine 052109 & 051960 */
@@ -125,12 +128,12 @@ void _88games_state::main_map(address_map &map)
 	map(0x1000, 0x1fff).w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x37ff).ram().share("nvram");
-	map(0x3800, 0x3fff).rw(FUNC(_88games_state::bankedram_r), FUNC(_88games_state::bankedram_w)).share("ram");
-	map(0x4000, 0x7fff).rw(FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
-	map(0x5f84, 0x5f84).w(FUNC(_88games_state::k88games_5f84_w));
+	map(0x3800, 0x3fff).rw(this, FUNC(_88games_state::bankedram_r), FUNC(_88games_state::bankedram_w)).share("ram");
+	map(0x4000, 0x7fff).rw(this, FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
+	map(0x5f84, 0x5f84).w(this, FUNC(_88games_state::k88games_5f84_w));
 	map(0x5f88, 0x5f88).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x5f8c, 0x5f8c).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x5f90, 0x5f90).w(FUNC(_88games_state::k88games_sh_irqtrigger_w));
+	map(0x5f90, 0x5f90).w(this, FUNC(_88games_state::k88games_sh_irqtrigger_w));
 	map(0x5f94, 0x5f94).portr("IN0");
 	map(0x5f95, 0x5f95).portr("IN1");
 	map(0x5f96, 0x5f96).portr("IN2");
@@ -144,10 +147,10 @@ void _88games_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(FUNC(_88games_state::speech_msg_w));
+	map(0x9000, 0x9000).w(this, FUNC(_88games_state::speech_msg_w));
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe000, 0xe000).w(FUNC(_88games_state::speech_control_w));
+	map(0xe000, 0xe000).w(this, FUNC(_88games_state::speech_control_w));
 }
 
 
@@ -301,56 +304,62 @@ void _88games_state::machine_reset()
 	m_k88games_priority = 0;
 }
 
-void _88games_state::_88games(machine_config &config)
-{
+MACHINE_CONFIG_START(_88games_state::_88games)
+
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, 3000000); /* ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_88games_state::main_map);
-	m_maincpu->line().set(FUNC(_88games_state::banking_callback));
+	MCFG_DEVICE_ADD("maincpu", KONAMI, 3000000) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, _88games_state, banking_callback))
 
-	Z80(config, m_audiocpu, 3579545);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &_88games_state::sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(_88games_state::screen_update_88games));
-	screen.set_palette("palette");
-	screen.screen_vblank().set(FUNC(_88games_state::vblank_irq));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(_88games_state, screen_update_88games)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, _88games_state, vblank_irq))
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette("palette");
-	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(_88games_state, tile_callback)
 
-	K051960(config, m_k051960, 0);
-	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback), this);
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(_88games_state, sprite_callback)
 
-	K051316(config, m_k051316, 0);
-	m_k051316->set_palette("palette");
-	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback), this);
+	MCFG_DEVICE_ADD("k051316", K051316, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051316_CB(_88games_state, zoom_callback)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "mono", 0.75).add_route(1, "mono", 0.75);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ROUTE(0, "mono", 0.75)
+	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 
-	UPD7759(config, m_upd7759[0]).add_route(ALL_OUTPUTS, "mono", 0.30);
+	MCFG_DEVICE_ADD("upd1", UPD7759)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	UPD7759(config, m_upd7759[1]).add_route(ALL_OUTPUTS, "mono", 0.30);
-}
+	MCFG_DEVICE_ADD("upd2", UPD7759)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+MACHINE_CONFIG_END
 
 
 

@@ -6,23 +6,17 @@
 class hyhoo_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_BLITTER
+	};
+
 	hyhoo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_nb1413m3(*this, "nb1413m3"),
 		m_screen(*this, "screen"),
 		m_clut(*this, "clut") { }
-
-	void hyhoo(machine_config &config);
-	void hyhoo2(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-
-private:
-	enum
-	{
-		TIMER_BLITTER
-	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
@@ -46,13 +40,17 @@ private:
 	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
 	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+
 	virtual void video_start() override;
 
 	uint32_t screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hyhoo_gfxdraw();
 
+	void hyhoo(machine_config &config);
+	void hyhoo2(machine_config &config);
 	void hyhoo_io_map(address_map &map);
 	void hyhoo_map(address_map &map);
-
+protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

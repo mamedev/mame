@@ -190,13 +190,13 @@ void btime_state::btime_map(address_map &map)
 	map(0x0c00, 0x0c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x1000, 0x13ff).ram().share("videoram");
 	map(0x1400, 0x17ff).ram().share("colorram");
-	map(0x1800, 0x1bff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0x1c00, 0x1fff).rw(FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x1800, 0x1bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
 	map(0x4000, 0x4000).portr("P1").nopw();
 	map(0x4001, 0x4001).portr("P2");
-	map(0x4002, 0x4002).portr("SYSTEM").w(FUNC(btime_state::btime_video_control_w));
+	map(0x4002, 0x4002).portr("SYSTEM").w(this, FUNC(btime_state::btime_video_control_w));
 	map(0x4003, 0x4003).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x4004, 0x4004).portr("DSW2").w(FUNC(btime_state::bnj_scroll1_w));
+	map(0x4004, 0x4004).portr("DSW2").w(this, FUNC(btime_state::bnj_scroll1_w));
 	map(0xb000, 0xffff).rom();
 }
 
@@ -206,12 +206,12 @@ void btime_state::cookrace_map(address_map &map)
 	map(0x0500, 0x3fff).rom();
 	map(0xc000, 0xc3ff).ram().share("videoram");
 	map(0xc400, 0xc7ff).ram().share("colorram");
-	map(0xc800, 0xcbff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0xcc00, 0xcfff).rw(FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0xc800, 0xcbff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0xcc00, 0xcfff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
 	map(0xd000, 0xd0ff).ram();                         /* background? */
 	map(0xd100, 0xd3ff).ram();                         /* ? */
 	map(0xd400, 0xd7ff).ram().share("bnj_bgram");
-	map(0xe000, 0xe000).portr("DSW1").w(FUNC(btime_state::bnj_video_control_w));
+	map(0xe000, 0xe000).portr("DSW1").w(this, FUNC(btime_state::bnj_video_control_w));
 	map(0xe300, 0xe300).portr("DSW1");   /* mirror address used on high score name entry */
 													/* screen */
 	map(0xe001, 0xe001).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -227,14 +227,14 @@ void btime_state::tisland_map(address_map &map)
 	map(0x0c00, 0x0c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x1000, 0x13ff).ram().share("videoram");
 	map(0x1400, 0x17ff).ram().share("colorram");
-	map(0x1800, 0x1bff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0x1c00, 0x1fff).rw(FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x1800, 0x1bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
 	map(0x4000, 0x4000).portr("P1").nopw();
 	map(0x4001, 0x4001).portr("P2");
-	map(0x4002, 0x4002).portr("SYSTEM").w(FUNC(btime_state::btime_video_control_w));
+	map(0x4002, 0x4002).portr("SYSTEM").w(this, FUNC(btime_state::btime_video_control_w));
 	map(0x4003, 0x4003).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x4004, 0x4004).portr("DSW2").w(FUNC(btime_state::bnj_scroll1_w));
-	map(0x4005, 0x4005).w(FUNC(btime_state::bnj_scroll2_w));
+	map(0x4004, 0x4004).portr("DSW2").w(this, FUNC(btime_state::bnj_scroll1_w));
+	map(0x4005, 0x4005).w(this, FUNC(btime_state::bnj_scroll2_w));
 	map(0x9000, 0xffff).rom();
 }
 
@@ -243,16 +243,16 @@ void btime_state::zoar_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("rambase");
 	map(0x8000, 0x83ff).writeonly().share("videoram");
 	map(0x8400, 0x87ff).writeonly().share("colorram");
-	map(0x8800, 0x8bff).w(FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0x8c00, 0x8fff).w(FUNC(btime_state::btime_mirrorcolorram_w));
-	map(0x9000, 0x9000).w(FUNC(btime_state::zoar_video_control_w));
-	map(0x9800, 0x9800).r(FUNC(btime_state::zoar_dsw1_read));
+	map(0x8800, 0x8bff).w(this, FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x8c00, 0x8fff).w(this, FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x9000, 0x9000).w(this, FUNC(btime_state::zoar_video_control_w));
+	map(0x9800, 0x9800).r(this, FUNC(btime_state::zoar_dsw1_read));
 	map(0x9801, 0x9801).portr("DSW2");
 	map(0x9802, 0x9802).portr("P1");
 	map(0x9803, 0x9803).portr("P2");
 	map(0x9800, 0x9803).writeonly().share("zoar_scrollram");
-	map(0x9804, 0x9804).portr("SYSTEM").w(FUNC(btime_state::bnj_scroll2_w));
-	map(0x9805, 0x9805).w(FUNC(btime_state::bnj_scroll1_w));
+	map(0x9804, 0x9804).portr("SYSTEM").w(this, FUNC(btime_state::bnj_scroll2_w));
+	map(0x9805, 0x9805).w(this, FUNC(btime_state::bnj_scroll1_w));
 	map(0x9806, 0x9806).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xd000, 0xffff).rom();
 }
@@ -260,11 +260,11 @@ void btime_state::zoar_map(address_map &map)
 void btime_state::lnc_map(address_map &map)
 {
 	map(0x0000, 0x3bff).ram().share("rambase");
-	map(0x3c00, 0x3fff).ram().w(FUNC(btime_state::lnc_videoram_w)).share("videoram");
+	map(0x3c00, 0x3fff).ram().w(this, FUNC(btime_state::lnc_videoram_w)).share("videoram");
 	map(0x7800, 0x7bff).writeonly().share("colorram");  /* this is just here to initialize the pointer */
-	map(0x7c00, 0x7fff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
+	map(0x7c00, 0x7fff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
 	map(0x8000, 0x8000).portr("DSW1").nopw();     /* ??? */
-	map(0x8001, 0x8001).portr("DSW2").w(FUNC(btime_state::bnj_video_control_w));
+	map(0x8001, 0x8001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
 	map(0x8003, 0x8003).writeonly().share("lnc_charbank");
 	map(0x9000, 0x9000).portr("P1").nopw();     /* IRQ ack??? */
 	map(0x9001, 0x9001).portr("P2");
@@ -276,16 +276,16 @@ void btime_state::lnc_map(address_map &map)
 void btime_state::mmonkey_map(address_map &map)
 {
 	map(0x0000, 0x3bff).ram().share("rambase");
-	map(0x3c00, 0x3fff).ram().w(FUNC(btime_state::lnc_videoram_w)).share("videoram");
+	map(0x3c00, 0x3fff).ram().w(this, FUNC(btime_state::lnc_videoram_w)).share("videoram");
 	map(0x7800, 0x7bff).writeonly().share("colorram");      /* this is just here to initialize the pointer */
-	map(0x7c00, 0x7fff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
+	map(0x7c00, 0x7fff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
 	map(0x8000, 0x8000).portr("DSW1");
-	map(0x8001, 0x8001).portr("DSW2").w(FUNC(btime_state::bnj_video_control_w));
+	map(0x8001, 0x8001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
 	map(0x8003, 0x8003).writeonly().share("lnc_charbank");
 	map(0x9000, 0x9000).portr("P1").nopw(); /* IRQ ack??? */
 	map(0x9001, 0x9001).portr("P2");
 	map(0x9002, 0x9002).portr("SYSTEM").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xb000, 0xbfff).rw(FUNC(btime_state::mmonkey_protection_r), FUNC(btime_state::mmonkey_protection_w));
+	map(0xb000, 0xbfff).rw(this, FUNC(btime_state::mmonkey_protection_r), FUNC(btime_state::mmonkey_protection_w));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -293,18 +293,18 @@ void btime_state::bnj_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("rambase");
 	map(0x1000, 0x1000).portr("DSW1");
-	map(0x1001, 0x1001).portr("DSW2").w(FUNC(btime_state::bnj_video_control_w));
+	map(0x1001, 0x1001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
 	map(0x1002, 0x1002).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1003, 0x1003).portr("P2");
 	map(0x1004, 0x1004).portr("SYSTEM");
 	map(0x4000, 0x43ff).ram().share("videoram");
 	map(0x4400, 0x47ff).ram().share("colorram");
-	map(0x4800, 0x4bff).rw(FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
-	map(0x4c00, 0x4fff).rw(FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
-	map(0x5000, 0x51ff).ram().w(FUNC(btime_state::bnj_background_w)).share("bnj_bgram");
+	map(0x4800, 0x4bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x4c00, 0x4fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x5000, 0x51ff).ram().w(this, FUNC(btime_state::bnj_background_w)).share("bnj_bgram");
 	map(0x5200, 0x53ff).ram();
-	map(0x5400, 0x5400).w(FUNC(btime_state::bnj_scroll1_w));
-	map(0x5800, 0x5800).w(FUNC(btime_state::bnj_scroll2_w));
+	map(0x5400, 0x5400).w(this, FUNC(btime_state::bnj_scroll1_w));
+	map(0x5800, 0x5800).w(this, FUNC(btime_state::bnj_scroll2_w));
 	map(0x5c00, 0x5c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xa000, 0xffff).rom();
 }
@@ -312,7 +312,7 @@ void btime_state::bnj_map(address_map &map)
 void btime_state::disco_map(address_map &map)
 {
 	map(0x0000, 0x04ff).ram().share("rambase");
-	map(0x2000, 0x7fff).ram().w(FUNC(btime_state::deco_charram_w)).share("deco_charram");
+	map(0x2000, 0x7fff).ram().w(this, FUNC(btime_state::deco_charram_w)).share("deco_charram");
 	map(0x8000, 0x83ff).ram().share("videoram");
 	map(0x8400, 0x87ff).ram().share("colorram");
 	map(0x8800, 0x881f).ram().share("spriteram");
@@ -321,7 +321,7 @@ void btime_state::disco_map(address_map &map)
 	map(0x9400, 0x9400).portr("P2");
 	map(0x9800, 0x9800).portr("DSW1");
 	map(0x9a00, 0x9a00).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x9c00, 0x9c00).portr("VBLANK").w(FUNC(btime_state::disco_video_control_w));
+	map(0x9c00, 0x9c00).portr("VBLANK").w(this, FUNC(btime_state::disco_video_control_w));
 	map(0xa000, 0xffff).rom();
 }
 
@@ -335,7 +335,7 @@ void btime_state::audio_map(address_map &map)
 	map(0x6000, 0x7fff).w("ay2", FUNC(ay8910_device::data_w));
 	map(0x8000, 0x9fff).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa000, 0xbfff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xc000, 0xdfff).w(FUNC(btime_state::audio_nmi_enable_w));
+	map(0xc000, 0xdfff).w(this, FUNC(btime_state::audio_nmi_enable_w));
 	map(0xe000, 0xefff).mirror(0x1000).rom();
 }
 
@@ -1291,37 +1291,40 @@ MACHINE_CONFIG_START(btime_state::btime)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_btime);
-	PALETTE(config, m_palette, FUNC(btime_state::btime_palette)).set_format(palette_device::BGR_233_inverted, 16);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_btime)
+
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
+	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	ay8910_device &ay1(AY8910(config, "ay1", HCLK2));
-	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
-	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
-	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
-	ay1.add_route(0, "discrete", 1.0, 0);
-	ay1.add_route(1, "discrete", 1.0, 1);
-	ay1.add_route(2, "discrete", 1.0, 2);
+	MCFG_DEVICE_ADD("ay1", AY8910, HCLK2)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
 
-	ay8910_device &ay2(AY8910(config, "ay2", HCLK2));
-	ay2.set_flags(AY8910_DISCRETE_OUTPUT);
-	ay2.set_resistors_load(RES_K(1), RES_K(5), RES_K(5));
-	ay2.add_route(0, "discrete", 1.0, 3);
-	ay2.add_route(1, "discrete", 1.0, 4);
-	ay2.add_route(2, "discrete", 1.0, 5);
+	MCFG_DEVICE_ADD("ay2", AY8910, HCLK2)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(1), RES_K(5), RES_K(5))
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 3)
+	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 4)
+	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 5)
 
 	MCFG_DEVICE_ADD("discrete", DISCRETE, btime_sound_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1339,8 +1342,10 @@ MACHINE_CONFIG_START(btime_state::cookrace)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_cookrace);
-	m_screen->set_screen_update(FUNC(btime_state::screen_update_cookrace));
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cookrace)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_cookrace)
 MACHINE_CONFIG_END
 
 
@@ -1354,22 +1359,26 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_lnc);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnc)
 
-	m_palette->set_entries(8);
-	m_palette->set_init(FUNC(btime_state::lnc_palette));
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(8)
+	MCFG_PALETTE_INIT_OWNER(btime_state,lnc)
 
-	m_screen->set_screen_update(FUNC(btime_state::screen_update_lnc));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_lnc)
 MACHINE_CONFIG_END
 
 
-void btime_state::wtennis(machine_config &config)
-{
+MACHINE_CONFIG_START(btime_state::wtennis)
 	lnc(config);
 
+	/* basic machine hardware */
+
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(btime_state::screen_update_eggs));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_eggs)
+MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(btime_state::mmonkey)
@@ -1392,12 +1401,13 @@ MACHINE_CONFIG_START(btime_state::bnj)
 	MCFG_DEVICE_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_bnj);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bnj)
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 
-	m_screen->set_screen_update(FUNC(btime_state::screen_update_bnj));
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_bnj)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 MACHINE_CONFIG_END
 
 
@@ -1418,22 +1428,24 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	MCFG_DEVICE_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_zoar);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
 
-	m_palette->set_entries(64);
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(64)
 
-	m_screen->set_screen_update(FUNC(btime_state::screen_update_zoar));
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 
 	/* sound hardware */
-	ay8910_device &ay1(AY8910(config.replace(), "ay1", HCLK1));
-	ay1.add_route(ALL_OUTPUTS, "mono", 0.23);
-	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
-	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
-	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
+	MCFG_DEVICE_REPLACE("ay1", AY8910, HCLK1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
 
-	ay8910_device &ay2(AY8910(config.replace(), "ay2", HCLK1));
-	ay2.add_route(ALL_OUTPUTS, "mono", 0.23);
+	MCFG_DEVICE_REPLACE("ay2", AY8910, HCLK1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
 
@@ -1448,15 +1460,19 @@ MACHINE_CONFIG_START(btime_state::disco)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(disco_audio_map)
 
-	m_soundlatch->set_separate_acknowledge(true);
+	MCFG_DEVICE_MODIFY("soundlatch")
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_disco);
-	m_palette->set_entries(32);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_disco)
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(32)
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
 
-	m_screen->set_screen_update(FUNC(btime_state::screen_update_disco));
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_disco)
 MACHINE_CONFIG_END
 
 
@@ -1468,7 +1484,7 @@ MACHINE_CONFIG_START(btime_state::tisland)
 	MCFG_DEVICE_PROGRAM_MAP(tisland_map)
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_zoar);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
 MACHINE_CONFIG_END
 
 
@@ -1986,10 +2002,8 @@ void btime_state::init_zoar()
 
 	/* At location 0xD50A is what looks like an undocumented opcode. I tried
 	   implementing it given what opcode 0x23 should do, but it still didn't
-	   work in demo mode, this could be another protection.
-
-	   The ROM has been confirmed as good on multiple working PCBs, so this
-	   isn't a bitrot issue */
+	   work in demo mode. So this could be another protection or a bad ROM read.
+	   I'm NOPing it out for now. */
 	memset(&rom[0xd50a],0xea,8);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
@@ -2002,11 +2016,7 @@ void btime_state::init_tisland()
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
 	   unmapped area that causes the game to fail in several circumstances.On the Cassette
 	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
-	   wrong going on in the encryption scheme.
-
-	   There are other locations with similar problems. These ROMs have NOT yet been
-	   confirmed on multiple PCBs, so this could still be a bad dump.
-	   */
+	   wrong going on in the encryption scheme.*/
 	memset(&rom[0xa2b6],0x24,1);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;

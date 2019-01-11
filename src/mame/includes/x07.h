@@ -5,10 +5,6 @@
     includes/x07.h
 
 *********************************************************************/
-#ifndef MAME_INCLUDES_X07_H
-#define MAME_INCLUDES_X07_H
-
-#pragma once
 
 #include "cpu/z80/z80.h"
 #include "sound/beep.h"
@@ -21,7 +17,7 @@
 #include "formats/x07_cas.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "emupal.h"
+#include "rendlay.h"
 
 //default value for user defined keys, taken for official documentation
 static const char *const udk_ini[12] = {
@@ -165,28 +161,18 @@ class x07_state : public driver_device
 {
 public:
 	x07_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_printer(*this, "printer")
-		, m_beep(*this, "beeper")
-		, m_ram(*this, RAM_TAG)
-		, m_nvram1(*this, "nvram1")
-		, m_nvram2(*this, "nvram2")
-		, m_cassette(*this, "cassette")
-		, m_card(*this, "cardslot")
-		, m_warm_start(1)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_printer(*this, "printer"),
+			m_beep(*this, "beeper"),
+			m_ram(*this, RAM_TAG),
+			m_nvram1(*this, "nvram1"),
+			m_nvram2(*this, "nvram2"),
+			m_cassette(*this, "cassette"),
+			m_card(*this, "cardslot"),
+			m_warm_start(1)
 	{ }
 
-	void x07(machine_config &config);
-
-	void init_x07();
-
-	DECLARE_INPUT_CHANGED_MEMBER( kb_keys );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_func_keys );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_break );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_update_udk );
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<printer_image_device> m_printer;
 	required_device<beep_device> m_beep;
@@ -202,6 +188,12 @@ private:
 	DECLARE_READ8_MEMBER( x07_io_r );
 	DECLARE_WRITE8_MEMBER( x07_io_w );
 
+	DECLARE_INPUT_CHANGED_MEMBER( kb_keys );
+	DECLARE_INPUT_CHANGED_MEMBER( kb_func_keys );
+	DECLARE_INPUT_CHANGED_MEMBER( kb_break );
+	DECLARE_INPUT_CHANGED_MEMBER( kb_update_udk );
+
+	void init_x07();
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	void t6834_cmd(uint8_t cmd);
@@ -283,16 +275,14 @@ private:
 	uint8_t m_prn_char_code;
 	uint8_t m_prn_buffer[0x100];
 	uint8_t m_prn_size;
-	void x07_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(x07);
 	TIMER_CALLBACK_MEMBER(cassette_tick);
 	TIMER_CALLBACK_MEMBER(cassette_poll);
 	TIMER_CALLBACK_MEMBER(rsta_clear);
 	TIMER_CALLBACK_MEMBER(rstb_clear);
 	TIMER_CALLBACK_MEMBER(beep_stop);
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_timer);
-
+	void x07(machine_config &config);
 	void x07_io(address_map &map);
 	void x07_mem(address_map &map);
 };
-
-#endif // MAME_INCLUDES_X07_H

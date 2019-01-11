@@ -11,6 +11,15 @@
 #pragma once
 
 
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_NAMCOIO_GEARBOX_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, NAMCOIO_GEARBOX, 0)
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -39,5 +48,13 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NAMCOIO_GEARBOX, namcoio_gearbox_device)
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+
 
 #endif // MAME_MACHINE_NAMCOIO_GEARBOX_H

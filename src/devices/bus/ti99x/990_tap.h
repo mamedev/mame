@@ -14,6 +14,7 @@ class tap_990_device : public device_t
 {
 public:
 	tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_line.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
@@ -25,8 +26,6 @@ public:
 		m_tape[id].eot = eot;
 		m_tape[id].wp = wp;
 	}
-
-	auto int_cb() { return m_int_line.bind(); }
 
 protected:
 	// device-level overrides
@@ -60,5 +59,8 @@ private:
 
 	tape_unit_t m_tape[MAX_TAPE_UNIT];
 };
+
+#define MCFG_TI990_TAPE_INT_HANDLER( _intcallb )  \
+	devcb = &downcast<tap_990_device &>(*device).set_int_callback(DEVCB_##_intcallb);
 
 #endif // MAME_BUS_TI99X_990_TAP_H

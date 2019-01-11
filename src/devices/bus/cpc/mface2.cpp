@@ -29,7 +29,7 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 {
 		int pc;
 
-		pc = m_slot->cpu().pc();
+		pc = machine().device<cpu_device>("maincpu")->pc();
 		/* there are two places where CALL &0065 can be found
 		in the multiface rom. At this address there is a RET.
 
@@ -59,7 +59,7 @@ DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
 			m_romdis=0;
 
 			/* clear op base override */
-			m_slot->cpu().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&cpc_multiface2_device::amstrad_default,this));
+			machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&cpc_multiface2_device::amstrad_default,this));
 		}
 
 		return pc;
@@ -108,14 +108,14 @@ void cpc_multiface2_device::multiface_rethink_memory()
 }
 
 // device machine config
-void cpc_multiface2_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(cpc_multiface2_device::device_add_mconfig)
 	// pass-through
-	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", DERIVED_CLOCK(1, 1), cpc_exp_cards, nullptr));
-	exp.irq_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::irq_w));
-	exp.nmi_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::nmi_w));
-	exp.romdis_callback().set(DEVICE_SELF_OWNER, FUNC(cpc_expansion_slot_device::romdis_w));  // ROMDIS
-}
+	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
+	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+MACHINE_CONFIG_END
 
 void cpc_multiface2_device::check_button_state()
 {
@@ -157,7 +157,7 @@ void cpc_multiface2_device::multiface_stop()
 		m_slot->nmi_w(0);
 
 		/* initialise 0065 override to monitor calls to 0065 */
-		//      m_slot->cpu().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&cpc_multiface2_device::amstrad_multiface_directoverride,this));
+		//      machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&cpc_multiface2_device::amstrad_multiface_directoverride,this));
 	}
 }
 

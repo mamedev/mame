@@ -179,7 +179,6 @@ Common game codes:
 #include "sound/ymz770.h"
 #include "video/epic12.h"
 
-#include "emupal.h"
 #include "profiler.h"
 #include "screen.h"
 #include "speaker.h"
@@ -346,9 +345,9 @@ void cv1k_state::cv1k_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw().share("rombase"); // mmmbanc writes here on startup for some reason..
 	map(0x0c000000, 0x0c7fffff).ram().share("mainram");// work RAM
-	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
+	map(0x10000000, 0x10000007).rw(this, FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
+	map(0x10C00000, 0x10C00007).rw(this, FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
@@ -357,9 +356,9 @@ void cv1k_state::cv1k_d_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw().share("rombase"); // mmmbanc writes here on startup for some reason..
 	map(0x0c000000, 0x0cffffff).ram().share("mainram"); // work RAM
-	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
+	map(0x10000000, 0x10000007).rw(this, FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
+	map(0x10C00000, 0x10C00007).rw(this, FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
@@ -368,7 +367,7 @@ void cv1k_state::cv1k_port(address_map &map)
 {
 	map(SH3_PORT_C, SH3_PORT_C+7).portr("PORT_C");
 	map(SH3_PORT_D, SH3_PORT_D+7).portr("PORT_D");
-	map(SH3_PORT_E, SH3_PORT_E+7).r(FUNC(cv1k_state::flash_port_e_r));
+	map(SH3_PORT_E, SH3_PORT_E+7).r(this, FUNC(cv1k_state::flash_port_e_r));
 	map(SH3_PORT_F, SH3_PORT_F+7).portr("PORT_F");
 	map(SH3_PORT_L, SH3_PORT_L+7).portr("PORT_L");
 	map(SH3_PORT_J, SH3_PORT_J+7).rw(m_blitter, FUNC(epic12_device::fpga_r), FUNC(epic12_device::fpga_w));
@@ -457,66 +456,69 @@ void cv1k_state::machine_reset()
 	m_blitter->reset();
 }
 
-void cv1k_state::cv1k(machine_config &config)
-{
-	/* basic machine hardware */
-	SH3BE(config, m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
-	m_maincpu->set_md(0, 0);  // none of this is verified
-	m_maincpu->set_md(1, 0);  // (the sh3 is different to the sh4 anyway, should be changed)
-	m_maincpu->set_md(2, 0);
-	m_maincpu->set_md(3, 0);
-	m_maincpu->set_md(4, 0);
-	m_maincpu->set_md(5, 1);
-	m_maincpu->set_md(6, 0);
-	m_maincpu->set_md(7, 1);
-	m_maincpu->set_md(8, 0);
-	m_maincpu->set_sh4_clock(12.8_MHz_XTAL*8); // 102.4MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_map);
-	m_maincpu->set_addrmap(AS_IO, &cv1k_state::cv1k_port);
-	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold));
+MACHINE_CONFIG_START(cv1k_state::cv1k)
 
-	RTC9701(config, m_eeprom);
-	SERFLASH(config, m_serflash, 0);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
+	MCFG_SH4_MD0(0)  // none of this is verified
+	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
+	MCFG_SH4_MD2(0)
+	MCFG_SH4_MD3(0)
+	MCFG_SH4_MD4(0)
+	MCFG_SH4_MD5(1)
+	MCFG_SH4_MD6(0)
+	MCFG_SH4_MD7(1)
+	MCFG_SH4_MD8(0)
+	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
+	MCFG_DEVICE_PROGRAM_MAP(cv1k_map)
+	MCFG_DEVICE_IO_MAP(cv1k_port)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
+
+	MCFG_RTC9701_ADD("eeprom")
+	MCFG_SERFLASH_ADD("game")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(0x200, 0x200);
-	screen.set_visarea(0, 0x140-1, 0, 0xf0-1);
-	screen.set_screen_update(FUNC(cv1k_state::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(0x200, 0x200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
+	MCFG_SCREEN_UPDATE_DRIVER(cv1k_state, screen_update)
 
-	PALETTE(config, "palette").set_entries(0x10000);
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 	SPEAKER(config, "mono").front_center();
-	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected
+	MCFG_DEVICE_ADD("ymz770", YMZ770, 16.384_MHz_XTAL)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0) // only Right output used, Left is not connected
 
-	EPIC12(config, m_blitter, 0);
-	m_blitter->set_mainramsize(0x800000);
-}
+	MCFG_EPIC12_ADD("blitter")
+	MCFG_EPIC12_SET_MAINRAMSIZE(0x800000)
+MACHINE_CONFIG_END
 
-void cv1k_state::cv1k_d(machine_config &config)
-{
+MACHINE_CONFIG_START(cv1k_state::cv1k_d)
 	cv1k(config);
 
 	/* basic machine hardware */
-	SH3BE(config.replace(), m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
-	m_maincpu->set_md(0, 0);  // none of this is verified
-	m_maincpu->set_md(1, 0);  // (the sh3 is different to the sh4 anyway, should be changed)
-	m_maincpu->set_md(2, 0);
-	m_maincpu->set_md(3, 0);
-	m_maincpu->set_md(4, 0);
-	m_maincpu->set_md(5, 1);
-	m_maincpu->set_md(6, 0);
-	m_maincpu->set_md(7, 1);
-	m_maincpu->set_md(8, 0);
-	m_maincpu->set_sh4_clock(12.8_MHz_XTAL*8); // 102.4MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_d_map);
-	m_maincpu->set_addrmap(AS_IO, &cv1k_state::cv1k_port);
-	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold));
+	MCFG_DEVICE_REMOVE("maincpu")
 
-	m_blitter->set_mainramsize(0x1000000);
-}
+	MCFG_DEVICE_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
+	MCFG_SH4_MD0(0)  // none of this is verified
+	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
+	MCFG_SH4_MD2(0)
+	MCFG_SH4_MD3(0)
+	MCFG_SH4_MD4(0)
+	MCFG_SH4_MD5(1)
+	MCFG_SH4_MD6(0)
+	MCFG_SH4_MD7(1)
+	MCFG_SH4_MD8(0)
+	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
+	MCFG_DEVICE_PROGRAM_MAP(cv1k_d_map)
+	MCFG_DEVICE_IO_MAP(cv1k_port)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
+
+	MCFG_DEVICE_MODIFY("blitter")
+	MCFG_EPIC12_SET_MAINRAMSIZE(0x1000000)
+MACHINE_CONFIG_END
 
 
 
@@ -807,20 +809,6 @@ ROM_START( pinkswtsx )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
 ROM_END
 
-// bootleg/hack based on 2006/04/06 MASTER VER....
-ROM_START( pinkswtssc )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "suicideclub.u4", 0x0000, 0x200000, CRC(5e03662f) SHA1(b974204b8dcd55fc1b7775f7c1806150919caff3) ) // (2017/10/31 SUICIDECLUB VER.)
-	ROM_RELOAD(0x200000,0x200000)
-
-	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "suicideclub.u2", 0x000000, 0x8400000, CRC(32324608) SHA1(cec1416c943520cb3f91eb295e2ba864a0db7d45) )
-
-	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(4b82d250) SHA1(ee98dbc3f791efb6d58f3945bcb2044667ae7978) )
-	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(e93f0627) SHA1(6f5ec0ade87f7fc42a58a8f125557a4d1f3f187d) )
-ROM_END
-
 ROM_START( ddpdfk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "ddpdfk_u4", 0x0000, 0x400000, CRC(9976d699) SHA1(9dfe9d1daf6f638cafce8cdc5230209e2bcb7522) ) /* (2008/06/23  MASTER VER 1.5) */
@@ -971,7 +959,6 @@ GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT27
 GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",          GAME_FLAGS )
 GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",            GAME_FLAGS )
 GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",            GAME_FLAGS ) // defaults to freeplay, possibly bootlegged from show/dev version?
-GAME( 2006, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg",            "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",GAME_FLAGS )
 
 // CA015  Mushihime-Sama Futari
 GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)", "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",     GAME_FLAGS )

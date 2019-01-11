@@ -51,13 +51,12 @@ static INPUT_PORTS_START(cpc_symbiface2)
 INPUT_PORTS_END
 
 // device machine config
-void cpc_symbiface2_device::device_add_mconfig(machine_config &config)
-{
-	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", nullptr, false);
-	DS12885(config, m_rtc, XTAL(32'768));
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+MACHINE_CONFIG_START(cpc_symbiface2_device::device_add_mconfig)
+	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
+	MCFG_DS12885_ADD("rtc")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 	// no pass-through
-}
+MACHINE_CONFIG_END
 
 ioport_constructor cpc_symbiface2_device::device_input_ports() const
 {
@@ -88,8 +87,11 @@ cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, cons
 
 void cpc_symbiface2_device::device_start()
 {
+	device_t* cpu = machine().device("maincpu");
+	address_space& space = cpu->memory().space(AS_IO);
+
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
-	address_space &space = m_slot->cpu().space(AS_IO);
+
 	space.install_readwrite_handler(0xfd00,0xfd07,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_w),this));
 	space.install_readwrite_handler(0xfd08,0xfd0f,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_w),this));
 	space.install_read_handler(0xfd10,0xfd10,read8_delegate(FUNC(cpc_symbiface2_device::mouse_r),this));

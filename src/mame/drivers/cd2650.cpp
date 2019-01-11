@@ -57,7 +57,6 @@ TODO
 #include "machine/keyboard.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -88,7 +87,7 @@ public:
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	required_device<s2650_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
@@ -133,7 +132,7 @@ void cd2650_state::cd2650_io(address_map &map)
 
 void cd2650_state::cd2650_data(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
 }
 
 /* Input ports */
@@ -286,47 +285,45 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	return result;
 }
 
-void cd2650_state::cd2650(machine_config &config)
-{
+MACHINE_CONFIG_START(cd2650_state::cd2650)
 	/* basic machine hardware */
-	S2650(config, m_maincpu, XTAL(14'192'640) / 12); // 1.182720MHz according to RE schematic
-	m_maincpu->set_addrmap(AS_PROGRAM, &cd2650_state::cd2650_mem);
-	m_maincpu->set_addrmap(AS_IO, &cd2650_state::cd2650_io);
-	m_maincpu->set_addrmap(AS_DATA, &cd2650_state::cd2650_data);
-	m_maincpu->sense_handler().set(FUNC(cd2650_state::cass_r));
-	m_maincpu->flag_handler().set(FUNC(cd2650_state::cass_w));
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'192'640) / 12) // 1.182720MHz according to RE schematic
+	MCFG_DEVICE_PROGRAM_MAP(cd2650_mem)
+	MCFG_DEVICE_IO_MAP(cd2650_io)
+	MCFG_DEVICE_DATA_MAP(cd2650_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, cd2650_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cd2650_state, cass_w))
 
-	f9334_device &outlatch(F9334(config, "outlatch")); // IC26
-	outlatch.q_out_cb<0>().set(FUNC(cd2650_state::tape_deck_on_w)); // TD ON
-	outlatch.q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // OUT6
+	MCFG_DEVICE_ADD("outlatch", F9334, 0) // IC26
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cd2650_state, tape_deck_on_w)) // TD ON
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("beeper", beep_device, set_state)) // OUT6
 	// Q1-Q7 = OUT 0-6, not defined in RE
 	// The connection of OUT6 to a 700-1200 Hz noise generator is suggested
 	// in Central Data 2650 Newsletter, Volume 1, Issue 3 for use with the
 	// "Morse Code" program by Mike Durham.
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(14'192'640), 112 * CHARACTER_WIDTH, 0, 80 * CHARACTER_WIDTH, 22 * CHARACTER_LINES, 0, 16 * CHARACTER_LINES);
-	screen.set_screen_update(FUNC(cd2650_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'192'640), 112 * CHARACTER_WIDTH, 0, 80 * CHARACTER_WIDTH, 22 * CHARACTER_LINES, 0, 16 * CHARACTER_LINES)
+	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_cd2650);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cd2650)
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(cd2650_state, cd2650), this), "pgm", 1);
+	MCFG_QUICKLOAD_ADD("quickload", cd2650_state, cd2650, "pgm", 1)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(cd2650_state::kbd_put));
-	CASSETTE(config, m_cass);
-}
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(cd2650_state, kbd_put))
+	MCFG_CASSETTE_ADD( "cassette" )
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( cd2650 )

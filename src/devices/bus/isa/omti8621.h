@@ -17,7 +17,6 @@
 
 #include "isa.h"
 #include "machine/pc_fdc.h"
-#include "imagedev/floppy.h"
 
 /***************************************************************************
  FUNCTION PROTOTYPES

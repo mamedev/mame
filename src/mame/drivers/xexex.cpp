@@ -343,11 +343,11 @@ void xexex_state::main_map(address_map &map)
 	map(0x080000, 0x08ffff).ram().share("workram");         // work RAM
 
 #if XE_SKIPIDLE
-	map(0x080014, 0x080015).r(FUNC(xexex_state::xexex_waitskip_r));              // helps sound CPU by giving back control as early as possible
+	map(0x080014, 0x080015).r(this, FUNC(xexex_state::xexex_waitskip_r));              // helps sound CPU by giving back control as early as possible
 #endif
 
 	map(0x090000, 0x097fff).ram().share("spriteram");           // K053247 sprite RAM
-	map(0x098000, 0x09ffff).rw(FUNC(xexex_state::spriteram_mirror_r), FUNC(xexex_state::spriteram_mirror_w));   // K053247 sprite RAM mirror read
+	map(0x098000, 0x09ffff).rw(this, FUNC(xexex_state::spriteram_mirror_r), FUNC(xexex_state::spriteram_mirror_w));   // K053247 sprite RAM mirror read
 	map(0x0c0000, 0x0c003f).w(m_k056832, FUNC(k056832_device::word_w));              // VACSET (K054157)
 	map(0x0c2000, 0x0c2007).w(m_k053246, FUNC(k053247_device::k053246_word_w));              // OBJSET1
 	map(0x0c4000, 0x0c4001).r(m_k053246, FUNC(k053247_device::k053246_word_r));               // Passthrough to sprite roms
@@ -356,14 +356,14 @@ void xexex_state::main_map(address_map &map)
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));              // CLTC
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::lsb_w));               // priority encoder
 //  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                // CCU
-	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
+	map(0x0d4000, 0x0d4001).w(this, FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));                // VSCCS regs
 	map(0x0da000, 0x0da001).portr("P1");
 	map(0x0da002, 0x0da003).portr("P2");
 	map(0x0dc000, 0x0dc001).portr("SYSTEM");
 	map(0x0dc002, 0x0dc003).portr("EEPROM");
-	map(0x0de000, 0x0de001).rw(FUNC(xexex_state::control2_r), FUNC(xexex_state::control2_w));
+	map(0x0de000, 0x0de001).rw(this, FUNC(xexex_state::control2_r), FUNC(xexex_state::control2_w));
 	map(0x100000, 0x17ffff).rom();
 	map(0x180000, 0x181fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x182000, 0x183fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
@@ -390,7 +390,7 @@ void xexex_state::sound_map(address_map &map)
 	map(0xe000, 0xe22f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xec00, 0xec01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(FUNC(xexex_state::sound_bankswitch_w));
+	map(0xf800, 0xf800).w(this, FUNC(xexex_state::sound_bankswitch_w));
 }
 
 
@@ -467,78 +467,80 @@ void xexex_state::machine_reset()
 	m_suspension_active = 0;
 	m_resume_trigger = 1000;
 	m_frame = -1;
+	m_k054539->init_flags(k054539_device::REVERSE_STEREO);
 }
 
-void xexex_state::xexex(machine_config &config)
-{
+MACHINE_CONFIG_START(xexex_state::xexex)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2); // 16MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &xexex_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(xexex_state::xexex_interrupt), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xexex_state, xexex_interrupt, "screen", 0, 1)
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // Z80E 8Mhz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &xexex_state::sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // Z80E 8Mhz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	config.m_minimum_quantum = attotime::from_hz(1920);
+	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-//  m_screen->set_refresh_hz(XTAL(32'000'000)/4/512/288);
-	m_screen->set_raw(XTAL(32'000'000)/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255); // 8Mhz horizontal dotclock
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(40, 40+384-1, 0, 0+256-1);
-	m_screen->set_screen_update(FUNC(xexex_state::screen_update_xexex));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+//  MCFG_SCREEN_REFRESH_RATE(XTAL(32'000'000)/4/512/288)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255) // 8Mhz horizontal dotclock
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 0, 0+256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(xexex_state, screen_update_xexex)
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(XRGB)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(xexex_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
-	m_k056832->set_palette(m_palette);
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(xexex_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
+	MCFG_K056832_PALETTE("palette")
 
-	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(xexex_state::sprite_callback), this);
-	m_k053246->set_config("gfx2", NORMAL_PLANE_ORDER, -48, 32);
-	m_k053246->set_palette(m_palette);
+	MCFG_DEVICE_ADD("k053246", K053246, 0)
+	MCFG_K053246_CB(xexex_state, sprite_callback)
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 32)
+	MCFG_K053246_PALETTE("palette")
 
-	K053250(config, m_k053250, 0, m_palette, m_screen, -5, -16);
+	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
-	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 
-	K054338(config, m_k054338, 0);
+	MCFG_DEVICE_ADD("k054338", K054338, 0)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'000'000)/8)); // 4MHz
-	ymsnd.add_route(0, "filter1_l", 0.50);
-	ymsnd.add_route(0, "filter1_r", 0.50);
-	ymsnd.add_route(1, "filter2_l", 0.50);
-	ymsnd.add_route(1, "filter2_r", 0.50);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8) // 4MHz
+	MCFG_SOUND_ROUTE(0, "filter1_l", 0.50)
+	MCFG_SOUND_ROUTE(0, "filter1_r", 0.50)
+	MCFG_SOUND_ROUTE(1, "filter2_l", 0.50)
+	MCFG_SOUND_ROUTE(1, "filter2_r", 0.50)
 
-	K054539(config, m_k054539, XTAL(18'432'000));
-	m_k054539->set_analog_callback(FUNC(xexex_state::ym_set_mixing));
-	m_k054539->add_route(0, "lspeaker", 1.0);
-	m_k054539->add_route(0, "rspeaker", 1.0);
-	m_k054539->add_route(1, "lspeaker", 1.0);
-	m_k054539->add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
+	MCFG_K054539_APAN_CB(xexex_state, ym_set_mixing)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	FILTER_VOLUME(config, "filter1_l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "filter1_r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	FILTER_VOLUME(config, "filter2_l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "filter2_r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
+MACHINE_CONFIG_END
 
 
 ROM_START( xexex ) /* Europe, Version AA */

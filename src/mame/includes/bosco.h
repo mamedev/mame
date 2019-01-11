@@ -31,7 +31,7 @@ public:
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	DECLARE_VIDEO_START(bosco);
-	void bosco_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(bosco);
 	uint32_t screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_bosco);
 

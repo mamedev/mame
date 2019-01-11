@@ -546,46 +546,44 @@ void screen_device::svg_renderer::rebuild_cache()
 //-------------------------------------------------
 
 screen_device::screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SCREEN, tag, owner, clock)
-	, m_type(SCREEN_TYPE_RASTER)
-	, m_orientation(ROT0)
-	, m_phys_aspect(0U, 0U)
-	, m_oldstyle_vblank_supplied(false)
-	, m_refresh(0)
-	, m_vblank(0)
-	, m_xoffset(0.0f)
-	, m_yoffset(0.0f)
-	, m_xscale(1.0f)
-	, m_yscale(1.0f)
-	, m_screen_vblank(*this)
-	, m_scanline_cb(*this)
-	, m_palette(*this, finder_base::DUMMY_TAG)
-	, m_video_attributes(0)
-	, m_svg_region(nullptr)
-	, m_container(nullptr)
-	, m_width(100)
-	, m_height(100)
-	, m_visarea(0, 99, 0, 99)
-	, m_texformat()
-	, m_curbitmap(0)
-	, m_curtexture(0)
-	, m_changed(true)
-	, m_last_partial_scan(0)
-	, m_partial_scan_hpos(0)
-	, m_color(rgb_t(0xff, 0xff, 0xff, 0xff))
-	, m_brightness(0xff)
-	, m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds())
-	, m_scantime(1)
-	, m_pixeltime(1)
-	, m_vblank_period(0)
-	, m_vblank_start_time(attotime::zero)
-	, m_vblank_end_time(attotime::zero)
-	, m_vblank_begin_timer(nullptr)
-	, m_vblank_end_timer(nullptr)
-	, m_scanline0_timer(nullptr)
-	, m_scanline_timer(nullptr)
-	, m_frame_number(0)
-	, m_partial_updates_this_frame(0)
+	: device_t(mconfig, SCREEN, tag, owner, clock),
+		m_type(SCREEN_TYPE_RASTER),
+		m_oldstyle_vblank_supplied(false),
+		m_refresh(0),
+		m_vblank(0),
+		m_xoffset(0.0f),
+		m_yoffset(0.0f),
+		m_xscale(1.0f),
+		m_yscale(1.0f),
+		m_screen_vblank(*this),
+		m_palette(nullptr),
+		m_palette_tag(nullptr),
+		m_video_attributes(0),
+		m_svg_region(nullptr),
+		m_container(nullptr),
+		m_width(100),
+		m_height(100),
+		m_visarea(0, 99, 0, 99),
+		m_texformat(),
+		m_curbitmap(0),
+		m_curtexture(0),
+		m_changed(true),
+		m_last_partial_scan(0),
+		m_partial_scan_hpos(0),
+		m_color(rgb_t(0xff, 0xff, 0xff, 0xff)),
+		m_brightness(0xff),
+		m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds()),
+		m_scantime(1),
+		m_pixeltime(1),
+		m_vblank_period(0),
+		m_vblank_start_time(attotime::zero),
+		m_vblank_end_time(attotime::zero),
+		m_vblank_begin_timer(nullptr),
+		m_vblank_end_timer(nullptr),
+		m_scanline0_timer(nullptr),
+		m_scanline_timer(nullptr),
+		m_frame_number(0),
+		m_partial_updates_this_frame(0)
 {
 	m_unique_id = m_id_counter;
 	m_id_counter++;
@@ -616,7 +614,7 @@ void screen_device::device_validity_check(validity_checker &valid) const
 	// sanity check display area
 	if (m_type != SCREEN_TYPE_VECTOR && m_type != SCREEN_TYPE_SVG)
 	{
-		if (m_visarea.empty() || m_visarea.right() >= m_width || m_visarea.bottom() >= m_height)
+		if (m_visarea.empty() || m_visarea.max_x >= m_width || m_visarea.max_y >= m_height)
 			osd_printf_error("Invalid display area\n");
 
 		// sanity check screen formats
@@ -633,74 +631,23 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid (zero) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
-	if (m_palette.finder_tag() != finder_base::DUMMY_TAG)
+	if (m_palette_tag != nullptr)
 	{
-		if (!m_palette)
-			osd_printf_error("Screen references non-existent palette tag %s\n", m_palette.finder_tag());
-
 		if (texformat == TEXFORMAT_RGB32)
 			osd_printf_warning("Screen does not need palette defined\n");
-	}
-	else if (texformat == TEXFORMAT_PALETTE16)
-	{
-		osd_printf_error("Screen does not have palette defined\n");
-	}
-}
 
-
-//-------------------------------------------------
-//  device_config_complete - finalise static
-//  configuration
-//-------------------------------------------------
-
-void screen_device::device_config_complete()
-{
-	// combine orientation with machine orientation
-	m_orientation = orientation_add(m_orientation, mconfig().gamedrv().flags & machine_flags::MASK_ORIENTATION);
-}
-
-
-//-------------------------------------------------
-//  physical_aspect - determine the physical
-//  aspect ratio to be used for rendering
-//-------------------------------------------------
-
-std::pair<unsigned, unsigned> screen_device::physical_aspect() const
-{
-	assert(configured());
-
-	std::pair<unsigned, unsigned> phys_aspect = m_phys_aspect;
-
-	// physical aspect ratio unconfigured
-	if (!phys_aspect.first || !phys_aspect.second)
-	{
-		switch (m_type)
+		device_t *paldev = owner()->subdevice(m_palette_tag);
+		if (paldev == nullptr)
+			osd_printf_error("Nonexistent device '%s' specified as palette\n", m_palette_tag);
+		else
 		{
-		case SCREEN_TYPE_RASTER:
-		case SCREEN_TYPE_VECTOR:
-			phys_aspect = std::make_pair(4, 3); // assume standard CRT
-			break;
-		case SCREEN_TYPE_LCD:
-		case SCREEN_TYPE_SVG:
-			phys_aspect = std::make_pair(~0U, ~0U); // assume square pixels
-			break;
-		case SCREEN_TYPE_INVALID:
-		default:
-			throw emu_fatalerror("%s: invalid screen type configured\n", tag());
+			device_palette_interface *palintf;
+			if (!paldev->interface(palintf))
+				osd_printf_error("Device '%s' specified as palette, but it has no palette interface\n", m_palette_tag);
 		}
 	}
-
-	// square pixels?
-	if ((~0U == phys_aspect.first) && (~0U == phys_aspect.second))
-	{
-		phys_aspect.first = visible_area().width();
-		phys_aspect.second = visible_area().height();
-	}
-
-	// always keep this in reduced form
-	util::reduce_fraction(phys_aspect.first, phys_aspect.second);
-
-	return phys_aspect;
+	else if (texformat == TEXFORMAT_PALETTE16)
+		osd_printf_error("Screen does not have palette defined\n");
 }
 
 
@@ -716,11 +663,24 @@ void screen_device::device_resolve_objects()
 	m_screen_update_ind16.bind_relative_to(*owner());
 	m_screen_update_rgb32.bind_relative_to(*owner());
 	m_screen_vblank.resolve_safe();
-	m_scanline_cb.resolve();
 
-	// assign our format to the palette before it starts
-	if (m_palette)
+	// find the specified palette
+	if (m_palette_tag != nullptr && m_palette == nullptr)
+	{
+		// find our palette as a sibling device
+		device_t *palette = owner()->subdevice(m_palette_tag);
+		if (palette == nullptr)
+			fatalerror("Screen '%s' specifies nonexistent device '%s' as palette\n",
+									tag(),
+									m_palette_tag);
+		if (!palette->interface(m_palette))
+			fatalerror("Screen '%s' specifies device '%s' as palette, but it has no palette interface\n",
+									tag(),
+									m_palette_tag);
+
+		// assign our format to the palette before it starts
 		m_palette->m_format = format();
+	}
 }
 
 
@@ -734,23 +694,21 @@ void screen_device::device_start()
 	{
 		memory_region *reg = owner()->memregion(m_svg_region);
 		if (!reg)
-			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region);
+			fatalerror("SVG region \"%s\" does not exist\n", m_svg_region);
 		m_svg = std::make_unique<svg_renderer>(reg);
 		machine().output().set_notifier(nullptr, svg_renderer::output_notifier, m_svg.get());
 
-		// don't do this - SVG units are arbitrary and interpreting them as pixels causes bad things to happen
-		// just render at the size/aspect ratio supplied by the driver
-		if (false)
+		if (0)
 		{
-			// The OSD picks up the size before start is called, so this only affect the info display if it's called up in-game
+			// The osd picks up the size before start is called, so that's useless
 			m_width = m_svg->width();
 			m_height = m_svg->height();
-			m_visarea.set(0, m_width - 1, 0, m_height - 1);
+			m_visarea.set(0, m_width-1, 0, m_height-1);
 		}
 	}
 
 	// if we have a palette and it's not started, wait for it
-	if (m_palette && !m_palette->device().started())
+	if (m_palette != nullptr && !m_palette->device().started())
 		throw device_missing_dependencies();
 
 	// configure bitmap formats and allocate screen bitmaps
@@ -766,9 +724,9 @@ void screen_device::device_start()
 
 	// allocate raw textures
 	m_texture[0] = machine().render().texture_alloc();
-	m_texture[0]->set_id(u64(m_unique_id) << 57);
+	m_texture[0]->set_osd_data(u64((m_unique_id << 1) | 0));
 	m_texture[1] = machine().render().texture_alloc();
-	m_texture[1]->set_id((u64(m_unique_id) << 57) | 1);
+	m_texture[1]->set_osd_data(u64((m_unique_id << 1) | 1));
 
 	// configure the default cliparea
 	render_container::user_settings settings;
@@ -787,7 +745,7 @@ void screen_device::device_start()
 	m_scanline0_timer = timer_alloc(TID_SCANLINE0);
 
 	// allocate a timer to generate per-scanline updates
-	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		m_scanline_timer = timer_alloc(TID_SCANLINE);
 
 	// configure the screen with the default parameters
@@ -798,7 +756,7 @@ void screen_device::device_start()
 	m_vblank_end_time = attotime(0, m_vblank_period);
 
 	// start the timer to generate per-scanline updates
-	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
+	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		m_scanline_timer->adjust(time_until_pos(0));
 
 	// create burn-in bitmap
@@ -901,18 +859,14 @@ void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		// subsequent scanlines when scanline updates are enabled
 		case TID_SCANLINE:
-			if (m_video_attributes & VIDEO_UPDATE_SCANLINE)
-			{
-				// force a partial update to the current scanline
-				update_partial(param);
-			}
-			if (m_scanline_cb)
-				m_scanline_cb(param);
+
+			// force a partial update to the current scanline
+			update_partial(param);
 
 			// compute the next visible scanline
 			param++;
-			if (param > m_visarea.bottom())
-				param = m_visarea.top();
+			if (param > m_visarea.max_y)
+				param = m_visarea.min_y;
 			m_scanline_timer->adjust(time_until_pos(param), param);
 			break;
 	}
@@ -928,12 +882,12 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	// validate arguments
 	assert(width > 0);
 	assert(height > 0);
-	assert(visarea.left() >= 0);
-	assert(visarea.top() >= 0);
-//  assert(visarea.right() < width);
-//  assert(visarea.bottom() < height);
-	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.left() < width);
-	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.top() < height);
+	assert(visarea.min_x >= 0);
+	assert(visarea.min_y >= 0);
+//  assert(visarea.max_x < width);
+//  assert(visarea.max_y < height);
+	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.min_x < width);
+	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.min_y < height);
 	assert(frame_period > 0);
 
 	// fill in the new parameters
@@ -998,9 +952,9 @@ void screen_device::reset_origin(int beamy, int beamx)
 	else
 		m_scanline0_timer->adjust(time_until_pos(0));
 
-	// if we are resetting relative to (visarea.bottom() + 1, 0) == VBLANK start,
+	// if we are resetting relative to (visarea.max_y + 1, 0) == VBLANK start,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
-	if (beamy == ((m_visarea.bottom() + 1) % m_height) && beamx == 0)
+	if (beamy == ((m_visarea.max_y + 1) % m_height) && beamx == 0)
 		vblank_begin();
 	else
 		m_vblank_begin_timer->adjust(time_until_vblank_start());
@@ -1019,15 +973,15 @@ void screen_device::realloc_screen_bitmaps()
 		return;
 
 	// determine effective size to allocate
-	s32 effwidth = std::max(m_width, m_visarea.right() + 1);
-	s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
+	s32 effwidth = std::max(m_width, m_visarea.max_x + 1);
+	s32 effheight = std::max(m_height, m_visarea.max_y + 1);
 
 	// reize all registered screen bitmaps
 	for (auto &item : m_auto_bitmap_list)
 		item->m_bitmap.resize(effwidth, effheight);
 
 	// re-set up textures
-	if (m_palette)
+	if (m_palette != nullptr)
 	{
 		m_bitmap[0].set_palette(m_palette->palette());
 		m_bitmap[1].set_palette(m_palette->palette());
@@ -1057,6 +1011,9 @@ void screen_device::set_visible_area(int min_x, int max_x, int min_y, int max_y)
 
 bool screen_device::update_partial(int scanline)
 {
+	// validate arguments
+	assert(scanline >= 0);
+
 	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag(), scanline));
 
 	// these two checks only apply if we're allowed to skip frames
@@ -1085,20 +1042,21 @@ bool screen_device::update_partial(int scanline)
 	}
 
 	// set the range of scanlines to render
-	rectangle clip(m_visarea);
-	clip.sety(
-			(std::max)(clip.top(), m_last_partial_scan),
-			(std::min)(clip.bottom(), scanline));
+	rectangle clip = m_visarea;
+	if (m_last_partial_scan > clip.min_y)
+		clip.min_y = m_last_partial_scan;
+	if (scanline < clip.max_y)
+		clip.max_y = scanline;
 
 	// skip if entirely outside of visible area
-	if (clip.top() > clip.bottom())
+	if (clip.min_y > clip.max_y)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because outside of visible area\n"));
 		return false;
 	}
 
 	// otherwise, render
-	LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.top(), clip.bottom()));
+	LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 	g_profiler.start(PROFILER_VIDEO);
 
 	u32 flags;
@@ -1158,7 +1116,7 @@ void screen_device::update_now()
 	int current_hpos = hpos();
 	rectangle clip = m_visarea;
 
-	LOG_PARTIAL_UPDATES(("update_now(): Y=%d, X=%d, last partial %d, partial hpos %d  (vis %d %d)\n", current_vpos, current_hpos, m_last_partial_scan, m_partial_scan_hpos, m_visarea.right(), m_visarea.bottom()));
+	LOG_PARTIAL_UPDATES(("update_now(): Y=%d, X=%d, last partial %d, partial hpos %d  (vis %d %d)\n", current_vpos, current_hpos, m_last_partial_scan, m_partial_scan_hpos, m_visarea.max_x, m_visarea.max_y));
 
 	// start off by doing a partial update up to the line before us, in case that was necessary
 	if (current_vpos > m_last_partial_scan)
@@ -1175,14 +1133,17 @@ void screen_device::update_now()
 
 			// now finish the previous partial scanline
 			int scanline = current_vpos - 1;
-			clip.set(
-					(std::max)(clip.left(), m_partial_scan_hpos),
-					(std::min)(clip.right(), current_hpos),
-					(std::max)(clip.top(), m_last_partial_scan),
-					(std::min)(clip.bottom(), scanline));
+			if (m_partial_scan_hpos > clip.min_x)
+				clip.min_x = m_partial_scan_hpos;
+			if (current_hpos < clip.max_x)
+				clip.max_x = current_hpos;
+			if (m_last_partial_scan > clip.min_y)
+				clip.min_y = m_last_partial_scan;
+			if (scanline < clip.max_y)
+				clip.max_y = scanline;
 
 			// if there's something to draw, do it
-			if (!clip.empty())
+			if ((clip.min_x <= clip.max_x) && (clip.min_y <= clip.max_y))
 			{
 				g_profiler.start(PROFILER_VIDEO);
 
@@ -1209,18 +1170,21 @@ void screen_device::update_now()
 	// now draw this partial scanline
 	clip = m_visarea;
 
-	clip.set(
-			(std::max)(clip.left(), m_partial_scan_hpos),
-			(std::min)(clip.right(), current_hpos),
-			(std::max)(clip.top(), current_vpos),
-			(std::min)(clip.bottom(), current_vpos));
+	if (m_partial_scan_hpos > clip.min_x)
+		clip.min_x = m_partial_scan_hpos;
+	if (current_hpos < clip.max_x)
+		clip.max_x = current_hpos;
+	if (current_vpos > clip.min_y)
+		clip.min_y = current_vpos;
+	if (current_vpos < clip.max_y)
+		clip.max_y = current_vpos;
 
 	// and if there's something to draw, do it
-	if (!clip.empty())
+	if ((clip.min_x <= clip.max_x) && (clip.min_y <= clip.max_y))
 	{
 		g_profiler.start(PROFILER_VIDEO);
 
-		LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.bottom(), clip.left(), clip.right()));
+		LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.max_y, clip.min_x, clip.max_x));
 
 		u32 flags;
 		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
@@ -1242,7 +1206,7 @@ void screen_device::update_now()
 		m_last_partial_scan = current_vpos;
 
 		// if we completed the line, mark it so
-		if (current_hpos >= m_visarea.right())
+		if (current_hpos >= m_visarea.max_x)
 		{
 			m_partial_scan_hpos = 0;
 			m_last_partial_scan = current_vpos + 1;
@@ -1266,96 +1230,6 @@ void screen_device::reset_partial_updates()
 
 
 //-------------------------------------------------
-//  pixel - returns the RGB value of the specified
-//  pixel location
-//-------------------------------------------------
-
-u32 screen_device::pixel(s32 x, s32 y)
-{
-	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
-	if (!curbitmap.valid())
-		return 0;
-
-	const int srcwidth = curbitmap.width();
-	const int srcheight = curbitmap.height();
-
-	if (x < 0 || y < 0 || x >= srcwidth || y >= srcheight)
-		return 0;
-
-	switch (curbitmap.format())
-	{
-		case BITMAP_FORMAT_IND16:
-		{
-			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
-			const u16 src = srcbitmap.pix(y, x);
-			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
-			return (u32)palette[src];
-		}
-
-		case BITMAP_FORMAT_RGB32:
-		{
-			// iterate over rows in the destination
-			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
-			return (u32)srcbitmap.pix(y, x);
-		}
-
-		default:
-			return 0;
-	}
-}
-
-
-//-------------------------------------------------
-//  pixels - fills the specified buffer with the
-//  RGB values of each pixel in the screen.
-//-------------------------------------------------
-
-void screen_device::pixels(u32 *buffer)
-{
-	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
-	if (!curbitmap.valid())
-		return;
-
-	const rectangle &visarea = visible_area();
-
-	switch (curbitmap.format())
-	{
-		case BITMAP_FORMAT_IND16:
-		{
-			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
-			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
-			for (int y = visarea.min_y; y <= visarea.max_y; y++)
-			{
-				const u16 *src = &srcbitmap.pix(y, visarea.min_x);
-				for (int x = visarea.min_x; x <= visarea.max_x; x++)
-				{
-					*buffer++ = palette[*src++];
-				}
-			}
-			break;
-		}
-
-		case BITMAP_FORMAT_RGB32:
-		{
-			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
-			for (int y = visarea.min_y; y <= visarea.max_y; y++)
-			{
-				const u32 *src = &srcbitmap.pix(y, visarea.min_x);
-				for (int x = visarea.min_x; x <= visarea.max_x; x++)
-				{
-					*buffer++ = *src++;
-				}
-			}
-			break;
-		}
-
-		default:
-			break;
-	}
-}
-
-
-//-------------------------------------------------
 //  vpos - returns the current vertical position
 //  of the beam
 //-------------------------------------------------
@@ -1372,7 +1246,7 @@ int screen_device::vpos() const
 	vpos = delta / m_scantime;
 
 	// adjust for the fact that VBLANK starts at the bottom of the visible area
-	return (m_visarea.bottom() + 1 + vpos) % m_height;
+	return (m_visarea.max_y + 1 + vpos) % m_height;
 }
 
 
@@ -1412,7 +1286,7 @@ attotime screen_device::time_until_pos(int vpos, int hpos) const
 	assert(hpos >= 0);
 
 	// since we measure time relative to VBLANK, compute the scanline offset from VBLANK
-	vpos += m_height - (m_visarea.bottom() + 1);
+	vpos += m_height - (m_visarea.max_y + 1);
 	vpos %= m_height;
 
 	// compute the delta for the given X,Y position
@@ -1479,7 +1353,7 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 	// if allocating now, just do it
 	bitmap.allocate(width(), height());
-	if (m_palette)
+	if (m_palette != nullptr)
 		bitmap.set_palette(m_palette->palette());
 }
 
@@ -1650,11 +1524,11 @@ void screen_device::finalize_burnin()
 		return;
 
 	// compute the scaled visible region
-	rectangle scaledvis(
-			m_visarea.left() * m_burnin.width() / m_width,
-			m_visarea.right() * m_burnin.width() / m_width,
-			m_visarea.top() * m_burnin.height() / m_height,
-			m_visarea.bottom() * m_burnin.height() / m_height);
+	rectangle scaledvis;
+	scaledvis.min_x = m_visarea.min_x * m_burnin.width() / m_width;
+	scaledvis.max_x = m_visarea.max_x * m_burnin.width() / m_width;
+	scaledvis.min_y = m_visarea.min_y * m_burnin.height() / m_height;
+	scaledvis.max_y = m_visarea.max_y * m_burnin.height() / m_height;
 
 	// wrap a bitmap around the memregion we care about
 	bitmap_argb32 finalmap(scaledvis.width(), scaledvis.height());

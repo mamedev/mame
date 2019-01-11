@@ -56,7 +56,6 @@ Grndtour:
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/ym2413.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -125,10 +124,10 @@ void iqblock_state::main_portmap(address_map &map)
 	map(0x5090, 0x5090).portr("SW0");
 	map(0x50a0, 0x50a0).portr("SW1");
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write)); // UM3567_data_port_0_w
-	map(0x50c0, 0x50c0).w(FUNC(iqblock_state::irqack_w));
-	map(0x6000, 0x603f).w(FUNC(iqblock_state::fgscroll_w));
-	map(0x6800, 0x69ff).w(FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
-	map(0x7000, 0x7fff).ram().w(FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
+	map(0x50c0, 0x50c0).w(this, FUNC(iqblock_state::irqack_w));
+	map(0x6000, 0x603f).w(this, FUNC(iqblock_state::fgscroll_w));
+	map(0x6800, 0x69ff).w(this, FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
+	map(0x7000, 0x7fff).ram().w(this, FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
 	map(0x8000, 0xffff).rom().region("user1", 0);
 }
 
@@ -348,11 +347,11 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	MCFG_DEVICE_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", iqblock_state, irq, "screen", 0, 1)
 
-	i8255_device &ppi(I8255A(config, "ppi8255"));
-	ppi.in_pa_callback().set_ioport("P1");
-	ppi.in_pb_callback().set_ioport("P2");
-	ppi.in_pc_callback().set_ioport("EXTRA");
-	ppi.out_pc_callback().set(FUNC(iqblock_state::port_C_w));
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iqblock_state, port_C_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -364,12 +363,14 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_iqblock)
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", 3'579'545).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

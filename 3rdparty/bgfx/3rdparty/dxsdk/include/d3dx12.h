@@ -1349,12 +1349,9 @@ namespace MinGW_Workaround
 {
 	inline D3D12_RESOURCE_DESC ID3D12ResourceGetDesc(ID3D12Resource* _resource)
 	{
+		typedef void (STDMETHODCALLTYPE ID3D12Resource::*PFN_GET_GET_DESC)(D3D12_RESOURCE_DESC*);
 		D3D12_RESOURCE_DESC desc;
-		union {
-			D3D12_RESOURCE_DESC (STDMETHODCALLTYPE ID3D12Resource::*w)();
-			void (STDMETHODCALLTYPE ID3D12Resource::*f)(D3D12_RESOURCE_DESC *);
-		} conversion = { &ID3D12Resource::GetDesc };
-		(_resource->*conversion.f)(&desc);
+		(_resource->*(PFN_GET_GET_DESC)(&ID3D12Resource::GetDesc))(&desc);
 		return desc;
 	}
 }

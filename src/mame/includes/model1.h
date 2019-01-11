@@ -17,7 +17,6 @@
 #include "machine/timer.h"
 #include "video/segaic24.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 #include <glm/vec3.hpp>
@@ -60,51 +59,9 @@ public:
 	{
 	}
 
-	void model1(machine_config &config);
-	void model1_hle(machine_config &config);
-
-	void vf(machine_config &config);
-	void vr(machine_config &config);
-	void vformula(machine_config &config);
-	void swa(machine_config &config);
-	void wingwar(machine_config &config);
-	void wingwar360(machine_config &config);
-	void netmerc(machine_config &config);
-
-	struct spoint_t
-	{
-		int32_t x, y;
-	};
-
-	struct point_t
-	{
-		float x, y, z;
-		float xx, yy;
-		spoint_t s;
-	};
-
-	class quad_t
-	{
-	public:
-		quad_t() { }
-		quad_t(int ccol, float cz, point_t* p0, point_t* p1, point_t* p2, point_t* p3)
-			: p{ p0, p1, p2, p3 }
-			, z(cz)
-			, col(ccol)
-		{
-		}
-
-		int compare(const quad_t* other) const;
-
-		point_t *p[4] = { nullptr, nullptr, nullptr, nullptr };
-		float z = 0;
-		int col = 0;
-	};
-
-private:
 	// Machine
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	DECLARE_MACHINE_START(model1);
+	DECLARE_MACHINE_RESET(model1);
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -165,12 +122,42 @@ private:
 	DECLARE_WRITE8_MEMBER(r360_w);
 
 	// Rendering
-	virtual void video_start() override;
+	DECLARE_VIDEO_START(model1);
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model1);
+
+	struct spoint_t
+	{
+		int32_t x, y;
+	};
+
+	struct point_t
+	{
+		float x, y, z;
+		float xx, yy;
+		spoint_t s;
+	};
+
+	class quad_t
+	{
+	public:
+		quad_t() { }
+		quad_t(int ccol, float cz, point_t* p0, point_t* p1, point_t* p2, point_t* p3)
+			: p{ p0, p1, p2, p3 }
+			, z(cz)
+			, col(ccol)
+		{
+		}
+
+		int compare(const quad_t* other) const;
+
+		point_t *p[4] = { nullptr, nullptr, nullptr, nullptr };
+		float z = 0;
+		int col = 0;
+	};
 
 	struct lightparam_t
 	{
@@ -215,6 +202,17 @@ private:
 		lightparam_t lightparams[32];
 	};
 
+	void model1(machine_config &config);
+	void model1_hle(machine_config &config);
+
+	void vf(machine_config &config);
+	void vr(machine_config &config);
+	void vformula(machine_config &config);
+	void swa(machine_config &config);
+	void wingwar(machine_config &config);
+	void wingwar360(machine_config &config);
+	void netmerc(machine_config &config);
+
 	void model1_io(address_map &map);
 	void model1_mem(address_map &map);
 	void model1_comm_mem(address_map &map);
@@ -227,6 +225,7 @@ private:
 
 	void polhemus_map(address_map &map);
 
+private:
 	// Machine
 	void irq_raise(int level);
 	void irq_init();

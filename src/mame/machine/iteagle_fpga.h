@@ -13,12 +13,31 @@
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 
+//MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subsystem_id)
+
+#define MCFG_ITEAGLE_FPGA_ADD(_tag, _cpu_tag, _irq_num, _serial_irq_num) \
+	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_FPGA, 0x55CC33AA, 0xAA, 0xAAAAAA, 0x00) \
+	downcast<iteagle_fpga_device *>(device)->set_irq_info(_cpu_tag, _irq_num, _serial_irq_num);
+
+#define MCFG_ITEAGLE_FPGA_INIT(_version, _seq_init) \
+	downcast<iteagle_fpga_device *>(device)->set_init_info(_version, _seq_init);
+
+#define MCFG_ITEAGLE_EEPROM_ADD(_tag) \
+	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_EEPROM, 0x80861229, 0x02, 0x020000, 0x00)
+
+#define MCFG_ITEAGLE_EEPROM_INIT(_sw_version, _hw_version) \
+	downcast<iteagle_eeprom_device *>(device)->set_info(_sw_version, _hw_version);
+
+// Mimic Cypress CY82C693 Peripheral Controller
+#define MCFG_ITEAGLE_PERIPH_ADD(_tag) \
+	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_PERIPH, 0x1080C693, 0x00, 0x060100, 0x00)
+
 // Functional emulation of AMD AM85C30 serial controller
 // Two channels, A & B
 class iteagle_am85c30
 {
 public:
-	void reset();
+	void reset(void);
 	void write_control(uint8_t data, int channel);
 	uint8_t read_control(int channel);
 	void write_data(uint8_t data, int channel);
@@ -26,7 +45,7 @@ public:
 	void write_rx_str(int channel, std::string resp);
 	std::string get_tx_str(int channel) { return m_serial_tx[channel]; };
 	void clear_tx_str(int channel) { m_serial_tx[channel].clear(); };
-	bool check_interrupt() { return (m_rr_regs[0][3] != 0); };
+	bool check_interrupt(void) { return (m_rr_regs[0][3] != 0); };
 private:
 	uint8_t m_rr_regs[2][16];
 	uint8_t m_wr_regs[2][16];
@@ -37,29 +56,19 @@ private:
 class iteagle_fpga_device : public pci_device
 {
 public:
-	template <typename T, typename U>
-	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag, U &&cpu_tag, int irq_num, int serial_num)
-		: iteagle_fpga_device(mconfig, tag, owner, clock)
-	{
-		set_screen_tag(std::forward<T>(screen_tag));
-		set_irq_info(std::forward<U>(cpu_tag), irq_num, serial_num);
-	}
 	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	required_device<nvram_device> m_rtc;
+	optional_device<nvram_device> m_e1_nvram;
+	required_device<scc85c30_device> m_scc1;
+	screen_device *m_screen;
+
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
-	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_irq_info(T &&tag, const int irq_num, int serial_num) {
-		m_cpu.set_tag(std::forward<T>(tag)); m_irq_num = irq_num; m_serial_irq_num = serial_num; }
+	void set_irq_info(const char *tag, const int irq_num, const int serial_num) {
+		m_cpu_tag = tag; m_irq_num = irq_num; m_serial_irq_num = serial_num;}
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_update);
 	DECLARE_WRITE8_MEMBER(serial_rx_w);
-
-	enum { IO_SYSTEM, IO_IN1, IO_SW5, IO_NUM };
-	template <unsigned N> auto in_callback() { return m_in_cb[N].bind(); }
-	auto trackx_callback() { return m_trackx_cb.bind(); }
-	auto tracky_callback() { return m_tracky_cb.bind(); }
-	auto gunx_callback() { return m_gunx_cb.bind(); }
-	auto guny_callback() { return m_guny_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -68,18 +77,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	required_device<nvram_device> m_rtc;
-	optional_device<nvram_device> m_e1_nvram;
-	required_device<scc85c30_device> m_scc1;
-	required_device<screen_device> m_screen;
-	required_device<device_execute_interface> m_cpu;
-	devcb_read16 m_in_cb[3];
-	devcb_read8 m_trackx_cb;
-	devcb_read8 m_tracky_cb;
-	devcb_read16 m_gunx_cb;
-	devcb_read16 m_guny_cb;
-
 	emu_timer *     m_timer;
+	const char *m_cpu_tag;
+	cpu_device *m_cpu;
 	int m_irq_num;
 	int m_serial_irq_num;
 
@@ -148,7 +148,6 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
-// Mimic Cypress CY82C693 Peripheral Controller
 class iteagle_periph_device : public pci_device {
 public:
 	iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

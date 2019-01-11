@@ -37,22 +37,22 @@ void quizdna_state::quizdna_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("mainbank");
-	map(0x8000, 0x9fff).w(FUNC(quizdna_state::fg_ram_w));
-	map(0xa000, 0xbfff).w(FUNC(quizdna_state::bg_ram_w));
+	map(0x8000, 0x9fff).w(this, FUNC(quizdna_state::fg_ram_w));
+	map(0xa000, 0xbfff).w(this, FUNC(quizdna_state::bg_ram_w));
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe1ff).ram().share("spriteram");
 	map(0xe200, 0xefff).ram();
-	map(0xf000, 0xffff).ram().w(FUNC(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)).share("paletteram");
+	map(0xf000, 0xffff).ram().w(this, FUNC(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)).share("paletteram");
 }
 
 void quizdna_state::gekiretu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("mainbank");
-	map(0x8000, 0x9fff).w(FUNC(quizdna_state::fg_ram_w));
-	map(0xa000, 0xbfff).w(FUNC(quizdna_state::bg_ram_w));
+	map(0x8000, 0x9fff).w(this, FUNC(quizdna_state::fg_ram_w));
+	map(0xa000, 0xbfff).w(this, FUNC(quizdna_state::bg_ram_w));
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xefff).ram().w(FUNC(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)).share("paletteram");
+	map(0xe000, 0xefff).ram().w(this, FUNC(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)).share("paletteram");
 	map(0xf000, 0xf1ff).ram().share("spriteram");
 	map(0xf200, 0xffff).ram();
 }
@@ -60,15 +60,15 @@ void quizdna_state::gekiretu_map(address_map &map)
 void quizdna_state::quizdna_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x03).w(FUNC(quizdna_state::bg_xscroll_w));
-	map(0x04, 0x04).w(FUNC(quizdna_state::bg_yscroll_w));
+	map(0x02, 0x03).w(this, FUNC(quizdna_state::bg_xscroll_w));
+	map(0x04, 0x04).w(this, FUNC(quizdna_state::bg_yscroll_w));
 	map(0x05, 0x06).nopw(); /* unknown */
 	map(0x80, 0x80).portr("P1");
 	map(0x81, 0x81).portr("P2");
 	map(0x90, 0x90).portr("SYSTEM");
 	map(0x91, 0x91).portr("SERVICE");
-	map(0xc0, 0xc0).w(FUNC(quizdna_state::rombank_w));
-	map(0xd0, 0xd0).w(FUNC(quizdna_state::screen_ctrl_w));
+	map(0xc0, 0xc0).w(this, FUNC(quizdna_state::rombank_w));
+	map(0xd0, 0xd0).w(this, FUNC(quizdna_state::screen_ctrl_w));
 	map(0xe0, 0xe1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf0, 0xf0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -76,15 +76,15 @@ void quizdna_state::quizdna_io_map(address_map &map)
 void quizdna_state::gakupara_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(FUNC(quizdna_state::bg_xscroll_w));
-	map(0x02, 0x02).w(FUNC(quizdna_state::bg_yscroll_w));
+	map(0x00, 0x01).w(this, FUNC(quizdna_state::bg_xscroll_w));
+	map(0x02, 0x02).w(this, FUNC(quizdna_state::bg_yscroll_w));
 	map(0x03, 0x04).nopw(); /* unknown */
 	map(0x80, 0x80).portr("P1");
 	map(0x81, 0x81).portr("P2");
 	map(0x90, 0x90).portr("SYSTEM");
 	map(0x91, 0x91).portr("SERVICE");
-	map(0xc0, 0xc0).w(FUNC(quizdna_state::rombank_w));
-	map(0xd0, 0xd0).w(FUNC(quizdna_state::screen_ctrl_w));
+	map(0xc0, 0xc0).w(this, FUNC(quizdna_state::rombank_w));
+	map(0xd0, 0xd0).w(this, FUNC(quizdna_state::screen_ctrl_w));
 	map(0xe0, 0xe1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf0, 0xf0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -92,15 +92,15 @@ void quizdna_state::gakupara_io_map(address_map &map)
 void quizdna_state::gekiretu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x03).w(FUNC(quizdna_state::bg_xscroll_w));
-	map(0x04, 0x04).w(FUNC(quizdna_state::bg_yscroll_w));
+	map(0x02, 0x03).w(this, FUNC(quizdna_state::bg_xscroll_w));
+	map(0x04, 0x04).w(this, FUNC(quizdna_state::bg_yscroll_w));
 	map(0x05, 0x06).nopw(); /* unknown */
 	map(0x80, 0x80).portr("P1");
 	map(0x81, 0x81).portr("P2");
 	map(0x90, 0x90).portr("SYSTEM");
 	map(0x91, 0x91).portr("SERVICE");
-	map(0xc0, 0xc0).w(FUNC(quizdna_state::gekiretu_rombank_w));
-	map(0xd0, 0xd0).w(FUNC(quizdna_state::screen_ctrl_w));
+	map(0xc0, 0xc0).w(this, FUNC(quizdna_state::gekiretu_rombank_w));
+	map(0xd0, 0xd0).w(this, FUNC(quizdna_state::screen_ctrl_w));
 	map(0xe0, 0xe1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xf0, 0xf0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -464,13 +464,13 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", MCLK/4));
-	ymsnd.port_a_read_callback().set_ioport("DSW3");
-	ymsnd.port_b_read_callback().set_ioport("DSW2");
-	ymsnd.add_route(0, "mono", 0.10);
-	ymsnd.add_route(1, "mono", 0.10);
-	ymsnd.add_route(2, "mono", 0.10);
-	ymsnd.add_route(3, "mono", 0.40);
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MCLK/4)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_ROUTE(2, "mono", 0.10)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, (MCLK/1024)*132, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

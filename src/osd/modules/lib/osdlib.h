@@ -63,6 +63,7 @@ int osd_setenv(const char *name, const char *value, int overwrite);
 
 char *osd_get_clipboard_text(void);
 
+
 /*-----------------------------------------------------------------------------
     dynamic_module: load functions from optional shared libraries
 

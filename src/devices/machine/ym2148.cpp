@@ -44,9 +44,8 @@ void ym2148_device::device_start()
 	m_port_read_handler.resolve_safe(0xff);
 
 	// Start a timer to trigger at clock / 8 / 16
-	const attotime rate = clocks_to_attotime(8 * 16);
 	m_timer = timer_alloc(0);
-	m_timer->adjust(rate, 0, rate);
+	m_timer->adjust(attotime::from_hz(m_clock / 8 / 16), 0, attotime::from_hz(m_clock / 8 / 16));
 }
 
 
@@ -72,14 +71,12 @@ void ym2148_device::receive_clock()
 
 			m_data_in = get_received_char();
 
-			if (is_receive_framing_error())
-				m_status |= STATUS_FRAMING_ERROR;
-
 			if (m_status & STATUS_RECEIVE_BUFFER_FULL)
+			{
+				// Overrun error
 				m_status |= STATUS_OVERRUN_ERROR;
-			else
-				m_status |= STATUS_RECEIVE_BUFFER_FULL;
-
+			}
+			m_status |= STATUS_RECEIVE_BUFFER_FULL;
 			update_irq();
 		}
 	}
@@ -147,19 +144,16 @@ READ8_MEMBER(ym2148_device::read)
 {
 	switch (offset & 7)
 	{
-	case 2:  // External port read
-		return m_port_read_handler();
+		case 2:  // External port read
+			return m_port_read_handler();
 
-	case 5:  // Midi data read register
-		if (!machine().side_effects_disabled())
-		{
+		case 5:  // Midi data read register
 			m_status &= ~STATUS_RECEIVE_BUFFER_FULL;
 			update_irq();
-		}
-		return m_data_in;
+			return m_data_in;
 
-	case 6:  // Midi status register
-		return m_status;
+		case 6:  // Midi status register
+			return m_status;
 	}
 	return 0xff;
 }
@@ -169,39 +163,36 @@ WRITE8_MEMBER(ym2148_device::write)
 {
 	switch (offset & 7)
 	{
-	case 2:  // External port write
-		m_port_write_handler(data);
-		break;
+		case 2:  // External port write
+			m_port_write_handler(data);
+			break;
 
-	case 3:  // IRQ vector
-		m_irq_vector = data;
-		break;
+		case 3:  // IRQ vector
+			m_irq_vector = data;
+			break;
 
-	case 4:  // External IRQ vector
-		m_external_irq_vector = data;
-		break;
+		case 4:  // External IRQ vector
+			m_external_irq_vector = data;
+			break;
 
-	case 5:  // Midi data write register
-		m_data_out = data;
-		m_status &= ~STATUS_TRANSMIT_READY;
-		break;
+		case 5:  // Midi data write register
+			m_data_out = data;
+			m_status &= ~STATUS_TRANSMIT_READY;
+			break;
 
-	case 6:  // Midi control register
-		m_control = data;
+		case 6:  // Midi control register
+			m_control = data;
 
-		if (BIT(m_control, 4))  // Error reset
-			m_status &= ~(STATUS_FRAMING_ERROR | STATUS_OVERRUN_ERROR);
-
-		if (BIT(m_control, 7))
-		{
-			// Reset
-			receive_clock();
-			transmit_clock();
-			m_irq_state = CLEAR_LINE;
-			m_irq_handler(m_irq_state);
-		}
-		update_irq();
-		break;
+			if (m_control & 0x80)
+			{
+				// Reset
+				receive_clock();
+				transmit_clock();
+				m_irq_state = CLEAR_LINE;
+				m_irq_handler(m_irq_state);
+			}
+			update_irq();
+			break;
 	}
 }
 

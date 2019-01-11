@@ -56,8 +56,6 @@ sol2 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 sqlite3 - Public Domain
 
-tap-windows6 - [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0)
-
 winpcap - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 zlib - [zlib license](http://opensource.org/licenses/Zlib)

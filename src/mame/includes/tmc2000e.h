@@ -32,9 +32,6 @@ public:
 		, m_led(*this, "led1")
 	{ }
 
-	void tmc2000e(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER( vismac_r );
 	DECLARE_WRITE8_MEMBER( vismac_w );
 	DECLARE_READ8_MEMBER( floppy_r );
@@ -59,13 +56,16 @@ private:
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
+	int m_reset;            /* reset activated */
+	void tmc2000e(machine_config &config);
 	void tmc2000e_io_map(address_map &map);
 	void tmc2000e_map(address_map &map);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cosmac_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<cassette_image_device> m_cassette;
 	required_shared_ptr<uint8_t> m_colorram;

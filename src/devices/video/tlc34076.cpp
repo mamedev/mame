@@ -57,7 +57,7 @@ void tlc34076_device::device_start()
 	for (int i = 0; i < 3; i++)
 	{
 		m_local_paletteram[i] = std::make_unique<uint8_t[]>(0x100);
-		save_pointer(NAME(m_local_paletteram[i]), 0x100, i);
+		save_pointer(NAME(m_local_paletteram[i].get()), 0x100, i);
 	}
 
 	save_item(NAME(m_regs));

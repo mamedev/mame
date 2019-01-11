@@ -169,15 +169,6 @@ class bt458_device : public bt45x_rgb_device_base
 {
 public:
 	bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class bt467_device : public bt458_device
-{
-public:
-	bt467_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(BT451, bt451_device)
@@ -186,6 +177,5 @@ DECLARE_DEVICE_TYPE(BT454, bt454_device)
 DECLARE_DEVICE_TYPE(BT455, bt455_device)
 DECLARE_DEVICE_TYPE(BT457, bt457_device)
 DECLARE_DEVICE_TYPE(BT458, bt458_device)
-DECLARE_DEVICE_TYPE(BT467, bt467_device)
 
 #endif // MAME_VIDEO_BT45X_H

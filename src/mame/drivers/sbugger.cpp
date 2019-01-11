@@ -114,8 +114,8 @@ Sound PCB
 void sbugger_state::sbugger_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
-	map(0xc800, 0xcbff).ram().w(FUNC(sbugger_state::videoram_attr_w)).share("videoram_attr");
-	map(0xcc00, 0xcfff).ram().w(FUNC(sbugger_state::videoram_w)).share("videoram");
+	map(0xc800, 0xcbff).ram().w(this, FUNC(sbugger_state::videoram_attr_w)).share("videoram_attr");
+	map(0xcc00, 0xcfff).ram().w(this, FUNC(sbugger_state::videoram_w)).share("videoram");
 	map(0xe000, 0xe0ff).rw("i8156", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w)); /* sp is set to e0ff */
 	map(0xf400, 0xffff).ram();
 }
@@ -123,8 +123,8 @@ void sbugger_state::sbugger_map(address_map &map)
 void sbugger_state::sbugger_io_map(address_map &map)
 {
 	map(0xe0, 0xe7).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::command_w));
-	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::command_w));
+	map(0xe8, 0xe8).w("sn76489.1", FUNC(sn76489_device::write));
+	map(0xe9, 0xe9).w("sn76489.2", FUNC(sn76489_device::write));
 }
 
 
@@ -220,11 +220,11 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	MCFG_DEVICE_PROGRAM_MAP(sbugger_map)
 	MCFG_DEVICE_IO_MAP(sbugger_io_map)
 
-	i8156_device &i8156(I8156(config, "i8156", 200000));     /* freq is an approximation */
-	i8156.in_pa_callback().set_ioport("INPUTS");
-	i8156.in_pb_callback().set_ioport("DSW1");
-	i8156.in_pc_callback().set_ioport("DSW2");
-	i8156.out_to_callback().set_inputline(m_maincpu, I8085_RST75_LINE);
+	MCFG_DEVICE_ADD("i8156", I8156, 200000)     /* freq is an approximation */
+	MCFG_I8155_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_I8155_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8155_IN_PORTC_CB(IOPORT("DSW2"))
+	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", I8085_RST75_LINE))
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sbugger)
 
@@ -236,7 +236,8 @@ MACHINE_CONFIG_START(sbugger_state::sbugger)
 	MCFG_SCREEN_UPDATE_DRIVER(sbugger_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(sbugger_state::sbugger_palette), 512);
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(sbugger_state, sbugger)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

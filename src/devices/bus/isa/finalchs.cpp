@@ -40,10 +40,10 @@ WRITE8_MEMBER( isa8_finalchs_device::io6000_write )
 void isa8_finalchs_device::finalchs_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x7ff8, 0x7ff8).r(FUNC(isa8_finalchs_device::io7ff8_read));
-	map(0x7ff8, 0x7ff8).w(FUNC(isa8_finalchs_device::io7ff8_write));
-	map(0x6000, 0x6000).r(FUNC(isa8_finalchs_device::io6000_read));
-	map(0x6000, 0x6000).w(FUNC(isa8_finalchs_device::io6000_write));
+	map(0x7ff8, 0x7ff8).r(this, FUNC(isa8_finalchs_device::io7ff8_read));
+	map(0x7ff8, 0x7ff8).w(this, FUNC(isa8_finalchs_device::io7ff8_write));
+	map(0x6000, 0x6000).r(this, FUNC(isa8_finalchs_device::io6000_read));
+	map(0x6000, 0x6000).w(this, FUNC(isa8_finalchs_device::io6000_write));
 	map(0x8000, 0xffff).rom();
 }
 

@@ -15,6 +15,22 @@
 #include "dirtc.h"
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_RTC4543_ADD(tag, clock) \
+		MCFG_DEVICE_ADD((tag), RTC4543, (clock))
+
+#define MCFG_RTC4543_DATA_CALLBACK(cb) \
+		devcb = &downcast<rtc4543_device &>(*device).set_data_cb(DEVCB_##cb);
+
+#define MCFG_JRC6355E_ADD(tag, clock) \
+		MCFG_DEVICE_ADD((tag), JRC6355E, (clock))
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -24,7 +40,7 @@
 class rtc4543_device :  public device_t,
 						public device_rtc_interface
 {
-	static char const *const s_reg_names[7];
+	static const char *s_reg_names[7];
 
 public:
 	// construction/destruction
@@ -36,7 +52,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( data_r );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 
-	auto data_cb() { return m_data_cb.bind(); }
+	template <class Object> devcb_base &set_data_cb(Object &&cb) { return data_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	rtc4543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -60,7 +76,7 @@ protected:
 	void advance_bit();
 	void update_effective();
 
-	devcb_write_line m_data_cb;
+	devcb_write_line data_cb;
 
 	int m_ce;
 	int m_clk;

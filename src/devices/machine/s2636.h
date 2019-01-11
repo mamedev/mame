@@ -18,6 +18,22 @@
 
 /*************************************
  *
+ *  Device configuration macros
+ *
+ *************************************/
+
+#define MCFG_S2636_OFFSETS(yoffs, xoffs) \
+	downcast<s2636_device &>(*device).set_offsets((yoffs), (xoffs));
+
+#define MCFG_S2636_DIVIDER(divider) \
+	downcast<s2636_device &>(*device).set_divider((divider));
+
+#define MCFG_S2623_SET_INTREQ_CALLBACK(cb) \
+	devcb = &downcast<s2636_device &>(*device).set_intreq_cb(DEVCB_##cb);
+
+
+/*************************************
+ *
  *  Device state class
  *
  *************************************/
@@ -33,7 +49,7 @@ public:
 
 	void set_divider(int divider) { m_divider = divider; }
 
-	auto intreq_cb() { return m_intreq_cb.bind(); }
+	template <class Object> devcb_base &set_intreq_cb(Object &&cb) { return m_intreq_cb.set_callback(std::forward<Object>(cb)); }
 
 	// returns a BITMAP_FORMAT_IND16 bitmap the size of the screen
 	// D0-D2 of each pixel is the pixel color

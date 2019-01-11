@@ -8,8 +8,6 @@
 
 ***************************************************************************/
 
-#include "emupal.h"
-
 class kangaroo_state : public driver_device
 {
 public:

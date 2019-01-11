@@ -46,10 +46,6 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void locomotp(machine_config &config);
-	void zac_1(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(ctrl_r);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_READ_LINE_MEMBER(serial_r);
@@ -58,20 +54,21 @@ private:
 	DECLARE_WRITE8_MEMBER(reset_int_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
-
+	void locomotp(machine_config &config);
+	void zac_1(machine_config &config);
 	void locomotp_data(address_map &map);
 	void locomotp_io(address_map &map);
 	void locomotp_map(address_map &map);
 	void zac_1_data(address_map &map);
 	void zac_1_io(address_map &map);
 	void zac_1_map(address_map &map);
-
+private:
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
 	uint8_t m_input_line;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<s2650_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	output_finder<78> m_digits;
 };
@@ -81,7 +78,7 @@ void zac_1_state::zac_1_map(address_map &map)
 {
 	map.global_mask(0x1fff);
 	map(0x0000, 0x13ff).rom();
-	map(0x1400, 0x17ff).w(FUNC(zac_1_state::reset_int_w));
+	map(0x1400, 0x17ff).w(this, FUNC(zac_1_state::reset_int_w));
 	map(0x1800, 0x18ff).mirror(0x300).ram().share("ram");
 	map(0x1c00, 0x1fff).rom();
 }
@@ -94,7 +91,7 @@ void zac_1_state::zac_1_io(address_map &map)
 void zac_1_state::zac_1_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
 }
 
 static INPUT_PORTS_START( zac_1 )
@@ -259,27 +256,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 	}
 }
 
-void zac_1_state::zac_1(machine_config &config)
-{
+MACHINE_CONFIG_START(zac_1_state::zac_1)
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 6000000/2); // no xtal, just 2 chips forming a random oscillator
-	m_maincpu->set_addrmap(AS_PROGRAM, &zac_1_state::zac_1_map);
-	m_maincpu->set_addrmap(AS_IO, &zac_1_state::zac_1_io);
-	m_maincpu->set_addrmap(AS_DATA, &zac_1_state::zac_1_data);
-	m_maincpu->sense_handler().set(FUNC(zac_1_state::serial_r));
-	m_maincpu->flag_handler().set(FUNC(zac_1_state::serial_w));
+	MCFG_DEVICE_ADD("maincpu", S2650, 6000000/2) // no xtal, just 2 chips forming a random oscillator
+	MCFG_DEVICE_PROGRAM_MAP(zac_1_map)
+	MCFG_DEVICE_IO_MAP(zac_1_io)
+	MCFG_DEVICE_DATA_MAP(zac_1_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_1_state, serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_1_state, serial_w))
+	MCFG_NVRAM_ADD_0FILL("ram")
 
-	NVRAM(config, "ram", nvram_device::DEFAULT_ALL_0);
-
-	TIMER(config, "zac_1_inttimer").configure_periodic(FUNC(zac_1_state::zac_1_inttimer), attotime::from_hz(200));
-	TIMER(config, "zac_1_outtimer").configure_periodic(FUNC(zac_1_state::zac_1_outtimer), attotime::from_hz(187500));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_inttimer", zac_1_state, zac_1_inttimer, attotime::from_hz(200))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_outtimer", zac_1_state, zac_1_outtimer, attotime::from_hz(187500))
 
 	/* Video */
-	config.set_default_layout(layout_zac_1);
+	MCFG_DEFAULT_LAYOUT(layout_zac_1)
 
 	/* Sound */
 	genpin_audio(config);
-}
+MACHINE_CONFIG_END
 
 /*************************** LOCOMOTION ********************************/
 
@@ -298,8 +293,8 @@ void zac_1_state::locomotp_io(address_map &map)
 
 void zac_1_state::locomotp_data(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(zac_1_state::reset_int_r));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(zac_1_state::reset_int_r));
 }
 
 READ8_MEMBER( zac_1_state::reset_int_r )
@@ -308,15 +303,15 @@ READ8_MEMBER( zac_1_state::reset_int_r )
 	return 0;
 }
 
-void zac_1_state::locomotp(machine_config &config)
-{
+MACHINE_CONFIG_START(zac_1_state::locomotp)
 	zac_1(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &zac_1_state::locomotp_map);
-	m_maincpu->set_addrmap(AS_IO, &zac_1_state::locomotp_io);
-	m_maincpu->set_addrmap(AS_DATA, &zac_1_state::locomotp_data);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(locomotp_map)
+	MCFG_DEVICE_IO_MAP(locomotp_io)
+	MCFG_DEVICE_DATA_MAP(locomotp_data)
 	// also has sound cpu
-}
+MACHINE_CONFIG_END
 
 
 /*--------------------------------

@@ -6,10 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_MACHINE_SPEC_SNQK_H
-#define MAME_MACHINE_SPEC_SNQK_H
-
-#pragma once
+#ifndef __SPEC_SNQK_H__
+#define __SPEC_SNQK_H__
 
 #include "imagedev/snapquik.h"
 
@@ -164,4 +162,4 @@ enum SPECTRUM_Z80_SNAPSHOT_TYPE {
 #define RAW_HDR    9
 #define RAW_SIZE   (RAW_HDR + 3*SPECTRUM_BANK)
 
-#endif // MAME_MACHINE_SPEC_SNQK_H
+#endif  /* __SPEC_SNQK_H__ */

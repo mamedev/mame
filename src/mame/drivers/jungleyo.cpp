@@ -9,7 +9,7 @@ QTY     Type    clock   position    function
 1x  u6295       u98     4-Channel Mixing ADCPM Voice Synthesis LSI - sound
 1x  HA17358         u101    Dual Operational Amplifier - sound
 1x  TDA2003         u104    Audio Amplifier - sound
-1x  oscillator  24.000MHz   osc1
+1x  oscillator  12.000MHz   osc1
 ROMs
 QTY     Type    position    status
 2x  M27C1001    2,3     dumped
@@ -40,7 +40,6 @@ PCB silkscreened: "MADE IN TAIWAN YONSHI PCB NO-006F"
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,15 +55,14 @@ public:
 
 	void jungleyo(machine_config &config);
 
-protected:
-	virtual void video_start() override;
-
-private:
+public:
 	/* video-related */
+	virtual void video_start() override;
 	uint32_t screen_update_jungleyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void jungleyo_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -122,11 +120,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(jungleyo_state::jungleyo)
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(jungleyo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jungleyo_state,  irq1_line_hold)
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_jungleyo);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jungleyo)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -136,12 +134,13 @@ MACHINE_CONFIG_START(jungleyo_state::jungleyo)
 	MCFG_SCREEN_UPDATE_DRIVER(jungleyo_state, screen_update_jungleyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24_MHz_XTAL / 20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/16, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END

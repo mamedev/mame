@@ -36,7 +36,6 @@ public:
 		m_psg(*this, SN76489_TAG),
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
-		m_centronics(*this, CENTRONICS_TAG),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_ram(*this, RAM_TAG),
 		m_inp_pa0(*this, "PA0.%u", 0),
@@ -50,7 +49,6 @@ public:
 	required_device<sn76496_base_device> m_psg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<crvision_cart_slot_device> m_cart;
-	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<ram_device> m_ram;
 	optional_ioport_array<8> m_inp_pa0;

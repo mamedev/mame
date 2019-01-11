@@ -1090,7 +1090,7 @@ void discrete_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 //  read - read from the chip's registers and internal RAM
 //-------------------------------------------------
 
-uint8_t discrete_device::read(offs_t offset)
+READ8_MEMBER( discrete_device::read )
 {
 	const discrete_base_node *node = discrete_find_node(offset);
 
@@ -1114,7 +1114,7 @@ uint8_t discrete_device::read(offs_t offset)
 //  write - write to the chip's registers and internal RAM
 //-------------------------------------------------
 
-void discrete_device::write(offs_t offset, uint8_t data)
+WRITE8_MEMBER( discrete_device::write )
 {
 	const discrete_base_node *node = discrete_find_node(offset);
 

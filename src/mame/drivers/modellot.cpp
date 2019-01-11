@@ -41,7 +41,6 @@ the devices themselves. An example shows a i8251 used as the US1 device.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -55,17 +54,15 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	void modellot(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
 	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void modellot(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-
+private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -85,8 +82,8 @@ void modellot_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x77, 0x77).r(FUNC(modellot_state::port77_r));
-	map(0xff, 0xff).r(FUNC(modellot_state::portff_r));
+	map(0x77, 0x77).r(this, FUNC(modellot_state::port77_r));
+	map(0xff, 0xff).r(this, FUNC(modellot_state::portff_r));
 }
 
 
@@ -194,11 +191,11 @@ MACHINE_CONFIG_START(modellot_state::modellot)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_modellot)
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(modellot_state::kbd_put));
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(modellot_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

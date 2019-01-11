@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -29,7 +29,7 @@ namespace bx
 		void load(const void* _data, uint32_t _len);
 
 		///
-		StringView get(const StringView& _name) const;
+		const char* get(const StringView& _name) const;
 
 		///
 		void set(const StringView& _name, const StringView& _value = "");

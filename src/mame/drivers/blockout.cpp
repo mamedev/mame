@@ -103,17 +103,17 @@ void blockout_state::main_map(address_map &map)
 	map(0x100004, 0x100005).portr("SYSTEM");
 	map(0x100006, 0x100007).portr("DSW1");
 	map(0x100008, 0x100009).portr("DSW2");
-	map(0x100010, 0x100011).w(FUNC(blockout_state::blockout_irq6_ack_w));
-	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100010, 0x100011).w(this, FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(this, FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).ram().w(FUNC(blockout_state::blockout_videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).ram().w(this, FUNC(blockout_state::blockout_videoram_w)).share("videoram");
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
 	map(0x208000, 0x21ffff).ram(); /* ??? */
-	map(0x280002, 0x280003).w(FUNC(blockout_state::blockout_frontcolor_w));
-	map(0x280200, 0x2805ff).ram().w(FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
+	map(0x280002, 0x280003).w(this, FUNC(blockout_state::blockout_frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(this, FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
 }
 
 void blockout_state::agress_map(address_map &map)
@@ -124,17 +124,17 @@ void blockout_state::agress_map(address_map &map)
 	map(0x100004, 0x100005).portr("SYSTEM");
 	map(0x100006, 0x100007).portr("DSW1");
 	map(0x100008, 0x100009).portr("DSW2");
-	map(0x100010, 0x100011).w(FUNC(blockout_state::blockout_irq6_ack_w));
-	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100010, 0x100011).w(this, FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(this, FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).ram().w(FUNC(blockout_state::blockout_videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).ram().w(this, FUNC(blockout_state::blockout_videoram_w)).share("videoram");
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
 	map(0x208000, 0x21ffff).ram(); /* ??? */
-	map(0x280002, 0x280003).w(FUNC(blockout_state::blockout_frontcolor_w));
-	map(0x280200, 0x2805ff).ram().w(FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
+	map(0x280002, 0x280003).w(this, FUNC(blockout_state::blockout_frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(this, FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
 }
 
 void blockout_state::audio_map(address_map &map)
@@ -329,13 +329,13 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", AUDIO_CLOCK));
-	ymsnd.irq_handler().set(FUNC(blockout_state::irq_handler));
-	ymsnd.add_route(0, "lspeaker", 0.60);
-	ymsnd.add_route(1, "rspeaker", 0.60);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, AUDIO_CLOCK)
+	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, blockout_state,irq_handler))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

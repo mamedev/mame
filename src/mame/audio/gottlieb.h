@@ -24,6 +24,15 @@ DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_de
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
 
 
+
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS() \
+	downcast<gottlieb_sound_r2_device &>(*device).enable_cobram3_mods();
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -71,7 +80,8 @@ public:
 	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
-	void write(u8 data);
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( votrax_request );
 
 protected:
 	gottlieb_sound_r1_device(
@@ -86,11 +96,24 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 
-	virtual void gottlieb_sound_r1_map(address_map &map);
+	// internal communications
+	DECLARE_WRITE8_MEMBER( votrax_data_w );
+	DECLARE_WRITE8_MEMBER( speech_clock_dac_w );
+
+	void gottlieb_sound_r1_map(address_map &map);
 
 private:
 	// devices
-	required_device<riot6532_device> m_riot;
+	required_device<m6502_device>       m_audiocpu;
+	required_device<riot6532_device>    m_riot;
+	optional_device<votrax_sc01_device> m_votrax;
+
+	// internal state
+	//bool            m_populate_votrax;
+	uint8_t           m_last_speech_clock;
+
+	DECLARE_WRITE_LINE_MEMBER( snd_interrupt );
+	DECLARE_WRITE8_MEMBER( r6532_portb_w );
 };
 
 // fully populated rev 1 sound board
@@ -104,21 +127,6 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_post_load() override;
-
-	// internal communications
-	DECLARE_WRITE8_MEMBER( votrax_data_w );
-	DECLARE_WRITE8_MEMBER( speech_clock_dac_w );
-
-	virtual void gottlieb_sound_r1_map(address_map &map) override;
-
-private:
-	// devices
-	required_device<votrax_sc01_device> m_votrax;
-
-	// internal state
-	uint8_t m_last_speech_clock;
 };
 
 
@@ -135,7 +143,7 @@ public:
 	void enable_cobram3_mods() { m_cobram3_mod = true; }
 
 	// read/write
-	void write(u8 data);
+	DECLARE_WRITE8_MEMBER( write );
 
 	// internal communications
 	DECLARE_READ8_MEMBER( speech_data_r );

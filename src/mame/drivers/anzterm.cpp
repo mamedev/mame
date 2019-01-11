@@ -350,7 +350,6 @@ Components:
 #include "machine/6850acia.h"
 #include "machine/i8214.h"
 #include "machine/mc6854.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -364,13 +363,11 @@ public:
 	{
 	}
 
-	void anzterm(machine_config &config);
-
-private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
+	void anzterm(machine_config &config);
 	void anzterm(address_map &map);
 };
 
@@ -429,7 +426,7 @@ MACHINE_CONFIG_START(anzterm_state::anzterm)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_RAW_PARAMS(15974400/4, 1024, 0, 104*8, 260, 0, 24*10) // this is totally wrong, it just stops a validation error
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_anzterm)
 MACHINE_CONFIG_END

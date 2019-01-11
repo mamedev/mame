@@ -33,7 +33,6 @@
 #include "machine/keyboard.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -53,11 +52,7 @@ public:
 	{
 	}
 
-	void phunsy(machine_config &config);
-
 	void init_phunsy();
-
-private:
 	DECLARE_READ8_MEMBER(phunsy_data_r);
 	DECLARE_WRITE8_MEMBER(phunsy_ctrl_w);
 	DECLARE_WRITE8_MEMBER(phunsy_data_w);
@@ -65,17 +60,18 @@ private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
-	void phunsy_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(phunsy);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void phunsy(machine_config &config);
 	void phunsy_data(address_map &map);
 	void phunsy_io(address_map &map);
 	void phunsy_mem(address_map &map);
-
+private:
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
 	virtual void machine_reset() override;
-	required_device<s2650_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -111,8 +107,8 @@ void phunsy_state::phunsy_io(address_map &map)
 void phunsy_state::phunsy_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(phunsy_state::phunsy_ctrl_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(phunsy_state::phunsy_ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
 }
 
 
@@ -210,10 +206,14 @@ void phunsy_state::machine_reset()
 }
 
 
-void phunsy_state::phunsy_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(phunsy_state, phunsy)
 {
-	for (int i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal3bit(i), pal3bit(i), pal3bit(i));
+	for ( int i = 0; i < 8; i++ )
+	{
+		int j = ( i << 5 ) | ( i << 2 ) | ( i >> 1 );
+
+		palette.set_pen_color( i, j, j, j );
+	}
 }
 
 
@@ -337,45 +337,44 @@ void phunsy_state::init_phunsy()
 	membank("bankq")->set_entry(0);
 }
 
-void phunsy_state::phunsy(machine_config &config)
-{
+MACHINE_CONFIG_START(phunsy_state::phunsy)
 	/* basic machine hardware */
-	S2650(config, m_maincpu, XTAL(1'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &phunsy_state::phunsy_mem);
-	m_maincpu->set_addrmap(AS_IO, &phunsy_state::phunsy_io);
-	m_maincpu->set_addrmap(AS_DATA, &phunsy_state::phunsy_data);
-	m_maincpu->sense_handler().set(FUNC(phunsy_state::cass_r));
-	m_maincpu->flag_handler().set(FUNC(phunsy_state::cass_w));
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(phunsy_mem)
+	MCFG_DEVICE_IO_MAP(phunsy_io)
+	MCFG_DEVICE_DATA_MAP(phunsy_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, phunsy_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, phunsy_state, cass_w))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	MCFG_SCREEN_ADD("screen", RASTER)
 	/* Display (page 12 of pdf)
 	   - 8Mhz clock
 	   - 64 6 pixel characters on a line.
 	   - 16us not active, 48us active: ( 64 * 6 ) * 60 / 48 => 480 pixels wide
 	   - 313 line display of which 256 are displayed.
 	*/
-	screen.set_raw(XTAL(8'000'000), 480, 0, 64*6, 313, 0, 256);
-	screen.set_screen_update(FUNC(phunsy_state::screen_update));
-	screen.set_palette("palette");
+	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000), 480, 0, 64*6, 313, 0, 256)
+	MCFG_SCREEN_UPDATE_DRIVER(phunsy_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_phunsy);
-	PALETTE(config, "palette", FUNC(phunsy_state::phunsy_palette), 8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_phunsy)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(phunsy_state, phunsy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(phunsy_state::kbd_put));
-	CASSETTE(config, m_cass);
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(phunsy_state, kbd_put))
+	MCFG_CASSETTE_ADD( "cassette" )
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(phunsy_state, phunsy), this), "bin", 2);
-}
+	MCFG_QUICKLOAD_ADD("quickload", phunsy_state, phunsy, "bin", 2)
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

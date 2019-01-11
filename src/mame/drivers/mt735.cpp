@@ -13,9 +13,6 @@ class mt735_state : public driver_device
 public:
 	mt735_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	void mt735(machine_config &config);
-
-private:
 	required_device<m68000_device> m_cpu;
 
 	DECLARE_READ8_MEMBER(p4_r);
@@ -23,6 +20,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void mt735(machine_config &config);
 	void mt735_map(address_map &map);
 };
 
@@ -57,8 +55,8 @@ void mt735_state::mt735_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x278000, 0x287fff).ram();
 	map(0x400000, 0x4fffff).ram();
-	map(0xff8004, 0xff8004).r(FUNC(mt735_state::p4_r));
-	map(0xff8005, 0xff8005).r(FUNC(mt735_state::p5_r));
+	map(0xff8004, 0xff8004).r(this, FUNC(mt735_state::p4_r));
+	map(0xff8005, 0xff8005).r(this, FUNC(mt735_state::p5_r));
 }
 
 static INPUT_PORTS_START( mt735 )

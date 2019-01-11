@@ -259,6 +259,7 @@ TODO:
 #include "emu.h"
 #include "includes/stfight.h"
 
+#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 
 #include "sound/2203intf.h"
@@ -277,11 +278,11 @@ void stfight_state::cpu1_map(address_map &map)
 	map(0xc202, 0xc202).portr("START");
 	map(0xc203, 0xc203).portr("DSW0");
 	map(0xc204, 0xc204).portr("DSW1");
-	map(0xc205, 0xc205).r(FUNC(stfight_state::stfight_coin_r));
-	map(0xc500, 0xc500).w(FUNC(stfight_state::stfight_fm_w));
-	map(0xc600, 0xc600).w(FUNC(stfight_state::stfight_mcu_w));
-	map(0xc700, 0xc700).w(FUNC(stfight_state::stfight_coin_w));
-	map(0xc804, 0xc804).w(FUNC(stfight_state::stfight_io_w));
+	map(0xc205, 0xc205).r(this, FUNC(stfight_state::stfight_coin_r));
+	map(0xc500, 0xc500).w(this, FUNC(stfight_state::stfight_fm_w));
+	map(0xc600, 0xc600).w(this, FUNC(stfight_state::stfight_mcu_w));
+	map(0xc700, 0xc700).w(this, FUNC(stfight_state::stfight_coin_w));
+	map(0xc804, 0xc804).w(this, FUNC(stfight_state::stfight_io_w));
 	map(0xc806, 0xc806).nopw();                    /* TBD */
 	map(0xe000, 0xefff).ram();
 }
@@ -305,7 +306,7 @@ void stfight_state::decrypted_opcodes_map(address_map &map)
 void stfight_state::cshooter_cpu1_map(address_map &map)
 {
 	cpu1_map(map);
-	map(0xc801, 0xc801).w(FUNC(stfight_state::stfight_bank_w));
+	map(0xc801, 0xc801).w(this, FUNC(stfight_state::stfight_bank_w));
 	map(0xd000, 0xd7ff).ram().w("airraid_vid", FUNC(airraid_video_device::txram_w)).share("txram");
 	map(0xd800, 0xd80f).ram().w("airraid_vid", FUNC(airraid_video_device::vregs_w)).share("vregs"); // wrong?
 	map(0xe000, 0xfdff).ram();
@@ -322,7 +323,7 @@ void stfight_state::cpu2_map(address_map &map)
 	map(0xd000, 0xd000).nopr();
 	map(0xd800, 0xd800).nopw();
 	map(0xe800, 0xe800).nopw();
-	map(0xf000, 0xf000).r(FUNC(stfight_state::stfight_fm_r));
+	map(0xf000, 0xf000).r(this, FUNC(stfight_state::stfight_fm_r));
 	map(0xf800, 0xffff).ram();
 }
 
@@ -452,67 +453,69 @@ INPUT_PORTS_END
 
 
 
-void stfight_state::stfight_base(machine_config &config)
-{
+MACHINE_CONFIG_START(stfight_state::stfight_base)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cpu1_map);
-	m_maincpu->set_vblank_int("stfight_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	Z80(config, m_audiocpu, XTAL(12'000'000) / 4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &stfight_state::cpu2_map);
-	m_audiocpu->set_periodic_int(FUNC(stfight_state::irq0_line_hold), attotime::from_hz(120));
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
-	M68705P5(config, m_mcu, XTAL(12'000'000) / 4);
-	m_mcu->portb_r().set(FUNC(stfight_state::stfight_68705_port_b_r));
-	m_mcu->porta_w().set(FUNC(stfight_state::stfight_68705_port_a_w));
-	m_mcu->portb_w().set(FUNC(stfight_state::stfight_68705_port_b_w));
-	m_mcu->portc_w().set(FUNC(stfight_state::stfight_68705_port_c_w));
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(12'000'000) / 4)
+	MCFG_M68705_PORTB_R_CB(READ8(*this, stfight_state, stfight_68705_port_b_r));
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_a_w));
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_b_w));
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_c_w));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 256);
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8 * 3));
-	ym1.add_route(0, "mono", 0.15);
-	ym1.add_route(1, "mono", 0.15);
-	ym1.add_route(2, "mono", 0.15);
-	ym1.add_route(3, "mono", 0.10);
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(12'000'000) / 8 * 3));
-	ym2.add_route(0, "mono", 0.15);
-	ym2.add_route(1, "mono", 0.15);
-	ym2.add_route(2, "mono", 0.15);
-	ym2.add_route(3, "mono", 0.10);
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000) / 8 * 3)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MSM5205(config, m_msm, XTAL(384'000));
-	m_msm->vck_callback().set(FUNC(stfight_state::stfight_adpcm_int)); // Interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8KHz, 4-bit
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, stfight_state, stfight_adpcm_int)) // Interrupt function
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // 8KHz, 4-bit
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void stfight_state::stfight(machine_config &config)
-{
+MACHINE_CONFIG_START(stfight_state::stfight)
 	stfight_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::stfight_cpu1_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &stfight_state::decrypted_opcodes_map);
-	m_maincpu->set_vblank_int("stfight_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(stfight_cpu1_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	STFIGHT_VIDEO(config, "stfight_vid", 0);
-}
+	MCFG_STFIGHT_VIDEO_ADD("stfight_vid")
+MACHINE_CONFIG_END
 
-void stfight_state::cshooter(machine_config &config)
-{
+
+MACHINE_CONFIG_START(stfight_state::cshooter)
 	stfight_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cshooter_cpu1_map);
-	m_maincpu->set_vblank_int("airraid_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cshooter_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	AIRRAID_VIDEO(config, "airraid_vid", 0);
-}
+	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

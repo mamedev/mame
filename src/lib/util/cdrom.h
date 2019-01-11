@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_CDROM_H
-#define MAME_UTIL_CDROM_H
-
 #pragma once
+
+#ifndef __CDROM_H__
+#define __CDROM_H__
 
 #include "osdcore.h"
 #include "chd.h"
@@ -179,4 +179,7 @@ static inline uint32_t lba_to_msf_alt(int lba)
 	return ret;
 }
 
-#endif // MAME_UTIL_CDROM_H
+
+
+
+#endif  // __CDROM_H__

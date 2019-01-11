@@ -150,11 +150,11 @@ void kaneko_view2_tilemap_device::device_start()
 	m_tmap[0]->set_scrolldy(-m_dy,      m_ydim + m_dy -1 );
 	m_tmap[1]->set_scrolldy(-m_dy,      m_ydim + m_dy -1 );
 
-	save_pointer(NAME(m_vram[0]), 0x1000/2);
-	save_pointer(NAME(m_vram[1]), 0x1000/2);
-	save_pointer(NAME(m_vscroll[0]), 0x1000/2);
-	save_pointer(NAME(m_vscroll[1]), 0x1000/2);
-	save_pointer(NAME(m_regs), 0x20/2);
+	save_pointer(NAME(m_vram[0].get()), 0x1000/2);
+	save_pointer(NAME(m_vram[1].get()), 0x1000/2);
+	save_pointer(NAME(m_vscroll[0].get()), 0x1000/2);
+	save_pointer(NAME(m_vscroll[1].get()), 0x1000/2);
+	save_pointer(NAME(m_regs.get()), 0x20/2);
 	save_item(NAME(m_vram_tile_addition[0]));
 	save_item(NAME(m_vram_tile_addition[1]));
 }

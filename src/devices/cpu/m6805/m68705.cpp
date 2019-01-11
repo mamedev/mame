@@ -652,23 +652,23 @@ void m68705p_device::p_map(address_map &map)
 	map.global_mask(0x07ff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0000).rw(FUNC(m68705p_device::port_r<0>), FUNC(m68705p_device::port_latch_w<0>));
-	map(0x0001, 0x0001).rw(FUNC(m68705p_device::port_r<1>), FUNC(m68705p_device::port_latch_w<1>));
-	map(0x0002, 0x0002).rw(FUNC(m68705p_device::port_r<2>), FUNC(m68705p_device::port_latch_w<2>));
+	map(0x0000, 0x0000).rw(this, FUNC(m68705p_device::port_r<0>), FUNC(m68705p_device::port_latch_w<0>));
+	map(0x0001, 0x0001).rw(this, FUNC(m68705p_device::port_r<1>), FUNC(m68705p_device::port_latch_w<1>));
+	map(0x0002, 0x0002).rw(this, FUNC(m68705p_device::port_r<2>), FUNC(m68705p_device::port_latch_w<2>));
 	// 0x0003 not used (no port D)
-	map(0x0004, 0x0004).w(FUNC(m68705p_device::port_ddr_w<0>));
-	map(0x0005, 0x0005).w(FUNC(m68705p_device::port_ddr_w<1>));
-	map(0x0006, 0x0006).w(FUNC(m68705p_device::port_ddr_w<2>));
+	map(0x0004, 0x0004).w(this, FUNC(m68705p_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).w(this, FUNC(m68705p_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).w(this, FUNC(m68705p_device::port_ddr_w<2>));
 	// 0x0007 not used (no port D)
-	map(0x0008, 0x0008).rw(FUNC(m68705p_device::tdr_r), FUNC(m68705p_device::tdr_w));
-	map(0x0009, 0x0009).rw(FUNC(m68705p_device::tcr_r), FUNC(m68705p_device::tcr_w));
+	map(0x0008, 0x0008).rw(this, FUNC(m68705p_device::tdr_r), FUNC(m68705p_device::tdr_w));
+	map(0x0009, 0x0009).rw(this, FUNC(m68705p_device::tcr_r), FUNC(m68705p_device::tcr_w));
 	// 0x000a not used
-	map(0x000b, 0x000b).rw(FUNC(m68705p_device::pcr_r), FUNC(m68705p_device::pcr_w));
+	map(0x000b, 0x000b).rw(this, FUNC(m68705p_device::pcr_r), FUNC(m68705p_device::pcr_w));
 	// 0x000c-0x000f not used
 	map(0x0010, 0x007f).ram();
-	map(0x0080, 0x0784).rw(FUNC(m68705p_device::eprom_r<0x0080>), FUNC(m68705p_device::eprom_w<0x0080>)); // User EPROM
+	map(0x0080, 0x0784).rw(this, FUNC(m68705p_device::eprom_r<0x0080>), FUNC(m68705p_device::eprom_w<0x0080>)); // User EPROM
 	map(0x0785, 0x07f7).rom().region("bootstrap", 0);
-	map(0x07f8, 0x07ff).rw(FUNC(m68705p_device::eprom_r<0x07f8>), FUNC(m68705p_device::eprom_w<0x07f8>)); // Interrupt vectors
+	map(0x07f8, 0x07ff).rw(this, FUNC(m68705p_device::eprom_r<0x07f8>), FUNC(m68705p_device::eprom_w<0x07f8>)); // Interrupt vectors
 }
 
 m68705p_device::m68705p_device(
@@ -714,24 +714,24 @@ void m68705u_device::u_map(address_map &map)
 	map.global_mask(0x0fff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0000).rw(FUNC(m68705u_device::port_r<0>), FUNC(m68705u_device::port_latch_w<0>));
-	map(0x0001, 0x0001).rw(FUNC(m68705u_device::port_r<1>), FUNC(m68705u_device::port_latch_w<1>));
-	map(0x0002, 0x0002).rw(FUNC(m68705u_device::port_r<2>), FUNC(m68705u_device::port_latch_w<2>));
-	map(0x0003, 0x0003).rw(FUNC(m68705u_device::port_r<3>), FUNC(m68705u_device::port_latch_w<3>));
-	map(0x0004, 0x0004).w(FUNC(m68705u_device::port_ddr_w<0>));
-	map(0x0005, 0x0005).w(FUNC(m68705u_device::port_ddr_w<1>));
-	map(0x0006, 0x0006).w(FUNC(m68705u_device::port_ddr_w<2>));
+	map(0x0000, 0x0000).rw(this, FUNC(m68705u_device::port_r<0>), FUNC(m68705u_device::port_latch_w<0>));
+	map(0x0001, 0x0001).rw(this, FUNC(m68705u_device::port_r<1>), FUNC(m68705u_device::port_latch_w<1>));
+	map(0x0002, 0x0002).rw(this, FUNC(m68705u_device::port_r<2>), FUNC(m68705u_device::port_latch_w<2>));
+	map(0x0003, 0x0003).rw(this, FUNC(m68705u_device::port_r<3>), FUNC(m68705u_device::port_latch_w<3>));
+	map(0x0004, 0x0004).w(this, FUNC(m68705u_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).w(this, FUNC(m68705u_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).w(this, FUNC(m68705u_device::port_ddr_w<2>));
 	// 0x0007 not used (port D is input only)
-	map(0x0008, 0x0008).rw(FUNC(m68705u_device::tdr_r), FUNC(m68705u_device::tdr_w));
-	map(0x0009, 0x0009).rw(FUNC(m68705u_device::tcr_r), FUNC(m68705u_device::tcr_w));
-	map(0x000a, 0x000a).rw(FUNC(m68705u_device::misc_r), FUNC(m68705u_device::misc_w));
-	map(0x000b, 0x000b).rw(FUNC(m68705u_device::pcr_r), FUNC(m68705u_device::pcr_w));
+	map(0x0008, 0x0008).rw(this, FUNC(m68705u_device::tdr_r), FUNC(m68705u_device::tdr_w));
+	map(0x0009, 0x0009).rw(this, FUNC(m68705u_device::tcr_r), FUNC(m68705u_device::tcr_w));
+	map(0x000a, 0x000a).rw(this, FUNC(m68705u_device::misc_r), FUNC(m68705u_device::misc_w));
+	map(0x000b, 0x000b).rw(this, FUNC(m68705u_device::pcr_r), FUNC(m68705u_device::pcr_w));
 	// 0x000c-0x000f not used
 	map(0x0010, 0x007f).ram();
-	map(0x0080, 0x0f38).rw(FUNC(m68705u_device::eprom_r<0x0080>), FUNC(m68705u_device::eprom_w<0x0080>)); // User EPROM
+	map(0x0080, 0x0f38).rw(this, FUNC(m68705u_device::eprom_r<0x0080>), FUNC(m68705u_device::eprom_w<0x0080>)); // User EPROM
 	// 0x0f39-0x0f7f not used
 	map(0x0f80, 0x0ff7).rom().region("bootstrap", 0);
-	map(0x0ff8, 0x0fff).rw(FUNC(m68705u_device::eprom_r<0x0ff8>), FUNC(m68705u_device::eprom_w<0x0ff8>)); // Interrupt vectors
+	map(0x0ff8, 0x0fff).rw(this, FUNC(m68705u_device::eprom_r<0x0ff8>), FUNC(m68705u_device::eprom_w<0x0ff8>)); // Interrupt vectors
 }
 
 m68705u_device::m68705u_device(
@@ -789,26 +789,26 @@ void m68705r_device::r_map(address_map &map)
 	map.global_mask(0x0fff);
 	map.unmap_value_high();
 
-	map(0x0000, 0x0000).rw(FUNC(m68705r_device::port_r<0>), FUNC(m68705r_device::port_latch_w<0>));
-	map(0x0001, 0x0001).rw(FUNC(m68705r_device::port_r<1>), FUNC(m68705r_device::port_latch_w<1>));
-	map(0x0002, 0x0002).rw(FUNC(m68705r_device::port_r<2>), FUNC(m68705r_device::port_latch_w<2>));
-	map(0x0003, 0x0003).rw(FUNC(m68705r_device::port_r<3>), FUNC(m68705r_device::port_latch_w<3>));
-	map(0x0004, 0x0004).w(FUNC(m68705r_device::port_ddr_w<0>));
-	map(0x0005, 0x0005).w(FUNC(m68705r_device::port_ddr_w<1>));
-	map(0x0006, 0x0006).w(FUNC(m68705r_device::port_ddr_w<2>));
+	map(0x0000, 0x0000).rw(this, FUNC(m68705r_device::port_r<0>), FUNC(m68705r_device::port_latch_w<0>));
+	map(0x0001, 0x0001).rw(this, FUNC(m68705r_device::port_r<1>), FUNC(m68705r_device::port_latch_w<1>));
+	map(0x0002, 0x0002).rw(this, FUNC(m68705r_device::port_r<2>), FUNC(m68705r_device::port_latch_w<2>));
+	map(0x0003, 0x0003).rw(this, FUNC(m68705r_device::port_r<3>), FUNC(m68705r_device::port_latch_w<3>));
+	map(0x0004, 0x0004).w(this, FUNC(m68705r_device::port_ddr_w<0>));
+	map(0x0005, 0x0005).w(this, FUNC(m68705r_device::port_ddr_w<1>));
+	map(0x0006, 0x0006).w(this, FUNC(m68705r_device::port_ddr_w<2>));
 	// 0x0007 not used (port D is input only)
-	map(0x0008, 0x0008).rw(FUNC(m68705r_device::tdr_r), FUNC(m68705r_device::tdr_w));
-	map(0x0009, 0x0009).rw(FUNC(m68705r_device::tcr_r), FUNC(m68705r_device::tcr_w));
-	map(0x000a, 0x000a).rw(FUNC(m68705r_device::misc_r), FUNC(m68705r_device::misc_w));
-	map(0x000b, 0x000b).rw(FUNC(m68705r_device::pcr_r), FUNC(m68705r_device::pcr_w));
+	map(0x0008, 0x0008).rw(this, FUNC(m68705r_device::tdr_r), FUNC(m68705r_device::tdr_w));
+	map(0x0009, 0x0009).rw(this, FUNC(m68705r_device::tcr_r), FUNC(m68705r_device::tcr_w));
+	map(0x000a, 0x000a).rw(this, FUNC(m68705r_device::misc_r), FUNC(m68705r_device::misc_w));
+	map(0x000b, 0x000b).rw(this, FUNC(m68705r_device::pcr_r), FUNC(m68705r_device::pcr_w));
 	// 0x000c-0x000d not used
-	map(0x000e, 0x000e).rw(FUNC(m68705r_device::acr_r), FUNC(m68705r_device::acr_w));
-	map(0x000f, 0x000f).rw(FUNC(m68705r_device::arr_r), FUNC(m68705r_device::arr_w));
+	map(0x000e, 0x000e).rw(this, FUNC(m68705r_device::acr_r), FUNC(m68705r_device::acr_w));
+	map(0x000f, 0x000f).rw(this, FUNC(m68705r_device::arr_r), FUNC(m68705r_device::arr_w));
 	map(0x0010, 0x007f).ram();
-	map(0x0080, 0x0f38).rw(FUNC(m68705r_device::eprom_r<0x0080>), FUNC(m68705r_device::eprom_w<0x0080>)); // User EPROM
+	map(0x0080, 0x0f38).rw(this, FUNC(m68705r_device::eprom_r<0x0080>), FUNC(m68705r_device::eprom_w<0x0080>)); // User EPROM
 	// 0x0f39-0x0f7f not used
 	map(0x0f80, 0x0ff7).rom().region("bootstrap", 0);
-	map(0x0ff8, 0x0fff).rw(FUNC(m68705r_device::eprom_r<0x0ff8>), FUNC(m68705r_device::eprom_w<0x0ff8>)); // Interrupt vectors
+	map(0x0ff8, 0x0fff).rw(this, FUNC(m68705r_device::eprom_r<0x0ff8>), FUNC(m68705r_device::eprom_w<0x0ff8>)); // Interrupt vectors
 }
 
 m68705r_device::m68705r_device(

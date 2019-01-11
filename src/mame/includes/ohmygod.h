@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 class ohmygod_state : public driver_device
 {
 public:
@@ -24,12 +22,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void ohmygod(machine_config &config);
-
 	void init_ohmygod();
 	void init_naname();
+	void ohmygod(machine_config &config);
 
-private:
+protected:
 	DECLARE_WRITE16_MEMBER(ohmygod_ctrl_w);
 	DECLARE_WRITE16_MEMBER(ohmygod_videoram_w);
 	DECLARE_WRITE16_MEMBER(ohmygod_spritebank_w);
@@ -44,6 +41,7 @@ private:
 	void ohmygod_map(address_map &map);
 	void oki_map(address_map &map);
 
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_spriteram;

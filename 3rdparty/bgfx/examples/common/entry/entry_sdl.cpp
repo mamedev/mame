@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -281,7 +281,6 @@ namespace entry
 			, m_width(0)
 			, m_height(0)
 			, m_flags(0)
-			, m_flagsEnabled(false)
 		{
 		}
 
@@ -291,7 +290,6 @@ namespace entry
 		uint32_t m_height;
 		uint32_t m_flags;
 		tinystl::string m_title;
-		bool m_flagsEnabled;
 	};
 
 	static uint32_t s_userEventStart;
@@ -301,7 +299,6 @@ namespace entry
 		SDL_USER_WINDOW_CREATE,
 		SDL_USER_WINDOW_DESTROY,
 		SDL_USER_WINDOW_SET_TITLE,
-		SDL_USER_WINDOW_SET_FLAGS,
 		SDL_USER_WINDOW_SET_POS,
 		SDL_USER_WINDOW_SET_SIZE,
 		SDL_USER_WINDOW_TOGGLE_FRAME,
@@ -488,8 +485,6 @@ namespace entry
 			WindowHandle defaultWindow = { 0 };
 			setWindowSize(defaultWindow, m_width, m_height, true);
 
-			SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
-
 			bx::FileReaderI* reader = NULL;
 			while (NULL == reader)
 			{
@@ -561,7 +556,7 @@ namespace entry
 								m_eventQueue.postMouseEvent(handle
 									, mev.x
 									, mev.y
-									, m_mz
+									, 0
 									, button
 									, mev.type == SDL_MOUSEBUTTONDOWN
 									);
@@ -808,18 +803,6 @@ namespace entry
 						}
 						break;
 
-					case SDL_DROPFILE:
-						{
-							const SDL_DropEvent& dev = event.drop;
-							WindowHandle handle = defaultWindow; //findHandle(dev.windowID);
-							if (isValid(handle) )
-							{
-								m_eventQueue.postDropFileEvent(handle, dev.file);
-								SDL_free(dev.file);
-							}
-						}
-						break;
-
 					default:
 						{
 							const SDL_UserEvent& uev = event.user;
@@ -831,13 +814,13 @@ namespace entry
 									Msg* msg = (Msg*)uev.data2;
 
 									m_window[handle.idx] = SDL_CreateWindow(msg->m_title.c_str()
-										, msg->m_x
-										, msg->m_y
-										, msg->m_width
-										, msg->m_height
-										, SDL_WINDOW_SHOWN
-										| SDL_WINDOW_RESIZABLE
-										);
+																, msg->m_x
+																, msg->m_y
+																, msg->m_width
+																, msg->m_height
+																, SDL_WINDOW_SHOWN
+																| SDL_WINDOW_RESIZABLE
+																);
 
 									m_flags[handle.idx] = msg->m_flags;
 
@@ -872,24 +855,6 @@ namespace entry
 									{
 										SDL_SetWindowTitle(m_window[handle.idx], msg->m_title.c_str() );
 									}
-									delete msg;
-								}
-								break;
-
-							case SDL_USER_WINDOW_SET_FLAGS:
-								{
-									WindowHandle handle = getWindowHandle(uev);
-									Msg* msg = (Msg*)uev.data2;
-
-									if (msg->m_flagsEnabled)
-									{
-										m_flags[handle.idx] |= msg->m_flags;
-									}
-									else
-									{
-										m_flags[handle.idx] &= ~msg->m_flags;
-									}
-
 									delete msg;
 								}
 								break;
@@ -1110,12 +1075,9 @@ namespace entry
 		sdlPostEvent(SDL_USER_WINDOW_SET_TITLE, _handle, msg);
 	}
 
-	void setWindowFlags(WindowHandle _handle, uint32_t _flags, bool _enabled)
+	void toggleWindowFrame(WindowHandle _handle)
 	{
-		Msg* msg = new Msg;
-		msg->m_flags = _flags;
-		msg->m_flagsEnabled = _enabled;
-		sdlPostEvent(SDL_USER_WINDOW_SET_FLAGS, _handle, msg);
+		sdlPostEvent(SDL_USER_WINDOW_TOGGLE_FRAME, _handle);
 	}
 
 	void toggleFullscreen(WindowHandle _handle)

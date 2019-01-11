@@ -14,7 +14,7 @@
         31/06/2009 Video - Robbbert
 
         29/10/2009 Update skeleton to functional machine
-                        by yo_fr       (jj.stac@aliceadsl.fr)
+                        by yo_fr       (jj.stac @ aliceadsl.fr)
 
                 => add Keyboard,
                 => add color,
@@ -24,19 +24,18 @@
                 => add BR/HR switching
                 => add bank switch for HRX
                 => add device MX80c and bank switching for the ROM
-        03/01/2010 Update and clean prog by yo_fr       (jj.stac @ aliceadsl.fr)
+        03/01/2010 Update and clean prog  by yo_fr       (jj.stac @ aliceadsl.fr)
                 => add the port mapping for keyboard
         28/09/2010 add the DISK II support by yo_fr      (jj.stac @ aliceadsl.fr)
-                => Note that the DISK II boots and loads CP/M, but CP/M doesn't yet work.
-        20/11/2010 : synchronization between uPD765 and Z80 is now OK, CP/M works. JJStacino
-        11/11/2011 : add the minidisk support (3.5" drive)  JJStacino
+                => Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
+        11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
         19/02/2012 : few adjustment for the hrp and hr machine - JJStacino
 
-    More information:
-    - http://dchector.free.fr/
-    - http://hectorvictor.free.fr/
+    don't forget to keep some information about these machines, see DChector project : http://dchector.free.fr/ made by DanielCoulom
+        (and thank's to Daniel!) and Yves site : http://hectorvictor.free.fr/ (thank's too Yves!)
 
-    TODO :  Add cartridge functionality,
+    TODO :  Add the cartridge function,
             Adjust the one shot and A/D timing (sn76477)
 */
 
@@ -44,7 +43,11 @@
 #include "includes/hec2hrp.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"      /* for K7 sound */
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
+#include "machine/upd765.h" /* for floppy disc controller */
+#include "sound/wave.h"      /* for K7 sound*/
+#include "sound/discrete.h"  /* for 1 Bit sound*/
 
 #include "speaker.h"
 
@@ -68,39 +71,40 @@ hec2mx40
 */
 
 /* Helper function*/
-int hec2hrp_state::has_disc2()
+int hec2hrp_state::isHectorWithDisc2()
 {
-	return ((strncmp(machine().system().name , "hec2hrx"  , 7)==0) ||
-			(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
-			(strncmp(machine().system().name , "hec2mx80" , 8)==0));
+return ((strncmp(machine().system().name , "hec2hrx"  , 7)==0) ||
+		(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
+		(strncmp(machine().system().name , "hec2mx80" , 8)==0));
 }
 
-int hec2hrp_state::has_minidisc()
+int hec2hrp_state::isHectorWithMiniDisc()
 {
-	return ((strncmp(machine().system().name , "hec2mdhrx", 9)==0));
+return ((strncmp(machine().system().name , "hec2mdhrx", 9)==0));
 }
 
-int hec2hrp_state::is_hr()
+int hec2hrp_state::isHectorHR()
 {
-	return ((strncmp(machine().system().name , "hec2hr"   , 6)==0) ||  //Aviable for hr & hrp
-			(strncmp(machine().system().name , "hec2mdhrx", 9)==0) ||
-			(strncmp(machine().system().name , "victor"   , 6)==0) ||
-			(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
-			(strncmp(machine().system().name , "hec2mx80" , 8)==0));
+return ((strncmp(machine().system().name , "hec2hr"   , 6)==0) ||  //Aviable for hr & hrp
+		(strncmp(machine().system().name , "hec2mdhrx", 9)==0) ||
+		(strncmp(machine().system().name , "victor"   , 6)==0) ||
+		(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
+		(strncmp(machine().system().name , "hec2mx80" , 8)==0));
 }
 
-int hec2hrp_state::is_extended()
+int hec2hrp_state::isHectoreXtend()
 {
-	return ((strncmp(machine().system().name , "hec2mdhrx", 9)==0) ||
-			(strncmp(machine().system().name , "hec2hrx"  , 7)==0) ||
-			(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
-			(strncmp(machine().system().name , "hec2mx80" , 8)==0));
+return ((strncmp(machine().system().name , "hec2mdhrx", 9)==0) ||
+		(strncmp(machine().system().name , "hec2hrx"  , 7)==0) ||
+		(strncmp(machine().system().name , "hec2mx40" , 8)==0) ||
+		(strncmp(machine().system().name , "hec2mx80" , 8)==0));
 }
 
 /* Cassette timer*/
-TIMER_CALLBACK_MEMBER(hec2hrp_state::cassette_clock)
+TIMER_CALLBACK_MEMBER(hec2hrp_state::Callback_CK)
 {
-	m_ck_signal++;
+/* To generate the CK signal (K7)*/
+	m_CK_signal++;
 }
 
 WRITE8_MEMBER( hec2hrp_state::minidisc_control_w )
@@ -122,100 +126,85 @@ WRITE8_MEMBER( hec2hrp_state::minidisc_control_w )
 	membank("bank2")->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC);
 }
 
-WRITE8_MEMBER(hec2hrp_state::switch_bank_w)
+WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 {
-	if (offset==0x00)
-	{
-		if (is_extended())
-		{
-			membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
-		}
-		if (m_flag_clk == 1)
-		{
-			m_flag_clk = 0;
-			m_maincpu->set_unscaled_clock(XTAL(5'000'000));
-		}
-	}
+	if (offset==0x00)   {   /* 0x800 et 0x000=> video page, HR*/
+							if (isHectoreXtend())
+								membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
+							if (m_flag_clk ==1)
+							{
+								m_flag_clk=0;
+								m_maincpu->set_unscaled_clock(XTAL(5'000'000));  /* increase CPU*/
+							}
+						}
+	if (offset==0x04)   {   /* 0x804 => video page, BR*/
+							m_hector_flag_hr=0;
+							if (isHectoreXtend())
+								membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
+							if (m_flag_clk ==0)
+							{
+								m_flag_clk=1;
+								m_maincpu->set_unscaled_clock(XTAL(1'750'000));  /* slowdown CPU*/
+							}
+						}
+	if (offset==0x08)   {   /* 0x808 => base page, HR*/
+							if (isHectoreXtend())
+								membank("bank1")->set_entry(HECTOR_BANK_PROG);
+							if (m_flag_clk ==1)
+							{
+								m_flag_clk=0;
+								m_maincpu->set_unscaled_clock(XTAL(5'000'000));  /* increase CPU*/
+							}
 
-	if (offset==0x04)
-	{
-		m_hector_flag_hr = 0;
-		if (is_extended())
-		{
-			membank("bank1")->set_entry(HECTOR_BANK_VIDEO);
-		}
-		if (m_flag_clk == 0)
-		{
-			m_flag_clk = 1;
-			m_maincpu->set_unscaled_clock(XTAL(1'750'000));
-		}
-	}
-
-	if (offset==0x08)
-	{
-		if (is_extended())
-		{
-			membank("bank1")->set_entry(HECTOR_BANK_PROG);
-		}
-		if (m_flag_clk == 1)
-		{
-			m_flag_clk = 0;
-			m_maincpu->set_unscaled_clock(XTAL(5'000'000));
-		}
-	}
-
-	if (offset == 0x0c)
-	{
-		m_hector_flag_hr = 0;
-		if (is_extended())
-		{
-			membank("bank1")->set_entry(HECTOR_BANK_PROG);
-		}
-		if (m_flag_clk == 0)
-		{
-			m_flag_clk = 1;
-			m_maincpu->set_unscaled_clock(XTAL(1'750'000));
-		}
-	}
+						}
+	if (offset==0x0c)   {   /* 0x80c => base page, BR*/
+							m_hector_flag_hr=0;
+							if (isHectoreXtend())
+								membank("bank1")->set_entry(HECTOR_BANK_PROG);
+							if (m_flag_clk ==0)
+							{
+								m_flag_clk=1;
+								m_maincpu->set_unscaled_clock(XTAL(1'750'000));  /* slowdown CPU*/
+							}
+						}
 }
 
-WRITE8_MEMBER(hec2hrp_state::keyboard_w)
+WRITE8_MEMBER(hec2hrp_state::hector_keyboard_w)
 {
-	/* nothing to do (read function manages the value) */
+	/*nothing to do => read function manage the value*/
 }
 
-READ8_MEMBER(hec2hrp_state::keyboard_r)
+READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 {
 	uint8_t data = 0xff;
 
-	if (offset == 7) /* Only when reading joystick */
+	if (offset ==7) /* Only when joy reading*/
 	{
-		/* Read special key for analog joystick emulation only (button and pot are analog signals), and reset */
+		/* Read special key for analog joystick emulation only (button and pot are analog signal!) and the reset */
 		data=m_keyboard[8]->read();
 
-		if (data & 0x01) /* Reset machine */
+		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
 			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-			if (is_hr())
+			if (isHectorHR()) /* aviable for HR and up */
 			{
-				m_hector_flag_hr = 1;
-				if (is_extended())
-				{
-					membank("bank1")->set_entry(HECTOR_BANK_PROG);
-					membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
-				}
+				m_hector_flag_hr=1;
+				if (isHectoreXtend())
+					{
+						membank("bank1")->set_entry(HECTOR_BANK_PROG);
+						membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
+					}
 				//RESET DISC II unit
-				if (has_disc2())
+				if (isHectorWithDisc2() )
 					hector_disc2_reset();
 
 				/* floppy md master reset */
-				if (has_minidisc())
+				if (isHectorWithMiniDisc())
 					m_minidisc_fdc->reset();
 			}
-			else
-			{
-				m_hector_flag_hr=0;
-			}
+
+			else /* aviable for BR machines */
+			m_hector_flag_hr=0;
 
 
 		/*Common flag*/
@@ -249,30 +238,28 @@ READ8_MEMBER(hec2hrp_state::keyboard_r)
 		if (m_pot1>250) m_pot1 = 0;
 	}
 
-	/* in all case return the requested value */
+	/* in all case return the request value*/
 	return m_keyboard[offset]->read();
 }
 
-WRITE8_MEMBER(hec2hrp_state::sn_2000_w)
+WRITE8_MEMBER(hec2hrp_state::hector_sn_2000_w)
 {
-	update_state(0x2000+ offset, data);
-	update_sound(space, data);
+	Mise_A_Jour_Etat(0x2000+ offset, data);
+	Update_Sound(space, data);
 }
-
-WRITE8_MEMBER(hec2hrp_state::sn_2800_w)
+WRITE8_MEMBER(hec2hrp_state::hector_sn_2800_w)
 {
-	update_state(0x2800+ offset, data);
-	update_sound(space, data);
+	Mise_A_Jour_Etat(0x2800+ offset, data);
+	Update_Sound(space, data);
 }
-
-READ8_MEMBER(hec2hrp_state::cassette_r)
+READ8_MEMBER(hec2hrp_state::hector_cassette_r)
 {
 	double level;
-	uint8_t value = 0;
+	uint8_t value=0;
 
-	if ((m_state3000 & 0x38) != 0x38 )
+	if ((m_state3000 & 0x38) != 0x38 )   /* Selon Sb choix cassette ou timer (74153)*/
 	{
-		m_data_k7 =  0x00;  /* No cassette => clear bit*/
+		m_Data_K7 =  0x00;  /* No cassette => clear bit*/
 		switch (m_state3000 & 0x38 )
 		{
 			case 0x08: value = (m_actions & 1) ? 0x80 : 0; break;
@@ -286,40 +273,42 @@ READ8_MEMBER(hec2hrp_state::cassette_r)
 	{
 		if (m_write_cassette == 0)
 		{
+			/* Accee a la cassette*/
 			level = m_cassette->input();
 
+			/* Travail du 741 en trigger*/
 			if  (level < -0.08)
 				m_cassette_bit = 0x00;
 			if (level > +0.08)
 				m_cassette_bit = 0x01;
 		}
-
+		/* Programme du sn7474 (bascule) : Changement ??tat bit Data K7 ?? chaque front montant de m_cassette_bit*/
 		if ((m_cassette_bit != m_cassette_bit_mem) && (m_cassette_bit !=0))
 		{
-			if (m_data_k7 == 0x00)
-				m_data_k7 =  0x80;
+			if (m_Data_K7 == 0x00)
+				m_Data_K7 =  0x80;/* En poids fort*/
 			else
-				m_data_k7 =  0x00;
+				m_Data_K7 =  0x00;
 		}
-		value = ( m_ck_signal & 0x7F ) + m_data_k7;
-		m_cassette_bit_mem = m_cassette_bit;
+		value = ( m_CK_signal & 0x7F ) + m_Data_K7;
+		m_cassette_bit_mem = m_cassette_bit;  /* Memorisation etat bit cassette*/
 	}
 	return value;
 }
-WRITE8_MEMBER(hec2hrp_state::sn_3000_w)
+WRITE8_MEMBER(hec2hrp_state::hector_sn_3000_w)
 {
 	m_state3000 = data & 0xf8; /* except bit 0 to 2*/
 	if ((data & 7) != m_oldstate3000 )
 	{
 		/* Update sn76477 only when necessary!*/
-		update_state(0x3000, data & 7 );
-		update_sound(space, data & 7);
+		Mise_A_Jour_Etat(0x3000, data & 7 );
+		Update_Sound(space, data & 7);
 	}
 	m_oldstate3000 = data & 7;
 }
 
 /* Color Interface */
-WRITE8_MEMBER(hec2hrp_state::color_a_w)
+WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 {
 	if (data & 0x40)
 	{
@@ -367,8 +356,9 @@ WRITE8_MEMBER(hec2hrp_state::color_a_w)
 	m_oldstate1000=data; /* For next step*/
 }
 
-WRITE8_MEMBER(hec2hrp_state::color_b_w)
+WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 {
+	discrete_device *discrete = machine().device<discrete_device>("discrete");
 	m_hector_color[1] =  data        & 0x07;
 	m_hector_color[3] = (data >> 3)  & 0x07;
 
@@ -376,7 +366,7 @@ WRITE8_MEMBER(hec2hrp_state::color_b_w)
 	if (data & 0x40) m_hector_color[2] |= 8; else m_hector_color[2] &= 7;
 
 	/* Play bit*/
-	m_discrete->write(NODE_01,  (data & 0x80) ? 0:1 );
+	discrete->write(space, NODE_01,  (data & 0x80) ? 0:1 );
 }
 
 
@@ -385,7 +375,7 @@ WRITE8_MEMBER(hec2hrp_state::color_b_w)
 ********************************************************************************/
 
 /*******************  READ PIO 8255 *******************/
-READ8_MEMBER(hec2hrp_state::io_8255_r)
+READ8_MEMBER(hec2hrp_state::hector_io_8255_r)
 {
 	/* 8255 in mode 0 */
 	uint8_t data =0;
@@ -432,7 +422,7 @@ READ8_MEMBER(hec2hrp_state::io_8255_r)
 
 /*******************  WRITE PIO 8255 *******************/
 
-WRITE8_MEMBER(hec2hrp_state::io_8255_w)
+WRITE8_MEMBER(hec2hrp_state::hector_io_8255_w)
 {
 	/* 8255 in mode 0 */
 	if ((offset & 0x3) == 0x0) /* Port A => to printer or Disc II*/
@@ -440,12 +430,16 @@ WRITE8_MEMBER(hec2hrp_state::io_8255_w)
 		m_hector_port_a = data;
 		/* Port A => to printer*/
 		/*  Caution : The strobe connection to the printer seems not be used
-		So, everything sent to the Disc2 unit will be printed too! */
+		So, all what is send to the Disc2 unit will be printed too! */
 
-		if (BIT(m_hector_port_c_l, 0)) // PC0 (bit 0) = strobe printer
-		{
-			m_printer->output(m_hector_port_a);
+		if (BIT(m_hector_port_c_l, 0)) {        // PC0 (bit X0)= strobe printer !
+			printer_image_device *printer = machine().device<printer_image_device>("printer");
+			printer->output(m_hector_port_a);
 		}
+
+#ifdef DEBUG_TRACE_COM_HECTOR
+		printf("\nEcriture data par Hector %x (dans portA)",data);
+#endif
 	}
 
 	if ((offset & 0x3) == 0x1) /* Port B */
@@ -454,31 +448,39 @@ WRITE8_MEMBER(hec2hrp_state::io_8255_w)
 
 	if ((offset & 0x3) == 0x2) /* Port C => depending cmd word */
 	{
-		if (!BIT(m_hector_port_cmd, 0))
+		if (!BIT(m_hector_port_cmd, 0))  /* cmd -> Quartet inf en sortie ?*/
 		{
 			m_hector_port_c_l = data & 0x0f;
-			// Utilizing bits port C : PC0 for the printer : strobe
-			if (BIT(m_hector_port_c_l, 0))        // PC0 (bit 0) = true
+			// Utilizing bits port C : PC0 for the printer : strobe!
+			if (BIT(m_hector_port_c_l  , 0))        // PC0 (bit X0)= true
 			{
-				/* Port A goes to the printer */
+				/* Port A => to printer*/
+				//printer_output(machine().device("printer"), m_hector_port_a);
 			}
 			// Utilizing bits port C : PC1 // PC2  for the communication with disc2
-			if (!BIT(m_hector_port_c_l, 1))       // PC1 (bit 1) = true
+			if (!BIT(m_hector_port_c_l  , 1))       // PC1 (bit X1)= true
 			{
-				m_hector_port_b = m_hector_disc2_data_write;
+				// Lecture effectuee => RAZ memoire donnee m_hector_disc2_data_write dispo
+				m_hector_port_b = m_hector_disc2_data_write; // Mep sur port B si 2eme 74374 existant !
 				m_hector_disc2_data_w_ready = 0x00;
+				#ifdef DEBUG_TRACE_COM_HECTOR
+					printf("\nEcriture port B vers m_hector_disc2_data_write suite a PC1");
+				#endif
 			}
-			if (!BIT(m_hector_port_c_l, 2))     // PC2 (bit 2) = true
+			if (!BIT(m_hector_port_c_l, 2))     // PC2 (bit X2)= true
 			{
-				m_hector_disc2_data_read = m_hector_port_a;
-				m_hector_disc2_data_r_ready = 0x08;
+				m_hector_disc2_data_read = m_hector_port_a; /* mise en place de l'info presente sur le port A */
+				m_hector_disc2_data_r_ready = 0x08;      /* memorisation de l'info */
+				#ifdef DEBUG_TRACE_COM_HECTOR
+					printf("\nEcriture port A pour m_hector_disc2_data_read suite a PC2");
+				#endif
 			}
 		}
-		if (!BIT(m_hector_port_cmd, 3))
+		if (!BIT(m_hector_port_cmd, 3))  /* cmd -> Quartet sup en sortie ?*/
 			m_hector_port_c_h = (data & 0xf0);
 	}
 
-	if ((offset & 0x3) == 0x3) /* command */
+	if ((offset & 0x3) == 0x3) /* Port commande */
 	{
 		m_hector_port_cmd = data;
 	}
@@ -486,10 +488,10 @@ WRITE8_MEMBER(hec2hrp_state::io_8255_w)
 /* End of 8255 managing */
 
 
-/*******************  PIO write handler for MX40 *******************/
-WRITE8_MEMBER(hec2hrp_state::mx40_io_port_w)
+/*******************  Ecriture PIO specifique machine MX40 *******************/
+WRITE8_MEMBER(hec2hrp_state::hector_mx40_io_port_w)
 {
-	/* Bank switching on several address */
+/* Bank switching on several address */
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
 		membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 	if ((offset &0x0ff) == 0x41) /* Port page 1*/
@@ -503,8 +505,8 @@ WRITE8_MEMBER(hec2hrp_state::mx40_io_port_w)
 		m_hector_flag_80c=0;/* No 80c in 40c !*/
 }
 
-/*******************  PIO write handlerfor MX80 *******************/
-WRITE8_MEMBER(hec2hrp_state::mx80_io_port_w)
+/*******************  Ecriture PIO specifique machine MX80 *******************/
+WRITE8_MEMBER(hec2hrp_state::hector_mx80_io_port_w)
 {
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
 		membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
@@ -513,259 +515,271 @@ WRITE8_MEMBER(hec2hrp_state::mx80_io_port_w)
 		membank("bank2")->set_entry(HECTORMX_BANK_PAGE1);
 		m_hector_flag_80c=0;
 	}
-	if ((offset &0x0ff) == 0x42) /* Port page 2  => different port on MX40 */
+	if ((offset &0x0ff) == 0x42) /* Port page 2  => port different du MX40*/
 		membank("bank2")->set_entry(HECTORMX_BANK_PAGE2);
 	if ((offset &0x0ff) == 0x49) /* Port screen resolution*/
 		m_hector_flag_80c=1;
 }
 
 /********************************************************************************
- sound management
+ sound managment
 ********************************************************************************/
 
-void hec2hrp_state::update_state(int Adresse, int Value )
+void hec2hrp_state::Mise_A_Jour_Etat(int Adresse, int Value )
 {
 /* Adjust value depending on I/O main CPU request*/
 switch(Adresse )
 {
 	case 0x2000:
-	{
-		m_au[ 0] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[ 8] =  ((Value & 0x040 )==0) ? 0 : 1 ;
-		break;
-	}
-
+		/* Modification AU0 / AU8*/
+		{   /* AU0*/
+			m_AU[ 0] =  ((Value & 0x080 )==0) ? 0 : 1 ;
+			/* AU8 : 0*/
+			m_AU[ 8] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+			break;
+		}
 	case 0x2001:
-	{
-		m_au[ 1] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[ 9] =  ((Value & 0x040 )==0) ? 0 : 1 ;
-		break;
-	}
-
+		/* Modification AU1 / AU9*/
+		{   /* AU1*/
+			m_AU[ 1] =  ((Value & 0x080 )==0) ? 0 : 1 ;
+			/* AU9*/
+			m_AU[ 9] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+			break;
+		}
 	case 0x2002:
-	{
-		m_au[ 2] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[10] =  ((Value & 0x040 )==0) ? 0 : 1 ;
-		break;
-	}
-
+		/* Modification AU2 / AU10*/
+		{   /* AU2*/
+			m_AU[ 2] =  ((Value & 0x080 )==0) ? 0 : 1 ;
+			/* AU10*/
+			m_AU[10] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+			break;
+		}
 	case 0x2003:
-	{
-		m_au[ 3] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[11] =  ((Value & 0x040 )==0) ? 0 : 1 ;
-		break;
-	}
-
+		/* Modification AU3 / AU11*/
+		{   /* AU3*/
+			m_AU[ 3] =  ((Value & 0x080 )==0) ? 0 : 1 ;
+			/* AU11*/
+			m_AU[11] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+			break;
+		}
 	case 0x2800:
-	{
-		m_au[ 4] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[12] =  ((Value & 0x040 )==0) ? 0 : 1 ;
-		break;
-	}
-
+		/* Modification AU4 / AU12*/
+		{   /* AU4*/
+			m_AU[ 4] =  ((Value & 0x080 )==0) ? 0 : 1 ;
+			/* AU8*/
+			m_AU[12] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+			break;
+		}
 	case 0x2801:
-	{
-		m_au[ 5] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[13] =  ((Value & 0x040 )==0) ? 0 : 1 ;
-		break;
-	}
-
+		/* Modification AU5 / AU13*/
+		{   /* AU5*/
+			m_AU[ 5] =  ((Value & 0x080 )==0) ? 0 : 1 ;
+			/* AU13*/
+			m_AU[13] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+			break;
+		}
 	case 0x2802:
-	{
-		m_au[ 6] = ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[14] = ((Value & 0x040 )==0) ? 0 : 1 ;
-		break;
-	}
-
+		{   /* Modification AU6 / AU14*/
+			/* AU6*/
+			m_AU[ 6] = ((Value & 0x080 )==0) ? 0 : 1 ;
+			/* AU14*/
+			m_AU[14] = ((Value & 0x040 )==0) ? 0 : 1 ;
+			break;
+		}
 	case 0x2803:
-	{
-		m_au[ 7] =  ((Value & 0x080 )==0) ? 0 : 1 ;
-		m_au[15] =  ((Value & 0x040 )==0) ? 0 : 1 ;
-		break;
-	}
-
+		/* Modification AU7 / AU15*/
+		{   /* AU7*/
+			m_AU[ 7] =  ((Value & 0x080 )==0) ? 0 : 1 ;
+			/* AU15*/
+			m_AU[15] =  ((Value & 0x040 )==0) ? 0 : 1 ;
+			break;
+		}
 	case 0x3000:
-	{
-		m_val_mixer = (Value & 7) ;
-		break;
-	}
+		/* Mixer modification*/
+		{
+			m_ValMixer = (Value & 7) ;
+			break;
+		}
 	default: break;
-}
+} /*switch*/
 }
 
 
-void hec2hrp_state::init_sn76477()
+void hec2hrp_state::Init_Value_SN76477_Hector()
 {
-	/* R/C value setup */
+	/* Remplissage des valeurs de resistance et capacite d'Hector*/
 
-	/* decay resistors */
-	m_pin_value[7][1] = RES_K(680.0); /*680K  */
-	m_pin_value[7][0] = RES_K(252.325); /* 142.325 (680 // 180KOhm)*/
+	/* Decay R*/
+	m_Pin_Value[7][1] = RES_K(680.0); /*680K  */
+		m_Pin_Value[7][0] = RES_K(252.325); /* 142.325 (680 // 180KOhm)*/
 
-	/* attack/decay capacitors */
-	m_pin_value[8][0] = CAP_U(0.47); /* 0.47uf*/
-	m_pin_value[8][1] = CAP_U(1.47);  /* 1.47*/
+	/* Capa A/D*/
+	m_Pin_Value[8][0] = CAP_U(0.47); /* 0.47uf*/
+	m_Pin_Value[8][1] = CAP_U(1.47);  /* 1.47*/
 
-	/* attack resistors */
-	m_pin_value[10][1]= RES_K(180.0);   /* 180*/
-	m_pin_value[10][0]= RES_K(32.054); /* 32.054 (180 // 39 KOhm)*/
+	/* ATTACK R*/
+	m_Pin_Value[10][1]= RES_K(180.0);   /* 180*/
+	m_Pin_Value[10][0]= RES_K(32.054); /* 32.054 (180 // 39 KOhm)*/
 
-	/* Version 3 : Frequency measurement adjustment:
+	/* Version 3 : Ajuste pour les frequences mesurees :
 	            // 4  0 SOUND 255 Hz => ajuste a l'oreille
 	            // 4  4 SOUND  65 Hz => ajuste a l'oreille
 	            // 4  8 SOUND  17 Hz =>  ajuste a l'oreille
 	            // 4 12 SOUND 4,3 Hz =>  ajuste a l'oreille*/
 	/*   SLF C       Version 3*/
-	m_pin_value[21][0]= CAP_U(0.1);  /*CAPU(0.1) */
-	m_pin_value[21][1]= CAP_U(1.1);  /*1.1*/
+	m_Pin_Value[21][0]= CAP_U(0.1);  /*CAPU(0.1) */
+	m_Pin_Value[21][1]= CAP_U(1.1);  /*1.1*/
 
-	/* SLF R        Version 3*/
-	m_pin_value[20][1]= RES_K(180);    //180 (based on visual inspection of the resistor)
-	m_pin_value[20][0]= RES_K(37.268); // 37.268 (47//180 KOhms)
+	/*SLF R        Version 3*/
+	m_Pin_Value[20][1]= RES_K(180);    //180 vu
+	m_Pin_Value[20][0]= RES_K(37.268); //37.268 (47//180 KOhms)
 
 	/* Capa VCO*/
-	/* Version 3 : Frequency measurement adjustment:
+	/* Version 3 : Ajust?? pour les frequences mesur??es :
 	        // 0 0  SOUND 5,5KHz => 5,1KHz
 	        // 0 16 SOUND 1,3KHz => 1,2KHz
 	        // 0 32 SOUND 580Hz  => 570Hz
 	        // 0 48 SOUND 132Hz  => 120Hz*/
-	m_pin_value[17][0] = CAP_N(47.0) ;  /* measured */
-	m_pin_value[17][1] = CAP_N(580.0) ; /* measured */
+	m_Pin_Value[17][0] = CAP_N(47.0) ;  /*47,0 mesure ok */
+	m_Pin_Value[17][1] = CAP_N(580.0) ; /*580  mesure ok */
 	/* R VCO   Version 3*/
-	m_pin_value[18][1] = RES_K(1400.0   );/* Measured 1300, instead of 1Mohm*/
-	m_pin_value[18][0] = RES_K( 203.548 );/* Measured 223, instead of 193.548 (1000 // 240KOhm)*/
+	m_Pin_Value[18][1] = RES_K(1400.0   );/*1300 mesure ok    // au lieu de 1Mohm*/
+	m_Pin_Value[18][0] = RES_K( 203.548 );/*223  mesure ok    // au lieu de 193.548 (1000 // 240KOhm)*/
 
 	/* VCO Controle*/
-	m_pin_value[16][0] = 0.0;  /* Volts  */
-	m_pin_value[16][1] = 1.41; /* 2 =  10/15th of 5V*/
+	m_Pin_Value[16][0] = 0.0;  /* Volts  */
+	m_Pin_Value[16][1] = 1.41; /* 2 =  10/15eme de 5V*/
 
 	/* Pitch*/
-	m_pin_value[19][0] = 0.0;   /*Volts */
-	m_pin_value[19][1] = 1.41;
+	m_Pin_Value[19][0] = 0.0;   /*Volts */
+	m_Pin_Value[19][1] = 1.41;
 
-	m_pin_value[22][0] = 0; /* TOR */
-	m_pin_value[22][1] = 1;
+	m_Pin_Value[22][0] = 0; /* TOR */
+	m_Pin_Value[22][1] = 1;
 
-	/* One-shot resistor */
-	m_pin_value[24][1] = RES_K(100);
-	m_pin_value[24][0] = RES_K(1000);  /* infinite on Hector due to lack of connection */
+	/* R OneShot*/
+	m_Pin_Value[24][1] = RES_K(100);
+		m_Pin_Value[24][0] = RES_K(1000);  /*RES_M(1) infini sur Hector car non connectee*/
 
-	/* One-shot capacitor */
-	m_pin_value[23][0] = 1.0;
-	m_pin_value[23][1] = 0.0;  /* bogus value on Hector, as +5V lacks a capacitor */
+	/* Capa OneShot*/
+	m_Pin_Value[23][0] = 1.0;
+	m_Pin_Value[23][1] = 0.0;  /* Valeur Bidon sur Hector car mise au 5Volts sans capa*/
 
 	/* Enabled*/
-	m_pin_value[9][0] = 0;
-	m_pin_value[9][1] = 1;
+	m_Pin_Value[9][0] = 0;
+	m_Pin_Value[9][1] = 1;
 
 	/* Volume*/
-	m_pin_value[11][0] = 128;
-	m_pin_value[11][1] = 255;
+	m_Pin_Value[11][0] = 128; /* Rapport 50% et 100%  128*/
+	m_Pin_Value[11][1] = 255; /*                      255*/
 
 	/* Noise filter*/
-	m_pin_value[6][0] = CAP_U(0.390);    /* 0.390*/
-	m_pin_value[6][1] = CAP_U(08.60);    /* 0.48*/
+	m_Pin_Value[6][0] = CAP_U(0.390);    /* 0.390*/
+	m_Pin_Value[6][1] = CAP_U(08.60);    /* 0.48*/
 
-	/* Values from schematic */
-	m_pin_value[5][1] = RES_K(3.30 ) ;   /* 330Kohm*/
-	m_pin_value[5][0] = RES_K(1.76 ) ;   /* 76 Kohm*/
+	/* Valeur corrige par rapport au schema :*/
+	m_Pin_Value[5][1] = RES_K(3.30 ) ;   /* 330Kohm*/
+	m_Pin_Value[5][0] = RES_K(1.76 ) ;   /* 76 Kohm*/
 
-	/* Noise is not controlled by the audio bus! */
-	/* Only value[0] is documented! */
-	m_pin_value[4][0] = RES_K(47) ;      /* 47 K ohm*/
-	m_pin_value[12][0] = RES_K(100);     /* 100K ohm*/
-	m_pin_value[3][0] = 0 ;              /* NC*/
+	/* Noise pas commande par le bus audio !*/
+		/* Seule la valeur [0] est documentee !*/
+	m_Pin_Value[4][0] = RES_K(47) ;      /* 47 K ohm*/
+	m_Pin_Value[12][0] = RES_K(100);     /* 100K ohm*/
+	m_Pin_Value[3][0] = 0 ;              /* NC*/
 
-	/* Envelope-related */
-	m_pin_value[ 1][0] = 0;
-	m_pin_value[ 1][1] = 1;
+	/* Gestion du type d'enveloppe*/
+	m_Pin_Value[ 1][0] = 0;
+	m_Pin_Value[ 1][1] = 1;
 
-	m_pin_value[28][0] = 0;
-	m_pin_value[28][1] = 1;
+	m_Pin_Value[28][0] = 0;
+	m_Pin_Value[28][1] = 1;
 
-	/* SN pins initialized to 0 */
-	m_au[0]=0;
-	m_au[1]=0;
-	m_au[2]=0;
-	m_au[3]=0;
-	m_au[4]=0;
-	m_au[5]=0;
-	m_au[6]=0;
-	m_au[7]=0;
-	m_au[8]=0;
-	m_au[9]=0;
-	m_au[10]=0;
-	m_au[11]=0;
-	m_au[12]=0;
-	m_au[13]=0;
-	m_au[14]=0;
-	m_au[15]=0;
-	m_val_mixer = 0;
+	/* Initialisation a 0 des pin du SN*/
+	m_AU[0]=0;
+	m_AU[1]=0;
+	m_AU[2]=0;
+	m_AU[3]=0;
+	m_AU[4]=0;
+	m_AU[5]=0;
+	m_AU[6]=0;
+	m_AU[7]=0;
+	m_AU[8]=0;
+	m_AU[9]=0;
+	m_AU[10]=0;
+	m_AU[11]=0;
+	m_AU[12]=0;
+	m_AU[13]=0;
+	m_AU[14]=0;
+	m_AU[15]=0;
+	m_ValMixer = 0;
 }
 
-void hec2hrp_state::update_sound(address_space &space, uint8_t data)
+void hec2hrp_state::Update_Sound(address_space &space, uint8_t data)
 {
-	/* MIXER */
-	m_sn->mixer_a_w(((m_val_mixer & 0x04)==4) ? 1 : 0);
-	m_sn->mixer_b_w(((m_val_mixer & 0x01)==1) ? 1 : 0);
-	m_sn->mixer_c_w(((m_val_mixer & 0x02)==2) ? 1 : 0); /* Measured on HRX*/
+	/* keep device*/
+	/* MIXER*/
+	m_sn->mixer_a_w(((m_ValMixer & 0x04)==4) ? 1 : 0);
+	m_sn->mixer_b_w(((m_ValMixer & 0x01)==1) ? 1 : 0);
+	m_sn->mixer_c_w(((m_ValMixer & 0x02)==2) ? 1 : 0);/* Revu selon mesure electronique sur HRX*/
 
-	/* VCO oscillator */
-	if (m_au[12]==1)
-		m_sn->vco_res_w(m_pin_value[18][m_au[10]]/12.0); /* no AU11 */
+	/* VCO oscillateur*/
+	if (m_AU[12]==1)
+		m_sn->vco_res_w(m_Pin_Value[18][m_AU[10]]/12.0); /* en non AU11*/
 	else
-		m_sn->vco_res_w(m_pin_value[18][m_au[10]]); /* no AU11 */
+		m_sn->vco_res_w(m_Pin_Value[18][m_AU[10]]); /* en non AU11*/
 
-	m_sn->vco_cap_w(m_pin_value[17][m_au[2 ]]);
-	m_sn->pitch_voltage_w(m_pin_value[19][m_au[15]]);
-	m_sn->vco_voltage_w(m_pin_value[16][m_au[15]]);
-	m_sn->vco_w(m_pin_value[22][m_au[12]]); /* VCO Select Ext/SLF */
+	m_sn->vco_cap_w(m_Pin_Value[17][m_AU[2 ]]);
+	m_sn->pitch_voltage_w(m_Pin_Value[19][m_AU[15]]);
+	m_sn->vco_voltage_w(m_Pin_Value[16][m_AU[15]]);
+	m_sn->vco_w(m_Pin_Value[22][m_AU[12]]); /* VCO Select Ext/SLF*/
 
-	/* SLF */
-	m_sn->slf_res_w(m_pin_value[20][m_au[ 9]]); /* AU10 */
-	m_sn->slf_cap_w(m_pin_value[21][m_au[1 ]]);
+	/* SLF*/
+	m_sn->slf_res_w(m_Pin_Value[20][m_AU[ 9]]);/*AU10*/
+	m_sn->slf_cap_w(m_Pin_Value[21][m_AU[1 ]]);
 
-	/* One Shot */
-	m_sn->one_shot_res_w(m_pin_value[24][     0]); /* NC */
-	m_sn->one_shot_cap_w(m_pin_value[23][m_au[13]]);
+	/* One Shot*/
+	m_sn->one_shot_res_w(m_Pin_Value[24][     0]); /* NC*/
+	m_sn->one_shot_cap_w(m_Pin_Value[23][m_AU[13]]);
 
-	/* amplitude value*/
-	m_sn->amplitude_res_w(m_pin_value[11][m_au[5]]);
+	/* Ampli value*/
+	m_sn->amplitude_res_w(m_Pin_Value[11][m_AU[5]]);
 
-	/* attack/decay */
-	m_sn->attack_res_w(m_pin_value[10][m_au[ 8]]);
-	m_sn->decay_res_w(m_pin_value[7 ][m_au[11]]);
-	m_sn->attack_decay_cap_w(m_pin_value[8][m_au[0]]);
+	/* Attack / Decay*/
+	m_sn->attack_res_w(m_Pin_Value[10][m_AU[ 8]]);
+	m_sn->decay_res_w(m_Pin_Value[7 ][m_AU[11]]);/*AU9*/
+	m_sn->attack_decay_cap_w(m_Pin_Value[8][m_AU[0]]);
 
-	/* filter */
-	m_sn->noise_filter_res_w(m_pin_value[5][m_au[4]]);
-	m_sn->noise_filter_cap_w(m_pin_value[6][m_au[3]]);
+	/* Filtre*/
+	m_sn->noise_filter_res_w(m_Pin_Value[5][m_AU[4]]);
+	m_sn->noise_filter_cap_w(m_Pin_Value[6][m_AU[3]]);
 
-	/* external noise clock */
-	m_sn->noise_clock_res_w(m_pin_value[4][0]);
-	m_sn->feedback_res_w(m_pin_value[12][0]);
+	/* Clock Extern Noise*/
+	m_sn->noise_clock_res_w(m_Pin_Value[4][0]);   /* fix*/
+	m_sn->feedback_res_w(m_Pin_Value[12][0]);     /*fix*/
 
-	/* envelope */
-	m_sn->envelope_1_w(m_pin_value[1 ][m_au[6]]);
-	m_sn->envelope_2_w(m_pin_value[28][m_au[7]]);
+	/*  Envelope*/
+	m_sn->envelope_1_w(m_Pin_Value[1 ][m_AU[6]]);
+	m_sn->envelope_2_w(m_Pin_Value[28][m_AU[7]]);
 
-	/* finally, enable */
-	m_sn->enable_w(m_pin_value[9][m_au[14]]);
+	/* En dernier on lance (ou pas !)*/
+	m_sn->enable_w(m_Pin_Value[9][m_AU[14]]);
 }
 
-void hec2hrp_state::hector_reset(int hr, int with_d2)
+void hec2hrp_state::hector_reset(int hr, int with_D2 )
 {
-	// Hector init
+	// Initialization Hector
 	m_hector_flag_hr = hr;
 	m_flag_clk = 0;
 	m_write_cassette = 0;
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
-	// Disc II init
-	if (with_d2 == 1)
+	// Initialization Disc II
+	if (with_D2==1)
+
 	{
+		upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 		m_disc2cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_upd_fdc->reset();
+		fdc->reset();
 	}
 }
 
@@ -773,11 +787,12 @@ void hec2hrp_state::hector_init()
 {
 	m_pot0 = m_pot1 = 0x40;
 
-	/* for cassette sync */
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hec2hrp_state::cassette_clock),this));
-	m_cassette_timer->adjust(attotime::from_msec(100), 0, attotime::from_usec(64));/* => real sync scan speed for 15,624Khz*/
+	/* For Cassette synchro*/
+	m_Cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hec2hrp_state::Callback_CK),this));
+	m_Cassette_timer->adjust(attotime::from_msec(100), 0, attotime::from_usec(64));/* => real synchro scan speed for 15,624Khz*/
 
-	init_sn76477();  /* init R/C values */
+	/* Sound sn76477*/
+	Init_Value_SN76477_Hector();  /*init R/C value*/
 }
 
 
@@ -788,148 +803,156 @@ static DISCRETE_SOUND_START( hec2hrp_discrete )
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
 
-void hec2hrp_state::hector_audio(machine_config &config)
-{
+MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(0, "mono", 0.25);  /* Sound level for cassette, as it is in mono => output channel=0*/
+	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);  /* Sound level for cassette, as it is in mono => output channel=0*/
 
-	SN76477(config, m_sn);
-	m_sn->set_noise_params(RES_K(47), RES_K(330), CAP_P(390));
-	m_sn->set_decay_res(RES_K(680));
-	m_sn->set_attack_params(CAP_U(47), RES_K(180));
-	m_sn->set_amp_res(RES_K(33));
-	m_sn->set_feedback_res(RES_K(100));
-	m_sn->set_vco_params(2, CAP_N(47), RES_K(1000));
-	m_sn->set_pitch_voltage(2);
-	m_sn->set_slf_params(CAP_U(0.1), RES_K(180));
-	m_sn->set_oneshot_params(CAP_U(1.00001), RES_K(10000));
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.1);
+	MCFG_DEVICE_ADD("sn76477", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_K(680))                  // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(47), RES_K(180))   // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(33))                     // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(100))               // feedback_res
+	MCFG_SN76477_VCO_PARAMS(2, CAP_N(47), RES_K(1000))  // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(2)                       // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_K(180))     // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(1.00001), RES_K(10000))   // oneshot caps + res
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	DISCRETE(config, m_discrete, hec2hrp_discrete).add_route(ALL_OUTPUTS, "mono", 1.0); /* 1-bit sound */
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, hec2hrp_discrete) /* Son 1bit*/
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-/*  DISK II drive for:
+MACHINE_CONFIG_END
+
+/* Lecteur de disquette DISK II pour les machines :
         Hector HRX
         Hector MX40c
         Hector MX80c
 
-    JJStacino  jj.stacino@aliceadsl.fr
+        JJStacino  jj.stacino@aliceadsl.fr
 
     15/02/2010 : Start of the disc2 project! JJStacino
-    26/09/2010 : first sending with bug2 (the first "dir" command terminates in a crash of the Z80 disc II processor) -JJStacino
-    01/11/2010 : first time boot sequence finishes, problem with CP/M launch -JJStacino
-    20/11/2010 : synchronization between uPD765 and Z80 is now OK, CP/M works! -JJStacino
+    26/09/2010 : first sending with bug2 (the first "dir" command finih with a crash of the Z80 disc II proc) JJStacino
+    01/11/2010 : first time ending boot sequence, probleme on the CP/M lauch JJStacino
+    20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
     28/11/2010 : Found at Bratislava that the disk writing with TRANS X: is NOT WORKING (the exchange Hector=>Disc2 ok)
 */
 
 /* Callback uPD request */
 
 /* How uPD765 works:
-    * First we send at uPD the string of command (p.e. 9 bytes for read starting by 0x46) on port 60h
-            between each byte, check the authorization of the uPD by reading the status register
-    * When the command is finish, the data arrive with DMA interrupt, then:
-            If read: in port 70 to retrieve the data,
-            If write: in port 70 send the data
-    * When all data had been send the uPD launch an INT
-    * The Z80 Disc2 writes in FF12 a flag
-    * if the flag is set, end of DMA function,
-    * At this point the Z80 can read the RESULT in port 61h
+        * First we send at uPD the string of command (p.e. 9 bytes for read starting by 0x46) on port 60h
+                between each byte, check the authorization of the uPD by reading the status register
+        * When the command is finish, the data arrive with DMA interrupt, then:
+                If read: in port 70 to retrieve the data,
+                If write: in port 70 send the data
+        * When all data had been send the uPD launch an INT
+        * The Z80 Disc2 writes in FF12 a flag
+        * if the flag is set, end of DMA function,
+        * At this point the Z80 can read the RESULT in port 61h
 */
 
-// Interrupt management
+/*****************************************************************************/
+/****  Management of the interrupts (NMI and INT)between uPD765 and Z80 ******/
+/*****************************************************************************/
 
-/* upd765 INT is connected to Z80 interrupt, with RNMI hardware authorization */
+/* upd765 INT is connected to interrupt of Z80 within a RNMI hardware authorization */
 WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_interrupt )
 {
-	m_irq_current_state = state;
-	m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, state && m_hector_disc2_rnmi ? ASSERT_LINE : CLEAR_LINE);
+	m_IRQ_current_state = state;
+	m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
 }
 
-/* upd765 DRQ is connected to Z80 NMI, with RNMI hardware authorization */
+/* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization */
 WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_dma_irq )
 {
-	m_nmi_current_state = state;
-	m_disc2cpu->set_input_line(INPUT_LINE_NMI,  state && m_hector_disc2_rnmi ? ASSERT_LINE : CLEAR_LINE);
+	m_NMI_current_state = state;
+	m_disc2cpu->set_input_line(INPUT_LINE_NMI,  state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
 }
 
+// RESET the disc2 Unit !
 void hec2hrp_state::hector_disc2_reset()
 {
+	// Initialization Disc2 unit
 	m_disc2cpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	m_upd_fdc->reset();
-	// Select ROM to cold restart
+	machine().device<upd765a_device>("upd765")->reset();
+	// Select ROM memory to cold restart
 	membank("bank3")->set_entry(DISCII_BANK_ROM);
 
 	// Clear the Hardware's buffers
-	m_hector_disc2_data_r_ready = 0x0; /* =ff when PC2 = true and data is in read buffer (state->m_hector_disc2_data_read) */
-	m_hector_disc2_data_w_ready = 0x0; /* =ff when Disc 2 Port 40 has data in write buffer (state->m_hector_disc2_data_write) */
-	m_hector_disc2_data_read = 0;      /* Data sent by Hector to Disc 2 when PC2=true */
-	m_hector_disc2_data_write = 0;     /* Data sent by Disc 2 to Hector when Write Port I/O 40 */
-	m_hector_disc2_rnmi = 0;           /* I/O 50 D5 state = authorization for INT / NMI */
-	m_irq_current_state = 0;           /* Clear the active IRQ request */
-	m_nmi_current_state = 0;           /* Clear the active DMA request */
+	m_hector_disc2_data_r_ready=0x0; /* =ff when PC2 = true and data in read buffer (state->m_hector_disc2_data_read) */
+	m_hector_disc2_data_w_ready=0x0; /* =ff when Disc 2 Port 40 had send a data in write buffer (state->m_hector_disc2_data_write) */
+	m_hector_disc2_data_read=0;      /* Data send by Hector to Disc 2 when PC2=true */
+	m_hector_disc2_data_write=0;     /* Data send by Disc 2 to Hector when Write Port I/O 40 */
+	m_hector_disc2_RNMI = 0;         /* State of I/O 50 D5 = authorization for INT / NMI */
+	m_IRQ_current_state=0;           /* Clear the IRQ active request */
+	m_NMI_current_state=0;           /* Clear the DMA active request */
 }
 
-// Port handling for Z80 Disc II unit
-
-READ8_MEMBER( hec2hrp_state::disc2_io00_port_r)
+/*****************************************************************************/
+/********************  Port handling of the Z80 Disc II unit *****************/
+/*****************************************************************************/
+READ8_MEMBER( hec2hrp_state::hector_disc2_io00_port_r)
 {
-	/* Switch Disc 2 to RAM */
+	/* Switch Disc 2 to RAM to let full RAM acces */
 	membank("bank3")->set_entry(DISCII_BANK_RAM);
 	return 0;
 }
-WRITE8_MEMBER( hec2hrp_state::disc2_io00_port_w)
+WRITE8_MEMBER( hec2hrp_state::hector_disc2_io00_port_w)
 {
-	/* Switch Disc 2 to RAM */
+	/* Switch Disc 2 to RAM to let full RAM acces */
 	membank("bank3")->set_entry(DISCII_BANK_RAM);
 }
-READ8_MEMBER( hec2hrp_state::disc2_io20_port_r)
+READ8_MEMBER( hec2hrp_state::hector_disc2_io20_port_r)
 {
-	// TODO: Implement 8251 chip communication
+	// You can implemente the 8251 chip communication here !
 	return 0;
 }
-WRITE8_MEMBER( hec2hrp_state::disc2_io20_port_w)
+WRITE8_MEMBER( hec2hrp_state::hector_disc2_io20_port_w)
 {
-	// TODO: Implement 8251 chip communication
+	// You can implemente the 8251 chip communication here !
 }
-
-READ8_MEMBER( hec2hrp_state::disc2_io30_port_r)
+READ8_MEMBER( hec2hrp_state::hector_disc2_io30_port_r)
 {
 	return m_hector_disc2_data_r_ready;
 }
-
-WRITE8_MEMBER( hec2hrp_state::disc2_io30_port_w)
+WRITE8_MEMBER( hec2hrp_state::hector_disc2_io30_port_w)
 {
+	// Nothing here !
 }
 
-READ8_MEMBER( hec2hrp_state::disc2_io40_port_r) /* Read data sent to Hector by Disc2 */
+READ8_MEMBER( hec2hrp_state::hector_disc2_io40_port_r)
 {
-	m_hector_disc2_data_r_ready = 0x00;
-	return m_hector_disc2_data_read;
+	/* Read data send by Hector, by Disc2*/
+	m_hector_disc2_data_r_ready = 0x00;  /* Clear memory info read ready*/
+	return m_hector_disc2_data_read;     /* send the data !*/
 }
 
-WRITE8_MEMBER( hec2hrp_state::disc2_io40_port_w)    /* Write data sent by Disc2 to Hector */
+WRITE8_MEMBER( hec2hrp_state::hector_disc2_io40_port_w)   /* Write data send by Disc2, to Hector*/
 {
-	m_hector_disc2_data_write = data;
-	m_hector_disc2_data_w_ready = 0x80;
+	m_hector_disc2_data_write = data;        /* Memorization data*/
+	m_hector_disc2_data_w_ready = 0x80;  /* Memorization data write ready in D7*/
 }
 
-READ8_MEMBER( hec2hrp_state::disc2_io50_port_r)
+READ8_MEMBER( hec2hrp_state::hector_disc2_io50_port_r)    /*Read memory info write ready*/
 {
 	return m_hector_disc2_data_w_ready;
 }
 
-WRITE8_MEMBER( hec2hrp_state::disc2_io50_port_w)
+WRITE8_MEMBER( hec2hrp_state::hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 {
+	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
+
 	/* FDC Motor Control - Bit 0/1 defines the state of the FDD 0/1 motor */
-	m_upd_connector[0]->get_device()->mon_w(BIT(data, 0));    // FLoppy motor A
-	m_upd_connector[1]->get_device()->mon_w(BIT(data, 1));    // Floppy motor B
+	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(BIT(data, 0));    // Moteur floppy A:
+	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(BIT(data, 1));    // Moteur floppy B:
 
 	/* Write bit TC uPD765 on D4 of port I/O 50 */
-	m_upd_fdc->tc_w(BIT(data, 4));
+	fdc->tc_w(BIT(data, 4));
 
 
-	/* allow interrupts by ANDing with RNMI signal */
-	m_hector_disc2_rnmi = BIT(data, 5);
-	m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, m_irq_current_state && m_hector_disc2_rnmi ? ASSERT_LINE : CLEAR_LINE);
-	m_disc2cpu->set_input_line(INPUT_LINE_NMI,  m_nmi_current_state && m_hector_disc2_rnmi ? ASSERT_LINE : CLEAR_LINE);
+	/* Authorization interrupt and NMI with RNMI signal*/
+	m_hector_disc2_RNMI = BIT(data, 5);
+	m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, m_IRQ_current_state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
+	m_disc2cpu->set_input_line(INPUT_LINE_NMI,  m_NMI_current_state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
 }

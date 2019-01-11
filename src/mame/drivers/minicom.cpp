@@ -53,24 +53,21 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void minicom(machine_config &config);
-
-	void init_minicom();
-
-private:
 	DECLARE_WRITE8_MEMBER(i87c52_p0_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p1_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p2_w);
 	DECLARE_WRITE8_MEMBER(i87c52_p3_w);
 	DECLARE_READ8_MEMBER(i87c52_p1_r);
 	DECLARE_READ8_MEMBER(i87c52_p2_r);
-
+	void init_minicom();
+	void minicom(machine_config &config);
+private:
 	uint8_t m_p[4];
 	uint16_t m_display_data;
 	int m_digit_index;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<i87c52_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	output_finder<20> m_digits;
 };
 
@@ -219,25 +216,24 @@ void minicom_state::init_minicom()
 {
 }
 
-void minicom_state::minicom(machine_config &config)
-{
+MACHINE_CONFIG_START(minicom_state::minicom)
 	/* basic machine hardware */
-	I87C52(config, m_maincpu, XTAL(10'000'000)); /*FIX-ME: verify the correct clock frequency */
-	m_maincpu->port_out_cb<0>().set(FUNC(minicom_state::i87c52_p0_w));
-	m_maincpu->port_in_cb<1>().set(FUNC(minicom_state::i87c52_p1_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(minicom_state::i87c52_p1_w));
-	m_maincpu->port_in_cb<2>().set(FUNC(minicom_state::i87c52_p2_r));
-	m_maincpu->port_out_cb<2>().set(FUNC(minicom_state::i87c52_p2_w));
-	m_maincpu->port_out_cb<3>().set(FUNC(minicom_state::i87c52_p3_w));
+	MCFG_DEVICE_ADD("maincpu", I87C52, XTAL(10'000'000)) /*FIX-ME: verify the correct clock frequency */
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, minicom_state, i87c52_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, minicom_state, i87c52_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, minicom_state, i87c52_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, minicom_state, i87c52_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, minicom_state, i87c52_p2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, minicom_state, i87c52_p3_w))
 
 	/* video hardware */
 	/* fluorescent 14-segment display forming a row of 20 characters */
-	config.set_default_layout(layout_minicom);
+	MCFG_DEFAULT_LAYOUT(layout_minicom)
 
-	/* TODO: Map the keyboard rows/cols inputs (43-key, 4-row keyboard) */
+/* TODO: Map the keyboard rows/cols inputs (43-key, 4-row keyboard) */
 
-	/* TODO: Treat the modem as a sound device. That may be an interesting challenge... :-) */
-}
+/* TODO: Treat the modem as a sound device. That may be an interesting challenge... :-) */
+MACHINE_CONFIG_END
 
 ROM_START( minicom )
 	ROM_REGION( 0x2000, "maincpu", 0 )

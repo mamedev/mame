@@ -493,7 +493,7 @@ void okim9810_device::write_tmp_register(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( okim9810_device::tmp_register_w )
+WRITE8_MEMBER( okim9810_device::write_tmp_register )
 {
 	assert(!m_serial);
 	write_tmp_register(data);

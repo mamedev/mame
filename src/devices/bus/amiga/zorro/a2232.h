@@ -18,7 +18,6 @@
 #include "zorro.h"
 #include "machine/autoconfig.h"
 #include "cpu/m6502/m65ce02.h"
-#include "machine/input_merger.h"
 #include "machine/mos6551.h"
 #include "machine/mos6526.h"
 #include "bus/rs232/rs232.h"
@@ -62,15 +61,51 @@ protected:
 	virtual void autoconfig_base_address(offs_t address) override;
 
 private:
+	enum
+	{
+		IRQ_ACIA_0,
+		IRQ_ACIA_1,
+		IRQ_ACIA_2,
+		IRQ_ACIA_3,
+		IRQ_ACIA_4,
+		IRQ_ACIA_5,
+		IRQ_ACIA_6,
+		IRQ_CIA,
+		IRQ_AMIGA,
+		IRQ_SOURCE_COUNT
+	};
+
+	void update_irqs();
+
 	// cpu
 	WRITE8_MEMBER( int2_w );
 	WRITE8_MEMBER( irq_ack8_w );
 
 	// acia
-	template<int N> DECLARE_READ8_MEMBER( acia_r );
-	template<int N> DECLARE_WRITE8_MEMBER( acia_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_0_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_1_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_2_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_3_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_4_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_5_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( acia_6_irq_w );
+	DECLARE_READ8_MEMBER( acia_0_r );
+	DECLARE_WRITE8_MEMBER( acia_0_w );
+	DECLARE_READ8_MEMBER( acia_1_r );
+	DECLARE_WRITE8_MEMBER( acia_1_w );
+	DECLARE_READ8_MEMBER( acia_2_r );
+	DECLARE_WRITE8_MEMBER( acia_2_w );
+	DECLARE_READ8_MEMBER( acia_3_r );
+	DECLARE_WRITE8_MEMBER( acia_3_w );
+	DECLARE_READ8_MEMBER( acia_4_r );
+	DECLARE_WRITE8_MEMBER( acia_4_w );
+	DECLARE_READ8_MEMBER( acia_5_r );
+	DECLARE_WRITE8_MEMBER( acia_5_w );
+	DECLARE_READ8_MEMBER( acia_6_r );
+	DECLARE_WRITE8_MEMBER( acia_6_w );
 
 	// cia
+	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
 	DECLARE_READ8_MEMBER( cia_port_a_r );
 	DECLARE_READ8_MEMBER( cia_port_b_r );
 	DECLARE_WRITE8_MEMBER( cia_port_b_w );
@@ -95,10 +130,17 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( rs232_7_cts_w );
 
 	required_device<m65ce02_device> m_iocpu;
-	required_device<input_merger_device> m_ioirq;
-	required_device_array<mos6551_device, 7> m_acia;
+	required_device<mos6551_device> m_acia_0;
+	required_device<mos6551_device> m_acia_1;
+	required_device<mos6551_device> m_acia_2;
+	required_device<mos6551_device> m_acia_3;
+	required_device<mos6551_device> m_acia_4;
+	required_device<mos6551_device> m_acia_5;
+	required_device<mos6551_device> m_acia_6;
 	required_device<mos8520_device> m_cia;
 	required_shared_ptr<uint8_t> m_shared_ram;
+
+	int m_irqs[IRQ_SOURCE_COUNT];
 
 	uint8_t m_cia_port_a;
 	uint8_t m_cia_port_b;

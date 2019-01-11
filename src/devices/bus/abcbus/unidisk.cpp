@@ -32,11 +32,11 @@ DEFINE_DEVICE_TYPE(UNIDISK, unidisk_t, "unidisk", "MyAB UNI DISK")
 ROM_START( unidisk )
 	ROM_REGION( 0x1000, TMS9995_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "5d", "5\" D PROM" )
-	ROMX_LOAD("unidisk5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676), ROM_BIOS(0))
+	ROMX_LOAD("unidisk5d.bin", 0x0000, 0x1000, CRC(569dd60c) SHA1(47b810bcb5a063ffb3034fd7138dc5e15d243676), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "5h", "5\" H PROM" )
-	ROMX_LOAD("unidisk5h.bin", 0x0000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863), ROM_BIOS(1))
+	ROMX_LOAD("unidisk5h.bin", 0x0000, 0x1000, CRC(5079ad85) SHA1(42bb91318f13929c3a440de3fa1f0491a0b90863), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "8", "8\" PROM" )
-	ROMX_LOAD("unidisk8.bin", 0x0000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532), ROM_BIOS(2))
+	ROMX_LOAD("unidisk8.bin", 0x0000, 0x1000, CRC(d04e6a43) SHA1(8db504d46ff0355c72bd58fd536abeb17425c532), ROM_BIOS(3))
 ROM_END
 
 
@@ -74,9 +74,7 @@ void unidisk_t::unidisk_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(unidisk_t::device_add_mconfig)
-	TMS9995(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &unidisk_t::unidisk_mem);
-	m_maincpu->set_addrmap(AS_IO, &unidisk_t::unidisk_io);
+	MCFG_TMS99xx_ADD(TMS9995_TAG, TMS9995, 12000000, unidisk_mem, unidisk_io)
 MACHINE_CONFIG_END
 
 

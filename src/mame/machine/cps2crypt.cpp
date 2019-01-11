@@ -741,7 +741,7 @@ struct game_keys
 
 
 
-void cps2_state::init_cps2crypt()
+void cps_state::init_cps2crypt()
 {
 	if (m_region_key)
 	{

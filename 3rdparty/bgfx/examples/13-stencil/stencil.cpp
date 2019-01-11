@@ -401,8 +401,8 @@ struct RenderState
 static RenderState s_renderStates[RenderState::Count] =
 {
 	{ // StencilReflection_CraftStencil
-		BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_Z
+		BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_MSAA
 		, UINT32_MAX
@@ -415,10 +415,10 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // StencilReflection_DrawReflected
-		BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_A
+		BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_ALPHA_WRITE
 		| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-		| BGFX_STATE_WRITE_Z
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_CULL_CW    //reflection matrix has inverted normals. using CCW instead of CW.
 		| BGFX_STATE_MSAA
@@ -432,8 +432,8 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // StencilReflection_BlendPlane
-		BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_Z
+		BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_SRC_COLOR)
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_CULL_CCW
@@ -443,8 +443,8 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // StencilReflection_DrawScene
-		BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_Z
+		BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_CULL_CCW
 		| BGFX_STATE_MSAA
@@ -453,8 +453,8 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // ProjectionShadows_DrawAmbient
-		BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_Z // write depth !
+		BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_DEPTH_WRITE // write depth !
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_CULL_CCW
 		| BGFX_STATE_MSAA
@@ -475,7 +475,7 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // ProjectionShadows_DrawDiffuse
-		BGFX_STATE_WRITE_RGB
+		BGFX_STATE_RGB_WRITE
 		| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
 		| BGFX_STATE_DEPTH_TEST_EQUAL
 		| BGFX_STATE_CULL_CCW
@@ -490,9 +490,9 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // Custom_BlendLightTexture
-		BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_A
-		| BGFX_STATE_WRITE_Z
+		BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_ALPHA_WRITE
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_COLOR, BGFX_STATE_BLEND_INV_SRC_COLOR)
 		| BGFX_STATE_CULL_CCW
@@ -502,7 +502,7 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // Custom_DrawPlaneBottom
-		BGFX_STATE_WRITE_RGB
+		BGFX_STATE_RGB_WRITE
 		| BGFX_STATE_CULL_CW
 		| BGFX_STATE_MSAA
 		, UINT32_MAX
@@ -805,13 +805,8 @@ public:
 		m_debug = BGFX_DEBUG_NONE;
 		m_reset = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_viewState.m_width;
-		init.resolution.height = m_viewState.m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_viewState.m_width, m_viewState.m_height, m_reset);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -931,15 +926,12 @@ public:
 
 			ImGui::SetNextWindowPos(
 				  ImVec2(m_viewState.m_width - m_viewState.m_width / 5.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_viewState.m_width / 5.0f, m_viewState.m_height / 2.0f)
-				, ImGuiCond_FirstUseEver
+				, ImGuiSetCond_FirstUseEver
 				);
 			ImGui::Begin("Settings"
 				, NULL
-				, 0
+				, ImVec2(m_viewState.m_width / 5.0f, m_viewState.m_height / 2.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
 			{
@@ -1013,9 +1005,9 @@ public:
 			const float radius = (m_scene == StencilReflectionScene) ? 15.0f : 25.0f;
 			for (uint8_t ii = 0; ii < numLights; ++ii)
 			{
-				lightPosRadius[ii][0] = bx::sin( (lightTimeAccumulator*1.1f + ii*0.03f + ii*bx::kPiHalf*1.07f ) )*20.0f;
-				lightPosRadius[ii][1] = 8.0f + (1.0f - bx::cos( (lightTimeAccumulator*1.5f + ii*0.29f + bx::kPiHalf*1.49f ) ) )*4.0f;
-				lightPosRadius[ii][2] = bx::cos( (lightTimeAccumulator*1.3f + ii*0.13f + ii*bx::kPiHalf*1.79f ) )*20.0f;
+				lightPosRadius[ii][0] = bx::fsin( (lightTimeAccumulator*1.1f + ii*0.03f + ii*bx::kPiHalf*1.07f ) )*20.0f;
+				lightPosRadius[ii][1] = 8.0f + (1.0f - bx::fcos( (lightTimeAccumulator*1.5f + ii*0.29f + bx::kPiHalf*1.49f ) ) )*4.0f;
+				lightPosRadius[ii][2] = bx::fcos( (lightTimeAccumulator*1.3f + ii*0.13f + ii*bx::kPiHalf*1.79f ) )*20.0f;
 				lightPosRadius[ii][3] = radius;
 			}
 			bx::memCopy(s_uniforms.m_lightPosRadius, lightPosRadius, numLights * 4*sizeof(float) );
@@ -1085,9 +1077,9 @@ public:
 					, 0.0f
 					, 0.0f
 					, 0.0f
-					, bx::sin(ii * 2.0f + 13.0f - sceneTimeAccumulator) * 13.0f
+					, bx::fsin(ii * 2.0f + 13.0f - sceneTimeAccumulator) * 13.0f
 					, 4.0f
-					, bx::cos(ii * 2.0f + 13.0f - sceneTimeAccumulator) * 13.0f
+					, bx::fcos(ii * 2.0f + 13.0f - sceneTimeAccumulator) * 13.0f
 					);
 			}
 

@@ -1,20 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
-#ifndef MAME_INCLUDES_PACLAND_H
-#define MAME_INCLUDES_PACLAND_H
-
-#pragma once
-
 #include "cpu/m6800/m6801.h"
 #include "sound/namco.h"
-#include "emupal.h"
 #include "screen.h"
 
 class pacland_state : public driver_device
 {
 public:
-	pacland_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	pacland_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
@@ -24,7 +18,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
-		m_color_prom(*this, "proms"),
 		m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -38,11 +31,11 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_region_ptr<uint8_t> m_color_prom;
 
 	output_finder<2> m_leds;
 
 	uint8_t m_palette_bank;
+	const uint8_t *m_color_prom;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_fg_bitmap;
@@ -60,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);
+	DECLARE_READ8_MEMBER(readFF);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(videoram2_w);
 	DECLARE_WRITE8_MEMBER(scroll0_w);
@@ -71,7 +65,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	void pacland_palette(palette_device &palette);
+	DECLARE_PALETTE_INIT(pacland);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
@@ -82,6 +76,5 @@ public:
 	void pacland(machine_config &config);
 	void main_map(address_map &map);
 	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_PACLAND_H

@@ -15,6 +15,13 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_UPD4992_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), UPD4992, XTAL(32'768))
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -24,7 +31,7 @@ class upd4992_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );

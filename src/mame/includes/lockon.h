@@ -5,14 +5,9 @@
     Lock-On hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LOCKON_H
-#define MAME_INCLUDES_LOCKON_H
-
-#pragma once
 
 #include "machine/watchdog.h"
 #include "sound/flt_vol.h"
-#include "emupal.h"
 #include "screen.h"
 
 /* Calculated from CRT controller writes */
@@ -50,7 +45,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_lamp(*this, "lamp1")
+		, m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	void lockon(machine_config &config);
@@ -113,7 +108,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	output_finder<> m_lamp;
+	output_finder<2> m_lamp;
 
 	DECLARE_READ16_MEMBER(lockon_crtc_r);
 	DECLARE_WRITE16_MEMBER(lockon_crtc_w);
@@ -139,7 +134,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_vol);
 	DECLARE_WRITE8_MEMBER(ym2203_out_b);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
-	void lockon_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(lockon);
 	uint32_t screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_lockon);
 	TIMER_CALLBACK_MEMBER(cursor_callback);
@@ -156,5 +151,3 @@ private:
 	void sound_io(address_map &map);
 	void sound_prg(address_map &map);
 };
-
-#endif // MAME_INCLUDES_LOCKON_H

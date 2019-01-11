@@ -42,12 +42,14 @@ tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *
 
 
 // machine configs
-void tp0320_cpu_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(tp0320_cpu_device::device_add_mconfig)
+
 	// main opcodes PLA(partial), microinstructions PLA
-	PLA(config, "ipla", 9, 6, 8).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "mpla", 6, 22, 64).set_format(pla_device::FMT::BERKELEY);
-}
+	MCFG_PLA_ADD("ipla", 9, 6, 8)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+	MCFG_PLA_ADD("mpla", 6, 22, 64)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+MACHINE_CONFIG_END
 
 
 // disasm

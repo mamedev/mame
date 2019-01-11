@@ -66,13 +66,12 @@ void iq151_grafik_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void iq151_grafik_device::device_add_mconfig(machine_config &config)
-{
-	I8255(config, m_ppi8255);
-	m_ppi8255->out_pa_callback().set(FUNC(iq151_grafik_device::x_write));
-	m_ppi8255->out_pb_callback().set(FUNC(iq151_grafik_device::y_write));
-	m_ppi8255->out_pc_callback().set(FUNC(iq151_grafik_device::control_w));
-}
+MACHINE_CONFIG_START(iq151_grafik_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, iq151_grafik_device, x_write))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, iq151_grafik_device, y_write))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iq151_grafik_device, control_w))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  I8255 port a
@@ -121,7 +120,8 @@ void iq151_grafik_device::io_read(offs_t offset, uint8_t &data)
 {
 	if (offset >= 0xd0 && offset < 0xd4)
 	{
-		data = m_ppi8255->read(offset & 3);
+		address_space& space = machine().device("maincpu")->memory().space(AS_IO);
+		data = m_ppi8255->read(space, offset & 3);
 	}
 	else if (offset == 0xd4)
 	{
@@ -140,7 +140,8 @@ void iq151_grafik_device::io_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xd0 && offset < 0xd4)
 	{
-		m_ppi8255->write(offset & 3, data);
+		address_space& space = machine().device("maincpu")->memory().space(AS_IO);
+		m_ppi8255->write(space, offset & 3, data);
 	}
 	else if (offset == 0xd4)
 	{

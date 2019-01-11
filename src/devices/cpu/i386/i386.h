@@ -24,6 +24,13 @@
 // mingw has this defined for 32-bit compiles
 #undef i386
 
+
+#define MCFG_I386_SMIACT(_devcb) \
+	devcb = &downcast<i386_device &>(*device).set_smiact(DEVCB_##_devcb);
+
+#define MCFG_I486_FERR_HANDLER(_devcb) \
+	devcb = &downcast<i386_device &>(*device).set_ferr(DEVCB_##_devcb);
+
 #define X86_NUM_CPUS        4
 
 class i386_device : public cpu_device, public device_vtlb_interface, public i386_disassembler::config
@@ -33,8 +40,8 @@ public:
 	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto smiact() { return m_smiact.bind(); }
-	auto ferr() { return m_ferr_handler.bind(); }
+	template <class Object> devcb_base &set_smiact(Object &&cb) { return m_smiact.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ferr(Object &&cb) { return m_ferr_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
@@ -69,12 +76,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual int get_mode() const override;
-
-	// routines for opcodes whose operation can vary between cpu models
-	// default implementations just log an error message
-	virtual void opcode_cpuid();
-	virtual uint64_t opcode_rdmsr(bool &valid_msr);
-	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr);
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -144,70 +145,6 @@ protected:
 		uint8_t dpl;
 		uint8_t dword_count;
 		uint8_t present;
-	};
-
-	enum FEATURE_FLAGS : uint32_t {
-		// returned in the EDX register
-		FF_PBE = (u32)1 << 31, // Pend. Brk. EN.
-		FF_TM = 1 << 29,       // Thermal Monitor
-		FF_HTT = 1 << 28,      // Multi-threading
-		FF_SS = 1 << 27,       // Self Snoop
-		FF_SSE2 = 1 << 26,     // SSE2 Extensions
-		FF_SSE = 1 << 25,      // SSE Extensions
-		FF_FXSR = 1 << 24,     // FXSAVE/FXRSTOR
-		FF_MMX = 1 << 23,      // MMX Technology
-		FF_ACPI = 1 << 22,     // Thermal Monitor and Clock Ctrl
-		FF_DS = 1 << 21,       // Debug Store
-		FF_CLFSH = 1 << 19,    // CLFLUSH instruction
-		FF_PSN = 1 << 18,      // Processor Serial Number
-		FF_PSE36 = 1 << 17,    // 36 Bit Page Size Extension
-		FF_PAT = 1 << 16,      // Page Attribute Table
-		FF_CMOV = 1 << 15,     // Conditional Move/Compare Instruction
-		FF_MCA = 1 << 14,      // Machine Check Architecture
-		FF_PGE = 1 << 13,      // PTE Global Bit
-		FF_MTRR = 1 << 12,     // Memory Type Range Registers
-		FF_SEP = 1 << 11,      // SYSENTER and SYSEXIT
-		FF_APIC = 1 << 9,      // APIC on Chip
-		FF_CX8 = 1 << 8,       // CMPXCHG8B Inst.
-		FF_MCE = 1 << 7,       // Machine Check Exception
-		FF_PAE = 1 << 6,       // Physical Address Extensions
-		FF_MSR = 1 << 5,       // RDMSR and WRMSR Support
-		FF_TSC = 1 << 4,       // Time Stamp Counter
-		FF_PSE = 1 << 3,       // Page Size Extensions
-		FF_DE = 1 << 2,        // Debugging Extensions
-		FF_VME = 1 << 1,       // Virtual-8086 Mode Enhancement
-		FF_FPU = 1 << 0,       // x87 FPU on Chip
-		// retuned in the ECX register
-		FF_RDRAND = 1 << 30,
-		FF_F16C = 1 << 29,
-		FF_AVX = 1 << 28,
-		FF_OSXSAVE = 1 << 27,
-		FF_XSAVE = 1 << 26,
-		FF_AES = 1 << 25,
-		FF_TSCD = 1 << 24,     // Deadline
-		FF_POPCNT = 1 << 23,
-		FF_MOVBE = 1 << 22,
-		FF_x2APIC = 1 << 21,
-		FF_SSE4_2 = 1 << 20,   // SSE4.2
-		FF_SSE4_1 = 1 << 19,   // SSE4.1
-		FF_DCA = 1 << 18,      // Direct Cache Access
-		FF_PCID = 1 << 17,     // Process-context Identifiers
-		FF_PDCM = 1 << 15,     // Perf/Debug Capability MSR
-		FF_xTPR = 1 << 14,     // Update Control
-		FF_CMPXCHG16B = 1 << 13,
-		FF_FMA = 1 << 12,      // Fused Multiply Add
-		FF_SDBG = 1 << 11,
-		FF_CNXT_ID = 1 << 10,  // L1 Context ID
-		FF_SSSE3 = 1 << 9,     // SSSE3 Extensions
-		FF_TM2 = 1 << 8,       // Thermal Monitor 2
-		FF_EIST = 1 << 7,      // Enhanced Intel SpeedStep Technology
-		FF_SMX = 1 << 6,       // Safer Mode Extensions
-		FF_VMX = 1 << 5,       // Virtual Machine Extensions
-		FF_DS_CPL = 1 << 4,    // CPL Qualified Debug Store
-		FF_MONITOR = 1 << 3,   // MONITOR/MWAIT
-		FF_DTES64 = 1 << 2,    // 64 Bit DS Area
-		FF_PCLMULQDQ = 1 << 1, // Carryless Multiplication
-		FF_SSE3 = 1 << 0,      // SSE3 Extensions
 	};
 
 	typedef void (i386_device::*i386_modrm_func)(uint8_t modrm);
@@ -286,7 +223,7 @@ protected:
 	address_space *m_io;
 	uint32_t m_a20_mask;
 
-	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
+	int m_cpuid_max_input_value_eax;
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
 	uint32_t m_cpu_version;
 	uint32_t m_feature_flags;
@@ -424,6 +361,14 @@ protected:
 	inline void WRITEPORT16(offs_t port, uint16_t value);
 	inline uint32_t READPORT32(offs_t port);
 	inline void WRITEPORT32(offs_t port, uint32_t value);
+	uint64_t pentium_msr_read(uint32_t offset,uint8_t *valid_msr);
+	void pentium_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
+	uint64_t p6_msr_read(uint32_t offset,uint8_t *valid_msr);
+	void p6_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
+	uint64_t piv_msr_read(uint32_t offset,uint8_t *valid_msr);
+	void piv_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
+	inline uint64_t MSR_READ(uint32_t offset,uint8_t *valid_msr);
+	inline void MSR_WRITE(uint32_t offset, uint64_t data, uint8_t *valid_msr);
 	uint32_t i386_load_protected_mode_segment(I386_SREG *seg, uint64_t *desc );
 	void i386_load_call_gate(I386_CALL_GATE *gate);
 	void i386_set_descriptor_accessed(uint16_t selector);
@@ -1533,20 +1478,6 @@ protected:
 
 	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
-	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
-
-class pentium_mmx_device : public pentium_device
-{
-public:
-	// construction/destruction
-	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -1571,16 +1502,24 @@ public:
 	pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
-	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
 
-class pentium2_device : public pentium_pro_device
+class pentium_mmx_device : public pentium_device
+{
+public:
+	// construction/destruction
+	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+
+class pentium2_device : public pentium_device
 {
 public:
 	// construction/destruction
@@ -1592,7 +1531,7 @@ protected:
 };
 
 
-class pentium3_device : public pentium_pro_device
+class pentium3_device : public pentium_device
 {
 public:
 	// construction/destruction
@@ -1604,23 +1543,6 @@ protected:
 };
 
 
-class athlonxp_device : public pentium_device
-{
-public:
-	// construction/destruction
-	athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void opcode_cpuid() override;
-	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
-	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	uint8_t m_processor_name_string[48];
-};
-
-
 class pentium4_device : public pentium_device
 {
 public:
@@ -1628,8 +1550,6 @@ public:
 	pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
-	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -1640,12 +1560,11 @@ DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
 DECLARE_DEVICE_TYPE(I486,        i486_device)
 DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
-DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(MEDIAGX,     mediagx_device)
 DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
+DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
 DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)
-DECLARE_DEVICE_TYPE(ATHLONXP,    athlonxp_device)
 DECLARE_DEVICE_TYPE(PENTIUM4,    pentium4_device)
 
 #endif // MAME_CPU_I386_I386_H

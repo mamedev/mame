@@ -65,6 +65,16 @@ spectrum_protek_device::spectrum_protek_device(const machine_config &mconfig, co
 
 void spectrum_protek_device::device_start()
 {
+	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void spectrum_protek_device::device_reset()
+{
 }
 
 

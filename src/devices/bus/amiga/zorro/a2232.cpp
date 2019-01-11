@@ -30,83 +30,113 @@ DEFINE_DEVICE_TYPE(A2232, a2232_device, "a2232", "CBM A2232 Serial Card")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void a2232_device::device_add_mconfig(machine_config &config)
+void a2232_device::iocpu_map(address_map &map)
 {
-	// main cpu
-	M65CE02(config, m_iocpu, 28.37516_MHz_XTAL / 8); // should run at Amiga clock 7M / 2
-	m_iocpu->set_addrmap(AS_PROGRAM, &a2232_device::iocpu_map);
+	map(0x0000, 0x3fff).ram().share("shared");
+	map(0x4000, 0x47ff).rw(this, FUNC(a2232_device::acia_0_r), FUNC(a2232_device::acia_0_w));
+	map(0x4800, 0x4fff).rw(this, FUNC(a2232_device::acia_1_r), FUNC(a2232_device::acia_1_w));
+	map(0x5000, 0x57ff).rw(this, FUNC(a2232_device::acia_2_r), FUNC(a2232_device::acia_2_w));
+	map(0x5800, 0x5fff).rw(this, FUNC(a2232_device::acia_3_r), FUNC(a2232_device::acia_3_w));
+	map(0x6000, 0x67ff).rw(this, FUNC(a2232_device::acia_4_r), FUNC(a2232_device::acia_4_w));
+	map(0x6800, 0x6fff).rw(this, FUNC(a2232_device::acia_5_r), FUNC(a2232_device::acia_5_w));
+	map(0x7000, 0x73ff).w(this, FUNC(a2232_device::int2_w));
+	map(0x7400, 0x77ff).rw(this, FUNC(a2232_device::acia_6_r), FUNC(a2232_device::acia_6_w));
+	map(0x7800, 0x7fff).rw(this, FUNC(a2232_device::cia_r), FUNC(a2232_device::cia_w));
+	map(0x8000, 0x8000).w(this, FUNC(a2232_device::irq_ack8_w));
+	map(0xc000, 0xffff).ram().share("shared");
+}
 
-	INPUT_MERGER_ANY_HIGH(config, m_ioirq);
-	m_ioirq->output_handler().set_inputline(m_iocpu, m65ce02_device::IRQ_LINE);
+MACHINE_CONFIG_START(a2232_device::device_add_mconfig)
+	// main cpu
+	MCFG_DEVICE_ADD("iocpu", M65CE02, XTAL(28'375'160) / 8) // should run at Amiga clock 7M / 2
+	MCFG_DEVICE_PROGRAM_MAP(iocpu_map)
 
 	// acia
-	for (auto &acia : m_acia)
-		MOS6551(config, acia, 28.37516_MHz_XTAL / 8).set_xtal(1.8432_MHz_XTAL);
-	m_acia[0]->txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
-	m_acia[0]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<0>));
-	m_acia[1]->txd_handler().set("rs232_2", FUNC(rs232_port_device::write_txd));
-	m_acia[1]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<1>));
-	m_acia[2]->txd_handler().set("rs232_3", FUNC(rs232_port_device::write_txd));
-	m_acia[2]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<2>));
-	m_acia[3]->txd_handler().set("rs232_4", FUNC(rs232_port_device::write_txd));
-	m_acia[3]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<3>));
-	m_acia[4]->txd_handler().set("rs232_5", FUNC(rs232_port_device::write_txd));
-	m_acia[4]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<4>));
-	m_acia[5]->txd_handler().set("rs232_6", FUNC(rs232_port_device::write_txd));
-	m_acia[5]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<5>));
-	m_acia[6]->txd_handler().set("rs232_7", FUNC(rs232_port_device::write_txd));
-	m_acia[6]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<6>));
+	MCFG_DEVICE_ADD("acia_0", MOS6551, XTAL(28'375'160) / 8)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_1", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_0_irq_w))
+
+	MCFG_DEVICE_ADD("acia_1", MOS6551, XTAL(28'375'160) / 8)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_2", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_1_irq_w))
+
+	MCFG_DEVICE_ADD("acia_2", MOS6551, XTAL(28'375'160) / 8)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_3", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_2_irq_w))
+
+	MCFG_DEVICE_ADD("acia_3", MOS6551, XTAL(28'375'160) / 8)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_4", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_3_irq_w))
+
+	MCFG_DEVICE_ADD("acia_4", MOS6551, XTAL(28'375'160) / 8)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_5", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_4_irq_w))
+
+	MCFG_DEVICE_ADD("acia_5", MOS6551, XTAL(28'375'160) / 8)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_6", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_5_irq_w))
+
+	MCFG_DEVICE_ADD("acia_6", MOS6551, XTAL(28'375'160) / 8)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+	MCFG_MOS6551_TXD_HANDLER(WRITELINE("rs232_7", rs232_port_device, write_txd))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, a2232_device, acia_6_irq_w))
 
 	// cia
-	MOS8520(config, m_cia, 1.8432_MHz_XTAL);
-	m_cia->irq_wr_callback().set(m_ioirq, FUNC(input_merger_device::in_w<7>));
-	m_cia->pa_rd_callback().set(FUNC(a2232_device::cia_port_a_r));
-	m_cia->pb_rd_callback().set(FUNC(a2232_device::cia_port_b_r));
-	m_cia->pb_wr_callback().set(FUNC(a2232_device::cia_port_b_w));
+	MCFG_DEVICE_ADD("cia", MOS8520, XTAL(1'843'200))
+	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, a2232_device, cia_irq_w))
+	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, a2232_device, cia_port_a_r))
+	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, a2232_device, cia_port_b_r))
+	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, a2232_device, cia_port_b_w))
 
 	// rs232 ports
-	rs232_port_device &rs232_1(RS232_PORT(config, "rs232_1", default_rs232_devices, nullptr));
-	rs232_1.rxd_handler().set(FUNC(a2232_device::rs232_1_rxd_w));
-	rs232_1.dcd_handler().set(FUNC(a2232_device::rs232_1_dcd_w));
-	rs232_1.dsr_handler().set(m_acia[0], FUNC(mos6551_device::write_dsr));
-	rs232_1.cts_handler().set(FUNC(a2232_device::rs232_1_cts_w));
+	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, a2232_device, rs232_1_rxd_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_1_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_0", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_1_cts_w))
 
-	rs232_port_device &rs232_2(RS232_PORT(config, "rs232_2", default_rs232_devices, nullptr));
-	rs232_2.rxd_handler().set(m_acia[1], FUNC(mos6551_device::write_rxd));
-	rs232_2.dcd_handler().set(FUNC(a2232_device::rs232_2_dcd_w));
-	rs232_2.dsr_handler().set(m_acia[1], FUNC(mos6551_device::write_dsr));
-	rs232_2.cts_handler().set(FUNC(a2232_device::rs232_2_cts_w));
+	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_1", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_2_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_1", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_2_cts_w))
 
-	rs232_port_device &rs232_3(RS232_PORT(config, "rs232_3", default_rs232_devices, nullptr));
-	rs232_3.rxd_handler().set(m_acia[2], FUNC(mos6551_device::write_rxd));
-	rs232_3.dcd_handler().set(FUNC(a2232_device::rs232_3_dcd_w));
-	rs232_3.dsr_handler().set(m_acia[2], FUNC(mos6551_device::write_dsr));
-	rs232_3.cts_handler().set(FUNC(a2232_device::rs232_3_cts_w));
+	MCFG_DEVICE_ADD("rs232_3", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_2", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_3_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_2", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_3_cts_w))
 
-	rs232_port_device &rs232_4(RS232_PORT(config, "rs232_4", default_rs232_devices, nullptr));
-	rs232_4.rxd_handler().set(m_acia[3], FUNC(mos6551_device::write_rxd));
-	rs232_4.dcd_handler().set(FUNC(a2232_device::rs232_4_dcd_w));
-	rs232_4.dsr_handler().set(m_acia[3], FUNC(mos6551_device::write_dsr));
-	rs232_4.cts_handler().set(FUNC(a2232_device::rs232_4_cts_w));
+	MCFG_DEVICE_ADD("rs232_4", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_3", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_4_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_3", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_4_cts_w))
 
-	rs232_port_device &rs232_5(RS232_PORT(config, "rs232_5", default_rs232_devices, nullptr));
-	rs232_5.rxd_handler().set(m_acia[4], FUNC(mos6551_device::write_rxd));
-	rs232_5.dcd_handler().set(FUNC(a2232_device::rs232_5_dcd_w));
-	rs232_5.dsr_handler().set(m_acia[4], FUNC(mos6551_device::write_dsr));
-	rs232_5.cts_handler().set(FUNC(a2232_device::rs232_5_cts_w));
+	MCFG_DEVICE_ADD("rs232_5", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_4", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_5_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_4", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_5_cts_w))
 
-	rs232_port_device &rs232_6(RS232_PORT(config, "rs232_6", default_rs232_devices, nullptr));
-	rs232_6.rxd_handler().set(m_acia[5], FUNC(mos6551_device::write_rxd));
-	rs232_6.dcd_handler().set(FUNC(a2232_device::rs232_6_dcd_w));
-	rs232_6.dsr_handler().set(m_acia[5], FUNC(mos6551_device::write_dsr));
-	rs232_6.cts_handler().set(FUNC(a2232_device::rs232_6_cts_w));
+	MCFG_DEVICE_ADD("rs232_6", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_5", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_6_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_5", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_6_cts_w))
 
-	rs232_port_device &rs232_7(RS232_PORT(config, "rs232_7", default_rs232_devices, nullptr));
-	rs232_7.rxd_handler().set(m_acia[6], FUNC(mos6551_device::write_rxd));
-	rs232_7.dcd_handler().set(FUNC(a2232_device::rs232_7_dcd_w));
-	rs232_7.dsr_handler().set(m_acia[6], FUNC(mos6551_device::write_dsr));
-	rs232_7.cts_handler().set(FUNC(a2232_device::rs232_7_cts_w));
-}
+	MCFG_DEVICE_ADD("rs232_7", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia_6", mos6551_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, a2232_device, rs232_7_dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("acia_6", mos6551_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, a2232_device, rs232_7_cts_w))
+MACHINE_CONFIG_END
 
 
 //**************************************************************************
@@ -121,8 +151,13 @@ a2232_device::a2232_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, A2232, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),
-	m_ioirq(*this, "ioirq"),
-	m_acia(*this, "acia_%u", 0U),
+	m_acia_0(*this, "acia_0"),
+	m_acia_1(*this, "acia_1"),
+	m_acia_2(*this, "acia_2"),
+	m_acia_3(*this, "acia_3"),
+	m_acia_4(*this, "acia_4"),
+	m_acia_5(*this, "acia_5"),
+	m_acia_6(*this, "acia_6"),
 	m_cia(*this, "cia"),
 	m_shared_ram(*this, "shared"),
 	m_cia_port_a(0xff),
@@ -137,6 +172,7 @@ a2232_device::a2232_device(const machine_config &mconfig, const char *tag, devic
 void a2232_device::device_start()
 {
 	set_zorro_device();
+	memset(m_irqs, 0, sizeof(m_irqs));
 }
 
 //-------------------------------------------------
@@ -149,14 +185,35 @@ void a2232_device::device_reset_after_children()
 	m_iocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// cts connected to gnd
-	for (auto &acia : m_acia)
-		acia->write_cts(0);
+	m_acia_0->write_cts(0);
+	m_acia_1->write_cts(0);
+	m_acia_2->write_cts(0);
+	m_acia_3->write_cts(0);
+	m_acia_4->write_cts(0);
+	m_acia_5->write_cts(0);
+	m_acia_6->write_cts(0);
 }
 
 
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+void a2232_device::update_irqs()
+{
+	// look for any active irq
+	for (auto & elem : m_irqs)
+	{
+		if (elem)
+		{
+			m_iocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			return;
+		}
+	}
+
+	// if we get here no irqs are pending
+	m_iocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
 
 WRITE8_MEMBER( a2232_device::int2_w )
 {
@@ -171,7 +228,8 @@ WRITE8_MEMBER( a2232_device::irq_ack8_w )
 	if (VERBOSE)
 		logerror("%s('%s'): irq_ack_w %04x\n", shortname(), basetag(), data);
 
-	m_ioirq->in_w<8>(CLEAR_LINE);
+	m_irqs[IRQ_AMIGA] = CLEAR_LINE;
+	update_irqs();
 }
 
 
@@ -305,15 +363,16 @@ WRITE16_MEMBER( a2232_device::reset_low_w )
 
 READ16_MEMBER( a2232_device::irq_r )
 {
-	if (!machine().side_effects_disabled())
-		m_ioirq->in_w<8>(ASSERT_LINE);
+	m_irqs[IRQ_AMIGA] = ASSERT_LINE;
+	update_irqs();
 
 	return 0xffff;
 }
 
 WRITE16_MEMBER( a2232_device::irq_w )
 {
-	m_ioirq->in_w<8>(ASSERT_LINE);
+	m_irqs[IRQ_AMIGA] = ASSERT_LINE;
+	update_irqs();
 }
 
 READ16_MEMBER( a2232_device::reset_high_r )
@@ -341,16 +400,116 @@ WRITE16_MEMBER( a2232_device::reset_high_w )
 //  ACIA
 //**************************************************************************
 
-template<int N>
-READ8_MEMBER( a2232_device::acia_r )
+READ8_MEMBER( a2232_device::acia_0_r )
 {
-	return m_acia[N]->read(space, offset >> 1);
+	return m_acia_0->read(space, offset >> 1);
 }
 
-template<int N>
-WRITE8_MEMBER( a2232_device::acia_w )
+WRITE8_MEMBER( a2232_device::acia_0_w )
 {
-	m_acia[N]->write(space, offset >> 1, data);
+	m_acia_0->write(space, offset >> 1, data);
+}
+
+WRITE_LINE_MEMBER( a2232_device::acia_0_irq_w )
+{
+	m_irqs[IRQ_ACIA_0] = state;
+	update_irqs();
+}
+
+READ8_MEMBER( a2232_device::acia_1_r )
+{
+	return m_acia_1->read(space, offset >> 1);
+}
+
+WRITE8_MEMBER( a2232_device::acia_1_w )
+{
+	m_acia_1->write(space, offset >> 1, data);
+}
+
+WRITE_LINE_MEMBER( a2232_device::acia_1_irq_w )
+{
+	m_irqs[IRQ_ACIA_1] = state;
+	update_irqs();
+}
+
+READ8_MEMBER( a2232_device::acia_2_r )
+{
+	return m_acia_2->read(space, offset >> 1);
+}
+
+WRITE8_MEMBER( a2232_device::acia_2_w )
+{
+	m_acia_2->write(space, offset >> 1, data);
+}
+
+WRITE_LINE_MEMBER( a2232_device::acia_2_irq_w )
+{
+	m_irqs[IRQ_ACIA_2] = state;
+	update_irqs();
+}
+
+READ8_MEMBER( a2232_device::acia_3_r )
+{
+	return m_acia_3->read(space, offset >> 1);
+}
+
+WRITE8_MEMBER( a2232_device::acia_3_w )
+{
+	m_acia_3->write(space, offset >> 1, data);
+}
+
+WRITE_LINE_MEMBER( a2232_device::acia_3_irq_w )
+{
+	m_irqs[IRQ_ACIA_3] = state;
+	update_irqs();
+}
+
+READ8_MEMBER( a2232_device::acia_4_r )
+{
+	return m_acia_4->read(space, offset >> 1);
+}
+
+WRITE8_MEMBER( a2232_device::acia_4_w )
+{
+	m_acia_4->write(space, offset >> 1, data);
+}
+
+WRITE_LINE_MEMBER( a2232_device::acia_4_irq_w )
+{
+	m_irqs[IRQ_ACIA_4] = state;
+	update_irqs();
+}
+
+READ8_MEMBER( a2232_device::acia_5_r )
+{
+	return m_acia_5->read(space, offset >> 1);
+}
+
+WRITE8_MEMBER( a2232_device::acia_5_w )
+{
+	m_acia_5->write(space, offset >> 1, data);
+}
+
+WRITE_LINE_MEMBER( a2232_device::acia_5_irq_w )
+{
+	m_irqs[IRQ_ACIA_5] = state;
+	update_irqs();
+}
+
+READ8_MEMBER( a2232_device::acia_6_r )
+{
+	return m_acia_6->read(space, offset >> 1);
+}
+
+WRITE8_MEMBER( a2232_device::acia_6_w )
+{
+	m_acia_6->write(space, offset >> 1, data);
+}
+
+WRITE_LINE_MEMBER( a2232_device::acia_6_irq_w )
+{
+	m_irqs[IRQ_ACIA_6] = state;
+	update_irqs();
 }
 
 
@@ -366,6 +525,12 @@ READ8_MEMBER( a2232_device::cia_r )
 WRITE8_MEMBER( a2232_device::cia_w )
 {
 	m_cia->write(space, offset >> 1, data);
+}
+
+WRITE_LINE_MEMBER( a2232_device::cia_irq_w )
+{
+	m_irqs[IRQ_CIA] = state;
+	update_irqs();
 }
 
 READ8_MEMBER( a2232_device::cia_port_a_r )
@@ -391,7 +556,7 @@ WRITE8_MEMBER( a2232_device::cia_port_b_w )
 
 WRITE_LINE_MEMBER( a2232_device::rs232_1_rxd_w )
 {
-	m_acia[0]->write_rxd(state);
+	m_acia_0->write_rxd(state);
 	m_cia->sp_w(state);
 }
 
@@ -479,22 +644,4 @@ WRITE_LINE_MEMBER( a2232_device::rs232_7_cts_w )
 {
 	m_cia_port_b &= ~0x40;
 	m_cia_port_b |= state << 6;
-}
-
-
-
-void a2232_device::iocpu_map(address_map &map)
-{
-	map(0x0000, 0x3fff).ram().share("shared");
-	map(0x4000, 0x47ff).rw(FUNC(a2232_device::acia_r<0>), FUNC(a2232_device::acia_w<0>));
-	map(0x4800, 0x4fff).rw(FUNC(a2232_device::acia_r<1>), FUNC(a2232_device::acia_w<1>));
-	map(0x5000, 0x57ff).rw(FUNC(a2232_device::acia_r<2>), FUNC(a2232_device::acia_w<2>));
-	map(0x5800, 0x5fff).rw(FUNC(a2232_device::acia_r<3>), FUNC(a2232_device::acia_w<3>));
-	map(0x6000, 0x67ff).rw(FUNC(a2232_device::acia_r<4>), FUNC(a2232_device::acia_w<4>));
-	map(0x6800, 0x6fff).rw(FUNC(a2232_device::acia_r<5>), FUNC(a2232_device::acia_w<5>));
-	map(0x7000, 0x73ff).w(FUNC(a2232_device::int2_w));
-	map(0x7400, 0x77ff).rw(FUNC(a2232_device::acia_r<6>), FUNC(a2232_device::acia_w<6>));
-	map(0x7800, 0x7fff).rw(FUNC(a2232_device::cia_r), FUNC(a2232_device::cia_w));
-	map(0x8000, 0x8000).w(FUNC(a2232_device::irq_ack8_w));
-	map(0xc000, 0xffff).ram().share("shared");
 }

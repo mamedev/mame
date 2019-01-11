@@ -59,11 +59,17 @@
 
 void mpu401_device::mpu401_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(FUNC(mpu401_device::regs_mode2_r), FUNC(mpu401_device::regs_mode2_w));
-	map(0x0020, 0x0021).rw(FUNC(mpu401_device::asic_r), FUNC(mpu401_device::asic_w));
+	map(0x0000, 0x001f).rw(this, FUNC(mpu401_device::regs_mode2_r), FUNC(mpu401_device::regs_mode2_w));
+	map(0x0020, 0x0021).rw(this, FUNC(mpu401_device::asic_r), FUNC(mpu401_device::asic_w));
 	map(0x0080, 0x00ff).ram(); // on-chip RAM
 	map(0x0800, 0x0fff).ram(); // external RAM
 	map(0xf000, 0xffff).rom().region(ROM_TAG, 0);
+}
+
+void mpu401_device::mpu401_io_map(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(mpu401_device::port1_r), FUNC(mpu401_device::port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(mpu401_device::port2_r), FUNC(mpu401_device::port2_w));
 }
 
 ROM_START( mpu401 )
@@ -82,13 +88,10 @@ DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(mpu401_device::device_add_mconfig)
-	M6801(config, m_ourcpu, 4000000); /* 4 MHz as per schematics */
-	m_ourcpu->set_addrmap(AS_PROGRAM, &mpu401_device::mpu401_map);
-	m_ourcpu->in_p1_cb().set(FUNC(mpu401_device::port1_r));
-	m_ourcpu->out_p1_cb().set(FUNC(mpu401_device::port1_w));
-	m_ourcpu->in_p2_cb().set(FUNC(mpu401_device::port2_r));
-	m_ourcpu->out_p2_cb().set(FUNC(mpu401_device::port2_w));
-	m_ourcpu->out_ser_tx_cb().set(MIDIOUT_TAG, FUNC(midi_port_device::write_txd));
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
+	MCFG_DEVICE_PROGRAM_MAP(mpu401_map)
+	MCFG_DEVICE_IO_MAP(mpu401_io_map)
+	MCFG_M6801_SER_TX(WRITELINE(MIDIOUT_TAG, midi_port_device, write_txd))
 
 	MCFG_MIDI_PORT_ADD(MIDIIN_TAG, midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(DEVICE_SELF, mpu401_device, midi_rx_w))

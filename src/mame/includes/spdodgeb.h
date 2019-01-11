@@ -5,22 +5,17 @@
     Super Dodge Ball hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SPDODGEB_H
-#define MAME_INCLUDES_SPDODGEB_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/msm5205.h"
-#include "emupal.h"
 #include "screen.h"
 
 class spdodgeb_state : public driver_device
 {
 public:
-	spdodgeb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	spdodgeb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm1(*this, "msm1"),
@@ -30,19 +25,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram")
-	{ }
+		m_spriteram(*this, "spriteram") { }
 
-	void spdodgeb(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu63705_busy_r);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm1;
@@ -90,17 +74,20 @@ private:
 	TILEMAP_MAPPER_MEMBER(background_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void spdodgeb_palette(palette_device &palette) const;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(spdodgeb);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	DECLARE_CUSTOM_INPUT_MEMBER(mcu63705_busy_r);
 
 	void mcu63705_update_inputs();
 	void spd_adpcm_int(msm5205_device *device, int chip);
+	void spdodgeb(machine_config &config);
 	void spdodgeb_map(address_map &map);
 	void spdodgeb_sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_SPDODGEB_H

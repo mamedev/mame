@@ -30,11 +30,9 @@ public:
 	{ }
 
 	void ice_tbd(machine_config &config);
-
-private:
 	void ice_tbd_io_map(address_map &map);
 	void ice_tbd_map(address_map &map);
-
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -73,10 +71,10 @@ MACHINE_CONFIG_START(ice_tbd_state::ice_tbd)
 	MCFG_DEVICE_PROGRAM_MAP(ice_tbd_map)
 	MCFG_DEVICE_IO_MAP(ice_tbd_io_map)
 
-	i8255_device &ppi(I8255(config, "ppi"));
-	ppi.out_pa_callback().set_nop(); // ?
-	ppi.out_pb_callback().set_nop(); // ?
-	ppi.in_pc_callback().set_constant(0); // ?
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(NOOP) // ?
+	MCFG_I8255_OUT_PORTB_CB(NOOP) // ?
+	MCFG_I8255_IN_PORTC_CB(NOOP) // ?
 MACHINE_CONFIG_END
 
 

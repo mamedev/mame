@@ -10,10 +10,8 @@
 
 #include "pstring.h"
 
-#include <cstddef>
-#include <memory>
-#include <utility>
 #include <vector>
+#include <memory>
 
 namespace plib {
 
@@ -52,7 +50,7 @@ std::unique_ptr<T> make_unique(Args&&... args)
 }
 
 template<typename BC, typename DC, typename... Args>
-std::unique_ptr<BC> make_unique_base(Args&&... args)
+static std::unique_ptr<BC> make_unique_base(Args&&... args)
 {
 	std::unique_ptr<BC> ret(new DC(std::forward<Args>(args)...));
 	return ret;
@@ -153,19 +151,19 @@ private:
 		char *data;
 	};
 
-	block * new_block();
+	size_t new_block();
 	size_t mininfosize();
 
 	struct info
 	{
-		info() : m_block(nullptr) { }
-		block * m_block;
+		info() : m_block(0) { }
+		size_t m_block;
 	};
 
 	size_t m_min_alloc;
 	size_t m_min_align;
 
-	std::vector<block *> m_blocks;
+	std::vector<block> m_blocks;
 
 public:
 	mempool(size_t min_alloc, size_t min_align);

@@ -49,10 +49,11 @@
 
 // memory and address spaces
 #include "emumem.h"
+class address_map; // Forward declaration
 #include "memarray.h"
 
 // machine-wide utilities
-#include "romentry.h"
+#include "romload.h"
 #include "save.h"
 
 // I/O
@@ -94,6 +95,7 @@
 
 // video-related
 #include "drawgfx.h"
+#include "emupal.h"
 #include "tilemap.h"
 #include "video.h"
 

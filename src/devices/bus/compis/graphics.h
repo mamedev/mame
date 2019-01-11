@@ -13,6 +13,23 @@
 
 #pragma once
 
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_COMPIS_GRAPHICS_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, COMPIS_GRAPHICS_SLOT, _clock) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
+#define MCFG_COMPIS_GRAPHICS_SLOT_DMA_REQUEST_CALLBACK(_dma_request) \
+	downcast<compis_graphics_slot_device *>(device)->set_dma_request_callback(DEVCB_##_dma_request);
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -50,18 +67,9 @@ class compis_graphics_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	compis_graphics_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
-		: compis_graphics_slot_device(mconfig, tag, owner, clock)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
 	compis_graphics_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto drq() { return m_write_dma_request.bind(); }
+	template<class _dma_request> void set_dma_request_callback(_dma_request dma_request) { m_write_dma_request.set_callback(dma_request); }
 
 	// computer interface
 	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }

@@ -27,10 +27,9 @@ a78_hiscore_device::a78_hiscore_device(const machine_config &mconfig, const char
 }
 
 
-void a78_hiscore_device::device_add_mconfig(machine_config &config)
-{
-	A78_CART_SLOT(config, "hsc_slot", a7800_cart, nullptr);
-}
+MACHINE_CONFIG_START(a78_hiscore_device::device_add_mconfig)
+	MCFG_A78_CARTRIDGE_ADD("hsc_slot", a7800_cart, nullptr)
+MACHINE_CONFIG_END
 
 
 /*-------------------------------------------------

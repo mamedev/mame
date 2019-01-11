@@ -28,9 +28,9 @@ ROM_START( cpc_hd20 )
 	ROM_DEFAULT_BIOS("xddos210")
 
 	ROM_SYSTEM_BIOS( 0, "xddos210", "X-DDOS 2.10" )
-	ROMX_LOAD( "xddos210.rom",   0x0000, 0x4000, CRC(5477fdb4) SHA1(2f1bd4d6e2d2e62818b01e6e7a26488362a7a8ee), ROM_BIOS(0) )
+	ROMX_LOAD( "xddos210.rom",   0x0000, 0x4000, CRC(5477fdb4) SHA1(2f1bd4d6e2d2e62818b01e6e7a26488362a7a8ee), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "xddos200", "X-DDOS 2.00" )
-	ROMX_LOAD( "x-ddos20.rom",   0x0000, 0x4000, CRC(c2d9cc03) SHA1(8a20788be5f957e84e849c226aa97b55b2a3aab9), ROM_BIOS(1) )
+	ROMX_LOAD( "x-ddos20.rom",   0x0000, 0x4000, CRC(c2d9cc03) SHA1(8a20788be5f957e84e849c226aa97b55b2a3aab9), ROM_BIOS(2) )
 ROM_END
 
 const tiny_rom_entry *cpc_hd20_device::device_rom_region() const
@@ -55,8 +55,10 @@ cpc_hd20_device::cpc_hd20_device(const machine_config &mconfig, const char *tag,
 
 void cpc_hd20_device::device_start()
 {
+	device_t* cpu = machine().device("maincpu");
+	address_space& space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
-	address_space &space = m_slot->cpu().space(AS_IO);
+
 	space.install_write_handler(0xfbe0,0xfbe4,write8_delegate(FUNC(cpc_hd20_device::hdc_w),this));
 	space.install_read_handler(0xfbe0,0xfbe4,read8_delegate(FUNC(cpc_hd20_device::hdc_r),this));
 }

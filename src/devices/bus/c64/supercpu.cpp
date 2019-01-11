@@ -61,14 +61,12 @@ void c64_supercpu_device::c64_supercpu_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void c64_supercpu_device::device_add_mconfig(machine_config &config)
-{
-	G65816(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c64_supercpu_device::c64_supercpu_map);
+MACHINE_CONFIG_START(c64_supercpu_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(G65816_TAG, G65816, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(c64_supercpu_map)
 
-	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
-	m_exp->set_passthrough();
-}
+	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -115,7 +113,7 @@ c64_supercpu_device::c64_supercpu_device(const machine_config &mconfig, const ch
 	device_t(mconfig, C64_SUPERCPU, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, G65816_TAG),
-	m_exp(*this, "exp"),
+	m_exp(*this, C64_EXPANSION_SLOT_TAG),
 	m_sram(*this, "sram"),
 	m_dimm(*this, "dimm")
 {

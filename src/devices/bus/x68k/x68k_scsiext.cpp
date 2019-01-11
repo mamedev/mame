@@ -38,26 +38,25 @@ const tiny_rom_entry *x68k_scsiext_device::device_rom_region() const
 
 // device machine config
 MACHINE_CONFIG_START(x68k_scsiext_device::device_add_mconfig)
-	SCSI_PORT(config, m_scsibus);
-	m_scsibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	m_scsibus->set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	m_scsibus->set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	m_scsibus->set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-	m_scsibus->set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-	m_scsibus->set_slot_device(6, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
-	m_scsibus->set_slot_device(7, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_1)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE3, "harddisk", SCSIHD, SCSI_ID_2)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE4, "harddisk", SCSIHD, SCSI_ID_3)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE5, "harddisk", SCSIHD, SCSI_ID_4)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE6, "harddisk", SCSIHD, SCSI_ID_5)
+	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE7, "harddisk", SCSIHD, SCSI_ID_6)
 
-	MB89352A(config, m_spc);
-	m_spc->set_scsi_port("scsi");
-	m_spc->irq_cb().set(FUNC(x68k_scsiext_device::irq_w));
-	m_spc->drq_cb().set(FUNC(x68k_scsiext_device::drq_w));
+	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
+	MCFG_LEGACY_SCSI_PORT("scsi")
+	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, x68k_scsiext_device, irq_w))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, x68k_scsiext_device, drq_w))
 MACHINE_CONFIG_END
 
 x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X68K_SCSIEXT, tag, owner, clock)
 	, device_x68k_expansion_card_interface(mconfig, *this)
 	, m_slot(nullptr),
-	m_scsibus(*this, "scsi"),
 	m_spc(*this, "mb89352")
 {
 }

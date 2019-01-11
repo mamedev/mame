@@ -7,20 +7,15 @@
     various SNK triple Z80 games
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SNK_H
-#define MAME_INCLUDES_SNK_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
-#include "emupal.h"
 #include "screen.h"
 
 class snk_state : public driver_device
 {
 public:
-	snk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	snk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -31,46 +26,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_tx_videoram(*this, "tx_videoram"),
-		m_rot_io(*this, "P%uROT", 1U),
-		m_trackball_x_io(*this, "TRACKBALLX%u", 1U),
-		m_trackball_y_io(*this, "TRACKBALLY%u", 1U),
-		m_joymode_io(*this, "JOYSTICK_MODE"),
-		m_bonus_io(*this, "BONUS")
-	{ }
+		m_tx_videoram(*this, "tx_videoram") { }
 
-	void gwar(machine_config &config);
-	void psychos(machine_config &config);
-	void fitegolf(machine_config &config);
-	void countryc(machine_config &config);
-	void tdfever2(machine_config &config);
-	void aso(machine_config &config);
-	void gwara(machine_config &config);
-	void tdfever(machine_config &config);
-	void fitegolf2(machine_config &config);
-	void jcross(machine_config &config);
-	void choppera(machine_config &config);
-	void tnk3(machine_config &config);
-	void victroad(machine_config &config);
-	void chopper1(machine_config &config);
-	void vangrd2(machine_config &config);
-	void bermudat(machine_config &config);
-	void hal21(machine_config &config);
-	void marvins(machine_config &config);
-	void athena(machine_config &config);
-	void ikari(machine_config &config);
-	void sgladiat(machine_config &config);
-	void madcrush(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(marvins_sound_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(snk_sound_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
-	DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
-	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
-	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
-	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
@@ -84,16 +41,11 @@ private:
 	required_shared_ptr<uint8_t> m_bg_videoram;
 	required_shared_ptr<uint8_t> m_tx_videoram;
 
-	optional_ioport_array<2> m_rot_io;
-	optional_ioport_array<2> m_trackball_x_io;
-	optional_ioport_array<2> m_trackball_y_io;
-	optional_ioport m_joymode_io;
-	optional_ioport m_bonus_io;
-
 	int m_countryc_trackball;
 	int m_last_value[2];
 	int m_cp_count[2];
 
+	int m_marvins_sound_busy_flag;
 	// FIXME this should be initialised on machine reset
 	int m_sound_status;
 
@@ -127,6 +79,8 @@ private:
 	DECLARE_WRITE8_MEMBER(snk_cpuA_nmi_ack_w);
 	DECLARE_READ8_MEMBER(snk_cpuB_nmi_trigger_r);
 	DECLARE_WRITE8_MEMBER(snk_cpuB_nmi_ack_w);
+	DECLARE_WRITE8_MEMBER(marvins_soundlatch_w);
+	DECLARE_READ8_MEMBER(marvins_soundlatch_r);
 	DECLARE_READ8_MEMBER(marvins_sound_nmi_ack_r);
 	DECLARE_WRITE8_MEMBER(sgladiat_soundlatch_w);
 	DECLARE_READ8_MEMBER(sgladiat_soundlatch_r);
@@ -201,7 +155,14 @@ private:
 	DECLARE_WRITE8_MEMBER(gwara_sp_scroll_msb_w);
 	DECLARE_WRITE8_MEMBER(tdfever_sp_scroll_msb_w);
 	DECLARE_WRITE8_MEMBER(tdfever_spriteram_w);
-
+	DECLARE_CUSTOM_INPUT_MEMBER(marvins_sound_busy);
+	DECLARE_CUSTOM_INPUT_MEMBER(snk_sound_busy);
+	DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
+	DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
+	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
+	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
+	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
+	void init_countryc();
 	TILEMAP_MAPPER_MEMBER(marvins_tx_scan_cols);
 	TILE_GET_INFO_MEMBER(marvins_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ikari_get_tx_tile_info);
@@ -213,7 +174,7 @@ private:
 	TILE_GET_INFO_MEMBER(ikari_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(gwar_get_bg_tile_info);
 	DECLARE_VIDEO_START(marvins);
-	void tnk3_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(tnk3);
 	DECLARE_VIDEO_START(jcross);
 	DECLARE_VIDEO_START(tnk3);
 	DECLARE_VIDEO_START(ikari);
@@ -243,7 +204,27 @@ private:
 	int turbofront_check(int small, int num);
 	int turbofront_check8(int small, int num);
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_1);
-
+	void gwar(machine_config &config);
+	void psychos(machine_config &config);
+	void fitegolf(machine_config &config);
+	void tdfever2(machine_config &config);
+	void aso(machine_config &config);
+	void gwara(machine_config &config);
+	void tdfever(machine_config &config);
+	void fitegolf2(machine_config &config);
+	void jcross(machine_config &config);
+	void choppera(machine_config &config);
+	void tnk3(machine_config &config);
+	void victroad(machine_config &config);
+	void chopper1(machine_config &config);
+	void vangrd2(machine_config &config);
+	void bermudat(machine_config &config);
+	void hal21(machine_config &config);
+	void marvins(machine_config &config);
+	void athena(machine_config &config);
+	void ikari(machine_config &config);
+	void sgladiat(machine_config &config);
+	void madcrush(machine_config &config);
 	void Y8950_sound_map(address_map &map);
 	void YM3526_Y8950_sound_map(address_map &map);
 	void YM3526_YM3526_sound_map(address_map &map);
@@ -254,7 +235,6 @@ private:
 	void aso_cpuB_map(address_map &map);
 	void bermudat_cpuA_map(address_map &map);
 	void bermudat_cpuB_map(address_map &map);
-	void countryc_cpuA_map(address_map &map);
 	void gwar_cpuA_map(address_map &map);
 	void gwar_cpuB_map(address_map &map);
 	void gwara_cpuA_map(address_map &map);
@@ -285,5 +265,3 @@ private:
 	void tnk3_cpuA_map(address_map &map);
 	void tnk3_cpuB_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_SNK_H

@@ -54,13 +54,13 @@
 	downcast<svi_slot_device &>(*device).set_bus(this, "slotbus");
 
 #define MCFG_SVI_SLOT_INT_HANDLER(_devcb) \
-	downcast<svi_slot_bus_device &>(*device).set_int_handler(DEVCB_##_devcb);
+	devcb = &downcast<svi_slot_bus_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_SLOT_ROMDIS_HANDLER(_devcb) \
-	downcast<svi_slot_bus_device &>(*device).set_romdis_handler(DEVCB_##_devcb);
+	devcb = &downcast<svi_slot_bus_device &>(*device).set_romdis_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_SLOT_RAMDIS_HANDLER(_devcb) \
-	downcast<svi_slot_bus_device &>(*device).set_ramdis_handler(DEVCB_##_devcb);
+	devcb = &downcast<svi_slot_bus_device &>(*device).set_ramdis_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

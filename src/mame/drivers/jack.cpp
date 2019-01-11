@@ -189,10 +189,10 @@ void jack_state::jack_map(address_map &map)
 	map(0xb503, 0xb503).portr("IN1");
 	map(0xb504, 0xb504).portr("IN2");
 	map(0xb505, 0xb505).portr("IN3");
-	map(0xb506, 0xb507).rw(FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
+	map(0xb506, 0xb507).rw(this, FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
 	map(0xb600, 0xb61f).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xb800, 0xbbff).ram().w(FUNC(jack_state::jack_videoram_w)).share("videoram");
-	map(0xbc00, 0xbfff).ram().w(FUNC(jack_state::jack_colorram_w)).share("colorram");
+	map(0xb800, 0xbbff).ram().w(this, FUNC(jack_state::jack_videoram_w)).share("videoram");
+	map(0xbc00, 0xbfff).ram().w(this, FUNC(jack_state::jack_colorram_w)).share("colorram");
 	map(0xc000, 0xffff).rom();
 }
 
@@ -205,7 +205,7 @@ void jack_state::striv_map(address_map &map)
 {
 	jack_map(map);
 	map(0xb000, 0xb0ff).nopw();
-	map(0xc000, 0xcfff).r(FUNC(jack_state::striv_question_r));
+	map(0xc000, 0xcfff).r(this, FUNC(jack_state::striv_question_r));
 }
 
 
@@ -214,17 +214,17 @@ void jack_state::joinem_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
 	map(0xb000, 0xb07f).ram().share("spriteram");
-	map(0xb080, 0xb0ff).ram().w(FUNC(jack_state::joinem_scroll_w)).share("scrollram");
+	map(0xb080, 0xb0ff).ram().w(this, FUNC(jack_state::joinem_scroll_w)).share("scrollram");
 	map(0xb400, 0xb400).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb500, 0xb500).portr("DSW1");
 	map(0xb501, 0xb501).portr("DSW2");
 	map(0xb502, 0xb502).portr("IN0");
 	map(0xb503, 0xb503).portr("IN1");
 	map(0xb504, 0xb504).portr("IN2");
-	map(0xb506, 0xb507).rw(FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
-	map(0xb700, 0xb700).w(FUNC(jack_state::joinem_control_w));
-	map(0xb800, 0xbbff).ram().w(FUNC(jack_state::jack_videoram_w)).share("videoram");
-	map(0xbc00, 0xbfff).ram().w(FUNC(jack_state::jack_colorram_w)).share("colorram");
+	map(0xb506, 0xb507).rw(this, FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
+	map(0xb700, 0xb700).w(this, FUNC(jack_state::joinem_control_w));
+	map(0xb800, 0xbbff).ram().w(this, FUNC(jack_state::jack_videoram_w)).share("videoram");
+	map(0xbc00, 0xbfff).ram().w(this, FUNC(jack_state::jack_colorram_w)).share("colorram");
 }
 
 void jack_state::unclepoo_map(address_map &map)
@@ -929,21 +929,23 @@ MACHINE_CONFIG_START(jack_state::jack)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_jack)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jack);
-	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jack)
+
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(18'000'000)/12));
-	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	aysnd.port_b_read_callback().set(FUNC(jack_state::timer_r));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'000'000)/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device,read))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jack_state, timer_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jack_state::treahunt)
@@ -993,9 +995,11 @@ MACHINE_CONFIG_START(jack_state::joinem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(jack_state, screen_update_joinem)
 
-	m_gfxdecode->set_info(gfx_joinem);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_joinem)
 
-	PALETTE(config.replace(), m_palette, FUNC(jack_state::joinem_palette), 64);
+	MCFG_DEVICE_REMOVE("palette")
+	MCFG_PALETTE_ADD("palette", 64)
+	MCFG_PALETTE_INIT_OWNER(jack_state, joinem)
 
 	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
 MACHINE_CONFIG_END
@@ -1012,7 +1016,8 @@ MACHINE_CONFIG_START(jack_state::unclepoo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	m_palette->set_entries(256);
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(256)
 MACHINE_CONFIG_END
 
 

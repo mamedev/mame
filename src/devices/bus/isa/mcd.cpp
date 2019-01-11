@@ -7,8 +7,8 @@
 
 void mcd_isa_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(mcd_isa_device::data_r), FUNC(mcd_isa_device::cmd_w));
-	map(0x1, 0x1).rw(FUNC(mcd_isa_device::flag_r), FUNC(mcd_isa_device::reset_w));
+	map(0x0, 0x0).rw(this, FUNC(mcd_isa_device::data_r), FUNC(mcd_isa_device::cmd_w));
+	map(0x1, 0x1).rw(this, FUNC(mcd_isa_device::flag_r), FUNC(mcd_isa_device::reset_w));
 }
 
 static INPUT_PORTS_START( ide )

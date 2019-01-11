@@ -52,10 +52,10 @@ WRITE_LINE_MEMBER(ti99_single_cart_conn_device::romgq_line)
 /*
     Combined select lines
 */
-void ti99_single_cart_conn_device::set_gromlines(line_state mline, line_state moline, line_state gsq)
+WRITE8_MEMBER(ti99_single_cart_conn_device::set_gromlines)
 {
 	// Pass through
-	m_cartridge->set_gromlines(mline, moline, gsq);
+	m_cartridge->set_gromlines(space, offset, data);
 }
 
 
@@ -83,10 +83,9 @@ void ti99_single_cart_conn_device::device_reset()
 	m_cartridge->set_slot(0);
 }
 
-void ti99_single_cart_conn_device::device_add_mconfig(machine_config &config)
-{
-	TI99_CART(config, "cartridge", 0);
-}
+MACHINE_CONFIG_START(ti99_single_cart_conn_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("cartridge", TI99_CART, 0)
+MACHINE_CONFIG_END
 
 } } } // end namespace bus::ti99::gromport
 

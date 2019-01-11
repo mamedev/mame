@@ -20,6 +20,33 @@
 
 
 //**************************************************************************
+//  GIME CONFIG/INTERFACE
+//**************************************************************************
+
+#define MCFG_GIME_HSYNC_CALLBACK    MCFG_MC6847_HSYNC_CALLBACK
+
+#define MCFG_GIME_FSYNC_CALLBACK    MCFG_MC6847_FSYNC_CALLBACK
+
+#define MCFG_GIME_IRQ_CALLBACK(_write) \
+	devcb = &downcast<gime_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+
+#define MCFG_GIME_FIRQ_CALLBACK(_write) \
+	devcb = &downcast<gime_device &>(*device).set_firq_wr_callback(DEVCB_##_write);
+
+#define MCFG_GIME_FLOATING_BUS_CALLBACK(_read) \
+	devcb = &downcast<gime_device &>(*device).set_floating_bus_rd_callback(DEVCB_##_read);
+
+#define MCFG_GIME_MAINCPU(_tag) \
+	downcast<gime_device &>(*device).set_maincpu_tag(_tag);
+
+#define MCFG_GIME_RAM(_tag) \
+	downcast<gime_device &>(*device).set_ram_tag(_tag);
+
+#define MCFG_GIME_EXT(_tag) \
+	downcast<gime_device &>(*device).set_ext_tag(_tag);
+
+
+//**************************************************************************
 //  GIME CORE
 //**************************************************************************
 
@@ -28,13 +55,16 @@ class cococart_slot_device;
 class gime_device : public mc6847_friend_device, public sam6883_friend_device_interface
 {
 public:
-	auto irq_wr_callback() { return m_write_irq.bind(); }
-	auto firq_wr_callback() { return m_write_firq.bind(); }
-	auto floating_bus_rd_callback() { return m_read_floating_bus.bind(); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_firq_wr_callback(Object &&cb) { return m_write_firq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_floating_bus_rd_callback(Object &&cb) { return m_read_floating_bus.set_callback(std::forward<Object>(cb)); }
+	void set_maincpu_tag(const char *tag) { m_maincpu_tag = tag; }
+	void set_ram_tag(const char *tag) { m_ram_tag = tag; }
+	void set_ext_tag(const char *tag) { m_ext_tag = tag; }
 
 	// read/write
-	DECLARE_READ8_MEMBER( bus_r ) { return read(offset); }
-	DECLARE_WRITE8_MEMBER( bus_w ) { write(offset, data); }
+	DECLARE_READ8_MEMBER( read ) { return read(offset); }
+	DECLARE_WRITE8_MEMBER( write ) { write(offset, data); }
 
 	// used to turn on/off reading/writing to $FF40-$FF5F
 	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }
@@ -79,7 +109,7 @@ protected:
 	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
 
-protected:
+private:
 	typedef mc6847_friend_device super;
 
 	struct scanline_record
@@ -138,43 +168,45 @@ protected:
 	devcb_read8        m_read_floating_bus;
 
 	// device state
-	uint8_t                     m_gime_registers[16];
-	uint8_t                     m_mmu[16];
-	uint8_t                     m_ff22_value;
-	uint8_t                     m_interrupt_value;
-	uint8_t                     m_irq;
-	uint8_t                     m_firq;
-	uint16_t                    m_timer_value;
+	uint8_t                       m_gime_registers[16];
+	uint8_t                       m_mmu[16];
+	uint8_t                       m_ff22_value;
+	uint8_t                       m_interrupt_value;
+	uint8_t                       m_irq;
+	uint8_t                       m_firq;
+	uint16_t                      m_timer_value;
 	bool                        m_is_blinking;
 	bool                        m_composite_phase_invert;
 
 	// video state
 	bool                        m_legacy_video;
-	uint32_t                    m_video_position;
-	uint8_t                     m_line_in_row;
+	uint32_t                      m_video_position;
+	uint8_t                       m_line_in_row;
 	scanline_record             m_scanlines[25+192+26];
 	bool                        m_displayed_rgb;
 
 	// palette state
-	uint8_t                     m_palette_rotated[1024][16];
-	uint16_t                    m_palette_rotated_position;
+	uint8_t                       m_palette_rotated[1024][16];
+	uint16_t                      m_palette_rotated_position;
 	bool                        m_palette_rotated_position_used;
 
 	// incidentals
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
+	ram_device *                m_ram;
 	emu_timer *                 m_gime_clock_timer;
-	required_device<cococart_slot_device> m_cart_device;
+	cococart_slot_device *      m_cart_device;
 	memory_bank *               m_read_banks[9];
 	memory_bank *               m_write_banks[9];
 	uint8_t *                   m_rom;
-	required_memory_region      m_rom_region;
 	uint8_t *                   m_cart_rom;
 	uint32_t                    m_cart_size;
 	pixel_t                     m_composite_palette[64];
 	pixel_t                     m_composite_bw_palette[64];
 	pixel_t                     m_rgb_palette[64];
 	uint8_t                     m_dummy_bank[0x2000];
+
+	const char *m_maincpu_tag;  /* tag of main CPU */
+	const char *m_ram_tag;      /* tag of RAM device */
+	const char *m_ext_tag;      /* tag of expansion device */
 
 	// timer constants
 	static const device_timer_id TIMER_FRAME = 0;
@@ -264,41 +296,7 @@ protected:
 //  VARIATIONS
 //**************************************************************************
 
-class gime_ntsc_device : public gime_device
-{
-public:
-	template <typename T, typename U, typename V, typename W>
-	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&ram_tag, V &&ext_tag, W &&region_tag)
-		: gime_ntsc_device(mconfig, tag, owner, clock)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_ram.set_tag(std::forward<U>(ram_tag));
-		m_cart_device.set_tag(std::forward<V>(ext_tag));
-		m_rom_region.set_tag(std::forward<W>(region_tag));
-	}
-
-	gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-class gime_pal_device : public gime_device
-{
-public:
-	template <typename T, typename U, typename V, typename W>
-	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&ram_tag, V &&ext_tag, W &&region_tag)
-		: gime_pal_device(mconfig, tag, owner, clock)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_ram.set_tag(std::forward<U>(ram_tag));
-		m_cart_device.set_tag(std::forward<V>(ext_tag));
-		m_rom_region.set_tag(std::forward<W>(region_tag));
-	}
-
-	gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-DECLARE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device)
-DECLARE_DEVICE_TYPE(GIME_PAL, gime_pal_device)
+DECLARE_DEVICE_TYPE(GIME_NTSC, gime_device)
+DECLARE_DEVICE_TYPE(GIME_PAL, gime_device)
 
 #endif //MAME_VIDEO_GIME_H

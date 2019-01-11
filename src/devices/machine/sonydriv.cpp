@@ -430,12 +430,6 @@ static void sony_doaction(device_t *device)
 			break;
 		case 0x03:  /* Reset diskswitched */
 			f->disk_switched = 0;
-			// flopdrv.cpp won't reset its disk switch flag without
-			// doing a seek.  So we do a seek of 0 tracks, which works.
-			if (cur_image)
-			{
-				cur_image->floppy_drive_seek(0);
-			}
 			break;
 		case 0x04:  /* Step disk */
 			if (cur_image)
@@ -577,10 +571,4 @@ void sonydriv_floppy_image_device::call_unload()
 	memset(&sony.floppy[id], 0, sizeof(sony.floppy[id]));
 
 	legacy_floppy_image_device::call_unload();
-}
-
-void sonydriv_floppy_image_device::legacy_2_drives_add(machine_config &mconfig, const floppy_interface *config)
-{
-	FLOPPY_SONY(mconfig, FLOPPY_0).set_floppy_config(config);
-	FLOPPY_SONY(mconfig, FLOPPY_1).set_floppy_config(config);
 }

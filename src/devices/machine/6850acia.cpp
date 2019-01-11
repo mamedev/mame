@@ -16,7 +16,7 @@
     MACROS
 ***************************************************************************/
 
-#define VERBOSE 1
+//#define VERBOSE 1
 //#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
@@ -582,20 +582,15 @@ void acia6850_device::output_irq(int irq)
 	{
 		m_irq = irq;
 
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(acia6850_device::delayed_output_irq), this), irq);
-	}
-}
+		if (irq)
+		{
+			m_status &= ~SR_IRQ;
+		}
+		else
+		{
+			m_status |= SR_IRQ;
+		}
 
-TIMER_CALLBACK_MEMBER(acia6850_device::delayed_output_irq)
-{
-	if (m_irq)
-	{
-		m_status &= ~SR_IRQ;
+		m_irq_handler(!m_irq);
 	}
-	else
-	{
-		m_status |= SR_IRQ;
-	}
-
-	m_irq_handler(!m_irq);
 }

@@ -9,6 +9,8 @@
 
 #include "osdcore.h"
 
+#define MCFG_S32COMM_ADD(_tag ) \
+	MCFG_DEVICE_ADD(_tag, S32COMM, 0)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -16,13 +16,12 @@
 #include "video/pc080sn.h"
 #include "video/pc090oj.h"
 #include "machine/timer.h"
-#include "emupal.h"
 
 class rbisland_state : public driver_device
 {
 public:
-	rbisland_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	rbisland_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -34,17 +33,7 @@ public:
 		m_cchip_irq_clear(*this, "cchip_irq_clear")
 	{ }
 
-	void jumping(machine_config &config);
-	void rbisland(machine_config &config);
-	void jumpingi(machine_config &config);
 
-	void init_jumping();
-	void init_rbisland();
-
-protected:
-	virtual void machine_start() override;
-
-private:
 	DECLARE_WRITE16_MEMBER(jumping_sound_w);
 	DECLARE_READ8_MEMBER(jumping_latch_r);
 	DECLARE_WRITE16_MEMBER(rbisland_cchip_ctrl_w);
@@ -56,6 +45,9 @@ private:
 	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
+	void init_jumping();
+	void init_rbisland();
+	virtual void machine_start() override;
 	DECLARE_VIDEO_START(jumping);
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -63,11 +55,15 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
+	void jumping(machine_config &config);
+	void rbisland(machine_config &config);
+	void jumpingi(machine_config &config);
 	void jumping_map(address_map &map);
 	void jumping_sound_map(address_map &map);
 	void rbisland_map(address_map &map);
 	void rbisland_sound_map(address_map &map);
 
+private:
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_spriteram;
 
@@ -88,5 +84,6 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<timer_device> m_cchip_irq_clear;
 };
+
 
 #endif // MAME_INCLUDES_RBISLAND_H

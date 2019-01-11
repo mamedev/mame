@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_COREUTIL_H
-#define MAME_UTIL_COREUTIL_H
-
 #pragma once
+
+#ifndef __COREUTIL_H__
+#define __COREUTIL_H__
 
 #include "osdcomm.h"
 
@@ -81,4 +81,4 @@ void rand_memory(void *memory, size_t length);
 
 uint32_t core_crc32(uint32_t crc, const uint8_t *buf, uint32_t len);
 
-#endif // MAME_UTIL_COREUTIL_H
+#endif /* __COREUTIL_H__ */

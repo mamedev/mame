@@ -12,21 +12,11 @@
 #include "plib/palloc.h"
 #include "plib/ptypes.h"
 
-// deprecated!
-#define NETLIB_DEVICE_IMPL_DEPRECATED(chip) \
+#define NETLIB_DEVICE_IMPL(chip) \
 	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
 			const pstring &name, const pstring &classname, const pstring &def_param) \
 	{ \
 		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
-	} \
-	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
-
-// the new way ...
-#define NETLIB_DEVICE_IMPL(chip, p_name, p_def_param) \
-	static std::unique_ptr<factory::element_t> NETLIB_NAME(chip ## _c)( \
-			const pstring &name, const pstring &classname, const pstring &def_param) \
-	{ \
-		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<NETLIB_NAME(chip)>>(p_name, classname, p_def_param, pstring(__FILE__))); \
 	} \
 	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
 
@@ -36,7 +26,6 @@
 	{ \
 		return std::unique_ptr<factory::element_t>(plib::palloc<factory::device_element_t<ns :: NETLIB_NAME(chip)>>(name, classname, def_param, pstring(__FILE__))); \
 	} \
-	\
 	factory::constructor_ptr_t decl_ ## chip = NETLIB_NAME(chip ## _c);
 
 namespace netlist {

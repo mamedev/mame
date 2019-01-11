@@ -15,7 +15,6 @@
 
 
 #include "includes/dragon.h"
-#include "imagedev/floppy.h"
 #include "sound/ay8910.h"
 #include "machine/wd_fdc.h"
 
@@ -51,9 +50,6 @@ public:
 	{
 	}
 
-	void dgnalpha(machine_config &config);
-
-private:
 	DECLARE_FLOPPY_FORMATS(dragon_formats);
 
 
@@ -70,6 +66,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
+	void dgnalpha(machine_config &config);
+protected:
 	/* driver overrides */
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
@@ -89,6 +87,7 @@ private:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 
+private:
 	uint8_t m_just_reset;
 
 	/* modem */

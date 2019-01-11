@@ -60,7 +60,7 @@
 
 
 #define MCFG_VIDEOBRAIN_EXPANSION_SLOT_EXTRES_CALLBACK(_write) \
-	downcast<videobrain_expansion_slot_device &>(*device).set_extres_wr_callback(DEVCB_##_write);
+	devcb = &downcast<videobrain_expansion_slot_device &>(*device).set_extres_wr_callback(DEVCB_##_write);
 
 
 

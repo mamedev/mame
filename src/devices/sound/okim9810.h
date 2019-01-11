@@ -41,7 +41,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( tmp_register_w );
+	DECLARE_WRITE8_MEMBER( write_tmp_register );
 
 	// serial read/write handlers
 	DECLARE_WRITE_LINE_MEMBER( serial_w );

@@ -117,18 +117,17 @@ void ppu_vt03_device::set_new_pen(int i)
 WRITE8_MEMBER(ppu_vt03_device::palette_write)
 {
 	//logerror("pal write %d %02x\n", offset, data);
-	// why is the check pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x08 : 0x80 in set_2010_reg and 0x04 : 0x80 here?
 	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x04 : 0x80;
 
 	if (m_201x_regs[0] & pal_mask)
 	{
-		m_newpal[offset&0xff] = data;
+		m_newpal[offset] = data;
 		set_new_pen(offset);
 	}
 	else
 	{
-		//if(m_pal_mode == PAL_MODE_NEW_VG) // ddrdismx writes the palette before setting the register but doesn't use 'PAL_MODE_NEW_VG', Konami logo is missing if you don't allow writes to be stored for when we switch
-		m_newpal[offset&0xff] = data;
+		if(m_pal_mode == PAL_MODE_NEW_VG)
+			m_newpal[offset] = data;
 		ppu2c0x_device::palette_write(space, offset, data);
 	}
 }
@@ -155,7 +154,7 @@ void ppu_vt03_device::device_start()
 	ppu2c0x_device::device_start();
 
 	m_newpal = std::make_unique<uint8_t[]>(0x100);
-	save_pointer(NAME(m_newpal), 0x100);
+	save_pointer(&m_newpal[0], "m_newpal", 0x100);
 
 	save_item(NAME(m_201x_regs));
 }
@@ -184,8 +183,6 @@ void ppu_vt03_device::device_reset()
 	// todo: what are the actual defaults for these?
 	for (int i = 0;i < 0x20;i++)
 		set_201x_reg(i, 0x00);
-
-	//m_201x_regs[0] = 0x86; // alt fix for ddrdismx would be to set the default palette mode here
 
 	init_palette();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -41,40 +41,38 @@ void testRng(const char* _name, Ty* _rng)
 	}
 
 	bx::WriterI* writer = bx::getNullOut();
-	bx::Error err;
-
-	bx::write(writer, &err, "%s\n", _name);
+	bx::writePrintf(writer, "%s\n", _name);
 
 	{
-		bx::write(writer, &err, "\tbits histogram:\n");
+		bx::writePrintf(writer, "\tbits histogram:\n");
 		uint32_t min = UINT32_MAX;
 		uint32_t max = 0;
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(histBits); ++ii)
 		{
-			bx::write(writer, &err, "\t\t%3d: %d\n", ii, histBits[ii]);
+			bx::writePrintf(writer, "\t\t%3d: %d\n", ii, histBits[ii]);
 			min = bx::min(min, histBits[ii]);
 			max = bx::max(max, histBits[ii]);
 		}
 
-		bx::write(writer, &err, "\tmin: %d, max: %d (diff: %d)\n", min, max, max-min);
+		bx::writePrintf(writer, "\tmin: %d, max: %d (diff: %d)\n", min, max, max-min);
 
 		REQUIRE(max-min < 8000);
 	}
 
 	{
-		bx::write(writer, &err, "\tuint8_t histogram:\n");
+		bx::writePrintf(writer, "\tuint8_t histogram:\n");
 		uint32_t min = UINT32_MAX;
 		uint32_t max = 0;
 
 		for (uint32_t ii = 0; ii < BX_COUNTOF(histUint8); ++ii)
 		{
-			bx::write(writer, &err, "\t\t%3d: %d\n", ii, histUint8[ii]);
+			bx::writePrintf(writer, "\t\t%3d: %d\n", ii, histUint8[ii]);
 			min = bx::min(min, histUint8[ii]);
 			max = bx::max(max, histUint8[ii]);
 		}
 
-		bx::write(writer, &err, "\tmin: %d, max: %d (diff: %d)\n", min, max, max-min);
+		bx::writePrintf(writer, "\tmin: %d, max: %d (diff: %d)\n", min, max, max-min);
 
 		REQUIRE(max-min < 8000);
 	}

@@ -14,6 +14,7 @@
 #include "imagedev/cassette.h"
 #include "includes/radio86.h"
 #include "includes/partner.h"
+#include "imagedev/flopdrv.h"
 
 /* Driver initialization */
 void partner_state::init_partner()
@@ -48,29 +49,27 @@ void partner_state::partner_window_2(uint8_t bank_num, uint16_t offset,uint8_t *
 	}
 }
 
-uint8_t partner_state::partner_floppy_r(offs_t offset)
-{
+READ8_MEMBER(partner_state::partner_floppy_r){
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : return m_fdc->status_r();
-			case 0x01 : return m_fdc->track_r();
-			case 0x02 : return m_fdc->sector_r();
+			case 0x00 : return m_fdc->status_r(space, 0);
+			case 0x01 : return m_fdc->track_r(space, 0);
+			case 0x02 : return m_fdc->sector_r(space, 0);
 			default   :
-						return m_fdc->data_r();
+						return m_fdc->data_r(space, 0);
 		}
 	} else {
 		return 0;
 	}
 }
 
-void partner_state::partner_floppy_w(offs_t offset, uint8_t data)
-{
+WRITE8_MEMBER(partner_state::partner_floppy_w){
 	if (offset<0x100) {
 		switch(offset & 3) {
-			case 0x00 : m_fdc->cmd_w(data); break;
-			case 0x01 : m_fdc->track_w(data);break;
-			case 0x02 : m_fdc->sector_w(data);break;
-			default   : m_fdc->data_w(data);break;
+			case 0x00 : m_fdc->cmd_w(space, 0,data); break;
+			case 0x01 : m_fdc->track_w(space, 0,data);break;
+			case 0x02 : m_fdc->sector_w(space, 0,data);break;
+			default   : m_fdc->data_w(space, 0,data);break;
 		}
 	} else {
 		floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
@@ -100,8 +99,8 @@ void partner_state::partner_iomap_bank(uint8_t *rom)
 	switch(m_win_mem_page) {
 		case 2 :
 				// FDD
-				space.install_write_handler(0xdc00, 0xddff, write8sm_delegate(FUNC(partner_state::partner_floppy_w),this));
-				space.install_read_handler (0xdc00, 0xddff, read8sm_delegate(FUNC(partner_state::partner_floppy_r),this));
+				space.install_write_handler(0xdc00, 0xddff, write8_delegate(FUNC(partner_state::partner_floppy_w),this));
+				space.install_read_handler (0xdc00, 0xddff, read8_delegate(FUNC(partner_state::partner_floppy_r),this));
 				break;
 		case 4 :
 				// Timer
@@ -315,13 +314,13 @@ void partner_state::partner_bank_switch()
 	}
 }
 
-void partner_state::partner_win_memory_page_w(uint8_t data)
+WRITE8_MEMBER(partner_state::partner_win_memory_page_w)
 {
 	m_win_mem_page = ~data;
 	partner_bank_switch();
 }
 
-void partner_state::partner_mem_page_w(uint8_t data)
+WRITE8_MEMBER(partner_state::partner_mem_page_w)
 {
 	m_mem_page = (data >> 4) & 0x0f;
 	partner_bank_switch();
@@ -333,6 +332,8 @@ I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	const uint8_t *charmap = m_charmap + 0x400 * (gpa * 2 + hlgt);
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	if(linecount == 8)
+		pixels = 0;
 	if (vsp) {
 		pixels = 0;
 	}
@@ -347,7 +348,7 @@ I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 	}
 }
 
-void partner_state::machine_reset()
+MACHINE_RESET_MEMBER(partner_state,partner)
 {
 	m_mem_page = 0;
 	m_win_mem_page = 0;

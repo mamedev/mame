@@ -51,14 +51,13 @@ const tiny_rom_entry *tandy2k_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void tandy2k_keyboard_device::device_add_mconfig(machine_config &config)
-{
-	I8048(config, m_maincpu, 1000000); // ?
-	m_maincpu->p1_out_cb().set(FUNC(tandy2k_keyboard_device::kb_p1_w));
-	m_maincpu->p2_out_cb().set(FUNC(tandy2k_keyboard_device::kb_p2_w));
-	m_maincpu->bus_in_cb().set(FUNC(tandy2k_keyboard_device::kb_p1_r));
-	m_maincpu->set_disable(); // TODO
-}
+MACHINE_CONFIG_START(tandy2k_keyboard_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(I8048_TAG, I8048, 1000000) // ?
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, tandy2k_keyboard_device, kb_p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, tandy2k_keyboard_device, kb_p2_w))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, tandy2k_keyboard_device, kb_p1_r))
+	MCFG_DEVICE_DISABLE() // TODO
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -211,7 +210,7 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 	device_t(mconfig, TANDY2K_KEYBOARD, tag, owner, clock),
 	m_maincpu(*this, I8048_TAG),
 	m_y(*this, "Y%u", 0),
-	m_leds(*this, "led%u", 0U),
+	m_led(*this, "led%u", 0U),
 	m_write_clock(*this),
 	m_write_data(*this),
 	m_keylatch(0xffff),
@@ -227,7 +226,7 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 
 void tandy2k_keyboard_device::device_start()
 {
-	m_leds.resolve();
+	m_led.resolve();
 	// resolve callbacks
 	m_write_clock.resolve_safe();
 	m_write_data.resolve_safe();
@@ -372,8 +371,8 @@ WRITE8_MEMBER( tandy2k_keyboard_device::kb_p2_w )
 	m_keylatch = ((data & 0x0f) << 8) | (m_keylatch & 0xff);
 
 	// led output
-	m_leds[LED_2] = BIT(~data, 4);
-	m_leds[LED_1] = BIT(~data, 5);
+	m_led[LED_2] = BIT(~data, 4);
+	m_led[LED_1] = BIT(~data, 5);
 
 	// keyboard clock
 	int clock = BIT(data, 6);

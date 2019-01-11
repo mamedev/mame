@@ -38,11 +38,6 @@ enum FONSalign {
 	FONS_ALIGN_BASELINE	= 1<<6, // Default
 };
 
-enum FONSglyphBitmap {
-	FONS_GLYPH_BITMAP_OPTIONAL = 1,
-	FONS_GLYPH_BITMAP_REQUIRED = 2,
-};
-
 enum FONSerrorCode {
 	// Font atlas is full.
 	FONS_ATLAS_FULL = 1,
@@ -83,13 +78,12 @@ struct FONStextIter {
 	const char* next;
 	const char* end;
 	unsigned int utf8state;
-	int bitmapOption;
 };
 typedef struct FONStextIter FONStextIter;
 
 typedef struct FONScontext FONScontext;
 
-// Contructor and destructor.
+// Constructor and destructor.
 FONScontext* fonsCreateInternal(FONSparams* params);
 void fonsDeleteInternal(FONScontext* s);
 
@@ -98,7 +92,7 @@ void fonsSetErrorCallback(FONScontext* s, void (*callback)(void* uptr, int error
 void fonsGetAtlasSize(FONScontext* s, int* width, int* height);
 // Expands the atlas size.
 int fonsExpandAtlas(FONScontext* s, int width, int height);
-// Reseta the whole stash.
+// Resets the whole stash.
 int fonsResetAtlas(FONScontext* stash, int width, int height);
 
 // Add fonts
@@ -128,7 +122,7 @@ void fonsLineBounds(FONScontext* s, float y, float* miny, float* maxy);
 void fonsVertMetrics(FONScontext* s, float* ascender, float* descender, float* lineh);
 
 // Text iterator
-int fonsTextIterInit(FONScontext* stash, FONStextIter* iter, float x, float y, const char* str, const char* end, int bitmapOption);
+int fonsTextIterInit(FONScontext* stash, FONStextIter* iter, float x, float y, const char* str, const char* end);
 int fonsTextIterNext(FONScontext* stash, FONStextIter* iter, struct FONSquad* quad);
 
 // Pull texture changes
@@ -886,24 +880,22 @@ error:
 int fonsAddFont(FONScontext* stash, const char* name, const char* path)
 {
 	FILE* fp = 0;
-	size_t dataSize = 0;
-	size_t readed;
+	int dataSize = 0;
 	unsigned char* data = NULL;
 
 	// Read in the font data.
 	fp = fopen(path, "rb");
 	if (fp == NULL) goto error;
 	fseek(fp,0,SEEK_END);
-	dataSize = ftell(fp);
+	dataSize = (int)ftell(fp);
 	fseek(fp,0,SEEK_SET);
 	data = (unsigned char*)malloc(dataSize);
 	if (data == NULL) goto error;
-	readed = fread(data, 1, dataSize, fp);
+	fread(data, 1, dataSize, fp);
 	fclose(fp);
 	fp = 0;
-	if (readed != dataSize) goto error;
 
-	return fonsAddFontMem(stash, name, data, int(dataSize), 1);
+	return fonsAddFontMem(stash, name, data, dataSize, 1);
 
 error:
 	if (data) free(data);
@@ -1043,7 +1035,7 @@ static void fons__blur(FONScontext* stash, unsigned char* dst, int w, int h, int
 }
 
 static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned int codepoint,
-								 short isize, short iblur, int bitmapOption)
+								 short isize, short iblur)
 {
 	int i, g, advance, lsb, x0, y0, x1, y1, gw, gh, gx, gy, x, y;
 	float scale;
@@ -1066,18 +1058,12 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	h = fons__hashint(codepoint) & (FONS_HASH_LUT_SIZE-1);
 	i = font->lut[h];
 	while (i != -1) {
-		if (font->glyphs[i].codepoint == codepoint && font->glyphs[i].size == isize && font->glyphs[i].blur == iblur) {
-			glyph = &font->glyphs[i];
-			if (bitmapOption == FONS_GLYPH_BITMAP_OPTIONAL || (glyph->x0 >= 0 && glyph->y0 >= 0)) {
-			  return glyph;
-			}
-			// At this point, glyph exists but the bitmap data is not yet created.
-			break;
-		}
+		if (font->glyphs[i].codepoint == codepoint && font->glyphs[i].size == isize && font->glyphs[i].blur == iblur)
+			return &font->glyphs[i];
 		i = font->glyphs[i].next;
 	}
 
-	// Create a new glyph or rasterize bitmap data for a cached glyph.
+	// Could not find glyph, create it.
 	g = fons__tt_getGlyphIndex(&font->font, codepoint);
 	// Try to find the glyph in fallback fonts.
 	if (g == 0) {
@@ -1098,34 +1084,20 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	gw = x1-x0 + pad*2;
 	gh = y1-y0 + pad*2;
 
-	// Determines the spot to draw glyph in the atlas.
-	if (bitmapOption == FONS_GLYPH_BITMAP_REQUIRED) {
-		// Find free spot for the rect in the atlas
+	// Find free spot for the rect in the atlas
+	added = fons__atlasAddRect(stash->atlas, gw, gh, &gx, &gy);
+	if (added == 0 && stash->handleError != NULL) {
+		// Atlas is full, let the user to resize the atlas (or not), and try again.
+		stash->handleError(stash->errorUptr, FONS_ATLAS_FULL, 0);
 		added = fons__atlasAddRect(stash->atlas, gw, gh, &gx, &gy);
-		if (added == 0 && stash->handleError != NULL) {
-			// Atlas is full, let the user to resize the atlas (or not), and try again.
-			stash->handleError(stash->errorUptr, FONS_ATLAS_FULL, 0);
-			added = fons__atlasAddRect(stash->atlas, gw, gh, &gx, &gy);
-		}
-		if (added == 0) return NULL;
-	} else {
-		// Negative coordinate indicates there is no bitmap data created.
-		gx = -1;
-		gy = -1;
 	}
+	if (added == 0) return NULL;
 
 	// Init glyph.
-	if (glyph == NULL) {
-		glyph = fons__allocGlyph(font);
-		glyph->codepoint = codepoint;
-		glyph->size = isize;
-		glyph->blur = iblur;
-		glyph->next = 0;
-
-		// Insert char to hash lookup.
-		glyph->next = font->lut[h];
-		font->lut[h] = font->nglyphs-1;
-	}
+	glyph = fons__allocGlyph(font);
+	glyph->codepoint = codepoint;
+	glyph->size = isize;
+	glyph->blur = iblur;
 	glyph->index = g;
 	glyph->x0 = (short)gx;
 	glyph->y0 = (short)gy;
@@ -1134,14 +1106,15 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	glyph->xadv = (short)(scale * advance * 10.0f);
 	glyph->xoff = (short)(x0 - pad);
 	glyph->yoff = (short)(y0 - pad);
+	glyph->next = 0;
 
-	if (bitmapOption == FONS_GLYPH_BITMAP_OPTIONAL) {
-		return glyph;
-	}
+	// Insert char to hash lookup.
+	glyph->next = font->lut[h];
+	font->lut[h] = font->nglyphs-1;
 
 	// Rasterize
 	dst = &stash->texData[(glyph->x0+pad) + (glyph->y0+pad) * stash->params.width];
-	fons__tt_renderGlyphBitmap(&renderFont->font, dst, gw-pad*2,gh-pad*2, stash->params.width, scale, scale, g);
+	fons__tt_renderGlyphBitmap(&renderFont->font, dst, gw-pad*2,gh-pad*2, stash->params.width, scale,scale, g);
 
 	// Make sure there is one pixel empty border.
 	dst = &stash->texData[glyph->x0 + glyph->y0 * stash->params.width];
@@ -1168,7 +1141,7 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	if (iblur > 0) {
 		stash->nscratch = 0;
 		bdst = &stash->texData[glyph->x0 + glyph->y0 * stash->params.width];
-		fons__blur(stash, bdst, gw, gh, stash->params.width, iblur);
+		fons__blur(stash, bdst, gw,gh, stash->params.width, iblur);
 	}
 
 	stash->dirtyRect[0] = fons__mini(stash->dirtyRect[0], glyph->x0);
@@ -1330,7 +1303,7 @@ float fonsDrawText(FONScontext* stash,
 	for (; str != end; ++str) {
 		if (fons__decutf8(&utf8state, &codepoint, *(const unsigned char*)str))
 			continue;
-		glyph = fons__getGlyph(stash, font, codepoint, isize, iblur, FONS_GLYPH_BITMAP_REQUIRED);
+		glyph = fons__getGlyph(stash, font, codepoint, isize, iblur);
 		if (glyph != NULL) {
 			fons__getQuad(stash, font, prevGlyphIndex, glyph, scale, state->spacing, &x, &y, &q);
 
@@ -1353,7 +1326,7 @@ float fonsDrawText(FONScontext* stash,
 }
 
 int fonsTextIterInit(FONScontext* stash, FONStextIter* iter,
-					 float x, float y, const char* str, const char* end, int bitmapOption)
+					 float x, float y, const char* str, const char* end)
 {
 	FONSstate* state = fons__getState(stash);
 	float width;
@@ -1393,7 +1366,6 @@ int fonsTextIterInit(FONScontext* stash, FONStextIter* iter,
 	iter->end = end;
 	iter->codepoint = 0;
 	iter->prevGlyphIndex = -1;
-	iter->bitmapOption = bitmapOption;
 
 	return 1;
 }
@@ -1414,8 +1386,7 @@ int fonsTextIterNext(FONScontext* stash, FONStextIter* iter, FONSquad* quad)
 		// Get glyph and quad
 		iter->x = iter->nextx;
 		iter->y = iter->nexty;
-		glyph = fons__getGlyph(stash, iter->font, iter->codepoint, iter->isize, iter->iblur, iter->bitmapOption);
-		// If the iterator was initialized with FONS_GLYPH_BITMAP_OPTIONAL, then the UV coordinates of the quad will be invalid.
+		glyph = fons__getGlyph(stash, iter->font, iter->codepoint, iter->isize, iter->iblur);
 		if (glyph != NULL)
 			fons__getQuad(stash, iter->font, iter->prevGlyphIndex, glyph, iter->scale, iter->spacing, &iter->nextx, &iter->nexty, quad);
 		iter->prevGlyphIndex = glyph != NULL ? glyph->index : -1;
@@ -1512,7 +1483,7 @@ float fonsTextBounds(FONScontext* stash,
 	for (; str != end; ++str) {
 		if (fons__decutf8(&utf8state, &codepoint, *(const unsigned char*)str))
 			continue;
-		glyph = fons__getGlyph(stash, font, codepoint, isize, iblur, FONS_GLYPH_BITMAP_OPTIONAL);
+		glyph = fons__getGlyph(stash, font, codepoint, isize, iblur);
 		if (glyph != NULL) {
 			fons__getQuad(stash, font, prevGlyphIndex, glyph, scale, state->spacing, &x, &y, &q);
 			if (q.x0 < minx) minx = q.x0;

@@ -20,13 +20,14 @@
  *
  *************************************/
 
-void gridlee_state::gridlee_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(gridlee_state, gridlee)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
-		palette.set_pen_color(i, pal4bit(color_prom[0x0000]), pal4bit(color_prom[0x0800]), pal4bit(color_prom[0x1000]));
+		palette.set_pen_color(i,pal4bit(color_prom[0x0000]),pal4bit(color_prom[0x0800]),pal4bit(color_prom[0x1000]));
 		color_prom++;
 	}
 }
@@ -41,10 +42,13 @@ void gridlee_state::gridlee_palette(palette_device &palette) const
 
 void gridlee_state::expand_pixels()
 {
-	for (int offset = 0; offset < 0x77ff; offset++)
+	uint8_t *videoram = m_videoram;
+	int offset = 0;
+
+	for(offset = 0; offset < 0x77ff; offset++)
 	{
-		m_local_videoram[offset * 2 + 0] = m_videoram[offset] >> 4;
-		m_local_videoram[offset * 2 + 1] = m_videoram[offset] & 15;
+		m_local_videoram[offset * 2 + 0] = videoram[offset] >> 4;
+		m_local_videoram[offset * 2 + 1] = videoram[offset] & 15;
 	}
 }
 
@@ -64,7 +68,7 @@ void gridlee_state::video_start()
 	/* reset the palette */
 	m_palettebank_vis = 0;
 
-	save_pointer(NAME(m_local_videoram), 256 * 256);
+	save_pointer(NAME(m_local_videoram.get()), 256 * 256);
 	save_item(NAME(m_cocktail_flip));
 	save_item(NAME(m_palettebank_vis));
 	machine().save().register_postload(save_prepost_delegate(FUNC(gridlee_state::expand_pixels), this));

@@ -63,6 +63,29 @@ WRITE16_MEMBER( galpani2_bg8_regs_1_w ) { galpani2_bg8_regs_w(space, offset, dat
 /***************************************************************************
 
 
+                            Video Init Functions
+
+
+***************************************************************************/
+
+PALETTE_INIT_MEMBER(galpani2_state, galpani2)
+{
+	int i;
+	/* first $4200 colors are dynamic */
+
+	/* initialize 555 RGB lookup */
+	for (i = 0; i < 0x8000; i++)
+		palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+}
+
+void galpani2_state::video_start()
+{
+}
+
+
+/***************************************************************************
+
+
                                 Screen Drawing
 
 

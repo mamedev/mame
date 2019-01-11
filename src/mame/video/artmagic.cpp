@@ -26,9 +26,9 @@ inline uint16_t *artmagic_state::address_to_vram(offs_t *address)
 	offs_t original = *address;
 	*address = (original & 0x001fffff) >> 4;
 	if (original < 0x001fffff)
-		return m_vram[0];
+		return m_vram0;
 	else if (original >= 0x00400000 && original < 0x005fffff)
-		return m_vram[1];
+		return m_vram1;
 	return nullptr;
 }
 
@@ -42,6 +42,9 @@ inline uint16_t *artmagic_state::address_to_vram(offs_t *address)
 
 void artmagic_state::video_start()
 {
+	m_blitter_base = (uint16_t *)memregion("gfx1")->base();
+	m_blitter_mask = memregion("gfx1")->bytes()/2 - 1;
+
 	save_item(NAME(m_xor));
 	save_item(NAME(m_is_stoneball));
 	save_item(NAME(m_blitter_data));
@@ -81,7 +84,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(artmagic_state::from_shiftreg)
 
 void artmagic_state::execute_blit()
 {
-	uint16_t *dest = m_vram[m_blitter_page ^ 1];
+	uint16_t *dest = m_blitter_page ? m_vram0 : m_vram1;
 	int offset = ((m_blitter_data[1] & 0xff) << 16) | m_blitter_data[0];
 	int color = (m_blitter_data[1] >> 4) & 0xf0;
 	int x = (int16_t)m_blitter_data[2];
@@ -219,7 +222,7 @@ void artmagic_state::execute_blit()
 				}
 				else    /* following lines */
 				{
-					int val = m_blitter_base[offset & m_blitter_base.mask()];
+					int val = m_blitter_base[offset & m_blitter_mask];
 
 					/* ultennis, stonebal */
 					last ^= 4;
@@ -234,7 +237,7 @@ void artmagic_state::execute_blit()
 
 				for (j = 0; j < w; j += 4)
 				{
-					uint16_t val = m_blitter_base[(offset + j/4) & m_blitter_base.mask()];
+					uint16_t val = m_blitter_base[(offset + j/4) & m_blitter_mask];
 					if (sx < 508)
 					{
 						if (h == 1 && m_is_stoneball)
@@ -294,7 +297,7 @@ void artmagic_state::execute_blit()
 }
 
 
-READ16_MEMBER(artmagic_state::blitter_r)
+READ16_MEMBER(artmagic_state::artmagic_blitter_r)
 {
 	/*
 	    bit 1 is a busy flag; loops tightly if clear
@@ -310,7 +313,7 @@ READ16_MEMBER(artmagic_state::blitter_r)
 }
 
 
-WRITE16_MEMBER(artmagic_state::blitter_w)
+WRITE16_MEMBER(artmagic_state::artmagic_blitter_w)
 {
 	COMBINE_DATA(&m_blitter_data[offset]);
 

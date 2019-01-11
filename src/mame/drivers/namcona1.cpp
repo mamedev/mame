@@ -554,23 +554,18 @@ WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_mcu)
 void namcona1_state::namcona1_main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).ram().share("workram");
-	map(0x3f8000, 0x3fffff).rw(FUNC(namcona1_state::mcu_mailbox_r), FUNC(namcona1_state::mcu_mailbox_w_68k));
+	map(0x3f8000, 0x3fffff).rw(this, FUNC(namcona1_state::mcu_mailbox_r), FUNC(namcona1_state::mcu_mailbox_w_68k));
 	map(0x400000, 0xbfffff).rom().region("maskrom", 0);  // data
 	map(0xc00000, 0xdfffff).rom().region("maincpu", 0);  // code
 	map(0xe00000, 0xe00fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
-	map(0xe40000, 0xe4000f).rw(FUNC(namcona1_state::custom_key_r), FUNC(namcona1_state::custom_key_w));
-	map(0xefff00, 0xefffff).ram().w(FUNC(namcona1_state::vreg_w)).share("vreg");
-	map(0xf00000, 0xf01fff).ram().w(FUNC(namcona1_state::paletteram_w)).share("paletteram");
-	map(0xf40000, 0xf7ffff).rw(FUNC(namcona1_state::gfxram_r), FUNC(namcona1_state::gfxram_w)).share("cgram");
-	map(0xff0000, 0xffbfff).ram().w(FUNC(namcona1_state::videoram_w)).share("videoram");
+	map(0xe40000, 0xe4000f).rw(this, FUNC(namcona1_state::custom_key_r), FUNC(namcona1_state::custom_key_w));
+	map(0xefff00, 0xefffff).ram().w(this, FUNC(namcona1_state::vreg_w)).share("vreg");
+	map(0xf00000, 0xf01fff).ram().w(this, FUNC(namcona1_state::paletteram_w)).share("paletteram");
+	map(0xf40000, 0xf7ffff).rw(this, FUNC(namcona1_state::gfxram_r), FUNC(namcona1_state::gfxram_w)).share("cgram");
+	map(0xff0000, 0xffbfff).ram().w(this, FUNC(namcona1_state::videoram_w)).share("videoram");
 	map(0xffd000, 0xffdfff).ram();                         /* unknown */
 	map(0xffe000, 0xffefff).ram().share("scroll");      /* scroll registers */
 	map(0xfff000, 0xffffff).ram().share("spriteram");   /* spriteram */
-}
-
-void namcona1_state::namcona1_c140_map(address_map &map)
-{
-	map(0x000000, 0x07ffff).ram().share("workram");
 }
 
 READ8_MEMBER(xday2_namcona2_state::printer_r)
@@ -591,7 +586,7 @@ void xday2_namcona2_state::xday2_main_map(address_map &map)
 	// these two seems lamps and flash related (mux too?)
 	map(0xd00000, 0xd00001).nopw();
 	map(0xd40000, 0xd40001).nopw();
-	map(0xd80001, 0xd80001).rw(FUNC(xday2_namcona2_state::printer_r), FUNC(xday2_namcona2_state::printer_w)); /* xday: serial out? */
+	map(0xd80001, 0xd80001).rw(this, FUNC(xday2_namcona2_state::printer_r), FUNC(xday2_namcona2_state::printer_w)); /* xday: serial out? */
 	map(0xdc0000, 0xdc001f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff); /* RTC device */
 
 	// seems bigger than standard na1 (otherwise you won't get proper ranking defaults)
@@ -603,7 +598,7 @@ void xday2_namcona2_state::xday2_main_map(address_map &map)
 
 READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 {
-	uint16_t data = swapendian_int16(m_workram[offset]);
+	uint16_t data = flipendian_int16(m_workram[offset]);
 
 #if 0
 	if (offset >= 0x70000/2)
@@ -616,8 +611,8 @@ READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 
 WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 {
-	mem_mask = swapendian_int16(mem_mask);
-	data = swapendian_int16(data);
+	mem_mask = flipendian_int16(mem_mask);
+	data = flipendian_int16(data);
 
 	COMBINE_DATA(&m_workram[offset]);
 }
@@ -644,11 +639,11 @@ WRITE16_MEMBER(namcona1_state::snd_w)
 
 void namcona1_state::namcona1_mcu_map(address_map &map)
 {
-	map(0x000800, 0x000fff).rw(FUNC(namcona1_state::mcu_mailbox_r), FUNC(namcona1_state::mcu_mailbox_w_mcu)); // "Mailslot" communications ports
-	map(0x001000, 0x001fff).rw(FUNC(namcona1_state::snd_r), FUNC(namcona1_state::snd_w)); // C140-alike sound chip
-	map(0x002000, 0x002fff).rw(FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // mirror of first page of shared work RAM
+	map(0x000800, 0x000fff).rw(this, FUNC(namcona1_state::mcu_mailbox_r), FUNC(namcona1_state::mcu_mailbox_w_mcu)); // "Mailslot" communications ports
+	map(0x001000, 0x001fff).rw(this, FUNC(namcona1_state::snd_r), FUNC(namcona1_state::snd_w)); // C140-alike sound chip
+	map(0x002000, 0x002fff).rw(this, FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // mirror of first page of shared work RAM
 	map(0x003000, 0x00afff).ram();                     // there is a 32k RAM chip according to CGFM
-	map(0x200000, 0x27ffff).rw(FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // shared work RAM
+	map(0x200000, 0x27ffff).rw(this, FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // shared work RAM
 }
 
 
@@ -723,6 +718,8 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 void namcona1_state::machine_start()
 {
 	m_mEnableInterrupts = 0;
+	m_c140->set_base(m_workram);
+
 	save_item(NAME(m_mEnableInterrupts));
 	save_item(NAME(m_count));
 	save_item(NAME(m_mcu_mailbox));
@@ -730,8 +727,6 @@ void namcona1_state::machine_start()
 	save_item(NAME(m_mcu_port5));
 	save_item(NAME(m_mcu_port6));
 	save_item(NAME(m_mcu_port8));
-
-	m_scan_timer = timer_alloc(TIMER_SCANLINE);
 }
 
 // the MCU boots the 68000
@@ -741,8 +736,6 @@ void namcona1_state::machine_reset()
 
 	m_mcu_port4 = 0;
 	m_mcu_port5 = 1;
-
-	m_scan_timer->adjust(m_screen->scan_period(), 0, m_screen->scan_period());
 }
 
 // each bit of player 3's inputs is split across one of the 8 analog input ports
@@ -764,12 +757,12 @@ READ8_MEMBER(namcona1_state::portana_r)
 
 void namcona1_state::namcona1_mcu_io_map(address_map &map)
 {
-	map(M37710_PORT4, M37710_PORT4).rw(FUNC(namcona1_state::port4_r), FUNC(namcona1_state::port4_w));
-	map(M37710_PORT5, M37710_PORT5).rw(FUNC(namcona1_state::port5_r), FUNC(namcona1_state::port5_w));
-	map(M37710_PORT6, M37710_PORT6).rw(FUNC(namcona1_state::port6_r), FUNC(namcona1_state::port6_w));
-	map(M37710_PORT7, M37710_PORT7).rw(FUNC(namcona1_state::port7_r), FUNC(namcona1_state::port7_w));
-	map(M37710_PORT8, M37710_PORT8).rw(FUNC(namcona1_state::port8_r), FUNC(namcona1_state::port8_w));
-	map(0x10, 0x1f).r(FUNC(namcona1_state::portana_r));
+	map(M37710_PORT4, M37710_PORT4).rw(this, FUNC(namcona1_state::port4_r), FUNC(namcona1_state::port4_w));
+	map(M37710_PORT5, M37710_PORT5).rw(this, FUNC(namcona1_state::port5_r), FUNC(namcona1_state::port5_w));
+	map(M37710_PORT6, M37710_PORT6).rw(this, FUNC(namcona1_state::port6_r), FUNC(namcona1_state::port6_w));
+	map(M37710_PORT7, M37710_PORT7).rw(this, FUNC(namcona1_state::port7_r), FUNC(namcona1_state::port7_w));
+	map(M37710_PORT8, M37710_PORT8).rw(this, FUNC(namcona1_state::port8_r), FUNC(namcona1_state::port8_w));
+	map(0x10, 0x1f).r(this, FUNC(namcona1_state::portana_r));
 }
 
 
@@ -924,9 +917,9 @@ static const gfx_layout shape_layout =
 };
 
 static GFXDECODE_START( gfx_namcona1 )
-	GFXDECODE_RAM( "cgram",  0, cg_layout_8bpp, 0, 0x2000/256 )
-	GFXDECODE_RAM( "cgram",  0, cg_layout_4bpp, 0, 0x2000/16  )
-	GFXDECODE_RAM(  nullptr, 0, shape_layout,   0, 0x2000/2   )
+	GFXDECODE_RAM( "cgram", 0, cg_layout_8bpp, 0, 0x2000/256 )
+	GFXDECODE_RAM( "cgram", 0, cg_layout_4bpp, 0, 0x2000/16  )
+	GFXDECODE_RAM(  nullptr,   0, shape_layout,   0, 0x2000/2   )
 GFXDECODE_END
 
 /***************************************************************************/
@@ -935,8 +928,9 @@ GFXDECODE_END
 //                 IRQ 1 =>
 //                 IRQ 2 =>
 
-void namcona1_state::scanline_interrupt(int scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::interrupt)
 {
+	int scanline = param;
 	int enabled = m_mEnableInterrupts ? ~m_vreg[0x1a/2] : 0;
 
 	// adc (timing guessed, when does this trigger?)
@@ -963,88 +957,69 @@ void namcona1_state::scanline_interrupt(int scanline)
 	}
 }
 
-void namcona1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if (id == TIMER_SCANLINE)
-	{
-		scanline_interrupt(m_screen->vpos());
-	}
-}
-
-void namcona1_state::c69(machine_config &config)
-{
-	NAMCO_C69(config, m_mcu, MASTER_CLOCK/4);
-	m_mcu->set_addrmap(AS_PROGRAM, &namcona1_state::namcona1_mcu_map);
-	m_mcu->set_addrmap(AS_IO, &namcona1_state::namcona1_mcu_io_map);
-}
-
 /* cropped at sides */
-void namcona1_state::namcona_base(machine_config &config)
-{
+MACHINE_CONFIG_START(namcona1_state::namcona1)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, MASTER_CLOCK/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcona1_state::namcona1_main_map);
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_main_map)
+
+	MCFG_DEVICE_ADD("mcu", NAMCO_C69, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_mcu_map)
+	MCFG_DEVICE_IO_MAP( namcona1_mcu_io_map)
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_main", namcona1_state, interrupt, "screen", 0, 1)
+
+	MCFG_EEPROM_2816_ADD("eeprom")
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(40*8, 32*8);
-//  m_screen->set_visarea(8, 38*8-1-8, 4*8, 32*8-1);
-	m_screen->set_visarea(0, 38*8-1, 4*8, 32*8-1);
-	m_screen->set_screen_update(FUNC(namcona1_state::screen_update));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 38*8-1, 4*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(namcona1_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_entries(0x2000).enable_shadows();
+	MCFG_PALETTE_ADD("palette", 0x2000)
+	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcona1);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_namcona1)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	C140(config, m_c140, 44100);
-	m_c140->set_bank_type(c140_device::C140_TYPE::ASIC219);
-	m_c140->set_addrmap(0, &namcona1_state::namcona1_c140_map);
-	m_c140->add_route(0, "rspeaker", 1.00);
-	m_c140->add_route(1, "lspeaker", 1.00);
-}
+	MCFG_C140_ADD("c140", 44100)
+	MCFG_C140_BANK_TYPE(ASIC219)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
+MACHINE_CONFIG_END
 
-void namcona1_state::namcona1(machine_config &config)
-{
-	namcona_base(config);
-	c69(config);
-	EEPROM_2816(config, "eeprom");
-}
+MACHINE_CONFIG_START(namcona2_state::namcona2)
+	namcona1(config);
 
-void namcona2_state::c70(machine_config &config)
-{
-	NAMCO_C70(config, m_mcu, MASTER_CLOCK/4);
-	m_mcu->set_addrmap(AS_PROGRAM, &namcona1_state::namcona1_mcu_map);
-	m_mcu->set_addrmap(AS_IO, &namcona1_state::namcona1_mcu_io_map);
-}
+	/* basic machine hardware */
+//  MCFG_DEVICE_MODIFY("maincpu")
+//  MCFG_DEVICE_PROGRAM_MAP(namcona2_main_map)
 
-void namcona2_state::namcona2(machine_config &config)
-{
-	namcona_base(config);
-	c70(config);
-	EEPROM_2816(config, "eeprom");
+	MCFG_DEVICE_REPLACE("mcu", NAMCO_C70, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(namcona1_mcu_map)
+	MCFG_DEVICE_IO_MAP( namcona1_mcu_io_map)
+MACHINE_CONFIG_END
 
-//  m_maincpu->set_addrmap(AS_PROGRAM, &namcona2_state::namcona2_main_map);
-}
+MACHINE_CONFIG_START(xday2_namcona2_state::xday2)
+	namcona2(config);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(xday2_main_map)
 
-void xday2_namcona2_state::xday2(machine_config &config)
-{
-	namcona_base(config);
-	c70(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &xday2_namcona2_state::xday2_main_map);
-
-	EEPROM_2864(config, "eeprom");
+	MCFG_DEVICE_REMOVE("eeprom")
+	MCFG_EEPROM_2864_ADD("eeprom")
 
 	// TODO: unknown sub type
-	MSM6242(config,"rtc", XTAL(32'768));
-}
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+MACHINE_CONFIG_END
 
  /* NA-1 Hardware */
 void namcona1_state::init_bkrtmaq()         { m_gametype = NAMCO_BKRTMAQ; }

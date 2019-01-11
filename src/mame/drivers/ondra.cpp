@@ -16,7 +16,6 @@
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/wave.h"
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -34,7 +33,7 @@ void ondra_state::ondra_io(address_map &map)
 {
 	map.global_mask(0x0b);
 	map.unmap_value_high();
-	map(0x03, 0x03).w(FUNC(ondra_state::ondra_port_03_w));
+	map(0x03, 0x03).w(this, FUNC(ondra_state::ondra_port_03_w));
 	//AM_RANGE(0x09, 0x09) AM_WRITE(ondra_port_09_w)
 	//AM_RANGE(0x0a, 0x0a) AM_WRITE(ondra_port_0a_w)
 }
@@ -138,7 +137,7 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ondra_state, vblank_irq))
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	// sound hardware
@@ -152,7 +151,9 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ondra")
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 /* ROM definition */

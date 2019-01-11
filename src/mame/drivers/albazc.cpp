@@ -17,7 +17,6 @@ TODO:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -37,18 +36,19 @@ public:
 
 	void hanaroku(machine_config &config);
 
-private:
+protected:
 	/* video-related */
 	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
 	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
 	virtual void video_start() override;
-	void albazc_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(albazc);
 	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hanaroku_map(address_map &map);
 
+private:
 	required_shared_ptr<uint8_t> m_spriteram1;
 	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_spriteram3;
@@ -63,14 +63,17 @@ private:
 
 /* video */
 
-void albazc_state::albazc_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(albazc_state, albazc)
 {
-	uint8_t const *const color_prom(memregion("proms")->base());
-	for (int i = 0; i < 0x200; i++)
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+	int r, g, b;
+
+	for (i = 0; i < 0x200; i++)
 	{
-		int const b = (color_prom[i * 2 + 1] & 0x1f);
-		int const g = ((color_prom[i * 2 + 1] & 0xe0) | ((color_prom[i * 2 + 0] & 0x03) <<8)) >> 5;
-		int const r = (color_prom[i * 2 + 0] & 0x7c) >> 2;
+		b = (color_prom[i * 2 + 1] & 0x1f);
+		g = ((color_prom[i * 2 + 1] & 0xe0) | ((color_prom[i * 2 + 0]& 0x03) <<8)) >> 5;
+		r = (color_prom[i * 2 + 0] & 0x7c) >> 2;
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
@@ -185,16 +188,16 @@ void albazc_state::hanaroku_map(address_map &map)
 	map(0x9000, 0x97ff).ram().share("spriteram2");
 	map(0xa000, 0xa1ff).ram().share("spriteram3");
 	map(0xa200, 0xa2ff).nopw();    // ??? written once during P.O.S.T.
-	map(0xa300, 0xa304).w(FUNC(albazc_state::albazc_vregs_w));   // ???
+	map(0xa300, 0xa304).w(this, FUNC(albazc_state::albazc_vregs_w));   // ???
 	map(0xb000, 0xb000).nopw();    // ??? always 0x40
 	map(0xc000, 0xc3ff).ram();         // main ram
 	map(0xc400, 0xc4ff).ram().share("nvram");
 	map(0xd000, 0xd000).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xe000, 0xe000).portr("IN0").w(FUNC(albazc_state::hanaroku_out_0_w));
+	map(0xe000, 0xe000).portr("IN0").w(this, FUNC(albazc_state::hanaroku_out_0_w));
 	map(0xe001, 0xe001).portr("IN1");
-	map(0xe002, 0xe002).portr("IN2").w(FUNC(albazc_state::hanaroku_out_1_w));
-	map(0xe004, 0xe004).portr("DSW3").w(FUNC(albazc_state::hanaroku_out_2_w));
+	map(0xe002, 0xe002).portr("IN2").w(this, FUNC(albazc_state::hanaroku_out_1_w));
+	map(0xe004, 0xe004).portr("DSW3").w(this, FUNC(albazc_state::hanaroku_out_2_w));
 }
 
 
@@ -282,7 +285,7 @@ MACHINE_CONFIG_START(albazc_state::hanaroku)
 	MCFG_DEVICE_PROGRAM_MAP(hanaroku_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", albazc_state,  irq0_line_hold)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
 
@@ -293,19 +296,20 @@ MACHINE_CONFIG_START(albazc_state::hanaroku)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(albazc_state, screen_update_hanaroku)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_hanaroku)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hanaroku)
 
-	PALETTE(config, "palette", FUNC(albazc_state::albazc_palette), 0x200);
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(albazc_state, albazc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); /* ? MHz */
-	aysnd.port_a_read_callback().set_ioport("DSW1");
-	aysnd.port_b_read_callback().set_ioport("DSW2");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ? MHz */
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

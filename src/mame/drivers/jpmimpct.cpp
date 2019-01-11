@@ -259,7 +259,8 @@ READ16_MEMBER(jpmimpct_state::duart_1_r)
 		case 0xe:
 		{
 			attotime rate = attotime::from_hz(MC68681_1_CLOCK) * (16 * duart_1.CT);
-			m_duart_1_timer->adjust(rate, 0, rate);
+			timer_device *duart_timer = machine().device<timer_device>("duart_1_timer");
+			duart_timer->adjust(rate, 0, rate);
 			break;
 		}
 		case 0xf:
@@ -469,8 +470,8 @@ WRITE16_MEMBER(jpmimpct_state::volume_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->set_rom_bank((data >> 1) & 3);
-		m_upd7759->reset_w(BIT(data, 0));
+		m_upd7759->set_bank_base(0x20000 * ((data >> 1) & 3));
+		m_upd7759->reset_w(data & 0x01);
 	}
 }
 
@@ -478,7 +479,7 @@ WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_upd7759->port_w(data);
+		m_upd7759->port_w(space, 0, data);
 		m_upd7759->start_w(0);
 		m_upd7759->start_w(1);
 	}
@@ -591,18 +592,18 @@ void jpmimpct_state::m68k_program_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom();
 	map(0x00100000, 0x001fffff).rom();
 	map(0x00400000, 0x00403fff).ram().share("nvram");
-	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
-	map(0x00480020, 0x00480033).r(FUNC(jpmimpct_state::inputs1_r));
-	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::unk_r));
-	map(0x00480060, 0x00480067).rw(FUNC(jpmimpct_state::unk_r), FUNC(jpmimpct_state::unk_w));//PPI
-	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
-	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
-	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
-	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmio_w));
-	map(0x004800e0, 0x004800e1).w(FUNC(jpmimpct_state::unk_w));
-	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::unk_r));
-	map(0x004801de, 0x004801df).r(FUNC(jpmimpct_state::unk_r));
-	map(0x004801e0, 0x004801ff).rw(FUNC(jpmimpct_state::duart_2_r), FUNC(jpmimpct_state::duart_2_w));
+	map(0x00480000, 0x0048001f).rw(this, FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
+	map(0x00480020, 0x00480033).r(this, FUNC(jpmimpct_state::inputs1_r));
+	map(0x00480034, 0x00480035).r(this, FUNC(jpmimpct_state::unk_r));
+	map(0x00480060, 0x00480067).rw(this, FUNC(jpmimpct_state::unk_r), FUNC(jpmimpct_state::unk_w));//PPI
+	map(0x00480080, 0x00480081).w(this, FUNC(jpmimpct_state::upd7759_w));
+	map(0x00480082, 0x00480083).w(this, FUNC(jpmimpct_state::volume_w));
+	map(0x00480084, 0x00480085).r(this, FUNC(jpmimpct_state::upd7759_r));
+	map(0x004800a0, 0x004800af).rw(this, FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmio_w));
+	map(0x004800e0, 0x004800e1).w(this, FUNC(jpmimpct_state::unk_w));
+	map(0x004801dc, 0x004801dd).r(this, FUNC(jpmimpct_state::unk_r));
+	map(0x004801de, 0x004801df).r(this, FUNC(jpmimpct_state::unk_r));
+	map(0x004801e0, 0x004801ff).rw(this, FUNC(jpmimpct_state::duart_2_r), FUNC(jpmimpct_state::duart_2_w));
 	map(0x00800000, 0x00800007).rw(m_dsp, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0x00c00000, 0x00cfffff).rom();
 	map(0x00d00000, 0x00dfffff).rom();
@@ -619,23 +620,23 @@ void jpmimpct_state::awp68k_program_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom(); // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
 	map(0x00400000, 0x00403fff).ram().share("nvram");
-	map(0x00480000, 0x0048001f).rw(FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
-	map(0x00480020, 0x00480033).r(FUNC(jpmimpct_state::inputs1awp_r));
-	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
-	map(0x00480040, 0x00480041).r(FUNC(jpmimpct_state::optos_r));
+	map(0x00480000, 0x0048001f).rw(this, FUNC(jpmimpct_state::duart_1_r), FUNC(jpmimpct_state::duart_1_w));
+	map(0x00480020, 0x00480033).r(this, FUNC(jpmimpct_state::inputs1awp_r));
+	map(0x00480034, 0x00480035).r(this, FUNC(jpmimpct_state::ump_r));
+	map(0x00480040, 0x00480041).r(this, FUNC(jpmimpct_state::optos_r));
 	map(0x00480060, 0x00480067).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
-	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
-	map(0x00480084, 0x00480085).r(FUNC(jpmimpct_state::upd7759_r));
-	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
-	map(0x004800a0, 0x004800af).rw(FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmioawp_w));
+	map(0x00480080, 0x00480081).w(this, FUNC(jpmimpct_state::upd7759_w));
+	map(0x00480082, 0x00480083).w(this, FUNC(jpmimpct_state::volume_w));
+	map(0x00480084, 0x00480085).r(this, FUNC(jpmimpct_state::upd7759_r));
+	map(0x00480086, 0x0048009f).r(this, FUNC(jpmimpct_state::prot_1_r));
+	map(0x004800a0, 0x004800af).rw(this, FUNC(jpmimpct_state::jpmio_r), FUNC(jpmimpct_state::jpmioawp_w));
 //  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
 //  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
 //  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
-	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::prot_1_r));
-	map(0x004801de, 0x006575ff).r(FUNC(jpmimpct_state::prot_1_r));
-	map(0x00657600, 0x00657601).r(FUNC(jpmimpct_state::prot_0_r));
-	map(0x00657602, 0x00ffffff).r(FUNC(jpmimpct_state::prot_1_r));
+	map(0x004801dc, 0x004801dd).r(this, FUNC(jpmimpct_state::prot_1_r));
+	map(0x004801de, 0x006575ff).r(this, FUNC(jpmimpct_state::prot_1_r));
+	map(0x00657600, 0x00657601).r(this, FUNC(jpmimpct_state::prot_0_r));
+	map(0x00657602, 0x00ffffff).r(this, FUNC(jpmimpct_state::prot_1_r));
 
 //  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
 //  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
@@ -660,7 +661,7 @@ void jpmimpct_state::tms_program_map(address_map &map)
 	map(0x00800000, 0x00ffffff).mirror(0xf8000000).rom().region("user1", 0x100000);
 	map(0x02000000, 0x027fffff).mirror(0xf8000000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x0100003f) AM_MIRROR(0xf87fffc0) AM_READWRITE(jpmimpct_bt477_r, jpmimpct_bt477_w)
-	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
+	map(0x01000000, 0x017fffff).mirror(0xf8000000).mask(0x1f).rw(this, FUNC(jpmimpct_state::jpmimpct_bt477_r), FUNC(jpmimpct_state::jpmimpct_bt477_w));
 	map(0x07800000, 0x07bfffff).mirror(0xf8400000).ram();
 	map(0xc0000000, 0xc00001ff).rw(m_dsp, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 }
@@ -843,20 +844,20 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
 	MCFG_DEVICE_PROGRAM_MAP(m68k_program_map)
 
-	TMS34010(config, m_dsp, 40000000);
-	m_dsp->set_addrmap(AS_PROGRAM, &jpmimpct_state::tms_program_map);
-	m_dsp->set_halt_on_reset(true);
-	m_dsp->set_pixel_clock(40000000/16);
-	m_dsp->set_pixels_per_clock(4);
-	m_dsp->set_scanline_rgb32_callback(FUNC(jpmimpct_state::scanline_update));
-	m_dsp->output_int().set(FUNC(jpmimpct_state::tms_irq));
-	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_state::to_shiftreg));
-	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_state::from_shiftreg));
+	MCFG_DEVICE_ADD("dsp", TMS34010, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(40000000/16) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(jpmimpct_state, scanline_update)   /* scanline updater (rgb32) */
+	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, jpmimpct_state, tms_irq))
+	MCFG_TMS340X0_TO_SHIFTREG_CB(jpmimpct_state, to_shiftreg)       /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(jpmimpct_state, from_shiftreg)      /* read from shiftreg function */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
 
@@ -1092,22 +1093,22 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 
 		case 0x02:
 		{
-			m_reel[0]->update((data >> 0)& 0x0F);
-			m_reel[1]->update((data >> 1)& 0x0F);
-			m_reel[2]->update((data >> 2)& 0x0F);
-			m_reel[3]->update((data >> 3)& 0x0F);
-			awp_draw_reel(machine(),"reel1", *m_reel[0]);
-			awp_draw_reel(machine(),"reel2", *m_reel[1]);
-			awp_draw_reel(machine(),"reel3", *m_reel[2]);
-			awp_draw_reel(machine(),"reel4", *m_reel[3]);
+			m_reel0->update((data >> 0)& 0x0F);
+			m_reel1->update((data >> 1)& 0x0F);
+			m_reel2->update((data >> 2)& 0x0F);
+			m_reel3->update((data >> 3)& 0x0F);
+			awp_draw_reel(machine(),"reel1", *m_reel0);
+			awp_draw_reel(machine(),"reel2", *m_reel1);
+			awp_draw_reel(machine(),"reel3", *m_reel2);
+			awp_draw_reel(machine(),"reel4", *m_reel3);
 			break;
 		}
 		case 0x04:
 		{
-			m_reel[4]->update((data >> 4)& 0x0F);
-			m_reel[5]->update((data >> 5)& 0x0F);
-			awp_draw_reel(machine(),"reel5", *m_reel[4]);
-			awp_draw_reel(machine(),"reel6", *m_reel[5]);
+			m_reel4->update((data >> 4)& 0x0F);
+			m_reel5->update((data >> 5)& 0x0F);
+			awp_draw_reel(machine(),"reel5", *m_reel4);
+			awp_draw_reel(machine(),"reel6", *m_reel5);
 			break;
 		}
 		case 0x06:
@@ -1316,37 +1317,37 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	MCFG_DEVICE_PROGRAM_MAP(awp68k_program_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
-	S16LF01(config, m_vfd);
+	MCFG_S16LF01_ADD("vfd",0)
 
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,impctawp)
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	i8255_device &ppi(I8255(config, "ppi8255"));
-	ppi.out_pa_callback().set(FUNC(jpmimpct_state::payen_a_w));
-	ppi.in_pb_callback().set(FUNC(jpmimpct_state::hopper_b_r));
-	ppi.in_pc_callback().set(FUNC(jpmimpct_state::hopper_c_r));
-	ppi.out_pc_callback().set(FUNC(jpmimpct_state::display_c_w));
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, jpmimpct_state, payen_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, jpmimpct_state, hopper_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, jpmimpct_state, hopper_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmimpct_state, display_c_w))
 
 	MCFG_TIMER_DRIVER_ADD("duart_1_timer", jpmimpct_state, duart_1_timer_event)
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	config.set_default_layout(layout_jpmimpct);
+	MCFG_DEFAULT_LAYOUT(layout_jpmimpct)
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[0]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[1]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[2]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[3]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[4]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
+	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel0_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel1_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel2_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel3_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel4_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, jpmimpct_state, reel5_optic_cb))
 
 	MCFG_DEVICE_ADD("meters", METERS, 0)
 	MCFG_METERS_NUMBER(5)

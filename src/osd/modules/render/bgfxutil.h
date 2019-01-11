@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef RENDER_BGFX_UTIL
-#define RENDER_BGFX_UTIL
-
 #pragma once
+
+#ifndef __RENDER_BGFX_UTIL__
+#define __RENDER_BGFX_UTIL__
 
 #include <bgfx/bgfx.h>
 
@@ -15,4 +15,4 @@ public:
 	static uint64_t get_blend_state(uint32_t blend);
 };
 
-#endif // RENDER_BGFX_UTIL
+#endif // __RENDER_BGFX_UTIL__

@@ -7,7 +7,7 @@
 
  This is an ARM7 with Internal ROM. (Also used on later PGM games)
 
- In some cases the first part of the Internal ROM is execute only, and
+ In some cases the first part of the Internal ROM is excute only, and
  cannot be read out with a trojan.  It hasn't been confirmed if these
  games make use of that feature.
 
@@ -39,8 +39,10 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
-	void igs_majhong(machine_config &config);
-	void amazonia(machine_config &config);
+	optional_shared_ptr<uint32_t> m_igs_mainram;
+	required_device<cpu_device> m_maincpu;
+	required_device<igs017_igs031_device> m_igs017_igs031;
+
 
 	void init_sdwx();
 	void init_chessc2();
@@ -57,17 +59,14 @@ public:
 	void init_amazonia();
 	void init_amazoni2();
 
-private:
-	optional_shared_ptr<uint32_t> m_igs_mainram;
-	required_device<cpu_device> m_maincpu;
-	required_device<igs017_igs031_device> m_igs017_igs031;
-
 	virtual void video_start() override;
 	uint32_t screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
+	void igs_majhong(machine_config &config);
+	void amazonia(machine_config &config);
 	void igs_majhong_map(address_map &map);
 };
 
@@ -331,7 +330,7 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
-//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -346,11 +345,11 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_text_reverse_bits();
-	m_igs017_igs031->set_palette("palette");
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_IGS017_IGS031_REVERSE_TEXT_BITS
+	MCFG_GFX_PALETTE("palette")
 
-	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
+	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
 
 	/* sound hardware */
 	// OK6295
@@ -364,7 +363,7 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_DEVICE_ADD("maincpu", ARM7, 20000000)
 	MCFG_DEVICE_PROGRAM_MAP(igs_majhong_map)
 
-//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 
 
@@ -380,11 +379,11 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_text_reverse_bits();
-	m_igs017_igs031->set_palette("palette");
+	MCFG_DEVICE_ADD("igs017_igs031", IGS017_IGS031, 0)
+	MCFG_IGS017_IGS031_REVERSE_TEXT_BITS
+	MCFG_GFX_PALETTE("palette")
 
-	// 82C55? (accessed through igs017/igs031 area like igs017.cpp?)
+	// 82C55? (accessed through igs017/igs031 area like igs017.c?)
 
 	/* sound hardware */
 	// OK6295
@@ -1136,5 +1135,5 @@ GAME( 200?, lhzb4,     0,        igs_majhong, sdwx, igs_m027_state, init_lhzb4, 
 GAME( 200?, klxyj,     0,        igs_majhong, sdwx, igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
 GAME( 2000, mgfx,      0,        igs_majhong, sdwx, igs_m027_state, init_mgfx,     ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
 GAME( 200?, gonefsh2,  0,        igs_majhong, sdwx, igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
-GAME( 2002, chessc2,   0,        igs_majhong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II",   MACHINE_IS_SKELETON )
+GAME( 200?, chessc2,   0,        igs_majhong, sdwx, igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge 2",   MACHINE_IS_SKELETON )
 GAME( 200?, haunthig,  0,        igs_majhong, sdwx, igs_m027_state, init_hauntedh, ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )

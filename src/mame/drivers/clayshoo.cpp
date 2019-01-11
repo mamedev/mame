@@ -221,7 +221,7 @@ void clayshoo_state::main_map(address_map &map)
 	map(0x4000, 0x47ff).rom();
 	map(0x8000, 0x97ff).ram().share("videoram");    /* 6k of video ram according to readme */
 	map(0x9800, 0xa800).nopw();      /* not really mapped, but cleared */
-	map(0xc800, 0xc800).rw(FUNC(clayshoo_state::analog_r), FUNC(clayshoo_state::analog_reset_w));
+	map(0xc800, 0xc800).rw(this, FUNC(clayshoo_state::analog_r), FUNC(clayshoo_state::analog_reset_w));
 }
 
 
@@ -330,7 +330,7 @@ MACHINE_CONFIG_START(clayshoo_state::clayshoo)
 	MCFG_DEVICE_IO_MAP(main_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,11 +340,11 @@ MACHINE_CONFIG_START(clayshoo_state::clayshoo)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_UPDATE_DRIVER(clayshoo_state, screen_update_clayshoo)
 
-	I8255A(config, "ppi8255_0");
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 
-	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
-	ppi1.out_pa_callback().set(FUNC(clayshoo_state::input_port_select_w));
-	ppi1.in_pb_callback().set(FUNC(clayshoo_state::input_port_r));
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, clayshoo_state, input_port_select_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, clayshoo_state, input_port_r))
 MACHINE_CONFIG_END
 
 

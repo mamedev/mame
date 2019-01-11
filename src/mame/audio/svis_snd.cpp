@@ -25,9 +25,6 @@ DEFINE_DEVICE_TYPE(SVISION_SND, svision_sound_device, "svision_sound", "Super Vi
 svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SVISION_SND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_irq_cb(*this)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_cartrom(*this, finder_base::DUMMY_TAG)
 	, m_mixer_channel(nullptr)
 {
 }
@@ -39,7 +36,8 @@ svision_sound_device::svision_sound_device(const machine_config &mconfig, const 
 
 void svision_sound_device::device_start()
 {
-	m_irq_cb.resolve_safe();
+	// bind callbacks
+	m_irq_cb.bind_relative_to(*owner());
 
 	memset(&m_dma, 0, sizeof(m_dma));
 	memset(&m_noise, 0, sizeof(m_noise));
@@ -134,11 +132,11 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			uint16_t addr = m_dma.start + (unsigned) m_dma.pos / 2;
 			if (addr >= 0x8000 && addr < 0xc000)
 			{
-				sample = ((uint8_t*)m_cartrom->base())[(addr & 0x3fff) | m_dma.ca14to16];
+				sample = machine().root_device().memregion("user1")->base()[(addr & 0x3fff) | m_dma.ca14to16];
 			}
 			else
 			{
-				sample = m_maincpu->space(AS_PROGRAM).read_byte(addr);
+				sample = machine().device("maincpu")->memory().space(AS_PROGRAM).read_byte(addr);
 			}
 			if (((unsigned)m_dma.pos) & 1)
 				s = (sample & 0xf);
@@ -154,7 +152,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			{
 				m_dma.finished = true;
 				m_dma.on = false;
-				m_irq_cb(1);
+				m_irq_cb();
 			}
 		}
 	}
@@ -175,7 +173,7 @@ WRITE8_MEMBER( svision_sound_device::sounddma_w )
 			m_dma.size = (data ? data : 0x100) * 32;
 			break;
 		case 3:
-			m_dma.step = unscaled_clock() / (256.0 * machine().sample_rate() * (1 + (data & 3)));
+			m_dma.step = machine().device("maincpu")->unscaled_clock() / (256.0 * machine().sample_rate() * (1 + (data & 3)));
 			m_dma.right = data & 4;
 			m_dma.left = data & 8;
 			m_dma.ca14to16 = ((data & 0x70) >> 4) << 14;
@@ -199,7 +197,7 @@ WRITE8_MEMBER( svision_sound_device::noise_w )
 	{
 		case 0:
 			m_noise.volume=data&0xf;
-			m_noise.step= unscaled_clock() / (256.0*machine().sample_rate()*(1+(data>>4)));
+			m_noise.step= machine().device("maincpu")->unscaled_clock() / (256.0*machine().sample_rate()*(1+(data>>4)));
 			break;
 		case 1:
 			m_noise.count = data + 1;
@@ -214,6 +212,12 @@ WRITE8_MEMBER( svision_sound_device::noise_w )
 			break;
 	}
 	m_noise.pos=0.0;
+}
+
+
+int *svision_sound_device::dma_finished()
+{
+	return &m_dma.finished;
 }
 
 
@@ -244,7 +248,7 @@ void svision_sound_device::soundport_w(int which, int offset, int data)
 			if (size)
 			{
 				//  channel.size=(int)(device->machine().sample_rate()*(size<<5)/4e6);
-				channel.size = (int) (machine().sample_rate() * (size << 5) / unscaled_clock());
+				channel.size= (int) (machine().sample_rate() * (size << 5) / machine().device("maincpu")->unscaled_clock());
 			}
 			else
 			{

@@ -21,7 +21,6 @@ written, so it may be normal behaviour.
 #include "sound/3526intf.h"
 #include "sound/okim6295.h"
 #include "machine/watchdog.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,26 +35,21 @@ public:
 		, m_oki(*this, "oki")
 	{ }
 
-	void missb2(machine_config &config);
-	void bublpong(machine_config &config);
-
-	void init_missb2();
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
 	DECLARE_WRITE8_MEMBER(missb2_oki_w);
 	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void init_missb2();
+	DECLARE_MACHINE_START(missb2);
+	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void missb2(machine_config &config);
+	void bublpong(machine_config &config);
 	void maincpu_map(address_map &map);
 	void sound_map(address_map &map);
 	void subcpu_map(address_map &map);
-
+protected:
 	void configure_banks();
 
 	required_shared_ptr<uint8_t> m_bgvram;
@@ -194,10 +188,10 @@ void missb2_state::maincpu_map(address_map &map)
 	map(0xe000, 0xf7ff).ram().share("share1");
 	map(0xf800, 0xf9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xfa00, 0xfa00).mirror(0x007c).r(m_sound_to_main, FUNC(generic_latch_8_device::read)).w(m_main_to_sound, FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).mirror(0x007c).r(FUNC(missb2_state::common_sound_semaphores_r));
-	map(0xfa03, 0xfa03).mirror(0x007c).w(FUNC(missb2_state::bublbobl_soundcpu_reset_w));
+	map(0xfa01, 0xfa01).mirror(0x007c).r(this, FUNC(missb2_state::common_sound_semaphores_r));
+	map(0xfa03, 0xfa03).mirror(0x007c).w(this, FUNC(missb2_state::bublbobl_soundcpu_reset_w));
 	map(0xfa80, 0xfa80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xfb40, 0xfb40).w(FUNC(missb2_state::bublbobl_bankswitch_w));
+	map(0xfb40, 0xfb40).w(this, FUNC(missb2_state::bublbobl_bankswitch_w));
 	map(0xfc00, 0xfcff).ram();
 	map(0xfd00, 0xfdff).ram();         // ???
 	map(0xfe00, 0xfe03).ram();         // ???
@@ -218,7 +212,7 @@ void missb2_state::subcpu_map(address_map &map)
 	map(0xb000, 0xb1ff).rom();         // banked ???
 	map(0xc000, 0xc1ff).ram().w(m_bgpalette, FUNC(palette_device::write8)).share("bgpalette");
 	map(0xc800, 0xcfff).ram();         // main ???
-	map(0xd000, 0xd000).w(FUNC(missb2_state::missb2_bg_bank_w));
+	map(0xd000, 0xd000).w(this, FUNC(missb2_state::missb2_bg_bank_w));
 	map(0xd002, 0xd002).nopw();
 	map(0xd003, 0xd003).ram().share("bgvram");
 	map(0xe000, 0xf7ff).ram().share("share1");
@@ -231,10 +225,10 @@ void missb2_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9000).rw(FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //AM_MIRROR(0x0fff) ???
-	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym3526", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
+	map(0x9000, 0x9000).rw(this, FUNC(missb2_state::missb2_oki_r), FUNC(missb2_state::missb2_oki_w)); //AM_MIRROR(0x0fff) ???
+	map(0xa000, 0xa001).mirror(0x0ffe).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
-	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(missb2_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
+	map(0xb001, 0xb001).mirror(0x0ffc).r(this, FUNC(missb2_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0xb002, 0xb002).mirror(0x0ffc).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
 	map(0xe000, 0xefff).rom();         // space for diagnostic ROM?
 }
@@ -451,75 +445,85 @@ WRITE_LINE_MEMBER(missb2_state::irqhandler)
 
 /* Machine Driver */
 
-void missb2_state::machine_start()
+MACHINE_START_MEMBER(missb2_state,missb2)
 {
-	MACHINE_START_CALL_MEMBER(common);
-
 	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
+
+	m_sreset_old = CLEAR_LINE;
+	save_item(NAME(m_video_enable));
+	save_item(NAME(m_sreset_old));
 }
 
-void missb2_state::machine_reset()
+MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
-
 	m_oki->reset();
 	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
-void missb2_state::missb2(machine_config &config)
-{
+MACHINE_CONFIG_START(missb2_state::missb2)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAIN_XTAL/4);   // 6 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &missb2_state::maincpu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(missb2_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	Z80(config, m_subcpu, MAIN_XTAL/4); // 6 MHz
-	m_subcpu->set_addrmap(AS_PROGRAM, &missb2_state::subcpu_map);
-	m_subcpu->set_vblank_int("screen", FUNC(missb2_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, MAIN_XTAL/8);  // 3 MHz
-	m_audiocpu->set_addrmap(AS_PROGRAM, &missb2_state::sound_map);
-	m_audiocpu->set_vblank_int("screen", FUNC(missb2_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 128);
+
+	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
+	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(missb2_state::screen_update_missb2));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(missb2_state, screen_update_missb2)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_missb2);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
-	PALETTE(config, m_bgpalette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_missb2)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_PALETTE_ADD("bgpalette", 256)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	GENERIC_LATCH_8(config, m_main_to_sound);
-	m_main_to_sound->data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
+	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
 
-	GENERIC_LATCH_8(config, m_sound_to_main);
+	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
-	YM3526(config, m_ym3526, MAIN_XTAL/8);
-	m_ym3526->irq_handler().set(FUNC(missb2_state::irqhandler));
-	m_ym3526->add_route(ALL_OUTPUTS, "mono", 0.40);
+	MCFG_DEVICE_ADD("ymsnd", YM3526, MAIN_XTAL/8)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, missb2_state, irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "mono", 0.4);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
+MACHINE_CONFIG_END
 
-void missb2_state::bublpong(machine_config &config)
-{
+MACHINE_CONFIG_START(missb2_state::bublpong)
 	missb2(config);
-	m_gfxdecode->set_info(gfx_bublpong);
-}
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bublpong)
+MACHINE_CONFIG_END
 
 /* ROMs */
 

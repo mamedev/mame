@@ -5,10 +5,6 @@
     Gradius 3
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_GRADIUS3_H
-#define MAME_INCLUDES_GRADIUS3_H
-
-#pragma once
 
 #include "machine/timer.h"
 #include "sound/k007232.h"
@@ -19,8 +15,8 @@
 class gradius3_state : public driver_device
 {
 public:
-	gradius3_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	gradius3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_gfxram(*this, "k052109"),
 		m_gfxrom(*this, "k051960"),
 		m_maincpu(*this, "maincpu"),
@@ -28,12 +24,8 @@ public:
 		m_subcpu(*this, "sub"),
 		m_k007232(*this, "k007232"),
 		m_k052109(*this, "k052109"),
-		m_k051960(*this, "k051960")
-	{ }
+		m_k051960(*this, "k051960") { }
 
-	void gradius3(machine_config &config);
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_gfxram;
 	required_region_ptr<uint8_t> m_gfxrom;
@@ -74,9 +66,8 @@ private:
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
+	void gradius3(machine_config &config);
 	void gradius3_map(address_map &map);
 	void gradius3_map2(address_map &map);
 	void gradius3_s_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_GRADIUS3_H

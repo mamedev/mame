@@ -10,6 +10,7 @@ TODO:
 - kurufev: column scrolling garbage on map and matchup screens. (btanb?)
 - mayjin3: static noise during gameplay.
 - starsldr: credit display is busted, it displays a 0 if credit is between 0 and 9. Silly protection/core bug? <- fixed as per 060916
+- vivdolls: PCB actually supports analogue joystick or JAMMA standard, dip 5 - currently only analogue controls are supported in driver
 
 
 If you want to boot eleven beat on any n64 emu ?(tested on nemu, 1964 and project64) patch the rom :
@@ -79,7 +80,7 @@ Notes:
 The cart contains:
                    CIC-NUS-5101: Boot protection chip
                    BK4D-NUS    : Similar to the save chip used in N64 console carts
-                   NUS-ZHAJ.U3 : 64Mbit 28 pin DIP serial mask ROM
+                   NUS-ZHAJ.U3 : 64Mbit 28 pin DIP serial MASKROM
 
       - RCA audio plugs output stereo sound. Regular mono sound is output
         via the standard JAMMA connector also.
@@ -149,7 +150,7 @@ PCB Layout
 Notes:
       Hsync      : 15.73kHz
       VSync      : 60Hz
-      *          : Unpopulated socket for 8M - 32M 42 pin DIP mask ROM
+      *          : Unpopulated socket for 8M - 32M 42 pin DIP MASKROM
       O          : Push-button reset switch
       X          : Connectors for special (Aleck64?) digital joysticks
       CPU-NUS A  : Labelled on the PCB as "VR4300"
@@ -157,8 +158,8 @@ Notes:
 
       ROMs
       ----
-      TET-01M.U5 : 8Mbit 42 pin mask ROM
-      NUS-CZAJ.U4: 128Mbit 28 pin DIP serial mask ROM
+      TET-01M.U5 : 8Mbit 42 pin MASKROM
+      NUS-CZAJ.U4: 128Mbit 28 pin DIP serial MASKROM
       AT24C01.U34: 128bytes x 8 bit serial EEPROM
 
       - RCA audio plugs output stereo sound. Regular mono sound is output
@@ -168,7 +169,7 @@ Notes:
         logic devices that most people need not be concerned about :-)
 
       - The Seta/N64 Aleck64 hardware is similar also, but instead of the high capacity
-        serial mask ROM being on the main board, it's in a cart that plugs into a slot.
+        serial MASKROM being on the main board, it's in a cart that plugs into a slot.
 
 */
 
@@ -178,7 +179,6 @@ Notes:
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -187,18 +187,12 @@ class aleck64_state : public n64_state
 {
 public:
 	aleck64_state(const machine_config &mconfig, device_type type, const char *tag)
-		: n64_state(mconfig, type, tag)
-		, m_e90_vram(*this,"e90vram")
-		, m_e90_pal(*this,"e90pal")
-		, m_dip_read_offset(0)
-	{ }
-
-	void aleck64(machine_config &config);
-	void a64_e90(machine_config &config);
+		: n64_state(mconfig, type, tag),
+			m_e90_vram(*this,"e90vram"),
+			m_e90_pal(*this,"e90pal"),
+			m_dip_read_offset(0) { }
 
 	void init_aleck64();
-
-private:
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
 	DECLARE_READ16_MEMBER(e90_prot_r);
@@ -206,12 +200,16 @@ private:
 
 	uint32_t screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void aleck64(machine_config &config);
+	void a64_e90(machine_config &config);
 	void e90_map(address_map &map);
 	void n64_map(address_map &map);
 	void rsp_map(address_map &map);
+protected:
 	optional_shared_ptr<uint32_t> m_e90_vram;
 	optional_shared_ptr<uint32_t> m_e90_pal;
 
+private:
 	uint32_t m_dip_read_offset;
 };
 
@@ -338,7 +336,7 @@ void aleck64_state::n64_map(address_map &map)
 
 	map(0xc0000000, 0xc07fffff).ram(); // SDRAM, Aleck 64 specific
 
-	map(0xc0800000, 0xc0800fff).rw(FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
+	map(0xc0800000, 0xc0800fff).rw(this, FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
 }
 
 /*
@@ -377,7 +375,7 @@ void aleck64_state::e90_map(address_map &map)
 	n64_map(map);
 	map(0xd0000000, 0xd0000fff).ram().share("e90vram");// x/y offsets
 	map(0xd0010000, 0xd0010fff).ram().share("e90pal");// RGB555 palette
-	map(0xd0030000, 0xd003001f).rw(FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
+	map(0xd0030000, 0xd003001f).rw(this, FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
 }
 
 void aleck64_state::rsp_map(address_map &map)
@@ -500,52 +498,6 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( vivdolls )
 	PORT_INCLUDE( aleck64 )
 
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Button A
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Button B
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Button Z
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)                          // Start
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)      // Joypad Up
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)    // Joypad Down
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)    // Joypad Left
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)   // Joypad Right
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Pan Left
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Pan Right
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // C Button Up
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // C Button Down
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // C Button Left
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // C Button Right
-
-	PORT_MODIFY("P1_ANALOG_X")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)
-
-	PORT_MODIFY("P1_ANALOG_Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1) PORT_REVERSE PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Button A
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Button B
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Button Z
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)                          // Start
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)      // Joypad Up
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)    // Joypad Down
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)    // Joypad Left
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)   // Joypad Right
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Pan Left
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // Pan Right
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // C Button Up
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // C Button Down
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // C Button Left
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)          // C Button Right
-
-	PORT_MODIFY("P2_ANALOG_X")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)
-
-	PORT_MODIFY("P2_ANALOG_Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2) PORT_REVERSE PORT_CONDITION("IN0", 0x00100000, EQUALS, 0x00100000)
-
 	PORT_MODIFY("IN0")
 	PORT_DIPNAME( 0x80000000, 0x80000000, "Unused" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING( 0x80000000, DEF_STR( Off ) )
@@ -593,26 +545,7 @@ static INPUT_PORTS_START( vivdolls )
 	PORT_DIPSETTING( 0x00010000, DEF_STR( Easy ) )
 	PORT_DIPSETTING( 0x00020000, DEF_STR( Hard ) )
 	PORT_DIPSETTING( 0x00000000, DEF_STR( Hardest ) )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START2 ) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 ) PORT_CONDITION("IN0", 0x00100000, NOTEQUALS, 0x00100000)
+	PORT_BIT(0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( 11beat )
@@ -973,43 +906,45 @@ static INPUT_PORTS_START( srmvs )
 INPUT_PORTS_END
 
 
-void aleck64_state::aleck64(machine_config &config)
-{
+MACHINE_CONFIG_START(aleck64_state::aleck64)
+
 	/* basic machine hardware */
-	VR4300BE(config, m_vr4300, 93750000);
-	m_vr4300->set_icache_size(16384);
-	m_vr4300->set_dcache_size(8192);
-	m_vr4300->set_system_clock(62500000);
-	m_vr4300->set_addrmap(AS_PROGRAM, &aleck64_state::n64_map);
-	m_vr4300->set_force_no_drc(true);
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, 93750000)
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(8192)
+	MCFG_MIPS3_SYSTEM_CLOCK(62500000)
+	MCFG_DEVICE_PROGRAM_MAP(n64_map)
+	MCFG_CPU_FORCE_NO_DRC()
 
-	RSP(config, m_rsp, 62500000);
-	m_rsp->dp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_r));
-	m_rsp->dp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::dp_reg_w));
-	m_rsp->sp_reg_r().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_r));
-	m_rsp->sp_reg_w().set(m_rcp_periphs, FUNC(n64_periphs::sp_reg_w));
-	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
-	m_rsp->set_addrmap(AS_PROGRAM, &aleck64_state::rsp_map);
-	m_rsp->set_force_no_drc(true);
+	MCFG_DEVICE_ADD("rsp", RSP, 62500000)
+	MCFG_RSP_DP_REG_R_CB(READ32("rcp",n64_periphs, dp_reg_r))
+	MCFG_RSP_DP_REG_W_CB(WRITE32("rcp",n64_periphs, dp_reg_w))
+	MCFG_RSP_SP_REG_R_CB(READ32("rcp",n64_periphs, sp_reg_r))
+	MCFG_RSP_SP_REG_W_CB(WRITE32("rcp",n64_periphs, sp_reg_w))
+	MCFG_RSP_SP_SET_STATUS_CB(WRITE32("rcp",n64_periphs, sp_set_status))
+	MCFG_DEVICE_PROGRAM_MAP(rsp_map)
+	MCFG_CPU_FORCE_NO_DRC()
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 525);
-	screen.set_visarea(0, 639, 0, 239);
-	screen.set_screen_update(FUNC(aleck64_state::screen_update_n64));
-	screen.screen_vblank().set(FUNC(aleck64_state::screen_vblank_n64));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(640, 525)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_n64)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, aleck64_state, screen_vblank_n64))
 
-	PALETTE(config, "palette").set_entries(0x1000);
+	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("dac1", DMADAC)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	N64PERIPH(config, m_rcp_periphs, 0);
-}
+	MCFG_N64_PERIPHS_ADD("rcp");
+MACHINE_CONFIG_END
 
 uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -1086,13 +1021,14 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-void aleck64_state::a64_e90(machine_config &config)
-{
+MACHINE_CONFIG_START(aleck64_state::a64_e90)
 	aleck64(config);
-	m_vr4300->set_addrmap(AS_PROGRAM, &aleck64_state::e90_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(e90_map)
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(aleck64_state::screen_update_e90));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_e90)
+MACHINE_CONFIG_END
 
 void aleck64_state::init_aleck64()
 {

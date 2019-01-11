@@ -1269,16 +1269,16 @@ chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 	/* TODO: I don't know why sometimes the data is one endian and sometimes another */
 	if (toc->numtrks > CD_MAX_TRACKS)
 	{
-		toc->numtrks = swapendian_int32(toc->numtrks);
+		toc->numtrks = flipendian_int32(toc->numtrks);
 		for (i = 0; i < CD_MAX_TRACKS; i++)
 		{
-			toc->tracks[i].trktype = swapendian_int32(toc->tracks[i].trktype);
-			toc->tracks[i].subtype = swapendian_int32(toc->tracks[i].subtype);
-			toc->tracks[i].datasize = swapendian_int32(toc->tracks[i].datasize);
-			toc->tracks[i].subsize = swapendian_int32(toc->tracks[i].subsize);
-			toc->tracks[i].frames = swapendian_int32(toc->tracks[i].frames);
-			toc->tracks[i].padframes = swapendian_int32(toc->tracks[i].padframes);
-			toc->tracks[i].extraframes = swapendian_int32(toc->tracks[i].extraframes);
+			toc->tracks[i].trktype = flipendian_int32(toc->tracks[i].trktype);
+			toc->tracks[i].subtype = flipendian_int32(toc->tracks[i].subtype);
+			toc->tracks[i].datasize = flipendian_int32(toc->tracks[i].datasize);
+			toc->tracks[i].subsize = flipendian_int32(toc->tracks[i].subsize);
+			toc->tracks[i].frames = flipendian_int32(toc->tracks[i].frames);
+			toc->tracks[i].padframes = flipendian_int32(toc->tracks[i].padframes);
+			toc->tracks[i].extraframes = flipendian_int32(toc->tracks[i].extraframes);
 		}
 	}
 

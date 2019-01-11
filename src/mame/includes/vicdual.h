@@ -39,56 +39,11 @@ public:
 		m_fake_lives(*this, "FAKE_LIVES.%u", 0)
 	{ }
 
-	void vicdual_root(machine_config &config);
-	void vicdual_dualgame_root(machine_config &config);
-	void heiankyo(machine_config &config);
-	void headon(machine_config &config);
-	void headon_audio(machine_config &config);
-	void sspacaho(machine_config &config);
-	void headonn(machine_config &config);
-	void invho2(machine_config &config);
-	void frogs(machine_config &config);
-	void frogs_audio(machine_config &config);
-	void headons(machine_config &config);
-	void invinco(machine_config &config);
-	void invinco_audio(machine_config &config);
-	void invds(machine_config &config);
-	void headon2(machine_config &config);
-	void carnival(machine_config &config);
-	void carnival_audio(machine_config &config);
-	void pulsar(machine_config &config);
-	void pulsar_audio(machine_config &config);
-	void spacetrk(machine_config &config);
-	void headon2bw(machine_config &config);
-	void safari(machine_config &config);
-	void brdrline(machine_config &config);
-	void brdrline_audio(machine_config &config);
-	void carnivalh(machine_config &config);
-	void samurai(machine_config &config);
-	void sspaceat(machine_config &config);
-	void digger(machine_config &config);
-	void depthch(machine_config &config);
-	void depthch_audio(machine_config &config);
-	void carhntds(machine_config &config);
-	void alphaho(machine_config &config);
-	void tranqgun(machine_config &config);
-	void tranqgun_audio(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_composite_blank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_timer_value);
-	DECLARE_CUSTOM_INPUT_MEMBER(fake_lives_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
-
-protected:
 	required_device<cpu_device> m_maincpu;
-	optional_device<i8039_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<ay8910_device> m_psg;
 	optional_device<samples_device> m_samples;
-	optional_device<discrete_sound_device> m_discrete;
+	optional_device<discrete_device> m_discrete;
 	required_device<timer_device> m_coinstate_timer;
 	optional_device<timer_device> m_nsub_coinage_timer;
 	required_device<screen_device> m_screen;
@@ -181,6 +136,15 @@ protected:
 	/*----------- defined in audio/tranqgun.c -----------*/
 	DECLARE_WRITE8_MEMBER( tranqgun_audio_w );
 
+	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank_comp);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_composite_blank_comp);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_timer_value);
+	DECLARE_CUSTOM_INPUT_MEMBER(fake_lives_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 
 	DECLARE_MACHINE_START(samurai);
@@ -194,7 +158,40 @@ protected:
 	int get_vcounter();
 	int is_cabinet_color();
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen);
-
+	void vicdual_root(machine_config &config);
+	void vicdual_dualgame_root(machine_config &config);
+	void heiankyo(machine_config &config);
+	void headon(machine_config &config);
+	void headon_audio(machine_config &config);
+	void sspacaho(machine_config &config);
+	void headonn(machine_config &config);
+	void invho2(machine_config &config);
+	void frogs(machine_config &config);
+	void frogs_audio(machine_config &config);
+	void headons(machine_config &config);
+	void invinco(machine_config &config);
+	void invinco_audio(machine_config &config);
+	void invds(machine_config &config);
+	void headon2(machine_config &config);
+	void carnival(machine_config &config);
+	void carnival_audio(machine_config &config);
+	void pulsar(machine_config &config);
+	void pulsar_audio(machine_config &config);
+	void spacetrk(machine_config &config);
+	void headon2bw(machine_config &config);
+	void safari(machine_config &config);
+	void brdrline(machine_config &config);
+	void brdrline_audio(machine_config &config);
+	void carnivalh(machine_config &config);
+	void samurai(machine_config &config);
+	void sspaceat(machine_config &config);
+	void digger(machine_config &config);
+	void depthch(machine_config &config);
+	void depthch_audio(machine_config &config);
+	void carhntds(machine_config &config);
+	void alphaho(machine_config &config);
+	void tranqgun(machine_config &config);
+	void tranqgun_audio(machine_config &config);
 	void alphaho_io_map(address_map &map);
 	void brdrline_io_map(address_map &map);
 	void carhntds_dualgame_map(address_map &map);
@@ -237,11 +234,6 @@ public:
 		m_s97271p(*this,"s97271p")
 	{ }
 
-	void nsub(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(nsub_coin_in);
-
-private:
 	required_device<s97269pb_device> m_s97269pb;
 	required_device<s97271p_device> m_s97271p;
 
@@ -251,22 +243,15 @@ private:
 	DECLARE_READ8_MEMBER(nsub_io_r);
 	DECLARE_WRITE8_MEMBER(nsub_io_w);
 
+	DECLARE_INPUT_CHANGED_MEMBER(nsub_coin_in);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(nsub_coin_pulse);
 
 	DECLARE_MACHINE_START(nsub);
 	DECLARE_MACHINE_RESET(nsub);
 
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen) override;
+	void nsub(machine_config &config);
 	void nsub_io_map(address_map &map);
 	void nsub_map(address_map &map);
-};
-
-class headonsa_state : public vicdual_state
-{
-public:
-	headonsa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: vicdual_state(mconfig, type, tag)
-	{}
-
-	DECLARE_INPUT_CHANGED_MEMBER(headonsa_coin_inserted);
 };

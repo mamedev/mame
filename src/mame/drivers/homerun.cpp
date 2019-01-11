@@ -74,8 +74,8 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 	// d5: d7756 reset pin(?)
 	if (m_d7756 != nullptr)
 	{
-		m_d7756->reset_w(!BIT(data, 5));
-		m_d7756->start_w(!BIT(data, 4));
+		m_d7756->reset_w(~data & 0x20);
+		m_d7756->start_w(~data & 0x10);
 	}
 	if (m_samples != nullptr)
 	{
@@ -100,24 +100,24 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 	m_sample = data;
 
 	if (m_d7756 != nullptr)
-		m_d7756->port_w(data);
+		m_d7756->port_w(space, 0, data);
 }
 
 void homerun_state::homerun_memmap(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("bank1");
-	map(0x8000, 0x9fff).ram().w(FUNC(homerun_state::homerun_videoram_w)).share("videoram");
+	map(0x8000, 0x9fff).ram().w(this, FUNC(homerun_state::homerun_videoram_w)).share("videoram");
 	map(0xa000, 0xa0ff).ram().share("spriteram");
-	map(0xb000, 0xb03f).ram().w(FUNC(homerun_state::homerun_color_w)).share("colorram");
+	map(0xb000, 0xb03f).ram().w(this, FUNC(homerun_state::homerun_color_w)).share("colorram");
 	map(0xc000, 0xdfff).ram();
 }
 
 void homerun_state::homerun_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).w(FUNC(homerun_state::homerun_d7756_sample_w));
-	map(0x20, 0x20).w(FUNC(homerun_state::homerun_control_w));
+	map(0x10, 0x10).w(this, FUNC(homerun_state::homerun_d7756_sample_w));
+	map(0x20, 0x20).w(this, FUNC(homerun_state::homerun_control_w));
 	map(0x30, 0x33).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x40).portr("IN0");
 	map(0x50, 0x50).portr("IN2");
@@ -350,62 +350,64 @@ void homerun_state::machine_reset()
 
 /**************************************************************************/
 
-void homerun_state::dynashot(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(20'000'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &homerun_state::homerun_memmap);
-	m_maincpu->set_addrmap(AS_IO, &homerun_state::homerun_iomap);
-	m_maincpu->set_vblank_int("screen", FUNC(homerun_state::irq0_line_hold));
+MACHINE_CONFIG_START(homerun_state::dynashot)
 
-	i8255_device &ppi(I8255A(config, "ppi8255"));
-	ppi.out_pa_callback().set(FUNC(homerun_state::homerun_scrollhi_w));
-	ppi.out_pb_callback().set(FUNC(homerun_state::homerun_scrolly_w));
-	ppi.out_pc_callback().set(FUNC(homerun_state::homerun_scrollx_w));
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(homerun_memmap)
+	MCFG_DEVICE_IO_MAP(homerun_iomap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, homerun_state, homerun_scrollhi_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, homerun_state, homerun_scrolly_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, homerun_state, homerun_scrollx_w))
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(20'000'000)/4,328,0,256,253,0,240);
-	m_screen->set_screen_update(FUNC(homerun_state::screen_update_homerun));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_SIZE(256, 256)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/4,328,0,256,253,0,240)
+	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_homerun);
-	PALETTE(config, m_palette).set_entries(16*4);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homerun)
+	MCFG_PALETTE_ADD("palette", 16*4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(20'000'000)/8));
-	ymsnd.port_a_read_callback().set_ioport("DSW");
-	ymsnd.port_b_write_callback().set(FUNC(homerun_state::homerun_banking_w));
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(20'000'000)/8)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, homerun_state, homerun_banking_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void homerun_state::homerun(machine_config &config)
-{
+MACHINE_CONFIG_START(homerun_state::homerun)
 	dynashot(config);
 
 	/* sound hardware */
-	UPD7756(config, m_d7756);
-	m_d7756->add_route(ALL_OUTPUTS, "mono", 0.75);
+	MCFG_DEVICE_ADD("d7756", UPD7756)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_names(homerun_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(homerun_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void homerun_state::ganjaja(machine_config &config)
-{
+MACHINE_CONFIG_START(homerun_state::ganjaja)
 	dynashot(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_periodic_int(FUNC(homerun_state::irq0_line_hold), attotime::from_hz(4*60)); // ?
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(homerun_state, irq0_line_hold,  4*60) // ?
 
 	/* sound hardware */
-	UPD7756(config, m_d7756);
-	m_d7756->add_route(ALL_OUTPUTS, "mono", 0.75);
-}
+	MCFG_DEVICE_ADD("d7756", UPD7756)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+MACHINE_CONFIG_END
 
 
 

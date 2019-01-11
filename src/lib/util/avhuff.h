@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_AVHUFF_H
-#define MAME_UTIL_AVHUFF_H
-
 #pragma once
+
+#ifndef __AVHUFF_H__
+#define __AVHUFF_H__
 
 #include "osdcore.h"
 #include "coretmpl.h"
@@ -198,4 +198,5 @@ private:
 #endif
 };
 
-#endif // MAME_UTIL_AVHUFF_H
+
+#endif

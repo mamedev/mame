@@ -1,19 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
-#ifndef MAME_INCLUDES_WC90B_H
-#define MAME_INCLUDES_WC90B_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
-#include "emupal.h"
 
 class wc90b_state : public driver_device
 {
 public:
-	wc90b_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	wc90b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
@@ -29,16 +24,8 @@ public:
 		m_scroll1y(*this, "scroll1y"),
 		m_scroll2y(*this, "scroll2y"),
 		m_scroll_x_lo(*this, "scroll_x_lo"),
-		m_spriteram(*this, "spriteram")
-	{ }
+		m_spriteram(*this, "spriteram") { }
 
-	void wc90b(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
@@ -79,12 +66,13 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
-
+	void wc90b(machine_config &config);
 	void sound_cpu(address_map &map);
 	void wc90b_map1(address_map &map);
 	void wc90b_map2(address_map &map);
 };
-
-#endif // MAME_INCLUDES_WC90B_H

@@ -46,11 +46,6 @@ public:
 		m_led_off(*this, "led_off")
 	{ }
 
-	void rzbatfor(machine_config &config);
-	void rztoshden(machine_config &config);
-	void rzindy500(machine_config &config);
-
-private:
 	output_finder<> m_led_out;
 	required_device<timer_device> m_led_off;
 
@@ -73,6 +68,10 @@ private:
 	DECLARE_WRITE8_MEMBER(t2_write_r);
 	DECLARE_WRITE8_MEMBER(t2_write_s);
 
+	void rzbatfor(machine_config &config);
+	void rzindy500(machine_config &config);
+
+protected:
 	virtual void machine_start() override;
 };
 
@@ -242,66 +241,15 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(rzone_state::rzbatfor)
-
-	/* basic machine hardware */
-	SM512(config, m_maincpu); // no external XTAL
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
-	m_maincpu->write_s().set(FUNC(rzone_state::t2_write_s));
-	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
-
-	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1368, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1368-1, 0, 1080-1)
-
-	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_rzone);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(rzone_state::rztoshden)
-
-	/* basic machine hardware */
-	SM510(config, m_maincpu);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
-	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
-	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
-
-	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1392, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1392-1, 0, 1080-1)
-
-	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_rzone);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
-
 MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	/* basic machine hardware */
-	SM510(config, m_maincpu); // no external XTAL
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
-	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
-	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
-	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
+	MCFG_DEVICE_ADD("maincpu", SM510) // no external XTAL
+	MCFG_SM510_R_MASK_OPTION(SM510_R_CONTROL_OUTPUT) // confirmed
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, rzone_state, t1_write_s))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, rzone_state, t1_write_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -311,7 +259,32 @@ MACHINE_CONFIG_START(rzone_state::rzindy500)
 
 	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_rzone);
+	MCFG_DEFAULT_LAYOUT(layout_rzone)
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(rzone_state::rzbatfor)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", SM512) // no external XTAL
+	MCFG_SM510_WRITE_SEGS_CB(WRITE16(*this, hh_sm510_state, sm510_lcd_segment_w))
+	MCFG_SM510_READ_K_CB(READ8(*this, rzone_state, input_r))
+	MCFG_SM510_WRITE_S_CB(WRITE8(*this, rzone_state, t2_write_s))
+	MCFG_SM510_WRITE_R_CB(WRITE8(*this, rzone_state, t2_write_r))
+
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(1368, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1368-1, 0, 1080-1)
+
+	MCFG_TIMER_DRIVER_ADD("led_off", rzone_state, led_off_callback)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_sm510_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_rzone)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -327,35 +300,26 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( rzbatfor )
-	ROM_REGION( 0x1000, "maincpu", 0 ) // model 71-231, SM512 under epoxy (die label KMN1202) (not the same game as the standalone Tiger handheld)
-	ROM_LOAD( "12_02.program", 0x0000, 0x1000, CRC(27abdb52) SHA1(b356ff80b628244da588b4748404b78d7a57eccd) )
-
-	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "12_02.melody", 0x000, 0x100, CRC(d794746c) SHA1(f0706c5100c090c65fcb2d768b5a5b4a55b29e04) )
-
-	ROM_REGION( 652556, "svg", 0)
-	ROM_LOAD( "rzbatfor.svg", 0, 652556, CRC(4d850489) SHA1(31a2a1e9209c0f77dbc268cddbfa4a67478734a7) )
-ROM_END
-
-ROM_START( rztoshden )
-	ROM_REGION( 0x1000, "maincpu", 0 ) // model 71-241, SM510 under epoxy (die label ML4)
-	ROM_LOAD( "ml4", 0x0000, 0x1000, CRC(282c641f) SHA1(f94e4a17ffe90adcc6046070034be9b777f72288) )
-
-	ROM_REGION( 857474, "svg", 0)
-	ROM_LOAD( "rztoshden.svg", 0, 857474, CRC(e4340f84) SHA1(4f040d3c7dc06d66b4f06942e610a64c11e5cd4d) )
-ROM_END
-
 ROM_START( rzindy500 )
-	ROM_REGION( 0x1000, "maincpu", 0 ) // model 71-312, SM510 under epoxy (die label KMS10 22)
-	ROM_LOAD( "10_22", 0x0000, 0x1000, CRC(99a746d0) SHA1(64264499d45a566fa9a0801c20e7fa27eac18da6) )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // SM510 under epoxy, KMS10 22
+	ROM_LOAD( "kms10_22", 0x0000, 0x1000, CRC(99a746d0) SHA1(64264499d45a566fa9a0801c20e7fa27eac18da6) )
 
 	ROM_REGION( 533411, "svg", 0)
 	ROM_LOAD( "rzindy500.svg", 0, 533411, CRC(cfc85677) SHA1(014b9123d81fba1488b4a22a6b6fd0c09e22c1ea) )
 ROM_END
 
+ROM_START( rzbatfor )
+	ROM_REGION( 0x1000, "maincpu", 0 ) // SM512 under epoxy, KMN1202 (not the same game as the standalone Tiger handheld)
+	ROM_LOAD( "kmn1202.program", 0x0000, 0x1000, CRC(27abdb52) SHA1(b356ff80b628244da588b4748404b78d7a57eccd) )
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, rztoshden, 0,      0,      rztoshden, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Takara)", "R-Zone: Battle Arena Toshinden", MACHINE_SUPPORTS_SAVE )
-CONS( 1996, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "kmn1202.melody", 0x000, 0x100, CRC(d794746c) SHA1(f0706c5100c090c65fcb2d768b5a5b4a55b29e04) )
+
+	ROM_REGION( 652556, "svg", 0)
+	ROM_LOAD( "rzbatfor.svg", 0, 652556, CRC(4d850489) SHA1(31a2a1e9209c0f77dbc268cddbfa4a67478734a7) )
+ROM_END
+
+
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY                                   FULLNAME                  FLAGS
+CONS( 1995, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500",       MACHINE_SUPPORTS_SAVE )
+CONS( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics",                      "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )

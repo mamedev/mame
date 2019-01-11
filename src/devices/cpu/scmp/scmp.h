@@ -6,6 +6,15 @@
 #pragma once
 
 
+#define MCFG_SCMP_CONFIG(_flag_out_devcb, _sout_devcb, _sin_devcb, _sensea_devcb, _senseb_devcb, _halt_devcb) \
+	downcast<scmp_device &>(*device).set_flag_out_cb(DEVCB_##_flag_out_devcb); \
+	downcast<scmp_device &>(*device).set_sout_cb(DEVCB_##_sout_devcb); \
+	downcast<scmp_device &>(*device).set_sin_cb(DEVCB_##_sin_devcb); \
+	downcast<scmp_device &>(*device).set_sensea_cb( DEVCB_##_sensea_devcb); \
+	downcast<scmp_device &>(*device).set_senseb_cb(DEVCB_##_senseb_devcb); \
+	downcast<scmp_device &>(*device).set_halt_cb(DEVCB_##_halt_devcb);
+
+
 class scmp_device : public cpu_device
 {
 public:
@@ -13,12 +22,12 @@ public:
 	scmp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto flag_out() { return m_flag_out_func.bind(); }
-	auto s_out() { return m_sout_func.bind(); }
-	auto s_in() { return m_sin_func.bind(); }
-	auto sense_a() { return m_sensea_func.bind(); }
-	auto sense_b() { return m_senseb_func.bind(); }
-	auto halt() { return m_halt_func.bind(); }
+	template <class Object> devcb_base &set_flag_out_cb(Object &&cb) { return m_flag_out_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sout_cb(Object &&cb) { return m_sout_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sin_cb(Object &&cb) { return m_sin_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sensea_cb(Object &&cb) { return m_sensea_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_senseb_cb(Object &&cb) { return m_senseb_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_halt_cb(Object &&cb) { return m_halt_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	enum

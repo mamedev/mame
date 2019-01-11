@@ -352,31 +352,31 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::scanline)
 void shadfrce_state::shadfrce_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x100fff).ram().w(FUNC(shadfrce_state::bg0videoram_w)).share("bg0videoram"); /* video */
+	map(0x100000, 0x100fff).ram().w(this, FUNC(shadfrce_state::bg0videoram_w)).share("bg0videoram"); /* video */
 	map(0x101000, 0x101fff).ram();
-	map(0x102000, 0x1027ff).ram().w(FUNC(shadfrce_state::bg1videoram_w)).share("bg1videoram"); /* bg 2 */
+	map(0x102000, 0x1027ff).ram().w(this, FUNC(shadfrce_state::bg1videoram_w)).share("bg1videoram"); /* bg 2 */
 	map(0x102800, 0x103fff).ram();
-	map(0x140000, 0x141fff).ram().w(FUNC(shadfrce_state::fgvideoram_w)).share("fgvideoram");
+	map(0x140000, 0x141fff).ram().w(this, FUNC(shadfrce_state::fgvideoram_w)).share("fgvideoram");
 	map(0x142000, 0x143fff).ram().share("spvideoram"); /* sprites */
 	map(0x180000, 0x187fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x1c0000, 0x1c0001).w(FUNC(shadfrce_state::bg0scrollx_w)); /* SCROLL X */
-	map(0x1c0002, 0x1c0003).w(FUNC(shadfrce_state::bg0scrolly_w)); /* SCROLL Y */
-	map(0x1c0004, 0x1c0005).w(FUNC(shadfrce_state::bg1scrollx_w)); /* SCROLL X */
-	map(0x1c0006, 0x1c0007).w(FUNC(shadfrce_state::bg1scrolly_w)); /* SCROLL Y */
+	map(0x1c0000, 0x1c0001).w(this, FUNC(shadfrce_state::bg0scrollx_w)); /* SCROLL X */
+	map(0x1c0002, 0x1c0003).w(this, FUNC(shadfrce_state::bg0scrolly_w)); /* SCROLL Y */
+	map(0x1c0004, 0x1c0005).w(this, FUNC(shadfrce_state::bg1scrollx_w)); /* SCROLL X */
+	map(0x1c0006, 0x1c0007).w(this, FUNC(shadfrce_state::bg1scrolly_w)); /* SCROLL Y */
 	map(0x1c0008, 0x1c0009).nopw(); /* ?? */
-	map(0x1c000a, 0x1c000b).nopr().w(FUNC(shadfrce_state::flip_screen));
+	map(0x1c000a, 0x1c000b).nopr().w(this, FUNC(shadfrce_state::flip_screen));
 	map(0x1c000c, 0x1c000d).nopw(); /* ?? */
-	map(0x1d0000, 0x1d0005).w(FUNC(shadfrce_state::irq_ack_w));
-	map(0x1d0006, 0x1d0007).w(FUNC(shadfrce_state::irq_w));
-	map(0x1d0008, 0x1d0009).w(FUNC(shadfrce_state::scanline_w));
+	map(0x1d0000, 0x1d0005).w(this, FUNC(shadfrce_state::irq_ack_w));
+	map(0x1d0006, 0x1d0007).w(this, FUNC(shadfrce_state::irq_w));
+	map(0x1d0008, 0x1d0009).w(this, FUNC(shadfrce_state::scanline_w));
 	map(0x1d000c, 0x1d000d).nopr();
 	map(0x1d000c, 0x1d000c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1d000d, 0x1d000d).w(FUNC(shadfrce_state::screen_brt_w));
+	map(0x1d000d, 0x1d000d).w(this, FUNC(shadfrce_state::screen_brt_w));
 	map(0x1d0010, 0x1d0011).nopw(); /* ?? */
 	map(0x1d0012, 0x1d0013).nopw(); /* ?? */
 	map(0x1d0014, 0x1d0015).nopw(); /* ?? */
 	map(0x1d0016, 0x1d0017).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x1d0020, 0x1d0027).r(FUNC(shadfrce_state::input_ports_r));
+	map(0x1d0020, 0x1d0027).r(this, FUNC(shadfrce_state::input_ports_r));
 	map(0x1f0000, 0x1fffff).ram();
 }
 
@@ -394,14 +394,14 @@ void shadfrce_state::shadfrce_sound_map(address_map &map)
 	map(0xc800, 0xc801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd800, 0xd800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).w(FUNC(shadfrce_state::oki_bankswitch_w));
+	map(0xe800, 0xe800).w(this, FUNC(shadfrce_state::oki_bankswitch_w));
 	map(0xf000, 0xffff).ram();
 }
 
 
 /* Input Ports */
 
-// Similar to MUGSMASH_PLAYER_INPUT in drivers/mugsmash.cpp
+/* Similar to MUGSMASH_PLAYER_INPUT in drivers/mugsmash.c */
 #define SHADFRCE_PLAYER_INPUT( player, start ) \
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) PORT_8WAY \
@@ -544,28 +544,29 @@ MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(shadfrce_sound_map)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shadfrce_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shadfrce);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x4000);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shadfrce)
+	MCFG_PALETTE_ADD("palette", 0x4000)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));      /* verified on pcb */
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))      /* verified on pcb */
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(13'495'200)/8, okim6295_device::PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

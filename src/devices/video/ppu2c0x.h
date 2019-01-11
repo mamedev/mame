@@ -31,6 +31,43 @@
 
 
 ///*************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+///*************************************************************************
+
+#define MCFG_PPU2C0X_ADD(_tag, _type)   \
+	MCFG_DEVICE_ADD(_tag, _type, 0)
+
+#define MCFG_PPU2C02_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C02)
+#define MCFG_PPU2C03B_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C03B)
+#define MCFG_PPU2C04_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C04)
+#define MCFG_PPU2C07_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C07)
+#define MCFG_PPUPALC_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_PALC)
+#define MCFG_PPU2C05_01_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_01)
+#define MCFG_PPU2C05_02_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_02)
+#define MCFG_PPU2C05_03_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_03)
+#define MCFG_PPU2C05_04_ADD(_tag)   \
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_04)
+
+#define MCFG_PPU2C0X_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
+#define MCFG_PPU2C0X_CPU(_tag) \
+	downcast<ppu2c0x_device &>(*device).set_cpu_tag(_tag);
+
+#define MCFG_PPU2C0X_INT_CALLBACK(_devcb) \
+	downcast<ppu2c0x_device &>(*device).set_int_callback(DEVCB_##_devcb);
+
+#define MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT \
+	downcast<ppu2c0x_device &>(*device).use_sprite_write_limitation_disable();
+
+///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
@@ -68,8 +105,8 @@ public:
 	virtual DECLARE_READ8_MEMBER( palette_read );
 	virtual DECLARE_WRITE8_MEMBER( palette_write );
 
-	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	auto int_callback() { return m_int_callback.bind(); }
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	template <typename Object> devcb_base &set_int_callback(Object &&cb) { return m_int_callback.set_callback(std::forward<Object>(cb)); }
 
 	/* routines */
 	virtual void init_palette();
@@ -155,7 +192,7 @@ protected:
 	};
 
 	// construction/destruction
-	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -224,7 +261,7 @@ private:
 
 class ppu2c0x_rgb_device : public ppu2c0x_device {
 protected:
-	ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void init_palette() override;
 
@@ -234,47 +271,47 @@ private:
 
 class ppu2c02_device : public ppu2c0x_device {
 public:
-	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c03b_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c04_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c07_device : public ppu2c0x_device {
 public:
-	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppupalc_device : public ppu2c0x_device {
 public:
-	ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c05_01_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c05_02_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c05_03_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c05_04_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

@@ -425,7 +425,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				return m_duart->read(offset);
+				return m_duart->read(space,offset);
 			}
 			else
 			{
@@ -594,7 +594,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				m_duart->write(offset,data&0x00ff);
+				m_duart->write(space,offset,data&0x00ff);
 			}
 			else
 			{
@@ -614,8 +614,8 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 
 void sc4_state::sc4_map(address_map &map)
 {
-	map(0x0000000, 0xffffff).rw(FUNC(sc4_state::sc4_mem_r), FUNC(sc4_state::sc4_mem_w));
-	map(0x0000000, 0x0fffff).r(FUNC(sc4_state::sc4_cs1_r)); // technically we should be going through the cs handler, but this is always set to ROM, and assuming that is a lot faster
+	map(0x0000000, 0xffffff).rw(this, FUNC(sc4_state::sc4_mem_r), FUNC(sc4_state::sc4_mem_w));
+	map(0x0000000, 0x0fffff).r(this, FUNC(sc4_state::sc4_cs1_r)); // technically we should be going through the cs handler, but this is always set to ROM, and assuming that is a lot faster
 }
 
 
@@ -636,9 +636,8 @@ READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 			return m_adder4ram[offset];
 
 		default:
-			//logerror("%08x adder4cpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
-			(void)pc;
-			break;
+			logerror("%08x adder4cpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+
 	}
 
 	return 0x0000;
@@ -652,9 +651,7 @@ WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
 	switch ( cs )
 	{
 		default:
-			//logerror("%08x adder4cpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
-			(void)pc;
-			break;
+			logerror("%08x adder4cpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
 
 		case 2:
 			offset &=0x3fff;
@@ -668,7 +665,7 @@ WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
 
 void sc4_adder4_state::sc4_adder4_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(FUNC(sc4_adder4_state::adder4_mem_r), FUNC(sc4_adder4_state::adder4_mem_w));
+	map(0x00000000, 0xffffffff).rw(this, FUNC(sc4_adder4_state::adder4_mem_r), FUNC(sc4_adder4_state::adder4_mem_w));
 }
 
 
@@ -736,16 +733,16 @@ void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint
 {
 	m_reel12_latch = data;
 
-	if(m_reel[0])
+	if(m_reel1)
 	{
-		m_reel[0]->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel1", *m_reel[0]);
+		m_reel1->update( data    &0x0f);
+		awp_draw_reel(machine(),"reel1", *m_reel1);
 	}
 
-	if (m_reel[1])
+	if (m_reel2)
 	{
-		m_reel[1]->update((data>>4)&0x0f);
-		awp_draw_reel(machine(),"reel2", *m_reel[1]);
+		m_reel2->update((data>>4)&0x0f);
+		awp_draw_reel(machine(),"reel2", *m_reel2);
 	}
 }
 
@@ -753,10 +750,10 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 {
 	m_reel3_latch = data;
 
-	if(m_reel[2])
+	if(m_reel3)
 	{
-		m_reel[2]->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel3", *m_reel[2]);
+		m_reel3->update( data    &0x0f);
+		awp_draw_reel(machine(),"reel3", *m_reel3);
 	}
 }
 
@@ -764,10 +761,10 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
 {
 	m_reel4_latch = data;
 
-	if(m_reel[3])
+	if(m_reel4)
 	{
-		m_reel[3]->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel4", *m_reel[3]);
+		m_reel4->update( data    &0x0f);
+		awp_draw_reel(machine(),"reel4", *m_reel4);
 	}
 }
 
@@ -859,16 +856,16 @@ WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
 //  logerror("bfm_sc4_duart_output_w\n");
 	m_reel56_latch = data;
 
-	if(m_reel[4])
+	if(m_reel5)
 	{
-		m_reel[4]->update( data    &0x0f);
-		awp_draw_reel(machine(),"reel5", *m_reel[4]);
+		m_reel5->update( data    &0x0f);
+		awp_draw_reel(machine(),"reel5", *m_reel5);
 	}
 
-	if (m_reel[5])
+	if (m_reel6)
 	{
-		m_reel[5]->update((data>>4)&0x0f);
-		awp_draw_reel(machine(),"reel6", *m_reel[5]);
+		m_reel6->update((data>>4)&0x0f);
+		awp_draw_reel(machine(),"reel6", *m_reel6);
 	}
 }
 
@@ -896,16 +893,16 @@ WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
 }
 
 MACHINE_CONFIG_START(sc4_state::sc4_common)
-	M68307(config, m_maincpu, 16000000);    // 68307! (EC000 core)
-	m_maincpu->set_addrmap(AS_PROGRAM, &sc4_state::sc4_map);
-	m_maincpu->serial_a_tx_callback().set(FUNC(sc4_state::m68307_duart_txa));
-	m_maincpu->serial_inport_callback().set(FUNC(sc4_state::m68307_duart_input_r));
-	m_maincpu->serial_outport_callback().set(FUNC(sc4_state::m68307_duart_output_w));
+	MCFG_DEVICE_ADD("maincpu", M68307, 16000000)    // 68307! (EC000 core)
+	MCFG_DEVICE_PROGRAM_MAP(sc4_map)
+	MCFG_MC68307_SERIAL_A_TX_CALLBACK(WRITELINE(*this, sc4_state, m68307_duart_txa))
+	MCFG_MC68307_SERIAL_INPORT_CALLBACK(READ8(*this, sc4_state, m68307_duart_input_r))
+	MCFG_MC68307_SERIAL_OUTPORT_CALLBACK(WRITE8(*this, sc4_state, m68307_duart_output_w))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8)
@@ -914,359 +911,338 @@ MACHINE_CONFIG_START(sc4_state::sc4_common)
 	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, sc4_state, bfm_sc4_duart_input_r))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, sc4_state, bfm_sc4_duart_output_w))
 
-	BFM_BDA(config, m_vfd0, 60, 0);
+	MCFG_BFMBDA_ADD("vfd0",0)
 
-//  config.set_default_layout(layout_bfm_sc4);
+//  MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 //Standard 6 reels all connected
-void sc4_state::sc4(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
 //Standard 3 reels
-void sc4_state::sc4_3reel(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_3reel)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
 
-}
+MACHINE_CONFIG_END
 
 //Standard 4 reels
-void sc4_state::sc4_4reel(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_4reel)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+MACHINE_CONFIG_END
 
 //4 reels, with the last connected to RL4 not RL3
-void sc4_state::sc4_4reel_alt(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_4reel_alt)
 
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
 
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+MACHINE_CONFIG_END
 
 
 //Standard 5 reels
-void sc4_state::sc4_5reel(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_5reel)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+MACHINE_CONFIG_END
 
 //5 reels, with RL4 skipped
-void sc4_state::sc4_5reel_alt(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_5reel_alt)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
 
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
 
-}
+MACHINE_CONFIG_END
 
 //6 reels, last 200 steps
-void sc4_state::sc4_200_std(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_std)
 
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
 //6 reels, last 200 steps
-void sc4_state::sc4_200_alt(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_alt)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
 //6 reels, RL4 200 steps
-void sc4_state::sc4_200_alta(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_alta)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
 //6 reels, 3 48 step, 3 200 step
-void sc4_state::sc4_200_altb(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_altb)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_200STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
 //5 reels, last one 200 steps
-void sc4_state::sc4_200_5r(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_5r)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+MACHINE_CONFIG_END
 
 
 
 //5 reels, last one 200 steps, RL4 skipped
-void sc4_state::sc4_200_5ra(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_5ra)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
 
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
 //5 reels, last one 200 steps, RL5 skipped
-void sc4_state::sc4_200_5rb(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_5rb)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
 
-	REEL(config, m_reel[5], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_200STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
 //5 reels, RL5 200 steps, RL4 skipped
-void sc4_state::sc4_200_5rc(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_5rc)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
 
-	REEL(config, m_reel[4], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_200STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
 //4 reels, last one 200 steps
-void sc4_state::sc4_200_4r(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_4r)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+MACHINE_CONFIG_END
 
 //4 reels, last one 200 steps, RL4 skipped
-void sc4_state::sc4_200_4ra(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_4ra)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
 
-	REEL(config, m_reel[4], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-}
+	MCFG_STARPOINT_200STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+MACHINE_CONFIG_END
 
 
 //4 reels, last one 200 steps, RL4,5 skipped
-void sc4_state::sc4_200_4rb(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_200_4rb)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
 
-	REEL(config, m_reel[5], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[5]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<5>));
-}
+	MCFG_STARPOINT_200STEP_ADD("reel6")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel6_optic_cb))
+MACHINE_CONFIG_END
 
-void sc4_state::sc4_4reel_200(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_4reel_200)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-}
+	MCFG_STARPOINT_200STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+MACHINE_CONFIG_END
 
-void sc4_state::sc4_3reel_200(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_3reel_200)
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-}
+	MCFG_STARPOINT_200STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+MACHINE_CONFIG_END
 
-void sc4_state::sc4_3reel_200_48(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_3reel_200_48)
 
 	sc4_common(config);
 
-	REEL(config, m_reel[0], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-}
+	MCFG_STARPOINT_200STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_200STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+MACHINE_CONFIG_END
 
-void sc4_state::sc4_no_reels(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4_no_reels)
 	sc4_common(config);
-}
+MACHINE_CONFIG_END
 
 void sc4_adder4_state::machine_start()
 {
@@ -1275,34 +1251,32 @@ void sc4_adder4_state::machine_start()
 	m_adder4ram = make_unique_clear<uint32_t[]>(0x10000);
 }
 
-void sc4_adder4_state::sc4_adder4(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_adder4_state::sc4_adder4)
 	sc4_common(config);
 
-	M68340(config, m_adder4cpu, 25175000);     // 68340 (CPU32 core)
-	m_adder4cpu->set_addrmap(AS_PROGRAM, &sc4_adder4_state::sc4_adder4_map);
-}
+	MCFG_DEVICE_ADD("adder4", M68340, 25175000)     // 68340 (CPU32 core)
+	MCFG_DEVICE_PROGRAM_MAP(sc4_adder4_map)
+MACHINE_CONFIG_END
 
-void sc4_state::sc4dmd(machine_config &config)
-{
+MACHINE_CONFIG_START(sc4_state::sc4dmd)
 	sc4_common(config);
 	/* video hardware */
 
-	//config.set_default_layout(layout_sc4_dmd);
-	BFM_DM01(config, m_dm01, 0);
-	m_dm01->busy_callback().set(FUNC(sc4_state::bfmdm01_busy));
+	//MCFG_DEFAULT_LAYOUT(layout_sc4_dmd)
+	MCFG_DEVICE_ADD("dm01", BFM_DM01, 0)
+	MCFG_BFM_DM01_BUSY_CB(WRITELINE(*this, sc4_state, bfmdm01_busy))
 
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[0]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[1]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[2]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[3]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<3>));
-	REEL(config, m_reel[4], STARPOINT_48STEP_REEL, 16, 24, 0x09, 7);
-	m_reel[4]->optic_handler().set(FUNC(sc4_state::reel_optic_cb<4>));
-}
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel1_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel2_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel3_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel4")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel4_optic_cb))
+	MCFG_STARPOINT_RM20_48STEP_ADD("reel5")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, sc4_state, reel5_optic_cb))
+MACHINE_CONFIG_END
 
 INPUT_PORTS_START( sc4_raw ) // completley unmapped, but named inputs for all the ports, used for testing.
 	PORT_START("IN-0")

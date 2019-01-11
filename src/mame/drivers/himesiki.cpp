@@ -130,7 +130,7 @@ void himesiki_state::himesiki_prm0(address_map &map)
 	map(0xa000, 0xa0ff).ram().share("spriteram");
 	map(0xa100, 0xa7ff).ram().share("sprram_p103a"); // not on Android
 	map(0xa800, 0xafff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xb000, 0xbfff).ram().w(FUNC(himesiki_state::himesiki_bg_ram_w)).share("bg_ram");
+	map(0xb000, 0xbfff).ram().w(this, FUNC(himesiki_state::himesiki_bg_ram_w)).share("bg_ram");
 	map(0xc000, 0xffff).bankr("bank1");
 }
 
@@ -139,9 +139,9 @@ void himesiki_state::himesiki_iom0(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write)); // inputs
 	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // dips + rombank
-	map(0x08, 0x08).w(FUNC(himesiki_state::himesiki_scrolly_w));
-	map(0x09, 0x0a).w(FUNC(himesiki_state::himesiki_scrollx_w));
-	map(0x0b, 0x0b).w(FUNC(himesiki_state::himesiki_sound_w));
+	map(0x08, 0x08).w(this, FUNC(himesiki_state::himesiki_scrolly_w));
+	map(0x09, 0x0a).w(this, FUNC(himesiki_state::himesiki_scrollx_w));
+	map(0x0b, 0x0b).w(this, FUNC(himesiki_state::himesiki_sound_w));
 }
 
 
@@ -426,53 +426,55 @@ void himesiki_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-void himesiki_state::himesiki(machine_config &config)
-{
+MACHINE_CONFIG_START(himesiki_state::himesiki)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, CLK2); /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &himesiki_state::himesiki_prm0);
-	m_maincpu->set_addrmap(AS_IO, &himesiki_state::himesiki_iom0);
-	m_maincpu->set_vblank_int("screen", FUNC(himesiki_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
+	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm0)
+	MCFG_DEVICE_IO_MAP(himesiki_iom0)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", himesiki_state,  irq0_line_hold)
 
-	Z80(config, m_subcpu, CLK2/2); /* 4.000 MHz (4Mhz rated part, near the 8 Mhz XTAL) */
-	m_subcpu->set_addrmap(AS_PROGRAM, &himesiki_state::himesiki_prm1);
-	m_subcpu->set_addrmap(AS_IO, &himesiki_state::himesiki_iom1);
+	MCFG_DEVICE_ADD("sub", Z80, CLK2/2) /* 4.000 MHz (4Mhz rated part, near the 8 Mhz XTAL) */
+	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm1)
+	MCFG_DEVICE_IO_MAP(himesiki_iom1)
 
-	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
-	ppi0.in_pa_callback().set_ioport("1P");
-	ppi0.in_pb_callback().set_ioport("2P");
-	ppi0.in_pc_callback().set_ioport("OTHERS");
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("1P"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("2P"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("OTHERS"))
 
-	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
-	ppi1.in_pa_callback().set_ioport("DSW1");
-	ppi1.in_pb_callback().set_ioport("DSW2");
-	ppi1.out_pc_callback().set(FUNC(himesiki_state::himesiki_rombank_w));
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, himesiki_state, himesiki_rombank_w))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
-	screen.set_screen_update(FUNC(himesiki_state::screen_update_himesiki));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(himesiki_state, screen_update_himesiki)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_himesiki);
-	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_himesiki)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2203_device &ym2203(YM2203(config, "ym2203", CLK2/4)); // ??
-	ym2203.irq_handler().set_inputline("sub", 0);
-	ym2203.add_route(0, "mono", 0.10);
-	ym2203.add_route(1, "mono", 0.10);
-	ym2203.add_route(2, "mono", 0.10);
-	ym2203.add_route(3, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("ym2203", YM2203, CLK2/4) // ??
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_ROUTE(2, "mono", 0.10)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
+MACHINE_CONFIG_END
 
 /****************************************************************************/
 

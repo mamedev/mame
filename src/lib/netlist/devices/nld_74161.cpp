@@ -126,8 +126,8 @@ namespace netlist
 		m_RCO.push(tRippleCarryOut, NLTIME_FROM_NS(20)); //FIXME
 	}
 
-	NETLIB_DEVICE_IMPL(74161, "TTL_74161", "+A,+B,+C,+D,+CLRQ,+LOADQ,+CLK,+ENABLEP,+ENABLET")
-	NETLIB_DEVICE_IMPL(74161_dip, "TTL_74161_DIP", "")
+	NETLIB_DEVICE_IMPL(74161)
+	NETLIB_DEVICE_IMPL(74161_dip)
 
 	} //namespace devices
 } // namespace netlist

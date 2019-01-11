@@ -51,7 +51,7 @@ patch sample in vec3 badp4;         // ERROR
 
 #extension GL_ARB_separate_shader_objects : enable
 
-in gl_PerVertex
+in gl_PerVertex            // ERROR, no size
 {
     float gl_ClipDistance[1];
 } gl_in[];

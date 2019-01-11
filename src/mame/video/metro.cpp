@@ -10,27 +10,27 @@
 #include "emu.h"
 #include "includes/metro.h"
 
-TILE_GET_INFO_MEMBER(metro_state::k053936_get_tile_info)
+TILE_GET_INFO_MEMBER(metro_state::metro_k053936_get_tile_info)
 {
 	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(4,
 			code & 0x7fff,
 			0xe,
 			0);
 }
 
-TILE_GET_INFO_MEMBER(metro_state::k053936_gstrik2_get_tile_info)
+TILE_GET_INFO_MEMBER(metro_state::metro_k053936_gstrik2_get_tile_info)
 {
 	int code = m_k053936_ram[tile_index];
 
-	SET_TILE_INFO_MEMBER(0,
+	SET_TILE_INFO_MEMBER(4,
 			(code & 0x7fff)>>2,
 			0xe,
 			0);
 }
 
-WRITE16_MEMBER(metro_state::k053936_w)
+WRITE16_MEMBER(metro_state::metro_k053936_w)
 {
 	COMBINE_DATA(&m_k053936_ram[offset]);
 	m_k053936_tilemap->mark_tile_dirty(offset);
@@ -39,19 +39,26 @@ WRITE16_MEMBER(metro_state::k053936_w)
 TILEMAP_MAPPER_MEMBER(metro_state::tilemap_scan_gstrik2)
 {
 	/* logical (col,row) -> memory offset */
-	return ((row & 0x40) >> 6) | (col << 1) | ((row & 0x80) << 1) | ((row & 0x3f) << 9);
+	int val;
+
+	val = (row & 0x3f) * (256 * 2) + (col * 2);
+
+	if (row & 0x40) val += 1;
+	if (row & 0x80) val += 256;
+
+	return val;
 }
 
 VIDEO_START_MEMBER(metro_state,blzntrnd)
 {
-	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
+	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 512);
 
 	m_screen->register_screen_bitmap(m_vdp_bitmap);
 }
 
 VIDEO_START_MEMBER(metro_state,gstrik2)
 {
-	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
+	m_k053936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(metro_state::metro_k053936_gstrik2_get_tile_info),this), tilemap_mapper_delegate(FUNC(metro_state::tilemap_scan_gstrik2),this), 16, 16, 128, 256);
 
 	m_screen->register_screen_bitmap(m_vdp_bitmap);
 }

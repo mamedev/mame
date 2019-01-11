@@ -103,7 +103,6 @@
 #include "emu.h"
 #include "includes/tdv2324.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -154,9 +153,9 @@ void tdv2324_state::tdv2324_io(address_map &map)
 	/* 0x30 is read by main code and if high bit isn't set at some point it will never get anywhere */
 	/* e0, e2, e8, ea are written to */
 	/* 30, e6 and e2 are readable */
-	map(0x30, 0x30).r(FUNC(tdv2324_state::tdv2324_main_io_30));
+	map(0x30, 0x30).r(this, FUNC(tdv2324_state::tdv2324_main_io_30));
 //  AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
-	map(0xe6, 0xe6).r(FUNC(tdv2324_state::tdv2324_main_io_e6));
+	map(0xe6, 0xe6).r(this, FUNC(tdv2324_state::tdv2324_main_io_e6));
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8253_5_0_TAG, pit8253_device, read, write)
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(MK3887N4_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 //  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8259A_TAG, pic8259_device, read, write)
@@ -284,25 +283,27 @@ MACHINE_CONFIG_START(tdv2324_state::tdv2324)
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	TMS9927(config, m_tms, 25.39836_MHz_XTAL / 8).set_char_width(8);
+	MCFG_DEVICE_ADD(TMS9937NL_TAG, TMS9927, XTAL(25'398'360) / 8)
+	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	// devices
-	PIC8259(config, m_pic, 0);
+	MCFG_DEVICE_ADD(P8259A_TAG, PIC8259, 0)
 
-	PIT8253(config, m_pit0, 0);
+	MCFG_DEVICE_ADD(P8253_5_0_TAG, PIT8253, 0)
 
-	PIT8253(config, m_pit1, 0);
+	MCFG_DEVICE_ADD(P8253_5_1_TAG, PIT8253, 0)
 
-	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
+	MCFG_DEVICE_ADD(MK3887N4_TAG, Z80SIO2, 8000000/2)
 
-	FD1797(config, FD1797PL02_TAG, 8000000/4);
+	MCFG_FD1797_ADD(FD1797PL02_TAG, 8000000/4)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("64K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")

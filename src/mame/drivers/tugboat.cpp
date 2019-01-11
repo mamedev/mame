@@ -29,7 +29,6 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -37,30 +36,19 @@ always false - counter was reloaded and incremented before interrupt occurs
 class tugboat_state : public driver_device
 {
 public:
-	tugboat_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_ram(*this, "ram")
-	{ }
-
-	void tugboat(machine_config &config);
-
-protected:
 	enum
 	{
 		TIMER_INTERRUPT
 	};
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	virtual void machine_reset() override;
+	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_ram(*this, "ram") { }
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -81,12 +69,19 @@ private:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 
-	void tugboat_palette(palette_device &palette) const;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+	DECLARE_PALETTE_INIT(tugboat);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int addr, int gfx0, int gfx1, int transparency);
+	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
+		int addr,int gfx0,int gfx1,int transparency);
 
-	void main_map(address_map &map);
+		void tugboat(machine_config &config);
+		void main_map(address_map &map);
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -107,19 +102,24 @@ void tugboat_state::video_start()
 	m_gfxdecode->gfx(2)->set_granularity(8);
 }
 
-//  there isn't the usual resistor array anywhere near the color PROM, just four 1k resistors.
-void tugboat_state::tugboat_palette(palette_device &palette) const
+/*  there isn't the usual resistor array anywhere near the color prom,
+    just four 1k resistors. */
+PALETTE_INIT_MEMBER(tugboat_state, tugboat)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0; i < palette.entries(); i++)
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+
+	for (i = 0;i < palette.entries();i++)
 	{
-		int const brt = BIT(color_prom[i], 3) ? 0xff : 0x80;
+		int r,g,b,brt;
 
-		int const r = brt * BIT(color_prom[i], 0);
-		int const g = brt * BIT(color_prom[i], 1);
-		int const b = brt * BIT(color_prom[i], 2);
+		brt = ((color_prom[i] >> 3) & 0x01) ? 0xff : 0x80;
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		r = brt * ((color_prom[i] >> 0) & 0x01);
+		g = brt * ((color_prom[i] >> 1) & 0x01);
+		b = brt * ((color_prom[i] >> 2) & 0x01);
+
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -145,18 +145,20 @@ WRITE8_MEMBER(tugboat_state::score_w)
 		if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
-void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect,
-		int addr, int gfx0, int gfx1, int transparency)
+void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
+		int addr,int gfx0,int gfx1,int transparency)
 {
-	for (int y = 0; y < 32; y++)
+	int x,y;
+
+	for (y = 0;y < 32;y++)
 	{
-		for (int x = 0; x < 32; x++)
+		for (x = 0;x < 32;x++)
 		{
 			int attr = m_ram[addr + 0x400];
 			int code = ((attr & 0x01) << 8) | m_ram[addr];
 			int color = (attr & 0x3c) >> 2;
-
 			int rgn, transpen;
+
 			if (attr & 0x02)
 			{
 				rgn = gfx1;
@@ -182,12 +184,12 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const startaddr0 = m_hd46505_0_reg[0x0c]*256 + m_hd46505_0_reg[0x0d];
-	int const startaddr1 = m_hd46505_1_reg[0x0c]*256 + m_hd46505_1_reg[0x0d];
+	int startaddr0 = m_hd46505_0_reg[0x0c]*256 + m_hd46505_0_reg[0x0d];
+	int startaddr1 = m_hd46505_1_reg[0x0c]*256 + m_hd46505_1_reg[0x0d];
 
-	draw_tilemap(bitmap, cliprect, startaddr0, 0, 1, false);
-	draw_tilemap(bitmap, cliprect, startaddr1, 2, 3, true);
 
+	draw_tilemap(bitmap,cliprect,startaddr0,0,1,false);
+	draw_tilemap(bitmap,cliprect,startaddr1,2,3,true);
 	return 0;
 }
 
@@ -236,12 +238,12 @@ void tugboat_state::main_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x01ff).ram().share("ram");
 	map(0x1060, 0x1061).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
-	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_1_w));
+	map(0x10a0, 0x10a1).w(this, FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
+	map(0x10c0, 0x10c1).w(this, FUNC(tugboat_state::hd46505_1_w));
 	map(0x11e4, 0x11e7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x11e8, 0x11eb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	//AM_RANGE(0x1700, 0x1fff) AM_RAM
-	map(0x18e0, 0x18ef).w(FUNC(tugboat_state::score_w));
+	map(0x18e0, 0x18ef).w(this, FUNC(tugboat_state::score_w));
 	map(0x2000, 0x2fff).ram(); /* tilemap RAM */
 	map(0x4000, 0x7fff).rom();
 }
@@ -363,28 +365,30 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_DEVICE_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	pia6821_device &pia0(PIA6821(config, "pia0", 0));
-	pia0.readpa_handler().set(FUNC(tugboat_state::input_r));
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tugboat_state,input_r))
 
-	pia6821_device &pia1(PIA6821(config, "pia1", 0));
-	pia1.readpa_handler().set_ioport("DSW");
-	pia1.writepb_handler().set(FUNC(tugboat_state::ctrl_w));
+	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tugboat_state, ctrl_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8,32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tugboat);
-	PALETTE(config, m_palette, FUNC(tugboat_state::tugboat_palette), 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tugboat)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(tugboat_state, tugboat)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8912(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.35);
+	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(10'000'000)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 

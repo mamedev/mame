@@ -49,9 +49,6 @@ public:
 	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
 
 	void williams_cvsd_map(address_map &map);
-
-	mc6809e_device *get_cpu() { return m_cpu; }
-
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -64,8 +61,6 @@ private:
 	required_device<mc6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
 	required_device<hc55516_device> m_hc55516;
-
-	required_memory_bank m_rombank;
 
 	// internal state
 	uint8_t m_talkback;
@@ -103,9 +98,6 @@ public:
 
 	void williams_narc_master_map(address_map &map);
 	void williams_narc_slave_map(address_map &map);
-
-	mc6809e_device *get_cpu() { return m_cpu[0]; }
-
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -123,11 +115,9 @@ private:
 	};
 
 	// devices
-	required_device_array<mc6809e_device, 2> m_cpu;
+	required_device<mc6809e_device> m_cpu0;
+	required_device<mc6809e_device> m_cpu1;
 	required_device<hc55516_device> m_hc55516;
-
-	required_memory_bank m_masterbank;
-	required_memory_bank m_slavebank;
 
 	// internal state
 	uint8_t m_latch;
@@ -160,9 +150,6 @@ public:
 
 	void williams_adpcm_map(address_map &map);
 	void williams_adpcm_oki_map(address_map &map);
-
-	mc6809e_device *get_cpu() { return m_cpu; }
-
 protected:
 	// timer IDs
 	enum
@@ -180,9 +167,6 @@ protected:
 private:
 	// devices
 	required_device<mc6809e_device> m_cpu;
-
-	required_memory_bank m_rombank;
-	required_memory_bank m_okibank;
 
 	// internal state
 	uint8_t m_latch;

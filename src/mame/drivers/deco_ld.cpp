@@ -114,7 +114,6 @@ Sound processor - 6502
 #include "machine/ldp1000.h"
 #include "machine/gen_latch.h"
 #include "machine/6850acia.h"
-#include "emupal.h"
 #include "speaker.h"
 
 
@@ -122,28 +121,23 @@ class deco_ld_state : public driver_device
 {
 public:
 	deco_ld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_laserdisc(*this, "laserdisc")
-		//, m_acia(*this, "acia")
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
-		, m_soundlatch(*this, "soundlatch")
-		, m_soundlatch2(*this, "soundlatch2")
-		, m_vram0(*this, "vram0")
-		, m_attr0(*this, "attr0")
-		, m_vram1(*this, "vram1")
-		, m_attr1(*this, "attr1")
-	{ }
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
+			m_laserdisc(*this, "laserdisc"),
+			//m_acia(*this, "acia"),
+			m_gfxdecode(*this, "gfxdecode"),
+			m_screen(*this, "screen"),
+			m_palette(*this, "palette"),
+			m_soundlatch(*this, "soundlatch"),
+			m_soundlatch2(*this, "soundlatch2"),
+			m_vram0(*this, "vram0"),
+			m_attr0(*this, "attr0"),
+			m_vram1(*this, "vram1"),
+			m_attr1(*this, "attr1")
 
-	void rblaster(machine_config &config);
+			{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<sony_ldp1000_device> m_laserdisc;
@@ -158,14 +152,18 @@ private:
 	required_shared_ptr<uint8_t> m_vram1;
 	required_shared_ptr<uint8_t> m_attr1;
 
+	uint8_t m_laserdisc_data;
 	int m_nmimask;
 	DECLARE_READ8_MEMBER(acia_status_hack_r);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
+	void rblaster(machine_config &config);
 	void rblaster_map(address_map &map);
 	void rblaster_sound_map(address_map &map);
 };
@@ -278,10 +276,10 @@ void deco_ld_state::rblaster_map(address_map &map)
 	map(0x1001, 0x1001).portr("DSW1");
 	map(0x1002, 0x1002).portr("DSW2");
 	map(0x1003, 0x1003).portr("IN1");
-	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(FUNC(deco_ld_state::decold_sound_cmd_w));
-	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
+	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(this, FUNC(deco_ld_state::decold_sound_cmd_w));
+	map(0x1005, 0x1005).r(this, FUNC(deco_ld_state::sound_status_r));
 	//AM_RANGE(0x1006, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
+	map(0x1006, 0x1006).r(this, FUNC(deco_ld_state::acia_status_hack_r));
 	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x27ff).ram();
@@ -478,28 +476,33 @@ MACHINE_CONFIG_START(deco_ld_state::rblaster)
 	MCFG_LASERDISC_LDP1000_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, deco_ld_state, screen_update_rblaster)
 	//MCFG_LASERDISC_OVERLAY_CLIP(0, 256-1, 8, 240-1)
-	MCFG_LASERDISC_OVERLAY_PALETTE(m_palette)
+	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rblaster)
-	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
-	//ACIA6850(config, m_acia, 0);
-	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
-	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
+	//MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	//MCFG_ACIA6850_TXD_HANDLER(WRITELINE("laserdisc", sony_ldp1000_device, write))
+	//MCFG_ACIA6850_RXD_HANDLER(READLINE("laserdisc", sony_ldp1000_device, read))
 
 	/* sound hardware */
 	/* TODO: mixing */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, m_soundlatch2);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
 	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

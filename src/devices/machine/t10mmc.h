@@ -66,7 +66,7 @@ protected:
 	uint32_t m_num_subblocks;
 	uint32_t m_cur_subblock;
 	int m_audio_sense;
-	int m_sotc;
+	bool m_sotc;
 
 	device_t *m_device;
 };

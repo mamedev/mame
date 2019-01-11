@@ -14,7 +14,6 @@
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
-#include "emupal.h"
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
@@ -105,7 +104,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vfd(*this, "vfd")
 		, m_6840ptm(*this, "ptm_ic2")
-		, m_ptm_ic3ss(*this, "ptm_ic3ss")
 		, m_pia3(*this, "pia_ic3")
 		, m_pia4(*this, "pia_ic4")
 		, m_pia5(*this, "pia_ic5")
@@ -117,17 +115,76 @@ public:
 		, m_aux2_port(*this, "AUX2")
 		, m_bank1(*this, "bank1")
 		, m_msm6376(*this, "msm6376")
-		, m_reel(*this, "reel%u", 0U)
+		, m_reel0(*this, "reel0")
+		, m_reel1(*this, "reel1")
+		, m_reel2(*this, "reel2")
+		, m_reel3(*this, "reel3")
+		, m_reel4(*this, "reel4")
+		, m_reel5(*this, "reel5")
+		, m_reel6(*this, "reel6")
+		, m_reel7(*this, "reel7")
 		, m_palette(*this, "palette")
 		, m_meters(*this, "meters")
-		, m_ym2413(*this, "ym2413")
-		, m_ay8913(*this, "ay8913")
 		, m_lamps(*this, "lamp%u", 0U)
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
 	 { }
 
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	{
+		return 0;
+	}
+
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(bankswitch_r);
+	DECLARE_WRITE8_MEMBER(bankset_w);
+	DECLARE_WRITE8_MEMBER(characteriser_w);
+	DECLARE_READ8_MEMBER(characteriser_r);
+	DECLARE_WRITE8_MEMBER(bwb_characteriser_w);
+	DECLARE_READ8_MEMBER(bwb_characteriser_r);
+	DECLARE_WRITE8_MEMBER(mpu4_ym2413_w);
+	DECLARE_READ8_MEMBER(mpu4_ym2413_r);
+	DECLARE_READ8_MEMBER(crystal_sound_r);
+	DECLARE_WRITE8_MEMBER(crystal_sound_w);
+	DECLARE_WRITE8_MEMBER(ic3ss_w);
+	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
+	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
+	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
+	DECLARE_WRITE8_MEMBER(pia_ic3_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic3_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic3_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_ic4_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic4_portb_w);
+	DECLARE_READ8_MEMBER(pia_ic4_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
+	DECLARE_READ8_MEMBER(pia_ic5_porta_r);
+	DECLARE_WRITE8_MEMBER(pia_ic5_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic5_portb_w);
+	DECLARE_READ8_MEMBER(pia_ic5_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
+	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic6_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic6_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_ic7_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_ic7_portb_w);
+	DECLARE_READ8_MEMBER(pia_ic7_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic7_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic7_cb2_w);
+	DECLARE_READ8_MEMBER(pia_ic8_porta_r);
+	DECLARE_WRITE8_MEMBER(pia_ic8_portb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic8_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_ic8_cb2_w);
+	DECLARE_WRITE8_MEMBER(pia_gb_porta_w);
+	DECLARE_WRITE8_MEMBER(pia_gb_portb_w);
+	DECLARE_READ8_MEMBER(pia_gb_portb_r);
+	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
 	void init_m4default_alt();
 	void init_crystali();
 	void init_m4tst2();
@@ -188,7 +245,17 @@ public:
 	void init_m4andyfh();
 	void init_m4andyge();
 	void init_m4apachg();
-
+	DECLARE_MACHINE_START(mod2);
+	DECLARE_MACHINE_RESET(mpu4);
+	DECLARE_MACHINE_START(mpu4yam);
+	DECLARE_MACHINE_START(mpu4oki);
+	DECLARE_MACHINE_START(mpu4oki_alt);
+	DECLARE_MACHINE_START(mod4oki_5r);
+	DECLARE_MACHINE_START(mod2_alt);
+	DECLARE_MACHINE_START(mpu4bwb);
+	DECLARE_MACHINE_START(mpu4cry);
+	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
+	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	void bwboki(machine_config &config);
 	void mod2(machine_config &config);
 	void mod2_alt(machine_config &config);
@@ -226,11 +293,11 @@ public:
 	void mpu4_bwb_7reel(machine_config &config);
 	void mpu4base(machine_config &config);
 
+	void mpu4_6809_map(address_map &map);
+	void mpu4_memmap(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void mpu4_6809_map(address_map &map);
-	void mpu4_memmap(address_map &map);
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
 	void led_write_latch(int latch, int data, int column);
@@ -243,76 +310,10 @@ protected:
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_install_mod4bwb_space(address_space &space);
 	void mpu4_config_common();
-	DECLARE_MACHINE_START(mod2);
-	DECLARE_MACHINE_RESET(mpu4);
-	DECLARE_MACHINE_START(mpu4yam);
-	DECLARE_MACHINE_START(mpu4oki);
-	DECLARE_MACHINE_START(mpu4oki_alt);
-	DECLARE_MACHINE_START(mod4oki_5r);
-	DECLARE_MACHINE_START(mod2_alt);
-	DECLARE_MACHINE_START(mpu4bwb);
-	DECLARE_MACHINE_START(mpu4cry);
-	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
-		uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-	{
-		return 0;
-	}
-
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(bankswitch_r);
-	DECLARE_WRITE8_MEMBER(bankset_w);
-	DECLARE_WRITE8_MEMBER(characteriser_w);
-	DECLARE_READ8_MEMBER(characteriser_r);
-	DECLARE_WRITE8_MEMBER(bwb_characteriser_w);
-	DECLARE_READ8_MEMBER(bwb_characteriser_r);
-	DECLARE_WRITE8_MEMBER(mpu4_ym2413_w);
-	DECLARE_READ8_MEMBER(mpu4_ym2413_r);
-	DECLARE_READ8_MEMBER(crystal_sound_r);
-	DECLARE_WRITE8_MEMBER(crystal_sound_w);
-	DECLARE_WRITE8_MEMBER(ic3ss_w);
-	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
-	DECLARE_WRITE8_MEMBER(pia_ic3_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_ic3_portb_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia_ic4_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_ic4_portb_w);
-	DECLARE_READ8_MEMBER(pia_ic4_portb_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
-	DECLARE_READ8_MEMBER(pia_ic5_porta_r);
-	DECLARE_WRITE8_MEMBER(pia_ic5_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_ic5_portb_w);
-	DECLARE_READ8_MEMBER(pia_ic5_portb_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia_ic6_portb_w);
-	DECLARE_WRITE8_MEMBER(pia_ic6_porta_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic6_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic6_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia_ic7_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_ic7_portb_w);
-	DECLARE_READ8_MEMBER(pia_ic7_portb_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic7_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic7_cb2_w);
-	DECLARE_READ8_MEMBER(pia_ic8_porta_r);
-	DECLARE_WRITE8_MEMBER(pia_ic8_portb_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic8_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic8_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia_gb_porta_w);
-	DECLARE_WRITE8_MEMBER(pia_gb_portb_w);
-	DECLARE_READ8_MEMBER(pia_gb_portb_r);
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<rocvfd_device> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
-	optional_device<ptm6840_device> m_ptm_ic3ss;
 	optional_device<pia6821_device> m_pia3;
 	optional_device<pia6821_device> m_pia4;
 	optional_device<pia6821_device> m_pia5;
@@ -324,11 +325,16 @@ protected:
 	required_ioport m_aux2_port;
 	optional_memory_bank m_bank1;
 	optional_device<okim6376_device> m_msm6376;
-	optional_device_array<stepper_device, 8> m_reel;
+	optional_device<stepper_device> m_reel0;
+	optional_device<stepper_device> m_reel1;
+	optional_device<stepper_device> m_reel2;
+	optional_device<stepper_device> m_reel3;
+	optional_device<stepper_device> m_reel4;
+	optional_device<stepper_device> m_reel5;
+	optional_device<stepper_device> m_reel6;
+	optional_device<stepper_device> m_reel7;
 	optional_device<palette_device> m_palette;
 	required_device<meters_device> m_meters;
-	optional_device<ym2413_device> m_ym2413;
-	optional_device<ay8913_device> m_ay8913;
 
 	// not all systems have this many lamps/LEDs/digits but the driver is too much of a mess to split up now
 

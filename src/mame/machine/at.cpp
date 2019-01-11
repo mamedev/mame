@@ -19,8 +19,8 @@
 
 DEFINE_DEVICE_TYPE(AT_MB, at_mb_device, "at_mb", "PC/AT Motherboard")
 
-at_mb_device::at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AT_MB, tag, owner, clock),
+at_mb_device::at_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AT_MB, tag, owner, clock),
 	m_maincpu(*this, ":maincpu"),
 	m_isabus(*this, "isabus"),
 	m_pic8259_slave(*this, "pic8259_slave"),
@@ -54,96 +54,93 @@ MACHINE_CONFIG_START(at_mb_device::at_softlists)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
-	PIT8254(config, m_pit8254, 0);
-	m_pit8254->set_clk<0>(4772720/4); /* heartbeat IRQ */
-	m_pit8254->out_handler<0>().set("pic8259_master", FUNC(pic8259_device::ir0_w));
-	m_pit8254->set_clk<1>(4772720/4); /* dram refresh */
-	m_pit8254->set_clk<2>(4772720/4); /* pio port c pin 4, and speaker polling enough */
-	m_pit8254->out_handler<2>().set(FUNC(at_mb_device::pit8254_out2_changed));
+	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)
+	MCFG_PIT8253_CLK0(4772720/4) /* heartbeat IRQ */
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259_master", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(4772720/4) /* dram refresh */
+	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, at_mb_device, pit8254_out2_changed))
 
-	AM9517A(config, m_dma8237_1, 14.318181_MHz_XTAL / 3);
-	m_dma8237_1->out_hreq_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq0_w));
-	m_dma8237_1->out_eop_callback().set(FUNC(at_mb_device::dma8237_out_eop));
-	m_dma8237_1->in_memr_callback().set(FUNC(at_mb_device::dma_read_byte));
-	m_dma8237_1->out_memw_callback().set(FUNC(at_mb_device::dma_write_byte));
-	m_dma8237_1->in_ior_callback<0>().set(FUNC(at_mb_device::dma8237_0_dack_r));
-	m_dma8237_1->in_ior_callback<1>().set(FUNC(at_mb_device::dma8237_1_dack_r));
-	m_dma8237_1->in_ior_callback<2>().set(FUNC(at_mb_device::dma8237_2_dack_r));
-	m_dma8237_1->in_ior_callback<3>().set(FUNC(at_mb_device::dma8237_3_dack_r));
-	m_dma8237_1->out_iow_callback<0>().set(FUNC(at_mb_device::dma8237_0_dack_w));
-	m_dma8237_1->out_iow_callback<1>().set(FUNC(at_mb_device::dma8237_1_dack_w));
-	m_dma8237_1->out_iow_callback<2>().set(FUNC(at_mb_device::dma8237_2_dack_w));
-	m_dma8237_1->out_iow_callback<3>().set(FUNC(at_mb_device::dma8237_3_dack_w));
-	m_dma8237_1->out_dack_callback<0>().set(FUNC(at_mb_device::dack0_w));
-	m_dma8237_1->out_dack_callback<1>().set(FUNC(at_mb_device::dack1_w));
-	m_dma8237_1->out_dack_callback<2>().set(FUNC(at_mb_device::dack2_w));
-	m_dma8237_1->out_dack_callback<3>().set(FUNC(at_mb_device::dack3_w));
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE("dma8237_2", am9517a_device, dreq0_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, at_mb_device, dma8237_out_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, at_mb_device, dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, at_mb_device, dma_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8(*this, at_mb_device, dma8237_0_dack_r))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, at_mb_device, dma8237_1_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(*this, at_mb_device, dma8237_2_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(*this, at_mb_device, dma8237_3_dack_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8(*this, at_mb_device, dma8237_0_dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, at_mb_device, dma8237_1_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, at_mb_device, dma8237_2_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, at_mb_device, dma8237_3_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, at_mb_device, dack0_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, at_mb_device, dack1_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, at_mb_device, dack2_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, at_mb_device, dack3_w))
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, at_mb_device, dma_hrq_changed))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, at_mb_device, dma_read_word))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, at_mb_device, dma_write_word))
+	MCFG_I8237_IN_IOR_1_CB(READ8(*this, at_mb_device, dma8237_5_dack_r))
+	MCFG_I8237_IN_IOR_2_CB(READ8(*this, at_mb_device, dma8237_6_dack_r))
+	MCFG_I8237_IN_IOR_3_CB(READ8(*this, at_mb_device, dma8237_7_dack_r))
+	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, at_mb_device, dma8237_5_dack_w))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8(*this, at_mb_device, dma8237_6_dack_w))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8(*this, at_mb_device, dma8237_7_dack_w))
+	MCFG_I8237_OUT_DACK_0_CB(WRITELINE(*this, at_mb_device, dack4_w))
+	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(*this, at_mb_device, dack5_w))
+	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(*this, at_mb_device, dack6_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, at_mb_device, dack7_w))
 
-	AM9517A(config, m_dma8237_2, 14.318181_MHz_XTAL / 3);
-	m_dma8237_2->out_hreq_callback().set(FUNC(at_mb_device::dma_hrq_changed));
-	m_dma8237_2->out_eop_callback().set(FUNC(at_mb_device::dma8237_2_out_eop));
-	m_dma8237_2->in_memr_callback().set(FUNC(at_mb_device::dma_read_word));
-	m_dma8237_2->out_memw_callback().set(FUNC(at_mb_device::dma_write_word));
-	m_dma8237_2->in_ior_callback<1>().set(FUNC(at_mb_device::dma8237_5_dack_r));
-	m_dma8237_2->in_ior_callback<2>().set(FUNC(at_mb_device::dma8237_6_dack_r));
-	m_dma8237_2->in_ior_callback<3>().set(FUNC(at_mb_device::dma8237_7_dack_r));
-	m_dma8237_2->out_iow_callback<1>().set(FUNC(at_mb_device::dma8237_5_dack_w));
-	m_dma8237_2->out_iow_callback<2>().set(FUNC(at_mb_device::dma8237_6_dack_w));
-	m_dma8237_2->out_iow_callback<3>().set(FUNC(at_mb_device::dma8237_7_dack_w));
-	m_dma8237_2->out_dack_callback<0>().set(FUNC(at_mb_device::dack4_w));
-	m_dma8237_2->out_dack_callback<1>().set(FUNC(at_mb_device::dack5_w));
-	m_dma8237_2->out_dack_callback<2>().set(FUNC(at_mb_device::dack6_w));
-	m_dma8237_2->out_dack_callback<3>().set(FUNC(at_mb_device::dack7_w));
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(":maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, at_mb_device, get_slave_ack))
 
-	pic8259_device &pic8259_master(PIC8259(config, "pic8259_master", 0));
-	pic8259_master.out_int_callback().set_inputline(":maincpu", 0);
-	pic8259_master.in_sp_callback().set_constant(1);
-	pic8259_master.read_slave_ack_callback().set(FUNC(at_mb_device::get_slave_ack));
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir2_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
-	PIC8259(config, m_pic8259_slave, 0);
-	m_pic8259_slave->out_int_callback().set("pic8259_master", FUNC(pic8259_device::ir2_w));
-	m_pic8259_slave->in_sp_callback().set_constant(0);
+	MCFG_DEVICE_ADD("isabus", ISA16, 0)
+	MCFG_ISA16_CPU(":maincpu")
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_slave",  pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_master", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_master", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_master", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_master", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_IRQ10_CB(WRITELINE("pic8259_slave", pic8259_device, ir3_w))
+	MCFG_ISA_OUT_IRQ11_CB(WRITELINE("pic8259_slave", pic8259_device, ir4_w))
+	MCFG_ISA_OUT_IRQ12_CB(WRITELINE("pic8259_slave", pic8259_device, ir5_w))
+	MCFG_ISA_OUT_IRQ14_CB(WRITELINE("pic8259_slave", pic8259_device, ir6_w))
+	MCFG_ISA_OUT_IRQ15_CB(WRITELINE("pic8259_slave", pic8259_device, ir7_w))
+	MCFG_ISA_OUT_DRQ0_CB(WRITELINE("dma8237_1", am9517a_device, dreq0_w))
+	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	MCFG_ISA_OUT_DRQ5_CB(WRITELINE("dma8237_2", am9517a_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ6_CB(WRITELINE("dma8237_2", am9517a_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("dma8237_2", am9517a_device, dreq3_w))
 
-	ISA16(config, m_isabus, 0);
-	m_isabus->set_cputag(":maincpu");
-	m_isabus->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w)); // in place of irq 2 on at irq 9 is used
-	m_isabus->irq3_callback().set("pic8259_master", FUNC(pic8259_device::ir3_w));
-	m_isabus->irq4_callback().set("pic8259_master", FUNC(pic8259_device::ir4_w));
-	m_isabus->irq5_callback().set("pic8259_master", FUNC(pic8259_device::ir5_w));
-	m_isabus->irq6_callback().set("pic8259_master", FUNC(pic8259_device::ir6_w));
-	m_isabus->irq7_callback().set("pic8259_master", FUNC(pic8259_device::ir7_w));
-	m_isabus->irq10_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir3_w));
-	m_isabus->irq11_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir4_w));
-	m_isabus->irq12_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir5_w));
-	m_isabus->irq14_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir6_w));
-	m_isabus->irq15_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir7_w));
-	m_isabus->drq0_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq0_w));
-	m_isabus->drq1_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq1_w));
-	m_isabus->drq2_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq2_w));
-	m_isabus->drq3_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq3_w));
-	m_isabus->drq5_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq1_w));
-	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
-	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
-
-	MC146818(config, m_mc146818, 32.768_kHz_XTAL);
-	m_mc146818->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
-	m_mc146818->set_century_index(0x32);
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_slave", pic8259_device, ir0_w)) MCFG_DEVCB_INVERT
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
-	keybc.hot_res().set_inputline(":maincpu", INPUT_LINE_RESET);
-	keybc.gate_a20().set_inputline(":maincpu", INPUT_LINE_A20);
-	keybc.kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
-	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
-
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
+	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
+	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
+	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("pic8259_master", pic8259_device, ir1_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
+	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_clk_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, kbd_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
 MACHINE_CONFIG_END
 
 
@@ -151,12 +148,12 @@ void at_mb_device::map(address_map &map)
 {
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xffff);
 	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
-	map(0x0040, 0x005f).rw(m_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0xffff);
-	map(0x0061, 0x0061).rw(FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
+	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0xffff);
+	map(0x0061, 0x0061).rw(this, FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
 	map(0x0060, 0x0060).rw("keybc", FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w));
 	map(0x0064, 0x0064).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
-	map(0x0070, 0x007f).r("rtc", FUNC(mc146818_device::read)).umask16(0xffff).w(FUNC(at_mb_device::write_rtc)).umask16(0xffff);
-	map(0x0080, 0x009f).rw(FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w)).umask16(0xffff);
+	map(0x0070, 0x007f).r("rtc", FUNC(mc146818_device::read)).umask16(0xffff).w(this, FUNC(at_mb_device::write_rtc)).umask16(0xffff);
+	map(0x0080, 0x009f).rw(this, FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w)).umask16(0xffff);
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
 	map(0x00c0, 0x00df).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
 }
@@ -337,13 +334,6 @@ WRITE_LINE_MEMBER( at_mb_device::dma8237_out_eop )
 	m_cur_eop = state == ASSERT_LINE;
 	if(m_dma_channel != -1)
 		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
-}
-
-WRITE_LINE_MEMBER( at_mb_device::dma8237_2_out_eop )
-{
-	m_cur_eop2 = state == ASSERT_LINE;
-	if(m_dma_channel != -1)
-		m_isabus->eop_w(m_dma_channel, m_cur_eop2 ? ASSERT_LINE : CLEAR_LINE );
 }
 
 void at_mb_device::set_dma_channel(int channel, int state)

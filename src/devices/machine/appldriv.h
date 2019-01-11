@@ -28,13 +28,7 @@ class apple525_floppy_image_device : public legacy_floppy_image_device
 {
 public:
 	// construction/destruction
-	apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const floppy_interface *config, int dividend, int divisor)
-		: apple525_floppy_image_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		set_floppy_config(config);
-		set_params(dividend, divisor);
-	}
-	apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	apple525_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;

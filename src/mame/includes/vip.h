@@ -50,47 +50,48 @@ public:
 		, m_exp_ef1(CLEAR_LINE)
 		, m_exp_ef3(CLEAR_LINE)
 		, m_exp_ef4(CLEAR_LINE)
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void vp111(machine_config &config);
-	void vip(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(reset_w);
-	DECLARE_INPUT_CHANGED_MEMBER(beeper_w);
-
-private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_interrupts();
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( io_r );
+	DECLARE_WRITE8_MEMBER( io_w );
 
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef1_r);
-	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_READ_LINE_MEMBER(ef3_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
+	DECLARE_READ_LINE_MEMBER( clear_r );
+	DECLARE_READ_LINE_MEMBER( ef1_r );
+	DECLARE_READ_LINE_MEMBER( ef2_r );
+	DECLARE_READ_LINE_MEMBER( ef3_r );
+	DECLARE_READ_LINE_MEMBER( ef4_r );
+	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_READ8_MEMBER( dma_r );
+	DECLARE_WRITE8_MEMBER( dma_w );
+	DECLARE_WRITE8_MEMBER( sc_w );
 
-	DECLARE_WRITE_LINE_MEMBER(vdc_int_w);
-	DECLARE_WRITE_LINE_MEMBER(vdc_dma_out_w);
-	DECLARE_WRITE_LINE_MEMBER(vdc_ef1_w);
+	DECLARE_WRITE_LINE_MEMBER( vdc_int_w );
+	DECLARE_WRITE_LINE_MEMBER( vdc_dma_out_w );
+	DECLARE_WRITE_LINE_MEMBER( vdc_ef1_w );
 
-	DECLARE_WRITE_LINE_MEMBER(byteio_inst_w);
+	DECLARE_WRITE_LINE_MEMBER( byteio_inst_w );
 
-	DECLARE_WRITE_LINE_MEMBER(exp_int_w );
-	DECLARE_WRITE_LINE_MEMBER(exp_dma_out_w);
-	DECLARE_WRITE_LINE_MEMBER(exp_dma_in_w);
+	DECLARE_WRITE_LINE_MEMBER( exp_int_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_dma_out_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_dma_in_w );
+
+	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
+	DECLARE_INPUT_CHANGED_MEMBER( beeper_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( vip );
-
+	void vp111(machine_config &config);
+	void vip(machine_config &config);
 	void vip_io(address_map &map);
 	void vip_mem(address_map &map);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -129,7 +130,7 @@ private:
 
 	// expansion state
 	uint8_t m_byteio_data;
-	output_finder<3> m_leds;
+	output_finder<3> m_led;
 };
 
 #endif

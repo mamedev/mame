@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "includes/blktiger.h"
 
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -77,8 +78,8 @@ void blktiger_state::blktiger_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).rw(FUNC(blktiger_state::blktiger_bgvideoram_r), FUNC(blktiger_state::blktiger_bgvideoram_w));
-	map(0xd000, 0xd7ff).ram().w(FUNC(blktiger_state::blktiger_txvideoram_w)).share("txvideoram");
+	map(0xc000, 0xcfff).rw(this, FUNC(blktiger_state::blktiger_bgvideoram_r), FUNC(blktiger_state::blktiger_bgvideoram_w));
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(blktiger_state::blktiger_txvideoram_w)).share("txvideoram");
 	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xdc00, 0xdfff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xe000, 0xfdff).ram();
@@ -89,36 +90,36 @@ void blktiger_state::blktiger_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x01, 0x01).portr("IN1").w(FUNC(blktiger_state::blktiger_bankswitch_w));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(blktiger_state::blktiger_bankswitch_w));
 	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).portr("DSW0").w(FUNC(blktiger_state::blktiger_coinlockout_w));
-	map(0x04, 0x04).portr("DSW1").w(FUNC(blktiger_state::blktiger_video_control_w));
+	map(0x03, 0x03).portr("DSW0").w(this, FUNC(blktiger_state::blktiger_coinlockout_w));
+	map(0x04, 0x04).portr("DSW1").w(this, FUNC(blktiger_state::blktiger_video_control_w));
 	map(0x05, 0x05).portr("FREEZE");
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).rw(FUNC(blktiger_state::blktiger_from_mcu_r), FUNC(blktiger_state::blktiger_to_mcu_w));     /* Software protection (7) */
-	map(0x08, 0x09).w(FUNC(blktiger_state::blktiger_scrollx_w));
-	map(0x0a, 0x0b).w(FUNC(blktiger_state::blktiger_scrolly_w));
-	map(0x0c, 0x0c).w(FUNC(blktiger_state::blktiger_video_enable_w));
-	map(0x0d, 0x0d).w(FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
-	map(0x0e, 0x0e).w(FUNC(blktiger_state::blktiger_screen_layout_w));
+	map(0x07, 0x07).rw(this, FUNC(blktiger_state::blktiger_from_mcu_r), FUNC(blktiger_state::blktiger_to_mcu_w));     /* Software protection (7) */
+	map(0x08, 0x09).w(this, FUNC(blktiger_state::blktiger_scrollx_w));
+	map(0x0a, 0x0b).w(this, FUNC(blktiger_state::blktiger_scrolly_w));
+	map(0x0c, 0x0c).w(this, FUNC(blktiger_state::blktiger_video_enable_w));
+	map(0x0d, 0x0d).w(this, FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
+	map(0x0e, 0x0e).w(this, FUNC(blktiger_state::blktiger_screen_layout_w));
 }
 
 void blktiger_state::blktigerbl_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x01, 0x01).portr("IN1").w(FUNC(blktiger_state::blktiger_bankswitch_w));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(blktiger_state::blktiger_bankswitch_w));
 	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).portr("DSW0").w(FUNC(blktiger_state::blktiger_coinlockout_w));
-	map(0x04, 0x04).portr("DSW1").w(FUNC(blktiger_state::blktiger_video_control_w));
+	map(0x03, 0x03).portr("DSW0").w(this, FUNC(blktiger_state::blktiger_coinlockout_w));
+	map(0x04, 0x04).portr("DSW1").w(this, FUNC(blktiger_state::blktiger_video_control_w));
 	map(0x05, 0x05).portr("FREEZE");
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x07, 0x07).noprw();  /* Software protection (7) */
-	map(0x08, 0x09).w(FUNC(blktiger_state::blktiger_scrollx_w));
-	map(0x0a, 0x0b).w(FUNC(blktiger_state::blktiger_scrolly_w));
-	map(0x0c, 0x0c).w(FUNC(blktiger_state::blktiger_video_enable_w));
-	map(0x0d, 0x0d).w(FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
-	map(0x0e, 0x0e).w(FUNC(blktiger_state::blktiger_screen_layout_w));
+	map(0x08, 0x09).w(this, FUNC(blktiger_state::blktiger_scrollx_w));
+	map(0x0a, 0x0b).w(this, FUNC(blktiger_state::blktiger_scrolly_w));
+	map(0x0c, 0x0c).w(this, FUNC(blktiger_state::blktiger_video_enable_w));
+	map(0x0d, 0x0d).w(this, FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
+	map(0x0e, 0x0e).w(this, FUNC(blktiger_state::blktiger_screen_layout_w));
 }
 
 void blktiger_state::blktiger_sound_map(address_map &map)
@@ -289,61 +290,62 @@ void blktiger_state::machine_reset()
 	m_i8751_latch = 0;
 }
 
-void blktiger_state::blktiger(machine_config &config)
-{
+MACHINE_CONFIG_START(blktiger_state::blktiger)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000)/4);	/* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &blktiger_state::blktiger_map);
-	m_maincpu->set_addrmap(AS_IO, &blktiger_state::blktiger_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(blktiger_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(blktiger_map)
+	MCFG_DEVICE_IO_MAP(blktiger_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));	/* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &blktiger_state::blktiger_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(blktiger_sound_map)
 
-	I8751(config, m_mcu, XTAL(24'000'000)/4); /* ??? */
-	m_mcu->port_in_cb<0>().set(FUNC(blktiger_state::blktiger_from_main_r));
-	m_mcu->port_out_cb<0>().set(FUNC(blktiger_state::blktiger_to_main_w));
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(24'000'000)/4) /* ??? */
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, blktiger_state, blktiger_from_main_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, blktiger_state, blktiger_to_main_w))
 	// other ports unknown
-	//m_mcu->set_vblank_int("screen", FUNC(blktiger_state::irq0_line_hold));
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(blktiger_state::screen_update_blktiger));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(blktiger_state, screen_update_blktiger)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blktiger);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blktiger)
 
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
 
-	BUFFERED_SPRITERAM8(config, m_spriteram);
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(3'579'545))); /* verified on pcb */
-	ym1.irq_handler().set_inputline(m_audiocpu, 0);
-	ym1.add_route(ALL_OUTPUTS, "mono", 0.15);
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(3'579'545))); /* verified on pcb */
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.15);
-}
+	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+MACHINE_CONFIG_END
 
-void blktiger_state::blktigerbl(machine_config &config)
-{
+MACHINE_CONFIG_START(blktiger_state::blktigerbl)
 	blktiger(config);
-	m_maincpu->set_addrmap(AS_IO, &blktiger_state::blktigerbl_io_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(blktigerbl_io_map)
 
-	config.device_remove("mcu");
-}
+	MCFG_DEVICE_REMOVE("mcu")
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -12,7 +12,6 @@
 #include "cpu/i86/i86.h"
 #include "machine/74259.h"
 //#include "machine/z80sio.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -71,9 +70,9 @@ void dms5000_state::dms5000_mem(address_map &map)
 void dms5000_state::dms5000_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x20, 0x2f).r(FUNC(dms5000_state::status_r)).umask16(0xff00);
+	map(0x20, 0x2f).r(this, FUNC(dms5000_state::status_r)).umask16(0xff00);
 	map(0x40, 0x4f).w("cntlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0x50, 0x57).w(FUNC(dms5000_state::brightness_w)).umask16(0x00ff);
+	map(0x50, 0x57).w(this, FUNC(dms5000_state::brightness_w)).umask16(0x00ff);
 }
 
 /* Input ports */
@@ -111,7 +110,7 @@ MACHINE_CONFIG_START(dms5000_state::dms5000)
 	MCFG_SCREEN_UPDATE_DRIVER(dms5000_state, screen_update_dms5000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

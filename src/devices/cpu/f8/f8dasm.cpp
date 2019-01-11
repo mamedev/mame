@@ -381,7 +381,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 
 	case 0xa2: /* 1010 0010 */
 	case 0xa3: /* 1010 0011 */
-		util::stream_format(stream, "???  $%02X", op);
+		util::stream_format(stream, "???  $%02X\n", op);
 		break;
 
 	case 0xa4: /* 1010 0100 */
@@ -406,7 +406,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 
 	case 0xb2: /* 1011 0010 */
 	case 0xb3: /* 1011 0011 */
-		util::stream_format(stream, "???  $%02X", op);
+		util::stream_format(stream, "???  $%02X\n", op);
 		break;
 
 	case 0xb4: /* 1011 0100 */
@@ -448,7 +448,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "AS   (IS--)");
 		break;
 	case 0xcf: /* 1100 1111 */
-		util::stream_format(stream, "???  $%02X", op);
+		util::stream_format(stream, "???  $%02X\n", op);
 		break;
 
 	case 0xd0: /* 1101 0000 */
@@ -475,7 +475,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "ASD  (IS--)");
 		break;
 	case 0xdf: /* 1101 1111 */
-		util::stream_format(stream, "???  $%02X", op);
+		util::stream_format(stream, "???  $%02X\n", op);
 		break;
 
 	case 0xe0: /* 1110 0000 */
@@ -502,7 +502,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "XS   (IS--)");
 		break;
 	case 0xef: /* 1110 1111 */
-		util::stream_format(stream, "???  $%02X", op);
+		util::stream_format(stream, "???  $%02X\n", op);
 		break;
 
 
@@ -530,7 +530,7 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		util::stream_format(stream, "NS   (IS--)");
 		break;
 	case 0xff: /* 1111 1111 */
-		util::stream_format(stream, "???  $%02X", op);
+		util::stream_format(stream, "???  $%02X\n", op);
 		break;
 	}
 

@@ -187,8 +187,8 @@ void mcatadv_state::mcatadv_map(address_map &map)
 	map(0x200000, 0x200005).ram().share("scroll1");
 	map(0x300000, 0x300005).ram().share("scroll2");
 
-	map(0x400000, 0x401fff).ram().w(FUNC(mcatadv_state::vram_w<0>)).share("vram_1"); // Tilemap 0
-	map(0x500000, 0x501fff).ram().w(FUNC(mcatadv_state::vram_w<1>)).share("vram_2"); // Tilemap 1
+	map(0x400000, 0x401fff).ram().w(this, FUNC(mcatadv_state::vram_w<0>)).share("vram_1"); // Tilemap 0
+	map(0x500000, 0x501fff).ram().w(this, FUNC(mcatadv_state::vram_w<1>)).share("vram_2"); // Tilemap 1
 
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x602000, 0x602fff).ram(); // Bigger than needs to be?
@@ -205,7 +205,7 @@ void mcatadv_state::mcatadv_map(address_map &map)
 	map(0xb00000, 0xb0000f).ram().share("vidregs");
 
 	map(0xb00018, 0xb00019).w(m_watchdog, FUNC(watchdog_timer_device::reset16_w)); // NOST Only
-	map(0xb0001e, 0xb0001f).r(FUNC(mcatadv_state::mcat_wd_r)); // MCAT Only
+	map(0xb0001e, 0xb0001f).r(this, FUNC(mcatadv_state::mcat_wd_r)); // MCAT Only
 	map(0xc00001, 0xc00001).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0xc00000, 0xc00001).w("soundlatch", FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16);
 }
@@ -224,7 +224,7 @@ void mcatadv_state::mcatadv_sound_map(address_map &map)
 	map(0x4000, 0xbfff).bankr("soundbank");                // ROM
 	map(0xc000, 0xdfff).ram();                     // RAM
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0xf000, 0xf000).w(FUNC(mcatadv_state::mcatadv_sound_bw_w));
+	map(0xf000, 0xf000).w(this, FUNC(mcatadv_state::mcatadv_sound_bw_w));
 }
 
 void mcatadv_state::mcatadv_sound_io_map(address_map &map)
@@ -246,7 +246,7 @@ void mcatadv_state::nost_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).w("ymsnd", FUNC(ym2610_device::write));
 	map(0x04, 0x07).r("ymsnd", FUNC(ym2610_device::read));
-	map(0x40, 0x40).w(FUNC(mcatadv_state::mcatadv_sound_bw_w));
+	map(0x40, 0x40).w(this, FUNC(mcatadv_state::mcatadv_sound_bw_w));
 	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
@@ -434,59 +434,64 @@ void mcatadv_state::machine_start()
 	save_item(NAME(m_palette_bank));
 }
 
-void mcatadv_state::mcatadv(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(16'000'000)); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &mcatadv_state::mcatadv_map);
-	m_maincpu->set_vblank_int("screen", FUNC(mcatadv_state::irq1_line_hold));
+MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
-	Z80(config, m_soundcpu, XTAL(16'000'000)/4); /* verified on pcb */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &mcatadv_state::mcatadv_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &mcatadv_state::mcatadv_sound_io_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mcatadv_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mcatadv_state,  irq1_line_hold)
+
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mcatadv_sound_map)
+	MCFG_DEVICE_IO_MAP(mcatadv_sound_io_map)
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(320, 256);
-	screen.set_visarea(0, 320-1, 0, 224-1);
-	screen.set_screen_update(FUNC(mcatadv_state::screen_update_mcatadv));
-	screen.screen_vblank().set(FUNC(mcatadv_state::screen_vblank_mcatadv));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mcatadv_state, screen_vblank_mcatadv))
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcatadv);
-	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x2000/2);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcatadv)
+	MCFG_PALETTE_ADD("palette", 0x2000/2)
+	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	GENERIC_LATCH_8(config, "soundlatch2");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2)); /* verified on pcb */
-	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "mono", 0.32);
-	ymsnd.add_route(1, "mono", 0.5);
-	ymsnd.add_route(2, "mono", 0.5);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.32)
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+	MCFG_SOUND_ROUTE(2, "mono", 0.5)
+MACHINE_CONFIG_END
 
-void mcatadv_state::nost(machine_config &config)
-{
+MACHINE_CONFIG_START(mcatadv_state::nost)
 	mcatadv(config);
 
-	m_soundcpu->set_addrmap(AS_PROGRAM, &mcatadv_state::nost_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &mcatadv_state::nost_sound_io_map);
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(nost_sound_map)
+	MCFG_DEVICE_IO_MAP(nost_sound_io_map)
 
-	ym2610_device &ymsnd(YM2610(config.replace(), "ymsnd", XTAL(16'000'000)/2)); /* verified on pcb */
-	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "mono", 0.2);
-	ymsnd.add_route(1, "mono", 0.5);
-	ymsnd.add_route(2, "mono", 0.5);
-}
+	MCFG_DEVICE_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.2)
+	MCFG_SOUND_ROUTE(1, "mono", 0.5)
+	MCFG_SOUND_ROUTE(2, "mono", 0.5)
+MACHINE_CONFIG_END
 
 
 ROM_START( mcatadv )

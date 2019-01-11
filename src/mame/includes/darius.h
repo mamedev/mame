@@ -5,15 +5,10 @@
     Darius
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DARIUS_H
-#define MAME_INCLUDES_DARIUS_H
-
-#pragma once
 
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
 #include "video/pc080sn.h"
-#include "emupal.h"
 
 #define DARIUS_VOL_MAX    (3*2 + 2)
 #define DARIUS_PAN_MAX    (2 + 2 + 1)   /* FM 2port + PSG 2port + DA 1port */
@@ -21,8 +16,8 @@
 class darius_state : public driver_device
 {
 public:
-	darius_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	darius_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_fg_ram(*this, "fg_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -50,17 +45,8 @@ public:
 		m_msm5205_l(*this, "msm5205.l"),
 		m_msm5205_r(*this, "msm5205.r"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void darius(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_fg_ram;
@@ -128,24 +114,26 @@ private:
 	DECLARE_WRITE8_MEMBER(darius_write_portB1);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	uint32_t screen_update_darius_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_darius_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_darius_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void darius_postload();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs);
-	void parse_control();   // assumes Z80 sandwiched between 68Ks
-	void update_fm0();
-	void update_fm1();
-	void update_psg0(int port);
-	void update_psg1(int port);
-	void update_da();
+	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
+	void update_fm0(  );
+	void update_fm1(  );
+	void update_psg0( int port );
+	void update_psg1( int port );
+	void update_da(  );
 	DECLARE_WRITE_LINE_MEMBER(darius_adpcm_int);
+	void darius(machine_config &config);
 	void darius_cpub_map(address_map &map);
 	void darius_map(address_map &map);
 	void darius_sound2_io_map(address_map &map);
 	void darius_sound2_map(address_map &map);
 	void darius_sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_DARIUS_H

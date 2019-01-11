@@ -21,10 +21,11 @@ public:
 
 	void ecoinf1_older(machine_config &config);
 
-private:
+protected:
 	void older_memmap(address_map &map);
 	void older_portmap(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 };
 

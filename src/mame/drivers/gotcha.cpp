@@ -68,7 +68,6 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -96,20 +95,20 @@ void gotcha_state::gotcha_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x100002, 0x100003).w(FUNC(gotcha_state::gotcha_lamps_w));
-	map(0x100004, 0x100004).w(FUNC(gotcha_state::gotcha_oki_bank_w));
+	map(0x100002, 0x100003).w(this, FUNC(gotcha_state::gotcha_lamps_w));
+	map(0x100004, 0x100004).w(this, FUNC(gotcha_state::gotcha_oki_bank_w));
 	map(0x120000, 0x12ffff).ram();
 	map(0x140000, 0x1405ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram");
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("SYSTEM");
 	map(0x180004, 0x180005).portr("DSW");
-	map(0x300000, 0x300001).w(FUNC(gotcha_state::gotcha_gfxbank_select_w));
-	map(0x300002, 0x300009).w(FUNC(gotcha_state::gotcha_scroll_w));
+	map(0x300000, 0x300001).w(this, FUNC(gotcha_state::gotcha_gfxbank_select_w));
+	map(0x300002, 0x300009).w(this, FUNC(gotcha_state::gotcha_scroll_w));
 //  { 0x30000c, 0x30000d,
-	map(0x30000e, 0x30000f).w(FUNC(gotcha_state::gotcha_gfxbank_w));
-	map(0x320000, 0x320fff).w(FUNC(gotcha_state::gotcha_fgvideoram_w)).share("fgvideoram");
-	map(0x322000, 0x322fff).w(FUNC(gotcha_state::gotcha_bgvideoram_w)).share("bgvideoram");
+	map(0x30000e, 0x30000f).w(this, FUNC(gotcha_state::gotcha_gfxbank_w));
+	map(0x320000, 0x320fff).w(this, FUNC(gotcha_state::gotcha_fgvideoram_w)).share("fgvideoram");
+	map(0x322000, 0x322fff).w(this, FUNC(gotcha_state::gotcha_bgvideoram_w)).share("bgvideoram");
 }
 
 
@@ -270,34 +269,36 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(gotcha_state::screen_update_gotcha));
-	screen.set_palette("palette");
-	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_6, HOLD_LINE);
-	screen.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI); // ?
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(55)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gotcha_state, screen_update_gotcha)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI)) // ?
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_gotcha);
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 768);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gotcha)
+	MCFG_PALETTE_ADD("palette", 768)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(1);
-	m_sprgen->set_is_bootleg(true);
-	m_sprgen->set_offsets(5, -1); // aligned to 2nd instruction screen in attract
-	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
+
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DECO_SPRITE_GFX_REGION(1)
+	MCFG_DECO_SPRITE_ISBOOTLEG(true)
+	MCFG_DECO_SPRITE_OFFSETS(5, -1) // aligned to 2nd instruction screen in attract
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14318180/4));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.80);
-	ymsnd.add_route(1, "mono", 0.80);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "mono", 0.80)
+	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

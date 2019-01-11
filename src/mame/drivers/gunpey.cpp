@@ -197,7 +197,6 @@ Release:                         November 1999
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -290,7 +289,7 @@ void gunpey_state::video_start()
 	m_vram = std::make_unique<uint8_t[]>(0x400000);
 	std::fill_n(&m_vram[0], 0x400000, 0xff);
 	m_blitter_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gunpey_state::blitter_end), this));
-	save_pointer(NAME(m_vram), 0x400000);
+	save_pointer(NAME(m_vram.get()), 0x400000);
 }
 
 uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient)
@@ -1094,21 +1093,21 @@ void gunpey_state::mem_map(address_map &map)
 
 void gunpey_state::io_map(address_map &map)
 {
-	map(0x7f40, 0x7f45).r(FUNC(gunpey_state::inputs_r));
+	map(0x7f40, 0x7f45).r(this, FUNC(gunpey_state::inputs_r));
 
-	map(0x7f48, 0x7f48).w(FUNC(gunpey_state::output_w));
+	map(0x7f48, 0x7f48).w(this, FUNC(gunpey_state::output_w));
 	map(0x7f80, 0x7f81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 
 	map(0x7f88, 0x7f88).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x7fc8, 0x7fc9).rw(FUNC(gunpey_state::status_r), FUNC(gunpey_state::status_w));
-	map(0x7fd0, 0x7fdf).w(FUNC(gunpey_state::blitter_w));
-	map(0x7fe0, 0x7fe5).w(FUNC(gunpey_state::blitter_upper_w));
-	map(0x7ff0, 0x7ff5).w(FUNC(gunpey_state::blitter_upper2_w));
+	map(0x7fc8, 0x7fc9).rw(this, FUNC(gunpey_state::status_r), FUNC(gunpey_state::status_w));
+	map(0x7fd0, 0x7fdf).w(this, FUNC(gunpey_state::blitter_w));
+	map(0x7fe0, 0x7fe5).w(this, FUNC(gunpey_state::blitter_upper_w));
+	map(0x7ff0, 0x7ff5).w(this, FUNC(gunpey_state::blitter_upper2_w));
 
 	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
-	map(0x7fec, 0x7fed).w(FUNC(gunpey_state::vregs_addr_w));
-	map(0x7fee, 0x7fef).w(FUNC(gunpey_state::vram_bank_w));
+	map(0x7fec, 0x7fed).w(this, FUNC(gunpey_state::vregs_addr_w));
+	map(0x7fee, 0x7fef).w(this, FUNC(gunpey_state::vram_bank_w));
 
 }
 
@@ -1229,9 +1228,9 @@ MACHINE_CONFIG_START(gunpey_state::gunpey)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(57242400/8, 442, 0, 320, 264, 0, 240) /* just to get ~60 Hz */
 	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette, palette_device::RGB_555);
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -69,36 +69,36 @@ DEFINE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device, "k573_dio", "Kon
 
 void k573dio_device::amap(address_map &map)
 {
-	map(0x00, 0x01).r(FUNC(k573dio_device::a00_r));
-	map(0x02, 0x03).r(FUNC(k573dio_device::a02_r));
-	map(0x04, 0x05).r(FUNC(k573dio_device::a04_r));
-	map(0x06, 0x07).r(FUNC(k573dio_device::a06_r));
-	map(0x0a, 0x0b).r(FUNC(k573dio_device::a0a_r));
-	map(0x80, 0x81).r(FUNC(k573dio_device::a80_r));
-	map(0xa0, 0xa1).w(FUNC(k573dio_device::mpeg_start_adr_high_w));
-	map(0xa2, 0xa3).w(FUNC(k573dio_device::mpeg_start_adr_low_w));
-	map(0xa4, 0xa5).w(FUNC(k573dio_device::mpeg_end_adr_high_w));
-	map(0xa6, 0xa7).w(FUNC(k573dio_device::mpeg_end_adr_low_w));
-	map(0xa8, 0xa9).w(FUNC(k573dio_device::mpeg_key_1_w));
-	map(0xac, 0xad).rw(FUNC(k573dio_device::mas_i2c_r), FUNC(k573dio_device::mas_i2c_w));
-	map(0xae, 0xaf).w(FUNC(k573dio_device::mpeg_ctrl_w));
-	map(0xb0, 0xb1).w(FUNC(k573dio_device::ram_write_adr_high_w));
-	map(0xb2, 0xb3).w(FUNC(k573dio_device::ram_write_adr_low_w));
-	map(0xb4, 0xb5).rw(FUNC(k573dio_device::ram_r), FUNC(k573dio_device::ram_w));
-	map(0xb6, 0xb7).w(FUNC(k573dio_device::ram_read_adr_high_w));
-	map(0xb8, 0xb9).w(FUNC(k573dio_device::ram_read_adr_low_w));
-	map(0xe0, 0xe1).w(FUNC(k573dio_device::output_1_w));
-	map(0xe2, 0xe3).w(FUNC(k573dio_device::output_0_w));
-	map(0xe4, 0xe5).w(FUNC(k573dio_device::output_3_w));
-	map(0xe6, 0xe7).w(FUNC(k573dio_device::output_7_w));
-	map(0xea, 0xeb).w(FUNC(k573dio_device::mpeg_key_2_w));
-	map(0xec, 0xed).w(FUNC(k573dio_device::mpeg_key_3_w));
-	map(0xee, 0xef).rw(FUNC(k573dio_device::digital_id_r), FUNC(k573dio_device::digital_id_w));
-	map(0xf6, 0xf7).r(FUNC(k573dio_device::fpga_status_r));
-	map(0xf8, 0xf9).w(FUNC(k573dio_device::fpga_firmware_w));
-	map(0xfa, 0xfb).w(FUNC(k573dio_device::output_4_w));
-	map(0xfc, 0xfd).w(FUNC(k573dio_device::output_5_w));
-	map(0xfe, 0xff).w(FUNC(k573dio_device::output_2_w));
+	map(0x00, 0x01).r(this, FUNC(k573dio_device::a00_r));
+	map(0x02, 0x03).r(this, FUNC(k573dio_device::a02_r));
+	map(0x04, 0x05).r(this, FUNC(k573dio_device::a04_r));
+	map(0x06, 0x07).r(this, FUNC(k573dio_device::a06_r));
+	map(0x0a, 0x0b).r(this, FUNC(k573dio_device::a0a_r));
+	map(0x80, 0x81).r(this, FUNC(k573dio_device::a80_r));
+	map(0xa0, 0xa1).w(this, FUNC(k573dio_device::mpeg_start_adr_high_w));
+	map(0xa2, 0xa3).w(this, FUNC(k573dio_device::mpeg_start_adr_low_w));
+	map(0xa4, 0xa5).w(this, FUNC(k573dio_device::mpeg_end_adr_high_w));
+	map(0xa6, 0xa7).w(this, FUNC(k573dio_device::mpeg_end_adr_low_w));
+	map(0xa8, 0xa9).w(this, FUNC(k573dio_device::mpeg_key_1_w));
+	map(0xac, 0xad).rw(this, FUNC(k573dio_device::mas_i2c_r), FUNC(k573dio_device::mas_i2c_w));
+	map(0xae, 0xaf).w(this, FUNC(k573dio_device::mpeg_ctrl_w));
+	map(0xb0, 0xb1).w(this, FUNC(k573dio_device::ram_write_adr_high_w));
+	map(0xb2, 0xb3).w(this, FUNC(k573dio_device::ram_write_adr_low_w));
+	map(0xb4, 0xb5).rw(this, FUNC(k573dio_device::ram_r), FUNC(k573dio_device::ram_w));
+	map(0xb6, 0xb7).w(this, FUNC(k573dio_device::ram_read_adr_high_w));
+	map(0xb8, 0xb9).w(this, FUNC(k573dio_device::ram_read_adr_low_w));
+	map(0xe0, 0xe1).w(this, FUNC(k573dio_device::output_1_w));
+	map(0xe2, 0xe3).w(this, FUNC(k573dio_device::output_0_w));
+	map(0xe4, 0xe5).w(this, FUNC(k573dio_device::output_3_w));
+	map(0xe6, 0xe7).w(this, FUNC(k573dio_device::output_7_w));
+	map(0xea, 0xeb).w(this, FUNC(k573dio_device::mpeg_key_2_w));
+	map(0xec, 0xed).w(this, FUNC(k573dio_device::mpeg_key_3_w));
+	map(0xee, 0xef).rw(this, FUNC(k573dio_device::digital_id_r), FUNC(k573dio_device::digital_id_w));
+	map(0xf6, 0xf7).r(this, FUNC(k573dio_device::fpga_status_r));
+	map(0xf8, 0xf9).w(this, FUNC(k573dio_device::fpga_firmware_w));
+	map(0xfa, 0xfb).w(this, FUNC(k573dio_device::output_4_w));
+	map(0xfc, 0xfd).w(this, FUNC(k573dio_device::output_5_w));
+	map(0xfe, 0xff).w(this, FUNC(k573dio_device::output_2_w));
 }
 
 k573dio_device::k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -113,7 +113,7 @@ void k573dio_device::device_start()
 {
 	output_cb.resolve_safe();
 	ram = std::make_unique<uint16_t[]>(12 * 1024 * 1024 );
-	save_pointer(NAME(ram), 12 * 1024 * 1024 );
+	save_pointer( NAME(ram.get()), 12 * 1024 * 1024 );
 }
 
 void k573dio_device::device_reset()
@@ -132,11 +132,10 @@ const tiny_rom_entry *k573dio_device::device_rom_region() const
 	return ROM_NAME(k573dio);
 }
 
-void k573dio_device::device_add_mconfig(machine_config &config)
-{
-	MAS3507D(config, "mpeg");
-	DS2401( config, "digital_id" );
-}
+MACHINE_CONFIG_START(k573dio_device::device_add_mconfig)
+	MCFG_MAS3507D_ADD( "mpeg" )
+	MCFG_DS2401_ADD( "digital_id" )
+MACHINE_CONFIG_END
 
 void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {

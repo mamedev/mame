@@ -10,7 +10,6 @@
 #include "pc83.h"
 #include "pcxt83.h"
 #include "pcat84.h"
-#include "pcat101.h"
 
 void pc_xt_keyboards(device_slot_interface &device)
 {
@@ -28,5 +27,4 @@ void pc_at_keyboards(device_slot_interface &device)
 	device.option_add(STR_KBD_MICROSOFT_NATURAL, PC_KBD_MICROSOFT_NATURAL);
 	device.option_add(STR_KBD_IBM_PC_AT_84, PC_KBD_IBM_PC_AT_84);
 	device.option_add(STR_KBD_IBM_3270PC_122, PC_KBD_IBM_3270PC_122);
-	device.option_add(STR_KBD_IBM_PC_AT_101, PC_KBD_IBM_PC_AT_101);
 }

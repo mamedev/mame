@@ -42,8 +42,8 @@ void mb60553_zooming_tilemap_device::device_start()
 	m_lineram = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_vram = make_unique_clear<uint16_t[]>(0x4000/2);
 
-	save_pointer(NAME(m_lineram), 0x1000/2);
-	save_pointer(NAME(m_vram), 0x4000/2);
+	save_pointer(NAME(m_lineram.get()), 0x1000/2);
+	save_pointer(NAME(m_vram.get()), 0x4000/2);
 	save_item(NAME(m_pal_base));
 	save_item(NAME(m_bank));
 	save_item(NAME(m_regs));

@@ -13,7 +13,6 @@
 
 #include "slot.h"
 #include "machine/wd_fdc.h"
-#include "imagedev/floppy.h"
 #include "formats/acorn_dsk.h"
 
 //**************************************************************************

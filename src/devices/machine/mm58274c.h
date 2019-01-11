@@ -14,7 +14,6 @@ public:
 
 	void set_mode24(int mode) { m_mode24 = mode; }
 	void set_day1(int day) { m_day1 = day; }
-	void set_mode_and_day(int mode, int day) { m_mode24 = mode; m_day1 = day; }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

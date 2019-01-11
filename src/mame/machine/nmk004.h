@@ -13,12 +13,19 @@
 
 #pragma once
 
+
+#define MCFG_NMK004_ADD(tag, clock) \
+	MCFG_DEVICE_ADD(tag, NMK004, clock)
+
+#define MCFG_NMK004_RESET_CB(cb) \
+	downcast<nmk004_device &>(*device).set_reset_cb(DEVCB_##cb);
+
 class nmk004_device : public device_t
 {
 public:
-	nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename Obj> devcb_base &set_reset_cb(Obj &&object) { return m_reset_cb.set_callback(std::forward<Obj>(object)); }
 
-	auto reset_cb() { return m_reset_cb.bind(); }
+	nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// host interface
 	DECLARE_WRITE8_MEMBER( write );

@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 		uint8_t data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		m_msm->write_data((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
+		m_msm->data_w((data >> (4 * (~m_sample_offset & 1))) & 0x0f);
 		m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
@@ -284,7 +284,7 @@ void crgolf_state::main_map(address_map &map)
 	map(0x8000, 0x8007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x8800, 0x8800).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x8800, 0x8800).w("soundlatch1", FUNC(generic_latch_8_device::write));
-	map(0x9000, 0x9000).w(FUNC(crgolf_state::rom_bank_select_w));
+	map(0x9000, 0x9000).w(this, FUNC(crgolf_state::rom_bank_select_w));
 	map(0xa000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 }
 
@@ -307,8 +307,8 @@ void crgolf_state::sound_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0xc000, 0xc001).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xc002, 0xc002).nopw();
-	map(0xe000, 0xe000).rw(FUNC(crgolf_state::switch_input_r), FUNC(crgolf_state::switch_input_select_w));
-	map(0xe001, 0xe001).rw(FUNC(crgolf_state::analog_input_r), FUNC(crgolf_state::unknown_w));
+	map(0xe000, 0xe000).rw(this, FUNC(crgolf_state::switch_input_r), FUNC(crgolf_state::switch_input_select_w));
+	map(0xe001, 0xe001).rw(this, FUNC(crgolf_state::analog_input_r), FUNC(crgolf_state::unknown_w));
 	map(0xe003, 0xe003).r("soundlatch1", FUNC(generic_latch_8_device::read));
 	map(0xe003, 0xe003).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
@@ -372,12 +372,12 @@ void crgolf_state::mastrglf_subio(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch1", FUNC(generic_latch_8_device::read)).nopw();
-	map(0x02, 0x02).r(FUNC(crgolf_state::unk_sub_02_r));
-	map(0x05, 0x05).r(FUNC(crgolf_state::unk_sub_05_r));
+	map(0x02, 0x02).r(this, FUNC(crgolf_state::unk_sub_02_r));
+	map(0x05, 0x05).r(this, FUNC(crgolf_state::unk_sub_05_r));
 	map(0x06, 0x06).nopr();
-	map(0x07, 0x07).r(FUNC(crgolf_state::unk_sub_07_r));
+	map(0x07, 0x07).r(this, FUNC(crgolf_state::unk_sub_07_r));
 	map(0x08, 0x08).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0x0c, 0x0c).w(FUNC(crgolf_state::unk_sub_0c_w));
+	map(0x0c, 0x0c).w(this, FUNC(crgolf_state::unk_sub_0c_w));
 	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
@@ -465,73 +465,89 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void crgolf_state::crgolf(machine_config &config)
-{
+MACHINE_CONFIG_START(crgolf_state::crgolf)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/3/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &crgolf_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, MASTER_CLOCK/3/2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::sound_map);
-	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
-	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
-	mainlatch.q_out_cb<4>().set(FUNC(crgolf_state::screen_flip_w));
-	mainlatch.q_out_cb<5>().set(FUNC(crgolf_state::screen_select_w));
-	mainlatch.q_out_cb<6>().set(FUNC(crgolf_state::screenb_enable_w));
-	mainlatch.q_out_cb<7>().set(FUNC(crgolf_state::screena_enable_w));
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1H
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, crgolf_state, color_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, crgolf_state, screen_flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, crgolf_state, screen_select_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, crgolf_state, screenb_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, crgolf_state, screena_enable_w))
 
-	GENERIC_LATCH_8(config, "soundlatch1").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	/* stride is technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&crgolf_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, m_palette, FUNC(crgolf_state::crgolf_palette), 0x20);
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000) /* technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
+
+	MCFG_PALETTE_ADD("palette", 0x20)
+	MCFG_PALETTE_INIT_OWNER(crgolf_state, crgolf)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 255, 8, 247);
-	screen.set_screen_update(FUNC(crgolf_state::screen_update_crgolf));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE_DRIVER(crgolf_state, screen_update_crgolf)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "aysnd", MASTER_CLOCK/3/2/2).add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void crgolf_state::crgolfhi(machine_config &config)
-{
+
+MACHINE_CONFIG_START(crgolf_state::crgolfhi)
 	crgolf(config);
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(crgolf_state::vck_callback));
-	m_msm->set_prescaler_selector(msm5205_device::S64_4B);
-	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, crgolf_state, vck_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void crgolf_state::mastrglf(machine_config &config)
-{
+
+MACHINE_CONFIG_START(crgolf_state::mastrglf)
 	crgolfhi(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &crgolf_state::mastrglf_map);
-	m_maincpu->set_addrmap(AS_IO, &crgolf_state::mastrglf_io);
-	m_maincpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mastrglf_map)
+	MCFG_DEVICE_IO_MAP(mastrglf_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::mastrglf_submap);
-	m_audiocpu->set_addrmap(AS_IO, &crgolf_state::mastrglf_subio);
-	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(mastrglf_submap)
+	MCFG_DEVICE_IO_MAP(mastrglf_subio)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crgolf_state,  irq0_line_hold)
 
-	PALETTE(config.replace(), m_palette, FUNC(crgolf_state::mastrglf_palette), 0x100);
-}
+	MCFG_DEVICE_REMOVE("palette")
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(crgolf_state, mastrglf)
+
+
+MACHINE_CONFIG_END
 
 
 /*************************************

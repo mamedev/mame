@@ -30,7 +30,7 @@ public:
 // matrix_solver - Direct1
 // ----------------------------------------------------------------------------------------
 
-inline unsigned matrix_solver_direct1_t::vsolve_non_dynamic(const bool newton_raphson)
+inline unsigned matrix_solver_direct1_t::vsolve_non_dynamic(ATTR_UNUSED const bool newton_raphson)
 {
 	build_LE_A<matrix_solver_direct1_t>();
 	build_LE_RHS<matrix_solver_direct1_t>();

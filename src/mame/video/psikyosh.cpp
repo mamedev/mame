@@ -1117,7 +1117,7 @@ void psikyosh_state::video_start()
 	save_item(NAME(m_z_bitmap));
 	save_item(NAME(m_zoom_bitmap));
 	save_item(NAME(m_bg_bitmap));
-	save_pointer(NAME(m_bg_zoom), 256);
+	save_pointer(NAME(m_bg_zoom.get()), 256);
 }
 
 

@@ -8,15 +8,15 @@ DEFINE_DEVICE_TYPE(MB8795, mb8795_device, "mb8795", "Fujitsu MB8795")
 
 void mb8795_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(mb8795_device::txstat_r), FUNC(mb8795_device::txstat_w));
-	map(0x1, 0x1).rw(FUNC(mb8795_device::txmask_r), FUNC(mb8795_device::txmask_w));
-	map(0x2, 0x2).rw(FUNC(mb8795_device::rxstat_r), FUNC(mb8795_device::rxstat_w));
-	map(0x3, 0x3).rw(FUNC(mb8795_device::rxmask_r), FUNC(mb8795_device::rxmask_w));
-	map(0x4, 0x4).rw(FUNC(mb8795_device::txmode_r), FUNC(mb8795_device::txmode_w));
-	map(0x5, 0x5).rw(FUNC(mb8795_device::rxmode_r), FUNC(mb8795_device::rxmode_w));
-	map(0x6, 0x6).w(FUNC(mb8795_device::reset_w));
-	map(0x7, 0x7).r(FUNC(mb8795_device::tdc_lsb_r));
-	map(0x8, 0xf).rw(FUNC(mb8795_device::mac_r), FUNC(mb8795_device::mac_w)); // Mapping limitation, real is up to 0xd
+	map(0x0, 0x0).rw(this, FUNC(mb8795_device::txstat_r), FUNC(mb8795_device::txstat_w));
+	map(0x1, 0x1).rw(this, FUNC(mb8795_device::txmask_r), FUNC(mb8795_device::txmask_w));
+	map(0x2, 0x2).rw(this, FUNC(mb8795_device::rxstat_r), FUNC(mb8795_device::rxstat_w));
+	map(0x3, 0x3).rw(this, FUNC(mb8795_device::rxmask_r), FUNC(mb8795_device::rxmask_w));
+	map(0x4, 0x4).rw(this, FUNC(mb8795_device::txmode_r), FUNC(mb8795_device::txmode_w));
+	map(0x5, 0x5).rw(this, FUNC(mb8795_device::rxmode_r), FUNC(mb8795_device::rxmode_w));
+	map(0x6, 0x6).w(this, FUNC(mb8795_device::reset_w));
+	map(0x7, 0x7).r(this, FUNC(mb8795_device::tdc_lsb_r));
+	map(0x8, 0xf).rw(this, FUNC(mb8795_device::mac_r), FUNC(mb8795_device::mac_w)); // Mapping limitation, real is up to 0xd
 }
 
 mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

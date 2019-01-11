@@ -11,7 +11,6 @@
 #include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
-#include "emupal.h"
 
 struct duart_t
 {
@@ -63,24 +62,29 @@ class jpmimpct_state : public driver_device
 public:
 	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_duart_1_timer(*this, "duart_1_timer")
 		, m_vfd(*this, "vfd")
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
 		, m_upd7759(*this, "upd")
 		, m_palette(*this, "palette")
 		, m_dsp(*this, "dsp")
-		, m_reel(*this, "reel%u", 0U)
+		, m_reel0(*this, "reel0")
+		, m_reel1(*this, "reel1")
+		, m_reel2(*this, "reel2")
+		, m_reel3(*this, "reel3")
+		, m_reel4(*this, "reel4")
+		, m_reel5(*this, "reel5")
 		, m_meters(*this, "meters")
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamp_output(*this, "lamp%u", 0U)
 	{ }
 
-	void impctawp(machine_config &config);
-	void jpmimpct(machine_config &config);
-
-private:
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	DECLARE_READ16_MEMBER(duart_1_r);
 	DECLARE_WRITE16_MEMBER(duart_1_w);
 	DECLARE_READ16_MEMBER(duart_2_r);
@@ -115,10 +119,13 @@ private:
 	DECLARE_MACHINE_START(impctawp);
 	DECLARE_MACHINE_RESET(impctawp);
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
+	void impctawp(machine_config &config);
+	void jpmimpct(machine_config &config);
 	void awp68k_program_map(address_map &map);
 	void m68k_program_map(address_map &map);
 	void tms_program_map(address_map &map);
 
+private:
 	uint8_t m_tms_irq;
 	uint8_t m_duart_1_irq;
 	struct duart_t m_duart_1;
@@ -136,15 +143,18 @@ private:
 	struct bt477_t m_bt477;
 	void jpm_draw_lamps(int data, int lamp_strobe);
 	void update_irqs();
-
-	required_device<timer_device> m_duart_1_timer;
 	optional_device<s16lf01_device> m_vfd;
 	optional_shared_ptr<uint16_t> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
 	optional_device<palette_device> m_palette;
 	optional_device<tms34010_device> m_dsp;
-	optional_device_array<stepper_device, 6> m_reel;
+	optional_device<stepper_device> m_reel0;
+	optional_device<stepper_device> m_reel1;
+	optional_device<stepper_device> m_reel2;
+	optional_device<stepper_device> m_reel3;
+	optional_device<stepper_device> m_reel4;
+	optional_device<stepper_device> m_reel5;
 	required_device<meters_device> m_meters;
 	output_finder<300> m_digits;
 	output_finder<256> m_lamp_output;

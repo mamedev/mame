@@ -21,7 +21,7 @@
 //         TRAP 0
 //------------------------------------------------------
 
-static char const *const trap0[] = {
+static const char* trap0[] = {
 /* 0x00 */nullptr, nullptr,
 /* 0x01 */"FIM_$GET_FIM_ADDR", "",
 /* 0x02 */nullptr, nullptr,
@@ -66,7 +66,7 @@ static char const *const trap0[] = {
 //         TRAP1
 //------------------------------------------------------
 
-static char const *const trap1[] = {
+static const char* trap1[] = {
 /* 0x00 */nullptr, nullptr,
 /* 0x01 */nullptr, nullptr,
 /* 0x02 */"FIM_$INSTALL", "x",
@@ -142,7 +142,7 @@ static char const *const trap1[] = {
 //         TRAP2
 //------------------------------------------------------
 
-static char const *const trap2[] = {
+static const char* trap2[] = {
 /* 0x00 */nullptr, nullptr,
 /* 0x01 */nullptr, nullptr,
 /* 0x02 */"FILE_$DELETE", "x,x",
@@ -294,7 +294,7 @@ static char const *const trap2[] = {
 //         TRAP3
 //------------------------------------------------------
 
-static char const *const trap3[] = {
+static const char* trap3[] = {
 /* 0x00 */"PBU2_$DMA_STOP", "x,x,x",
 /* 0x01 */nullptr, nullptr,
 /* 0x02 */"FILE_$CREATE", "x,x,x",
@@ -474,7 +474,7 @@ static char const *const trap3[] = {
 //         TRAP4
 //------------------------------------------------------
 
-static char const *const trap4[] = {
+static const char* trap4[] = {
 /* 0x00 */nullptr, nullptr,
 /* 0x01 */"MST_$SET_GUARD", "u,x,x,x",
 /* 0x02 */"MST_$UNMAP_GLOBAL", "u,x,x,x",
@@ -621,7 +621,7 @@ static char const *const trap4[] = {
 //         TRAP5
 //------------------------------------------------------
 
-static char const *const trap5[] = {
+static const char* trap5[] = {
 /* 0x00 */nullptr, nullptr,
 /* 0x01 */"MST_$MAP_AREA", "x,x,x,u,x",
 /* 0x02 */nullptr, nullptr,
@@ -732,7 +732,7 @@ static char const *const trap5[] = {
 //         TRAP7
 //------------------------------------------------------
 
-static char const *const trap7[] = {
+static const char* trap7[] = {
 /* 0x00 */"FILE_$LOCK", "u,x,x,x,x,x,x",
 /* 0x01 */"VFMT_$WRITE", "s,x,x,x,x,x,x",
 /* 0x02 */"MST_$MAP_AREA_AT", "x,x,x,x,x,x,x",
@@ -799,7 +799,7 @@ static char const *const trap7[] = {
 //         TRAP8
 //------------------------------------------------------
 
-static char const *const trap8[] = {
+static const char* trap8[] = {
 /* 0x00 - 0x07 */"MST_$MAP", "u,x,x,x,x,x,x",
 /* 0x01 - 0x08 */"MST_$MAP_AT", "x,u,x,x,x,x,x,x",
 /* 0x02 - 0x07 */"MST_$MAP_GLOBAL", "u,x,x,x,x,x,x",

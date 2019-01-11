@@ -47,9 +47,6 @@ public:
 	// construction/destruction
 	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16'000'000);
 
-	// helpers
-	void suspend_cpu();
-
 	// read/write
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -67,7 +64,7 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 
 	void ssio_map(address_map &map);
-	static void ssio_input_ports(address_map &map, const char *ssio);
+	void ssio_input_ports(address_map &map, const char *ssio) const;
 
 protected:
 	// device-level overrides

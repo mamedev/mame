@@ -80,7 +80,6 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -94,7 +93,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_vram(*this, "vram")
 		, m_attr(*this, "attr")
-		, m_ppi(*this, "ppi8255_%u", 0U)
 		, m_spriteram(*this, "spriteram")
 		, m_soundcpu(*this, "soundcpu")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -106,9 +104,6 @@ public:
 	void kingdrbb(machine_config &config);
 	void cowrace(machine_config &config);
 	void kingdrby(machine_config &config);
-
-protected:
-	virtual void video_start() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(sc0_vram_w);
@@ -125,8 +120,9 @@ private:
 	DECLARE_WRITE8_MEMBER(outportb_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
-	void kingdrby_palette(palette_device &palette) const;
-	void kingdrbb_palette(palette_device &palette) const;
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(kingdrby);
+	DECLARE_PALETTE_INIT(kingdrbb);
 	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -149,7 +145,6 @@ private:
 	uint8_t m_p1_hopper;
 	uint8_t m_p2_hopper;
 	uint8_t m_mux_data;
-	required_device_array<i8255_device, 2> m_ppi;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -437,8 +432,8 @@ void kingdrby_state::master_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x33ff).ram().mirror(0xc00).share("share1");
-	map(0x4000, 0x43ff).ram().w(FUNC(kingdrby_state::sc0_vram_w)).share("vram");
-	map(0x5000, 0x53ff).ram().w(FUNC(kingdrby_state::sc0_attr_w)).share("attr");
+	map(0x4000, 0x43ff).ram().w(this, FUNC(kingdrby_state::sc0_vram_w)).share("vram");
+	map(0x5000, 0x53ff).ram().w(this, FUNC(kingdrby_state::sc0_attr_w)).share("attr");
 }
 
 void kingdrby_state::master_io_map(address_map &map)
@@ -452,13 +447,13 @@ void kingdrby_state::slave_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x3fff).rom(); //sound rom, tested for the post check
 	map(0x4000, 0x43ff).ram().share("nvram"); //backup ram
-	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
-	map(0x6000, 0x6003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+	map(0x5000, 0x5003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+	map(0x6000, 0x6003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
 	map(0x7000, 0x73ff).ram().share("share1");
 	map(0x7400, 0x74ff).ram().share("spriteram");
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x7801, 0x780f).w(FUNC(kingdrby_state::led_array_w));
+	map(0x7801, 0x780f).w(this, FUNC(kingdrby_state::led_array_w));
 	map(0x7a00, 0x7a00).ram(); //buffer for the key matrix
 	map(0x7c00, 0x7c00).portr("DSW");
 }
@@ -473,8 +468,8 @@ void kingdrby_state::slave_1986_map(address_map &map)
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x3fff).rom(); //sound rom tested for the post check
 	map(0x4000, 0x47ff).ram().share("nvram"); //backup ram
-	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
-//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE(m_ppi[1], i8255_device, read, write) /* I/O Ports */
+	map(0x5000, 0x5003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
+//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) /* I/O Ports */
 	map(0x7000, 0x73ff).ram().share("share1");
 	map(0x7400, 0x74ff).ram().share("spriteram");
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
@@ -483,7 +478,7 @@ void kingdrby_state::slave_1986_map(address_map &map)
 	map(0x7801, 0x7801).portr("KEY1");
 	map(0x7802, 0x7802).portr("KEY2");
 	map(0x7803, 0x7803).portr("KEY3");
-	map(0x7800, 0x7803).w(FUNC(kingdrby_state::kingdrbb_lamps_w));
+	map(0x7800, 0x7803).w(this, FUNC(kingdrby_state::kingdrbb_lamps_w));
 	map(0x7a00, 0x7a00).portr("SYSTEM");
 	map(0x7c00, 0x7c00).portr("DSW");
 }
@@ -904,61 +899,59 @@ GFXDECODE_END
  *
  *************************************/
 
-void kingdrby_state::kingdrby_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	for (int i = 0; i < 0x200; ++i)
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
+
+	for (i = 0; i < 0x200; ++i)
 	{
-		int bit0, bit1, bit2;
-
 		bit0 = 0;
-		bit1 = BIT(color_prom[0], 1);
-		bit2 = BIT(color_prom[0], 0);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(color_prom[0], 4);
-		bit1 = BIT(color_prom[0], 3);
-		bit2 = BIT(color_prom[0], 2);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(color_prom[0], 7);
-		bit1 = BIT(color_prom[0], 6);
-		bit2 = BIT(color_prom[0], 5);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 0) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 4) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 7) & 0x01;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 }
 
-void kingdrby_state::kingdrbb_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 {
-	uint8_t *const raw_prom = memregion("raw_prom")->base();
+	uint8_t *raw_prom = memregion("raw_prom")->base();
 	uint8_t *prom = memregion("proms")->base();
-	for (int i = 0; i < 0x200; i++)
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
+
+	for(i = 0; i < 0x200; i++)
 	{
-		// this set has an extra address line shuffle applied on the PROM
+		/* this set has an extra address line shuffle applied on the prom */
 		prom[i] = raw_prom[bitswap<16>(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
 	}
 
-	for (int i = 0; i < 0x200; i++)
+	for(i = 0; i < 0x200; i++)
 	{
-		int bit0, bit1, bit2;
-
 		bit0 = 0;
-		bit1 = BIT(prom[i], 1);
-		bit2 = BIT(prom[i], 0);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(prom[i], 4);
-		bit1 = BIT(prom[i], 3);
-		bit2 = BIT(prom[i], 2);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(prom[i], 7);
-		bit1 = BIT(prom[i], 6);
-		bit2 = BIT(prom[i], 5);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (prom[i] >> 1) & 0x01;
+		bit2 = (prom[i] >> 0) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (prom[i] >> 4) & 0x01;
+		bit1 = (prom[i] >> 3) & 0x01;
+		bit2 = (prom[i] >> 2) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (prom[i] >> 7) & 0x01;
+		bit1 = (prom[i] >> 6) & 0x01;
+		bit2 = (prom[i] >> 5) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -982,42 +975,42 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrby)
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
-	I8255A(config, m_ppi[0]);
-	m_ppi[0]->in_pa_callback().set(FUNC(kingdrby_state::hopper_io_r));
-	m_ppi[0]->in_pb_callback().set_ioport("IN1");
-	m_ppi[0]->out_pc_callback().set(FUNC(kingdrby_state::hopper_io_w));
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, kingdrby_state, hopper_io_r))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, hopper_io_w))
 
 	// 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
-	I8255A(config, m_ppi[1]);
-	m_ppi[1]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
-	m_ppi[1]->tri_pa_callback().set_constant(0x7f);
-	m_ppi[1]->in_pb_callback().set(FUNC(kingdrby_state::key_matrix_r));
-	m_ppi[1]->in_pc_callback().set(FUNC(kingdrby_state::input_mux_r));
-	m_ppi[1]->out_pc_callback().set(FUNC(kingdrby_state::outport2_w));
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kingdrby_state, sound_cmd_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, kingdrby_state, key_matrix_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, kingdrby_state, input_mux_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kingdrby_state, outport2_w))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kingdrby);
-	PALETTE(config, m_palette, FUNC(kingdrby_state::kingdrby_palette), 0x200);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingdrby)
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)    /* controlled by CRTC */
 	MCFG_SCREEN_UPDATE_DRIVER(kingdrby_state, screen_update_kingdrby)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	mc6845_device &crtc(MC6845(config, "crtc", CLK_1/32));  /* 53.333 Hz. guess */
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", CLK_1/32)  /* 53.333 Hz. guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", CLK_1/8));    /* guess */
-	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("aysnd", AY8910, CLK_1/8)    /* guess */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
@@ -1026,24 +1019,22 @@ MACHINE_CONFIG_START(kingdrby_state::kingdrbb)
 	MCFG_DEVICE_MODIFY("slave")
 	MCFG_DEVICE_PROGRAM_MAP(slave_1986_map)
 
-	m_palette->set_init(FUNC(kingdrby_state::kingdrbb_palette));
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrbb)
 
+	MCFG_DEVICE_REMOVE("ppi8255_0")
+	MCFG_DEVICE_REMOVE("ppi8255_1")
+
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	/* C as input, (all) as output */
-	m_ppi[0]->out_pa_callback().set(FUNC(kingdrby_state::sound_cmd_w));
-	m_ppi[0]->in_pa_callback().set_constant(0);
-	m_ppi[0]->tri_pa_callback().set_constant(0x7f);
-	m_ppi[0]->in_pb_callback().set_ioport("IN0");
-	m_ppi[0]->out_pb_callback().set(FUNC(kingdrby_state::outportb_w));
-	m_ppi[0]->in_pc_callback().set_ioport("IN1");
-	m_ppi[0]->out_pc_callback().set_nop();
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kingdrby_state, sound_cmd_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0x7f))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kingdrby_state, outportb_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
 
-	/* PPI1 is actually unused */
-	m_ppi[1]->in_pa_callback().set_constant(0);
-	m_ppi[1]->in_pb_callback().set_constant(0);
-	m_ppi[1]->in_pc_callback().set_constant(0);
-	m_ppi[1]->out_pa_callback().set_nop();
-	m_ppi[1]->out_pb_callback().set_nop();
-	m_ppi[1]->out_pc_callback().set_nop();
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	/* actually unused */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kingdrby_state::cowrace)
@@ -1053,16 +1044,17 @@ MACHINE_CONFIG_START(kingdrby_state::cowrace)
 	MCFG_DEVICE_PROGRAM_MAP(cowrace_sound_map)
 	MCFG_DEVICE_IO_MAP(cowrace_sound_io)
 
-	m_gfxdecode->set_info(gfx_cowrace);
-	m_palette->set_init(FUNC(kingdrby_state::kingdrby_palette));
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cowrace)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(kingdrby_state,kingdrby)
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	ym2203_device &aysnd(YM2203(config.replace(), "aysnd", 3000000));
-	aysnd.port_a_read_callback().set(FUNC(kingdrby_state::sound_cmd_r));
-	aysnd.port_b_read_callback().set("oki", FUNC(okim6295_device::read));
-	aysnd.port_b_write_callback().set("oki", FUNC(okim6295_device::write));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.80);
+	MCFG_DEVICE_REPLACE("aysnd", YM2203, 3000000)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, kingdrby_state, sound_cmd_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8("oki", okim6295_device, read))   // read B
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("oki", okim6295_device, write))   // write B
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 ROM_START( kingdrby )
@@ -1130,13 +1122,13 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 //  ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
 
 	ROM_REGION( 0x4000, "pals", 0 ) // all read protected
-	ROM_LOAD( "palce16v.u101.bin", 0x0000, 0x117, NO_DUMP )
-	ROM_LOAD( "palce16v.u113.bin", 0x0000, 0x117, NO_DUMP )
-	ROM_LOAD( "palce16v.u160.bin", 0x0000, 0x117, NO_DUMP )
-	ROM_LOAD( "palce16v.u2.bin",   0x0000, 0x117, NO_DUMP )
-	ROM_LOAD( "palce16v.u29.bin",  0x0000, 0x117, NO_DUMP )
-	ROM_LOAD( "palce16v.u4.bin",   0x0000, 0x117, NO_DUMP )
-	ROM_LOAD( "palce16v.u75.bin",  0x0000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v.u101.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u113.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u160.bin", 0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u2.bin",   0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u29.bin",  0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u4.bin",   0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v.u75.bin",  0x0000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
 	// jedutil just complains these are invalid..
 	ROM_LOAD( "palce16v8q.u53.jed", 0x0000, 0x892, CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) )
 	ROM_LOAD( "palce16v8q.u77.jed", 0x0000, 0x892, CRC(b7956421) SHA1(57db38b571adf6cf49d7c221cd65a068a9a3383a) )

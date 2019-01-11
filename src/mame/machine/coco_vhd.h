@@ -66,5 +66,7 @@ DECLARE_DEVICE_TYPE(COCO_VHD, coco_vhd_image_device)
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
+#define MCFG_COCO_VHD_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, COCO_VHD, 0)
 
 #endif // MAME_MACHINE_COCO_VHD_H

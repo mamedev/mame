@@ -27,10 +27,9 @@ msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, co
 }
 
 
-void msx_slot_fs4600_device::device_add_mconfig(machine_config &config)
-{
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-}
+MACHINE_CONFIG_START(msx_slot_fs4600_device::device_add_mconfig)
+	MCFG_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
 
 void msx_slot_fs4600_device::device_start()

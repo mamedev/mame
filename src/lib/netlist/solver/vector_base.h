@@ -11,7 +11,6 @@
 #define VECTOR_BASE_H_
 
 #include <algorithm>
-#include <cmath>
 #include "../plib/pconfig.h"
 
 #if 0

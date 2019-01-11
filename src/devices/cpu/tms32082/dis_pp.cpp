@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "dis_pp.h"
 
-char const *const tms32082_pp_disassembler::REG_NAMES[128] =
+const char *tms32082_pp_disassembler::REG_NAMES[128] =
 {
 	// 0 - 15
 	"a0",       "a1",       "a2",       "a3",       "a4",       "???",      "a6",       "a7",
@@ -33,7 +33,7 @@ char const *const tms32082_pp_disassembler::REG_NAMES[128] =
 	"???",      "???",      "???",      "???",      "tag0",     "tag1",     "tag2",     "tag3"
 };
 
-char const *const tms32082_pp_disassembler::CONDITION_CODES[16] =
+const char *tms32082_pp_disassembler::CONDITION_CODES[16] =
 {
 	"",         "[p] ",     "[ls] ",    "[hi] ",
 	"[lt] ",    "[le] ",    "[ge] ",    "[gt] ",
@@ -41,7 +41,7 @@ char const *const tms32082_pp_disassembler::CONDITION_CODES[16] =
 	"[v] ",     "[nv] ",    "[n] ",     "[nn] "
 };
 
-char const *const tms32082_pp_disassembler::TRANSFER_SIZE[4] =
+const char *tms32082_pp_disassembler::TRANSFER_SIZE[4] =
 {
 	"b:", "h:", "w:", ""
 };

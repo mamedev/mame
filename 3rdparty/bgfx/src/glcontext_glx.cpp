@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -11,9 +11,6 @@
 #	if BGFX_USE_GLX
 #		define GLX_GLXEXT_PROTOTYPES
 #		include <glx/glxext.h>
-
-// will include X11 which #defines None...
-#undef None
 
 namespace bgfx { namespace gl
 {
@@ -29,30 +26,28 @@ namespace bgfx { namespace gl
 
 	struct SwapChainGL
 	{
-		SwapChainGL(::Display* display, ::Window _window, XVisualInfo* _visualInfo, GLXContext _context)
-			: m_display(display)
-			, m_window(_window)
+		SwapChainGL(::Window _window, XVisualInfo* _visualInfo, GLXContext _context)
+			: m_window(_window)
 		{
-			m_context = glXCreateContext(m_display, _visualInfo, _context, GL_TRUE);
+			m_context = glXCreateContext( (::Display*)g_platformData.ndt, _visualInfo, _context, GL_TRUE);
 		}
 
 		~SwapChainGL()
 		{
-			glXMakeCurrent(m_display, 0, 0);
-			glXDestroyContext(m_display, m_context);
+			glXMakeCurrent( (::Display*)g_platformData.ndt, 0, 0);
+			glXDestroyContext( (::Display*)g_platformData.ndt, m_context);
 		}
 
 		void makeCurrent()
 		{
-			glXMakeCurrent(m_display, m_window, m_context);
+			glXMakeCurrent( (::Display*)g_platformData.ndt, m_window, m_context);
 		}
 
 		void swapBuffers()
 		{
-			glXSwapBuffers(m_display, m_window);
+			glXSwapBuffers( (::Display*)g_platformData.ndt, m_window);
 		}
 
-		::Display* m_display;
 		Window m_window;
 		GLXContext m_context;
 	};
@@ -62,23 +57,13 @@ namespace bgfx { namespace gl
 		BX_UNUSED(_width, _height);
 
 		m_context = (GLXContext)g_platformData.context;
-		m_display = (::Display*)g_platformData.ndt;
-
-		// It's possible the user has provided the window handle, but not
-		// the display handle. If this is the case, try opening the default
-		// display
-		if (NULL == m_display)
-		{
-			m_display = XOpenDisplay(NULL);
-			BGFX_FATAL(m_display, Fatal::UnableToInitialize, "XOpenDisplay(NULL) : Failed to open default display");
-		}
 
 		if (NULL == g_platformData.context)
 		{
-			XLockDisplay(m_display);
+			XLockDisplay( (::Display*)g_platformData.ndt);
 
 			int major, minor;
-			bool version = glXQueryVersion(m_display, &major, &minor);
+			bool version = glXQueryVersion( (::Display*)g_platformData.ndt, &major, &minor);
 			BGFX_FATAL(version, Fatal::UnableToInitialize, "Failed to query GLX version");
 			BGFX_FATAL( (major == 1 && minor >= 2) || major > 1
 					, Fatal::UnableToInitialize
@@ -87,9 +72,9 @@ namespace bgfx { namespace gl
 					, minor
 					);
 
-			int32_t screen = DefaultScreen(m_display);
+			int32_t screen = DefaultScreen( (::Display*)g_platformData.ndt);
 
-			const char* extensions = glXQueryExtensionsString(m_display, screen);
+			const char* extensions = glXQueryExtensionsString( (::Display*)g_platformData.ndt, screen);
 			BX_TRACE("GLX extensions:");
 			dumpExtensions(extensions);
 
@@ -111,21 +96,21 @@ namespace bgfx { namespace gl
 			GLXFBConfig bestConfig = NULL;
 
 			int numConfigs;
-			GLXFBConfig* configs = glXChooseFBConfig(m_display, screen, attrsGlx, &numConfigs);
+			GLXFBConfig* configs = glXChooseFBConfig( (::Display*)g_platformData.ndt, screen, attrsGlx, &numConfigs);
 
 			BX_TRACE("glX num configs %d", numConfigs);
 
 			for (int ii = 0; ii < numConfigs; ++ii)
 			{
-				m_visualInfo = glXGetVisualFromFBConfig(m_display, configs[ii]);
+				m_visualInfo = glXGetVisualFromFBConfig( (::Display*)g_platformData.ndt, configs[ii]);
 				if (NULL != m_visualInfo)
 				{
 					BX_TRACE("---");
 					bool valid = true;
-					for (uint32_t attr = 6; attr < BX_COUNTOF(attrsGlx)-1 && attrsGlx[attr] != 0; attr += 2)
+					for (uint32_t attr = 6; attr < BX_COUNTOF(attrsGlx)-1 && attrsGlx[attr] != None; attr += 2)
 					{
 						int value;
-						glXGetFBConfigAttrib(m_display, configs[ii], attrsGlx[attr], &value);
+						glXGetFBConfigAttrib( (::Display*)g_platformData.ndt, configs[ii], attrsGlx[attr], &value);
 						BX_TRACE("glX %d/%d %2d: %4x, %8x (%8x%s)"
 								, ii
 								, numConfigs
@@ -161,7 +146,7 @@ namespace bgfx { namespace gl
 			BGFX_FATAL(m_visualInfo, Fatal::UnableToInitialize, "Failed to find a suitable X11 display configuration.");
 
 			BX_TRACE("Create GL 2.1 context.");
-			m_context = glXCreateContext(m_display, m_visualInfo, 0, GL_TRUE);
+			m_context = glXCreateContext( (::Display*)g_platformData.ndt, m_visualInfo, 0, GL_TRUE);
 			BGFX_FATAL(NULL != m_context, Fatal::UnableToInitialize, "Failed to create GL 2.1 context.");
 
 #if BGFX_CONFIG_RENDERER_OPENGL >= 31
@@ -180,11 +165,11 @@ namespace bgfx { namespace gl
 					0,
 				};
 
-				GLXContext context = glXCreateContextAttribsARB(m_display, bestConfig, 0, true, contextAttrs);
+				GLXContext context = glXCreateContextAttribsARB( (::Display*)g_platformData.ndt, bestConfig, 0, true, contextAttrs);
 
 				if (NULL != context)
 				{
-					glXDestroyContext(m_display, m_context);
+					glXDestroyContext( (::Display*)g_platformData.ndt, m_context);
 					m_context = context;
 				}
 			}
@@ -192,19 +177,19 @@ namespace bgfx { namespace gl
 			BX_UNUSED(bestConfig);
 #endif // BGFX_CONFIG_RENDERER_OPENGL >= 31
 
-			XUnlockDisplay(m_display);
+			XUnlockDisplay( (::Display*)g_platformData.ndt);
 		}
 
 		import();
 
-		glXMakeCurrent(m_display, (::Window)g_platformData.nwh, m_context);
+		glXMakeCurrent( (::Display*)g_platformData.ndt, (::Window)g_platformData.nwh, m_context);
 		m_current = NULL;
 
 		glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)glXGetProcAddress( (const GLubyte*)"glXSwapIntervalEXT");
 		if (NULL != glXSwapIntervalEXT)
 		{
 			BX_TRACE("Using glXSwapIntervalEXT.");
-			glXSwapIntervalEXT(m_display, (::Window)g_platformData.nwh, 0);
+			glXSwapIntervalEXT( (::Display*)g_platformData.ndt, (::Window)g_platformData.nwh, 0);
 		}
 		else
 		{
@@ -227,27 +212,21 @@ namespace bgfx { namespace gl
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glXSwapBuffers(m_display, (::Window)g_platformData.nwh);
+		glXSwapBuffers( (::Display*)g_platformData.ndt, (::Window)g_platformData.nwh);
 
 		g_internalData.context = m_context;
 	}
 
 	void GlContext::destroy()
 	{
-		glXMakeCurrent(m_display, 0, 0);
+		glXMakeCurrent( (::Display*)g_platformData.ndt, 0, 0);
 		if (NULL == g_platformData.context)
 		{
-			glXDestroyContext(m_display, m_context);
+			glXDestroyContext( (::Display*)g_platformData.ndt, m_context);
 			XFree(m_visualInfo);
-		}
-		// If we opened the display, have to close it
-		if (NULL == g_platformData.ndt)
-		{
-			XCloseDisplay(m_display);
 		}
 		m_context    = NULL;
 		m_visualInfo = NULL;
-		m_display    = NULL;
 	}
 
 	void GlContext::resize(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t _flags)
@@ -257,7 +236,7 @@ namespace bgfx { namespace gl
 
 		if (NULL != glXSwapIntervalEXT)
 		{
-			glXSwapIntervalEXT(m_display, (::Window)g_platformData.nwh, interval);
+			glXSwapIntervalEXT( (::Display*)g_platformData.ndt, (::Window)g_platformData.nwh, interval);
 		}
 		else if (NULL != glXSwapIntervalMESA)
 		{
@@ -276,13 +255,13 @@ namespace bgfx { namespace gl
 
 	SwapChainGL* GlContext::createSwapChain(void* _nwh)
 	{
-		return BX_NEW(g_allocator, SwapChainGL)(m_display, (::Window)_nwh, m_visualInfo, m_context);
+		return BX_NEW(g_allocator, SwapChainGL)( (::Window)_nwh, m_visualInfo, m_context);
 	}
 
 	void GlContext::destroySwapChain(SwapChainGL* _swapChain)
 	{
 		BX_DELETE(g_allocator, _swapChain);
-		glXMakeCurrent(m_display, (::Window)g_platformData.nwh, m_context);
+		glXMakeCurrent( (::Display*)g_platformData.ndt, (::Window)g_platformData.nwh, m_context);
 	}
 
 	void GlContext::swap(SwapChainGL* _swapChain)
@@ -291,7 +270,7 @@ namespace bgfx { namespace gl
 
 		if (NULL == _swapChain)
 		{
-			glXSwapBuffers(m_display, (::Window)g_platformData.nwh);
+			glXSwapBuffers( (::Display*)g_platformData.ndt, (::Window)g_platformData.nwh);
 		}
 		else
 		{
@@ -307,7 +286,7 @@ namespace bgfx { namespace gl
 
 			if (NULL == _swapChain)
 			{
-				glXMakeCurrent(m_display, (::Window)g_platformData.nwh, m_context);
+				glXMakeCurrent( (::Display*)g_platformData.ndt, (::Window)g_platformData.nwh, m_context);
 			}
 			else
 			{

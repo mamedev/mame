@@ -61,24 +61,21 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void gp_2(machine_config &config);
-
 	void init_gp_2();
-
-private:
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
+	void gp_2(machine_config &config);
 	void gp_2_io(address_map &map);
 	void gp_2_map(address_map &map);
-
+private:
 	uint8_t m_u14;
 	uint8_t m_digit;
 	uint8_t m_segment[16];
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<z80_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
@@ -584,27 +581,27 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(gp_2_state::gp_2)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 2457600);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gp_2_state::gp_2_map);
-	m_maincpu->set_addrmap(AS_IO, &gp_2_state::gp_2_io);
-	m_maincpu->set_daisy_config(daisy_chain);
+	MCFG_DEVICE_ADD("maincpu", Z80, 2457600)
+	MCFG_DEVICE_PROGRAM_MAP(gp_2_map)
+	MCFG_DEVICE_IO_MAP(gp_2_io)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	config.set_default_layout(layout_gp_2);
+	MCFG_DEFAULT_LAYOUT(layout_gp_2)
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	i8255_device &ppi(I8255A(config, "ppi"));
-	ppi.out_pa_callback().set(FUNC(gp_2_state::porta_w));
-	ppi.in_pb_callback().set(FUNC(gp_2_state::portb_r));
-	ppi.out_pc_callback().set(FUNC(gp_2_state::portc_w));
+	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_2_state, porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_2_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_2_state, portc_w))
 
-	Z80CTC(config, m_ctc, 2457600);
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // Todo: absence of ints will cause a watchdog reset
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_2_state, zero_timer, attotime::from_hz(120)) // mains freq*2
 MACHINE_CONFIG_END
 

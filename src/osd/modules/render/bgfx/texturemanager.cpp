@@ -11,9 +11,10 @@
 
 #include <bgfx/bgfx.h>
 
+#include "emu.h"
+
 #include "texturemanager.h"
 #include "texture.h"
-#include "bgfxutil.h"
 #include "rendutil.h"
 #include "modules/render/copyutil.h"
 
@@ -27,12 +28,6 @@ texture_manager::~texture_manager()
 		}
 	}
 	m_textures.clear();
-
-	for (std::pair<uint64_t, sequenced_handle> mame_texture : m_mame_textures)
-	{
-		bgfx::destroy(mame_texture.second.handle);
-	}
-	m_mame_textures.clear();
 }
 
 void texture_manager::add_provider(std::string name, bgfx_texture_handle_provider* provider)
@@ -88,75 +83,6 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 	delete [] data;
 
 	return texture;
-}
-
-bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t format, int width, int height
-	, int rowpixels, const rgb_t *palette, void *base, uint32_t seqid, uint32_t flags, uint64_t key, uint64_t old_key)
-{
-	bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-	if (old_key != ~0ULL)
-	{
-		std::map<uint64_t, sequenced_handle>::iterator iter = m_mame_textures.find(old_key);
-		if (iter != m_mame_textures.end())
-		{
-			handle = iter->second.handle;
-			if (handle.idx == bgfx::kInvalidHandle)
-				return handle;
-
-			if (iter->second.width == width && iter->second.height == height)
-			{
-				// Size matches, so let's just swap the old handle into the new location
-				m_mame_textures[key] = { handle, seqid, width, height };
-				m_mame_textures[old_key] = { BGFX_INVALID_HANDLE, 0, 0, 0 };
-
-				if (iter->second.seqid == seqid)
-				{
-					// Everything matches, just return the existing handle
-					return handle;
-				}
-				else
-				{
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(format, width, height, rowpixels, palette, base);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem);
-					return handle;
-				}
-			}
-			bgfx::destroy(handle);
-			m_mame_textures[old_key] = { BGFX_INVALID_HANDLE, 0, 0, 0 };
-		}
-	}
-	else
-	{
-		std::map<uint64_t, sequenced_handle>::iterator iter = m_mame_textures.find(key);
-		if (iter != m_mame_textures.end())
-		{
-			handle = iter->second.handle;
-			if (handle.idx == bgfx::kInvalidHandle)
-				return handle;
-
-			if (iter->second.width == width && iter->second.height == height)
-			{
-				if (iter->second.seqid == seqid)
-				{
-					return handle;
-				}
-				else
-				{
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(format, width, height, rowpixels, palette, base);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem);
-					return handle;
-				}
-			}
-			bgfx::destroy(handle);
-		}
-	}
-
-	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(format, width, height, rowpixels, palette, base);
-	handle = bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGBA8, flags, nullptr);
-	bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)width, (uint16_t)height, mem);
-
-	m_mame_textures[key] = { handle, seqid, width, height };
-	return handle;
 }
 
 bgfx::TextureHandle texture_manager::handle(std::string name)

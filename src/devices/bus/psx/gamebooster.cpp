@@ -150,11 +150,10 @@ static void gb_cart(device_slot_interface &device)
 //  device.option_add_internal("rom_unk01",   GB_ROM_UNK01);
 }
 
-void psx_gamebooster_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(psx_gamebooster_device::device_add_mconfig)
 	/* cartslot */
-	GB_CART_SLOT(config, m_cartslot, gb_cart, nullptr);
+	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
 
-	SOFTWARE_LIST(config, "cart_list").set_original("gameboy");
-	SOFTWARE_LIST(config, "gbc_list").set_compatible("gbcolor");
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
+MACHINE_CONFIG_END

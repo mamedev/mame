@@ -5,10 +5,6 @@
     Midway MCR-68k system
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_MCR68_H
-#define MAME_INCLUDES_MCR68_H
-
-#pragma once
 
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -21,8 +17,8 @@
 class mcr68_state : public driver_device
 {
 public:
-	mcr68_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	mcr68_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_sounds_good(*this, "sg"),
 		m_turbo_cheap_squeak(*this, "tcs"),
 		m_cvsd_sound(*this, "cvsd"),
@@ -35,24 +31,6 @@ public:
 		m_ptm(*this, "ptm")
 	{ }
 
-	void mcr68(machine_config &config);
-	void intlaser(machine_config &config);
-	void xenophob(machine_config &config);
-	void spyhunt2(machine_config &config);
-	void trisport(machine_config &config);
-	void pigskin(machine_config &config);
-	void archrivl(machine_config &config);
-
-	void init_intlaser();
-	void init_pigskin();
-	void init_blasted();
-	void init_trisport();
-	void init_xenophob();
-	void init_archrivl();
-	void init_spyhunt2();
-	void init_archrivlb();
-
-private:
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
@@ -81,7 +59,14 @@ private:
 	DECLARE_READ16_MEMBER(pigskin_port_2_r);
 	DECLARE_READ16_MEMBER(trisport_port_1_r);
 	DECLARE_WRITE16_MEMBER(mcr68_videoram_w);
-
+	void init_intlaser();
+	void init_pigskin();
+	void init_blasted();
+	void init_trisport();
+	void init_xenophob();
+	void init_archrivl();
+	void init_spyhunt2();
+	void init_archrivlb();
 	DECLARE_READ16_MEMBER(archrivlb_port_1_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_START(mcr68);
@@ -99,11 +84,16 @@ private:
 	std::unique_ptr<uint8_t[]> m_srcdata0;
 	std::unique_ptr<uint8_t[]> m_srcdata2;
 
+	void mcr68(machine_config &config);
+	void intlaser(machine_config &config);
+	void xenophob(machine_config &config);
+	void spyhunt2(machine_config &config);
+	void trisport(machine_config &config);
+	void pigskin(machine_config &config);
+	void archrivl(machine_config &config);
 	void mcr68_map(address_map &map);
 	void pigskin_map(address_map &map);
 	void trisport_map(address_map &map);
-
+private:
 	required_device<ptm6840_device> m_ptm;
 };
-
-#endif // MAME_INCLUDES_MCR68_H

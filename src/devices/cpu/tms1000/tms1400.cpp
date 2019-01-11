@@ -67,12 +67,14 @@ tms1670_cpu_device::tms1670_cpu_device(const machine_config &mconfig, const char
 
 
 // machine configs
-void tms1400_cpu_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(tms1400_cpu_device::device_add_mconfig)
+
 	// microinstructions PLA, output PLA
-	PLA(config, "mpla", 8, 16, 30).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 8, 32).set_format(pla_device::FMT::BERKELEY);
-}
+	MCFG_PLA_ADD("mpla", 8, 16, 30)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+	MCFG_PLA_ADD("opla", 5, 8, 32)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+MACHINE_CONFIG_END
 
 
 // device_reset

@@ -40,8 +40,8 @@ TODO: boot tests fail
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/mc6845.h"
+#include "machine/terminal.h"
 //#include "machine/ins8250.h"
-#include "emupal.h"
 #include "screen.h"
 
 #define HP9816_CHDIMX 8
@@ -111,24 +111,6 @@ static uint8_t prom16a[256] = {
 
 class hp9k_state : public driver_device
 {
-public:
-	hp9k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_6845(*this, "mc6845"),
-		m_gfxdecode(*this, "gfxdecode")
-	{
-		kbdBit=0;
-		crtc_curreg=0;
-		crtc_addrStartHi=0;
-		crtc_addrStartLow=0;
-		calc_prom_crc(prom16a);
-	}
-
-	void hp9k(machine_config &config);
-
-	void init_hp9k();
-
 private:
 
 	int crtc_curreg;
@@ -138,13 +120,31 @@ private:
 	void calc_prom_crc(uint8_t* prom);
 	void putChar(uint8_t thec,int x,int y,bitmap_ind16 &bitmap);
 
+public:
+	hp9k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	//m_terminal(*this, TERMINAL_TAG),
+	m_6845(*this, "mc6845"),
+	m_gfxdecode(*this, "gfxdecode")
+	{
+		kbdBit=0;
+		crtc_curreg=0;
+		crtc_addrStartHi=0;
+		crtc_addrStartLow=0;
+		calc_prom_crc(prom16a);
+	}
+
 	uint8_t kbdBit;
 
 	required_device<cpu_device> m_maincpu;
+	//required_device<> m_terminal;
 	required_device<mc6845_device> m_6845;
 
 	uint8_t m_videoram[0x4000];
 	uint8_t m_screenram[0x800];
+
+	void init_hp9k();
 
 	DECLARE_READ16_MEMBER(buserror_r);
 	DECLARE_WRITE16_MEMBER(buserror_w);
@@ -166,6 +166,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	void hp9k(machine_config &config);
 	void hp9k_mem(address_map &map);
 };
 
@@ -309,18 +310,18 @@ void hp9k_state::hp9k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x000909).rom().region("bootrom", 0);
-	map(0x00090a, 0x00090d).rw(FUNC(hp9k_state::leds_r), FUNC(hp9k_state::leds_w));
+	map(0x00090a, 0x00090d).rw(this, FUNC(hp9k_state::leds_r), FUNC(hp9k_state::leds_w));
 	map(0x00090e, 0x00ffff).rom().region("bootrom", 0x90e);
-	map(0x010000, 0x427fff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x428000, 0x428fff).rw(FUNC(hp9k_state::keyboard_r), FUNC(hp9k_state::keyboard_w));
-	map(0x429000, 0x50ffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x510000, 0x51ffff).rw(FUNC(hp9k_state::hp9k_videoram_r), FUNC(hp9k_state::hp9k_videoram_w));
-	map(0x520000, 0x52ffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x010000, 0x427fff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x428000, 0x428fff).rw(this, FUNC(hp9k_state::keyboard_r), FUNC(hp9k_state::keyboard_w));
+	map(0x429000, 0x50ffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x510000, 0x51ffff).rw(this, FUNC(hp9k_state::hp9k_videoram_r), FUNC(hp9k_state::hp9k_videoram_w));
+	map(0x520000, 0x52ffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0x530000, 0x53ffff).ram(); // graphic memory
-	map(0x540000, 0x5effff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
-	map(0x5f0000, 0x5f3fff).rw(FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
+	map(0x540000, 0x5effff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x5f0000, 0x5f3fff).rw(this, FUNC(hp9k_state::hp9k_prom_r), FUNC(hp9k_state::hp9k_prom_w));
 	//AM_RANGE(0x5f0000, 0x5f3fff) AM_READWRITE(buserror_r,buserror_w)
-	map(0x5f4000, 0xfbffff).rw(FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
+	map(0x5f4000, 0xfbffff).rw(this, FUNC(hp9k_state::buserror_r), FUNC(hp9k_state::buserror_w));
 	map(0xFC0000, 0xffffff).ram(); // system ram
 }
 
@@ -410,12 +411,11 @@ MACHINE_CONFIG_START(hp9k_state::hp9k)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hp9k)
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MC6845(config, m_6845, XTAL(16'000'000) / 16);
-	m_6845->set_screen("screen");
-	m_6845->set_show_border_area(false);
-	m_6845->set_char_width(8);
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -424,9 +424,9 @@ ROM_START( hp9816 )
 
 	ROM_DEFAULT_BIOS("bios40")
 	ROM_SYSTEM_BIOS(0, "bios40",  "Bios v4.0")
-	ROMX_LOAD( "rom40.bin", 0x0000, 0x10000, CRC(36005480) SHA1(645a077ffd95e4c31f05cd8bbd6e4554b12813f1), ROM_BIOS(0) )
+	ROMX_LOAD( "rom40.bin", 0x0000, 0x10000, CRC(36005480) SHA1(645a077ffd95e4c31f05cd8bbd6e4554b12813f1), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "bios30",  "Bios v3.0")
-	ROMX_LOAD( "rom30.bin", 0x0000, 0x10000, CRC(05c07e75) SHA1(3066a65e6137482041f9a77d09ee2289fe0974aa), ROM_BIOS(1) )
+	ROMX_LOAD( "rom30.bin", 0x0000, 0x10000, CRC(05c07e75) SHA1(3066a65e6137482041f9a77d09ee2289fe0974aa), ROM_BIOS(2) )
 
 ROM_END
 

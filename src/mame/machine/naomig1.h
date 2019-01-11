@@ -7,6 +7,10 @@
 
 #include "cpu/sh/sh4.h"
 
+#define MCFG_NAOMI_G1_ADD(_tag, type, _irq_cb)                          \
+	MCFG_DEVICE_ADD(_tag, type, 0)                                      \
+	downcast<naomi_g1_device *>(device)->set_irq_cb(DEVCB_ ## _irq_cb);
+
 class naomi_g1_device : public device_t
 {
 public:
@@ -16,7 +20,7 @@ public:
 
 	typedef delegate<void (uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram)> dma_cb;
 
-	auto irq_callback() { return irq_cb.bind(); }
+	template <class Object> void set_irq_cb(Object &&cb) { irq_cb.set_callback(std::forward<Object>(cb)); }
 	void set_dma_cb(dma_cb cb) { _dma_cb = cb; }
 
 	void amap(address_map &map);

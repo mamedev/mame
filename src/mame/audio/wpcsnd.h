@@ -16,6 +16,13 @@
 #include "sound/hc55516.h"
 
 
+#define MCFG_WPC_ROM_REGION(_region) \
+	downcast<wpcsnd_device &>(*device).set_romregion(_region);
+
+#define MCFG_WPC_SOUND_REPLY_CALLBACK(_reply) \
+	downcast<wpcsnd_device *>(device)->set_reply_callback(DEVCB_##_reply);
+
+
 class wpcsnd_device : public device_t, public device_mixer_interface
 {
 public:
@@ -41,10 +48,10 @@ public:
 	uint8_t ctrl_r();
 	uint8_t data_r();
 
-	template <typename T> void set_romregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
+	void set_romregion(const char *tag) { m_rom.set_tag(tag); }
 
 	// callbacks
-	auto reply_callback() { return m_reply_cb.bind(); }
+	template <class Reply> void set_reply_callback(Reply &&cb) { m_reply_cb.set_callback(std::forward<Reply>(cb)); }
 
 	void wpcsnd_map(address_map &map);
 protected:

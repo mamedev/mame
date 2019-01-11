@@ -47,7 +47,7 @@ public:
 	void jp(machine_config &config);
 	void jps(machine_config &config);
 
-private:
+protected:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(out1_w);
@@ -67,6 +67,7 @@ private:
 	void jp_map(address_map &map);
 	void jp_sound_map(address_map &map);
 
+private:
 	void update_display();
 
 	uint32_t m_disp_data;
@@ -90,17 +91,17 @@ void jp_state::jp_map(address_map &map)
 	map(0x6000, 0x6000).mirror(0x1ffc).w("ay", FUNC(ay8910_device::address_w));
 	map(0x6001, 0x6001).mirror(0x1ffc).r("ay", FUNC(ay8910_device::data_r));
 	map(0x6002, 0x6002).mirror(0x1ffc).w("ay", FUNC(ay8910_device::data_w));
-	map(0xa000, 0xa007).mirror(0x1ff8).w(FUNC(jp_state::out1_w));
-	map(0xc000, 0xc007).mirror(0x1ff8).w(FUNC(jp_state::out2_w));
+	map(0xa000, 0xa007).mirror(0x1ff8).w(this, FUNC(jp_state::out1_w));
+	map(0xc000, 0xc007).mirror(0x1ff8).w(this, FUNC(jp_state::out2_w));
 }
 
 void jp_state::jp_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom(); // includes ADPCM data from 0x0400 to 0x3fff
 	map(0x4000, 0x47ff).ram();
-	map(0x5000, 0x5000).w(FUNC(jp_state::sample_bank_w));
+	map(0x5000, 0x5000).w(this, FUNC(jp_state::sample_bank_w));
 	map(0x6000, 0x6000).w(m_adpcm_select, FUNC(ls157_device::ba_w));
-	map(0x7000, 0x7000).w(FUNC(jp_state::adpcm_reset_w));
+	map(0x7000, 0x7000).w(this, FUNC(jp_state::adpcm_reset_w));
 	map(0x8000, 0xffff).bankr("adpcm_bank");
 }
 
@@ -332,55 +333,53 @@ void jp_state::machine_reset()
 	m_digits[99] = 0x3f;
 }
 
-void jp_state::jp(machine_config &config)
-
-{
+MACHINE_CONFIG_START(jp_state::jp)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jp_state::jp_map);
-	m_maincpu->set_periodic_int(FUNC(jp_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL / 8192)); // 4020 divider
+	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(jp_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, 8_MHz_XTAL / 8192) // 4020 divider
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	LS259(config, m_latch[0]);
-	m_latch[0]->q_out_cb<1>().set(FUNC(jp_state::disp_data_w)).invert();
+	MCFG_DEVICE_ADD("latch0", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_data_w)) MCFG_DEVCB_INVERT
 
-	LS259(config, m_latch[1]);
-	m_latch[1]->q_out_cb<1>().set(FUNC(jp_state::disp_clock_w)).invert();
+	MCFG_DEVICE_ADD("latch1", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_clock_w)) MCFG_DEVCB_INVERT
 
-	LS259(config, m_latch[2]);
-	m_latch[2]->q_out_cb<1>().set(FUNC(jp_state::disp_strobe_w)).invert();
+	MCFG_DEVICE_ADD("latch2", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_strobe_w)) MCFG_DEVCB_INVERT
 
-	LS259(config, m_latch[3]);
-	m_latch[3]->q_out_cb<1>().set(FUNC(jp_state::row_w));
+	MCFG_DEVICE_ADD("latch3", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
-	LS259(config, m_latch[4]);
-	m_latch[4]->q_out_cb<1>().set(FUNC(jp_state::row_w));
+	MCFG_DEVICE_ADD("latch4", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
-	LS259(config, m_latch[5]);
-	m_latch[5]->q_out_cb<1>().set(FUNC(jp_state::row_w));
+	MCFG_DEVICE_ADD("latch5", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
-	LS259(config, m_latch[6]);
-	m_latch[6]->q_out_cb<1>().set(FUNC(jp_state::row_w));
+	MCFG_DEVICE_ADD("latch6", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
-	LS259(config, m_latch[7]);
-	m_latch[7]->q_out_cb<1>().set(FUNC(jp_state::row_w));
+	MCFG_DEVICE_ADD("latch7", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
-	LS259(config, m_latch[8]);
+	MCFG_DEVICE_ADD("latch8", LS259, 0)
 
-	LS259(config, m_latch[9]);
+	MCFG_DEVICE_ADD("latch9", LS259, 0)
 
 	/* Video */
-	config.set_default_layout(layout_jp);
+	MCFG_DEFAULT_LAYOUT(layout_jp)
 
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	ay8910_device &ay(AY8910(config, "ay", 8_MHz_XTAL / 4));
-	ay.port_a_read_callback().set(FUNC(jp_state::porta_r));
-	ay.port_b_read_callback().set(FUNC(jp_state::portb_r));
-	ay.add_route(ALL_OUTPUTS, "ayvol", 0.9);
-}
+	MCFG_DEVICE_ADD("ay", AY8910, 8_MHz_XTAL / 4)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jp_state, porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jp_state, portb_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 0.9)
+MACHINE_CONFIG_END
 
 WRITE8_MEMBER(jp_state::sample_bank_w)
 {
@@ -409,24 +408,24 @@ IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
 	return 0xff;
 }
 
-void jp_state::jps(machine_config &config)
-{
+MACHINE_CONFIG_START(jp_state::jps)
 	jp(config);
-	Z80(config, m_soundcpu, 8_MHz_XTAL / 2);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &jp_state::jp_sound_map);
-	m_soundcpu->set_irq_acknowledge_callback(FUNC(jp_state::sound_int_cb));
+	MCFG_DEVICE_ADD("soundcpu", Z80, 8_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(jp_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)
 
-	LS157(config, m_adpcm_select, 0); // not labeled in manual; might even be a CD4019
-	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // not labeled in manual; might even be a CD4019
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
 	SPEAKER(config, "msmvol").front_center();
-	MSM5205(config, m_msm, 384'000); // not labeled in manual; clock unknown
-	m_msm->vck_callback().set(FUNC(jp_state::vck_w));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unknown
-	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);
+	MCFG_DEVICE_ADD("msm", MSM5205, 384'000) // not labeled in manual; clock unknown
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, jp_state, vck_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B) // unknown
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
-	m_latch[9]->q_out_cb<5>().set_inputline("soundcpu", INPUT_LINE_NMI); // only external input for sound board
-}
+	MCFG_DEVICE_MODIFY("latch9")
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI)) // only external input for sound board
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
 / America 1492 #1107

@@ -47,74 +47,73 @@ other 2 bits (output & 0x0c) unknown
 
 ***************************************************************************/
 
-void _1943_state::_1943_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(_1943_state,1943)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	for (int i = 0; i < 0x100; i++)
+	int i;
+
+	for (i = 0; i < 0x100; i++)
 	{
 		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
-		// red component
+		/* red component */
 		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
 		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
 		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
 		bit3 = (color_prom[i + 0x000] >> 3) & 0x01;
-		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		// green component
+		/* green component */
 		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
 		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
 		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
 		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
-		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		// blue component
+		/* blue component */
 		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
 		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
 		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
-		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	// color_prom now points to the beginning of the lookup table
+	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x300;
 
-	// characters use colors 0x40-0x4f
-	for (int i = 0x00; i < 0x80; i++)
+	/* characters use colors 0x40-0x4f */
+	for (i = 0x00; i < 0x80; i++)
 	{
-		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x40;
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | 0x40;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	// foreground tiles use colors 0x00-0x3f
-	for (int i = 0x80; i < 0x180; i++)
+	/* foreground tiles use colors 0x00-0x3f */
+	for (i = 0x80; i < 0x180; i++)
 	{
-		uint8_t const ctabentry =
-				((color_prom[0x200 + (i - 0x080)] & 0x03) << 4) |
-				((color_prom[0x100 + (i - 0x080)] & 0x0f) << 0);
+		uint8_t ctabentry = ((color_prom[0x200 + (i - 0x080)] & 0x03) << 4) |
+							((color_prom[0x100 + (i - 0x080)] & 0x0f) << 0);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	// background tiles also use colors 0x00-0x3f
-	for (int i = 0x180; i < 0x280; i++)
+	/* background tiles also use colors 0x00-0x3f */
+	for (i = 0x180; i < 0x280; i++)
 	{
-		uint8_t const ctabentry =
-				((color_prom[0x400 + (i - 0x180)] & 0x03) << 4) |
-				((color_prom[0x300 + (i - 0x180)] & 0x0f) << 0);
+		uint8_t ctabentry = ((color_prom[0x400 + (i - 0x180)] & 0x03) << 4) |
+							((color_prom[0x300 + (i - 0x180)] & 0x0f) << 0);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	/* sprites use colors 0x80-0xff
 	   bit 3 of BMPROM.07 selects priority over the background,
 	   but we handle it differently for speed reasons */
-	for (int i = 0x280; i < 0x380; i++)
+	for (i = 0x280; i < 0x380; i++)
 	{
-		uint8_t const ctabentry =
-				((color_prom[0x600 + (i - 0x280)] & 0x07) << 4) |
-				((color_prom[0x500 + (i - 0x280)] & 0x0f) << 0) |
-				0x80;
+		uint8_t ctabentry = ((color_prom[0x600 + (i - 0x280)] & 0x07) << 4) |
+							((color_prom[0x500 + (i - 0x280)] & 0x0f) << 0) | 0x80;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

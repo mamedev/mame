@@ -16,6 +16,12 @@
 
 
 /***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+#define ADC12138_IPT_CONVERT_CB(name)  double name(uint8_t input)
+
+/***************************************************************************
     MACROS / CONSTANTS
 ***************************************************************************/
 
@@ -26,15 +32,7 @@ public:
 
 	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_ipt_convert_callback(ipt_convert_delegate callback) { m_ipt_read_cb = callback; }
-	template <class FunctionClass> void set_ipt_convert_callback(const char *devname, double (FunctionClass::*callback)(uint8_t), const char *name)
-	{
-		set_ipt_convert_callback(ipt_convert_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_ipt_convert_callback(double (FunctionClass::*callback)(uint8_t), const char *name)
-	{
-		set_ipt_convert_callback(ipt_convert_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename Object> void set_ipt_convert_callback(Object &&cb) { m_ipt_read_cb = std::forward<Object>(cb); }
 
 	DECLARE_WRITE8_MEMBER( di_w );
 	DECLARE_WRITE8_MEMBER( cs_w );
@@ -87,5 +85,9 @@ public:
 DECLARE_DEVICE_TYPE(ADC12138, adc12138_device)
 DECLARE_DEVICE_TYPE(ADC12130, adc12130_device)
 DECLARE_DEVICE_TYPE(ADC12132, adc12132_device)
+
+
+#define MCFG_ADC1213X_IPT_CONVERT_CB(_class, _method) \
+	downcast<adc12138_device &>(*device).set_ipt_convert_callback(adc12138_device::ipt_convert_delegate(&_class::_method, #_class "::" #_method, this));
 
 #endif // MAME_MACHINE_ADC1213X_H

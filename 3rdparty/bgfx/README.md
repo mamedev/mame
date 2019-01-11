@@ -16,14 +16,18 @@ Supported rendering backends:
 
  * Direct3D 9
  * Direct3D 11
- * Direct3D 12
- * Metal
+ * Direct3D 12 (WIP)
+ * Metal (WIP)
  * OpenGL 2.1
  * OpenGL 3.1+
  * OpenGL ES 2
  * OpenGL ES 3.1
  * WebGL 1.0
  * WebGL 2.0
+
+Supported HMD:
+
+ * OculusVR (1.3.0)
 
 Supported platforms:
 
@@ -33,17 +37,17 @@ Supported platforms:
  * iOS (iPhone, iPad, AppleTV)
  * Linux
  * MIPS Creator CI20
- * OSX (10.12+)
+ * OSX (10.9+)
  * RaspberryPi
  * SteamLink
  * Windows (XP, Vista, 7, 8, 10)
- * UWP (Universal Windows, Xbox One)
+ * WinRT (WinPhone 8.0+)
 
 Supported compilers:
 
  * Clang 3.3 and above
- * GCC 5 and above
- * VS2017 and above
+ * GCC 4.6 and above
+ * VS2015 and above
 
 Languages:
 
@@ -75,8 +79,8 @@ Languages:
 [Tools](https://bkaradzic.github.io/bgfx/tools.html)
 ----------------------------------------------------
 
-Who is using it? #madewithbgfx
-------------------------------
+Who is using it?
+----------------
 
 ## Airmech
 
@@ -110,6 +114,12 @@ derivative of the original Torque Engine.
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=p4LTM_QGK34" 
 target="_blank"><img src="http://img.youtube.com/vi/p4LTM_QGK34/0.jpg" 
 alt="Torque 6 Material Editor" width="640" height="480" border="0" /></a>
+
+## twinkle
+
+https://github.com/cgbystrom/twinkle GPU-accelerated UI framework powered by
+JavaScript for desktop/mobile apps. Idea is to combine the fast workflow and
+deployment model of web with the performance of native code and GPU acceleration.
 
 ## Lumix Engine
 
@@ -200,7 +210,7 @@ width="640" height="480" border="0" /></a>
 
 https://github.com/volcoma/EtherealEngine EtherealEngine C++ Game Engine and
 WYSIWYG Editor  
-![EtherealEngine screenshot](https://user-images.githubusercontent.com/1499411/29488403-ff3c3df6-8512-11e7-869f-32a783530cc3.png)
+![EtherealEngine screenshot](https://cloud.githubusercontent.com/assets/1499411/19988985/2a302204-a22c-11e6-98af-5f446d0c79ac.png)
 
 ## Go Rally
 
@@ -218,21 +228,26 @@ https://github.com/s1ddok/Fiber2D#fiber2d - Fiber2D - Cross-platform 2D Game
 Engine in pure Swift  
 ![Fiber2D Demo Gif](http://imgur.com/CP6d9kT.gif)
 
-## On the Hunt / Lumix Engine
+## On the Hunt
 
 http://www.indiedb.com/games/on-the-hunt - On the Hunt is an open world hunting
-game in development. It's a combination of FPS and stealth.
+game in development. It's a combination of FPS and stealth.  
+![On the Hunt](http://media.indiedb.com/images/downloads/1/120/119448/img.png)
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=cAsqLbqSDBg" 
-target="_blank"><img src="http://img.youtube.com/vi/cAsqLbqSDBg/0.jpg" 
-alt="Lumix Engine - new features v0.29 & v0.30"
-width="640" height="480" border="0" /></a>
+## FbxPipeline
+
+https://github.com/VladSerhiienko/FbxPipeline - Yet another FBX exporter with
+flatbuffers serialization.
+
+## FRAG - Framework for Rather Awesome Games
+
+http://fragworks.io/ - FRAG is a cross-platform 2D game creation framework for
+the Nim programming language.
 
 ## vg-renderer
 
 https://github.com/jdryg/vg-renderer#vg-renderer - A vector graphics renderer
-for bgfx, based on ideas from both NanoVG and ImDrawList (Dear ImGUI)  
-![vg-renderer](https://raw.githubusercontent.com/jdryg/vg-renderer/master/img/vgrenderer_tiger.png)
+for bgfx, based on ideas from both NanoVG and ImDrawList (Dear ImGUI)
 
 ## Zombie Safari
 
@@ -269,66 +284,6 @@ target="_blank"><img src="http://img.youtube.com/vi/1Woak1Bl_KI/0.jpg"
 alt="Match Engine | Football Manager 2018"
 width="640" height="480" border="0" /></a>
 
-## WonderWorlds
-
-http://wonderworlds.me/ - WonderWorlds is a place to play thousands
-of user-created levels and stories, make your own using the extensive in-game
-tools and share them with whomever you want.
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=nY8y_dFolKo" 
-target="_blank"><img src="http://img.youtube.com/vi/nY8y_dFolKo/0.jpg" 
-alt="WonderWorlds"
-width="640" height="480" border="0" /></a>
-
-## mud
-
-https://hugoam.github.io/mud-io/ - an all-purpose c++ app prototyping library,
-focused towards live graphical apps and games.
-
-![mud](https://raw.githubusercontent.com/hugoam/mud-io/master/media/14_live_gfx.png)
-
-## Talking Tom Pool
-
-https://outfit7.com/apps/talking-tom-pool/ - "Sling and match” puzzle game for
-mobile devices.
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=eNSI45zDEo0" 
-target="_blank"><img src="http://img.youtube.com/vi/eNSI45zDEo0/0.jpg" 
-alt="Talking Tom Pool"
-width="640" height="480" border="0" /></a>
-
-## GPlayEngine
-
-https://github.com/fredakilla/GPlayEngine#gplayengine - GPlayEngine is C++ 
-cross-platform game engine for creating 2D/3D games based on the GamePlay 3D 
-engine v3.0.
-
-![](https://camo.githubusercontent.com/d89a364fb306f208ca14a58267c8303f60f0f0cf/68747470733a2f2f692e696d6775722e636f6d2f306569395932382e706e67)
-
-## Off The Road
-
-http://www.dogbytegames.com/off_the_road.html - Sandbox off-road driving
-simulator.
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=IUmxqAWdXvk" 
-target="_blank"><img src="http://img.youtube.com/vi/IUmxqAWdXvk/0.jpg" 
-alt="Off The Road"
-width="640" height="480" border="0" /></a>
-
-## Coal Burnout
-
-https://beardsvibe.com/ - Multiplayer PVP rhythm game.
-
-![coal-burnout](https://beardsvibe.com/scr/0l.png)
-
-## Project Aero
-
-https://www.adobe.com/products/projectaero.html - Project Aero, a powerful new
-augmented reality (AR) authoring tool that makes it easier for designers to
-create immersive content.
-
-![project-aero](https://www.adobe.com/content/dam/acom/en/products/aero/pod2.jpg/_jcr_content/renditions/cq5dam.mobile_640.640.462.jpg)
-
 [License (BSD 2-clause)](https://bkaradzic.github.io/bgfx/license.html)
 -----------------------------------------------------------------------
 
@@ -336,7 +291,7 @@ create immersive content.
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-	Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+	Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 	
 	https://github.com/bkaradzic/bgfx
 	

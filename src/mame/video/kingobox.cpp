@@ -104,7 +104,7 @@ void kingofb_state::palette_init_common( palette_device &palette, const uint8_t 
 }
 
 
-void kingofb_state::kingofb_get_rgb_data(const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data)
+void kingofb_state::kingofb_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data )
 {
 	*r_data = color_prom[i + 0x000] & 0x0f;
 	*g_data = color_prom[i + 0x100] & 0x0f;
@@ -112,7 +112,7 @@ void kingofb_state::kingofb_get_rgb_data(const uint8_t *color_prom, int i, int *
 }
 
 
-void kingofb_state::ringking_get_rgb_data(const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data)
+void kingofb_state::ringking_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data )
 {
 	*r_data = (color_prom[i + 0x000] >> 4) & 0x0f;
 	*g_data = (color_prom[i + 0x000] >> 0) & 0x0f;
@@ -120,13 +120,13 @@ void kingofb_state::ringking_get_rgb_data(const uint8_t *color_prom, int i, int 
 }
 
 
-void kingofb_state::kingofb_palette(palette_device &palette)
+PALETTE_INIT_MEMBER(kingofb_state,kingofb)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, &kingofb_state::kingofb_get_rgb_data);
 }
 
-void kingofb_state::ringking_palette(palette_device &palette)
+PALETTE_INIT_MEMBER(kingofb_state,ringking)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, &kingofb_state::ringking_get_rgb_data);

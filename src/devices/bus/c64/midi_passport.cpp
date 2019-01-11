@@ -59,13 +59,13 @@ WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::write_acia_clock )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c64_passport_midi_cartridge_device::device_add_mconfig)
-	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
-	m_acia->irq_handler().set(FUNC(c64_passport_midi_cartridge_device::acia_irq_w));
+	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, c64_passport_midi_cartridge_device, acia_irq_w))
 
-	PTM6840(config, m_ptm, 1021800);
-	m_ptm->set_external_clocks(1021800.0f, 1021800.0f, 1021800.0f);
-	m_ptm->irq_callback().set(FUNC(c64_passport_midi_cartridge_device::ptm_irq_w));
+	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, 1021800)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, c64_passport_midi_cartridge_device, ptm_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
 	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_TAG, acia6850_device, write_rxd))

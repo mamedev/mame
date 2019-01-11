@@ -209,9 +209,9 @@ D5 = SKID2
 
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_out0_w)
 {
-	m_discrete->write(NITEDRVR_MOTOR_DATA, data & 0x0f);  // Motor freq data
-	m_discrete->write(NITEDRVR_SKID1_EN, data & 0x10);    // Skid1 enable
-	m_discrete->write(NITEDRVR_SKID2_EN, data & 0x20);    // Skid2 enable
+	m_discrete->write(space, NITEDRVR_MOTOR_DATA, data & 0x0f);  // Motor freq data
+	m_discrete->write(space, NITEDRVR_SKID1_EN, data & 0x10);    // Skid1 enable
+	m_discrete->write(space, NITEDRVR_SKID2_EN, data & 0x20);    // Skid2 enable
 }
 
 /***************************************************************************
@@ -231,8 +231,8 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 
 	m_crash_en = data & 0x01;
 
-	m_discrete->write(NITEDRVR_CRASH_EN, m_crash_en); // Crash enable
-	m_discrete->write(NITEDRVR_ATTRACT_EN, data & 0x02);      // Attract enable (sound disable)
+	m_discrete->write(space, NITEDRVR_CRASH_EN, m_crash_en); // Crash enable
+	m_discrete->write(space, NITEDRVR_ATTRACT_EN, data & 0x02);      // Attract enable (sound disable)
 
 	if (!m_crash_en)
 	{
@@ -243,7 +243,7 @@ WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 		m_palette->set_pen_color(1, rgb_t(0x00,0x00,0x00)); /* BLACK */
 		m_palette->set_pen_color(0, rgb_t(0xff,0xff,0xff)); /* WHITE */
 	}
-	m_discrete->write(NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);    // Crash Volume
+	m_discrete->write(space, NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);    // Crash Volume
 }
 
 
@@ -252,7 +252,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 	if (m_crash_en && m_crash_data_en)
 	{
 		m_crash_data--;
-		m_discrete->write(NITEDRVR_BANG_DATA, m_crash_data);  // Crash Volume
+		address_space &space = machine().dummy_space();
+		m_discrete->write(space, NITEDRVR_BANG_DATA, m_crash_data);  // Crash Volume
 		if (!m_crash_data)
 			m_crash_data_en = 0;    // Done counting?
 

@@ -19,6 +19,10 @@
 #define CP1610_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 #define CP1610_INT_INTR     INPUT_LINE_NMI      /* Non-Maskable */
 
+#define MCFG_CP1610_BEXT_CALLBACK(_read) \
+	devcb = &downcast<cp1610_cpu_device *>(device)->set_bext_callback(DEVCB_##_read);
+
+
 class cp1610_cpu_device :  public cpu_device
 {
 public:
@@ -32,7 +36,10 @@ public:
 	// construction/destruction
 	cp1610_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	auto bext() { return m_read_bext.bind(); }
+	template <class Object> devcb_base &set_bext_callback(Object &&rd)
+	{
+		return m_read_bext.set_callback(std::forward<Object>(rd));
+	}
 
 protected:
 	// device-level overrides

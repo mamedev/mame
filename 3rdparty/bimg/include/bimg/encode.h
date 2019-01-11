@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -24,8 +24,7 @@ namespace bimg
 
 	///
 	void imageEncodeFromRgba8(
-		  bx::AllocatorI* _allocator
-		, void* _dst
+		  void* _dst
 		, const void* _src
 		, uint32_t _width
 		, uint32_t _height
@@ -87,6 +86,7 @@ namespace bimg
 		, uint32_t _width
 		, uint32_t _height
 		, uint32_t _srcPitch
+		, float _edge
 		, const void* _src
 		);
 
@@ -124,49 +124,6 @@ namespace bimg
 		, void* _src
 		, float _coverage
 		, float _alphaRef
-		);
-
-	///
-	ImageContainer* imageCubemapFromLatLongRgba32F(
-		  bx::AllocatorI* _allocator
-		, const ImageContainer& _input
-		, bool _useBilinearInterpolation
-		, bx::Error* _err
-		);
-
-	///
-	ImageContainer* imageCubemapFromStripRgba32F(
-		  bx::AllocatorI* _allocator
-		, const ImageContainer& _input
-		, bx::Error* _err
-		);
-
-	///
-	ImageContainer* imageGenerateMips(
-		  bx::AllocatorI* _allocator
-		, const ImageContainer& _image
-		);
-
-	struct LightingModel
-	{
-		enum Enum
-		{
-			Phong,
-			PhongBrdf,
-			Blinn,
-			BlinnBrdf,
-			Ggx,
-
-			Count
-		};
-	};
-
-	///
-	ImageContainer* imageCubemapRadianceFilter(
-		  bx::AllocatorI* _allocator
-		, const ImageContainer& _image
-		, LightingModel::Enum _lightingModel
-		, bx::Error* _err
 		);
 
 } // namespace bimg

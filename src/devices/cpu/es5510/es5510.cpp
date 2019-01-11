@@ -586,9 +586,9 @@ void es5510_device::device_start() {
 	save_item(NAME(dol));
 	save_item(NAME(dol_count));
 
-	save_pointer(NAME(gpr), 0xc0);
-	save_pointer(NAME(instr), 160);
-	save_pointer(NAME(dram), DRAM_SIZE);
+	save_pointer(NAME(gpr.get()), 0xc0);
+	save_pointer(NAME(instr.get()), 160);
+	save_pointer(NAME(dram.get()), DRAM_SIZE);
 
 	save_item(NAME(dol_latch));
 	save_item(NAME(dil_latch));

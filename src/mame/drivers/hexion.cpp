@@ -126,8 +126,8 @@ void hexion_state::hexion_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdffe).rw(FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
-	map(0xdfff, 0xdfff).w(FUNC(hexion_state::bankctrl_w));
+	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
 	map(0xe000, 0xe000).noprw();
 	map(0xe800, 0xe8ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xf000, 0xf00f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
@@ -138,9 +138,9 @@ void hexion_state::hexion_map(address_map &map)
 	map(0xf403, 0xf403).portr("P2");
 	map(0xf440, 0xf440).portr("DSW3");
 	map(0xf441, 0xf441).portr("SYSTEM");
-	map(0xf480, 0xf480).w(FUNC(hexion_state::bankswitch_w));
-	map(0xf4c0, 0xf4c0).w(FUNC(hexion_state::coincntr_w));
-	map(0xf500, 0xf500).w(FUNC(hexion_state::gfxrom_select_w));
+	map(0xf480, 0xf480).w(this, FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(this, FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(this, FUNC(hexion_state::gfxrom_select_w));
 	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
@@ -149,8 +149,8 @@ void hexion_state::hexionb_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdffe).rw(FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
-	map(0xdfff, 0xdfff).w(FUNC(hexion_state::bankctrl_w));
+	map(0xc000, 0xdffe).rw(this, FUNC(hexion_state::bankedram_r), FUNC(hexion_state::bankedram_w));
+	map(0xdfff, 0xdfff).w(this, FUNC(hexion_state::bankctrl_w));
 	map(0xe000, 0xe000).noprw();
 	map(0xe800, 0xe87f).noprw(); // all the code to use the k051649 is still present
 	map(0xe880, 0xe889).noprw(); // but the bootleg has an additional M6295 @ 0xf5c0 instead
@@ -165,9 +165,9 @@ void hexion_state::hexionb_map(address_map &map)
 	map(0xf403, 0xf403).portr("P2");
 	map(0xf440, 0xf440).portr("DSW3");
 	map(0xf441, 0xf441).portr("SYSTEM");
-	map(0xf480, 0xf480).w(FUNC(hexion_state::bankswitch_w));
-	map(0xf4c0, 0xf4c0).w(FUNC(hexion_state::coincntr_w));
-	map(0xf500, 0xf500).w(FUNC(hexion_state::gfxrom_select_w));
+	map(0xf480, 0xf480).w(this, FUNC(hexion_state::bankswitch_w));
+	map(0xf4c0, 0xf4c0).w(this, FUNC(hexion_state::coincntr_w));
+	map(0xf500, 0xf500).w(this, FUNC(hexion_state::gfxrom_select_w));
 	map(0xf540, 0xf540).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xf5c0, 0xf5c0).w("oki2", FUNC(okim6295_device::write));
 }
@@ -251,51 +251,52 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 	}
 }
 
-void hexion_state::hexion(machine_config &config)
-{
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &hexion_state::hexion_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(hexion_state::scanline), "screen", 0, 1);
-	WATCHDOG_TIMER(config, "watchdog");
 
-	K053252(config, m_k053252, XTAL(24'000'000)/2); /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
-	m_k053252->int1_ack().set(FUNC(hexion_state::irq_ack_w));
-	m_k053252->int2_ack().set(FUNC(hexion_state::nmi_ack_w));
-	m_k053252->int_time().set(FUNC(hexion_state::ccu_int_time_w));
+MACHINE_CONFIG_START(hexion_state::hexion)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
+	MCFG_DEVICE_PROGRAM_MAP(hexion_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
+	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, hexion_state, irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, hexion_state, nmi_ack_w))
+	MCFG_K053252_INT_TIME_CB(WRITE8(*this, hexion_state, ccu_int_time_w))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 36*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(hexion_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 36*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(hexion_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hexion);
-	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexion)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	/* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	/* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
-	K051649(config, "k051649", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.5);
-}
+	MCFG_K051649_ADD("k051649", XTAL(24'000'000)/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
-void hexion_state::hexionb(machine_config &config)
-{
+MACHINE_CONFIG_START(hexion_state::hexionb)
 	hexion(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hexion_state::hexionb_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(hexionb_map)
 
-	config.device_remove("k051649");
+	MCFG_DEVICE_REMOVE("k051649")
 
-	// clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
-	OKIM6295(config, "oki2", 1056000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
-}
+	MCFG_DEVICE_ADD("oki2", OKIM6295, 1056000, okim6295_device::PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

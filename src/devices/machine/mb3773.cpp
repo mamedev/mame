@@ -42,6 +42,7 @@ mb3773_device::mb3773_device( const machine_config &mconfig, const char *tag, de
 void mb3773_device::device_start()
 {
 	m_watchdog_timer = timer_alloc();
+	reset_timer();
 
 	save_item( NAME(m_ck) );
 }
@@ -53,7 +54,7 @@ void mb3773_device::device_start()
 
 void mb3773_device::device_reset()
 {
-	reset_timer();
+	m_ck = 0;
 }
 
 void mb3773_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

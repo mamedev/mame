@@ -33,11 +33,11 @@
 
 void k051649_device::scc_map(address_map &map)
 {
-	map(0x00, 0x7f).rw(FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
-	map(0x80, 0x89).w(FUNC(k051649_device::k051649_frequency_w));
-	map(0x8a, 0x8e).w(FUNC(k051649_device::k051649_volume_w));
-	map(0x8f, 0x8f).w(FUNC(k051649_device::k051649_keyonoff_w));
-	map(0xe0, 0xff).rw(FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
+	map(0x00, 0x7f).rw(this, FUNC(k051649_device::k051649_waveform_r), FUNC(k051649_device::k051649_waveform_w));
+	map(0x80, 0x89).w(this, FUNC(k051649_device::k051649_frequency_w));
+	map(0x8a, 0x8e).w(this, FUNC(k051649_device::k051649_volume_w));
+	map(0x8f, 0x8f).w(this, FUNC(k051649_device::k051649_keyonoff_w));
+	map(0xe0, 0xff).rw(this, FUNC(k051649_device::k051649_test_r), FUNC(k051649_device::k051649_test_w));
 }
 
 // device type definition

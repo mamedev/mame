@@ -81,10 +81,10 @@ WRITE_LINE_MEMBER(sonson_state::coin2_counter_w)
 void sonson_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x13ff).ram().w(FUNC(sonson_state::sonson_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(FUNC(sonson_state::sonson_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(this, FUNC(sonson_state::sonson_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(this, FUNC(sonson_state::sonson_colorram_w)).share("colorram");
 	map(0x2020, 0x207f).ram().share("spriteram");
-	map(0x3000, 0x3000).w(FUNC(sonson_state::sonson_scrollx_w));
+	map(0x3000, 0x3000).w(this, FUNC(sonson_state::sonson_scrollx_w));
 	map(0x3002, 0x3002).portr("P1");
 	map(0x3003, 0x3003).portr("P2");
 	map(0x3004, 0x3004).portr("SYSTEM");
@@ -236,11 +236,11 @@ MACHINE_CONFIG_START(sonson_state::sonson)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(sonson_state, irq0_line_hold, 4*60)    /* FIRQs are triggered by the main CPU */
 
-	ls259_device &mainlatch(LS259(config, "mainlatch")); // A9
-	mainlatch.q_out_cb<0>().set(FUNC(sonson_state::flipscreen_w));
-	mainlatch.q_out_cb<1>().set(FUNC(sonson_state::sh_irqtrigger_w));
-	mainlatch.q_out_cb<6>().set(FUNC(sonson_state::coin2_counter_w));
-	mainlatch.q_out_cb<7>().set(FUNC(sonson_state::coin1_counter_w));
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // A9
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sonson_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, sonson_state, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, sonson_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, sonson_state, coin1_counter_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -248,20 +248,24 @@ MACHINE_CONFIG_START(sonson_state::sonson)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sonson_state, screen_update_sonson)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sonson)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sonson)
 
-	PALETTE(config, m_palette, FUNC(sonson_state::sonson_palette), 64*4 + 32*8, 32);
+	MCFG_PALETTE_ADD("palette", 64*4+32*8)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
+	MCFG_PALETTE_INIT_OWNER(sonson_state, sonson)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 1.5 MHz */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)   /* 1.5 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 1.5 MHz */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)   /* 1.5 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 

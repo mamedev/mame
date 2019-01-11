@@ -5,20 +5,15 @@
     King of Boxer - Ring King
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_KINGOBOX_H
-#define MAME_INCLUDES_KINGOBOX_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
-#include "emupal.h"
 
 class kingofb_state : public driver_device
 {
 public:
-	kingofb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	kingofb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_scroll_y(*this, "scroll_y"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
@@ -32,16 +27,8 @@ public:
 		m_nmigate(*this, "nmigate"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
-	{ }
+		m_soundlatch(*this, "soundlatch") { }
 
-	void kingofb(machine_config &config);
-	void ringking(machine_config &config);
-
-	void init_ringkingw();
-	void init_ringking3();
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_scroll_y;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -67,19 +54,21 @@ private:
 	DECLARE_WRITE8_MEMBER(kingofb_videoram2_w);
 	DECLARE_WRITE8_MEMBER(kingofb_colorram2_w);
 	DECLARE_WRITE8_MEMBER(kingofb_f800_w);
+	void init_ringkingw();
+	void init_ringking3();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ringking_get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(kingofb);
-	void kingofb_palette(palette_device &palette);
+	DECLARE_PALETTE_INIT(kingofb);
 	DECLARE_VIDEO_START(ringking);
-	void ringking_palette(palette_device &palette);
+	DECLARE_PALETTE_INIT(ringking);
 	uint32_t screen_update_kingofb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ringking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kingofb_interrupt);
-	void palette_init_common(palette_device &palette, const uint8_t *color_prom, void (kingofb_state::*get_rgb_data)(const uint8_t *, int, int *, int *, int *));
+	void palette_init_common( palette_device &palette, const uint8_t *color_prom, void (kingofb_state::*get_rgb_data)(const uint8_t *, int, int *, int *, int *) );
 	void kingofb_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data );
 	void ringking_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data );
 	void kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -90,6 +79,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void kingofb(machine_config &config);
+	void ringking(machine_config &config);
 	void kingobox_map(address_map &map);
 	void kingobox_sound_io_map(address_map &map);
 	void kingobox_sound_map(address_map &map);
@@ -100,5 +91,3 @@ private:
 	void ringking_sprite_map(address_map &map);
 	void ringking_video_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_KINGOBOX_H

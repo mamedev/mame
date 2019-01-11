@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_CHD_H
-#define MAME_UTIL_CHD_H
-
 #pragma once
+
+#ifndef __CHD_H__
+#define __CHD_H__
 
 #include "osdcore.h"
 #include "coretmpl.h"
@@ -580,4 +580,5 @@ private:
 	uint32_t                  m_write_hunk;       // next hunk to write
 };
 
-#endif // MAME_UTIL_CHD_H
+
+#endif // __CHD_H__

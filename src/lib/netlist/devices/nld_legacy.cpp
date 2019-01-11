@@ -100,8 +100,8 @@ namespace netlist
 		m_last = nval;
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(nicRSFF)
-	NETLIB_DEVICE_IMPL_DEPRECATED(nicDelay)
+	NETLIB_DEVICE_IMPL(nicRSFF)
+	NETLIB_DEVICE_IMPL(nicDelay)
 
 	} //namespace devices
 } // namespace netlist

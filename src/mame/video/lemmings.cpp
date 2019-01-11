@@ -48,9 +48,9 @@ void lemmings_state::video_start()
 	m_sprite_triple_buffer[1] = make_unique_clear<uint16_t[]>(0x800/2);
 
 	save_item(NAME(m_bitmap0));
-	save_pointer(NAME(m_vram_buffer), 2048 * 64);
-	save_pointer(NAME(m_sprite_triple_buffer[0]), 0x800/2, 0);
-	save_pointer(NAME(m_sprite_triple_buffer[1]), 0x800/2, 1);
+	save_pointer(NAME(m_vram_buffer.get()), 2048 * 64);
+	save_pointer(NAME(m_sprite_triple_buffer[0].get()), 0x800/2, 0);
+	save_pointer(NAME(m_sprite_triple_buffer[1].get()), 0x800/2, 1);
 }
 
 WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)
@@ -118,11 +118,11 @@ void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, int* xscroll, in
 	int y,x;
 	const pen_t *paldata = m_palette->pens();
 
-	for (y=cliprect.top(); y<cliprect.bottom();y++)
+	for (y=cliprect.min_y; y<cliprect.max_y;y++)
 	{
 		uint32_t* dst = &bitmap.pix32(y,0);
 
-		for (x=cliprect.left(); x<cliprect.right();x++)
+		for (x=cliprect.min_x; x<cliprect.max_x;x++)
 		{
 			uint16_t src = m_bitmap0.pix16((y-*yscroll)&0xff,(x-*xscroll)&0x7ff);
 
@@ -137,7 +137,9 @@ uint32_t lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rg
 	int x1 = -m_control_data[0];
 	int x0 = -m_control_data[2];
 	int y = 0;
-	rectangle rect(0, 0, cliprect.top(), cliprect.bottom());
+	rectangle rect;
+	rect.max_y = cliprect.max_y;
+	rect.min_y = cliprect.min_y;
 
 	// sprites are flipped relative to tilemaps
 	m_sprgen[0]->set_flip_screen(true);
@@ -155,10 +157,12 @@ uint32_t lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rg
 	}
 	else
 	{
-		rect.setx(0, 159);
+		rect.max_x = 159;
+		rect.min_x = 0;
 		lemmings_copy_bitmap(bitmap, &x0, &y, rect);
 
-		rect.setx(160, 319);
+		rect.max_x = 319;
+		rect.min_x = 160;
 		lemmings_copy_bitmap(bitmap, &x1, &y, rect);
 	}
 

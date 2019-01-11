@@ -6,7 +6,6 @@
 #pragma once
 
 #include "machine/taito68705interface.h"
-#include "emupal.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
@@ -23,6 +22,8 @@ enum {
 class arkanoid_state : public driver_device
 {
 public:
+
+
 	arkanoid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoram(*this, "videoram")

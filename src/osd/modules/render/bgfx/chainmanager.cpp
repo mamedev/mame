@@ -185,9 +185,6 @@ void chain_manager::parse_chain_selections(std::string chain_str)
 {
 	std::vector<std::string> chain_names = split_option_string(chain_str);
 
-	if (chain_names.empty())
-		chain_names.push_back("default");
-
 	while (m_current_chain.size() != chain_names.size())
 	{
 		m_screen_chains.push_back(nullptr);
@@ -297,7 +294,7 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, render_p
 		tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base);
 
 	std::string full_name = "screen" + std::to_string(screen);
-	bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
+	bgfx_texture *texture = new bgfx_texture(full_name, bgfx::TextureFormat::RGBA8, tex_width, tex_height, mem, BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT);
 	m_textures.add_provider(full_name, texture);
 
 	const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, tex_width, tex_height, TARGET_STYLE_GUEST);

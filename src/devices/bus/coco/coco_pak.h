@@ -26,8 +26,6 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t* get_cart_base() override;
-	virtual uint32_t get_cart_size() override;
-	virtual memory_region* get_cart_memregion() override;
 
 protected:
 	coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

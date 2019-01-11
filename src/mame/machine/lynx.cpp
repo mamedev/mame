@@ -1299,33 +1299,36 @@ DISPCTL EQU $FD92       ; set to $D by INITMIKEY
 
 void lynx_state::lynx_draw_line()
 {
-	pen_t const *const pen = m_palette->pens();
+	int x, y;
 	uint16_t j; // clipping needed!
+	uint8_t byte;
+	uint16_t *line;
+
 
 	// calculate y: first three lines are vblank,
-	int const y = 101-m_timer[2].counter;
+	y = 101-m_timer[2].counter;
 	// Documentation states lower two bits of buffer address are ignored (thus 0xfffc mask)
 	j = (m_mikey.disp_addr & 0xfffc) + y * 160 / 2;
 
 	if (m_mikey.data[0x92] & 0x02)
 	{
 		j -= 160 * 102 / 2 - 1;
-		uint32_t *const line = &m_bitmap_temp.pix32(102 - 1 - y);
-		for (int x = 160 - 2; x >= 0; j++, x -= 2)
+		line = &m_bitmap_temp.pix16(102 - 1 - y);
+		for (x = 160 - 2; x >= 0; j++, x -= 2)
 		{
-			uint8_t const byte = lynx_read_ram(j);
-			line[x + 1] = pen[(byte >> 4) & 0x0f];
-			line[x + 0] = pen[(byte >> 0) & 0x0f];
+			byte = lynx_read_ram(j);
+			line[x + 1] = m_lynx_palette[(byte >> 4) & 0x0f];
+			line[x + 0] = m_lynx_palette[(byte >> 0) & 0x0f];
 		}
 	}
 	else
 	{
-		uint32_t *const line = &m_bitmap_temp.pix32(y);
-		for (int x = 0; x < 160; j++, x += 2)
+		line = &m_bitmap_temp.pix16(y);
+		for (x = 0; x < 160; j++, x += 2)
 		{
-			uint8_t const byte = lynx_read_ram(j);
-			line[x + 0] = pen[(byte >> 4) & 0x0f];
-			line[x + 1] = pen[(byte >> 0) & 0x0f];
+			byte = lynx_read_ram(j);
+			line[x + 0] = m_lynx_palette[(byte >> 4) & 0x0f];
+			line[x + 1] = m_lynx_palette[(byte >> 0) & 0x0f];
 		}
 	}
 }
@@ -1829,10 +1832,10 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[offset] = data;
 
 		/* RED = 0xb- & 0x0f, GREEN = 0xa- & 0x0f, BLUE = (0xb- & 0xf0) >> 4 */
-		m_palette->set_pen_color(offset & 0x0f, rgb_t(
-			pal4bit(m_mikey.data[0xb0 | (offset & 0x0f)] & 0x0f),
-			pal4bit(m_mikey.data[0xa0 | (offset & 0x0f)] & 0x0f),
-			pal4bit((m_mikey.data[0xb0 | (offset & 0x0f)] & 0xf0) >> 4)));
+		m_lynx_palette[offset & 0x0f] = m_palette->pen(
+			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0x0f)) |
+			((m_mikey.data[0xa0 + (offset & 0x0f)] & 0x0f) << 4) |
+			((m_mikey.data[0xb0 + (offset & 0x0f)] & 0xf0) << 4));
 		break;
 
 	/* TODO: properly implement these writes */
@@ -1883,10 +1886,24 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 	 * when these are safe in the cpu */
 	m_memory_config = data;
 
-	m_bank_fc00->set_bank(BIT(data, 0));
-	m_bank_fd00->set_bank(BIT(data, 1));
-	m_bank_fe00->set_entry(BIT(data, 2));
-	m_bank_fffa->set_entry(BIT(data, 3));
+	if (data & 1)
+	{
+		space.install_readwrite_bank(0xfc00, 0xfcff, "bank1");
+		membank("bank1")->set_base(m_mem_fc00);
+	}
+	else
+		space.install_readwrite_handler(0xfc00, 0xfcff, read8_delegate(FUNC(lynx_state::suzy_read),this), write8_delegate(FUNC(lynx_state::suzy_write),this));
+
+	if (data & 2)
+	{
+		space.install_readwrite_bank(0xfd00, 0xfdff, "bank2");
+		membank("bank2")->set_base(m_mem_fd00);
+	}
+	else
+		space.install_readwrite_handler(0xfd00, 0xfdff, read8_delegate(FUNC(lynx_state::mikey_read),this), write8_delegate(FUNC(lynx_state::mikey_write),this));
+
+	membank("bank3")->set_entry((data & 4) ? 1 : 0);
+	membank("bank4")->set_entry((data & 8) ? 1 : 0);
 }
 
 void lynx_state::machine_reset()
@@ -1937,6 +1954,7 @@ void lynx_state::machine_start()
 	save_item(NAME(m_memory_config));
 	save_item(NAME(m_sign_AB));
 	save_item(NAME(m_sign_CD));
+	save_item(NAME(m_lynx_palette));
 	save_item(NAME(m_rotate));
 	// save blitter variables
 	save_item(NAME(m_blitter.screen));
@@ -1996,10 +2014,10 @@ void lynx_state::machine_start()
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(lynx_state::lynx_postload), this));
 
-	m_bank_fe00->configure_entry(0, memregion("maincpu")->base() + 0x0000);
-	m_bank_fe00->configure_entry(1, m_mem_fe00);
-	m_bank_fffa->configure_entry(0, memregion("maincpu")->base() + 0x01fa);
-	m_bank_fffa->configure_entry(1, m_mem_fffa);
+	membank("bank3")->configure_entry(0, memregion("maincpu")->base() + 0x0000);
+	membank("bank3")->configure_entry(1, m_mem_fe00);
+	membank("bank4")->configure_entry(0, memregion("maincpu")->base() + 0x01fa);
+	membank("bank4")->configure_entry(1, m_mem_fffa);
 
 	for (int i = 0; i < NR_LYNX_TIMERS; i++)
 		lynx_timer_init(i);

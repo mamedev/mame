@@ -25,10 +25,8 @@ public:
 		m_ie15(*this, "ie15")
 	{ }
 
-	void ie15(machine_config &config);
-
-private:
 	required_device<ie15_device> m_ie15;
+	void ie15(machine_config &config);
 };
 
 

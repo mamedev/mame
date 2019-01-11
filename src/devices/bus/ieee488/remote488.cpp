@@ -43,8 +43,6 @@
     | Q    | O         | No        | Request 'P' msg                 |
     | R    | I/O       | Yes       | Set bus control signals to 0    |
     | S    | I/O       | Yes       | Set bus control signals to 1    |
-    | X    | I/O       | No        | Checkpoint in byte string       |
-    | Y    | I/O       | Yes       | Checkpoint reached              |
 
     - D messages
 
@@ -52,42 +50,24 @@
     In the output direction the remotizer implements an acceptor so
     that the proper 3-way handshake is implemented with the
     source. The acceptor has no delays between state transitions so
-    that it can keep up with any speed of the source.
+    that it can keep up with any speed of the source. The acceptor
+    doesn't wait for any acknowledgement from external receiver. The
+    buffering in the output stream must have enough space to hold
+    bursts of data bytes before they are processed by the external
+    receiver.
     In the input direction a source is implemented to handshake with
     local acceptor(s). The FSM in the source has no delays so that it can
     operate at whatever speed the slowest acceptor on the bus can sustain.
     Bytes are removed from the input buffer of the stream as the local
     acceptors acknowledge them. No input message is processed by the
     remotizer when it's waiting for 3-way handshake with acceptors to
-    complete.
+    complete. If a local controller asserts the ATN signal to regain
+    control of the bus when there are input bytes waiting, the bytes
+    are discarded.
     Byte values are expressed in positive logic (which is the opposite
     of what's sent on the bus). To discriminate between DAB and command
     bytes the receiver of this message has to check its state of ATN
     signal (see R&S messages).
-    A simple infrastructure for synchronization between near and far
-    end is provided. The sender of a string of bytes can insert a
-    "checkpoint" msg in the string. This msg is turned into a
-    "checkpoint reached" msg by the receiver and sent back. This msg
-    reports to the sender that the receiver has processed data up to
-    the last checkpoint.
-    The acceptor in the remotizer sends a checkpoint in two cases: when a
-    byte with EOI is accepted and sent to the far end or when there's
-    a pause in the byte string longer than 10 ms. This is just for
-    safety, normal byte strings are always terminated by EOI by the
-    sender. The remotizer acceptor stops accepting data after sending
-    a checkpoint. It resumes when the "checkpoint reached" msg is sent
-    back. Bytes of I/F commands never use checkpointing.
-    The source handshake (SH) in the remotizer accepts data bytes from
-    the far end and puts them on the local bus. A simple heuristic is
-    implemented to recognize the situation when the far end has sent
-    more data than a local acceptor is willing to take. Whenever ATN
-    is asserted by a local device (the controller) all input bytes are
-    discarded up to the next checkpoint. The "checkpoint reached" msg
-    then reports that data has been completely/partially flushed by
-    setting its byte to 1. In normal cases byte is set to 0.
-    Usage of checkpointing is optional. The minimum the far end should
-    implement is sending back a "checkpoint reached" msg whenever a
-    checkpoint is received.
 
     - E messages
 
@@ -149,31 +129,16 @@
     message is attempting to set to 1 a signal that is locally forced
     to 0.
 
-    - X & Y messages
-
-    See "D" messages above. "X" message is sent to request the
-    receiver to acknowledge the reception by sending back a "Y"
-    message.  When used, the "X" message should be sent at the end of
-    a string of bytes by the sender. The reception of "Y" message
-    confirms that the receiver has seen (though not necessarily
-    accepted) the whole string.
-    The "X" -> "Y" sequence is used in the local AH for flow control:
-    once "X" is sent out, the acceptor pauses accepting bytes until a
-    "Y" is received.  For this reason the far end should always
-    implement, at the very least, the sending back of "Y" whenever "X"
-    is seen.
-    A "X" message carries no info in its byte. A "Y" message reports
-    whether the preceding byte string was entirely accepted by the
-    receiver or not (with a 00 or 01 value in the associated byte,
-    respectively).
-
     Limits & potential issues:
     - There are no checks for violations of IEEE-488 protocol. It's
       possible, for example, to put the bus in an illegal state by
       sending a 'E' msg when the local controller is asserting ATN
       (thus creating a phantom parallel poll).
-    - The heuristic to discard byte strings in the SH could be a bit
-      too simple and do the wrong thing in few rare cases.
+    - The unacknowledged nature of D/E msgs may cause problems if
+      the sender of the msgs must be synchronized byte-for-byte with
+      the receiver. There is no direct way, for example, for the
+      sender of a string of bytes to know how many have been accepted
+      by the receiver.
     - It's difficult to achieve accurate synchronization between the
       local emulation time and the external time.
 
@@ -181,6 +146,10 @@
     - Implement handling of incoming Q msgs (needed when parallel poll
       is being performed by a remote controller)
     - Enhancement: implement a msg for accurate time synchronization
+    - Enhancement: implement some form of sliding window acknowledgement
+      for cases when sender has to know how many bytes have been
+      processed by the receiver. The HP "Amigo" protocol I used for
+      my experiments has no such need.
 
 *********************************************************************/
 
@@ -230,14 +199,11 @@ constexpr char MSG_PP_DATA       = 'P'; // I:   Parallel poll data
 constexpr char MSG_PP_REQUEST    = 'Q'; // O:   Request PP data
 constexpr char MSG_ECHO_REQ      = 'J'; // O:   Heartbeat msg: echo request
 constexpr char MSG_ECHO_REPLY    = 'K'; // I:   Heartbeat msg: echo reply
-constexpr char MSG_CHECKPOINT    = 'X'; // I/O: Checkpoint in byte stream
-constexpr char MSG_CP_REACHED    = 'Y'; // I/O: Checkpoint reached
 
 // Timings
 constexpr unsigned POLL_PERIOD_US   = 20;   // Poll period (µs)
 constexpr unsigned HEARTBEAT_MS     = 500;  // Heartbeat ping period (ms)
 constexpr unsigned MAX_MISSED_HB    = 3;    // Missed heartbeats to declare the connection dead
-constexpr unsigned AH_TO_MS         = 10;   // Timeout in AH to report a byte string terminated (ms)
 
 // device type definition
 DEFINE_DEVICE_TYPE(REMOTE488, remote488_device, "remote488", "IEEE-488 Remotizer")
@@ -278,7 +244,6 @@ void remote488_device::ieee488_ifc(int state)
 	update_signal(SIGNAL_IFC_BIT , state);
 	if (!state) {
 		LOG("IFC\n");
-		flush_data();
 		bus_reset();
 	}
 }
@@ -292,7 +257,6 @@ void remote488_device::ieee488_atn(int state)
 {
 	update_signal(SIGNAL_ATN_BIT , state);
 	update_sh_fsm();
-	update_ah_fsm();
 	update_pp();
 }
 
@@ -305,7 +269,6 @@ void remote488_device::device_start()
 {
 	m_poll_timer = timer_alloc(TMR_ID_POLL);
 	m_hb_timer = timer_alloc(TMR_ID_HEARTBEAT);
-	m_ah_timer = timer_alloc(TMR_ID_AH);
 }
 
 void remote488_device::device_reset()
@@ -324,9 +287,6 @@ void remote488_device::device_reset()
 	m_connected = true;
 	set_connection(false);
 
-	m_ibf = false;
-	m_flush_bytes = false;
-	m_waiting_cp = false;
 	bus_reset();
 }
 
@@ -335,6 +295,8 @@ void remote488_device::bus_reset()
 	m_sh_state = REM_SH_SIDS;
 	m_ah_state = REM_AH_ACRS;
 	m_rx_state = REM_RX_WAIT_CH;
+	m_ibf = false;
+	m_flush_bytes = false;
 	m_poll_timer->adjust(attotime::from_usec(POLL_PERIOD_US) , 0 , attotime::from_usec(POLL_PERIOD_US));
 	m_pp_data = 0;
 	m_pp_requested = false;
@@ -353,25 +315,38 @@ void remote488_device::process_input_msgs()
 
 		switch (msg_ch) {
 		case MSG_SIGNAL_CLEAR:
+			m_flush_bytes = false;
 			update_signals_from_rem(0 , data);
 			break;
 
 		case MSG_SIGNAL_SET:
+			m_flush_bytes = false;
 			update_signals_from_rem(data , 0);
 			break;
 
 		case MSG_DATA_BYTE:
+			if (m_flush_bytes) {
+				LOG("Flushed\n");
+			} else {
+				m_poll_timer->reset();
+				recvd_data_byte(data , false);
+				return;
+			}
+			break;
+
 		case MSG_END_BYTE:
 			if (m_flush_bytes) {
 				LOG("Flushed\n");
-				m_poll_timer->adjust(attotime::zero);
+				m_flush_bytes = false;
 			} else {
 				m_poll_timer->reset();
-				recvd_data_byte(data , msg_ch == MSG_END_BYTE);
+				recvd_data_byte(data , true);
+				return;
 			}
-			return;
+			break;
 
 		case MSG_PP_DATA:
+			m_flush_bytes = false;
 			m_pp_data = data;
 			m_pp_requested = false;
 			update_pp_dio();
@@ -379,18 +354,6 @@ void remote488_device::process_input_msgs()
 
 		case MSG_ECHO_REQ:
 			send_update(MSG_ECHO_REPLY , 0);
-			break;
-
-		case MSG_CHECKPOINT:
-			send_update(MSG_CP_REACHED , m_flush_bytes);
-			m_flush_bytes = false;
-			break;
-
-		case MSG_CP_REACHED:
-			if (m_waiting_cp) {
-				m_waiting_cp = false;
-				update_ah_fsm();
-			}
 			break;
 
 		default:
@@ -414,13 +377,6 @@ void remote488_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			set_connection(false);
 		}
 		send_update(MSG_ECHO_REQ , 0);
-		break;
-
-	case TMR_ID_AH:
-		if (!m_waiting_cp) {
-			LOG("CP T/O\n");
-			ah_checkpoint();
-		}
 		break;
 
 	default:
@@ -463,21 +419,8 @@ void remote488_device::recvd_data_byte(uint8_t data , bool eoi)
 	m_ib = data;
 	m_ib_eoi = eoi;
 	m_ibf = true;
-	if (is_local_atn_active()) {
-		flush_data();
-	}
 	update_sh_fsm();
 	update_ah_fsm();
-}
-
-void remote488_device::flush_data()
-{
-	if (m_ibf) {
-		LOG("Flushing enabled\n");
-		m_flush_bytes = true;
-		m_ibf = false;
-		m_poll_timer->adjust(attotime::zero);
-	}
 }
 
 void remote488_device::update_signals_from_rem(uint8_t to_set , uint8_t to_clear)
@@ -530,8 +473,11 @@ void remote488_device::update_state(uint8_t new_signals)
 
 	m_out_signals = new_signals;
 
-	if (is_local_atn_active()) {
-		flush_data();
+	if (is_local_atn_active() && m_ibf) {
+		LOG("Flushing enabled\n");
+		m_flush_bytes = true;
+		m_ibf = false;
+		m_poll_timer->adjust(attotime::zero);
 	}
 
 	if (to_set) {
@@ -575,9 +521,7 @@ bool remote488_device::is_msg_type(char c)
 		c == MSG_DATA_BYTE ||
 		c == MSG_END_BYTE ||
 		c == MSG_PP_DATA ||
-		c == MSG_ECHO_REPLY ||
-		c == MSG_CHECKPOINT ||
-		c == MSG_CP_REACHED;
+		c == MSG_ECHO_REPLY;
 }
 
 bool remote488_device::is_terminator(char c)
@@ -673,13 +617,6 @@ bool remote488_device::is_local_atn_active() const
 	return !BIT(m_out_signals , SIGNAL_ATN_BIT) && BIT(m_in_signals , SIGNAL_ATN_BIT);
 }
 
-void remote488_device::ah_checkpoint()
-{
-	m_waiting_cp = true;
-	m_ah_timer->reset();
-	send_update(MSG_CHECKPOINT , 0);
-}
-
 void remote488_device::update_ah_fsm()
 {
 	bool changed = true;
@@ -703,22 +640,13 @@ void remote488_device::update_ah_fsm()
 				break;
 
 			case REM_AH_ACDS:
-				if (m_bus->dav_r()) {
-					m_ah_state = REM_AH_ACRS;
-				} else if (!m_waiting_cp) {
-					uint8_t dio = ~m_bus->read_dio();
+				{
+					uint8_t dio = ~m_bus->dio_r();
 
 					if (!m_bus->eoi_r()) {
 						send_update(MSG_END_BYTE , dio);
-						ah_checkpoint();
 					} else {
 						send_update(MSG_DATA_BYTE , dio);
-						if (!BIT(m_out_signals , SIGNAL_ATN_BIT)) {
-							// I/F commands have no checkpoint
-							m_ah_timer->reset();
-						} else {
-							m_ah_timer->adjust(attotime::from_msec(AH_TO_MS));
-						}
 					}
 					m_ah_state = REM_AH_AWNS;
 				}

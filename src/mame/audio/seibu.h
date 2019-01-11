@@ -45,29 +45,32 @@ public:
 	~seibu_sound_device() {}
 
 	//  configuration
-	template <typename T> void set_rom_tag(T &&tag) { m_sound_rom.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_rombank_tag(T &&tag) { m_rom_bank.set_tag(std::forward<T>(tag)); }
-	auto int_callback()  { return m_int_cb.bind(); }
-	auto ym_read_callback()  { return m_ym_read_cb.bind(); }
-	auto ym_write_callback() { return m_ym_write_cb.bind(); }
+	void set_cpu_tag(const char *tag)
+	{
+		m_sound_cpu.set_tag(tag);
+		m_sound_rom.set_tag(tag);
+	}
+	void set_rombank_tag(const char *tag) { m_rom_bank.set_tag(tag); }
+	template<class Object> devcb_base &set_ym_read_callback(Object &&object)  { return m_ym_read_cb.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_ym_write_callback(Object &&object) { return m_ym_write_cb.set_callback(std::forward<Object>(object)); }
 
-	u8 main_r(offs_t offset);
-	void main_w(offs_t offset, u8 data);
-	void main_mustb_w(offs_t, u16 data, u16 mem_mask);
-	void irq_clear_w(u8);
-	void rst10_ack_w(u8);
-	void rst18_ack_w(u8);
-	u8 ym_r(offs_t offset);
-	void ym_w(offs_t offset, u8 data);
-	void bank_w(u8 data);
-	void coin_w(u8 data);
+	DECLARE_READ8_MEMBER( main_r );
+	DECLARE_WRITE8_MEMBER( main_w );
+	DECLARE_WRITE16_MEMBER( main_mustb_w );
+	DECLARE_WRITE8_MEMBER( irq_clear_w );
+	DECLARE_WRITE8_MEMBER( rst10_ack_w );
+	DECLARE_WRITE8_MEMBER( rst18_ack_w );
+	DECLARE_READ8_MEMBER( ym_r );
+	DECLARE_WRITE8_MEMBER( ym_w );
+	DECLARE_WRITE8_MEMBER( bank_w );
+	DECLARE_WRITE8_MEMBER( coin_w );
 	WRITE_LINE_MEMBER( fm_irqhandler );
-	u8 soundlatch_r(offs_t offset);
-	u8 main_data_pending_r();
-	void main_data_w(offs_t offset, u8 data);
-	void pending_w(u8);
+	DECLARE_READ8_MEMBER( soundlatch_r );
+	DECLARE_READ8_MEMBER( main_data_pending_r );
+	DECLARE_WRITE8_MEMBER( main_data_w );
+	DECLARE_WRITE8_MEMBER( pending_w );
 
-	IRQ_CALLBACK_MEMBER(im0_vector_cb);
+	void update_irq_lines(int param);
 
 protected:
 	// device-level overrides
@@ -75,15 +78,12 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void update_irq_lines(int param);
-	TIMER_CALLBACK_MEMBER(update_irq_synced);
-
 	// device callbacks
-	devcb_write_line m_int_cb;
 	devcb_read8 m_ym_read_cb;
 	devcb_write8 m_ym_write_cb;
 
 	// internal state
+	required_device<cpu_device> m_sound_cpu;
 	optional_region_ptr<uint8_t> m_sound_rom;
 	optional_memory_bank m_rom_bank;
 	uint8_t m_main2sub[2];
@@ -113,8 +113,8 @@ class sei80bu_device : public device_t, public device_rom_interface
 public:
 	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	u8 data_r(offs_t offset);
-	u8 opcode_r(offs_t offset);
+	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_READ8_MEMBER(opcode_r);
 
 protected:
 	// device-level overrides
@@ -134,8 +134,8 @@ public:
 	~seibu_adpcm_device() {}
 
 	void decrypt();
-	void adr_w(offs_t offset, u8 data);
-	void ctl_w(u8 data);
+	DECLARE_WRITE8_MEMBER( adr_w );
+	DECLARE_WRITE8_MEMBER( ctl_w );
 
 protected:
 	// device-level overrides
@@ -180,6 +180,18 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                     \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                     \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+#define MCFG_SEIBU_SOUND_CPU(_audiocputag) \
+	downcast<seibu_sound_device &>(*device).set_cpu_tag(_audiocputag);
+
+#define MCFG_SEIBU_SOUND_ROMBANK(_banktag) \
+	downcast<seibu_sound_device &>(*device).set_rombank_tag(_banktag);
+
+#define MCFG_SEIBU_SOUND_YM_READ_CB(_devcb) \
+	devcb = &downcast<seibu_sound_device &>(*device).set_ym_read_callback(DEVCB_##_devcb);
+
+#define MCFG_SEIBU_SOUND_YM_WRITE_CB(_devcb) \
+	devcb = &downcast<seibu_sound_device &>(*device).set_ym_write_callback(DEVCB_##_devcb);
 
 /**************************************************************************/
 

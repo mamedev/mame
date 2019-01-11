@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "emupal.h"
 #include "screen.h"
 
 class tunhunt_state : public driver_device
@@ -26,7 +25,7 @@ public:
 
 	void tunhunt(machine_config &config);
 
-private:
+protected:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_READ8_MEMBER(button_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -40,7 +39,7 @@ private:
 
 	virtual void machine_start() override { m_led.resolve(); }
 	virtual void video_start() override;
-	void tunhunt_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(tunhunt);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_pens();
@@ -50,6 +49,7 @@ private:
 	int hposition,int vstart,int vstop,int vstretch,int hstretch);
 	void main_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

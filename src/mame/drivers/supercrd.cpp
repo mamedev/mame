@@ -166,7 +166,6 @@
 #include "machine/nvram.h"
 #include "video/mc6845.h"
 #include "video/resnet.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -177,31 +176,25 @@
 class supercrd_state : public driver_device
 {
 public:
-	supercrd_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	supercrd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
-	{ }
+		m_gfxdecode(*this, "gfxdecode") { }
 
-	void supercrd(machine_config &config);
-
-protected:
-	virtual void video_start() override;
-
-private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-
 	DECLARE_WRITE8_MEMBER(supercrd_videoram_w);
 	DECLARE_WRITE8_MEMBER(supercrd_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void supercrd_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(supercrd);
+	DECLARE_VIDEO_START(supercrd);
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	void supercrd(machine_config &config);
 	void supercrd_map(address_map &map);
 };
 
@@ -210,40 +203,40 @@ private:
 *     Video Hardware     *
 *************************/
 
-void supercrd_state::supercrd_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(supercrd_state, supercrd)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	static constexpr int resistances_rb[3] = { 1000, 470, 220 };
-	static constexpr int resistances_g [2] = { 470, 220 };
-
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+	static const int resistances_rb[3] = { 1000, 470, 220 };
+	static const int resistances_g [2] = { 470, 220 };
 	double weights_r[3], weights_b[3], weights_g[2];
+
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistances_rb, weights_r,  100,    0,
 			3,  resistances_rb, weights_b,  100,    0,
 			2,  resistances_g,  weights_g,  100,    0);
 
-	for (int i = 0; i < palette.entries(); i++)
+
+	for (i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2;
+		int bit0, bit1, bit2, r, g, b;
 
-		// red component
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		int const r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		/* blue component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		b = combine_3_weights(weights_b, bit0, bit1, bit2);
+		/* green component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		g = combine_2_weights(weights_g, bit0, bit1);
 
-		// blue component */
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int const b = combine_3_weights(weights_b, bit0, bit1, bit2);
-
-		// green component */
-		bit0 = BIT(color_prom[i], 6);
-		bit1 = BIT(color_prom[i], 7);
-		int const g = combine_2_weights(weights_g, bit0, bit1);
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -277,7 +270,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 }
 
 
-void supercrd_state::video_start()
+VIDEO_START_MEMBER(supercrd_state, supercrd)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supercrd_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
@@ -297,8 +290,8 @@ uint32_t supercrd_state::screen_update_supercrd(screen_device &screen, bitmap_in
 void supercrd_state::supercrd_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(FUNC(supercrd_state::supercrd_videoram_w)).share("videoram"); // wrong
-	map(0xd000, 0xdfff).ram().w(FUNC(supercrd_state::supercrd_colorram_w)).share("colorram"); // wrong
+	map(0xc000, 0xcfff).ram().w(this, FUNC(supercrd_state::supercrd_videoram_w)).share("videoram"); // wrong
+	map(0xd000, 0xdfff).ram().w(this, FUNC(supercrd_state::supercrd_colorram_w)).share("colorram"); // wrong
 //  AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -427,7 +420,7 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_DEVICE_PROGRAM_MAP(supercrd_map)
 
-//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 //  MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 //  MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
@@ -442,13 +435,15 @@ MACHINE_CONFIG_START(supercrd_state::supercrd)
 	MCFG_SCREEN_UPDATE_DRIVER(supercrd_state, screen_update_supercrd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_supercrd);
-	PALETTE(config, "palette", FUNC(supercrd_state::supercrd_palette), 0x200);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supercrd)
 
-//  mc6845_device &crtc(MC6845(config, "crtc",  MASTER_CLOCK/8));
-//  crtc.set_screen("screen");
-//  crtc.set_show_border_area(false);
-//  crtc.set_char_width(4);
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_INIT_OWNER(supercrd_state, supercrd)
+	MCFG_VIDEO_START_OVERRIDE(supercrd_state, supercrd)
+
+//  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8)
+//  MCFG_MC6845_SHOW_BORDER_AREA(false)
+//  MCFG_MC6845_CHAR_WIDTH(4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -5,7 +5,7 @@
  Driver by David Haywood
  Inputs by Stephh
 
- maybe it could be merged with megasys1.cpp, could be messy
+ maybe it could be merged with megasys1.c, could be messy
 
  todo:
 
@@ -54,9 +54,9 @@ void bigstrkb_state::bigstrkb_map(address_map &map)
 
 	map(0x0D0000, 0x0dffff).ram();  // 0xd2000 - 0xd3fff?   0xd8000?
 
-	map(0x0e0000, 0x0e3fff).ram().w(FUNC(bigstrkb_state::videoram2_w)).share("videoram2");
-	map(0x0e8000, 0x0ebfff).ram().w(FUNC(bigstrkb_state::videoram3_w)).share("videoram3");
-	map(0x0ec000, 0x0effff).ram().w(FUNC(bigstrkb_state::videoram_w)).share("videoram");
+	map(0x0e0000, 0x0e3fff).ram().w(this, FUNC(bigstrkb_state::videoram2_w)).share("videoram2");
+	map(0x0e8000, 0x0ebfff).ram().w(this, FUNC(bigstrkb_state::videoram3_w)).share("videoram3");
+	map(0x0ec000, 0x0effff).ram().w(this, FUNC(bigstrkb_state::videoram_w)).share("videoram");
 
 	map(0x0f0000, 0x0f7fff).ram();
 	map(0x0f8000, 0x0f87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -206,7 +206,7 @@ MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 	MCFG_DEVICE_PROGRAM_MAP(bigstrkb_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigstrkb);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigstrkb)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -214,13 +214,15 @@ MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bigstrkb_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-//  YM2151(config, "ymsnd", 4000000);
+//  MCFG_DEVICE_ADD("ymsnd", YM2151, ym2151_config)
 
 	MCFG_DEVICE_ADD("oki1", OKIM6295, 4000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)

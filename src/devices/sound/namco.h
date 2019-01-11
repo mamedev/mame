@@ -6,13 +6,20 @@
 #pragma once
 
 
+#define MCFG_NAMCO_AUDIO_VOICES(_voices) \
+	downcast<namco_audio_device &>(*device).set_voices(_voices);
+
+#define MCFG_NAMCO_AUDIO_STEREO(_stereo) \
+	downcast<namco_audio_device &>(*device).set_stereo(_stereo);
+
+
 class namco_audio_device : public device_t,
 							public device_sound_interface
 {
 public:
 	// configuration
 	void set_voices(int voices) { m_voices = voices; }
-	void set_stereo(bool stereo) { m_stereo = stereo; }
+	void set_stereo(int stereo) { m_stereo = stereo; }
 
 	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
 
@@ -64,7 +71,7 @@ protected:
 	int m_f_fracbits;
 
 	int m_voices;     /* number of voices */
-	bool m_stereo;    /* set to indicate stereo (e.g., System 1) */
+	int m_stereo;     /* set to 1 to indicate stereo (e.g., System 1) */
 
 	/* decoded waveform table */
 	int16_t *m_waveform[MAX_VOLUME];

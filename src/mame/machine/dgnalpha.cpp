@@ -69,6 +69,7 @@ keeping track of it in a variable in the driver.
 #include "emu.h"
 #include "includes/dgnalpha.h"
 #include "sound/ay8910.h"
+#include "imagedev/flopdrv.h"
 
 //-------------------------------------------------
 //  device_start
@@ -146,19 +147,19 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 			break;
 
 		case 12:
-			result = m_fdc->data_r();
+			result = m_fdc->data_r(space, 0);
 			break;
 
 		case 13:
-			result = m_fdc->sector_r();
+			result = m_fdc->sector_r(space, 0);
 			break;
 
 		case 14:
-			result = m_fdc->track_r();
+			result = m_fdc->track_r(space, 0);
 			break;
 
 		case 15:
-			result = m_fdc->status_r();
+			result = m_fdc->status_r(space, 0);
 			break;
 	}
 
@@ -188,16 +189,16 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 			break;
 
 		case 12:
-			m_fdc->data_w(data);
+			m_fdc->data_w(space, 0, data);
 			break;
 		case 13:
-			m_fdc->sector_w(data);
+			m_fdc->sector_w(space, 0, data);
 			break;
 		case 14:
-			m_fdc->track_w(data);
+			m_fdc->track_w(space, 0, data);
 			break;
 		case 15:
-			m_fdc->cmd_w(data);
+			m_fdc->cmd_w(space, 0, data);
 			break;
 	}
 }
@@ -242,7 +243,7 @@ WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 			m_ay8912->data_w(space, 0, m_pia_2->b_output());
 			break;
 		case 0x02:      /* Read from selected port */
-			m_pia_2->write_portb(m_ay8912->data_r(space, 0));
+			m_pia_2->portb_w(m_ay8912->data_r(space, 0));
 			break;
 		case 0x03:      /* Select port to write to */
 			m_ay8912->address_w(space, 0, m_pia_2->b_output());

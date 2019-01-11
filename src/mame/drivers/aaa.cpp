@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:
 /***********************************************************************************************************************************
 
 Skeleton driver for Ann Arbor Ambassador terminal.
@@ -8,8 +8,6 @@ Skeleton driver for Ann Arbor Ambassador terminal.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/input_merger.h"
-#include "machine/mc2661.h"
 
 class aaa_state : public driver_device
 {
@@ -17,41 +15,21 @@ public:
 	aaa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pci(*this, "pci%u", 0U)
-		, m_chargen(*this, "chargen")
+		, m_p_chargen(*this, "chargen")
 	{ }
 
 	void aaa(machine_config &config);
-
-private:
-	template<int N> u8 pci_r(offs_t offset);
-	template<int N> void pci_w(offs_t offset, u8 data);
-
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
-	required_device_array<mc2661_device, 2> m_pci;
-	required_region_ptr<u8> m_chargen;
+	required_region_ptr<u8> m_p_chargen;
 };
-
-template<int N>
-u8 aaa_state::pci_r(offs_t offset)
-{
-	return m_pci[N]->read(offset >> 1);
-}
-
-template<int N>
-void aaa_state::pci_w(offs_t offset, u8 data)
-{
-	m_pci[N]->write(offset >> 1, data);
-}
 
 void aaa_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("maincpu", 0);
 	map(0x2000, 0x27ff).ram();
-	map(0x2800, 0x2fff).ram(); // NVRAM?
 	map(0x8000, 0x9fff).rom().region("maincpu", 0x8000);
 	map(0xc000, 0xffff).ram();
 }
@@ -59,35 +37,16 @@ void aaa_state::mem_map(address_map &map)
 void aaa_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).select(6).r(FUNC(aaa_state::pci_r<0>));
-	map(0x01, 0x01).select(6).w(FUNC(aaa_state::pci_w<0>));
-	map(0x40, 0x40).select(6).r(FUNC(aaa_state::pci_r<1>));
-	map(0x41, 0x41).select(6).w(FUNC(aaa_state::pci_w<1>));
-	map(0x87, 0x87).nopw();
 }
 
 static INPUT_PORTS_START( aaa )
 INPUT_PORTS_END
 
-void aaa_state::aaa(machine_config &config)
-{
-	Z80(config, m_maincpu, 2'000'000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &aaa_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &aaa_state::io_map);
-
-	input_merger_device &pciint(INPUT_MERGER_ANY_HIGH(config, "pciint")); // open collector?
-	pciint.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-
-	MC2661(config, m_pci[0], 5.0688_MHz_XTAL);
-	m_pci[0]->txrdy_handler().set("pciint", FUNC(input_merger_device::in_w<0>));
-	m_pci[0]->rxrdy_handler().set("pciint", FUNC(input_merger_device::in_w<1>));
-	m_pci[0]->txemt_dschg_handler().set("pciint", FUNC(input_merger_device::in_w<2>));
-
-	MC2661(config, m_pci[1], 5.0688_MHz_XTAL);
-	m_pci[1]->txrdy_handler().set("pciint", FUNC(input_merger_device::in_w<3>));
-	m_pci[1]->rxrdy_handler().set("pciint", FUNC(input_merger_device::in_w<4>));
-	m_pci[1]->txemt_dschg_handler().set("pciint", FUNC(input_merger_device::in_w<5>));
-}
+MACHINE_CONFIG_START(aaa_state::aaa)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2'000'000)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+MACHINE_CONFIG_END
 
 /**************************************************************************************************************
 

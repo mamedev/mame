@@ -40,15 +40,14 @@ public:
 	// make slide switches usable on a keyboard
 	template <ioport_value V> DECLARE_INPUT_CHANGED_MEMBER(sw_function);
 	template <ioport_value V> DECLARE_INPUT_CHANGED_MEMBER(sw_mode);
-
 	DECLARE_CUSTOM_INPUT_MEMBER(function_in) { return m_sw_function; }
 	DECLARE_CUSTOM_INPUT_MEMBER(mode_in) { return m_sw_mode; }
 
-private:
 	void sk1_memory(address_map &map);
-
+protected:
 	virtual void driver_start() override;
 
+private:
 	ioport_value    m_sw_function = 0xfe;
 	ioport_value    m_sw_mode = 0xfe;
 };
@@ -90,8 +89,10 @@ void sk1_state::sk1_memory(address_map &map)
 
 
 MACHINE_CONFIG_START(sk1_state::sk1)
-	// just to attach the memory map to something until I can work out what the CPU core is
-	ADDRESS_MAP_BANK(config, "dummy").set_map(&sk1_state::sk1_memory).set_data_width(8).set_addr_width(16);
+	MCFG_DEVICE_ADD("dummy", ADDRESS_MAP_BANK, 0) // just to attach the memory map to something until I can work out what the CPU core is
+	MCFG_DEVICE_PROGRAM_MAP(sk1_memory)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 MACHINE_CONFIG_END
 
 

@@ -138,7 +138,7 @@ GND | 20
 
 */
 
-// note: I've kept this code out of cps1.cpp as there is likely to be a substantial amount of game specific code here ones all the extra hardware is emulated
+// note: I've kept this code out of cps1.c as there is likely to be a substantial amount of game specific code here ones all the extra hardware is emulated
 
 #include "emu.h"
 #include "cpu/z80/tmpz84c011.h"
@@ -159,7 +159,7 @@ public:
 		m_from68k_st4(0),
 		m_from68k_st3(0),
 		m_from68k_st2(0),
-		m_lamps(*this, "lamp%u", 1U)
+		m_lamp(*this, "lamp%u", 1U)
 	{
 		for (int i = 0; i < 6; i++)
 		{
@@ -168,17 +168,6 @@ public:
 		}
 	}
 
-	void kenseim(machine_config &config);
-
-	void init_kenseim();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_9_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
-
-private:
 	void mole_up(int side, int mole)
 	{
 		if (side == 0)
@@ -212,8 +201,10 @@ private:
 		}
 	}
 
+
 	/* kenseim */
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
+	void init_kenseim();
 
 	// certain
 
@@ -233,11 +224,20 @@ private:
 	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
 
+
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_9_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
+
 	void set_leds(uint32_t ledstates);
 
+	void kenseim(machine_config &config);
 	void kenseim_io_map(address_map &map);
 	void kenseim_map(address_map &map);
 
+private:
 	uint8_t m_to_68k_cmd_low;
 	uint8_t m_to_68k_cmd_d9;
 	uint8_t m_to_68k_cmd_req;
@@ -254,7 +254,7 @@ private:
 
 	int mole_state_a[6];
 	int mole_state_b[6];
-	output_finder<20> m_lamps;
+	output_finder<20> m_lamp;
 };
 
 
@@ -265,7 +265,7 @@ private:
 void kenseim_state::set_leds(uint32_t ledstates)
 {
 	for (int i=0; i<20; i++)
-		m_lamps[i] = BIT(ledstates, i);
+		m_lamp[i] = BIT(ledstates, i);
 }
 
 // could be wrong
@@ -477,35 +477,34 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ nullptr }
 };
 
-void kenseim_state::kenseim(machine_config &config)
-{
+MACHINE_CONFIG_START(kenseim_state::kenseim)
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	tmpz84c011_device& gamecpu(TMPZ84C011(config, "gamecpu", XTAL(16'000'000)/2)); // tmpz84c011-8
-	gamecpu.set_daisy_config(daisy_chain_gamecpu);
-	gamecpu.set_addrmap(AS_PROGRAM, &kenseim_state::kenseim_map);
-	gamecpu.set_addrmap(AS_IO, &kenseim_state::kenseim_io_map);
-	gamecpu.out_pc_callback().set(FUNC(kenseim_state::cpu_portc_w));
-	gamecpu.out_pd_callback().set(FUNC(kenseim_state::cpu_portd_w));
-	gamecpu.out_pe_callback().set(FUNC(kenseim_state::cpu_porte_w));
-	gamecpu.in_pa_callback().set_ioport("DSW1");
-	gamecpu.in_pb_callback().set_ioport("DSW2");
-	gamecpu.in_pc_callback().set_ioport("CAB-IN");
-	gamecpu.in_pd_callback().set(FUNC(kenseim_state::cpu_portd_r));
+	MCFG_DEVICE_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_gamecpu)
+	MCFG_DEVICE_PROGRAM_MAP(kenseim_map)
+	MCFG_DEVICE_IO_MAP(kenseim_io_map)
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(*this, kenseim_state, cpu_portc_w))
+	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(*this, kenseim_state, cpu_portd_w))
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(*this, kenseim_state, cpu_porte_w))
+	MCFG_TMPZ84C011_PORTA_READ_CB(IOPORT("DSW1"))
+	MCFG_TMPZ84C011_PORTB_READ_CB(IOPORT("DSW2"))
+	MCFG_TMPZ84C011_PORTC_READ_CB(IOPORT("CAB-IN"))
+	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(*this, kenseim_state, cpu_portd_r))
 
-	mb89363b_device &ppi_x2(MB89363B(config, "mb89363b"));
+	MCFG_MB89363B_ADD("mb89363b")
 	// a,b,c always $80: all ports set as output
 	// d,e,f always $92: port D and E as input, port F as output
-	ppi_x2.out_pa().set(FUNC(kenseim_state::mb8936_porta_w));
-	ppi_x2.out_pb().set(FUNC(kenseim_state::mb8936_portb_w));
-	ppi_x2.out_pc().set(FUNC(kenseim_state::mb8936_portc_w));
-	ppi_x2.in_pd().set_ioport("MOLEA");
-	ppi_x2.in_pe().set_ioport("MOLEB");
-	ppi_x2.out_pf().set(FUNC(kenseim_state::mb8936_portf_w));
+	MCFG_MB89363B_OUT_PORTA_CB(WRITE8(*this, kenseim_state, mb8936_porta_w))
+	MCFG_MB89363B_OUT_PORTB_CB(WRITE8(*this, kenseim_state, mb8936_portb_w))
+	MCFG_MB89363B_OUT_PORTC_CB(WRITE8(*this, kenseim_state, mb8936_portc_w))
+	MCFG_MB89363B_IN_PORTD_CB(IOPORT("MOLEA"))
+	MCFG_MB89363B_IN_PORTE_CB(IOPORT("MOLEB"))
+	MCFG_MB89363B_OUT_PORTF_CB(WRITE8(*this, kenseim_state, mb8936_portf_w))
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
-}
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kenseim )
 	// the regular CPS1 input ports are used for comms with the extra board
@@ -703,7 +702,7 @@ void kenseim_state::init_kenseim()
 	m_led_clock = 0;
 	m_led_latch = 0;
 
-	m_lamps.resolve();
+	m_lamp.resolve();
 }
 
 

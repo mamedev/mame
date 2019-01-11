@@ -26,13 +26,13 @@
 
 #define MOVSPA  \
 	tmp = (Wreg(PSW_SAVE) & 0x7000) >> 8;   \
-	Sreg(SS) = m_internal_ram[tmp+SS];    \
-	Wreg(SP) = m_internal_ram[tmp+SP]
+	Sreg(SS) = m_ram.w[tmp+SS];    \
+	Wreg(SP) = m_ram.w[tmp+SP]
 
 #define MOVSPB  \
 	tmp <<= 4;  \
-	m_internal_ram[tmp+SS] = Sreg(SS);    \
-	m_internal_ram[tmp+SP] = Wreg(SP)
+	m_ram.w[tmp+SS] = Sreg(SS);    \
+	m_ram.w[tmp+SP] = Wreg(SP)
 
 #define FINT    \
 	for(tmp = 1; tmp < 0x100; tmp <<= 1) {  \

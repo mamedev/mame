@@ -27,12 +27,12 @@ public:
 		m_bankrom_base(*this, "bankrom_base")
 	{ }
 
-	void offtwall(machine_config &config);
-
 	void init_offtwall();
 	void init_offtwalc();
 
-private:
+	void offtwall(machine_config &config);
+
+protected:
 	DECLARE_WRITE16_MEMBER(io_latch_w);
 	DECLARE_READ16_MEMBER(bankswitch_r);
 	DECLARE_READ16_MEMBER(bankrom_r);
@@ -42,6 +42,7 @@ private:
 	uint32_t screen_update_offtwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<atari_jsa_iii_device> m_jsa;
 	required_device<atari_vad_device> m_vad;

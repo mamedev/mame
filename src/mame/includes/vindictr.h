@@ -13,7 +13,6 @@
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
-#include "emupal.h"
 
 class vindictr_state : public atarigen_state
 {
@@ -23,16 +22,13 @@ public:
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),
 		m_mob(*this, "mob"),
-		m_jsa(*this, "jsa"),
-		m_palette(*this, "palette"),
-		m_paletteram(*this, "paletteram")
+		m_jsa(*this, "jsa")
 	{ }
 
+	void init_vindictr();
 	void vindictr(machine_config &config);
 
-	void init_vindictr();
-
-private:
+protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void update_interrupts() override;
@@ -46,13 +42,11 @@ private:
 	static const atari_motion_objects_config s_mob_config;
 	void main_map(address_map &map);
 
+private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 	required_device<atari_jsa_i_device> m_jsa;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint16_t> m_paletteram;
-
 	uint8_t           m_playfield_tile_bank;
 	uint16_t          m_playfield_xscroll;
 	uint16_t          m_playfield_yscroll;

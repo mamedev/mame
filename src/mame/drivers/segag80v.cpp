@@ -139,6 +139,7 @@
 #include "machine/segag80.h"
 
 #include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "speaker.h"
 
@@ -392,13 +393,13 @@ void segag80v_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();     /* CPU board ROM */
 	map(0x0800, 0xbfff).rom();     /* PROM board ROM area */
-	map(0xc800, 0xcfff).ram().w(FUNC(segag80v_state::mainram_w)).share("mainram");
-	map(0xe000, 0xefff).ram().w(FUNC(segag80v_state::vectorram_w)).share("vectorram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(segag80v_state::mainram_w)).share("mainram");
+	map(0xe000, 0xefff).ram().w(this, FUNC(segag80v_state::vectorram_w)).share("vectorram");
 }
 
 void segag80v_state::opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(segag80v_state::g80v_opcode_r));
+	map(0x0000, 0xffff).r(this, FUNC(segag80v_state::g80v_opcode_r));
 }
 
 
@@ -407,12 +408,12 @@ void segag80v_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0xbc, 0xbc); /* AM_READ ??? */
-	map(0xbd, 0xbe).w(FUNC(segag80v_state::multiply_w));
-	map(0xbe, 0xbe).r(FUNC(segag80v_state::multiply_r));
-	map(0xbf, 0xbf).w(FUNC(segag80v_state::unknown_w));
+	map(0xbd, 0xbe).w(this, FUNC(segag80v_state::multiply_w));
+	map(0xbe, 0xbe).r(this, FUNC(segag80v_state::multiply_r));
+	map(0xbf, 0xbf).w(this, FUNC(segag80v_state::unknown_w));
 
-	map(0xf9, 0xf9).mirror(0x04).w(FUNC(segag80v_state::coin_count_w));
-	map(0xf8, 0xfb).r(FUNC(segag80v_state::mangled_ports_r));
+	map(0xf9, 0xf9).mirror(0x04).w(this, FUNC(segag80v_state::coin_count_w));
+	map(0xf8, 0xfb).r(this, FUNC(segag80v_state::mangled_ports_r));
 	map(0xfc, 0xfc).portr("FC");
 }
 
@@ -892,86 +893,90 @@ static const char *const zektor_sample_names[] =
  *
  *************************************/
 
-void segag80v_state::g80v_base(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80v_state::g80v_base)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, VIDEO_CLOCK/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &segag80v_state::main_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &segag80v_state::opcodes_map);
-	m_maincpu->set_addrmap(AS_IO, &segag80v_state::main_portmap);
-	m_maincpu->set_vblank_int("screen", FUNC(segag80v_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, VIDEO_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_OPCODES_MAP(opcodes_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80v_state,  irq0_line_hold)
+
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(40);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(512, 1536, 640-32, 1408+32);
-	m_screen->set_screen_update(FUNC(segag80v_state::screen_update_segag80v));
 
-	VECTOR(config, m_vector);
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(40)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
+	MCFG_SCREEN_UPDATE_DRIVER(segag80v_state, screen_update_segag80v)
+
+	MCFG_VECTOR_ADD("vector")
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-}
+MACHINE_CONFIG_END
 
-void segag80v_state::elim2(machine_config &config)
-{
+
+MACHINE_CONFIG_START(segag80v_state::elim2)
 	g80v_base(config);
 
 	/* custom sound board */
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(elim_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(elim_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
 
-void segag80v_state::spacfury(machine_config &config)
-{
+
+MACHINE_CONFIG_START(segag80v_state::spacfury)
 	g80v_base(config);
 
 	/* custom sound board */
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(spacfury_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.1);
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(spacfury_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
 	/* speech board */
 	sega_speech_board(config);
-}
+MACHINE_CONFIG_END
 
-void segag80v_state::zektor(machine_config &config)
-{
+
+MACHINE_CONFIG_START(segag80v_state::zektor)
 	g80v_base(config);
 
 	/* custom sound board */
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(8);
-	m_samples->set_samples_names(zektor_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.1);
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(8)
+	MCFG_SAMPLES_NAMES(zektor_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
-	AY8912(config, m_aysnd, VIDEO_CLOCK/4/2).add_route(ALL_OUTPUTS, "speaker", 0.33);
+	MCFG_DEVICE_ADD("aysnd", AY8912, VIDEO_CLOCK/4/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 
 	/* speech board */
 	sega_speech_board(config);
-}
+MACHINE_CONFIG_END
 
 
-void segag80v_state::tacscan(machine_config &config)
-{
+MACHINE_CONFIG_START(segag80v_state::tacscan)
 	g80v_base(config);
 
 	/* universal sound board */
-	SEGAUSB(config, m_usb, 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+	MCFG_SEGAUSB_ADD("usbsnd")
+MACHINE_CONFIG_END
 
 
-void segag80v_state::startrek(machine_config &config)
-{
-	tacscan(config);
+MACHINE_CONFIG_START(segag80v_state::startrek)
+	g80v_base(config);
 
 	/* speech board */
 	sega_speech_board(config);
-}
+
+	/* universal sound board */
+	MCFG_SEGAUSB_ADD("usbsnd")
+MACHINE_CONFIG_END
 
 
 
@@ -1110,7 +1115,7 @@ ROM_START( spacfury ) /* Revision C */
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808c.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x4000, "speech", 0 )
 	ROM_LOAD( "970c.speech-u6",  0x0000, 0x1000, CRC(979d8535) SHA1(1ed097e563319ca6d2b7df9875ce7ee921eae468) )
 	ROM_LOAD( "971c.speech-u5",  0x1000, 0x1000, CRC(022dbd32) SHA1(4e0504b5ccc28094078912673c49571cf83804ab) )
 	ROM_LOAD( "972c.speech-u4",  0x2000, 0x1000, CRC(fad9346d) SHA1(784e5ab0fb00235cfd733c502baf23960923504f) )
@@ -1137,7 +1142,7 @@ ROM_START( spacfurya ) /* Revision A */
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808a.speech-u7",  0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x4000, "speech", 0 )
 	ROM_LOAD( "970.speech-u6",   0x0000, 0x1000, CRC(f3b47b36) SHA1(6ae0b627349664140a7f70799645b368e452d69c) )
 	ROM_LOAD( "971.speech-u5",   0x1000, 0x1000, CRC(e72bbe88) SHA1(efadf8aa448c289cf4d0cf1831255b9ac60820f2) )
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
@@ -1164,7 +1169,7 @@ ROM_START( spacfuryb ) /* Revision B */
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808a.speech-u7",  0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x4000, "speech", 0 )
 	ROM_LOAD( "970.speech-u6",   0x0000, 0x1000, CRC(f3b47b36) SHA1(6ae0b627349664140a7f70799645b368e452d69c) )
 	ROM_LOAD( "971.speech-u5",   0x1000, 0x1000, CRC(e72bbe88) SHA1(efadf8aa448c289cf4d0cf1831255b9ac60820f2) )
 	ROM_LOAD( "972.speech-u4",   0x2000, 0x1000, CRC(8b3da539) SHA1(3a0c4af96a2116fc668a340534582776b2018663) )
@@ -1204,7 +1209,7 @@ ROM_START( zektor )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "1607.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x4000, "speech", 0 )
 	ROM_LOAD( "1608.speech-u6",  0x0000, 0x1000, CRC(637e2b13) SHA1(8a470f9a8a722f7ced340c4d32b4cf6f05b3e848) )
 	ROM_LOAD( "1609.speech-u5",  0x1000, 0x1000, CRC(675ee8e5) SHA1(e314482028b8925ad02e833a1d22224533d0a683) )
 	ROM_LOAD( "1610.speech-u4",  0x2000, 0x1000, CRC(2915c7bd) SHA1(3ed98747b5237aa1b3bab6866292370dc2c7655a) )
@@ -1277,7 +1282,7 @@ ROM_START( startrek )
 	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "1670.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
-	ROM_REGION( 0x4000, SEGASND_SEGASPEECH_REGION, 0 )
+	ROM_REGION( 0x4000, "speech", 0 )
 	ROM_LOAD( "1871.speech-u6",  0x0000, 0x1000, CRC(03713920) SHA1(25a0158cab9983248e91133f96d1849c9e9bcbd2) )
 	ROM_LOAD( "1872.speech-u5",  0x1000, 0x1000, CRC(ebb5c3a9) SHA1(533b6f0499b311f561cf7aba14a7f48ca7c47321) )
 
@@ -1343,6 +1348,7 @@ void segag80v_state::init_spacfury()
 void segag80v_state::init_zektor()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
+	ay8912_device *ay8912 = machine().device<ay8912_device>("aysnd");
 
 	/* configure security */
 	m_decrypt = segag80_security(82);
@@ -1350,7 +1356,7 @@ void segag80v_state::init_zektor()
 	/* configure sound */
 	iospace.install_write_handler(0x38, 0x38, write8_delegate(FUNC(speech_sound_device::data_w), (speech_sound_device*)m_speech));
 	iospace.install_write_handler(0x3b, 0x3b, write8_delegate(FUNC(speech_sound_device::control_w), (speech_sound_device*)m_speech));
-	iospace.install_write_handler(0x3c, 0x3d, write8_delegate(FUNC(ay8912_device::address_data_w), (ay8912_device*)m_aysnd));
+	iospace.install_write_handler(0x3c, 0x3d, write8_delegate(FUNC(ay8912_device::address_data_w), ay8912));
 	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::zektor1_sh_w),this));
 	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::zektor2_sh_w),this));
 

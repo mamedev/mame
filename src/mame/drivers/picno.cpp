@@ -42,11 +42,9 @@ public:
 	{ }
 
 	void picno(machine_config &config);
-
-private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
 };
 

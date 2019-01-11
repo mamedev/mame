@@ -8,13 +8,17 @@
 #include "screen.h"
 
 
+#define MCFG_LADYBUG_VIDEO_GFXDECODE(tag) \
+	downcast<ladybug_video_device &>(*device).set_gfxdecode_tag(tag);
+
+
 // used by ladybug and sraider
 class ladybug_video_device : public device_t
 {
 public:
 	ladybug_video_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfxdecode_tag(char const *tag) { m_gfxdecode.set_tag(tag); }
 
 	DECLARE_READ8_MEMBER(spr_r) { return m_spr_ram[offset & 0x03ff]; }
 	DECLARE_WRITE8_MEMBER(spr_w) { m_spr_ram[offset & 0x03ff] = data; }

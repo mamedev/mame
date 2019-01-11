@@ -30,7 +30,6 @@ Notes:
 #include "emu.h"
 #include "cpu/h8/h83048.h"
 #include "sound/okim6295.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,30 +39,28 @@ Notes:
 class sealy_state : public driver_device
 {
 public:
-	sealy_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	sealy_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")
 	{ }
 
-	void sealy(machine_config &config);
-
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	void sealy_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(sealy);
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void sealy(machine_config &config);
 	void sealy_map(address_map &map);
 };
 
 
-void sealy_state::sealy_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(sealy_state,sealy)
 {
 //  for (int i = 0; i < 32768; i++)
-//      palette.set_pen_color(i, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
+//      palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 uint32_t sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -115,8 +112,9 @@ MACHINE_CONFIG_START(sealy_state::sealy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sealy_state, screen_update_sealy)
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_sealy);
-	PALETTE(config, m_palette, FUNC(sealy_state::sealy_palette), 32768);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sealy)
+	MCFG_PALETTE_ADD("palette", 32768)
+	MCFG_PALETTE_INIT_OWNER(sealy_state, sealy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -31,12 +31,12 @@ DEFINE_DEVICE_TYPE(A2BUS_APPLICARD, a2bus_applicard_device, "a2aplcrd", "PCPI Ap
 
 void a2bus_applicard_device::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(a2bus_applicard_device::dma_r), FUNC(a2bus_applicard_device::dma_w));
+	map(0x0000, 0xffff).rw(this, FUNC(a2bus_applicard_device::dma_r), FUNC(a2bus_applicard_device::dma_w));
 }
 
 void a2bus_applicard_device::z80_io(address_map &map)
 {
-	map(0x00, 0x60).mirror(0xff00).rw(FUNC(a2bus_applicard_device::z80_io_r), FUNC(a2bus_applicard_device::z80_io_w));
+	map(0x00, 0x60).mirror(0xff00).rw(this, FUNC(a2bus_applicard_device::z80_io_r), FUNC(a2bus_applicard_device::z80_io_w));
 }
 
 ROM_START( a2applicard )
@@ -52,12 +52,11 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void a2bus_applicard_device::device_add_mconfig(machine_config &config)
-{
-	Z80(config, m_z80, 6000000); // Z80 runs at 6 MHz
-	m_z80->set_addrmap(AS_PROGRAM, &a2bus_applicard_device::z80_mem);
-	m_z80->set_addrmap(AS_IO, &a2bus_applicard_device::z80_io);
-}
+MACHINE_CONFIG_START(a2bus_applicard_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+	MCFG_DEVICE_IO_MAP(z80_io)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_rom_region - device-specific ROMs

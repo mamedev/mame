@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -21,7 +21,6 @@ namespace bgfx { namespace gl
 			: m_current(NULL)
 			, m_context(0)
 			, m_visualInfo(NULL)
-			, m_display(NULL)
 		{
 		}
 
@@ -45,7 +44,6 @@ namespace bgfx { namespace gl
 		SwapChainGL* m_current;
 		GLXContext m_context;
 		XVisualInfo* m_visualInfo;
-		::Display* m_display;
 	};
 } /* namespace gl */ } // namespace bgfx
 

@@ -40,7 +40,7 @@ sv803_device::sv803_device(const machine_config &mconfig, const char *tag, devic
 void sv803_device::device_start()
 {
 	// register for savestates
-	save_pointer(NAME(m_ram), 0x4000);
+	save_pointer(NAME(m_ram.get()), 0x4000);
 }
 
 //-------------------------------------------------

@@ -21,8 +21,6 @@ namespace util {
 class disasm_interface
 {
 public:
-	virtual ~disasm_interface() = default;
-
 	// independence from emu.h
 	using u8 = osd::u8;
 	using u16 = osd::u16;

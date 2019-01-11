@@ -6,19 +6,14 @@
     Jack the Giant Killer
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_JACK_H
-#define MAME_INCLUDES_JACK_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
-#include "emupal.h"
 
 class jack_state : public driver_device
 {
 public:
-	jack_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	jack_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_spriteram(*this, "spriteram"),
@@ -31,19 +26,6 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
-	void joinem(machine_config &config);
-	void treahunt(machine_config &config);
-	void unclepoo(machine_config &config);
-	void striv(machine_config &config);
-	void jack(machine_config &config);
-
-	void init_zzyzzyxx();
-	void init_striv();
-	void init_treahunt();
-	void init_loverboy();
-	void init_jack();
-
-private:
 	/* device- and memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -77,11 +59,17 @@ private:
 	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
 	DECLARE_READ8_MEMBER(timer_r);
 
+	void init_zzyzzyxx();
+	void init_striv();
+	void init_treahunt();
+	void init_loverboy();
+	void init_jack();
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
 	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
 	DECLARE_VIDEO_START(joinem);
-	void joinem_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(joinem);
 	DECLARE_MACHINE_START(striv);
 	DECLARE_MACHINE_RESET(striv);
 	DECLARE_MACHINE_START(joinem);
@@ -99,6 +87,11 @@ private:
 	void jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void treahunt_decode(  );
+	void joinem(machine_config &config);
+	void treahunt(machine_config &config);
+	void unclepoo(machine_config &config);
+	void striv(machine_config &config);
+	void jack(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void jack_map(address_map &map);
 	void joinem_map(address_map &map);
@@ -107,5 +100,3 @@ private:
 	void striv_map(address_map &map);
 	void unclepoo_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_JACK_H

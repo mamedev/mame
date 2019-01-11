@@ -2,8 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Intel 8275 Programmable CRT Controller
-    Intel 8276 Small Systems CRT Controller
+    Intel 8275 Programmable CRT Controller emulation
 
 **********************************************************************/
 
@@ -12,6 +11,7 @@
     TODO:
 
     - double spaced rows
+    - end of row/screen - stop dma
     - preset counters - how it affects DMA and HRTC?
 
 */
@@ -41,7 +41,7 @@ static const int DMA_BURST_SPACING[] = { 0, 7, 15, 23, 31, 39, 47, 55 };
 	((m_param[REG_SCN1] & 0x7f) + 1)
 
 #define VRTC_ROW_COUNT \
-	((m_param[REG_SCN2] >> 6) + 1)
+	((m_param[REG_SCN2] >> 5) + 1)
 
 #define CHARACTER_ROWS_PER_FRAME \
 	((m_param[REG_SCN2] & 0x3f) + 1)
@@ -84,9 +84,8 @@ const int i8275_device::character_attribute[3][16] =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-// device type definitions
-DEFINE_DEVICE_TYPE(I8275, i8275_device, "i8275", "Intel 8275 CRTC")
-DEFINE_DEVICE_TYPE(I8276, i8276_device, "i8276", "Intel 8276 CRTC")
+// device type definition
+DEFINE_DEVICE_TYPE(I8275, i8275_device, "i8275x", "Intel 8275 CRTC")
 
 
 
@@ -98,8 +97,8 @@ DEFINE_DEVICE_TYPE(I8276, i8276_device, "i8276", "Intel 8276 CRTC")
 //  i8275_device - constructor
 //-------------------------------------------------
 
-i8275_device::i8275_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
+i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, I8275, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_drq(*this),
@@ -111,7 +110,7 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_buffer_idx(0),
 	m_fifo_idx(0),
 	m_dma_idx(0),
-	m_dma_last_char(0),
+	m_fifo_next(false),
 	m_buffer_dma(0),
 	m_lpen(0),
 	m_hlgt(0),
@@ -128,16 +127,6 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_stored_attr(0)
 {
 	memset(m_param, 0x00, sizeof(m_param));
-}
-
-i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8275_device(mconfig, I8275, tag, owner, clock)
-{
-}
-
-i8276_device::i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	i8275_device(mconfig, I8276, tag, owner, clock)
-{
 }
 
 
@@ -172,7 +161,7 @@ void i8275_device::device_start()
 	save_item(NAME(m_buffer_idx));
 	save_item(NAME(m_fifo_idx));
 	save_item(NAME(m_dma_idx));
-	save_item(NAME(m_dma_last_char));
+	save_item(NAME(m_fifo_next));
 	save_item(NAME(m_buffer_dma));
 	save_item(NAME(m_lpen));
 	save_item(NAME(m_hlgt));
@@ -226,7 +215,6 @@ void i8275_device::vrtc_start()
 		m_rvv = 0;
 		m_lten = 0;
 
-		m_buffer_idx = CHARACTERS_PER_ROW;
 		m_dma_stop = false;
 		m_end_of_screen = false;
 
@@ -249,21 +237,6 @@ void i8275_device::vrtc_end()
 {
 	//LOG("I8275 y %u x %u VRTC 0\n", y, x);
 	m_write_vrtc(0);
-}
-
-
-//-------------------------------------------------
-//  dma_start - start DMA for a new row
-//-------------------------------------------------
-
-void i8275_device::dma_start()
-{
-	m_buffer_idx = 0;
-	m_fifo_idx = 0;
-	m_dma_idx = 0;
-	m_dma_last_char = 0;
-
-	m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
 }
 
 
@@ -297,32 +270,41 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		if (m_scanline == 0)
 			vrtc_end();
 
-		if ((m_status & ST_VE) && lc == 0 && m_scanline < m_vrtc_scanline)
+		if ((m_status & ST_VE) && m_scanline <= (m_vrtc_scanline - SCANLINES_PER_ROW))
 		{
-			if (!m_dma_stop && m_buffer_idx < CHARACTERS_PER_ROW)
+			if (lc == 0)
 			{
-				m_status |= ST_DU;
-				m_dma_stop = true;
+				if (m_dma_idx < CHARACTERS_PER_ROW)
+				{
+					m_status |= ST_DU;
+					m_dma_stop = true;
 
-				// blank screen until after VRTC
-				m_end_of_screen = true;
+					// blank screen until after VRTC
+					m_end_of_screen = true;
 
-				//LOG("I8275 y %u x %u DMA Underrun\n", y, x);
+					//LOG("I8275 y %u x %u DMA Underrun\n", y, x);
 
-				m_write_drq(0);
-			}
+					m_write_drq(0);
+				}
 
-			if (!m_dma_stop)
-			{
-				// swap line buffers
-				m_buffer_dma = !m_buffer_dma;
+				if (!m_dma_stop)
+				{
+					// swap line buffers
+					m_buffer_dma = !m_buffer_dma;
+					m_buffer_idx = 0;
+					m_fifo_idx = 0;
+					m_dma_idx = 0;
 
-				if (m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW))
-					dma_start();
+					if ((m_scanline < (m_vrtc_scanline - SCANLINES_PER_ROW)))
+					{
+						// start DMA burst
+						m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
+					}
+				}
 			}
 		}
 
-		if ((m_status & ST_IE) && !(m_status & ST_IR) && m_scanline == m_irq_scanline)
+		if ((m_status & ST_IE) && m_scanline == m_irq_scanline)
 		{
 			//LOG("I8275 y %u x %u IRQ 1\n", y, x);
 			m_status |= ST_IR;
@@ -336,16 +318,18 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		{
 			// swap line buffers
 			m_buffer_dma = !m_buffer_dma;
+			m_buffer_idx = 0;
+			m_fifo_idx = 0;
+			m_dma_idx = 0;
 
 			// start DMA burst
-			dma_start();
+			m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
 		}
 
 		if ((m_status & ST_VE) && m_scanline < m_vrtc_scanline)
 		{
 			int line_counter = OFFSET_LINE_COUNTER ? ((lc - 1) % SCANLINES_PER_ROW) : lc;
-			bool end_of_row = false;
-			bool blank_row = (UNDERLINE >= 8) && ((lc == 0) || (lc == SCANLINES_PER_ROW - 1));
+			bool end_of_row = (UNDERLINE >= 8) && ((lc == 0) || (lc == SCANLINES_PER_ROW - 1));
 			int fifo_idx = 0;
 			m_hlgt = (m_stored_attr & FAC_H) ? 1 : 0;
 			m_vsp = (m_stored_attr & FAC_B) ? 1 : 0;
@@ -459,7 +443,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 					}
 				}
 
-				if (blank_row || end_of_row || m_end_of_screen)
+				if (end_of_row || m_end_of_screen)
 				{
 					vsp = 1;
 				}
@@ -566,7 +550,7 @@ WRITE8_MEMBER( i8275_device::write )
 		case CMD_RESET:
 			LOG("I8275 Reset\n");
 
-			m_status &= ~(ST_IE | ST_IR | ST_VE);
+			m_status &= ~(ST_IE | ST_VE);
 			LOG("I8275 IRQ 0\n");
 			m_write_irq(CLEAR_LINE);
 			m_write_drq(0);
@@ -654,7 +638,7 @@ WRITE8_MEMBER( i8275_device::dack_w )
 
 	m_write_drq(0);
 
-	if (!VISIBLE_FIELD_ATTRIBUTE && ((m_dma_last_char & 0xc0) == 0x80))
+	if (m_fifo_next)
 	{
 		if (m_fifo_idx == 16)
 		{
@@ -662,32 +646,38 @@ WRITE8_MEMBER( i8275_device::dack_w )
 			m_status |= ST_FO;
 		}
 
-		// FIFO is 7 bits wide
-		m_fifo[m_buffer_dma][m_fifo_idx++] = data & 0x7f;
+		m_fifo[m_buffer_dma][m_fifo_idx++] = data;
 
-		data = 0;
+		m_fifo_next = false;
 	}
-	else if (m_buffer_idx < CHARACTERS_PER_ROW)
+	else
 	{
-		m_buffer[m_buffer_dma][m_buffer_idx++] = data;
+		if (m_dma_idx < ARRAY_LENGTH(m_buffer[m_buffer_dma]))
+			m_buffer[m_buffer_dma][m_buffer_idx++] = data;
+
+		if (!VISIBLE_FIELD_ATTRIBUTE && ((data & 0xc0) == 0x80))
+		{
+			m_fifo_next = true;
+		}
 	}
 
 	m_dma_idx++;
 
-	switch (m_dma_last_char)
+	switch (data)
 	{
 	case SCC_END_OF_ROW_DMA:
 		// stop DMA
-		m_buffer_idx = CHARACTERS_PER_ROW;
+		// TODO should read one more character if DMA burst not completed
+		m_drq_on_timer->adjust(screen().time_until_pos(screen().vpos() + 1, 0));
 		break;
 
 	case SCC_END_OF_SCREEN_DMA:
 		m_dma_stop = true;
-		m_buffer_idx = CHARACTERS_PER_ROW;
+		// TODO should read one more character if DMA burst not completed
 		break;
 
 	default:
-		if (m_buffer_idx == CHARACTERS_PER_ROW)
+		if (m_dma_idx == CHARACTERS_PER_ROW)
 		{
 			// stop DMA
 		}
@@ -700,8 +690,6 @@ WRITE8_MEMBER( i8275_device::dack_w )
 			m_drq_on_timer->adjust(attotime::zero);
 		}
 	}
-
-	m_dma_last_char = data;
 }
 
 

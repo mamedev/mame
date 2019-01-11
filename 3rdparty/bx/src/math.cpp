@@ -1,302 +1,152 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "bx_p.h"
 #include <bx/math.h>
-#include <bx/uint32_t.h>
+
+#include <math.h>
 
 namespace bx
 {
-	const float kInfinity = bitsToFloat(UINT32_C(0x7f800000) );
+	const float kPi         = 3.1415926535897932384626433832795f;
+	const float kPi2        = 6.2831853071795864769252867665590f;
+	const float kInvPi      = 1.0f/kPi;
+	const float kPiHalf     = 1.5707963267948966192313216916398f;
+	const float kSqrt2      = 1.4142135623730950488016887242097f;
+	const float kInvLogNat2 = 1.4426950408889634073599246810019f;
+#if BX_COMPILER_MSVC
+	const float kHuge = float(HUGE_VAL);
+#else
+	const float kHuge = HUGE_VALF;
+#endif // BX_COMPILER_MSVC
 
-	namespace
+	float fabs(float _a)
 	{
-		constexpr float kSinC2  = -0.16666667163372039794921875f;
-		constexpr float kSinC4  =  8.333347737789154052734375e-3f;
-		constexpr float kSinC6  = -1.9842604524455964565277099609375e-4f;
-		constexpr float kSinC8  =  2.760012648650445044040679931640625e-6f;
-		constexpr float kSinC10 = -2.50293279435709337121807038784027099609375e-8f;
-
-		constexpr float kCosC2  = -0.5f;
-		constexpr float kCosC4  =  4.166664183139801025390625e-2f;
-		constexpr float kCosC6  = -1.388833043165504932403564453125e-3f;
-		constexpr float kCosC8  =  2.47562347794882953166961669921875e-5f;
-		constexpr float kCosC10 = -2.59630184018533327616751194000244140625e-7f;
-
-	} // namespace
-
-	BX_CONST_FUNC float cos(float _a)
-	{
-		const float scaled = _a * 2.0f*kInvPi;
-		const float real   = floor(scaled);
-		const float xx     = _a - real * kPiHalf;
-		const int32_t bits = int32_t(real) & 3;
-
-		float c0, c2, c4, c6, c8, c10;
-
-		if (bits == 0
-		||  bits == 2)
-		{
-			c0  = 1.0f;
-			c2  = kCosC2;
-			c4  = kCosC4;
-			c6  = kCosC6;
-			c8  = kCosC8;
-			c10 = kCosC10;
-		}
-		else
-		{
-			c0  = xx;
-			c2  = kSinC2;
-			c4  = kSinC4;
-			c6  = kSinC6;
-			c8  = kSinC8;
-			c10 = kSinC10;
-		}
-
-		const float xsq    = square(xx);
-		const float tmp0   = mad(c10,  xsq, c8 );
-		const float tmp1   = mad(tmp0, xsq, c6 );
-		const float tmp2   = mad(tmp1, xsq, c4 );
-		const float tmp3   = mad(tmp2, xsq, c2 );
-		const float tmp4   = mad(tmp3, xsq, 1.0);
-		const float result = tmp4 * c0;
-
-		return bits == 1 || bits == 2
-			? -result
-			:  result
-			;
+		return ::fabsf(_a);
 	}
 
-	namespace
+	float fsin(float _a)
 	{
-		constexpr float kAcosC0 =  1.5707288f;
-		constexpr float kAcosC1 = -0.2121144f;
-		constexpr float kAcosC2 =  0.0742610f;
-		constexpr float kAcosC3 = -0.0187293f;
-
-	} // namespace
-
-	BX_CONST_FUNC float acos(float _a)
-	{
-		const float absa   = abs(_a);
-		const float tmp0   = mad(kAcosC3, absa, kAcosC2);
-		const float tmp1   = mad(tmp0,    absa, kAcosC1);
-		const float tmp2   = mad(tmp1,    absa, kAcosC0);
-		const float tmp3   = tmp2 * sqrt(1.0f - absa);
-		const float negate = float(_a < 0.0f);
-		const float tmp4   = tmp3 - 2.0f*negate*tmp3;
-		const float result = negate*kPi + tmp4;
-
-		return result;
+		return ::sinf(_a);
 	}
 
-	namespace
+	float fasin(float _a)
 	{
-		constexpr float kAtan2C0 = -0.013480470f;
-		constexpr float kAtan2C1 =  0.057477314f;
-		constexpr float kAtan2C2 = -0.121239071f;
-		constexpr float kAtan2C3 =  0.195635925f;
-		constexpr float kAtan2C4 = -0.332994597f;
-		constexpr float kAtan2C5 =  0.999995630f;
+		return ::asinf(_a);
+	}
 
-	} // namespace
-
-	BX_CONST_FUNC float atan2(float _y, float _x)
+	float fcos(float _a)
 	{
-		const float ax     = abs(_x);
-		const float ay     = abs(_y);
-		const float maxaxy = max(ax, ay);
-		const float minaxy = min(ax, ay);
+		return ::cosf(_a);
+	}
 
-		if (maxaxy == 0.0f)
+	float ftan(float _a)
+	{
+		return ::tanf(_a);
+	}
+
+	float facos(float _a)
+	{
+		return ::acosf(_a);
+	}
+
+	float fatan2(float _y, float _x)
+	{
+		return ::atan2f(_y, _x);
+	}
+
+	float fpow(float _a, float _b)
+	{
+		return ::powf(_a, _b);
+	}
+
+	float flog(float _a)
+	{
+		return ::logf(_a);
+	}
+
+	float fsqrt(float _a)
+	{
+		return ::sqrtf(_a);
+	}
+
+	float ffloor(float _f)
+	{
+		return ::floorf(_f);
+	}
+
+	float fceil(float _f)
+	{
+		return ::ceilf(_f);
+	}
+
+	float fmod(float _a, float _b)
+	{
+		return ::fmodf(_a, _b);
+	}
+
+	void mtxLookAtImpl(float* _result, const float* _eye, const float* _view, const float* _up)
+	{
+		float up[3] = { 0.0f, 1.0f, 0.0f };
+		if (NULL != _up)
 		{
-			return 0.0f*sign(_y);
+			up[0] = _up[0];
+			up[1] = _up[1];
+			up[2] = _up[2];
 		}
 
-		const float mxy    = minaxy / maxaxy;
-		const float mxysq  = square(mxy);
-		const float tmp0   = mad(kAtan2C0, mxysq, kAtan2C1);
-		const float tmp1   = mad(tmp0,     mxysq, kAtan2C2);
-		const float tmp2   = mad(tmp1,     mxysq, kAtan2C3);
-		const float tmp3   = mad(tmp2,     mxysq, kAtan2C4);
-		const float tmp4   = mad(tmp3,     mxysq, kAtan2C5);
-		const float tmp5   = tmp4 * mxy;
-		const float tmp6   = ay > ax   ? kPiHalf - tmp5 : tmp5;
-		const float tmp7   = _x < 0.0f ? kPi     - tmp6 : tmp6;
-		const float result = sign(_y)*tmp7;
+		float tmp[4];
+		vec3Cross(tmp, up, _view);
 
-		return result;
-	}
+		float right[4];
+		vec3Norm(right, tmp);
 
-	BX_CONST_FUNC float ldexp(float _a, int32_t _b)
-	{
-		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked   = uint32_and(ftob, UINT32_C(0xff800000) );
-		const uint32_t expsign0 = uint32_sra(masked, 23);
-		const uint32_t tmp      = uint32_iadd(expsign0, _b);
-		const uint32_t expsign1 = uint32_sll(tmp, 23);
-		const uint32_t mantissa = uint32_and(ftob, UINT32_C(0x007fffff) );
-		const uint32_t bits     = uint32_or(mantissa, expsign1);
-		const float    result   = bitsToFloat(bits);
-
-		return result;
-	}
-
-	float frexp(float _a, int32_t* _outExp)
-	{
-		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked0  = uint32_and(ftob, UINT32_C(0x7f800000) );
-		const uint32_t exp0     = uint32_srl(masked0, 23);
-		const uint32_t masked1  = uint32_and(ftob,   UINT32_C(0x807fffff) );
-		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
-		const float    result   = bitsToFloat(bits);
-
-		*_outExp = int32_t(exp0 - 0x7e);
-
-		return result;
-	}
-
-	namespace
-	{
-		constexpr float kExpC0  =  1.66666666666666019037e-01f;
-		constexpr float kExpC1  = -2.77777777770155933842e-03f;
-		constexpr float kExpC2  =  6.61375632143793436117e-05f;
-		constexpr float kExpC3  = -1.65339022054652515390e-06f;
-		constexpr float kExpC4  =  4.13813679705723846039e-08f;
-
-	} // namespace
-
-	BX_CONST_FUNC float exp(float _a)
-	{
-		if (abs(_a) <= kNearZero)
-		{
-			return _a + 1.0f;
-		}
-
-		const float kk     = round(_a*kInvLogNat2);
-		const float hi     = _a - kk*kLogNat2Hi;
-		const float lo     =      kk*kLogNat2Lo;
-		const float hml    = hi - lo;
-		const float hmlsq  = square(hml);
-		const float tmp0   = mad(kExpC4, hmlsq, kExpC3);
-		const float tmp1   = mad(tmp0,   hmlsq, kExpC2);
-		const float tmp2   = mad(tmp1,   hmlsq, kExpC1);
-		const float tmp3   = mad(tmp2,   hmlsq, kExpC0);
-		const float tmp4   = hml - hmlsq * tmp3;
-		const float tmp5   = hml*tmp4/(2.0f-tmp4);
-		const float tmp6   = 1.0f - ( (lo - tmp5) - hi);
-		const float result = ldexp(tmp6, int32_t(kk) );
-
-		return result;
-	}
-
-	namespace
-	{
-		constexpr float kLogC0 = 6.666666666666735130e-01f;
-		constexpr float kLogC1 = 3.999999999940941908e-01f;
-		constexpr float kLogC2 = 2.857142874366239149e-01f;
-		constexpr float kLogC3 = 2.222219843214978396e-01f;
-		constexpr float kLogC4 = 1.818357216161805012e-01f;
-		constexpr float kLogC5 = 1.531383769920937332e-01f;
-		constexpr float kLogC6 = 1.479819860511658591e-01f;
-
-	} // namespace
-
-	BX_CONST_FUNC float log(float _a)
-	{
-		int32_t exp;
-		float ff = frexp(_a, &exp);
-		if (ff < kSqrt2*0.5f)
-		{
-			ff *= 2.0f;
-			--exp;
-		}
-
-		ff -= 1.0f;
-		const float kk     = float(exp);
-		const float hi     = kk*kLogNat2Hi;
-		const float lo     = kk*kLogNat2Lo;
-		const float ss     = ff / (2.0f + ff);
-		const float s2     = square(ss);
-		const float s4     = square(s2);
-
-		const float tmp0   = mad(kLogC6, s4, kLogC4);
-		const float tmp1   = mad(tmp0,   s4, kLogC2);
-		const float tmp2   = mad(tmp1,   s4, kLogC0);
-		const float t1     = s2*tmp2;
-
-		const float tmp3   = mad(kLogC5, s4, kLogC3);
-		const float tmp4   = mad(tmp3,   s4, kLogC1);
-		const float t2     = s4*tmp4;
-
-		const float t12    = t1 + t2;
-		const float hfsq   = 0.5f*square(ff);
-		const float result = hi - ( (hfsq - (ss*(hfsq+t12) + lo) ) - ff);
-
-		return result;
-	}
-
-	BX_CONST_FUNC float floor(float _a)
-	{
-		if (_a < 0.0f)
-		{
-			const float fr = fract(-_a);
-			const float result = -_a - fr;
-
-			return -(0.0f != fr
-				? result + 1.0f
-				: result)
-				;
-		}
-
-		return _a - fract(_a);
-	}
-
-	static void mtxLookAtImpl(float* _result, const Vec3& _eye, const Vec3& _view, const Vec3& _up)
-	{
-		const Vec3 uxv   = cross(_up, _view);
-		const Vec3 right = normalize(uxv);
-		const Vec3 up    = cross(_view, right);
+		vec3Cross(up, _view, right);
 
 		memSet(_result, 0, sizeof(float)*16);
-		_result[ 0] = right.x;
-		_result[ 1] = up.x;
-		_result[ 2] = _view.x;
+		_result[ 0] = right[0];
+		_result[ 1] = up[0];
+		_result[ 2] = _view[0];
 
-		_result[ 4] = right.y;
-		_result[ 5] = up.y;
-		_result[ 6] = _view.y;
+		_result[ 4] = right[1];
+		_result[ 5] = up[1];
+		_result[ 6] = _view[1];
 
-		_result[ 8] = right.z;
-		_result[ 9] = up.z;
-		_result[10] = _view.z;
+		_result[ 8] = right[2];
+		_result[ 9] = up[2];
+		_result[10] = _view[2];
 
-		_result[12] = -dot(right, _eye);
-		_result[13] = -dot(up, _eye);
-		_result[14] = -dot(_view, _eye);
+		_result[12] = -vec3Dot(right, _eye);
+		_result[13] = -vec3Dot(up, _eye);
+		_result[14] = -vec3Dot(_view, _eye);
 		_result[15] = 1.0f;
 	}
 
-	void mtxLookAtLh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
+	void mtxLookAtLh(float* _result, const float* _eye, const float* _at, const float* _up)
 	{
-		const Vec3 tmp  = sub(_at, _eye);
-		const Vec3 view = normalize(tmp);
+		float tmp[4];
+		vec3Sub(tmp, _at, _eye);
+
+		float view[4];
+		vec3Norm(view, tmp);
 
 		mtxLookAtImpl(_result, _eye, view, _up);
 	}
 
-	void mtxLookAtRh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
+	void mtxLookAtRh(float* _result, const float* _eye, const float* _at, const float* _up)
 	{
-		const Vec3 tmp = sub(_eye, _at);
-		const Vec3 view = normalize(tmp);
+		float tmp[4];
+		vec3Sub(tmp, _eye, _at);
+
+		float view[4];
+		vec3Norm(view, tmp);
 
 		mtxLookAtImpl(_result, _eye, view, _up);
 	}
 
-	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
+	void mtxLookAt(float* _result, const float* _eye, const float* _at, const float* _up)
 	{
 		mtxLookAtLh(_result, _eye, _at, _up);
 	}
@@ -339,7 +189,7 @@ namespace bx
 	template<Handness::Enum HandnessT>
 	void mtxProjImpl(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc)
 	{
-		const float height = 1.0f/tan(toRad(_fovy)*0.5f);
+		const float height = 1.0f/ftan(toRad(_fovy)*0.5f);
 		const float width  = height * 1.0f/_aspect;
 		mtxProjXYWH<HandnessT>(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
 	}
@@ -436,7 +286,7 @@ namespace bx
 	template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
 	void mtxProjInfImpl(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc)
 	{
-		const float height = 1.0f/tan(toRad(_fovy)*0.5f);
+		const float height = 1.0f/ftan(toRad(_fovy)*0.5f);
 		const float width  = height * 1.0f/_aspect;
 		mtxProjInfXYWH<NearFarT,HandnessT>(_result, 0.0f, 0.0f, width, height, _near, _oglNdc);
 	}
@@ -556,8 +406,8 @@ namespace bx
 
 	void mtxRotateX(float* _result, float _ax)
 	{
-		const float sx = sin(_ax);
-		const float cx = cos(_ax);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = 1.0f;
@@ -570,8 +420,8 @@ namespace bx
 
 	void mtxRotateY(float* _result, float _ay)
 	{
-		const float sy = sin(_ay);
-		const float cy = cos(_ay);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy;
@@ -584,8 +434,8 @@ namespace bx
 
 	void mtxRotateZ(float* _result, float _az)
 	{
-		const float sz = sin(_az);
-		const float cz = cos(_az);
+		const float sz = fsin(_az);
+		const float cz = fcos(_az);
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cz;
@@ -598,10 +448,10 @@ namespace bx
 
 	void mtxRotateXY(float* _result, float _ax, float _ay)
 	{
-		const float sx = sin(_ax);
-		const float cx = cos(_ax);
-		const float sy = sin(_ay);
-		const float cy = cos(_ay);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy;
@@ -617,12 +467,12 @@ namespace bx
 
 	void mtxRotateXYZ(float* _result, float _ax, float _ay, float _az)
 	{
-		const float sx = sin(_ax);
-		const float cx = cos(_ax);
-		const float sy = sin(_ay);
-		const float cy = cos(_ay);
-		const float sz = sin(_az);
-		const float cz = cos(_az);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
+		const float sz = fsin(_az);
+		const float cz = fcos(_az);
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
@@ -639,12 +489,12 @@ namespace bx
 
 	void mtxRotateZYX(float* _result, float _ax, float _ay, float _az)
 	{
-		const float sx = sin(_ax);
-		const float cx = cos(_ax);
-		const float sy = sin(_ay);
-		const float cy = cos(_ay);
-		const float sz = sin(_az);
-		const float cz = cos(_az);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
+		const float sz = fsin(_az);
+		const float cz = fcos(_az);
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
@@ -661,12 +511,12 @@ namespace bx
 
 	void mtxSRT(float* _result, float _sx, float _sy, float _sz, float _ax, float _ay, float _az, float _tx, float _ty, float _tz)
 	{
-		const float sx = sin(_ax);
-		const float cx = cos(_ax);
-		const float sy = sin(_ay);
-		const float cy = cos(_ay);
-		const float sz = sin(_az);
-		const float cz = cos(_az);
+		const float sx = fsin(_ax);
+		const float cx = fcos(_ax);
+		const float sy = fsin(_ay);
+		const float cy = fcos(_ay);
+		const float sz = fsin(_az);
+		const float cz = fcos(_az);
 
 		const float sxsz = sx*sz;
 		const float cycz = cy*cz;
@@ -854,24 +704,24 @@ namespace bx
 		const float gg = _rgb[1];
 		const float bb = _rgb[2];
 
-		const float s0 = step(bb, gg);
+		const float s0 = fstep(bb, gg);
 
-		const float px = lerp(bb,        gg,         s0);
-		const float py = lerp(gg,        bb,         s0);
-		const float pz = lerp(-1.0f,     0.0f,       s0);
-		const float pw = lerp(2.0f/3.0f, -1.0f/3.0f, s0);
+		const float px = flerp(bb,        gg,         s0);
+		const float py = flerp(gg,        bb,         s0);
+		const float pz = flerp(-1.0f,     0.0f,       s0);
+		const float pw = flerp(2.0f/3.0f, -1.0f/3.0f, s0);
 
-		const float s1 = step(px, rr);
+		const float s1 = fstep(px, rr);
 
-		const float qx = lerp(px, rr, s1);
+		const float qx = flerp(px, rr, s1);
 		const float qy = py;
-		const float qz = lerp(pw, pz, s1);
-		const float qw = lerp(rr, px, s1);
+		const float qz = flerp(pw, pz, s1);
+		const float qw = flerp(rr, px, s1);
 
-		const float dd = qx - min(qw, qy);
+		const float dd = qx - fmin(qw, qy);
 		const float ee = 1.0e-10f;
 
-		_hsv[0] = abs(qz + (qw - qy) / (6.0f * dd + ee) );
+		_hsv[0] = fabs(qz + (qw - qy) / (6.0f * dd + ee) );
 		_hsv[1] = dd / (qx + ee);
 		_hsv[2] = qx;
 	}
@@ -882,13 +732,13 @@ namespace bx
 		const float ss = _hsv[1];
 		const float vv = _hsv[2];
 
-		const float px = abs(fract(hh + 1.0f     ) * 6.0f - 3.0f);
-		const float py = abs(fract(hh + 2.0f/3.0f) * 6.0f - 3.0f);
-		const float pz = abs(fract(hh + 1.0f/3.0f) * 6.0f - 3.0f);
+		const float px = fabs(ffract(hh + 1.0f     ) * 6.0f - 3.0f);
+		const float py = fabs(ffract(hh + 2.0f/3.0f) * 6.0f - 3.0f);
+		const float pz = fabs(ffract(hh + 1.0f/3.0f) * 6.0f - 3.0f);
 
-		_rgb[0] = vv * lerp(1.0f, clamp(px - 1.0f, 0.0f, 1.0f), ss);
-		_rgb[1] = vv * lerp(1.0f, clamp(py - 1.0f, 0.0f, 1.0f), ss);
-		_rgb[2] = vv * lerp(1.0f, clamp(pz - 1.0f, 0.0f, 1.0f), ss);
+		_rgb[0] = vv * flerp(1.0f, fsaturate(px - 1.0f), ss);
+		_rgb[1] = vv * flerp(1.0f, fsaturate(py - 1.0f), ss);
+		_rgb[2] = vv * flerp(1.0f, fsaturate(pz - 1.0f), ss);
 	}
 
 } // namespace bx

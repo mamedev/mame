@@ -14,8 +14,34 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
-#include "emupal.h"
 #include "screen.h"
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_SEGA_315_5195_CPU(_cputag) \
+	downcast<sega_315_5195_mapper_device &>(*device).set_cputag(_cputag);
+#define MCFG_SEGA_315_5195_MAPPER_HANDLER(_class, _mapper) \
+	downcast<sega_315_5195_mapper_device &>(*device).set_mapper(sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
+#define MCFG_SEGA_315_5195_PBF_CALLBACK(_devcb) \
+	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_pbf_callback(DEVCB_##_devcb);
+#define MCFG_SEGA_315_5195_MCU_INT_CALLBACK(_devcb) \
+	devcb = &downcast<sega_315_5195_mapper_device &>(*device).set_mcu_int_callback(DEVCB_##_devcb);
+
+#define MCFG_SEGA_315_5248_MULTIPLIER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA_315_5248_MULTIPLIER, 0)
+
+#define MCFG_SEGA_315_5249_DIVIDER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA_315_5249_DIVIDER, 0)
+
+#define MCFG_SEGA_315_5250_COMPARE_TIMER_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA_315_5250_COMPARE_TIMER, 0)
+#define MCFG_SEGA_315_5250_TIMER_ACK(_class, _func) \
+	downcast<sega_315_5250_compare_timer_device &>(*device).set_timer_ack(sega_315_5250_compare_timer_device::timer_ack_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
+#define MCFG_SEGA_315_5250_SOUND_WRITE_CALLBACK(_devcb) \
+	devcb = &downcast<sega_315_5250_compare_timer_device &>(*device).set_sound_write(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -42,7 +68,7 @@ protected:
 	// internal helpers
 	void palette_init();
 
-public: // -- stupid system16.cpp
+public: // -- stupid system16.c
 	// memory pointers
 	required_shared_ptr<uint16_t> m_paletteram;
 protected:
@@ -66,21 +92,17 @@ public:
 	typedef device_delegate<void (sega_315_5195_mapper_device &, uint8_t)> mapper_delegate;
 
 	// construction/destruction
-	template <typename T>
-	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: sega_315_5195_mapper_device(mconfig, tag, owner, clock)
-	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-		m_cpuregion.set_tag(std::forward<T>(cpu_tag));
-	}
-
 	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <typename... T> void set_mapper(T &&... args) { m_mapper = mapper_delegate(std::forward<T>(args)...); }
-
-	auto pbf() { return m_pbf_callback.bind(); }
-	auto mcu_int() { return m_mcu_int_callback.bind(); }
+	void set_cputag(const char *cpu)
+	{
+		m_cpu.set_tag(cpu);
+		m_cpuregion.set_tag(cpu);
+	}
+	void set_mapper(mapper_delegate callback) { m_mapper = callback; }
+	template<class Object> devcb_base &set_pbf_callback(Object &&object) { return m_pbf_callback.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_mcu_int_callback(Object &&object) { return m_mcu_int_callback.set_callback(std::forward<Object>(object)); }
 
 	// public interface
 	DECLARE_READ8_MEMBER( read );
@@ -225,18 +247,19 @@ private:
 class sega_315_5250_compare_timer_device : public device_t
 {
 public:
+	typedef device_delegate<void ()> timer_ack_delegate;
+
 	// construction/destruction
 	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto m68kint_callback() { return m_68kint_callback.bind(); }
-	auto zint_callback() { return m_zint_callback.bind(); }
+	void set_timer_ack(timer_ack_delegate callback) { m_timer_ack = callback; }
+	template<class Object> devcb_base &set_sound_write(Object &&object) { return m_sound_write.set_callback(std::forward<Object>(object)); }
 
 	// public interface
-	DECLARE_WRITE_LINE_MEMBER(exck_w);
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ8_MEMBER(zread);
+	bool clock();
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
 
 protected:
 	// device-level overrides
@@ -246,18 +269,16 @@ protected:
 private:
 	// internal helpers
 	void execute(bool update_history = false);
-	void interrupt_ack();
-	TIMER_CALLBACK_MEMBER(write_to_sound);
+	void interrupt_ack() { if (!m_timer_ack.isnull()) m_timer_ack(); }
 
 	// configuration
-	devcb_write_line            m_68kint_callback;
-	devcb_write_line            m_zint_callback;
+	timer_ack_delegate          m_timer_ack;
+	devcb_write8                m_sound_write;
 
 	// internal state
 	uint16_t                      m_regs[16];
 	uint16_t                      m_counter;
 	uint8_t                       m_bit;
-	bool                          m_exck;
 };
 
 

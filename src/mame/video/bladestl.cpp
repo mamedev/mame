@@ -4,18 +4,19 @@
 #include "includes/bladestl.h"
 
 
-void bladestl_state::bladestl_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(bladestl_state, bladestl)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	// characters use pens 0x00-0x1f, no look-up table
-	for (int i = 0; i < 0x20; i++)
+	/* characters use pens 0x00-0x1f, no look-up table */
+	for (i = 0; i < 0x20; i++)
 		palette.set_pen_indirect(i, i);
 
-	// sprites use pens 0x20-0x2f
-	for (int i = 0x20; i < 0x120; i++)
+	/* sprites use pens 0x20-0x2f */
+	for (i = 0x20; i < 0x120; i++)
 	{
-		uint8_t const ctabentry = (color_prom[i - 0x20] & 0x0f) | 0x20;
+		uint8_t ctabentry = (color_prom[i - 0x20] & 0x0f) | 0x20;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

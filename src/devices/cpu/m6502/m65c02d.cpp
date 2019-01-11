@@ -4,8 +4,8 @@
 
     m65c02d.cpp
 
-    MOS Technology 6502, CMOS variant with some additional instructions
-    (but not the bitwise ones), disassembler
+    Mostek 6502, CMOS variant with some additional instructions (but
+    not the bitwise ones), disassembler
 
 ***************************************************************************/
 

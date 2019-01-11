@@ -15,7 +15,18 @@
 #include "cpu/drcuml.h"
 #include "machine/gen_fifo.h"
 
+#define MCFG_MB86235_FIFOIN(tag) \
+	downcast<mb86235_device &>(*device).set_fifoin_tag(tag);
+
+#define MCFG_MB86235_FIFOOUT0(tag) \
+	downcast<mb86235_device &>(*device).set_fifoout0_tag(tag);
+
+#define MCFG_MB86235_FIFOOUT1(tag) \
+	downcast<mb86235_device &>(*device).set_fifoout1_tag(tag);
+
 class mb86235_frontend;
+
+
 
 class mb86235_device :  public cpu_device
 {
@@ -26,9 +37,9 @@ public:
 	mb86235_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t clock);
 	virtual ~mb86235_device() override;
 
-	template <typename T> void set_fifoin_tag(T &&fifo_tag) { m_fifoin.set_tag(std::forward<T>(fifo_tag)); }
-	template <typename T> void set_fifoout0_tag(T &&fifo_tag) { m_fifoout0.set_tag(std::forward<T>(fifo_tag)); }
-	template <typename T> void set_fifoout1_tag(T &&fifo_tag) { m_fifoout1.set_tag(std::forward<T>(fifo_tag)); }
+	void set_fifoin_tag(const char *tag) { m_fifoin.set_tag(tag); }
+	void set_fifoout0_tag(const char *tag) { m_fifoout0.set_tag(tag); }
+	void set_fifoout1_tag(const char *tag) { m_fifoout1.set_tag(tag); }
 
 	void unimplemented_op();
 	void unimplemented_alu();

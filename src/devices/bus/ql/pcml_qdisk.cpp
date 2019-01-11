@@ -26,7 +26,7 @@ ROM_START( pcml_q_disk_interface )
 	ROM_REGION( 0x4000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v114")
 	ROM_SYSTEM_BIOS( 0, "v114", "v1.14" )
-	ROMX_LOAD( "pcml_diskram system_v1.14_1984.rom", 0x0000, 0x4000, CRC(e38b41dd) SHA1(d2038f0b1a62e8e65ec86660d03c25489ce40274), ROM_BIOS(0) )
+	ROMX_LOAD( "pcml_diskram system_v1.14_1984.rom", 0x0000, 0x4000, CRC(e38b41dd) SHA1(d2038f0b1a62e8e65ec86660d03c25489ce40274), ROM_BIOS(1) )
 ROM_END
 
 

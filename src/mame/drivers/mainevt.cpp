@@ -11,25 +11,14 @@ Notes:
 - Schematics show a palette/work RAM bank selector, but this doesn't seem
   to be used?
 
-- Devastators: has player-trench collision detection issues, player isn't
-  supposed to go through them.
-
-- Devastators: shadows don't work. Bit 7 of the sprite attribute is always 0,
+- In Devastators, shadows don't work. Bit 7 of the sprite attribute is always 0,
   could there be a global enable flag in the 051960?
   This is particularly evident in level 2 where plane shadows cover other sprites.
   The priority/shadow encoder PROM is quite complex, however bits 5-7 of the sprite
   attribute don't seem to be used, at least not in the first two levels, so the
   PROM just maps to the fixed priority order currently implemented.
 
-- Devastators: sprite zooming for the planes in level 2 is particularly bad.
-
-- Devastators: title screen white backdrop is always supposed to flicker,
-  it currently do that only from second/fourth attract cycles (supposed to always
-  flicker from PCB video);
-
-Both games run on Konami's PWB351024A PCB
-  The Main Event uses a uPD7759 + 640KHz resonator plus sample ROM, for Devastators this area is unpopulated
-  Devastators uses a YM2151 + YM3012 and the 051733, for The Main Event these chips are unpopulated
+- In Devastators, sprite zooming for the planes in level 2 is particularly bad.
 
 ***************************************************************************/
 
@@ -42,7 +31,6 @@ Both games run on Konami's PWB351024A PCB
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
-#include "emupal.h"
 #include "speaker.h"
 
 
@@ -84,10 +72,10 @@ WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
-	m_leds[0] = BIT(data, 0);
-	m_leds[1] = BIT(data, 1);
-	m_leds[2] = BIT(data, 2);
-	m_leds[3] = BIT(data, 3);
+	m_led[0] = BIT(data, 0);
+	m_led[1] = BIT(data, 1);
+	m_led[2] = BIT(data, 2);
+	m_led[3] = BIT(data, 3);
 }
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
@@ -125,7 +113,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 	m_k007232->set_bank(bank_A, bank_B);
 
 	/* bits 4-5 select the UPD7759 bank */
-	m_upd7759->set_rom_bank((data >> 4) & 0x03);
+	m_upd7759->set_bank_base(((data >> 4) & 0x03) * 0x20000);
 }
 
 WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
@@ -168,13 +156,13 @@ WRITE8_MEMBER(mainevt_state::k052109_051960_w)
 
 void mainevt_state::mainevt_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
+	map(0x0000, 0x3fff).rw(this, FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
 
-	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::mainevt_bankswitch_w));
+	map(0x1f80, 0x1f80).w(this, FUNC(mainevt_state::mainevt_bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); /* probably */
-	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
+	map(0x1f88, 0x1f88).w(this, FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
 	map(0x1f8c, 0x1f8d).nopw();    /* ??? */
-	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
+	map(0x1f90, 0x1f90).w(this, FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -194,12 +182,12 @@ void mainevt_state::mainevt_map(address_map &map)
 
 void mainevt_state::devstors_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
+	map(0x0000, 0x3fff).rw(this, FUNC(mainevt_state::k052109_051960_r), FUNC(mainevt_state::k052109_051960_w));
 
-	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::mainevt_bankswitch_w));
+	map(0x1f80, 0x1f80).w(this, FUNC(mainevt_state::mainevt_bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); /* probably */
-	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
-	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
+	map(0x1f88, 0x1f88).w(this, FUNC(mainevt_state::mainevt_sh_irqtrigger_w));  /* probably */
+	map(0x1f90, 0x1f90).w(this, FUNC(mainevt_state::mainevt_coin_w));   /* coin counters + lamps */
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -208,7 +196,7 @@ void mainevt_state::devstors_map(address_map &map)
 	map(0x1f98, 0x1f98).portr("DSW3");
 	map(0x1f9b, 0x1f9b).portr("DSW2");
 	map(0x1fa0, 0x1fbf).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));
-	map(0x1fb2, 0x1fb2).w(FUNC(mainevt_state::dv_nmienable_w));
+	map(0x1fb2, 0x1fb2).w(this, FUNC(mainevt_state::dv_nmienable_w));
 
 	map(0x4000, 0x5dff).ram();
 	map(0x5e00, 0x5fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -224,9 +212,9 @@ void mainevt_state::mainevt_sound_map(address_map &map)
 	map(0x9000, 0x9000).w(m_upd7759, FUNC(upd7759_device::port_w));
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
-	map(0xd000, 0xd000).r(FUNC(mainevt_state::mainevt_sh_busy_r));
-	map(0xe000, 0xe000).w(FUNC(mainevt_state::mainevt_sh_irqcontrol_w));
-	map(0xf000, 0xf000).w(FUNC(mainevt_state::mainevt_sh_bankswitch_w));
+	map(0xd000, 0xd000).r(this, FUNC(mainevt_state::mainevt_sh_busy_r));
+	map(0xe000, 0xe000).w(this, FUNC(mainevt_state::mainevt_sh_irqcontrol_w));
+	map(0xf000, 0xf000).w(this, FUNC(mainevt_state::mainevt_sh_bankswitch_w));
 }
 
 void mainevt_state::devstors_sound_map(address_map &map)
@@ -236,8 +224,8 @@ void mainevt_state::devstors_sound_map(address_map &map)
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xe000, 0xe000).w(FUNC(mainevt_state::devstor_sh_irqcontrol_w));
-	map(0xf000, 0xf000).w(FUNC(mainevt_state::dv_sh_bankswitch_w));
+	map(0xe000, 0xe000).w(this, FUNC(mainevt_state::devstor_sh_irqcontrol_w));
+	map(0xf000, 0xf000).w(this, FUNC(mainevt_state::dv_sh_bankswitch_w));
 }
 
 
@@ -381,7 +369,7 @@ static INPUT_PORTS_START( devstors )
 INPUT_PORTS_END
 
 /* Same as 'devstors', but additional "Cocktail" Dip Switch (even if I don't see the use) */
-static INPUT_PORTS_START( devstors_ct )
+static INPUT_PORTS_START( devstor2 )
 	PORT_INCLUDE( devstors )
 
 	PORT_MODIFY("DSW2")
@@ -400,7 +388,7 @@ WRITE8_MEMBER(mainevt_state::volume_callback)
 
 void mainevt_state::machine_start()
 {
-	m_leds.resolve();
+	m_led.resolve();
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 
 	save_item(NAME(m_nmi_enable));
@@ -423,99 +411,103 @@ INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-void mainevt_state::mainevt(machine_config &config)
-{
-	/* basic machine hardware */
-	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // E & Q generated by 052109
-	m_maincpu->set_addrmap(AS_PROGRAM, &mainevt_state::mainevt_map);
-	m_maincpu->set_vblank_int("screen", FUNC(mainevt_state::mainevt_interrupt));
+MACHINE_CONFIG_START(mainevt_state::mainevt)
 
-	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);  /* 3.579545 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &mainevt_state::mainevt_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(mainevt_state::mainevt_sound_timer_irq), attotime::from_hz(8*60));  /* ??? */
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", HD6309E, 3000000)  /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(mainevt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mainevt_state,  mainevt_interrupt)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3.579545_MHz_XTAL)  /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mainevt_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mainevt_state, mainevt_sound_timer_irq, 8*60)  /* ??? */
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(64*8, 32*8);
-//  screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_raw(XTAL(24'000'000)/3, 528, 14*8, (64-14)*8, 256, 16, 240); // same hardware as Devastators so assume 59.17
-	screen.set_screen_update(FUNC(mainevt_state::screen_update_mainevt));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(mainevt_state, screen_update_mainevt)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 256).enable_shadows();
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	K052109(config, m_k052109, 24_MHz_XTAL);
-	m_k052109->set_palette("palette");
-	m_k052109->set_tile_callback(FUNC(mainevt_state::mainevt_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 24_MHz_XTAL)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(mainevt_state, mainevt_tile_callback)
 
-	K051960(config, m_k051960, 24_MHz_XTAL);
-	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(mainevt_state::mainevt_sprite_callback), this);
+	MCFG_DEVICE_ADD("k051960", K051960, 24_MHz_XTAL)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(mainevt_state, mainevt_sprite_callback)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	K007232(config, m_k007232, 3.579545_MHz_XTAL);
-	m_k007232->port_write().set(FUNC(mainevt_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.20);
-	m_k007232->add_route(1, "mono", 0.20);
+	MCFG_DEVICE_ADD("k007232", K007232, 3.579545_MHz_XTAL)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, mainevt_state, volume_callback))
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 
-	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("upd", UPD7759)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 
-void mainevt_state::devstors(machine_config &config)
-{
+MACHINE_CONFIG_START(mainevt_state::devstors)
+
 	/* basic machine hardware */
-	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // E & Q generated by 052109
-	m_maincpu->set_addrmap(AS_PROGRAM, &mainevt_state::devstors_map);
-	m_maincpu->set_vblank_int("screen", FUNC(mainevt_state::dv_interrupt));
+	MCFG_DEVICE_ADD("maincpu", HD6309E, 24_MHz_XTAL / 8) // E & Q generated by 052109
+	MCFG_DEVICE_PROGRAM_MAP(devstors_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mainevt_state,  dv_interrupt)
 
-	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &mainevt_state::devstors_sound_map);
-	m_audiocpu->set_periodic_int(FUNC(mainevt_state::devstors_sound_timer_irq), attotime::from_hz(4*60)); /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3.579545_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(devstors_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mainevt_state, devstors_sound_timer_irq, 4*60) /* ??? */
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(64*8, 32*8);
-//  screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
-	screen.set_raw(XTAL(24'000'000)/3, 528, 13*8, (64-13)*8, 256, 16, 240); // measured 59.17
-	screen.set_screen_update(FUNC(mainevt_state::screen_update_dv));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(mainevt_state, screen_update_dv)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 256).enable_shadows();
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	K052109(config, m_k052109, 24_MHz_XTAL);
-	m_k052109->set_palette("palette");
-	m_k052109->set_tile_callback(FUNC(mainevt_state::dv_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 24_MHz_XTAL)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(mainevt_state, dv_tile_callback)
 
-	K051960(config, m_k051960, 24_MHz_XTAL);
-	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(mainevt_state::dv_sprite_callback), this);
+	MCFG_DEVICE_ADD("k051960", K051960, 24_MHz_XTAL)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(mainevt_state, dv_sprite_callback)
 
-	K051733(config, "k051733", 0);
+	MCFG_K051733_ADD("k051733")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579545_MHz_XTAL)
+	MCFG_SOUND_ROUTE(0, "mono", 0.30)
+	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 
-	K007232(config, m_k007232, 3.579545_MHz_XTAL);
-	m_k007232->port_write().set(FUNC(mainevt_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.20);
-	m_k007232->add_route(1, "mono", 0.20);
-}
+	MCFG_DEVICE_ADD("k007232", K007232, 3.579545_MHz_XTAL)
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, mainevt_state, volume_callback))
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+MACHINE_CONFIG_END
 
 
 
@@ -659,7 +651,7 @@ ROM_START( devstors )
 	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
-ROM_START( devstorsx )
+ROM_START( devstors2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "890x02.k11",  0x00000, 0x10000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
 
@@ -683,33 +675,9 @@ ROM_START( devstorsx )
 	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
 ROM_END
 
-ROM_START( devstorsv )
+ROM_START( devstors3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "890v02.k11",   0x00000, 0x10000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
-
-	ROM_REGION( 0x8000, "audiocpu", 0 )
-	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
-
-	ROM_REGION( 0x40000, "k052109", 0 )    /* tiles */
-	ROM_LOAD32_BYTE( "890f06.f22",  0x00000, 0x10000, CRC(26592155) SHA1(aa1f8662f091ca1eb495223e41a35edd861ae9e9) )
-	ROM_LOAD32_BYTE( "890f07.h22",  0x00001, 0x10000, CRC(6c74fa2e) SHA1(419a2ad31d269fafe4c474bf512e935d5e018846) )
-	ROM_LOAD32_BYTE( "890f08.j22",  0x00002, 0x10000, CRC(29e12e80) SHA1(6d09e190055218e2dfd07838f1446dfb5f801206) )
-	ROM_LOAD32_BYTE( "890f09.k22",  0x00003, 0x10000, CRC(67ca40d5) SHA1(ff719f55d2534ff076fbdd2bcb7d12c683bfe958) )
-
-	ROM_REGION( 0x100000, "k051960", 0 )   /* sprites */
-	ROM_LOAD32_WORD( "890f04.h4",  0x00000, 0x80000, CRC(f16cd1fa) SHA1(60ea19c19918a71aded3c9ea398c956908e217f1) )
-	ROM_LOAD32_WORD( "890f05.k4",  0x00002, 0x80000, CRC(da37db05) SHA1(0b48d1021cf0dec78dae0ef183b4c61fea783533) )
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141n.k14", 0x0000, 0x0100, CRC(d3620106) SHA1(528a0a34754902d0f262a9619c6105da6de99354) ) /* priority encoder (not used) */
-
-	ROM_REGION( 0x80000, "k007232", 0 ) /* 512k for 007232 samples */
-	ROM_LOAD( "890f03.d4",  0x00000, 0x80000, CRC(19065031) SHA1(12c47fbe28f85fa2f901fe52601188a5e9633f22) )
-ROM_END
-
-ROM_START( devstors2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "890_202.k11",   0x00000, 0x10000, CRC(afbf0951) SHA1(6eb5d7e1de58058bd50d184d4c7e8dbea9cce13d) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
@@ -757,12 +725,11 @@ ROM_END
 
 
 
-GAME( 1988, mainevt,   0,        mainevt,  mainevt,     mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevto,  mainevt,  mainevt,  mainevt,     mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevt2p, mainevt,  mainevt,  mainev2p,    mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ringohja,  mainevt,  mainevt,  mainev2p,    mainevt_state, empty_init, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors,  0,        devstors, devstors,    mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, devstorsx, devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, devstorsv, devstors, devstors, devstors,    mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, devstors2, devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. 2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, garuka,    devstors, devstors, devstors_ct, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, empty_init, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, empty_init, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, empty_init, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )

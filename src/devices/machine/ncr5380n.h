@@ -16,10 +16,10 @@
 #include "machine/nscsi_bus.h"
 
 #define MCFG_NCR5380N_IRQ_HANDLER(_devcb) \
-	downcast<ncr5380n_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	devcb = &downcast<ncr5380n_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_NCR5380N_DRQ_HANDLER(_devcb) \
-	downcast<ncr5380n_device &>(*device).set_drq_handler(DEVCB_##_devcb);
+	devcb = &downcast<ncr5380n_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 class ncr5380n_device : public nscsi_device
 {

@@ -42,12 +42,6 @@
 #include "emu.h"
 #include "tn_usbsm.h"
 
-#define LOG_WARN        (1U<<1)    // Warnings
-
-#define VERBOSE ( LOG_WARN )
-#include "logmacro.h"
-
-
 DEFINE_DEVICE_TYPE_NS(TI99_USBSM, bus::ti99::peb, nouspikel_usb_smartmedia_device, "ti99_usbsm", "Nouspikel USB/Smartmedia card")
 
 namespace bus { namespace ti99 { namespace peb {
@@ -221,7 +215,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 				if (m_enable_io && (offset >= 0x5ff0))
 				{
 					// USB controller. Not implemented.
-					LOGMASKED(LOG_WARN, "Reading from USB not implemented\n");
+					logerror("tn_usbsm: Reading from USB\n");
 				}
 				else
 				{
@@ -288,7 +282,7 @@ WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
 				if (m_enable_io && (offset >= 0x5ff0))
 				{
 					// USB controller. Not implemented.
-					LOG("tn_usbsm: Writing to USB controller.\n");
+					logerror("tn_usbsm: Writing to USB controller.\n");
 				}
 				else
 				{   // SRAM
@@ -367,10 +361,14 @@ INPUT_PORTS_START( tn_usbsm )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(nouspikel_usb_smartmedia_device::device_add_mconfig)
-	SMARTMEDIA(config, "smartmedia", 0);
-	STRATAFLASH(config, STRATA_TAG, 0);
-	RAM(config, RAM1_TAG).set_default_size("512K").set_default_value(0);
-	RAM(config, RAM2_TAG).set_default_size("512K").set_default_value(0);
+	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
+	MCFG_STRATAFLASH_ADD(STRATA_TAG)
+	MCFG_RAM_ADD(RAM1_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512k")
+	MCFG_RAM_DEFAULT_VALUE(0)
+	MCFG_RAM_ADD(RAM2_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512k")
+	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
 ioport_constructor nouspikel_usb_smartmedia_device::device_input_ports() const

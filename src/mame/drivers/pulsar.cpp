@@ -16,10 +16,7 @@ The terminal must be set for 9600 baud, 7 bits, even parity, 1 stop bit.
 
 
 ToDo:
-- Fix floppy. It needs to WAIT the cpu whenever port 0xD3 is read, wait
-  for either DRQ or INTRQ to assert, then release the cpu and then do the
-  actual port read. Our Z80 cannot do that.
-- Fix FDC so MAME doesn't crash when a certain disk is inserted.
+- Need software
 
 
 Monitor Commands:
@@ -41,7 +38,6 @@ X - Test off-board memory banks
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/z80dart.h"
 #include "machine/msm5832.h"
@@ -56,39 +52,36 @@ public:
 	pulsar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_brg(*this, "brg")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_rtc(*this, "rtc")
-	{ }
-
-
-	void pulsar(machine_config &config);
+		{ }
 
 	void init_pulsar();
-
-protected:
-	virtual void machine_reset() override;
-
-private:
+	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
+	DECLARE_WRITE8_MEMBER(baud_w);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-
+	void pulsar(machine_config &config);
+	void pulsar_io(address_map &map);
+	void pulsar_mem(address_map &map);
+private:
 	floppy_image_device *m_floppy;
-	required_device<z80_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<com8116_device> m_brg;
 	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<msm5832_device> m_rtc;
 };
 
-void pulsar_state::mem_map(address_map &map)
+void pulsar_state::pulsar_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).bankr("bankr0").bankw("bankw0");
@@ -96,16 +89,22 @@ void pulsar_state::mem_map(address_map &map)
 	map(0xf800, 0xffff).bankr("bankr1").bankw("bankw1");
 }
 
-void pulsar_state::io_map(address_map &map)
+void pulsar_state::pulsar_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xc0, 0xc3).mirror(0x0c).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0xd0, 0xd3).mirror(0x0c).rw(m_fdc, FUNC(fd1797_device::read), FUNC(fd1797_device::write));
 	map(0xe0, 0xe3).mirror(0x0c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xf0, 0xf0).mirror(0x0f).w("brg", FUNC(com8116_device::stt_str_w));
+	map(0xf0, 0xff).w(this, FUNC(pulsar_state::baud_w));
 }
 
+
+WRITE8_MEMBER( pulsar_state::baud_w )
+{
+	m_brg->str_w(data & 0x0f);
+	m_brg->stt_w(data >> 4);
+}
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)
@@ -182,14 +181,14 @@ DEVICE_INPUT_DEFAULTS_END
 
 static void pulsar_floppies(device_slot_interface &device)
 {
-	device.option_add("flop", FLOPPY_8_DSDD);
+	device.option_add("525hd", FLOPPY_525_HD);
 }
 
 /* Input ports */
 static INPUT_PORTS_START( pulsar )
 INPUT_PORTS_END
 
-void pulsar_state::machine_reset()
+MACHINE_RESET_MEMBER( pulsar_state, pulsar )
 {
 	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(pulsar_state::pulsar_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom
@@ -212,54 +211,55 @@ void pulsar_state::init_pulsar()
 	membank("bankw1")->configure_entry(0, &main[0xf800]);
 }
 
-void pulsar_state::pulsar(machine_config &config)
-{
+MACHINE_CONFIG_START(pulsar_state::pulsar)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pulsar_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &pulsar_state::io_map);
-	m_maincpu->set_daisy_config(daisy_chain_intf);
-
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pulsar_mem)
+	MCFG_DEVICE_IO_MAP(pulsar_io)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	MCFG_MACHINE_RESET_OVERRIDE(pulsar_state, pulsar)
 
 	/* Devices */
-	i8255_device &ppi(I8255(config, "ppi"));
-	ppi.out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));
-	ppi.out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));
-	ppi.in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));
-	ppi.out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));
+	MCFG_DEVICE_ADD("ppi", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pulsar_state, ppi_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pulsar_state, ppi_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pulsar_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pulsar_state, ppi_pc_w))
 
-	MSM5832(config, "rtc", 32.768_kHz_XTAL);
+	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
 
-	z80dart_device& dart(Z80DART(config, "dart", 4_MHz_XTAL));
-	dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	dart.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
-	dart.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
-	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(4'000'000))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set("dart", FUNC(z80dart_device::rxa_w));
-	rs232.cts_handler().set("dart", FUNC(z80dart_device::ctsa_w));
-	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("dart", z80dart_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("dart", z80dart_device, ctsa_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL));
+	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800))
 	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.
-	brg.fr_handler().set("dart", FUNC(z80dart_device::txca_w));
-	brg.fr_handler().append("dart", FUNC(z80dart_device::rxca_w));
-	brg.ft_handler().set("dart", FUNC(z80dart_device::txcb_w));
-	brg.ft_handler().append("dart", FUNC(z80dart_device::rxcb_w));
+	MCFG_COM8116_FR_HANDLER(WRITELINE("dart", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_COM8116_FT_HANDLER(WRITELINE("dart", z80dart_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart", z80dart_device, rxcb_w))
 
-	FD1797(config, m_fdc, 4_MHz_XTAL / 2);
-	FLOPPY_CONNECTOR(config, "fdc:0", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-}
+	MCFG_FD1797_ADD("fdc", XTAL(4'000'000) / 2)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( pulsarlb )
 	ROM_REGION( 0x10800, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "mon7", "MP7A")
-	ROMX_LOAD( "mp7a.u2", 0x10000, 0x800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113), ROM_BIOS(0))
+	ROMX_LOAD( "mp7a.bin", 0x10000, 0x800, CRC(726b8a19) SHA1(43b2af84d5622c1f67584c501b730acf002a6113), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "mon6", "LBOOT6") // Blank screen until floppy boots
-	ROMX_LOAD( "lboot6.u2", 0x10000, 0x800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(1))
+	ROMX_LOAD( "lboot6.rom", 0x10000, 0x800, CRC(3bca9096) SHA1(ff99288e51a9e832785ce8e3ab5a9452b1064231), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

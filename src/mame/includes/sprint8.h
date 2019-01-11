@@ -8,7 +8,6 @@
 #include "machine/74259.h"
 #include "machine/timer.h"
 #include "sound/discrete.h"
-#include "emupal.h"
 #include "screen.h"
 
 class sprint8_state : public driver_device
@@ -29,7 +28,7 @@ public:
 
 	void sprint8(machine_config &config);
 
-private:
+protected:
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(lockout_w);
@@ -40,7 +39,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void sprint8_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(sprint8);
 
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
@@ -55,6 +54,7 @@ private:
 	void sprint8_audio(machine_config &config);
 	void sprint8_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

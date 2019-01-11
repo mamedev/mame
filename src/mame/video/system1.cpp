@@ -144,9 +144,9 @@ void system1_state::video_start_common(int pagecount)
 	save_item(NAME(m_mix_collide_summary));
 	save_item(NAME(m_sprite_collide_summary));
 	save_item(NAME(m_videoram_bank));
-	save_pointer(NAME(m_videoram), 0x800 * pagecount);
-	save_pointer(NAME(m_mix_collide), 64);
-	save_pointer(NAME(m_sprite_collide), 1024);
+	save_pointer(NAME(m_videoram.get()), 0x800 * pagecount);
+	save_pointer(NAME(m_mix_collide.get()), 64);
+	save_pointer(NAME(m_sprite_collide.get()), 1024);
 }
 
 

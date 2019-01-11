@@ -44,9 +44,8 @@ protected:
 	virtual int vip_ef1_r() override;
 	virtual int vip_ef3_r() override;
 	virtual int vip_ef4_r() override;
-	virtual void vip_sc_w(int n, int sc) override;
+	virtual void vip_sc_w(int data) override;
 	virtual void vip_q_w(int state) override;
-	virtual void vip_tpb_w(int state) override;
 	virtual void vip_run_w(int state) override;
 
 private:

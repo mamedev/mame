@@ -374,7 +374,8 @@ class device_t : public delegate_late_bind
 	friend class simple_list<device_t>;
 	friend class running_machine;
 	friend class finder_base;
-	friend class devcb_base;
+	friend class devcb_read_base;
+	friend class devcb_write_base;
 
 	class subdevice_list
 	{
@@ -522,18 +523,20 @@ public:
 	// owned object helpers
 	subdevice_list &subdevices() { return m_subdevices; }
 	const subdevice_list &subdevices() const { return m_subdevices; }
+	const std::list<devcb_read_base *> input_callbacks() const { return m_input_callbacks; }
+	const std::list<devcb_write_base *> output_callbacks() const { return m_output_callbacks; }
 
 	// device-relative tag lookups
-	std::string subtag(std::string tag) const;
-	std::string siblingtag(std::string tag) const { return (m_owner != nullptr) ? m_owner->subtag(tag) : tag; }
-	memory_region *memregion(std::string tag) const;
-	memory_share *memshare(std::string tag) const;
-	memory_bank *membank(std::string tag) const;
-	ioport_port *ioport(std::string tag) const;
+	std::string subtag(const char *tag) const;
+	std::string siblingtag(const char *tag) const { return (m_owner != nullptr) ? m_owner->subtag(tag) : std::string(tag); }
+	memory_region *memregion(const char *tag) const;
+	memory_share *memshare(const char *tag) const;
+	memory_bank *membank(const char *tag) const;
+	ioport_port *ioport(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
-	template<class DeviceClass> DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
-	template<class DeviceClass> DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
+	template<class DeviceClass> inline DeviceClass *subdevice(const char *tag) const { return downcast<DeviceClass *>(subdevice(tag)); }
+	template<class DeviceClass> inline DeviceClass *siblingdevice(const char *tag) const { return downcast<DeviceClass *>(siblingdevice(tag)); }
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
@@ -568,15 +571,15 @@ public:
 
 	// state saving interfaces
 	template<typename ItemType>
-	void ATTR_COLD save_item(ItemType &&value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, std::forward<ItemType>(value), valname); }
+	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
 	template<typename ItemType>
-	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count); }
+	void ATTR_COLD save_pointer(ItemType *value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
 
 	void set_system_bios(u8 bios) { m_system_bios = bios; }
-	bool findit(bool isvalidation) const;
+	bool findit(bool pre_map, bool isvalidation) const;
 
 	// misc
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
@@ -594,7 +597,6 @@ protected:
 	void post_load();
 	void notify_clock_changed();
 	finder_base *register_auto_finder(finder_base &autodev);
-	void register_callback(devcb_base &callback);
 
 	//------------------- begin derived class overrides
 
@@ -656,7 +658,8 @@ private:
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find
 	mutable std::vector<rom_entry>  m_rom_entries;
-	std::list<devcb_base *> m_callbacks;
+	std::list<devcb_read_base *> m_input_callbacks;
+	std::list<devcb_write_base *> m_output_callbacks;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;

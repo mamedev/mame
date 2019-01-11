@@ -32,7 +32,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/floppy.h"
 #include "machine/mos6530n.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
@@ -59,8 +58,8 @@ public:
 		m_speaker(*this, "speaker"),
 		m_eprom(*this, EPROM_TAG),
 		m_q(*this, "Q%u", 6U),
-		m_digits(*this, "digit%u", 0U),
-		m_leds(*this, "led%u", 0U)
+		m_digit(*this, "digit%u", 0U),
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
@@ -86,8 +85,8 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_eprom;
 	required_ioport_array<4> m_q;
-	output_finder<6> m_digits;
-	output_finder<2> m_leds;
+	output_finder<6> m_digit;
+	output_finder<2> m_led;
 
 	/* EPROM state */
 	int m_eprom_oe;
@@ -163,7 +162,7 @@ INPUT_PORTS_END
 TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 {
 	if (m_ls145_p < 6)
-		m_digits[m_ls145_p] = m_segment;
+		m_digit[m_ls145_p] = m_segment;
 }
 
 READ8_MEMBER( beta_state::riot_pa_r )
@@ -262,10 +261,10 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	m_speaker->level_w(!BIT(data, 4));
 
 	/* address led */
-	m_leds[0] = BIT(data, 5);
+	m_led[0] = BIT(data, 5);
 
 	/* data led */
-	m_leds[1] = !BIT(data, 5);
+	m_led[1] = !BIT(data, 5);
 
 	/* EPROM address shift */
 	if (!BIT(m_old_data, 5) && BIT(data, 5))
@@ -317,8 +316,8 @@ DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 
 void beta_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
+	m_digit.resolve();
+	m_led.resolve();
 
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
 
@@ -351,7 +350,7 @@ MACHINE_CONFIG_START(beta_state::beta)
 	MCFG_DEVICE_PROGRAM_MAP(beta_mem)
 
 	/* video hardware */
-	config.set_default_layout(layout_beta);
+	MCFG_DEFAULT_LAYOUT( layout_beta )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -373,7 +372,8 @@ MACHINE_CONFIG_START(beta_state::beta)
 	MCFG_GENERIC_UNLOAD(beta_state, beta_eprom)
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("256");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256")
 MACHINE_CONFIG_END
 
 /* ROMs */

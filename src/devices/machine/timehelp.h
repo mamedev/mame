@@ -26,15 +26,13 @@ public:
 		return (((data >> 4) & 15) * 10) + (data & 15);
 	}
 
-	static int inc_bcd(uint8_t *data, int mask, int min, int max, bool *tens_carry = nullptr)
+	static int inc_bcd(uint8_t *data, int mask, int min, int max)
 	{
 		int bcd = (*data + 1) & mask;
 		int carry = 0;
 
 		if ((bcd & 0x0f) > 9)
 		{
-			if (tens_carry)
-				*tens_carry = true;
 			bcd &= 0xf0;
 			bcd += 0x10;
 			if (bcd > max)
@@ -42,10 +40,6 @@ public:
 				bcd = min;
 				carry = 1;
 			}
-		}
-		else if (tens_carry)
-		{
-			*tens_carry = false;
 		}
 
 		*data = (*data & ~mask) | (bcd & mask);

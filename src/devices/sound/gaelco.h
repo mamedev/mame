@@ -7,8 +7,20 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_GAELCO_SND_DATA(_tag) \
+	downcast<gaelco_gae1_device &>(*device).set_snd_data_tag(_tag);
+
+#define MCFG_GAELCO_BANKS(_offs1, _offs2, _offs3, _offs4) \
+	downcast<gaelco_gae1_device &>(*device).set_bank_offsets(_offs1, _offs2, _offs3, _offs4);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
 
 // ======================> gaelco_gae1_device
 
@@ -16,7 +28,7 @@ class gaelco_gae1_device : public device_t,
 							public device_sound_interface
 {
 public:
-	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_snd_data_tag(const char *tag) { m_snd_data.set_tag(tag); }
 	void set_bank_offsets(int offs1, int offs2, int offs3, int offs4)
@@ -71,7 +83,7 @@ DECLARE_DEVICE_TYPE(GAELCO_GAE1, gaelco_gae1_device)
 class gaelco_cg1v_device : public gaelco_gae1_device
 {
 public:
-	gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(GAELCO_CG1V, gaelco_cg1v_device)

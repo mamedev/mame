@@ -342,9 +342,10 @@ void submenu::populate(float &customtop, float &custombottom)
 			switch (sm_option->entry->type())
 			{
 			case OPTION_BOOLEAN:
-				item_append_on_off(_(sm_option->description),
-					sm_option->options->bool_value(sm_option->name),
-					0,
+				arrow_flags = sm_option->options->bool_value(sm_option->name) ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW;
+				item_append(_(sm_option->description),
+					(arrow_flags == FLAG_RIGHT_ARROW) ? "On" : "Off",
+					arrow_flags,
 					static_cast<void*>(&(*sm_option)));
 				break;
 			case OPTION_INTEGER:

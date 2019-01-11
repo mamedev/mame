@@ -10,8 +10,10 @@
 
 #pragma once
 
-#include "emupal.h"
 #include "screen.h"
+
+#define MCFG_BFM_DM01_BUSY_CB(_devcb) \
+	devcb = &downcast<bfm_dm01_device &>(*device).set_busy_callback(DEVCB_##_devcb);
 
 class bfm_dm01_device : public device_t
 {
@@ -19,7 +21,7 @@ public:
 	bfm_dm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~bfm_dm01_device() {}
 
-	auto busy_callback() { return m_busy_cb.bind(); }
+	template <class Object> devcb_base &set_busy_callback(Object &&cb) { return m_busy_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( control_r );
 	DECLARE_WRITE8_MEMBER( control_w );

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -207,9 +207,11 @@ struct Emitter
 	void gizmo(const float* _view, const float* _proj)
 	{
 		float mtx[16];
-		float scale[3] = { 1.0f, 1.0f, 1.0f };
-
-		ImGuizmo::RecomposeMatrixFromComponents(m_uniforms.m_position, m_uniforms.m_angle, scale, mtx);
+		bx::mtxSRT(mtx
+				, 1.0f, 1.0f, 1.0f
+				, m_uniforms.m_angle[0],    m_uniforms.m_angle[1],    m_uniforms.m_angle[2]
+				, m_uniforms.m_position[0], m_uniforms.m_position[1], m_uniforms.m_position[2]
+				);
 
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
@@ -222,6 +224,7 @@ struct Emitter
 				, mtx
 				);
 
+		float scale[3];
 		ImGuizmo::DecomposeMatrixToComponents(mtx, m_uniforms.m_position, m_uniforms.m_angle, scale);
 	}
 };
@@ -243,13 +246,8 @@ public:
 		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable m_debug text.
 		bgfx::setDebug(m_debug);
@@ -342,6 +340,16 @@ public:
 			float proj[16];
 
 			// Set view and projection matrix for view 0.
+			const bgfx::HMD* hmd = bgfx::getHMD();
+			if (NULL != hmd && 0 != (hmd->flags & BGFX_HMD_RENDERING) )
+			{
+				float eye[3];
+				cameraGetPosition(eye);
+				bx::mtxQuatTranslationHMD(view, hmd->eye[0].rotation, eye);
+				bgfx::setViewTransform(0, view, hmd->eye[0].projection, BGFX_VIEW_STEREO, hmd->eye[1].projection);
+				bgfx::setViewRect(0, 0, 0, hmd->width, hmd->height);
+			}
+			else
 			{
 				bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
@@ -364,14 +372,12 @@ public:
 
 			ImGui::SetNextWindowPos(
 				  ImVec2(m_width - m_width / 4.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_width / 4.0f, m_height - 20.0f)
-				, ImGuiCond_FirstUseEver
+				, ImGuiSetCond_FirstUseEver
 				);
 			ImGui::Begin("Settings"
 				, NULL
+				, ImVec2(m_width / 4.0f, m_height - 20.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
 			static float timeScale = 1.0f;
@@ -404,11 +410,10 @@ public:
 
 			imguiEndFrame();
 
-			DebugDrawEncoder dde;
-			dde.begin(0);
+			ddBegin(0);
 
 			float center[3] = { 0.0f, 0.0f, 0.0f };
-			dde.drawGrid(Axis::Y, center);
+			ddDrawGrid(Axis::Y, center);
 
 			float eye[3];
 			cameraGetPosition(eye);
@@ -416,20 +421,17 @@ public:
 			m_emitter[currentEmitter].update();
 
 			psUpdate(deltaTime * timeScale);
-			psRender(0, view, bx::load(eye) );
+			psRender(0, view, eye);
 
 			if (showBounds)
 			{
 				Aabb aabb;
 				psGetAabb(m_emitter[currentEmitter].m_handle, aabb);
-				dde.push();
-					dde.setWireframe(true);
-					dde.setColor(0xff0000ff);
-					dde.draw(aabb);
-				dde.pop();
+				ddSetColor(0xff0000ff);
+				ddDraw(aabb);
 			}
 
-			dde.end();
+			ddEnd();
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.

@@ -46,41 +46,36 @@ TODO:
 
 */
 
+#define MASTER_CLOCK    XTAL(22'118'400)
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-#define MASTER_CLOCK    XTAL(22'118'400)
 
 
 class carrera_state : public driver_device
 {
 public:
-	carrera_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	carrera_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_tileram(*this, "tileram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
-
-	void carrera(machine_config &config);
-
-private:
-	DECLARE_READ8_MEMBER(unknown_r);
-	void carrera_palette(palette_device &palette) const;
-	uint32_t screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void carrera_map(address_map &map);
-	void io_map(address_map &map);
+		m_palette(*this, "palette")  { }
 
 	required_shared_ptr<uint8_t> m_tileram;
+	DECLARE_READ8_MEMBER(unknown_r);
+	DECLARE_PALETTE_INIT(carrera);
+	uint32_t screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void carrera(machine_config &config);
+	void carrera_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
@@ -291,26 +286,29 @@ READ8_MEMBER(carrera_state::unknown_r)
 	return machine().rand();
 }
 
-void carrera_state::carrera_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(carrera_state, carrera)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0; i < 0x20; ++i)
-	{
-		int bit0, bit1;
-		int const br_bit0 = BIT(color_prom[i], 6);
-		int const br_bit1 = BIT(color_prom[i], 7);
+	const uint8_t *color_prom = memregion("proms")->base();
+	int br_bit0, br_bit1, bit0, bit1, r, g, b;
+	int i;
 
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 3);
-		int const b = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
-		bit0 = BIT(color_prom[i], 1);
-		bit1 = BIT(color_prom[i], 4);
-		int const g = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
-		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i], 5);
-		int const r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+	for (i = 0; i < 0x20; ++i)
+	{
+		br_bit0 = (color_prom[0] >> 6) & 0x01;
+		br_bit1 = (color_prom[0] >> 7) & 0x01;
+
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		b = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 1) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		g = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 2) & 0x01;
+		bit1 = (color_prom[0] >> 5) & 0x01;
+		r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
+		color_prom++;
 	}
 }
 
@@ -328,25 +326,25 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(carrera_state, screen_update_carrera)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_carrera);
-	PALETTE(config, m_palette, FUNC(carrera_state::carrera_palette), 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_carrera)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(carrera_state, carrera)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/12));
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)
 	/* these are set as input, but I have no idea which input port it uses is for the AY */
-	aysnd.port_a_read_callback().set(FUNC(carrera_state::unknown_r));
-	aysnd.port_b_read_callback().set(FUNC(carrera_state::unknown_r));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, carrera_state, unknown_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, carrera_state, unknown_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

@@ -33,7 +33,7 @@
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
-#include "emupal.h"
+#include "rendlay.h"
 #include "screen.h"
 
 
@@ -51,13 +51,6 @@ public:
 	{
 	}
 
-	void mstation(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_bankdev1;
@@ -67,7 +60,7 @@ private:
 
 	uint8_t m_bank1[2];
 	uint8_t m_bank2[2];
-	std::unique_ptr<uint8_t[]> m_vram;
+	uint8_t *m_vram;
 	uint8_t m_screen_column;
 	uint8_t m_port2;
 	uint8_t m_irq;
@@ -98,10 +91,13 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq );
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mstation_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
+	void mstation(machine_config &config);
 	void mstation_banked_map(address_map &map);
 	void mstation_io(address_map &map);
 	void mstation_mem(address_map &map);
@@ -265,9 +261,9 @@ void mstation_state::mstation_banked_map(address_map &map)
 	map(0x0000000, 0x00fffff).mirror(0x0300000).rw("flash0", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 	map(0x0400000, 0x041ffff).mirror(0x03e0000).ram().share("nvram");
 	map(0x0c00000, 0x0c7ffff).mirror(0x0380000).rw("flash1", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
-	map(0x0800000, 0x0803fff).mirror(0x03fc000).rw(FUNC(mstation_state::lcd_left_r), FUNC(mstation_state::lcd_left_w));
-	map(0x1000000, 0x1003fff).mirror(0x03fc000).rw(FUNC(mstation_state::lcd_right_r), FUNC(mstation_state::lcd_right_w));
-	map(0x1400000, 0x1403fff).mirror(0x03fc000).rw(FUNC(mstation_state::modem_r), FUNC(mstation_state::modem_w));
+	map(0x0800000, 0x0803fff).mirror(0x03fc000).rw(this, FUNC(mstation_state::lcd_left_r), FUNC(mstation_state::lcd_left_w));
+	map(0x1000000, 0x1003fff).mirror(0x03fc000).rw(this, FUNC(mstation_state::lcd_right_r), FUNC(mstation_state::lcd_right_w));
+	map(0x1400000, 0x1403fff).mirror(0x03fc000).rw(this, FUNC(mstation_state::modem_r), FUNC(mstation_state::modem_w));
 }
 
 void mstation_state::mstation_mem(address_map &map)
@@ -281,12 +277,12 @@ void mstation_state::mstation_mem(address_map &map)
 void mstation_state::mstation_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).rw(FUNC(mstation_state::kb_r), FUNC(mstation_state::kb_w));
-	map(0x02, 0x02).w(FUNC(mstation_state::port2_w));
-	map(0x03, 0x03).rw(FUNC(mstation_state::irq_r), FUNC(mstation_state::irq_w));
-	map(0x05, 0x06).rw(FUNC(mstation_state::bank1_r), FUNC(mstation_state::bank1_w));
-	map(0x07, 0x08).rw(FUNC(mstation_state::bank2_r), FUNC(mstation_state::bank2_w));
-	map(0x09, 0x09).r(FUNC(mstation_state::battery_status_r));
+	map(0x01, 0x01).rw(this, FUNC(mstation_state::kb_r), FUNC(mstation_state::kb_w));
+	map(0x02, 0x02).w(this, FUNC(mstation_state::port2_w));
+	map(0x03, 0x03).rw(this, FUNC(mstation_state::irq_r), FUNC(mstation_state::irq_w));
+	map(0x05, 0x06).rw(this, FUNC(mstation_state::bank1_r), FUNC(mstation_state::bank1_w));
+	map(0x07, 0x08).rw(this, FUNC(mstation_state::bank2_r), FUNC(mstation_state::bank2_w));
+	map(0x09, 0x09).r(this, FUNC(mstation_state::battery_status_r));
 	map(0x10, 0x1f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 	//AM_RANGE( 0x2c, 0x2c ) printer
 }
@@ -398,7 +394,7 @@ INPUT_PORTS_END
 void mstation_state::machine_start()
 {
 	// allocate the videoram
-	m_vram = make_unique_clear<uint8_t[]>(9600);
+	m_vram = (uint8_t*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
 
 	// map firsh RAM bank at 0xc000-0xffff
 	membank("sysram")->set_base(m_nvram);
@@ -409,6 +405,7 @@ void mstation_state::machine_reset()
 {
 	m_bank1[0] =  m_bank1[1] = 0;
 	m_bank2[0] =  m_bank2[1] = 0;
+	memset(m_vram, 0, 9600);
 
 	// reset banks
 	m_bankdev1->set_bank(0);
@@ -439,7 +436,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mstation_state::mstation_kb_timer)
 	refresh_ints();
 }
 
-void mstation_state::mstation_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(mstation_state, mstation)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -461,10 +458,12 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(mstation_state::mstation_palette), 2);
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(mstation_state, mstation)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	AMD_29F080(config, "flash0");
-	SST_28SF040(config, "flash1");
+	MCFG_AMD_29F080_ADD("flash0")
+	MCFG_SST_28SF040_ADD("flash1")
 
 	// IRQ 4 is generated every second, used for auto power off
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", mstation_state, mstation_1hz_timer, attotime::from_hz(1))
@@ -472,23 +471,33 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	// IRQ 1 is used for scan the kb and for cursor blinking
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
 
-	rp5c01_device &rtc(RP5C01(config, "rtc", XTAL(32'768)));
-	rtc.out_alarm_callback().set(FUNC(mstation_state::rtc_irq));
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, mstation_state, rtc_irq))
 
-	ADDRESS_MAP_BANK(config, "bank0").set_map(&mstation_state::mstation_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-	ADDRESS_MAP_BANK(config, "bank1").set_map(&mstation_state::mstation_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("128K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mstation )
 	ROM_REGION( 0x100000, "flash0", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v303a", "v3.03a" )
-	ROMX_LOAD("ms303a.bin", 0x000000, 0x100000, CRC(7a5cf752) SHA1(15629ccaecd8094dd883987bed94c16eee6de7c2), ROM_BIOS(0))
+	ROMX_LOAD( "ms303a.bin", 0x000000, 0x100000, CRC(7a5cf752) SHA1(15629ccaecd8094dd883987bed94c16eee6de7c2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v253", "v2.53" )
-	ROMX_LOAD("ms253.bin",  0x000000, 0x0fc000, BAD_DUMP CRC(a27e7f8b) SHA1(ae5a0aa0f1e23f3b183c5c0bcf4d4c1ae54b1798), ROM_BIOS(1))
+	ROMX_LOAD( "ms253.bin",  0x000000, 0x0fc000, BAD_DUMP CRC(a27e7f8b) SHA1(ae5a0aa0f1e23f3b183c5c0bcf4d4c1ae54b1798), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

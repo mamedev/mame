@@ -8,6 +8,28 @@
 #include "m740.h"
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_M3745X_ADC14_CALLBACKS(_ad0, _ad1, _ad2, _ad3) \
+	downcast<m3745x_device *>(device)->set_ad14_callbacks(DEVCB_##_ad0, DEVCB_##_ad1, DEVCB_##_ad2, DEVCB_##_ad3);
+
+#define MCFG_M3745X_ADC58_CALLBACKS(_ad0, _ad1, _ad2, _ad3) \
+	downcast<m3745x_device *>(device)->set_ad58_callbacks(DEVCB_##_ad0, DEVCB_##_ad1, DEVCB_##_ad2, DEVCB_##_ad3);
+
+#define MCFG_M3745X_PORT3_CALLBACKS(_read, _write) \
+	downcast<m3745x_device *>(device)->set_p3_callbacks(DEVCB_##_read, DEVCB_##_write);
+
+#define MCFG_M3745X_PORT4_CALLBACKS(_read, _write) \
+	downcast<m3745x_device *>(device)->set_p4_callbacks(DEVCB_##_read, DEVCB_##_write);
+
+#define MCFG_M3745X_PORT5_CALLBACKS(_read, _write) \
+	downcast<m3745x_device *>(device)->set_p5_callbacks(DEVCB_##_read, DEVCB_##_write);
+
+#define MCFG_M3745X_PORT6_CALLBACKS(_read, _write) \
+	downcast<m3745x_device *>(device)->set_p6_callbacks(DEVCB_##_read, DEVCB_##_write);
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -40,13 +62,50 @@ public:
 
 	const address_space_config m_program_config;
 
-	template<std::size_t Bit> auto read_p() { return m_read_p[Bit-3].bind(); }
-	template<std::size_t Bit> auto write_p() { return m_write_p[Bit-3].bind(); }
-	template<std::size_t Bit> auto read_ad() { return m_read_ad[Bit].bind(); }
+	template <class Read, class Write> void set_p3_callbacks(Read &&rd, Write &&wr)
+	{
+		read_p3.set_callback(std::forward<Read>(rd));
+		write_p3.set_callback(std::forward<Write>(wr));
+	}
 
-	devcb_read8  m_read_p[4];
-	devcb_write8 m_write_p[4];
-	devcb_read8  m_read_ad[8];
+	template <class Read, class Write> void set_p4_callbacks(Read &&rd, Write &&wr)
+	{
+		read_p4.set_callback(std::forward<Read>(rd));
+		write_p4.set_callback(std::forward<Write>(wr));
+	}
+
+	template <class Read, class Write> void set_p5_callbacks(Read &&rd, Write &&wr)
+	{
+		read_p5.set_callback(std::forward<Read>(rd));
+		write_p5.set_callback(std::forward<Write>(wr));
+	}
+
+	template <class Read, class Write> void set_p6_callbacks(Read &&rd, Write &&wr)
+	{
+		read_p6.set_callback(std::forward<Read>(rd));
+		write_p6.set_callback(std::forward<Write>(wr));
+	}
+
+	template <class Read, class Read2, class Read3, class Read4> void set_ad14_callbacks(Read &&rd, Read2 &&rd2, Read3 &&rd3, Read4 &&rd4)
+	{
+		read_ad_0.set_callback(std::forward<Read>(rd));
+		read_ad_1.set_callback(std::forward<Read2>(rd2));
+		read_ad_2.set_callback(std::forward<Read3>(rd3));
+		read_ad_3.set_callback(std::forward<Read4>(rd4));
+	}
+
+	template <class Read, class Read2, class Read3, class Read4> void set_ad58_callbacks(Read &&rd, Read2 &&rd2, Read3 &&rd3, Read4 &&rd4)
+	{
+		read_ad_4.set_callback(std::forward<Read>(rd));
+		read_ad_5.set_callback(std::forward<Read2>(rd2));
+		read_ad_6.set_callback(std::forward<Read3>(rd3));
+		read_ad_7.set_callback(std::forward<Read4>(rd4));
+	}
+
+	devcb_read8  read_p3, read_p4, read_p5, read_p6;
+	devcb_write8 write_p3, write_p4, write_p5, write_p6;
+	devcb_read8  read_ad_0, read_ad_1, read_ad_2, read_ad_3;
+	devcb_read8  read_ad_4, read_ad_5, read_ad_6, read_ad_7;
 
 	DECLARE_READ8_MEMBER(ports_r);
 	DECLARE_WRITE8_MEMBER(ports_w);
@@ -68,7 +127,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual space_config_vector memory_space_config() const override;
 
-	void send_port(uint8_t offset, uint8_t data);
+	void send_port(address_space &space, uint8_t offset, uint8_t data);
 	uint8_t read_port(uint8_t offset);
 
 	void recalc_irqs();

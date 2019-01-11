@@ -51,7 +51,7 @@ public:
 
 	const C& operator[](const std::size_t &index) const noexcept
 	{
-		return *reinterpret_cast<const C *>(&m_buf[index]);
+		return *reinterpret_cast<C *>(&m_buf[index]);
 	}
 
 	template<typename... Args>

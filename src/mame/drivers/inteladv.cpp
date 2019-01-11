@@ -20,20 +20,23 @@
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/timer.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class inteladv_state : public driver_device
 {
 public:
-	inteladv_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	inteladv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")
 	{ }
 
+	uint32_t screen_update_inteladv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void inteladv(machine_config &config);
+	void inteladv_main(address_map &map);
+	void inteladv(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -41,11 +44,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint32_t screen_update_inteladv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void inteladv_main(address_map &map);
-	void inteladv(address_map &map);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 };
@@ -95,7 +93,9 @@ MACHINE_CONFIG_START(inteladv_state::inteladv)
 	MCFG_SCREEN_UPDATE_DRIVER(inteladv_state, screen_update_inteladv)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 256).enable_shadows();
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(XBGR)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -148,7 +148,7 @@ WRITE_LINE_MEMBER(upd4701_device::resety_w)
 //  reset_x - pulse the X counter reset line
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::reset_x_r)
+READ8_MEMBER(upd4701_device::reset_x)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -158,7 +158,7 @@ READ8_MEMBER(upd4701_device::reset_x_r)
 	return space.unmap();
 }
 
-WRITE8_MEMBER(upd4701_device::reset_x_w)
+WRITE8_MEMBER(upd4701_device::reset_x)
 {
 	resetx_w(1);
 	resetx_w(0);
@@ -168,7 +168,7 @@ WRITE8_MEMBER(upd4701_device::reset_x_w)
 //  reset_y - pulse the Y counter reset line
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::reset_y_r)
+READ8_MEMBER(upd4701_device::reset_y)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -178,7 +178,7 @@ READ8_MEMBER(upd4701_device::reset_y_r)
 	return space.unmap();
 }
 
-WRITE8_MEMBER(upd4701_device::reset_y_w)
+WRITE8_MEMBER(upd4701_device::reset_y)
 {
 	resety_w(1);
 	resety_w(0);
@@ -188,7 +188,7 @@ WRITE8_MEMBER(upd4701_device::reset_y_w)
 //  reset_xy - pulse the counter reset lines
 //-------------------------------------------------
 
-READ8_MEMBER(upd4701_device::reset_xy_r)
+READ8_MEMBER(upd4701_device::reset_xy)
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -200,7 +200,7 @@ READ8_MEMBER(upd4701_device::reset_xy_r)
 	return space.unmap();
 }
 
-WRITE8_MEMBER(upd4701_device::reset_xy_w)
+WRITE8_MEMBER(upd4701_device::reset_xy)
 {
 	resetx_w(1);
 	resety_w(1);

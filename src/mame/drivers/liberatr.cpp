@@ -275,21 +275,21 @@ WRITE8_MEMBER( liberatr_state::earom_control_w )
 
 void liberatr_state::liberatr_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");   /* overlapping for my convenience */
+	map(0x0000, 0x3fff).ram().w(this, FUNC(liberatr_state::bitmap_w)).share("bitmapram");   /* overlapping for my convenience */
 	map(0x0000, 0x0000).ram().share("xcoord");
 	map(0x0001, 0x0001).ram().share("ycoord");
-	map(0x0002, 0x0002).rw(FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
-	map(0x4000, 0x403f).r(FUNC(liberatr_state::earom_r));
-	map(0x5000, 0x5000).r(FUNC(liberatr_state::port0_r));
+	map(0x0002, 0x0002).rw(this, FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
+	map(0x4000, 0x403f).r(this, FUNC(liberatr_state::earom_r));
+	map(0x5000, 0x5000).r(this, FUNC(liberatr_state::port0_r));
 	map(0x5001, 0x5001).portr("IN1");
 	map(0x6000, 0x600f).nopr().writeonly().share("base_ram");
 	map(0x6200, 0x621f).nopr().writeonly().share("colorram");
 	map(0x6400, 0x6400).nopw();
-	map(0x6600, 0x6600).w(FUNC(liberatr_state::earom_control_w));
+	map(0x6600, 0x6600).w(this, FUNC(liberatr_state::earom_control_w));
 	map(0x6800, 0x6800).writeonly().share("planet_frame");
 	map(0x6a00, 0x6a00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x6c00, 0x6c07).w(FUNC(liberatr_state::output_latch_w));
-	map(0x6e00, 0x6e3f).nopr().w(FUNC(liberatr_state::earom_w));
+	map(0x6c00, 0x6c07).w(this, FUNC(liberatr_state::output_latch_w));
+	map(0x6e00, 0x6e3f).nopr().w(this, FUNC(liberatr_state::earom_w));
 	map(0x7000, 0x701f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x7800, 0x781f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x8000, 0xefff).rom();
@@ -306,22 +306,22 @@ void liberatr_state::liberatr_map(address_map &map)
 
 void liberatr_state::liberat2_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(FUNC(liberatr_state::bitmap_w)).share("bitmapram");   /* overlapping for my convenience */
+	map(0x0000, 0x3fff).ram().w(this, FUNC(liberatr_state::bitmap_w)).share("bitmapram");   /* overlapping for my convenience */
 	map(0x0000, 0x0000).ram().share("xcoord");
 	map(0x0001, 0x0001).ram().share("ycoord");
-	map(0x0002, 0x0002).rw(FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
-	map(0x4000, 0x4000).r(FUNC(liberatr_state::port0_r));
+	map(0x0002, 0x0002).rw(this, FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
+	map(0x4000, 0x4000).r(this, FUNC(liberatr_state::port0_r));
 	map(0x4001, 0x4001).portr("IN1");
 	map(0x4002, 0x400f).nopr();
 	map(0x4000, 0x400f).writeonly().share("base_ram");
 	map(0x4200, 0x421f).nopr().writeonly().share("colorram");
 	map(0x4400, 0x4400).nopw();
-	map(0x4600, 0x4600).w(FUNC(liberatr_state::earom_control_w));
-	map(0x4800, 0x483f).r(FUNC(liberatr_state::earom_r));
+	map(0x4600, 0x4600).w(this, FUNC(liberatr_state::earom_control_w));
+	map(0x4800, 0x483f).r(this, FUNC(liberatr_state::earom_r));
 	map(0x4800, 0x4800).writeonly().share("planet_frame");
 	map(0x4a00, 0x4a00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x4c00, 0x4c07).w(FUNC(liberatr_state::output_latch_w));
-	map(0x4e00, 0x4e3f).nopr().w(FUNC(liberatr_state::earom_w));
+	map(0x4c00, 0x4c07).w(this, FUNC(liberatr_state::output_latch_w));
+	map(0x4e00, 0x4e3f).nopr().w(this, FUNC(liberatr_state::earom_w));
 	map(0x5000, 0x501f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x5800, 0x581f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
@@ -420,56 +420,57 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void liberatr_state::liberatr(machine_config &config)
-{
+MACHINE_CONFIG_START(liberatr_state::liberatr)
+
 	/* basic machine hardware */
-	m6502_device &maincpu(M6502(config, "maincpu", MASTER_CLOCK/16)); /* 1.25Mhz divided from 20Mhz master clock */
-	maincpu.set_addrmap(AS_PROGRAM, &liberatr_state::liberatr_map);
-	maincpu.set_periodic_int(FUNC(driver_device::irq0_line_hold), attotime::from_hz(4*60));
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
+	MCFG_DEVICE_PROGRAM_MAP(liberatr_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
-	ER2055(config, m_earom);
+	MCFG_DEVICE_ADD("earom", ER2055, 0)
 
-	LS259(config, m_outlatch);
-	m_outlatch->q_out_cb<0>().set_output("led0").invert(); // START LED1
-	m_outlatch->q_out_cb<1>().set_output("led1").invert(); // START LED2
-	m_outlatch->q_out_cb<2>().set_nop(); // TBSWP
-	m_outlatch->q_out_cb<3>().set_nop(); // SPARE
-	m_outlatch->q_out_cb<4>().set(FUNC(liberatr_state::trackball_reset_w)); // CTRLD
-	m_outlatch->q_out_cb<5>().set(FUNC(liberatr_state::coin_counter_right_w));
-	m_outlatch->q_out_cb<6>().set(FUNC(liberatr_state::coin_counter_left_w));
-	m_outlatch->q_out_cb<7>().set([this] (int state) { m_planet_select = state; });
+	MCFG_DEVICE_ADD("outlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LED1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LED2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // TBSWP
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // SPARE
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, liberatr_state, trackball_reset_w)) // CTRLD
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, liberatr_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, liberatr_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, liberatr_state, planet_select_w))
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_screen_update(FUNC(liberatr_state::screen_update));
-	m_screen->set_size(256,256);
-	m_screen->set_visarea(8, 247, 13, 244);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE_DRIVER(liberatr_state, screen_update)
+	MCFG_SCREEN_SIZE(256,256)
+	MCFG_SCREEN_VISIBLE_AREA(8, 247, 13, 244)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK/16)); /* 1.25Mhz from Phi2 signal from 6502 */
-	pokey1.allpot_r().set_ioport("DSW2");
-	pokey1.set_output_opamp_low_pass(RES_K(4.7), CAP_U(0.01), 5.0);
-	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
+	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(4.7), CAP_U(0.01), 5.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK/16)); /* 1.25Mhz from Phi2 signal from 6502 */
-	pokey2.set_output_opamp_low_pass(RES_K(4.7), CAP_U(0.01), 5.0);
-	pokey2.allpot_r().set_ioport("DSW1");
-	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
+	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(4.7), CAP_U(0.01), 5.0)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void liberatr_state::liberat2(machine_config &config)
-{
+
+MACHINE_CONFIG_START(liberatr_state::liberat2)
 	liberatr(config);
 
 	/* basic machine hardware */
-	subdevice<m6502_device>("maincpu")->set_addrmap(AS_PROGRAM, &liberatr_state::liberat2_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(liberat2_map)
+MACHINE_CONFIG_END
 
 
 

@@ -17,8 +17,8 @@
     arkanoidu   USA version. MCU code properly dumped.
     arkanoidj   Japanese version.  Final revision, MCU code properly dumped.
     arkanoidja  Japanese version.  A later revision with level selector.
-                  The 68705 code for this one was not available; it has been
-                  made using the decapped Taito A75__06.IC16 by changing the level
+                  The 68705 code for this one was not available; Brad Oliver[?]
+                  made it up from the bootleg A75-06.IC16 by changing the level
                   data pointer table.
     arkanoidjbl Bootleg of the early Japanese version. The only difference is
                   that the warning text has been replaced by "WAIT"
@@ -757,14 +757,10 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
     write:
     d000      AY8910 control
     d001      AY8910 write
-    d008      bit 0   flip screen x
-              bit 1   flip screen y
-              bit 2   paddle player select
-              bit 3   coin lockout
-              bit 4   ????????
-              bit 5 = graphics bank
-              bit 6 = palette bank
-              bit 7 = mcu reset
+    d008      bit0/1 = flip screen x/y
+              bit 4 = ROM bank??
+              bit 5 = char bank
+              other bits????????
     d010      watchdog reset, or IRQ acknowledge, or both
     f000      ????????
 
@@ -834,12 +830,12 @@ void arkanoid_state::arkanoid_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().mirror(0x0800);
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w)).mirror(0x0fe6);
 	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r)).mirror(0x0fe6);
-	map(0xd008, 0xd008).w(FUNC(arkanoid_state::arkanoid_d008_w)).mirror(0x0fe7);  /* gfx bank, flip screen, 68705 reset, etc. */
+	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::arkanoid_d008_w)).mirror(0x0fe7);  /* gfx bank, flip screen, 68705 reset, etc. */
 	map(0xd008, 0xd008).portr("SYSTEM2").mirror(0x0fe3); /* unused p1 and p2 joysticks */
 	map(0xd00c, 0xd00c).portr("SYSTEM").mirror(0x0fe3); /* start, service, coins, and 2 bits from the 68705 */
 	map(0xd010, 0xd010).portr("BUTTONS").w("watchdog", FUNC(watchdog_timer_device::reset_w)).mirror(0x0fe7);
 	map(0xd018, 0xd018).rw(m_mcuintf, FUNC(arkanoid_mcu_device_base::data_r), FUNC(arkanoid_mcu_device_base::data_w)).mirror(0x0fe7); /* input from the 68705 */
-	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xe83f).ram().share("spriteram");
 	map(0xe840, 0xefff).ram();
 	map(0xf000, 0xffff).nopr(); /* fixes instant death in final level */
@@ -851,11 +847,11 @@ void arkanoid_state::bootleg_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd000).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xd001, 0xd001).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xd008, 0xd008).w(FUNC(arkanoid_state::arkanoid_d008_w));  /* gfx bank, flip screen etc. */
+	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::arkanoid_d008_w));  /* gfx bank, flip screen etc. */
 	map(0xd00c, 0xd00c).portr("SYSTEM");
 	map(0xd010, 0xd010).portr("BUTTONS").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xd018, 0xd018).portr("MUX").nopw();
-	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xe83f).ram().share("spriteram");
 	map(0xe840, 0xefff).ram();
 	map(0xf000, 0xffff).nopr(); /* fixes instant death in final level */
@@ -868,9 +864,9 @@ void arkanoid_state::hexa_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xd008, 0xd008).w(FUNC(arkanoid_state::hexa_d008_w));
+	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::hexa_d008_w));
 	map(0xd010, 0xd010).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* or IRQ acknowledge, or both */
-	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 }
 
 READ8_MEMBER(arkanoid_state::hexaa_f000_r)
@@ -891,11 +887,11 @@ void arkanoid_state::hexaa_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd001, 0xd001).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xd000, 0xd001).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0xd008, 0xd008).w(FUNC(arkanoid_state::hexa_d008_w));
+	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::hexa_d008_w));
 	map(0xd010, 0xd010).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* or IRQ acknowledge, or both */
-	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xefff).ram();
-	map(0xf000, 0xf000).rw(FUNC(arkanoid_state::hexaa_f000_r), FUNC(arkanoid_state::hexaa_f000_w));
+	map(0xf000, 0xf000).rw(this, FUNC(arkanoid_state::hexaa_f000_r), FUNC(arkanoid_state::hexaa_f000_w));
 }
 
 void arkanoid_state::hexaa_sub_map(address_map &map)
@@ -919,8 +915,8 @@ void arkanoid_state::hexaa_sub_iomap(address_map &map)
 {
 	map.global_mask(0x9f);
 	map(0x00, 0x0f).ram(); // ?? could be communication with the other chip (protection?)
-	map(0x80, 0x80).w(FUNC(arkanoid_state::hexaa_sub_80_w));
-	map(0x90, 0x90).r(FUNC(arkanoid_state::hexaa_sub_90_r));
+	map(0x80, 0x80).w(this, FUNC(arkanoid_state::hexaa_sub_80_w));
+	map(0x90, 0x90).r(this, FUNC(arkanoid_state::hexaa_sub_90_r));
 }
 
 
@@ -931,8 +927,8 @@ void arkanoid_state::brixian_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("protram");
 	map(0xd000, 0xd000).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0xd001, 0xd001).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0xd008, 0xd008).w(FUNC(arkanoid_state::brixian_d008_w));  /* gfx bank, flip screen etc. */
-	map(0xe000, 0xe7ff).ram().w(FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
+	map(0xd008, 0xd008).w(this, FUNC(arkanoid_state::brixian_d008_w));  /* gfx bank, flip screen etc. */
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(arkanoid_state::arkanoid_videoram_w)).share("videoram");
 	map(0xe800, 0xe83f).ram().share("spriteram");
 	map(0xe840, 0xefff).ram();
 }
@@ -1351,10 +1347,11 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 	MCFG_DEVICE_PROGRAM_MAP(arkanoid_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
 
-	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
-	m_mcuintf->portb_r_cb().set_ioport("MUX");
+	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P5, XTAL(12'000'000)/4) /* verified on pcb */
+	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
@@ -1366,40 +1363,42 @@ MACHINE_CONFIG_START(arkanoid_state::arkanoid)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_arkanoid)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL(12'000'000)/4)); /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
-	aysnd.set_flags(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW); // all outputs are tied together with no resistors, and pin 26 is low
-	aysnd.port_a_read_callback().set_ioport("UNUSED");
-	aysnd.port_b_read_callback().set_ioport("DSW");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.66);
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000)/4) /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW) // all outputs are tied together with no resistors, and pin 26 is low
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
 MACHINE_CONFIG_END
 
-void arkanoid_state::p3mcu(machine_config &config)
-{
+MACHINE_CONFIG_START(arkanoid_state::p3mcu)
 	arkanoid(config);
 
 	/* unprotected MCU */
-	ARKANOID_68705P3(config.replace(), m_mcuintf, 12_MHz_XTAL / 4);
-	m_mcuintf->portb_r_cb().set_ioport("MUX");
-}
+	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
+	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
+MACHINE_CONFIG_END
 
-void arkanoid_state::p3mcuay(machine_config &config)
-{
-	p3mcu(config);
+MACHINE_CONFIG_START(arkanoid_state::p3mcuay)
+	arkanoid(config);
 
-	ay8910_device &aysnd(AY8910(config.replace(), "aysnd", XTAL(12'000'000)/4)); // AY-3-8910A
-	aysnd.set_flags(AY8910_SINGLE_OUTPUT);
-	aysnd.port_a_read_callback().set_ioport("UNUSED");
-	aysnd.port_b_read_callback().set_ioport("DSW");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.66);
-}
+	/* unprotected MCU */
+	MCFG_DEVICE_REPLACE("mcu", ARKANOID_68705P3, XTAL(12'000'000)/4)
+	MCFG_ARKANOID_MCU_PORTB_R_CB(IOPORT("MUX"))
+
+	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4) // AY-3-8910A
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arkanoid_state::bootleg)
 	arkanoid(config);
@@ -1411,16 +1410,14 @@ MACHINE_CONFIG_START(arkanoid_state::bootleg)
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
-void arkanoid_state::aysnd(machine_config &config)
-{
+MACHINE_CONFIG_START(arkanoid_state::aysnd)
 	bootleg(config);
-
-	ay8910_device &aysnd(AY8910(config.replace(), "aysnd", XTAL(12'000'000)/4));
-	aysnd.set_flags(AY8910_SINGLE_OUTPUT);
-	aysnd.port_a_read_callback().set_ioport("UNUSED");
-	aysnd.port_b_read_callback().set_ioport("DSW");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.66);
-}
+	MCFG_DEVICE_REPLACE("aysnd", AY8910, XTAL(12'000'000)/4)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("UNUSED"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.66)
+MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(arkanoid_state::hexa)
@@ -1430,7 +1427,7 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 	MCFG_DEVICE_PROGRAM_MAP(hexa_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1440,17 +1437,17 @@ MACHINE_CONFIG_START(arkanoid_state::hexa)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hexa)
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(12'000'000)/4/2)); /* Imported from arkanoid - correct? */
-	aysnd.port_a_read_callback().set_ioport("INPUTS");
-	aysnd.port_b_read_callback().set_ioport("DSW");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(arkanoid_state::hexaa)
@@ -1483,17 +1480,17 @@ MACHINE_CONFIG_START(arkanoid_state::brixian)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_RAW_PARAMS(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arkanoid)
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 512)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(12'000'000)/4/2)); /* Imported from arkanoid - correct? */
-	aysnd.port_a_read_callback().set_ioport("INPUTS");
-	aysnd.port_b_read_callback().set_ioport("DSW");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(12'000'000)/4/2) /* Imported from arkanoid - correct? */
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1502,10 +1499,10 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 /* rom numbering, with guesses for version numbers and missing roms:
-    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED; it has been rumored that arkatayt
-               and arkangc and maybe arkanoidjbl might actually be bootlegs of this
-               undumped version, so, if true, it might be possible to 'restore' this
-               version by 'de-bootlegging' those sets.)
+    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED, arkatayt and arkangc and
+               maybe arkanoidjbl may actually be bootlegs of this undumped
+               version, so it might be possible to 'restore' this version by
+              'de-bootlegging' those sets?)
     A75 01-1 = Z80 code 1/2 v1.1 Japan and USA/Romstar and World
     A75 02   = Z80 code 2/2 v1.0 Japan (has 'Notice: This game is for use in Japan only' screen)
     A75 03   = GFX 1/3
@@ -1527,7 +1524,7 @@ MACHINE_CONFIG_END
     A75 20   = MC68705P5 MCU code, v2.0 USA/Romstar (verified. dumped from MCU)
     A75 21   = Z80 code v2.0 1/2 Japan w/level select
     A75 22   = Z80 code v2.0 2/2 Japan w/level select
-    A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED)
+    A75 23   = MC68705P5 MCU code, v2.0 Japan w/level select (NOT DUMPED, PLACEHOLDER HACKED FROM BOOTLEG MCU)
     A75 24   = Z80 code v2.1 1/2 Japan
     A75 25   = Z80 code v2.1 2/2 Japan
     A75 26   = MC68705P5 MCU code, v2.1 Japan (verified. dumped from MCU)
@@ -1653,7 +1650,8 @@ ROM_START( arkanoidja ) // V2.0 Japan w/level select
 	ROM_LOAD( "a75-22.ic16",   0x8000, 0x8000, CRC(3a2688d3) SHA1(9633a661352def3d85f95ca830f6d761b0b5450e) ) // v2 JPN level select?, region byte is 0x92
 
 	ROM_REGION( 0x0800, "mcu:mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a75-23.ic14",  0x0000, 0x0800, BAD_DUMP CRC(543fed28) SHA1(0a0cafc229a9ece7d7f09d717b35a59653ccdc4d)  ) /* Hand crafted based on the original a75-06 chip, need the real data here */
+	// the handcrafted value at 0x351 (0x9ddb) seems incorrect compared to other sets? (but it appears the value is never used, and the data it would usually point to does not exist in the program rom?)
+	ROM_LOAD( "a75-23.ic14",  0x0000, 0x0800, BAD_DUMP CRC(0a4abef6) SHA1(fdce0b7a2eab7fd4f1f4fc3b93120b1ebc16078e)  ) /* Hand crafted based on the bootleg a75-06 chip, need the real data here */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "a75-03.ic64",   0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
@@ -2128,14 +2126,14 @@ void arkanoid_state::init_block2()
 	{
 		// combine these into a single swap..
 		int srctile = bitswap<16>(tile,15,14,13,12,
-									   11,10, 9, 8,
-										7, 5, 6, 3,
-										1, 2, 4, 0);
+						               11,10, 9, 8,
+						                7, 5, 6, 3,
+						                1, 2, 4, 0);
 
 		srctile = bitswap<16>(srctile,15,14,13,12,
-									  11, 9,10, 5,
-									   7, 6, 8, 4,
-									   3, 2, 1, 0);
+						              11, 9,10, 5,
+						               7, 6, 8, 4,
+						               3, 2, 1, 0);
 
 		srctile = srctile ^ 0xd4;
 

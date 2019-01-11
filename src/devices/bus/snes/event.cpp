@@ -203,7 +203,7 @@ READ16_MEMBER( sns_pfest94_device::necdsp_data_r )
 
 void sns_pfest94_device::dsp_prg_map_lorom(address_map &map)
 {
-	map(0x0000, 0x07ff).r(FUNC(sns_pfest94_device::necdsp_prg_r));
+	map(0x0000, 0x07ff).r(this, FUNC(sns_pfest94_device::necdsp_prg_r));
 }
 
 
@@ -213,7 +213,7 @@ void sns_pfest94_device::dsp_prg_map_lorom(address_map &map)
 
 void sns_pfest94_device::dsp_data_map_lorom(address_map &map)
 {
-	map(0x0000, 0x03ff).r(FUNC(sns_pfest94_device::necdsp_data_r));
+	map(0x0000, 0x03ff).r(this, FUNC(sns_pfest94_device::necdsp_data_r));
 }
 
 

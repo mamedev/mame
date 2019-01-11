@@ -64,12 +64,10 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	void iqunlim(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void iqunlim(machine_config &config);
 	void iqunlim_mem(address_map &map);
 };
 

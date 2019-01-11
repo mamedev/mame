@@ -51,14 +51,12 @@ public:
 		, m_usart_clock_state(0)
 	{ }
 
-	void sdk80(machine_config &config);
-
-private:
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
+	void sdk80(machine_config &config);
 	void sdk80_io(address_map &map);
 	void sdk80_mem(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
 	required_device<i8255_device> m_ppi_0;
@@ -83,7 +81,8 @@ void sdk80_state::sdk80_io(address_map &map)
 	map.global_mask(0xff);
 	map(0xec, 0xef).rw(m_ppi_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf4, 0xf7).rw(m_ppi_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xfa, 0xfb).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xfa, 0xfa).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xfb, 0xfb).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 }
 
 static INPUT_PORTS_START( sdk80 )
@@ -121,30 +120,29 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-void sdk80_state::sdk80(machine_config &config)
-{
+MACHINE_CONFIG_START(sdk80_state::sdk80)
 	/* basic machine hardware */
-	I8080A(config, m_maincpu, XTAL(18'432'000)/9);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sdk80_state::sdk80_mem);
-	m_maincpu->set_addrmap(AS_IO, &sdk80_state::sdk80_io);
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'432'000)/9)
+	MCFG_DEVICE_PROGRAM_MAP(sdk80_mem)
+	MCFG_DEVICE_IO_MAP(sdk80_io)
 
-	I8251(config, m_usart, 0);
-	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
-	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD(I8251A_TAG, I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
 
-	I8255A(config, m_ppi_0);
-	I8255A(config, m_ppi_1);
+	MCFG_DEVICE_ADD(I8255A_0_TAG, I8255A, 0)
+	MCFG_DEVICE_ADD(I8255A_1_TAG, I8255A, 0)
 
-	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
-	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
-	m_rs232->dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
-	m_rs232->cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
-	m_rs232->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(I8251A_TAG, i8251_device, write_cts))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	clock_device &clock(CLOCK(config, "usart_clock", XTAL(18'432'000)/60));
-	clock.signal_handler().set(FUNC(sdk80_state::usart_clock_tick));
-}
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(18'432'000)/60)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sdk80_state, usart_clock_tick))
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( sdk80 )

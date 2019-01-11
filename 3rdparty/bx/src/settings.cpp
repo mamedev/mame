@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -59,11 +59,12 @@ void Settings::load(const void* _data, uint32_t _len)
 	}
 	else
 	{
-		m_ini = ini_load( (const char*)_data, _len, m_allocator);
+		BX_UNUSED(_len);
+		m_ini = ini_load( (const char*)_data, m_allocator);
 	}
 }
 
-StringView Settings::get(const StringView& _name) const
+const char* Settings::get(const StringView& _name) const
 {
 	ini_t* ini = INI_T(m_ini);
 
@@ -84,7 +85,7 @@ StringView Settings::get(const StringView& _name) const
 	int32_t property = ini_find_property(ini, section, fileName.getPtr(), fileName.getLength() );
 	if (INI_NOT_FOUND == property)
 	{
-		return StringView();
+		return NULL;
 	}
 
 	return ini_property_value(ini, section, property);

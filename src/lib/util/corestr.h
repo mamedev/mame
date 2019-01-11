@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_CORESTR_H
-#define MAME_UTIL_CORESTR_H
-
 #pragma once
+
+#ifndef __CORESTR_H__
+#define __CORESTR_H__
 
 #include "osdcore.h"
 #include "strformat.h"
@@ -64,4 +64,4 @@ std::string &strmakeupper(std::string& str);
 std::string &strmakelower(std::string& str);
 int strreplace(std::string &str, const std::string& search, const std::string& replace);
 
-#endif // MAME_UTIL_CORESTR_H
+#endif /* __CORESTR_H__ */

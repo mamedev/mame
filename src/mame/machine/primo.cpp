@@ -167,18 +167,18 @@ WRITE8_MEMBER(primo_state::primo_ki_2_w)
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK
-	m_iec->host_clk_w(!BIT(data, 5));
+	m_iec->clk_w(!BIT(data, 5));
 
 	// bit 4 - SDATA
-	m_iec->host_data_w(!BIT(data, 4));
+	m_iec->data_w(!BIT(data, 4));
 
 	// bit 3 - not used
 
 	// bit 2 - SRQ
-	m_iec->host_srq_w(!BIT(data, 2));
+	m_iec->srq_w(!BIT(data, 2));
 
 	// bit 1 - ATN
-	m_iec->host_atn_w(!BIT(data, 1));
+	m_iec->atn_w(!BIT(data, 1));
 
 	// bit 0 - not used
 
@@ -229,12 +229,12 @@ void primo_state::init_primo64()
 
 *******************************************************************************/
 
-void primo_state::primo_common_machine_init()
+void primo_state::primo_common_machine_init ()
 {
-	if (m_mem_exp_port->read())
+	if (ioport("MEMORY_EXPANSION")->read())
 		m_port_FD = 0x00;
 	primo_update_memory();
-	m_maincpu->set_clock_scale(m_clock_port->read() ? 1.5 : 1.0);
+	machine().device("maincpu")->set_clock_scale(ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
 }
 
 void primo_state::machine_start()

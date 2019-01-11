@@ -10,31 +10,33 @@
 #ifndef MAME_INCLUDES_WPC_DOT_H
 #define MAME_INCLUDES_WPC_DOT_H
 
-#pragma once
-
 #include "cpu/m6809/m6809.h"
 #include "audio/wpcsnd.h"
 #include "audio/dcs.h"
 #include "machine/wpc.h"
+#include "rendlay.h"
 
 class wpc_dot_state : public driver_device
 {
 public:
 	wpc_dot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_wpcsnd(*this,"wpcsnd")
-		, m_wpc(*this,"wpc")
-		, m_cpubank(*this, "cpubank")
-		, m_fixedbank(*this, "fixedbank")
-		, m_dmdbanks(*this, "dmdbank%u", 1U)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_wpcsnd(*this,"wpcsnd"),
+			m_wpc(*this,"wpc"),
+			m_cpubank(*this, "cpubank"),
+			m_fixedbank(*this, "fixedbank"),
+			m_dmdbank1(*this, "dmdbank1"),
+			m_dmdbank2(*this, "dmdbank2"),
+			m_dmdbank3(*this, "dmdbank3"),
+			m_dmdbank4(*this, "dmdbank4"),
+			m_dmdbank5(*this, "dmdbank5"),
+			m_dmdbank6(*this, "dmdbank6")
 	{ }
 
-	void init_wpc_dot();
 	void wpc_dot(machine_config &config);
-
-protected:
 	void wpc_dot_map(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -42,14 +44,20 @@ protected:
 	required_device<wpc_device> m_wpc;
 	required_memory_bank m_cpubank;
 	required_memory_bank m_fixedbank;
-	required_memory_bank_array<6> m_dmdbanks;
+	required_memory_bank m_dmdbank1;
+	required_memory_bank m_dmdbank2;
+	required_memory_bank m_dmdbank3;
+	required_memory_bank m_dmdbank4;
+	required_memory_bank m_dmdbank5;
+	required_memory_bank m_dmdbank6;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
-
+public:
+	void init_wpc_dot();
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);

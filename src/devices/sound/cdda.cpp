@@ -47,7 +47,7 @@ void cdda_device::device_start()
 	save_item( NAME(m_audio_ended_normally) );
 	save_item( NAME(m_audio_lba) );
 	save_item( NAME(m_audio_length) );
-	save_pointer( NAME(m_audio_cache), CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	save_pointer( NAME(m_audio_cache.get()), CD_MAX_SECTOR_DATA * MAX_SECTORS );
 	save_item( NAME(m_audio_samples) );
 	save_item( NAME(m_audio_bptr) );
 }

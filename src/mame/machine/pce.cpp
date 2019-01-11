@@ -136,6 +136,8 @@ WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 	int joy_i;
 	uint8_t joy_type = m_joy_type->read();
 
+	m_maincpu->io_set_buffer(data);
+
 	/* bump counter on a low-to-high transition of bit 1 */
 	if ((!m_joystick_data_select) && (data & JOY_CLOCK))
 	{

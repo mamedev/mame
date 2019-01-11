@@ -19,6 +19,16 @@
 #define ABC80_KEYBOARD_TAG  "abc80kb"
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_ABC80_KEYBOARD_KEYDOWN_CALLBACK(_write) \
+	devcb = &downcast<abc80_keyboard_device &>(*device).set_keydown_wr_callback(DEVCB_##_write);
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -31,7 +41,7 @@ public:
 	// construction/destruction
 	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto keydown_wr_callback() { return m_write_keydown.bind(); }
+	template <class Object> devcb_base &set_keydown_wr_callback(Object &&cb) { return m_write_keydown.set_callback(std::forward<Object>(cb)); }
 
 	uint8_t data_r();
 

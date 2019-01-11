@@ -10,7 +10,7 @@ MAME Documentation
 	
 .. toctree::
     :titlesonly:
-
+    
     whatis
     initialsetup/index
 

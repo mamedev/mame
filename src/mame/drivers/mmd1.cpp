@@ -160,12 +160,6 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		{ }
 
-	void mmd1(machine_config &config);
-	void mmd2(machine_config &config);
-
-	void init_mmd2();
-
-private:
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port2_w);
@@ -177,17 +171,21 @@ private:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
+	void init_mmd2();
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
+	void mmd1(machine_config &config);
+	void mmd2(machine_config &config);
 	void mmd1_io(address_map &map);
 	void mmd1_mem(address_map &map);
 	void mmd2_io(address_map &map);
 	void mmd2_mem(address_map &map);
 
+private:
 	uint8_t m_return_code;
 	uint8_t m_digit;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<i8080_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	output_finder<9> m_digits;
 };
 
@@ -270,9 +268,9 @@ void mmd1_state::mmd1_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x07);
-	map(0x00, 0x00).rw(FUNC(mmd1_state::mmd1_keyboard_r), FUNC(mmd1_state::mmd1_port0_w));
-	map(0x01, 0x01).w(FUNC(mmd1_state::mmd1_port1_w));
-	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
+	map(0x00, 0x00).rw(this, FUNC(mmd1_state::mmd1_keyboard_r), FUNC(mmd1_state::mmd1_port0_w));
+	map(0x01, 0x01).w(this, FUNC(mmd1_state::mmd1_port1_w));
+	map(0x02, 0x02).w(this, FUNC(mmd1_state::mmd1_port2_w));
 }
 
 void mmd1_state::mmd2_mem(address_map &map)
@@ -288,12 +286,12 @@ void mmd1_state::mmd2_mem(address_map &map)
 void mmd1_state::mmd2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).w(FUNC(mmd1_state::mmd1_port0_w));
-	map(0x01, 0x01).rw(FUNC(mmd1_state::mmd2_01_r), FUNC(mmd1_state::mmd1_port1_w));
-	map(0x02, 0x02).w(FUNC(mmd1_state::mmd1_port2_w));
+	map(0x00, 0x00).w(this, FUNC(mmd1_state::mmd1_port0_w));
+	map(0x01, 0x01).rw(this, FUNC(mmd1_state::mmd2_01_r), FUNC(mmd1_state::mmd1_port1_w));
+	map(0x02, 0x02).w(this, FUNC(mmd1_state::mmd1_port2_w));
 	map(0x03, 0x03).rw("i8279", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 	map(0x04, 0x04).rw("i8279", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
-	map(0x05, 0x07).r(FUNC(mmd1_state::mmd2_bank_r));
+	map(0x05, 0x07).r(this, FUNC(mmd1_state::mmd2_bank_r));
 }
 
 
@@ -493,41 +491,40 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	membank("bank8")->configure_entry(2, &p_ram[0xd800]);
 }
 
-void mmd1_state::mmd1(machine_config &config)
-{
+MACHINE_CONFIG_START(mmd1_state::mmd1)
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 6750000 / 9);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mmd1_state::mmd1_mem);
-	m_maincpu->set_addrmap(AS_IO, &mmd1_state::mmd1_io);
+	MCFG_DEVICE_ADD("maincpu",I8080, 6750000 / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mmd1_mem)
+	MCFG_DEVICE_IO_MAP(mmd1_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd1)
 
 	/* video hardware */
-	config.set_default_layout(layout_mmd1);
-}
+	MCFG_DEFAULT_LAYOUT(layout_mmd1)
+MACHINE_CONFIG_END
 
-void mmd1_state::mmd2(machine_config &config)
-{
+MACHINE_CONFIG_START(mmd1_state::mmd2)
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 6750000 / 9);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mmd1_state::mmd2_mem);
-	m_maincpu->set_addrmap(AS_IO, &mmd1_state::mmd2_io);
-	m_maincpu->out_status_func().set(FUNC(mmd1_state::mmd2_status_callback));
-	m_maincpu->out_inte_func().set(FUNC(mmd1_state::mmd2_inte_callback));
+	MCFG_DEVICE_ADD("maincpu",I8080, 6750000 / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mmd2_mem)
+	MCFG_DEVICE_IO_MAP(mmd2_io)
+	MCFG_I8085A_STATUS(WRITE8(*this, mmd1_state, mmd2_status_callback))
+	MCFG_I8085A_INTE(WRITELINE(*this, mmd1_state, mmd2_inte_callback))
 
 	MCFG_MACHINE_RESET_OVERRIDE(mmd1_state,mmd2)
 
 	/* video hardware */
-	config.set_default_layout(layout_mmd2);
+	MCFG_DEFAULT_LAYOUT(layout_mmd2)
 
 	/* Devices */
-	i8279_device &kbdc(I8279(config, "i8279", 400000));             // based on divider
-	kbdc.out_sl_callback().set(FUNC(mmd1_state::mmd2_scanlines_w)); // scan SL lines
-	kbdc.out_disp_callback().set(FUNC(mmd1_state::mmd2_digit_w));   // display A&B
-	kbdc.in_rl_callback().set(FUNC(mmd1_state::mmd2_kbd_r));        // kbd RL lines
-	kbdc.in_shift_callback().set_constant(1);                       // Shift key
-	kbdc.in_ctrl_callback().set_constant(1);
-}
+	MCFG_DEVICE_ADD("i8279", I8279, 400000) // based on divider
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, mmd1_state, mmd2_scanlines_w))          // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, mmd1_state, mmd2_digit_w))            // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, mmd1_state, mmd2_kbd_r))                  // kbd RL lines
+	MCFG_I8279_IN_SHIFT_CB(VCC)                                     // Shift key
+	MCFG_I8279_IN_CTRL_CB(VCC)
+
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mmd1 )

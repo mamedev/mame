@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "pps4dasm.h"
 
-char const *const pps4_disassembler::token_str[t_COUNT] = {
+const char *pps4_disassembler::token_str[t_COUNT] = {
 	"ad",           /* add */
 	"adc",          /* add with carry-in */
 	"adsk",         /* add and skip on carry-out */
@@ -66,7 +66,7 @@ char const *const pps4_disassembler::token_str[t_COUNT] = {
 	"sag"           /* special address generation */
 };
 
-uint16_t const pps4_disassembler::table[] = {
+const uint16_t pps4_disassembler::table[] = {
 /* 00 */ t_LBL | t_I8c,
 /* 01 */ t_TML | t_I4 | t_I8,
 /* 02 */ t_TML | t_I4 | t_I8,

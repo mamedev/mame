@@ -16,7 +16,7 @@ SAMPLES_START_CB_MEMBER( cclimber_audio_device::sh_start )
 	if (m_samples_region)
 	{
 		m_sample_buf = std::make_unique<int16_t[]>(2 * m_samples_region.bytes());
-		save_pointer(NAME(m_sample_buf), 2 * m_samples_region.bytes());
+		save_pointer(NAME(m_sample_buf.get()), 2 * m_samples_region.bytes());
 	}
 }
 
@@ -57,17 +57,16 @@ void cclimber_audio_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void cclimber_audio_device::device_add_mconfig(machine_config &config)
-{
-	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK/2));
-	aysnd.port_a_write_callback().set(FUNC(cclimber_audio_device::sample_select_w));
-	aysnd.add_route(ALL_OUTPUTS, ":speaker", 0.5);
+MACHINE_CONFIG_START(cclimber_audio_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK/2)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, cclimber_audio_device, sample_select_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(cclimber_audio_device::sh_start));
-	m_samples->add_route(ALL_OUTPUTS, ":speaker", 0.5);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_START_CB(cclimber_audio_device, sh_start)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":speaker", 0.5)
+MACHINE_CONFIG_END
 
 
 WRITE8_MEMBER(cclimber_audio_device::sample_select_w)
@@ -86,7 +85,7 @@ WRITE8_MEMBER(cclimber_audio_device::sample_volume_w)
 	m_sample_volume = data & 0x1f;    /* range 0-31 */
 }
 
-WRITE_LINE_MEMBER(cclimber_audio_device::sample_trigger)
+WRITE_LINE_MEMBER(cclimber_audio_device::sample_trigger_w)
 {
 	if (state == 0)
 		return;
@@ -96,7 +95,7 @@ WRITE_LINE_MEMBER(cclimber_audio_device::sample_trigger)
 
 WRITE8_MEMBER(cclimber_audio_device::sample_trigger_w)
 {
-	sample_trigger(data != 0);
+	sample_trigger_w(data != 0);
 }
 
 

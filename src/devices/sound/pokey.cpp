@@ -183,13 +183,13 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		device_sound_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		device_state_interface(mconfig, *this),
+		m_output_type(LEGACY_LINEAR),
 		m_icount(0),
 		m_stream(nullptr),
 		m_pot_r_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 		m_allpot_r_cb(*this),
 		m_serin_r_cb(*this),
-		m_serout_w_cb(*this),
-		m_output_type(LEGACY_LINEAR)
+		m_serout_w_cb(*this)
 {
 }
 
@@ -507,7 +507,7 @@ void pokey_device::step_keyboard()
 					if (m_IRQEN & IRQ_KEYBD)
 					{
 						/* last interrupt not acknowledged ? */
-						if (m_IRQST & IRQ_KEYBD)
+						if(m_IRQST & IRQ_KEYBD)
 							m_SKSTAT |= SK_KBERR;
 						m_IRQST |= IRQ_KEYBD;
 						if (!m_irq_f.isnull())
@@ -546,16 +546,14 @@ void pokey_device::step_keyboard()
 
 void pokey_device::step_pot()
 {
-	if ((m_SKCTL & SK_RESET) == 0)
-		return;
-
+	int pot;
 	uint8_t upd = 0;
 	m_pot_counter++;
-	for (int pot = 0; pot < 8; pot++)
+	for (pot = 0; pot < 8; pot++)
 	{
 		if ((m_POTx[pot]<m_pot_counter) || (m_pot_counter == 228))
 		{
-			upd |= (1 << pot);
+			upd |= (1<<pot);
 			/* latching is emulated in read */
 		}
 	}
@@ -572,13 +570,14 @@ void pokey_device::step_pot()
 
 uint32_t pokey_device::step_one_clock(void)
 {
-	int const base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
+	int ch, clk;
+	uint32_t sum = 0;
+	int clock_triggered[3] = {0,0,0};
+	int base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
 
-	if (m_SKCTL & SK_RESET)
+	if( (m_SKCTL & SK_RESET) )
 	{
 		/* Clocks only count if we are not in a reset */
-		int clock_triggered[3] = {0,0,0};
-		int clk;
 		for (clk = 0; clk < 3; clk++)
 		{
 			m_clock_cnt[clk]++;
@@ -622,7 +621,7 @@ uint32_t pokey_device::step_one_clock(void)
 	/* do CHAN2 before CHAN1 because CHAN1 may set borrow! */
 	if (m_channel[CHAN2].check_borrow())
 	{
-		bool const isJoined(m_AUDCTL & CH12_JOINED);
+		int isJoined = (m_AUDCTL & CH12_JOINED);
 		if (isJoined)
 			m_channel[CHAN1].reset_channel();
 		m_channel[CHAN2].reset_channel();
@@ -635,7 +634,7 @@ uint32_t pokey_device::step_one_clock(void)
 
 	if (m_channel[CHAN1].check_borrow())
 	{
-		bool const isJoined(m_AUDCTL & CH12_JOINED);
+		int isJoined = (m_AUDCTL & CH12_JOINED);
 		if (isJoined)
 			m_channel[CHAN2].inc_chan();
 		else
@@ -649,7 +648,7 @@ uint32_t pokey_device::step_one_clock(void)
 	/* do CHAN4 before CHAN3 because CHAN3 may set borrow! */
 	if (m_channel[CHAN4].check_borrow())
 	{
-		bool const isJoined(m_AUDCTL & CH34_JOINED);
+		int isJoined = (m_AUDCTL & CH34_JOINED);
 		if (isJoined)
 			m_channel[CHAN3].reset_channel();
 		m_channel[CHAN4].reset_channel();
@@ -665,7 +664,7 @@ uint32_t pokey_device::step_one_clock(void)
 
 	if (m_channel[CHAN3].check_borrow())
 	{
-		bool const isJoined(m_AUDCTL & CH34_JOINED);
+		int isJoined = (m_AUDCTL & CH34_JOINED);
 		if (isJoined)
 			m_channel[CHAN4].inc_chan();
 		else
@@ -678,8 +677,7 @@ uint32_t pokey_device::step_one_clock(void)
 			m_channel[CHAN1].m_filter_sample = 1;
 	}
 
-	uint32_t sum = 0;
-	for (int ch = 0; ch < 4; ch++)
+	for (ch = 0; ch < 4; ch++)
 	{
 		sum |= (((((m_channel[ch].m_output ^ m_channel[ch].m_filter_sample) || (m_channel[ch].m_AUDC & VOLUME_ONLY)) ? (m_channel[ch].m_AUDC & VOLUME_MASK) : 0 )) << (ch * 4));
 	}
@@ -782,6 +780,11 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 READ8_MEMBER( pokey_device::read )
 {
+	return read(offset);
+}
+
+uint8_t pokey_device::read(offs_t offset)
+{
 	int data, pot;
 
 	synchronize(SYNC_NOOP); /* force resync */
@@ -791,7 +794,7 @@ READ8_MEMBER( pokey_device::read )
 	case POT0_C: case POT1_C: case POT2_C: case POT3_C:
 	case POT4_C: case POT5_C: case POT6_C: case POT7_C:
 		pot = offset & 7;
-		if (m_ALLPOT & (1 << pot))
+		if( m_ALLPOT & (1 << pot) )
 		{
 			/* we have a value measured */
 			data = m_POTx[pot];
@@ -809,14 +812,14 @@ READ8_MEMBER( pokey_device::read )
 		 * If the 2 least significant bits of SKCTL are 0, the ALLPOTs
 		 * are disabled (SKRESET). Thanks to MikeJ for pointing this out.
 		 ****************************************************************/
-		if ((m_SKCTL & SK_RESET) == 0)
+		if( (m_SKCTL & SK_RESET) == 0)
 		{
-			data = m_ALLPOT;
+			data = 0;
 			LOG(("POKEY '%s' ALLPOT internal $%02x (reset)\n", tag(), data));
 		}
-		else if (!m_allpot_r_cb.isnull())
+		else if( !m_allpot_r_cb.isnull() )
 		{
-			m_ALLPOT = data = m_allpot_r_cb(offset);
+			data = m_allpot_r_cb(offset);
 			LOG(("%s: POKEY '%s' ALLPOT callback $%02x\n", machine().describe_context(), tag(), data));
 		}
 		else
@@ -831,7 +834,7 @@ READ8_MEMBER( pokey_device::read )
 		break;
 
 	case RANDOM_C:
-		if (m_AUDCTL & POLY9)
+		if( m_AUDCTL & POLY9 )
 		{
 			data = m_poly9[m_p9] & 0xff;
 			LOG_RAND(("POKEY '%s' rand9[$%05x]: $%02x\n", tag(), m_p9, data));
@@ -844,7 +847,7 @@ READ8_MEMBER( pokey_device::read )
 		break;
 
 	case SERIN_C:
-		if (!m_serin_r_cb.isnull())
+		if( !m_serin_r_cb.isnull() )
 			m_SERIN = m_serin_r_cb(offset);
 		data = m_SERIN;
 		LOG(("POKEY '%s' SERIN  $%02x\n", tag(), data));
@@ -869,6 +872,7 @@ READ8_MEMBER( pokey_device::read )
 		break;
 	}
 	return data;
+
 }
 
 
@@ -876,9 +880,14 @@ READ8_MEMBER( pokey_device::read )
 //  write - memory interface for write
 //-------------------------------------------------
 
+void pokey_device::write(offs_t offset, uint8_t data)
+{
+	synchronize(SYNC_WRITE, (offset<<8) | data);
+}
+
 WRITE8_MEMBER( pokey_device::write )
 {
-	synchronize(SYNC_WRITE, (offset << 8) | data);
+	write(offset, data);
 }
 
 void pokey_device::write_internal(offs_t offset, uint8_t data)
@@ -1074,9 +1083,6 @@ void pokey_device::pokey_potgo(void)
 {
 	int pot;
 
-	if( (m_SKCTL & SK_RESET) == 0)
-		return;
-
 	LOG(("POKEY #%p pokey_potgo\n", (void *) this));
 
 	m_ALLPOT = 0x00;
@@ -1143,7 +1149,7 @@ void pokey_device::vol_init()
 		rTot = 0;
 		for (int i=0; i<4; i++)
 		{
-			rTot += 1.0 / r_chan[(j >> (i*4)) & 0x0f];
+			rTot += 1.0 / r_chan[(j>>(i*4)) & 0x0f];
 		}
 		rTot = 1.0 / rTot;
 		m_voltab[j] = rTot;

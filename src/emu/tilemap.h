@@ -370,7 +370,7 @@ enum tilemap_standard_mapper
 #define MCFG_TILEMAP_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TILEMAP)
 #define MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	downcast<tilemap_device &>(*device).set_gfxdecode(_gfxtag);
+	downcast<tilemap_device &>(*device).set_gfxdecode_tag(_gfxtag);
 #define MCFG_TILEMAP_BYTES_PER_ENTRY(_bpe) \
 	downcast<tilemap_device &>(*device).set_bytes_per_entry(_bpe);
 #define MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \
@@ -717,44 +717,13 @@ class tilemap_device :  public device_t,
 						public tilemap_t
 {
 public:
-	template <typename T>
-	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxtag, int entrybytes
-		, u16 tilewidth, u16 tileheight, tilemap_standard_mapper mapper, u32 columns, u32 rows, pen_t transpen)
-		: tilemap_device(mconfig, tag, owner, (u32)0)
-	{
-		set_gfxdecode(std::forward<T>(gfxtag));
-		set_bytes_per_entry(entrybytes);
-		set_layout(mapper, columns, rows);
-		set_tile_size(tilewidth, tileheight);
-		set_configured_transparent_pen(transpen);
-	}
-
-	template <typename T>
-	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&gfxtag, int entrybytes
-		, u16 tilewidth, u16 tileheight, tilemap_standard_mapper mapper, u32 columns, u32 rows)
-		: tilemap_device(mconfig, tag, owner, (u32)0)
-	{
-		set_gfxdecode(std::forward<T>(gfxtag));
-		set_bytes_per_entry(entrybytes);
-		set_layout(mapper, columns, rows);
-		set_tile_size(tilewidth, tileheight);
-	}
-
+	// construction/destruction
 	tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	// configuration
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_bytes_per_entry(int bpe) { m_bytes_per_entry = bpe; }
-
 	void set_info_callback(tilemap_get_info_delegate tile_get_info) { m_get_info = tile_get_info; }
-	template <class FunctionClass> void set_info_callback(const char *devname, void (FunctionClass::*callback)(tilemap_t &, tile_data &, tilemap_memory_index), const char *name)
-	{
-		set_info_callback(tilemap_get_info_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_info_callback(void (FunctionClass::*callback)(tilemap_t &, tile_data &, tilemap_memory_index), const char *name)
-	{
-		set_info_callback(tilemap_get_info_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
 	void set_layout(tilemap_standard_mapper mapper, u32 columns, u32 rows) {
 		m_standard_mapper = mapper;
 		m_num_columns = columns;

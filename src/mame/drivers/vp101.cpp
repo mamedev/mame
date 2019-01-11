@@ -116,10 +116,6 @@ public:
 			m_in0(*this, "IN0")
 	{ }
 
-	void vp50(machine_config &config);
-	void vp101(machine_config &config);
-
-private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 
@@ -144,8 +140,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t vp50_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void vp50(machine_config &config);
+	void vp101(machine_config &config);
 	void main_map(address_map &map);
 	void vp50_map(address_map &map);
+protected:
 
 	// devices
 	required_device<mips3_device> m_maincpu;
@@ -253,14 +252,19 @@ void vp10x_state::video_start()
 
 uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 240; y++)
-	{
-		uint32_t *line = &bitmap.pix32(y);
-		const uint32_t *video_ram = (const uint32_t *) &m_mainram[(0x7400000/4) + (y * (0x1000/4)) + 4];
+	const uint32_t *video_ram;
+	uint32_t word;
+	uint32_t *line;
+	int y, x;
 
-		for (int x = 0; x < 320; x++)
+	for (y = 0; y < 240; y++)
+	{
+		line = &bitmap.pix32(y);
+		video_ram = (const uint32_t *) &m_mainram[(0x7400000/4) + (y * (0x1000/4)) + 4];
+
+		for (x = 0; x < 320; x++)
 		{
-			uint32_t word = *(video_ram++);
+			word = *(video_ram++);
 			video_ram++;
 			*line++ = word;
 		}
@@ -271,19 +275,23 @@ uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 // TODO: Palette is not at 0, where is it?
 uint32_t vp10x_state::vp50_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const uint8_t *video_ram;
+	uint32_t *line;
+	int y, x;
+	int r,g,b;
 	const uint16_t *pal_ram = (const uint16_t *) &m_mainram[0];
 
-	for (int y = 0; y < 240; y++)
+	for (y = 0; y < 240; y++)
 	{
-		uint32_t *line = &bitmap.pix32(y);
-		const uint8_t *video_ram = (const uint8_t *) &m_mainram[(0x10000/4)+(y * 100)];
+		line = &bitmap.pix32(y);
+		video_ram = (const uint8_t *) &m_mainram[(0x10000/4)+(y * 100)];
 
-		for (int x = 0; x < 400; x++)
+		for (x = 0; x < 400; x++)
 		{
 			// assume 565
-			int r = pal_ram[video_ram[x]] >> 11;
-			int g = (pal_ram[video_ram[x]] >> 5) & 0x3f;
-			int b = pal_ram[video_ram[x]] & 0x1f;
+			r = pal_ram[video_ram[x]] >> 11;
+			g = (pal_ram[video_ram[x]] >> 5) & 0x3f;
+			b = pal_ram[video_ram[x]] & 0x1f;
 
 			*line++ = (r << 19) | (g << 10) | (b << 3);
 		}
@@ -306,18 +314,18 @@ WRITE32_MEMBER(vp10x_state::tty_w)  // set breakpoint at bfc01430 to catch when 
 void vp10x_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).ram().share("mainram");
-	map(0x14000000, 0x14000003).r(FUNC(vp10x_state::test_r));
-	map(0x1c000000, 0x1c000003).w(FUNC(vp10x_state::tty_w));        // RSS OS code uses this one
-	map(0x1c000014, 0x1c000017).r(FUNC(vp10x_state::tty_ready_r));
-	map(0x1c400000, 0x1c400003).w(FUNC(vp10x_state::tty_w));        // boot ROM code uses this one
-	map(0x1c400014, 0x1c400017).r(FUNC(vp10x_state::tty_ready_r));
+	map(0x14000000, 0x14000003).r(this, FUNC(vp10x_state::test_r));
+	map(0x1c000000, 0x1c000003).w(this, FUNC(vp10x_state::tty_w));        // RSS OS code uses this one
+	map(0x1c000014, 0x1c000017).r(this, FUNC(vp10x_state::tty_ready_r));
+	map(0x1c400000, 0x1c400003).w(this, FUNC(vp10x_state::tty_w));        // boot ROM code uses this one
+	map(0x1c400014, 0x1c400017).r(this, FUNC(vp10x_state::tty_ready_r));
 	map(0x1ca0000c, 0x1ca0000f).portr("IN0");
-	map(0x1ca00010, 0x1ca00013).r(FUNC(vp10x_state::test_r));        // bits here cause various test mode stuff
+	map(0x1ca00010, 0x1ca00013).r(this, FUNC(vp10x_state::test_r));        // bits here cause various test mode stuff
 	map(0x1cf00000, 0x1cf00003).noprw().nopr();
-	map(0x1d000030, 0x1d000033).w(FUNC(vp10x_state::dmaaddr_w));    // ATA DMA destination address
-	map(0x1d000040, 0x1d00005f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)).umask32(0x0000ffff);
-	map(0x1d000060, 0x1d00007f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask32(0x0000ffff);
-	map(0x1f200000, 0x1f200003).rw(FUNC(vp10x_state::pic_r), FUNC(vp10x_state::pic_w));
+	map(0x1d000030, 0x1d000033).w(this, FUNC(vp10x_state::dmaaddr_w));    // ATA DMA destination address
+	map(0x1d000040, 0x1d00005f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)).umask32(0x0000ffff);
+	map(0x1d000060, 0x1d00007f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)).umask32(0x0000ffff);
+	map(0x1f200000, 0x1f200003).rw(this, FUNC(vp10x_state::pic_r), FUNC(vp10x_state::pic_w));
 	map(0x1f807000, 0x1f807fff).ram().share("nvram");
 	map(0x1fc00000, 0x1fffffff).rom().region("maincpu", 0);
 }
@@ -325,18 +333,18 @@ void vp10x_state::main_map(address_map &map)
 void vp10x_state::vp50_map(address_map &map)
 {
 	map(0x00000000, 0x03ffffff).ram().share("mainram");
-	map(0x1f000010, 0x1f00001f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
-	map(0x1f000020, 0x1f00002f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
+	map(0x1f000010, 0x1f00001f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1));
+	map(0x1f000020, 0x1f00002f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
 	map(0x1f400000, 0x1f400003).noprw(); // FPGA bitstream download?
 	map(0x1f400800, 0x1f400bff).ram().share("nvram");
 	map(0x1fc00000, 0x1fffffff).rom().region("maincpu", 0);
 
 	// TX4925 peripherals
-	map(0xff1ff40c, 0xff1ff40f).r(FUNC(vp10x_state::tty_4925_rdy_r));
-	map(0xff1ff41c, 0xff1ff41f).w(FUNC(vp10x_state::tty_w));
+	map(0xff1ff40c, 0xff1ff40f).r(this, FUNC(vp10x_state::tty_4925_rdy_r));
+	map(0xff1ff41c, 0xff1ff41f).w(this, FUNC(vp10x_state::tty_w));
 	map(0xff1ff500, 0xff1ff503).noprw();
-	map(0xff1ff814, 0xff1ff817).r(FUNC(vp10x_state::spi_status_r));
-	map(0xff1ff818, 0xff1ff81b).rw(FUNC(vp10x_state::spi_r), FUNC(vp10x_state::spi_w));
+	map(0xff1ff814, 0xff1ff817).r(this, FUNC(vp10x_state::spi_status_r));
+	map(0xff1ff818, 0xff1ff81b).rw(this, FUNC(vp10x_state::spi_r), FUNC(vp10x_state::spi_w));
 }
 
 static INPUT_PORTS_START( vp101 )
@@ -359,44 +367,42 @@ static INPUT_PORTS_START( vp50 )
 	PORT_BIT( 0xfffffff0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-void vp10x_state::vp101(machine_config &config)
-{
-	VR5500LE(config, m_maincpu, 400000000);
-	m_maincpu->set_dcache_size(32768);
-	m_maincpu->set_system_clock(100000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::main_map);
+MACHINE_CONFIG_START(vp10x_state::vp101)
+	MCFG_DEVICE_ADD("maincpu", VR5500LE, 400000000)
+	MCFG_MIPS3_DCACHE_SIZE(32768)
+	MCFG_MIPS3_SYSTEM_CLOCK(100000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(vp10x_state::screen_update));
-	screen.set_size(320, 240);
-	screen.set_visarea(0, 319, 0, 239);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE_DRIVER(vp10x_state, screen_update)
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
-	m_ata->dmarq_handler().set(FUNC(vp10x_state::dmarq_w));
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
+	MCFG_ATA_INTERFACE_DMARQ_HANDLER(WRITELINE(*this, vp10x_state, dmarq_w))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-}
+	MCFG_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
-void vp10x_state::vp50(machine_config &config)
-{
-	TX4925LE(config, m_maincpu, 200000000);
-	m_maincpu->set_dcache_size(32768);
-	m_maincpu->set_system_clock(100000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vp10x_state::vp50_map);
+MACHINE_CONFIG_START(vp10x_state::vp50)
+	MCFG_DEVICE_ADD("maincpu", TX4925LE, 200000000)
+	MCFG_MIPS3_DCACHE_SIZE(32768)
+	MCFG_MIPS3_SYSTEM_CLOCK(100000000)
+	MCFG_DEVICE_PROGRAM_MAP(vp50_map)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(vp10x_state::vp50_screen_update));
-	screen.set_size(400, 240);
-	screen.set_visarea(0, 399, 0, 239);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_UPDATE_DRIVER(vp10x_state, vp50_screen_update)
+	MCFG_SCREEN_SIZE(400, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
 
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-}
+	MCFG_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
 ROM_START(jnero)
 	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
@@ -413,11 +419,11 @@ ROM_END
 ROM_START(specfrce)
 	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
 	ROM_SYSTEM_BIOS(0, "default", "rev. 3.6")
-	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(0) )
+	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "r35", "rev. 3.5")
-	ROMX_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a), ROM_BIOS(1) ) /* Newer, but keep both in driver */
+	ROMX_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a), ROM_BIOS(2) ) /* Newer, but keep both in driver */
 	ROM_SYSTEM_BIOS(2, "r34", "rev. 3.4")
-	ROMX_LOAD( "special_forces_boot_v3.4.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58), ROM_BIOS(2) )
+	ROMX_LOAD( "special_forces_boot_v3.4.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58), ROM_BIOS(3) )
 
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 I/P program - read-protected, need dumped */
 	ROM_LOAD( "special_forces_et_u7_rev1.2.u7", 0x000000, 0x80000, NO_DUMP )
@@ -429,11 +435,11 @@ ROM_END
 ROM_START(specfrceo)
 	ROM_REGION(0x400000, "maincpu", 0)  /* Boot ROM */
 	ROM_SYSTEM_BIOS(0, "default", "rev. 3.6")
-	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(0) )
+	ROMX_LOAD( "boot 3.6.u4.27c801", 0x000000, 0x100000, CRC(b1628dd9) SHA1(5970d31b0cf3d0c1ab4b10ee8e54d2696fafde24), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "r35", "rev. 3.5")
-	ROMX_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a), ROM_BIOS(1) ) /* Newer, but keep both in driver */
+	ROMX_LOAD( "special_forces_boot_v3.5.u4", 0x000000, 0x100000, CRC(ae8dfdf0) SHA1(d64130e710d0c70095ad8ebd4e2194b8c461be4a), ROM_BIOS(2) ) /* Newer, but keep both in driver */
 	ROM_SYSTEM_BIOS(2, "r34", "rev. 3.4")
-	ROMX_LOAD( "special_forces_boot_v3.4.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58), ROM_BIOS(2) )
+	ROMX_LOAD( "special_forces_boot_v3.4.u4", 0x000000, 0x100000, CRC(db4862ac) SHA1(a1e886d424cf7d26605e29d972d48e8d44ae2d58), ROM_BIOS(3) )
 
 	ROM_REGION(0x80000, "pic", 0)       /* PIC18c422 I/P program - read-protected, need dumped */
 	ROM_LOAD( "special_forces_et_u7_rev1.2.u7", 0x000000, 0x80000, NO_DUMP )

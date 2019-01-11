@@ -32,17 +32,15 @@ public:
 
 	void jpmsru(machine_config &config);
 	void jpmsru_4(machine_config &config);
-
-	void init_jpmsru();
-
-private:
 	void jpmsru_4_map(address_map &map);
 	void jpmsru_io(address_map &map);
 	void jpmsru_map(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
+	void init_jpmsru();
 };
 
 // blind guess
@@ -74,15 +72,11 @@ static INPUT_PORTS_START( jpmsru )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(jpmsru_state::jpmsru)
-	TMS9980A(config, m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsru_state::jpmsru_map);
-	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::jpmsru_io);
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_map, jpmsru_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jpmsru_state::jpmsru_4)
-	TMS9980A(config, m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsru_state::jpmsru_4_map);
-	m_maincpu->set_addrmap(AS_IO, &jpmsru_state::jpmsru_io);
+	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MAIN_CLOCK, jpmsru_4_map, jpmsru_io)
 MACHINE_CONFIG_END
 
 void jpmsru_state::init_jpmsru()

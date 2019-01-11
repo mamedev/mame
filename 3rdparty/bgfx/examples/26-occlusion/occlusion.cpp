@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -76,16 +76,11 @@ public:
 
 		m_width  = _width;
 		m_height = _height;
-		m_debug  = BGFX_DEBUG_TEXT;
+		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -209,6 +204,23 @@ public:
 				cameraGetViewMtx(view);
 
 				// Set view and projection matrix for view 0.
+				const bgfx::HMD* hmd = bgfx::getHMD();
+				if (NULL != hmd && 0 != (hmd->flags & BGFX_HMD_RENDERING) )
+				{
+					float viewHead[16];
+					float eye[3] = {};
+					bx::mtxQuatTranslationHMD(viewHead, hmd->eye[0].rotation, eye);
+
+					float tmp[16];
+					bx::mtxMul(tmp, view, viewHead);
+
+					bgfx::setViewTransform(0, tmp, hmd->eye[0].projection);
+					bgfx::setViewRect(0, 0, 0, hmd->width, hmd->height);
+
+					bgfx::setViewTransform(1, tmp, hmd->eye[1].projection);
+					bgfx::setViewRect(1, 0, 0, hmd->width, hmd->height);
+				}
+				else
 				{
 					float proj[16];
 					bx::mtxProj(proj, 90.0f, float(m_width)/float(m_height), 0.1f, 10000.0f, bgfx::getCaps()->homogeneousDepth);
@@ -219,8 +231,8 @@ public:
 					bgfx::setViewTransform(1, view, proj);
 					bgfx::setViewRect(1, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 
-					const bx::Vec3 at  = {  0.0f,  0.0f,   0.0f };
-					const bx::Vec3 eye = { 17.5f, 10.0f, -17.5f };
+					float at[3]  = {  0.0f,  0.0f,   0.0f };
+					float eye[3] = { 17.5f, 10.0f, -17.5f };
 					bx::mtxLookAt(view, eye, at);
 
 					bgfx::setViewTransform(2, view, proj);
@@ -274,12 +286,12 @@ public:
 
 				for (uint16_t xx = 0; xx < CUBES_DIM; ++xx)
 				{
-					bgfx::dbgTextImage(5 + xx*2, 20, 1, CUBES_DIM, img + xx*2, CUBES_DIM*2);
+					bgfx::dbgTextImage(5 + xx*2, 5, 1, CUBES_DIM, img + xx*2, CUBES_DIM*2);
 				}
 
 				int32_t numPixels = 0;
 				bgfx::getResult(m_occlusionQueries[0], &numPixels);
-				bgfx::dbgTextPrintf(5, 20 + CUBES_DIM + 1, 0xf, "Passing pixels count: %d", numPixels);
+				bgfx::dbgTextPrintf(5, 5 + CUBES_DIM + 1, 0xf, "%d", numPixels);
 			}
 
 			// Advance to next frame. Rendering thread will be kicked to
