@@ -163,6 +163,7 @@ private:
 	void nvram_w(offs_t offset, u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(nvram_protect_w);
+	DECLARE_WRITE_LINE_MEMBER(select_disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ram_control_w);
 	DECLARE_WRITE_LINE_MEMBER(parity_poison_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_w);
@@ -200,6 +201,7 @@ private:
 	required_shared_ptr<u8> m_p_nvram;
 	std::unique_ptr<u8 []>  m_p_parity;
 
+	u16 m_disp_mask;
 	u16 m_bank_mask;
 	bool m_parity_poison;
 	bool m_display_enable;
@@ -269,6 +271,11 @@ WRITE_LINE_MEMBER(univac_state::nvram_protect_w)
 	// The present implementation is a crude approximation of a wild guess.
 	if (state)
 		m_nvram_protect = m_screen->vpos() < 10;
+}
+
+WRITE_LINE_MEMBER(univac_state::select_disp_w)
+{
+	m_disp_mask = state ? 0x2000 : 0x0000;
 }
 
 WRITE_LINE_MEMBER(univac_state::ram_control_w)
@@ -456,7 +463,7 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	}
 
 	u8 y,ra,chr;
-	uint16_t sy=0,x,ma=0,gfx; //m_bank_mask; (it isn't port43 that selects the screen)
+	uint16_t sy=0,x,ma=0,gfx;
 
 	m_framecnt++;
 
@@ -468,7 +475,7 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 			for (x = ma; x < ma + 80; x++)
 			{
-				chr = m_p_videoram[x];    // bit 7 = rv attribute (or dim, depending on control-page setting)
+				chr = ram_r(x ^ m_disp_mask);    // bit 7 = rv attribute (or dim, depending on control-page setting)
 
 				gfx = m_p_chargen[((chr & 0x7f)<<4) | ra];
 
@@ -536,6 +543,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	ls259_device &latch_40(LS259(config, "latch_40")); // actual type and location unknown
+	latch_40.q_out_cb<1>().set(FUNC(univac_state::select_disp_w));
 	latch_40.q_out_cb<3>().set(FUNC(univac_state::ram_control_w));
 
 	ls259_device &latch_c0(LS259(config, "latch_c0")); // actual type and location unknown
