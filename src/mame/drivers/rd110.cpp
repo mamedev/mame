@@ -257,7 +257,7 @@ MACHINE_CONFIG_START(d110_state::d110)
 
 	PALETTE(config, "palette", FUNC(d110_state::d110_palette), 2);
 
-	MCFG_MSM6222B_01_ADD( m_lcd )
+	MSM6222B_01(config, m_lcd, 0);
 
 	MCFG_TIMER_DRIVER_ADD( m_midi_timer, d110_state, midi_timer_cb )
 

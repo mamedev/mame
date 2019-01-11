@@ -407,13 +407,13 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_NSC810_ADD("iotimer",XTAL(4'000'000),XTAL(4'000'000))
-	MCFG_NSC810_PORTA_READ(READ8(*this, hunter2_state,keyboard_r))
-	MCFG_NSC810_PORTB_READ(READ8(*this, hunter2_state,serial_dsr_r))
-	MCFG_NSC810_PORTB_WRITE(WRITE8(*this, hunter2_state,keyboard_w))
-	MCFG_NSC810_PORTC_READ(READ8(*this, hunter2_state,serial_rx_r))
-	MCFG_NSC810_TIMER0_OUT(WRITELINE(*this, hunter2_state,timer0_out))
-	MCFG_NSC810_TIMER1_OUT(WRITELINE(*this, hunter2_state,timer1_out))
+	nsc810_device &iotimer(NSC810(config, "iotimer", 0, XTAL(4'000'000), XTAL(4'000'000)));
+	iotimer.portA_read_callback().set(FUNC(hunter2_state::keyboard_r));
+	iotimer.portB_read_callback().set(FUNC(hunter2_state::serial_dsr_r));
+	iotimer.portB_write_callback().set(FUNC(hunter2_state::keyboard_w));
+	iotimer.portC_read_callback().set(FUNC(hunter2_state::serial_rx_r));
+	iotimer.timer0_callback().set(FUNC(hunter2_state::timer0_out));
+	iotimer.timer1_callback().set(FUNC(hunter2_state::timer1_out));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->cts_handler().set(FUNC(hunter2_state::cts_w));

@@ -2525,7 +2525,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	MCFG_DEVICE_PROGRAM_MAP(funcube_sub_map)
 	MCFG_DEVICE_IO_MAP(funcube_sub_io)
 
-	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
 

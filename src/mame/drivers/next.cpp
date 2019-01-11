@@ -1016,7 +1016,7 @@ MACHINE_CONFIG_START(next_state::next_base)
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
 
-	MCFG_DEVICE_ADD("rtc", MCCS1850, XTAL(32'768))
+	MCCS1850(config, rtc, XTAL(32'768));
 
 	SCC8530(config, scc, XTAL(25'000'000));
 	scc->intrq_callback().set(FUNC(next_state::scc_irq));

@@ -215,12 +215,12 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	pit.out_handler<2>().append(m_uart2, FUNC(i8251_device::write_rxc));
 
 	// CRTC
-	MCFG_DEVICE_ADD(m_crtc, I8275, 14.318'181_MHz_XTAL / 7)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE("irq0", input_merger_device, in_w<1>))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 7);
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr), this);
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
+	m_crtc->irq_wr_callback().set("irq0", FUNC(input_merger_device::in_w<1>));
+	m_crtc->set_screen("screen");
 
 	// Floppies
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);

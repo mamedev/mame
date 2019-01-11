@@ -16,16 +16,30 @@ class nsc810_device :  public device_t
 {
 public:
 	// construction/destruction
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t clk0, uint32_t clk1)
+		: nsc810_device(mconfig, tag, owner, clock)
+	{
+		set_timer0_clock(clk0);
+		set_timer1_clock(clk1);
+	}
+
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const XTAL &clk0, const XTAL &clk1)
+		: nsc810_device(mconfig, tag, owner, clock)
+	{
+		set_timer0_clock(clk0.value());
+		set_timer1_clock(clk1.value());
+	}
+	
 	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_portA_read_callback(Object &&cb) { return m_portA_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portB_read_callback(Object &&cb) { return m_portB_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portC_read_callback(Object &&cb) { return m_portC_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portA_write_callback(Object &&cb) { return m_portA_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portB_write_callback(Object &&cb) { return m_portB_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portC_write_callback(Object &&cb) { return m_portC_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_timer0_callback(Object &&cb) { return m_timer0_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_timer1_callback(Object &&cb) { return m_timer1_out.set_callback(std::forward<Object>(cb)); }
+	auto portA_read_callback() { return m_portA_r.bind(); }
+	auto portB_read_callback() { return m_portB_r.bind(); }
+	auto portC_read_callback() { return m_portC_r.bind(); }
+	auto portA_write_callback() { return m_portA_w.bind(); }
+	auto portB_write_callback() { return m_portB_w.bind(); }
+	auto portC_write_callback() { return m_portC_w.bind(); }
+	auto timer0_callback() { return m_timer0_out.bind(); }
+	auto timer1_callback() { return m_timer1_out.bind(); }
 
 	void set_timer0_clock(uint32_t clk) { m_timer0_clock = clk; }
 	void set_timer0_clock(const XTAL &clk) { set_timer0_clock(clk.value()); }
