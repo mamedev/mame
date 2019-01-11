@@ -94,6 +94,18 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	enum
+	{
+		REG_SP = 0,
+		REG_R1,
+		REG_R2,
+		REG_R3,
+		REG_R4,
+		REG_BP,
+		REG_SR,
+		REG_PC
+	};
+
 	void add_lpc(const int32_t offset);
 
 	inline void execute_one(const uint16_t op);
@@ -122,7 +134,7 @@ private:
 	inline uint16_t read16(uint32_t address);
 	inline void write16(uint32_t address, uint16_t data);
 	inline void update_nz(uint32_t value);
-	inline void update_sc(uint32_t value, uint16_t r0, uint16_t r1);
+	inline void update_nzsc(uint32_t value, uint16_t r0, uint16_t r1);
 	inline void push(uint16_t value, uint16_t *reg);
 	inline uint16_t pop(uint16_t *reg);
 	inline void trigger_fiq();
