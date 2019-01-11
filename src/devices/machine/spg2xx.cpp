@@ -106,6 +106,16 @@ void spg2xx_device::map(address_map &map)
 
 void spg2xx_device::device_start()
 {
+	for (uint8_t i = 0; i < 32; i++)
+	{
+		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);
+	}
+	for (uint16_t i = 0; i < 0x8000; i++)
+	{
+		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
+		                        (m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
+		                        (m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
+	}
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
 	m_portc_out.resolve_safe();
@@ -250,12 +260,6 @@ void spg2xx_device::device_reset()
 *     Video Hardware     *
 *************************/
 
-inline uint8_t spg2xx_device::expand_rgb5_to_rgb8(uint8_t val)
-{
-	uint8_t temp = val & 0x1f;
-	return (temp << 3) | (temp >> 2);
-}
-
 // Perform a lerp between a and b
 inline uint8_t spg2xx_device::mix_channel(uint8_t bottom, uint8_t top)
 {
@@ -263,30 +267,15 @@ inline uint8_t spg2xx_device::mix_channel(uint8_t bottom, uint8_t top)
 	return ((256 - alpha) * bottom + alpha * top) >> 8;
 }
 
-void spg2xx_device::mix_pixel(uint32_t offset, uint16_t rgb)
-{
-	m_screenbuf[offset].r = mix_channel(m_screenbuf[offset].r, expand_rgb5_to_rgb8(rgb >> 10));
-	m_screenbuf[offset].g = mix_channel(m_screenbuf[offset].g, expand_rgb5_to_rgb8(rgb >> 5));
-	m_screenbuf[offset].b = mix_channel(m_screenbuf[offset].b, expand_rgb5_to_rgb8(rgb));
-}
-
-void spg2xx_device::set_pixel(uint32_t offset, uint16_t rgb)
-{
-	m_screenbuf[offset].r = expand_rgb5_to_rgb8(rgb >> 10);
-	m_screenbuf[offset].g = expand_rgb5_to_rgb8(rgb >> 5);
-	m_screenbuf[offset].b = expand_rgb5_to_rgb8(rgb);
-}
-
-template<spg2xx_device::blend_enable_t Blend, spg2xx_device::rowscroll_enable_t RowScroll>
+template<spg2xx_device::blend_enable_t Blend, spg2xx_device::rowscroll_enable_t RowScroll, spg2xx_device::flipx_t FlipX>
 void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 
-	uint32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	uint32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	int32_t h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	int32_t w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 	uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
-	uint32_t xflipmask = attr & TILE_X_FLIP ? w - 1 : 0;
 
 	uint32_t nc = ((attr & 0x0003) + 1) << 1;
 
@@ -294,7 +283,7 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 	if (SPG_DEBUG_VIDEO && m_debug_blit)
 	{
 		printf("s:%d line:%d xy:%08x,%08x attr:%08x ctrl:%08x bitmap_addr:%08x tile:%04x\n", cliprect.min_x, line, xoff, yoff, attr, ctrl, bitmap_addr, tile);
-		printf("hw:%d,%d f:%d,%d fm:%d,%d ncols:%d pobs:%02x ", w, h, (attr & TILE_X_FLIP) ? 1 : 0, (attr & TILE_Y_FLIP) ? 1 : 0, xflipmask, yflipmask, nc, palette_offset);
+		printf("hw:%d,%d f:%d,%d yfm:%d ncols:%d pobs:%02x ", w, h, (attr & TILE_X_FLIP) ? 1 : 0, (attr & TILE_Y_FLIP) ? 1 : 0, yflipmask, nc, palette_offset);
 	}
 	palette_offset >>= nc;
 	palette_offset <<= nc;
@@ -319,9 +308,9 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 
 	int y_index = yy * 320;
 
-	for (uint32_t x = 0; x < w; x++)
+	for (int32_t x = FlipX ? (w - 1) : 0; FlipX ? x >= 0 : x < w; FlipX ? x-- : x++)
 	{
-		int xx = xoff + (x ^ xflipmask);
+		int xx = xoff + x;
 
 		bits <<= nc;
 		if (SPG_DEBUG_VIDEO && m_debug_blit)
@@ -356,19 +345,22 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 			uint16_t rgb = m_paletteram[pal];
 			if (SPG_DEBUG_VIDEO && m_debug_blit)
 				printf("rgb:%04x ", rgb);
+
 			if (!(rgb & 0x8000))
 			{
 				if (Blend)
 				{
 					if (SPG_DEBUG_VIDEO && m_debug_blit)
 						printf("M\n");
-					mix_pixel(pix_index, rgb);
+					m_screenbuf[pix_index] = (mix_channel((uint8_t)(m_screenbuf[pix_index] >> 16), m_rgb5_to_rgb8[(rgb >> 10) & 0x1f]) << 16) |
+					                         (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
+					                         (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  0), m_rgb5_to_rgb8[rgb & 0x1f]));
 				}
 				else
 				{
 					if (SPG_DEBUG_VIDEO && m_debug_blit)
 						printf("S\n");
-					set_pixel(pix_index, rgb);
+					m_screenbuf[pix_index] = m_rgb555_to_rgb888[rgb];
 				}
 			}
 			else if (SPG_DEBUG_VIDEO && m_debug_blit)
@@ -417,20 +409,15 @@ void spg2xx_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 	{
 		uint32_t yy = ((tile_h * y0 - yscroll + 0x10) & 0xff) - 0x10;
 		uint32_t xx = (tile_w * x0 - xscroll) & 0x1ff;
-
 		uint16_t tile = (ctrl & PAGE_WALLPAPER_MASK) ? space.read_word(tilemap) : space.read_word(tilemap + tile_address);
 		uint16_t palette = 0;
 
 		if (!tile)
-		{
 			continue;
-		}
 
 		palette = space.read_word(palette_map + tile_address / 2);
 		if (x0 & 1)
-		{
 			palette >>= 8;
-		}
 
 		uint32_t tileattr = attr;
 		uint32_t tilectrl = ctrl;
@@ -448,20 +435,41 @@ void spg2xx_device::blit_page(const rectangle &cliprect, uint32_t scanline, int 
 
 		bool blend = (tileattr & 0x4000 || tilectrl & 0x0100);
 		bool row_scroll = (tilectrl & 0x0010);
+		bool flip_x = (tileattr & TILE_X_FLIP);
 
 		if (blend)
 		{
 			if (row_scroll)
-				blit<BlendOn, RowScrollOn>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			{
+				if (flip_x)
+					blit<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+				else
+					blit<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			}
 			else
-				blit<BlendOn, RowScrollOff>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			{
+				if (flip_x)
+					blit<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+				else
+					blit<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			}
 		}
 		else
 		{
 			if (row_scroll)
-				blit<BlendOff, RowScrollOn>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			{
+				if (flip_x)
+					blit<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+				else
+					blit<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			}
 			else
-				blit<BlendOff, RowScrollOff>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			{
+				if (flip_x)
+					blit<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+				else
+					blit<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			}
 		}
 	}
 	if (SPG_DEBUG_VIDEO && machine().input().code_pressed(KEYCODE_EQUALS))
@@ -498,17 +506,12 @@ void spg2xx_device::blit_sprite(const rectangle &cliprect, uint32_t scanline, in
 	x &= 0x01ff;
 	y &= 0x01ff;
 
-	static bool check_y = true;
-
-	if (SPG_DEBUG_VIDEO && machine().input().code_pressed_once(KEYCODE_J))
-		check_y = !check_y;
-
 	uint32_t tile_line = ((scanline - y) + 0x200) % h;
 	int16_t test_y = (y + tile_line) & 0x1ff;
 	if (test_y >= 0x01c0)
 		test_y -= 0x0200;
 
-	if (test_y > scanline && check_y)
+	if (test_y != scanline)
 	{
 		if (SPG_DEBUG_VIDEO && machine().input().code_pressed(KEYCODE_L))
 			printf("Rejecting because %d > %d\n", test_y, scanline);
@@ -516,20 +519,41 @@ void spg2xx_device::blit_sprite(const rectangle &cliprect, uint32_t scanline, in
 	}
 
 	bool blend = (attr & 0x4000);
+	bool flip_x = (attr & TILE_X_FLIP);
 
 #if SPG_DEBUG_VIDEO
 	if (m_debug_sprites && machine().input().code_pressed(KEYCODE_MINUS))
 		m_debug_blit = true;
 	if (blend)
-		blit<BlendOn, RowScrollOff>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+	{
+		if (flip_x)
+			blit<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+		else
+			blit<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+	}
 	else
-		blit<BlendOff, RowScrollOff>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+	{
+		if (flip_x)
+			blit<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+		else
+			blit<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+	}
 	m_debug_blit = false;
 #else
 	if (blend)
-		blit<BlendOn, RowScrollOff>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+	{
+		if (flip_x)
+			blit<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+		else
+			blit<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+	}
 	else
-		blit<BlendOff, RowScrollOff>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+	{
+		if (flip_x)
+			blit<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+		else
+			blit<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, attr, 0, bitmap_addr, tile);
+	}
 #endif
 }
 
@@ -566,12 +590,13 @@ void spg2xx_device::apply_saturation(const rectangle &cliprect)
 	const float sat_adjust = (0xff - (m_video_regs[0x3c] & 0x00ff)) / (float)(0xff - 0x20);
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		rgbtriad_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
+		uint32_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			const float src_r = src->r * s_u8_to_float;
-			const float src_g = src->g * s_u8_to_float;
-			const float src_b = src->b * s_u8_to_float;
+			const uint32_t src_rgb = *src;
+			const float src_r = (uint8_t)(src_rgb >> 16) * s_u8_to_float;
+			const float src_g = (uint8_t)(src_rgb >>  8) * s_u8_to_float;
+			const float src_b = (uint8_t)(src_rgb >>  0) * s_u8_to_float;
 			const float luma = src_r * s_gray_r + src_g * s_gray_g + src_b * s_gray_b;
 			const float adjusted_r = luma + (src_r - luma) * sat_adjust;
 			const float adjusted_g = luma + (src_g - luma) * sat_adjust;
@@ -579,10 +604,9 @@ void spg2xx_device::apply_saturation(const rectangle &cliprect)
 			const int integer_r = (int)floor(adjusted_r * 255.0f);
 			const int integer_g = (int)floor(adjusted_g * 255.0f);
 			const int integer_b = (int)floor(adjusted_b * 255.0f);
-			src->r = integer_r > 255 ? 255 : (integer_r < 0 ? 0 : (uint8_t)integer_r);
-			src->g = integer_g > 255 ? 255 : (integer_g < 0 ? 0 : (uint8_t)integer_g);
-			src->b = integer_b > 255 ? 255 : (integer_b < 0 ? 0 : (uint8_t)integer_b);
-			src++;
+			*src++ = (integer_r > 255 ? 0xff0000 : (integer_r < 0 ? 0 : ((uint8_t)integer_r << 16))) |
+			         (integer_g > 255 ? 0x00ff00 : (integer_g < 0 ? 0 : ((uint8_t)integer_g << 8))) |
+			         (integer_b > 255 ? 0x0000ff : (integer_b < 0 ? 0 : (uint8_t)integer_b));
 		}
 	}
 }
@@ -592,23 +616,26 @@ void spg2xx_device::apply_fade(const rectangle &cliprect)
 	const uint16_t fade_offset = m_video_regs[0x30] << 1;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		rgbtriad_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
+		uint32_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			const uint16_t r = (uint16_t)src->r - fade_offset;
-			const uint16_t g = (uint16_t)src->g - fade_offset;
-			const uint16_t b = (uint16_t)src->b - fade_offset;
-			src->r = (r > src->r ? 0 : r);
-			src->g = (g > src->g ? 0 : g);
-			src->b = (b > src->b ? 0 : b);
-			src++;
+			const uint32_t src_rgb = *src;
+			const uint8_t src_r = (src_rgb >> 16) & 0xff;
+			const uint8_t src_g = (src_rgb >>  8) & 0xff;
+			const uint8_t src_b = (src_rgb >>  0) & 0xff;
+			const uint8_t r = src_r - fade_offset;
+			const uint8_t g = src_g - fade_offset;
+			const uint8_t b = src_b - fade_offset;
+			*src++ = (r > src_r ? 0 : (r << 16)) |
+			         (g > src_g ? 0 : (g <<  8)) |
+			         (b > src_b ? 0 : (b <<  0));
 		}
 	}
 }
 
 uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	memset(&m_screenbuf[320 * cliprect.min_y], 0, 3 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
+	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
 
 	const uint32_t page1_addr = 0x40 * m_video_regs[0x20];
 	const uint32_t page2_addr = 0x40 * m_video_regs[0x21];
@@ -641,12 +668,8 @@ uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
-		rgbtriad_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			*dest++ = (src->r << 16) | (src->g << 8) | src->b;
-			src++;
-		}
+		uint32_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
+		memcpy(dest, src, sizeof(uint32_t) * ((cliprect.max_x - cliprect.min_x) + 1));
 	}
 
 	return 0;
