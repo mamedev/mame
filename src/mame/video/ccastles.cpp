@@ -36,7 +36,6 @@ void ccastles_state::video_start()
 	m_screen->register_screen_bitmap(m_spritebitmap);
 
 	/* register for savestates */
-	save_item(NAME(m_video_control));
 	save_item(NAME(m_bitmode_addr));
 	save_item(NAME(m_hscroll));
 	save_item(NAME(m_vscroll));
@@ -66,7 +65,7 @@ WRITE8_MEMBER(ccastles_state::ccastles_vscroll_w)
 WRITE8_MEMBER(ccastles_state::ccastles_video_control_w)
 {
 	/* only D3 matters */
-	m_video_control[offset] = (data >> 3) & 1;
+	m_outlatch[1]->write_bit(offset, BIT(data, 3));
 }
 
 
@@ -166,18 +165,18 @@ inline void ccastles_state::ccastles_write_vram( uint16_t addr, uint8_t data, ui
 inline void ccastles_state::bitmode_autoinc(  )
 {
 	/* auto increment in the x-direction if it's enabled */
-	if (!m_video_control[0]) /* /AX */
+	if (!m_outlatch[1]->q0_r()) /* /AX */
 	{
-		if (!m_video_control[2]) /* /XINC */
+		if (!m_outlatch[1]->q2_r()) /* /XINC */
 			m_bitmode_addr[0]++;
 		else
 			m_bitmode_addr[0]--;
 	}
 
 	/* auto increment in the y-direction if it's enabled */
-	if (!m_video_control[1]) /* /AY */
+	if (!m_outlatch[1]->q1_r()) /* /AY */
 	{
-		if (!m_video_control[3]) /* /YINC */
+		if (!m_outlatch[1]->q3_r()) /* /YINC */
 			m_bitmode_addr[1]++;
 		else
 			m_bitmode_addr[1]--;
@@ -255,8 +254,8 @@ WRITE8_MEMBER(ccastles_state::ccastles_bitmode_addr_w)
 
 uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteaddr = &m_spriteram[m_video_control[7] * 0x100];   /* BUF1/BUF2 */
-	int flip = m_video_control[4] ? 0xff : 0x00;    /* PLAYER2 */
+	uint8_t *spriteaddr = &m_spriteram[m_outlatch[1]->q7_r() * 0x100];   /* BUF1/BUF2 */
+	int flip = m_outlatch[1]->q4_r() ? 0xff : 0x00;    /* PLAYER2 */
 	pen_t black = m_palette->black_pen();
 	int x, y, offs;
 
@@ -273,14 +272,14 @@ uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_in
 	}
 
 	/* draw the bitmap to the screen, looping over Y */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (m_syncprom[y] & 1)
 		{
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 				dst[x] = black;
 		}
 
@@ -297,7 +296,7 @@ uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_in
 			src = &m_videoram[effy * 128];
 
 			/* loop over X */
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				/* if we're in the HBLANK region, just store black */
 				if (x >= 256)

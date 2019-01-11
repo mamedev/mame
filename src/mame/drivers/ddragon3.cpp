@@ -20,7 +20,7 @@ Double Dragon 3 PCB Layout
 --------------------------
 
 TA-0030-P1-03 (early version with EPROMs)
-TA-0030-P1-04 (later version with MASKROMs)
+TA-0030-P1-04 (later version with mask ROMs)
 |----------------------------------------------|
 |VOL M51516 YM3012 YM2151     3.579545MHz IC15 |
 |     MB3615 1.056MHz   Z80               IC14|-|
@@ -294,17 +294,17 @@ void ddragon3_state::ddragon3_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x000004, 0x000007).nopw();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
-	map(0x0c0000, 0x0c000f).w(this, FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x0c0000, 0x0c000f).w(FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x100001).portr("P1_P2");
 	map(0x100002, 0x100003).portr("SYSTEM");
 	map(0x100004, 0x100005).portr("DSW");
 	map(0x100006, 0x100007).portr("P3");
-	map(0x100000, 0x100001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x100000, 0x100001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x100003, 0x100003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x100004, 0x100005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x100006, 0x100007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x100004, 0x100005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x100006, 0x100007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140000, 0x1405ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
 	map(0x180000, 0x180fff).ram().share("spriteram");
 	map(0x1c0000, 0x1c3fff).ram(); /* work RAM */
@@ -313,15 +313,15 @@ void ddragon3_state::ddragon3_map(address_map &map)
 void ddragon3_state::dd3b_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
 	map(0x081000, 0x081fff).ram().share("spriteram");
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
-	map(0x0c0000, 0x0c000f).w(this, FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x0c0000, 0x0c000f).w(FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x140000, 0x140001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x140000, 0x140001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x140003, 0x140003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x140004, 0x140005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x140006, 0x140007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x140004, 0x140005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x140006, 0x140007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140008, 0x140009).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180000, 0x180001).portr("IN0");
 	map(0x180002, 0x180003).portr("IN1");
@@ -333,16 +333,16 @@ void ddragon3_state::dd3b_map(address_map &map)
 void ddragon3_state::ctribe_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
+	map(0x080000, 0x080fff).ram().w(FUNC(ddragon3_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* Foreground (32x32 Tiles - 4 by per tile) */
 	map(0x081000, 0x081fff).ram().share("spriteram");
-	map(0x082000, 0x0827ff).ram().w(this, FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
+	map(0x082000, 0x0827ff).ram().w(FUNC(ddragon3_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* Background (32x32 Tiles - 2 by per tile) */
 	map(0x082800, 0x082fff).ram();
-	map(0x0c0000, 0x0c000f).rw(this, FUNC(ddragon3_state::ddragon3_scroll_r), FUNC(ddragon3_state::ddragon3_scroll_w));
+	map(0x0c0000, 0x0c000f).rw(FUNC(ddragon3_state::ddragon3_scroll_r), FUNC(ddragon3_state::ddragon3_scroll_w));
 	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); /* Palette RAM */
-	map(0x140000, 0x140001).w(this, FUNC(ddragon3_state::ddragon3_vreg_w));
+	map(0x140000, 0x140001).w(FUNC(ddragon3_state::ddragon3_vreg_w));
 	map(0x140003, 0x140003).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x140004, 0x140005).w(this, FUNC(ddragon3_state::irq6_ack_w));
-	map(0x140006, 0x140007).w(this, FUNC(ddragon3_state::irq5_ack_w));
+	map(0x140004, 0x140005).w(FUNC(ddragon3_state::irq6_ack_w));
+	map(0x140006, 0x140007).w(FUNC(ddragon3_state::irq5_ack_w));
 	map(0x140008, 0x140009).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x180000, 0x180001).portr("IN0");
 	map(0x180002, 0x180003).portr("IN1");
@@ -354,20 +354,20 @@ void ddragon3_state::ctribe_map(address_map &map)
 void wwfwfest_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x0c0000, 0x0c1fff).ram().w(this, FUNC(wwfwfest_state::wwfwfest_fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram - 4 bytes per tile */
+	map(0x0c0000, 0x0c1fff).ram().w(FUNC(wwfwfest_state::wwfwfest_fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram - 4 bytes per tile */
 	map(0x0c2000, 0x0c3fff).ram().share("spriteram");                       /* SPR Ram */
-	map(0x080000, 0x080fff).ram().w(this, FUNC(wwfwfest_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* BG0 Ram - 4 bytes per tile */
-	map(0x082000, 0x082fff).ram().w(this, FUNC(wwfwfest_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* BG1 Ram - 2 bytes per tile */
-	map(0x100000, 0x100007).rw(this, FUNC(wwfwfest_state::ddragon3_scroll_r), FUNC(wwfwfest_state::ddragon3_scroll_w));
-	map(0x10000a, 0x10000b).w(this, FUNC(wwfwfest_state::wwfwfest_flipscreen_w));
-	map(0x140000, 0x140003).w(this, FUNC(wwfwfest_state::wwfwfest_irq_ack_w));
-	map(0x14000c, 0x14000d).w(this, FUNC(wwfwfest_state::wwfwfest_soundwrite));
-	map(0x140011, 0x140011).w(this, FUNC(wwfwfest_state::wwfwfest_priority_w));
+	map(0x080000, 0x080fff).ram().w(FUNC(wwfwfest_state::ddragon3_fg_videoram_w)).share("fg_videoram"); /* BG0 Ram - 4 bytes per tile */
+	map(0x082000, 0x082fff).ram().w(FUNC(wwfwfest_state::ddragon3_bg_videoram_w)).share("bg_videoram"); /* BG1 Ram - 2 bytes per tile */
+	map(0x100000, 0x100007).rw(FUNC(wwfwfest_state::ddragon3_scroll_r), FUNC(wwfwfest_state::ddragon3_scroll_w));
+	map(0x10000a, 0x10000b).w(FUNC(wwfwfest_state::wwfwfest_flipscreen_w));
+	map(0x140000, 0x140003).w(FUNC(wwfwfest_state::wwfwfest_irq_ack_w));
+	map(0x14000c, 0x14000d).w(FUNC(wwfwfest_state::wwfwfest_soundwrite));
+	map(0x140011, 0x140011).w(FUNC(wwfwfest_state::wwfwfest_priority_w));
 	map(0x140020, 0x140021).portr("P1");
 	map(0x140022, 0x140023).portr("P2");
 	map(0x140024, 0x140025).portr("P3");
 	map(0x140026, 0x140027).portr("P4");
-	map(0x180000, 0x18ffff).rw(this, FUNC(wwfwfest_state::wwfwfest_paletteram_r), FUNC(wwfwfest_state::wwfwfest_paletteram_w)).share("palette");
+	map(0x180000, 0x18ffff).rw(FUNC(wwfwfest_state::wwfwfest_paletteram_r), FUNC(wwfwfest_state::wwfwfest_paletteram_w)).share("palette");
 	map(0x1c0000, 0x1c3fff).ram(); /* Work Ram */
 }
 
@@ -379,7 +379,7 @@ void ddragon3_state::sound_map(address_map &map)
 	map(0xc800, 0xc801).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd800, 0xd800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).w(this, FUNC(ddragon3_state::oki_bankswitch_w));
+	map(0xe800, 0xe800).w(FUNC(ddragon3_state::oki_bankswitch_w));
 }
 
 
@@ -835,25 +835,24 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	MCFG_SCREEN_RAW_PARAMS(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ddragon3)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddragon3)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon3);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 768);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+	ym2151_device &ym2151(YM2151(config, "ym2151", XTAL(3'579'545)));
+	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151.add_route(0, "lspeaker", 0.50);
+	ym2151.add_route(1, "rspeaker", 0.50);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
@@ -879,8 +878,7 @@ MACHINE_CONFIG_START(ddragon3_state::ctribe)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(ctribe_sound_map)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	m_palette->set_format(palette_device::xBGR_444, 768);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ctribe)
@@ -909,30 +907,29 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(wwfwfest_state, screen_update_wwfwfest)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wwfwfest)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wwfwfest);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 8192);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ym2151(YM2151(config, "ym2151", XTAL(3'579'545)));
+	ym2151.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2151.add_route(0, "mono", 0.45);
+	ym2151.add_route(1, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1024188, okim6295_device::PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -981,8 +978,8 @@ ROM_END
 
 ROM_START( ddragon3j )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
-	ROM_LOAD16_BYTE( "30j15.ic78", 0x00001, 0x40000, CRC(40618cbc) SHA1(cb05498003a45d773983501d3a0f1584a25dcdd3) )
-	ROM_LOAD16_BYTE( "30j14.ic79", 0x00000, 0x20000, CRC(96827e80) SHA1(499c0c67d55ff4816ad8832d1d8836eb7432bd13) )
+	ROM_LOAD16_BYTE( "30j15-0.ic78", 0x00001, 0x40000, CRC(40618cbc) SHA1(cb05498003a45d773983501d3a0f1584a25dcdd3) )
+	ROM_LOAD16_BYTE( "30j14-0.ic79", 0x00000, 0x20000, CRC(96827e80) SHA1(499c0c67d55ff4816ad8832d1d8836eb7432bd13) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
 	ROM_LOAD( "30j13.ic43",   0x00000, 0x10000, CRC(1e974d9b) SHA1(8e54ff747efe587a2e971c15e729445c4e232f0f) )
@@ -1115,7 +1112,7 @@ ROM_START( ctribe )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(c46b2e63) SHA1(86ace715dca48c78a46da1d102de47e5f948a86c) )
 	ROM_LOAD16_BYTE( "28a15-2.ic25", 0x00000, 0x20000, CRC(3221c755) SHA1(0f6fe5cd6947f6547585eedb7fc5e6af8544b1f7) )
-	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j17-0.104",  0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
@@ -1145,11 +1142,11 @@ ROM_START( ctribe )
 	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
 
-ROM_START( ctribe1 )
+ROM_START( ctribeua )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "1_28a16-2.ic26", 0x00001, 0x20000, CRC(f00f8443) SHA1(3c099b6bea9956cc60ce4a9a5d790ac2bf7d77bd) )
 	ROM_LOAD16_BYTE( "1_28a15-2.ic25", 0x00000, 0x20000, CRC(dd70079f) SHA1(321b523fefec2a962d0afa20b33428e7caea8958) )
-	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j17-0.104",    0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
@@ -1179,11 +1176,11 @@ ROM_START( ctribe1 )
 	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
 
-ROM_START( ctribeo ) // only main program code differs from ctribe1 set
+ROM_START( ctribeu1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-1.ic26", 0x00001, 0x20000, CRC(d108f36f) SHA1(af53fa441b9ddfc639abb573864a9b351633c6b7) )
 	ROM_LOAD16_BYTE( "28a15-1.ic25", 0x00000, 0x20000, CRC(3f5693a3) SHA1(2d4516506ad1d68ac45242fe149bba1b4b53eb45) )
-	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j17-0.104",  0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
@@ -1215,9 +1212,9 @@ ROM_END
 
 ROM_START( ctribej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
-	ROM_LOAD16_BYTE( "28j16-02.26", 0x00001, 0x20000, CRC(658b8568) SHA1(899682f6ab28b184654c51c1169216974043f1b9) )
-	ROM_LOAD16_BYTE( "28j15-12.25", 0x00000, 0x20000, CRC(50aac7e7) SHA1(af77107f325f9b45a92c544328d3073ed1db5465) )
-	ROM_LOAD16_BYTE( "28j17-0.104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28j16-2.ic26", 0x00001, 0x20000, CRC(658b8568) SHA1(899682f6ab28b184654c51c1169216974043f1b9) )
+	ROM_LOAD16_BYTE( "28j15-2.ic25", 0x00000, 0x20000, CRC(50aac7e7) SHA1(af77107f325f9b45a92c544328d3073ed1db5465) )
+	ROM_LOAD16_BYTE( "28j17-0.104",  0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound cpu code */
@@ -1385,7 +1382,36 @@ ROM_START( wwfwfestu )
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
 
-ROM_START( wwfwfestb )
+ROM_START( wwfwfestu1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
+	ROM_LOAD16_BYTE( "31a13-0.ic19", 0x00001, 0x40000, CRC(a01c7c95) SHA1(298b9eeaeb8a207cbb02f4bea87436f0421697fe) ) /* label had a blue stripe down the side */
+	ROM_LOAD16_BYTE( "31a14-0.ic18", 0x00000, 0x40000, CRC(30824d0b) SHA1(54281c76f380225516877648645a619d8417816e) ) /* label had a blue stripe down the side */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
+	ROM_LOAD( "31a11-0.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) ) /* == 31a11-2.ic42 */
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
+	ROM_LOAD( "31a12-0.ic33", 0x00000, 0x20000, CRC(d0803e20) SHA1(b68758e9a5522396f831a3972571f8aed54c64de) )
+
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
+	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
+	ROM_LOAD( "31j2.ic8",     0x100000, 0x100000, CRC(b5a97465) SHA1(08d82c29a5c02b83fdbd0bad649b74eb35ab7e54) ) /* Tiles 1 */
+	ROM_LOAD( "31j5.ic11",    0x200000, 0x100000, CRC(2ce545e8) SHA1(82173e58a8476a6fe9d2c990fce1f71af117a0ea) ) /* Tiles 0 */
+	ROM_LOAD( "31j4.ic10",    0x300000, 0x100000, CRC(00edb66a) SHA1(926606d1923936b6e75391b1ab03b369d9822d13) ) /* Tiles 1 */
+	ROM_LOAD( "31j6.ic12",    0x400000, 0x100000, CRC(79956cf8) SHA1(52207263620a6b6dde66d3f8749b772577899ea5) ) /* Tiles 0 */
+	ROM_LOAD( "31j7.ic13",    0x500000, 0x100000, CRC(74d774c3) SHA1(a723ac5d481bf91b12e17652fbb2d869c886dec0) ) /* Tiles 1 */
+	ROM_LOAD( "31j9.ic15",    0x600000, 0x100000, CRC(dd387289) SHA1(2cad42d4e7cd1a49346f844058ae18c38bc686a8) ) /* Tiles 0 */
+	ROM_LOAD( "31j8.ic14",    0x700000, 0x100000, CRC(44abe127) SHA1(c723e1dea117534e976d2d383e634faf073cd57b) ) /* Tiles 1 */
+
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 / BG1 Tiles (16x16) */
+	ROM_LOAD( "31j0.ic1",     0x40000, 0x40000, CRC(8a12b450) SHA1(2e15c949efcda8bb6f11afe3ff07ba1dee9c771c) ) /* 0,1 */
+	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
+ROM_END
+
+ROM_START( wwfwfestub )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "3",      0x00000, 0x40000, CRC(ea73369c) SHA1(be614a342f9014251810fa30ec56fec03f7c8ef3) )
 	ROM_LOAD16_BYTE( "2",      0x00001, 0x40000, CRC(632bb3a4) SHA1(9c04fed5aeefc683810cfbd9b3318e155ed9813f) )
@@ -1481,20 +1507,21 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",       "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3,  0,        ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3j, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3p, ddragon3, ddragon3,  ddragon3,  ddragon3_state, empty_init, ROT0, "East Technology / Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddragon3b, ddragon3, ddragon3b, ddragon3b, ddragon3_state, empty_init, ROT0, "bootleg",                         "Double Dragon 3 - The Rosetta Stone (bootleg)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribe1,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US set 1?)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeo,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, older)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribe,    0,        ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeua,  ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 2, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeu1,  ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (US, rev 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribej,   ctribe,   ctribe,    ctribe,    ddragon3_state, empty_init, ROT0, "Technos Japan", "The Combatribes (Japan, rev 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb,   ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ctribeb2,  ctribe,   ctribe,    ctribeb,   ddragon3_state, empty_init, ROT0, "bootleg",       "The Combatribes (bootleg set 2)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, wwfwfest,  0,        wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
-GAME( 1991, wwfwfestu, wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestj, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestk, wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfest,   0,        wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) // Euro label but shows FBI "Winners Don't Do drugs" logo
+GAME( 1991, wwfwfestu,  wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US, rev 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestu1, wwfwfest, wwfwfest,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestub, wwfwfest, wwfwfstb,  wwfwfest,  wwfwfest_state, empty_init, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestj,  wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestk,  wwfwfest, wwfwfest,  wwfwfesta, wwfwfest_state, empty_init, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )

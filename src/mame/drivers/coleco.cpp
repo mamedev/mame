@@ -104,13 +104,13 @@ void coleco_state::coleco_map(address_map &map)
 void coleco_state::coleco_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x80, 0x80).mirror(0x1f).w(this, FUNC(coleco_state::paddle_off_w));
-	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0xc0, 0xc0).mirror(0x1f).w(this, FUNC(coleco_state::paddle_on_w));
-	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::write));
-	map(0xe0, 0xe0).mirror(0x1d).r(this, FUNC(coleco_state::paddle_1_r));
-	map(0xe2, 0xe2).mirror(0x1d).r(this, FUNC(coleco_state::paddle_2_r));
+	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_state::paddle_off_w));
+	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
+	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
+	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
+	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));
 }
 
 void coleco_state::czz50_map(address_map &map)
@@ -374,71 +374,65 @@ void coleco_state::machine_reset()
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(coleco_state::coleco)
-
+void coleco_state::coleco(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
-	MCFG_DEVICE_PROGRAM_MAP(coleco_map)
-	MCFG_DEVICE_IO_MAP(coleco_io_map)
+	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_state::coleco_map);
+	m_maincpu->set_addrmap(AS_IO, &coleco_state::coleco_io_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) // 3.579545 MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	sn76489a_device &psg(SN76489A(config, "sn76489a", XTAL(7'159'090)/2)); // 3.579545 MHz
+	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
 	// TODO: enable when Z80 has better WAIT pin emulation, this currently breaks pitfall2 for example
-	//MCFG_SN76496_READY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
+	//psg.ready_cb().set_inputline("maincpu", Z80_INPUT_LINE_WAIT).invert();
 
 	/* cartridge */
-	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, nullptr)
+	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","coleco")
+	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
-MACHINE_CONFIG_END
+	TIMER(config, "paddle_timer").configure_periodic(FUNC(coleco_state::paddle_update_callback), attotime::from_msec(20));
+}
 
-MACHINE_CONFIG_START(coleco_state::colecop)
+void coleco_state::colecop(machine_config &config)
+{
 	coleco(config);
 
 	/* video hardware */
-	MCFG_DEVICE_REMOVE("tms9928a")
-	MCFG_DEVICE_REMOVE("screen")
+	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+}
 
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(coleco_state::czz50)
+void coleco_state::czz50(machine_config &config)
+{
 	coleco(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
-	MCFG_DEVICE_PROGRAM_MAP(czz50_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_state::czz50_map); // note: cpu speed unverified, assume it's the same as ColecoVision
+}
 
-MACHINE_CONFIG_START(coleco_state::dina)
+void coleco_state::dina(machine_config &config)
+{
 	czz50(config);
 
 	/* video hardware */
-	MCFG_DEVICE_REMOVE("tms9928a")
-	MCFG_DEVICE_REMOVE("screen")
-
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
-MACHINE_CONFIG_END
+	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+}
 
 
 /* ROMs */
@@ -446,10 +440,10 @@ MACHINE_CONFIG_END
 ROM_START (coleco)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "original", "Original" )
-	ROMX_LOAD( "313 10031-4005 73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92), ROM_BIOS(1) )
+	ROMX_LOAD( "313 10031-4005 73108a.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "thick", "Thick characters" )
 	// differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
-	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(2) )
+	ROMX_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59), ROM_BIOS(1) )
 ROM_END
 
 /*  ONYX (Prototype)

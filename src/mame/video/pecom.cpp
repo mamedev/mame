@@ -88,21 +88,21 @@ void pecom_state::video_start()
 	/* register for state saving */
 	save_item(NAME(m_reset));
 	save_item(NAME(m_dma));
-	save_pointer(NAME(m_charram.get()), PECOM_CHAR_RAM_SIZE);
+	save_pointer(NAME(m_charram), PECOM_CHAR_RAM_SIZE);
 }
 
-MACHINE_CONFIG_START(pecom_state::pecom_video)
-	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
-
+void pecom_state::pecom_video(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_CDP1869_ADD(CDP1869_TAG, cdp1869_device::DOT_CLK_PAL, cdp1869_page_ram)
-	MCFG_CDP1869_COLOR_CLOCK(cdp1869_device::COLOR_CLK_PAL)
-	MCFG_CDP1869_CHAR_PCB_READ_OWNER(pecom_state, pecom_pcb_r)
-	MCFG_CDP1869_CHAR_RAM_READ_OWNER(pecom_state, pecom_char_ram_r)
-	MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(pecom_state, pecom_char_ram_w)
-	MCFG_CDP1869_PAL_NTSC_CALLBACK(VCC)
-	MCFG_CDP1869_PRD_CALLBACK(WRITELINE(*this, pecom_state, pecom_prd_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	CDP1869(config, m_cdp1869, cdp1869_device::DOT_CLK_PAL, &pecom_state::cdp1869_page_ram);
+	m_cdp1869->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
+	m_cdp1869->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
+	m_cdp1869->set_pcb_read_callback(FUNC(pecom_state::pecom_pcb_r));
+	m_cdp1869->set_char_ram_read_callback(FUNC(pecom_state::pecom_char_ram_r));
+	m_cdp1869->set_char_ram_write_callback(FUNC(pecom_state::pecom_char_ram_w));
+	m_cdp1869->pal_ntsc_callback().set_constant(1);
+	m_cdp1869->prd_callback().set(FUNC(pecom_state::pecom_prd_w));
+	m_cdp1869->add_route(ALL_OUTPUTS, "mono", 0.25);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}

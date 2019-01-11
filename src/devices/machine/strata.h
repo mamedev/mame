@@ -71,7 +71,4 @@ private:
 
 DECLARE_DEVICE_TYPE(STRATAFLASH, strataflash_device)
 
-#define MCFG_STRATAFLASH_ADD(_tag) \
-		MCFG_DEVICE_ADD(_tag, STRATAFLASH, 0)
-
 #endif // MAME_MACHINE_STRATA_H

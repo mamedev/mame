@@ -199,29 +199,31 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		memset(m_ddram, 0x00, sizeof(m_ddram));
 		m_page = 0;
 		m_column = 0;
-		LOG("NT7534: Reset \n");
+		LOG("Reset \n");
 		return;
 	}
 		else if ((m_ir & 0xFE) == 0xAE)
 	{
 		// Display ON/OFF
 		m_display_on = m_ir & 1;
-		LOG("NT7534: Display %s\n", m_display_on ? "ON" : "OFF");
+		LOG("Display %s\n", m_display_on ? "ON" : "OFF");
 		return;
 	}
 		else if ((m_ir & 0xC0) == 0x40)
 	{
 		// Display Start Line Set
 		m_display_start_line = m_ir & 0x3F;
-		LOG("NT7534: Display Start Line: %d\n", m_display_start_line);
+		LOG("Display Start Line: %d\n", m_display_start_line);
 		return;
 	}
 	else if ((m_ir & 0xF0) == 0xB0)
 	{
 		// set Page Address
 		m_page = m_ir & 0x0F;
-
-		LOG("NT7534: set Page address %x\n", m_page);
+		if (m_page <= 0x08)
+			LOG("Set Page address %x\n", m_page);
+		else
+			LOG("Set Page address %x (invalid)\n", m_page);
 		return;
 	}
 	else if ((m_ir & 0xF0) == 0x10)
@@ -229,7 +231,7 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		// Set column address MSB
 		m_column = (m_column & 0x0F) | ((m_ir & 0x0F) << 4);
 
-		LOG("NT7534: set column address MSB %x\n", (m_column >> 4) & 0x0F);
+		LOG("Set column address MSB %x\n", (m_column >> 4) & 0x0F);
 		return;
 	}
 	else if ((m_ir & 0xF0) == 0x00)
@@ -237,28 +239,28 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		// Set column address LSB
 		m_column = (m_column & 0xF0) | (m_ir & 0x0F);
 
-		LOG("NT7534: set column address LSB %x\n", m_column & 0x0F);
+		LOG("Set column address LSB %x\n", m_column & 0x0F);
 		return;
 	}
 	else if ((m_ir & 0xFE) == 0xA0)
 	{
 		// ADC Select
 		m_adc = m_ir & 1;
-		LOG("NT7534: ADC: %d\n", m_adc);
+		LOG("ADC: %d\n", m_adc);
 		return;
 	}
 	else if ((m_ir & 0xFE) == 0xA6)
 	{
 		// Normal/Reverse Display
 		m_reverse = m_ir & 1;
-		LOG("NT7534: Display Reverse ? %s\n", m_reverse ? "Yes" : "No");
+		LOG("Display Reverse ? %s\n", m_reverse ? "Yes" : "No");
 		return;
 	}
 	else if ((m_ir & 0xFE) == 0xA4)
 	{
 		// Entire display ON
 		m_entire_display_on = m_ir & 1;
-		LOG("NT7534: Entire Display ON ? %s\n", m_entire_display_on ? "Yes" : "No");
+		LOG("Entire Display ON ? %s\n", m_entire_display_on ? "Yes" : "No");
 		return;
 	}
 	else if (m_ir == 0xE0)
@@ -266,7 +268,7 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		// Enable Read-Modify-Write
 		m_read_modify_write = true;
 		m_backup_column = m_column;
-		LOG("NT7534: Enable Read-Modify-Write. Backup column: %d\n", m_backup_column);
+		LOG("Enable Read-Modify-Write. Backup column: %d\n", m_backup_column);
 		return;
 	}
 	else if (m_ir == 0xEE)
@@ -274,7 +276,7 @@ WRITE8_MEMBER(nt7534_device::control_write)
 		// Disable Read-Modify-Write
 		m_read_modify_write = false;
 		m_column = m_backup_column; // restore column value
-		LOG("NT7534: Disable Read-Modify-Write.\n");
+		LOG("Disable Read-Modify-Write.\n");
 		return;
 	}
 }
@@ -301,7 +303,7 @@ WRITE8_MEMBER(nt7534_device::data_write)
 {
 //  if (m_busy_flag)
 //  {
-//      logerror("NT7534: Ignoring data write %02x due to busy flag\n", data);
+//      logerror("Ignoring data write %02x due to busy flag\n", data);
 //      return;
 //  }
 
@@ -324,9 +326,10 @@ WRITE8_MEMBER(nt7534_device::data_write)
 		m_dr = data;
 	}
 
-	LOG("NT7534: RAM write %x %x '%c'\n", m_page*132 + m_column, m_dr, isprint(m_dr) ? m_dr : '.');
+	LOG("RAM write %x %x '%c'\n", m_page*132 + m_column, m_dr, isprint(m_dr) ? m_dr : '.');
 
-	m_ddram[m_page*132 + m_column] = m_dr;
+	if (m_page*132 + m_column < ARRAY_LENGTH(m_ddram))
+		m_ddram[m_page*132 + m_column] = m_dr;
 
 	if (m_column < 131)
 		m_column++;
@@ -336,6 +339,9 @@ WRITE8_MEMBER(nt7534_device::data_write)
 
 READ8_MEMBER(nt7534_device::data_read)
 {
+	if (m_page*132 + m_column >= ARRAY_LENGTH(m_ddram))
+		return 0;
+
 	uint8_t data = m_ddram[m_page*132 + m_column];
 	if (m_read_modify_write == false && m_column < 131)
 		m_column++;

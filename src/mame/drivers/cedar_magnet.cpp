@@ -4,7 +4,7 @@
 
 /*
  todo:
-  - fix sound emulation
+  - fix sound emulation (speed needs verifying + sample playback)
   - fix sprite communication / banking
     * bit "output bit 0x02 %d (IC21)" at 0x42 might be important
     * mag_exzi currently requires a gross hack to stop the sprite CPU crashing on startup
@@ -22,6 +22,12 @@
     * there seem to be 2 checks, one based on a weird sector on the discs, the other based on
       a port read
   - add additional hardware notes from ArcadeHacker
+  - layer enables on War Mission? (transitions from title screen etc.)
+
+ notes:
+  - high scores will be defaulted if the data in the table is corrupt, the games give no
+    option to do this otherwise.  A backup copy of the score table is kept, so you also
+    have to enter and exit service mode.
 
 */
 
@@ -115,6 +121,7 @@ I suspect the additional memory was an afterthought.
 #include "machine/cedar_magnet_sprite.h"
 #include "machine/cedar_magnet_flop.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -241,9 +248,9 @@ void cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map(address_map &map)
 {
 // these are 3x MOTOROLA MM2114N SRAM 4096 bit RAM (twice the size because we map bytes, but only 4 bits are used)
 // these are on the master board memory sub-board
-	map(0x2400, 0x27ff).ram().w(this, FUNC(cedar_magnet_state::palette_r_w)).share("pal_r");
-	map(0x2800, 0x2bff).ram().w(this, FUNC(cedar_magnet_state::palette_g_w)).share("pal_g");
-	map(0x3000, 0x33ff).ram().w(this, FUNC(cedar_magnet_state::palette_b_w)).share("pal_b");
+	map(0x2400, 0x27ff).ram().w(FUNC(cedar_magnet_state::palette_r_w)).share("pal_r");
+	map(0x2800, 0x2bff).ram().w(FUNC(cedar_magnet_state::palette_g_w)).share("pal_g");
+	map(0x3000, 0x33ff).ram().w(FUNC(cedar_magnet_state::palette_b_w)).share("pal_b");
 }
 
 void cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map(address_map &map)
@@ -262,10 +269,10 @@ void cedar_magnet_state::cedar_magnet_io(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x18, 0x18).rw(this, FUNC(cedar_magnet_state::port18_r), FUNC(cedar_magnet_state::port18_w));
-	map(0x19, 0x19).rw(this, FUNC(cedar_magnet_state::port19_r), FUNC(cedar_magnet_state::port19_w));
-	map(0x1a, 0x1a).r(this, FUNC(cedar_magnet_state::port1a_r));
-	map(0x1b, 0x1b).w(this, FUNC(cedar_magnet_state::port1b_w));
+	map(0x18, 0x18).rw(FUNC(cedar_magnet_state::port18_r), FUNC(cedar_magnet_state::port18_w));
+	map(0x19, 0x19).rw(FUNC(cedar_magnet_state::port19_r), FUNC(cedar_magnet_state::port19_w));
+	map(0x1a, 0x1a).r(FUNC(cedar_magnet_state::port1a_r));
+	map(0x1b, 0x1b).w(FUNC(cedar_magnet_state::port1b_w));
 
 	map(0x20, 0x23).rw(m_ic48_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x40, 0x43).rw(m_ic49_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -277,10 +284,10 @@ void cedar_magnet_state::cedar_magnet_io(address_map &map)
 	map(0x6c, 0x6c).portr("TEST");
 
 	// banking / access controls to the sub-board memory
-	map(0x70, 0x70).w(this, FUNC(cedar_magnet_state::rambank_palbank_w));
-	map(0x74, 0x74).w(this, FUNC(cedar_magnet_state::palupload_w));
-	map(0x78, 0x78).rw(this, FUNC(cedar_magnet_state::watchdog_r), FUNC(cedar_magnet_state::paladdr_w));
-	map(0x7c, 0x7c).r(this, FUNC(cedar_magnet_state::port7c_r)); // protection??
+	map(0x70, 0x70).w(FUNC(cedar_magnet_state::rambank_palbank_w));
+	map(0x74, 0x74).w(FUNC(cedar_magnet_state::palupload_w));
+	map(0x78, 0x78).rw(FUNC(cedar_magnet_state::watchdog_r), FUNC(cedar_magnet_state::paladdr_w));
+	map(0x7c, 0x7c).r(FUNC(cedar_magnet_state::port7c_r)); // protection??
 
 	map(0xff, 0xff).w(m_cedsound, FUNC(cedar_magnet_sound_device::sound_command_w));
 }
@@ -296,7 +303,7 @@ void cedar_magnet_state::cedar_bank0(address_map &map)
 
 	/* memory configuration  2*/
 	map(0x20000, 0x2bfff).m(m_sub_ram_bankdev, FUNC(address_map_bank_device::amap8));
-	map(0x2c000, 0x2ffff).rw(this, FUNC(cedar_magnet_state::other_cpu_r), FUNC(cedar_magnet_state::other_cpu_w));
+	map(0x2c000, 0x2ffff).rw(FUNC(cedar_magnet_state::other_cpu_r), FUNC(cedar_magnet_state::other_cpu_w));
 
 	/* memory configuration 3*/
 	map(0x30000, 0x31fff).rom().region("maincpu", 0x0000).mirror(0x0e000);
@@ -768,40 +775,23 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 	MCFG_DEVICE_IO_MAP(cedar_magnet_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cedar_magnet_state,  irq)
 
-	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cedar_bank0)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "bank0").set_map(&cedar_magnet_state::cedar_bank0).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "mb_sub_ram").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	ADDRESS_MAP_BANK(config, "mb_sub_pal").set_map(&cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map).set_options(ENDIANNESS_LITTLE, 8, 8+6, 0x100);
 
-	MCFG_DEVICE_ADD("mb_sub_ram", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_mainboard_sub_ram_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	Z80PIO(config, m_ic48_pio, 4000000/2);
+//  m_ic48_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ic48_pio->in_pa_callback().set(FUNC(cedar_magnet_state::ic48_pio_pa_r));
+	m_ic48_pio->out_pa_callback().set(FUNC(cedar_magnet_state::ic48_pio_pa_w));
+	m_ic48_pio->in_pb_callback().set(FUNC(cedar_magnet_state::ic48_pio_pb_r));
+	m_ic48_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic48_pio_pb_w));
 
-	MCFG_DEVICE_ADD("mb_sub_pal", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(cedar_magnet_mainboard_sub_pal_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(8+6)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
-
-	MCFG_DEVICE_ADD("z80pio_ic48", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_state, ic48_pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_state, ic48_pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_state, ic48_pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_state, ic48_pio_pb_w))
-
-	MCFG_DEVICE_ADD("z80pio_ic49", Z80PIO, 4000000/2)
-//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//  MCFG_Z80PIO_IN_PA_CB(READ8(*this, cedar_magnet_state, ic49_pio_pa_r)) // NOT USED
-//  MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, cedar_magnet_state, ic49_pio_pa_w)) // NOT USED
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, cedar_magnet_state, ic49_pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, cedar_magnet_state, ic49_pio_pb_w))
+	Z80PIO(config, m_ic49_pio, 4000000/2);
+//  m_ic49_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+//  m_ic49_pio->in_pa_callback().set(FUNC(cedar_magnet_state::ic49_pio_pa_r)); // NOT USED
+//  m_ic49_pio->out_pa_callback().set(FUNC(cedar_magnet_state::ic49_pio_pa_w)); // NOT USED
+	m_ic49_pio->in_pb_callback().set(FUNC(cedar_magnet_state::ic49_pio_pb_r));
+	m_ic49_pio->out_pb_callback().set(FUNC(cedar_magnet_state::ic49_pio_pb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -814,12 +804,12 @@ MACHINE_CONFIG_START(cedar_magnet_state::cedar_magnet)
 
 	MCFG_PALETTE_ADD("palette", 0x400)
 
-	MCFG_CEDAR_MAGNET_SOUND_ADD("cedtop")
-	MCFG_CEDAR_MAGNET_PLANE_ADD("cedplane0")
-	MCFG_CEDAR_MAGNET_PLANE_ADD("cedplane1")
-	MCFG_CEDAR_MAGNET_SPRITE_ADD("cedsprite")
+	CEDAR_MAGNET_SOUND(config, m_cedsound, 0);
+	CEDAR_MAGNET_PLANE(config, m_cedplane0, 0);
+	CEDAR_MAGNET_PLANE(config, m_cedplane1, 0);
+	CEDAR_MAGNET_SPRITE(config, m_cedsprite, 0);
 
-	MCFG_CEDAR_MAGNET_FLOP_ADD("flop")
+	CEDAR_MAGNET_FLOP(config, "flop", 0);
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
@@ -859,13 +849,54 @@ ROM_START( mag_xain )
 	ROM_LOAD( "xain.img", 0x00000, 0xf0000, CRC(5647849f) SHA1(edd2f3f6359424583bf526bf4601476dc849e617) )
 ROM_END
 
-// game has various lockups, including in attract mode, which may be due to problems with the image or other emulation bugs.
+
+/*
+    Data after 0xd56b0 would not read consistently, however the game only appears to use the first 24 tracks (up to 0x48fff)
+    as it loads once on startup, not during gameplay, and all tracks before that gave consistent reads.  There is data after this
+    point but it is likely leftovers from another game / whatever was on the disk before, so for our purposes this should be fine.
+
+    Some bullets do seem to spawn from locations where there are no enemies, but I think this is just annoying game design.
+*/
 ROM_START( mag_war )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	// track 44, side 0 is broken at least (0x400 bytes were missing, substituted with 0x00 values) maybe others have bad data too, needs reading with original drive.
-	ROM_LOAD( "warmission.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(547e2338) SHA1(a798fc0a92d0b8d0d4f95a9eb7081a30f6b28e35) )
+	ROM_LOAD( "war mission wm 4_6_87.img", 0x00000, 0xf0000, CRC(7c813520) SHA1(2ba5999709a52302aa367fb46199b331421a0d56) )
+ROM_END
+
+/*
+    Data read 100% consistently with multiple drives
+*/
+ROM_START( mag_wara )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "war mission wm 9_4_87.img", 0x00000, 0xf0000, CRC(6296ea6f) SHA1(c0aaf51362bfa3362ef39c3fb1e1c848b73fd780) )
+ROM_END
+
+/*
+    Data read 100% consistently with multiple drives
+*/
+ROM_START( mag_burn )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 ) //
+	ROM_LOAD( "theburningcavern 31_3_87.img", 0x00000, 0xf0000, CRC(c95911f8) SHA1(eda3bdbbcc3e00a7da83253209e832855c2968b1) )
+ROM_END
+
+/*
+    Data read 100% consistently with non-original drive (usually gives worse results)
+    later tracks showed differences with original drive on each read (around 0xeef80 onwards, doesn't seem to be game data)
+
+    weirdly there's was a single byte in an earlier track that read consistently, but in a different way for each drive
+    0x2480e: 9d (non-original) vs 1d (original drive)
+    1d seems to be correct as the same data is also elsewhere on the disc
+*/
+ROM_START( mag_day )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "adayinspace 31_3_87.img", 0x00000, 0xf0000, CRC(bc65302d) SHA1(6ace68a0b5f7a07a8f5c318c5359011074e7f2ec) )
 ROM_END
 
 /*
@@ -925,7 +956,14 @@ void cedar_magnet_state::kludge_protection()
 GAME( 1987, cedmag,   0,      cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
 
 GAME( 1987, mag_time, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
-GAME( 1987, mag_exzi, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
-GAME( 1987, mag_xain, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos
-GAME( 1987, mag_war,  cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "War Mission (WM 4/6/87)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+GAME( 1987, mag_exzi, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
+
+GAME( 1987, mag_xain, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos
+
+GAME( 1987, mag_war,  cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "War Mission (WM 04/06/87)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // date in program
+GAME( 1987, mag_wara, mag_war,cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "War Mission (WM 09/04/87)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // the '9' was handwritten over a printed letter on disk label, date not in program
+
+GAME( 1987, mag_burn, cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "The Burning Cavern (31/03/87)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // date on label
+
+GAME( 1987, mag_day,  cedmag, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "A Day In Space (31/03/87)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // date on label

@@ -108,11 +108,9 @@ const uint16_t delay[256] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(amiga_state,amiga)
+void amiga_state::amiga_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 		palette.set_pen_color(i, pal4bit(i >> 8), pal4bit(i >> 4), pal4bit(i));
 }
 
@@ -219,7 +217,7 @@ int amiga_state::copper_execute_next(int xpos)
 	{
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		custom_chip_w(m_copper_pending_offset, m_copper_pending_data);
+		write_custom_chip(m_copper_pending_offset, m_copper_pending_data);
 		m_copper_pending_offset = 0;
 	}
 
@@ -250,12 +248,12 @@ int amiga_state::copper_execute_next(int xpos)
 	}
 
 	/* fetch the first data word */
-	word0 = chip_ram_r(m_copper_pc);
+	word0 = read_chip_ram(m_copper_pc);
 	m_copper_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	/* fetch the second data word */
-	word1 = chip_ram_r(m_copper_pc);
+	word1 = read_chip_ram(m_copper_pc);
 	m_copper_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
@@ -275,7 +273,7 @@ int amiga_state::copper_execute_next(int xpos)
 			{
 				if (LOG_COPPER)
 					logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				custom_chip_w(word0, word1);
+				write_custom_chip(word0, word1);
 			}
 			else    // additional 2 cycles needed for non-Agnus registers
 			{
@@ -387,8 +385,8 @@ void amiga_state::sprite_enable_comparitor(int which, int enable)
 
 void amiga_state::fetch_sprite_data(int scanline, int sprite)
 {
-	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 	CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 	if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, CUSTOM_REG(REG_SPR0DATA + 4 * sprite), CUSTOM_REG(REG_SPR0DATB + 4 * sprite));
 }
@@ -417,8 +415,8 @@ void amiga_state::update_sprite_dma(int scanline)
 			m_sprite_dma_reload_mask &= ~bitmask;
 
 			/* fetch data into the control words */
-			CUSTOM_REG(REG_SPR0POS + 4 * num) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
+			CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
+			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
@@ -592,7 +590,7 @@ uint8_t amiga_state::assemble_even_bitplanes(int planes, int ebitoffs)
 
 void amiga_state::fetch_bitplane_data(int plane)
 {
-	CUSTOM_REG(REG_BPL1DAT + plane) = chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+	CUSTOM_REG(REG_BPL1DAT + plane) = read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 	CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 }
 
@@ -817,7 +815,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
 		if ((CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN) &&
-			planes > 0 && scanline >= m_diw.min_y && scanline < m_diw.max_y)
+			planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -922,7 +920,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (dst != nullptr && x >= m_diw.min_x && x < m_diw.max_x)
+			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
 			{
 				int pix, pri;
 
@@ -1012,7 +1010,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	}
 
 	// end of the line: time to add the modulos
-	if (scanline >= m_diw.min_y && scanline < m_diw.max_y)
+	if (scanline >= m_diw.top() && scanline < m_diw.bottom())
 	{
 		// update odd planes
 		for (pl = 0; pl < planes; pl += 2)
@@ -1054,11 +1052,11 @@ uint32_t amiga_state::screen_update_amiga(screen_device &screen, bitmap_ind16 &b
 {
 	// sometimes the core tells us to render a bunch of lines to keep up (resolution change, for example)
 	// this causes trouble for us since it can happen at any time
-	if (cliprect.min_y != cliprect.max_y)
+	if (cliprect.top() != cliprect.bottom())
 		return 0;
 
 	// render each scanline in the visible region
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		render_scanline(bitmap, y);
 
 	return 0;

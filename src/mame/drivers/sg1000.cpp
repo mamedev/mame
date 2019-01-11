@@ -136,10 +136,10 @@ void sg1000_state::sg1000_map(address_map &map)
 void sg1000_state::sg1000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
-	map(0xdc, 0xdf).rw(this, FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
 }
 
 /*-------------------------------------------------
@@ -148,7 +148,7 @@ void sg1000_state::sg1000_io_map(address_map &map)
 
 void sg1000_state::omv_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rw(this, FUNC(sg1000_state::omv_r), FUNC(sg1000_state::omv_w));
+	map(0x0000, 0xbfff).rw(FUNC(sg1000_state::omv_r), FUNC(sg1000_state::omv_w));
 	map(0xc000, 0xc7ff).mirror(0x3800).ram();
 }
 
@@ -159,9 +159,9 @@ void sg1000_state::omv_map(address_map &map)
 void sg1000_state::omv_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
 	map(0xc0, 0xc0).mirror(0x38).portr("C0");
 	map(0xc1, 0xc1).mirror(0x38).portr("C1");
 	map(0xc2, 0xc2).mirror(0x38).portr("C2");
@@ -187,10 +187,10 @@ void sg1000_state::sc3000_map(address_map &map)
 void sg1000_state::sc3000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
-	map(0xdc, 0xdf).rw(this, FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
 }
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
@@ -198,10 +198,10 @@ void sg1000_state::sc3000_io_map(address_map &map)
 {
     map.global_mask(0xff);
     map(0x00, 0x00).mirror(0xdf).rw(UPD9255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-    map(0x00, 0x00).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-    map(0x01, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
-    map(0x60, 0x60).mirror(0x9f).r(this, FUNC(sg1000_state::sc3000_r_r));
+    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+    map(0x00, 0x00).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+    map(0x01, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+    map(0x60, 0x60).mirror(0x9f).r(FUNC(sg1000_state::sc3000_r_r));
 }
 */
 
@@ -222,14 +222,13 @@ void sf7000_state::sf7000_map(address_map &map)
 void sf7000_state::sf7000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
-	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
-	map(0xdc, 0xdf).rw(this, FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
+	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0xdc, 0xdf).rw(FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
 	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe8, 0xe8).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe9, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xe8, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /***************************************************************************
@@ -534,11 +533,11 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_DEVICE_IO_MAP(sg1000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -556,8 +555,7 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
+	RAM(config, m_ram).set_default_size("1K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -573,8 +571,7 @@ MACHINE_CONFIG_START(sg1000_state::omv)
 	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
 	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	m_ram->set_default_size("2K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -588,11 +585,11 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	MCFG_DEVICE_IO_MAP(sc3000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -611,8 +608,7 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* the sk1100 device will add sc3000 cart and cass lists */
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
+	RAM(config, m_ram).set_default_size("2K");
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
@@ -626,11 +622,11 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_DEVICE_IO_MAP(sf7000_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( TMS9918A_TAG, TMS9918A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -639,24 +635,24 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD(UPD9255_1_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sf7000_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sf7000_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, UPD9255_1_TAG));
+	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
+	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));
+	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	upd8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	upd8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(UPD8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(UPD8251_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(UPD8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(UPD8251_TAG, FUNC(i8251_device::write_dsr));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
+	UPD765A(config, m_fdc, 8'000'000, false, false);
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats)
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -667,8 +663,7 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, m_ram).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /***************************************************************************

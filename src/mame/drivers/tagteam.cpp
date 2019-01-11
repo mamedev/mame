@@ -50,15 +50,15 @@ WRITE8_MEMBER(tagteam_state::irq_clear_w)
 void tagteam_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x2000).portr("P2").w(this, FUNC(tagteam_state::flipscreen_w));
-	map(0x2001, 0x2001).portr("P1").w(this, FUNC(tagteam_state::control_w));
+	map(0x2000, 0x2000).portr("P2").w(FUNC(tagteam_state::flipscreen_w));
+	map(0x2001, 0x2001).portr("P1").w(FUNC(tagteam_state::control_w));
 	map(0x2002, 0x2002).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x2003, 0x2003).portr("DSW2").w(this, FUNC(tagteam_state::irq_clear_w));
-	map(0x4000, 0x43ff).rw(this, FUNC(tagteam_state::mirrorvideoram_r), FUNC(tagteam_state::mirrorvideoram_w));
-	map(0x4400, 0x47ff).rw(this, FUNC(tagteam_state::mirrorcolorram_r), FUNC(tagteam_state::mirrorcolorram_w));
+	map(0x2003, 0x2003).portr("DSW2").w(FUNC(tagteam_state::irq_clear_w));
+	map(0x4000, 0x43ff).rw(FUNC(tagteam_state::mirrorvideoram_r), FUNC(tagteam_state::mirrorvideoram_w));
+	map(0x4400, 0x47ff).rw(FUNC(tagteam_state::mirrorcolorram_r), FUNC(tagteam_state::mirrorcolorram_w));
 	map(0x4800, 0x4fff).readonly();
-	map(0x4800, 0x4bff).w(this, FUNC(tagteam_state::videoram_w)).share("videoram");
-	map(0x4c00, 0x4fff).w(this, FUNC(tagteam_state::colorram_w)).share("colorram");
+	map(0x4800, 0x4bff).w(FUNC(tagteam_state::videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).w(FUNC(tagteam_state::colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -73,8 +73,8 @@ void tagteam_state::sound_map(address_map &map)
 	map(0x0000, 0x03ff).ram();
 	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::write));
-	map(0x2005, 0x2005).w(this, FUNC(tagteam_state::sound_nmi_mask_w));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2005, 0x2005).w(FUNC(tagteam_state::sound_nmi_mask_w));
 	map(0x2007, 0x2007).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x4000, 0xffff).rom();
 }
@@ -227,23 +227,19 @@ MACHINE_CONFIG_START(tagteam_state::tagteam)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tagteam)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tagteam);
+	PALETTE(config, m_palette, FUNC(tagteam_state::tagteam_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

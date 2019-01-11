@@ -89,11 +89,15 @@ class magtouch_state : public pcat_base_state
 {
 public:
 	magtouch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-			m_isabus(*this, "isa"),
-			m_rombank(*this, "rombank"),
-			m_in0(*this, "IN0"){ }
+		: pcat_base_state(mconfig, type, tag)
+		, m_isabus(*this, "isa")
+		, m_rombank(*this, "rombank")
+		, m_in0(*this, "IN0")
+	{ }
 
+	void magtouch(machine_config &config);
+
+private:
 	required_device<isa8_device> m_isabus;
 	required_memory_bank m_rombank;
 	required_ioport m_in0;
@@ -103,7 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	virtual void machine_start() override;
 	static void magtouch_sb_conf(device_t *device);
-	void magtouch(machine_config &config);
 	void magtouch_io(address_map &map);
 	void magtouch_map(address_map &map);
 };
@@ -149,7 +152,7 @@ void magtouch_state::magtouch_map(address_map &map)
 void magtouch_state::magtouch_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x02e0, 0x02e7).rw(this, FUNC(magtouch_state::magtouch_io_r), FUNC(magtouch_state::magtouch_io_w));
+	map(0x02e0, 0x02e7).rw(FUNC(magtouch_state::magtouch_io_r), FUNC(magtouch_state::magtouch_io_w));
 	map(0x03b0, 0x03bf).rw("vga", FUNC(trident_vga_device::port_03b0_r), FUNC(trident_vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(trident_vga_device::port_03c0_r), FUNC(trident_vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
@@ -172,7 +175,7 @@ void magtouch_state::machine_start()
 {
 	m_rombank->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	m_rombank->set_entry(0);
-	machine().device<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
+	subdevice<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
 }
 
 static void magtouch_isa8_cards(device_slot_interface &device)
@@ -202,27 +205,28 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 	MCFG_DEVICE_REPLACE("vga", TVGA9000_VGA, 0)
 
 	pcat_common(config);
-	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
+
+	ns16450_device &uart(NS16450(config, "ns16450_0", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
+
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("ns16450_0", ins8250_uart_device, rx_w) )
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_MODIFY("dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(*this, magtouch_state, dma8237_1_dack_w))
+	m_dma8237_1->out_iow_callback<1>().set(FUNC(magtouch_state::dma8237_1_dack_w));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_2", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_1", pic8259_device, ir3_w))
-	//MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_1", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_1", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_cputag("maincpu");
+	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
+	//m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set("pic8259_1", FUNC(pic8259_device::ir5_w));
+	m_isabus->irq6_callback().set("pic8259_1", FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set("pic8259_1", FUNC(pic8259_device::ir7_w));
+	m_isabus->drq1_callback().set("dma8237_1", FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set("dma8237_1", FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", magtouch_isa8_cards, "sb15", true)

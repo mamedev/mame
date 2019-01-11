@@ -6,10 +6,15 @@
 
         12/05/2009 Skeleton driver.
 
+        Several of the boards apparently used in this S-100 system were
+        made by CompuPro/Viasyn, including the CPU 68K and Interfacer 3
+        (2651 USART multiplexer).
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc2661.h"
 
@@ -19,23 +24,23 @@ public:
 	tricep_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_pci(*this, "pci%u", 0)
+		, m_usart(*this, "usart%u", 0)
 		, m_p_ram(*this, "p_ram")
 	{
 	}
 
 	void tricep(machine_config &config);
-protected:
-	DECLARE_WRITE8_MEMBER(pci_mux_w);
-	DECLARE_READ8_MEMBER(pci_r);
-	DECLARE_WRITE8_MEMBER(pci_w);
+private:
+	void usart_select_w(uint8_t data);
+	uint8_t usart_r(offs_t offset);
+	void usart_w(offs_t offset, uint8_t data);
 
 	void tricep_mem(address_map &map);
 
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<mc2661_device, 4> m_pci;
+	required_device_array<mc2661_device, 4> m_usart;
 	required_shared_ptr<uint16_t> m_p_ram;
 
 	uint8_t m_mux;
@@ -43,19 +48,19 @@ protected:
 
 
 
-WRITE8_MEMBER(tricep_state::pci_mux_w)
+void tricep_state::usart_select_w(uint8_t data)
 {
 	m_mux = data & 3;
 }
 
-READ8_MEMBER(tricep_state::pci_r)
+uint8_t tricep_state::usart_r(offs_t offset)
 {
-	return m_pci[m_mux]->read(space, offset);
+	return m_usart[m_mux]->read(offset);
 }
 
-WRITE8_MEMBER(tricep_state::pci_w)
+void tricep_state::usart_w(offs_t offset, uint8_t data)
 {
-	m_pci[m_mux]->write(space, offset, data);
+	m_usart[m_mux]->write(offset, data);
 }
 
 void tricep_state::tricep_mem(address_map &map)
@@ -63,8 +68,9 @@ void tricep_state::tricep_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share("p_ram");
 	map(0x00fd0000, 0x00fd1fff).rom().region("user1", 0);
-	map(0x00ff0028, 0x00ff002b).rw(this, FUNC(tricep_state::pci_r), FUNC(tricep_state::pci_w)).umask16(0xffff);
-	map(0x00ff002f, 0x00ff002f).w(this, FUNC(tricep_state::pci_mux_w));
+	map(0x00ff0028, 0x00ff002b).rw(FUNC(tricep_state::usart_r), FUNC(tricep_state::usart_w));
+	map(0x00ff002e, 0x00ff002f).nopr();
+	map(0x00ff002f, 0x00ff002f).w(FUNC(tricep_state::usart_select_w));
 }
 
 /* Input ports */
@@ -83,35 +89,39 @@ void tricep_state::machine_reset()
 	m_mux = 0;
 }
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 ) // FIXME: should be 19200 with SCN2661B
+static const input_device_default terminal_defaults[] =
+{
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
+	{ nullptr, 0, 0 }
+};
 
-MACHINE_CONFIG_START(tricep_state::tricep)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(tricep_mem)
+void tricep_state::tricep(machine_config &config)
+{
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tricep_state::tricep_mem);
+	// TODO: MC68451 MMU
 
-	MCFG_DEVICE_ADD("pci0", MC2661, 4915200)
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MC2661(config, m_usart[0], 5.0688_MHz_XTAL);
+	m_usart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_usart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_usart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_DEVICE_ADD("pci1", MC2661, 4915200)
-	MCFG_DEVICE_ADD("pci2", MC2661, 4915200)
-	MCFG_DEVICE_ADD("pci3", MC2661, 4915200)
+	MC2661(config, m_usart[1], 5.0688_MHz_XTAL);
+	MC2661(config, m_usart[2], 5.0688_MHz_XTAL);
+	MC2661(config, m_usart[3], 5.0688_MHz_XTAL);
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("pci0", mc2661_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("pci0", mc2661_device, dsr_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("pci0", mc2661_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("pci0", mc2661_device, cts_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_usart[0], FUNC(mc2661_device::rx_w));
+	rs232.dsr_handler().set(m_usart[0], FUNC(mc2661_device::dsr_w));
+	rs232.dcd_handler().set(m_usart[0], FUNC(mc2661_device::dcd_w));
+	rs232.cts_handler().set(m_usart[0], FUNC(mc2661_device::cts_w));
+	rs232.set_option_device_input_defaults("terminal", terminal_defaults);
+}
 
 /* ROM definition */
 ROM_START( tricep )

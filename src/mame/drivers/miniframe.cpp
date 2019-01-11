@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
@@ -26,15 +27,18 @@ class miniframe_state : public driver_device
 {
 public:
 	miniframe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_wd2797(*this, "wd2797"),
-			m_floppy(*this, "wd2797:0:525dd"),
-			m_ramrombank(*this, "ramrombank"),
-			m_mapram(*this, "mapram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_wd2797(*this, "wd2797")
+		, m_floppy(*this, "wd2797:0:525dd")
+		, m_ramrombank(*this, "ramrombank")
+		, m_mapram(*this, "mapram")
 	{ }
 
+	void miniframe(machine_config &config);
+
+private:
 	required_device<m68010_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<wd2797_device> m_wd2797;
@@ -56,10 +60,9 @@ public:
 
 	required_shared_ptr<uint16_t> m_mapram;
 
-	void miniframe(machine_config &config);
 	void miniframe_mem(address_map &map);
 	void ramrombank_map(address_map &map);
-private:
+
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
 	uint16_t m_diskdmasize;
@@ -192,7 +195,7 @@ void miniframe_state::miniframe_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).m(m_ramrombank, FUNC(address_map_bank_device::amap16));
 	map(0x400000, 0x4007ff).ram().share("mapram");
-	map(0x450000, 0x450001).w(this, FUNC(miniframe_state::general_ctrl_w));
+	map(0x450000, 0x450001).w(FUNC(miniframe_state::general_ctrl_w));
 	map(0x800000, 0x81ffff).rom().region("bootrom", 0);
 	map(0xc00000, 0xc00007).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xc40000, 0xc40007).rw("baudgen", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
@@ -202,7 +205,7 @@ void miniframe_state::miniframe_mem(address_map &map)
 void miniframe_state::ramrombank_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("bootrom", 0);
-	map(0x400000, 0x7fffff).rw(this, FUNC(miniframe_state::ram_mmu_r), FUNC(miniframe_state::ram_mmu_w));
+	map(0x400000, 0x7fffff).rw(FUNC(miniframe_state::ram_mmu_r), FUNC(miniframe_state::ram_mmu_w));
 }
 
 /***************************************************************************
@@ -222,49 +225,44 @@ static void miniframe_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-MACHINE_CONFIG_START(miniframe_state::miniframe)
+void miniframe_state::miniframe(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68010, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(miniframe_mem)
+	M68010(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &miniframe_state::miniframe_mem);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
+	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");
 
 	// RAM/ROM bank
-	MCFG_DEVICE_ADD("ramrombank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(ramrombank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400000)
+	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&miniframe_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
-//  MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_intrq_w))
-//  MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, miniframe_state, wd2797_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	WD2797(config, m_wd2797, 1000000);
+//  m_wd2797->intrq_wr_callback().set(FUNC(miniframe_state::wd2797_intrq_w));
+//  m_wd2797->drq_wr_callback().set(FUNC(miniframe_state::wd2797_drq_w));
+	FLOPPY_CONNECTOR(config, "wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
 	// 8263s
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(76800)
-	MCFG_PIT8253_CLK1(76800)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir4_w))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(76800);
+	pit8253.set_clk<1>(76800);
+	pit8253.out_handler<0>().set("pic8259", FUNC(pic8259_device::ir4_w)); // FIXME: fighting for IR4 - error, or needs input merger?
 	// chain clock 1 output into clock 2
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
+	pit8253.out_handler<1>().set("pit8253", FUNC(pit8253_device::write_clk2));
 	// and ir4 on the PIC
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("pic8259", pic8259_device, ir4_w))
+	pit8253.out_handler<1>().append("pic8259", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("baudgen", PIT8253, 0)
-	MCFG_PIT8253_CLK0(1228800)
-	MCFG_PIT8253_CLK1(1228800)
-	MCFG_PIT8253_CLK2(1228800)
+	pit8253_device &baudgen(PIT8253(config, "baudgen", 0));
+	baudgen.set_clk<0>(1228800);
+	baudgen.set_clk<1>(1228800);
+	baudgen.set_clk<2>(1228800);
 
 	// PIC8259s
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_PIC8259_IN_SP_CB(VCC)
-MACHINE_CONFIG_END
+	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
+	pic8259.in_sp_callback().set_constant(1);
+}
 
 
 /***************************************************************************

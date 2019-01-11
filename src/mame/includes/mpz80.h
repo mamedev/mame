@@ -37,6 +37,9 @@ public:
 			m_trap_aux(1)
 	{ }
 
+	void mpz80(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<s100_bus_device> m_s100;
@@ -92,7 +95,6 @@ public:
 	int m_trap_stop;
 	int m_trap_aux;
 	void init_mpz80();
-	void mpz80(machine_config &config);
 	void mpz80_io(address_map &map);
 	void mpz80_mem(address_map &map);
 };

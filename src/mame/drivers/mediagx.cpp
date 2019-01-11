@@ -75,6 +75,7 @@
 #include "machine/timer.h"
 #include "sound/dmadac.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -92,6 +93,8 @@ public:
 	mediagx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
 		m_ide(*this, "ide"),
+		m_ramdac(*this, "ramdac"),
+		m_dmadac(*this, "dac%u", 0U),
 		m_main_ram(*this, "main_ram"),
 		m_cga_ram(*this, "cga_ram"),
 		m_bios_ram(*this, "bios_ram"),
@@ -106,6 +109,11 @@ public:
 	void mediagx(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	DECLARE_READ32_MEMBER(disp_ctrl_r);
 	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
 	DECLARE_READ32_MEMBER(memory_ctrl_r);
@@ -118,10 +126,7 @@ protected:
 	DECLARE_WRITE32_MEMBER(ad1847_w);
 	DECLARE_READ8_MEMBER(io20_r);
 	DECLARE_WRITE8_MEMBER(io20_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ32_MEMBER(speedup0_r);
 	DECLARE_READ32_MEMBER(speedup1_r);
 	DECLARE_READ32_MEMBER(speedup2_r);
@@ -147,7 +152,6 @@ protected:
 	void mediagx_map(address_map &map);
 	void ramdac_map(address_map &map);
 
-private:
 	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask)
 	{
 		//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
@@ -166,6 +170,8 @@ private:
 	}
 
 	required_device<ide_controller_32_device> m_ide;
+	required_device<ramdac_device> m_ramdac;
+	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_shared_ptr<uint32_t> m_main_ram;
 	required_shared_ptr<uint32_t> m_cga_ram;
 	required_shared_ptr<uint32_t> m_bios_ram;
@@ -207,8 +213,6 @@ private:
 	uint8_t m_ad1847_regs[16];
 	uint32_t m_ad1847_sample_counter;
 	uint32_t m_ad1847_sample_rate;
-
-	dmadac_sound_device *m_dmadac[2];
 
 #if SPEEDUP_HACKS
 	const speedup_entry *m_speedup_table;
@@ -387,19 +391,18 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 
 void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int i, j;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *cga = m_cga_ram;
+	gfx_element *const gfx = m_gfxdecode->gfx(0);
+	uint32_t const *const cga = m_cga_ram;
 	int index = 0;
 
-	for (j=0; j < 25; j++)
+	for (int j=0; j < 25; j++)
 	{
-		for (i=0; i < 80; i+=2)
+		for (int i=0; i < 80; i+=2)
 		{
-			int att0 = (cga[index] >> 8) & 0xff;
-			int ch0 = (cga[index] >> 0) & 0xff;
-			int att1 = (cga[index] >> 24) & 0xff;
-			int ch1 = (cga[index] >> 16) & 0xff;
+			int const att0 = (cga[index] >> 8) & 0xff;
+			int const ch0 = (cga[index] >> 0) & 0xff;
+			int const att1 = (cga[index] >> 24) & 0xff;
+			int const ch1 = (cga[index] >> 16) & 0xff;
 
 			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
 			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
@@ -408,7 +411,7 @@ void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-uint32_t mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mediagx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -460,8 +463,6 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
-		ramdac_device *ramdac = machine().device<ramdac_device>("ramdac");
-
 		if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00e00000) == 0x00400000)
 		{
 			// guess: crtc params?
@@ -470,17 +471,16 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00000000)
 		{
 			m_pal_index = data;
-			ramdac->index_w( space, 0, data );
+			m_ramdac->index_w( space, 0, data );
 		}
 		else if((m_disp_ctrl_reg[DC_GENERAL_CFG] & 0x00f00000) == 0x00100000)
 		{
 			m_pal[m_pal_index] = data & 0xff;
 			m_pal_index++;
 			if (m_pal_index >= 768)
-			{
 				m_pal_index = 0;
-			}
-			ramdac->pal_w( space, 0, data );
+
+			m_ramdac->pal_w( space, 0, data );
 		}
 	}
 	else
@@ -667,8 +667,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 	m_ad1847_sample_counter = 0;
 	timer.adjust(attotime::from_msec(10));
 
-	dmadac_transfer(&m_dmadac[0], 1, 0, 1, m_dacl_ptr, m_dacl.get());
-	dmadac_transfer(&m_dmadac[1], 1, 0, 1, m_dacr_ptr, m_dacr.get());
+	m_dmadac[0]->transfer(1, 0, 1, m_dacl_ptr, m_dacl.get());
+	m_dmadac[1]->transfer(1, 0, 1, m_dacr_ptr, m_dacr.get());
 
 	m_dacl_ptr = 0;
 	m_dacr_ptr = 0;
@@ -691,7 +691,8 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 				m_ad1847_sample_rate = 24576000 / divide_factor[(data >> 1) & 0x7];
 			}
 
-			dmadac_set_frequency(&m_dmadac[0], 2, m_ad1847_sample_rate);
+			m_dmadac[0]->set_frequency(m_ad1847_sample_rate);
+			m_dmadac[1]->set_frequency(m_ad1847_sample_rate);
 
 			if (data & 0x20)
 			{
@@ -751,27 +752,27 @@ WRITE32_MEMBER(mediagx_state::ad1847_w)
 
 void mediagx_state::mediagx_map(address_map &map)
 {
-	map(0x00000000, 0x0009ffff).ram().share("main_ram");
+	map(0x00000000, 0x0009ffff).ram().share(m_main_ram);
 	map(0x000a0000, 0x000affff).ram();
-	map(0x000b0000, 0x000b7fff).ram().share("cga_ram");
-	map(0x000c0000, 0x000fffff).ram().share("bios_ram");
+	map(0x000b0000, 0x000b7fff).ram().share(m_cga_ram);
+	map(0x000c0000, 0x000fffff).ram().share(m_bios_ram);
 	map(0x00100000, 0x00ffffff).ram();
-	map(0x40008000, 0x400080ff).rw(this, FUNC(mediagx_state::biu_ctrl_r), FUNC(mediagx_state::biu_ctrl_w));
-	map(0x40008300, 0x400083ff).rw(this, FUNC(mediagx_state::disp_ctrl_r), FUNC(mediagx_state::disp_ctrl_w));
-	map(0x40008400, 0x400084ff).rw(this, FUNC(mediagx_state::memory_ctrl_r), FUNC(mediagx_state::memory_ctrl_w));
-	map(0x40800000, 0x40bfffff).ram().share("vram");
+	map(0x40008000, 0x400080ff).rw(FUNC(mediagx_state::biu_ctrl_r), FUNC(mediagx_state::biu_ctrl_w));
+	map(0x40008300, 0x400083ff).rw(FUNC(mediagx_state::disp_ctrl_r), FUNC(mediagx_state::disp_ctrl_w));
+	map(0x40008400, 0x400084ff).rw(FUNC(mediagx_state::memory_ctrl_r), FUNC(mediagx_state::memory_ctrl_w));
+	map(0x40800000, 0x40bfffff).ram().share(m_vram);
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
 void mediagx_state::mediagx_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x0022, 0x0023).rw(this, FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
+	map(0x0022, 0x0023).rw(FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
-	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x0378, 0x037b).rw(this, FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
-	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
-	map(0x0400, 0x04ff).rw(this, FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
+	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 
@@ -867,23 +868,22 @@ void mediagx_state::machine_reset()
 	memcpy(m_bios_ram, rom, 0x40000);
 	m_maincpu->reset();
 
-	timer_device *sound_timer = machine().device<timer_device>("sound_timer");
+	timer_device *sound_timer = subdevice<timer_device>("sound_timer");
 	sound_timer->adjust(attotime::from_msec(10));
 
-	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
-	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
-	dmadac_enable(&m_dmadac[0], 2, 1);
+	m_dmadac[0]->enable(1);
+	m_dmadac[1]->enable(1);
 }
 
 void mediagx_state::ramdac_map(address_map &map)
 {
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+	map(0x000, 0x3ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
 MACHINE_CONFIG_START(mediagx_state::mediagx)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MEDIAGX, 166000000)
+	MCFG_DEVICE_ADD(m_maincpu, MEDIAGX, 166000000)
 	MCFG_DEVICE_PROGRAM_MAP(mediagx_map)
 	MCFG_DEVICE_IO_MAP(mediagx_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
@@ -893,32 +893,33 @@ MACHINE_CONFIG_START(mediagx_state::mediagx)
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(18, DEVICE_SELF, mediagx_state, cx5510_pci_r, cx5510_pci_w)
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set(m_pic8259_2, FUNC(pic8259_device::ir6_w));
 
 	MCFG_TIMER_DRIVER_ADD("sound_timer", mediagx_state, sound_timer_callback)
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	RAMDAC(config, m_ramdac, 0, m_palette);
+	m_ramdac->set_addrmap(0, &mediagx_state::ramdac_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update_mediagx)
+	MCFG_SCREEN_UPDATE_DRIVER(mediagx_state, screen_update)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_cga)
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD(m_palette, 256)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("dac1", DMADAC)
+	MCFG_DEVICE_ADD(m_dmadac[0], DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("dac2", DMADAC)
+	MCFG_DEVICE_ADD(m_dmadac[1], DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -963,23 +964,19 @@ const read32_delegate mediagx_state::s_speedup_handlers[]
 #ifdef MAME_DEBUG
 void mediagx_state::report_speedups()
 {
-	int i;
-
-	for (i = 0; i < m_speedup_count; i++)
+	for (int i = 0; i < m_speedup_count; i++)
 		printf("Speedup %2d: offs=%06X pc=%06X hits=%d\n", i, m_speedup_table[i].offset, m_speedup_table[i].pc, m_speedup_hits[i]);
 }
 #endif
 
 void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 {
-	int i;
-
 	assert(count < ARRAY_LENGTH(s_speedup_handlers));
 
 	m_speedup_table = entries;
 	m_speedup_count = count;
 
-	for (i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		read32_delegate func = s_speedup_handlers[i];
 		func.late_bind(*this);
 		m_maincpu->space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
@@ -1020,11 +1017,11 @@ void mediagx_state::init_a51site4()
 ROM_START( a51site4 )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "new", "v1.0h" )
-	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(1)) /* Build date 09/15/98 string stored at 0x3fff5 */
+	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(0)) /* Build date 09/15/98 string stored at 0x3fff5 */
 	ROM_SYSTEM_BIOS(1, "old", "v1.0f" )
-	ROMX_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe), ROM_BIOS(2)) /* Build date 07/11/98 string stored at 0x3fff5 */
+	ROMX_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe), ROM_BIOS(1)) /* Build date 07/11/98 string stored at 0x3fff5 */
 	ROM_SYSTEM_BIOS(2, "older", "v1.0d" ) /* doesn't work with the HDs currently available, shows "FOR EVALUATION ONLY" */
-	ROMX_LOAD("a51s4_bios_04-22-98.u1", 0x00000, 0x40000, CRC(2008bfc6) SHA1(004bec8759fb04d375c6efc49d048693d1f871ee), ROM_BIOS(3)) /* Build date 04/22/98 string stored at 0x3fff5 */
+	ROMX_LOAD("a51s4_bios_04-22-98.u1", 0x00000, 0x40000, CRC(2008bfc6) SHA1(004bec8759fb04d375c6efc49d048693d1f871ee), ROM_BIOS(2)) /* Build date 04/22/98 string stored at 0x3fff5 */
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
@@ -1036,11 +1033,11 @@ ROM_END
 ROM_START( a51site4a ) /* When dumped connected straight to IDE the cylinders were 4968 and heads were 16 */
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "new", "v1.0h" )
-	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(1)) /* Build date 09/15/98 string stored at 0x3fff5 */
+	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(0)) /* Build date 09/15/98 string stored at 0x3fff5 */
 	ROM_SYSTEM_BIOS(1, "old", "v1.0f" )
-	ROMX_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe), ROM_BIOS(2)) /* Build date 07/11/98 string stored at 0x3fff5 */
+	ROMX_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe), ROM_BIOS(1)) /* Build date 07/11/98 string stored at 0x3fff5 */
 	ROM_SYSTEM_BIOS(2, "older", "v1.0d" ) /* doesn't work with the HDs currently available, shows "FOR EVALUATION ONLY" */
-	ROMX_LOAD("a51s4_bios_04-22-98.u1", 0x00000, 0x40000, CRC(2008bfc6) SHA1(004bec8759fb04d375c6efc49d048693d1f871ee), ROM_BIOS(3)) /* Build date 04/22/98 string stored at 0x3fff5, doesn't work */
+	ROMX_LOAD("a51s4_bios_04-22-98.u1", 0x00000, 0x40000, CRC(2008bfc6) SHA1(004bec8759fb04d375c6efc49d048693d1f871ee), ROM_BIOS(2)) /* Build date 04/22/98 string stored at 0x3fff5, doesn't work */
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))

@@ -90,29 +90,33 @@
       - Then do EXT DIR with a Lynx-formatted disk, or EXT BOOT with a CP/M disk.
       - Then, on a Lynx-formatted disk, do EXT LOAD "name" or EXT MLOAD "name".
 
-    To Do:
+    TODO:
     - printer
     - joysticks
     - UART type COM8017 (48k,96k only) (not used by any programs)
     - There's a few games that are not perfectly perfect, but it runs at least
       as well as any other Lynx emulator.
+    - Racer - Sideways scrolling incorrect.
+    - Nuclear Invaders - User defined characters fail to be defined.
+    - Card Index - Not enough RAM detected.
 
     Game bugs (reproducible in Jynx):
     - 3D Monster Craze: When attacked, garbage on screen
     - 3D Monster Craze: When you find the key, the game freezes
-    - YNXVADERS: Colours of top 2 rows of invaders should be white and yellow
+    - Ynxvaders: Colours of top 2 rows of invaders should be white and yellow
       but they show as magenta and red. After game ends, title screen has wrong
       colours.
 
-      Game Hints:
+    Game Hints:
       Most games have instructions or are quite obvious.
-      - Power Blaster. Using debug.exe, change byte 1965 from FE to F2 to fix
-        the loading. Then, arrows to turn, Shift to clean out a whole row of dots.
-        You can then move into the vacated areas. Even though it says you have
-        3 lives, you actually only have 1.
-      - Backgammon. This is just the instructions. The game is missing.
-      - LogiChess. The page at http://www.nascomhomepage.com/games/logichess.html
-        should provide enough clues to enable you to work out how to play.
+    - Power Blaster: Using debug.exe, change byte 1865 from FE to F2 to fix
+      the loading. Then, arrows to turn, Shift to clean out a whole row of dots.
+      You can then move into the vacated areas. Even though it says you have
+      3 lives, you actually only have 1.
+    - Treasure Island: Doesn't auto-run after loading main program, type RUN.
+    - Backgammon: This is just the instructions. The game is missing.
+    - LogiChess: The page at http://www.nascomhomepage.com/games/logichess.html
+      should provide enough clues to enable you to work out how to play.
 
     Alternate ROMs for Lynx 96k:
     - Scorpion EXTensions
@@ -157,11 +161,13 @@
 
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 #include "formats/camplynx_cas.h"
 #include "formats/camplynx_dsk.h"
@@ -469,7 +475,7 @@ void camplynx_state::lynx48k_mem(address_map &map)
 	map(0xa000, 0xbfff).bankr("bankr6");
 	map(0xc000, 0xdfff).bankr("bankr7");
 	map(0xe000, 0xffff).bankr("bankr8");
-	map(0x0000, 0xffff).w(this, FUNC(camplynx_state::bank6_w));
+	map(0x0000, 0xffff).w(FUNC(camplynx_state::bank6_w));
 }
 
 void camplynx_state::lynx128k_mem(address_map &map)
@@ -483,15 +489,15 @@ void camplynx_state::lynx128k_mem(address_map &map)
 	map(0xa000, 0xbfff).bankr("bankr6");
 	map(0xc000, 0xdfff).bankr("bankr7");
 	map(0xe000, 0xffff).bankr("bankr8");
-	map(0x0000, 0xffff).w(this, FUNC(camplynx_state::bank1_w));
+	map(0x0000, 0xffff).w(FUNC(camplynx_state::bank1_w));
 }
 
 void camplynx_state::lynx48k_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x007f, 0x007f).mirror(0xff80).w(this, FUNC(camplynx_state::port7f_w));
-	map(0x0080, 0x0080).mirror(0xff00).w(this, FUNC(camplynx_state::port80_w));
-	map(0x0080, 0x0080).mirror(0xf000).r(this, FUNC(camplynx_state::port80_r));
+	map(0x007f, 0x007f).mirror(0xff80).w(FUNC(camplynx_state::port7f_w));
+	map(0x0080, 0x0080).mirror(0xff00).w(FUNC(camplynx_state::port80_w));
+	map(0x0080, 0x0080).mirror(0xf000).r(FUNC(camplynx_state::port80_r));
 	map(0x0180, 0x0180).mirror(0xf000).portr("LINE1");
 	map(0x0280, 0x0280).mirror(0xf000).portr("LINE2");
 	map(0x0380, 0x0380).mirror(0xf000).portr("LINE3");
@@ -501,7 +507,7 @@ void camplynx_state::lynx48k_io(address_map &map)
 	map(0x0780, 0x0780).mirror(0xf000).portr("LINE7");
 	map(0x0880, 0x0880).mirror(0xf000).portr("LINE8");
 	map(0x0980, 0x0980).mirror(0xf000).portr("LINE9");
-	map(0x0084, 0x0084).mirror(0xff00).w(this, FUNC(camplynx_state::port84_w));
+	map(0x0084, 0x0084).mirror(0xff00).w(FUNC(camplynx_state::port84_w));
 	map(0x0086, 0x0086).mirror(0xff00).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0087, 0x0087).mirror(0xff00).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -511,7 +517,7 @@ void camplynx_state::lynx96k_io(address_map &map)
 	lynx48k_io(map);
 	map(0x0050, 0x0053).mirror(0xff80).r("fdc", FUNC(fd1793_device::read));
 	map(0x0054, 0x0057).mirror(0xff80).w("fdc", FUNC(fd1793_device::write));
-	map(0x0058, 0x0058).mirror(0xff80).w(this, FUNC(camplynx_state::port58_w));
+	map(0x0058, 0x0058).mirror(0xff80).w(FUNC(camplynx_state::port58_w));
 }
 
 void camplynx_state::lynx128k_io(address_map &map)
@@ -519,12 +525,12 @@ void camplynx_state::lynx128k_io(address_map &map)
 	map.unmap_value_high();
 	map(0x0050, 0x0053).mirror(0xff80).r("fdc", FUNC(fd1793_device::read));
 	map(0x0054, 0x0057).mirror(0xff80).w("fdc", FUNC(fd1793_device::write));
-	map(0x0058, 0x0058).mirror(0xff80).w(this, FUNC(camplynx_state::port58_w));
+	map(0x0058, 0x0058).mirror(0xff80).w(FUNC(camplynx_state::port58_w));
 //  AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
 //  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
 //  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
 //  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
-	map(0x0080, 0x0080).mirror(0xff00).w(this, FUNC(camplynx_state::port80_w));
+	map(0x0080, 0x0080).mirror(0xff00).w(FUNC(camplynx_state::port80_w));
 	map(0x0080, 0x0080).mirror(0xf000).portr("LINE0");
 	map(0x0180, 0x0180).mirror(0xf000).portr("LINE1");
 	map(0x0280, 0x0280).mirror(0xf000).portr("LINE2");
@@ -535,8 +541,8 @@ void camplynx_state::lynx128k_io(address_map &map)
 	map(0x0780, 0x0780).mirror(0xf000).portr("LINE7");
 	map(0x0880, 0x0880).mirror(0xf000).portr("LINE8");
 	map(0x0980, 0x0980).mirror(0xf000).portr("LINE9");
-	map(0x0082, 0x0082).mirror(0xff00).rw(this, FUNC(camplynx_state::port82_r), FUNC(camplynx_state::port82_w)); // read=serial buffer
-	map(0x0084, 0x0084).mirror(0xff00).w(this, FUNC(camplynx_state::port84_w));
+	map(0x0082, 0x0082).mirror(0xff00).rw(FUNC(camplynx_state::port82_r), FUNC(camplynx_state::port82_w)); // read=serial buffer
+	map(0x0084, 0x0084).mirror(0xff00).w(FUNC(camplynx_state::port84_w));
 	map(0x0086, 0x0086).mirror(0xff00).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0087, 0x0087).mirror(0xff00).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -750,15 +756,15 @@ MC6845_UPDATE_ROW( camplynx_state::lynx48k_update_row )
 
 	// determine green bank
 	if (BIT(m_port80, 4))
-		green_bank = 0x38000+mem; // alt green
+		green_bank = 0x38000 + mem; // alt green
 	else
-		green_bank = 0x3c000+mem; // normal green
+		green_bank = 0x3c000 + mem; // normal green
 
 	for (x = 0; x < x_count; x++)
 	{
-		r = m_p_ram[0x2c000+mem+x];
-		b = m_p_ram[0x28000+mem+x];
-		g = m_p_ram[green_bank+x];
+		r = m_p_ram[0x2c000 + mem + x];
+		b = m_p_ram[0x28000 + mem + x];
+		g = m_p_ram[green_bank + x];
 
 		*p++ = m_palette->pen_color((BIT(b, 7) << 2) | (BIT(g, 7) << 1) | (BIT(r, 7)));
 		*p++ = m_palette->pen_color((BIT(b, 6) << 2) | (BIT(g, 6) << 1) | (BIT(r, 6)));
@@ -843,31 +849,30 @@ static void camplynx_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-MACHINE_CONFIG_START(camplynx_state::lynx_common)
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+void camplynx_state::lynx_common(machine_config &config)
+{
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_6BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.375); // unknown DAC
+	VOLTAGE_REGULATOR(config, "vref").set_output(5.0)
+			.add_route(0, m_dac, 1.0, DAC_VREF_POS_INPUT).add_route(0, m_dac, -1.0, DAC_VREF_NEG_INPUT);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.02);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(camplynx_state::lynx_disk)
-	MCFG_FD1793_ADD("fdc", 24_MHz_XTAL / 24)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+void camplynx_state::lynx_disk(machine_config &config)
+{
+	FD1793(config, m_fdc, 24_MHz_XTAL / 24);
+	FLOPPY_CONNECTOR(config, m_floppy0, camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, camplynx_floppies, "525qd", camplynx_state::camplynx_floppy_formats).enable_sound(true);
+}
 
 MACHINE_CONFIG_START(camplynx_state::lynx48k)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(lynx48k_mem)
-	MCFG_DEVICE_IO_MAP(lynx48k_io)
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &camplynx_state::lynx48k_mem);
+	m_maincpu->set_addrmap(AS_IO, &camplynx_state::lynx48k_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx48k)
 
@@ -887,32 +892,34 @@ MACHINE_CONFIG_START(camplynx_state::lynx48k)
 	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'000'000) / 8 )
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx48k_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MC6845(config, m_crtc, 12_MHz_XTAL / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx48k_update_row), this);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	/* software lists */
+	SOFTWARE_LIST(config, "cass_list").set_original("camplynx_cass");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(camplynx_state::lynx96k)
+void camplynx_state::lynx96k(machine_config &config)
+{
 	lynx48k(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(lynx96k_io)
+	m_maincpu->set_addrmap(AS_IO, &camplynx_state::lynx96k_io);
 
 	lynx_disk(config);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "camplynx_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "96K")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("camplynx_flop").set_filter("96K");
+}
 
 MACHINE_CONFIG_START(camplynx_state::lynx128k)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 24_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(lynx128k_mem)
-	MCFG_DEVICE_IO_MAP(lynx128k_io)
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &camplynx_state::lynx128k_mem);
+	m_maincpu->set_addrmap(AS_IO, &camplynx_state::lynx128k_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx128k)
 
@@ -932,17 +939,18 @@ MACHINE_CONFIG_START(camplynx_state::lynx128k)
 	MCFG_CASSETTE_INTERFACE("camplynx_cass")
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12_MHz_XTAL / 8 )
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(camplynx_state, lynx128k_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MC6845(config, m_crtc, 12_MHz_XTAL / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx128k_update_row), this);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	lynx_disk(config);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "camplynx_flop")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "128K")
+	SOFTWARE_LIST(config, "cass_list").set_original("camplynx_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("camplynx_flop").set_filter("128K");
 MACHINE_CONFIG_END
 
 void camplynx_state::init_lynx48k()
@@ -979,11 +987,11 @@ ROM_START( lynx48k )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("1")
 	ROM_SYSTEM_BIOS(0, "1", "Set1")
-	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(1) )
-	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx48-1.rom", 0x0000, 0x2000, CRC(56feec44) SHA1(7ded5184561168e159a30fa8e9d3fde5e52aa91a), ROM_BIOS(0) )
+	ROMX_LOAD( "lynx48-2.rom", 0x2000, 0x2000, CRC(d894562e) SHA1(c08a78ecb4eb05baa4c52488fce3648cd2688744), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "2", "Set2")
-	ROMX_LOAD( "lynx4811.rom", 0x0000, 0x2000, CRC(a933e577) SHA1(c7b30a28d99b38dbe63a1314c78e3e614287143b), ROM_BIOS(2) )
-	ROMX_LOAD( "lynx4812.rom", 0x2000, 0x2000, CRC(3d3fdd0e) SHA1(259d124f05367a96f891790f9418cc9c7798e2f8), ROM_BIOS(2) )
+	ROMX_LOAD( "lynx4811.rom", 0x0000, 0x2000, CRC(a933e577) SHA1(c7b30a28d99b38dbe63a1314c78e3e614287143b), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx4812.rom", 0x2000, 0x2000, CRC(3d3fdd0e) SHA1(259d124f05367a96f891790f9418cc9c7798e2f8), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( lynx96k )
@@ -992,11 +1000,11 @@ ROM_START( lynx96k )
 	ROM_LOAD( "lynx9645.rom",  0x2000, 0x2000, CRC(f596b9a3) SHA1(3fca46bd68422d34c6cd801dd904507e52bd8846) )
 	ROM_DEFAULT_BIOS("orig")
 	ROM_SYSTEM_BIOS(0, "orig", "Original")
-	ROMX_LOAD( "lynx9644.rom", 0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b), ROM_BIOS(1) )
+	ROMX_LOAD( "lynx9644.rom", 0x4000, 0x1000, CRC(4b96b0de) SHA1(c372a8d26399b9b45e615b674d61ccda76491b8b), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "scorp", "Scorpion") /* Scorpion ROM v2.1 03/86 (Reading Lynx User Group) */
-	ROMX_LOAD( "skorprom.rom", 0x4000, 0x2000, CRC(698d3de9) SHA1(c707bdcecef79774c2a8a23d1f3e9ba382cb9304), ROM_BIOS(2) )
+	ROMX_LOAD( "skorprom.rom", 0x4000, 0x2000, CRC(698d3de9) SHA1(c707bdcecef79774c2a8a23d1f3e9ba382cb9304), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(2, "danish", "Danish")
-	ROMX_LOAD( "danish96k3.rom", 0x4000, 0x2000, CRC(795c22ea) SHA1(0a57394cd986c5b338b38d514e894bace7f6e47b), ROM_BIOS(3) )
+	ROMX_LOAD( "danish96k3.rom", 0x4000, 0x2000, CRC(795c22ea) SHA1(0a57394cd986c5b338b38d514e894bace7f6e47b), ROM_BIOS(2) )
 	ROM_LOAD( "dosrom.rom",    0xe000, 0x2000, CRC(011e106a) SHA1(e77f0ca99790551a7122945f3194516b2390fb69) )
 ROM_END
 

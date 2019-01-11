@@ -231,44 +231,44 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
  *
  *************************************/
 
-void ninjakd2_state::omegaf_io_protection_start()
+void omegaf_state::io_protection_start()
 {
 	// register for save states
-	save_item(NAME(m_omegaf_io_protection));
-	save_item(NAME(m_omegaf_io_protection_input));
-	save_item(NAME(m_omegaf_io_protection_tic));
+	save_item(NAME(m_io_protection));
+	save_item(NAME(m_io_protection_input));
+	save_item(NAME(m_io_protection_tick));
 }
 
-void ninjakd2_state::omegaf_io_protection_reset()
+void omegaf_state::io_protection_reset()
 {
 	// make sure protection starts in a known state
-	m_omegaf_io_protection[0] = 0;
-	m_omegaf_io_protection[1] = 0;
-	m_omegaf_io_protection[2] = 0;
-	m_omegaf_io_protection_input = 0;
-	m_omegaf_io_protection_tic = 0;
+	m_io_protection[0] = 0;
+	m_io_protection[1] = 0;
+	m_io_protection[2] = 0;
+	m_io_protection_input = 0;
+	m_io_protection_tick = 0;
 }
 
-READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
+READ8_MEMBER(omegaf_state::io_protection_r)
 {
 	uint8_t result = 0xff;
 
-	switch (m_omegaf_io_protection[1] & 3)
+	switch (m_io_protection[1] & 3)
 	{
 		case 0:
 			switch (offset)
 			{
 				case 1:
-					switch (m_omegaf_io_protection[0] & 0xe0)
+					switch (m_io_protection[0] & 0xe0)
 					{
 						case 0x00:
-							if (++m_omegaf_io_protection_tic & 1)
+							if (++m_io_protection_tick & 1)
 							{
 								result = 0x00;
 							}
 							else
 							{
-								switch (m_omegaf_io_protection_input)
+								switch (m_io_protection_input)
 								{
 									// first interrogation
 									// this happens just after setting mode 0.
@@ -299,11 +299,11 @@ READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 							break;
 
 						case 0x80:
-							result = 0x20 | (m_omegaf_io_protection_input & 0x1f);
+							result = 0x20 | (m_io_protection_input & 0x1f);
 							break;
 
 						case 0xc0:
-							result = 0x60 | (m_omegaf_io_protection_input & 0x1f);
+							result = 0x60 | (m_io_protection_input & 0x1f);
 							break;
 					}
 					break;
@@ -313,8 +313,8 @@ READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 		case 1: // dip switches
 			switch (offset)
 			{
-				case 0: result = ioport("DIPSW1")->read(); break;
-				case 1: result = ioport("DIPSW2")->read(); break;
+				case 0:
+				case 1: result = m_dsw_io[offset & 1]->read(); break;
 				case 2: result = 0x02; break;
 			}
 			break;
@@ -322,8 +322,8 @@ READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 		case 2: // player inputs
 			switch (offset)
 			{
-				case 0: result = ioport("PAD1")->read(); break;
-				case 1: result = ioport("PAD2")->read(); break;
+				case 0:
+				case 1: result = m_pad_io[offset & 1]->read(); break;
 				case 2: result = 0x01; break;
 			}
 			break;
@@ -332,16 +332,16 @@ READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 	return result;
 }
 
-WRITE8_MEMBER(ninjakd2_state::omegaf_io_protection_w)
+WRITE8_MEMBER(omegaf_state::io_protection_w)
 {
 	// load parameter on c006 bit 0 rise transition
-	if (offset == 2 && (data & 1) && !(m_omegaf_io_protection[2] & 1))
+	if (offset == 2 && (data & 1) && !(m_io_protection[2] & 1))
 	{
-		logerror("loading protection input %02x\n", m_omegaf_io_protection[0]);
-		m_omegaf_io_protection_input = m_omegaf_io_protection[0];
+		logerror("loading protection input %02x\n", m_io_protection[0]);
+		m_io_protection_input = m_io_protection[0];
 	}
 
-	m_omegaf_io_protection[offset] = data;
+	m_io_protection[offset] = data;
 }
 
 
@@ -350,7 +350,7 @@ WRITE8_MEMBER(ninjakd2_state::omegaf_io_protection_w)
 
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_bankselect_w)
 {
-	membank("bank1")->set_entry(data & m_rom_bank_mask);
+	m_mainbank->set_entry(data & m_rom_bank_mask);
 }
 
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
@@ -364,6 +364,41 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
 	// other bits unused
 }
 
+template<int Layer>
+WRITE8_MEMBER(robokid_state::robokid_bg_bank_w)
+{
+	m_robokid_bg_bank[Layer] = data & m_vram_bank_mask;
+}
+
+template<int Layer>
+READ8_MEMBER(robokid_state::robokid_bg_videoram_r)
+{
+	return m_robokid_bg_videoram[Layer][(m_robokid_bg_bank[Layer] << 10) | offset];
+}
+
+template<int Layer>
+WRITE8_MEMBER(robokid_state::robokid_bg_videoram_w)
+{
+	int const address = (m_robokid_bg_bank[Layer] << 10 ) | offset;
+
+	m_robokid_bg_videoram[Layer][address] = data;
+	m_robokid_tilemap[Layer]->mark_tile_dirty(address >> 1);
+}
+
+template<int Layer>
+WRITE8_MEMBER(robokid_state::robokid_bg_ctrl_w)
+{
+	bg_ctrl(offset, data, m_robokid_tilemap[Layer]);
+}
+
+// omega fighter compares port $c1e7 with and $e0
+// returning 0 and no small enemies shoot any bullet.
+// returning 0xff seems enough
+// TODO: find a better reference and verify if there are more gameplay quirks, this might really be anything!
+READ8_MEMBER(omegaf_state::unk_r)
+{
+	return 0xff;
+}
 
 
 /*************************************
@@ -375,32 +410,32 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
 void ninjakd2_state::ninjakd2_main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xc000).portr("KEYCOIN");
 	map(0xc001, 0xc001).portr("PAD1");
 	map(0xc002, 0xc002).portr("PAD2");
 	map(0xc003, 0xc003).portr("DIPSW1");
 	map(0xc004, 0xc004).portr("DIPSW2");
 	map(0xc200, 0xc200).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc201, 0xc201).w(this, FUNC(ninjakd2_state::ninjakd2_soundreset_w));
-	map(0xc202, 0xc202).w(this, FUNC(ninjakd2_state::ninjakd2_bankselect_w));
-	map(0xc203, 0xc203).w(this, FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
-	map(0xc208, 0xc20c).w(this, FUNC(ninjakd2_state::ninjakd2_bg_ctrl_w));
+	map(0xc201, 0xc201).w(FUNC(ninjakd2_state::ninjakd2_soundreset_w));
+	map(0xc202, 0xc202).w(FUNC(ninjakd2_state::ninjakd2_bankselect_w));
+	map(0xc203, 0xc203).w(FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xc208, 0xc20c).w(FUNC(ninjakd2_state::ninjakd2_bg_ctrl_w));
 	map(0xc800, 0xcdff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(ninjakd2_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
 	map(0xe000, 0xf9ff).ram();
 	map(0xfa00, 0xffff).ram().share("spriteram");
 }
 
-void ninjakd2_state::mnight_main_cpu(address_map &map)
+void mnight_state::mnight_main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xd9ff).ram();
 	map(0xda00, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(mnight_state::ninjakd2_bgvideoram_w)).share("bg_videoram");
+	map(0xe800, 0xefff).ram().w(FUNC(mnight_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
 	map(0xf000, 0xf5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf800).portr("KEYCOIN");
 	map(0xf801, 0xf801).portr("PAD1");
@@ -408,59 +443,59 @@ void ninjakd2_state::mnight_main_cpu(address_map &map)
 	map(0xf803, 0xf803).portr("DIPSW1");
 	map(0xf804, 0xf804).portr("DIPSW2");
 	map(0xfa00, 0xfa00).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xfa01, 0xfa01).w(this, FUNC(ninjakd2_state::ninjakd2_soundreset_w));
-	map(0xfa02, 0xfa02).w(this, FUNC(ninjakd2_state::ninjakd2_bankselect_w));
-	map(0xfa03, 0xfa03).w(this, FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
-	map(0xfa08, 0xfa0c).w(this, FUNC(ninjakd2_state::ninjakd2_bg_ctrl_w));
+	map(0xfa01, 0xfa01).w(FUNC(mnight_state::ninjakd2_soundreset_w));
+	map(0xfa02, 0xfa02).w(FUNC(mnight_state::ninjakd2_bankselect_w));
+	map(0xfa03, 0xfa03).w(FUNC(mnight_state::ninjakd2_sprite_overdraw_w));
+	map(0xfa08, 0xfa0c).w(FUNC(mnight_state::ninjakd2_bg_ctrl_w));
 }
 
 
-void ninjakd2_state::robokid_main_cpu(address_map &map)
+void robokid_state::robokid_main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
-	map(0xd000, 0xd3ff).rw(this, FUNC(ninjakd2_state::robokid_bg2_videoram_r), FUNC(ninjakd2_state::robokid_bg2_videoram_w));   // banked
-	map(0xd400, 0xd7ff).rw(this, FUNC(ninjakd2_state::robokid_bg1_videoram_r), FUNC(ninjakd2_state::robokid_bg1_videoram_w));   // banked
-	map(0xd800, 0xdbff).rw(this, FUNC(ninjakd2_state::robokid_bg0_videoram_r), FUNC(ninjakd2_state::robokid_bg0_videoram_w));   // banked
+	map(0xc800, 0xcfff).ram().w(FUNC(robokid_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xd000, 0xd3ff).rw(FUNC(robokid_state::robokid_bg_videoram_r<2>), FUNC(robokid_state::robokid_bg_videoram_w<2>));   // banked
+	map(0xd400, 0xd7ff).rw(FUNC(robokid_state::robokid_bg_videoram_r<1>), FUNC(robokid_state::robokid_bg_videoram_w<1>));   // banked
+	map(0xd800, 0xdbff).rw(FUNC(robokid_state::robokid_bg_videoram_r<0>), FUNC(robokid_state::robokid_bg_videoram_w<0>));   // banked
 	map(0xdc00, 0xdc00).portr("KEYCOIN").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xdc01, 0xdc01).portr("PAD1").w(this, FUNC(ninjakd2_state::ninjakd2_soundreset_w));
-	map(0xdc02, 0xdc02).portr("PAD2").w(this, FUNC(ninjakd2_state::ninjakd2_bankselect_w));
-	map(0xdc03, 0xdc03).portr("DIPSW1").w(this, FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
+	map(0xdc01, 0xdc01).portr("PAD1").w(FUNC(robokid_state::ninjakd2_soundreset_w));
+	map(0xdc02, 0xdc02).portr("PAD2").w(FUNC(robokid_state::ninjakd2_bankselect_w));
+	map(0xdc03, 0xdc03).portr("DIPSW1").w(FUNC(robokid_state::ninjakd2_sprite_overdraw_w));
 	map(0xdc04, 0xdc04).portr("DIPSW2");
-	map(0xdd00, 0xdd04).w(this, FUNC(ninjakd2_state::robokid_bg0_ctrl_w));
-	map(0xdd05, 0xdd05).w(this, FUNC(ninjakd2_state::robokid_bg0_bank_w));
-	map(0xde00, 0xde04).w(this, FUNC(ninjakd2_state::robokid_bg1_ctrl_w));
-	map(0xde05, 0xde05).w(this, FUNC(ninjakd2_state::robokid_bg1_bank_w));
-	map(0xdf00, 0xdf04).w(this, FUNC(ninjakd2_state::robokid_bg2_ctrl_w));
-	map(0xdf05, 0xdf05).w(this, FUNC(ninjakd2_state::robokid_bg2_bank_w));
+	map(0xdd00, 0xdd04).w(FUNC(robokid_state::robokid_bg_ctrl_w<0>));
+	map(0xdd05, 0xdd05).w(FUNC(robokid_state::robokid_bg_bank_w<0>));
+	map(0xde00, 0xde04).w(FUNC(robokid_state::robokid_bg_ctrl_w<1>));
+	map(0xde05, 0xde05).w(FUNC(robokid_state::robokid_bg_bank_w<1>));
+	map(0xdf00, 0xdf04).w(FUNC(robokid_state::robokid_bg_ctrl_w<2>));
+	map(0xdf05, 0xdf05).w(FUNC(robokid_state::robokid_bg_bank_w<2>));
 	map(0xe000, 0xf9ff).ram();
 	map(0xfa00, 0xffff).ram().share("spriteram");
 }
 
 
-void ninjakd2_state::omegaf_main_cpu(address_map &map)
+void omegaf_state::omegaf_main_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr("mainbank");
 	map(0xc000, 0xc000).portr("KEYCOIN").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc001, 0xc003).r(this, FUNC(ninjakd2_state::omegaf_io_protection_r));
-	map(0xc001, 0xc001).w(this, FUNC(ninjakd2_state::ninjakd2_soundreset_w));
-	map(0xc002, 0xc002).w(this, FUNC(ninjakd2_state::ninjakd2_bankselect_w));
-	map(0xc003, 0xc003).w(this, FUNC(ninjakd2_state::ninjakd2_sprite_overdraw_w));
-	map(0xc004, 0xc006).w(this, FUNC(ninjakd2_state::omegaf_io_protection_w));
-	map(0xc100, 0xc104).w(this, FUNC(ninjakd2_state::robokid_bg0_ctrl_w));
-	map(0xc105, 0xc105).w(this, FUNC(ninjakd2_state::robokid_bg0_bank_w));
-	map(0xc1e7, 0xc1e7).nopr(); // see notes
-	map(0xc200, 0xc204).w(this, FUNC(ninjakd2_state::robokid_bg1_ctrl_w));
-	map(0xc205, 0xc205).w(this, FUNC(ninjakd2_state::robokid_bg1_bank_w));
-	map(0xc300, 0xc304).w(this, FUNC(ninjakd2_state::robokid_bg2_ctrl_w));
-	map(0xc305, 0xc305).w(this, FUNC(ninjakd2_state::robokid_bg2_bank_w));
-	map(0xc400, 0xc7ff).rw(this, FUNC(ninjakd2_state::robokid_bg0_videoram_r), FUNC(ninjakd2_state::robokid_bg0_videoram_w));   // banked
-	map(0xc800, 0xcbff).rw(this, FUNC(ninjakd2_state::robokid_bg1_videoram_r), FUNC(ninjakd2_state::robokid_bg1_videoram_w));   // banked
-	map(0xcc00, 0xcfff).rw(this, FUNC(ninjakd2_state::robokid_bg2_videoram_r), FUNC(ninjakd2_state::robokid_bg2_videoram_w));   // banked
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(ninjakd2_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
+	map(0xc001, 0xc003).r(FUNC(omegaf_state::io_protection_r));
+	map(0xc001, 0xc001).w(FUNC(omegaf_state::ninjakd2_soundreset_w));
+	map(0xc002, 0xc002).w(FUNC(omegaf_state::ninjakd2_bankselect_w));
+	map(0xc003, 0xc003).w(FUNC(omegaf_state::ninjakd2_sprite_overdraw_w));
+	map(0xc004, 0xc006).w(FUNC(omegaf_state::io_protection_w));
+	map(0xc100, 0xc104).w(FUNC(omegaf_state::robokid_bg_ctrl_w<0>));
+	map(0xc105, 0xc105).w(FUNC(omegaf_state::robokid_bg_bank_w<0>));
+	map(0xc1e7, 0xc1e7).r(FUNC(omegaf_state::unk_r)); // see notes
+	map(0xc200, 0xc204).w(FUNC(omegaf_state::robokid_bg_ctrl_w<1>));
+	map(0xc205, 0xc205).w(FUNC(omegaf_state::robokid_bg_bank_w<1>));
+	map(0xc300, 0xc304).w(FUNC(omegaf_state::robokid_bg_ctrl_w<2>));
+	map(0xc305, 0xc305).w(FUNC(omegaf_state::robokid_bg_bank_w<2>));
+	map(0xc400, 0xc7ff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<0>), FUNC(omegaf_state::robokid_bg_videoram_w<0>));   // banked
+	map(0xc800, 0xcbff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<1>), FUNC(omegaf_state::robokid_bg_videoram_w<1>));   // banked
+	map(0xcc00, 0xcfff).rw(FUNC(omegaf_state::robokid_bg_videoram_r<2>), FUNC(omegaf_state::robokid_bg_videoram_w<2>));   // banked
+	map(0xd000, 0xd7ff).ram().w(FUNC(omegaf_state::ninjakd2_fgvideoram_w)).share("fg_videoram");
 	map(0xd800, 0xdfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xe000, 0xf9ff).ram();
 	map(0xfa00, 0xffff).ram().share("spriteram");
@@ -473,7 +508,7 @@ void ninjakd2_state::ninjakd2_sound_cpu(address_map &map)
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).w(this, FUNC(ninjakd2_state::ninjakd2_pcm_play_w));
+	map(0xf000, 0xf000).w(FUNC(ninjakd2_state::ninjakd2_pcm_play_w));
 }
 
 void ninjakd2_state::ninjakid_nopcm_sound_cpu(address_map &map)
@@ -902,170 +937,156 @@ GFXDECODE_END
 
 void ninjakd2_state::machine_start()
 {
-}
-
-void ninjakd2_state::machine_reset()
-{
 	/* initialize main Z80 bank */
 	int num_banks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
-	membank("bank1")->configure_entries(0, num_banks, memregion("maincpu")->base() + 0x10000, 0x4000);
-	membank("bank1")->set_entry(0);
+	m_mainbank->configure_entries(0, num_banks, memregion("maincpu")->base() + 0x10000, 0x4000);
+	// ...
 
 	m_rom_bank_mask = num_banks - 1;
 }
 
-MACHINE_START_MEMBER(ninjakd2_state,omegaf)
+void ninjakd2_state::machine_reset()
 {
-	omegaf_io_protection_start();
-
-	machine_start();
+	m_mainbank->set_entry(0);
 }
 
-MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
+void omegaf_state::machine_start()
 {
-	omegaf_io_protection_reset();
+	io_protection_start();
 
-	machine_reset();
+	ninjakd2_state::machine_start();
+}
+
+void omegaf_state::machine_reset()
+{
+	io_protection_reset();
+
+	ninjakd2_state::machine_reset();
 }
 
 /*****************************************************************************/
 
-MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
-
+void ninjakd2_state::ninjakd2_core(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
-	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_main_cpu)
+	Z80(config, m_maincpu, MAIN_CLOCK_12/2); /* verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_main_cpu);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MAIN_CLOCK_5)     /* verified */
-	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_DEVICE_IO_MAP(ninjakd2_sound_io)
+	Z80(config, m_soundcpu, MAIN_CLOCK_5);     /* verified */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_sound_cpu);
+	m_soundcpu->set_addrmap(AS_IO, &ninjakd2_state::ninjakd2_sound_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_ninjakd2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ninjakd2_state, screen_vblank_ninjakd2))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.61);    /* verified on pcb */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(ninjakd2_state::screen_update_ninjakd2));
+	m_screen->screen_vblank().set(FUNC(ninjakd2_state::screen_vblank_ninjakd2));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ninjakd2)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjakd2);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 0x300);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym2203_1(YM2203(config, "2203.1", MAIN_CLOCK_12/8)); /* verified */
+	ym2203_1.irq_handler().set_inputline("soundcpu", 0);
+	ym2203_1.add_route(0, "mono", 0.10);
+	ym2203_1.add_route(1, "mono", 0.10);
+	ym2203_1.add_route(2, "mono", 0.10);
+	ym2203_1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)       /* verified */
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym2203_2(YM2203(config, "2203.2", MAIN_CLOCK_12/8)); /* verified */
+	ym2203_2.add_route(0, "mono", 0.10);
+	ym2203_2.add_route(1, "mono", 0.10);
+	ym2203_2.add_route(2, "mono", 0.10);
+	ym2203_2.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("pcm", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(ninjakd2_state, ninjakd2_init_samples)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_pcm);
+	m_pcm->set_channels(1);
+	m_pcm->set_samples_start_callback(FUNC(ninjakd2_state::ninjakd2_init_samples));
+	m_pcm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(ninjakd2_state::ninjakd2)
+void ninjakd2_state::ninjakd2(machine_config &config)
+{
 	ninjakd2_core(config);
-	MCFG_DEVICE_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
-	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_DEVICE_IO_MAP(ninjakd2_sound_io)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_soundcpu, MAIN_CLOCK_5); /* verified */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_sound_cpu);
+	m_soundcpu->set_addrmap(AS_IO, &ninjakd2_state::ninjakd2_sound_io);
+	m_soundcpu->set_addrmap(AS_OPCODES, &ninjakd2_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(ninjakd2_state::ninjakd2b)
+void ninjakd2_state::ninjakd2b(machine_config &config)
+{
 	ninjakd2_core(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ninjakd2_state::ninjakd2_sound_cpu);
+	m_soundcpu->set_addrmap(AS_OPCODES, &ninjakd2_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(ninjakd2_state::mnight)
+void mnight_state::mnight(machine_config &config)
+{
 	ninjakd2_core(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mnight_main_cpu)
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mnight_state::mnight_main_cpu);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mnight_state::ninjakid_nopcm_sound_cpu);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,mnight)
+	MCFG_VIDEO_START_OVERRIDE(mnight_state,mnight)
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("pcm")
-MACHINE_CONFIG_END
+	config.device_remove("pcm");
+}
 
-MACHINE_CONFIG_START(ninjakd2_state::arkarea)
-	ninjakd2_core(config);
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mnight_main_cpu)
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+void mnight_state::arkarea(machine_config &config)
+{
+	mnight(config);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,arkarea)
+	MCFG_VIDEO_START_OVERRIDE(mnight_state,arkarea)
+}
 
-	/* sound hardware */
-	MCFG_DEVICE_REMOVE("pcm")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(ninjakd2_state::robokid)
+void robokid_state::robokid(machine_config &config)
+{
 	mnight(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(robokid_main_cpu)
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	m_maincpu->set_addrmap(AS_PROGRAM, &robokid_state::robokid_main_cpu);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &robokid_state::ninjakid_nopcm_sound_cpu);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_robokid)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x400)  // RAM is this large, but still only 0x300 colors used
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	m_gfxdecode->set_info(gfx_robokid);
+	m_palette->set_format(palette_device::RGBx_444, 0x400);  // RAM is this large, but still only 0x300 colors used
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
-	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,robokid)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_robokid)
-MACHINE_CONFIG_END
+	MCFG_VIDEO_START_OVERRIDE(robokid_state,robokid)
 
-MACHINE_CONFIG_START(ninjakd2_state::omegaf)
+	m_screen->set_screen_update(FUNC(robokid_state::screen_update_robokid));
+}
+
+void omegaf_state::omegaf(machine_config &config)
+{
 	robokid(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(omegaf_main_cpu)
+	m_maincpu->set_addrmap(AS_PROGRAM, &omegaf_state::omegaf_main_cpu);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &omegaf_state::ninjakid_nopcm_sound_cpu);
 
-	MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
-	MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
+//  MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
+//  MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,omegaf)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_omegaf)
-MACHINE_CONFIG_END
+	MCFG_VIDEO_START_OVERRIDE(omegaf_state,omegaf)
+
+	m_screen->set_screen_update(FUNC(omegaf_state::screen_update_omegaf));
+}
 
 
 
@@ -1656,21 +1677,21 @@ void ninjakd2_state::init_bootleg()
 	gfx_unscramble();
 }
 
-void ninjakd2_state::init_mnight()
+void mnight_state::init_mnight()
 {
 	gfx_unscramble();
 }
 
 /*****************************************************************************/
 
-READ8_MEMBER(ninjakd2_state::robokid_motion_error_verbose_r)
+READ8_MEMBER(robokid_state::motion_error_verbose_r)
 {
 	popmessage("%s MOTION ERROR, contact MAMEdev", machine().system().name);
 	logerror("maincpu %04x MOTION ERROR\n", m_maincpu->pc());
 	return 0xe6;
 }
 
-void ninjakd2_state::robokid_motion_error_kludge(uint16_t offset)
+void robokid_state::motion_error_kludge(uint16_t offset)
 {
 	// patch out rare "5268 MOTION ERROR" (MT 05024)
 	// It looks like it's due to a buggy random number generator,
@@ -1684,17 +1705,17 @@ void ninjakd2_state::robokid_motion_error_kludge(uint16_t offset)
 	ROM[2] = 0x18;
 	ROM[3] = 0xf6; // jr $-8
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(ninjakd2_state::robokid_motion_error_verbose_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(robokid_state::motion_error_verbose_r), this));
 }
 
-void ninjakd2_state::init_robokid()
+void robokid_state::init_robokid()
 {
-	robokid_motion_error_kludge(0x5247);
+	motion_error_kludge(0x5247);
 }
 
-void ninjakd2_state::init_robokidj()
+void robokid_state::init_robokidj()
 {
-	robokid_motion_error_kludge(0x5266);
+	motion_error_kludge(0x5266);
 }
 
 
@@ -1713,15 +1734,15 @@ GAME( 1987, ninjakd2c, ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninja
 GAME( 1987, rdaction,  ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, jt104,     ninjakd2, ninjakd2,  rdaction, ninjakd2_state, init_bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, mnight,    0,        mnight,    mnight,   ninjakd2_state, init_mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mnightj,   mnight,   mnight,    mnight,   ninjakd2_state, init_mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnight,    0,        mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnightj,   mnight,   mnight,    mnight,   mnight_state,   init_mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, arkarea,   0,        arkarea,   arkarea,  ninjakd2_state, init_mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, arkarea,   0,        arkarea,   arkarea,  mnight_state,   init_mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, robokid,   0,        robokid,   robokid,  ninjakd2_state, init_robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
-GAME( 1988, robokidj,  robokid,  robokid,   robokidj, ninjakd2_state, init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, robokidj2, robokid,  robokid,   robokidj, ninjakd2_state, init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1988, robokidj3, robokid,  robokid,   robokidj, ninjakd2_state, empty_init,    ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokid,   0,        robokid,   robokid,  robokid_state,  init_robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
+GAME( 1988, robokidj,  robokid,  robokid,   robokidj, robokid_state,  init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj2, robokid,  robokid,   robokidj, robokid_state,  init_robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj3, robokid,  robokid,   robokidj, robokid_state,  empty_init,    ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1989, omegaf,    0,        omegaf,    omegaf,   ninjakd2_state, empty_init,    ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, omegafs,   omegaf,   omegaf,    omegaf,   ninjakd2_state, empty_init,    ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegaf,    0,        omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegafs,   omegaf,   omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )

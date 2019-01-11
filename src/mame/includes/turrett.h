@@ -10,7 +10,11 @@
 
 #pragma once
 
+#include "cpu/mips/mips1.h"
 #include "machine/ataintf.h"
+#include "machine/idehd.h"
+#include "emupal.h"
+#include "speaker.h"
 #include "screen.h"
 
 
@@ -18,13 +22,20 @@ class turrett_state : public driver_device
 {
 public:
 	turrett_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ata(*this, "ata"),
-			m_bank_a(*this, "bank_a"),
-			m_bank_b(*this, "bank_b"),
-			m_screen(*this, "screen") {}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ata(*this, "ata")
+		, m_bank_a(*this, "bank_a")
+		, m_bank_b(*this, "bank_b")
+		, m_screen(*this, "screen")
+	{
+	}
 
+	void turrett(machine_config &config);
+
+	INPUT_CHANGED_MEMBER(ipt_change);
+
+private:
 	// constants
 	static const uint32_t X_VISIBLE = 336;
 	static const uint32_t Y_VISIBLE = 244;
@@ -33,7 +44,7 @@ public:
 	static const uint32_t VRAM_BANK_WORDS = 256 * 1024;
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<r3041_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_shared_ptr<uint16_t> m_bank_a;
 	required_shared_ptr<uint16_t> m_bank_b;
@@ -45,7 +56,6 @@ public:
 	DECLARE_WRITE32_MEMBER(video_w);
 	DECLARE_READ32_MEMBER(int_r);
 	DECLARE_WRITE32_MEMBER(int_w);
-	INPUT_CHANGED_MEMBER(ipt_change);
 	DECLARE_READ_LINE_MEMBER(sbrc2_r);
 	DECLARE_READ_LINE_MEMBER(sbrc3_r);
 
@@ -84,10 +94,9 @@ public:
 	uint8_t   m_frame;
 	uint8_t   m_adc;
 
-	void turrett(machine_config &config);
 	void cpu_map(address_map &map);
 	void turrett_sound_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

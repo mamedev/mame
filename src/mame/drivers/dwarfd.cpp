@@ -301,14 +301,15 @@ uPC1352C @ N3
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "video/i8275.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class dwarfd_state : public driver_device
 {
 public:
-	dwarfd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dwarfd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_palette(*this, "palette"),
 		m_crtc(*this, "i8275"),
@@ -316,6 +317,18 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
+	void dwarfd(machine_config &config);
+	void pokeresp(machine_config &config);
+	void qc(machine_config &config);
+
+	void init_qc();
+	void init_dwarfd();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	/* video-related */
 	int m_crt_access;
 	bool m_back_color;
@@ -323,7 +336,7 @@ public:
 	/* memory */
 	uint8_t    m_dw_ram[0x1000];
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc;
 	required_region_ptr<uint16_t> m_charmap;
@@ -336,17 +349,10 @@ public:
 	DECLARE_READ8_MEMBER(qc_b8_r);
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	void init_qc();
-	void init_dwarfd();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dwarfd);
+	void dwarfd_palette(palette_device &palette) const;
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
-	void dwarfd(machine_config &config);
-	void pokeresp(machine_config &config);
-	void qc(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 	void pokeresp_map(address_map &map);
@@ -412,13 +418,13 @@ READ8_MEMBER(dwarfd_state::qc_b8_r)
 void dwarfd_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+	map(0x4000, 0x4fff).rw(FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
 }
 
 void dwarfd_state::pokeresp_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x3000, 0x3fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+	map(0x3000, 0x3fff).rw(FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
 }
 
 void dwarfd_state::io_map(address_map &map)
@@ -429,8 +435,8 @@ void dwarfd_state::io_map(address_map &map)
 
 	map(0x20, 0x21).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
 	map(0x40, 0x40).nopw(); // unknown
-	map(0x60, 0x60).w(this, FUNC(dwarfd_state::output1_w));
-	map(0x80, 0x80).w(this, FUNC(dwarfd_state::output2_w));
+	map(0x60, 0x60).w(FUNC(dwarfd_state::output1_w));
+	map(0x80, 0x80).w(FUNC(dwarfd_state::output2_w));
 	map(0xc0, 0xc0).portr("DSW1");
 	map(0xc1, 0xc1).portr("DSW2");
 }
@@ -438,14 +444,14 @@ void dwarfd_state::io_map(address_map &map)
 void dwarfd_state::qc_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).rw(this, FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
+	map(0x8000, 0x8fff).rw(FUNC(dwarfd_state::dwarfd_ram_r), FUNC(dwarfd_state::dwarfd_ram_w));
 }
 
 void dwarfd_state::qc_io_map(address_map &map)
 {
 	io_map(map);
 	map.global_mask(0xff);
-	map(0xb8, 0xb8).r(this, FUNC(dwarfd_state::qc_b8_r));
+	map(0xb8, 0xb8).r(FUNC(dwarfd_state::qc_b8_r));
 }
 
 static INPUT_PORTS_START( dwarfd )
@@ -600,7 +606,6 @@ INPUT_PORTS_END
 
 I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 {
-	int i;
 	int bank = ((gpa & 2) ? 0 : 2) + (gpa & 1);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
@@ -610,7 +615,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 	//if(!linecount)
 	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
 
-	for(i=0;i<8;i+=2)
+	for (int i = 0; i < 8; i += 2)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
 		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
@@ -624,7 +629,6 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::pesp_display_pixels)
 
 I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 {
-	int i;
 	int bank = ((gpa & 2) ? 0 : 4) + (gpa & 1) + (m_dsw2->read() & 2);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
@@ -634,7 +638,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 	//if(!linecount)
 	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
 
-	for(i=0;i<8;i+=2)
+	for (int i = 0; i < 8; i += 2)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
 		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
@@ -648,7 +652,6 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::display_pixels)
 
 I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 {
-	int i;
 	int bank = gpa;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t pixels = m_charmap[(linecount & 7) + ((charcode + (bank * 128)) << 3)];
@@ -658,7 +661,7 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	//if(!linecount)
 	//  logerror("%d %d %02x %02x %02x %02x %02x %02x %02x\n", x/8, y/8, charcode, lineattr, lten, rvv, vsp, gpa, hlgt);
 
-	for(i=0;i<8;i+=2)
+	for (int i = 0; i < 8; i += 2)
 	{
 		uint8_t pixel = (pixels >> (i * 2)) & 0xf;
 		uint8_t value = (pixel >> 1) | (rvv << 4) | (vsp << 3);
@@ -699,19 +702,18 @@ static GFXDECODE_START( gfx_dwarfd )
 	GFXDECODE_REVERSEBITS("gfx1", 0, tiles8x8_layout, 0, 8)
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
+void dwarfd_state::dwarfd_palette(palette_device &palette) const
 {
-	uint8_t rgb[3];
-	int i,j;
-	uint8_t *prom = memregion("proms")->base();
+	uint8_t const *const prom = memregion("proms")->base();
 
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
 		// what are the top 2 bits?
+		uint8_t rgb[3];
 		rgb[0] = ((prom[i] & 0x08) >> 2) | (prom[i] & 1);
 		rgb[1] = ((prom[i] & 0x10) >> 3) | ((prom[i] & 2) >> 1);
 		rgb[2] = ((prom[i] & 0x20) >> 4) | ((prom[i] & 4) >> 2);
-		for(j = 0; j < 3; j++)
+		for (int j = 0; j < 3; j++)
 			rgb[j] |= (rgb[j] << 6) | (rgb[j] << 4) | (rgb[j] << 2);
 
 		palette.set_pen_color(i,rgb_t(rgb[0], rgb[1], rgb[2]));
@@ -729,59 +731,56 @@ void dwarfd_state::machine_reset()
 	m_back_color = false;
 }
 
-MACHINE_CONFIG_START(dwarfd_state::dwarfd)
-
+void dwarfd_state::dwarfd(machine_config &config)
+{
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MCFG_DEVICE_ADD("maincpu", I8085A, 10595000/3*2)        /* ? MHz */
-	MCFG_I8085A_SOD(WRITELINE(*this, dwarfd_state,dwarfd_sod_callback))
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	I8085A(config, m_maincpu, 10595000/3*2); /* ? MHz */
+	m_maincpu->out_sod_func().set(FUNC(dwarfd_state::dwarfd_sod_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &dwarfd_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dwarfd_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(272*2, 200+4*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(272*2, 200+4*8);
+	screen.set_visarea(0, 272*2-1, 0, 200-1);
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
 
-	MCFG_DEVICE_ADD("i8275", I8275, 10595000/3)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, display_pixels)
-	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, dwarfd_state, drq_w))
+	I8275(config, m_crtc, 10595000/3);
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(dwarfd_state::display_pixels));
+	m_crtc->irq_wr_callback().set_inputline("maincpu", I8085_RST55_LINE);
+	m_crtc->drq_wr_callback().set(FUNC(dwarfd_state::drq_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dwarfd)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dwarfd);
+	PALETTE(config, m_palette, FUNC(dwarfd_state::dwarfd_palette), 32);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set_ioport("IN2");
+	aysnd.port_b_read_callback().set_ioport("IN1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(dwarfd_state::pokeresp)
-	dwarfd(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(pokeresp_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-
-	MCFG_DEVICE_MODIFY("i8275")
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, pesp_display_pixels)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(dwarfd_state::qc)
+void dwarfd_state::pokeresp(machine_config &config)
+{
 	dwarfd(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(qc_map)
-	MCFG_DEVICE_IO_MAP(qc_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dwarfd_state::pokeresp_map);
+	m_maincpu->set_addrmap(AS_IO, &dwarfd_state::io_map);
 
-	MCFG_DEVICE_MODIFY("i8275")
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, qc_display_pixels)
-MACHINE_CONFIG_END
+	m_crtc->set_display_callback(FUNC(dwarfd_state::pesp_display_pixels));
+}
+
+void dwarfd_state::qc(machine_config &config)
+{
+	dwarfd(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dwarfd_state::qc_map);
+	m_maincpu->set_addrmap(AS_IO, &dwarfd_state::qc_io_map);
+
+	m_crtc->set_display_callback(FUNC(dwarfd_state::qc_display_pixels));
+}
 
 /* Dwarfs den PROM explanation:
    The proms used in Dwarfs den are 74S188 (82s23 equivalent, 32x8 open collector)

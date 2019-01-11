@@ -9,6 +9,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "emupal.h"
 #include "ui/ui.h"
 #include "uiinput.h"
 #include "render.h"

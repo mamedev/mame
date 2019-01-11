@@ -13,9 +13,6 @@
 #pragma once
 
 
-#define MCFG_SPEAKER_LEVELS(_num, _levels) \
-	downcast<speaker_sound_device &>(*device).set_levels(_num, _levels);
-
 class speaker_sound_device : public device_t,
 								public device_sound_interface
 {
@@ -32,6 +29,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -77,8 +75,6 @@ private:
 	attotime      m_next_interm_sample_time;
 	int           m_interm_sample_index;              /* counts interm. samples between stream samples */
 	attotime      m_last_update_time;                 /* internal timestamp */
-
-	void speaker_postload();
 
 	// DC blocker state
 	double  m_prevx, m_prevy;

@@ -48,12 +48,12 @@ void hyhoo_state::hyhoo_io_map(address_map &map)
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x90, 0x90).portr("SYSTEM");
-	map(0x90, 0x97).w(this, FUNC(hyhoo_state::hyhoo_blitter_w));
+	map(0x90, 0x97).w(FUNC(hyhoo_state::hyhoo_blitter_w));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
 	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
 	map(0xc0, 0xcf).writeonly().share("clut");
-	map(0xd0, 0xd0).nopr().w("dac", FUNC(dac_byte_interface::write));     // unknown read
-	map(0xe0, 0xe0).w(this, FUNC(hyhoo_state::hyhoo_romsel_w));
+	map(0xd0, 0xd0).nopr().w("dac", FUNC(dac_byte_interface::data_w));     // unknown read
+	map(0xe0, 0xe0).w(FUNC(hyhoo_state::hyhoo_romsel_w));
 	map(0xe0, 0xe1).r(m_nb1413m3, FUNC(nb1413m3_device::gfxrom_r));
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
 //  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
@@ -234,7 +234,7 @@ MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 	MCFG_DEVICE_IO_MAP(hyhoo_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", hyhoo_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -244,17 +244,15 @@ MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hyhoo_state, screen_update_hyhoo)
 
-	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_HYHOO )
-
+	NB1413M3(config, m_nb1413m3, 0, NB1413M3_HYHOO);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1250000));
+	aysnd.port_a_read_callback().set_ioport("DSWA");
+	aysnd.port_b_read_callback().set_ioport("DSWB");
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -262,11 +260,11 @@ MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(hyhoo_state::hyhoo2)
+void hyhoo_state::hyhoo2(machine_config &config)
+{
 	hyhoo(config);
-	MCFG_DEVICE_MODIFY("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_HYHOO2 )
-MACHINE_CONFIG_END
+	m_nb1413m3->set_type(NB1413M3_HYHOO2);
+}
 
 
 ROM_START( hyhoo )

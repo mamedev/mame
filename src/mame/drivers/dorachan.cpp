@@ -19,6 +19,7 @@ It appears that unused bits in port 03 are to operate the discrete sound channel
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -34,16 +35,17 @@ public:
 		, m_colors(*this, "colors")
 	{ }
 
+	void dorachan(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(control_w);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_READ8_MEMBER(v128_r);
 	uint32_t screen_update_dorachan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void dorachan(machine_config &config);
 	void dorachan_io_map(address_map &map);
 	void dorachan_map(address_map &map);
 
-private:
 	// internal state
 	uint8_t m_flip_screen;
 	uint16_t m_prot_value;
@@ -152,10 +154,10 @@ void dorachan_state::dorachan_map(address_map &map)
 	map(0x0000, 0x17ff).rom();
 	map(0x1800, 0x1fff).ram();
 	map(0x2000, 0x23ff).rom();
-	map(0x2400, 0x2400).mirror(0x03ff).r(this, FUNC(dorachan_state::protection_r));
+	map(0x2400, 0x2400).mirror(0x03ff).r(FUNC(dorachan_state::protection_r));
 	map(0x2800, 0x2800).mirror(0x03ff).portr("IN0");
 	map(0x2c00, 0x2c00).mirror(0x03ff).portr("IN1");
-	map(0x3800, 0x3800).mirror(0x03ff).r(this, FUNC(dorachan_state::v128_r));
+	map(0x3800, 0x3800).mirror(0x03ff).r(FUNC(dorachan_state::v128_r));
 	map(0x4000, 0x5fff).ram().share("videoram");
 	map(0x6000, 0x77ff).rom();
 }
@@ -164,8 +166,8 @@ void dorachan_state::dorachan_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x01, 0x01).nopw();
-	map(0x02, 0x02).w(this, FUNC(dorachan_state::protection_w));
-	map(0x03, 0x03).w(this, FUNC(dorachan_state::control_w));
+	map(0x02, 0x02).w(FUNC(dorachan_state::protection_w));
+	map(0x03, 0x03).w(FUNC(dorachan_state::control_w));
 }
 
 
@@ -239,7 +241,7 @@ MACHINE_CONFIG_START(dorachan_state::dorachan)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_UPDATE_DRIVER(dorachan_state, screen_update_dorachan)
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 MACHINE_CONFIG_END
 
 

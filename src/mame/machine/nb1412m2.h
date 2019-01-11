@@ -12,18 +12,6 @@ Nichibutsu 1412M2 device emulation
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NB1412M2_ADD(tag, freq) \
-		MCFG_DEVICE_ADD((tag), NB1412M2, (freq))
-
-#define MCFG_NB1412M2_DAC_CB(_devcb) \
-	devcb = &downcast<nb1412m2_device &>(*device).set_dac_callback(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -40,7 +28,7 @@ public:
 	DECLARE_WRITE8_MEMBER( command_w );
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_READ8_MEMBER( data_r );
-	
+
 	DECLARE_WRITE8_MEMBER( rom_address_w );
 	DECLARE_READ8_MEMBER( rom_decrypt_r );
 	DECLARE_WRITE8_MEMBER( rom_op_w );
@@ -53,15 +41,14 @@ public:
 	DECLARE_WRITE8_MEMBER( dac_address_w );
 	DECLARE_WRITE8_MEMBER( dac_timer_w );
 
-	template <class Object> devcb_base &set_dac_callback(Object &&cb)
-	{ return m_dac_cb.set_callback(std::forward<Object>(cb)); }
+	auto dac_callback() { return m_dac_cb.bind(); }
 
 
 	void nb1412m2_map(address_map &map);
 protected:
 	// device-level overrides
-//	virtual void device_validity_check(validity_checker &valid) const override;
-//	virtual void device_add_mconfig(machine_config &config) override;
+//  virtual void device_validity_check(validity_checker &valid) const override;
+//  virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

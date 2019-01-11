@@ -14,21 +14,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BBC_FDC_SLOT_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, BBC_FDC_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
-#define MCFG_BBC_FDC_SLOT_INTRQ_HANDLER(_devcb) \
-	devcb = &downcast<bbc_fdc_slot_device &>(*device).set_intrq_handler(DEVCB_##_devcb);
-
-#define MCFG_BBC_FDC_SLOT_DRQ_HANDLER(_devcb) \
-	devcb = &downcast<bbc_fdc_slot_device &>(*device).set_drq_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -40,15 +25,27 @@ class bbc_fdc_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_fdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~bbc_fdc_slot_device();
+	template <typename T>
+	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
+		: bbc_fdc_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
+
+	bbc_fdc_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_intrq_handler(Object &&cb) { return m_intrq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
+	auto intrq_wr_callback() { return m_intrq_cb.bind(); }
+	auto drq_wr_callback() { return m_drq_cb.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_handler(state); }
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
+
+	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_cb(state); }
 
 protected:
 	// device-level overrides
@@ -59,8 +56,8 @@ protected:
 	device_bbc_fdc_interface *m_card;
 
 private:
-	devcb_write_line m_intrq_handler;
-	devcb_write_line m_drq_handler;
+	devcb_write_line m_intrq_cb;
+	devcb_write_line m_drq_cb;
 };
 
 
@@ -69,8 +66,8 @@ private:
 class device_bbc_fdc_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	virtual ~device_bbc_fdc_interface();
+	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write) { }
 
 protected:
 	device_bbc_fdc_interface(const machine_config &mconfig, device_t &device);

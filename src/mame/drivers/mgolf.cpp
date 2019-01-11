@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mgolf_state : public driver_device
@@ -29,7 +30,7 @@ public:
 
 	void mgolf(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_READ8_MEMBER(wram_r);
 	DECLARE_READ8_MEMBER(dial_r);
@@ -38,7 +39,7 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_PALETTE_INIT(mgolf);
+	void mgolf_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -53,7 +54,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void cpu_map(address_map &map);
 
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -235,11 +235,11 @@ void mgolf_state::cpu_map(address_map &map)
 	map.global_mask(0x3fff);
 
 	map(0x0040, 0x0040).portr("40");
-	map(0x0041, 0x0041).r(this, FUNC(mgolf_state::dial_r));
+	map(0x0041, 0x0041).r(FUNC(mgolf_state::dial_r));
 	map(0x0060, 0x0060).portr("60");
-	map(0x0061, 0x0061).r(this, FUNC(mgolf_state::misc_r));
-	map(0x0080, 0x00ff).r(this, FUNC(mgolf_state::wram_r));
-	map(0x0180, 0x01ff).r(this, FUNC(mgolf_state::wram_r));
+	map(0x0061, 0x0061).r(FUNC(mgolf_state::misc_r));
+	map(0x0080, 0x00ff).r(FUNC(mgolf_state::wram_r));
+	map(0x0180, 0x01ff).r(FUNC(mgolf_state::wram_r));
 	map(0x0800, 0x0bff).readonly();
 
 	map(0x0000, 0x0009).nopw();
@@ -253,9 +253,9 @@ void mgolf_state::cpu_map(address_map &map)
 	map(0x006a, 0x006a).nopw();
 	map(0x006c, 0x006c).nopw();
 	map(0x006d, 0x006d).nopw();
-	map(0x0080, 0x00ff).w(this, FUNC(mgolf_state::wram_w));
-	map(0x0180, 0x01ff).w(this, FUNC(mgolf_state::wram_w));
-	map(0x0800, 0x0bff).w(this, FUNC(mgolf_state::vram_w)).share("video_ram");
+	map(0x0080, 0x00ff).w(FUNC(mgolf_state::wram_w));
+	map(0x0180, 0x01ff).w(FUNC(mgolf_state::wram_w));
+	map(0x0800, 0x0bff).w(FUNC(mgolf_state::vram_w)).share("video_ram");
 
 	map(0x2000, 0x3fff).rom();
 }
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( mgolf )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(mgolf_state, mgolf)
+void mgolf_state::mgolf_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80));
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
@@ -381,11 +381,10 @@ MACHINE_CONFIG_START(mgolf_state::mgolf)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(mgolf_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgolf)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(mgolf_state, mgolf)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_mgolf)
+	PALETTE(config, m_palette, FUNC(mgolf_state::mgolf_palette), 4);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

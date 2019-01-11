@@ -33,7 +33,7 @@ OKI M6295
     sample 27c020
 sound_prog 27512
 
-COR_x are LN60G resitor packs
+COR_x are LN60G resistor packs
 
 -------------------------------------
 
@@ -47,30 +47,35 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-#define MASTER_CLOCK        XTAL(4'000'000)
 
 class onetwo_state : public driver_device
 {
 public:
-	onetwo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_paletteram(*this, "paletteram"),
-		m_paletteram2(*this, "paletteram2"),
+	onetwo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
+		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
+	void onetwo(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_paletteram;
-	required_shared_ptr<uint8_t> m_paletteram2;
 	required_shared_ptr<uint8_t> m_fgram;
+	required_memory_bank m_mainbank;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
@@ -83,17 +88,12 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(onetwo_fgram_w);
-	DECLARE_WRITE8_MEMBER(onetwo_cpubank_w);
-	DECLARE_WRITE8_MEMBER(onetwo_coin_counters_w);
-	DECLARE_WRITE8_MEMBER(palette1_w);
-	DECLARE_WRITE8_MEMBER(palette2_w);
+	DECLARE_WRITE8_MEMBER(fgram_w);
+	DECLARE_WRITE8_MEMBER(cpubank_w);
+	DECLARE_WRITE8_MEMBER(coin_counters_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	uint32_t screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_color(int offset);
-	void onetwo(machine_config &config);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	static rgb_t BBBGGGGGxBBRRRRR(uint32_t raw);
 	void main_cpu(address_map &map);
 	void main_cpu_io(address_map &map);
 	void sound_cpu(address_map &map);
@@ -123,7 +123,7 @@ void onetwo_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(onetwo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-uint32_t onetwo_state::screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t onetwo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -135,44 +135,30 @@ uint32_t onetwo_state::screen_update_onetwo(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-WRITE8_MEMBER(onetwo_state::onetwo_fgram_w)
+WRITE8_MEMBER(onetwo_state::fgram_w)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(onetwo_state::onetwo_cpubank_w)
+WRITE8_MEMBER(onetwo_state::cpubank_w)
 {
-	membank("bank1")->set_entry(data);
+	m_mainbank->set_entry(data);
 }
 
-WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
+WRITE8_MEMBER(onetwo_state::coin_counters_w)
 {
 	m_watchdog->watchdog_reset();
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
-void onetwo_state::set_color(int offset)
+rgb_t onetwo_state::BBBGGGGGxBBRRRRR(uint32_t raw)
 {
-	int r, g, b;
-
-	r = m_paletteram[offset] & 0x1f;
-	g = m_paletteram2[offset] & 0x1f;
-	b = ((m_paletteram[offset] & 0x60) >> 2) | ((m_paletteram2[offset] & 0xe0) >> 5);
-	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
-}
-
-WRITE8_MEMBER(onetwo_state::palette1_w)
-{
-	m_paletteram[offset] = data;
-	set_color(offset);
-}
-
-WRITE8_MEMBER(onetwo_state::palette2_w)
-{
-	m_paletteram2[offset] = data;
-	set_color(offset);
+	uint8_t const r = pal5bit((raw >> 0) & 0x1f);
+	uint8_t const g = pal5bit((raw >> 8) & 0x1f);
+	uint8_t const b = pal5bit(((raw >> 2) & 0x18) | ((raw >> 13) & 0x7));
+	return rgb_t(r, g, b);
 }
 
 /*************************************
@@ -183,20 +169,20 @@ WRITE8_MEMBER(onetwo_state::palette2_w)
 
 void onetwo_state::main_cpu(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region("maincpu", 0x10000);
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc800, 0xc87f).ram().w(this, FUNC(onetwo_state::palette1_w)).share("paletteram");
-	map(0xc900, 0xc97f).ram().w(this, FUNC(onetwo_state::palette2_w)).share("paletteram2");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(onetwo_state::onetwo_fgram_w)).share("fgram");
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc800, 0xc87f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc900, 0xc97f).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xd000, 0xdfff).ram().w(FUNC(onetwo_state::fgram_w)).share(m_fgram);
 	map(0xe000, 0xffff).ram();
 }
 
 void onetwo_state::main_cpu_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1").w(this, FUNC(onetwo_state::onetwo_coin_counters_w));
+	map(0x00, 0x00).portr("DSW1").w(FUNC(onetwo_state::coin_counters_w));
 	map(0x01, 0x01).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x02, 0x02).portr("P1").w(this, FUNC(onetwo_state::onetwo_cpubank_w));
+	map(0x02, 0x02).portr("P1").w(FUNC(onetwo_state::cpubank_w));
 	map(0x03, 0x03).portr("P2");
 	map(0x04, 0x04).portr("SYSTEM");
 }
@@ -264,7 +250,7 @@ static INPUT_PORTS_START( onetwo )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) ) PORT_DIPLOCATION("SW2:1") /* Flip Sreen? */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) ) PORT_DIPLOCATION("SW2:1") /* Flip Screen? */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
@@ -333,8 +319,8 @@ static const gfx_layout tiles8x8x6_layout =
 	RGN_FRAC(1,3),
 	6,
 	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+4, RGN_FRAC(0,3)+0, RGN_FRAC(0,3)+4, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+4 },
-	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP4(0,1), STEP4(4*2*8,1) },
+	{ STEP8(0,4*2) },
 	16*8
 };
 
@@ -351,53 +337,49 @@ GFXDECODE_END
 
 void onetwo_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
-
+	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
-MACHINE_CONFIG_START(onetwo_state::onetwo)
-
+void onetwo_state::onetwo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
-	MCFG_DEVICE_IO_MAP(main_cpu_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", onetwo_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &onetwo_state::main_cpu);
+	m_maincpu->set_addrmap(AS_IO, &onetwo_state::main_cpu_io);
+	m_maincpu->set_vblank_int("screen", FUNC(onetwo_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,MASTER_CLOCK)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
-	MCFG_DEVICE_IO_MAP(sound_cpu_io)
+	Z80(config, m_audiocpu, 4_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &onetwo_state::sound_cpu);
+	m_audiocpu->set_addrmap(AS_IO, &onetwo_state::sound_cpu_io);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(16))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(onetwo_state, screen_update_onetwo)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(16));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(onetwo_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_onetwo)
-	MCFG_PALETTE_ADD("palette", 0x80)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_onetwo);
+	PALETTE(config, m_palette).set_format(2, &onetwo_state::BBBGGGGGxBBRRRRR, 0x80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, MASTER_CLOCK)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 4_MHz_XTAL));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000*2, okim6295_device::PIN7_LOW) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000*2, okim6295_device::PIN7_LOW)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /*************************************
  *
@@ -406,8 +388,8 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( onetwo )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* main z80 */
-	ROM_LOAD( "maincpu", 0x10000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* main z80 */
+	ROM_LOAD( "maincpu", 0x00000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
@@ -415,15 +397,15 @@ ROM_START( onetwo )
 	ROM_REGION( 0x180000, "gfx1", 0 )
 	ROM_LOAD( "3_graphics", 0x000000, 0x80000, CRC(c72ff3a0) SHA1(17394d8a8b5ef4aee9522d87ba92ef1285f4d76a) )
 	ROM_LOAD( "4_graphics", 0x080000, 0x80000, CRC(0ca40557) SHA1(ca2db57d64ece90f2066f15b276c8d5827dcb4fa) )
-	ROM_LOAD( "5_graphics",   0x100000, 0x80000, CRC(664b6679) SHA1(f9f78bd34fb58e24f890a540382392e1c9d01220) )
+	ROM_LOAD( "5_graphics", 0x100000, 0x80000, CRC(664b6679) SHA1(f9f78bd34fb58e24f890a540382392e1c9d01220) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
 ROM_END
 
 ROM_START( onetwoe )
-	ROM_REGION( 0x30000, "maincpu", 0 ) /* main z80 */
-	ROM_LOAD( "main_prog", 0x10000,  0x20000, CRC(6c1936e9) SHA1(d8fb3056299c9b45e0b537e77dc0d633882705dd) )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* main z80 */
+	ROM_LOAD( "main_prog", 0x00000,  0x20000, CRC(6c1936e9) SHA1(d8fb3056299c9b45e0b537e77dc0d633882705dd) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )

@@ -33,14 +33,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void sc1(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER( matrix_w );
 	DECLARE_WRITE8_MEMBER( pio_port_a_w );
 	DECLARE_READ8_MEMBER( pio_port_b_r );
 
-	void sc1(machine_config &config);
 	void sc1_io(address_map &map);
 	void sc1_mem(address_map &map);
-private:
+
 	uint8_t m_matrix;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
@@ -117,7 +119,7 @@ void sc1_state::sc1_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x80, 0x83).rw("z80pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0xfc, 0xfc).w(this, FUNC(sc1_state::matrix_w));
+	map(0xfc, 0xfc).w(FUNC(sc1_state::matrix_w));
 }
 
 /* Input ports */
@@ -163,12 +165,12 @@ MACHINE_CONFIG_START(sc1_state::sc1)
 	MCFG_DEVICE_IO_MAP(sc1_io)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_sc1)
+	config.set_default_layout(layout_sc1);
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, sc1_state, pio_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, sc1_state, pio_port_b_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(4'000'000)));
+	pio.out_pa_callback().set(FUNC(sc1_state::pio_port_a_w));
+	pio.in_pb_callback().set(FUNC(sc1_state::pio_port_b_r));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

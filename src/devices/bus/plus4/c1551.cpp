@@ -109,7 +109,7 @@ WRITE8_MEMBER( c1551_device::port_w )
 	m_ga->mtr_w(BIT(data, 2));
 
 	// activity LED
-	m_led[LED_ACT] = BIT(data, 3);
+	m_leds[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -316,18 +316,8 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 void c1551_device::c1551_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).ram();
-	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(c1551_device::tpi0_r), FUNC(c1551_device::tpi0_w));
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(FUNC(c1551_device::tpi0_r), FUNC(c1551_device::tpi0_w));
 	map(0xc000, 0xffff).rom().region(M6510T_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  SLOT_INTERFACE( c1551_floppies )
-//-------------------------------------------------
-
-static void c1551_floppies(device_slot_interface &device)
-{
-	device.option_add("525ssqd", FLOPPY_525_SSQD);
 }
 
 
@@ -345,33 +335,47 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c1551_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6510T_TAG, M6510T, XTAL(16'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(c1551_mem)
-	MCFG_M6510T_PORT_CALLBACKS(READ8(*this, c1551_device, port_r), WRITE8(*this, c1551_device, port_w))
-	MCFG_QUANTUM_PERFECT_CPU(M6510T_TAG)
+void c1551_device::device_add_mconfig(machine_config &config)
+{
+	M6510T(config, m_maincpu, XTAL(16'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1551_device::c1551_mem);
+	m_maincpu->read_callback().set(FUNC(c1551_device::port_r));
+	m_maincpu->write_callback().set(FUNC(c1551_device::port_w));
+	config.m_perfect_cpu_quantum = subtag(M6510T_TAG);
 
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_DEVICE_ADD(M6523_0_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(*this, c1551_device, tcbm_data_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, c1551_device, tcbm_data_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(C64H156_TAG, c64h156_device, yb_r))
-	MCFG_TPI6525_OUT_PB_CB(WRITE8(C64H156_TAG, c64h156_device, yb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(*this, c1551_device, tpi0_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, c1551_device, tpi0_pc_w))
-	MCFG_DEVICE_ADD(M6523_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(*this, c1551_device, tcbm_data_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, c1551_device, tcbm_data_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(*this, c1551_device, tpi1_pb_r))
-	MCFG_TPI6525_IN_PC_CB(READ8(*this, c1551_device, tpi1_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, c1551_device, tpi1_pc_w))
+	PLS100(config, m_pla);
 
-	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
-	MCFG_64H156_BYTE_CALLBACK(WRITELINE(C64H156_TAG, c64h156_device, atni_w))
-	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1551_floppies, "525ssqd", c1551_device::floppy_formats)
+	TPI6525(config, m_tpi0, 0);
+	m_tpi0->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
+	m_tpi0->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
+	m_tpi0->in_pb_cb().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
+	m_tpi0->out_pb_cb().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
+	m_tpi0->in_pc_cb().set(FUNC(c1551_device::tpi0_pc_r));
+	m_tpi0->out_pc_cb().set(FUNC(c1551_device::tpi0_pc_w));
 
-	MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD()
-MACHINE_CONFIG_END
+	TPI6525(config, m_tpi1, 0);
+	m_tpi1->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
+	m_tpi1->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
+	m_tpi1->in_pb_cb().set(FUNC(c1551_device::tpi1_pb_r));
+	m_tpi1->in_pc_cb().set(FUNC(c1551_device::tpi1_pc_r));
+	m_tpi1->out_pc_cb().set(FUNC(c1551_device::tpi1_pc_w));
+
+	C64H156(config, m_ga, XTAL(16'000'000));
+	m_ga->byte_callback().set(C64H156_TAG, FUNC(c64h156_device::atni_w));
+
+	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
+	connector.option_add("525ssqd", FLOPPY_525_SSQD);
+	connector.set_default_option("525ssqd");
+	connector.set_fixed(true);
+	connector.set_formats(c1551_device::floppy_formats);
+
+	PLUS4_EXPANSION_SLOT(config, m_exp, 0);
+	m_exp->irq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::irq_w));
+	m_exp->cd_rd_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::dma_cd_r));
+	m_exp->cd_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::dma_cd_w));
+	m_exp->aec_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::aec_w));
+	plus4_expansion_cards(*m_exp);
+}
 
 
 //-------------------------------------------------
@@ -416,7 +420,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
 	, m_exp(*this, PLUS4_EXPANSION_SLOT_TAG)
 	, m_jp1(*this, "JP1")
-	, m_led(*this, "led%u", 0U)
+	, m_leds(*this, "led%u", 0U)
 	, m_tcbm_data(0xff)
 	, m_status(1)
 	, m_dav(1)
@@ -433,7 +437,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 
 void c1551_device::device_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	// allocate timers
 	m_irq_timer = timer_alloc();

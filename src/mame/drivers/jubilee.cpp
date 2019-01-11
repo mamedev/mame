@@ -197,10 +197,11 @@
 #include "cpu/tms9900/tms9980a.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */
-#define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
+#define CPU_CLOCK       MASTER_CLOCK           /* guess */
 #define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
 
 
@@ -213,9 +214,12 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void jubileep(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
 	DECLARE_WRITE8_MEMBER(unk_w);
@@ -223,12 +227,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
-	void jubileep(machine_config &config);
 	void jubileep_cru_map(address_map &map);
 	void jubileep_map(address_map &map);
 
-protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	uint8_t mux_sel;
@@ -239,7 +241,7 @@ protected:
 	tilemap_t *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<9> m_lamp;
+	output_finder<9> m_lamps;
 };
 
 
@@ -312,8 +314,8 @@ void jubilee_state::jubileep_map(address_map &map)
     Working RAM = 3400-37FF
     Color RAM =   3800-3BFF (lower 4-bits)
 */
-	map(0x3000, 0x37ff).ram().w(this, FUNC(jubilee_state::jubileep_videoram_w)).share("videoworkram");  /* TC5517AP battery backed RAM */
-	map(0x3800, 0x3bff).ram().w(this, FUNC(jubilee_state::jubileep_colorram_w)).share("colorram");      /* Whole 2114 RAM */
+	map(0x3000, 0x37ff).ram().w(FUNC(jubilee_state::jubileep_videoram_w)).share("videoworkram");  /* TC5517AP battery backed RAM */
+	map(0x3800, 0x3bff).ram().w(FUNC(jubilee_state::jubileep_colorram_w)).share("colorram");      /* Whole 2114 RAM */
 
 /*  CRTC *is* mapped here. Read 00-01 and then write on them.
     Then does the same for 02-03. Initialization seems incomplete since
@@ -418,19 +420,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				m_lamp[0] = BIT(data, 0);  /* lamp */
+				m_lamps[0] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 0 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 0");
 			}
 		if (muxlamps == 2)
 			{
-				m_lamp[3] = BIT(data, 0);  /* lamp */
+				m_lamps[3] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 3 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 3");
 			}
 		if (muxlamps == 3)
 			{
-				m_lamp[6] = BIT(data, 0);  /* lamp */
+				m_lamps[6] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 6 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 6");
 			}
@@ -440,19 +442,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				m_lamp[1] = BIT(data, 0);  /* lamp */
+				m_lamps[1] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 1 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 1");
 			}
 		if (muxlamps == 2)
 			{
-				m_lamp[4] = BIT(data, 0);  /* lamp */
+				m_lamps[4] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 4 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 4");
 			}
 		if (muxlamps == 3)
 			{
-				m_lamp[7] = BIT(data, 0);  /* lamp */
+				m_lamps[7] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 7 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 7");
 			}
@@ -462,19 +464,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				m_lamp[2] = BIT(data, 0);  /* lamp */
+				m_lamps[2] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 2 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 2");
 			}
 		if (muxlamps == 2)
 			{
-				m_lamp[5] = BIT(data, 0);  /* lamp */
+				m_lamps[5] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 5 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 5");
 			}
 		if (muxlamps == 3)
 			{
-				m_lamp[8] = BIT(data, 0);  /* lamp */
+				m_lamps[8] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 8 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 8");
 			}
@@ -578,8 +580,8 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 
 void jubilee_state::jubileep_cru_map(address_map &map)
 {
-	map(0x00c8, 0x00c8).r(this, FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
-	map(0x0000, 0x07ff).w(this, FUNC(jubilee_state::unk_w));
+	map(0x00c8, 0x00c8).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
+	map(0x0000, 0x07ff).w(FUNC(jubilee_state::unk_w));
 }
 
 /* I/O byte R/W
@@ -671,10 +673,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(jubilee_state::jubileep)
 
 	// Main CPU TMS9980A, no line connections.
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
+	TMS9980A(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jubilee_state::jubileep_map);
+	m_maincpu->set_addrmap(AS_IO, &jubilee_state::jubileep_cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jubilee_state::jubileep_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("videoworkram")
+	NVRAM(config, "videoworkram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -688,9 +692,10 @@ MACHINE_CONFIG_START(jubilee_state::jubileep)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jubileep)
 	MCFG_PALETTE_ADD("palette",8)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 MACHINE_CONFIG_END
 
 

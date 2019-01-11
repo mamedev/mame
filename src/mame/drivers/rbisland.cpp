@@ -353,7 +353,7 @@ void rbisland_state::rbisland_map(address_map &map)
 	map(0x200000, 0x200fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x201000, 0x203fff).ram();             /* r/w in initial checks */
 	map(0x390000, 0x390003).portr("DSWA");
-	map(0x3a0000, 0x3a0001).w(this, FUNC(rbisland_state::rbisland_spritectrl_w));
+	map(0x3a0000, 0x3a0001).w(FUNC(rbisland_state::rbisland_spritectrl_w));
 	map(0x3b0000, 0x3b0003).portr("DSWB");
 	map(0x3c0000, 0x3c0003).nopw();        /* written very often, watchdog? */
 	map(0x3e0000, 0x3e0001).nopr();
@@ -380,9 +380,9 @@ void rbisland_state::jumping_map(address_map &map)
 	map(0x400002, 0x400003).portr("DSWB");
 	map(0x401000, 0x401001).portr("401001");
 	map(0x401002, 0x401003).portr("401003");
-	map(0x3a0000, 0x3a0001).w(this, FUNC(rbisland_state::jumping_spritectrl_w));
+	map(0x3a0000, 0x3a0001).w(FUNC(rbisland_state::jumping_spritectrl_w));
 	map(0x3c0000, 0x3c0001).nopw();        /* watchdog? */
-	map(0x400006, 0x400007).w(this, FUNC(rbisland_state::jumping_sound_w));
+	map(0x400006, 0x400007).w(FUNC(rbisland_state::jumping_sound_w));
 	map(0x420000, 0x420001).nopr();         /* read, but result not used */
 	map(0x430000, 0x430003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
 	map(0x440000, 0x4407ff).ram().share("spriteram");
@@ -429,7 +429,7 @@ void rbisland_state::jumping_sound_map(address_map &map)
 	map(0x8000, 0x8fff).ram();
 	map(0xb000, 0xb001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb400, 0xb401).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xb800, 0xb800).r(this, FUNC(rbisland_state::jumping_latch_r));
+	map(0xb800, 0xb800).r(FUNC(rbisland_state::jumping_latch_r));
 	map(0xbc00, 0xbc00).nopw();    /* looks like a bankswitch, but sound works with or without it */
 	map(0xc000, 0xffff).rom();
 }
@@ -663,12 +663,12 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(rbisland_sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)) /* 12MHz OSC next to C-Chip */
-	MCFG_CCHIP_IN_PORTA_CB(IOPORT("800007"))
-	MCFG_CCHIP_IN_PORTB_CB(IOPORT("800009"))
-	MCFG_CCHIP_IN_PORTC_CB(IOPORT("80000B"))
-	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("80000D"))
-	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(*this, rbisland_state, counters_w))
+	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); // 12MHz OSC next to C-Chip
+	m_cchip->in_pa_callback().set_ioport("800007");
+	m_cchip->in_pb_callback().set_ioport("800009");
+	m_cchip->in_pc_callback().set_ioport("80000B");
+	m_cchip->in_ad_callback().set_ioport("80000D");
+	m_cchip->out_pb_callback().set(FUNC(rbisland_state::counters_w));
 
 	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", rbisland_state, cchip_irq_clear_cb)
 
@@ -681,32 +681,31 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbisland)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbisland);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_gfxdecode_tag(m_gfxdecode);
+	m_pc090oj->set_palette_tag(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, rbisland_state,bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(16'000'000)/4)); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set(FUNC(rbisland_state::bankswitch_w));
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 MACHINE_CONFIG_END
 
 
@@ -731,18 +730,17 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jumping)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jumping);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
 
-	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_YINVERT(1)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn, 0);
+	m_pc080sn->set_gfx_region(1);
+	m_pc080sn->set_yinvert(1);
+	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -757,6 +755,7 @@ MACHINE_CONFIG_END
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
 MACHINE_CONFIG_START(rbisland_state::jumpingi)
 	jumping(config);
+
 	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)

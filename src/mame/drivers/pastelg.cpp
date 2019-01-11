@@ -65,12 +65,12 @@ void pastelg_state::pastelg_io_map(address_map &map)
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x90, 0x90).portr("SYSTEM");
-	map(0x90, 0x96).w(this, FUNC(pastelg_state::pastelg_blitter_w));
+	map(0x90, 0x96).w(FUNC(pastelg_state::pastelg_blitter_w));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
-	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(this, FUNC(pastelg_state::pastelg_romsel_w));
-	map(0xc0, 0xc0).r(this, FUNC(pastelg_state::pastelg_sndrom_r));
+	map(0xb0, 0xb0).r(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r)).w(FUNC(pastelg_state::pastelg_romsel_w));
+	map(0xc0, 0xc0).r(FUNC(pastelg_state::pastelg_sndrom_r));
 	map(0xc0, 0xcf).writeonly().share("clut");
-	map(0xd0, 0xd0).r(this, FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::write));
+	map(0xd0, 0xd0).r(FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe0, 0xe0).portr("DSWC");
 }
 
@@ -118,13 +118,13 @@ void pastelg_state::threeds_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0x90, 0x90).portr("SYSTEM").w(this, FUNC(pastelg_state::threeds_romsel_w));
-	map(0xf0, 0xf6).w(this, FUNC(pastelg_state::pastelg_blitter_w));
-	map(0xa0, 0xa0).rw(this, FUNC(pastelg_state::threeds_inputport1_r), FUNC(pastelg_state::threeds_inputportsel_w));
-	map(0xb0, 0xb0).r(this, FUNC(pastelg_state::threeds_inputport2_r)).w(this, FUNC(pastelg_state::threeds_output_w));//writes: bit 3 is coin lockout, bit 1 is coin counter
+	map(0x90, 0x90).portr("SYSTEM").w(FUNC(pastelg_state::threeds_romsel_w));
+	map(0xf0, 0xf6).w(FUNC(pastelg_state::pastelg_blitter_w));
+	map(0xa0, 0xa0).rw(FUNC(pastelg_state::threeds_inputport1_r), FUNC(pastelg_state::threeds_inputportsel_w));
+	map(0xb0, 0xb0).r(FUNC(pastelg_state::threeds_inputport2_r)).w(FUNC(pastelg_state::threeds_output_w));//writes: bit 3 is coin lockout, bit 1 is coin counter
 	map(0xc0, 0xcf).writeonly().share("clut");
-	map(0xc0, 0xc0).r(this, FUNC(pastelg_state::threeds_rom_readback_r));
-	map(0xd0, 0xd0).r(this, FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::write));
+	map(0xc0, 0xc0).r(FUNC(pastelg_state::threeds_rom_readback_r));
+	map(0xd0, 0xd0).r(FUNC(pastelg_state::pastelg_irq_ack_r)).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 static INPUT_PORTS_START( pastelg )
@@ -405,10 +405,9 @@ MACHINE_CONFIG_START(pastelg_state::pastelg)
 	MCFG_DEVICE_IO_MAP(pastelg_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert) // nmiclock not written, chip is 1411M1 instead of 1413M3
 
-	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NB1413M3_TYPE( NB1413M3_PASTELG )
+	NB1413M3(config, m_nb1413m3, 0, NB1413M3_PASTELG);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -419,16 +418,15 @@ MACHINE_CONFIG_START(pastelg_state::pastelg)
 	MCFG_SCREEN_UPDATE_DRIVER(pastelg_state, screen_update_pastelg)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
+	PALETTE(config, "palette", FUNC(pastelg_state::pastelg_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1250000));
+	aysnd.port_a_read_callback().set_ioport("DSWA");
+	aysnd.port_b_read_callback().set_ioport("DSWB");
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -466,8 +464,8 @@ MACHINE_CONFIG_START(pastelg_state::threeds)
 	MCFG_DEVICE_IO_MAP(threeds_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pastelg_state,  irq0_line_assert)
 
-	MCFG_NB1413M3_ADD("nb1413m3")
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NB1413M3(config, m_nb1413m3, 0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -478,16 +476,15 @@ MACHINE_CONFIG_START(pastelg_state::threeds)
 	MCFG_SCREEN_UPDATE_DRIVER(pastelg_state, screen_update_pastelg)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(pastelg_state, pastelg)
+	PALETTE(config, "palette", FUNC(pastelg_state::pastelg_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1250000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1250000));
+	aysnd.port_a_read_callback().set_ioport("DSWB");
+	aysnd.port_b_read_callback().set_ioport("DSWA");
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

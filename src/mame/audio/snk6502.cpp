@@ -15,8 +15,7 @@
 #include "emu.h"
 #include "audio/snk6502.h"
 
-#include "sound/sn76477.h"
-
+#include "speaker.h"
 
 #ifndef M_LN2
 #define M_LN2       0.69314718055994530942
@@ -29,7 +28,7 @@
 #define FRAC_ONE    (1 << FRAC_BITS)
 #define FRAC_MASK   (FRAC_ONE - 1)
 
-const char *const sasuke_sample_names[] =
+static const char *const sasuke_sample_names[] =
 {
 	"*sasuke",
 
@@ -42,7 +41,7 @@ const char *const sasuke_sample_names[] =
 	nullptr
 };
 
-const char *const vanguard_sample_names[] =
+static const char *const vanguard_sample_names[] =
 {
 	"*vanguard",
 
@@ -72,7 +71,7 @@ const char *const vanguard_sample_names[] =
 };
 
 
-const char *const fantasy_sample_names[] =
+static const char *const fantasy_sample_names[] =
 {
 	"*fantasy",
 
@@ -108,7 +107,7 @@ static const discrete_op_amp_filt_info fantasy_filter =
 #define FANTASY_NOISE_STREAM_IN     NODE_02
 #define FANTASY_NOISE_LOGIC         NODE_03
 
-DISCRETE_SOUND_START( fantasy_discrete )
+static DISCRETE_SOUND_START( fantasy_discrete )
 
 	DISCRETE_INPUT_LOGIC (FANTASY_BOMB_EN)
 	DISCRETE_INPUT_STREAM(FANTASY_NOISE_STREAM_IN, 0)
@@ -128,23 +127,28 @@ DISCRETE_SOUND_START( fantasy_discrete )
 DISCRETE_SOUND_END
 
 
-DEFINE_DEVICE_TYPE(SNK6502, snk6502_sound_device, "snk6502_sound", "SNK6502 Custom Sound")
+DEFINE_DEVICE_TYPE(SNK6502_SOUND,  snk6502_sound_device,  "snk6502_sound",  "SNK6502 Custom Sound")
+DEFINE_DEVICE_TYPE(VANGUARD_SOUND, vanguard_sound_device, "vanguard_sound", "SNK Vanguard Sound")
+DEFINE_DEVICE_TYPE(FANTASY_SOUND,  fantasy_sound_device,  "fantasy_sound",  "SNK Fantasy Sound")
+DEFINE_DEVICE_TYPE(NIBBLER_SOUND,  nibbler_sound_device,  "nibbler_sound",  "Rock-Ola Nibbler Sound")
+DEFINE_DEVICE_TYPE(PBALLOON_SOUND, pballoon_sound_device, "pballoon_sound", "SNK Pioneer Balloon Sound")
+DEFINE_DEVICE_TYPE(SASUKE_SOUND,   sasuke_sound_device,   "sasuke_sound",   "SNK Sasuke Vs. Commander Sound")
+DEFINE_DEVICE_TYPE(SATANSAT_SOUND, satansat_sound_device, "satansat_sound", "SNK Satan of Saturn Sound")
+
 
 snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNK6502, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		//m_tone_channels[CHANNELS],
-		m_tone_clock_expire(0),
-		m_tone_clock(0),
-		m_tone_stream(nullptr),
-		m_samples(*this, ":samples"),
-		m_ROM(nullptr),
-		m_Sound0StopOnRollover(0),
-		m_LastPort1(0),
-		m_hd38880_cmd(0),
-		m_hd38880_addr(0),
-		m_hd38880_data_bytes(0),
-		m_hd38880_speed(0)
+	: device_t(mconfig, SNK6502_SOUND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_tone_clock_expire(0)
+	, m_tone_clock(0)
+	, m_tone_stream(nullptr)
+	, m_samples(*this, "^samples")
+	, m_rom(*this, DEVICE_SELF_OWNER)
+	, m_sound0_stop_on_rollover(0)
+	, m_hd38880_cmd(0)
+	, m_hd38880_addr(0)
+	, m_hd38880_data_bytes(0)
+	, m_hd38880_speed(0)
 {
 }
 
@@ -155,8 +159,6 @@ snk6502_sound_device::snk6502_sound_device(const machine_config &mconfig, const 
 
 void snk6502_sound_device::device_start()
 {
-	m_ROM = machine().root_device().memregion("snk6502")->base();
-
 	// adjusted
 	set_music_freq(43000);
 
@@ -165,7 +167,7 @@ void snk6502_sound_device::device_start()
 
 	m_tone_stream = machine().sound().stream_alloc(*this, 0, 1, SAMPLE_RATE);
 
-	for (int i = 0; i < CHANNELS; i++)
+	for (int i = 0; i < NUM_CHANNELS; i++)
 	{
 		save_item(NAME(m_tone_channels[i].mute), i);
 		save_item(NAME(m_tone_channels[i].offset), i);
@@ -177,8 +179,7 @@ void snk6502_sound_device::device_start()
 	}
 
 	save_item(NAME(m_tone_clock));
-	save_item(NAME(m_Sound0StopOnRollover));
-	save_item(NAME(m_LastPort1));
+	save_item(NAME(m_sound0_stop_on_rollover));
 	save_item(NAME(m_hd38880_cmd));
 	save_item(NAME(m_hd38880_addr));
 	save_item(NAME(m_hd38880_data_bytes));
@@ -189,7 +190,7 @@ inline void snk6502_sound_device::validate_tone_channel(int channel)
 {
 	if (!m_tone_channels[channel].mute)
 	{
-		uint8_t romdata = m_ROM[m_tone_channels[channel].base + m_tone_channels[channel].offset];
+		uint8_t romdata = m_rom->base()[m_tone_channels[channel].base + m_tone_channels[channel].offset];
 
 		if (romdata != 0xff)
 			m_tone_channels[channel].sample_step = m_tone_channels[channel].sample_rate / (256 - romdata);
@@ -200,164 +201,105 @@ inline void snk6502_sound_device::validate_tone_channel(int channel)
 
 void snk6502_sound_device::sasuke_build_waveform(int mask)
 {
-	int bit0, bit1, bit2, bit3;
-	int base;
-	int i;
+	const int bit0 = BIT(mask, 0);
+	const int bit1 = BIT(mask, 1);
+	const int bit2 = 1;
+	const int bit3 = BIT(mask, 2);
+	const int base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
 
-	mask &= 7;
-
-	//logerror("0: wave form = %d\n", mask);
-	bit0 = bit1 = bit3 = 0;
-	bit2 = 1;
-
-	if (mask & 1)
-		bit0 = 1;
-	if (mask & 2)
-		bit1 = 1;
-	if (mask & 4)
-		bit3 = 1;
-
-	base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		int data = 0;
-
-		if (i & 1)
-			data += bit0;
-		if (i & 2)
-			data += bit1;
-		if (i & 4)
-			data += bit2;
-		if (i & 8)
-			data += bit3;
-
-		//logerror(" %3d\n", data);
+		const int data = (bit0 & BIT(i, 0)) + (bit1 & BIT(i, 1)) + (bit2 & BIT(i, 2)) + (bit3 & BIT(i, 3));
 		m_tone_channels[0].form[i] = data - base;
 	}
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_tone_channels[0].form[i] *= 65535 / 16;
 }
 
 void snk6502_sound_device::satansat_build_waveform(int mask)
 {
-	int bit0, bit1, bit2, bit3;
-	int base;
-	int i;
-
-	mask &= 7;
-
 	//logerror("1: wave form = %d\n", mask);
-	bit0 = bit1 = bit2 = 1;
-	bit3 = 0;
+	const int bit0 = 1;
+	const int bit1 = 1;
+	const int bit2 = 1;
+	const int bit3 = BIT(mask, 0);
+	const int base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
 
-	if (mask & 1)
-		bit3 = 1;
-
-	base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		int data = 0;
-
-		if (i & 1)
-			data += bit0;
-		if (i & 2)
-			data += bit1;
-		if (i & 4)
-			data += bit2;
-		if (i & 8)
-			data += bit3;
-
-		//logerror(" %3d\n", data);
+		const int data = (bit0 & BIT(i, 0)) + (bit1 & BIT(i, 1)) + (bit2 & BIT(i, 2)) + (bit3 & BIT(i, 3));
 		m_tone_channels[1].form[i] = data - base;
 	}
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_tone_channels[1].form[i] *= 65535 / 16;
 }
 
 void snk6502_sound_device::build_waveform(int channel, int mask)
 {
-	int bit0, bit1, bit2, bit3;
-	int base;
-	int i;
-
-	mask &= 15;
-
 	//logerror("%d: wave form = %d\n", channel, mask);
-	bit0 = bit1 = bit2 = bit3 = 0;
+	int bit0 = 0;
+	int bit1 = 0;
+	int bit2 = 0;
+	int bit3 = 0;
 
 	// bit 3
-	if (mask & (1 | 2))
+	if (BIT(mask, 0) || BIT(mask, 1))
 		bit3 = 8;
-	else if (mask & 4)
+	else if (BIT(mask, 2))
 		bit3 = 4;
-	else if (mask & 8)
+	else if (BIT(mask, 3))
 		bit3 = 2;
 
 	// bit 2
-	if (mask & 4)
+	if (BIT(mask, 2))
 		bit2 = 8;
-	else if (mask & (2 | 8))
+	else if (BIT(mask, 1) || BIT(mask, 3))
 		bit2 = 4;
 
 	// bit 1
-	if (mask & 8)
+	if (BIT(mask, 3))
 		bit1 = 8;
-	else if (mask & 4)
+	else if (BIT(mask, 2))
 		bit1 = 4;
-	else if (mask & 2)
+	else if (BIT(mask, 1))
 		bit1 = 2;
 
 	// bit 0
-	bit0 = bit1 / 2;
+	bit0 = bit1 >> 1;
 
 	if (bit0 + bit1 + bit2 + bit3 < 16)
 	{
-		bit0 *= 2;
-		bit1 *= 2;
-		bit2 *= 2;
-		bit3 *= 2;
+		bit0 <<= 1;
+		bit1 <<= 1;
+		bit2 <<= 1;
+		bit3 <<= 1;
 	}
 
-	base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
+	const int base = (bit0 + bit1 + bit2 + bit3 + 1) / 2;
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		/* special channel for fantasy */
 		if (channel == 2)
 		{
-			m_tone_channels[channel].form[i] = (i & 8) ? 7 : -8;
+			m_tone_channels[channel].form[i] = BIT(i, 3) ? 7 : -8;
 		}
 		else
 		{
-			int data = 0;
-
-			if (i & 1)
-				data += bit0;
-			if (i & 2)
-				data += bit1;
-			if (i & 4)
-				data += bit2;
-			if (i & 8)
-				data += bit3;
-
-			//logerror(" %3d\n", data);
+			const int data = (BIT(i, 0) ? bit0 : 0) + (BIT(i, 1) ? bit1 : 0) + (BIT(i, 2) ? bit2 : 0) + (BIT(i, 3) ? bit3 : 0);
 			m_tone_channels[channel].form[i] = data - base;
 		}
 	}
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		m_tone_channels[channel].form[i] *= 65535 / 160;
 }
 
 void snk6502_sound_device::set_music_freq(int freq)
 {
-	int i;
-
-	for (i = 0; i < CHANNELS; i++)
+	for (int i = 0; i < NUM_CHANNELS; i++)
 	{
 		m_tone_channels[i].mute = 1;
 		m_tone_channels[i].offset = 0;
@@ -365,7 +307,7 @@ void snk6502_sound_device::set_music_freq(int freq)
 		m_tone_channels[i].mask = 0xff;
 		m_tone_channels[i].sample_step = 0;
 		m_tone_channels[i].sample_cur = 0;
-		m_tone_channels[i].sample_rate = (double)(freq * 8) / SAMPLE_RATE * FRAC_ONE;
+		m_tone_channels[i].sample_rate = double(freq * 8) / SAMPLE_RATE * FRAC_ONE;
 
 		build_waveform(i, 1);
 	}
@@ -377,342 +319,27 @@ void snk6502_sound_device::set_music_clock(double clock_time)
 	m_tone_clock = 0;
 }
 
-int snk6502_sound_device::music0_playing()
+CUSTOM_INPUT_MEMBER(snk6502_sound_device::music0_playing)
 {
-	return m_tone_channels[0].mute;
+	return m_tone_channels[0].mute ? 0x01 : 0x00;
 }
 
-
-WRITE8_MEMBER( snk6502_sound_device::sasuke_sound_w )
+void snk6502_sound_device::set_channel_base(int channel, int base, int mask)
 {
-	switch (offset)
-	{
-	case 0:
-		/*
-		    bit description
-
-		    0   hit (ic52)
-		    1   boss start (ic51)
-		    2   shot
-		    3   boss attack (ic48?)
-		    4   ??
-		    5
-		    6
-		    7   reset counter
-		*/
-
-		if ((~data & 0x01) && (m_LastPort1 & 0x01))
-			m_samples->start(0, 0);
-		if ((~data & 0x02) && (m_LastPort1 & 0x02))
-			m_samples->start(1, 1);
-		if ((~data & 0x04) && (m_LastPort1 & 0x04))
-			m_samples->start(2, 2);
-		if ((~data & 0x08) && (m_LastPort1 & 0x08))
-			m_samples->start(3, 3);
-
-		if ((data & 0x80) && (~m_LastPort1 & 0x80))
-		{
-			m_tone_channels[0].offset = 0;
-			m_tone_channels[0].mute = 0;
-		}
-
-		if ((~data & 0x80) && (m_LastPort1 & 0x80))
-			m_tone_channels[0].mute = 1;
-
-		m_LastPort1 = data;
-		break;
-
-	case 1:
-		/*
-		    bit description
-
-		    0
-		    1   wave form
-		    2   wave form
-		    3   wave form
-		    4   MUSIC A8
-		    5   MUSIC A9
-		    6   MUSIC A10
-		    7
-		*/
-
-		/* select tune in ROM based on sound command byte */
-		m_tone_channels[0].base = 0x0000 + ((data & 0x70) << 4);
-		m_tone_channels[0].mask = 0xff;
-
-		m_Sound0StopOnRollover = 1;
-
-		/* bit 1-3 sound0 waveform control */
-		sasuke_build_waveform((data & 0x0e) >> 1);
-		break;
-	}
+	m_tone_channels[channel].base = base;
+	m_tone_channels[channel].mask = mask;
 }
 
-WRITE8_MEMBER( snk6502_sound_device::satansat_sound_w )
+void snk6502_sound_device::mute_channel(int channel)
 {
-	switch (offset)
-	{
-	case 0:
-		/*
-		    bit description
-
-		*/
-
-		/* bit 0 = analog sound trigger */
-
-		/* bit 1 = to 76477 */
-
-		/* bit 2 = analog sound trigger */
-		if (data & 0x04 && !(m_LastPort1 & 0x04))
-			m_samples->start(0, 1);
-
-		if (data & 0x08)
-		{
-			m_tone_channels[0].mute = 1;
-			m_tone_channels[0].offset = 0;
-		}
-
-		/* bit 4-6 sound0 waveform control */
-		sasuke_build_waveform((data & 0x70) >> 4);
-
-		/* bit 7 sound1 waveform control */
-		satansat_build_waveform((data & 0x80) >> 7);
-
-		m_LastPort1 = data;
-		break;
-	case 1:
-		/*
-		    bit description
-
-		*/
-
-		/* select tune in ROM based on sound command byte */
-		m_tone_channels[0].base = 0x0000 + ((data & 0x0e) << 7);
-		m_tone_channels[0].mask = 0xff;
-		m_tone_channels[1].base = 0x0800 + ((data & 0x60) << 4);
-		m_tone_channels[1].mask = 0x1ff;
-
-		m_Sound0StopOnRollover = 1;
-
-		if (data & 0x01)
-			m_tone_channels[0].mute = 0;
-
-		if (data & 0x10)
-			m_tone_channels[1].mute = 0;
-		else
-		{
-			m_tone_channels[1].mute = 1;
-			m_tone_channels[1].offset = 0;
-		}
-
-		/* bit 7 = ? */
-		break;
-	}
+	m_tone_channels[channel].mute = 1;
+	m_tone_channels[channel].offset = 0;
 }
 
-WRITE8_MEMBER( snk6502_sound_device::vanguard_sound_w )
+void snk6502_sound_device::unmute_channel(int channel)
 {
-	switch (offset)
-	{
-	case 0:
-		/*
-		    bit description
-
-		    0   MUSIC A10
-		    1   MUSIC A9
-		    2   MUSIC A8
-		    3   LS05 PORT 1
-		    4   LS04 PORT 2
-		    5   SHOT A
-		    6   SHOT B
-		    7   BOMB
-		*/
-
-		/* select musical tune in ROM based on sound command byte */
-		m_tone_channels[0].base = ((data & 0x07) << 8);
-		m_tone_channels[0].mask = 0xff;
-
-		m_Sound0StopOnRollover = 1;
-
-		/* play noise samples requested by sound command byte */
-		/* SHOT A */
-		if (data & 0x20 && !(m_LastPort1 & 0x20))
-			m_samples->start(1, 0);
-		else if (!(data & 0x20) && m_LastPort1 & 0x20)
-			m_samples->stop(1);
-
-		/* BOMB */
-		if (data & 0x80 && !(m_LastPort1 & 0x80))
-			m_samples->start(2, 1);
-
-		if (data & 0x08)
-		{
-			m_tone_channels[0].mute = 1;
-			m_tone_channels[0].offset = 0;
-		}
-
-		if (data & 0x10)
-		{
-			m_tone_channels[0].mute = 0;
-		}
-
-		/* SHOT B */
-		machine().device<sn76477_device>("sn76477.2")->enable_w((data & 0x40) ? 0 : 1);
-
-		m_LastPort1 = data;
-		break;
-	case 1:
-		/*
-		    bit description
-
-		    0   MUSIC A10
-		    1   MUSIC A9
-		    2   MUSIC A8
-		    3   LS04 PORT 3
-		    4   EXTP A (HD38880 external pitch control A)
-		    5   EXTP B (HD38880 external pitch control B)
-		    6
-		    7
-		*/
-
-		/* select tune in ROM based on sound command byte */
-		m_tone_channels[1].base = 0x0800 + ((data & 0x07) << 8);
-		m_tone_channels[1].mask = 0xff;
-
-		if (data & 0x08)
-			m_tone_channels[1].mute = 0;
-		else
-		{
-			m_tone_channels[1].mute = 1;
-			m_tone_channels[1].offset = 0;
-		}
-		break;
-	case 2:
-		/*
-		    bit description
-
-		    0   AS 1    (sound0 waveform)
-		    1   AS 2    (sound0 waveform)
-		    2   AS 4    (sound0 waveform)
-		    3   AS 3    (sound0 waveform)
-		    4   AS 5    (sound1 waveform)
-		    5   AS 6    (sound1 waveform)
-		    6   AS 7    (sound1 waveform)
-		    7   AS 8    (sound1 waveform)
-		*/
-
-		build_waveform(0, (data & 0x3) | ((data & 4) << 1) | ((data & 8) >> 1));
-		build_waveform(1, data >> 4);
-	}
-}
-
-WRITE8_MEMBER( snk6502_sound_device::fantasy_sound_w )
-{
-	switch (offset)
-	{
-	case 0:
-		/*
-		    bit description
-
-		    0   MUSIC A10
-		    1   MUSIC A9
-		    2   MUSIC A8
-		    3   LS04 PART 1
-		    4   LS04 PART 2
-		    5
-		    6
-		    7   BOMB
-		*/
-
-		/* select musical tune in ROM based on sound command byte */
-		m_tone_channels[0].base = 0x0000 + ((data & 0x07) << 8);
-		m_tone_channels[0].mask = 0xff;
-
-		m_Sound0StopOnRollover = 0;
-
-		if (data & 0x08)
-			m_tone_channels[0].mute = 0;
-		else
-		{
-			m_tone_channels[0].offset = m_tone_channels[0].base;
-			m_tone_channels[0].mute = 1;
-		}
-
-		if (data & 0x10)
-			m_tone_channels[2].mute = 0;
-		else
-		{
-			m_tone_channels[2].offset = 0;
-			m_tone_channels[2].mute = 1;
-		}
-
-		/* BOMB */
-		machine().device<discrete_device>("discrete")->write(space, FANTASY_BOMB_EN, data & 0x80);
-
-		m_LastPort1 = data;
-		break;
-	case 1:
-		/*
-		    bit description
-
-		    0   MUSIC A10
-		    1   MUSIC A9
-		    2   MUSIC A8
-		    3   LS04 PART 3
-		    4   EXT PA (HD38880 external pitch control A)
-		    5   EXT PB (HD38880 external pitch control B)
-		    6
-		    7
-		*/
-
-		/* select tune in ROM based on sound command byte */
-		m_tone_channels[1].base = 0x0800 + ((data & 0x07) << 8);
-		m_tone_channels[1].mask = 0xff;
-
-		if (data & 0x08)
-			m_tone_channels[1].mute = 0;
-		else
-		{
-			m_tone_channels[1].mute = 1;
-			m_tone_channels[1].offset = 0;
-		}
-		break;
-	case 2:
-		/*
-		    bit description
-
-		    0   AS 1    (sound0 waveform)
-		    1   AS 3    (sound0 waveform)
-		    2   AS 2    (sound0 waveform)
-		    3   AS 4    (sound0 waveform)
-		    4   AS 5    (sound1 waveform)
-		    5   AS 6    (sound1 waveform)
-		    6   AS 7    (sound1 waveform)
-		    7   AS 8    (sound1 waveform)
-		*/
-
-		build_waveform(0, (data & 0x9) | ((data & 2) << 1) | ((data & 4) >> 1));
-		build_waveform(1, data >> 4);
-		break;
-	case 3:
-		/*
-		    bit description
-
-		    0   BC 1
-		    1   BC 2
-		    2   BC 3
-		    3   MUSIC A10
-		    4   MUSIC A9
-		    5   MUSIC A8
-		    6
-		    7   INV
-		*/
-
-		/* select tune in ROM based on sound command byte */
-		m_tone_channels[2].base = 0x1000 + ((data & 0x70) << 4);
-		m_tone_channels[2].mask = 0xff;
-		break;
-	}
+	m_tone_channels[channel].mute = 0;
+	m_tone_channels[channel].offset = 0;
 }
 
 
@@ -769,9 +396,7 @@ void snk6502_sound_device::speech_w(uint8_t data, const uint16_t *table, int sta
 
 				if (m_hd38880_data_bytes == 5 && !m_samples->playing(0))
 				{
-					int i;
-
-					for (i = 0; i < 16; i++)
+					for (int i = 0; i < 16; i++)
 					{
 						if (table[i] && table[i] == m_hd38880_addr)
 						{
@@ -882,7 +507,159 @@ void snk6502_sound_device::speech_w(uint8_t data, const uint16_t *table, int sta
   10 operations
 */
 
-WRITE8_MEMBER( snk6502_sound_device::vanguard_speech_w )
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void snk6502_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	stream_sample_t *buffer = outputs[0];
+
+	for (int i = 0; i < NUM_CHANNELS; i++)
+		validate_tone_channel(i);
+
+	while (samples-- > 0)
+	{
+		int32_t data = 0;
+
+		for (tone_t &voice : m_tone_channels)
+		{
+			int16_t const *const form = voice.form;
+
+			if (!voice.mute && voice.sample_step)
+			{
+				const int cur_pos = voice.sample_cur + voice.sample_step;
+				const int prev = form[(voice.sample_cur >> FRAC_BITS) & 15];
+				const int cur = form[(cur_pos >> FRAC_BITS) & 15];
+
+				/* interpolate */
+				data += (int32_t(prev) * (FRAC_ONE - (cur_pos & FRAC_MASK))
+						+ int32_t(cur) * (cur_pos & FRAC_MASK)) >> FRAC_BITS;
+
+				voice.sample_cur = cur_pos;
+			}
+		}
+
+		*buffer++ = data;
+
+		m_tone_clock += FRAC_ONE;
+		if (m_tone_clock >= m_tone_clock_expire)
+		{
+			for (int i = 0; i < NUM_CHANNELS; i++)
+			{
+				m_tone_channels[i].offset++;
+				m_tone_channels[i].offset &= m_tone_channels[i].mask;
+
+				validate_tone_channel(i);
+			}
+
+			if (m_tone_channels[0].offset == 0 && m_sound0_stop_on_rollover)
+				m_tone_channels[0].mute = 1;
+
+			m_tone_clock -= m_tone_clock_expire;
+		}
+	}
+}
+
+
+vanguard_sound_device::vanguard_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, VANGUARD_SOUND, tag, owner, clock)
+	, m_custom(*this, "custom")
+	, m_sn76477_2(*this, "sn76477.2")
+	, m_samples(*this, "samples")
+	, m_last_port1(0)
+{
+}
+
+WRITE8_MEMBER(vanguard_sound_device::sound_w)
+{
+	switch (offset)
+	{
+	case 0:
+		/*
+		    bit description
+
+		    0   MUSIC A10
+		    1   MUSIC A9
+		    2   MUSIC A8
+		    3   LS05 PORT 1
+		    4   LS04 PORT 2
+		    5   SHOT A
+		    6   SHOT B
+		    7   BOMB
+		*/
+
+		/* select musical tune in ROM based on sound command byte */
+		m_custom->set_channel_base(0, (data & 0x07) << 8);
+
+		m_custom->set_sound0_stop_on_rollover(1);
+
+		/* play noise samples requested by sound command byte */
+		/* SHOT A */
+		if (data & 0x20 && !(m_last_port1 & 0x20))
+			m_samples->start(1, 0);
+		else if (!(data & 0x20) && m_last_port1 & 0x20)
+			m_samples->stop(1);
+
+		/* BOMB */
+		if (data & 0x80 && !(m_last_port1 & 0x80))
+			m_samples->start(2, 1);
+
+		if (data & 0x08)
+			m_custom->mute_channel(0);
+
+		if (data & 0x10)
+			m_custom->unmute_channel(0);
+
+		/* SHOT B */
+		m_sn76477_2->enable_w((data & 0x40) ? 0 : 1);
+
+		m_last_port1 = data;
+		break;
+
+	case 1:
+		/*
+		    bit description
+
+		    0   MUSIC A10
+		    1   MUSIC A9
+		    2   MUSIC A8
+		    3   LS04 PORT 3
+		    4   EXTP A (HD38880 external pitch control A)
+		    5   EXTP B (HD38880 external pitch control B)
+		    6
+		    7
+		*/
+
+		/* select tune in ROM based on sound command byte */
+		m_custom->set_channel_base(1, 0x0800 | ((data & 0x07) << 8));
+
+		if (data & 0x08)
+			m_custom->unmute_channel(1);
+		else
+			m_custom->mute_channel(1);
+		break;
+
+	case 2:
+		/*
+		    bit description
+
+		    0   AS 1    (sound0 waveform)
+		    1   AS 2    (sound0 waveform)
+		    2   AS 4    (sound0 waveform)
+		    3   AS 3    (sound0 waveform)
+		    4   AS 5    (sound1 waveform)
+		    5   AS 6    (sound1 waveform)
+		    6   AS 7    (sound1 waveform)
+		    7   AS 8    (sound1 waveform)
+		*/
+
+		m_custom->build_waveform(0, (data & 0x3) | ((data & 4) << 1) | ((data & 8) >> 1));
+		m_custom->build_waveform(1, data >> 4);
+	}
+}
+
+WRITE8_MEMBER(vanguard_sound_device::speech_w)
 {
 	static const uint16_t vanguard_table[16] =
 	{
@@ -904,10 +681,182 @@ WRITE8_MEMBER( snk6502_sound_device::vanguard_speech_w )
 		0x054ce
 	};
 
-	speech_w(data, vanguard_table, 2);
+	m_custom->speech_w(data, vanguard_table, 2);
 }
 
-WRITE8_MEMBER( snk6502_sound_device::fantasy_speech_w )
+void vanguard_sound_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SNK6502_SOUND(config, m_custom, 0);
+	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(3);
+	m_samples->set_samples_names(vanguard_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
+	// SHOT A   GND: 2,9,26,27  +5V: 15,25
+	sn76477_1.set_noise_params(RES_K(470), RES_M(1.5), CAP_P(220));
+	sn76477_1.set_decay_res(0);
+	sn76477_1.set_attack_params(0, 0);
+	sn76477_1.set_amp_res(RES_K(47));
+	sn76477_1.set_feedback_res(RES_K(4.7));
+	sn76477_1.set_vco_params(0, 0, 0);
+	sn76477_1.set_pitch_voltage(0);
+	sn76477_1.set_slf_params(0, 0);
+	sn76477_1.set_oneshot_params(0, 0);
+	sn76477_1.set_vco_mode(0);
+	sn76477_1.set_mixer_params(0, 1, 0);
+	sn76477_1.set_envelope_params(1, 1);
+	sn76477_1.set_enable(1);
+	sn76477_1.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	SN76477(config, m_sn76477_2);
+	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
+	m_sn76477_2->set_noise_params(RES_K(10), RES_K(30), 0);
+	m_sn76477_2->set_decay_res(0);
+	m_sn76477_2->set_attack_params(0, 0);
+	m_sn76477_2->set_amp_res(RES_K(47));
+	m_sn76477_2->set_feedback_res(RES_K(4.7));
+	m_sn76477_2->set_vco_params(0, 0, 0);
+	m_sn76477_2->set_pitch_voltage(0);
+	m_sn76477_2->set_slf_params(0, 0);
+	m_sn76477_2->set_oneshot_params(0, 0);
+	m_sn76477_2->set_vco_mode(0);
+	m_sn76477_2->set_mixer_params(0, 1, 0);
+	m_sn76477_2->set_envelope_params(0, 1);
+	m_sn76477_2->set_enable(1);
+	m_sn76477_2->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void vanguard_sound_device::device_start()
+{
+	save_item(NAME(m_last_port1));
+}
+
+void vanguard_sound_device::device_reset()
+{
+	// 41.6 Hz update (measured)
+	m_custom->set_music_clock(1 / 41.6);
+}
+
+
+fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: fantasy_sound_device(mconfig, FANTASY_SOUND, tag, owner, clock)
+{
+}
+
+fantasy_sound_device::fantasy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_custom(*this, "custom")
+	, m_discrete(*this, "discrete")
+	, m_last_port1(0)
+{
+}
+
+WRITE8_MEMBER(fantasy_sound_device::sound_w)
+{
+	switch (offset)
+	{
+	case 0:
+		/*
+		    bit description
+
+		    0   MUSIC A10
+		    1   MUSIC A9
+		    2   MUSIC A8
+		    3   LS04 PART 1
+		    4   LS04 PART 2
+		    5
+		    6
+		    7   BOMB
+		*/
+
+		/* select musical tune in ROM based on sound command byte */
+		m_custom->set_channel_base(0, 0x0000 | ((data & 0x07) << 8));
+
+		m_custom->set_sound0_stop_on_rollover(0);
+
+		if (data & 0x08)
+			m_custom->unmute_channel(0);
+		else
+			m_custom->mute_channel(0);
+
+		if (data & 0x10)
+			m_custom->unmute_channel(2);
+		else
+			m_custom->mute_channel(2);
+
+		/* BOMB */
+		m_discrete->write(FANTASY_BOMB_EN, data & 0x80);
+
+		m_last_port1 = data;
+		break;
+
+	case 1:
+		/*
+		    bit description
+
+		    0   MUSIC A10
+		    1   MUSIC A9
+		    2   MUSIC A8
+		    3   LS04 PART 3
+		    4   EXT PA (HD38880 external pitch control A)
+		    5   EXT PB (HD38880 external pitch control B)
+		    6
+		    7
+		*/
+
+		/* select tune in ROM based on sound command byte */
+		m_custom->set_channel_base(1, 0x0800 | ((data & 0x07) << 8));
+
+		if (data & 0x08)
+			m_custom->unmute_channel(1);
+		else
+			m_custom->mute_channel(1);
+		break;
+
+	case 2:
+		/*
+		    bit description
+
+		    0   AS 1    (sound0 waveform)
+		    1   AS 3    (sound0 waveform)
+		    2   AS 2    (sound0 waveform)
+		    3   AS 4    (sound0 waveform)
+		    4   AS 5    (sound1 waveform)
+		    5   AS 6    (sound1 waveform)
+		    6   AS 7    (sound1 waveform)
+		    7   AS 8    (sound1 waveform)
+		*/
+
+		m_custom->build_waveform(0, (data & 0x9) | ((data & 2) << 1) | ((data & 4) >> 1));
+		m_custom->build_waveform(1, data >> 4);
+		break;
+
+	case 3:
+		/*
+		    bit description
+
+		    0   BC 1
+		    1   BC 2
+		    2   BC 3
+		    3   MUSIC A10
+		    4   MUSIC A9
+		    5   MUSIC A8
+		    6
+		    7   INV
+		*/
+
+		/* select tune in ROM based on sound command byte */
+		m_custom->set_channel_base(2, 0x1000 | ((data & 0x70) << 4));
+		break;
+	}
+}
+
+WRITE8_MEMBER(fantasy_sound_device::speech_w)
 {
 	static const uint16_t fantasy_table[16] =
 	{
@@ -929,63 +878,335 @@ WRITE8_MEMBER( snk6502_sound_device::fantasy_speech_w )
 		0
 	};
 
-	speech_w(data, fantasy_table, 0);
+	m_custom->speech_w(data, fantasy_table, 0);
 }
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void snk6502_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void fantasy_sound_device::device_add_mconfig(machine_config &config)
 {
-	stream_sample_t *buffer = outputs[0];
+	SPEAKER(config, "mono").front_center();
 
-	int i;
+	SNK6502_SOUND(config, m_custom, 0);
+	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	for (i = 0; i < CHANNELS; i++)
-		validate_tone_channel(i);
+	samples_device &samples(SAMPLES(config, "samples"));
+	samples.set_channels(1);
+	samples.set_samples_names(fantasy_sample_names);
+	samples.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	while (samples-- > 0)
+	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
+	// BOMB     GND:    2,9,26,27       +5V: 15,25
+	sn76477_1.set_noise_params(RES_K(470), RES_M(1.5), CAP_P(220));
+	sn76477_1.set_decay_res(0);
+	sn76477_1.set_attack_params(0, 0);
+	sn76477_1.set_amp_res(RES_K(470));
+	sn76477_1.set_feedback_res(RES_K(4.7));
+	sn76477_1.set_vco_params(0, 0, 0);
+	sn76477_1.set_pitch_voltage(0);
+	sn76477_1.set_slf_params(0, 0);
+	sn76477_1.set_oneshot_params(0, 0);
+	sn76477_1.set_vco_mode(0);
+	sn76477_1.set_mixer_params(0, 1, 0);
+	// schematic does not show pin 1 grounded, but it must be.
+	// otherwise it is using the VCO for the envelope, but the VCO is not hooked up
+	sn76477_1.set_envelope_params(0, 1);
+	sn76477_1.set_enable(0);
+	sn76477_1.add_route(0, "discrete", 1.0, 0);
+
+	DISCRETE(config, m_discrete, fantasy_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+void fantasy_sound_device::device_start()
+{
+	save_item(NAME(m_last_port1));
+}
+
+void fantasy_sound_device::device_reset()
+{
+	// 41.6 Hz update (measured)
+	m_custom->set_music_clock(1 / 41.6);
+}
+
+
+nibbler_sound_device::nibbler_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: fantasy_sound_device(mconfig, NIBBLER_SOUND, tag, owner, clock)
+{
+}
+
+void nibbler_sound_device::device_add_mconfig(machine_config &config)
+{
+	fantasy_sound_device::device_add_mconfig(config);
+
+	config.device_remove("samples");
+}
+
+
+pballoon_sound_device::pballoon_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: fantasy_sound_device(mconfig, PBALLOON_SOUND, tag, owner, clock)
+{
+}
+
+void pballoon_sound_device::device_add_mconfig(machine_config &config)
+{
+	fantasy_sound_device::device_add_mconfig(config);
+
+	config.device_remove("samples");
+}
+
+void pballoon_sound_device::device_reset()
+{
+	// 40.3 Hz update (measured)
+	m_custom->set_music_clock(1 / 40.3);
+}
+
+
+sasuke_sound_device::sasuke_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SASUKE_SOUND, tag, owner, clock)
+	, m_custom(*this, "custom")
+	, m_samples(*this, "samples")
+	, m_last_port1(0)
+{
+}
+
+WRITE8_MEMBER(sasuke_sound_device::sound_w)
+{
+	switch (offset)
 	{
-		int32_t data = 0;
+	case 0:
+		/*
+		    bit description
 
-		for (i = 0; i < CHANNELS; i++)
-		{
-			TONE *voice = &m_tone_channels[i];
-			int16_t *form = voice->form;
+		    0   hit (ic52)
+		    1   boss start (ic51)
+		    2   shot
+		    3   boss attack (ic48?)
+		    4   ??
+		    5
+		    6
+		    7   reset counter
+		*/
 
-			if (!voice->mute && voice->sample_step)
-			{
-				int cur_pos = voice->sample_cur + voice->sample_step;
-				int prev = form[(voice->sample_cur >> FRAC_BITS) & 15];
-				int cur = form[(cur_pos >> FRAC_BITS) & 15];
+		if (BIT(~data & m_last_port1, 0))
+			m_samples->start(0, 0);
+		if (BIT(~data & m_last_port1, 1))
+			m_samples->start(1, 1);
+		if (BIT(~data & m_last_port1, 2))
+			m_samples->start(2, 2);
+		if (BIT(~data & m_last_port1, 3))
+			m_samples->start(3, 3);
 
-				/* interpolate */
-				data += ((int32_t)prev * (FRAC_ONE - (cur_pos & FRAC_MASK))
-						+ (int32_t)cur * (cur_pos & FRAC_MASK)) >> FRAC_BITS;
+		if (BIT(data & ~m_last_port1, 7))
+			m_custom->unmute_channel(0);
+		else if (BIT(~data & m_last_port1, 7))
+			m_custom->mute_channel(0);
 
-				voice->sample_cur = cur_pos;
-			}
-		}
+		m_last_port1 = data;
+		break;
 
-		*buffer++ = data;
+	case 1:
+		/*
+		    bit description
 
-		m_tone_clock += FRAC_ONE;
-		if (m_tone_clock >= m_tone_clock_expire)
-		{
-			for (i = 0; i < CHANNELS; i++)
-			{
-				m_tone_channels[i].offset++;
-				m_tone_channels[i].offset &= m_tone_channels[i].mask;
+		    0
+		    1   wave form
+		    2   wave form
+		    3   wave form
+		    4   MUSIC A8
+		    5   MUSIC A9
+		    6   MUSIC A10
+		    7
+		*/
 
-				validate_tone_channel(i);
-			}
+		/* select tune in ROM based on sound command byte */
+		m_custom->set_channel_base(0, 0x0000 | ((data & 0x70) << 4));
 
-			if (m_tone_channels[0].offset == 0 && m_Sound0StopOnRollover)
-				m_tone_channels[0].mute = 1;
+		m_custom->set_sound0_stop_on_rollover(1);
 
-			m_tone_clock -= m_tone_clock_expire;
-		}
-
+		/* bit 1-3 sound0 waveform control */
+		m_custom->sasuke_build_waveform((data & 0x0e) >> 1);
+		break;
 	}
+}
+
+void sasuke_sound_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SNK6502_SOUND(config, m_custom, 0);
+	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	samples_device &samples(SAMPLES(config, "samples"));
+	samples.set_channels(4);
+	samples.set_samples_names(sasuke_sample_names);
+	samples.add_route(ALL_OUTPUTS, "mono", 0.12);
+
+	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
+	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
+	sn76477_1.set_noise_params(RES_K(470), RES_K(150), CAP_P(4700));
+	sn76477_1.set_decay_res(RES_K(22));
+	sn76477_1.set_attack_params(CAP_U(10), RES_K(10));
+	sn76477_1.set_amp_res(RES_K(100));
+	sn76477_1.set_feedback_res(RES_K(47));
+	sn76477_1.set_vco_params(0, 0, 0);
+	sn76477_1.set_pitch_voltage(0);
+	sn76477_1.set_slf_params(0, RES_K(10));
+	sn76477_1.set_oneshot_params(CAP_U(2.2), RES_K(100));
+	sn76477_1.set_vco_mode(0);
+	sn76477_1.set_mixer_params(0, 1, 0);
+	sn76477_1.set_envelope_params(1, 0);
+	sn76477_1.set_enable(1);
+	sn76477_1.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	sn76477_device &sn76477_2(SN76477(config, "sn76477.2"));
+	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
+	sn76477_2.set_noise_params(RES_K(340), RES_K(47), CAP_P(100));
+	sn76477_2.set_decay_res(RES_K(470));
+	sn76477_2.set_attack_params(CAP_U(4.7), RES_K(10));
+	sn76477_2.set_amp_res(RES_K(100));
+	sn76477_2.set_feedback_res(RES_K(47));
+	sn76477_2.set_vco_params(0, CAP_P(220), RES_K(1000));
+	sn76477_2.set_pitch_voltage(0);
+	sn76477_2.set_slf_params(0, RES_K(220));
+	sn76477_2.set_oneshot_params(CAP_U(22), RES_K(47));
+	sn76477_2.set_vco_mode(1);
+	sn76477_2.set_mixer_params(0, 1, 0);
+	sn76477_2.set_envelope_params(1, 1);
+	sn76477_2.set_enable(1);
+	sn76477_2.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	sn76477_device &sn76477_3(SN76477(config, "sn76477.3"));
+	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
+	sn76477_3.set_noise_params(RES_K(330), RES_K(47), CAP_P(100));
+	sn76477_3.set_decay_res(RES_K(1));
+	sn76477_3.set_attack_params(0, RES_K(1));
+	sn76477_3.set_amp_res(RES_K(100));
+	sn76477_3.set_feedback_res(RES_K(47));
+	sn76477_3.set_vco_params(0, CAP_P(1000), RES_K(1000));
+	sn76477_3.set_pitch_voltage(0);
+	sn76477_3.set_slf_params(CAP_U(1), RES_K(10));
+	sn76477_3.set_oneshot_params(CAP_U(2.2), RES_K(150));
+	sn76477_3.set_vco_mode(0);
+	sn76477_3.set_mixer_params(1, 1, 0);
+	sn76477_3.set_envelope_params(1, 0);
+	sn76477_3.set_enable(1);
+	sn76477_3.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void sasuke_sound_device::device_start()
+{
+	save_item(NAME(m_last_port1));
+}
+
+void sasuke_sound_device::device_reset()
+{
+	m_custom->set_music_clock(M_LN2 * (RES_K(18) + RES_K(1)) * CAP_U(1));
+
+	// adjusted (measured through audio recording of pcb)
+	m_custom->set_music_freq(35300);
+}
+
+
+satansat_sound_device::satansat_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SATANSAT_SOUND, tag, owner, clock)
+	, m_custom(*this, "custom")
+	, m_samples(*this, "samples")
+	, m_last_port1(0)
+{
+}
+
+WRITE8_MEMBER(satansat_sound_device::sound_w)
+{
+	switch (offset)
+	{
+	case 0:
+		/*
+		    bit description
+
+		*/
+
+		/* bit 0 = analog sound trigger */
+
+		/* bit 1 = to 76477 */
+
+		/* bit 2 = analog sound trigger */
+		if (data & 0x04 && !(m_last_port1 & 0x04))
+			m_samples->start(0, 1);
+
+		if (data & 0x08)
+			m_custom->mute_channel(0);
+
+		/* bit 4-6 sound0 waveform control */
+		m_custom->sasuke_build_waveform((data & 0x70) >> 4);
+
+		/* bit 7 sound1 waveform control */
+		m_custom->satansat_build_waveform((data & 0x80) >> 7);
+
+		m_last_port1 = data;
+		break;
+
+	case 1:
+		/*
+		    bit description
+
+		*/
+
+		/* select tune in ROM based on sound command byte */
+		m_custom->set_channel_base(0, 0x0000 | ((data & 0x0e) << 7));
+		m_custom->set_channel_base(1, 0x0800 | ((data & 0x60) << 4), 0x1ff);
+
+		m_custom->set_sound0_stop_on_rollover(1);
+
+		if (data & 0x01)
+			m_custom->unmute_channel(0);
+
+		if (data & 0x10)
+			m_custom->unmute_channel(1);
+		else
+			m_custom->mute_channel(1);
+
+		/* bit 7 = ? */
+		break;
+	}
+}
+
+void satansat_sound_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SNK6502_SOUND(config, m_custom, 0);
+	m_custom->add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	samples_device &samples(SAMPLES(config, "samples"));
+	samples.set_channels(3);
+	samples.set_samples_names(vanguard_sample_names);
+	samples.add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	sn76477_device &sn76477_1(SN76477(config, "sn76477.1"));
+	// ???      GND: 2,26,27        +5V: 15,25
+	sn76477_1.set_noise_params(RES_K(470), RES_M(1.5), CAP_P(220));
+	sn76477_1.set_decay_res(0);
+	sn76477_1.set_attack_params(0, 0);
+	sn76477_1.set_amp_res(RES_K(47));
+	sn76477_1.set_feedback_res(RES_K(47));
+	sn76477_1.set_vco_params(0, 0, 0);
+	sn76477_1.set_pitch_voltage(0);
+	sn76477_1.set_slf_params(0, 0);
+	sn76477_1.set_oneshot_params(0, 0);
+	sn76477_1.set_vco_mode(0);
+	sn76477_1.set_mixer_params(0, 1, 0);
+	sn76477_1.set_envelope_params(1, 1);
+	sn76477_1.set_enable(1);
+	sn76477_1.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void satansat_sound_device::device_start()
+{
+	save_item(NAME(m_last_port1));
+}
+
+void satansat_sound_device::device_reset()
+{
+	// same as sasuke (assumption?)
+	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
+	m_custom->set_music_freq(38000);
 }

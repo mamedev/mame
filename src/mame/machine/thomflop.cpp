@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "includes/thomson.h"
-#include "machine/wd_fdc.h"
 
 
 #define VERBOSE 0 /* 0, 1 or 2 */
@@ -276,14 +275,12 @@ static uint8_t to7_5p14_select;
 
 READ8_MEMBER( thomson_state::to7_5p14_r )
 {
-	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
-
 	if ( offset < 4 )
-		return fdc->read(space, offset );
+		return m_wd2793_fdc->read(offset);
 	else if ( offset == 8 )
 		return to7_5p14_select;
 	else
-		logerror ( "%f $%04x to7_5p14_r: invalid read offset %i\n", machine().time().as_double(), m_maincpu->pc(), offset );
+		logerror ( "%s: to7_5p14_r: invalid read offset %i\n", machine().describe_context(), offset );
 	return 0;
 }
 
@@ -291,18 +288,17 @@ READ8_MEMBER( thomson_state::to7_5p14_r )
 
 WRITE8_MEMBER( thomson_state::to7_5p14_w )
 {
-	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
 	if ( offset < 4 )
-		fdc->write(space, offset, data );
+		m_wd2793_fdc->write(offset, data );
 	else if ( offset == 8 )
 	{
 		/* drive select */
 		floppy_image_device *floppy = nullptr;
 
-		if (BIT(data, 1)) floppy = fdc->subdevice<floppy_connector>("0")->get_device();
-		if (BIT(data, 2)) floppy = fdc->subdevice<floppy_connector>("1")->get_device();
+		if (BIT(data, 1)) floppy = m_wd2793_fdc->subdevice<floppy_connector>("0")->get_device();
+		if (BIT(data, 2)) floppy = m_wd2793_fdc->subdevice<floppy_connector>("1")->get_device();
 
-		fdc->set_floppy(floppy);
+		m_wd2793_fdc->set_floppy(floppy);
 
 		if (floppy)
 		{
@@ -312,24 +308,25 @@ WRITE8_MEMBER( thomson_state::to7_5p14_w )
 		}
 	}
 	else
-		logerror ( "%f $%04x to7_5p14_w: invalid write offset %i (data=$%02X)\n",
-				machine().time().as_double(), m_maincpu->pc(), offset, data );
+	{
+		logerror("%s: to7_5p14_w: invalid write offset %i (data=$%02X)\n",
+				machine().describe_context(), offset, data );
+	}
 }
 
 
 
 void thomson_state::to7_5p14_reset()
 {
-	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
-	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
-	fdc->reset();
+	logerror("%s: to7_5p14_reset: CD 90-640 controller\n", machine().describe_context());
+	m_wd2793_fdc->reset();
 }
 
 
 
 void thomson_state::to7_5p14_init()
 {
-	LOG(( "to7_5p14_init: CD 90-640 controller\n" ));
+	logerror("%s: to7_5p14_init: CD 90-640 controller\n", machine().describe_context());
 	save_item(NAME(to7_5p14_select));
 }
 
@@ -408,7 +405,7 @@ WRITE8_MEMBER( thomson_state::to7_5p14sd_w )
 				machine().time().as_double(), m_maincpu->pc(), offset, data );
 }
 
-void thomson_state::to7_5p14_index_pulse_callback( device_t *controller,legacy_floppy_image_device *image, int state )
+void thomson_state::to7_5p14_index_pulse_callback( int state )
 {
 	m_mc6843->set_index_pulse( state );
 }
@@ -505,7 +502,7 @@ static to7qdd_t * to7qdd;
 
 
 
-void thomson_state::to7_qdd_index_pulse_cb( device_t *controller,legacy_floppy_image_device *image, int state )
+void thomson_state::to7_qdd_index_pulse_cb( int state )
 {
 	to7qdd->index_pulse = state;
 
@@ -889,7 +886,7 @@ struct thmfc1_t
 {
 	uint8_t   op;
 	uint8_t   sector;            /* target sector, in [1,16] */
-		uint32_t  sector_id;
+	uint32_t  sector_id;
 	uint8_t   track;             /* current track, in [0,79] */
 	uint8_t   side;              /* current side, 0 or 1 */
 	uint8_t   drive;             /* 0 to 3 */
@@ -926,19 +923,21 @@ legacy_floppy_image_device * thomson_state::thmfc_floppy_image()
 
 int thomson_state::thmfc_floppy_is_qdd ( legacy_floppy_image_device *image )
 {
-	if (image==nullptr) return 0;
+	if (!image) return 0;
 	if (!image->exists()) return 0;
-	return image->length()==51200; // idf QDD
+	return image->length() == 51200; // idf QDD
 }
 
 
 
-void thomson_state::thmfc_floppy_index_pulse_cb ( device_t *controller,legacy_floppy_image_device *image, int state )
+void thomson_state::thmfc_floppy_index_pulse_cb( int index, int state )
 {
+	legacy_floppy_image_device *const image = m_floppy_image[index];
+
 	if ( image != thmfc_floppy_image())
 		return;
 
-	if ( thmfc_floppy_is_qdd(image))
+	if ( thmfc_floppy_is_qdd(image) )
 	{
 		/* pulse each time the whole-disk spiraling track ends */
 		image->floppy_drive_set_rpm( 16.92f /* 423/25 */ );
@@ -965,7 +964,7 @@ void thomson_state::thmfc_floppy_index_pulse_cb ( device_t *controller,legacy_fl
 
 int thomson_state::thmfc_floppy_find_sector( chrn_id* dst )
 {
-	legacy_floppy_image_device* img = thmfc_floppy_image();
+	legacy_floppy_image_device *const img = thmfc_floppy_image();
 	chrn_id id;
 	int r = 0;
 
@@ -1007,7 +1006,7 @@ void thomson_state::thmfc_floppy_cmd_complete()
 
 	if ( thmfc1->op == THMFC1_OP_WRITE_SECT )
 	{
-		legacy_floppy_image_device * img = thmfc_floppy_image();
+		legacy_floppy_image_device *const img = thmfc_floppy_image();
 		img->floppy_drive_write_sector_data( thmfc1->side, thmfc1->sector_id, thmfc1->data + 3, thmfc1->data_size - 3, 0 );
 				thom_floppy_active( 1 );
 	}
@@ -1629,7 +1628,7 @@ TIMER_CALLBACK_MEMBER( thomson_state::ans )
 
 */
 
-MC6854_OUT_FRAME_CB(thomson_state::to7_network_got_frame)
+void thomson_state::to7_network_got_frame(uint8_t *data, int length)
 {
 	LOG(( "%f to7_network_got_frame:", machine().time().as_double() ));
 	for ( int i = 0; i < length; i++ )
@@ -1890,23 +1889,23 @@ WRITE8_MEMBER( thomson_state::to9_floppy_w )
 		to7_5p14_w( space, offset, data, mem_mask );
 }
 
-void thomson_state::thomson_index_callback(legacy_floppy_image_device *device, int state)
+void thomson_state::thomson_index_callback(int index, int state)
 {
 	switch ( to7_controller_type )
 	{
 	case 1:
-		to7_5p14_index_pulse_callback(nullptr, device, state);
+		to7_5p14_index_pulse_callback(state);
 		break;
 
 	case 2:
 		break;
 
 	case 3:
-		thmfc_floppy_index_pulse_cb(nullptr, device, state);
+		thmfc_floppy_index_pulse_cb(index, state);
 		break;
 
 	case 4:
-		to7_qdd_index_pulse_cb(nullptr, device, state);
+		to7_qdd_index_pulse_cb(state);
 		break;
 
 	default:

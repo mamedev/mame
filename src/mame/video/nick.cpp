@@ -78,15 +78,15 @@ DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
 
 void nick_device::vram_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(nick_device::vram_r), FUNC(nick_device::vram_w));
+	map(0x0000, 0xffff).rw(FUNC(nick_device::vram_r), FUNC(nick_device::vram_w));
 }
 
 void nick_device::vio_map(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(nick_device::fixbias_w));
-	map(0x01, 0x01).w(this, FUNC(nick_device::border_w));
-	map(0x02, 0x02).w(this, FUNC(nick_device::lpl_w));
-	map(0x03, 0x03).w(this, FUNC(nick_device::lph_w));
+	map(0x00, 0x00).w(FUNC(nick_device::fixbias_w));
+	map(0x01, 0x01).w(FUNC(nick_device::border_w));
+	map(0x02, 0x02).w(FUNC(nick_device::lpl_w));
+	map(0x03, 0x03).w(FUNC(nick_device::lph_w));
 }
 
 

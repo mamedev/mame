@@ -43,7 +43,7 @@ enum line_state
 enum
 {
 	// input lines
-	MAX_INPUT_LINES = 32+3,
+	MAX_INPUT_LINES = 64+3,
 	INPUT_LINE_IRQ0 = 0,
 	INPUT_LINE_IRQ1 = 1,
 	INPUT_LINE_IRQ2 = 2,
@@ -140,17 +140,54 @@ public:
 
 	// inline configuration helpers
 	void set_disable() { m_disabled = true; }
-	template <typename Object> void set_vblank_int(Object &&cb, const char *tag, int rate = 0)
+	template <typename Object> void set_vblank_int(Object &&cb, const char *tag)
 	{
 		m_vblank_interrupt = std::forward<Object>(cb);
 		m_vblank_interrupt_screen = tag;
 	}
+	void set_vblank_int(device_interrupt_delegate callback, const char *tag)
+	{
+		m_vblank_interrupt = callback;
+		m_vblank_interrupt_screen = tag;
+	}
+	template <class FunctionClass> void set_vblank_int(const char *tag, const char *devname, void (FunctionClass::*callback)(device_t &), const char *name)
+	{
+		set_vblank_int(device_interrupt_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), tag);
+	}
+	template <class FunctionClass> void set_vblank_int(const char *tag, void (FunctionClass::*callback)(device_t &), const char *name)
+	{
+		set_vblank_int(device_interrupt_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), tag);
+	}
+
 	template <typename Object> void set_periodic_int(Object &&cb, const attotime &rate)
 	{
 		m_timed_interrupt = std::forward<Object>(cb);
 		m_timed_interrupt_period = rate;
 	}
+	void set_periodic_int(device_interrupt_delegate callback, const attotime &rate)
+	{
+		m_timed_interrupt = callback;
+		m_timed_interrupt_period = rate;
+	}
+	template <class FunctionClass> void set_periodic_int(const char *devname, void (FunctionClass::*callback)(device_t &), const char *name, const attotime &rate)
+	{
+		set_periodic_int(device_interrupt_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), rate);
+	}
+	template <class FunctionClass> void set_periodic_int(void (FunctionClass::*callback)(device_t &), const char *name, const attotime &rate)
+	{
+		set_periodic_int(device_interrupt_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), rate);
+	}
+
 	template <typename Object> void set_irq_acknowledge_callback(Object &&cb) { m_driver_irq = std::forward<Object>(cb); }
+	void set_irq_acknowledge_callback(device_irq_acknowledge_delegate callback) { m_driver_irq = callback; }
+	template <class FunctionClass> void set_irq_acknowledge_callback(const char *devname, int (FunctionClass::*callback)(device_t &, int), const char *name)
+	{
+		set_irq_acknowledge_callback(device_irq_acknowledge_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_irq_acknowledge_callback(int (FunctionClass::*callback)(device_t &, int), const char *name)
+	{
+		set_irq_acknowledge_callback(device_irq_acknowledge_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// execution management
 	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
@@ -237,10 +274,11 @@ protected:
 		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
 			device().debug()->exception_hook(exception);
 	}
-	void debugger_interrupt_hook(int irqline)
+
+	void debugger_privilege_hook()
 	{
 		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
-			device().debug()->interrupt_hook(irqline);
+			device().debug()->privilege_hook();
 	}
 
 private:

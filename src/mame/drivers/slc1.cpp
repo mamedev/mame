@@ -68,7 +68,7 @@ public:
 
 	void slc1(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
@@ -78,7 +78,6 @@ protected:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-private:
 	uint8_t m_digit = 0;
 	bool m_kbd_type = false;
 
@@ -205,7 +204,7 @@ void slc1_state::mem_map(address_map &map)
 void slc1_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+	map(0x0000, 0xffff).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
 }
 
 
@@ -275,7 +274,7 @@ MACHINE_CONFIG_START(slc1_state::slc1)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_slc1)
+	config.set_default_layout(layout_slc1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -293,9 +292,9 @@ MACHINE_CONFIG_END
 ROM_START(slc1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "bios0", "SLC-1")
-	ROMX_LOAD("slc1_0000.bin",   0x0000, 0x1000, CRC(06d32967) SHA1(f25eac66a4fca9383964d509c671a7ad2e020e7e), ROM_BIOS(1) )
+	ROMX_LOAD("slc1_0000.bin",   0x0000, 0x1000, CRC(06d32967) SHA1(f25eac66a4fca9383964d509c671a7ad2e020e7e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "bios1", "SC-1 v2")
-	ROMX_LOAD("sc1-v2.bin",      0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36), ROM_BIOS(2) )
+	ROMX_LOAD("sc1-v2.bin",      0x0000, 0x1000, CRC(1f122a85) SHA1(d60f89f8b59d04f4cecd6e3ecfe0a24152462a36), ROM_BIOS(1))
 ROM_END
 
 

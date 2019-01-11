@@ -13,11 +13,11 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(sshangha_state::sshangha_video_w)
+WRITE16_MEMBER(sshangha_state::video_w)
 {
 	/* 0x4: Special video mode, other bits unknown */
-	m_video_control=data;
-//  popmessage("%04x",data);
+	m_video_control = data;
+//  popmessage("%04x", data);
 }
 
 /******************************************************************************/
@@ -26,43 +26,50 @@ void sshangha_state::video_start()
 {
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();
+
+	save_item(NAME(m_video_control));
 }
 
 /******************************************************************************/
 
-uint32_t sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sshangha_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const bool combine_tilemaps = (m_video_control&4) ? false : true;
+
 	// sprites are flipped relative to tilemaps
 	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_tilegen->pf_control_r(space, 0, 0xffff);
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen1->set_flip_screen(!BIT(flip, 7));
 	m_sprgen2->set_flip_screen(!BIT(flip, 7));
 
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram, 0x800);
+	// render sprites to temp bitmaps
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2, 0x400);
 
-	// I'm pretty sure only the original has the 2nd spriteram, used for the Japanese text on the 2nd scene (non-scrolling text) in the intro of the quest (3rd in JPN) mode
-	if (m_spriteram2 != nullptr)
-		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2, 0x800);
-
+	// draw / mix
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+	m_tilegen->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+
+	// TODO: fully verify draw order / priorities
 
 	/* the tilemap 4bpp + 4bpp = 8bpp mixing actually seems external to the tilemap, note video_control is not part of the tilemap chip */
-	if ((m_video_control&4)==0) {
-		m_deco_tilegen1->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 0, 1);
-		m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0200, 0x0200, 0x100, 0x1ff);
+	if (combine_tilemaps) {
+		m_tilegen->tilemap_12_combine_draw(screen, bitmap, cliprect, 0, 0, 1);
 	}
 	else {
-		m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-		m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0200, 0x0200, 0x100, 0x1ff);
-		m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+		m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	}
+	//                                                          pri,   primask,palbase,palmask
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x000,  0x000,  0x0ff); // low+high pri spr1 (definitely needs to be below low pri spr2 - game tiles & definitely needs to be below tilemap1 - lightning on win screen in traditional mode)
+	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x200, 0x200,  0x100,  0x0ff); // low pri spr2  (definitely needs to be below tilemap1 - 2nd level failure screen etc.)
 
-	if (m_spriteram2 != nullptr)
-		m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0, 0x1ff);
+	if (!combine_tilemaps)
+		m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
-	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0200, 0, 0x1ff);
+	//                                                          pri,   primask,palbase,palmask
+	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x000, 0x200,  0x100,  0x0ff); // high pri spr2 (definitely needs to be above tilemap1 - title logo)
+
 	return 0;
 }

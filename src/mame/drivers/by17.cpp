@@ -37,6 +37,8 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_pia_u10(*this, "pia_u10")
 		, m_pia_u11(*this, "pia_u11")
+		, m_zero_crossing_active_timer(*this, "timer_z_pulse")
+		, m_display_refresh_timer(*this, "timer_d_pulse")
 		, m_io_test(*this, "TEST")
 		, m_io_dsw0(*this, "DSW0")
 		, m_io_dsw1(*this, "DSW1")
@@ -86,6 +88,8 @@ private:
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
+	required_device<timer_device> m_zero_crossing_active_timer;
+	required_device<timer_device> m_display_refresh_timer;
 	required_ioport m_io_test;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
@@ -133,7 +137,7 @@ void by17_state::by17_map(address_map &map)
 	map(0x0000, 0x007f).ram();
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0200, 0x02ff).ram().rw(this, FUNC(by17_state::nibble_nvram_r), FUNC(by17_state::nibble_nvram_w)).share("nvram");
+	map(0x0200, 0x02ff).ram().rw(FUNC(by17_state::nibble_nvram_r), FUNC(by17_state::nibble_nvram_w)).share("nvram");
 	map(0x1000, 0x1fff).rom().region("roms", 0);
 }
 
@@ -805,9 +809,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_freq )
      +--------------------------+   +-----
 */
 
-	timer_device *zero_crossing_active_timer = machine().device<timer_device>("timer_z_pulse");
-
-	zero_crossing_active_timer->adjust(attotime::from_usec(700));
+	m_zero_crossing_active_timer->adjust(attotime::from_usec(700));
 
 	m_u10_cb1 = true;
 	m_pia_u10->cb1_w(m_u10_cb1);
@@ -835,9 +837,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
     -+                          +---+
 */
 
-	timer_device *display_refresh_timer = machine().device<timer_device>("timer_d_pulse");
-
-	display_refresh_timer->adjust(attotime::from_msec(2.85));
+	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
 	m_u11_ca1 = true;
 	m_pia_u11->ca1_w(m_u11_ca1);
@@ -998,41 +998,41 @@ MACHINE_CONFIG_START(by17_state::by17)
 	MCFG_DEVICE_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_DEVICE_PROGRAM_MAP(by17_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // 'F' filled causes Credit Display to be blank on first startup
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_by17)
+	config.set_default_layout(layout_by17);
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, by17_state, u10_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by17_state, u10_a_w))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, by17_state, u10_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by17_state, u10_b_w))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, by17_state, u10_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, by17_state, u10_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by17_state, u10_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by17_state, u10_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia_u10, 0);
+	m_pia_u10->readpa_handler().set(FUNC(by17_state::u10_a_r));
+	m_pia_u10->writepa_handler().set(FUNC(by17_state::u10_a_w));
+	m_pia_u10->readpb_handler().set(FUNC(by17_state::u10_b_r));
+	m_pia_u10->writepb_handler().set(FUNC(by17_state::u10_b_w));
+	m_pia_u10->readca1_handler().set(FUNC(by17_state::u10_ca1_r));
+	m_pia_u10->readcb1_handler().set(FUNC(by17_state::u10_cb1_r));
+	m_pia_u10->ca2_handler().set(FUNC(by17_state::u10_ca2_w));
+	m_pia_u10->cb2_handler().set(FUNC(by17_state::u10_cb2_w));
+	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_z_freq", by17_state, timer_z_freq, attotime::from_hz(100)) // Mains Line Frequency * 2
-	MCFG_TIMER_DRIVER_ADD("timer_z_pulse", by17_state, timer_z_pulse)                                // Active pulse length from Zero Crossing detector
+	MCFG_TIMER_DRIVER_ADD(m_zero_crossing_active_timer, by17_state, timer_z_pulse)  // Active pulse length from Zero Crossing detector
 
-	MCFG_DEVICE_ADD("pia_u11", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, by17_state, u11_a_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, by17_state, u11_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, by17_state, u11_b_w))
-	MCFG_PIA_READCA1_HANDLER(READLINE(*this, by17_state, u11_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(*this, by17_state, u11_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, by17_state, u11_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, by17_state, u11_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia_u11, 0);
+	m_pia_u11->readpa_handler().set(FUNC(by17_state::u11_a_r));
+	m_pia_u11->writepa_handler().set(FUNC(by17_state::u11_a_w));
+	m_pia_u11->writepb_handler().set(FUNC(by17_state::u11_b_w));
+	m_pia_u11->readca1_handler().set(FUNC(by17_state::u11_ca1_r));
+	m_pia_u11->readcb1_handler().set(FUNC(by17_state::u11_cb1_r));
+	m_pia_u11->ca2_handler().set(FUNC(by17_state::u11_ca2_w));
+	m_pia_u11->cb2_handler().set(FUNC(by17_state::u11_cb2_w));
+	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d_freq", by17_state, u11_timer, attotime::from_hz(317)) // 555 timer
-	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by17_state, timer_d_pulse)                             // 555 Active pulse length
+	MCFG_TIMER_DRIVER_ADD(m_display_refresh_timer, by17_state, timer_d_pulse)   // 555 Active pulse length
 MACHINE_CONFIG_END
 
 

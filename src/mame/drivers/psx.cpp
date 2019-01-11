@@ -23,6 +23,7 @@
 #include "video/psx.h"
 
 #include "debugger.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -37,10 +38,17 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
-		m_parallel(*this, "parallel")
+		m_parallel(*this, "parallel"),
+		m_psxcd(*this, PSXCD_TAG)
 	{
 	}
 
+	void psx_base(machine_config &config);
+	void pse(machine_config &config);
+	void psu(machine_config &config);
+	void psj(machine_config &config);
+
+protected:
 	std::vector<uint8_t> m_exe_buffer;
 	int m_cd_param_p;
 	int m_cd_result_p;
@@ -65,14 +73,12 @@ public:
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	void pse(machine_config &config);
-	void psu(machine_config &config);
-	void psj(machine_config &config);
 
 	void psx_map(address_map &map);
 	void subcpu_map(address_map &map);
 private:
 	required_device<psx_parallel_slot_device> m_parallel;
+	required_device<psxcd_device> m_psxcd;
 };
 
 
@@ -494,8 +500,7 @@ QUICKLOAD_LOAD_MEMBER(psx1_state, psx_exe_load)
 void psx1_state::cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
 	uint8_t *psxram = (uint8_t *) p_n_psxram;
-	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
-	psxcd->start_dma(psxram + n_address, n_size*4);
+	m_psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
 void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
@@ -505,7 +510,7 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 
 void psx1_state::psx_map(address_map &map)
 {
-	map(0x1f000000, 0x1f07ffff).rw(this, FUNC(psx1_state::parallel_r), FUNC(psx1_state::parallel_w));
+	map(0x1f000000, 0x1f07ffff).rw(FUNC(psx1_state::parallel_r), FUNC(psx1_state::parallel_w));
 }
 
 void psx1_state::subcpu_map(address_map &map)
@@ -513,155 +518,124 @@ void psx1_state::subcpu_map(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-MACHINE_CONFIG_START(psx1_state::psj)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( psx_map )
+void psx1_state::psx_base(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
+	m_maincpu->cd_read().set(PSXCD_TAG, FUNC(psxcd_device::read));
+	m_maincpu->cd_write().set(PSXCD_TAG, FUNC(psxcd_device::write));
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers", 0));
+	controllers.rxd().set("maincpu:sio0", FUNC(psxsio0_device::write_rxd));
+	controllers.dsr().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
+	PSX_CONTROLLER_PORT(config, "port1", psx_controllers, "digital_pad");
+	PSX_CONTROLLER_PORT(config, "port2", psx_controllers, "digital_pad");
 
-	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
-	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
-	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
-	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
-	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
+	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
+	sio0.dtr_handler().set("controllers", FUNC(psxcontrollerports_device::write_dtr));
+	sio0.sck_handler().set("controllers", FUNC(psxcontrollerports_device::write_sck));
+	sio0.txd_handler().set("controllers", FUNC(psxcontrollerports_device::write_txd));
 
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_txd))
-
-	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
+	spu.add_route(0, "lspeaker", 1.00);
+	spu.add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(psx1_state, psx_exe_load), this), "cpe,exe,psf,psx", 0);
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
+	PSX_PARALLEL_SLOT(config, "parallel", psx_parallel_devices, nullptr);
 
-	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
+	PSXCD(config, m_psxcd, m_maincpu, "spu");
+	m_psxcd->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin2));
+	subdevice<psxdma_device>("maincpu:dma")->install_read_handler(3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this));
+	subdevice<psxdma_device>("maincpu:dma")->install_write_handler(3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this));
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
-	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
+	SOFTWARE_LIST(config, "cd_list").set_original("psx");
+}
 
-	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
-	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
-MACHINE_CONFIG_END
+void psx1_state::psj(machine_config &config)
+{
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
 
-MACHINE_CONFIG_START(psx1_state::psu)
-	psj(config);
-	MCFG_DEVICE_ADD( "subcpu", HD63705, 4166667 ) // MC68HC05G6
-	MCFG_DEVICE_PROGRAM_MAP( subcpu_map )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(psx1_state::pse)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( psx_map)
-
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
-
-	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
-	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
-	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
-	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
-	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
-
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_txd))
-
-	/* video hardware */
 	/* TODO: visible area and refresh rate */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	psx_base(config);
+}
 
-	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
+void psx1_state::psu(machine_config &config)
+{
+	psj(config);
+	HD63705(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // MC68HC05G6
+}
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
+void psx1_state::pse(machine_config &config)
+{
+	CXD8530AQ(config, m_maincpu, XTAL(67'737'600));
 
-	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
+	/* TODO: visible area and refresh rate */
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
-	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
-
-	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
-	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
-MACHINE_CONFIG_END
+	psx_base(config);
+}
 
 ROM_START( psj )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "1.0j", "SCPH-1000/DTL-H1000" ) // 22091994
-	ROMX_LOAD( "ps-10j.bin",    0x000000, 0x080000, CRC(3b601fc8) SHA1(343883a7b555646da8cee54aadd2795b6e7dd070), ROM_BIOS(1) )
+	ROMX_LOAD( "ps-10j.bin",    0x000000, 0x080000, CRC(3b601fc8) SHA1(343883a7b555646da8cee54aadd2795b6e7dd070), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "1.1j", "SCPH-3000/DTL-H1000H (Version 1.1 01/22/95)" ) // 22091994
-	ROMX_LOAD( "ps-11j.bin",    0x000000, 0x080000, CRC(3539def6) SHA1(b06f4a861f74270be819aa2a07db8d0563a7cc4e), ROM_BIOS(2) )
+	ROMX_LOAD( "ps-11j.bin",    0x000000, 0x080000, CRC(3539def6) SHA1(b06f4a861f74270be819aa2a07db8d0563a7cc4e), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS( 2, "2.1j", "SCPH-3500 (Version 2.1 07/17/95 J)" ) // 22091994
-	ROMX_LOAD( "ps-21j.bin",    0x000000, 0x080000, CRC(bc190209) SHA1(e38466a4ba8005fba7e9e3c7b9efeba7205bee3f), ROM_BIOS(3) )
+	ROMX_LOAD( "ps-21j.bin",    0x000000, 0x080000, CRC(bc190209) SHA1(e38466a4ba8005fba7e9e3c7b9efeba7205bee3f), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS( 3, "2.2j", "SCPH-5000/DTL-H1200/DTL-H3000 (Version 2.2 12/04/95 J)" ) // 04121995
-/*  ROMX_LOAD( "ps-22j.bad",    0x000000, 0x080000, BAD_DUMP CRC(8c93a399) SHA1(e340db2696274dda5fdc25e434a914db71e8b02b), ROM_BIOS(4) ) */
-	ROMX_LOAD( "ps-22j.bin",    0x000000, 0x080000, CRC(24fc7e17) SHA1(ffa7f9a7fb19d773a0c3985a541c8e5623d2c30d), ROM_BIOS(4) )
+/*  ROMX_LOAD( "ps-22j.bad",    0x000000, 0x080000, BAD_DUMP CRC(8c93a399) SHA1(e340db2696274dda5fdc25e434a914db71e8b02b), ROM_BIOS(3) ) */
+	ROMX_LOAD( "ps-22j.bin",    0x000000, 0x080000, CRC(24fc7e17) SHA1(ffa7f9a7fb19d773a0c3985a541c8e5623d2c30d), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 4, "2.2d", "DTL-H1100 (Version 2.2 03/06/96 D)" ) // 04121995
-	ROMX_LOAD( "ps-22d.bin",    0x000000, 0x080000, CRC(decb22f5) SHA1(73107d468fc7cb1d2c5b18b269715dd889ecef06), ROM_BIOS(5) )
+	ROMX_LOAD( "ps-22d.bin",    0x000000, 0x080000, CRC(decb22f5) SHA1(73107d468fc7cb1d2c5b18b269715dd889ecef06), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 5, "3.0j", "SCPH-5500 (Version 3.0 09/09/96 J)" ) // 04121995
-	ROMX_LOAD( "ps-30j.bin",    0x000000, 0x080000, CRC(ff3eeb8c) SHA1(b05def971d8ec59f346f2d9ac21fb742e3eb6917), ROM_BIOS(6) )
+	ROMX_LOAD( "ps-30j.bin",    0x000000, 0x080000, CRC(ff3eeb8c) SHA1(b05def971d8ec59f346f2d9ac21fb742e3eb6917), ROM_BIOS(5) )
 
 	ROM_SYSTEM_BIOS( 6, "4.0j", "SCPH-7000/SCPH-7500/SCPH-9000 (Version 4.0 08/18/97 J)" ) // 29051997
-	ROMX_LOAD( "ps-40j.bin",    0x000000, 0x080000, CRC(ec541cd0) SHA1(77b10118d21ac7ffa9b35f9c4fd814da240eb3e9), ROM_BIOS(7) )
+	ROMX_LOAD( "ps-40j.bin",    0x000000, 0x080000, CRC(ec541cd0) SHA1(77b10118d21ac7ffa9b35f9c4fd814da240eb3e9), ROM_BIOS(6) )
 
 	ROM_SYSTEM_BIOS( 7, "4.1a", "SCPH-7000W (Version 4.1 11/14/97 A)" ) // 04121995
-	ROMX_LOAD( "ps-41a,w.bin", 0x000000, 0x080000, CRC(b7c43dad) SHA1(1b0dbdb23da9dc0776aac58d0755dc80fea20975), ROM_BIOS(8) )
+	ROMX_LOAD( "ps-41a,w.bin", 0x000000, 0x080000, CRC(b7c43dad) SHA1(1b0dbdb23da9dc0776aac58d0755dc80fea20975), ROM_BIOS(7) )
 
 	ROM_SYSTEM_BIOS( 8, "4.3j", "SCPH-100 (Version 4.3 03/11/00 J)" ) // 04121995
-	ROMX_LOAD( "psone-43j.bin", 0x000000, 0x080000, CRC(f2af798b) SHA1(339a48f4fcf63e10b5b867b8c93cfd40945faf6c), ROM_BIOS(9) )
+	ROMX_LOAD( "psone-43j.bin", 0x000000, 0x080000, CRC(f2af798b) SHA1(339a48f4fcf63e10b5b867b8c93cfd40945faf6c), ROM_BIOS(8) )
 ROM_END
 
 ROM_START( psu )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "2.0a", "DTL-H1001 (Version 2.0 05/07/95 A)" ) // 22091994
-	ROMX_LOAD( "ps-20a.bin",    0x000000, 0x080000, CRC(55847d8c) SHA1(649895efd79d14790eabb362e94eb0622093dfb9), ROM_BIOS(1) )
+	ROMX_LOAD( "ps-20a.bin",    0x000000, 0x080000, CRC(55847d8c) SHA1(649895efd79d14790eabb362e94eb0622093dfb9), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "2.1a", "DTL-H1101 (Version 2.1 07/17/95 A)" ) // 22091994
-	ROMX_LOAD( "ps-21a.bin",    0x000000, 0x080000, CRC(aff00f2f) SHA1(ca7af30b50d9756cbd764640126c454cff658479), ROM_BIOS(2) )
+	ROMX_LOAD( "ps-21a.bin",    0x000000, 0x080000, CRC(aff00f2f) SHA1(ca7af30b50d9756cbd764640126c454cff658479), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS( 2, "2.2a", "SCPH-1001/DTL-H1201/DTL-H3001 (Version 2.2 12/04/95 A)" ) // 04121995
-	ROMX_LOAD( "ps-22a.bin",    0x000000, 0x080000, CRC(37157331) SHA1(10155d8d6e6e832d6ea66db9bc098321fb5e8ebf), ROM_BIOS(3) )
+	ROMX_LOAD( "ps-22a.bin",    0x000000, 0x080000, CRC(37157331) SHA1(10155d8d6e6e832d6ea66db9bc098321fb5e8ebf), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS( 3, "3.0a", "SCPH-5501/SCPH-5503/SCPH-7003 (Version 3.0 11/18/96 A)" ) // 04121995
-	ROMX_LOAD( "ps-30a.bin",    0x000000, 0x080000, CRC(8d8cb7e4) SHA1(0555c6fae8906f3f09baf5988f00e55f88e9f30b), ROM_BIOS(4) )
+	ROMX_LOAD( "ps-30a.bin",    0x000000, 0x080000, CRC(8d8cb7e4) SHA1(0555c6fae8906f3f09baf5988f00e55f88e9f30b), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 4, "4.1a", "SCPH-7001/SCPH-7501/SCPH-7503/SCPH-9001/SCPH-9003/SCPH-9903 (Version 4.1 12/16/97 A)" ) // 04121995
-	ROMX_LOAD( "ps-41a.bin",    0x000000, 0x080000, CRC(502224b6) SHA1(14df4f6c1e367ce097c11deae21566b4fe5647a9), ROM_BIOS(5) )
+	ROMX_LOAD( "ps-41a.bin",    0x000000, 0x080000, CRC(502224b6) SHA1(14df4f6c1e367ce097c11deae21566b4fe5647a9), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 5, "4.5a", "SCPH-101 (Version 4.5 05/25/00 A)" ) // 04121995
-	ROMX_LOAD( "psone-45a.bin", 0x000000, 0x080000, CRC(171bdcec) SHA1(dcffe16bd90a723499ad46c641424981338d8378), ROM_BIOS(6) )
+	ROMX_LOAD( "psone-45a.bin", 0x000000, 0x080000, CRC(171bdcec) SHA1(dcffe16bd90a723499ad46c641424981338d8378), ROM_BIOS(5) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "ram.ic304",    0x000000, 0x000400, CRC(e9fefc8b) SHA1(7ab4a498216fb9a3fca9daf6ad21b4553126e74f) )
@@ -675,36 +649,36 @@ ROM_START( pse )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "2.0e", "DTL-H1002/SCPH-1002 (Version 2.0 05/10/95 E)" ) // 22091994
-	ROMX_LOAD( "ps-20e.bin",    0x000000, 0x080000, CRC(9bb87c4b) SHA1(20b98f3d80f11cbf5a7bfd0779b0e63760ecc62c), ROM_BIOS(1) )
+	ROMX_LOAD( "ps-20e.bin",    0x000000, 0x080000, CRC(9bb87c4b) SHA1(20b98f3d80f11cbf5a7bfd0779b0e63760ecc62c), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "2.1e", "SCPH-1002/DTL-H1102 (Version 2.1 07/17/95 E)" ) // 22091994
-	ROMX_LOAD( "ps-21e.bin",    0x000000, 0x080000, CRC(86c30531) SHA1(76cf6b1b2a7c571a6ad07f2bac0db6cd8f71e2cc), ROM_BIOS(2) )
+	ROMX_LOAD( "ps-21e.bin",    0x000000, 0x080000, CRC(86c30531) SHA1(76cf6b1b2a7c571a6ad07f2bac0db6cd8f71e2cc), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS( 2, "2.2e", "SCPH-1002/DTL-H1202/DTL-H3002 (Version 2.2 12/04/95 E)" ) // 04121995
-	ROMX_LOAD( "ps-22e.bin",    0x000000, 0x080000, CRC(1e26792f) SHA1(b6a11579caef3875504fcf3831b8e3922746df2c), ROM_BIOS(3) )
+	ROMX_LOAD( "ps-22e.bin",    0x000000, 0x080000, CRC(1e26792f) SHA1(b6a11579caef3875504fcf3831b8e3922746df2c), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS( 3, "3.0e", "SCPH-5502/SCPH-5552 (Version 3.0 01/06/97 E)" ) // 04121995
-/*  ROMX_LOAD( "ps-30e.bad",    0x000000, 0x080000, BAD_DUMP CRC(4d9e7c86) SHA1(f8de9325fc36fcfa4b29124d291c9251094f2e54), ROM_BIOS(4) ) */
-	ROMX_LOAD( "ps-30e.bin",    0x000000, 0x080000, CRC(d786f0b9) SHA1(f6bc2d1f5eb6593de7d089c425ac681d6fffd3f0), ROM_BIOS(4) )
+/*  ROMX_LOAD( "ps-30e.bad",    0x000000, 0x080000, BAD_DUMP CRC(4d9e7c86) SHA1(f8de9325fc36fcfa4b29124d291c9251094f2e54), ROM_BIOS(3) ) */
+	ROMX_LOAD( "ps-30e.bin",    0x000000, 0x080000, CRC(d786f0b9) SHA1(f6bc2d1f5eb6593de7d089c425ac681d6fffd3f0), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS( 4, "4.1e", "SCPH-7002/SCPH-7502/SCPH-9002 (Version 4.1 12/16/97 E)" ) // 04121995
-	ROMX_LOAD( "ps-41e.bin",    0x000000, 0x080000, CRC(318178bf) SHA1(8d5de56a79954f29e9006929ba3fed9b6a418c1d), ROM_BIOS(5) )
+	ROMX_LOAD( "ps-41e.bin",    0x000000, 0x080000, CRC(318178bf) SHA1(8d5de56a79954f29e9006929ba3fed9b6a418c1d), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS( 5, "4.4e", "SCPH-102 (Version 4.4 03/24/00 E)" ) // 04121995
-	ROMX_LOAD( "psone-44e.bin", 0x000000, 0x080000, CRC(0bad7ea9) SHA1(beb0ac693c0dc26daf5665b3314db81480fa5c7c), ROM_BIOS(6) )
+	ROMX_LOAD( "psone-44e.bin", 0x000000, 0x080000, CRC(0bad7ea9) SHA1(beb0ac693c0dc26daf5665b3314db81480fa5c7c), ROM_BIOS(5) )
 
 	ROM_SYSTEM_BIOS( 6, "4.5e", "SCPH-102 (Version 4.5 05/25/00 E)" ) // 04121995
-	ROMX_LOAD( "psone-45e.bin", 0x000000, 0x080000, CRC(76b880e5) SHA1(dbc7339e5d85827c095764fc077b41f78fd2ecae), ROM_BIOS(7) )
+	ROMX_LOAD( "psone-45e.bin", 0x000000, 0x080000, CRC(76b880e5) SHA1(dbc7339e5d85827c095764fc077b41f78fd2ecae), ROM_BIOS(6) )
 ROM_END
 
 ROM_START( psa )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "3.0a", "SCPH-5501/SCPH-5503/SCPH-7003 (Version 3.0 11/18/96 A)" ) // 04121995
-	ROMX_LOAD( "ps-30a.bin",    0x000000, 0x080000, CRC(8d8cb7e4) SHA1(0555c6fae8906f3f09baf5988f00e55f88e9f30b), ROM_BIOS(1) )
+	ROMX_LOAD( "ps-30a.bin",    0x000000, 0x080000, CRC(8d8cb7e4) SHA1(0555c6fae8906f3f09baf5988f00e55f88e9f30b), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "4.1a", "SCPH-7001/SCPH-7501/SCPH-7503/SCPH-9001/SCPH-9003/SCPH-9903 (Version 4.1 12/16/97 A)" ) // 04121995
-	ROMX_LOAD( "ps-41a.bin",    0x000000, 0x080000, CRC(502224b6) SHA1(14df4f6c1e367ce097c11deae21566b4fe5647a9), ROM_BIOS(2) )
+	ROMX_LOAD( "ps-41a.bin",    0x000000, 0x080000, CRC(502224b6) SHA1(14df4f6c1e367ce097c11deae21566b4fe5647a9), ROM_BIOS(1) )
 ROM_END
 
 /*
@@ -738,7 +712,7 @@ Version 4.3 E
 */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                            FULLNAME                            FLAGS
-CONS( 1994, psj,  0,      0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, pse,  psj,    0,      pse,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psu,  psj,    0,      psu,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psa,  psj,    0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1994, psj,  0,      0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, pse,  psj,    0,      pse,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, psu,  psj,    0,      psu,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, psa,  psj,    0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

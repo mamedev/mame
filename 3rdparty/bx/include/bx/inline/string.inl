@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -19,14 +19,13 @@ namespace bx
 		char temp[2048];
 
 		char* out = temp;
-		int32_t len = bx::vsnprintf(out, sizeof(temp), _format, _argList);
-		if ( (int32_t)sizeof(temp) < len)
+		int32_t len = vsnprintf(out, sizeof(temp), _format, _argList);
+		if (int32_t(sizeof(temp) ) < len)
 		{
-			out = (char*)alloca(len+1);
-			len = bx::vsnprintf(out, len, _format, _argList);
+			out = (char*)alloca(len);
+			len = vsnprintf(out, len, _format, _argList);
 		}
-		out[len] = '\0';
-		_out.append(out);
+		_out.append(out, out+len);
 	}
 
 	template <typename Ty>
@@ -59,9 +58,9 @@ namespace bx
 		clear();
 	}
 
-	inline StringView::StringView(const StringView& _rhs)
+	inline StringView::StringView(const StringView& _rhs, int32_t _start, int32_t _len)
 	{
-		set(_rhs.m_ptr, _rhs.m_len);
+		set(_rhs, _start, _len);
 	}
 
 	inline StringView& StringView::operator=(const char* _rhs)
@@ -72,8 +71,23 @@ namespace bx
 
 	inline StringView& StringView::operator=(const StringView& _rhs)
 	{
-		set(_rhs.m_ptr, _rhs.m_len);
+		set(_rhs);
 		return *this;
+	}
+
+	inline StringView::StringView(char* _ptr)
+	{
+		set(_ptr, INT32_MAX);
+	}
+
+	inline StringView::StringView(const char* _ptr)
+	{
+		set(_ptr, INT32_MAX);
+	}
+
+	inline StringView::StringView(char* _ptr, int32_t _len)
+	{
+		set(_ptr, _len);
 	}
 
 	inline StringView::StringView(const char* _ptr, int32_t _len)
@@ -86,18 +100,30 @@ namespace bx
 		set(_ptr, _term);
 	}
 
+	template<typename Ty>
+	inline StringView::StringView(const Ty& _container)
+	{
+		set(_container);
+	}
+
+	inline void StringView::set(char* _ptr)
+	{
+		set(_ptr, INT32_MAX);
+	}
+
+	inline void StringView::set(const char* _ptr)
+	{
+		set(_ptr, INT32_MAX);
+	}
+
 	inline void StringView::set(const char* _ptr, int32_t _len)
 	{
 		clear();
 
 		if (NULL != _ptr)
 		{
-			int32_t len = strLen(_ptr, _len);
-			if (0 != len)
-			{
-				m_len = len;
-				m_ptr = _ptr;
-			}
+			m_len = INT32_MAX == _len ? strLen(_ptr) : _len;
+			m_ptr = _ptr;
 		}
 	}
 
@@ -106,9 +132,17 @@ namespace bx
 		set(_ptr, int32_t(_term-_ptr) );
 	}
 
-	inline void StringView::set(const StringView& _str)
+	template<typename Ty>
+	inline void StringView::set(const Ty& _container)
 	{
-		set(_str.m_ptr, _str.m_len);
+		set(_container.data(), int32_t(_container.length() ) );
+	}
+
+	inline void StringView::set(const StringView& _str, int32_t _start, int32_t _len)
+	{
+		const int32_t start = min(_start, _str.m_len);
+		const int32_t len   = clamp(_str.m_len - start, 0, min(_len, _str.m_len) );
+		set(_str.m_ptr + start, len);
 	}
 
 	inline void StringView::clear()
@@ -200,6 +234,11 @@ namespace bx
 
 			StringView::clear();
 		}
+	}
+
+	inline StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len)
+	{
+		return StringView(_str, _start, _len);
 	}
 
 } // namespace bx

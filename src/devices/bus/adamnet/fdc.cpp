@@ -45,21 +45,21 @@ ROM_START( adam_fdc )
 	ROM_REGION( 0x1000, M6801_TAG, 0 )
 	ROM_DEFAULT_BIOS("ssdd")
 	ROM_SYSTEM_BIOS( 0, "ssdd", "Coleco 160KB SSDD" )
-	ROMX_LOAD( "adam disk u10 ad 31 rev a 09-27-84.u10", 0x0000, 0x1000, CRC(4b0b7143) SHA1(1cb68891c3af80e99efad7e309136ca37244f060), ROM_BIOS(1) )
+	ROMX_LOAD( "adam disk u10 ad 31 rev a 09-27-84.u10", 0x0000, 0x1000, CRC(4b0b7143) SHA1(1cb68891c3af80e99efad7e309136ca37244f060), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "320ta", "320KB DSDD (Minh Ta?)" )
-	ROMX_LOAD( "320ta.u10", 0x0000, 0x1000, CRC(dcd865b3) SHA1(dde583e0d18ce4406e9ea44ab34d083e73ee30e2), ROM_BIOS(2) )
+	ROMX_LOAD( "320ta.u10", 0x0000, 0x1000, CRC(dcd865b3) SHA1(dde583e0d18ce4406e9ea44ab34d083e73ee30e2), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "dbl24", "320KB DSDD (DBL)" )
-	ROMX_LOAD( "dbl2-4.u10", 0x0000, 0x1000, CRC(5df49f15) SHA1(43d5710e4fb05f520e813869a049585b41ada86b), ROM_BIOS(3) )
+	ROMX_LOAD( "dbl2-4.u10", 0x0000, 0x1000, CRC(5df49f15) SHA1(43d5710e4fb05f520e813869a049585b41ada86b), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "320doug", "320KB DSDD (Doug Slopsema)" )
-	ROMX_LOAD( "doug.u10", 0x0000, 0x1000, CRC(2b2a9c6d) SHA1(e40304cbb6b9f174d9f5762d920983c79c899b3e), ROM_BIOS(4) )
+	ROMX_LOAD( "doug.u10", 0x0000, 0x1000, CRC(2b2a9c6d) SHA1(e40304cbb6b9f174d9f5762d920983c79c899b3e), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "a720dipi", "720KB 3.5\" A720DIPI 7607 MMSG" )
-	ROMX_LOAD( "a720dipi 7607 mmsg =c= 1988.u10", 0x0000, 0x1000, CRC(5f248557) SHA1(15b3aaebba38af84f6a1a6ccdf840ca3d58635da), ROM_BIOS(5) )
+	ROMX_LOAD( "a720dipi 7607 mmsg =c= 1988.u10", 0x0000, 0x1000, CRC(5f248557) SHA1(15b3aaebba38af84f6a1a6ccdf840ca3d58635da), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "fp720at", "720KB 3.5\" FastPack 720A(T)" )
-	ROMX_LOAD( "fastpack 720a,t.u10", 0x0000, 0x1000, CRC(8f952c88) SHA1(e593a89d7c6e7ea99e7ce376ffa2732d7b646d49), ROM_BIOS(6) )
+	ROMX_LOAD( "fastpack 720a,t.u10", 0x0000, 0x1000, CRC(8f952c88) SHA1(e593a89d7c6e7ea99e7ce376ffa2732d7b646d49), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "mihddd", "1.44MB 3.5\" Micro Innovations HD-DD" )
-	ROMX_LOAD( "1440k micro innovations hd-dd.u10", 0x0000, 0x1000, CRC(2efec8c0) SHA1(f6df22339c93dca938b65d0cbe23abcad89ec230), ROM_BIOS(7) )
+	ROMX_LOAD( "1440k micro innovations hd-dd.u10", 0x0000, 0x1000, CRC(2efec8c0) SHA1(f6df22339c93dca938b65d0cbe23abcad89ec230), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 7, "pmhd", "1.44MB 3.5\" Powermate High Density" )
-	ROMX_LOAD( "pmhdfdc.u10", 0x0000, 0x1000, CRC(fed4006c) SHA1(bc8dd00dd5cde9500a4cd7dc1e4d74330184472a), ROM_BIOS(8) )
+	ROMX_LOAD( "pmhdfdc.u10", 0x0000, 0x1000, CRC(fed4006c) SHA1(bc8dd00dd5cde9500a4cd7dc1e4d74330184472a), ROM_BIOS(7) )
 ROM_END
 
 
@@ -90,22 +90,9 @@ void adam_fdc_device::adam_fdc_mem(address_map &map)
 	map(0x4800, 0x4800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::sector_r));
 	map(0x5800, 0x5800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::sector_w));
 	map(0x6800, 0x6800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::data_r));
-	map(0x6c00, 0x6fff).r(this, FUNC(adam_fdc_device::data_r));
+	map(0x6c00, 0x6fff).r(FUNC(adam_fdc_device::data_r));
 	map(0x7800, 0x7800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::data_w));
 	map(0x8000, 0x8fff).mirror(0x7000).rom().region(M6801_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( fdc6801_io )
-//-------------------------------------------------
-
-void adam_fdc_device::adam_fdc_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(adam_fdc_device::p1_r), FUNC(adam_fdc_device::p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_fdc_device::p2_r), FUNC(adam_fdc_device::p2_w));
-	map(M6801_PORT3, M6801_PORT3);
-	map(M6801_PORT4, M6801_PORT4);
 }
 
 
@@ -127,16 +114,20 @@ static void adam_fdc_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(adam_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6801_TAG, M6801, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(adam_fdc_mem)
-	MCFG_DEVICE_IO_MAP(adam_fdc_io)
+void adam_fdc_device::device_add_mconfig(machine_config &config)
+{
+	M6801(config, m_maincpu, 4_MHz_XTAL),
+	m_maincpu->set_addrmap(AS_PROGRAM, &adam_fdc_device::adam_fdc_mem);
+	m_maincpu->in_p1_cb().set(FUNC(adam_fdc_device::p1_r));
+	m_maincpu->out_p1_cb().set(FUNC(adam_fdc_device::p1_w));
+	m_maincpu->in_p2_cb().set(FUNC(adam_fdc_device::p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(adam_fdc_device::p2_w));
 
-	MCFG_WD2793_ADD(WD2793_TAG, XTAL(4'000'000)/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(M6801_TAG, INPUT_LINE_NMI))
+	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_connector, adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats);
+}
 
 
 //-------------------------------------------------

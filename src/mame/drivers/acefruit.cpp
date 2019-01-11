@@ -14,6 +14,7 @@ Inputs and Dip Switches by Stephh
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "sidewndr.lh"
@@ -22,11 +23,6 @@ Inputs and Dip Switches by Stephh
 class acefruit_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_ACEFRUIT_REFRESH
-	};
-
 	acefruit_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -43,26 +39,32 @@ public:
 		m_refresh_timer(nullptr)
 	{ }
 
+	void acefruit(machine_config &config);
+
 	void init_sidewndr();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
 
-	void acefruit(machine_config &config);
-
 protected:
+	enum
+	{
+		TIMER_ACEFRUIT_REFRESH
+	};
+
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
 	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
 	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
 	DECLARE_WRITE8_MEMBER(acefruit_lamp_w);
 	DECLARE_WRITE8_MEMBER(acefruit_solenoid_w);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	DECLARE_PALETTE_INIT(acefruit);
+	void acefruit_palette(palette_device &palette) const;
 	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
 	void acefruit_update_irq(int vpos);
@@ -70,7 +72,6 @@ protected:
 	void acefruit_io(address_map &map);
 	void acefruit_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -309,7 +310,7 @@ WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 		m_solenoids[i] = BIT(data, i);
 }
 
-PALETTE_INIT_MEMBER(acefruit_state, acefruit)
+void acefruit_state::acefruit_palette(palette_device &palette) const
 {
 	/* sprites */
 	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00) );
@@ -337,7 +338,7 @@ void acefruit_state::acefruit_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x20ff).ram().share("nvram");
 	map(0x4000, 0x43ff).ram().share("videoram");
-	map(0x4400, 0x47ff).ram().w(this, FUNC(acefruit_state::acefruit_colorram_w)).share("colorram");
+	map(0x4400, 0x47ff).ram().w(FUNC(acefruit_state::acefruit_colorram_w)).share("colorram");
 	map(0x8000, 0x8000).portr("IN0");
 	map(0x8001, 0x8001).portr("IN1");
 	map(0x8002, 0x8002).portr("IN2");
@@ -347,10 +348,10 @@ void acefruit_state::acefruit_map(address_map &map)
 	map(0x8006, 0x8006).portr("IN6");
 	map(0x8007, 0x8007).portr("IN7");
 	map(0x6000, 0x6005).ram().share("spriteram");
-	map(0xa000, 0xa001).w(this, FUNC(acefruit_state::acefruit_lamp_w));
-	map(0xa002, 0xa003).w(this, FUNC(acefruit_state::acefruit_coin_w));
-	map(0xa004, 0xa004).w(this, FUNC(acefruit_state::acefruit_solenoid_w));
-	map(0xa005, 0xa006).w(this, FUNC(acefruit_state::acefruit_sound_w));
+	map(0xa000, 0xa001).w(FUNC(acefruit_state::acefruit_lamp_w));
+	map(0xa002, 0xa003).w(FUNC(acefruit_state::acefruit_coin_w));
+	map(0xa004, 0xa004).w(FUNC(acefruit_state::acefruit_solenoid_w));
+	map(0xa005, 0xa006).w(FUNC(acefruit_state::acefruit_sound_w));
 	map(0xc000, 0xc000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe000, 0xffff).rom();
 }
@@ -633,9 +634,9 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	MCFG_DEVICE_IO_MAP(acefruit_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_acefruit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_acefruit);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -644,13 +645,11 @@ MACHINE_CONFIG_START(acefruit_state::acefruit)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(acefruit_state, screen_update_acefruit)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(acefruit_state, acefruit)
+	PALETTE(config, m_palette, FUNC(acefruit_state::acefruit_palette), 16);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

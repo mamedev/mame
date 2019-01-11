@@ -29,6 +29,7 @@
 #include "machine/nvram.h"
 #include "sound/es8712.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -36,14 +37,18 @@
 class d9final_state : public driver_device
 {
 public:
-	d9final_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	d9final_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lo_vram(*this, "lo_vram"),
 		m_hi_vram(*this, "hi_vram"),
-		m_cram(*this, "cram") { }
+		m_cram(*this, "cram")
+	{ }
 
+	void d9final(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -65,7 +70,6 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void d9final(machine_config &config);
 	void d9final_io(address_map &map);
 	void d9final_map(address_map &map);
 };
@@ -133,10 +137,10 @@ void d9final_state::d9final_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("nvram");
 	map(0xc800, 0xcbff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xcc00, 0xcfff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(d9final_state::sc0_lovram)).share("lo_vram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(d9final_state::sc0_hivram)).share("hi_vram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(d9final_state::sc0_cram)).share("cram");
-	map(0xf000, 0xf007).r(this, FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share("lo_vram");
+	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share("hi_vram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share("cram");
+	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 }
 
@@ -150,7 +154,7 @@ void d9final_state::d9final_io(address_map &map)
 	map(0x40, 0x41).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x60, 0x60).portr("DSWD");
 	map(0x80, 0x80).portr("IN0");
-	map(0xa0, 0xa0).portr("IN1").w(this, FUNC(d9final_state::bank_w));
+	map(0xa0, 0xa0).portr("IN1").w(FUNC(d9final_state::bank_w));
 	map(0xe0, 0xe0).portr("IN2");
 }
 
@@ -305,7 +309,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_DEVICE_IO_MAP(d9final_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // Sharp LH5116D-10 + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -317,8 +321,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_d9final)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBRG_444, 0x400);
 
 	SPEAKER(config, "mono").front_center();
 

@@ -56,6 +56,7 @@ SC-61.5A
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "sound/sn76496.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -65,17 +66,27 @@ class sprcros2_state : public driver_device
 {
 public:
 	sprcros2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_master_cpu(*this, "master_cpu"),
-			m_slave_cpu(*this, "slave_cpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_fgvram(*this, "fgvram"),
-			m_fgattr(*this, "fgattr"),
-			m_bgvram(*this, "bgvram"),
-			m_bgattr(*this, "bgattr"),
-			m_sprram(*this, "sprram")
+		: driver_device(mconfig, type, tag)
+		, m_master_cpu(*this, "master_cpu")
+		, m_slave_cpu(*this, "slave_cpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_fgvram(*this, "fgvram")
+		, m_fgattr(*this, "fgattr")
+		, m_bgvram(*this, "bgvram")
+		, m_bgattr(*this, "bgattr")
+		, m_sprram(*this, "sprram")
 	{ }
 
+	void sprcros2(machine_config &config);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void video_start() override;
+
+private:
 	// devices
 	required_device<cpu_device> m_master_cpu;
 	required_device<cpu_device> m_slave_cpu;
@@ -87,10 +98,15 @@ public:
 	required_shared_ptr<uint8_t> m_bgattr;
 	required_shared_ptr<uint8_t> m_sprram;
 
+	bool m_master_nmi_enable;
+	bool m_master_irq_enable;
+	bool m_slave_nmi_enable;
+	bool m_screen_enable;
+	uint8_t m_bg_scrollx, m_bg_scrolly;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(sprcros2);
+	void sprcros2_palette(palette_device &palette) const;
 	DECLARE_WRITE8_MEMBER(master_output_w);
 	DECLARE_WRITE8_MEMBER(slave_output_w);
 	DECLARE_WRITE8_MEMBER(bg_scrollx_w);
@@ -99,24 +115,11 @@ public:
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
 
-	bool m_master_nmi_enable;
-	bool m_master_irq_enable;
-	bool m_slave_nmi_enable;
-	bool m_screen_enable;
-	uint8_t m_bg_scrollx, m_bg_scrolly;
-	void sprcros2(machine_config &config);
 	void master_io(address_map &map);
 	void master_map(address_map &map);
 	void slave_io(address_map &map);
 	void slave_map(address_map &map);
-protected:
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
-	virtual void video_start() override;
-
-private:
 	void legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_fg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -257,12 +260,12 @@ void sprcros2_state::master_map(address_map &map)
 void sprcros2_state::master_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::write));
-	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::write));
-	map(0x02, 0x02).portr("EXTRA").w("sn3", FUNC(sn76489_device::write));
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::command_w));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::command_w));
+	map(0x02, 0x02).portr("EXTRA").w("sn3", FUNC(sn76489_device::command_w));
 	map(0x04, 0x04).portr("DSW1");
 	map(0x05, 0x05).portr("DSW2");
-	map(0x07, 0x07).w(this, FUNC(sprcros2_state::master_output_w));
+	map(0x07, 0x07).w(FUNC(sprcros2_state::master_output_w));
 }
 
 void sprcros2_state::slave_map(address_map &map)
@@ -278,9 +281,9 @@ void sprcros2_state::slave_map(address_map &map)
 void sprcros2_state::slave_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(sprcros2_state::bg_scrollx_w));
-	map(0x01, 0x01).w(this, FUNC(sprcros2_state::bg_scrolly_w));
-	map(0x03, 0x03).w(this, FUNC(sprcros2_state::slave_output_w));
+	map(0x00, 0x00).w(FUNC(sprcros2_state::bg_scrollx_w));
+	map(0x01, 0x01).w(FUNC(sprcros2_state::bg_scrolly_w));
+	map(0x03, 0x03).w(FUNC(sprcros2_state::slave_output_w));
 }
 
 static INPUT_PORTS_START( sprcros2 )
@@ -380,50 +383,48 @@ void sprcros2_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
+void sprcros2_state::sprcros2_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = 0x47 * bit0 + 0xb8 * bit1;
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x47 * bit0 + 0xb8 * bit1;
 
+		palette.set_pen_color(i, rgb_t(r, g, b));
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x20;
 
-	/* bg */
-	for (i = 0; i < 0x100; i++)
+	// bg
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = (color_prom[i] & 0x0f) | ((color_prom[i + 0x100] & 0x0f) << 4);
+		uint8_t const ctabentry = (color_prom[i] & 0x0f) | ((color_prom[i + 0x100] & 0x0f) << 4);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* sprites & fg */
-	for (i = 0x100; i < 0x300; i++)
+	// sprites & fg
+	for (int i = 0x100; i < 0x300; i++)
 	{
 		uint8_t ctabentry = color_prom[i + 0x100];
 		palette.set_pen_indirect(i, ctabentry);
@@ -473,22 +474,15 @@ MACHINE_CONFIG_START(sprcros2_state::sprcros2)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 343, 8, 256-8, 262, 16, 240) // TODO: Wrong screen parameters
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprcros2)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_sprcros2);
 
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(sprcros2_state, sprcros2)
+	PALETTE(config, "palette", FUNC(sprcros2_state::sprcros2_palette), 768, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn2", SN76489, 10000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn3", SN76489, 10000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489(config, "sn1", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn2", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn3", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 

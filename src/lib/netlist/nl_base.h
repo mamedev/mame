@@ -28,7 +28,11 @@
 // Type definitions
 // ----------------------------------------------------------------------------------------
 
-/*! netlist_sig_t is the type used for logic signals. */
+/*! @brief netlist_sig_t is the type used for logic signals.
+ *
+ *  This may be any of bool, uint8_t, uint16_t, uin32_t and uint64_t.
+ *  The choice has little to no impact on performance.
+ */
 using netlist_sig_t = std::uint32_t;
 
 //============================================================
@@ -149,7 +153,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
 
 // FIXME: NETLIB_PARENT_UPDATE should disappear
-#define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update();
+#define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update()
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
@@ -649,7 +653,7 @@ namespace netlist
 				nldelegate delegate = nldelegate());
 		virtual ~logic_input_t();
 
-		netlist_sig_t operator()() const NL_NOEXCEPT
+		const netlist_sig_t &operator()() const NL_NOEXCEPT
 		{
 			return Q();
 		}
@@ -659,7 +663,7 @@ namespace netlist
 		void activate_hl() NL_NOEXCEPT;
 		void activate_lh() NL_NOEXCEPT;
 	private:
-		netlist_sig_t Q() const NL_NOEXCEPT;
+		const netlist_sig_t &Q() const NL_NOEXCEPT;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -737,8 +741,8 @@ namespace netlist
 
 		std::size_t num_cons() const NL_NOEXCEPT { return m_core_terms.size(); }
 
-		void inc_active(core_terminal_t &term) NL_NOEXCEPT;
-		void dec_active(core_terminal_t &term) NL_NOEXCEPT;
+		void add_to_active_list(core_terminal_t &term) NL_NOEXCEPT;
+		void remove_from_active_list(core_terminal_t &term) NL_NOEXCEPT;
 
 		/* setup stuff */
 
@@ -757,7 +761,6 @@ namespace netlist
 		state_var<netlist_sig_t> m_new_Q;
 		state_var<netlist_sig_t> m_cur_Q;
 		state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
-		state_var_s32            m_active;
 
 		state_var<netlist_time>  m_time;
 
@@ -765,7 +768,7 @@ namespace netlist
 		plib::linkedlist_t<core_terminal_t> m_list_active;
 		core_terminal_t * m_railterminal;
 
-		void process(unsigned Mask);
+		void process(const unsigned &mask);
 	};
 
 	class logic_net_t : public detail::net_t
@@ -775,10 +778,10 @@ namespace netlist
 		logic_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t();
 
-		netlist_sig_t Q() const NL_NOEXCEPT { return m_cur_Q; }
+		inline const netlist_sig_t & Q() const NL_NOEXCEPT { return m_cur_Q; }
 		void initial(const netlist_sig_t val) NL_NOEXCEPT { m_cur_Q = m_new_Q = val; }
 
-		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		inline void set_Q_and_push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q )
 			{
@@ -786,7 +789,7 @@ namespace netlist
 				push_to_queue(delay);
 			}
 		}
-		void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		inline void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q || is_queued())
 			{
@@ -795,7 +798,7 @@ namespace netlist
 			}
 		}
 
-		void set_Q_time(const netlist_sig_t newQ, const netlist_time &at) NL_NOEXCEPT
+		inline void set_Q_time(const netlist_sig_t newQ, const netlist_time &at) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q)
 			{
@@ -1094,9 +1097,9 @@ namespace netlist
 		void set_default_delegate(detail::core_terminal_t &term);
 
 		/* stats */
-		nperftime_t  m_stat_total_time;
-		nperfcount_t m_stat_call_count;
-		nperfcount_t m_stat_inc_active;
+		nperftime_t<NL_KEEP_STATISTICS>  m_stat_total_time;
+		nperfcount_t<NL_KEEP_STATISTICS> m_stat_call_count;
+		nperfcount_t<NL_KEEP_STATISTICS> m_stat_inc_active;
 
 
 	protected:
@@ -1190,7 +1193,7 @@ namespace netlist
 	 * solvers will update inputs after parallel processing.
 	 */
 	class detail::queue_t :
-			public timed_queue<pqentry_t<net_t *, netlist_time>, false>,
+			public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{
@@ -1221,6 +1224,14 @@ namespace netlist
 
 		explicit netlist_t(const pstring &aname);
 		virtual ~netlist_t();
+
+		/**
+		 * @brief Load base libraries for diodes, transistors ...
+		 *
+		 * This must be called after netlist_t is created.
+		 *
+		 */
+		void load_base_libraries();
 
 		/* run functions */
 
@@ -1317,7 +1328,7 @@ namespace netlist
 	private:
 
 		/* helper for save above */
-		static pstring from_utf8(const char *c) { return pstring(c, pstring::UTF8); }
+		static pstring from_utf8(const char *c) { return pstring(c); }
 		static pstring from_utf8(const pstring &c) { return c; }
 
 		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
@@ -1340,8 +1351,8 @@ namespace netlist
 		plib::state_manager_t               m_state;
 
 		// performance
-		nperftime_t     m_stat_mainloop;
-		nperfcount_t    m_perf_out_processed;
+		nperftime_t<NL_KEEP_STATISTICS>     m_stat_mainloop;
+		nperfcount_t<NL_KEEP_STATISTICS>    m_perf_out_processed;
 
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
 };
@@ -1358,10 +1369,11 @@ namespace netlist
 		{
 			const char *p[N];
 		};
-		object_array_t(core_device_t &dev, init names)
+		template<typename... Args>
+		object_array_t(core_device_t &dev, init names, Args&&... args)
 		{
 			for (std::size_t i = 0; i<N; i++)
-				this->emplace(i, dev, pstring(names.p[i], pstring::UTF8));
+				this->emplace(i, dev, pstring(names.p[i]), std::forward<Args>(args)...);
 		}
 	};
 
@@ -1385,7 +1397,7 @@ namespace netlist
 		if (!is_state(STATE_INP_PASSIVE))
 		{
 			set_state(STATE_INP_PASSIVE);
-			net().dec_active(*this);
+			net().remove_from_active_list(*this);
 		}
 	}
 
@@ -1393,7 +1405,7 @@ namespace netlist
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
-			net().inc_active(*this);
+			net().add_to_active_list(*this);
 			set_state(STATE_INP_ACTIVE);
 		}
 	}
@@ -1402,7 +1414,7 @@ namespace netlist
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
-			net().inc_active(*this);
+			net().add_to_active_list(*this);
 			set_state(STATE_INP_HL);
 		}
 	}
@@ -1411,7 +1423,7 @@ namespace netlist
 	{
 		if (is_state(STATE_INP_PASSIVE))
 		{
-			net().inc_active(*this);
+			net().add_to_active_list(*this);
 			set_state(STATE_INP_LH);
 		}
 	}
@@ -1423,7 +1435,7 @@ namespace netlist
 			if (is_queued())
 				netlist().queue().remove(this);
 			m_time = netlist().time() + delay;
-			m_in_queue = (m_active > 0) ? QS_QUEUED : QS_DELAYED_DUE_TO_INACTIVE;    /* queued ? */
+			m_in_queue = (!m_list_active.empty()) ? QS_QUEUED : QS_DELAYED_DUE_TO_INACTIVE;    /* queued ? */
 			if (m_in_queue == QS_QUEUED)
 				netlist().queue().push(queue_t::entry_t(m_time, this));
 		}
@@ -1451,7 +1463,7 @@ namespace netlist
 		return static_cast<const logic_net_t &>(core_terminal_t::net());
 	}
 
-	inline netlist_sig_t logic_input_t::Q() const NL_NOEXCEPT
+	inline const netlist_sig_t & logic_input_t::Q() const NL_NOEXCEPT
 	{
 		nl_assert(state() != STATE_INP_PASSIVE);
 		return net().Q();

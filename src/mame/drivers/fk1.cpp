@@ -15,18 +15,22 @@
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 
 class fk1_state : public driver_device
 {
 public:
-	fk1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fk1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG)
 	{ }
 
+	void fk1(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
@@ -62,7 +66,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(fk1_irq_callback);
-	void fk1(machine_config &config);
 	void fk1_io(address_map &map);
 	void fk1_mem(address_map &map);
 };
@@ -324,12 +327,11 @@ void fk1_state::fk1_io(address_map &map)
 	map(0x00, 0x03).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x20, 0x23).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x30).rw(this, FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
-	map(0x40, 0x40).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x50, 0x50).rw(this, FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
+	map(0x30, 0x30).rw(FUNC(fk1_state::fk1_bank_ram_r), FUNC(fk1_state::fk1_intr_w));
+	map(0x40, 0x41).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x50, 0x50).rw(FUNC(fk1_state::fk1_bank_rom_r), FUNC(fk1_state::fk1_disk_w));
 	map(0x60, 0x63).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x70, 0x70).rw(this, FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
+	map(0x70, 0x70).rw(FUNC(fk1_state::fk1_mouse_r), FUNC(fk1_state::fk1_reset_int_w));
 }
 
 /* Input ports */
@@ -426,44 +428,43 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(50)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out0))
-	MCFG_PIT8253_CLK1(1000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out1))
-	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, fk1_state, fk1_pit_out2))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(50);
+	pit8253.out_handler<0>().set(FUNC(fk1_state::fk1_pit_out0));
+	pit8253.set_clk<1>(1000000);
+	pit8253.out_handler<1>().set(FUNC(fk1_state::fk1_pit_out1));
+	pit8253.set_clk<2>(0);
+	pit8253.out_handler<2>().set(FUNC(fk1_state::fk1_pit_out2));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, fk1_state, fk1_ppi_1_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_1_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_1_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fk1_state, fk1_ppi_1_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_1_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_1_c_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set(FUNC(fk1_state::fk1_ppi_1_a_r));
+	ppi1.out_pa_callback().set(FUNC(fk1_state::fk1_ppi_1_a_w));
+	ppi1.in_pb_callback().set(FUNC(fk1_state::fk1_ppi_1_b_r));
+	ppi1.out_pb_callback().set(FUNC(fk1_state::fk1_ppi_1_b_w));
+	ppi1.in_pc_callback().set(FUNC(fk1_state::fk1_ppi_1_c_r));
+	ppi1.out_pc_callback().set(FUNC(fk1_state::fk1_ppi_1_c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_2_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_2_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_2_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_2_c_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.out_pa_callback().set(FUNC(fk1_state::fk1_ppi_2_a_w));
+	ppi2.in_pb_callback().set(FUNC(fk1_state::fk1_ppi_2_b_r));
+	ppi2.in_pc_callback().set(FUNC(fk1_state::fk1_ppi_2_c_r));
+	ppi2.out_pc_callback().set(FUNC(fk1_state::fk1_ppi_2_c_w));
 
-	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, fk1_state, fk1_ppi_3_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, fk1_state, fk1_ppi_3_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, fk1_state, fk1_ppi_3_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, fk1_state, fk1_ppi_3_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, fk1_state, fk1_ppi_3_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, fk1_state, fk1_ppi_3_c_w))
+	i8255_device &ppi3(I8255(config, "ppi8255_3"));
+	ppi3.in_pa_callback().set(FUNC(fk1_state::fk1_ppi_3_a_r));
+	ppi3.out_pa_callback().set(FUNC(fk1_state::fk1_ppi_3_a_w));
+	ppi3.in_pb_callback().set(FUNC(fk1_state::fk1_ppi_3_b_r));
+	ppi3.out_pb_callback().set(FUNC(fk1_state::fk1_ppi_3_b_w));
+	ppi3.in_pc_callback().set(FUNC(fk1_state::fk1_ppi_3_c_r));
+	ppi3.out_pc_callback().set(FUNC(fk1_state::fk1_ppi_3_c_w));
 
 	/* uart */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
+	I8251(config, "uart", 0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("80K") // 64 + 16
+	RAM(config, RAM_TAG).set_default_size("80K"); // 64 + 16
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", fk1_state, keyboard_callback, attotime::from_hz(24000))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("vsync_timer", fk1_state, vsync_callback, attotime::from_hz(50))
@@ -473,9 +474,9 @@ MACHINE_CONFIG_END
 ROM_START( fk1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original BIOS" )
-	ROMX_LOAD( "fk1.u65",      0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(1))
+	ROMX_LOAD( "fk1.u65",      0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "diag", "Diag BIOS" )
-	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(2))
+	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

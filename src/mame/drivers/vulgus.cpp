@@ -69,12 +69,12 @@ void vulgus_state::main_map(address_map &map)
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).nopw(); // ?
 	map(0xc802, 0xc803).ram().share("scroll_low");
-	map(0xc804, 0xc804).w(this, FUNC(vulgus_state::c804_w));
-	map(0xc805, 0xc805).w(this, FUNC(vulgus_state::palette_bank_w));
+	map(0xc804, 0xc804).w(FUNC(vulgus_state::c804_w));
+	map(0xc805, 0xc805).w(FUNC(vulgus_state::palette_bank_w));
 	map(0xc902, 0xc903).ram().share("scroll_high");
 	map(0xcc00, 0xcc7f).ram().share("spriteram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(vulgus_state::fgvideoram_w)).share("fgvideoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(vulgus_state::bgvideoram_w)).share("bgvideoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(vulgus_state::fgvideoram_w)).share("fgvideoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(vulgus_state::bgvideoram_w)).share("bgvideoram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -234,24 +234,20 @@ MACHINE_CONFIG_START(vulgus_state::vulgus)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vulgus)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_vulgus)
 
-	MCFG_PALETTE_ADD("palette", 64*4+16*16+4*32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(vulgus_state, vulgus)
+	PALETTE(config, m_palette, FUNC(vulgus_state::vulgus_palette), 64*4+16*16+4*32*8, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5 MHz */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5 MHz */
 MACHINE_CONFIG_END
 
 

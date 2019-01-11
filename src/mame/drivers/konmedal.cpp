@@ -40,6 +40,7 @@ K051649 (sound)
 #include "video/k054156_k054157_k056832.h"
 #include "video/k052109.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -56,7 +57,12 @@ public:
 		m_oki(*this, "oki")
 	{ }
 
-	DECLARE_PALETTE_INIT(konmedal);
+	void shuriboy(machine_config &config);
+	void ddboy(machine_config &config);
+	void tsukande(machine_config &config);
+
+private:
+	void konmedal_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(shuriboy);
 
 	DECLARE_READ8_MEMBER(vram_r);
@@ -85,18 +91,14 @@ public:
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
-	void shuriboy(machine_config &config);
-	void ddboy(machine_config &config);
-	void tsukande(machine_config &config);
 	void ddboy_main(address_map &map);
 	void medal_main(address_map &map);
 	void shuriboy_main(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<k056832_device> m_k056832;
 	optional_device<k052109_device> m_k052109;
@@ -197,18 +199,17 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(konmedal_state, konmedal)
+void konmedal_state::konmedal_palette(palette_device &palette) const
 {
-	int i;
-	uint8_t *PROM = memregion("proms")->base();
+	uint8_t const *const PROM = memregion("proms")->base();
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		// this is extremely wrong, see the color test screen
 		palette.set_pen_color(i,
-			PROM[i]<<4,
-			PROM[0x100+i]<<4,
-			PROM[0x200+i]<<4);
+				PROM[i] << 4,
+				PROM[0x100 + i] << 4,
+				PROM[0x200 + i] << 4);
 	}
 }
 
@@ -232,17 +233,17 @@ void konmedal_state::medal_main(address_map &map)
 	map(0xa000, 0xafff).ram(); // work RAM?
 	map(0xb800, 0xbfff).ram(); // stack goes here
 	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
-	map(0xc100, 0xc100).w(this, FUNC(konmedal_state::control2_w));
-	map(0xc400, 0xc400).w(this, FUNC(konmedal_state::bankswitch_w));
+	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).noprw(); // read to reset watchdog
 	map(0xc700, 0xc700).portr("DSW2");
 	map(0xc701, 0xc701).portr("DSW1");
 	map(0xc702, 0xc702).portr("IN1");
 	map(0xc703, 0xc703).portr("IN2");
 	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
-	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
+	map(0xc80f, 0xc80f).r(FUNC(konmedal_state::magic_r));
 	map(0xd000, 0xd001).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
-	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
 }
 
 void konmedal_state::ddboy_main(address_map &map)
@@ -251,17 +252,17 @@ void konmedal_state::ddboy_main(address_map &map)
 	map(0x8000, 0x9fff).bankr("bank1");
 	map(0xa000, 0xbfff).ram(); // work RAM
 	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
-	map(0xc100, 0xc100).w(this, FUNC(konmedal_state::control2_w));
-	map(0xc400, 0xc400).w(this, FUNC(konmedal_state::bankswitch_w));
+	map(0xc100, 0xc100).w(FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(FUNC(konmedal_state::bankswitch_w));
 	map(0xc500, 0xc500).noprw(); // read to reset watchdog
 	map(0xc702, 0xc702).portr("IN1");
 	map(0xc703, 0xc703).portr("IN2");
 	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
-	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
+	map(0xc80f, 0xc80f).r(FUNC(konmedal_state::magic_r));
 	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
 	map(0xd800, 0xd8ff).m("k051649", FUNC(k051649_device::scc_map));
-	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
 }
 
 void konmedal_state::shuriboy_main(address_map &map)
@@ -273,15 +274,15 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8802, 0x8802).portr("DSW1");
 	map(0x8803, 0x8803).portr("DSW2");
 	map(0x8b00, 0x8b00).nopw();    // watchdog?
-	map(0x8c00, 0x8c00).w(this, FUNC(konmedal_state::shuri_bank_w));
+	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
-	map(0xdd00, 0xdd00).rw(this, FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
-	map(0xdd80, 0xdd80).w(this, FUNC(konmedal_state::shuri_control_w));
-	map(0xde00, 0xde00).w(this, FUNC(konmedal_state::shuri_vrom_addr_w));
-	map(0xdf00, 0xdf00).w(this, FUNC(konmedal_state::shuri_vrom_bank_w));
-	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
+	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
+	map(0xdd80, 0xdd80).w(FUNC(konmedal_state::shuri_control_w));
+	map(0xde00, 0xde00).w(FUNC(konmedal_state::shuri_vrom_addr_w));
+	map(0xdf00, 0xdf00).w(FUNC(konmedal_state::shuri_vrom_bank_w));
+	map(0xe000, 0xffff).rw(FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
 }
 
 static INPUT_PORTS_START( konmedal )
@@ -379,74 +380,71 @@ void konmedal_state::machine_reset()
 	m_control = m_control2 = m_shuri_irq = 0;
 }
 
-MACHINE_CONFIG_START(konmedal_state::tsukande)
+void konmedal_state::tsukande(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(medal_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::medal_main);
+	m_maincpu->set_vblank_int("screen", FUNC(konmedal_state::konmedal_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // 16.9344MHz xtal verified on PCB
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, XTAL(16'934'400)); // 16.9344MHz xtal verified on PCB
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(konmedal_state::ddboy)
+void konmedal_state::ddboy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(ddboy_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::ddboy_main);
+	m_maincpu->set_vblank_int("screen", FUNC(konmedal_state::konmedal_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
+	m_k056832->set_config("gfx1", K056832_BPP_4, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	OKIM6295(config, m_oki, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(0, "mono", 1.0);
+	m_oki->add_route(1, "mono", 1.0);
 
-	MCFG_K051649_ADD("k051649", XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	K051649(config, "k051649", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
 /*
 Shuriken Boy
@@ -540,40 +538,39 @@ WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
 	m_vrom_base |= (data << 10);
 }
 
-MACHINE_CONFIG_START(konmedal_state::shuriboy)
+void konmedal_state::shuriboy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(shuriboy_main)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 3); // divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::shuriboy_main);
+	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER) // everything not verified, just a placeholder
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(30))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_shuriboy)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192) // not verified
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xBGR_555, 8192); // not verified
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(konmedal_state, shuriboy_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback), this);
 
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_K051649_ADD("k051649", XTAL(24'000'000) / 12) // divisor unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	K051649(config, "k051649", XTAL(24'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
 	// upd7759c
-MACHINE_CONFIG_END
+}
 
 ROM_START( tsukande )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
@@ -662,6 +659,11 @@ ROM_START( shuriboy )
 
 	ROM_REGION( 0x200000, "upd", 0 )
 	ROM_LOAD( "341-a02.13c", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "am27s21apc.2d", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "am27s21apc.3d", 0x100, 0x100, NO_DUMP )
+	ROM_LOAD( "am27s21apc.4d", 0x200, 0x100, NO_DUMP )
 ROM_END
 
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)

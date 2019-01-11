@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(COM5016_013, com5016_013_device, "com5016_013", "COM5016-013 
 const int com8116_device::divisors_16X_5_0688MHz[16] =
 	{ 6336, 4224, 2880, 2355, 2112, 1056, 528, 264, 176, 158, 132, 88, 66, 44, 33, 16 };
 
-// SMC/COM8116-003
+// SMC/COM8116-003 and WD WD-1943-03
 // from http://www.vintagecomputer.net/fjkraan/comp/divcomp/doc/SMC_BaudGen.pdf page 283 (pdf page 20)
 // baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 9600, 19200
 // SMC/COM8116T-020 should have similar output rates, but clock is unknown and probably different
@@ -54,11 +54,11 @@ const int com8116_device::divisors_16X_4_9152MHz[16] =
 // SMC/COM5016(T)-6 and WD WD-1943-06
 // baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1200, 1800, 2400, 3600, 4800, 7200, 9600, 19200
 const int com8116_device::divisors_32X_5_0688MHz[16] =
-	{ 3168, 2112, 1440, 1177, 1056, 792, 528, 264, 132, 88, 66, 44, 33, 22, 16, 8 };
+	{ 3168, 2112, 1440, 1177, 1056, 792, 528, 264, 132, 88, 66, 44, 33, 22, 17, 8 };
 
-// SMC/COM5016(T)-013 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/dec/terminal/vt100/EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf page 4-27 (pdf page 78))
+// SMC/COM5016(T)-013 and WD WD-1943-02 (from http://bitsavers.informatik.uni-stuttgart.de/pdf/dec/terminal/vt100/EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf page 4-27 (pdf page 78))
 // and from http://www.vintagecomputer.net/fjkraan/comp/divcomp/doc/SMC_BaudGen.pdf page 283 (pdf page 20)
-// SMC/COM5106-013A is the same chip clocked twice as fast, but with 32x clocks per baud instead of 16x
+// SMC/COM5106-013A and WD WD-1943-04 are the same chip clocked twice as fast, but with 32x clocks per baud instead of 16x
 // baud rates are 50, 75, 110, 134.5, 150, 200, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 9600, 19200
 const int com8116_device::divisors_16X_2_7648MHz[16] =
 	{ 3456, 2304, 1571, 1285, 1152, 864, 576, 288, 144, 96, 86, 72, 48, 36, 18, 9 };
@@ -128,13 +128,16 @@ com5016_013_device::com5016_013_device(const machine_config &mconfig, const char
 void com8116_device::device_start()
 {
 	// resolve callbacks
-	m_fx4_handler.resolve_safe();
+	m_fx4_handler.resolve();
 	m_fr_handler.resolve_safe();
 	m_ft_handler.resolve_safe();
 
 	// allocate timers
-	m_fx4_timer = timer_alloc(TIMER_FX4);
-	m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
+	if (!m_fx4_handler.isnull())
+	{
+		m_fx4_timer = timer_alloc(TIMER_FX4);
+		m_fx4_timer->adjust(attotime::from_hz((clock() / 4) * 2), 0, attotime::from_hz((clock() / 4)) * 2);
+	}
 	m_fr_timer = timer_alloc(TIMER_FR);
 	m_ft_timer = timer_alloc(TIMER_FT);
 
@@ -190,7 +193,7 @@ void com8116_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  str_w -
 //-------------------------------------------------
 
-void com8116_device::str_w(uint8_t data)
+void com8116_device::write_str(uint8_t data)
 {
 	int fr_divider = data & 0x0f;
 	int fr_clock = clock() / m_divisors[fr_divider];
@@ -200,17 +203,12 @@ void com8116_device::str_w(uint8_t data)
 	m_fr_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(fr_clock * 2));
 }
 
-WRITE8_MEMBER( com8116_device::str_w )
-{
-	str_w(data);
-}
-
 
 //-------------------------------------------------
 //  stt_w -
 //-------------------------------------------------
 
-void com8116_device::stt_w(uint8_t data)
+void com8116_device::write_stt(uint8_t data)
 {
 	int ft_divider = data & 0x0f;
 	int ft_clock = clock() / m_divisors[ft_divider];
@@ -220,7 +218,24 @@ void com8116_device::stt_w(uint8_t data)
 	m_ft_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(ft_clock * 2));
 }
 
-WRITE8_MEMBER( com8116_device::stt_w )
+
+//-------------------------------------------------
+//  str_stt_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER(com8116_device::str_stt_w)
 {
-	stt_w(data);
+	write_str(data >> 4);
+	write_stt(data & 0x0f);
+}
+
+
+//-------------------------------------------------
+//  stt_str_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER(com8116_device::stt_str_w)
+{
+	write_stt(data >> 4);
+	write_str(data & 0x0f);
 }

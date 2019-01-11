@@ -10,6 +10,13 @@
 class seibu_cop_bootleg_device : public device_t, public device_memory_interface
 {
 public:
+	template <typename T>
+	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: seibu_cop_bootleg_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		m_host_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ16_MEMBER( read );
@@ -30,7 +37,7 @@ public:
 	DECLARE_READ16_MEMBER( prng_r );
 	DECLARE_READ16_MEMBER( scale_r );
 	DECLARE_WRITE16_MEMBER( scale_w );
-	
+
 	void seibucopbl_map(address_map &map);
 protected:
 	// device-level overrides
@@ -39,8 +46,8 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	cpu_device *m_host_cpu;      /**< reference to the host cpu */
-	address_space *m_host_space;                            /**< reference to the host cpu space */
+	required_device<cpu_device> m_host_cpu;
+	address_space *m_host_space;
 	const address_space_config      m_space_config;
 	inline uint16_t read_word(offs_t address);
 	inline void write_word(offs_t address, uint16_t data);
@@ -55,8 +62,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device)
-
-#define MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEIBU_COP_BOOTLEG, 0)
 
 #endif // MAME_MACHINE_SEICOP_H

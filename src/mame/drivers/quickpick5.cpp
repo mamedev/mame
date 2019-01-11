@@ -30,14 +30,15 @@
 #include "machine/k053252.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class quickpick5_state : public driver_device
 {
 public:
-	quickpick5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	quickpick5_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_k053245(*this, "k053245"),
@@ -48,6 +49,9 @@ public:
 		m_ttlrom_offset(0)
 	{ }
 
+	void quickpick5(machine_config &config);
+
+private:
 	uint32_t screen_update_quickpick5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K05324X_CB_MEMBER(sprite_callback);
@@ -79,14 +83,12 @@ public:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 
-	void quickpick5(machine_config &config);
 	void quickpick5_main(address_map &map);
-protected:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<k05324x_device> m_k053245;
@@ -270,20 +272,20 @@ void quickpick5_state::quickpick5_main(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdbff).ram().share("nvram");
 	map(0xdc00, 0xdc0f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write));
-	map(0xdc40, 0xdc4f).rw(this, FUNC(quickpick5_state::k244_r), FUNC(quickpick5_state::k244_w));
+	map(0xdc40, 0xdc4f).rw(FUNC(quickpick5_state::k244_r), FUNC(quickpick5_state::k244_w));
 	map(0xdc80, 0xdc80).portr("DSW3");
 	map(0xdc81, 0xdc81).portr("DSW4");
 	map(0xdcc0, 0xdcc0).portr("DSW1");
 	map(0xdcc1, 0xdcc1).portr("DSW2");
 	map(0xdd00, 0xdd00).nopw();
 	map(0xdd40, 0xdd40).noprw();
-	map(0xdd80, 0xdd80).rw(this, FUNC(quickpick5_state::control_r), FUNC(quickpick5_state::control_w));
+	map(0xdd80, 0xdd80).rw(FUNC(quickpick5_state::control_r), FUNC(quickpick5_state::control_w));
 	map(0xddc0, 0xddc0).nopw();
 	map(0xde00, 0xde00).nopw();
 	map(0xde40, 0xde40).w(m_oki, FUNC(okim6295_device::write));
-	map(0xe000, 0xefff).rw(this, FUNC(quickpick5_state::vram_r), FUNC(quickpick5_state::vram_w));
+	map(0xe000, 0xefff).rw(FUNC(quickpick5_state::vram_r), FUNC(quickpick5_state::vram_w));
 	map(0xf000, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf800, 0xffff).rw(this, FUNC(quickpick5_state::k245_r), FUNC(quickpick5_state::k245_w));
+	map(0xf800, 0xffff).rw(FUNC(quickpick5_state::k245_r), FUNC(quickpick5_state::k245_w));
 }
 
 static INPUT_PORTS_START( quickpick5 )
@@ -398,48 +400,48 @@ void quickpick5_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(quickpick5_state::quickpick5)
+void quickpick5_state::quickpick5(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(32'000'000)/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(quickpick5_main)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", quickpick5_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(32'000'000)/4); // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &quickpick5_state::quickpick5_main);
+	TIMER(config, "scantimer").configure_scanline(FUNC(quickpick5_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) /* K053252, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, quickpick5_state, vbl_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, quickpick5_state, nmi_ack_w))
-	MCFG_K053252_INT_TIME_CB(WRITE8(*this, quickpick5_state, ccu_int_time_w))
+	K053252(config, m_k053252, XTAL(32'000'000)/4); /* K053252, xtal verified, divider not verified */
+	m_k053252->int1_ack().set(FUNC(quickpick5_state::vbl_ack_w));
+	m_k053252->int2_ack().set(FUNC(quickpick5_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(quickpick5_state::ccu_int_time_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(20))
-	MCFG_SCREEN_SIZE(64*8, 33*8)
-	MCFG_SCREEN_VISIBLE_AREA(88, 456-1, 28, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(quickpick5_state, screen_update_quickpick5)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(20));
+	screen.set_size(64*8, 33*8);
+	screen.set_visarea(88, 456-1, 28, 256-1);
+	screen.set_screen_update(FUNC(quickpick5_state::screen_update_quickpick5));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(-(44+80), 20)
-	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_offsets(-(44+80), 20);
+	m_k053245->set_sprite_callback(FUNC(quickpick5_state::sprite_callback), this);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_K051649_ADD("k051649", XTAL(32'000'000)/18)  // xtal is verified, divider is not
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	K051649(config, m_k051649, XTAL(32'000'000)/18);  // xtal is verified, divider is not
+	m_k051649->add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(0, "mono", 1.0);
+	m_oki->add_route(1, "mono", 1.0);
+}
 
 ROM_START( quickp5 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */

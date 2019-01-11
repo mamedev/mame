@@ -54,7 +54,7 @@ Word | Bit(s)           | Use
   a  | xxxxxxxxxxxxxxxx | x zoom
   b  | xxxxxxxxxxxxxxxx | rotation
   c  | xxxxxxxxxxxxxxxx | rotation
-  d  | xxxxxxxxxxxxxxxx | x zoom
+  d  | xxxxxxxxxxxxxxxx | y zoom
   e  | ---------------- | unknown
   f  | ---------------- | unknown
 
@@ -89,15 +89,12 @@ void shangha3_state::video_start()
 
 
 
-WRITE16_MEMBER(shangha3_state::flipscreen_w)
+WRITE8_MEMBER(shangha3_state::flipscreen_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		/* bit 7 flips screen, the rest seems to always be set to 0x7e */
-		flip_screen_set(data & 0x80);
+	/* bit 7 flips screen, the rest seems to always be set to 0x7e */
+	flip_screen_set(data & 0x80);
 
-		if ((data & 0x7f) != 0x7e) popmessage("flipscreen_w %02x",data);
-	}
+	if ((data & 0x7f) != 0x7e) popmessage("flipscreen_w %02x",data);
 }
 
 WRITE16_MEMBER(shangha3_state::gfxlist_addr_w)
@@ -119,7 +116,6 @@ WRITE16_MEMBER(shangha3_state::blitter_go_w)
 	for (offs = m_gfxlist_addr << 3; offs < m_ram.bytes()/2; offs += 16)
 	{
 		int sx,sy,x,y,code,color,flipx,flipy,sizex,sizey,zoomx,zoomy;
-
 
 		code = shangha3_ram[offs+1];
 		color = shangha3_ram[offs+5] & 0x7f;
@@ -144,12 +140,12 @@ WRITE16_MEMBER(shangha3_state::blitter_go_w)
 
 		if ((sizex || sizey)
 				/* avoid garbage on startup */
-&& sizex < 512 && sizey < 256 && zoomx < 0x1f0 && zoomy < 0x1f0)
+		&& sizex < 512 && sizey < 256 && zoomx < 0x1f0 && zoomy < 0x1f0)
 		{
 			rectangle myclip;
 
-//if (shangha3_ram[offs+11] || shangha3_ram[offs+12])
-//logerror("offs %04x: sx %04x sy %04x zoom %04x %04x %04x %04x fx %d fy %d\n",offs,sx,sy,zoomx,shangha3_ram[offs+11]),shangha3_ram[offs+12],zoomy,flipx,flipy);
+//          if (shangha3_ram[offs+11] || shangha3_ram[offs+12])
+//              logerror("offs %04x: sx %04x sy %04x zoom %04x %04x %04x %04x fx %d fy %d\n",offs,sx,sy,zoomx,shangha3_ram[offs+11]),shangha3_ram[offs+12],zoomy,flipx,flipy);
 
 			myclip.set(sx, sx + sizex, sy, sy + sizey);
 			myclip &= rawbitmap.cliprect();
@@ -190,17 +186,17 @@ WRITE16_MEMBER(shangha3_state::blitter_go_w)
 						/* TODO: zooming algo is definitely wrong for Blocken here */
 						if (condensed)
 						{
-							int addr = ((y+srcy) & 0x1f) +
-										0x20 * ((x+srcx) & 0xff);
+							int addr = ((y+srcy) & 0x1f) |
+										(((x+srcx) & 0xff) << 5);
 							tile = shangha3_ram[addr];
 							dx = 8*x*(0x200-zoomx)/0x100 - dispx;
 							dy = 8*y*(0x200-zoomy)/0x100 - dispy;
 						}
 						else
 						{
-							int addr = ((y+srcy) & 0x0f) +
-										0x10 * ((x+srcx) & 0xff) +
-										0x100 * ((y+srcy) & 0x10);
+							int addr = ((y+srcy) & 0x0f) |
+										(((x+srcx) & 0xff) << 4) |
+										(((y+srcy) & 0x10) << 8);
 							tile = shangha3_ram[addr];
 							dx = 16*x*(0x200-zoomx)/0x100 - dispx;
 							dy = 16*y*(0x200-zoomy)/0x100 - dispy;
@@ -223,34 +219,34 @@ WRITE16_MEMBER(shangha3_state::blitter_go_w)
 			{
 				int w;
 
-if (zoomx <= 1 && zoomy <= 1)
-	m_gfxdecode->gfx(0)->zoom_transtable(rawbitmap,myclip,
-			code,
-			color,
-			flipx,flipy,
-			sx,sy,
-			0x1000000,0x1000000,
-			drawmode_table);
-else
-{
-				w = (sizex+15)/16;
-
-				for (x = 0;x < w;x++)
-				{
+				if (zoomx <= 1 && zoomy <= 1)
 					m_gfxdecode->gfx(0)->zoom_transtable(rawbitmap,myclip,
 							code,
 							color,
 							flipx,flipy,
-							sx + 16*x,sy,
-							(0x200-zoomx)*0x100,(0x200-zoomy)*0x100,
+							sx,sy,
+							0x1000000,0x1000000,
 							drawmode_table);
+				else
+				{
+					w = (sizex+15)/16;
 
-					if ((code & 0x000f) == 0x0f)
-						code = (code + 0x100) & 0xfff0;
-					else
-						code++;
+					for (x = 0;x < w;x++)
+					{
+						m_gfxdecode->gfx(0)->zoom_transtable(rawbitmap,myclip,
+								code,
+								color,
+								flipx,flipy,
+								sx + 16*x,sy,
+								(0x200-zoomx)*0x100,(0x200-zoomy)*0x100,
+								drawmode_table);
+
+						if ((code & 0x000f) == 0x0f)
+							code = (code + 0x100) & 0xfff0;
+						else
+							code++;
+					}
 				}
-}
 			}
 		}
 	}

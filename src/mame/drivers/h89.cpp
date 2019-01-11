@@ -36,6 +36,9 @@ public:
 	{
 	}
 
+	void h89(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	DECLARE_WRITE8_MEMBER( port_f2_w );
@@ -43,7 +46,6 @@ public:
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
-	void h89(machine_config &config);
 	void h89_io(address_map &map);
 	void h89_mem(address_map &map);
 };
@@ -84,7 +86,7 @@ void h89_state::h89_io(address_map &map)
 																								 // the H19 code could be connected and ran
 																								 // as a separate thread.
 //  AM_RANGE(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
-	map(0xf2, 0xf2).w(this, FUNC(h89_state::port_f2_w)).portr("SW501");
+	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
 //  AM_RANGE(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 }
 
@@ -183,21 +185,22 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
-MACHINE_CONFIG_START(h89_state::h89)
+void h89_state::h89(machine_config & config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(12'288'000) / 6)
-	MCFG_DEVICE_PROGRAM_MAP(h89_mem)
-	MCFG_DEVICE_IO_MAP(h89_io)
+	Z80(config, m_maincpu, XTAL(12'288'000) / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
+	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
+	uart.out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", h89_state, h89_irq_timer, attotime::from_hz(100))
-MACHINE_CONFIG_END
+	TIMER(config, "irq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(h89_state::h89_irq_timer), this), attotime::from_hz(100));
+}
 
 /* ROM definition */
 ROM_START( h89 )

@@ -14,6 +14,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -196,7 +197,7 @@ void cultures_state::oki_map(address_map &map)
 
 void cultures_state::vrambank_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(this, FUNC(cultures_state::bg0_videoram_w)).share("bg0_videoram");
+	map(0x0000, 0x3fff).ram().w(FUNC(cultures_state::bg0_videoram_w)).share("bg0_videoram");
 	map(0x4000, 0x6fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
@@ -220,9 +221,9 @@ void cultures_state::cultures_io_map(address_map &map)
 	map(0x50, 0x53).ram().share("bg1_regs_y");
 	map(0x60, 0x63).ram().share("bg2_regs_x");
 	map(0x70, 0x73).ram().share("bg2_regs_y");
-	map(0x80, 0x80).w(this, FUNC(cultures_state::cpu_bankswitch_w));
-	map(0x90, 0x90).w(this, FUNC(cultures_state::misc_w));
-	map(0xa0, 0xa0).w(this, FUNC(cultures_state::bg_bank_w));
+	map(0x80, 0x80).w(FUNC(cultures_state::cpu_bankswitch_w));
+	map(0x90, 0x90).w(FUNC(cultures_state::misc_w));
+	map(0xa0, 0xa0).w(FUNC(cultures_state::bg_bank_w));
 	map(0xc0, 0xc0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd0, 0xd0).portr("SW1_A");
 	map(0xd1, 0xd1).portr("SW1_B");
@@ -411,13 +412,7 @@ MACHINE_CONFIG_START(cultures_state::cultures)
 	MCFG_DEVICE_IO_MAP(cultures_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&cultures_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x4000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

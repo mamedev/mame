@@ -19,8 +19,10 @@
 #include "sound/beep.h"         /* pcw/pcw16 beeper */
 #include "machine/intelfsh.h"
 #include "formats/pc_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "emupal.h"
 
 #define PCW16_BORDER_HEIGHT 8
 #define PCW16_BORDER_WIDTH 8
@@ -95,7 +97,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pcw16);
+	void pcw16_colours(palette_device &palette) const;
 	uint32_t screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw16_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_timer_callback);
@@ -107,9 +109,9 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	inline void pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
-	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
-	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
-	void pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
+	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);
+	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);
+	void pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);
 
 	void pcw16_io(address_map &map);
 	void pcw16_map(address_map &map);

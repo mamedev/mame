@@ -33,6 +33,7 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -50,16 +51,16 @@ void galaxy_state::galaxyp_io(address_map &map)
 void galaxy_state::galaxy_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x2037).mirror(0x07c0).r(this, FUNC(galaxy_state::galaxy_keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(this, FUNC(galaxy_state::galaxy_latch_w));
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::galaxy_keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::galaxy_latch_w));
 }
 
 void galaxy_state::galaxyp_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom(); // ROM A
 	map(0x1000, 0x1fff).rom(); // ROM B
-	map(0x2000, 0x2037).mirror(0x07c0).r(this, FUNC(galaxy_state::galaxy_keyboard_r));
-	map(0x2038, 0x203f).mirror(0x07c0).w(this, FUNC(galaxy_state::galaxy_latch_w));
+	map(0x2000, 0x2037).mirror(0x07c0).r(FUNC(galaxy_state::galaxy_keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(FUNC(galaxy_state::galaxy_latch_w));
 	map(0xe000, 0xefff).rom(); // ROM C
 	map(0xf000, 0xffff).rom(); // ROM D
 }
@@ -194,8 +195,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxy)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
@@ -211,9 +211,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxy)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("6K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,22K,38K,54K")
+	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxy_state::galaxyp)
@@ -235,7 +233,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* snapshot */
@@ -243,7 +241,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4) // FIXME: really no output routes for this AY?
+	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -254,8 +252,7 @@ MACHINE_CONFIG_START(galaxy_state::galaxyp)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("38K")
+	RAM(config, RAM_TAG).set_default_size("38K");
 MACHINE_CONFIG_END
 
 ROM_START (galaxy)

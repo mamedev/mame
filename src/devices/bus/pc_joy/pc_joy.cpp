@@ -19,6 +19,10 @@ pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, dev
 	device_slot_interface(mconfig, *this),
 	m_dev(nullptr)
 {
+	option_reset();
+	pc_joysticks(*this);
+	set_default_option("basic_joy");
+	set_fixed(false);
 }
 
 READ8_MEMBER ( pc_joy_device::joy_port_r )

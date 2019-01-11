@@ -51,12 +51,15 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	void init_gen32();
 	void alm32(machine_config &config);
 	void van32(machine_config &config);
 	void van16(machine_config &config);
 	void alm16(machine_config &config);
 	void gen32(machine_config &config);
+
+	void init_gen32();
+
+private:
 	void alm16_mem(address_map &map);
 	void alm32_mem(address_map &map);
 	void gen32_mem(address_map &map);
@@ -74,11 +77,13 @@ public:
 		, m_keys(*this, "KEY")
 	{ }
 
+	void berlinp(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(berlinp_input_r);
 
-	void berlinp(machine_config &config);
 	void berlinp_mem(address_map &map);
-private:
+
 	required_device<mephisto_board_device> m_board;
 	required_ioport m_keys;
 };
@@ -176,7 +181,7 @@ void berlinp_state::berlinp_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x800000, 0x800000).r(this, FUNC(berlinp_state::berlinp_input_r));
+	map(0x800000, 0x800000).r(FUNC(berlinp_state::berlinp_input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_modul_device::io_w));
@@ -255,9 +260,9 @@ MACHINE_CONFIG_START(mmodular_state::alm16)
 	MCFG_DEVICE_PROGRAM_MAP(alm16_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mmodular)
+	MEPHISTO_SENSORS_BOARD(config, "board", 0);
+	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	config.set_default_layout(layout_mmodular);
 MACHINE_CONFIG_END
 
 
@@ -273,11 +278,11 @@ MACHINE_CONFIG_START(mmodular_state::alm32)
 	MCFG_DEVICE_PROGRAM_MAP(alm32_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mmodular)
+	MEPHISTO_SENSORS_BOARD(config, "board", 0);
+	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	config.set_default_layout(layout_mmodular);
 MACHINE_CONFIG_END
 
 
@@ -293,11 +298,11 @@ MACHINE_CONFIG_START(mmodular_state::gen32)
 	MCFG_DEVICE_PROGRAM_MAP(gen32_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_MEPHISTO_SENSORS_BOARD_ADD("board")
-	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mmodular)
+	MEPHISTO_SENSORS_BOARD(config, "board", 0);
+	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	config.set_default_layout(layout_mmodular);
 MACHINE_CONFIG_END
 
 
@@ -306,23 +311,23 @@ MACHINE_CONFIG_START(berlinp_state::berlinp)
 	MCFG_DEVICE_PROGRAM_MAP(berlinp_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
-	MCFG_MEPHISTO_DISPLAY_MODUL_ADD("display")
-	MCFG_DEFAULT_LAYOUT(layout_mmodular)
+	MEPHISTO_SENSORS_BOARD(config, m_board, 0);
+	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
+	config.set_default_layout(layout_mmodular);
 MACHINE_CONFIG_END
 
 
 ROM_START( alm16 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("alm16eve.bin", 0x00000, 0x10000, CRC(EE5B6EC4) SHA1(30920C1B9E16FFAE576DA5AFA0B56DA59ADA3DBB))
-	ROM_LOAD16_BYTE("alm16odd.bin", 0x00001, 0x10000, CRC(D0BE4EE4) SHA1(D36C074802D2C9099CD44E75F9DE3FC7D1FD9908))
+	ROM_LOAD16_BYTE("alm16eve.bin", 0x00000, 0x10000, CRC(ee5b6ec4) SHA1(30920c1b9e16ffae576da5afa0b56da59ada3dbb))
+	ROM_LOAD16_BYTE("alm16odd.bin", 0x00001, 0x10000, CRC(d0be4ee4) SHA1(d36c074802d2c9099cd44e75f9de3fc7d1fd9908))
 ROM_END
 
 ROM_START( alm32 )
 	ROM_REGION32_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD("alm32.bin", 0x00000, 0x20000, CRC(38F4B305) SHA1(43459A057FF29248C74D656A036AC325202B9C15))
+	ROM_LOAD("alm32.bin", 0x00000, 0x20000, CRC(38f4b305) SHA1(43459a057ff29248c74d656a036ac325202b9c15))
 ROM_END
 
 ROM_START( port16 )
@@ -339,36 +344,36 @@ ROM_END
 ROM_START( gen32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v41", "V4.1" )
-	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(1))
+	ROMX_LOAD("gen32_41.bin", 0x00000, 0x40000, CRC(ea9938c0) SHA1(645cf0b5b831b48104ad6cec8d78c63dbb6a588c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v40", "V4.0" )
-	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1), ROM_BIOS(2))
+	ROMX_LOAD("gen32_4.bin", 0x00000, 0x40000, CRC(6cc4da88) SHA1(ea72acf9c67ed17c6ac8de56a165784aa629c4a1), ROM_BIOS(1))
 ROM_END
 
 ROM_START( van16 )
 	ROM_REGION16_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("va16even.bin", 0x00000, 0x20000, CRC(E87602D5) SHA1(90CB2767B4AE9E1B265951EB2569B9956B9F7F44))
-	ROM_LOAD16_BYTE("va16odd.bin",  0x00001, 0x20000, CRC(585F3BDD) SHA1(90BB94A12D3153A91E3760020E1EA2A9EAA7EC0A))
+	ROM_LOAD16_BYTE("va16even.bin", 0x00000, 0x20000, CRC(e87602d5) SHA1(90cb2767b4ae9e1b265951eb2569b9956b9f7f44))
+	ROM_LOAD16_BYTE("va16odd.bin",  0x00001, 0x20000, CRC(585f3bdd) SHA1(90bb94a12d3153a91e3760020e1ea2a9eaa7ec0a))
 ROM_END
 
 ROM_START( van32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("vanc32.bin", 0x00000, 0x40000, CRC(F872BEB5) SHA1(9919F207264F74E2B634B723B048AE9CA2CEFBC7))
+	ROM_LOAD("vanc32.bin", 0x00000, 0x40000, CRC(f872beb5) SHA1(9919f207264f74e2b634b723b048ae9ca2cefbc7))
 ROM_END
 
 ROM_START( lond020 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("lond020.bin", 0x00000, 0x40000, CRC(3225B8DA) SHA1(FD8F6F4E9C03B6CDC86D8405E856C26041BFAD12))
+	ROM_LOAD("lond020.bin", 0x00000, 0x40000, CRC(3225b8da) SHA1(fd8f6f4e9c03b6cdc86d8405e856c26041bfad12))
 ROM_END
 
 ROM_START( lond030 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("lond030.bin", 0x00000, 0x40000, CRC(853BAA4E) SHA1(946951081D4E91E5BDD9E93D0769568A7FE79BAD))
+	ROM_LOAD("lond030.bin", 0x00000, 0x40000, CRC(853baa4e) SHA1(946951081d4e91e5bdd9e93d0769568a7fe79bad))
 ROM_END
 
 ROM_START( lyon16 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("lyon16ev.bin", 0x00000, 0x10000, CRC(497BD41A) SHA1(3FFEFEEAC694F49997C10D248EC6A7AA932898A4))
-	ROM_LOAD16_BYTE("lyon16od.bin", 0x00001, 0x10000, CRC(F9DE3F54) SHA1(4060E29566D2F40122CCDE3C1F84C94A9C1ED54F))
+	ROM_LOAD16_BYTE("lyon16ev.bin", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4))
+	ROM_LOAD16_BYTE("lyon16od.bin", 0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f))
 ROM_END
 
 ROM_START( lyon32 )
@@ -378,12 +383,12 @@ ROM_END
 
 ROM_START( berlinp )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("berlinp.bin", 0x00000, 0x40000, CRC(82FBAF6E) SHA1(729B7CEF3DFAECC4594A6178FC4BA6015AFA6202))
+	ROM_LOAD("berlinp.bin", 0x00000, 0x40000, CRC(82fbaf6e) SHA1(729b7cef3dfaecc4594a6178fc4ba6015afa6202))
 ROM_END
 
 ROM_START( bpl32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
-	ROM_LOAD("bpl32.bin", 0x00000, 0x40000, CRC(D75E170F) SHA1(AC0EBDAA114ABD4FEF87361A03DF56928768B1AE))
+	ROM_LOAD("bpl32.bin", 0x00000, 0x40000, CRC(d75e170f) SHA1(ac0ebdaa114abd4fef87361a03df56928768b1ae))
 ROM_END
 
 

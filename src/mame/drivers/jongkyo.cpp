@@ -30,6 +30,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,17 +40,32 @@
 class jongkyo_state : public driver_device
 {
 public:
-	jongkyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+	jongkyo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_bank1(*this, "bank1"),
+		m_bank1d(*this, "bank1d"),
+		m_bank0d(*this, "bank0d"),
+		m_mainregion(*this, "maincpu"),
+		m_videoram(*this, "videoram")
+	{ }
 
+	void jongkyo(machine_config &config);
+
+	void init_jongkyo();
+
+private:
 	/* misc */
 	uint8_t    m_rom_bank;
 	uint8_t    m_mux_data;
 	uint8_t    m_flip_screen;
 
 	/* memory pointers */
+	required_device<segacrpt_z80_device> m_maincpu;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank1d;
+	required_memory_bank m_bank0d;
+	required_region_ptr<uint8_t> m_mainregion;
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t    m_videoram2[0x4000];
 	DECLARE_WRITE8_MEMBER(bank_select_w);
@@ -59,14 +75,11 @@ public:
 	DECLARE_WRITE8_MEMBER(unknown_w);
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
-	void init_jongkyo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jongkyo);
+	void jongkyo_palette(palette_device &palette) const;
 	uint32_t screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	void jongkyo(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void jongkyo_memmap(address_map &map);
 	void jongkyo_portmap(address_map &map);
@@ -144,8 +157,8 @@ WRITE8_MEMBER(jongkyo_state::bank_select_w)
 	if (offset & 1)
 		m_rom_bank |= mask;
 
-	membank("bank1")->set_entry(m_rom_bank);
-	membank("bank1d")->set_entry(m_rom_bank);
+	m_bank1->set_entry(m_rom_bank);
+	m_bank1d->set_entry(m_rom_bank);
 }
 
 WRITE8_MEMBER(jongkyo_state::mux_w)
@@ -244,7 +257,7 @@ WRITE8_MEMBER(jongkyo_state::unknown_w)
 
 void jongkyo_state::jongkyo_memmap(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().w(this, FUNC(jongkyo_state::videoram2_w)); // wrong, this doesn't seem to be video ram on write..
+	map(0x0000, 0x3fff).rom().w(FUNC(jongkyo_state::videoram2_w)); // wrong, this doesn't seem to be video ram on write..
 	map(0x4000, 0x6bff).rom(); // fixed rom
 	map(0x6c00, 0x6fff).bankr("bank1");    // banked (8 banks)
 	map(0x7000, 0x77ff).ram();
@@ -265,12 +278,12 @@ void jongkyo_state::jongkyo_portmap(address_map &map)
 	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 
-	map(0x10, 0x10).portr("DSW").w(this, FUNC(jongkyo_state::jongkyo_coin_counter_w));
-	map(0x11, 0x11).portr("IN0").w(this, FUNC(jongkyo_state::mux_w));
+	map(0x10, 0x10).portr("DSW").w(FUNC(jongkyo_state::jongkyo_coin_counter_w));
+	map(0x11, 0x11).portr("IN0").w(FUNC(jongkyo_state::mux_w));
 	// W 11 select keyboard row (fe fd fb f7)
 	map(0x40, 0x40).nopr(); // unknown, if (A & 0xf) == 0x0a then a bit 0 write to 0x7520 doesn't occur
-	map(0x40, 0x45).w(this, FUNC(jongkyo_state::bank_select_w));
-	map(0x46, 0x4f).w(this, FUNC(jongkyo_state::unknown_w));
+	map(0x40, 0x45).w(FUNC(jongkyo_state::bank_select_w));
+	map(0x46, 0x4f).w(FUNC(jongkyo_state::unknown_w));
 }
 
 /*************************************
@@ -458,20 +471,18 @@ INPUT_PORTS_END
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(jongkyo_state, jongkyo)
+void jongkyo_state::jongkyo_palette(palette_device &palette) const
 {
-	int i;
-	uint8_t* proms = memregion("proms")->base();
-	for (i = 0; i < 0x40; i++)
+	uint8_t const *const proms = memregion("proms")->base();
+	for (int i = 0; i < 0x40; i++)
 	{
-		int data = proms[i];
+		int const data = proms[i];
 
-		int r = (data  >> 0) & 0x07;
-		int g = (data  >> 3) & 0x07;
-		int b = (data  >> 6) & 0x03;
+		int const r = pal3bit((data  >> 0) & 0x07);
+		int const g = pal3bit((data  >> 3) & 0x07);
+		int const b = pal2bit((data  >> 6) & 0x03);
 
-			palette.set_pen_color(i, r << 5, g << 5, b << 6 );
-
+		palette.set_pen_color(i, r, g, b);
 	}
 }
 
@@ -500,15 +511,14 @@ void jongkyo_state::machine_reset()
 MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(jongkyo_memmap)
-	MCFG_DEVICE_IO_MAP(jongkyo_portmap)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jongkyo_state,  irq0_line_hold)
-	MCFG_SEGACRPT_SET_SIZE(0x6c00)
-	MCFG_SEGACRPT_SET_NUMBANKS(8)
-	MCFG_SEGACRPT_SET_BANKSIZE(0x400)
-	//  sega_decode(rom, opcodes, 0x6c00, convtable, 8, 0x400);
+	sega_315_5084_device &maincpu(SEGA_315_5084(config, m_maincpu, JONGKYO_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &jongkyo_state::jongkyo_memmap);
+	maincpu.set_addrmap(AS_IO, &jongkyo_state::jongkyo_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &jongkyo_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(jongkyo_state::irq0_line_hold));
+	maincpu.set_size(0x6c00);
+	maincpu.set_numbanks(8);
+	maincpu.set_banksize(0x400);
 
 
 	/* video hardware */
@@ -520,14 +530,13 @@ MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 	MCFG_SCREEN_UPDATE_DRIVER(jongkyo_state, screen_update_jongkyo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(jongkyo_state, jongkyo)
+	PALETTE(config, "palette", FUNC(jongkyo_state::jongkyo_palette), 0x100);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jongkyo_state, input_1p_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jongkyo_state, input_2p_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	ay8910_device &aysnd(AY8910(config, "aysnd", JONGKYO_CLOCK/8));
+	aysnd.port_a_read_callback().set(FUNC(jongkyo_state::input_1p_r));
+	aysnd.port_b_read_callback().set(FUNC(jongkyo_state::input_2p_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
 
@@ -566,34 +575,23 @@ ROM_END
 
 void jongkyo_state::init_jongkyo()
 {
-	uint8_t *rom = memregion("maincpu")->base();
-
 	/* first of all, do a simple bitswap */
 	for (int i = 0x6000; i < 0x8c00; ++i)
 	{
-		rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0);
+		m_mainregion[i] = bitswap<8>(m_mainregion[i], 7,6,5,3,4,2,1,0);
 	}
 
 	uint8_t *opcodes = auto_alloc_array(machine(), uint8_t, 0x6c00+0x400*8);
 
-	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
-
-	if (!cpu)
-	{
-		fatalerror("can't find cpu!\n");
-	}
-	else
-	{
-		cpu->set_region_p(rom);
-		cpu->set_decrypted_p(opcodes);
-	}
+	m_maincpu->set_region_p(m_mainregion);
+	m_maincpu->set_decrypted_p(opcodes);
 
 	/* then do the standard Sega decryption */
-
-	membank("bank1")->configure_entries(0, 8, rom+0x6c00, 0x400);
-	membank("bank1d")->configure_entries(0, 8, opcodes+0x6c00, 0x400);
-	membank("bank0d")->set_base(opcodes);
+	m_bank1->configure_entries(0, 8, m_mainregion+0x6c00, 0x400);
+	m_bank1d->configure_entries(0, 8, opcodes+0x6c00, 0x400);
+	m_bank0d->set_base(opcodes);
 }
+
 
 
 /*************************************

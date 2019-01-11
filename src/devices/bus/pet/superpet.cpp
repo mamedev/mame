@@ -62,7 +62,7 @@ const tiny_rom_entry *superpet_device::device_rom_region() const
 
 void superpet_device::superpet_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(superpet_device::read), FUNC(superpet_device::write));
+	map(0x0000, 0xffff).rw(FUNC(superpet_device::read), FUNC(superpet_device::write));
 }
 
 
@@ -70,23 +70,24 @@ void superpet_device::superpet_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(superpet_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6809_TAG, M6809, XTAL(16'000'000)/16)
-	MCFG_DEVICE_PROGRAM_MAP(superpet_mem)
+void superpet_device::device_add_mconfig(machine_config &config)
+{
+	MC6809E(config, m_maincpu, 16_MHz_XTAL / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &superpet_device::superpet_mem);
 
-	MCFG_MOS6702_ADD(MOS6702_TAG, XTAL(16'000'000)/16)
+	MOS6702(config, m_dongle, 16_MHz_XTAL / 16);
 
-	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, superpet_device, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->irq_handler().set(FUNC(superpet_device::acia_irq_w));
+	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+}
 
 
 //-------------------------------------------------

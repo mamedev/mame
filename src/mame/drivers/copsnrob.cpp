@@ -79,7 +79,7 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
 {
 	m_misc = data & 0x7f;
 	/* Multi Player Start */
-	m_led[1] = BIT(~data, 6);
+	m_leds[1] = BIT(~data, 6);
 }
 
 
@@ -102,8 +102,8 @@ void copsnrob_state::main_map(address_map &map)
 	map(0x0a00, 0x0a03).writeonly().share("cary");
 	map(0x0b00, 0x0bff).ram();
 	map(0x0c00, 0x0fff).ram().share("videoram");
-	map(0x1000, 0x1000).r(this, FUNC(copsnrob_state::copsnrob_misc_r));
-	map(0x1000, 0x1000).w(this, FUNC(copsnrob_state::copsnrob_misc2_w));
+	map(0x1000, 0x1000).r(FUNC(copsnrob_state::copsnrob_misc_r));
+	map(0x1000, 0x1000).w(FUNC(copsnrob_state::copsnrob_misc2_w));
 	map(0x1002, 0x1002).portr("CTRL1");
 	map(0x1006, 0x1006).portr("CTRL2");
 	map(0x100a, 0x100a).portr("CTRL3");
@@ -238,7 +238,7 @@ void copsnrob_state::machine_start()
 {
 	save_item(NAME(m_ic_h3_data));
 	save_item(NAME(m_misc));
-	m_led.resolve();
+	m_leds.resolve();
 }
 
 void copsnrob_state::machine_reset()
@@ -255,16 +255,16 @@ MACHINE_CONFIG_START(copsnrob_state::copsnrob)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 26*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(copsnrob_state, screen_update_copsnrob)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 26*8-1);
+	m_screen->set_screen_update(FUNC(copsnrob_state::screen_update_copsnrob));
+	m_screen->set_palette(m_palette);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_copsnrob)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	copsnrob_audio(config);
 MACHINE_CONFIG_END

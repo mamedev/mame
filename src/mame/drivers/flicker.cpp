@@ -64,7 +64,7 @@ public:
 
 	void flicker(machine_config &config);
 
-protected:
+private:
 	virtual void driver_start() override;
 
 	DECLARE_WRITE8_MEMBER(ram0_out) { m_ram0_output = data; }
@@ -81,7 +81,6 @@ protected:
 	void flicker_rom_ports(address_map &map);
 	void flicker_status(address_map &map);
 
-private:
 	required_device<i4004_cpu_device>   m_maincpu;
 	required_ioport                     m_testport;
 	required_ioport                     m_coinport;
@@ -111,14 +110,14 @@ void flicker_state::flicker_status(address_map &map)
 
 void flicker_state::flicker_rom_ports(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0x0700).w(this, FUNC(flicker_state::rom0_out));
-	map(0x0010, 0x001f).mirror(0x0700).w(this, FUNC(flicker_state::rom1_out));
-	map(0x0020, 0x002f).mirror(0x0700).r(this, FUNC(flicker_state::rom2_in));
+	map(0x0000, 0x000f).mirror(0x0700).w(FUNC(flicker_state::rom0_out));
+	map(0x0010, 0x001f).mirror(0x0700).w(FUNC(flicker_state::rom1_out));
+	map(0x0020, 0x002f).mirror(0x0700).r(FUNC(flicker_state::rom2_in));
 }
 
 void flicker_state::flicker_ram_ports(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(flicker_state::ram0_out));
+	map(0x00, 0x00).w(FUNC(flicker_state::ram0_out));
 }
 
 static INPUT_PORTS_START( flicker )
@@ -396,23 +395,24 @@ void flicker_state::driver_start()
 }
 
 
-MACHINE_CONFIG_START(flicker_state::flicker)
+void flicker_state::flicker(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I4004, 5_MHz_XTAL / 8)
-	MCFG_I4004_ROM_MAP(flicker_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(flicker_memory)
-	MCFG_I4004_ROM_PORTS_MAP(flicker_rom_ports)
-	MCFG_I4004_RAM_STATUS_MAP(flicker_status)
-	MCFG_I4004_RAM_PORTS_MAP(flicker_ram_ports)
-	MCFG_I4004_CM_RAM1_CB(WRITELINE(*this, flicker_state, cm_ram1_w))
-	MCFG_I4004_CM_RAM2_CB(WRITELINE(*this, flicker_state, cm_ram2_w))
+	I4004(config, m_maincpu, 5_MHz_XTAL / 8);
+	m_maincpu->set_rom_map(&flicker_state::flicker_rom);
+	m_maincpu->set_ram_memory_map(&flicker_state::flicker_memory);
+	m_maincpu->set_rom_ports_map(&flicker_state::flicker_rom_ports);
+	m_maincpu->set_ram_status_map(&flicker_state::flicker_status);
+	m_maincpu->set_ram_ports_map(&flicker_state::flicker_ram_ports);
+	m_maincpu->cm_ram_cb<1>().set(FUNC(flicker_state::cm_ram1_w));
+	m_maincpu->cm_ram_cb<2>().set(FUNC(flicker_state::cm_ram2_w));
 
 	// video
-	MCFG_DEFAULT_LAYOUT(layout_flicker)
+	config.set_default_layout(layout_flicker);
 
 	// sound
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(flicker)

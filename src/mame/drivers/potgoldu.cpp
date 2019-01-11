@@ -34,7 +34,7 @@ public:
 
 	void potgold(machine_config &config);
 
-protected:
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -42,8 +42,7 @@ protected:
 
 	void potgold_map(address_map &map);
 
-protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_maincpu;
 };
 
 
@@ -82,12 +81,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(potgold_state::potgold)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(potgold_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(potgold_state, scanline_update)  /* scanline callback (rgb32) */
+	TMS34010(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &potgold_state::potgold_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(potgold_state::scanline_update));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)

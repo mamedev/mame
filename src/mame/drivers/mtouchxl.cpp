@@ -52,16 +52,20 @@
 class mtxl_state : public driver_device
 {
 public:
-	mtxl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+	mtxl_state(const machine_config &mconfig, device_type type, const char *tag) :
+			driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 #ifndef REAL_PCI_CHIPSET
-		m_mb(*this, "mb"),
+			m_mb(*this, "mb"),
 #endif
-		m_ram(*this, RAM_TAG),
-		m_iocard(*this, "dbank"),
-		m_multikey(*this, "multikey")
+			m_ram(*this, RAM_TAG),
+			m_iocard(*this, "dbank"),
+			m_multikey(*this, "multikey")
 		{ }
+
+	void at486(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 #ifndef REAL_PCI_CHIPSET
 	required_device<at_mb_device> m_mb;
@@ -75,7 +79,6 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(coin_r);
-	void at486(machine_config &config);
 	static void cdrom(device_t *device);
 	void at32_io(address_map &map);
 	void at32_map(address_map &map);
@@ -107,19 +110,19 @@ WRITE8_MEMBER(mtxl_state::key_w)
 void mtxl_state::at32_map(address_map &map)
 {
 	map.unmap_value_high();
-	#ifndef REAL_PCI_CHIPSET
+#ifndef REAL_PCI_CHIPSET
 	map(0x00000000, 0x0009ffff).bankrw("bank10");
 	map(0x000c8000, 0x000cffff).ram().share("nvram");
 	map(0x000d0000, 0x000dffff).m(m_iocard, FUNC(address_map_bank_device::amap32));
 	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
-	#endif
+#endif
 }
 
 void mtxl_state::at32_io(address_map &map)
 {
 	map.unmap_value_high();
-	#ifndef REAL_PCI_CHIPSET
+#ifndef REAL_PCI_CHIPSET
 	map(0x0000, 0x001f).rw("mb:dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x003f).rw("mb:pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
@@ -130,14 +133,14 @@ void mtxl_state::at32_io(address_map &map)
 	map(0x00a0, 0x00bf).rw("mb:pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw("mb:dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
 	map(0x0224, 0x0227).rw("cs4231", FUNC(ad1848_device::read), FUNC(ad1848_device::write));
-	#endif
+#endif
 	map(0x0228, 0x022b).portr("Unknown");
-	map(0x022f, 0x022f).w(this, FUNC(mtxl_state::bank_w));
-	map(0x022d, 0x022d).rw(this, FUNC(mtxl_state::key_r), FUNC(mtxl_state::key_w));
-	map(0x022c, 0x022c).r(this, FUNC(mtxl_state::coin_r));
-	#ifndef REAL_PCI_CHIPSET
+	map(0x022f, 0x022f).w(FUNC(mtxl_state::bank_w));
+	map(0x022d, 0x022d).rw(FUNC(mtxl_state::key_r), FUNC(mtxl_state::key_w));
+	map(0x022c, 0x022c).r(FUNC(mtxl_state::coin_r));
+#ifndef REAL_PCI_CHIPSET
 	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	#endif
+#endif
 }
 
 void mtxl_state::dbank_map(address_map &map)
@@ -205,72 +208,68 @@ void mtxl_state::cdrom(device_t *device)
 	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
 	ide1->set_default_option("");
 	ide1->set_fixed(true);
-MACHINE_CONFIG_END
+}
 #endif
 
-MACHINE_CONFIG_START(mtxl_state::at486)
-	MCFG_DEVICE_ADD("maincpu", I486DX4, 33000000)
-	MCFG_DEVICE_PROGRAM_MAP(at32_map)
-	MCFG_DEVICE_IO_MAP(at32_io)
+void mtxl_state::at486(machine_config &config)
+{
+	I486DX4(config, m_maincpu, 33000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mtxl_state::at32_map);
+	m_maincpu->set_addrmap(AS_IO, &mtxl_state::at32_io);
 #ifndef REAL_PCI_CHIPSET
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("mb", AT_MB, 0)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	AT_MB(config, "mb", 0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
-	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true) // FIXME: determine ISA bus clock
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", cdrom); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
 
-	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("cs4231", AD1848, 0)
-	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
-	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
 
-	MCFG_DEVICE_MODIFY("mb:dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8("cs4231", ad1848_device, dack_w))
+	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
+	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
+
+	subdevice<am9517a_device>("mb:dma8237_1")->out_iow_callback<1>().set("cs4231", FUNC(ad1848_device::dack_w));
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
-	MCFG_DEVICE_REMOVE("mb:keybc");
-	MCFG_DEVICE_REMOVE("mb:pc_kbdc");
-	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
-	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
-	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
-	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
-	MCFG_DEVICE_REMOVE("mb:rtc")
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	config.device_remove("mb:keybc");
+	config.device_remove("mb:pc_kbdc");
+	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
+	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
+	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
+
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 #endif
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32M")    // Early XL games had 8 MB RAM, 6000 and later require 32MB
+	RAM(config, RAM_TAG).set_default_size("32M"); // Early XL games had 8 MB RAM, 6000 and later require 32MB
 
 	/* bankdev for dxxxx */
-	MCFG_DEVICE_ADD("dbank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(dbank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(32)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
+	ADDRESS_MAP_BANK(config, "dbank").set_map(&mtxl_state::dbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* Flash ROM */
-	MCFG_AMD_29F040_ADD("flash")
+	AMD_29F040(config, "flash");
 
 	/* Security key */
-	MCFG_DS1205_ADD("multikey")
+	DS1205(config, "multikey");
 
 #ifdef REAL_PCI_CHIPSET
 	/* PCI root */
-	MCFG_PCI_ROOT_ADD(":pci")
-	MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
+	PCI_ROOT(config, ":pci");
+	// FIXME: This MCFG fragment does not compile. -R
+	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
-MACHINE_CONFIG_END
+}
 
 #ifdef REAL_PCI_CHIPSET
 #define MOTHERBOARD_ROMS \

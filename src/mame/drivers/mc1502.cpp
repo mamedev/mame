@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-    drivers/mc1502.c
+    drivers/mc1502.cpp
 
     Driver file for Elektronika MS 1502
 
@@ -219,8 +219,7 @@ void mc1502_state::mc1502_map(address_map &map)
 void mc1502_state::mc1502_io(address_map &map)
 {
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0028, 0x0028).rw(m_upd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0029, 0x0029).rw(m_upd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0028, 0x0029).rw(m_upd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw(m_ppi8255n1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0068, 0x006B).rw(m_ppi8255n2, FUNC(i8255_device::read), FUNC(i8255_device::write));    // keyboard poll
@@ -231,59 +230,59 @@ static INPUT_PORTS_START( mc1502 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mc1502_state::mc1502)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(16'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(mc1502_map)
-	MCFG_DEVICE_IO_MAP(mc1502_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	I8088(config, m_maincpu, XTAL(16'000'000)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mc1502_state::mc1502_map);
+	m_maincpu->set_addrmap(AS_IO, &mc1502_state::mc1502_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
 	MCFG_MACHINE_START_OVERRIDE( mc1502_state, mc1502 )
 	MCFG_MACHINE_RESET_OVERRIDE( mc1502_state, mc1502 )
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(16'000'000)/12) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(16'000'000)/12) /* serial port */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, mc1502_state, mc1502_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL(16'000'000)/12) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mc1502_state, mc1502_pit8253_out2_changed))
+	PIT8253(config, m_pit8253, 0);
+	m_pit8253->set_clk<0>(XTAL(16'000'000)/12); /* heartbeat IRQ */
+	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
+	m_pit8253->set_clk<1>(XTAL(16'000'000)/12); /* serial port */
+	m_pit8253->out_handler<1>().set(FUNC(mc1502_state::mc1502_pit8253_out1_changed));
+	m_pit8253->set_clk<2>(XTAL(16'000'000)/12); /* pio port c pin 4, and speaker polling enough */
+	m_pit8253->out_handler<2>().set(FUNC(mc1502_state::mc1502_pit8253_out2_changed));
 
-	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_pic8259, 0);
+	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("ppi8255n1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mc1502_state, mc1502_ppi_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_ppi_portc_w))
+	I8255(config, m_ppi8255n1);
+	m_ppi8255n1->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_ppi8255n1->out_pb_callback().set(FUNC(mc1502_state::mc1502_ppi_portb_w));
+	m_ppi8255n1->in_pc_callback().set(FUNC(mc1502_state::mc1502_ppi_portc_r));
+	m_ppi8255n1->out_pc_callback().set(FUNC(mc1502_state::mc1502_ppi_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255n2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mc1502_state, mc1502_kppi_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8("cent_status_in", input_buffer_device, read))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mc1502_state, mc1502_kppi_portc_w))
+	I8255(config, m_ppi8255n2);
+	m_ppi8255n2->in_pa_callback().set(FUNC(mc1502_state::mc1502_kppi_porta_r));
+	m_ppi8255n2->out_pb_callback().set(FUNC(mc1502_state::mc1502_kppi_portb_w));
+	m_ppi8255n2->in_pc_callback().set("cent_status_in", FUNC(input_buffer_device::bus_r));
+	m_ppi8255n2->out_pc_callback().set(FUNC(mc1502_state::mc1502_kppi_portc_w));
 
-	MCFG_DEVICE_ADD("upd8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, m_upd8251, 0);
+	m_upd8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_upd8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_upd8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	/* XXX RxD data are accessible via PPI port C, bit 7 */
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w)) /* default handler does nothing */
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w))
-	MCFG_I8251_SYNDET_HANDLER(WRITELINE(*this, mc1502_state, mc1502_i8251_syndet))
+	m_upd8251->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w)); /* default handler does nothing */
+	m_upd8251->txrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+	m_upd8251->syndet_handler().set(FUNC(mc1502_state::mc1502_i8251_syndet));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("upd8251", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("upd8251", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("upd8251", i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_upd8251, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_upd8251, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(m_upd8251, FUNC(i8251_device::write_cts));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
+	isa8_device &isa(ISA8(config, "isa", 0));
+	isa.set_cputag("maincpu");
+	isa.irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	isa.irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	isa.irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+	isa.irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	isa.irq6_callback().set(m_pic8259, FUNC(pic8259_device::ir6_w));
+	isa.irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 
 	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "cga_mc1502", true) // FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("isa1",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "fdc", false)
@@ -293,7 +292,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	WAVE(config, "wave", "cassette"); // FIXME: really no output routes for the cassette sound?
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
@@ -309,9 +308,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("608K")                   /* 96 base + 512 on expansion card */
-	MCFG_RAM_EXTRA_OPTIONS("96K")
+	RAM(config, RAM_TAG).set_default_size("608K").set_extra_options("96K"); /* 96 base + 512 on expansion card */
 MACHINE_CONFIG_END
 
 
@@ -329,45 +326,45 @@ ROM_START( mc1502 )
 
 	ROM_DEFAULT_BIOS("v52")
 	ROM_SYSTEM_BIOS(0, "v50", "v5.0 10/05/89")
-	ROMX_LOAD( "monitor_5_0.rom",  0xc000, 0x4000, CRC(9e97c6a0) SHA1(16a304e8de69ec4d8b92acda6bf28454c361a24f),ROM_BIOS(1))
+	ROMX_LOAD("monitor_5_0.rom",  0xc000, 0x4000, CRC(9e97c6a0) SHA1(16a304e8de69ec4d8b92acda6bf28454c361a24f),ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v52", "v5.2 22/03/91")
-	ROMX_LOAD( "monitor_5_2.rom",  0xc000, 0x4000, CRC(0e65491e) SHA1(8a4d556473b5e0e59b05fab77c79c29f4d562412),ROM_BIOS(2))
+	ROMX_LOAD("monitor_5_2.rom",  0xc000, 0x4000, CRC(0e65491e) SHA1(8a4d556473b5e0e59b05fab77c79c29f4d562412),ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "v521", "v5.21 12/10/92")
-	ROMX_LOAD( "monitor_5_21.rom", 0xc000, 0x4000, CRC(28c8f653) SHA1(04b0b09e0b86d9648a83352cc1590eb8963833e0),ROM_BIOS(3))
+	ROMX_LOAD("monitor_5_21.rom", 0xc000, 0x4000, CRC(28c8f653) SHA1(04b0b09e0b86d9648a83352cc1590eb8963833e0),ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "v531", "v5.31 12/10/92")
-	ROMX_LOAD( "monitor_5_31.rom", 0xc000, 0x4000, CRC(a48295d5) SHA1(6f38977c22f9cc6c2bc6f6e53edc4048ca6b6721),ROM_BIOS(4))
+	ROMX_LOAD("monitor_5_31.rom", 0xc000, 0x4000, CRC(a48295d5) SHA1(6f38977c22f9cc6c2bc6f6e53edc4048ca6b6721),ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "v533", "v5.33 01/08/93")
-	ROMX_LOAD( "0,cbc0.bin", 0xc000, 0x2000, CRC(9a55bc4f) SHA1(81da44eec2e52cf04b1fc7053502270f51270590),ROM_BIOS(5))
-	ROMX_LOAD( "1,dfe2.bin", 0xe000, 0x2000, CRC(8dec077a) SHA1(d6f6d7cc2183abc77fbd9cd59132de5766f7c458),ROM_BIOS(5))
+	ROMX_LOAD("0,cbc0.bin", 0xc000, 0x2000, CRC(9a55bc4f) SHA1(81da44eec2e52cf04b1fc7053502270f51270590),ROM_BIOS(4))
+	ROMX_LOAD("1,dfe2.bin", 0xe000, 0x2000, CRC(8dec077a) SHA1(d6f6d7cc2183abc77fbd9cd59132de5766f7c458),ROM_BIOS(4))
 
 	// 5.21 + 3rd party HDC support. fails checksum test so marked BAD_DUMP.
 	ROM_SYSTEM_BIOS(5, "v521h", "v5.21h 22/09/93")
-	ROMX_LOAD( "mshbios0.pgm", 0xc000, 0x2000, BAD_DUMP CRC(be447261) SHA1(b93c597c17dfa4b678f72c20a3f7119b73e6ba1c),ROM_BIOS(6))
-	ROMX_LOAD( "mshbios1.pgm", 0xe000, 0x2000, BAD_DUMP CRC(89e2eaf2) SHA1(37d6b225b5e35574fdac81219589407d925225be),ROM_BIOS(6))
+	ROMX_LOAD("mshbios0.pgm", 0xc000, 0x2000, BAD_DUMP CRC(be447261) SHA1(b93c597c17dfa4b678f72c20a3f7119b73e6ba1c),ROM_BIOS(5))
+	ROMX_LOAD("mshbios1.pgm", 0xe000, 0x2000, BAD_DUMP CRC(89e2eaf2) SHA1(37d6b225b5e35574fdac81219589407d925225be),ROM_BIOS(5))
 
 	// 5.3
 	ROM_SYSTEM_BIOS(6, "v53", "v5.3 10/11/91")
-	ROMX_LOAD( "1502-3b0.pgm", 0xc000, 0x2000, CRC(dc148763) SHA1(7a5e66438007b2de328ac680614f9c4ff60f6a75),ROM_BIOS(7))
-	ROMX_LOAD( "1502-3b1.pgm", 0xe000, 0x2000, CRC(17fc2af2) SHA1(a060d7b7302dfa639025f025106b50412cf26953),ROM_BIOS(7))
+	ROMX_LOAD("1502-3b0.pgm", 0xc000, 0x2000, CRC(dc148763) SHA1(7a5e66438007b2de328ac680614f9c4ff60f6a75),ROM_BIOS(6))
+	ROMX_LOAD("1502-3b1.pgm", 0xe000, 0x2000, CRC(17fc2af2) SHA1(a060d7b7302dfa639025f025106b50412cf26953),ROM_BIOS(6))
 	// 5.1 -- JCUKEN keyboard
 	ROM_SYSTEM_BIOS(7, "v51", "v5.1 10/12/90")
-	ROMX_LOAD( "ms1502b0.pgm", 0xc000, 0x2000, CRC(92fcc29a) SHA1(930a4cffcd6ec6110dd9a18bd389b78f0ccb110a),ROM_BIOS(8))
-	ROMX_LOAD( "ms1502b1.pgm", 0xe000, 0x2000, CRC(fe355a58) SHA1(b4ef7775045c6f2095e2b487fe19824986a4892c),ROM_BIOS(8))
+	ROMX_LOAD("ms1502b0.pgm", 0xc000, 0x2000, CRC(92fcc29a) SHA1(930a4cffcd6ec6110dd9a18bd389b78f0ccb110a),ROM_BIOS(7))
+	ROMX_LOAD("ms1502b1.pgm", 0xe000, 0x2000, CRC(fe355a58) SHA1(b4ef7775045c6f2095e2b487fe19824986a4892c),ROM_BIOS(7))
 	// 5.31
 	ROM_SYSTEM_BIOS(8, "v531_93", "v5.31 21/01/93")
-	ROMX_LOAD( "ms531b0.pgm", 0xc000, 0x2000, CRC(d97157d1) SHA1(cb1a1e0e2d9a0fcc78f9b09bfb4814d408ee4fae),ROM_BIOS(9))
-	ROMX_LOAD( "ms531b1.pgm", 0xe000, 0x2000, CRC(b1368e1a) SHA1(286496d25dc0ac2d8fe1802caffc6c37b236d105),ROM_BIOS(9))
+	ROMX_LOAD("ms531b0.pgm", 0xc000, 0x2000, CRC(d97157d1) SHA1(cb1a1e0e2d9a0fcc78f9b09bfb4814d408ee4fae),ROM_BIOS(8))
+	ROMX_LOAD("ms531b1.pgm", 0xe000, 0x2000, CRC(b1368e1a) SHA1(286496d25dc0ac2d8fe1802caffc6c37b236d105),ROM_BIOS(8))
 	// 5.2
 	ROM_SYSTEM_BIOS(9, "v52_91", "v5.2 10/11/91")
-	ROMX_LOAD( "msv5-2b0.pgm", 0xc000, 0x2000, CRC(f7f370e9) SHA1(e069a35005581a02856853b57dd511ab8e10054b),ROM_BIOS(10))
-	ROMX_LOAD( "msv5-2b1.pgm", 0xe000, 0x2000, CRC(d50e1c43) SHA1(22724dec0052ee9e52f44f5914f2f5f3fae14612),ROM_BIOS(10))
+	ROMX_LOAD("msv5-2b0.pgm", 0xc000, 0x2000, CRC(f7f370e9) SHA1(e069a35005581a02856853b57dd511ab8e10054b),ROM_BIOS(9))
+	ROMX_LOAD("msv5-2b1.pgm", 0xe000, 0x2000, CRC(d50e1c43) SHA1(22724dec0052ee9e52f44f5914f2f5f3fae14612),ROM_BIOS(9))
 
 	// 7.2
 	ROM_SYSTEM_BIOS(10, "v72", "v7.2 01/21/96")
-	ROMX_LOAD( "7.2_1.bin", 0xe000, 0x2000, CRC(80912ad4) SHA1(cc54b77b2db4cc5d614efafd04367d2f06400fc8),ROM_BIOS(11))
+	ROMX_LOAD("7.2_1.bin", 0xe000, 0x2000, CRC(80912ad4) SHA1(cc54b77b2db4cc5d614efafd04367d2f06400fc8),ROM_BIOS(10))
 
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	ROM_LOAD( "symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))
+	ROM_LOAD("symgen.rom", 0x0000, 0x2000, CRC(b2747a52) SHA1(6766d275467672436e91ac2997ac6b77700eba1e))
 ROM_END
 
 /*

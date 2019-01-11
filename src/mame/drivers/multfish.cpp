@@ -681,10 +681,10 @@ void igrosoft_gamble_state::init_crzmon2ent()
 
 void igrosoft_gamble_state::igrosoft_gamble_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_vid_w));
+	map(0x0000, 0x7fff).rom().w(FUNC(igrosoft_gamble_state::igrosoft_gamble_vid_w));
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xdfff).rw(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_timekeeper_r), FUNC(igrosoft_gamble_state::igrosoft_gamble_timekeeper_w));
-	map(0xe000, 0xffff).rw(this, FUNC(igrosoft_gamble_state::bankedram_r), FUNC(igrosoft_gamble_state::bankedram_w));
+	map(0xc000, 0xdfff).rw(FUNC(igrosoft_gamble_state::igrosoft_gamble_timekeeper_r), FUNC(igrosoft_gamble_state::igrosoft_gamble_timekeeper_w));
+	map(0xe000, 0xffff).rw(FUNC(igrosoft_gamble_state::bankedram_r), FUNC(igrosoft_gamble_state::bankedram_w));
 }
 
 // According to control panel the user buttons are arranged as
@@ -846,14 +846,14 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps1_w)
     -X-- ---- Start Lamp 34A
     X--- ---- Bet/Double Lamp 29B
 */
-	m_lamp[1] = BIT(data, 0); /* Hold 1 Lamp */
-	m_lamp[2] = BIT(data, 1); /* Hold 2 Lamp */
-	m_lamp[3] = BIT(data, 2); /* Hold 3 Lamp */
-	m_lamp[4] = BIT(data, 3); /* Hold 4 Lamp */
-	m_lamp[5] = BIT(data, 4); /* Hold 5 Lamp */
-	m_lamp[8] = BIT(data, 5); /* Help Lamp */
-	m_lamp[6] = BIT(data, 6); /* Start Lamp */
-	m_lamp[0] = BIT(data, 7); /* Bet/Double Lamp */
+	m_lamps[1] = BIT(data, 0); /* Hold 1 Lamp */
+	m_lamps[2] = BIT(data, 1); /* Hold 2 Lamp */
+	m_lamps[3] = BIT(data, 2); /* Hold 3 Lamp */
+	m_lamps[4] = BIT(data, 3); /* Hold 4 Lamp */
+	m_lamps[5] = BIT(data, 4); /* Hold 5 Lamp */
+	m_lamps[8] = BIT(data, 5); /* Help Lamp */
+	m_lamps[6] = BIT(data, 6); /* Start Lamp */
+	m_lamps[0] = BIT(data, 7); /* Bet/Double Lamp */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
@@ -866,10 +866,10 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
     ---- -X-- Maxbet Lamp 30B
     ---X ---- Upper Lamp Green 25B  (Demo Mode)
 */
-	m_lamp[9] = BIT(data, 0);  /* Payout Lamp */
-	m_lamp[12] = BIT(data, 1); /* Upper Lamp Yellow */
-	m_lamp[7] = BIT(data, 2);  /* Maxbet Lamp */
-	m_lamp[10] = BIT(data, 4); /* Upper Lamp Green */
+	m_lamps[9] = BIT(data, 0);  /* Payout Lamp */
+	m_lamps[12] = BIT(data, 1); /* Upper Lamp Yellow */
+	m_lamps[7] = BIT(data, 2);  /* Maxbet Lamp */
+	m_lamps[10] = BIT(data, 4); /* Upper Lamp Green */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
@@ -879,7 +879,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
     7654 3210
     ---- --X- Upper Lamp Red 26B (Service Mode)
 */
-	m_lamp[11] = BIT(data, 1); /* Upper Lamp Red */
+	m_lamps[11] = BIT(data, 1); /* Upper Lamp Red */
 }
 
 WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_counters_w)
@@ -926,63 +926,63 @@ void igrosoft_gamble_state::igrosoft_gamble_portmap(address_map &map)
 	map(0x17, 0x17).portr("IN7");
 
 	/* Write ports not hooked up yet */
-	map(0x30, 0x30).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps1_w));
-		map(0x31, 0x31).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_counters_w));
+	map(0x30, 0x30).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps1_w));
+		map(0x31, 0x31).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_counters_w));
 //  AM_RANGE(0x32, 0x32) AM_WRITE(igrosoft_gamble_port32_w)
-	map(0x33, 0x33).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_hopper_w));
-	map(0x34, 0x34).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps2_w));
-	map(0x35, 0x35).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps3_w));
+	map(0x33, 0x33).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_hopper_w));
+	map(0x34, 0x34).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps2_w));
+	map(0x35, 0x35).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_lamps3_w));
 //  AM_RANGE(0x36, 0x36) AM_WRITE(igrosoft_gamble_port36_w)
 	map(0x37, 0x37).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x38, 0x38).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x39, 0x39).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3a, 0x3a).r("aysnd", FUNC(ay8910_device::data_r));
 
-	map(0x60, 0x60).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_dispenable_w)); // display enable mirror for lottery sets
+	map(0x60, 0x60).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_dispenable_w)); // display enable mirror for lottery sets
 
-	map(0x90, 0x90).r(this, FUNC(igrosoft_gamble_state::ray_r));
+	map(0x90, 0x90).r(FUNC(igrosoft_gamble_state::ray_r));
 
-	map(0xa0, 0xa0).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey 2 banking
-	map(0xa5, 0xa5).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey 2 Ent banking
-	map(0xb0, 0xb0).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 lottery banking
-	map(0xb1, 0xb1).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey Ent banking
-	map(0xb2, 0xb2).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Lacky Haunter Ent banking
-	map(0xb3, 0xb3).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail Ent banking
-	map(0xb4, 0xb4).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 Ent banking
-	map(0xb5, 0xb5).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Garage Ent banking
-	map(0xb6, 0xb6).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Resident Ent banking
-	map(0xb7, 0xb7).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Rock Climber Ent banking
-	map(0xb9, 0xb9).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 Ent banking
-	map(0xbb, 0xbb).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 Ent banking
-	map(0xbd, 0xbd).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate 2 Ent banking
-	map(0xbe, 0xbe).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Keks Ent banking
-	map(0xbf, 0xbf).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome Ent banking
-	map(0xc7, 0xc7).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Resident lottery banking
-	map(0xca, 0xca).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome lottery banking
-	map(0xcb, 0xcb).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Keks lottery banking
-	map(0xcc, 0xcc).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 lottery banking
-	map(0xcd, 0xcd).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 lottery banking
-	map(0xce, 0xce).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate 2 lottery banking
-	map(0xd0, 0xd0).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // rollfr_4 banking
-	map(0xe1, 0xe1).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 banking
-	map(0xe5, 0xe5).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome banking
-	map(0xe8, 0xe8).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 banking
-	map(0xea, 0xea).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 banking
-	map(0xec, 0xec).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey lottery banking
+	map(0xa0, 0xa0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey 2 banking
+	map(0xa5, 0xa5).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey 2 Ent banking
+	map(0xb0, 0xb0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 lottery banking
+	map(0xb1, 0xb1).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey Ent banking
+	map(0xb2, 0xb2).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Lacky Haunter Ent banking
+	map(0xb3, 0xb3).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail Ent banking
+	map(0xb4, 0xb4).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 Ent banking
+	map(0xb5, 0xb5).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Garage Ent banking
+	map(0xb6, 0xb6).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Resident Ent banking
+	map(0xb7, 0xb7).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Rock Climber Ent banking
+	map(0xb9, 0xb9).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 Ent banking
+	map(0xbb, 0xbb).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 Ent banking
+	map(0xbd, 0xbd).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate 2 Ent banking
+	map(0xbe, 0xbe).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Keks Ent banking
+	map(0xbf, 0xbf).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome Ent banking
+	map(0xc7, 0xc7).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Resident lottery banking
+	map(0xca, 0xca).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome lottery banking
+	map(0xcb, 0xcb).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Keks lottery banking
+	map(0xcc, 0xcc).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 lottery banking
+	map(0xcd, 0xcd).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 lottery banking
+	map(0xce, 0xce).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Pirate 2 lottery banking
+	map(0xd0, 0xd0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // rollfr_4 banking
+	map(0xe1, 0xe1).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Island 2 banking
+	map(0xe5, 0xe5).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gnome banking
+	map(0xe8, 0xe8).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Sweet Life 2 banking
+	map(0xea, 0xea).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Fruit Cocktail 2 banking
+	map(0xec, 0xec).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Crazy Monkey lottery banking
 
-	map(0xf0, 0xf0).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gold Fish banking
-	map(0xf1, 0xf1).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_rambank_w));
-	map(0xf3, 0xf3).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_f3_w)); // from 00->01 at startup, irq enable maybe?
-	map(0xf4, 0xf4).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_dispenable_w)); // display enable
+	map(0xf0, 0xf0).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w)); // Gold Fish banking
+	map(0xf1, 0xf1).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_rambank_w));
+	map(0xf3, 0xf3).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_f3_w)); // from 00->01 at startup, irq enable maybe?
+	map(0xf4, 0xf4).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_dispenable_w)); // display enable
 
 	/* mirrors of the rom banking */
-	map(0xf8, 0xfd).w(this, FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w));
+	map(0xf8, 0xfd).w(FUNC(igrosoft_gamble_state::igrosoft_gamble_bank_w));
 }
 
 void igrosoft_gamble_state::rollfr_portmap(address_map &map)
 {
 	igrosoft_gamble_portmap(map);
-	map(0x33, 0x33).w(this, FUNC(igrosoft_gamble_state::rollfr_hopper_w));
+	map(0x33, 0x33).w(FUNC(igrosoft_gamble_state::rollfr_hopper_w));
 }
 
 static const gfx_layout tiles16x16_layout =
@@ -1010,7 +1010,7 @@ GFXDECODE_END
 
 void igrosoft_gamble_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_disp_enable));
 	save_item(NAME(m_rambk));
@@ -1032,7 +1032,7 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	MCFG_DEVICE_IO_MAP(igrosoft_gamble_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1048,10 +1048,9 @@ MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 6000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "aysnd", 6000000/4).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_M48T35_ADD( "m48t35" )
+	MCFG_DEVICE_ADD("m48t35", M48T35, 0)
 	MCFG_HOPPER_ADD("hopper", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
 

@@ -178,16 +178,16 @@ READ16_MEMBER(mugsmash_state::mugsmash_input_ports_r)
 void mugsmash_state::mugsmash_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x080fff).ram().w(this, FUNC(mugsmash_state::mugsmash_videoram1_w)).share("videoram1");
-	map(0x082000, 0x082fff).ram().w(this, FUNC(mugsmash_state::mugsmash_videoram2_w)).share("videoram2");
-	map(0x0c0000, 0x0c0007).w(this, FUNC(mugsmash_state::mugsmash_reg_w)).share("regs1"); /* video registers*/
+	map(0x080000, 0x080fff).ram().w(FUNC(mugsmash_state::mugsmash_videoram1_w)).share("videoram1");
+	map(0x082000, 0x082fff).ram().w(FUNC(mugsmash_state::mugsmash_videoram2_w)).share("videoram2");
+	map(0x0c0000, 0x0c0007).w(FUNC(mugsmash_state::mugsmash_reg_w)).share("regs1"); /* video registers*/
 	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x140000, 0x140007).w(this, FUNC(mugsmash_state::mugsmash_reg2_w)).share("regs2"); /* sound + ? */
+	map(0x140000, 0x140007).w(FUNC(mugsmash_state::mugsmash_reg2_w)).share("regs2"); /* sound + ? */
 	map(0x1c0000, 0x1c3fff).ram(); /* main ram? */
 	map(0x1c4000, 0x1cffff).ram();
 	map(0x200000, 0x203fff).ram().share("spriteram"); /* sprite ram */
 #if USE_FAKE_INPUT_PORTS
-	map(0x180000, 0x180007).r(this, FUNC(mugsmash_state::mugsmash_input_ports_r));
+	map(0x180000, 0x180007).r(FUNC(mugsmash_state::mugsmash_input_ports_r));
 #else
 	map(0x180000, 0x180001).portr("IN0");
 	map(0x180002, 0x180003).portr("IN1");
@@ -414,24 +414,22 @@ MACHINE_CONFIG_START(mugsmash_state::mugsmash)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mugsmash_state, screen_update_mugsmash)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mugsmash)
 
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x300);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579545)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)   /* music */
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 1.00);   /* music */
+	ymsnd.add_route(1, "rspeaker", 1.00);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50) /* sound fx */

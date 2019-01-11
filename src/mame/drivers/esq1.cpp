@@ -198,7 +198,7 @@ class esq1_filters : public device_t,
 {
 public:
 	// construction/destruction
-	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_vca(int channel, uint8_t value);
 	void set_vpan(int channel, uint8_t value);
@@ -396,6 +396,13 @@ public:
 		m_mdout(*this, "mdout")
 	{ }
 
+	void sq80(machine_config &config);
+
+	void esq1(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scn2681_device> m_duart;
 	required_device<esq1_filters> m_filters;
@@ -422,11 +429,8 @@ public:
 	uint8_t m_seqram[0x10000];
 	uint8_t m_dosram[0x2000];
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	void send_through_panel(uint8_t data);
-	void esq1(machine_config &config);
-	void sq80(machine_config &config);
 	void esq1_map(address_map &map);
 	void sq80_map(address_map &map);
 };
@@ -452,12 +456,12 @@ void esq1_state::machine_reset()
 
 READ8_MEMBER(esq1_state::wd1772_r)
 {
-	return m_fdc->read(space, offset&3);
+	return m_fdc->read(offset&3);
 }
 
 WRITE8_MEMBER(esq1_state::wd1772_w)
 {
-	m_fdc->write(space, offset&3, data);
+	m_fdc->write(offset&3, data);
 }
 
 WRITE8_MEMBER(esq1_state::mapper_w)
@@ -509,7 +513,7 @@ void esq1_state::esq1_map(address_map &map)
 	map(0x4000, 0x5fff).ram();                 // SEQRAM
 	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
 	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0x6800, 0x68ff).w(this, FUNC(esq1_state::analog_w));
+	map(0x6800, 0x68ff).w(FUNC(esq1_state::analog_w));
 	map(0x7000, 0x7fff).bankr("osbank");
 	map(0x8000, 0xffff).rom().region("osrom", 0x8000);  // OS "high" ROM is always mapped here
 }
@@ -521,9 +525,9 @@ void esq1_state::sq80_map(address_map &map)
 //  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
 	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
 	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0x6800, 0x68ff).w(this, FUNC(esq1_state::analog_w));
-	map(0x6c00, 0x6dff).w(this, FUNC(esq1_state::mapper_w));
-	map(0x6e00, 0x6fff).rw(this, FUNC(esq1_state::wd1772_r), FUNC(esq1_state::wd1772_w));
+	map(0x6800, 0x68ff).w(FUNC(esq1_state::analog_w));
+	map(0x6c00, 0x6dff).w(FUNC(esq1_state::mapper_w));
+	map(0x6e00, 0x6fff).rw(FUNC(esq1_state::wd1772_r), FUNC(esq1_state::wd1772_w));
 	map(0x7000, 0x7fff).bankr("osbank");
 	map(0x8000, 0xffff).rom().region("osrom", 0x8000);  // OS "high" ROM is always mapped here
 }
@@ -585,54 +589,55 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 	}
 }
 
-MACHINE_CONFIG_START(esq1_state::esq1)
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000)) // XTAL not directly attached to CPU
-	MCFG_DEVICE_PROGRAM_MAP(esq1_map)
+void esq1_state::esq1(machine_config &config)
+{
+	MC6809(config, m_maincpu, XTAL(8'000'000)); // XTAL not directly attached to CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::esq1_map);
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(8'000'000) / 2)
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(8'000'000) / 16, XTAL(8'000'000) / 16, XTAL(8'000'000) / 8, XTAL(8'000'000) / 8)
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, esq1_state, duart_tx_a))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, esq1_state, duart_tx_b))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, esq1_state, duart_output))
+	SCN2681(config, m_duart, XTAL(8'000'000) / 2);
+	m_duart->set_clocks(XTAL(8'000'000) / 16, XTAL(8'000'000) / 16, XTAL(8'000'000) / 8, XTAL(8'000'000) / 8);
+	m_duart->irq_cb().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_duart->a_tx_cb().set(FUNC(esq1_state::duart_tx_a));
+	m_duart->b_tx_cb().set(FUNC(esq1_state::duart_tx_b));
+	m_duart->outport_cb().set(FUNC(esq1_state::duart_output));
 
-	MCFG_ESQPANEL2X40_ADD("panel")
-	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", scn2681_device, rx_b_w))
+	ESQPANEL2X40(config, m_panel);
+	m_panel->write_tx().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	auto &mdin(MIDI_PORT(config, "mdin"));
+	midiin_slot(mdin);
+	mdin.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w)); // route MIDI Tx send directly to 68681 channel A Rx
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	midiout_slot(MIDI_PORT(config, "mdout"));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("filters", ESQ1_FILTERS, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ESQ1_FILTERS(config, m_filters);
+	m_filters->add_route(0, "lspeaker", 1.0);
+	m_filters->add_route(1, "rspeaker", 1.0);
 
-	MCFG_ES5503_ADD("es5503", XTAL(8'000'000))
-	MCFG_ES5503_OUTPUT_CHANNELS(8)
-	MCFG_ES5503_IRQ_FUNC(WRITELINE(*this, esq1_state, esq1_doc_irq))
-	MCFG_ES5503_ADC_FUNC(READ8(*this, esq1_state, esq1_adc_read))
+	auto &es5503(ES5503(config, "es5503", XTAL(8'000'000)));
+	es5503.set_channels(8);
+	es5503.irq_func().set(FUNC(esq1_state::esq1_doc_irq));
+	es5503.adc_func().set(FUNC(esq1_state::esq1_adc_read));
+	es5503.add_route(0, "filters", 1.0, 0);
+	es5503.add_route(1, "filters", 1.0, 1);
+	es5503.add_route(2, "filters", 1.0, 2);
+	es5503.add_route(3, "filters", 1.0, 3);
+	es5503.add_route(4, "filters", 1.0, 4);
+	es5503.add_route(5, "filters", 1.0, 5);
+	es5503.add_route(6, "filters", 1.0, 6);
+	es5503.add_route(7, "filters", 1.0, 7);
+}
 
-	MCFG_SOUND_ROUTE(0, "filters", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "filters", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "filters", 1.0, 2)
-	MCFG_SOUND_ROUTE(3, "filters", 1.0, 3)
-	MCFG_SOUND_ROUTE(4, "filters", 1.0, 4)
-	MCFG_SOUND_ROUTE(5, "filters", 1.0, 5)
-	MCFG_SOUND_ROUTE(6, "filters", 1.0, 6)
-	MCFG_SOUND_ROUTE(7, "filters", 1.0, 7)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(esq1_state::sq80)
+void esq1_state::sq80(machine_config &config)
+{
 	esq1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sq80_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &esq1_state::sq80_map);
 
-	MCFG_WD1772_ADD(WD1772_TAG, 4000000)
-MACHINE_CONFIG_END
+	WD1772(config, m_fdc, 4000000);
+}
 
 static INPUT_PORTS_START( esq1 )
 	PORT_START("KEY0")

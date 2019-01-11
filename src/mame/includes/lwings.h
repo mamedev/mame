@@ -4,23 +4,34 @@
 #include "video/bufsprite.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "emupal.h"
 
 class lwings_state : public driver_device
 {
 public:
 	lwings_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram") ,
+		m_spriteram(*this, "spriteram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_soundlatch2(*this, "soundlatch_2"),
 		m_nmi_mask(0),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
 		m_msm(*this, "5205"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
+	void lwings(machine_config &config);
+	void trojan(machine_config &config);
+	void fball(machine_config &config);
+	void avengers(machine_config &config);
+	void avengersb(machine_config &config);
+
+	void init_avengersb();
+
+private:
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
@@ -69,7 +80,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void init_avengersb();
 	DECLARE_VIDEO_START(trojan);
 	DECLARE_VIDEO_START(avengers);
 	DECLARE_VIDEO_START(avengersb);
@@ -82,15 +92,11 @@ public:
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int avengers_fetch_paldata(  );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void lwings(machine_config &config);
-	void trojan(machine_config &config);
-	void fball(machine_config &config);
-	void avengers(machine_config &config);
-	void avengersb(machine_config &config);
 	void avengers_adpcm_io_map(address_map &map);
 	void avengers_map(address_map &map);
 	void fball_map(address_map &map);

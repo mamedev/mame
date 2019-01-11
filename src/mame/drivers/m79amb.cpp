@@ -125,14 +125,14 @@ WRITE8_MEMBER(m79amb_state::m79amb_8002_w)
 void m79amb_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x5fff).ram().w(this, FUNC(m79amb_state::ramtek_videoram_w)).share("videoram");
+	map(0x4000, 0x5fff).ram().w(FUNC(m79amb_state::ramtek_videoram_w)).share("videoram");
 	map(0x6000, 0x63ff).ram();                 /* ?? */
-	map(0x8000, 0x8000).portr("8000").w(this, FUNC(m79amb_state::m79amb_8000_w));
+	map(0x8000, 0x8000).portr("8000").w(FUNC(m79amb_state::m79amb_8000_w));
 	map(0x8001, 0x8001).writeonly().share("mask");
-	map(0x8002, 0x8002).portr("8002").w(this, FUNC(m79amb_state::m79amb_8002_w));
-	map(0x8003, 0x8003).w(this, FUNC(m79amb_state::m79amb_8003_w));
-	map(0x8004, 0x8004).r(this, FUNC(m79amb_state::gray5bit_controller0_r));
-	map(0x8005, 0x8005).r(this, FUNC(m79amb_state::gray5bit_controller1_r));
+	map(0x8002, 0x8002).portr("8002").w(FUNC(m79amb_state::m79amb_8002_w));
+	map(0x8003, 0x8003).w(FUNC(m79amb_state::m79amb_8003_w));
+	map(0x8004, 0x8004).r(FUNC(m79amb_state::gray5bit_controller0_r));
+	map(0x8005, 0x8005).r(FUNC(m79amb_state::gray5bit_controller1_r));
 	map(0xc000, 0xc07f).ram();                 /* ?? */
 	map(0xc200, 0xc27f).ram();                 /* ?? */
 }

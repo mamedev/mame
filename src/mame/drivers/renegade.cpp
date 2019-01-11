@@ -107,6 +107,7 @@ $8000 - $ffff   ROM
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/3526intf.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -159,12 +160,12 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	{
 		m_msm->reset_w(1);
 		m_adpcm_playing = false;
-		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 	else
 	{
 		uint8_t const data = m_adpcmrom[m_adpcm_pos / 2];
-		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
+		m_msm->write_data(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
 		m_adpcm_pos++;
 	}
 }
@@ -237,18 +238,18 @@ WRITE8_MEMBER(renegade_state::coincounter_w)
 void renegade_state::renegade_nomcu_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
-	map(0x1800, 0x1fff).ram().w(this, FUNC(renegade_state::fg_videoram_w)).share("fg_videoram");
+	map(0x1800, 0x1fff).ram().w(FUNC(renegade_state::fg_videoram_w)).share("fg_videoram");
 	map(0x2000, 0x27ff).ram().share("spriteram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(renegade_state::bg_videoram_w)).share("bg_videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(renegade_state::bg_videoram_w)).share("bg_videoram");
 	map(0x3000, 0x30ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x3100, 0x31ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0x3800, 0x3800).portr("IN0").w(this, FUNC(renegade_state::scroll_lsb_w));       /* Player#1 controls, P1,P2 start */
-	map(0x3801, 0x3801).portr("IN1").w(this, FUNC(renegade_state::scroll_msb_w));       /* Player#2 controls, coin triggers */
+	map(0x3800, 0x3800).portr("IN0").w(FUNC(renegade_state::scroll_lsb_w));       /* Player#1 controls, P1,P2 start */
+	map(0x3801, 0x3801).portr("IN1").w(FUNC(renegade_state::scroll_msb_w));       /* Player#2 controls, coin triggers */
 	map(0x3802, 0x3802).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write)); /* DIP2  various IO ports */
-	map(0x3803, 0x3803).portr("DSW1").w(this, FUNC(renegade_state::flipscreen_w));   /* DIP1 */
-	map(0x3805, 0x3805).nopr().w(this, FUNC(renegade_state::bankswitch_w));
+	map(0x3803, 0x3803).portr("DSW1").w(FUNC(renegade_state::flipscreen_w));   /* DIP1 */
+	map(0x3805, 0x3805).nopr().w(FUNC(renegade_state::bankswitch_w));
 	map(0x3806, 0x3806).nopw(); // ?? watchdog
-	map(0x3807, 0x3807).w(this, FUNC(renegade_state::coincounter_w));
+	map(0x3807, 0x3807).w(FUNC(renegade_state::coincounter_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom();
 }
@@ -257,17 +258,17 @@ void renegade_state::renegade_map(address_map &map)
 {
 	renegade_nomcu_map(map);
 	map(0x3804, 0x3804).rw(m_mcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x3805, 0x3805).r(this, FUNC(renegade_state::mcu_reset_r));
+	map(0x3805, 0x3805).r(FUNC(renegade_state::mcu_reset_r));
 }
 
 void renegade_state::renegade_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1800, 0x1800).w(this, FUNC(renegade_state::adpcm_start_w));
-	map(0x2000, 0x2000).w(this, FUNC(renegade_state::adpcm_addr_w));
+	map(0x1800, 0x1800).w(FUNC(renegade_state::adpcm_start_w));
+	map(0x2000, 0x2000).w(FUNC(renegade_state::adpcm_addr_w));
 	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-	map(0x3000, 0x3000).w(this, FUNC(renegade_state::adpcm_stop_w));
+	map(0x3000, 0x3000).w(FUNC(renegade_state::adpcm_stop_w));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -470,55 +471,53 @@ void renegade_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(renegade_state::renegade)
-
+void renegade_state::renegade(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12000000/8)  /* 1.5 MHz (measured) */
-	MCFG_DEVICE_PROGRAM_MAP(renegade_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", renegade_state, interrupt, "screen", 0, 1)
+	M6502(config, m_maincpu, 12000000/8);  /* 1.5 MHz (measured) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &renegade_state::renegade_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(renegade_state::interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, 12000000/2) // HD68A09P
-	MCFG_DEVICE_PROGRAM_MAP(renegade_sound_map)    /* IRQs are caused by the main CPU */
+	MC6809(config, m_audiocpu, 12000000/2); // HD68A09P
+	m_audiocpu->set_addrmap(AS_PROGRAM, &renegade_state::renegade_sound_map);    /* IRQs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", TAITO68705_MCU, 12000000/4) // ?
+	TAITO68705_MCU(config, m_mcu, 12000000/4); // ?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)*2)  /* not accurate */
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(renegade_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)*2);  /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 0, 30*8-1);
+	screen.set_screen_update(FUNC(renegade_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_renegade)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_renegade);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, 12000000/4)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", 12000000/4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 12000000/32)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, renegade_state, adpcm_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 12000000/32);
+	m_msm->vck_legacy_callback().set(FUNC(renegade_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(renegade_state::kuniokunb)
+void renegade_state::kuniokunb(machine_config &config)
+{
 	renegade(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(renegade_nomcu_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &renegade_state::renegade_nomcu_map);
 
-	MCFG_DEVICE_REMOVE("mcu")
-MACHINE_CONFIG_END
+	config.device_remove("mcu");
+}
 
 
 ROM_START( renegade )

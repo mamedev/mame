@@ -133,25 +133,25 @@ WRITE8_MEMBER(route16_state::stratvox_sn76477_w)
 
 
 
-/*************************************
+/***************************************************
  *
- *  T.T Mahjong's multiplixed ports
+ *  Jongputer and T.T Mahjong's multiplixed ports
  *
- *************************************/
+ ***************************************************/
 
 
 
-WRITE8_MEMBER(route16_state::ttmahjng_input_port_matrix_w)
+WRITE8_MEMBER(route16_state::jongpute_input_port_matrix_w)
 {
-	m_ttmahjng_port_select = data;
+	m_jongpute_port_select = data;
 }
 
 
-READ8_MEMBER(route16_state::ttmahjng_p1_matrix_r)
+READ8_MEMBER(route16_state::jongpute_p1_matrix_r)
 {
 	uint8_t ret = 0;
 
-	switch (m_ttmahjng_port_select)
+	switch (m_jongpute_port_select)
 	{
 	case 1:  ret = ioport("KEY0")->read(); break;
 	case 2:  ret = ioport("KEY1")->read(); break;
@@ -163,11 +163,11 @@ READ8_MEMBER(route16_state::ttmahjng_p1_matrix_r)
 	return ret;
 }
 
-READ8_MEMBER(route16_state::ttmahjng_p2_matrix_r)
+READ8_MEMBER(route16_state::jongpute_p2_matrix_r)
 {
 	uint8_t ret = 0;
 
-	switch (m_ttmahjng_port_select)
+	switch (m_jongpute_port_select)
 	{
 	case 1:  ret = ioport("KEY4")->read(); break;
 	case 2:  ret = ioport("KEY5")->read(); break;
@@ -220,10 +220,10 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
 void route16_state::route16_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-	map(0x3000, 0x3001).r(this, FUNC(route16_state::route16_prot_read));
-	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x3000, 0x3001).r(FUNC(route16_state::route16_prot_read));
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
@@ -232,11 +232,11 @@ void route16_state::route16_cpu1_map(address_map &map)
 void route16_state::routex_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
-	map(0x6400, 0x6400).r(this, FUNC(route16_state::routex_prot_read));
+	map(0x6400, 0x6400).r(FUNC(route16_state::routex_prot_read));
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
@@ -245,8 +245,8 @@ void route16_state::stratvox_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
@@ -256,21 +256,21 @@ void route16_state::speakres_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
-	map(0x5800, 0x5800).portr("P2").w(this, FUNC(route16_state::speakres_out2_w));
-	map(0x6000, 0x6000).r(this, FUNC(route16_state::speakres_in3_r));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2").w(FUNC(route16_state::speakres_out2_w));
+	map(0x6000, 0x6000).r(FUNC(route16_state::speakres_in3_r));
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
 
-void route16_state::ttmahjng_cpu1_map(address_map &map)
+void route16_state::jongpute_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).r(this, FUNC(route16_state::ttmahjng_p2_matrix_r)).w(this, FUNC(route16_state::out1_w));
-	map(0x5800, 0x5800).rw(this, FUNC(route16_state::ttmahjng_p1_matrix_r), FUNC(route16_state::ttmahjng_input_port_matrix_w));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).r(FUNC(route16_state::jongpute_p2_matrix_r)).w(FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).rw(FUNC(route16_state::jongpute_p1_matrix_r), FUNC(route16_state::jongpute_input_port_matrix_w));
 	map(0x6800, 0x6800).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x6900, 0x6900).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0x8000, 0xbfff).ram().share("videoram1");
@@ -280,7 +280,7 @@ void route16_state::ttmahjng_cpu1_map(address_map &map)
 void route16_state::route16_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<false>)).share("sharedram");
+	map(0x4000, 0x43ff).ram().w(FUNC(route16_state::route16_sharedram_w<false>)).share("sharedram");
 	map(0x8000, 0xbfff).ram().share("videoram2");
 }
 
@@ -288,7 +288,7 @@ void route16_state::route16_cpu2_map(address_map &map)
 void route16_state::stratvox_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2800, 0x2800).w("dac", FUNC(dac_byte_interface::write));
+	map(0x2800, 0x2800).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x4000, 0x43ff).ram().share("sharedram");
 	map(0x8000, 0xbfff).ram().share("videoram2");
 }
@@ -488,112 +488,93 @@ static INPUT_PORTS_START( spacecho )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( ttmahjng )
+static INPUT_PORTS_START( jongpute )
 	PORT_START("DSW")       /* IN0 */
-	PORT_DIPNAME( 0x01, 0x00, "Unknown 01" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x01, "01" )
-	PORT_DIPNAME( 0x02, 0x00, "Unknown 02" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x02, "02" )
-	PORT_DIPNAME( 0x04, 0x00, "Unknown 04" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x04, "04" )
-	PORT_DIPNAME( 0x08, 0x00, "Unknown 08" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x08, "08" )
-	PORT_DIPNAME( 0x10, 0x00, "Unknown 10" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x10, "10" )
-	PORT_DIPNAME( 0x20, 0x00, "Unknown 20" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x20, "20" )
-	PORT_DIPNAME( 0x40, 0x00, "Unknown 40" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x40, "40" )
-	PORT_DIPNAME( 0x80, 0x00, "Unknown 80" )
-	PORT_DIPSETTING(    0x00, "00" )
-	PORT_DIPSETTING(    0x80, "80" )
+	PORT_DIPNAME( 0x0c, 0x08, "Timer Descrement Speed" )
+	PORT_DIPSETTING(    0x00, "Very Fast" )
+	PORT_DIPSETTING(    0x04, "Fast" )
+	PORT_DIPSETTING(    0x08, "Normal" )
+	PORT_DIPSETTING(    0x0c, "Slow" )
 
 	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_E )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_I )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_M )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_B )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_F )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_N )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_C )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_G )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_K )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_RON )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_H )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_L )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_PON )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_E ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_I ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_M ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_B ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_N ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_C ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_K ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_RON ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_D ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_L ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_PON ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 MACHINE_START_MEMBER(route16_state, speakres)
@@ -601,9 +582,9 @@ MACHINE_START_MEMBER(route16_state, speakres)
 	save_item(NAME(m_speakres_vrx));
 }
 
-MACHINE_START_MEMBER(route16_state, ttmahjng)
+MACHINE_START_MEMBER(route16_state, jongpute)
 {
-	save_item(NAME(m_ttmahjng_port_select));
+	save_item(NAME(m_jongpute_port_select));
 }
 
 void route16_state::init_route16()
@@ -611,119 +592,110 @@ void route16_state::init_route16()
 	save_item(NAME(m_protection_data));
 }
 
-MACHINE_CONFIG_START(route16_state::route16)
-
+void route16_state::route16(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(route16_cpu1_map)
-	MCFG_DEVICE_IO_MAP(cpu1_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", route16_state,  irq0_line_hold)
+	Z80(config, m_cpu1, 2500000);  /* 10MHz / 4 = 2.5MHz */
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu1_map);
+	m_cpu1->set_addrmap(AS_IO, &route16_state::cpu1_io_map);
+	m_cpu1->set_vblank_int("screen", FUNC(route16_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("cpu2", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(route16_cpu2_map)
+	Z80(config, m_cpu2, 2500000);  /* 10MHz / 4 = 2.5MHz */
+	m_cpu2->set_addrmap(AS_PROGRAM, &route16_state::route16_cpu2_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   /* frames per second, vblank duration */
-	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_route16)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0, 256-1);
+	m_screen->set_refresh_hz(57);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(route16_state::screen_update_route16));
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	AY8910(config, "ay8910", 10000000/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
 
-MACHINE_CONFIG_START(route16_state::routex)
+void route16_state::routex(machine_config &config)
+{
 	route16(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(routex_cpu1_map)
-MACHINE_CONFIG_END
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::routex_cpu1_map);
+}
 
 
-MACHINE_CONFIG_START(route16_state::stratvox)
+void route16_state::stratvox(machine_config &config)
+{
 	route16(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(stratvox_cpu1_map)
-
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PROGRAM_MAP(stratvox_cpu2_map)
-
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::stratvox_cpu1_map);
+	m_cpu2->set_addrmap(AS_PROGRAM, &route16_state::stratvox_cpu2_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_ttmahjng)
+	m_screen->set_screen_update(FUNC(route16_state::screen_update_jongpute));
 
 	/* sound hardware */
-	MCFG_DEVICE_MODIFY("ay8910")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, route16_state, stratvox_sn76477_w))  /* SN76477 commands (not used in Route 16?) */
+	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(route16_state::stratvox_sn76477_w));  /* SN76477 commands (not used in Route 16?) */
 
-	MCFG_DEVICE_ADD("snsnd", SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(150), CAP_U(0.001)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_M(3.3))                  // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1), RES_K(4.7))    // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(200))                    // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(55))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(5.0 * 2/ (2 + 10), CAP_U(0.022), RES_K(100)) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(75))      // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(2.2), RES_K(4.7)) // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(47), RES_K(150), CAP_U(0.001));
+	m_sn->set_decay_res(RES_M(3.3));
+	m_sn->set_attack_params(CAP_U(1), RES_K(4.7));
+	m_sn->set_amp_res(RES_K(200));
+	m_sn->set_feedback_res(RES_K(55));
+	m_sn->set_vco_params(5.0 * 2/ (2 + 10), CAP_U(0.022), RES_K(100));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(75));
+	m_sn->set_oneshot_params(CAP_U(2.2), RES_K(4.7));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(0, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-
-MACHINE_CONFIG_START(route16_state::speakres)
+void route16_state::speakres(machine_config &config)
+{
 	stratvox(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(speakres_cpu1_map)
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::speakres_cpu1_map);
 
 	MCFG_MACHINE_START_OVERRIDE(route16_state, speakres)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(route16_state::spacecho)
+void route16_state::spacecho(machine_config &config)
+{
 	speakres(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("cpu2")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(route16_state, irq0_line_hold, 48*60)
-MACHINE_CONFIG_END
+	m_cpu2->set_periodic_int(FUNC(route16_state::irq0_line_hold), attotime::from_hz(48*60));
+}
 
-
-MACHINE_CONFIG_START(route16_state::ttmahjng)
+void route16_state::jongpute(machine_config &config)
+{
 	route16(config);
-	MCFG_DEVICE_MODIFY("cpu1")
-	MCFG_DEVICE_PROGRAM_MAP(ttmahjng_cpu1_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
+	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::jongpute_cpu1_map);
+	m_cpu1->set_addrmap(AS_IO, address_map_constructor());
 
-	MCFG_MACHINE_START_OVERRIDE(route16_state, ttmahjng)
+	MCFG_MACHINE_START_OVERRIDE(route16_state, jongpute)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(route16_state, screen_update_ttmahjng)
+	m_screen->set_screen_update(FUNC(route16_state::screen_update_jongpute));
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
-MACHINE_CONFIG_END
+	PALETTE(config.replace(), m_palette, palette_device::BGR_3BIT);
+}
 
 
 
@@ -1052,6 +1024,25 @@ ROM_START( ttmahjng )
 	ROM_LOAD( "ju09",         0x0100, 0x0100, CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
 ROM_END
 
+ROM_START( jongpute )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "j2",           0x0000, 0x1000, CRC(6690b6a4) SHA1(ab79faa1ed84d766eee652f3cbdc0296ddb80fe2) )
+	ROM_LOAD( "j3",           0x1000, 0x1000, CRC(985723d3) SHA1(9d7499c48cfc242875a95d01459b8f3252ea41bc) )
+	ROM_LOAD( "j4",           0x2000, 0x1000, CRC(f35ab1e6) SHA1(5b76d05ab9d8b2a88b408cf9e9297ec31a8de33a) )
+	ROM_LOAD( "j5",           0x3000, 0x1000, CRC(77074618) SHA1(73329e945ea578bce1d04c80e09929bfb0e9875b) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "j6",           0x0000, 0x1000, CRC(54b349b0) SHA1(e5620b85a24a35d995860c7121f1ddf16f7ea168) )
+
+	/* maybe used for pseudo sampling voice, "reach", that is not emulated yet */
+	ROM_REGION( 0x1000, "unknown", 0 )
+	ROM_LOAD( "j1",           0x0000, 0x1000, CRC(6d6ba272) SHA1(a4efd8daddbbf595ee46484578f544d7ed84e090) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	/* not dumped, but ttmahjng roms seem to be compatible completely */
+	ROM_LOAD( "ju03",         0x0000, 0x0100, BAD_DUMP CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
+	ROM_LOAD( "ju09",         0x0100, 0x0100, BAD_DUMP CRC(27d47624) SHA1(ee04ce8043216be8b91413b546479419fca2b917) )
+ROM_END
 
 
 /*************************************
@@ -1107,4 +1098,5 @@ GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,  
 GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, route16_state, empty_init,    ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
+GAME( 1981, ttmahjng, jongpute, jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

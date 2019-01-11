@@ -339,7 +339,7 @@ WRITE_LINE_MEMBER(firetrap_state::firetrap_adpcm_int)
 WRITE8_MEMBER(firetrap_state::adpcm_data_w)
 {
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-	m_adpcm_select->ba_w(data);
+	m_adpcm_select->write_ba(data);
 }
 
 WRITE8_MEMBER(firetrap_state::flip_screen_w)
@@ -352,20 +352,20 @@ void firetrap_state::firetrap_base_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(firetrap_state::firetrap_bg1videoram_w)).share("bg1videoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(firetrap_state::firetrap_bg2videoram_w)).share("bg2videoram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(firetrap_state::firetrap_fgvideoram_w)).share("fgvideoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(firetrap_state::firetrap_bg1videoram_w)).share("bg1videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(firetrap_state::firetrap_bg2videoram_w)).share("bg2videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(firetrap_state::firetrap_fgvideoram_w)).share("fgvideoram");
 	map(0xe800, 0xe97f).ram().share("spriteram");
 	map(0xf000, 0xf000).nopw();    /* IRQ acknowledge */
 	map(0xf001, 0xf001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf002, 0xf002).w(this, FUNC(firetrap_state::firetrap_bankselect_w));
-	map(0xf003, 0xf003).w(this, FUNC(firetrap_state::flip_screen_w));
-	map(0xf004, 0xf004).w(this, FUNC(firetrap_state::firetrap_nmi_disable_w));
-	map(0xf005, 0xf005).w(this, FUNC(firetrap_state::firetrap_8751_w));
-	map(0xf008, 0xf009).w(this, FUNC(firetrap_state::firetrap_bg1_scrollx_w));
-	map(0xf00a, 0xf00b).w(this, FUNC(firetrap_state::firetrap_bg1_scrolly_w));
-	map(0xf00c, 0xf00d).w(this, FUNC(firetrap_state::firetrap_bg2_scrollx_w));
-	map(0xf00e, 0xf00f).w(this, FUNC(firetrap_state::firetrap_bg2_scrolly_w));
+	map(0xf002, 0xf002).w(FUNC(firetrap_state::firetrap_bankselect_w));
+	map(0xf003, 0xf003).w(FUNC(firetrap_state::flip_screen_w));
+	map(0xf004, 0xf004).w(FUNC(firetrap_state::firetrap_nmi_disable_w));
+	map(0xf005, 0xf005).w(FUNC(firetrap_state::firetrap_8751_w));
+	map(0xf008, 0xf009).w(FUNC(firetrap_state::firetrap_bg1_scrollx_w));
+	map(0xf00a, 0xf00b).w(FUNC(firetrap_state::firetrap_bg1_scrolly_w));
+	map(0xf00c, 0xf00d).w(FUNC(firetrap_state::firetrap_bg2_scrollx_w));
+	map(0xf00e, 0xf00f).w(FUNC(firetrap_state::firetrap_bg2_scrolly_w));
 	map(0xf010, 0xf010).portr("IN0");
 	map(0xf011, 0xf011).portr("IN1");
 	map(0xf012, 0xf012).portr("IN2");
@@ -376,13 +376,13 @@ void firetrap_state::firetrap_base_map(address_map &map)
 void firetrap_state::firetrap_map(address_map &map)
 {
 	firetrap_base_map(map);
-	map(0xf016, 0xf016).r(this, FUNC(firetrap_state::firetrap_8751_r));
+	map(0xf016, 0xf016).r(FUNC(firetrap_state::firetrap_8751_r));
 }
 
 void firetrap_state::firetrap_bootleg_map(address_map &map)
 {
 	firetrap_base_map(map);
-	map(0xf016, 0xf016).r(this, FUNC(firetrap_state::firetrap_8751_bootleg_r));
+	map(0xf016, 0xf016).r(FUNC(firetrap_state::firetrap_8751_bootleg_r));
 	map(0xf800, 0xf8ff).rom(); /* extra ROM in the bootleg with unprotection code */
 }
 
@@ -390,9 +390,9 @@ void firetrap_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x1000, 0x1001).w("ymsnd", FUNC(ym3526_device::write));
-	map(0x2000, 0x2000).w(this, FUNC(firetrap_state::adpcm_data_w));
-	map(0x2400, 0x2400).w(this, FUNC(firetrap_state::sound_flip_flop_w));
-	map(0x2800, 0x2800).w(this, FUNC(firetrap_state::sound_bankselect_w));
+	map(0x2000, 0x2000).w(FUNC(firetrap_state::adpcm_data_w));
+	map(0x2400, 0x2400).w(FUNC(firetrap_state::sound_flip_flop_w));
+	map(0x2800, 0x2800).w(FUNC(firetrap_state::sound_bankselect_w));
 	map(0x3400, 0x3400).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x4000, 0x7fff).bankr("bank2");
 	map(0x8000, 0xffff).rom();
@@ -615,98 +615,95 @@ void firetrap_state::machine_reset()
 	m_coin_command_pending = 0;
 }
 
-MACHINE_CONFIG_START(firetrap_state::firetrap)
-
+void firetrap_state::firetrap(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(firetrap_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", firetrap_state, firetrap_irq)
+	Z80(config, m_maincpu, FIRETRAP_XTAL/2);	// 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &firetrap_state::firetrap_map);
+	m_maincpu->set_vblank_int("screen", FUNC(firetrap_state::firetrap_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)    // 1.5 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-							/* IRQs are caused by the ADPCM chip */
-							/* NMIs are caused by the main CPU */
+	M6502(config, m_audiocpu, FIRETRAP_XTAL/8);	// 1.5 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &firetrap_state::sound_map);
+	/* IRQs are caused by the ADPCM chip */
+	/* NMIs are caused by the main CPU */
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_DEVICE_DISABLE()
+	I8751(config, "mcu", XTAL(8'000'000)).set_disable();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(57.4034) // PCB measurement
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(57.4034); // PCB measurement
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	// DECO video CRTC, unverified
-	MCFG_SCREEN_RAW_PARAMS(FIRETRAP_XTAL/2,384,0,256,272,8,248)
-	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw(FIRETRAP_XTAL/2,384,0,256,272,8,248);
+	screen.set_screen_update(FUNC(firetrap_state::screen_update_firetrap));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrap)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firetrap);
+	PALETTE(config, m_palette, FUNC(firetrap_state::firetrap_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", FIRETRAP_XTAL/4));    // 3 MHz
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, firetrap_state, firetrap_adpcm_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 7.8125kHz          */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, FIRETRAP_XTAL/32);	// 375 kHz
+	m_msm->vck_callback().set(FUNC(firetrap_state::firetrap_adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 7.8125kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-MACHINE_CONFIG_START(firetrap_state::firetrapbl)
-
+void firetrap_state::firetrapbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(firetrap_bootleg_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", firetrap_state,  firetrap_irq)
+	Z80(config, m_maincpu, FIRETRAP_XTAL/2);	// 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &firetrap_state::firetrap_bootleg_map);
+	m_maincpu->set_vblank_int("screen", FUNC(firetrap_state::firetrap_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, FIRETRAP_XTAL/8)    // 1.5 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-							/* IRQs are caused by the ADPCM chip */
-							/* NMIs are caused by the main CPU */
+	M6502(config, m_audiocpu, FIRETRAP_XTAL/8);	// 1.5 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &firetrap_state::sound_map);
+	/* IRQs are caused by the ADPCM chip */
+	/* NMIs are caused by the main CPU */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(57.4034)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(57.4034);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	// DECO video CRTC, unverified
-	MCFG_SCREEN_RAW_PARAMS(FIRETRAP_XTAL/2,384,0,256,272,8,248)
-	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw(FIRETRAP_XTAL/2,384,0,256,272,8,248);
+	screen.set_screen_update(FUNC(firetrap_state::screen_update_firetrap));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrap)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(firetrap_state, firetrap)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firetrap);
+	PALETTE(config, m_palette, FUNC(firetrap_state::firetrap_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", FIRETRAP_XTAL/4));	// 3 MHz
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
+	LS157(config, m_adpcm_select, 0);
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, firetrap_state, firetrap_adpcm_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 7.8125kHz          */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, FIRETRAP_XTAL/32);	// 375 kHz
+	m_msm->vck_callback().set(FUNC(firetrap_state::firetrap_adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 7.8125kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 
 

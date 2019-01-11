@@ -163,6 +163,9 @@ public:
 		, m_centronics(*this, "centronics")
 	{}
 
+	void spc1000(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(iplk_w);
 	DECLARE_READ8_MEMBER(iplk_r);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
@@ -178,10 +181,9 @@ public:
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
-	void spc1000(machine_config &config);
 	void spc1000_io(address_map &map);
 	void spc1000_mem(address_map &map);
-private:
+
 	uint8_t m_IPLK;
 	uint8_t m_GMODE;
 	uint16_t m_page;
@@ -269,12 +271,12 @@ void spc1000_state::spc1000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("videoram");
-	map(0x2000, 0x3fff).rw(this, FUNC(spc1000_state::gmode_r), FUNC(spc1000_state::gmode_w));
+	map(0x2000, 0x3fff).rw(FUNC(spc1000_state::gmode_r), FUNC(spc1000_state::gmode_w));
 	map(0x4000, 0x4000).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0x4001, 0x4001).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x6000, 0x6000).w(this, FUNC(spc1000_state::cass_w));
-	map(0x8000, 0x9fff).r(this, FUNC(spc1000_state::keyboard_r));
-	map(0xa000, 0xa000).rw(this, FUNC(spc1000_state::iplk_r), FUNC(spc1000_state::iplk_w));
+	map(0x6000, 0x6000).w(FUNC(spc1000_state::cass_w));
+	map(0x8000, 0x9fff).r(FUNC(spc1000_state::keyboard_r));
+	map(0xa000, 0xa000).rw(FUNC(spc1000_state::iplk_r), FUNC(spc1000_state::iplk_w));
 	map(0xc000, 0xdfff).rw("ext1", FUNC(spc1000_exp_device::read), FUNC(spc1000_exp_device::write));
 }
 
@@ -482,16 +484,16 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(4'000'000) / 1)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spc1000_state, porta_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(4'000'000) / 1));
+	ay8910.port_a_read_callback().set(FUNC(spc1000_state::porta_r));
+	ay8910.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1000_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
@@ -504,8 +506,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1000_cass")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -11,7 +11,7 @@
 
 void wpc_dot_state::wpc_dot_map(address_map &map)
 {
-	map(0x0000, 0x2fff).rw(this, FUNC(wpc_dot_state::ram_r), FUNC(wpc_dot_state::ram_w));
+	map(0x0000, 0x2fff).rw(FUNC(wpc_dot_state::ram_r), FUNC(wpc_dot_state::ram_w));
 	map(0x3000, 0x31ff).bankrw("dmdbank1");
 	map(0x3200, 0x33ff).bankrw("dmdbank2");
 	map(0x3400, 0x35ff).bankrw("dmdbank3");
@@ -170,18 +170,18 @@ void wpc_dot_state::init_wpc_dot()
 	m_cpubank->set_entry(0);
 	m_fixedbank->configure_entries(0, 1, &fixed[codeoff],0x8000);
 	m_fixedbank->set_entry(0);
-	m_dmdbank1->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank1->set_entry(0);
-	m_dmdbank2->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank2->set_entry(1);
-	m_dmdbank3->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank3->set_entry(2);
-	m_dmdbank4->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank4->set_entry(3);
-	m_dmdbank5->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank5->set_entry(4);
-	m_dmdbank6->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
-	m_dmdbank6->set_entry(5);
+	m_dmdbanks[0]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[0]->set_entry(0);
+	m_dmdbanks[1]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[1]->set_entry(1);
+	m_dmdbanks[2]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[2]->set_entry(2);
+	m_dmdbanks[3]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[3]->set_entry(3);
+	m_dmdbanks[4]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[4]->set_entry(4);
+	m_dmdbanks[5]->configure_entries(0, 16, &m_dmdram[0x0000],0x200);
+	m_dmdbanks[5]->set_entry(5);
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
 	m_vblank_timer->adjust(attotime::from_hz(60),0,attotime::from_hz(60*4));
 	m_irq_timer = timer_alloc(TIMER_IRQ);
@@ -213,28 +213,18 @@ WRITE8_MEMBER(wpc_dot_state::wpc_rombank_w)
 
 WRITE8_MEMBER(wpc_dot_state::wpc_dmdbank_w)
 {
-	uint8_t page = offset >> 4;
+	uint8_t const bank(offset & 0x07);
+	uint8_t const page(offset >> 4);
 
-	switch(offset & 0x07)
+	switch (bank)
 	{
 	case 0:
-		m_dmdbank1->set_entry(data + (page*16));
-		break;
 	case 1:
-		m_dmdbank2->set_entry(data + (page*16));
-		break;
 	case 2:
-		m_dmdbank3->set_entry(data + (page*16));
-		break;
 	case 3:
-		m_dmdbank4->set_entry(data + (page*16));
-		break;
 	case 4:
-		m_dmdbank5->set_entry(data + (page*16));
-		break;
 	case 5:
-		m_dmdbank6->set_entry(data + (page*16));
-		break;
+		m_dmdbanks[bank]->set_entry(data + (page << 4));
 	}
 }
 
@@ -302,33 +292,35 @@ uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-MACHINE_CONFIG_START(wpc_dot_state::wpc_dot)
+void wpc_dot_state::wpc_dot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(wpc_dot_map)
+	M6809(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_dot_state::wpc_dot_map);
 
-	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_dot_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_dot_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_dot_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_dot_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_dot_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_dot_state,wpc_sound_data_r),WRITE8(*this, wpc_dot_state,wpc_sound_data_w))
-	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_dot_state,wpc_dmdbank_w))
+	WPCASIC(config, m_wpc, 0);
+	m_wpc->irq_callback().set(FUNC(wpc_dot_state::wpc_irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_dot_state::wpc_firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_dot_state::wpc_rombank_w));
+	m_wpc->sound_ctrl_read().set(FUNC(wpc_dot_state::wpc_sound_ctrl_r));
+	m_wpc->sound_ctrl_write().set(FUNC(wpc_dot_state::wpc_sound_ctrl_w));
+	m_wpc->sound_data_read().set(FUNC(wpc_dot_state::wpc_sound_data_r));
+	m_wpc->sound_data_write().set(FUNC(wpc_dot_state::wpc_sound_data_w));
+	m_wpc->dmdbank_write().set(FUNC(wpc_dot_state::wpc_dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
-	MCFG_WPC_ROM_REGION("sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_dot_state,wpcsnd_reply_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	WPCSND(config, m_wpcsnd);
+	m_wpcsnd->set_romregion("sound1");
+	m_wpcsnd->reply_callback().set(FUNC(wpc_dot_state::wpcsnd_reply_w));
+	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(128, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(wpc_dot_state, screen_update)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_native_aspect();
+	screen.set_size(128, 32);
+	screen.set_visarea(0, 128-1, 0, 32-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(wpc_dot_state::screen_update));
+}
 
 /*-----------------
 / Gilligan's Island #20003

@@ -5,17 +5,23 @@
     Mermaid
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MERMAID_H
+#define MAME_INCLUDES_MERMAID_H
 
+#pragma once
+
+#include "machine/74259.h"
 #include "machine/ripple_counter.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 
 class mermaid_state : public driver_device
 {
 public:
-	mermaid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mermaid_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram2(*this, "videoram2"),
 		m_videoram(*this, "videoram"),
 		m_bg_scrollram(*this, "bg_scrollram"),
@@ -28,10 +34,15 @@ public:
 		m_ay8910(*this, "ay%u", 1),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_latch(*this, "latch%u", 1U)
 	{
 	}
 
+	void rougien(machine_config &config);
+	void mermaid(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram2;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -68,6 +79,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device_array<ls259_device, 2> m_latch;
 
 	uint8_t    m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(mermaid_ay8910_write_port_w);
@@ -94,15 +106,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mermaid);
-	DECLARE_PALETTE_INIT(rougien);
+	void common_palette(palette_device &palette) const;
+	void mermaid_palette(palette_device &palette) const;
+	void rougien_palette(palette_device &palette) const;
 	uint32_t screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mermaid);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	uint8_t collision_check( rectangle& rect );
 	void collision_update();
 	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
-	void rougien(machine_config &config);
-	void mermaid(machine_config &config);
 	void mermaid_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MERMAID_H

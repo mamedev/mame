@@ -52,15 +52,16 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_corvfdc02_device::device_add_mconfig)
-	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc02_device, intrq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, a2bus_corvfdc02_device, drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":0", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":1", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":2", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC02_FDC_TAG":3", corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats)
-MACHINE_CONFIG_END
+void a2bus_corvfdc02_device::device_add_mconfig(machine_config &config)
+{
+	UPD765A(config, m_fdc, 8'000'000, true, false);
+	m_fdc->intrq_wr_callback().set(FUNC(a2bus_corvfdc02_device::intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(a2bus_corvfdc02_device::drq_w));
+	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con2, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con3, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con4, corv_floppies, "525dsqd", a2bus_corvfdc02_device::corv_floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -131,10 +132,10 @@ uint8_t a2bus_corvfdc02_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0: // 765 FIFO
-			return m_fdc->fifo_r();
+			return m_fdc->read_fifo();
 
 		case 1: // 765 MSR
-			return m_fdc->msr_r();
+			return m_fdc->read_msr();
 
 		case 2: // buffer address
 			return (m_bufptr>>1) & 0xff;
@@ -169,7 +170,7 @@ void a2bus_corvfdc02_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:    // FDC FIFO write
-			m_fdc->fifo_w(data);
+			m_fdc->write_fifo(data);
 			break;
 
 		case 1:    // FDC ???

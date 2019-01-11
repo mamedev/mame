@@ -79,7 +79,7 @@ WRITE8_MEMBER(fastlane_state::fastlane_k2_k007232_w)
 }
 void fastlane_state::fastlane_map(address_map &map)
 {
-	map(0x0000, 0x005f).ram().w(this, FUNC(fastlane_state::k007121_registers_w)).share("k007121_regs"); /* 007121 registers */
+	map(0x0000, 0x005f).ram().w(FUNC(fastlane_state::k007121_registers_w)).share("k007121_regs"); /* 007121 registers */
 	map(0x0800, 0x0800).portr("DSW3");
 	map(0x0801, 0x0801).portr("P2");
 	map(0x0802, 0x0802).portr("P1");
@@ -87,14 +87,14 @@ void fastlane_state::fastlane_map(address_map &map)
 	map(0x0900, 0x0900).portr("DSW1");
 	map(0x0901, 0x0901).portr("DSW2");
 	map(0x0b00, 0x0b00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0c00, 0x0c00).w(this, FUNC(fastlane_state::fastlane_bankswitch_w));                                    /* bankswitch control */
-	map(0x0d00, 0x0d0d).rw(this, FUNC(fastlane_state::fastlane_k1_k007232_r), FUNC(fastlane_state::fastlane_k1_k007232_w)); /* 007232 registers (chip 1) */
-	map(0x0e00, 0x0e0d).rw(this, FUNC(fastlane_state::fastlane_k2_k007232_r), FUNC(fastlane_state::fastlane_k2_k007232_w)); /* 007232 registers (chip 2) */
+	map(0x0c00, 0x0c00).w(FUNC(fastlane_state::fastlane_bankswitch_w));                                    /* bankswitch control */
+	map(0x0d00, 0x0d0d).rw(FUNC(fastlane_state::fastlane_k1_k007232_r), FUNC(fastlane_state::fastlane_k1_k007232_w)); /* 007232 registers (chip 1) */
+	map(0x0e00, 0x0e0d).rw(FUNC(fastlane_state::fastlane_k2_k007232_r), FUNC(fastlane_state::fastlane_k2_k007232_w)); /* 007232 registers (chip 2) */
 	map(0x0f00, 0x0f1f).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));                                    /* 051733 (protection) */
 	map(0x1000, 0x17ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 	map(0x1800, 0x1fff).ram();                                                             /* Work RAM */
-	map(0x2000, 0x27ff).ram().w(this, FUNC(fastlane_state::fastlane_vram1_w)).share("videoram1");       /* Video RAM (chip 1) */
-	map(0x2800, 0x2fff).ram().w(this, FUNC(fastlane_state::fastlane_vram2_w)).share("videoram2");       /* Video RAM (chip 2) */
+	map(0x2000, 0x27ff).ram().w(FUNC(fastlane_state::fastlane_vram1_w)).share("videoram1");       /* Video RAM (chip 1) */
+	map(0x2800, 0x2fff).ram().w(FUNC(fastlane_state::fastlane_vram2_w)).share("videoram2");       /* Video RAM (chip 2) */
 	map(0x3000, 0x3fff).ram().share("spriteram");                                           /* Sprite RAM */
 	map(0x4000, 0x7fff).bankr("bank1");                                                        /* banked ROM */
 	map(0x8000, 0xffff).rom();                                                             /* ROM */
@@ -199,47 +199,45 @@ void fastlane_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-MACHINE_CONFIG_START(fastlane_state::fastlane)
-
+void fastlane_state::fastlane(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, XTAL(24'000'000)/2) // 3MHz(XTAL(24'000'000)/8) internally
-	MCFG_DEVICE_PROGRAM_MAP(fastlane_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastlane_state, fastlane_scanline, "screen", 0, 1)
+	HD6309(config, m_maincpu, XTAL(24'000'000)/2); // 3MHz(XTAL(24'000'000)/8) internally
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastlane_state::fastlane_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(fastlane_state::fastlane_scanline), "screen", 0, 1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17) // measured
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(37*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fastlane_state, screen_update_fastlane)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.17); // measured
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(37*8, 32*8);
+	m_screen->set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(fastlane_state::screen_update_fastlane));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastlane)
-	MCFG_PALETTE_ADD("palette", 1024*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(fastlane_state, fastlane)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fastlane);
+	PALETTE(config, m_palette, FUNC(fastlane_state::fastlane_palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
-	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K051733_ADD("k051733")
+	K007121(config, m_k007121, 0);
+	m_k007121->set_palette_tag(m_palette);
+
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, fastlane_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	K007232(config, m_k007232_1, XTAL(3'579'545));
+	m_k007232_1->port_write().set(FUNC(fastlane_state::volume_callback0));
+	m_k007232_1->add_route(0, "mono", 0.50);
+	m_k007232_1->add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, fastlane_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232_2, XTAL(3'579'545));
+	m_k007232_2->port_write().set(FUNC(fastlane_state::volume_callback1));
+	m_k007232_2->add_route(0, "mono", 0.50);
+	m_k007232_2->add_route(1, "mono", 0.50);
+}
 
 
 /***************************************************************************

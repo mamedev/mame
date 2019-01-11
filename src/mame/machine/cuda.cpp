@@ -69,14 +69,14 @@ ROM_END
 
 void cuda_device::cuda_map(address_map &map)
 {
-	map(0x0000, 0x0002).rw(this, FUNC(cuda_device::ports_r), FUNC(cuda_device::ports_w));
-	map(0x0004, 0x0006).rw(this, FUNC(cuda_device::ddr_r), FUNC(cuda_device::ddr_w));
-	map(0x0007, 0x0007).rw(this, FUNC(cuda_device::pll_r), FUNC(cuda_device::pll_w));
-	map(0x0008, 0x0008).rw(this, FUNC(cuda_device::timer_ctrl_r), FUNC(cuda_device::timer_ctrl_w));
-	map(0x0009, 0x0009).rw(this, FUNC(cuda_device::timer_counter_r), FUNC(cuda_device::timer_counter_w));
-	map(0x0012, 0x0012).rw(this, FUNC(cuda_device::onesec_r), FUNC(cuda_device::onesec_w));
+	map(0x0000, 0x0002).rw(FUNC(cuda_device::ports_r), FUNC(cuda_device::ports_w));
+	map(0x0004, 0x0006).rw(FUNC(cuda_device::ddr_r), FUNC(cuda_device::ddr_w));
+	map(0x0007, 0x0007).rw(FUNC(cuda_device::pll_r), FUNC(cuda_device::pll_w));
+	map(0x0008, 0x0008).rw(FUNC(cuda_device::timer_ctrl_r), FUNC(cuda_device::timer_ctrl_w));
+	map(0x0009, 0x0009).rw(FUNC(cuda_device::timer_counter_r), FUNC(cuda_device::timer_counter_w));
+	map(0x0012, 0x0012).rw(FUNC(cuda_device::onesec_r), FUNC(cuda_device::onesec_w));
 	map(0x0090, 0x00ff).ram();                         // work RAM and stack
-	map(0x0100, 0x01ff).rw(this, FUNC(cuda_device::pram_r), FUNC(cuda_device::pram_w));
+	map(0x0100, 0x01ff).rw(FUNC(cuda_device::pram_r), FUNC(cuda_device::pram_w));
 	map(0x0f00, 0x1fff).rom().region(CUDA_CPU_TAG, 0);
 }
 
@@ -297,10 +297,10 @@ WRITE8_MEMBER( cuda_device::timer_ctrl_w )
 {
 	static const attotime rates[4][5] =
 	{
-		{ attotime::from_seconds(1), attotime::from_msec(31.3f), attotime::from_msec(15.6f), attotime::from_msec(7.8f), attotime::from_msec(3.9f) },
-		{ attotime::from_seconds(2), attotime::from_msec(62.5f), attotime::from_msec(31.3f), attotime::from_msec(15.6f), attotime::from_msec(7.8f) },
-		{ attotime::from_seconds(4), attotime::from_msec(125.0f), attotime::from_msec(62.5f), attotime::from_msec(31.3f), attotime::from_msec(15.6f) },
-		{ attotime::from_seconds(8), attotime::from_msec(250.0f), attotime::from_msec(125.1f), attotime::from_msec(62.5f), attotime::from_msec(31.3f) },
+		{ attotime::from_seconds(1), attotime::from_usec(31300), attotime::from_usec(15600), attotime::from_usec(7800), attotime::from_usec(3900) },
+		{ attotime::from_seconds(2), attotime::from_usec(62500), attotime::from_usec(31300), attotime::from_usec(15600), attotime::from_usec(7800) },
+		{ attotime::from_seconds(4), attotime::from_usec(125000), attotime::from_usec(62500), attotime::from_usec(31300), attotime::from_usec(15600) },
+		{ attotime::from_seconds(8), attotime::from_usec(250000), attotime::from_usec(125100), attotime::from_usec(62500), attotime::from_usec(31300) },
 	};
 
 //    printf("%02x to timer control (PC=%x)\n", data, m_maincpu->pc());

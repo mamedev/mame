@@ -133,9 +133,9 @@ void tmc600_state::tmc600_io_map(address_map &map)
 {
 	map(0x03, 0x03).w(m_bwio, FUNC(cdp1852_device::write));
 	map(0x04, 0x04).w(CDP1852_TMC700_TAG, FUNC(cdp1852_device::write));
-	map(0x05, 0x05).rw(this, FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
+	map(0x05, 0x05).rw(FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
-	map(0x07, 0x07).w(this, FUNC(tmc600_state::vismac_register_w));
+	map(0x07, 0x07).w(FUNC(tmc600_state::vismac_register_w));
 }
 
 /* Input Ports */
@@ -255,34 +255,38 @@ WRITE8_MEMBER( tmc600_state::sc_w )
 
 MACHINE_CONFIG_START(tmc600_state::tmc600)
 	// CPU
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(3'570'000))
-	MCFG_DEVICE_PROGRAM_MAP(tmc600_map)
-	MCFG_DEVICE_IO_MAP(tmc600_io_map)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, tmc600_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, tmc600_state, ef3_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, tmc600_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, tmc600_state, sc_w))
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, 3.57_MHz_XTAL));
+	cpu.set_addrmap(AS_PROGRAM, &tmc600_state::tmc600_map);
+	cpu.set_addrmap(AS_IO, &tmc600_state::tmc600_io_map);
+	cpu.wait_cb().set_constant(1);
+	cpu.ef2_cb().set(FUNC(tmc600_state::ef2_r));
+	cpu.ef3_cb().set(FUNC(tmc600_state::ef3_r));
+	cpu.q_cb().set(FUNC(tmc600_state::q_w));
+	cpu.sc_cb().set(FUNC(tmc600_state::sc_w));
+	cpu.tpb_cb().set(CDP1852_KB_TAG, FUNC(cdp1852_device::clock_w));
+	cpu.tpb_cb().append(CDP1852_TMC700_TAG, FUNC(cdp1852_device::clock_w));
 
 	// sound and video hardware
 	tmc600_video(config);
 
 	// keyboard output latch
-	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
-	MCFG_CDP1852_MODE_CALLBACK(VCC)
+	CDP1852(config, m_bwio); // clock is CDP1802 TPB
+	m_bwio->mode_cb().set_constant(1);
 
+#if 0
 	// address bus demux for expansion bus
-	MCFG_DEVICE_ADD(CDP1852_BUS_TAG, CDP1852, 0) // clock is expansion bus TPA
-	MCFG_CDP1852_MODE_CALLBACK(GND)
+	cdp1852_device &demux(CDP1852(config, CDP1852_BUS_TAG)); // clock is expansion bus TPA
+	demux.mode_cb().set_constant(0);
+#endif
 
 	// printer output latch
-	MCFG_DEVICE_ADD(CDP1852_TMC700_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB
-	MCFG_CDP1852_MODE_CALLBACK(VCC)
-	MCFG_CDP1852_DO_CALLBACK(WRITE8(*this, tmc600_state, printer_w))
+	cdp1852_device &prtout(CDP1852(config, CDP1852_TMC700_TAG)); // clock is CDP1802 TPB
+	prtout.mode_cb().set_constant(1);
+	prtout.do_cb().set(FUNC(tmc600_state::printer_w));
 
 	// printer connector
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, nullptr)
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(CDP1802_TAG, cosmac_device, ef4_w)) MCFG_DEVCB_XOR(1)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(CDP1802_TAG, FUNC(cosmac_device::ef4_w)).exor(1);
 
 	// cassette
 	MCFG_CASSETTE_ADD("cassette")
@@ -292,8 +296,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_TMC600_EURO_BUS_SLOT_ADD(TMC600_EURO_BUS_TAG, tmc600_euro_bus_cards, nullptr)
 
 	// internal RAM
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
+	RAM(config, RAM_TAG).set_default_size("8K");
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -306,10 +309,10 @@ ROM_START( tmc600s1 )
 	ROM_LOAD( "sb22",       0x2000, 0x1000, NO_DUMP )
 	ROM_LOAD( "sb23",       0x3000, 0x1000, NO_DUMP )
 	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
-	ROMX_LOAD( "190482",    0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "190482",    0x4000, 0x1000, NO_DUMP, ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
-	ROMX_LOAD( "190482_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "190482_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "190482_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "190482_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
@@ -323,10 +326,10 @@ ROM_START( tmc600s2 )
 	ROM_LOAD( "sb32",       0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )
 	ROM_LOAD( "sb33",       0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
 	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
-	ROMX_LOAD( "151182",    0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde), ROM_BIOS(1) )
+	ROMX_LOAD( "151182",    0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
-	ROMX_LOAD( "151182_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(2) )
-	ROMX_LOAD( "151182_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "151182_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "151182_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )

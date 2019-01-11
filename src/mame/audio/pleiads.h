@@ -65,7 +65,7 @@ protected:
 	inline int noise(int samplerate);
 
 	// internal state
-	tms36xx_device *m_tms;
+	required_device<tms36xx_device> m_tms;
 	sound_stream *m_channel;
 
 	int m_sound_latch_a;

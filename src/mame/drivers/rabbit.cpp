@@ -83,6 +83,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -95,8 +96,8 @@ public:
 		TIMER_BLIT_DONE
 	};
 
-	rabbit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rabbit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -109,8 +110,14 @@ public:
 		m_tilemap_regs(*this, "tilemap_regs.%u", 0),
 		m_spriteregs(*this, "spriteregs"),
 		m_blitterregs(*this, "blitterregs"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
+	void rabbit(machine_config &config);
+
+	void init_rabbit();
+
+private:
 	DECLARE_WRITE32_MEMBER(tilemap0_w);
 	DECLARE_WRITE32_MEMBER(tilemap1_w);
 	DECLARE_WRITE32_MEMBER(tilemap2_w);
@@ -124,16 +131,11 @@ public:
 	DECLARE_WRITE32_MEMBER(blitter_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
 
-	void init_rabbit();
-
-	void rabbit(machine_config &config);
-
 	void rabbit_map(address_map &map);
-protected:
+
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -443,10 +445,10 @@ void rabbit_state::video_start()
 
 	m_blit_done_timer = timer_alloc(TIMER_BLIT_DONE);
 
-	save_pointer(NAME(m_tilemap_ram[0].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[1].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[2].get()), 0x20000/4);
-	save_pointer(NAME(m_tilemap_ram[3].get()), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[0]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[1]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[2]), 0x20000/4);
+	save_pointer(NAME(m_tilemap_ram[3]), 0x20000/4);
 }
 
 /*
@@ -720,8 +722,8 @@ void rabbit_state::rabbit_map(address_map &map)
 	map(0x000010, 0x000013).nopw(); // bug in code / emulation?
 	map(0x000024, 0x000027).nopw(); // bug in code / emulation?
 	map(0x00719c, 0x00719f).nopw(); // bug in code / emulation?
-	map(0x200000, 0x200003).portr("INPUTS").w(this, FUNC(rabbit_state::eeprom_write));
-	map(0x400010, 0x400013).r(this, FUNC(rabbit_state::randomrabbits)); // gfx chip status?
+	map(0x200000, 0x200003).portr("INPUTS").w(FUNC(rabbit_state::eeprom_write));
+	map(0x400010, 0x400013).r(FUNC(rabbit_state::randomrabbits)); // gfx chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
 	map(0x400010, 0x400013).writeonly().share("viewregs0");
 	map(0x400100, 0x400117).writeonly().share("tilemap_regs.0"); // tilemap regs1
@@ -729,10 +731,10 @@ void rabbit_state::rabbit_map(address_map &map)
 	map(0x400140, 0x400157).writeonly().share("tilemap_regs.2"); // tilemap regs3
 	map(0x400160, 0x400177).writeonly().share("tilemap_regs.3"); // tilemap regs4
 	map(0x400200, 0x40021b).writeonly().share("spriteregs"); // sprregs?
-	map(0x400300, 0x400303).w(this, FUNC(rabbit_state::rombank_w)); // used during rom testing, rombank/area select + something else?
+	map(0x400300, 0x400303).w(FUNC(rabbit_state::rombank_w)); // used during rom testing, rombank/area select + something else?
 	map(0x400400, 0x400413).writeonly().share("viewregs6"); // some global controls? (brightness etc.?)
 	map(0x400500, 0x400503).writeonly().share("viewregs7");
-	map(0x400700, 0x40070f).w(this, FUNC(rabbit_state::blitter_w)).share("blitterregs");
+	map(0x400700, 0x40070f).w(FUNC(rabbit_state::blitter_w)).share("blitterregs");
 	map(0x400800, 0x40080f).writeonly().share("viewregs9"); // never changes?
 	map(0x400900, 0x4009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
@@ -740,10 +742,10 @@ void rabbit_state::rabbit_map(address_map &map)
 
 	map(0x440000, 0x47ffff).bankr("bank1"); // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
-	map(0x480000, 0x483fff).rw(this, FUNC(rabbit_state::tilemap0_r), FUNC(rabbit_state::tilemap0_w));
-	map(0x484000, 0x487fff).rw(this, FUNC(rabbit_state::tilemap1_r), FUNC(rabbit_state::tilemap1_w));
-	map(0x488000, 0x48bfff).rw(this, FUNC(rabbit_state::tilemap2_r), FUNC(rabbit_state::tilemap2_w));
-	map(0x48c000, 0x48ffff).rw(this, FUNC(rabbit_state::tilemap3_r), FUNC(rabbit_state::tilemap3_w));
+	map(0x480000, 0x483fff).rw(FUNC(rabbit_state::tilemap0_r), FUNC(rabbit_state::tilemap0_w));
+	map(0x484000, 0x487fff).rw(FUNC(rabbit_state::tilemap1_r), FUNC(rabbit_state::tilemap1_w));
+	map(0x488000, 0x48bfff).rw(FUNC(rabbit_state::tilemap2_r), FUNC(rabbit_state::tilemap2_w));
+	map(0x48c000, 0x48ffff).rw(FUNC(rabbit_state::tilemap3_r), FUNC(rabbit_state::tilemap3_w));
 	map(0x494000, 0x497fff).ram().share("spriteram"); // sprites?
 	map(0x4a0000, 0x4affff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xff0000, 0xffffff).ram();
@@ -900,38 +902,36 @@ INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 	m_maincpu->set_input_line(m_vblirqlevel, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(rabbit_state::rabbit)
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(24'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
+void rabbit_state::rabbit(machine_config &config)
+{
+	M68EC020(config, m_maincpu, XTAL(24'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &rabbit_state::rabbit_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rabbit_state::vblank_interrupt));
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rabbit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rabbit);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*16, 64*16-1)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 20*16-1, 32*16, 48*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rabbit_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*16, 64*16);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+//  screen.set_visarea(0*8, 64*16-1, 0*16, 64*16-1);
+//  screen.set_visarea(0*8, 20*16-1, 32*16, 48*16-1);
+	screen.set_screen_update(FUNC(rabbit_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(XGRB)
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xGRB_888, 0x4000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-MACHINE_CONFIG_END
-
-
+	i5000snd_device &i5000snd(I5000_SND(config, "i5000snd", XTAL(40'000'000)));
+	i5000snd.add_route(0, "rspeaker", 1.0);
+	i5000snd.add_route(1, "lspeaker", 1.0);
+}
 
 
 

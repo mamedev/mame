@@ -16,6 +16,11 @@
 
 namespace plib
 {
+
+	// Avoid unused variable warnings
+	template<typename... Ts>
+	inline void unused_var(Ts&&...) {}
+
 	namespace util
 	{
 		const pstring buildpath(std::initializer_list<pstring> list );
@@ -69,6 +74,9 @@ namespace plib
 
 	std::vector<pstring> psplit(const pstring &str, const pstring &onstr, bool ignore_empty = false);
 	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl);
+	std::vector<std::string> psplit_r(const std::string &stri,
+			const std::string &token,
+			const std::size_t maxsplit);
 
 }
 

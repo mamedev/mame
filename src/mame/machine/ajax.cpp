@@ -79,14 +79,14 @@ WRITE8_MEMBER(ajax_state::bankswitch_w)
 
 WRITE8_MEMBER(ajax_state::lamps_w)
 {
-	m_lamp[1] = BIT(data, 1);  /* super weapon lamp */
-	m_lamp[2] = BIT(data, 2);  /* power up lamps */
-	m_lamp[5] = BIT(data, 2);  /* power up lamps */
-	m_lamp[0] = BIT(data, 5);  /* start lamp */
-	m_lamp[3] = BIT(data, 6);  /* game over lamps */
-	m_lamp[6] = BIT(data, 6);  /* game over lamps */
-	m_lamp[4] = BIT(data, 7);  /* game over lamps */
-	m_lamp[7] = BIT(data, 7);  /* game over lamps */
+	m_lamps[1] = BIT(data, 1);  /* super weapon lamp */
+	m_lamps[2] = BIT(data, 2);  /* power up lamps */
+	m_lamps[5] = BIT(data, 2);  /* power up lamps */
+	m_lamps[0] = BIT(data, 5);  /* start lamp */
+	m_lamps[3] = BIT(data, 6);  /* game over lamps */
+	m_lamps[6] = BIT(data, 6);  /* game over lamps */
+	m_lamps[4] = BIT(data, 7);  /* game over lamps */
+	m_lamps[7] = BIT(data, 7);  /* game over lamps */
 }
 
 /*  ajax_ls138_f10:
@@ -199,7 +199,7 @@ void ajax_state::machine_start()
 	uint8_t *MAIN = memregion("maincpu")->base();
 	uint8_t *SUB  = memregion("sub")->base();
 
-	m_lamp.resolve();
+	m_lamps.resolve();
 	membank("mainbank")->configure_entries(0, 4, &MAIN[0x00000], 0x2000);
 	membank("mainbank")->configure_entries(4, 8, &MAIN[0x10000], 0x2000);
 	membank("subbank")->configure_entries(0,  9,  &SUB[0x00000], 0x2000);

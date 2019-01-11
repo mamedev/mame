@@ -127,7 +127,7 @@ void niyanpai_state::niyanpai_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x040fff).ram().share("nvram");
 
-	map(0x0a0000, 0x0a08ff).rw(this, FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
+	map(0x0a0000, 0x0a08ff).rw(FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
 	map(0x0a0900, 0x0a11ff).ram(); // palette work ram?
 
 	map(0x0bf800, 0x0bffff).ram();
@@ -138,22 +138,22 @@ void niyanpai_state::niyanpai_map(address_map &map)
 	map(0x240000, 0x240009).nopw();            // unknown
 	map(0x240200, 0x2403ff).nopw();            // unknown
 
-	map(0x240400, 0x240403).r(this, FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
-	map(0x240400, 0x24041f).w(this, FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
-	map(0x240420, 0x24043f).w(this, FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
-	map(0x240600, 0x240603).r(this, FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
-	map(0x240600, 0x24061f).w(this, FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
-	map(0x240620, 0x24063f).w(this, FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
-	map(0x240800, 0x240803).r(this, FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
-	map(0x240800, 0x24081f).w(this, FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
-	map(0x240820, 0x24083f).w(this, FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
-	map(0x280000, 0x280001).r(this, FUNC(niyanpai_state::dipsw_r));
+	map(0x240400, 0x240403).r(FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
+	map(0x240400, 0x24041f).w(FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
+	map(0x240420, 0x24043f).w(FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
+	map(0x240600, 0x240603).r(FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
+	map(0x240600, 0x24061f).w(FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
+	map(0x240620, 0x24063f).w(FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
+	map(0x240800, 0x240803).r(FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
+	map(0x240800, 0x24081f).w(FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
+	map(0x240820, 0x24083f).w(FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
+	map(0x280000, 0x280001).r(FUNC(niyanpai_state::dipsw_r));
 
 	map(0x280200, 0x280201).portr("P1_P2");
 	map(0x280400, 0x280401).portr("SYSTEM");
-	map(0x240a01, 0x240a01).w(this, FUNC(niyanpai_state::clutsel_0_w));
-	map(0x240c01, 0x240c01).w(this, FUNC(niyanpai_state::clutsel_1_w));
-	map(0x240e01, 0x240e01).w(this, FUNC(niyanpai_state::clutsel_2_w));
+	map(0x240a01, 0x240a01).w(FUNC(niyanpai_state::clutsel_0_w));
+	map(0x240c01, 0x240c01).w(FUNC(niyanpai_state::clutsel_1_w));
+	map(0x240e01, 0x240e01).w(FUNC(niyanpai_state::clutsel_2_w));
 
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
 }
@@ -163,7 +163,7 @@ void niyanpai_state::musobana_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x040fff).ram();
 
-	map(0x0a0000, 0x0a08ff).rw(this, FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
+	map(0x0a0000, 0x0a08ff).rw(FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
 	map(0x0a0900, 0x0a11ff).ram();             // palette work ram?
 
 	map(0x0a8000, 0x0a87ff).ram().share("nvram");
@@ -171,27 +171,27 @@ void niyanpai_state::musobana_map(address_map &map)
 
 	map(0x200000, 0x200000).w("nichisnd", FUNC(nichisnd_device::sound_host_command_w));
 
-	map(0x200200, 0x200201).w(this, FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
+	map(0x200200, 0x200201).w(FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
 	map(0x240000, 0x240009).nopw();            // unknown
 	map(0x240200, 0x2403ff).nopw();            // unknown
 
-	map(0x240400, 0x240403).r(this, FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
-	map(0x240400, 0x24041f).w(this, FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
-	map(0x240420, 0x24043f).w(this, FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
+	map(0x240400, 0x240403).r(FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
+	map(0x240400, 0x24041f).w(FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
+	map(0x240420, 0x24043f).w(FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
 
-	map(0x240600, 0x240603).r(this, FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
-	map(0x240600, 0x24061f).w(this, FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
-	map(0x240620, 0x24063f).w(this, FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
+	map(0x240600, 0x240603).r(FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
+	map(0x240600, 0x24061f).w(FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
+	map(0x240620, 0x24063f).w(FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
 
-	map(0x240800, 0x240803).r(this, FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
-	map(0x240800, 0x24081f).w(this, FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
-	map(0x240820, 0x24083f).w(this, FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
-	map(0x240a01, 0x240a01).w(this, FUNC(niyanpai_state::clutsel_0_w));
-	map(0x240c01, 0x240c01).w(this, FUNC(niyanpai_state::clutsel_1_w));
-	map(0x240e01, 0x240e01).w(this, FUNC(niyanpai_state::clutsel_2_w));
+	map(0x240800, 0x240803).r(FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
+	map(0x240800, 0x24081f).w(FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
+	map(0x240820, 0x24083f).w(FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
+	map(0x240a01, 0x240a01).w(FUNC(niyanpai_state::clutsel_0_w));
+	map(0x240c01, 0x240c01).w(FUNC(niyanpai_state::clutsel_1_w));
+	map(0x240e01, 0x240e01).w(FUNC(niyanpai_state::clutsel_2_w));
 
-	map(0x280000, 0x280001).r(this, FUNC(niyanpai_state::dipsw_r));
-	map(0x280200, 0x280201).r(this, FUNC(niyanpai_state::musobana_inputport_0_r));
+	map(0x280000, 0x280001).r(FUNC(niyanpai_state::dipsw_r));
+	map(0x280200, 0x280201).r(FUNC(niyanpai_state::musobana_inputport_0_r));
 	map(0x280400, 0x280401).portr("SYSTEM");
 
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
@@ -202,7 +202,7 @@ void niyanpai_state::mhhonban_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x040fff).ram();
 
-	map(0x060000, 0x0608ff).rw(this, FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
+	map(0x060000, 0x0608ff).rw(FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
 	map(0x060900, 0x0611ff).ram();             // palette work ram?
 	map(0x07f800, 0x07ffff).ram();
 
@@ -211,28 +211,28 @@ void niyanpai_state::mhhonban_map(address_map &map)
 
 	map(0x200000, 0x200000).w("nichisnd", FUNC(nichisnd_device::sound_host_command_w));
 
-	map(0x200200, 0x200201).w(this, FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
+	map(0x200200, 0x200201).w(FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
 	map(0x240000, 0x240009).nopw();            // unknown
 	map(0x240200, 0x2403ff).nopw();            // unknown
 
-	map(0x240400, 0x240403).r(this, FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
-	map(0x240400, 0x24041f).w(this, FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
-	map(0x240420, 0x24043f).w(this, FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
+	map(0x240400, 0x240403).r(FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
+	map(0x240400, 0x24041f).w(FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
+	map(0x240420, 0x24043f).w(FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
 
-	map(0x240600, 0x240603).r(this, FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
-	map(0x240600, 0x24061f).w(this, FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
-	map(0x240620, 0x24063f).w(this, FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
+	map(0x240600, 0x240603).r(FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
+	map(0x240600, 0x24061f).w(FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
+	map(0x240620, 0x24063f).w(FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
 
-	map(0x240800, 0x240803).r(this, FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
-	map(0x240800, 0x24081f).w(this, FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
-	map(0x240820, 0x24083f).w(this, FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
+	map(0x240800, 0x240803).r(FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
+	map(0x240800, 0x24081f).w(FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
+	map(0x240820, 0x24083f).w(FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
 
-	map(0x240a01, 0x240a01).w(this, FUNC(niyanpai_state::clutsel_0_w));
-	map(0x240c01, 0x240c01).w(this, FUNC(niyanpai_state::clutsel_1_w));
-	map(0x240e01, 0x240e01).w(this, FUNC(niyanpai_state::clutsel_2_w));
+	map(0x240a01, 0x240a01).w(FUNC(niyanpai_state::clutsel_0_w));
+	map(0x240c01, 0x240c01).w(FUNC(niyanpai_state::clutsel_1_w));
+	map(0x240e01, 0x240e01).w(FUNC(niyanpai_state::clutsel_2_w));
 
-	map(0x280000, 0x280001).r(this, FUNC(niyanpai_state::dipsw_r));
-	map(0x280200, 0x280201).r(this, FUNC(niyanpai_state::musobana_inputport_0_r));
+	map(0x280000, 0x280001).r(FUNC(niyanpai_state::dipsw_r));
+	map(0x280200, 0x280201).r(FUNC(niyanpai_state::musobana_inputport_0_r));
 	map(0x280400, 0x280401).portr("SYSTEM");
 
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
@@ -243,7 +243,7 @@ void niyanpai_state::zokumahj_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x0ff000, 0x0fffff).ram();
 
-	map(0x0e0000, 0x0e08ff).rw(this, FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
+	map(0x0e0000, 0x0e08ff).rw(FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
 	map(0x0e0900, 0x0e11ff).ram();             // palette work ram?
 
 	map(0x0a8000, 0x0a87ff).ram().share("nvram");
@@ -251,28 +251,28 @@ void niyanpai_state::zokumahj_map(address_map &map)
 
 	map(0x200000, 0x200000).w("nichisnd", FUNC(nichisnd_device::sound_host_command_w));
 
-	map(0x200200, 0x200201).w(this, FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
+	map(0x200200, 0x200201).w(FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
 	map(0x240000, 0x240009).nopw();            // unknown
 	map(0x240200, 0x2403ff).nopw();            // unknown
 
-	map(0x240400, 0x240403).r(this, FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
-	map(0x240400, 0x24041f).w(this, FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
-	map(0x240420, 0x24043f).w(this, FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
+	map(0x240400, 0x240403).r(FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
+	map(0x240400, 0x24041f).w(FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
+	map(0x240420, 0x24043f).w(FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
 
-	map(0x240600, 0x240603).r(this, FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
-	map(0x240600, 0x24061f).w(this, FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
-	map(0x240620, 0x24063f).w(this, FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
+	map(0x240600, 0x240603).r(FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
+	map(0x240600, 0x24061f).w(FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
+	map(0x240620, 0x24063f).w(FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
 
-	map(0x240800, 0x240803).r(this, FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
-	map(0x240800, 0x24081f).w(this, FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
-	map(0x240820, 0x24083f).w(this, FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
+	map(0x240800, 0x240803).r(FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
+	map(0x240800, 0x24081f).w(FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
+	map(0x240820, 0x24083f).w(FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
 
-	map(0x240a01, 0x240a01).w(this, FUNC(niyanpai_state::clutsel_0_w));
-	map(0x240c01, 0x240c01).w(this, FUNC(niyanpai_state::clutsel_1_w));
-	map(0x240e01, 0x240e01).w(this, FUNC(niyanpai_state::clutsel_2_w));
+	map(0x240a01, 0x240a01).w(FUNC(niyanpai_state::clutsel_0_w));
+	map(0x240c01, 0x240c01).w(FUNC(niyanpai_state::clutsel_1_w));
+	map(0x240e01, 0x240e01).w(FUNC(niyanpai_state::clutsel_2_w));
 
-	map(0x280000, 0x280001).r(this, FUNC(niyanpai_state::dipsw_r));
-	map(0x280200, 0x280201).r(this, FUNC(niyanpai_state::musobana_inputport_0_r));
+	map(0x280000, 0x280001).r(FUNC(niyanpai_state::dipsw_r));
+	map(0x280200, 0x280201).r(FUNC(niyanpai_state::musobana_inputport_0_r));
 	map(0x280400, 0x280401).portr("SYSTEM");
 
 	map(0xfffc00, 0xffffff).rw(m_tmp68301, FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));  // TMP68301 Registers
@@ -694,16 +694,15 @@ WRITE_LINE_MEMBER(niyanpai_state::vblank_irq)
 MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, 12288000/2) /* TMP68301, 6.144 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(niyanpai_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, niyanpai_state, tmp68301_parallel_port_w))
+	TMP68301(config, m_tmp68301, 0);
+	m_tmp68301->set_cputag(m_maincpu);
+	m_tmp68301->out_parallel_callback().set(FUNC(niyanpai_state::tmp68301_parallel_port_w));
 
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -718,7 +717,7 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	MCFG_PALETTE_ADD("palette", 256*3)
 
 	/* sound hardware */
-	MCFG_NICHISND_ADD("nichisnd")
+	NICHISND(config, "nichisnd", 0);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(niyanpai_state::musobana)

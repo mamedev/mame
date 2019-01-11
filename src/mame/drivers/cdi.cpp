@@ -35,6 +35,7 @@ TODO:
 #include "machine/timekpr.h"
 #include "sound/cdda.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -131,14 +132,14 @@ void cdi_state::cdi910_mem(address_map &map)
 
 void cdi_state::cdimono2_servo_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(cdi_state::servo_io_r), FUNC(cdi_state::servo_io_w));
+	map(0x0000, 0x001f).rw(FUNC(cdi_state::servo_io_r), FUNC(cdi_state::servo_io_w));
 	map(0x0050, 0x00ff).ram();
 	map(0x0100, 0x1fff).rom().region("servo", 0x100);
 }
 
 void cdi_state::cdimono2_slave_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(this, FUNC(cdi_state::slave_io_r), FUNC(cdi_state::slave_io_w));
+	map(0x0000, 0x001f).rw(FUNC(cdi_state::slave_io_r), FUNC(cdi_state::slave_io_w));
 	map(0x0050, 0x00ff).ram();
 	map(0x0100, 0x1fff).rom().region("slave", 0x100);
 }
@@ -194,17 +195,6 @@ INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 }
 
 static INPUT_PORTS_START( cdi )
-	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-
-	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-
-	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
-
 	PORT_START("DEBUG")
 	PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -235,17 +225,6 @@ static INPUT_PORTS_START( cdi )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cdimono2 )
-	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) //PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-
-	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) //PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-
-	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") //PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") //PORT_CHANGED_MEMBER("slave_hle", cdislave_device, mouse_update, 0)
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
-
 	PORT_START("DEBUG")
 	PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -311,9 +290,6 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono1 )
 	memset(m_slave_io_regs, 0, 0x20);
 
 	m_maincpu->reset();
-
-	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
-	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
 MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
@@ -323,9 +299,6 @@ MACHINE_RESET_MEMBER( cdi_state, cdimono2 )
 	memcpy(dst, src, 0x8);
 
 	m_maincpu->reset();
-
-	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
-	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
 }
 
 MACHINE_RESET_MEMBER( cdi_state, quizard1 )
@@ -779,8 +752,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_DEVICE_PROGRAM_MAP(cdimono1_mem)
 
-	MCFG_MCD212_ADD("mcd212")
-	MCFG_MCD212_SET_SCREEN("screen")
+	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -798,11 +771,12 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
-	MCFG_CDI68070_ADD("scc68070")
-	MCFG_CDICDIC_ADD("cdic")
-	MCFG_CDISLAVE_ADD("slave_hle")
+	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
+
+	MCFG_DEVICE_ADD("cdic", CDI_CDIC, 0)
+	MCFG_DEVICE_ADD("slave_hle", CDI_SLAVE, 0)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -818,7 +792,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono1_base)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-	MCFG_MK48T08_ADD( "mk48t08" )
+	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 MACHINE_CONFIG_END
 
 // CD-i model 220 (Mono-II, NTSC)
@@ -826,8 +800,8 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_mem)
 
-	MCFG_MCD212_ADD("mcd212")
-	MCFG_MCD212_SET_SCREEN("screen")
+	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -845,17 +819,17 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
-	MCFG_CDI68070_ADD("scc68070")
+	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
 	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
-	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("cdi_cdrom")
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
@@ -874,15 +848,15 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-	MCFG_MK48T08_ADD( "mk48t08" )
+	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_DEVICE_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_DEVICE_PROGRAM_MAP(cdi910_mem)
 
-	MCFG_MCD212_ADD("mcd212")
-	MCFG_MCD212_SET_SCREEN("screen")
+	MCFG_DEVICE_ADD("mcd212", MCD212, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -900,11 +874,11 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DEFAULT_LAYOUT(layout_cdi)
+	config.set_default_layout(layout_cdi);
 
 	MCFG_MACHINE_RESET_OVERRIDE( cdi_state, cdimono2 )
 
-	MCFG_CDI68070_ADD("scc68070")
+	MCFG_DEVICE_ADD("scc68070", CDI_68070, 0, "maincpu")
 	MCFG_DEVICE_ADD("servo", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_servo_mem)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
@@ -929,7 +903,7 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
-	MCFG_MK48T08_ADD( "mk48t08" )
+	MCFG_DEVICE_ADD("mk48t08", MK48T08, 0)
 MACHINE_CONFIG_END
 
 // CD-i Mono-I, with CD-ROM image device (MESS) and Software List (MESS)
@@ -956,39 +930,37 @@ READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 	return machine().rand();
 }
 
-MACHINE_CONFIG_START(cdi_state::quizard1)
+void cdi_state::quizard1(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1)
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
+	i8751_device &mcu(I8751(config, "mcu", 8000000));
+	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
+//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cdi_state::quizard2)
+void cdi_state::quizard2(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
-MACHINE_CONFIG_END
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2)
+}
 
-MACHINE_CONFIG_START(cdi_state::quizard3)
+void cdi_state::quizard3(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
-MACHINE_CONFIG_END
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3)
+}
 
-MACHINE_CONFIG_START(cdi_state::quizard4)
+void cdi_state::quizard4(machine_config &config)
+{
 	quizard(config);
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4)
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, cdi_state, quizard_mcu_p1_r))
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
-
-MACHINE_CONFIG_END
-
-
-
-
+	i8751_device &mcu(I8751(config, "mcu", 8000000));
+	mcu.port_in_cb<1>().set(FUNC(cdi_state::quizard_mcu_p1_r));
+//  mcu.set_vblank_int("screen", FUNC(cdi_state::irq0_line_pulse));
+}
 
 /*************************
 *        Rom Load        *
@@ -997,11 +969,11 @@ MACHINE_CONFIG_END
 ROM_START( cdimono1 )
 	ROM_REGION(0x80000, "maincpu", 0) // these roms need byteswapping
 	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
-	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(1) )
+	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220 F2" )
-	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(2) )
+	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "pcdi220_alt", "Philips CD-i 220?" ) // doesn't boot
-	ROMX_LOAD( "cdi220.rom", 0x000000, 0x80000, CRC(584c0af8) SHA1(5d757ab46b8c8fc36361555d978d7af768342d47), ROM_BIOS(3) )
+	ROMX_LOAD( "cdi220.rom", 0x000000, 0x80000, CRC(584c0af8) SHA1(5d757ab46b8c8fc36361555d978d7af768342d47), ROM_BIOS(2) )
 
 	ROM_REGION(0x2000, "cdic", 0)
 	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
@@ -1015,9 +987,9 @@ ROM_END
 ROM_START( cdi910 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "cdi910", "CD-I 910-17P Mini-MMC" )
-	ROMX_LOAD( "philips__cd-i_2.1__mb834200b-15__26b_aa__9224_z01.tc574200.7211", 0x000000, 0x80000, CRC(4ae3bee3) SHA1(9729b4ee3ce0c17172d062339c47b1ab822b222b), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
+	ROMX_LOAD( "philips__cd-i_2.1__mb834200b-15__26b_aa__9224_z01.tc574200.7211", 0x000000, 0x80000, CRC(4ae3bee3) SHA1(9729b4ee3ce0c17172d062339c47b1ab822b222b), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE )
 	ROM_SYSTEM_BIOS( 1, "cdi910_alt", "alt" )
-	ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000, CRC(2f3048d2) SHA1(11c4c3e602060518b52e77156345fa01f619e793), ROM_BIOS(2) | ROM_GROUPWORD | ROM_REVERSE )
+	ROMX_LOAD( "cdi910.rom", 0x000000, 0x80000, CRC(2f3048d2) SHA1(11c4c3e602060518b52e77156345fa01f619e793), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
 
 	// cdic
 
@@ -1047,7 +1019,7 @@ ROM_END
 ROM_START( cdi490a )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "cdi490", "CD-i 490" )
-	ROMX_LOAD( "cdi490a.rom", 0x000000, 0x80000, CRC(e2f200f6) SHA1(c9bf3c4c7e4fe5cbec3fe3fc993c77a4522ca547), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE  )
+	ROMX_LOAD( "cdi490a.rom", 0x000000, 0x80000, CRC(e2f200f6) SHA1(c9bf3c4c7e4fe5cbec3fe3fc993c77a4522ca547), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE  )
 
 	ROM_REGION(0x40000, "mpegs", 0) // keep these somewhere
 	ROM_LOAD( "impega.rom", 0x0000, 0x40000, CRC(84d6f6aa) SHA1(02526482a0851ea2a7b582d8afaa8ef14a8bd914) )
@@ -1060,9 +1032,9 @@ ROM_END
 ROM_START( cdibios ) // for the quizard sets
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "mcdi200", "Magnavox CD-i 200" )
-	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(1) )
+	ROMX_LOAD( "cdi200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "pcdi220", "Philips CD-i 220 F2" )
-	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(2) )
+	ROMX_LOAD( "cdi220b.rom", 0x000000, 0x80000, CRC(279683ca) SHA1(53360a1f21ddac952e95306ced64186a3fc0b93e), ROM_BIOS(1) )
 
 	ROM_REGION(0x2000, "cdic", 0)
 	ROM_LOAD( "cdic.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping

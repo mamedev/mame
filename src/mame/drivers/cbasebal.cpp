@@ -98,7 +98,7 @@ void cbasebal_state::cbasebal_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).rw(this, FUNC(cbasebal_state::bankedram_r), FUNC(cbasebal_state::bankedram_w)).share("palette");  /* palette + vram + scrollram */
+	map(0xc000, 0xcfff).rw(FUNC(cbasebal_state::bankedram_r), FUNC(cbasebal_state::bankedram_w)).share("palette");  /* palette + vram + scrollram */
 	map(0xe000, 0xfdff).ram();     /* work RAM */
 	map(0xfe00, 0xffff).ram().share("spriteram");
 }
@@ -112,19 +112,19 @@ void cbasebal_state::decrypted_opcodes_map(address_map &map)
 void cbasebal_state::cbasebal_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(cbasebal_state::cbasebal_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(cbasebal_state::cbasebal_bankswitch_w));
 	map(0x01, 0x01).portw("IO_01");
 	map(0x02, 0x02).portw("IO_02");
 	map(0x03, 0x03).portw("IO_03");
 	map(0x05, 0x05).w("oki", FUNC(okim6295_device::write));
 	map(0x06, 0x07).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x08, 0x09).w(this, FUNC(cbasebal_state::cbasebal_scrollx_w));
-	map(0x0a, 0x0b).w(this, FUNC(cbasebal_state::cbasebal_scrolly_w));
+	map(0x08, 0x09).w(FUNC(cbasebal_state::cbasebal_scrollx_w));
+	map(0x0a, 0x0b).w(FUNC(cbasebal_state::cbasebal_scrolly_w));
 	map(0x10, 0x10).portr("P1");
 	map(0x11, 0x11).portr("P2");
 	map(0x12, 0x12).portr("SYSTEM");
-	map(0x13, 0x13).w(this, FUNC(cbasebal_state::cbasebal_gfxctrl_w));
-	map(0x14, 0x14).w(this, FUNC(cbasebal_state::cbasebal_coinctrl_w));
+	map(0x13, 0x13).w(FUNC(cbasebal_state::cbasebal_gfxctrl_w));
+	map(0x14, 0x14).w(FUNC(cbasebal_state::cbasebal_coinctrl_w));
 }
 
 
@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cbasebal_state,  irq0_line_hold)   /* ??? */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -280,12 +280,11 @@ MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(cbasebal_state, screen_update_cbasebal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cbasebal)
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

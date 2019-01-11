@@ -267,15 +267,15 @@ DISCRETE_SOUND_END
 WRITE8_MEMBER(wiz_state::stinger_explosion_w)
 {
 	// explosion sound trigger(analog?)
-	m_discrete->write(space, STINGER_BOOM_EN1, m_dsc1);
-	m_discrete->write(space, STINGER_BOOM_EN2, m_dsc1^=1);
+	m_discrete->write(STINGER_BOOM_EN1, m_dsc1);
+	m_discrete->write(STINGER_BOOM_EN2, m_dsc1^=1);
 }
 
 WRITE8_MEMBER(wiz_state::stinger_shot_w)
 {
 	// player shot sound trigger(analog?)
-	m_discrete->write(space, STINGER_SHOT_EN1, m_dsc0);
-	m_discrete->write(space, STINGER_SHOT_EN2, m_dsc0^=1);
+	m_discrete->write(STINGER_SHOT_EN1, m_dsc0);
+	m_discrete->write(STINGER_SHOT_EN2, m_dsc0^=1);
 }
 
 
@@ -322,16 +322,16 @@ void wiz_state::kungfut_main_map(address_map &map)
 	map(0xe800, 0xe83f).ram().share("attrram");
 	map(0xe840, 0xe85f).ram().share("spriteram");
 	map(0xf000, 0xf000).portr("DSW0");
-	map(0xf001, 0xf001).w(this, FUNC(wiz_state::wiz_main_nmi_mask_w));
-	map(0xf002, 0xf003).w(this, FUNC(wiz_state::wiz_palette_bank_w));
-	map(0xf004, 0xf005).w(this, FUNC(wiz_state::wiz_char_bank_w));
-	map(0xf006, 0xf006).w(this, FUNC(wiz_state::wiz_flipx_w));
-	map(0xf007, 0xf007).w(this, FUNC(wiz_state::wiz_flipy_w));
+	map(0xf001, 0xf001).w(FUNC(wiz_state::wiz_main_nmi_mask_w));
+	map(0xf002, 0xf003).w(FUNC(wiz_state::wiz_palette_bank_w));
+	map(0xf004, 0xf005).w(FUNC(wiz_state::wiz_char_bank_w));
+	map(0xf006, 0xf006).w(FUNC(wiz_state::wiz_flipx_w));
+	map(0xf007, 0xf007).w(FUNC(wiz_state::wiz_flipy_w));
 	map(0xf008, 0xf008).portr("DSW1");
 	map(0xf010, 0xf010).portr("IN0");
 	map(0xf018, 0xf018).portr("IN1");
 	map(0xf800, 0xf800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf818, 0xf818).w(this, FUNC(wiz_state::wiz_bgcolor_w));
+	map(0xf818, 0xf818).w(FUNC(wiz_state::wiz_bgcolor_w));
 }
 
 void wiz_state::decrypted_opcodes_map(address_map &map)
@@ -342,9 +342,9 @@ void wiz_state::decrypted_opcodes_map(address_map &map)
 void wiz_state::wiz_main_map(address_map &map)
 {
 	kungfut_main_map(map);
-	map(0xc800, 0xc801).w(this, FUNC(wiz_state::wiz_coin_counter_w));
-	map(0xd400, 0xd400).r(this, FUNC(wiz_state::wiz_protection_r));
-	map(0xf000, 0xf000).w(this, FUNC(wiz_state::wiz_sprite_bank_w));
+	map(0xc800, 0xc801).w(FUNC(wiz_state::wiz_coin_counter_w));
+	map(0xd400, 0xd400).r(FUNC(wiz_state::wiz_protection_r));
+	map(0xf000, 0xf000).w(FUNC(wiz_state::wiz_sprite_bank_w));
 }
 
 void wiz_state::stinger_main_map(address_map &map)
@@ -352,8 +352,8 @@ void wiz_state::stinger_main_map(address_map &map)
 	kungfut_main_map(map);
 //  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
 	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xf808, 0xf808).w(this, FUNC(wiz_state::stinger_explosion_w));
-	map(0xf80a, 0xf80a).w(this, FUNC(wiz_state::stinger_shot_w));
+	map(0xf808, 0xf808).w(FUNC(wiz_state::stinger_explosion_w));
+	map(0xf80a, 0xf80a).w(FUNC(wiz_state::stinger_shot_w));
 }
 
 
@@ -373,7 +373,7 @@ void wiz_state::kungfut_sound_map(address_map &map)
 	map(0x4000, 0x4001).w("8910.3", FUNC(ay8910_device::address_data_w));
 	map(0x5000, 0x5001).w("8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("8910.2", FUNC(ay8910_device::address_data_w));
-	map(0x7000, 0x7000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(wiz_state::wiz_sound_nmi_mask_w));
+	map(0x7000, 0x7000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::wiz_sound_nmi_mask_w));
 }
 
 void wiz_state::stinger_sound_map(address_map &map)
@@ -381,7 +381,7 @@ void wiz_state::stinger_sound_map(address_map &map)
 	map.global_mask(0x7fff);
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(wiz_state::wiz_sound_nmi_mask_w));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(wiz_state::wiz_sound_nmi_mask_w));
 	map(0x4000, 0x4000).nopw(); // ?
 	map(0x5000, 0x5001).w("8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("8910.2", FUNC(ay8910_device::address_data_w));
@@ -808,25 +808,21 @@ MACHINE_CONFIG_START(wiz_state::kungfut)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_kungfut)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_stinger)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(wiz_state, wiz)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stinger);
+	PALETTE(config, m_palette, FUNC(wiz_state::wiz_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("8910.1", AY8910, 18432000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	AY8910(config, "8910.1", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("8910.2", AY8910, 18432000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	AY8910(config, "8910.2", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("8910.3", AY8910, 18432000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	AY8910(config, "8910.3", 18432000/12).add_route(ALL_OUTPUTS, "mono", 0.10);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wiz_state::wiz)
@@ -837,7 +833,7 @@ MACHINE_CONFIG_START(wiz_state::wiz)
 	MCFG_DEVICE_PROGRAM_MAP(wiz_main_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wiz)
+	m_gfxdecode->set_info(gfx_wiz);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 MACHINE_CONFIG_END
@@ -855,7 +851,7 @@ MACHINE_CONFIG_START(wiz_state::stinger)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_PROGRAM_MAP(stinger_sound_map)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

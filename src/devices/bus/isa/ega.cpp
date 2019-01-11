@@ -468,10 +468,10 @@ ROM_START( ega )
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_DEFAULT_BIOS("ega")
 	ROM_SYSTEM_BIOS(0, "ega", "IBM EGA BIOS")
-	ROMX_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b), ROM_BIOS(1))
+	ROMX_LOAD("6277356.u44", 0x0000, 0x4000, CRC(dc146448) SHA1(dc0794499b3e499c5777b3aa39554bbf0f2cc19b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "iskr3104", "Iskra-3104 EGA BIOS")
-	ROMX_LOAD( "143-03.bin", 0x0001, 0x2000, CRC(d0706345) SHA1(e04bb40d944426a4ae2e3a614d3f4953d7132ede),ROM_SKIP(1)|ROM_BIOS(2))
-	ROMX_LOAD( "143-02.bin", 0x0000, 0x2000, CRC(c8c18ebb) SHA1(fd6dac76d43ab8b582e70f1d5cc931d679036fb9),ROM_SKIP(1)|ROM_BIOS(2))
+	ROMX_LOAD( "143-03.bin", 0x0001, 0x2000, CRC(d0706345) SHA1(e04bb40d944426a4ae2e3a614d3f4953d7132ede), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "143-02.bin", 0x0000, 0x2000, CRC(c8c18ebb) SHA1(fd6dac76d43ab8b582e70f1d5cc931d679036fb9), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_REGION(0x4000, "user2", ROMREGION_ERASE00)
 ROM_END
 
@@ -536,14 +536,14 @@ MACHINE_CONFIG_START(isa8_ega_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD( "palette", 64 )
 
-	MCFG_DEVICE_ADD(EGA_CRTC_NAME, CRTC_EGA, 16257000/8)
-	MCFG_CRTC_EGA_SET_SCREEN(EGA_SCREEN_NAME)
-	MCFG_CRTC_EGA_HPIXELS_PER_COLUMN(8)
-	MCFG_CRTC_EGA_ROW_UPDATE_CB(isa8_ega_device, ega_update_row)
-	MCFG_CRTC_EGA_RES_OUT_DE_CB(WRITELINE(*this, isa8_ega_device, de_changed))
-	MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(WRITELINE(*this, isa8_ega_device, hsync_changed))
-	MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(WRITELINE(*this, isa8_ega_device, vsync_changed))
-	MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(WRITELINE(*this, isa8_ega_device, vblank_changed))
+	CRTC_EGA(config, m_crtc_ega, 16257000/8);
+	m_crtc_ega->set_screen(EGA_SCREEN_NAME);
+	m_crtc_ega->config_set_hpixels_per_column(8);
+	m_crtc_ega->set_row_update_callback(FUNC(isa8_ega_device::ega_update_row), this);
+	m_crtc_ega->res_out_de_callback().set(FUNC(isa8_ega_device::de_changed));
+	m_crtc_ega->res_out_hsync_callback().set(FUNC(isa8_ega_device::hsync_changed));
+	m_crtc_ega->res_out_vsync_callback().set(FUNC(isa8_ega_device::vsync_changed));
+	m_crtc_ega->res_out_vblank_callback().set(FUNC(isa8_ega_device::vblank_changed));
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -576,7 +576,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, const char *tag,
 isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
-	m_crtc_ega(nullptr), m_vram(nullptr), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
+	m_crtc_ega(*this, EGA_CRTC_NAME), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
 	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_video_mode(0),
 	m_palette(*this, "palette")
 {
@@ -618,19 +618,13 @@ void isa8_ega_device::device_start()
 		memcpy(memregion(subtag("user2").c_str())->base(), memregion(subtag("user1").c_str())->base(), 0x4000);
 
 	/* Install 256KB Video ram on our EGA card */
-	m_vram = machine().memory().region_alloc(subtag("vram").c_str(), 256 * 1024, 1, ENDIANNESS_LITTLE);
+	m_vram = make_unique_clear<uint8_t[]>(256 * 1024);
 
-	m_videoram = m_vram->base();
+	m_videoram = m_vram.get();
 	m_plane[0] = m_videoram + 0x00000;
-	memset(m_plane[0], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[1] = m_videoram + 0x10000;
-	memset(m_plane[1], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[2] = m_videoram + 0x20000;
-	memset(m_plane[2], 0, sizeof(uint8_t) * 0x10000);
 	m_plane[3] = m_videoram + 0x30000;
-	memset(m_plane[3], 0, sizeof(uint8_t) * 0x10000);
-
-	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, "ega", "user2");
 	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));

@@ -17,42 +17,6 @@
 #pragma once
 
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MC146818_ADD(_tag, _xtal) \
-	MCFG_DEVICE_ADD(_tag, MC146818, _xtal)
-
-#define MCFG_MC146818_IRQ_HANDLER(_irq) \
-	devcb = &downcast<mc146818_device &>(*device).set_irq_callback(DEVCB_##_irq);
-
-// The MC146818 doesn't have century support, but when syncing the date & time at startup we can optionally store the century.
-#define MCFG_MC146818_CENTURY_INDEX(_century_index) \
-	downcast<mc146818_device *>(device)->set_century_index(_century_index);
-
-// The MC146818 doesn't have UTC support, but when syncing the data & time at startup we can use UTC instead of local time.
-#define MCFG_MC146818_UTC(_utc) \
-	downcast<mc146818_device *>(device)->set_use_utc(_utc);
-
-#define MCFG_MC146818_BINARY(_bin) \
-	downcast<mc146818_device *>(device)->set_binary(_bin);
-
-#define MCFG_MC146818_24_12(_hour) \
-	downcast<mc146818_device *>(device)->set_hour(_hour);
-
-#define MCFG_MC146818_EPOCH(_epoch) \
-	downcast<mc146818_device *>(device)->set_epoch(_epoch);
-
-#define MCFG_MC146818_BINARY_YEAR(_bin) \
-	downcast<mc146818_device *>(device)->set_binary_year(_bin);
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> mc146818_device
-
 class mc146818_device : public device_t,
 						public device_nvram_interface
 {
@@ -61,17 +25,26 @@ public:
 	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_write_irq.bind(); }
+
+	// The MC146818 doesn't have century support, but when syncing the date & time at startup we can optionally store the century.
 	void set_century_index(int century_index) { m_century_index = century_index; }
+
+	// The MC146818 doesn't have UTC support, but when syncing the data & time at startup we can use UTC instead of local time.
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
+
 	void set_binary(bool binary) { m_binary = binary; }
-	void set_hour(bool hour) { m_hour = hour; }
+	void set_24hrs(bool hour) { m_hour = hour; }
 	void set_epoch(int epoch) { m_epoch = epoch; }
 	void set_binary_year(int bin) { m_binyear = bin; }
 
 	// read/write access
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+
+	// direct-mapped read/write access
+	DECLARE_READ8_MEMBER( read_direct );
+	DECLARE_WRITE8_MEMBER( write_direct );
 
 protected:
 	mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

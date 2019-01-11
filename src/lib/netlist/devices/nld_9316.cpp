@@ -24,12 +24,13 @@ namespace netlist
 		, m_cnt(*this, "m_cnt", 0)
 		, m_ENP(*this, "ENP")
 		, m_CLRQ(*this, "CLRQ")
-		, m_A(*this, "A", NETLIB_DELEGATE(9316, noop))
-		, m_B(*this, "B", NETLIB_DELEGATE(9316, noop))
-		, m_C(*this, "C", NETLIB_DELEGATE(9316, noop))
-		, m_D(*this, "D", NETLIB_DELEGATE(9316, noop))
+		, m_A(*this, "A", NETLIB_DELEGATE(9316, abcd))
+		, m_B(*this, "B", NETLIB_DELEGATE(9316, abcd))
+		, m_C(*this, "C", NETLIB_DELEGATE(9316, abcd))
+		, m_D(*this, "D", NETLIB_DELEGATE(9316, abcd))
 		, m_Q(*this, {{ "QA", "QB", "QC", "QD" }})
 		, m_RC(*this, "RC")
+		, m_abcd(*this, "m_abcd", 0)
 		{
 		}
 
@@ -37,14 +38,17 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 		NETLIB_HANDLERI(clk);
-		NETLIB_HANDLERI(noop) { }
+		NETLIB_HANDLERI(abcd)
+		{
+			m_abcd = static_cast<uint8_t>((m_D() << 3) | (m_C() << 2) | (m_B() << 1) | (m_A() << 0));
+		}
 
 		logic_input_t m_CLK;
 
 		logic_input_t m_ENT;
 		logic_input_t m_LOADQ;
 
-		state_var<unsigned> m_cnt;
+		state_var_u8 m_cnt;
 
 		logic_input_t m_ENP;
 		logic_input_t m_CLRQ;
@@ -56,7 +60,7 @@ namespace netlist
 
 		object_array_t<logic_output_t, 4> m_Q;
 		logic_output_t m_RC;
-
+		state_var_u8 m_abcd;
 
 	private:
 		//inline void update_outputs_all(const unsigned &cnt, const netlist_time &out_delay) noexcept
@@ -97,6 +101,7 @@ namespace netlist
 	{
 		m_CLK.set_state(logic_t::STATE_INP_LH);
 		m_cnt = 0;
+		m_abcd = 0;
 	}
 
 	NETLIB_HANDLER(9316, clk)
@@ -105,6 +110,7 @@ namespace netlist
 		{
 			++m_cnt &= MAXCNT;
 			//m_RC.push(m_ENT() && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
+#if 0
 			if (m_cnt == MAXCNT)
 			{
 				m_RC.push(m_ENT(), NLTIME_FROM_NS(27));
@@ -117,10 +123,24 @@ namespace netlist
 			}
 			else
 				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
+#else
+			if (m_cnt > 0 && m_cnt < MAXCNT)
+				update_outputs_all(m_cnt, NLTIME_FROM_NS(20));
+			else if (m_cnt == 0)
+			{
+				m_RC.push(0, NLTIME_FROM_NS(27));
+				update_outputs_all(0, NLTIME_FROM_NS(20));
+			}
+			else
+			{
+				m_RC.push(m_ENT(), NLTIME_FROM_NS(27));
+				update_outputs_all(MAXCNT, NLTIME_FROM_NS(20));
+			}
+#endif
 		}
 		else
 		{
-			m_cnt = (m_D() << 3) | (m_C() << 2) | (m_B() << 1) | (m_A() << 0);
+			m_cnt = m_abcd;
 			m_RC.push(m_ENT() && (m_cnt == MAXCNT), NLTIME_FROM_NS(27));
 			update_outputs_all(m_cnt, NLTIME_FROM_NS(22));
 		}
@@ -148,8 +168,8 @@ namespace netlist
 	}
 
 
-	NETLIB_DEVICE_IMPL(9316)
-	NETLIB_DEVICE_IMPL(9316_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(9316)
+	NETLIB_DEVICE_IMPL_DEPRECATED(9316_dip)
 
 	} //namespace devices
 } // namespace netlist

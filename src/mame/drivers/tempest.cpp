@@ -281,7 +281,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
-#include "machine/atari_vg.h"
+#include "machine/er2055.h"
 #include "sound/pokey.h"
 #include "screen.h"
 #include "speaker.h"
@@ -304,6 +304,7 @@ public:
 		m_mathbox(*this, "mathbox"),
 		m_watchdog(*this, "watchdog"),
 		m_avg(*this, "avg"),
+		m_earom(*this, "earom"),
 		m_rom(*this, "maincpu"),
 		m_knob_p1(*this, TEMPEST_KNOB_P1_TAG),
 		m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
@@ -311,13 +312,14 @@ public:
 		m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
 		m_in1(*this, "IN1/DSW0"),
 		m_in2(*this, "IN2"),
-		m_led(*this, "led%u", 0U)
+		m_leds(*this, "led%u", 0U)
 	{ }
+
+	void tempest(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	void tempest(machine_config &config);
 
 protected:
 	DECLARE_WRITE8_MEMBER(wdclr_w);
@@ -326,16 +328,20 @@ protected:
 	DECLARE_READ8_MEMBER(input_port_1_bit_r);
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
 
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
+
 	DECLARE_READ8_MEMBER(rom_ae1f_r);
 
 	virtual void machine_start() override;
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<avg_tempest_device> m_avg;
+	required_device<er2055_device> m_earom;
 	required_region_ptr<uint8_t> m_rom;
 
 	required_ioport m_knob_p1;
@@ -344,7 +350,7 @@ private:
 	required_ioport m_buttons_p2;
 	required_ioport m_in1;
 	required_ioport m_in2;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	uint8_t m_player_select;
 };
@@ -352,7 +358,7 @@ private:
 
 void tempest_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 	save_item(NAME(m_player_select));
 }
 
@@ -413,8 +419,8 @@ READ8_MEMBER(tempest_state::input_port_2_bit_r)
 
 WRITE8_MEMBER(tempest_state::tempest_led_w)
 {
-	m_led[0] = BIT(~data, 1);
-	m_led[1] = BIT(~data, 0);
+	m_leds[0] = BIT(~data, 1);
+	m_leds[1] = BIT(~data, 0);
 	/* FLIP is bit 0x04 */
 	m_player_select = data & 0x04;
 }
@@ -427,6 +433,32 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
 	machine().bookkeeping().coin_counter_w(2, (data & 0x04));
 	m_avg->set_flip_x(data & 0x08);
 	m_avg->set_flip_y(data & 0x10);
+}
+
+
+
+/*************************************
+ *
+ *  High score EAROM
+ *
+ *************************************/
+
+READ8_MEMBER(tempest_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(tempest_state::earom_write)
+{
+	m_earom->set_address(offset & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(tempest_state::earom_control_w)
+{
+	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
+	m_earom->set_clk(BIT(data, 0));
 }
 
 
@@ -457,21 +489,21 @@ void tempest_state::main_map(address_map &map)
 	map(0x0e00, 0x0e00).portr("DSW2");
 	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x3fff).rom();
-	map(0x4000, 0x4000).w(this, FUNC(tempest_state::tempest_coin_w));
+	map(0x4000, 0x4000).w(FUNC(tempest_state::tempest_coin_w));
 	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));
-	map(0x5000, 0x5000).w(this, FUNC(tempest_state::wdclr_w));
+	map(0x5000, 0x5000).w(FUNC(tempest_state::wdclr_w));
 	map(0x5800, 0x5800).w(m_avg, FUNC(avg_tempest_device::reset_w));
-	map(0x6000, 0x603f).w("earom", FUNC(atari_vg_earom_device::write));
-	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
-	map(0x6050, 0x6050).r("earom", FUNC(atari_vg_earom_device::read));
+	map(0x6000, 0x603f).w(FUNC(tempest_state::earom_write));
+	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w(FUNC(tempest_state::earom_control_w));
+	map(0x6050, 0x6050).r(FUNC(tempest_state::earom_read));
 	map(0x6060, 0x6060).r(m_mathbox, FUNC(mathbox_device::lo_r));
 	map(0x6070, 0x6070).r(m_mathbox, FUNC(mathbox_device::hi_r));
 	map(0x6080, 0x609f).w(m_mathbox, FUNC(mathbox_device::go_w));
 	map(0x60c0, 0x60cf).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x60d0, 0x60df).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x60e0, 0x60e0).w(this, FUNC(tempest_state::tempest_led_w));
+	map(0x60e0, 0x60e0).w(FUNC(tempest_state::tempest_led_w));
 	map(0x9000, 0xdfff).rom();
-	map(0xae1f, 0xae1f).r(this, FUNC(tempest_state::rom_ae1f_r));
+	map(0xae1f, 0xae1f).r(FUNC(tempest_state::rom_ae1f_r));
 	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
@@ -599,61 +631,58 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(tempest_state::tempest)
-
+void tempest_state::tempest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	M6502(config, m_maincpu, MASTER_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tempest_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(tempest_state::irq0_line_assert), attotime::from_hz(CLOCK_3KHZ / 12));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(CLOCK_3KHZ / 256));
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	ER2055(config, m_earom);
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 570)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(60);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 580, 0, 570);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("avg", AVG_TEMPEST, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	AVG_TEMPEST(config, m_avg, 0);
+	m_avg->set_vector_tag("vector");
 
 	/* Drivers */
-	MCFG_MATHBOX_ADD("mathbox")
+	MATHBOX(config, m_mathbox, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT1_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT2_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT3_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT4_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT5_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT6_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT7_R_CB(READ8(*this, tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK / 8));
+	pokey1.pot_r<0>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<1>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<2>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<3>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<4>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<5>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<6>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<7>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.set_output_rc(RES_K(10), CAP_U(0.015), 5.0);
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-	MCFG_DEVICE_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT1_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT2_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT3_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT4_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT5_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT6_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT7_R_CB(READ8(*this, tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK / 8));
+	pokey2.pot_r<0>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<1>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<2>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<3>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<4>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<5>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<6>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<7>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.set_output_rc(RES_K(10), CAP_U(0.015), 5.0);
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 

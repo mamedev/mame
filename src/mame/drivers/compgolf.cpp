@@ -63,12 +63,12 @@ WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
 void compgolf_state::compgolf_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x17ff).ram().w(this, FUNC(compgolf_state::compgolf_video_w)).share("videoram");
-	map(0x1800, 0x1fff).ram().w(this, FUNC(compgolf_state::compgolf_back_w)).share("bg_ram");
+	map(0x1000, 0x17ff).ram().w(FUNC(compgolf_state::compgolf_video_w)).share("videoram");
+	map(0x1800, 0x1fff).ram().w(FUNC(compgolf_state::compgolf_back_w)).share("bg_ram");
 	map(0x2000, 0x2060).ram().share("spriteram");
 	map(0x2061, 0x2061).nopw();
 	map(0x3000, 0x3000).portr("P1");
-	map(0x3001, 0x3001).portr("P2").w(this, FUNC(compgolf_state::compgolf_ctrl_w));
+	map(0x3001, 0x3001).portr("P2").w(FUNC(compgolf_state::compgolf_ctrl_w));
 	map(0x3002, 0x3002).portr("DSW1");
 	map(0x3003, 0x3003).portr("DSW2");
 	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
@@ -235,21 +235,20 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(compgolf_state, screen_update_compgolf)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(compgolf_state, compgolf)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_compgolf)
+	PALETTE(config, m_palette, FUNC(compgolf_state::compgolf_palette), 0x100);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_compgolf)
 
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, compgolf_state, compgolf_scrollx_lo_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, compgolf_state, compgolf_scrolly_lo_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ymsnd.irq_handler().set_inputline(m_maincpu, 0);
+	ymsnd.port_a_write_callback().set(FUNC(compgolf_state::compgolf_scrollx_lo_w));
+	ymsnd.port_b_write_callback().set(FUNC(compgolf_state::compgolf_scrolly_lo_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 

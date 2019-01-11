@@ -5,6 +5,10 @@
     Diet Go Go
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_DIETGO_H
+#define MAME_INCLUDES_DIETGO_H
+
+#pragma once
 
 #include "cpu/h6280/h6280.h"
 #include "video/decospr.h"
@@ -26,6 +30,11 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
+	void dietgo(machine_config &config);
+
+	void init_dietgo();
+
+private:
 	optional_device<deco104_device> m_deco104;
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
@@ -37,14 +46,14 @@ public:
 	required_device<h6280_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
-	void init_dietgo();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
 	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );
-	void dietgo(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void dietgo_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DIETGO_H

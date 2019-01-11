@@ -44,6 +44,7 @@ Dumping Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -65,6 +66,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void gpworld(machine_config &config);
+
+	void init_gpworld();
+
+private:
 	uint8_t m_nmi_enable;
 	uint8_t m_start_lamp;
 	uint8_t m_ldp_read_latch;
@@ -81,7 +87,6 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_io_write);
 	DECLARE_WRITE8_MEMBER(brake_gas_write);
 	DECLARE_WRITE8_MEMBER(palette_write);
-	void init_gpworld();
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback);
@@ -92,10 +97,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	void gpworld(machine_config &config);
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
@@ -325,14 +329,14 @@ void gpworld_state::mainmem(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share("sprite_ram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(gpworld_state::palette_write)).share("palette_ram"); /* The memory test reads at 0xc800 */
+	map(0xc800, 0xcfff).ram().w(FUNC(gpworld_state::palette_write)).share("palette_ram"); /* The memory test reads at 0xc800 */
 	map(0xd000, 0xd7ff).ram().share("tile_ram");
-	map(0xd800, 0xd800).rw(this, FUNC(gpworld_state::ldp_read), FUNC(gpworld_state::ldp_write));
+	map(0xd800, 0xd800).rw(FUNC(gpworld_state::ldp_read), FUNC(gpworld_state::ldp_write));
 /*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
 	map(0xda00, 0xda00).portr("INWHEEL"); //8255 here....
 /*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
-	map(0xda02, 0xda02).w(this, FUNC(gpworld_state::brake_gas_write));               /*bit 0 select gas/brake input */
-	map(0xda20, 0xda20).r(this, FUNC(gpworld_state::pedal_in));
+	map(0xda02, 0xda02).w(FUNC(gpworld_state::brake_gas_write));               /*bit 0 select gas/brake input */
+	map(0xda20, 0xda20).r(FUNC(gpworld_state::pedal_in));
 
 	map(0xe000, 0xffff).ram();                              /* Potentially not all work RAM? */
 }
@@ -342,7 +346,7 @@ void gpworld_state::mainmem(address_map &map)
 void gpworld_state::mainport(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).w(this, FUNC(gpworld_state::misc_io_write));
+	map(0x01, 0x01).w(FUNC(gpworld_state::misc_io_write));
 	map(0x80, 0x80).portr("IN0");
 	map(0x81, 0x81).portr("IN1");
 	map(0x82, 0x82).portr("DSW1");

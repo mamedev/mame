@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "emupal.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,8 +23,8 @@ public:
 	mb_vcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
-	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
+	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write_vregs );
@@ -83,16 +85,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(MB_VCU, mb_vcu_device)
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MB_VCU_CPU(_tag) \
-	downcast<mb_vcu_device &>(*device).set_cpu_tag(_tag);
-
-#define MCFG_MB_VCU_PALETTE(_palette_tag) \
-	downcast<mb_vcu_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_MB_VCU_H

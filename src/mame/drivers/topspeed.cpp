@@ -165,6 +165,7 @@ From JP manual
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -269,7 +270,7 @@ void topspeed_state::msm5205_update(int chip)
 
 	uint8_t data = m_msm_rom[chip][m_msm_pos[chip]];
 
-	m_msm[chip]->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	m_msm[chip]->write_data((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];
@@ -377,7 +378,7 @@ void topspeed_state::cpua_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40ffff).ram().share("sharedram");
 	map(0x500000, 0x503fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x600002, 0x600003).w(this, FUNC(topspeed_state::cpua_ctrl_w));
+	map(0x600002, 0x600003).w(FUNC(topspeed_state::cpua_ctrl_w));
 	map(0x7e0000, 0x7e0001).nopr();
 	map(0x7e0001, 0x7e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x7e0003, 0x7e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -400,9 +401,9 @@ void topspeed_state::cpub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x400000, 0x40ffff).ram().share("sharedram");
-	map(0x880001, 0x880001).r(this, FUNC(topspeed_state::input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
+	map(0x880001, 0x880001).r(FUNC(topspeed_state::input_bypass_r)).w(m_tc0040ioc, FUNC(tc0040ioc_device::portreg_w)).umask16(0x00ff);
 	map(0x880003, 0x880003).rw(m_tc0040ioc, FUNC(tc0040ioc_device::port_r), FUNC(tc0040ioc_device::port_w));
-	map(0x900000, 0x9003ff).rw(this, FUNC(topspeed_state::motor_r), FUNC(topspeed_state::motor_w));
+	map(0x900000, 0x9003ff).rw(FUNC(topspeed_state::motor_r), FUNC(topspeed_state::motor_w));
 }
 
 
@@ -416,8 +417,8 @@ void topspeed_state::z80_prg(address_map &map)
 	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
 	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
-	map(0xb000, 0xcfff).w(this, FUNC(topspeed_state::msm5205_command_w));
-	map(0xd000, 0xdfff).w(this, FUNC(topspeed_state::volume_w));
+	map(0xb000, 0xcfff).w(FUNC(topspeed_state::msm5205_command_w));
+	map(0xd000, 0xdfff).w(FUNC(topspeed_state::volume_w));
 }
 
 void topspeed_state::z80_io(address_map &map)
@@ -566,77 +567,76 @@ void topspeed_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(topspeed_state::topspeed)
-
+void topspeed_state::topspeed(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(cpua_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", topspeed_state, irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &topspeed_state::cpua_map);
+	m_maincpu->set_vblank_int("screen", FUNC(topspeed_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(cpub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", topspeed_state, irq5_line_hold)
+	M68000(config, m_subcpu, XTAL(16'000'000) / 2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &topspeed_state::cpub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(topspeed_state::irq5_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(z80_prg)
-	MCFG_DEVICE_IO_MAP(z80_io)
+	Z80(config, m_audiocpu, XTAL(16'000'000) / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &topspeed_state::z80_prg);
+	m_audiocpu->set_addrmap(AS_IO, &topspeed_state::z80_io);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, topspeed_state, z80ctc_to0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
+	ctc.intr_callback().set(FUNC(topspeed_state::z80ctc_to0));
 
-	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_OFFSETS(0, 8)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn[0], 0);
+	m_pc080sn[0]->set_gfx_region(1);
+	m_pc080sn[0]->set_offsets(0, 8);
+	m_pc080sn[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("pc080sn_2", PC080SN, 0)
-	MCFG_PC080SN_GFX_REGION(1)
-	MCFG_PC080SN_OFFSETS(0, 8)
-	MCFG_PC080SN_GFXDECODE("gfxdecode")
+	PC080SN(config, m_pc080sn[1], 0);
+	m_pc080sn[1]->set_gfx_region(1);
+	m_pc080sn[1]->set_offsets(0, 8);
+	m_pc080sn[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
 
-	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
-	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, topspeed_state, coins_w))
-	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
+	TC0040IOC(config, m_tc0040ioc, 0);
+	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
+	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
+	m_tc0040ioc->read_2_callback().set_ioport("IN0");
+	m_tc0040ioc->read_3_callback().set_ioport("IN1");
+	m_tc0040ioc->write_4_callback().set(FUNC(topspeed_state::coins_w));
+	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.0532) // Measured on real hardware
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(topspeed_state, screen_update_topspeed)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.0532); // Measured on real hardware
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(topspeed_state::screen_update_topspeed));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_topspeed)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_topspeed);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 8192);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(16'000'000) / 4)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("sndbank")) MCFG_DEVCB_MASK(0x03)
-	MCFG_SOUND_ROUTE(0, "filter1l", 1.0)
-	MCFG_SOUND_ROUTE(1, "filter1r", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_write_handler().set_membank("sndbank").mask(0x03);
+	ymsnd.add_route(0, "filter1l", 1.0);
+	ymsnd.add_route(1, "filter1r", 1.0);
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, topspeed_state, msm5205_1_vck)) // VCK function
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
+	MSM5205(config, m_msm[0], XTAL(384'000));
+	m_msm[0]->vck_legacy_callback().set(FUNC(topspeed_state::msm5205_1_vck));
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);	// 8 kHz, 4-bit
+	m_msm[0]->add_route(ALL_OUTPUTS, "filter2", 1.0);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
+	MSM5205(config, m_msm[1], XTAL(384'000));
+	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);	// Slave mode, 4-bit
+	m_msm[1]->add_route(ALL_OUTPUTS, "filter3", 1.0);
 
 	FILTER_VOLUME(config, "filter1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "filter1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	FILTER_VOLUME(config, "filter2").add_route(ALL_OUTPUTS, "lspeaker", 1.0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	FILTER_VOLUME(config, "filter3").add_route(ALL_OUTPUTS, "lspeaker", 1.0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 

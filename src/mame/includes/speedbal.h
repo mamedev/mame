@@ -1,5 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Joseba Epalza
+#ifndef MAME_INCLUDES_SPEEDBAL_H
+#define MAME_INCLUDES_SPEEDBAL_H
+
+#pragma once
+
+#include "emupal.h"
+
 class speedbal_state : public driver_device
 {
 public:
@@ -14,6 +21,16 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void speedbal(machine_config &config);
+
+	void init_speedbal();
+	void init_musicbal();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -28,11 +45,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	void init_speedbal();
-	void init_musicbal();
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(foreground_videoram_w);
 	DECLARE_WRITE8_MEMBER(background_videoram_w);
@@ -46,9 +58,11 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void speedbal(machine_config &config);
+
 	void main_cpu_io_map(address_map &map);
 	void main_cpu_map(address_map &map);
 	void sound_cpu_io_map(address_map &map);
 	void sound_cpu_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SPEEDBAL_H

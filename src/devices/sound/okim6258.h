@@ -7,20 +7,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_OKIM6258_DIVIDER(div) \
-	downcast<okim6258_device &>(*device).set_start_div((okim6258_device::div));
-
-#define MCFG_OKIM6258_ADPCM_TYPE(type) \
-	downcast<okim6258_device &>(*device).set_type((okim6258_device::type));
-
-#define MCFG_OKIM6258_OUT_BITS(bits) \
-	downcast<okim6258_device &>(*device).set_outbits((okim6258_device::bits));
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

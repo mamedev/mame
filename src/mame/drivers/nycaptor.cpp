@@ -285,46 +285,46 @@ void nycaptor_state::nycaptor_master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
 	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0xd001, 0xd001).w(this, FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(this, FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::nycaptor_generic_control_w));   /* bit 3 - memory bank at 0x8000-0xbfff */
+	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
+	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::nycaptor_generic_control_w));   /* bit 3 - memory bank at 0x8000-0xbfff */
 	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xd401, 0xd401).nopr();
-	map(0xd403, 0xd403).w(this, FUNC(nycaptor_state::sound_cpu_reset_w));
+	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(this, FUNC(nycaptor_state::nycaptor_mcu_status_r1));
-	map(0xd806, 0xd806).r(this, FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(this, FUNC(nycaptor_state::nycaptor_mcu_status_r2));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::nycaptor_mcu_status_r1));
+	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::nycaptor_mcu_status_r2));
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
 	map(0xdce1, 0xdce1).nopw();
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
 void nycaptor_state::nycaptor_slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
 
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(this, FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(this, FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(this, FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).r(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r)).nopw();/* ? gfx control ? */
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
+	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
+	map(0xdf03, 0xdf03).r(FUNC(nycaptor_state::nycaptor_gfxctrl_r)).nopw();/* ? gfx control ? */
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
@@ -339,9 +339,9 @@ void nycaptor_state::sound_map(address_map &map)
 	map(0xcb00, 0xcb00).nopw();
 	map(0xcc00, 0xcc00).nopw();
 	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
-	map(0xd200, 0xd200).nopr().w(this, FUNC(nycaptor_state::nmi_enable_w));
-	map(0xd400, 0xd400).w(this, FUNC(nycaptor_state::nmi_disable_w));
-	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::write)); //otherwise no girl's scream in cycle shooting, see MT03975
+	map(0xd200, 0xd200).nopr().w(FUNC(nycaptor_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(FUNC(nycaptor_state::nmi_disable_w));
+	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::data_w)); //otherwise no girl's scream in cycle shooting, see MT03975
 	map(0xe000, 0xefff).noprw();
 }
 
@@ -383,44 +383,44 @@ void nycaptor_state::cyclshtg_master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
-	map(0xd000, 0xd000).rw(this, FUNC(nycaptor_state::cyclshtg_mcu_r), FUNC(nycaptor_state::cyclshtg_mcu_w));
-	map(0xd001, 0xd001).w(this, FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(this, FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
+	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xd000, 0xd000).rw(FUNC(nycaptor_state::cyclshtg_mcu_r), FUNC(nycaptor_state::cyclshtg_mcu_w));
+	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
+	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
 	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd403, 0xd403).w(this, FUNC(nycaptor_state::sound_cpu_reset_w));
+	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xd806, 0xd806).r(this, FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
 	map(0xdce1, 0xdce1).nopw();
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
 void nycaptor_state::cyclshtg_slave_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(this, FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(this, FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(this, FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).r(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r));
+	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
+	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
+	map(0xdf03, 0xdf03).r(FUNC(nycaptor_state::nycaptor_gfxctrl_r));
 	map(0xdf03, 0xdf03).nopw();
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
@@ -434,46 +434,46 @@ void nycaptor_state::bronx_master_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
-	map(0xd000, 0xd000).r(this, FUNC(nycaptor_state::cyclshtg_mcu_r)).nopw();
-	map(0xd001, 0xd001).w(this, FUNC(nycaptor_state::sub_cpu_halt_w));
-	map(0xd002, 0xd002).rw(this, FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
+	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xd000, 0xd000).r(FUNC(nycaptor_state::cyclshtg_mcu_r)).nopw();
+	map(0xd001, 0xd001).w(FUNC(nycaptor_state::sub_cpu_halt_w));
+	map(0xd002, 0xd002).rw(FUNC(nycaptor_state::nycaptor_generic_control_r), FUNC(nycaptor_state::cyclshtg_generic_control_w));
 	map(0xd400, 0xd400).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xd401, 0xd401).r(this, FUNC(nycaptor_state::unk_r));
-	map(0xd403, 0xd403).w(this, FUNC(nycaptor_state::sound_cpu_reset_w));
+	map(0xd401, 0xd401).r(FUNC(nycaptor_state::unk_r));
+	map(0xd403, 0xd403).w(FUNC(nycaptor_state::sound_cpu_reset_w));
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
-	map(0xd806, 0xd806).r(this, FUNC(nycaptor_state::sound_status_r));
-	map(0xd807, 0xd807).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd806, 0xd806).r(FUNC(nycaptor_state::sound_status_r));
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).ram().w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf03, 0xdf03).rw(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
+	map(0xdca0, 0xdcbf).ram().w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
 void nycaptor_state::bronx_slave_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xcfff).ram().w(this, FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
+	map(0xc000, 0xcfff).ram().w(FUNC(nycaptor_state::nycaptor_videoram_w)).share("videoram");
 	map(0xd800, 0xd800).portr("DSWA");
 	map(0xd801, 0xd801).portr("DSWB");
 	map(0xd802, 0xd802).portr("DSWC");
 	map(0xd803, 0xd803).portr("IN0");
 	map(0xd804, 0xd804).portr("IN1");
-	map(0xd805, 0xd805).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r1));
-	map(0xd807, 0xd807).r(this, FUNC(nycaptor_state::cyclshtg_mcu_status_r));
+	map(0xd805, 0xd805).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r1));
+	map(0xd807, 0xd807).r(FUNC(nycaptor_state::cyclshtg_mcu_status_r));
 	map(0xdc00, 0xdc9f).ram().share("spriteram");
-	map(0xdca0, 0xdcbf).w(this, FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
-	map(0xdd00, 0xdeff).rw(this, FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
-	map(0xdf00, 0xdf00).r(this, FUNC(nycaptor_state::nycaptor_bx_r));
-	map(0xdf01, 0xdf01).r(this, FUNC(nycaptor_state::nycaptor_by_r));
-	map(0xdf02, 0xdf02).r(this, FUNC(nycaptor_state::nycaptor_b_r));
-	map(0xdf03, 0xdf03).rw(this, FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
+	map(0xdca0, 0xdcbf).w(FUNC(nycaptor_state::nycaptor_scrlram_w)).share("scrlram");
+	map(0xdd00, 0xdeff).rw(FUNC(nycaptor_state::nycaptor_palette_r), FUNC(nycaptor_state::nycaptor_palette_w));
+	map(0xdf00, 0xdf00).r(FUNC(nycaptor_state::nycaptor_bx_r));
+	map(0xdf01, 0xdf01).r(FUNC(nycaptor_state::nycaptor_by_r));
+	map(0xdf02, 0xdf02).r(FUNC(nycaptor_state::nycaptor_b_r));
+	map(0xdf03, 0xdf03).rw(FUNC(nycaptor_state::nycaptor_gfxctrl_r), FUNC(nycaptor_state::nycaptor_gfxctrl_w));
 	map(0xe000, 0xffff).ram().share("sharedram");
 }
 
@@ -732,222 +732,214 @@ void nycaptor_state::machine_reset()
 	m_gfxctrl = 0;
 }
 
-MACHINE_CONFIG_START(nycaptor_state::nycaptor)
-
+void nycaptor_state::nycaptor(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)      /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(nycaptor_master_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000/2);      /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nycaptor_state::nycaptor_master_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(nycaptor_slave_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)   /* IRQ generated by ??? */
+	Z80(config, m_subcpu, 8000000/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::nycaptor_slave_map);
+	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));   /* IRQ generated by ??? */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)  /* IRQ generated by ??? */
+	Z80(config, m_audiocpu, 8000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), attotime::from_hz(2*60));  /* IRQ generated by ??? */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,2000000)
+	TAITO68705_MCU(config, m_bmcu, 2000000);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
-
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(nycaptor_state::screen_update_nycaptor));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nycaptor);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
+	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
+	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
-	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "speaker", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "speaker", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "speaker", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "speaker", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "speaker", 1.0)    // pin 33 16'-2
+	MSM5232(config, m_msm, 2000000);
+	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
+	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
+	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
+	m_msm->add_route(3, "speaker", 1.0);   // pin 31 16'-1
+	m_msm->add_route(4, "speaker", 1.0);   // pin 36  2'-2
+	m_msm->add_route(5, "speaker", 1.0);   // pin 35  4'-2
+	m_msm->add_route(6, "speaker", 1.0);   // pin 34  8'-2
+	m_msm->add_route(7, "speaker", 1.0);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	// Does the DAC also exist on this board? nycaptor writes 0x80 to 0xd600
-	// Update: of course it exists, sound board seems common Taito design.
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(nycaptor_state::cyclshtg)
+void nycaptor_state::cyclshtg(machine_config &config)
+{
+	Z80(config, m_maincpu, 8000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nycaptor_state::cyclshtg_master_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(cyclshtg_master_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 8000000/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::cyclshtg_slave_map);
+	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(cyclshtg_slave_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)
+	Z80(config, m_audiocpu, 8000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), attotime::from_hz(2*60));
 
 #ifdef USE_MCU
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,2000000)
+	TAITO68705_MCU(config, m_bmcu, 2000000);
 #endif
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(nycaptor_state::screen_update_nycaptor));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nycaptor);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
+	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
+	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
-	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "speaker", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "speaker", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "speaker", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "speaker", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "speaker", 1.0)    // pin 33 16'-2
+	MSM5232(config, m_msm, 2000000);
+	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
+	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
+	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
+	m_msm->add_route(3, "speaker", 1.0);   // pin 31 16'-1
+	m_msm->add_route(4, "speaker", 1.0);   // pin 36  2'-2
+	m_msm->add_route(5, "speaker", 1.0);   // pin 35  4'-2
+	m_msm->add_route(6, "speaker", 1.0);   // pin 34  8'-2
+	m_msm->add_route(7, "speaker", 1.0);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
-MACHINE_CONFIG_START(nycaptor_state::bronx)
+void nycaptor_state::bronx(machine_config &config)
+{
+	Z80(config, m_maincpu, 8000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nycaptor_state::bronx_master_map);
+	m_maincpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(bronx_master_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 8000000/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &nycaptor_state::bronx_slave_map);
+	m_subcpu->set_addrmap(AS_IO, &nycaptor_state::bronx_slave_io_map);
+	m_subcpu->set_vblank_int("screen", FUNC(nycaptor_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(bronx_slave_map)
-	MCFG_DEVICE_IO_MAP(bronx_slave_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nycaptor_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, 8000000/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(nycaptor_state, irq0_line_hold, 2*60)
+	config.m_minimum_quantum = attotime::from_hz(120);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(120))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(nycaptor_state::screen_update_nycaptor));
+	screen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(nycaptor_state, screen_update_nycaptor)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nycaptor)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nycaptor);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay1(AY8910(config, "ay1", 8000000/4));
+	ay1.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 8000000/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nycaptor_state, unk_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &ay2(AY8910(config, "ay2", 8000000/4));
+	ay2.port_a_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.port_b_write_callback().set(FUNC(nycaptor_state::unk_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
-	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
-	MCFG_SOUND_ROUTE(0, "speaker", 1.0)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "speaker", 1.0)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "speaker", 1.0)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "speaker", 1.0)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "speaker", 1.0)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "speaker", 1.0)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "speaker", 1.0)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "speaker", 1.0)    // pin 33 16'-2
+	MSM5232(config, m_msm, 2000000);
+	m_msm->set_capacitors(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6); /* 0.65 (???) uF capacitors (match the sample, not verified) */
+	m_msm->add_route(0, "speaker", 1.0);   // pin 28  2'-1
+	m_msm->add_route(1, "speaker", 1.0);   // pin 29  4'-1
+	m_msm->add_route(2, "speaker", 1.0);   // pin 30  8'-1
+	m_msm->add_route(3, "speaker", 1.0);   // pin 31 16'-1
+	m_msm->add_route(4, "speaker", 1.0);   // pin 36  2'-2
+	m_msm->add_route(5, "speaker", 1.0);   // pin 35  4'-2
+	m_msm->add_route(6, "speaker", 1.0);   // pin 34  8'-2
+	m_msm->add_route(7, "speaker", 1.0);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 

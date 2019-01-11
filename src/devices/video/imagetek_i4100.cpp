@@ -72,6 +72,51 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+/***************************************************************************
+                            Graphics Layouts
+***************************************************************************/
+
+/* 8x8x4 tiles */
+static const gfx_layout layout_8x8x4 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 4*1,4*0, 4*3,4*2, 4*5,4*4, 4*7,4*6 },
+	{ STEP8(0,4*8) },
+	4*8*8
+};
+
+/* 8x8x8 tiles for later games */
+static GFXLAYOUT_RAW( layout_8x8x8, 8, 8, 8*8, 32*8 )
+
+/* 16x16x4 tiles for later games */
+static const gfx_layout layout_16x16x4 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 4*1,4*0, 4*3,4*2, 4*5,4*4, 4*7,4*6, 4*9,4*8, 4*11,4*10, 4*13,4*12, 4*15,4*14 },
+	{ STEP16(0,4*16) },
+	4*8*8
+};
+
+/* 16x16x8 tiles for later games */
+static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 32*8 )
+
+GFXDECODE_START( imagetek_i4100_device::gfxinfo )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
+GFXDECODE_END
+
+GFXDECODE_START( imagetek_i4100_device::gfxinfo_ext )
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
+	GFXDECODE_DEVICE( DEVICE_SELF, 0, layout_16x16x8,  0x0,  0x10 ) // [3] 8 Bit Tiles 16x16
+GFXDECODE_END
+
 // device type definition
 DEFINE_DEVICE_TYPE(I4100, imagetek_i4100_device, "i4100", "Imagetek I4100 052 VDP")
 DEFINE_DEVICE_TYPE(I4220, imagetek_i4220_device, "i4220", "Imagetek I4220 071 VDP")
@@ -79,120 +124,120 @@ DEFINE_DEVICE_TYPE(I4300, imagetek_i4300_device, "i4300", "Imagetek I4300 095 VD
 
 void imagetek_i4100_device::map(address_map &map)
 {
-	map(0x00000, 0x1ffff).rw(this, FUNC(imagetek_i4100_device::vram_0_r), FUNC(imagetek_i4100_device::vram_0_w)).share("vram_0");
-	map(0x20000, 0x3ffff).rw(this, FUNC(imagetek_i4100_device::vram_1_r), FUNC(imagetek_i4100_device::vram_1_w)).share("vram_1");
-	map(0x40000, 0x5ffff).rw(this, FUNC(imagetek_i4100_device::vram_2_r), FUNC(imagetek_i4100_device::vram_2_w)).share("vram_2");
-	map(0x60000, 0x6ffff).r(this, FUNC(imagetek_i4100_device::gfxrom_r));
-	map(0x70000, 0x71fff).rw(this, FUNC(imagetek_i4100_device::scratchram_r), FUNC(imagetek_i4100_device::scratchram_w)).share("scratchram"); // unknown, maybe palette
-	map(0x72000, 0x73fff).rw("palette", FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
-	map(0x74000, 0x74fff).rw(this, FUNC(imagetek_i4100_device::spriteram_r), FUNC(imagetek_i4100_device::spriteram_w)).share("spriteram");
-	map(0x75000, 0x75fff).rw(this, FUNC(imagetek_i4100_device::rmw_vram_0_r), FUNC(imagetek_i4100_device::rmw_vram_0_w));
-	map(0x76000, 0x76fff).rw(this, FUNC(imagetek_i4100_device::rmw_vram_1_r), FUNC(imagetek_i4100_device::rmw_vram_1_w));
-	map(0x77000, 0x77fff).rw(this, FUNC(imagetek_i4100_device::rmw_vram_2_r), FUNC(imagetek_i4100_device::rmw_vram_2_w));
-	map(0x78000, 0x787ff).rw(this, FUNC(imagetek_i4100_device::tiletable_r), FUNC(imagetek_i4100_device::tiletable_w)).share("tiletable");
+	map(0x00000, 0x1ffff).rw(FUNC(imagetek_i4100_device::vram_0_r), FUNC(imagetek_i4100_device::vram_0_w)).share("vram_0");
+	map(0x20000, 0x3ffff).rw(FUNC(imagetek_i4100_device::vram_1_r), FUNC(imagetek_i4100_device::vram_1_w)).share("vram_1");
+	map(0x40000, 0x5ffff).rw(FUNC(imagetek_i4100_device::vram_2_r), FUNC(imagetek_i4100_device::vram_2_w)).share("vram_2");
+	map(0x60000, 0x6ffff).r(FUNC(imagetek_i4100_device::gfxrom_r));
+	map(0x70000, 0x71fff).rw(FUNC(imagetek_i4100_device::scratchram_r), FUNC(imagetek_i4100_device::scratchram_w)).share("scratchram"); // unknown, maybe palette
+	map(0x72000, 0x73fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
+	map(0x74000, 0x74fff).rw(FUNC(imagetek_i4100_device::spriteram_r), FUNC(imagetek_i4100_device::spriteram_w)).share("spriteram");
+	map(0x75000, 0x75fff).rw(FUNC(imagetek_i4100_device::rmw_vram_0_r), FUNC(imagetek_i4100_device::rmw_vram_0_w));
+	map(0x76000, 0x76fff).rw(FUNC(imagetek_i4100_device::rmw_vram_1_r), FUNC(imagetek_i4100_device::rmw_vram_1_w));
+	map(0x77000, 0x77fff).rw(FUNC(imagetek_i4100_device::rmw_vram_2_r), FUNC(imagetek_i4100_device::rmw_vram_2_w));
+	map(0x78000, 0x787ff).rw(FUNC(imagetek_i4100_device::tiletable_r), FUNC(imagetek_i4100_device::tiletable_w)).share("tiletable");
 	// video registers
-	map(0x78800, 0x78801).rw(this, FUNC(imagetek_i4100_device::sprite_count_r), FUNC(imagetek_i4100_device::sprite_count_w));
-	map(0x78802, 0x78803).rw(this, FUNC(imagetek_i4100_device::sprite_priority_r), FUNC(imagetek_i4100_device::sprite_priority_w));
-	map(0x78804, 0x78805).rw(this, FUNC(imagetek_i4100_device::sprite_yoffset_r), FUNC(imagetek_i4100_device::sprite_yoffset_w));
-	map(0x78806, 0x78807).rw(this, FUNC(imagetek_i4100_device::sprite_xoffset_r), FUNC(imagetek_i4100_device::sprite_xoffset_w));
-	map(0x78808, 0x78809).rw(this, FUNC(imagetek_i4100_device::sprite_color_code_r), FUNC(imagetek_i4100_device::sprite_color_code_w));
-	map(0x78810, 0x78811).rw(this, FUNC(imagetek_i4100_device::layer_priority_r), FUNC(imagetek_i4100_device::layer_priority_w));
-	map(0x78812, 0x78813).rw(this, FUNC(imagetek_i4100_device::background_color_r), FUNC(imagetek_i4100_device::background_color_w));
+	map(0x78800, 0x78801).rw(FUNC(imagetek_i4100_device::sprite_count_r), FUNC(imagetek_i4100_device::sprite_count_w));
+	map(0x78802, 0x78803).rw(FUNC(imagetek_i4100_device::sprite_priority_r), FUNC(imagetek_i4100_device::sprite_priority_w));
+	map(0x78804, 0x78805).rw(FUNC(imagetek_i4100_device::sprite_yoffset_r), FUNC(imagetek_i4100_device::sprite_yoffset_w));
+	map(0x78806, 0x78807).rw(FUNC(imagetek_i4100_device::sprite_xoffset_r), FUNC(imagetek_i4100_device::sprite_xoffset_w));
+	map(0x78808, 0x78809).rw(FUNC(imagetek_i4100_device::sprite_color_code_r), FUNC(imagetek_i4100_device::sprite_color_code_w));
+	map(0x78810, 0x78811).rw(FUNC(imagetek_i4100_device::layer_priority_r), FUNC(imagetek_i4100_device::layer_priority_w));
+	map(0x78812, 0x78813).rw(FUNC(imagetek_i4100_device::background_color_r), FUNC(imagetek_i4100_device::background_color_w));
 
-	map(0x78840, 0x7884d).w(this, FUNC(imagetek_i4100_device::blitter_w)).share("blitter_regs");
-	map(0x78850, 0x78851).rw(this, FUNC(imagetek_i4100_device::screen_yoffset_r), FUNC(imagetek_i4100_device::screen_yoffset_w));
-	map(0x78852, 0x78853).rw(this, FUNC(imagetek_i4100_device::screen_xoffset_r), FUNC(imagetek_i4100_device::screen_xoffset_w));
-	map(0x78860, 0x7886b).rw(this, FUNC(imagetek_i4100_device::window_r), FUNC(imagetek_i4100_device::window_w)).share("windowregs");
-	map(0x78870, 0x7887b).rw(this, FUNC(imagetek_i4100_device::scroll_r), FUNC(imagetek_i4100_device::scroll_w)).share("scrollregs");
+	map(0x78840, 0x7884d).w(FUNC(imagetek_i4100_device::blitter_w)).share("blitter_regs");
+	map(0x78850, 0x78851).rw(FUNC(imagetek_i4100_device::screen_yoffset_r), FUNC(imagetek_i4100_device::screen_yoffset_w));
+	map(0x78852, 0x78853).rw(FUNC(imagetek_i4100_device::screen_xoffset_r), FUNC(imagetek_i4100_device::screen_xoffset_w));
+	map(0x78860, 0x7886b).rw(FUNC(imagetek_i4100_device::window_r), FUNC(imagetek_i4100_device::window_w)).share("windowregs");
+	map(0x78870, 0x7887b).rw(FUNC(imagetek_i4100_device::scroll_r), FUNC(imagetek_i4100_device::scroll_w)).share("scrollregs");
 
-	map(0x78880, 0x78881).w(this, FUNC(imagetek_i4100_device::crtc_vert_w));
-	map(0x78890, 0x78891).w(this, FUNC(imagetek_i4100_device::crtc_horz_w));
-	map(0x788a0, 0x788a1).w(this, FUNC(imagetek_i4100_device::crtc_unlock_w));
-	map(0x788aa, 0x788ab).w(this, FUNC(imagetek_i4100_device::rombank_w));
-	map(0x788ac, 0x788ad).w(this, FUNC(imagetek_i4100_device::screen_ctrl_w));
+	map(0x78880, 0x78881).w(FUNC(imagetek_i4100_device::crtc_vert_w));
+	map(0x78890, 0x78891).w(FUNC(imagetek_i4100_device::crtc_horz_w));
+	map(0x788a0, 0x788a1).w(FUNC(imagetek_i4100_device::crtc_unlock_w));
+	map(0x788aa, 0x788ab).w(FUNC(imagetek_i4100_device::rombank_w));
+	map(0x788ac, 0x788ad).w(FUNC(imagetek_i4100_device::screen_ctrl_w));
 }
 
 // same as above but with moved video registers (now at 0x797**)
 void imagetek_i4220_device::v2_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).rw(this, FUNC(imagetek_i4220_device::vram_0_r), FUNC(imagetek_i4220_device::vram_0_w)).share("vram_0");
-	map(0x20000, 0x3ffff).rw(this, FUNC(imagetek_i4220_device::vram_1_r), FUNC(imagetek_i4220_device::vram_1_w)).share("vram_1");
-	map(0x40000, 0x5ffff).rw(this, FUNC(imagetek_i4220_device::vram_2_r), FUNC(imagetek_i4220_device::vram_2_w)).share("vram_2");
-	map(0x60000, 0x6ffff).r(this, FUNC(imagetek_i4220_device::gfxrom_r));
-	map(0x70000, 0x71fff).rw(this, FUNC(imagetek_i4220_device::scratchram_r), FUNC(imagetek_i4220_device::scratchram_w)).share("scratchram"); // unknown, maybe palette
-	map(0x72000, 0x73fff).rw("palette", FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
-	map(0x74000, 0x74fff).rw(this, FUNC(imagetek_i4220_device::spriteram_r), FUNC(imagetek_i4220_device::spriteram_w)).share("spriteram");
-	map(0x75000, 0x75fff).rw(this, FUNC(imagetek_i4220_device::rmw_vram_0_r), FUNC(imagetek_i4220_device::rmw_vram_0_w));
-	map(0x76000, 0x76fff).rw(this, FUNC(imagetek_i4220_device::rmw_vram_1_r), FUNC(imagetek_i4220_device::rmw_vram_1_w));
-	map(0x77000, 0x77fff).rw(this, FUNC(imagetek_i4220_device::rmw_vram_2_r), FUNC(imagetek_i4220_device::rmw_vram_2_w));
-	map(0x78000, 0x787ff).rw(this, FUNC(imagetek_i4220_device::tiletable_r), FUNC(imagetek_i4220_device::tiletable_w)).share("tiletable");
+	map(0x00000, 0x1ffff).rw(FUNC(imagetek_i4220_device::vram_0_r), FUNC(imagetek_i4220_device::vram_0_w)).share("vram_0");
+	map(0x20000, 0x3ffff).rw(FUNC(imagetek_i4220_device::vram_1_r), FUNC(imagetek_i4220_device::vram_1_w)).share("vram_1");
+	map(0x40000, 0x5ffff).rw(FUNC(imagetek_i4220_device::vram_2_r), FUNC(imagetek_i4220_device::vram_2_w)).share("vram_2");
+	map(0x60000, 0x6ffff).r(FUNC(imagetek_i4220_device::gfxrom_r));
+	map(0x70000, 0x71fff).rw(FUNC(imagetek_i4220_device::scratchram_r), FUNC(imagetek_i4220_device::scratchram_w)).share("scratchram"); // unknown, maybe palette
+	map(0x72000, 0x73fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
+	map(0x74000, 0x74fff).rw(FUNC(imagetek_i4220_device::spriteram_r), FUNC(imagetek_i4220_device::spriteram_w)).share("spriteram");
+	map(0x75000, 0x75fff).rw(FUNC(imagetek_i4220_device::rmw_vram_0_r), FUNC(imagetek_i4220_device::rmw_vram_0_w));
+	map(0x76000, 0x76fff).rw(FUNC(imagetek_i4220_device::rmw_vram_1_r), FUNC(imagetek_i4220_device::rmw_vram_1_w));
+	map(0x77000, 0x77fff).rw(FUNC(imagetek_i4220_device::rmw_vram_2_r), FUNC(imagetek_i4220_device::rmw_vram_2_w));
+	map(0x78000, 0x787ff).rw(FUNC(imagetek_i4220_device::tiletable_r), FUNC(imagetek_i4220_device::tiletable_w)).share("tiletable");
 
-	map(0x78840, 0x7884d).w(this, FUNC(imagetek_i4220_device::blitter_w)).share("blitter_regs");
-	map(0x78850, 0x78851).rw(this, FUNC(imagetek_i4220_device::screen_yoffset_r), FUNC(imagetek_i4220_device::screen_yoffset_w));
-	map(0x78852, 0x78853).rw(this, FUNC(imagetek_i4220_device::screen_xoffset_r), FUNC(imagetek_i4220_device::screen_xoffset_w));
-	map(0x78860, 0x7886b).rw(this, FUNC(imagetek_i4220_device::window_r), FUNC(imagetek_i4220_device::window_w)).share("windowregs");
-	map(0x78870, 0x7887b).rw(this, FUNC(imagetek_i4220_device::scroll_r), FUNC(imagetek_i4220_device::scroll_w)).share("scrollregs");
+	map(0x78840, 0x7884d).w(FUNC(imagetek_i4220_device::blitter_w)).share("blitter_regs");
+	map(0x78850, 0x78851).rw(FUNC(imagetek_i4220_device::screen_yoffset_r), FUNC(imagetek_i4220_device::screen_yoffset_w));
+	map(0x78852, 0x78853).rw(FUNC(imagetek_i4220_device::screen_xoffset_r), FUNC(imagetek_i4220_device::screen_xoffset_w));
+	map(0x78860, 0x7886b).rw(FUNC(imagetek_i4220_device::window_r), FUNC(imagetek_i4220_device::window_w)).share("windowregs");
+	map(0x78870, 0x7887b).rw(FUNC(imagetek_i4220_device::scroll_r), FUNC(imagetek_i4220_device::scroll_w)).share("scrollregs");
 
-	map(0x78880, 0x78881).w(this, FUNC(imagetek_i4220_device::crtc_vert_w));
-	map(0x78890, 0x78891).w(this, FUNC(imagetek_i4220_device::crtc_horz_w));
-	map(0x788a0, 0x788a1).w(this, FUNC(imagetek_i4220_device::crtc_unlock_w));
-	map(0x788aa, 0x788ab).w(this, FUNC(imagetek_i4220_device::rombank_w));
-	map(0x788ac, 0x788ad).w(this, FUNC(imagetek_i4220_device::screen_ctrl_w));
+	map(0x78880, 0x78881).w(FUNC(imagetek_i4220_device::crtc_vert_w));
+	map(0x78890, 0x78891).w(FUNC(imagetek_i4220_device::crtc_horz_w));
+	map(0x788a0, 0x788a1).w(FUNC(imagetek_i4220_device::crtc_unlock_w));
+	map(0x788aa, 0x788ab).w(FUNC(imagetek_i4220_device::rombank_w));
+	map(0x788ac, 0x788ad).w(FUNC(imagetek_i4220_device::screen_ctrl_w));
 
 	// video registers
-	map(0x79700, 0x79701).rw(this, FUNC(imagetek_i4220_device::sprite_count_r), FUNC(imagetek_i4220_device::sprite_count_w));
-	map(0x79702, 0x79703).rw(this, FUNC(imagetek_i4220_device::sprite_priority_r), FUNC(imagetek_i4220_device::sprite_priority_w));
-	map(0x79704, 0x79705).rw(this, FUNC(imagetek_i4220_device::sprite_yoffset_r), FUNC(imagetek_i4220_device::sprite_yoffset_w));
-	map(0x79706, 0x79707).rw(this, FUNC(imagetek_i4220_device::sprite_xoffset_r), FUNC(imagetek_i4220_device::sprite_xoffset_w));
-	map(0x79708, 0x79709).rw(this, FUNC(imagetek_i4220_device::sprite_color_code_r), FUNC(imagetek_i4220_device::sprite_color_code_w));
-	map(0x79710, 0x79711).rw(this, FUNC(imagetek_i4220_device::layer_priority_r), FUNC(imagetek_i4220_device::layer_priority_w));
-	map(0x79712, 0x79713).rw(this, FUNC(imagetek_i4220_device::background_color_r), FUNC(imagetek_i4220_device::background_color_w));
+	map(0x79700, 0x79701).rw(FUNC(imagetek_i4220_device::sprite_count_r), FUNC(imagetek_i4220_device::sprite_count_w));
+	map(0x79702, 0x79703).rw(FUNC(imagetek_i4220_device::sprite_priority_r), FUNC(imagetek_i4220_device::sprite_priority_w));
+	map(0x79704, 0x79705).rw(FUNC(imagetek_i4220_device::sprite_yoffset_r), FUNC(imagetek_i4220_device::sprite_yoffset_w));
+	map(0x79706, 0x79707).rw(FUNC(imagetek_i4220_device::sprite_xoffset_r), FUNC(imagetek_i4220_device::sprite_xoffset_w));
+	map(0x79708, 0x79709).rw(FUNC(imagetek_i4220_device::sprite_color_code_r), FUNC(imagetek_i4220_device::sprite_color_code_w));
+	map(0x79710, 0x79711).rw(FUNC(imagetek_i4220_device::layer_priority_r), FUNC(imagetek_i4220_device::layer_priority_w));
+	map(0x79712, 0x79713).rw(FUNC(imagetek_i4220_device::background_color_r), FUNC(imagetek_i4220_device::background_color_w));
 	// repeated here in Puzzlet compatibility mode
-	map(0x78800, 0x78801).rw(this, FUNC(imagetek_i4220_device::sprite_count_r), FUNC(imagetek_i4220_device::sprite_count_w));
+	map(0x78800, 0x78801).rw(FUNC(imagetek_i4220_device::sprite_count_r), FUNC(imagetek_i4220_device::sprite_count_w));
 	// ... this one breaks Blazing Tornado tho
 //  AM_RANGE(0x78802, 0x78803) AM_READWRITE(sprite_priority_r,   sprite_priority_w)
-	map(0x78804, 0x78805).rw(this, FUNC(imagetek_i4220_device::sprite_yoffset_r), FUNC(imagetek_i4220_device::sprite_yoffset_w));
-	map(0x78806, 0x78807).rw(this, FUNC(imagetek_i4220_device::sprite_xoffset_r), FUNC(imagetek_i4220_device::sprite_xoffset_w));
-	map(0x78808, 0x78809).rw(this, FUNC(imagetek_i4220_device::sprite_color_code_r), FUNC(imagetek_i4220_device::sprite_color_code_w));
-	map(0x78810, 0x78811).rw(this, FUNC(imagetek_i4220_device::layer_priority_r), FUNC(imagetek_i4220_device::layer_priority_w));
-	map(0x78812, 0x78813).rw(this, FUNC(imagetek_i4220_device::background_color_r), FUNC(imagetek_i4220_device::background_color_w));
+	map(0x78804, 0x78805).rw(FUNC(imagetek_i4220_device::sprite_yoffset_r), FUNC(imagetek_i4220_device::sprite_yoffset_w));
+	map(0x78806, 0x78807).rw(FUNC(imagetek_i4220_device::sprite_xoffset_r), FUNC(imagetek_i4220_device::sprite_xoffset_w));
+	map(0x78808, 0x78809).rw(FUNC(imagetek_i4220_device::sprite_color_code_r), FUNC(imagetek_i4220_device::sprite_color_code_w));
+	map(0x78810, 0x78811).rw(FUNC(imagetek_i4220_device::layer_priority_r), FUNC(imagetek_i4220_device::layer_priority_w));
+	map(0x78812, 0x78813).rw(FUNC(imagetek_i4220_device::background_color_r), FUNC(imagetek_i4220_device::background_color_w));
 }
 
 // more changes around, namely the screen offsets being reversed here
 void imagetek_i4300_device::v3_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).rw(this, FUNC(imagetek_i4300_device::vram_0_r), FUNC(imagetek_i4300_device::vram_0_w)).share("vram_0");
-	map(0x20000, 0x3ffff).rw(this, FUNC(imagetek_i4300_device::vram_1_r), FUNC(imagetek_i4300_device::vram_1_w)).share("vram_1");
-	map(0x40000, 0x5ffff).rw(this, FUNC(imagetek_i4300_device::vram_2_r), FUNC(imagetek_i4300_device::vram_2_w)).share("vram_2");
-	map(0x60000, 0x6ffff).r(this, FUNC(imagetek_i4300_device::gfxrom_r));
-	map(0x70000, 0x71fff).rw(this, FUNC(imagetek_i4300_device::scratchram_r), FUNC(imagetek_i4300_device::scratchram_w)).share("scratchram"); // unknown, maybe palette
-	map(0x72000, 0x73fff).rw("palette", FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
-	map(0x74000, 0x74fff).rw(this, FUNC(imagetek_i4300_device::spriteram_r), FUNC(imagetek_i4300_device::spriteram_w)).share("spriteram");
-	map(0x75000, 0x75fff).rw(this, FUNC(imagetek_i4300_device::rmw_vram_0_r), FUNC(imagetek_i4300_device::rmw_vram_0_w));
-	map(0x76000, 0x76fff).rw(this, FUNC(imagetek_i4300_device::rmw_vram_1_r), FUNC(imagetek_i4300_device::rmw_vram_1_w));
-	map(0x77000, 0x77fff).rw(this, FUNC(imagetek_i4300_device::rmw_vram_2_r), FUNC(imagetek_i4300_device::rmw_vram_2_w));
-	map(0x78000, 0x787ff).rw(this, FUNC(imagetek_i4300_device::tiletable_r), FUNC(imagetek_i4300_device::tiletable_w)).share("tiletable");
-	map(0x78808, 0x78809).rw(this, FUNC(imagetek_i4300_device::screen_xoffset_r), FUNC(imagetek_i4300_device::screen_xoffset_w));
-	map(0x7880a, 0x7880b).rw(this, FUNC(imagetek_i4300_device::screen_yoffset_r), FUNC(imagetek_i4300_device::screen_yoffset_w));
-	map(0x7880e, 0x7880f).w(this, FUNC(imagetek_i4300_device::screen_ctrl_w)); // TODO: can be read back here (gakusai)
+	map(0x00000, 0x1ffff).rw(FUNC(imagetek_i4300_device::vram_0_r), FUNC(imagetek_i4300_device::vram_0_w)).share("vram_0");
+	map(0x20000, 0x3ffff).rw(FUNC(imagetek_i4300_device::vram_1_r), FUNC(imagetek_i4300_device::vram_1_w)).share("vram_1");
+	map(0x40000, 0x5ffff).rw(FUNC(imagetek_i4300_device::vram_2_r), FUNC(imagetek_i4300_device::vram_2_w)).share("vram_2");
+	map(0x60000, 0x6ffff).r(FUNC(imagetek_i4300_device::gfxrom_r));
+	map(0x70000, 0x71fff).rw(FUNC(imagetek_i4300_device::scratchram_r), FUNC(imagetek_i4300_device::scratchram_w)).share("scratchram"); // unknown, maybe palette
+	map(0x72000, 0x73fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
+	map(0x74000, 0x74fff).rw(FUNC(imagetek_i4300_device::spriteram_r), FUNC(imagetek_i4300_device::spriteram_w)).share("spriteram");
+	map(0x75000, 0x75fff).rw(FUNC(imagetek_i4300_device::rmw_vram_0_r), FUNC(imagetek_i4300_device::rmw_vram_0_w));
+	map(0x76000, 0x76fff).rw(FUNC(imagetek_i4300_device::rmw_vram_1_r), FUNC(imagetek_i4300_device::rmw_vram_1_w));
+	map(0x77000, 0x77fff).rw(FUNC(imagetek_i4300_device::rmw_vram_2_r), FUNC(imagetek_i4300_device::rmw_vram_2_w));
+	map(0x78000, 0x787ff).rw(FUNC(imagetek_i4300_device::tiletable_r), FUNC(imagetek_i4300_device::tiletable_w)).share("tiletable");
+	map(0x78808, 0x78809).rw(FUNC(imagetek_i4300_device::screen_xoffset_r), FUNC(imagetek_i4300_device::screen_xoffset_w));
+	map(0x7880a, 0x7880b).rw(FUNC(imagetek_i4300_device::screen_yoffset_r), FUNC(imagetek_i4300_device::screen_yoffset_w));
+	map(0x7880e, 0x7880f).w(FUNC(imagetek_i4300_device::screen_ctrl_w)); // TODO: can be read back here (gakusai)
 
-	map(0x78800, 0x78801).w(this, FUNC(imagetek_i4300_device::crtc_unlock_w));
-	map(0x78802, 0x78803).w(this, FUNC(imagetek_i4300_device::crtc_horz_w));
-	map(0x78804, 0x78805).w(this, FUNC(imagetek_i4300_device::crtc_vert_w));
+	map(0x78800, 0x78801).w(FUNC(imagetek_i4300_device::crtc_unlock_w));
+	map(0x78802, 0x78803).w(FUNC(imagetek_i4300_device::crtc_horz_w));
+	map(0x78804, 0x78805).w(FUNC(imagetek_i4300_device::crtc_vert_w));
 
-	map(0x78840, 0x7884d).w(this, FUNC(imagetek_i4300_device::blitter_w)).share("blitter_regs");
-	map(0x78850, 0x7885b).rw(this, FUNC(imagetek_i4300_device::scroll_r), FUNC(imagetek_i4300_device::scroll_w)).share("scrollregs");
-	map(0x78860, 0x7886b).rw(this, FUNC(imagetek_i4300_device::window_r), FUNC(imagetek_i4300_device::window_w)).share("windowregs");
-	map(0x78870, 0x78871).w(this, FUNC(imagetek_i4300_device::rombank_w));
+	map(0x78840, 0x7884d).w(FUNC(imagetek_i4300_device::blitter_w)).share("blitter_regs");
+	map(0x78850, 0x7885b).rw(FUNC(imagetek_i4300_device::scroll_r), FUNC(imagetek_i4300_device::scroll_w)).share("scrollregs");
+	map(0x78860, 0x7886b).rw(FUNC(imagetek_i4300_device::window_r), FUNC(imagetek_i4300_device::window_w)).share("windowregs");
+	map(0x78870, 0x78871).w(FUNC(imagetek_i4300_device::rombank_w));
 
 	// video registers
-	map(0x79700, 0x79701).rw(this, FUNC(imagetek_i4300_device::sprite_count_r), FUNC(imagetek_i4300_device::sprite_count_w));
-	map(0x79702, 0x79703).rw(this, FUNC(imagetek_i4300_device::sprite_priority_r), FUNC(imagetek_i4300_device::sprite_priority_w));
-	map(0x79704, 0x79705).rw(this, FUNC(imagetek_i4300_device::sprite_yoffset_r), FUNC(imagetek_i4300_device::sprite_yoffset_w));
-	map(0x79706, 0x79707).rw(this, FUNC(imagetek_i4300_device::sprite_xoffset_r), FUNC(imagetek_i4300_device::sprite_xoffset_w));
-	map(0x79708, 0x79709).rw(this, FUNC(imagetek_i4300_device::sprite_color_code_r), FUNC(imagetek_i4300_device::sprite_color_code_w));
-	map(0x79710, 0x79711).rw(this, FUNC(imagetek_i4300_device::layer_priority_r), FUNC(imagetek_i4300_device::layer_priority_w));
-	map(0x79712, 0x79713).rw(this, FUNC(imagetek_i4300_device::background_color_r), FUNC(imagetek_i4300_device::background_color_w));
+	map(0x79700, 0x79701).rw(FUNC(imagetek_i4300_device::sprite_count_r), FUNC(imagetek_i4300_device::sprite_count_w));
+	map(0x79702, 0x79703).rw(FUNC(imagetek_i4300_device::sprite_priority_r), FUNC(imagetek_i4300_device::sprite_priority_w));
+	map(0x79704, 0x79705).rw(FUNC(imagetek_i4300_device::sprite_yoffset_r), FUNC(imagetek_i4300_device::sprite_yoffset_w));
+	map(0x79706, 0x79707).rw(FUNC(imagetek_i4300_device::sprite_xoffset_r), FUNC(imagetek_i4300_device::sprite_xoffset_w));
+	map(0x79708, 0x79709).rw(FUNC(imagetek_i4300_device::sprite_color_code_r), FUNC(imagetek_i4300_device::sprite_color_code_w));
+	map(0x79710, 0x79711).rw(FUNC(imagetek_i4300_device::layer_priority_r), FUNC(imagetek_i4300_device::layer_priority_w));
+	map(0x79712, 0x79713).rw(FUNC(imagetek_i4300_device::background_color_r), FUNC(imagetek_i4300_device::background_color_w));
 }
 
 
@@ -207,6 +252,7 @@ void imagetek_i4300_device::v3_map(address_map &map)
 
 imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool has_ext_tiles)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, has_ext_tiles ? gfxinfo_ext : gfxinfo, "palette")
 	, device_video_interface(mconfig, *this)
 	, m_vram_0(*this, "vram_0")
 	, m_vram_1(*this, "vram_1")
@@ -218,13 +264,13 @@ imagetek_i4100_device::imagetek_i4100_device(const machine_config &mconfig, devi
 	, m_window(*this, "windowregs")
 	, m_scroll(*this, "scrollregs")
 	, m_palette(*this, "palette")
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
-	, m_gfxrom(*this, "^gfx1")
+	, m_gfxrom(*this, DEVICE_SELF)
 	, m_blit_irq_cb(*this)
 	, m_support_8bpp( has_ext_tiles )
 	, m_support_16x16( has_ext_tiles )
 	, m_tilemap_scrolldx{0, 0, 0}
 	, m_tilemap_scrolldy{0, 0, 0}
+	, m_spriteram_buffered(false)
 {
 }
 
@@ -249,11 +295,11 @@ imagetek_i4300_device::imagetek_i4300_device(const machine_config &mconfig, cons
 //  configuration addiitons
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(imagetek_i4100_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-MACHINE_CONFIG_END
-
+void imagetek_i4100_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette).set_format(palette_device::GRBx_555, 0x1000);
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -281,9 +327,6 @@ void imagetek_i4100_device::expand_gfx1()
 
 void imagetek_i4100_device::device_start()
 {
-	if(!m_gfxdecode->started())
-		throw device_missing_dependencies();
-
 	m_inited_hack = false;
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_crtc_unlock));
@@ -296,10 +339,9 @@ void imagetek_i4100_device::device_start()
 	save_item(NAME(m_screen_yoffset));
 	save_item(NAME(m_layer_priority));
 	save_item(NAME(m_background_color));
-//  save_item(NAME(m_window));
-//  save_item(NAME(m_scroll));
 	save_item(NAME(m_screen_blank));
 	save_item(NAME(m_screen_flip));
+	save_item(NAME(m_layer_tile_select));
 
 //  memory_region *devregion =  machine().root_device().memregion(":gfx1");
 //  m_gfxrom = devregion->base();
@@ -363,8 +405,8 @@ WRITE16_MEMBER(imagetek_i4100_device::rmw_vram_2_w){ COMBINE_DATA(&m_vram_2[RMW_
 
 READ16_MEMBER(imagetek_i4100_device::scratchram_r ) { return m_scratchram[offset]; }
 WRITE16_MEMBER(imagetek_i4100_device::scratchram_w ) { COMBINE_DATA(&m_scratchram[offset]); }
-READ16_MEMBER(imagetek_i4100_device::spriteram_r ) { return m_spriteram[offset]; }
-WRITE16_MEMBER(imagetek_i4100_device::spriteram_w ) { COMBINE_DATA(&m_spriteram[offset]); }
+READ16_MEMBER(imagetek_i4100_device::spriteram_r ) { return m_spriteram->live()[offset]; }
+WRITE16_MEMBER(imagetek_i4100_device::spriteram_w ) { COMBINE_DATA(&m_spriteram->live()[offset]); }
 READ16_MEMBER(imagetek_i4100_device::tiletable_r ) { return m_tiletable[offset]; }
 WRITE16_MEMBER(imagetek_i4100_device::tiletable_w ) { COMBINE_DATA(&m_tiletable[offset]); }
 
@@ -656,7 +698,7 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 
 	if (offset == 0x0c / 2)
 	{
-		//uint8_t *src     = memregion("gfx1")->base();
+		//uint8_t *src     = memregion(DEVICE_SELF)->base();
 
 		uint32_t tmap     = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
 		uint32_t src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
@@ -777,6 +819,133 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
  *
  ***************************************************************************/
 
+void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &clip,
+							uint32_t const gfxstart, uint16_t const width, uint16_t const height,
+							uint16_t color, int const flipx, int const flipy, int sx, int sy,
+							uint32_t const scale, uint8_t const prival )
+{
+	if (!scale) return;
+	uint8_t trans;
+	bool const is_8bpp = (m_support_8bpp == true && color == 0xf) ? true : false;  /* 8bpp */
+
+	if (is_8bpp)
+	{
+		trans = 0xff;
+		color = 0;
+		/* Bounds checking */
+		if ((gfxstart + width * height - 1) >= m_gfxrom.bytes())
+			return;
+	}
+	else
+	{
+		trans = 0xf;
+		color <<= 4;
+		/* Bounds checking */
+		if ((gfxstart + width / 2 * height - 1) >= m_gfxrom.bytes())
+			return;
+	}
+
+	if (bitmap.bpp() == 16)
+	{
+		const pen_t *pal = &m_palette->pen((m_sprite_color_code & 0x0f) << 8);
+		const uint8_t *source_base;
+		if (is_8bpp)
+			source_base = &m_gfxrom[gfxstart % m_gfxrom.bytes()];
+		else
+			source_base = &m_expanded_gfx1[(gfxstart % m_gfxrom.bytes()) << 1];
+
+		int const sprite_screen_height = (scale * height + 0x8000) >> 16;
+		int const sprite_screen_width = (scale * width + 0x8000) >> 16;
+		if (sprite_screen_width && sprite_screen_height)
+		{
+			/* compute sprite increment per screen pixel */
+			int dx = (width << 16) / sprite_screen_width;
+			int dy = (height << 16) / sprite_screen_height;
+
+			int ex = sx + sprite_screen_width;
+			int ey = sy + sprite_screen_height;
+
+			int x_index_base;
+			int y_index;
+
+			if (flipx)
+			{
+				x_index_base = (sprite_screen_width - 1) * dx;
+				dx = -dx;
+			}
+			else
+			{
+				x_index_base = 0;
+			}
+
+			if (flipy)
+			{
+				y_index = (sprite_screen_height - 1) * dy;
+				dy = -dy;
+			}
+			else
+			{
+				y_index = 0;
+			}
+
+			if (sx < clip.min_x)
+			{ /* clip left */
+				int pixels = clip.min_x - sx;
+				sx += pixels;
+				x_index_base += pixels * dx;
+			}
+			if (sy < clip.min_y)
+			{ /* clip top */
+				int pixels = clip.min_y - sy;
+				sy += pixels;
+				y_index += pixels * dy;
+			}
+			if (ex > clip.max_x + 1)
+			{ /* clip right */
+				int pixels = ex - clip.max_x - 1;
+				ex -= pixels;
+			}
+			if (ey > clip.max_y + 1)
+			{ /* clip bottom */
+				int pixels = ey - clip.max_y - 1;
+				ey -= pixels;
+			}
+
+			if (ex > sx)
+			{ /* skip if inner loop doesn't draw anything */
+				int y;
+				bitmap_ind8 &priority_bitmap = screen.priority();
+				if (priority_bitmap.valid())
+				{
+					for (y = sy; y < ey; y++)
+					{
+						const uint8_t *source = source_base + (y_index >> 16) * width;
+						uint16_t *dest = &bitmap.pix16(y);
+						uint8_t *pri = &priority_bitmap.pix8(y);
+						int x, x_index = x_index_base;
+						{
+							for (x = sx; x < ex; x++)
+							{
+								uint8_t const c = source[x_index >> 16];
+
+								if (c != trans)
+								{
+									if (pri[x] <= prival)
+										dest[x] = pal[color + c];
+
+									pri[x] = 0xff;
+								}
+								x_index += dx;
+							}
+							y_index += dy;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
  /***************************************************************************
 
 
@@ -807,22 +976,24 @@ WRITE16_MEMBER( imagetek_i4100_device::blitter_w )
 
 void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *base_gfx4 = m_expanded_gfx1.get();
-	uint8_t *base_gfx8 = m_gfxrom;
-	uint32_t gfx_size = m_gfxrom_size;
+	int max_x = (m_screen_xoffset + 1) * 2;
+	int max_y = (m_screen_yoffset + 1) * 2;
+	int m_sprite_xoffs = m_sprite_xoffset - (m_screen_xoffset + 1);
+	int m_sprite_yoffs = m_sprite_yoffset - (m_screen_yoffset + 1);
 
-	int max_x = (m_screen_xoffset+1)*2;
-	int max_y = (m_screen_yoffset+1)*2;
-	int m_sprite_xoffs = m_sprite_xoffset - (m_screen_xoffset+1);
-	int m_sprite_yoffs = m_sprite_yoffset - (m_screen_yoffset+1);
-
-	int max_sprites = m_spriteram.bytes() / 8;
+	int max_sprites = m_spriteram->bytes() / 8;
 	int sprites     = m_sprite_count % max_sprites;
 
-	int color_start = (m_sprite_color_code & 0x0f) << 4;
-
-	int i, j, pri;
-	static const int primask[4] = { 0x0000, 0xff00, 0xff00 | 0xf0f0, 0xff00 | 0xf0f0 | 0xcccc };
+	// Exponential zoom table extracted from daitoride
+	static const uint16_t zoomtable[0x40] =
+	{   0xAAC,0x800,0x668,0x554,0x494,0x400,0x390,0x334,
+		0x2E8,0x2AC,0x278,0x248,0x224,0x200,0x1E0,0x1C8,
+		0x1B0,0x198,0x188,0x174,0x164,0x154,0x148,0x13C,
+		0x130,0x124,0x11C,0x110,0x108,0x100,0x0F8,0x0F0,
+		0x0EC,0x0E4,0x0DC,0x0D8,0x0D4,0x0CC,0x0C8,0x0C4,
+		0x0C0,0x0BC,0x0B8,0x0B4,0x0B0,0x0AC,0x0A8,0x0A4,
+		0x0A0,0x09C,0x098,0x094,0x090,0x08C,0x088,0x080,
+		0x078,0x070,0x068,0x060,0x058,0x050,0x048,0x040 };
 
 	uint16_t *src;
 	int inc;
@@ -830,34 +1001,23 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 	if (sprites == 0)
 		return;
 
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		if (!(m_sprite_priority & 0x8000))
 		{
-			src = m_spriteram + (sprites - 1) * (8 / 2);
+			src = (m_spriteram_buffered ? m_spriteram->buffer() : m_spriteram->live()) + (sprites - 1) * (8 / 2);
 			inc = -(8 / 2);
-		} else {
-			src = m_spriteram;
+		}
+		else
+		{
+			src = (m_spriteram_buffered ? m_spriteram->buffer() : m_spriteram->live());
 			inc = (8 / 2);
 		}
 
-		for (j = 0; j < sprites; j++)
+		for (int j = 0; j < sprites; j++)
 		{
-			int x, y, attr, code, color, flipx, flipy, zoom, curr_pri, width, height;
-
-			// Exponential zoom table extracted from daitoride
-			static const int zoomtable[0x40] =
-			{   0xAAC,0x800,0x668,0x554,0x494,0x400,0x390,0x334,
-				0x2E8,0x2AC,0x278,0x248,0x224,0x200,0x1E0,0x1C8,
-				0x1B0,0x198,0x188,0x174,0x164,0x154,0x148,0x13C,
-				0x130,0x124,0x11C,0x110,0x108,0x100,0x0F8,0x0F0,
-				0x0EC,0x0E4,0x0DC,0x0D8,0x0D4,0x0CC,0x0C8,0x0C4,
-				0x0C0,0x0BC,0x0B8,0x0B4,0x0B0,0x0AC,0x0A8,0x0A4,
-				0x0A0,0x09C,0x098,0x094,0x090,0x08C,0x088,0x080,
-				0x078,0x070,0x068,0x060,0x058,0x050,0x048,0x040 };
-
-			x = src[0];
-			curr_pri = (x & 0xf800) >> 11;
+			int x = src[0];
+			int const curr_pri = (x & 0xf800) >> 11;
 
 			if ((curr_pri == 0x1f) || (curr_pri != i))
 			{
@@ -865,7 +1025,7 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 				continue;
 			}
 
-			pri = (m_sprite_priority & 0x0300) >> 8;
+			uint8_t pri = (m_sprite_priority & 0x0300) >> 8;
 
 			if (!(m_sprite_priority & 0x8000))
 			{
@@ -873,23 +1033,23 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 					pri = (m_sprite_priority & 0x0c00) >> 10;
 			}
 
-			y     = src[1];
-			attr  = src[2];
-			code  = src[3];
+			int y               = src[1];
+			uint16_t const attr = src[2];
+			uint16_t const code = src[3];
 
-			flipx =  attr & 0x8000;
-			flipy =  attr & 0x4000;
-			color = (attr & 0xf0) >> 4;
+			int flipx            = attr & 0x8000;
+			int flipy            = attr & 0x4000;
+			uint16_t const color = (attr & 0xf0) >> 4;
 
-			zoom = zoomtable[(y & 0xfc00) >> 10] << (16 - 8);
+			uint32_t const zoom = zoomtable[(y & 0xfc00) >> 10] << (16 - 8);
 
 			x = (x & 0x07ff) - m_sprite_xoffs;
 			y = (y & 0x03ff) - m_sprite_yoffs;
 
-			width  = (((attr >> 11) & 0x7) + 1) * 8;
-			height = (((attr >>  8) & 0x7) + 1) * 8;
+			int const width  = (((attr >> 11) & 0x7) + 1) * 8;
+			int const height = (((attr >>  8) & 0x7) + 1) * 8;
 
-			uint32_t gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
+			uint32_t const gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
 			if (m_screen_flip)
 			{
@@ -897,38 +1057,7 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 				flipy = !flipy;     y = max_y - y - height;
 			}
 
-			if (m_support_8bpp == true && color == 0xf)  /* 8bpp */
-			{
-				/* Bounds checking */
-				if ((gfxstart + width * height - 1) >= gfx_size)
-					continue;
-
-				gfx_element gfx(m_palette, base_gfx8 + gfxstart, width, height, width, m_palette->entries(), 0, 256);
-
-				gfx.prio_zoom_transpen(bitmap,cliprect,
-								0,
-								color_start >> 4,
-								flipx, flipy,
-								x, y,
-								zoom, zoom,
-								screen.priority(),primask[pri], 255);
-			}
-			else
-			{
-				/* Bounds checking */
-				if ((gfxstart + width / 2 * height - 1) >= gfx_size)
-					continue;
-
-				gfx_element gfx(m_palette, base_gfx4 + 2 * gfxstart, width, height, width, m_palette->entries(),0, 16);
-
-				gfx.prio_zoom_transpen(bitmap,cliprect,
-								0,
-								color + color_start,
-								flipx, flipy,
-								x, y,
-								zoom, zoom,
-								screen.priority(),primask[pri], 15);
-			}
+			draw_spritegfx(screen, bitmap, cliprect, gfxstart, width, height, color, flipx, flipy, x, y, zoom, 3 - pri);
 
 			src += inc;
 		}
@@ -936,14 +1065,11 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 }
 
 
- inline uint8_t imagetek_i4100_device::get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool big, uint16_t *pix )
+ inline uint8_t imagetek_i4100_device::get_tile_pix( uint16_t code, uint8_t x, uint8_t y, bool const big, uint16_t *pix )
 {
-	int table_index;
-	uint32_t tile;
-
 	// Use code as an index into the tiles set table
-	table_index = ((code & 0x1ff0) >> 4) * 2;
-	tile = (m_tiletable[table_index + 0] << 16) + m_tiletable[table_index + 1];
+	int table_index = (code & 0x1ff0) >> 3;
+	uint32_t tile = (m_tiletable[table_index] << 16) + m_tiletable[table_index | 1];
 
 	if (code & 0x8000) // Special: draw a tile of a single color (i.e. not from the gfx ROMs)
 	{
@@ -956,9 +1082,9 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 	}
 	else if (((tile & 0x00f00000) == 0x00f00000) && (m_support_8bpp == true)) /* draw tile as 8bpp (e.g. balcube bg) */
 	{
-		gfx_element *gfx1 = m_gfxdecode->gfx(big?3:1);
-		uint32_t tile2 = big ? ((tile & 0xfffff) + 8*(code & 0xf)) :
-								((tile & 0xfffff) + 2*(code & 0xf));
+		gfx_element *gfx1 = gfx(big ? 3 : 1);
+		uint32_t tile2 = big ? ((tile & 0xfffff) + ((code & 0xf) << 3)) :
+								((tile & 0xfffff) + ((code & 0xf) << 1));
 		const uint8_t* data;
 		uint8_t flipxy = (code & 0x6000) >> 13;
 
@@ -973,13 +1099,13 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 		switch (flipxy)
 		{
 			default:
-			case 0x0: *pix = data[(y              * (big?16:8)) + x];              break;
-			case 0x1: *pix = data[(((big?15:7)-y) * (big?16:8)) + x];              break;
-			case 0x2: *pix = data[(y              * (big?16:8)) + ((big?15:7)-x)]; break;
-			case 0x3: *pix = data[(((big?15:7)-y) * (big?16:8)) + ((big?15:7)-x)]; break;
+			case 0x0: *pix = data[(y                    * (big ? 16 : 8)) + x];                    break;
+			case 0x1: *pix = data[(((big ? 15 : 7) - y) * (big ? 16 : 8)) + x];                    break;
+			case 0x2: *pix = data[(y                    * (big ? 16 : 8)) + ((big ? 15 : 7) - x)]; break;
+			case 0x3: *pix = data[(((big ? 15 : 7) - y) * (big ? 16 : 8)) + ((big ? 15 : 7) - x)]; break;
 		}
 
-		*pix |= ((tile & 0x0f000000) >> 24) * 0x100;
+		*pix |= (tile & 0x0f000000) >> 16;
 
 		if ((*pix & 0xff) != 0xff)
 			return 1;
@@ -988,9 +1114,9 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 	}
 	else
 	{
-		gfx_element *gfx1 = m_gfxdecode->gfx(big?2:0);
-		uint32_t tile2 = big ? ((tile & 0xfffff) + 4*(code & 0xf)) :
-								((tile & 0xfffff) +   (code & 0xf));
+		gfx_element *gfx1 = gfx(big ? 2 : 0);
+		uint32_t tile2 = big ? ((tile & 0xfffff) + ((code & 0xf) << 2)) :
+								((tile & 0xfffff) + (code & 0xf));
 		const uint8_t* data;
 		uint8_t flipxy = (code & 0x6000) >> 13;
 
@@ -1005,13 +1131,13 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 		switch (flipxy)
 		{
 			default:
-			case 0x0: *pix = data[(y              * (big?16:8)) + x];             break;
-			case 0x1: *pix = data[(((big?15:7)-y) * (big?16:8)) + x];             break;
-			case 0x2: *pix = data[(y              * (big?16:8)) + ((big?15:7)-x)]; break;
-			case 0x3: *pix = data[(((big?15:7)-y) * (big?16:8)) + ((big?15:7)-x)]; break;
+			case 0x0: *pix = data[(y                    * (big ? 16 : 8)) + x];                    break;
+			case 0x1: *pix = data[(((big ? 15 : 7) - y) * (big ? 16 : 8)) + x];                    break;
+			case 0x2: *pix = data[(y                    * (big ? 16 : 8)) + ((big ? 15 : 7) - x)]; break;
+			case 0x3: *pix = data[(((big ? 15 : 7) - y) * (big ? 16 : 8)) + ((big ? 15 : 7) - x)]; break;
 		}
 
-		*pix |= (((tile & 0x0ff00000) >> 20)) * 0x10;
+		*pix |= (tile & 0x0ff00000) >> 16;
 
 		if ((*pix & 0xf) != 0xf)
 			return 1;
@@ -1040,8 +1166,8 @@ void imagetek_i4100_device::draw_sprites( screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t pcode,
-							int sx, int sy, int wx, int wy, bool big, uint16_t *tilemapram, int layer )
+void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t const pcode,
+							int sx, int sy, int wx, int wy, bool const big, uint16_t const *tilemapram, int const layer )
 {
 	int y;
 
@@ -1067,7 +1193,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 	if (dx != 0)
 	{
 		min_x = 0;
-		max_x = scrwidth-1;
+		max_x = scrwidth - 1;
 	}
 	else
 	{
@@ -1078,7 +1204,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 	if (dy != 0)
 	{
 		min_y = 0;
-		max_y = scrheight-1;
+		max_y = scrheight - 1;
 	}
 	else
 	{
@@ -1088,11 +1214,11 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 
 	for (y = min_y; y <= max_y; y++)
 	{
-		int scrolly = (sy+y-wy)&(windowheight-1);
+		int scrolly = (sy + y - wy) & (windowheight - 1);
 		int x;
 		uint16_t *dst;
 		uint8_t *priority_baseaddr;
-		int srcline = (wy+scrolly)&(height-1);
+		int srcline = (wy + scrolly) & (height - 1);
 		int srctilerow = srcline >> (big ? 4 : 3);
 
 		if (!m_screen_flip)
@@ -1102,15 +1228,15 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 
 			for (x = min_x; x <= max_x; x++)
 			{
-				int scrollx = (sx+x-wx)&(windowwidth-1);
-				int srccol = (wx+scrollx)&(width-1);
+				int scrollx = (sx + x - wx) & (windowwidth - 1);
+				int srccol = (wx + scrollx) & (width - 1);
 				int srctilecol = srccol >> (big ? 4 : 3);
 				int tileoffs = srctilecol + srctilerow * BIG_NX;
 
 				uint16_t dat = 0;
 
 				uint16_t tile = tilemapram[tileoffs];
-				uint8_t draw = get_tile_pix(tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
+				uint8_t draw = get_tile_pix(tile, big ? (srccol & 0xf) : (srccol & 0x7), big ? (srcline & 0xf) : (srcline & 0x7), big, &dat);
 
 				if (draw)
 				{
@@ -1126,15 +1252,15 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 
 			for (x = min_x; x <= max_x; x++)
 			{
-				int scrollx = (sx+x-wx)&(windowwidth-1);
-				int srccol = (wx+scrollx)&(width-1);
+				int scrollx = (sx + x - wx) & (windowwidth-1);
+				int srccol = (wx + scrollx) & (width - 1);
 				int srctilecol = srccol >> (big ? 4 : 3);
 				int tileoffs = srctilecol + srctilerow * BIG_NX;
 
 				uint16_t dat = 0;
 
 				uint16_t tile = tilemapram[tileoffs];
-				uint8_t draw = get_tile_pix(tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
+				uint8_t draw = get_tile_pix(tile, big ? (srccol & 0xf) : (srccol & 0x7), big ? (srcline & 0xf) : (srcline & 0x7), big, &dat);
 
 				if (draw)
 				{
@@ -1167,9 +1293,9 @@ void imagetek_i4100_device::draw_layers( screen_device &screen, bitmap_ind16 &bi
 				case 2: tilemapram = m_vram_2;   break;
 			}
 
-			bool big = (m_support_16x16 && m_layer_tile_select[layer]) == 1;
+			bool const big = (m_support_16x16 && m_layer_tile_select[layer]) == 1;
 
-			draw_tilemap(screen, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, big, tilemapram, layer);
+			draw_tilemap(screen, bitmap, cliprect, 0, 3 - pri, sx, sy, wx, wy, big, tilemapram, layer);
 		}
 	}
 }
@@ -1190,4 +1316,15 @@ uint32_t imagetek_i4100_device::screen_update(screen_device &screen, bitmap_ind1
 	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
+}
+
+WRITE_LINE_MEMBER(imagetek_i4100_device::screen_eof)
+{
+	if (state)
+	{
+		if (!m_spriteram_buffered)
+			return;
+
+		m_spriteram->copy();
+	}
 }

@@ -43,12 +43,17 @@
 #include "emu.h"
 #include "multiconn.h"
 
+#define LOG_WARN             (1U<<1)
+#define LOG_CHANGE          (1U<<2)
+#define VERBOSE ( LOG_WARN )
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_MULTI,  bus::ti99::gromport, ti99_multi_cart_conn_device,  "ti99_mcartconn", "TI-99 Multi-cartridge extender")
 
 namespace bus { namespace ti99 { namespace gromport {
 
 #define AUTO -1
-#define TRACE_CHANGE 0
 
 ti99_multi_cart_conn_device::ti99_multi_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cartridge_connector_device(mconfig, TI99_GROMPORT_MULTI, tag, owner, clock),
@@ -98,8 +103,8 @@ ti99_multi_cart_conn_device::ti99_multi_cart_conn_device(const machine_config &m
 */
 void ti99_multi_cart_conn_device::set_slot(int slotnumber)
 {
-	if (TRACE_CHANGE)
-		if (m_active_slot != slotnumber) logerror("Setting cartslot to %d\n", slotnumber);
+	if (m_active_slot != slotnumber)
+		LOGMASKED(LOG_CHANGE, "Setting cartslot to %d\n", slotnumber);
 
 	if (m_fixed_slot==AUTO)
 		m_active_slot = slotnumber;
@@ -121,14 +126,14 @@ int ti99_multi_cart_conn_device::get_active_slot(bool changebase, offs_t offset)
 
 void ti99_multi_cart_conn_device::insert(int index, ti99_cartridge_device* cart)
 {
-	if (TRACE_CHANGE) logerror("Insert slot %d\n", index);
+	LOGMASKED(LOG_CHANGE, "Insert slot %d\n", index);
 	m_cartridge[index] = cart;
 	m_gromport->cartridge_inserted();
 }
 
 void ti99_multi_cart_conn_device::remove(int index)
 {
-	if (TRACE_CHANGE) logerror("Remove slot %d\n", index);
+	LOGMASKED(LOG_CHANGE, "Remove slot %d\n", index);
 	m_cartridge[index] = nullptr;
 }
 
@@ -149,17 +154,17 @@ WRITE_LINE_MEMBER(ti99_multi_cart_conn_device::romgq_line)
 /*
     Combined select lines
 */
-WRITE8_MEMBER(ti99_multi_cart_conn_device::set_gromlines)
+void ti99_multi_cart_conn_device::set_gromlines(line_state mline, line_state moline, line_state gsq)
 {
 	// GROM selected?
-	m_grom_selected = (data != 0);
+	m_grom_selected = (gsq == ASSERT_LINE);
 
 	// Propagate to all slots
 	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
 	{
 		if (m_cartridge[i] != nullptr)
 		{
-			m_cartridge[i]->set_gromlines(space, offset, data);
+			m_cartridge[i]->set_gromlines(mline, moline, gsq);
 		}
 	}
 }
@@ -296,16 +301,17 @@ void ti99_multi_cart_conn_device::device_reset(void)
 	m_grom_selected = false;
 }
 
-MACHINE_CONFIG_START(ti99_multi_cart_conn_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cartridge1", TI99_CART, 0)
-	MCFG_DEVICE_ADD("cartridge2", TI99_CART, 0)
-	MCFG_DEVICE_ADD("cartridge3", TI99_CART, 0)
-	MCFG_DEVICE_ADD("cartridge4", TI99_CART, 0)
-MACHINE_CONFIG_END
+void ti99_multi_cart_conn_device::device_add_mconfig(machine_config &config)
+{
+	TI99_CART(config, "cartridge1", 0);
+	TI99_CART(config, "cartridge2", 0);
+	TI99_CART(config, "cartridge3", 0);
+	TI99_CART(config, "cartridge4", 0);
+}
 
 INPUT_CHANGED_MEMBER( ti99_multi_cart_conn_device::switch_changed )
 {
-	if (TRACE_CHANGE) logerror("Slot changed %d - %d\n", (int)((uint64_t)param & 0x07), newval);
+	LOGMASKED(LOG_CHANGE, "Slot changed %d - %d\n", (int)((uint64_t)param & 0x07), newval);
 	m_active_slot = m_fixed_slot = newval - 1;
 }
 

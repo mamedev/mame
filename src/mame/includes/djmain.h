@@ -1,9 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#ifndef MAME_INCLUDES_DJMAIN_H
+#define MAME_INCLUDES_DJMAIN_H
+
+#pragma once
+
 #include "machine/ataintf.h"
 #include "video/konami_helper.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
+#include "emupal.h"
 
 class djmain_state : public driver_device
 {
@@ -17,12 +23,30 @@ public:
 		, m_ata(*this, "ata")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_turntable(*this, {"TT1", "TT2"})
+		, m_turntable(*this, "TT%u", 1U)
 		, m_sndram(*this, "sndram")
-		, m_led(*this, "led%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{
 	}
 
+	void djmainj(machine_config &config);
+	void djmainu(machine_config &config);
+	void djmaina(machine_config &config);
+
+	void init_bm7thmix();
+	void init_bm6thmix();
+	void init_hmcompmx();
+	void init_bmfinal();
+	void init_hmcompm2();
+	void init_bm5thmix();
+	void init_bm4thmix();
+	void init_beatmania();
+	void init_bmdct();
+	void init_bmcompm2();
+	void init_bmcorerm();
+	void init_bmclubmx();
+
+private:
 	DECLARE_WRITE32_MEMBER(sndram_bank_w);
 	DECLARE_READ32_MEMBER(sndram_r);
 	DECLARE_WRITE32_MEMBER(sndram_w);
@@ -40,33 +64,18 @@ public:
 	DECLARE_WRITE32_MEMBER(unknown590000_w);
 	DECLARE_WRITE32_MEMBER(unknown802000_w);
 	DECLARE_WRITE32_MEMBER(unknownc02000_w);
-	void init_bm7thmix();
-	void init_bm6thmix();
-	void init_hmcompmx();
-	void init_bmfinal();
-	void init_hmcompm2();
-	void init_bm5thmix();
-	void init_bm4thmix();
-	void init_beatmania();
-	void init_bmdct();
-	void init_bmcompm2();
-	void init_bmcorerm();
-	void init_bmclubmx();
+
 	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
-	void djmainj(machine_config &config);
-	void djmainu(machine_config &config);
-	void djmaina(machine_config &config);
 	void k054539_map(address_map &map);
 	void maincpu_djmain(address_map &map);
 	void maincpu_djmaina(address_map &map);
 	void maincpu_djmainj(address_map &map);
 	void maincpu_djmainu(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -80,7 +89,7 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_ioport_array<2> m_turntable;
 	required_shared_ptr<uint8_t> m_sndram;
-	output_finder<3> m_led;
+	output_finder<3> m_leds;
 
 	int m_sndram_bank;
 	int m_turntable_select;
@@ -92,3 +101,5 @@ protected:
 	const uint8_t *m_ata_user_password;
 	const uint8_t *m_ata_master_password;
 };
+
+#endif // MAME_INCLUDES_DJMAIN_H

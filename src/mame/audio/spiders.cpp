@@ -178,29 +178,29 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(spiders_state::spiders_audio_command_w)
 {
-	m_pia[3]->porta_w(data & 0xf8);
-	m_pia[3]->ca1_w(data & 0x80 ? 1 : 0);
+	m_pia[3]->write_porta(data & 0xf8);
+	m_pia[3]->ca1_w(BIT(data, 7));
 }
 
 
 WRITE8_MEMBER(spiders_state::spiders_audio_a_w)
 {
-	m_discrete->write(space, SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
+	m_discrete->write(SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
 }
 
 WRITE8_MEMBER(spiders_state::spiders_audio_b_w)
 {
-	m_discrete->write(space, SPIDERS_WEB_SOUND_DATA, data);
+	m_discrete->write(SPIDERS_WEB_SOUND_DATA, data);
 }
 
 
 WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
 {
-	m_discrete->write(space, SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
-	m_discrete->write(space, SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
-	m_discrete->write(space, SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
-	m_discrete->write(space, SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
-	m_discrete->write(space, SPIDERS_X_EN, data & 0x01 ? 1 : 0);
+	m_discrete->write(SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
+	m_discrete->write(SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
+	m_discrete->write(SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
+	m_discrete->write(SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
+	m_discrete->write(SPIDERS_X_EN, data & 0x01 ? 1 : 0);
 }
 
 

@@ -67,13 +67,13 @@ void circus_state::circus_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
 	map(0x1000, 0x1fff).rom();
-	map(0x2000, 0x2000).w(this, FUNC(circus_state::circus_clown_x_w));
-	map(0x3000, 0x3000).w(this, FUNC(circus_state::circus_clown_y_w));
-	map(0x4000, 0x43ff).ram().w(this, FUNC(circus_state::circus_videoram_w)).share("videoram");
-	map(0x8000, 0x8000).ram().w(this, FUNC(circus_state::circus_clown_z_w));
+	map(0x2000, 0x2000).w(FUNC(circus_state::circus_clown_x_w));
+	map(0x3000, 0x3000).w(FUNC(circus_state::circus_clown_y_w));
+	map(0x4000, 0x43ff).ram().w(FUNC(circus_state::circus_videoram_w)).share("videoram");
+	map(0x8000, 0x8000).ram().w(FUNC(circus_state::circus_clown_z_w));
 	map(0xa000, 0xa000).portr("INPUTS");
 	map(0xc000, 0xc000).portr("DSW");
-	map(0xd000, 0xd000).r(this, FUNC(circus_state::circus_paddle_r));
+	map(0xd000, 0xd000).r(FUNC(circus_state::circus_paddle_r));
 	map(0xf000, 0xffff).rom();
 }
 
@@ -283,72 +283,69 @@ void circus_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(circus_state::circus)
-
+void circus_state::circus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_DEVICE_PROGRAM_MAP(circus_map)
-
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)          /* needed for proper hardware collisions */
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)   /* frames per second, vblank duration (complete guess) */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_circus)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);  /* needed for proper hardware collisions */
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(circus_state::screen_update_circus));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(3)
-	MCFG_SAMPLES_NAMES(circus_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(3);
+	m_samples->set_samples_names(circus_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, circus_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, circus_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(circus_state::robotbwl)
-
+void circus_state::robotbwl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_DEVICE_PROGRAM_MAP(circus_map)
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
 	// does not generate irq!
 
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500) /* frames per second, vblank duration (complete guess) */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_robotbwl)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(circus_state::screen_update_robotbwl));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robotbwl)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robotbwl);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(5)
-	MCFG_SAMPLES_NAMES(robotbwl_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(robotbwl_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, robotbwl_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, robotbwl_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
 {
@@ -358,71 +355,69 @@ TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(circus_state::crash)
-
+void circus_state::crash(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_DEVICE_PROGRAM_MAP(circus_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", circus_state, crash_scanline, "screen", 0, 1)
-
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(circus_state::crash_scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500) /* frames per second, vblank duration (complete guess) */)
-	MCFG_SCREEN_SIZE(40*8, 40*8) //TODO
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_crash)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_size(40*8, 40*8); // TODO // to do what?
+	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(circus_state::screen_update_crash));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(crash_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(crash_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, crash_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, crash_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(circus_state::ripcord)
-
+void circus_state::ripcord(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
-	MCFG_DEVICE_PROGRAM_MAP(circus_map)
-
+	M6502(config, m_maincpu, XTAL(11'289'000) / 16); /* 705.562kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::circus_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)          /* needed for proper hardware collisions */
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)   /* frames per second, vblank duration (complete guess) */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(circus_state, screen_update_ripcord)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);          /* needed for proper hardware collisions */
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(circus_state::screen_update_ripcord));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_circus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(ripcord_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(ripcord_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, circus_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, circus_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -513,6 +508,21 @@ ROM_START( crash )
 	ROM_LOAD( "crash.d14",  0x0000, 0x0200, CRC(833f81e4) SHA1(78a0ace3510546691ecaf6f6275cb3269495edc9) )
 ROM_END
 
+// colours: the playfield is cyan. The entire centre box (and contents) is pale green
+// see http://forum.arcadecontrols.com/index.php/topic,146323.msg1526542.html
+ROM_START( crasha )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // code
+	ROM_LOAD( "nsa7.a8",    0x1000, 0x0800, CRC(2e47c5ee) SHA1(4712ec3080ce3797420266d6efb26e7d146a965a) )
+	ROM_LOAD( "nsa3.a4",    0x1800, 0x0800, CRC(11c8c461) SHA1(197b903ad7626a4055530c8c9c99299ffd94cd37) )
+	ROM_RELOAD(             0xf800, 0x0800 ) /* for the reset and interrupt vectors */
+
+	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
+	ROM_LOAD( "nsc2.c2",    0x0000, 0x0800, CRC(a16cd133) SHA1(a3ec34b7f9e58948b2ce45261f05071e2ef7427f) )
+
+	ROM_REGION( 0x0200, "gfx2", 0 ) // car sprite
+	ROM_LOAD( "sd14.d14",   0x0000, 0x0200, CRC(833f81e4) SHA1(78a0ace3510546691ecaf6f6275cb3269495edc9) )
+ROM_END
+
 ROM_START( smash )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
 	ROM_LOAD( "smash.a1",   0x1000, 0x0200, CRC(b9571203) SHA1(1299e476598d07a67aa1640f3320de1198280296) )
@@ -581,5 +591,6 @@ GAMEL( 1977, circus,   0,      circus,   circus,   circus_state, init_circus,   
 GAMEL( 1977, springbd, circus, circus,   circus,   circus_state, init_circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
 GAME(  1977, robotbwl, 0,      robotbwl, robotbwl, circus_state, init_robotbwl, ROT0, "Exidy", "Robot Bowl", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL( 1979, crash,    0,      crash,    crash,    circus_state, init_crash,    ROT0, "Exidy", "Crash", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
+GAMEL( 1979, crasha,   crash,  crash,    crash,    circus_state, init_crash,    ROT0, "Exidy", "Crash (alt)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash )
 GAMEL( 1979, smash,    crash,  crash,    crash,    circus_state, init_crash,    ROT0, "bootleg", "Smash (Crash bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel
 GAME(  1979, ripcord,  0,      ripcord,  ripcord,  circus_state, init_ripcord,  ROT0, "Exidy", "Rip Cord", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

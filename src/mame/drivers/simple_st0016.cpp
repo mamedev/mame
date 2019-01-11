@@ -92,12 +92,12 @@ WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 void st0016_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xc0, 0xc0).portr("P1").w(this, FUNC(st0016_state::mux_select_w));
+	map(0xc0, 0xc0).portr("P1").w(FUNC(st0016_state::mux_select_w));
 	map(0xc1, 0xc1).portr("P2").nopw();
-	map(0xc2, 0xc2).r(this, FUNC(st0016_state::mux_r)).nopw();
+	map(0xc2, 0xc2).r(FUNC(st0016_state::mux_r)).nopw();
 	map(0xc3, 0xc3).portr("P2").nopw();
 	map(0xe0, 0xe0).nopw(); /* renju = $40, neratte = 0 */
-	map(0xe1, 0xe1).w(this, FUNC(st0016_state::st0016_rom_bank_w));
+	map(0xe1, 0xe1).w(FUNC(st0016_state::st0016_rom_bank_w));
 	map(0xe6, 0xe6).nopw(); /* banking ? ram bank ? shared rambank ? */
 	map(0xe7, 0xe7).nopw(); /* watchdog */
 }
@@ -146,20 +146,20 @@ void st0016_state::v810_mem(address_map &map)
 	map(0x00000000, 0x0001ffff).ram();
 	map(0x80000000, 0x8001ffff).ram();
 	map(0xc0000000, 0xc001ffff).ram();
-	map(0x40000000, 0x4000000f).r(this, FUNC(st0016_state::latch32_r)).w(this, FUNC(st0016_state::latch32_w));
+	map(0x40000000, 0x4000000f).r(FUNC(st0016_state::latch32_r)).w(FUNC(st0016_state::latch32_w));
 	map(0xfff80000, 0xffffffff).bankr("bank2");
 }
 
 void st0016_state::st0016_m2_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xc0, 0xc3).r(this, FUNC(st0016_state::latch8_r)).w(this, FUNC(st0016_state::latch8_w));
-	map(0xd0, 0xd0).portr("P1").w(this, FUNC(st0016_state::mux_select_w));
+	map(0xc0, 0xc3).r(FUNC(st0016_state::latch8_r)).w(FUNC(st0016_state::latch8_w));
+	map(0xd0, 0xd0).portr("P1").w(FUNC(st0016_state::mux_select_w));
 	map(0xd1, 0xd1).portr("P2").nopw();
-	map(0xd2, 0xd2).r(this, FUNC(st0016_state::mux_r)).nopw();
+	map(0xd2, 0xd2).r(FUNC(st0016_state::mux_r)).nopw();
 	map(0xd3, 0xd3).portr("P2").nopw();
 	map(0xe0, 0xe0).nopw();
-	map(0xe1, 0xe1).w(this, FUNC(st0016_state::st0016_rom_bank_w));
+	map(0xe1, 0xe1).w(FUNC(st0016_state::st0016_rom_bank_w));
 	map(0xe6, 0xe6).nopw(); /* banking ? ram bank ? shared rambank ? */
 	map(0xe7, 0xe7).nopw(); /* watchdog */
 }

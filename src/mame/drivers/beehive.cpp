@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -33,7 +34,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(beehive_60_r);
 	DECLARE_WRITE8_MEMBER(beehive_62_w);
@@ -79,9 +80,9 @@ void beehive_state::beehive_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x11, 0x11).portr("DIPS");
-	map(0x60, 0x60).r(this, FUNC(beehive_state::beehive_60_r));
+	map(0x60, 0x60).r(FUNC(beehive_state::beehive_60_r));
 	map(0x61, 0x61).portr("MODIFIERS");
-	map(0x62, 0x62).w(this, FUNC(beehive_state::beehive_62_w));
+	map(0x62, 0x62).w(FUNC(beehive_state::beehive_62_w));
 }
 
 /* Input ports */
@@ -305,7 +306,7 @@ MACHINE_CONFIG_START(beehive_state::beehive)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 /* ROM definition */

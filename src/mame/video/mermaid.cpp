@@ -4,56 +4,49 @@
 #include "includes/mermaid.h"
 
 
-PALETTE_INIT_MEMBER(mermaid_state, mermaid)
+void mermaid_state::common_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0; i < 0x40; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 0x40; i++)
 	{
-		int r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
-		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
-		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
+		int const r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
+		int const g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
+		int const b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
+}
 
-	/* blue background */
+void mermaid_state::mermaid_palette(palette_device &palette) const
+{
+	common_palette(palette);
+
+	// blue background
 	palette.set_indirect_color(0x40, rgb_t(0, 0, 0xff));
 
-	/* char/sprite palette */
-	for (i = 0; i < 0x40; i++)
+	// char/sprite palette
+	for (int i = 0; i < 0x40; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* background palette */
+	// background palette
 	palette.set_pen_indirect(0x40, 0x20);
 	palette.set_pen_indirect(0x41, 0x21);
 	palette.set_pen_indirect(0x42, 0x40);
 	palette.set_pen_indirect(0x43, 0x21);
 }
 
-PALETTE_INIT_MEMBER(mermaid_state,rougien)
+void mermaid_state::rougien_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	common_palette(palette);
 
-	for (i = 0; i < 0x40; i++)
-	{
-		int r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
-		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
-		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
-
-		palette.set_indirect_color(i, rgb_t(r, g, b));
-	}
-
-	/* blue background */
+	// black background
 	palette.set_indirect_color(0x40, rgb_t(0, 0, 0));
 
-	/* char/sprite palette */
-	for (i = 0; i < 0x40; i++)
+	// char/sprite palette
+	for (int i = 0; i < 0x40; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* background palette */
+	// background palette
 	palette.set_pen_indirect(0x40, 0x40);
 	palette.set_pen_indirect(0x41, 0x00);
 	palette.set_pen_indirect(0x42, 0x00);
@@ -230,8 +223,8 @@ uint8_t mermaid_state::collision_check( rectangle& rect )
 	int x;
 	int y;
 
-	for (y = rect.min_y; y <= rect.max_y; y++)
-		for (x = rect.min_x; x <= rect.max_x; x++)
+	for (y = rect.top(); y <= rect.bottom(); y++)
+		for (x = rect.left(); x <= rect.right(); x++)
 		{
 			uint16_t a = m_palette->pen_indirect(m_helper.pix16(y, x)) & 0x3f;
 			uint16_t b = m_palette->pen_indirect(m_helper2.pix16(y, x)) & 0x3f;
@@ -289,11 +282,9 @@ void mermaid_state::collision_update()
 			sy = 240 - sy;
 		}
 
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-		rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
 		rect &= visarea;
 
 		// check collision sprite - background
@@ -392,11 +383,9 @@ void mermaid_state::collision_update()
 			sy = 240 - sy;
 		}
 
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-		rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
 		rect &= visarea;
 
 		// check collision sprite - sprite
@@ -473,11 +462,9 @@ void mermaid_state::collision_update()
 			sy = 240 - sy;
 		}
 
-		rect.min_x = sx;
-		rect.min_y = sy;
-		rect.max_x = sx + m_gfxdecode->gfx(1)->width() - 1;
-		rect.max_y = sy + m_gfxdecode->gfx(1)->height() - 1;
-
+		rect.set(
+				sx, sx + m_gfxdecode->gfx(1)->width() - 1,
+				sy, sy + m_gfxdecode->gfx(1)->height() - 1);
 		rect &= visarea;
 
 		// check collision sprite - sprite

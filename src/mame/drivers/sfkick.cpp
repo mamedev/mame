@@ -167,7 +167,6 @@ class sfkick_state : public driver_device
 public:
 	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_v9938(*this, "v9938"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_region_bios(*this, "bios"),
@@ -189,10 +188,11 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	void init_sfkick();
 	void sfkick(machine_config &config);
 
-protected:
+	void init_sfkick();
+
+private:
 	DECLARE_WRITE8_MEMBER(page0_w);
 	DECLARE_WRITE8_MEMBER(page1_w);
 	DECLARE_WRITE8_MEMBER(page2_w);
@@ -209,13 +209,11 @@ protected:
 	void sfkick_sound_io_map(address_map &map);
 	void sfkick_sound_map(address_map &map);
 
-private:
 	std::unique_ptr<uint8_t[]> m_main_mem;
 	int m_bank_cfg;
 	int m_bank[8];
 	int m_input_mux;
 
-	required_device<v9938_device> m_v9938;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_memory_region m_region_bios;
@@ -475,10 +473,10 @@ void sfkick_state::sfkick_map(address_map &map)
 	map(0xa000, 0xbfff).bankr("bank6");
 	map(0xc000, 0xdfff).bankr("bank7");
 	map(0xe000, 0xffff).bankr("bank8");
-	map(0x0000, 0x3fff).w(this, FUNC(sfkick_state::page0_w));
-	map(0x4000, 0x7fff).w(this, FUNC(sfkick_state::page1_w));
-	map(0x8000, 0xbfff).w(this, FUNC(sfkick_state::page2_w));
-	map(0xc000, 0xffff).w(this, FUNC(sfkick_state::page3_w));
+	map(0x0000, 0x3fff).w(FUNC(sfkick_state::page0_w));
+	map(0x4000, 0x7fff).w(FUNC(sfkick_state::page1_w));
+	map(0x8000, 0xbfff).w(FUNC(sfkick_state::page2_w));
+	map(0xc000, 0xffff).w(FUNC(sfkick_state::page3_w));
 }
 
 void sfkick_state::sfkick_io_map(address_map &map)
@@ -486,7 +484,7 @@ void sfkick_state::sfkick_io_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0xa0, 0xa7).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb4, 0xb5).ram(); /* loopback ? req by sfkicka (MSX Bios leftover)*/
 }
@@ -593,40 +591,40 @@ WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
-MACHINE_CONFIG_START(sfkick_state::sfkick)
+void sfkick_state::sfkick(machine_config &config)
+{
+	Z80(config, m_maincpu, MASTER_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_map);
+	m_maincpu->set_addrmap(AS_IO, &sfkick_state::sfkick_io_map);
 
-	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(sfkick_map)
-	MCFG_DEVICE_IO_MAP(sfkick_io_map)
+	config.m_minimum_quantum = attotime::from_hz(60000);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+	Z80(config, m_soundcpu, MASTER_CLOCK/6);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &sfkick_state::sfkick_sound_io_map);
 
-	MCFG_DEVICE_ADD("soundcpu",Z80,MASTER_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(sfkick_sound_map)
-	MCFG_DEVICE_IO_MAP(sfkick_sound_io_map)
+	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(0x80000);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_V9938_ADD("v9938", "screen", 0x80000, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
-
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sfkick_state, ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, sfkick_state, ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sfkick_state, ppi_port_c_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.out_pa_callback().set(FUNC(sfkick_state::ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(sfkick_state::ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(sfkick_state::ppi_port_c_w));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MASTER_CLOCK/6)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, sfkick_state, irqhandler))
-
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
-
-MACHINE_CONFIG_END
+	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK/6));
+	ym1.irq_handler().set(FUNC(sfkick_state::irqhandler));
+	ym1.add_route(0, "mono", 0.25);
+	ym1.add_route(1, "mono", 0.25);
+	ym1.add_route(2, "mono", 0.25);
+	ym1.add_route(3, "mono", 0.50);
+}
 
 void sfkick_state::init_sfkick()
 {

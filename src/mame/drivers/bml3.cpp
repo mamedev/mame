@@ -25,6 +25,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 #include "bus/bml3/bml3bus.h"
 #include "bus/bml3/bml3mp1802.h"
@@ -405,53 +406,53 @@ void bml3_state::bml3_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x43ff).rw(this, FUNC(bml3_state::bml3_vram_r), FUNC(bml3_state::bml3_vram_w));
+	map(0x0400, 0x43ff).rw(FUNC(bml3_state::bml3_vram_r), FUNC(bml3_state::bml3_vram_w));
 	map(0x4400, 0x9fff).ram();
 	map(0xff40, 0xff46).noprw(); // lots of unknown reads and writes
 	map(0xffc0, 0xffc3).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xffc4, 0xffc5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xffc6, 0xffc7).rw(this, FUNC(bml3_state::bml3_6845_r), FUNC(bml3_state::bml3_6845_w));
+	map(0xffc6, 0xffc7).rw(FUNC(bml3_state::bml3_6845_r), FUNC(bml3_state::bml3_6845_w));
 	// KBNMI - Keyboard "Break" key non-maskable interrupt
-	map(0xffc8, 0xffc8).r(this, FUNC(bml3_state::bml3_keyb_nmi_r)); // keyboard nmi
+	map(0xffc8, 0xffc8).r(FUNC(bml3_state::bml3_keyb_nmi_r)); // keyboard nmi
 	// DIPSW - DIP switches on system mainboard
 	map(0xffc9, 0xffc9).portr("DSW");
 	// TIMER - System timer enable
-	map(0xffca, 0xffca).r(this, FUNC(bml3_state::bml3_firq_status_r)); // timer irq
+	map(0xffca, 0xffca).r(FUNC(bml3_state::bml3_firq_status_r)); // timer irq
 	// LPFLG - Light pen interrupt
 //  AM_RANGE(0xffcb, 0xffcb)
 	// MODE_SEL - Graphics mode select
-	map(0xffd0, 0xffd0).w(this, FUNC(bml3_state::bml3_hres_reg_w));
+	map(0xffd0, 0xffd0).w(FUNC(bml3_state::bml3_hres_reg_w));
 	// TRACE - Trace counter
 //  AM_RANGE(0xffd1, 0xffd1)
 	// REMOTE - Remote relay control for cassette - bit 7
-	map(0xffd2, 0xffd2).w(this, FUNC(bml3_state::relay_w));
+	map(0xffd2, 0xffd2).w(FUNC(bml3_state::relay_w));
 	// MUSIC_SEL - Music select: toggle audio output level when rising
-	map(0xffd3, 0xffd3).rw(this, FUNC(bml3_state::bml3_beep_r), FUNC(bml3_state::bml3_beep_w));
+	map(0xffd3, 0xffd3).rw(FUNC(bml3_state::bml3_beep_r), FUNC(bml3_state::bml3_beep_w));
 	// TIME_MASK - Prohibit timer IRQ
-	map(0xffd4, 0xffd4).w(this, FUNC(bml3_state::bml3_firq_mask_w));
+	map(0xffd4, 0xffd4).w(FUNC(bml3_state::bml3_firq_mask_w));
 	// LPENBL - Light pen operation enable
 	map(0xffd5, 0xffd5).noprw();
 	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
-	map(0xffd6, 0xffd6).w(this, FUNC(bml3_state::bml3_vres_reg_w));
+	map(0xffd6, 0xffd6).w(FUNC(bml3_state::bml3_vres_reg_w));
 //  AM_RANGE(0xffd7, 0xffd7) baud select
 	// C_REG_SEL - Attribute register (character/video mode and colours)
-	map(0xffd8, 0xffd8).rw(this, FUNC(bml3_state::bml3_vram_attr_r), FUNC(bml3_state::bml3_vram_attr_w));
+	map(0xffd8, 0xffd8).rw(FUNC(bml3_state::bml3_vram_attr_r), FUNC(bml3_state::bml3_vram_attr_w));
 	// KB - Keyboard mode register, interrupt control, keyboard LEDs
-	map(0xffe0, 0xffe0).rw(this, FUNC(bml3_state::bml3_keyboard_r), FUNC(bml3_state::bml3_keyboard_w));
+	map(0xffe0, 0xffe0).rw(FUNC(bml3_state::bml3_keyboard_r), FUNC(bml3_state::bml3_keyboard_w));
 //  AM_RANGE(0xffe8, 0xffe8) bank register
 //  AM_RANGE(0xffe9, 0xffe9) IG mode register
 //  AM_RANGE(0xffea, 0xffea) IG enable register
 	map(0xa000, 0xfeff).rom().region("maincpu", 0xa000);
 	map(0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
-	map(0xa000, 0xbfff).w(this, FUNC(bml3_state::bml3_a000_w));
-	map(0xc000, 0xdfff).w(this, FUNC(bml3_state::bml3_c000_w));
-	map(0xe000, 0xefff).w(this, FUNC(bml3_state::bml3_e000_w));
-	map(0xf000, 0xfeff).w(this, FUNC(bml3_state::bml3_f000_w));
-	map(0xfff0, 0xffff).w(this, FUNC(bml3_state::bml3_fff0_w));
+	map(0xa000, 0xbfff).w(FUNC(bml3_state::bml3_a000_w));
+	map(0xc000, 0xdfff).w(FUNC(bml3_state::bml3_c000_w));
+	map(0xe000, 0xefff).w(FUNC(bml3_state::bml3_e000_w));
+	map(0xf000, 0xfeff).w(FUNC(bml3_state::bml3_f000_w));
+	map(0xfff0, 0xffff).w(FUNC(bml3_state::bml3_fff0_w));
 
 #if 0
-	map(0xff00, 0xff00).rw(this, FUNC(bml3_state::bml3_ym2203_r), FUNC(bml3_state::bml3_ym2203_w));
-	map(0xff02, 0xff02).rw(this, FUNC(bml3_state::bml3_psg_latch_r), FUNC(bml3_state::bml3_psg_latch_w)); // PSG address/data select
+	map(0xff00, 0xff00).rw(FUNC(bml3_state::bml3_ym2203_r), FUNC(bml3_state::bml3_ym2203_w));
+	map(0xff02, 0xff02).rw(FUNC(bml3_state::bml3_psg_latch_r), FUNC(bml3_state::bml3_psg_latch_w)); // PSG address/data select
 #endif
 }
 
@@ -948,18 +949,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-#if 0
-static const ay8910_interface ay8910_config =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NOOP, // read A
-	DEVCB_NOOP, // read B
-	DEVCB_NOOP, // write A
-	DEVCB_NOOP  // write B
-};
-#endif
-
 static void bml3_cards(device_slot_interface &device)
 {
 	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
@@ -983,14 +972,15 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	/* Devices */
 	// CRTC clock should be synchronous with the CPU clock.
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CPU_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(bml3_state, crtc_update_row)
+	H46505(config, m_crtc, CPU_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row), this);
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
@@ -998,17 +988,17 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, bml3_state, bml3_piaA_w))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.writepa_handler().set(FUNC(bml3_state::bml3_piaA_w));
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_tx_w))
-	MCFG_ACIA6850_RTS_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_rts_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, bml3_state, bml3_acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(bml3_state::bml3_acia_tx_w));
+	m_acia->rts_handler().set(FUNC(bml3_state::bml3_acia_rts_w));
+	m_acia->irq_handler().set(FUNC(bml3_state::bml3_acia_irq_w));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 9600) // 600 baud x 16(divider) = 9600
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 9'600)); // 600 baud x 16(divider) = 9600
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
@@ -1045,12 +1035,12 @@ MACHINE_CONFIG_START(bml3_state::bml3)
 #if 0
 	// TODO: slot device for sound card
 	// audio
-	MCFG_DEVICE_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
-	MCFG_YM2203_AY8910_INTF(&ay8910_config)
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	YM2203(config, m_ym2203, 2000000); //unknown clock / divider
+	m_ym2203->set_flags(AY8910_LEGACY_OUTPUT);
+	m_ym2203->add_route(0, "mono", 0.25);
+	m_ym2203->add_route(1, "mono", 0.25);
+	m_ym2203->add_route(2, "mono", 0.50);
+	m_ym2203->add_route(3, "mono", 0.50);
 #endif
 MACHINE_CONFIG_END
 

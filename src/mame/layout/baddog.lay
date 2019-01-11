@@ -52,13 +52,17 @@
 		</text>
 	</element>
 
-	<element name="unused3">
+	<element name="BLACK">
 		<rect state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
+		<text string="BLACK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.8" />
+		</text>
 	</element>
 
 	<element name="DRAW">
@@ -68,7 +72,7 @@
 		<rect state="1">
 			<color red="0.5" green="0.5" blue="0.5" />
 		</rect>
-		<text string="DRAW / BLACK">
+		<text string="DRAW">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
@@ -321,7 +325,7 @@
 		<bezel name="lamp4" element="TAKE_WIN" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		<bezel name="lamp3" element="unused3" inputtag="P1" inputmask="0x08">
+		<bezel name="lamp3" element="BLACK" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp2" element="DRAW" inputtag="P1" inputmask="0x04">
@@ -386,7 +390,7 @@
 		<bezel name="lamp4" element="TAKE_WIN" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		<bezel name="lamp3" element="unused3" inputtag="P1" inputmask="0x08">
+		<bezel name="lamp3" element="BLACK" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp2" element="DRAW" inputtag="P1" inputmask="0x04">
@@ -451,7 +455,7 @@
 		<bezel name="lamp4" element="TAKE_WIN" inputtag="P1" inputmask="0x10">
 			<bounds x="1.51" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-		<bezel name="lamp3" element="unused3" inputtag="P1" inputmask="0x08">
+		<bezel name="lamp3" element="BLACK" inputtag="P1" inputmask="0x08">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
 		</bezel>
 		<bezel name="lamp2" element="DRAW" inputtag="P1" inputmask="0x04">

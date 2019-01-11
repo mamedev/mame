@@ -1072,6 +1072,9 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				case 4: /* Gouraud shading */
 					m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, pix );
 					break;
+				// TODO: Pro Yakyuu Team mo Tsukurou (during team creation, on PR girl select)
+				//case 6:
+				//  break;
 				case 7: /* Gouraud-shading + half-transparent */
 					// Lupin the 3rd Pyramid no Kenja enemy shadows
 					// Death Crimson lives indicators
@@ -1115,7 +1118,7 @@ void saturn_state::stv_vdp1_set_drawpixel( void )
 		drawpixel = &saturn_state::drawpixel_generic;
 		return;
 	}
-	
+
 	// polygon / polyline / line with replace case
 	if (sprite_type & 4 && ((stv2_current_sprite.CMDPMOD & 0x7) == 0))
 	{
@@ -2217,8 +2220,8 @@ int saturn_state::stv_vdp1_start ( void )
 	m_vdp1.user_cliprect.set(0, 512, 0, 256);
 
 	// save state
-	save_pointer(NAME(m_vdp1_regs.get()), 0x020/2);
-	save_pointer(NAME(m_vdp1_vram.get()), 0x100000/4);
+	save_pointer(NAME(m_vdp1_regs), 0x020/2);
+	save_pointer(NAME(m_vdp1_vram), 0x100000/4);
 	save_item(NAME(m_vdp1.fbcr_accessed));
 	save_item(NAME(m_vdp1.framebuffer_current_display));
 	save_item(NAME(m_vdp1.framebuffer_current_draw));

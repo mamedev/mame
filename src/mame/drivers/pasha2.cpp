@@ -78,6 +78,7 @@ Notes:
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -101,6 +102,11 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void pasha2(machine_config &config);
+
+	void init_pasha2();
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_wram;
 	required_shared_ptr<uint16_t> m_paletteram;
@@ -126,16 +132,14 @@ public:
 	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
 	DECLARE_READ16_MEMBER(pasha2_speedup_r);
 	template<int Chip> DECLARE_WRITE16_MEMBER(oki_bank_w);
-	void init_pasha2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<i80c52_device> m_audiocpu;
+	required_device<at89c52_device> m_audiocpu;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
-	void pasha2(machine_config &config);
 	void pasha2_io(address_map &map);
 	void pasha2_map(address_map &map);
 };
@@ -222,17 +226,17 @@ WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 void pasha2_state::pasha2_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("wram");
-	map(0x40000000, 0x4001ffff).ram().w(this, FUNC(pasha2_state::bitmap_0_w));
-	map(0x40020000, 0x4003ffff).ram().w(this, FUNC(pasha2_state::bitmap_1_w));
+	map(0x40000000, 0x4001ffff).ram().w(FUNC(pasha2_state::bitmap_0_w));
+	map(0x40020000, 0x4003ffff).ram().w(FUNC(pasha2_state::bitmap_1_w));
 	map(0x40060000, 0x40060001).nopw();
 	map(0x40064000, 0x40064001).nopw();
 	map(0x40068000, 0x40068001).nopw();
 	map(0x4006c000, 0x4006c001).nopw();
-	map(0x40070000, 0x40070001).w(this, FUNC(pasha2_state::vbuffer_clear_w));
-	map(0x40074000, 0x40074001).w(this, FUNC(pasha2_state::vbuffer_set_w));
+	map(0x40070000, 0x40070001).w(FUNC(pasha2_state::vbuffer_clear_w));
+	map(0x40074000, 0x40074001).w(FUNC(pasha2_state::vbuffer_set_w));
 	map(0x40078000, 0x40078001).nopw(); //once at startup -> to disable the eeprom?
 	map(0x80000000, 0x803fffff).bankr("mainbank");
-	map(0xe0000000, 0xe00003ff).ram().w(this, FUNC(pasha2_state::pasha2_palette_w)).share("paletteram"); //tilemap? palette?
+	map(0xe0000000, 0xe00003ff).ram().w(FUNC(pasha2_state::pasha2_palette_w)).share("paletteram"); //tilemap? palette?
 	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -240,16 +244,16 @@ void pasha2_state::pasha2_io(address_map &map)
 {
 	map(0x08, 0x0b).nopr(); //sound status?
 	map(0x18, 0x1b).nopr(); //sound status?
-	map(0x20, 0x23).w(this, FUNC(pasha2_state::pasha2_lamps_w));
+	map(0x20, 0x23).w(FUNC(pasha2_state::pasha2_lamps_w));
 	map(0x40, 0x43).portr("COINS");
 	map(0x60, 0x63).portr("DSW");
 	map(0x80, 0x83).portr("INPUTS");
 	map(0xa0, 0xa3).nopw(); //soundlatch?
-	map(0xc0, 0xc3).w(this, FUNC(pasha2_state::pasha2_misc_w));
+	map(0xc0, 0xc3).w(FUNC(pasha2_state::pasha2_misc_w));
 	map(0xe3, 0xe3).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xe7, 0xe7).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe8, 0xeb).w(this, FUNC(pasha2_state::oki_bank_w<0>));
-	map(0xec, 0xef).w(this, FUNC(pasha2_state::oki_bank_w<1>));
+	map(0xe8, 0xeb).w(FUNC(pasha2_state::oki_bank_w<0>));
+	map(0xec, 0xef).w(FUNC(pasha2_state::oki_bank_w<1>));
 }
 
 static INPUT_PORTS_START( pasha2 )
@@ -345,8 +349,8 @@ void pasha2_state::video_start()
 	{
 		m_bitmap0[i] = make_unique_clear<uint8_t[]>(0x20000);
 		m_bitmap1[i] = make_unique_clear<uint8_t[]>(0x20000);
-		save_pointer(NAME(m_bitmap0[i].get()), 0x20000, i);
-		save_pointer(NAME(m_bitmap1[i].get()), 0x20000, i);
+		save_pointer(NAME(m_bitmap0[i]), 0x20000, i);
+		save_pointer(NAME(m_bitmap1[i]), 0x20000, i);
 	}
 }
 
@@ -402,10 +406,10 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_DEVICE_IO_MAP(pasha2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", I80C52, 12000000)     /* actually AT89C52; clock from docs */
+	MCFG_DEVICE_ADD("audiocpu", AT89C52, 12000000)     /* clock from docs */
 	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -414,9 +418,9 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pasha2_state, screen_update_pasha2)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, m_palette).set_entries(0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

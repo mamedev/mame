@@ -28,6 +28,17 @@ public:
 		, swarray(*this, "SW.%u", 0)
 	{ }
 
+	void wpc_dcs(machine_config &config);
+
+	void init();
+	void init_dm();
+	void init_ij();
+	void init_jd();
+	void init_pop();
+	void init_sttng();
+	void init_afv();
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
@@ -41,20 +52,11 @@ public:
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_WRITE8_MEMBER(switches_w);
 
-	void init();
-	void init_dm();
-	void init_ij();
-	void init_jd();
-	void init_pop();
-	void init_sttng();
-	void init_afv();
-
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
-	void wpc_dcs(machine_config &config);
 	void wpc_dcs_map(address_map &map);
-protected:
+
 	// devices
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_8k_device> dcs;
@@ -68,7 +70,6 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 
-private:
 	uint8_t firq_src, zc, switch_col;
 	uint16_t rtc_base_day;
 };
@@ -88,8 +89,8 @@ void wpc_dcs_state::wpc_dcs_map(address_map &map)
 
 	map(0x3fd4, 0x3fd4).portr("FLIPPERS").w(out, FUNC(wpc_out_device::out4_w));
 
-	map(0x3fdc, 0x3fdc).rw(this, FUNC(wpc_dcs_state::dcs_data_r), FUNC(wpc_dcs_state::dcs_data_w));
-	map(0x3fdd, 0x3fdd).rw(this, FUNC(wpc_dcs_state::dcs_ctrl_r), FUNC(wpc_dcs_state::dcs_reset_w));
+	map(0x3fdc, 0x3fdc).rw(FUNC(wpc_dcs_state::dcs_data_r), FUNC(wpc_dcs_state::dcs_data_w));
+	map(0x3fdd, 0x3fdd).rw(FUNC(wpc_dcs_state::dcs_ctrl_r), FUNC(wpc_dcs_state::dcs_reset_w));
 
 	map(0x3fe0, 0x3fe3).w(out, FUNC(wpc_out_device::out_w));
 	map(0x3fe4, 0x3fe4).nopr().w(lamp, FUNC(wpc_lamp_device::row_w));
@@ -97,17 +98,17 @@ void wpc_dcs_state::wpc_dcs_map(address_map &map)
 	map(0x3fe6, 0x3fe6).w(out, FUNC(wpc_out_device::gi_w));
 	map(0x3fe7, 0x3fe7).portr("DSW");
 	map(0x3fe8, 0x3fe8).portr("DOOR");
-	map(0x3fe9, 0x3fe9).r(this, FUNC(wpc_dcs_state::switches_r));
-	map(0x3fea, 0x3fea).w(this, FUNC(wpc_dcs_state::switches_w));
+	map(0x3fe9, 0x3fe9).r(FUNC(wpc_dcs_state::switches_r));
+	map(0x3fea, 0x3fea).w(FUNC(wpc_dcs_state::switches_w));
 
 	map(0x3ff2, 0x3ff2).w(out, FUNC(wpc_out_device::led_w));
-	map(0x3ff3, 0x3ff3).nopr().w(this, FUNC(wpc_dcs_state::irq_ack_w));
+	map(0x3ff3, 0x3ff3).nopr().w(FUNC(wpc_dcs_state::irq_ack_w));
 	map(0x3ff4, 0x3ff7).m("shift", FUNC(wpc_shift_device::registers));
-	map(0x3ff8, 0x3ff8).r(this, FUNC(wpc_dcs_state::firq_src_r)).nopw(); // ack?
-	map(0x3ffa, 0x3ffb).r(this, FUNC(wpc_dcs_state::rtc_r));
-	map(0x3ffc, 0x3ffc).w(this, FUNC(wpc_dcs_state::bank_w));
+	map(0x3ff8, 0x3ff8).r(FUNC(wpc_dcs_state::firq_src_r)).nopw(); // ack?
+	map(0x3ffa, 0x3ffb).r(FUNC(wpc_dcs_state::rtc_r));
+	map(0x3ffc, 0x3ffc).w(FUNC(wpc_dcs_state::bank_w));
 	map(0x3ffd, 0x3ffe).noprw(); // memory protection stuff?
-	map(0x3fff, 0x3fff).rw(this, FUNC(wpc_dcs_state::zc_r), FUNC(wpc_dcs_state::watchdog_w));
+	map(0x3fff, 0x3fff).rw(FUNC(wpc_dcs_state::zc_r), FUNC(wpc_dcs_state::watchdog_w));
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom().region("maincpu", 0x78000);
 }
@@ -431,13 +432,13 @@ MACHINE_CONFIG_START(wpc_dcs_state::wpc_dcs)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_dcs_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
-	MCFG_WPC_LAMP_ADD("lamp")
-	MCFG_WPC_OUT_ADD("out", 3)
-	MCFG_WPC_SHIFT_ADD("shift")
-	MCFG_WPC_DMD_ADD("dmd", WRITELINE(*this, wpc_dcs_state, scanline_irq))
+	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
+	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 3)
+	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
+	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_dcs_state::scanline_irq));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	DCS_AUDIO_8K(config, dcs, 0);
 MACHINE_CONFIG_END
 
 /*-------------

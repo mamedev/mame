@@ -35,6 +35,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/seta001.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,9 +49,13 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
-		m_led(*this, "led%u", 0U)
+		m_iox_io(*this, "IOX"),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
+	void thedealr(machine_config &config);
+
+private:
 	// IOX
 	DECLARE_READ8_MEMBER(iox_r);
 	DECLARE_WRITE8_MEMBER(iox_w);
@@ -66,24 +71,23 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
 
 	// video
-	DECLARE_PALETTE_INIT(thedealr);
+	void thedealr_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
-	void thedealr(machine_config &config);
+
 	void thedealr(address_map &map);
 	void thedealr_sub(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
-	output_finder<8> m_led;
+	optional_ioport m_iox_io;
+	output_finder<8> m_leds;
 };
 
 /***************************************************************************
@@ -92,13 +96,13 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thedealr_state,thedealr)
+void thedealr_state::thedealr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int col = (color_prom[i] << 8) + color_prom[i + 512];
+		int const col = (color_prom[i] << 8) | color_prom[i + 512];
 		palette.set_pen_color(i, pal5bit(col >> 10), pal5bit(col >> 5), pal5bit(col >> 0));
 	}
 }
@@ -110,7 +114,7 @@ uint32_t thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_seta001->set_bg_yoffsets(  0x11+1, -0x10 );   // + is up (down with flip)
 	m_seta001->set_fg_yoffsets( -0x12+1, -0x01 );
 
-	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x1000, 1);
+	m_seta001->draw_sprites(screen, bitmap, cliprect, 0x1000);
 	return 0;
 }
 
@@ -165,14 +169,14 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x20:  // leds
 				m_iox_leds = data;
-				m_led[0] = BIT(data, 0);  // bet
-				m_led[1] = BIT(data, 1);  // deal
-				m_led[2] = BIT(data, 2);
-				m_led[3] = BIT(data, 3);
-				m_led[4] = BIT(data, 4);  // hold 1-5?
-				m_led[5] = BIT(data, 5);
-				m_led[6] = BIT(data, 6);
-				m_led[7] = BIT(data, 7);
+				m_leds[0] = BIT(data, 0);  // bet
+				m_leds[1] = BIT(data, 1);  // deal
+				m_leds[2] = BIT(data, 2);
+				m_leds[3] = BIT(data, 3);
+				m_leds[4] = BIT(data, 4);  // hold 1-5?
+				m_leds[5] = BIT(data, 5);
+				m_leds[6] = BIT(data, 6);
+				m_leds[7] = BIT(data, 7);
 				break;
 
 			case 0x40:  // coin counters
@@ -201,7 +205,7 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x01:  // inputs?
 			{
-				uint16_t buttons = ioport("IOX")->read();
+				uint16_t buttons = m_iox_io->read();
 				m_iox_ret = 0;
 				for (int i = 0; i < 16; ++i)
 				{
@@ -284,16 +288,16 @@ void thedealr_state::thedealr(address_map &map)
 
 	map(0x2000, 0x2000).ram(); // w ff at boot (after clearing commram)
 
-	map(0x2400, 0x2400).r(this, FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
-	map(0x2400, 0x2400).w(this, FUNC(thedealr_state::unk_w));    // w = ?
+	map(0x2400, 0x2400).r(FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
+	map(0x2400, 0x2400).w(FUNC(thedealr_state::unk_w));    // w = ?
 
 	map(0x2800, 0x2800).portr("COINS").nopw();  // rw
 
 	map(0x2801, 0x2801).portr("DSW4");
 	map(0x2c00, 0x2c00).portr("DSW3");
 
-	map(0x3400, 0x3400).rw(this, FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
-	map(0x3401, 0x3401).r(this, FUNC(thedealr_state::iox_status_r));
+	map(0x3400, 0x3400).rw(FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
+	map(0x3401, 0x3401).r(FUNC(thedealr_state::iox_status_r));
 
 	map(0x3000, 0x3000).ram(); // rw, comm in test mode
 	map(0x3001, 0x3001).ram(); // rw, ""
@@ -513,7 +517,7 @@ GFXDECODE_END
 
 void thedealr_state::machine_start()
 {
-	m_led.resolve();
+	m_leds.resolve();
 
 	save_item(NAME(m_iox_status));
 	save_item(NAME(m_iox_ret));
@@ -546,34 +550,33 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_DEVICE_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
 	MCFG_DEVICE_PROGRAM_MAP(thedealr_sub)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, thedealr_state, screen_vblank))
-	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 384-1, 0+30, 256-1);
+	screen.set_screen_update(FUNC(thedealr_state::screen_update));
+	screen.screen_vblank().set(FUNC(thedealr_state::screen_vblank));
+	screen.screen_vblank().append_inputline(m_subcpu, INPUT_LINE_NMI);
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thedealr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(thedealr_state,thedealr)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_thedealr);
+	PALETTE(config, m_palette, FUNC(thedealr_state::thedealr_palette), 512);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(16'000'000)/8)   // 2 MHz?
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL(16'000'000)/8));   // 2 MHz?
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
 /***************************************************************************

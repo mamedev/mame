@@ -220,6 +220,7 @@ U145        1Brown          PAL14H4CN
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -231,9 +232,13 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void sureshot(machine_config &config);
+	void sms(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(link_r);
 	DECLARE_WRITE8_MEMBER(link_w);
@@ -246,13 +251,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi0_b_w);
 	DECLARE_MACHINE_START(sureshot);
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sureshot(machine_config &config);
-	void sms(machine_config &config);
 	void sms_map(address_map &map);
 	void sub_map(address_map &map);
 	void sureshot_map(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -263,7 +265,7 @@ protected:
 	uint8_t m_vid_regs[7];
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	output_finder<10> m_lamp;
+	output_finder<10> m_lamps;
 };
 
 
@@ -415,20 +417,20 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
-	m_lamp[0] = BIT(~data, 7); /* Display Light 1 */
-	m_lamp[1] = BIT(~data, 6); /* Display Light 2 */
-	m_lamp[2] = BIT(~data, 5); /* Display Light 3 */
-	m_lamp[3] = BIT(~data, 4); /* Display Light 4 */
-	m_lamp[4] = BIT(~data, 3); /* Display Light 5 */
-	m_lamp[5] = BIT(~data, 2); /* Bet Light */
-	m_lamp[6] = BIT(~data, 1); /* Deal Light */
-	m_lamp[7] = BIT(~data, 0); /* Draw Light */
+	m_lamps[0] = BIT(~data, 7); /* Display Light 1 */
+	m_lamps[1] = BIT(~data, 6); /* Display Light 2 */
+	m_lamps[2] = BIT(~data, 5); /* Display Light 3 */
+	m_lamps[3] = BIT(~data, 4); /* Display Light 4 */
+	m_lamps[4] = BIT(~data, 3); /* Display Light 5 */
+	m_lamps[5] = BIT(~data, 2); /* Bet Light */
+	m_lamps[6] = BIT(~data, 1); /* Deal Light */
+	m_lamps[7] = BIT(~data, 0); /* Draw Light */
 }
 
 WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
 {
-	m_lamp[8] = BIT(~data, 7); /* Stand Light */
-	m_lamp[9] = BIT(~data, 6); /* Cancel Light */
+	m_lamps[8] = BIT(~data, 7); /* Stand Light */
+	m_lamps[9] = BIT(~data, 6); /* Cancel Light */
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data,1));
 	machine().bookkeeping().coin_lockout_w(0, BIT(data,5));
@@ -494,10 +496,10 @@ void smsmfg_state::sms_map(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("nvram");
 	map(0x00800, 0x00803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x01000, 0x01007).w(this, FUNC(smsmfg_state::video_w));
-	map(0x01800, 0x01803).rw(this, FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
+	map(0x01000, 0x01007).w(FUNC(smsmfg_state::video_w));
+	map(0x01800, 0x01803).rw(FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
 	map(0x04000, 0x07fff).bankr("bank1");
-	map(0x04000, 0x04000).w(this, FUNC(smsmfg_state::bankswitch_w));
+	map(0x04000, 0x04000).w(FUNC(smsmfg_state::bankswitch_w));
 	map(0x08000, 0x0ffff).rom();
 	map(0xf8000, 0xfffff).rom(); // mirror for vectors
 }
@@ -505,9 +507,9 @@ void smsmfg_state::sms_map(address_map &map)
 void smsmfg_state::sureshot_map(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("nvram");
-	map(0x02000, 0x02007).w(this, FUNC(smsmfg_state::video_w));
+	map(0x02000, 0x02007).w(FUNC(smsmfg_state::video_w));
 	map(0x03000, 0x03003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x03800, 0x03803).rw(this, FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
+	map(0x03800, 0x03803).rw(FUNC(smsmfg_state::link_r), FUNC(smsmfg_state::link_w));
 	map(0x08000, 0x0ffff).rom();
 	map(0xf8000, 0xfffff).rom(); // mirror for vectors
 }
@@ -518,8 +520,8 @@ void smsmfg_state::sub_map(address_map &map)
 	map(0x2000, 0x27ff).ram();
 	map(0x3100, 0x3103).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3381, 0x3382).w("aysnd", FUNC(ay8910_device::data_address_w));
-	map(0x3400, 0x3400).r(this, FUNC(smsmfg_state::z80_8088_r));
-	map(0x3500, 0x3501).rw(this, FUNC(smsmfg_state::p03_r), FUNC(smsmfg_state::p03_w));
+	map(0x3400, 0x3400).r(FUNC(smsmfg_state::z80_8088_r));
+	map(0x3500, 0x3501).rw(FUNC(smsmfg_state::p03_r), FUNC(smsmfg_state::p03_w));
 }
 
 /*************************************
@@ -530,7 +532,7 @@ void smsmfg_state::sub_map(address_map &map)
 
 void smsmfg_state::machine_start()
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	membank("bank1")->configure_entries(0, 16, memregion("questions")->base(), 0x4000);
 
 	save_item(NAME(m_communication_port_status));
@@ -539,7 +541,7 @@ void smsmfg_state::machine_start()
 
 MACHINE_START_MEMBER(smsmfg_state,sureshot)
 {
-	m_lamp.resolve();
+	m_lamps.resolve();
 	save_item(NAME(m_communication_port_status));
 	save_item(NAME(m_communication_port));
 }
@@ -558,17 +560,17 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, smsmfg_state, ppi0_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, smsmfg_state, ppi0_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, smsmfg_state, ppi0_c_r))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.out_pa_callback().set(FUNC(smsmfg_state::ppi0_a_w));
+	ppi0.out_pb_callback().set(FUNC(smsmfg_state::ppi0_b_w));
+	ppi0.in_pc_callback().set(FUNC(smsmfg_state::ppi0_c_r));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("IN0");
+	ppi1.in_pb_callback().set_ioport("IN1");
+	ppi1.in_pc_callback().set_ioport("IN2");
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -579,13 +581,12 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	MCFG_SCREEN_UPDATE_DRIVER(smsmfg_state, screen_update_sms)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "aysnd", XTAL(16'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(smsmfg_state::sureshot)

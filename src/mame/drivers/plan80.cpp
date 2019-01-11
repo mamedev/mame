@@ -25,17 +25,13 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "emupal.h"
 #include "screen.h"
 
 
 class plan80_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_BOOT
-	};
-
 	plan80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -43,15 +39,23 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void plan80(machine_config &config);
+
+	void init_plan80();
+
+private:
+	enum
+	{
+		TIMER_BOOT
+	};
+
 	DECLARE_READ8_MEMBER(plan80_04_r);
 	DECLARE_WRITE8_MEMBER(plan80_09_w);
-	void init_plan80();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void plan80(machine_config &config);
 	void plan80_io(address_map &map);
 	void plan80_mem(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_kbd_row;
 	virtual void machine_reset() override;
@@ -101,8 +105,8 @@ void plan80_state::plan80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x04).r(this, FUNC(plan80_state::plan80_04_r));
-	map(0x09, 0x09).w(this, FUNC(plan80_state::plan80_09_w));
+	map(0x04, 0x04).r(FUNC(plan80_state::plan80_04_r));
+	map(0x09, 0x09).w(FUNC(plan80_state::plan80_09_w));
 }
 
 /* Input ports */
@@ -245,7 +249,7 @@ MACHINE_CONFIG_START(plan80_state::plan80)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plan80)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 /* ROM definition */

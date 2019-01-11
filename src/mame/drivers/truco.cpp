@@ -424,17 +424,16 @@ MACHINE_CONFIG_START(truco_state::truco)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", truco_state,  interrupt)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))    /* 1.6 seconds */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600));    /* 1.6 seconds */
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("P1"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("JMPRS"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, truco_state,porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, truco_state,portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, truco_state,pia_ca2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, truco_state,pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, truco_state,pia_irqb_w))
+	pia6821_device &pia(PIA6821(config, "pia0", 0));
+	pia.readpa_handler().set_ioport("P1");
+	pia.readpb_handler().set_ioport("JMPRS");
+	pia.writepa_handler().set(FUNC(truco_state::porta_w));
+	pia.writepb_handler().set(FUNC(truco_state::portb_w));
+	pia.ca2_handler().set(FUNC(truco_state::pia_ca2_w));
+	pia.irqa_handler().set(FUNC(truco_state::pia_irqa_w));
+	pia.irqb_handler().set(FUNC(truco_state::pia_irqb_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -445,12 +444,12 @@ MACHINE_CONFIG_START(truco_state::truco)
 	MCFG_SCREEN_UPDATE_DRIVER(truco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(truco_state, truco)
+	PALETTE(config, "palette", FUNC(truco_state::truco_palette), 16);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* Identified as UM6845 */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* Identified as UM6845 */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -18,6 +18,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -25,13 +26,19 @@
 class wink_state : public driver_device
 {
 public:
-	wink_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wink_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
+	void wink(machine_config &config);
+
+	void init_wink();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -59,7 +66,6 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void init_wink();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -67,7 +73,6 @@ public:
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(wink_sound);
-	void wink(machine_config &config);
 	void wink_io(address_map &map);
 	void wink_map(address_map &map);
 	void wink_sound_io(address_map &map);
@@ -161,7 +166,7 @@ void wink_state::wink_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x9000, 0x97ff).ram().share("nvram");
-	map(0xa000, 0xa3ff).ram().w(this, FUNC(wink_state::bgram_w)).share("videoram");
+	map(0xa000, 0xa3ff).ram().w(FUNC(wink_state::bgram_w)).share("videoram");
 }
 
 
@@ -196,17 +201,17 @@ void wink_state::wink_io(address_map &map)
 	map(0x00, 0x1f).ram().w("palette", FUNC(palette_device::write8)).share("palette"); //0x10-0x1f is likely to be something else
 	map(0x20, 0x27).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x40, 0x40).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x60, 0x60).w(this, FUNC(wink_state::sound_irq_w));
-	map(0x80, 0x80).r(this, FUNC(wink_state::analog_port_r));
-	map(0xa0, 0xa0).r(this, FUNC(wink_state::player_inputs_r));
+	map(0x60, 0x60).w(FUNC(wink_state::sound_irq_w));
+	map(0x80, 0x80).r(FUNC(wink_state::analog_port_r));
+	map(0xa0, 0xa0).r(FUNC(wink_state::player_inputs_r));
 	map(0xa4, 0xa4).portr("DSW1");   //dipswitch bank2
 	map(0xa8, 0xa8).portr("DSW2");   //dipswitch bank1
 //  AM_RANGE(0xac, 0xac) AM_WRITENOP            //protection - loads video xor unit (written only once at startup)
 	map(0xb0, 0xb0).portr("DSW3");   //unused inputs
 	map(0xb4, 0xb4).portr("DSW4");   //dipswitch bank3
-	map(0xc0, 0xdf).w(this, FUNC(wink_state::prot_w));       //load load protection-buffer from upper address bus
+	map(0xc0, 0xdf).w(FUNC(wink_state::prot_w));       //load load protection-buffer from upper address bus
 	map(0xc3, 0xc3).nopr();             //watchdog?
-	map(0xe0, 0xff).r(this, FUNC(wink_state::prot_r));        //load math unit from buffer & lower address-bus
+	map(0xe0, 0xff).r(FUNC(wink_state::prot_r));        //load math unit from buffer & lower address-bus
 }
 
 void wink_state::wink_sound_map(address_map &map)
@@ -384,22 +389,22 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_DEVICE_PROGRAM_MAP(wink_map)
 	MCFG_DEVICE_IO_MAP(wink_io)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wink_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wink_state, player_mux_w))      //??? no mux on the pcb.
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wink_state, tile_banking_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)                //?
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                //cab Knocker like in q-bert!
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<2>))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(wink_state::nmi_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(wink_state::player_mux_w)); //??? no mux on the pcb.
+	mainlatch.q_out_cb<2>().set(FUNC(wink_state::tile_banking_w));
+	mainlatch.q_out_cb<3>().set_nop();                //?
+	mainlatch.q_out_cb<4>().set_nop();                //cab Knocker like in q-bert!
+	mainlatch.q_out_cb<5>().set(FUNC(wink_state::coin_counter_w<0>));
+	mainlatch.q_out_cb<6>().set(FUNC(wink_state::coin_counter_w<1>));
+	mainlatch.q_out_cb<7>().set(FUNC(wink_state::coin_counter_w<2>));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000 / 8)
 	MCFG_DEVICE_PROGRAM_MAP(wink_sound_map)
 	MCFG_DEVICE_IO_MAP(wink_sound_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -411,19 +416,17 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wink_state, nmi_clock_w))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wink)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
-
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_wink);
+	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("aysnd", AY8912, 12000000 / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, wink_state, sound_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8912_device &aysnd(AY8912(config, "aysnd", 12000000 / 8));
+	aysnd.port_a_read_callback().set(FUNC(wink_state::sound_r));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /***************************************************************************

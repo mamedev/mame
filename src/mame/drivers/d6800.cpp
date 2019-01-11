@@ -46,6 +46,7 @@
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -71,6 +72,10 @@ public:
 		, m_io_shift(*this, "SHIFT")
 		{ }
 
+
+	void d6800(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
 	DECLARE_READ8_MEMBER( d6800_keyboard_r );
@@ -81,9 +86,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 
-	void d6800(machine_config &config);
 	void d6800_map(address_map &map);
-private:
+
 	uint8_t m_rtc;
 	bool m_cb2;
 	bool m_cassold;
@@ -398,7 +402,7 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(25))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -406,14 +410,14 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, d6800_state, d6800_keyboard_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, d6800_state, d6800_cassette_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, d6800_state, d6800_keyboard_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, d6800_state, d6800_cassette_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, d6800_state, d6800_screen_w))
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia, 0);
+	m_pia->readpa_handler().set(FUNC(d6800_state::d6800_keyboard_r));
+	m_pia->readpb_handler().set(FUNC(d6800_state::d6800_cassette_r));
+	m_pia->writepa_handler().set(FUNC(d6800_state::d6800_keyboard_w));
+	m_pia->writepb_handler().set(FUNC(d6800_state::d6800_cassette_w));
+	m_pia->cb2_handler().set(FUNC(d6800_state::d6800_screen_w));
+	m_pia->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
@@ -430,10 +434,10 @@ MACHINE_CONFIG_END
 ROM_START( d6800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "0", "Original")
-	ROMX_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(1) )
-	ROMX_LOAD( "d6800.bin", 0xc400, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(1) )
+	ROMX_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
+	ROMX_LOAD( "d6800.bin", 0xc400, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "1", "Dreamsoft")
-	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(2) )
+	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(1) )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS

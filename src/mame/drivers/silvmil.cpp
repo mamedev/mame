@@ -5,7 +5,7 @@
 
   yet another Data East / Tumble Pop derived hardware
   this one seems similar to (but not identical to)
-  the crospang.c hardware from F2 system
+  the crospang.cpp hardware from F2 system
   also very close to gotcha.c, which was also a Para
   board.
 
@@ -30,6 +30,7 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "video/decospr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,16 +39,23 @@ class silvmil_state : public driver_device
 {
 public:
 	silvmil_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_sprgen(*this, "spritegen"),
-			m_soundlatch(*this, "soundlatch"),
-			m_bg_videoram(*this, "bg_videoram"),
-			m_fg_videoram(*this, "fg_videoram"),
-			m_spriteram(*this, "spriteram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_sprgen(*this, "spritegen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_spriteram(*this, "spriteram")
+	{ }
 
+	void puzzlovek(machine_config &config);
+	void puzzlove(machine_config &config);
+	void silvmil(machine_config &config);
 
+	void init_silvmil();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -123,7 +131,6 @@ public:
 	}
 
 
-	void init_silvmil();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
@@ -132,9 +139,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
-	void puzzlovek(machine_config &config);
-	void puzzlove(machine_config &config);
-	void silvmil(machine_config &config);
+
 	void silvmil_map(address_map &map);
 	void silvmil_sound_map(address_map &map);
 };
@@ -187,18 +192,18 @@ void silvmil_state::silvmil_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 
-	map(0x100000, 0x100001).w(this, FUNC(silvmil_state::silvmil_tilebank1_w));
-	map(0x100002, 0x100003).w(this, FUNC(silvmil_state::silvmil_fg_scrollx_w));
-	map(0x100004, 0x100005).w(this, FUNC(silvmil_state::silvmil_fg_scrolly_w));
-	map(0x100006, 0x100007).w(this, FUNC(silvmil_state::silvmil_bg_scrollx_w));
-	map(0x100008, 0x100009).w(this, FUNC(silvmil_state::silvmil_bg_scrolly_w));
-	map(0x10000e, 0x10000f).w(this, FUNC(silvmil_state::silvmil_tilebank_w));
+	map(0x100000, 0x100001).w(FUNC(silvmil_state::silvmil_tilebank1_w));
+	map(0x100002, 0x100003).w(FUNC(silvmil_state::silvmil_fg_scrollx_w));
+	map(0x100004, 0x100005).w(FUNC(silvmil_state::silvmil_fg_scrolly_w));
+	map(0x100006, 0x100007).w(FUNC(silvmil_state::silvmil_bg_scrollx_w));
+	map(0x100008, 0x100009).w(FUNC(silvmil_state::silvmil_bg_scrolly_w));
+	map(0x10000e, 0x10000f).w(FUNC(silvmil_state::silvmil_tilebank_w));
 
-	map(0x120000, 0x120fff).ram().w(this, FUNC(silvmil_state::silvmil_fg_videoram_w)).share("fg_videoram");
-	map(0x122000, 0x122fff).ram().w(this, FUNC(silvmil_state::silvmil_bg_videoram_w)).share("bg_videoram");
+	map(0x120000, 0x120fff).ram().w(FUNC(silvmil_state::silvmil_fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x122fff).ram().w(FUNC(silvmil_state::silvmil_bg_videoram_w)).share("bg_videoram");
 	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x210000, 0x2107ff).ram().share("spriteram");
-	map(0x270000, 0x270001).w(this, FUNC(silvmil_state::silvmil_soundcmd_w));
+	map(0x270000, 0x270001).w(FUNC(silvmil_state::silvmil_soundcmd_w));
 	map(0x280000, 0x280001).portr("P1_P2");
 	map(0x280002, 0x280003).portr("COIN");
 	map(0x280004, 0x280005).portr("DSW");
@@ -422,24 +427,22 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_SCREEN_UPDATE_DRIVER(silvmil_state, screen_update_silvmil)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silvmil)
 
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(0)
-	MCFG_DECO_SPRITE_ISBOOTLEG(true)
-	MCFG_DECO_SPRITE_OFFSETS(5, 7)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(0);
+	m_sprgen->set_is_bootleg(true);
+	m_sprgen->set_offsets(5, 7);
+	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* Verified */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4)); /* Verified */
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'096'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -451,21 +454,18 @@ MACHINE_CONFIG_START(silvmil_state::puzzlove)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
 	MCFG_DEVICE_PROGRAM_MAP(silvmil_sound_map)
 
-	MCFG_DEVICE_MODIFY("spritegen")
-	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
+	m_sprgen->set_bootleg_type(1);
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(silvmil_state::puzzlovek)
+void silvmil_state::puzzlovek(machine_config &config)
+{
 	puzzlove(config);
-	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(15'000'000)/4) /* Verified */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	subdevice<ym2151_device>("ymsnd")->set_clock(XTAL(15'000'000)/4); /* Verified */
+}
 
 
 ROM_START( silvmil )

@@ -6,6 +6,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 
 
 class gladiatr_state_base : public driver_device
@@ -16,7 +17,6 @@ public:
 	DECLARE_WRITE8_MEMBER(textram_w);
 	DECLARE_WRITE8_MEMBER(paletteram_w);
 	DECLARE_WRITE_LINE_MEMBER(spritebuffer_w);
-	DECLARE_WRITE8_MEMBER(spritebuffer_w);
 	DECLARE_WRITE8_MEMBER(adpcm_command_w);
 	DECLARE_READ8_MEMBER(adpcm_command_r);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);

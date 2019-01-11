@@ -37,6 +37,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,8 +49,8 @@
 class galaxi_state : public driver_device
 {
 public:
-	galaxi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galaxi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bg1_ram(*this, "bg1_ram"),
 		m_bg2_ram(*this, "bg2_ram"),
 		m_bg3_ram(*this, "bg3_ram"),
@@ -123,7 +124,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void show_out(  );
+	void show_out();
 
 	void galaxi_map(address_map &map);
 	void lastfour_map(address_map &map);
@@ -314,20 +315,20 @@ void galaxi_state::galaxi_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0x100000, 0x1003ff).ram().w(this, FUNC(galaxi_state::bg1_w)).share("bg1_ram");
-	map(0x100400, 0x1007ff).ram().w(this, FUNC(galaxi_state::bg2_w)).share("bg2_ram");
-	map(0x100800, 0x100bff).ram().w(this, FUNC(galaxi_state::bg3_w)).share("bg3_ram");
-	map(0x100c00, 0x100fff).ram().w(this, FUNC(galaxi_state::bg4_w)).share("bg4_ram");
+	map(0x100000, 0x1003ff).ram().w(FUNC(galaxi_state::bg1_w)).share("bg1_ram");
+	map(0x100400, 0x1007ff).ram().w(FUNC(galaxi_state::bg2_w)).share("bg2_ram");
+	map(0x100800, 0x100bff).ram().w(FUNC(galaxi_state::bg3_w)).share("bg3_ram");
+	map(0x100c00, 0x100fff).ram().w(FUNC(galaxi_state::bg4_w)).share("bg4_ram");
 
-	map(0x101000, 0x101fff).ram().w(this, FUNC(galaxi_state::fg_w)).share("fg_ram");
+	map(0x101000, 0x101fff).ram().w(FUNC(galaxi_state::fg_w)).share("fg_ram");
 	map(0x102000, 0x107fff).nopr(); // unknown
 
 	map(0x300000, 0x3007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x500000, 0x500001).portr("INPUTS");
-	map(0x500000, 0x500001).w(this, FUNC(galaxi_state::_500000_w));
-	map(0x500002, 0x500003).w(this, FUNC(galaxi_state::_500002_w));
-	map(0x500004, 0x500005).w(this, FUNC(galaxi_state::_500004_w));
+	map(0x500000, 0x500001).w(FUNC(galaxi_state::_500000_w));
+	map(0x500002, 0x500003).w(FUNC(galaxi_state::_500002_w));
+	map(0x500004, 0x500005).w(FUNC(galaxi_state::_500004_w));
 
 	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -340,20 +341,20 @@ void galaxi_state::lastfour_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 
 	// bg3+4 / 1+2 seem to be swapped, order, palettes, scroll register etc. all suggest this
-	map(0x100000, 0x1003ff).ram().w(this, FUNC(galaxi_state::bg3_w)).share("bg3_ram");
-	map(0x100400, 0x1007ff).ram().w(this, FUNC(galaxi_state::bg4_w)).share("bg4_ram");
-	map(0x100800, 0x100bff).ram().w(this, FUNC(galaxi_state::bg1_w)).share("bg1_ram");
-	map(0x100c00, 0x100fff).ram().w(this, FUNC(galaxi_state::bg2_w)).share("bg2_ram");
+	map(0x100000, 0x1003ff).ram().w(FUNC(galaxi_state::bg3_w)).share("bg3_ram");
+	map(0x100400, 0x1007ff).ram().w(FUNC(galaxi_state::bg4_w)).share("bg4_ram");
+	map(0x100800, 0x100bff).ram().w(FUNC(galaxi_state::bg1_w)).share("bg1_ram");
+	map(0x100c00, 0x100fff).ram().w(FUNC(galaxi_state::bg2_w)).share("bg2_ram");
 
-	map(0x101000, 0x101fff).ram().w(this, FUNC(galaxi_state::fg_w)).share("fg_ram");
+	map(0x101000, 0x101fff).ram().w(FUNC(galaxi_state::fg_w)).share("fg_ram");
 	map(0x102000, 0x107fff).nopr(); // unknown
 
 	map(0x300000, 0x3007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x500000, 0x500001).portr("INPUTS");
-	map(0x500000, 0x500001).w(this, FUNC(galaxi_state::_500000_w));
-	map(0x500002, 0x500003).w(this, FUNC(galaxi_state::_500002_w));
-	map(0x500004, 0x500005).w(this, FUNC(galaxi_state::_500004_w));
+	map(0x500000, 0x500001).w(FUNC(galaxi_state::_500000_w));
+	map(0x500002, 0x500003).w(FUNC(galaxi_state::_500002_w));
+	map(0x500004, 0x500005).w(FUNC(galaxi_state::_500004_w));
 
 	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
@@ -469,7 +470,7 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 	MCFG_DEVICE_PROGRAM_MAP(galaxi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxi_state,  irq4_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -478,11 +479,10 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(16*5, 512-16*2-1, 16*1, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxi_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxi)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxi);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

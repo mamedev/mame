@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_UTIL_FLAC_H
+#define MAME_UTIL_FLAC_H
 
-#ifndef __FLAC_H__
-#define __FLAC_H__
+#pragma once
 
 #include "osdcore.h"
 #include "corefile.h"
@@ -126,20 +126,19 @@ private:
 	// output state
 	FLAC__StreamDecoder *   m_decoder;              // actual encoder
 	util::core_file *       m_file;                 // output file
-	uint32_t                  m_sample_rate;          // decoded sample rate
-	uint8_t                   m_channels;             // decoded number of channels
-	uint8_t                   m_bits_per_sample;      // decoded bits per sample
-	uint32_t                  m_compressed_offset;    // current offset in compressed data
+	uint32_t                m_sample_rate;          // decoded sample rate
+	uint8_t                 m_channels;             // decoded number of channels
+	uint8_t                 m_bits_per_sample;      // decoded bits per sample
+	uint32_t                m_compressed_offset;    // current offset in compressed data
 	const FLAC__byte *      m_compressed_start;     // start of compressed data
-	uint32_t                  m_compressed_length;    // length of compressed data
+	uint32_t                m_compressed_length;    // length of compressed data
 	const FLAC__byte *      m_compressed2_start;    // start of compressed data
-	uint32_t                  m_compressed2_length;   // length of compressed data
-	int16_t *                 m_uncompressed_start[8];// pointer to start of uncompressed data (up to 8 streams)
-	uint32_t                  m_uncompressed_offset;  // current position in uncompressed data
-	uint32_t                  m_uncompressed_length;  // length of uncompressed data
+	uint32_t                m_compressed2_length;   // length of compressed data
+	int16_t *               m_uncompressed_start[8];// pointer to start of uncompressed data (up to 8 streams)
+	uint32_t                m_uncompressed_offset;  // current position in uncompressed data
+	uint32_t                m_uncompressed_length;  // length of uncompressed data
 	bool                    m_uncompressed_swap;    // swap uncompressed sample data
-	uint8_t                   m_custom_header[0x2a];  // custom header
+	uint8_t                 m_custom_header[0x2a];  // custom header
 };
 
-
-#endif // __FLAC_H__
+#endif // MAME_UTIL_FLAC_H

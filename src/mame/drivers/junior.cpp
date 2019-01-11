@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
 	void junior(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
 	DECLARE_READ8_MEMBER(junior_riot_b_r);
 	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
@@ -59,7 +59,6 @@ protected:
 
 	void junior_mem(address_map &map);
 
-private:
 	required_device<mos6532_new_device> m_riot;
 	uint8_t m_port_a;
 	uint8_t m_port_b;
@@ -233,7 +232,7 @@ MACHINE_CONFIG_START(junior_state::junior)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_junior )
+	config.set_default_layout(layout_junior);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)
@@ -253,13 +252,13 @@ ROM_START( junior )
 	ROM_DEFAULT_BIOS("orig")
 
 	ROM_SYSTEM_BIOS( 0, "orig", "Original ESS503" )
-	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(1))
+	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "mod-orig", "Mod-Original (2708)" )
-	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(2))
+	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS( 2, "2732", "Just monitor (2732)" )
-	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(3))
+	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(2))
 ROM_END
 
 /* Driver */

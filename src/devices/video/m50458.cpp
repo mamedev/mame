@@ -32,14 +32,14 @@ DEFINE_DEVICE_TYPE(M50458, m50458_device, "m50458", "Mitsubishi M50458 OSD")
 void m50458_device::m50458_vram(address_map &map)
 {
 	map(0x0000, 0x023f).ram(); // vram
-	map(0x0240, 0x0241).w(this, FUNC(m50458_device::vreg_120_w));
-	map(0x0242, 0x0243).w(this, FUNC(m50458_device::vreg_121_w));
-	map(0x0244, 0x0245).w(this, FUNC(m50458_device::vreg_122_w));
-	map(0x0246, 0x0247).w(this, FUNC(m50458_device::vreg_123_w));
-	map(0x0248, 0x0249).w(this, FUNC(m50458_device::vreg_124_w));
-	map(0x024a, 0x024b).w(this, FUNC(m50458_device::vreg_125_w));
-	map(0x024c, 0x024d).w(this, FUNC(m50458_device::vreg_126_w));
-	map(0x024e, 0x024f).w(this, FUNC(m50458_device::vreg_127_w));
+	map(0x0240, 0x0241).w(FUNC(m50458_device::vreg_120_w));
+	map(0x0242, 0x0243).w(FUNC(m50458_device::vreg_121_w));
+	map(0x0244, 0x0245).w(FUNC(m50458_device::vreg_122_w));
+	map(0x0246, 0x0247).w(FUNC(m50458_device::vreg_123_w));
+	map(0x0248, 0x0249).w(FUNC(m50458_device::vreg_124_w));
+	map(0x024a, 0x024b).w(FUNC(m50458_device::vreg_125_w));
+	map(0x024c, 0x024d).w(FUNC(m50458_device::vreg_126_w));
+	map(0x024e, 0x024f).w(FUNC(m50458_device::vreg_127_w));
 }
 
 // internal GFX ROM (TODO: GFXs in here should be 12x18, not 16x18)

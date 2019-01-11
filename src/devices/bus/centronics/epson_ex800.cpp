@@ -202,11 +202,11 @@ void epson_ex800_device::ex800_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0xbfff).ram(); /* external RAM */
-	map(0xc000, 0xc7ff).mirror(0x1800).rw(this, FUNC(epson_ex800_device::devsel_r), FUNC(epson_ex800_device::devsel_w));
-	map(0xe000, 0xe7ff).rw(this, FUNC(epson_ex800_device::gate5a_r), FUNC(epson_ex800_device::gate5a_w));
-	map(0xe800, 0xefff).rw(this, FUNC(epson_ex800_device::iosel_r), FUNC(epson_ex800_device::iosel_w));
-	map(0xf000, 0xf001).mirror(0x07fc).r(this, FUNC(epson_ex800_device::gate7a_r));
-	map(0xf002, 0xf003).mirror(0x07fc).w(this, FUNC(epson_ex800_device::gate7a_w));
+	map(0xc000, 0xc7ff).mirror(0x1800).rw(FUNC(epson_ex800_device::devsel_r), FUNC(epson_ex800_device::devsel_w));
+	map(0xe000, 0xe7ff).rw(FUNC(epson_ex800_device::gate5a_r), FUNC(epson_ex800_device::gate5a_w));
+	map(0xe800, 0xefff).rw(FUNC(epson_ex800_device::iosel_r), FUNC(epson_ex800_device::iosel_w));
+	map(0xf000, 0xf001).mirror(0x07fc).r(FUNC(epson_ex800_device::gate7a_r));
+	map(0xf002, 0xf003).mirror(0x07fc).w(FUNC(epson_ex800_device::gate7a_w));
 	map(0xf800, 0xfeff).noprw(); /* not connected */
 }
 
@@ -215,24 +215,25 @@ void epson_ex800_device::ex800_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(epson_ex800_device::device_add_mconfig)
+void epson_ex800_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", UPD7810, 12000000)  /* 12 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(ex800_mem)
-	MCFG_UPD7810_PORTA_READ_CB(READ8(*this, epson_ex800_device, porta_r))
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, epson_ex800_device, porta_w))
-	MCFG_UPD7810_PORTB_READ_CB(READ8(*this, epson_ex800_device, portb_r))
-	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(*this, epson_ex800_device, portb_w))
-	MCFG_UPD7810_PORTC_READ_CB(READ8(*this, epson_ex800_device, portc_r))
-	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(*this, epson_ex800_device, portc_w))
+	upd7810_device &upd(UPD7810(config, m_maincpu, 12000000)); // 12 MHz?
+	upd.set_addrmap(AS_PROGRAM, &epson_ex800_device::ex800_mem);
+	upd.pa_in_cb().set(FUNC(epson_ex800_device::porta_r));
+	upd.pa_out_cb().set(FUNC(epson_ex800_device::porta_w));
+	upd.pb_in_cb().set(FUNC(epson_ex800_device::portb_r));
+	upd.pb_out_cb().set(FUNC(epson_ex800_device::portb_w));
+	upd.pc_in_cb().set(FUNC(epson_ex800_device::portc_r));
+	upd.pc_out_cb().set(FUNC(epson_ex800_device::portc_w));
 
-	MCFG_DEFAULT_LAYOUT(layout_ex800)
+	config.set_default_layout(layout_ex800);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 4000) /* measured at 4000 Hz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, 4000); // measured at 4000 Hz */
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /* The ON LINE switch is directly connected to the INT1 input of the CPU */

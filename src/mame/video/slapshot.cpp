@@ -21,8 +21,8 @@ void slapshot_state::video_start()
 	save_item(NAME(m_sprites_master_scrolly));
 	save_item(NAME(m_sprites_flipscreen));
 	save_item(NAME(m_prepare_sprites));
-	save_pointer(NAME(m_spriteram_delayed.get()), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_spriteram_buffered.get()), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_delayed), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_spriteram_buffered), m_spriteram.bytes() / 2);
 }
 
 /************************************************************

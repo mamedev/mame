@@ -120,15 +120,15 @@ void busicom_state::busicom_stat(address_map &map)
 void busicom_state::busicom_rp(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x000f).mirror(0x0700).w(this, FUNC(busicom_state::shifter_w)); // ROM0 I/O
-	map(0x0010, 0x001f).mirror(0x0700).rw(this, FUNC(busicom_state::keyboard_r), FUNC(busicom_state::printer_ctrl_w)); // ROM1 I/O
-	map(0x0020, 0x002f).mirror(0x0700).r(this, FUNC(busicom_state::printer_r));  // ROM2 I/O
+	map(0x0000, 0x000f).mirror(0x0700).w(FUNC(busicom_state::shifter_w)); // ROM0 I/O
+	map(0x0010, 0x001f).mirror(0x0700).rw(FUNC(busicom_state::keyboard_r), FUNC(busicom_state::printer_ctrl_w)); // ROM1 I/O
+	map(0x0020, 0x002f).mirror(0x0700).r(FUNC(busicom_state::printer_r));  // ROM2 I/O
 }
 
 void busicom_state::busicom_mp(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(busicom_state::printer_w)); // RAM0 output
-	map(0x01, 0x01).w(this, FUNC(busicom_state::status_w));  // RAM1 output
+	map(0x00, 0x00).w(FUNC(busicom_state::printer_w)); // RAM0 output
+	map(0x01, 0x01).w(FUNC(busicom_state::status_w));  // RAM1 output
 }
 
 /* Input ports */
@@ -226,12 +226,12 @@ void busicom_state::machine_reset()
 
 MACHINE_CONFIG_START(busicom_state::busicom)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I4004, 750000)
-	MCFG_I4004_ROM_MAP(busicom_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(busicom_mem)
-	MCFG_I4004_ROM_PORTS_MAP(busicom_rp)
-	MCFG_I4004_RAM_STATUS_MAP(busicom_stat)
-	MCFG_I4004_RAM_PORTS_MAP(busicom_mp)
+	I4004(config, m_maincpu, 750000);
+	m_maincpu->set_rom_map(&busicom_state::busicom_rom);
+	m_maincpu->set_ram_memory_map(&busicom_state::busicom_mem);
+	m_maincpu->set_rom_ports_map(&busicom_state::busicom_rp);
+	m_maincpu->set_ram_status_map(&busicom_state::busicom_stat);
+	m_maincpu->set_ram_ports_map(&busicom_state::busicom_mp);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -240,10 +240,9 @@ MACHINE_CONFIG_START(busicom_state::busicom)
 	MCFG_SCREEN_SIZE(40*17, 44*11)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*17-1, 0, 44*11-1)
 	MCFG_SCREEN_UPDATE_DRIVER(busicom_state, screen_update_busicom)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(busicom_state, busicom)
+	PALETTE(config, m_palette, FUNC(busicom_state::busicom_palette), 16);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("busicom_timer", busicom_state, timer_callback, attotime::from_msec(28*2))
 MACHINE_CONFIG_END

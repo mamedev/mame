@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Roberto Fresca
-/****************************************************************************
+/************************************************************************************************************************************
 
   MAGIC'S 10
   ----------
@@ -8,26 +8,28 @@
   Driver by Pierpaolo Prazzoli.
   Additional work by Roberto Fresca.
 
-
   Supported games:
+                                                             lex 425   boot      test     MC68000     MCU     NVRAM or  PCB
+  Game                           year  manufacturer          19951006  sequence  at boot  size+place  H8/330  battery   marking
 
-  Magic's 10 (ver. 16.15),        1995, AWP Games.
-  Magic's 10 (ver. 16.45),        1995, AWP Games.
-  Magic's 10 (ver. 16.54),        1995, AWP Games.
-  Magic's 10 (ver. 16.55),        1995, AWP Games.
-  Magic's 10 2,                   1997, ABM Games.
-  Music Sort (ver 2.02, English), 1995, ABM Games.
-  Super Pool (9743 rev.01),       1997, ABM Games.
-  Hot Slot (ver. 05.01),          1996, ABM Electronics.
-  Magic Colors (ver. 1.7a),       1999, Unknown.
-  Super Gran Safari (ver 3.11),   1996, New Impeuropex Corp.
-  Luna Park (ver. 1.2),           1998, ABM Games.
-  Alta Tensione (ver. 2.01a),     199?, Unknown.
+  Music Sort (ver. 2.02)         1995  ABM Games             pre lex   direct    yes       ?          no      NVRAM     ?
+  Magic's 10 (ver. 16.15)        1995  A.W.P. Games          post lex  direct    yes       DIP H      no      battery   039
+  Magic's 10 (ver. 16.45)        1995  A.W.P. Games          post lex  direct    yes       ?          no      NVRAM     ?
+  Magic's 10 (ver. 16.54)        1995  A.W.P. Games          post lex  direct    yes       ?          no      ?         ?
+  Magic's 10 (ver. 16.55)        1995  A.W.P. Games          post lex  direct    yes       DIP H      no      NVRAM     040
+  Hot Slot (ver. 05.01)          1996  ABM Games             post lex  direct    yes       LCC        no      battery   ?
+  Super Gran Safari (ver. 3.11)  1996  New Impeuropex Corp.  post lex  [1]       yes       DIP V      no      NVRAM     COMP01
+  Magic's 10 2 (ver. 1.1)        1997  ABM Games             post lex  [2]       no        ?          yes     battery   9605 Rev.02
+  Super Pool (ver. 1.2)          1998  ABM Games             post lex  [3]       no        DIP V      yes     battery   9743 Rev.01
+  Luna Park (ver. 1.2)           1998  ABM Games             post lex  [3]       no        LCC        yes     battery   9743 Rev.02
+  Magic Colors (ver. 1.6)        1999  ABM Games             post lex  [3]       no        DIP V      yes     battery   9743 Rev.01
+  Magic Colors (ver. 1.7a)       1999  ABM Games             post lex  [3]       no        LCC        yes     none      Rev.03
+  Alta Tensione (ver. 2.01a)     1999  Unknown               post lex  [3]       no        LCC        yes     battery   H3
 
-*****************************************************************************
+*************************************************************************************************************************************
 
-  Game Notes
-  ==========
+  Game Notes & Boot Sequence
+  ============================
 
   * Magic's 10
 
@@ -38,7 +40,7 @@
   - Press Collect to get the 1st game over
 
 
-  * Super Gran Safari
+  * [1] Super Gran Safari
 
   There is a input sequence to initialize the game.
 
@@ -57,7 +59,20 @@
   For now, you must miss the shot till hopper & ticket dispenser are properly emulated.
 
 
-  * Alta Tensione
+  * [2] Magic's 10 2
+
+  First time boot instructions:
+
+  As soon as you get the "DATI NVRAM-68K NON VALIDI!!!" screen...
+
+  - Press F2 to enter the Test Mode.
+  - Press HOLD 5 (AZZERAMENTO) (key 'b')
+  - Press HOLD 1 (AZZERAMENTO TOTALE) (key 'z')
+  - Press START (SI) (key '1') when the legend "CONFERMI AZZERAMENTO TOTALE" appear.
+  - Press COLLECT (key 'i') twice to leave the Test Mode and start the game...
+
+
+  * [3] Alta Tensione, Luna Park, Magic Colors, Super Pool
 
   First time boot instructions:
 
@@ -69,6 +84,21 @@
   - Press HOLD 4 (SI) (key 'v') when the legend "CONFERMI AZZERAMENTO TOTALE" appear.
   - Press BET (key 'm') twice to leave the Test Mode and start the game...
 
+
+*****************************************************************************
+
+There are basically 2 hardware setup:
+
+The OLDER one based on
+1x MC68000 (main)
+1x M6295 (sound)
+
+and the NEWER one based on
+1x MC68000 (main)
+1x H8/330 (MCU)
+1x M6295 (sound)
+
+Both setups show different variants for components layout, memory size, NVRAM, etc.etc.
 
 *****************************************************************************
 
@@ -94,6 +124,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -119,9 +150,27 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void magic102(machine_config &config);
+	void magic10a(machine_config &config);
+	void magic10(machine_config &config);
+	void hotslot(machine_config &config);
+	void sgsafari(machine_config &config);
+
+	void init_sgsafari();
+	void init_suprpool();
+	void init_magic102();
+	void init_magic10();
+	void init_hotslot();
+	void init_altaten();
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
 	DECLARE_WRITE16_MEMBER(layer2_videoram_w);
@@ -129,30 +178,15 @@ public:
 	DECLARE_READ16_MEMBER(hotslot_copro_r);
 	DECLARE_WRITE16_MEMBER(hotslot_copro_w);
 	DECLARE_WRITE16_MEMBER(magic10_out_w);
-	void init_sgsafari();
-	void init_suprpool();
-	void init_magic102();
-	void init_magic10();
-	void init_hotslot();
-	void init_altaten();
 	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
 	uint32_t screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void magic102(machine_config &config);
-	void magic10a(machine_config &config);
-	void magic10(machine_config &config);
-	void hotslot(machine_config &config);
-	void sgsafari(machine_config &config);
 	void hotslot_map(address_map &map);
 	void magic102_map(address_map &map);
 	void magic10_map(address_map &map);
 	void magic10a_map(address_map &map);
 	void sgsafari_map(address_map &map);
-
-protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
-	virtual void video_start() override;
 
 	tilemap_t *m_layer0_tilemap;
 	tilemap_t *m_layer1_tilemap;
@@ -166,7 +200,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<9> m_lamp;
+	output_finder<8> m_lamps;
 };
 
 
@@ -307,14 +341,14 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 
 //  popmessage("lamps: %02X", data);
 
-	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
-	m_lamp[2] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
-	m_lamp[3] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
-	m_lamp[4] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
-	m_lamp[5] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
-	m_lamp[6] = BIT(data, 5);      /* Lamp 6 - START  */
-	m_lamp[7] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
-	m_lamp[8] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - HOLD 1 */
+	m_lamps[1] = BIT(data, 1);      /* Lamp 2 - HOLD 2 */
+	m_lamps[2] = BIT(data, 2);      /* Lamp 3 - HOLD 3 */
+	m_lamps[3] = BIT(data, 3);      /* Lamp 4 - HOLD 4 */
+	m_lamps[4] = BIT(data, 4);      /* Lamp 5 - HOLD 5 */
+	m_lamps[5] = BIT(data, 5);      /* Lamp 6 - START  */
+	m_lamps[6] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
+	m_lamps[7] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x400);
 }
@@ -326,14 +360,14 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 void magic10_state::magic10_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x400000, 0x400001).portr("INPUTS");
 	map(0x400002, 0x400003).portr("DSW");
-	map(0x400008, 0x400009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x400008, 0x400009).w(FUNC(magic10_state::magic10_out_w));
 	map(0x40000b, 0x40000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x40000e, 0x40000f).nopw();
 	map(0x400080, 0x400087).ram().share("vregs");
@@ -343,14 +377,14 @@ void magic10_state::magic10_map(address_map &map)
 void magic10_state::magic10a_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x500001).portr("INPUTS");
 	map(0x500002, 0x500003).portr("DSW");
-	map(0x500008, 0x500009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x500008, 0x500009).w(FUNC(magic10_state::magic10_out_w));
 	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x50000e, 0x50000f).nopw();
 	map(0x500080, 0x500087).ram().share("vregs");   // video registers?
@@ -360,12 +394,12 @@ void magic10_state::magic10a_map(address_map &map)
 void magic10_state::magic102_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x400000, 0x4001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x500001).r(this, FUNC(magic10_state::magic102_r));
+	map(0x500000, 0x500001).r(FUNC(magic10_state::magic102_r));
 	map(0x500004, 0x500005).nopr(); // gives credits
 	map(0x500006, 0x500007).nopr(); // gives credits
 	map(0x50001a, 0x50001b).portr("IN0");
@@ -380,12 +414,12 @@ void magic10_state::magic102_map(address_map &map)
 void magic10_state::hotslot_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x2007ff).ram().share("nvram");
 	map(0x400000, 0x4001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500004, 0x500005).rw(this, FUNC(magic10_state::hotslot_copro_r), FUNC(magic10_state::hotslot_copro_w)); // copro comm
+	map(0x500004, 0x500005).rw(FUNC(magic10_state::hotslot_copro_r), FUNC(magic10_state::hotslot_copro_w)); // copro comm
 	map(0x500006, 0x500011).ram();
 	map(0x500012, 0x500013).portr("IN0");
 	map(0x500014, 0x500015).portr("IN1");
@@ -400,13 +434,13 @@ void magic10_state::hotslot_map(address_map &map)
 void magic10_state::sgsafari_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
-	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
-	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x100000, 0x100fff).ram().w(FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x203fff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500002, 0x500003).portr("DSW1");
-	map(0x500008, 0x500009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x500008, 0x500009).w(FUNC(magic10_state::magic10_out_w));
 	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x50000e, 0x50000f).portr("IN0");
 	map(0x500080, 0x500087).ram().share("vregs");   // video registers?
@@ -709,7 +743,7 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magic10_state, irq1_line_hold)
 
 	// 1FILL is required by vanilla magic10 at least (otherwise gameplay won't work properly)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -717,12 +751,11 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(magic10_state, screen_update_magic10)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 256);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magic10)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magic10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -795,7 +828,7 @@ MACHINE_CONFIG_END
   1x blu resonator 1000J (XTAL1, close to sound).
 
   ROMs:
-  6x M27C1001 (1-6).
+  6x M27C1001 (2,3,14,15,16,17).
   1x AM27C020 (1).
 
   RAMs:
@@ -809,24 +842,29 @@ MACHINE_CONFIG_END
   1x AMPAL16R4PC (u42) (dumped).
 
   Others:
-  1x 28x2 edge connector.
-  1x trimmer (volume).
-  1x 8x2 DIP switches (DIP1)
+  1x 28x2 JAMMA edge connector
+  1x 12 legs connector (J1)
+  1x trimmer (volume)(P1)
+  1x 8 DIP switches bank (DIP1)
+
+  Notes:
+  PCB is marked: "040" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+  PCB is labelled: "PASSED BY:_R_ DATE:_29.03.96_" on component side
 
 */
 ROM_START( magic10 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "u3.bin", 0x000000, 0x20000, CRC(191a46f4) SHA1(65bc22cdcc4b2f102d3eef595626819af709cacb) )
-	ROM_LOAD16_BYTE( "u2.bin", 0x000001, 0x20000, CRC(a03a80bc) SHA1(a21da8912f1d2c8c2fa4a8d3ce4d43da8a934e21) )
+	ROM_LOAD16_BYTE( "2.16.55s.u3", 0x000000, 0x20000, CRC(191a46f4) SHA1(65bc22cdcc4b2f102d3eef595626819af709cacb) )
+	ROM_LOAD16_BYTE( "3.16.55s.u2", 0x000001, 0x20000, CRC(a03a80bc) SHA1(a21da8912f1d2c8c2fa4a8d3ce4d43da8a934e21) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD( "u25.bin", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
-	ROM_LOAD( "u26.bin", 0x20000, 0x20000, CRC(fd0b912d) SHA1(1cd15fa3459e7fece9fc37595f2b6848c00ffa43) )
-	ROM_LOAD( "u27.bin", 0x40000, 0x20000, CRC(8178c907) SHA1(8c3440769ed4e113d84d1f8f9079783497791859) )
-	ROM_LOAD( "u28.bin", 0x60000, 0x20000, CRC(dfd41aab) SHA1(82248c7fa4febb1c453f35a0e4cfae062c5da2d5) )
+	ROM_LOAD( "16.u25", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
+	ROM_LOAD( "14.u26", 0x20000, 0x20000, CRC(fd0b912d) SHA1(1cd15fa3459e7fece9fc37595f2b6848c00ffa43) )
+	ROM_LOAD( "15.u27", 0x40000, 0x20000, CRC(8178c907) SHA1(8c3440769ed4e113d84d1f8f9079783497791859) )
+	ROM_LOAD( "17.u28", 0x60000, 0x20000, CRC(dfd41aab) SHA1(82248c7fa4febb1c453f35a0e4cfae062c5da2d5) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
-	ROM_LOAD( "u22.bin", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
+	ROM_LOAD( "1.u22", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
 
 	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
 	ROM_LOAD( "pal16r4.u42", 0x0000, 0x0104, CRC(6d70f3f2) SHA1(44c2be5945c052e057d4e0b03369acb7b9ff5d37) )
@@ -850,9 +888,6 @@ ROM_END
 /*
   Magic's 10 (ver. 16.45)
 
-  1995, A.W.P. Games
-  Version: 16.15
-
   CPU:
   1x MC68000P12 (u1) 16/32-bit Microprocessor (main).
   1x OKI M6295  (u21) 4-Channel Mixing ADCPM Voice Synthesis LSI (sound).
@@ -864,7 +899,7 @@ ROM_END
   1x blu resonator 1000J (XTAL1, close to sound).
 
   ROMs:
-  6x M27C1001 (1-6).
+  6x M27C1001 (u2,u3,u25,u26,u27,u28).
   1x AM27C020 (1).
 
   RAMs:
@@ -875,12 +910,13 @@ ROM_END
 
   PLDs:
   2x TPC1020BFN-084C1 (u41, u60) (read protected).
-  1x AMPAL16R4PC (u42) dumped.
+  1x PAL ? to be confirmed
 
   Others:
-  1x 28x2 edge connector.
-  1x trimmer (volume).
-  1x 8x2 DIP switches (DIP1).
+  1x 28x2 JAMMA edge connector
+  1x 12 legs connector (J1)
+  1x trimmer (volume)(P1)
+  1x 8 DIP switches bank (DIP1)
 
 */
 ROM_START( magic10b )
@@ -901,17 +937,11 @@ ROM_END
 /*
   Magic's 10 (ver. 16.15)
 
-  1995, A.W.P. Games
-  Version: 16.15
-
   CPU:
   1x TS68000P12 (main)(u1)
-  2x TPC1020AFN-084C (PLD)(not dumped)(u41,u60)
-
-  Sound:
   1x OKI M6295 (u21)
-  1x TDA2003 (u24)
   1x LM358N
+  1x TDA2003 (u24)
 
   1x oscillator 20.000000MHz (close to main)(osc1)
   1x oscillator 30.000MHz (close to sound)(osc2)
@@ -921,13 +951,27 @@ ROM_END
   1x M27C2001 (1)
   5x M27C1001 (2,3,5,6,7)
   1x TMS27C010A (4)
+
+  RAMs:
+  2x W2465-70LL (u4,u59)
+  2x HY6264ALP-10 (u34,u35)
+  2x HM3-65728BK-5 (u50,u51)
+  1x UM6116-3L (u5)
+
+  PLDs:
+  2x TPC1020AFN-084C (PLD)(not dumped)(u41,u60)
   1x PALCE16V8H (read protected)
 
-  Note:
-  1x 28x2 edge connector
-  1x trimmer (volume)
-  1x 8x2 switches dip
-  1x battery
+  Others:
+  1x 28x2 JAMMA edge connector
+  1x 12 legs connector (J1)
+  1x trimmer (volume)(P1)
+  1x 8 DIP switches bank (DIP1)
+  1x battery 3V
+
+  Notes:
+  PCB is marked: "039" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+  PCB is labelled: "PASSED BY:_&_ DATE:_26.12.95_" on component side
 
 */
 ROM_START( magic10c )
@@ -943,19 +987,34 @@ ROM_START( magic10c )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "1.u22", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "pal16v8h.u42", 0x0000, 0x0117, NO_DUMP )
 ROM_END
 
 /*
-  PCB is marked: Copyright ABM - 9605 Rev.02
+  Magic's 10 2 (ver 1.1)
 
-  1x 68000
-  1x osc 30mhz
-  1x osc 20mhz (near the 68k)
-  1x h8/330 HD6473308cp10
+  CPUs:
+  1x 68000 (main)
+  1x HD6473308CP10 (MCU)
+  1x OKI6295 (sound)
+  1x oscillator 30.000MHz
+  1x oscillator 20.000MHz
+
+  ROMs:
+  6x 27010 1-6
+  1x 27020 7
+
+  PLDs:
+  1x FPGA by Actel (read protected)
+
+  Others:
   1x dipswitch
   1x battery
-  1x fpga by Actel
-  1x oki6295
+
+  Notes:
+  PCB marked: ABM - 9605 Rev.02
 
 */
 ROM_START( magic102 )
@@ -977,33 +1036,40 @@ ROM_START( magic102 )
 ROM_END
 
 /*
-  Super Pool
+  Super Pool (ver. 1.2)
 
-  ABM (Nazionale Elettronica Giochi S.A.S.), 1998.
-  PCB: 9743 Rev.01
+  CPUs:
+  1x MC68HC000P10 (u1)
+  1x HD6473308CP10 (u24)
+  1x U6295 (u31)
+  1x LM358N (u33)
+  1x TDA2003 (u34)
 
-  1x MC68HC000P10
-  1x ACTEL A1020B-PL84C
-  1x HD6473308CP10 (label says: do not remove version 1.2)
-  1x U6295 (sound)
-  1x LM358N (sound)
-  1x TDA2003 (sound)
   1x oscillator 20.000MHz
   1x oscillator 30.0000MHz
   1x blu resonator 1000J (close to sound)
 
+  ROMs:
   1x M27C2001 (1) (Sound)
   2x TMS27C010A (2,3) (main)
   4x TMS27C010A (4,5,6,7) (gfx)
-  1x PALCE22V10H (not dumped)
-  1x PALCE16V8H (not dumped)
 
+  RAMs:
+  4x W2465-10L (u4,u5,u43,u44)
+  1x 6116 (u6)
+  2x HM3-65728BK-5 (u61,u62)
+
+  PLDs:
+  1x ACTEL A1020B-PL84C (u50)(read protected)
+  1x PALCE22V10H (u22)(not dumped)
+  1x PALCE16V8H (u54)(not dumped)
+
+  Others:
   1x 28x2 JAMMA edge connector
   1x 12 legs connector (J1)
-  1x trimmer (volume)
-  1x 8x2 switches dip
-  1x lithium battery
-
+  1x trimmer (volume)(P1)
+  1x 8 DIP switches bank (DIP1)
+  1x battery 3V
 
   STATUS:
 
@@ -1032,6 +1098,10 @@ ROM_START( suprpool )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "1.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
 ROM_END
 
 /*
@@ -1068,7 +1138,7 @@ ROM_END
   PLDs
   1x A40MX04-PL84 (u50) (not dumped).
   1x GAL16V8D-25LP (u54), (read protected).
-  1x PALC22V10H-25PC/4 (u22), (read protected).
+  1x PALCE22V10H-25PC/4 (u22), (read protected).
 
   Others:
   1x 28x2 JAMMA edge connector.
@@ -1079,6 +1149,11 @@ ROM_END
   1x trimmer (unknown)(P2).
   1x 8x2 DIP switches (DIP1).
   1x CR2032 3v. lithium battery.
+
+  Notes:
+  PCB is marked: "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+  PCB is marked: "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
+  PCB is labeled: "Hot Slot Non rimuovere" on component side
 
 
   - The system RAM test need the bit 7 of offset 0x500005 activated to be successful.
@@ -1121,35 +1196,51 @@ ROM_START( hotslot )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "hotslot1.u32", 0x00000, 0x40000, CRC(ae880970) SHA1(3c302b3f6f6bbf72a522889592add3b6ef8ce1b0) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "gal6v8d.u54",     0x02dd, 0x0117, NO_DUMP )
 ROM_END
 
 /*
-  Magic Colors
-  PCB marking: Rev.03
+  Magic Colors (ver. 1.7a)
 
   CPU:
-  1x missing CPU (QFP68 socket, u1)
+  1x missing CPU MC68000 (QFP68 socket, u1)
   1x HD6473308CP10 (u24)(MCU)
-  1x A40MX04-PL84-9828 (u50)
-
   1x M6295 (u31)(sound)
   1x KA358 (u33)(sound)
   1x TDA2003 (u34)(sound)
 
   1x oscillator 20.0000MHz (OSC1)
+  1x oscillator 30.0000MHz (OSC2)
   1x 1000J blu resonator (XTAL1)
 
   ROMs:
   6x 27C010 (2,3,4,5,6,7)
   1x 27C020 (1)
+
+  RAMs:
+  1x U6216ADC-08L (u6)
+  4x LP6264D-70LL (u4,u5,u43,u44)
+  2x HM3-65728H-5 (u61,u62)
+
+  PLDs:
+  1x A40MX04-PL84-9828 (u50)
   1x GAL16V8D (as PAL16R4)(read protected)
   1x missing PAL22V10
 
-  Note:
-  1x 28x2 edge connector
-  1x trimmer (volume)
-  1x 12 legs connector (J1,J2,J3)
+  Others:
+  1x 28x2 JAMMA edge connector
+  1x 12 legs connector (J1)
+  1x trimmer (volume)(P1)
+  1x 8 DIP switches bank (DIP1)
+  1x battery 3V
 
+  Notes:
+  PCB is marked: "OC Rev. 03", "0/088066-L0" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+  PCB is marked: "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
+  PCB is labeled: "Non rimuovere M.Colors 2.0 68000" and "Passed 01/04/99" on component side
 
   STATUS:
 
@@ -1178,20 +1269,84 @@ ROM_START( mcolors )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "m.color1.u32", 0x00000, 0x40000, CRC(db8d6769) SHA1(2ab7730fd8ae9522e5452fe1f535002e11db5e7b) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "gal6v8d.u54",     0x02dd, 0x0117, NO_DUMP )
 ROM_END
 
 /*
-  Super Gran Safari
-  1996 - New Impeuropex Corp.
+  Magic Colors (ver. 1.6)
 
   CPU:
-  1x MC68000P12 (main)
-  2x A1020B-PL84C (not dumped)
+  1x MC68000P12 (u1)(main)
+  1x HD6473308CP10 (u24)(MCU)
+  1x M6295 (u31)(sound)
+  1x LM358N (u33)(sound)
+  1x TDA2003 (u34)(sound)
 
-  1x M6295 (sound)
-  1x TDA2002 (sound)
-  1x GL324 (sound)
+  1x oscillator 20.0000MHz (OSC1)
+  1x oscillator 30.0000MHz (OSC2)
+  1x 1000J blu resonator (XTAL1)
 
+  ROMs:
+  6x AM27C010 (2,3,4,5,6,7)
+  1x M27C2001 (1)
+
+  RAMs:
+  1x LH6116-10 (u6)
+  4x UM6264D-70LL (u4,u5,u43,u44)
+  2x HM3-65728H-5 (u61,u62)
+
+  PLDs:
+  1x ACTEL A1020B-PL84C (u50)
+  1x AMPAL22V10APC (u22)
+  1x PALCE16V8H-25PC/4 (u54)
+
+  Others:
+  1x 28x2 JAMMA edge connector
+  1x 12 legs connector (J1)
+  1x trimmer (volume)(P1)
+  1x 8 DIP switches bank (DIP1)
+  1x battery 3V
+
+  Notes:
+  PCB is marked: "OC ABM - 9743 Rev.01" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+  PCB is marked: "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
+  PCB is labelled: "Non rimuovere 2a" and "Passed 02/03/99" on component side
+  PCB is labelled: "1.99" on solder side
+
+*/
+ROM_START( mcolorsa )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "m.c.1.6-2.u3", 0x00000, 0x20000, CRC(43062c18) SHA1(5ac23eb392192131cf6745afddba6b5b32d75c9e) )
+	ROM_LOAD16_BYTE( "m.c.1.6-3.u2", 0x00001, 0x20000, CRC(a24daff4) SHA1(a8f30712543c5d3b6024bcdbfa1359585495ba4a) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
+	ROM_LOAD( "m.c.1.6-7.u35", 0x00000, 0x20000, CRC(ac0e0520) SHA1(84f0f28260a2234db379c8c745a50d1ea3d0b695) )
+	ROM_LOAD( "m.c.1.6-6.u36", 0x20000, 0x20000, CRC(fab02757) SHA1(cc67325ff512b05b910a648bd4d9143b71081675) )
+	ROM_LOAD( "m.c.1.6-5.u37", 0x40000, 0x20000, CRC(41a2c761) SHA1(27d05a3132c96a9529f34fc1313f4652f7c2ce99) )
+	ROM_LOAD( "m.c.1.6-4.u38", 0x60000, 0x20000, CRC(7fb74c19) SHA1(20e6ecb7f34d9b82d1073c5018a7c1c6cdf3740f) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "m.c.-1.u32", 0x00000, 0x40000, CRC(db8d6769) SHA1(2ab7730fd8ae9522e5452fe1f535002e11db5e7b) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "ampal22v10apc.u22", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u54",    0x02dd, 0x0117, NO_DUMP )
+ROM_END
+
+/*
+  Super Gran Safari (ver 3.11)
+
+  CPU:
+  1x MC68000P12
+  1x M6295
+  1x TDA2002
+  1x GL324
   1x oscillator 30.000MHz
 
   ROMs:
@@ -1199,14 +1354,24 @@ ROM_END
   1x M27C2001 (3)
   4x M27C1001 (4,5,6,7)
 
-  Note:
-  1x JAMMA edge connector
-  1x 12 legs connector (j2)
-  1x 8x2 switches dip
-  1x 4 legs jumper (j3)
-  1x 2 legs jumper (j4)
-  1x trimmer (volume)
+  RAMs:
+  6x GM76C88AL-15
+  1x M48Z02 (u37 dumped)
 
+  PLDs:
+  2x A1020B-PL84C read protected
+
+  Others:
+  1x 28x2 JAMMA edge connector (J1)
+  1x 12 legs connector (J2)
+  1x 4 legs connector (J3)
+  1x 2 legs connector (J4)
+  1x trimmer (volume)
+  1x 8 DIP switches bank
+
+  Notes:
+  PCB is marked: "COMP01" and "ALL.01A" on component side
+  PCB is labelled: "GRAN SAFARI ORIGINALE NEW IMPEUROPEX CORP. COPYRIGHT 1996 No. 9603125" and "SUPER GRAN SAFARI SPC46" on component side
 
   STATUS:
 
@@ -1239,23 +1404,35 @@ ROM_END
   Same PCB than Magic's 10 (ver. 16.15)
 
   CPU:
-  1x TS68000P12 (main)
-  2x TPC1020AFN-084C (PLD)(not dumped)
-
-  Sound:
-  1x OKI M6295
-  1x TDA2003
+  1x TS68000P12 (main)(u1)
+  1x OKI M6295 (u21)
   1x LM358N
+  1x TDA2003 (u24)
 
-  1x oscillator 20.000000MHz (close to main)
-  1x oscillator 30.000MHz (close to sound)
-  1x orange resonator 1000J (close to sound)
+  1x oscillator 20.000000MHz (close to main)(osc1)
+  1x oscillator 30.000MHz (close to sound)(osc2)
+  1x orange resonator 1000J (close to sound)(xtal1)
 
-  Note:
-  1x 28x2 edge connector
-  1x trimmer (volume)
-  1x 8x2 switches dip
-  1x battery
+  ROMs:
+  1x M27C2001 (1)
+  5x M27C1001 (2,3,5,6,7)
+  1x TMS27C010A (4)
+
+  RAMs:
+  2x W2465-70LL (u4,u59)
+  2x HY6264ALP-10 (u34,u35)
+  2x HM3-65728BK-5 (u50,u51)
+  1x NVRAM (u5)
+
+  PLDs:
+  2x TPC1020AFN-084C (PLD)(not dumped)(u41,u60)
+  1x PALCE16V8H (read protected)
+
+  Others:
+  1x 28x2 JAMMA edge connector
+  1x 12 legs connector (J1)
+  1x trimmer (volume)(P1)
+  1x 8 DIP switches bank (DIP1)
 
 */
 ROM_START( musicsrt )
@@ -1273,19 +1450,18 @@ ROM_START( musicsrt )
 	ROM_LOAD( "1.u22", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
 
 	ROM_REGION( 0x0800, "nvram", 0 ) /* default Non Volatile RAM */
-	ROM_LOAD( "musicsrt_nv.bin", 0x0000, 0x0800, CRC(f4e063cf) SHA1(a60bbd960bb7dcf023417e8c7164303b6ce71014) )
+	ROM_LOAD( "musicsrt_nv.u5", 0x0000, 0x0800, CRC(f4e063cf) SHA1(a60bbd960bb7dcf023417e8c7164303b6ce71014) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "palce6v8h.u42",     0x0000, 0x0117, NO_DUMP )
 ROM_END
 
 /*
   Luna Park (ver. 1.2)
-  1998.25.11
-  ABM games.
 
-  PCB: ABM 9743 Rev.02
-
+  CPU:
   1x  MC68HC000FN10 (u1)    16/32-bit Microprocessor.
   1x  HD6473308CP10 (u24)   label: version 1.2 - 16-bit Single-Chip Microcomputer. NOT DUMPED.
-
   1x  M6295         (u31)   4-Channel Mixing ADCPM Voice Synthesis LSI.
   1x  LM358N        (u33)   Dual Operational Amplifier.
   1x  TDA2003       (u34)   Audio Amplifier.
@@ -1294,22 +1470,31 @@ ROM_END
   1x 30.000MHz oscillator (osc2).
   1x blu resonator 1000J (xtal1).
 
+  ROMs:
   6x AM27C010 ROMs(2-7).
   1x AM27C020 ROM (1).
 
+  RAMs:
   1x LH5116-10 RAM (u6).
   4x HY6264ALP-10 RAM (u4, u5, u43, u44).
   2x HM3-65728H-8 RAM (u61, u62).
 
+  PLDs:
   1x TPC1020AFN-084C (u50), read protected.
   1x PALCE16V8H-25PC/4 (u54), read protected.
-  1x PALC22V10H-25PC/4 (u22), read protected.
+  1x PALCE22V10H-25PC/4 (u22), read protected.
 
+  Others:
   1x 28x2 JAMMA edge connector.
   1x 12-pins male connector (JP1).
   1x trimmer (volume)(P1).
   1x 8x2 DIP switches (DIP1).
   1x Renata 3V. CR2032 lithium battery.
+
+  Notes:
+  PCB is marked: "OC ABM - 9743 Rev.02" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+  PCB is marked: "44-98 ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
+  PCB is labeled: "CAUTION! DO NOT REMOVE THIS CHIP - ATTENZIONE! NON RIMUOVERE GAME:____ VERSION:_1.2_" and "25/11/98" on component side
 
 
   STATUS:
@@ -1339,15 +1524,18 @@ ROM_START( lunaprk )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "1.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
 ROM_END
 
 /*
   Alta Tensione (ver. 2.01a)
-  199?, Unknown manufacturer.
 
+  CPU:
   1x  MC68HC000FN12 (u1)    16/32-bit Microprocessor.
   1x  HD6473308CP10 (u24)   16-bit Single-Chip Microcomputer. NOT DUMPED.
-
   1x  M6295         (u31)   4-Channel Mixing ADCPM Voice Synthesis LSI.
   1x  KA358         (u33)   Dual Operational Amplifier.
   1x  TDA2003       (u34)   Audio Amplifier.
@@ -1356,18 +1544,22 @@ ROM_END
   1x 30.000MHz oscillator (osc2).
   1x blu resonator 1000J (xtal1).
 
+  ROMs:
   5x MX27C1000APC-12 ROMs(2-6).
   1x M271001 ROM (7).
   1x MX27C2000DC-90 ROM (1).
 
+  RAMs:
   1x ZMDU6216ADC-08L RAM (u6).
   4x LP6264D-70LL RAM (u4, u5, u43, u44).
   2x HM3-65728H-5 RAM (u61, u62).
 
+  PLDs:
   1x A40MX04-PL84 (u50), read protected.
   1x PALCE16V8H-25PC/4 (u54), read protected.
   1x PALC22V10H-25PC/4 (u22), read protected.
 
+  Others:
   1x 28x2 JAMMA edge connector.
   1x 12-legs connector (J1).
   1x 12-pins jumper (J2, J3).
@@ -1377,6 +1569,10 @@ ROM_END
   1x 8x2 DIP switches (DIP1).
   1x Rayovac 3V. BR20xx lithium battery.
 
+  Notes:
+  PCB is marked: "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+  PCB is marked: "H3" and "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side")
+  PCB is labeled: "ALTA TENSIONE", "Non rimuovere Alta Tensione 1.00" and "Passed 23/06/99" on component side
 
   STATUS:
 
@@ -1405,6 +1601,10 @@ ROM_START( altaten )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "alta_tensione_1.u32", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) /* PLDs */
+	ROM_LOAD( "palce22v10h.u22", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u54",  0x02dd, 0x0117, NO_DUMP )
 ROM_END
 
 
@@ -1462,16 +1662,17 @@ void magic10_state::init_altaten()
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT           ROT   COMPANY                 FULLNAME                          FLAGS            LAYOUT
-GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,               layout_sgsafari )
-GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,               layout_sgsafari )
-GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver 1.1)",         MACHINE_NOT_WORKING )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT           ROT   COMPANY                 FULLNAME                          FLAGS                 LAYOUT
+GAMEL( 1995, magic10,  0,        magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.55)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10a, magic10,  magic10,  magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.54)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10b, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.45)",        0,                    layout_sgsafari )
+GAMEL( 1995, magic10c, magic10,  magic10a, magic10,  magic10_state, init_magic10,  ROT0, "A.W.P. Games",         "Magic's 10 (ver. 16.15)",        0,                    layout_sgsafari )
+GAME(  1997, magic102, 0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic's 10 2 (ver. 1.1)",        MACHINE_NOT_WORKING )
 GAME(  1998, suprpool, 0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Super Pool (ver. 1.2)",          MACHINE_NOT_WORKING )
-GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, init_hotslot,  ROT0, "ABM Electronics",      "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
-GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, init_magic102, ROT0, "<unknown>",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
-GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver 3.11)",   0,               layout_sgsafari )
-GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, init_magic10,  ROT0, "ABM Games",            "Music Sort (ver 2.02, English)", 0,               layout_musicsrt )
+GAME(  1996, hotslot,  0,        hotslot,  hotslot,  magic10_state, init_hotslot,  ROT0, "ABM Games",            "Hot Slot (ver. 05.01)",          MACHINE_NOT_WORKING )
+GAME(  1999, mcolors,  0,        magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.7a)",       MACHINE_NOT_WORKING )
+GAME(  1999, mcolorsa, mcolors,  magic102, magic102, magic10_state, init_magic102, ROT0, "ABM Games",            "Magic Colors (ver. 1.6)",        MACHINE_NOT_WORKING )
+GAMEL( 1996, sgsafari, 0,        sgsafari, sgsafari, magic10_state, init_sgsafari, ROT0, "New Impeuropex Corp.", "Super Gran Safari (ver. 3.11)",  0,                    layout_sgsafari )
+GAMEL( 1995, musicsrt, 0,        magic10a, musicsrt, magic10_state, init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)", 0,                            layout_musicsrt )
 GAME(  1998, lunaprk,  0,        magic102, magic102, magic10_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING )
-GAME(  199?, altaten,  0,        magic102, magic102, magic10_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )
+GAME(  1999, altaten,  0,        magic102, magic102, magic10_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING )

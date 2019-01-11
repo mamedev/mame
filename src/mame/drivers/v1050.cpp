@@ -336,7 +336,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 
 READ8_MEMBER( v1050_state::kb_status_r )
 {
-	uint8_t val = m_uart_kb->status_r(space, 0);
+	uint8_t val = m_uart_kb->status_r();
 
 	return val | (m_keyavail ? 0x02 : 0x00);
 }
@@ -481,32 +481,30 @@ void v1050_state::v1050_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x84, 0x87).rw(m_ppi_disp, FUNC(i8255_device::read), FUNC(i8255_device::write));
-//  AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(I8251A_KB_TAG, i8251_device, data_r, data_w)
-//  AM_RANGE(0x89, 0x89) AM_DEVREADWRITE(I8251A_KB_TAG, i8251_device, status_r, control_w)
-	map(0x88, 0x88).r(this, FUNC(v1050_state::kb_data_r)).w(m_uart_kb, FUNC(i8251_device::data_w));
-	map(0x89, 0x89).r(this, FUNC(v1050_state::kb_status_r)).w(m_uart_kb, FUNC(i8251_device::control_w));
-	map(0x8c, 0x8c).rw(m_uart_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x8d, 0x8d).rw(m_uart_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+//  map(0x88, 0x89).rw(m_uart_kb, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x88, 0x88).r(FUNC(v1050_state::kb_data_r)).w(m_uart_kb, FUNC(i8251_device::data_w));
+	map(0x89, 0x89).r(FUNC(v1050_state::kb_status_r)).w(m_uart_kb, FUNC(i8251_device::control_w));
+	map(0x8c, 0x8d).rw(m_uart_sio, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x90, 0x93).rw(I8255A_MISC_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x94, 0x97).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write));
 	map(0x9c, 0x9f).rw(I8255A_RTC_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa0, 0xa0).rw(this, FUNC(v1050_state::vint_clr_r), FUNC(v1050_state::vint_clr_w));
-	map(0xb0, 0xb0).rw(this, FUNC(v1050_state::dint_clr_r), FUNC(v1050_state::dint_clr_w));
-	map(0xc0, 0xc0).w(this, FUNC(v1050_state::v1050_i8214_w));
-	map(0xd0, 0xd0).w(this, FUNC(v1050_state::bank_w));
-	map(0xe0, 0xe0).w(this, FUNC(v1050_state::sasi_data_w)).r(m_sasi_data_in, FUNC(input_buffer_device::read));
-	map(0xe1, 0xe1).r(m_sasi_ctrl_in, FUNC(input_buffer_device::read)).w(this, FUNC(v1050_state::sasi_ctrl_w));
+	map(0xa0, 0xa0).rw(FUNC(v1050_state::vint_clr_r), FUNC(v1050_state::vint_clr_w));
+	map(0xb0, 0xb0).rw(FUNC(v1050_state::dint_clr_r), FUNC(v1050_state::dint_clr_w));
+	map(0xc0, 0xc0).w(FUNC(v1050_state::v1050_i8214_w));
+	map(0xd0, 0xd0).w(FUNC(v1050_state::bank_w));
+	map(0xe0, 0xe0).w(FUNC(v1050_state::sasi_data_w)).r(m_sasi_data_in, FUNC(input_buffer_device::bus_r));
+	map(0xe1, 0xe1).r(m_sasi_ctrl_in, FUNC(input_buffer_device::bus_r)).w(FUNC(v1050_state::sasi_ctrl_w));
 }
 
 void v1050_state::v1050_crt_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(this, FUNC(v1050_state::videoram_r), FUNC(v1050_state::videoram_w)).share("video_ram");
+	map(0x0000, 0x7fff).rw(FUNC(v1050_state::videoram_r), FUNC(v1050_state::videoram_w)).share("video_ram");
 	map(0x8000, 0x8000).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x8001, 0x8001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x9000, 0x9003).rw(m_ppi_6502, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa000, 0xa000).rw(this, FUNC(v1050_state::attr_r), FUNC(v1050_state::attr_w));
-	map(0xb000, 0xb000).w(this, FUNC(v1050_state::dint_w));
-	map(0xc000, 0xc000).w(this, FUNC(v1050_state::dvint_clr_w));
+	map(0xa000, 0xa000).rw(FUNC(v1050_state::attr_r), FUNC(v1050_state::attr_w));
+	map(0xb000, 0xb000).w(FUNC(v1050_state::dint_w));
+	map(0xc000, 0xc000).w(FUNC(v1050_state::dvint_clr_w));
 	map(0xe000, 0xffff).rom();
 }
 
@@ -1044,8 +1042,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	v1050_video(config);
 
 	// devices
-	MCFG_DEVICE_ADD(UPB8214_TAG, I8214, 16_MHz_XTAL/4)
-	MCFG_I8214_INT_CALLBACK(WRITELINE(*this, v1050_state, pic_int_w))
+	I8214(config, m_pic, 16_MHz_XTAL/4);
+	m_pic->int_wr_callback().set(FUNC(v1050_state::pic_int_w));
 
 	MCFG_DEVICE_ADD(MSM58321RS_TAG, MSM58321, 32.768_kHz_XTAL)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_0_w))
@@ -1054,68 +1052,68 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_3_w))
 	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pc_3_w))
 
-	MCFG_DEVICE_ADD(I8255A_DISP_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_M6502_TAG, i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, disp_ppi_pc_w))
+	I8255A(config, m_ppi_disp);
+	m_ppi_disp->in_pa_callback().set(I8255A_M6502_TAG, FUNC(i8255_device::pb_r));
+	m_ppi_disp->out_pc_callback().set(FUNC(v1050_state::disp_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_MISC_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v1050_state, misc_ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, v1050_state,misc_ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state,misc_ppi_pc_w))
+	i8255_device &ppi_misc(I8255A(config, I8255A_MISC_TAG));
+	ppi_misc.in_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_r));
+	ppi_misc.out_pa_callback().set(FUNC(v1050_state::misc_ppi_pa_w));
+	ppi_misc.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi_misc.out_pc_callback().set(FUNC(v1050_state::misc_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_RTC_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, v1050_state, rtc_ppi_pa_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, v1050_state, rtc_ppi_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, v1050_state, rtc_ppi_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, v1050_state, rtc_ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, rtc_ppi_pc_w))
+	i8255_device &ppi_rtc(I8255A(config, I8255A_RTC_TAG));
+	ppi_rtc.in_pa_callback().set(FUNC(v1050_state::rtc_ppi_pa_r));
+	ppi_rtc.in_pc_callback().set(FUNC(v1050_state::rtc_ppi_pc_r));
+	ppi_rtc.out_pa_callback().set(FUNC(v1050_state::rtc_ppi_pa_w));
+	ppi_rtc.out_pb_callback().set(FUNC(v1050_state::rtc_ppi_pb_w));
+	ppi_rtc.out_pc_callback().set(FUNC(v1050_state::rtc_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8255A_M6502_TAG, I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(I8255A_DISP_TAG, i8255_device, pb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, v1050_state, m6502_ppi_pc_w))
+	I8255A(config, m_ppi_6502);
+	m_ppi_6502->in_pa_callback().set(m_ppi_disp, FUNC(i8255_device::pb_r));
+	m_ppi_6502->out_pc_callback().set(FUNC(v1050_state::m6502_ppi_pc_w));
 
-	MCFG_DEVICE_ADD(I8251A_KB_TAG, I8251, 0/*16_MHz_XTAL/8,*/)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(V1050_KEYBOARD_TAG, v1050_keyboard_device, si_w))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v1050_state, kb_rxrdy_w))
+	I8251(config, m_uart_kb, 0/*16_MHz_XTAL/8,*/);
+	m_uart_kb->txd_handler().set(V1050_KEYBOARD_TAG, FUNC(v1050_keyboard_device::si_w));
+	m_uart_kb->rxrdy_handler().set(FUNC(v1050_state::kb_rxrdy_w));
 
 	MCFG_DEVICE_ADD(CLOCK_KB_TAG, CLOCK, 16_MHz_XTAL/4/13/8)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_keyboard_clock))
 
 	// keyboard
-	MCFG_DEVICE_ADD(V1050_KEYBOARD_TAG, V1050_KEYBOARD, 0)
-	MCFG_V1050_KEYBOARD_OUT_TX_HANDLER(WRITELINE(I8251A_KB_TAG, i8251_device, write_rxd))
+	v1050_keyboard_device &keyboard(V1050_KEYBOARD(config, V1050_KEYBOARD_TAG, 0));
+	keyboard.out_tx_handler().set(m_uart_kb, FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD(I8251A_SIO_TAG, I8251, 0/*16_MHz_XTAL/8,*/)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, v1050_state, sio_rxrdy_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, v1050_state, sio_txrdy_w))
+	I8251(config, m_uart_sio, 0/*16_MHz_XTAL/8,*/);
+	m_uart_sio->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart_sio->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart_sio->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart_sio->rxrdy_handler().set(FUNC(v1050_state::sio_rxrdy_w));
+	m_uart_sio->txrdy_handler().set(FUNC(v1050_state::sio_txrdy_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(I8251A_SIO_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart_sio, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_uart_sio, FUNC(i8251_device::write_dsr));
 
 	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))
 
-	MCFG_MB8877_ADD(MB8877_TAG, 16_MHz_XTAL/16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, v1050_state, fdc_drq_w))
+	MB8877(config, m_fdc, 16_MHz_XTAL/16);
+	m_fdc->intrq_wr_callback().set(FUNC(v1050_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(v1050_state::fdc_drq_w));
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
 	// SASI bus
-	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
-	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
-	MCFG_SCSI_REQ_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit0)) MCFG_DEVCB_XOR(1)
-	MCFG_SCSI_BSY_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit1))
-	MCFG_SCSI_MSG_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit2))
-	MCFG_SCSI_CD_HANDLER(WRITELINE("scsi_ctrl_in", input_buffer_device, write_bit3))
-	MCFG_SCSI_IO_HANDLER(WRITELINE(*this, v1050_state, write_sasi_io)) MCFG_DEVCB_XOR(1) // bit4
+	SCSI_PORT(config, m_sasibus, 0);
+	m_sasibus->set_data_input_buffer("scsi_data_in");
+	m_sasibus->req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit0)).exor(1);
+	m_sasibus->bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
+	m_sasibus->msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
+	m_sasibus->cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	m_sasibus->io_handler().set(FUNC(v1050_state::write_sasi_io)).exor(1); // bit4
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", S1410, SCSI_ID_0)
 
 	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", SASIBUS_TAG)
@@ -1130,15 +1128,14 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "v1050_hdd")
 
 	// printer
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, v1050_state, write_centronics_busy))
 	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, v1050_state, write_centronics_perror))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 MACHINE_CONFIG_END
 
 // ROMs

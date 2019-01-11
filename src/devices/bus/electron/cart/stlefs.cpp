@@ -44,16 +44,15 @@ void stlefs_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_stlefs_device::device_add_mconfig)
+void electron_stlefs_device::device_add_mconfig(machine_config &config)
+{
 	/* fdc */
-	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, electron_stlefs_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, electron_stlefs_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", stlefs_floppies, "525qd", electron_stlefs_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", stlefs_floppies, nullptr, electron_stlefs_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(electron_stlefs_device::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(electron_stlefs_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, m_floppy0, stlefs_floppies, "525qd", electron_stlefs_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, stlefs_floppies, nullptr, electron_stlefs_device::floppy_formats).enable_sound(true);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -96,7 +95,7 @@ uint8_t electron_stlefs_device::read(address_space &space, offs_t offset, int in
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			data = m_fdc->read(space, offset & 0x03);
+			data = m_fdc->read(offset & 0x03);
 			break;
 		}
 	}
@@ -129,7 +128,7 @@ void electron_stlefs_device::write(address_space &space, offs_t offset, uint8_t 
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			m_fdc->write(space, offset & 0x03, data);
+			m_fdc->write(offset & 0x03, data);
 			break;
 		//case 0xcb:
 			//m_page_register = data;

@@ -56,6 +56,7 @@ Address   Description
 #include "machine/mm5740.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -98,6 +99,9 @@ public:
 	{
 	}
 
+	void h19(machine_config &config);
+
+private:
 	DECLARE_WRITE8_MEMBER(h19_keyclick_w);
 	DECLARE_WRITE8_MEMBER(h19_bell_w);
 	DECLARE_READ8_MEMBER(kbd_key_r);
@@ -108,10 +112,9 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void h19(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 
@@ -173,10 +176,10 @@ void h19_state::io_map(address_map &map)
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x60, 0x60).mirror(0x1E).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x61, 0x61).mirror(0x1E).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x80, 0x80).mirror(0x1f).r(this, FUNC(h19_state::kbd_key_r));
-	map(0xA0, 0xA0).mirror(0x1f).r(this, FUNC(h19_state::kbd_flags_r));
-	map(0xC0, 0xC0).mirror(0x1f).w(this, FUNC(h19_state::h19_keyclick_w));
-	map(0xE0, 0xE0).mirror(0x1f).w(this, FUNC(h19_state::h19_bell_w));
+	map(0x80, 0x80).mirror(0x1f).r(FUNC(h19_state::kbd_key_r));
+	map(0xA0, 0xA0).mirror(0x1f).r(FUNC(h19_state::kbd_flags_r));
+	map(0xC0, 0xC0).mirror(0x1f).w(FUNC(h19_state::h19_keyclick_w));
+	map(0xE0, 0xE0).mirror(0x1f).w(FUNC(h19_state::h19_bell_w));
 }
 
 /* Input ports */
@@ -533,16 +536,17 @@ MACHINE_CONFIG_START(h19_state::h19)
 	MCFG_SCREEN_SIZE(640, 250)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 250 - 1)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_h19)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MC6845_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(h19_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
+	MC6845(config, m_crtc, MC6845_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(h19_state::crtc_update_row), this);
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
-	MCFG_DEVICE_ADD("ins8250", INS8250, INS8250_CLOCK)
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
+	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	MCFG_DEVICE_ADD(KBDC_TAG, MM5740, MM5740_CLOCK)
 	MCFG_MM5740_MATRIX_X1(IOPORT("X1"))

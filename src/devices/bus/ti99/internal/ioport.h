@@ -57,10 +57,17 @@ class ioport_device : public device_t, public device_slot_interface
 	friend class ioport_attached_device;
 
 public:
-	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename U>
+	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: ioport_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 
-	template<class Object> devcb_base &set_extint_callback(Object &&cb) {  return m_console_extint.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_ready_callback(Object &&cb)  {  return m_console_ready.set_callback(std::forward<Object>(cb)); }
+	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Methods called from the console
 	DECLARE_READ8Z_MEMBER( readz );
@@ -71,6 +78,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( memen_in );
 	DECLARE_WRITE_LINE_MEMBER( msast_in );
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
+
+	// Callbacks
+	auto extint_cb() { return m_console_extint.bind(); }
+	auto ready_cb() { return m_console_ready.bind(); }
 
 protected:
 	void device_start() override;
@@ -87,21 +98,7 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device)
 
-void ti99_io_port(device_slot_interface &device);
-void ti99_io_port_ev(device_slot_interface &device);
-
-#define MCFG_IOPORT_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_IOPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_io_port, nullptr, false)
-
-#define MCFG_IOPORT_ADD_WITH_PEB( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_IOPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_io_port_ev, "peb", false)
-
-#define MCFG_IOPORT_EXTINT_HANDLER( _extint ) \
-	devcb = &downcast<bus::ti99::internal::ioport_device &>(*device).set_extint_callback(DEVCB_##_extint);
-
-#define MCFG_IOPORT_READY_HANDLER( _ready ) \
-	devcb = &downcast<bus::ti99::internal::ioport_device &>(*device).set_ready_callback(DEVCB_##_ready);
+void ti99_ioport_options_plain(device_slot_interface &device);
+void ti99_ioport_options_evpc(device_slot_interface &device);
 
 #endif /* __TI99IOPORT__ */

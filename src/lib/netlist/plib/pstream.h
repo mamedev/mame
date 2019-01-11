@@ -154,10 +154,10 @@ protected:
 	/* write n bytes to stream */
 	virtual void vwrite(const void *buf, const pos_type n) override
 	{
-		m_buf += pstring(static_cast<const pstring::mem_t *>(buf), n, pstring::UTF8);
+		m_buf += pstring(static_cast<const char *>(buf), n);
 	}
 	virtual void vseek(const pos_type n) override { }
-	virtual pos_type vtell() override { return m_buf.mem_t_size(); }
+	virtual pos_type vtell() override { return m_buf.size(); }
 
 private:
 	pstring m_buf;
@@ -284,7 +284,7 @@ private:
 class pistringstream : public pimemstream
 {
 public:
-	explicit pistringstream(const pstring &str) : pimemstream(str.c_str(), str.mem_t_size()), m_str(str) { }
+	explicit pistringstream(const pstring &str) : pimemstream(str.c_str(), std::strlen(str.c_str())), m_str(str) { }
 	virtual ~pistringstream() override;
 
 private:
@@ -312,22 +312,22 @@ public:
 		return (m_strm.read(&b, 1) == 1);
 	}
 
-	bool readcode(pstring::code_t &c)
+	bool readcode(putf8string::traits_type::code_t &c)
 	{
 		char b[4];
 		if (m_strm.read(&b[0], 1) != 1)
 			return false;
-		const std::size_t l = pstring::traits_type::codelen(b);
+		const std::size_t l = putf8string::traits_type::codelen(b);
 		for (std::size_t i = 1; i < l; i++)
 			if (m_strm.read(&b[i], 1) != 1)
 				return false;
-		c = pstring::traits_type::code(b);
+		c = putf8string::traits_type::code(b);
 		return true;
 	}
 
 private:
 	pistream &m_strm;
-	pstring m_linebuf;
+	putf8string m_linebuf;
 };
 
 // -----------------------------------------------------------------------------
@@ -348,12 +348,14 @@ public:
 
 	void write(const pstring &text) const
 	{
-		m_strm.write(text.c_str(), text.mem_t_size());
+		putf8string conv_utf8(text);
+		m_strm.write(conv_utf8.c_str(), conv_utf8.mem_t_size());
 	}
 
-	void write(const pstring::code_t c) const
+	void write(const pstring::value_type c) const
 	{
-		write(pstring(c));
+		pstring t = pstring("") + c;
+		write(t);
 	}
 
 private:
@@ -391,8 +393,10 @@ public:
 
 	void write(const pstring &s)
 	{
-		write(s.mem_t_size());
-		m_strm.write(s.c_str(), s.mem_t_size());
+		const char *sm = s.c_str();
+		const std::size_t sl = std::strlen(sm);
+		write(sl);
+		m_strm.write(sm, sl);
 	}
 
 	template <typename T>
@@ -423,10 +427,10 @@ public:
 	{
 		std::size_t sz = 0;
 		read(sz);
-		pstring::mem_t *buf = new pstring::mem_t[sz+1];
+		plib::string_info<pstring>::mem_t *buf = new plib::string_info<pstring>::mem_t[sz+1];
 		m_strm.read(buf, sz);
 		buf[sz] = 0;
-		s = pstring(buf, pstring::UTF8);
+		s = pstring(buf);
 		delete [] buf;
 	}
 

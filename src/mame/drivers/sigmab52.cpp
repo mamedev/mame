@@ -94,20 +94,6 @@
 
 *******************************************************************************
 
-
-  DRIVER UPDATES:
-
-
-  [2010-02-04]
-
-  - Initial release.
-  - Pre-defined Xtals.
-  - Started a preliminary memory map.
-  - Hooked both CPUs.
-  - Preliminary ACRTC support.
-  - Added technical notes.
-
-
   TODO:
 
   - Verify clocks.
@@ -127,6 +113,7 @@
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "video/hd63484.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -149,11 +136,13 @@ public:
 		m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	void init_jwildb52();
 	void jwildb52(machine_config &config);
 
-protected:
+	void init_jwildb52();
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+
+private:
 	DECLARE_READ8_MEMBER(unk_f700_r);
 	DECLARE_READ8_MEMBER(unk_f760_r);
 	DECLARE_READ8_MEMBER(in0_r);
@@ -176,7 +165,6 @@ protected:
 	void jwildb52_map(address_map &map);
 	void sound_prog_map(address_map &map);
 
-private:
 	required_device<cpu_device>     m_maincpu;
 	required_device<cpu_device>     m_audiocpu;
 	required_device<ptm6840_device> m_6840ptm_2;
@@ -248,7 +236,7 @@ READ8_MEMBER(sigmab52_state::in0_r)
 	}
 
 	uint16_t in0 = m_in0->read();
-	for(int i=0; i<16; i++)
+	for (int i = 0; i < 16; i++)
 		if (!BIT(in0, i))
 		{
 			data &= ~(i << 4);
@@ -307,7 +295,7 @@ WRITE8_MEMBER(sigmab52_state::palette_bank_w)
 {
 	int bank = data & 0x0f;
 
-	for (int i = 0; i<m_palette->entries(); i++)
+	for (int i = 0; i < m_palette->entries(); i++)
 	{
 		uint8_t d = m_prom[(bank << 4) | i];
 		m_palette->set_pen_color(i, pal3bit(d >> 5), pal3bit(d >> 2), pal2bit(d >> 0));
@@ -325,15 +313,15 @@ void sigmab52_state::jwildb52_map(address_map &map)
 
 	map(0x8000, 0xf6ff).rom();
 
-	map(0xf700, 0xf700).r(this, FUNC(sigmab52_state::unk_f700_r));    // ACIA ???
-	map(0xf710, 0xf710).w(this, FUNC(sigmab52_state::bank1_w));
+	map(0xf700, 0xf700).r(FUNC(sigmab52_state::unk_f700_r));    // ACIA ???
+	map(0xf710, 0xf710).w(FUNC(sigmab52_state::bank1_w));
 
 	map(0xf720, 0xf727).rw("6840ptm_1", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 
 	map(0xf730, 0xf730).rw("hd63484", FUNC(hd63484_device::status8_r), FUNC(hd63484_device::address8_w));
 	map(0xf731, 0xf731).rw("hd63484", FUNC(hd63484_device::data8_r), FUNC(hd63484_device::data8_w));
 
-	map(0xf740, 0xf740).r(this, FUNC(sigmab52_state::in0_r));
+	map(0xf740, 0xf740).r(FUNC(sigmab52_state::in0_r));
 	map(0xf741, 0xf741).portr("IN1");
 	map(0xf742, 0xf742).portr("IN2");
 	map(0xf743, 0xf743).portr("DSW1");
@@ -341,20 +329,20 @@ void sigmab52_state::jwildb52_map(address_map &map)
 	map(0xf745, 0xf745).portr("DSW3");
 	map(0xf746, 0xf746).portr("DSW4");
 	map(0xf747, 0xf747).portr("IN3");
-	map(0xf750, 0xf750).w(this, FUNC(sigmab52_state::palette_bank_w));
+	map(0xf750, 0xf750).w(FUNC(sigmab52_state::palette_bank_w));
 
-	map(0xf760, 0xf760).r(this, FUNC(sigmab52_state::unk_f760_r));
+	map(0xf760, 0xf760).r(FUNC(sigmab52_state::unk_f760_r));
 
 //  AM_RANGE(0xf770, 0xf77f)  Bill validator
 
-	map(0xf780, 0xf780).w(this, FUNC(sigmab52_state::audiocpu_cmd_irq_w));
+	map(0xf780, 0xf780).w(FUNC(sigmab52_state::audiocpu_cmd_irq_w));
 	map(0xf790, 0xf790).w("soundlatch", FUNC(generic_latch_8_device::write));
 
-	map(0xf7b0, 0xf7b0).w(this, FUNC(sigmab52_state::coin_enable_w));
-	map(0xf7d5, 0xf7d5).w(this, FUNC(sigmab52_state::hopper_w));
-	map(0xf7b2, 0xf7b7).w(this, FUNC(sigmab52_state::lamps1_w));
-	map(0xf7c0, 0xf7c3).w(this, FUNC(sigmab52_state::lamps2_w));
-	map(0xf7d6, 0xf7d7).w(this, FUNC(sigmab52_state::tower_lamps_w));
+	map(0xf7b0, 0xf7b0).w(FUNC(sigmab52_state::coin_enable_w));
+	map(0xf7d5, 0xf7d5).w(FUNC(sigmab52_state::hopper_w));
+	map(0xf7b2, 0xf7b7).w(FUNC(sigmab52_state::lamps1_w));
+	map(0xf7c0, 0xf7c3).w(FUNC(sigmab52_state::lamps2_w));
+	map(0xf7d6, 0xf7d7).w(FUNC(sigmab52_state::tower_lamps_w));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -374,16 +362,12 @@ void sigmab52_state::sound_prog_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x6020, 0x6027).rw(m_6840ptm_2, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	map(0x6030, 0x6030).w(this, FUNC(sigmab52_state::audiocpu_irq_ack_w));
+	map(0x6030, 0x6030).w(FUNC(sigmab52_state::audiocpu_irq_ack_w));
 	map(0x6050, 0x6050).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x6060, 0x6061).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x8000, 0xffff).rom().region("audiocpu", 0);
 }
 
-/* Unknown R/W:
-
-
-*/
 
 void sigmab52_state::jwildb52_hd63484_map(address_map &map)
 {
@@ -586,6 +570,7 @@ void sigmab52_state::machine_reset()
 	m_audiocpu_cmd_irq = CLEAR_LINE;
 }
 
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -599,30 +584,30 @@ MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 	MCFG_DEVICE_ADD("audiocpu", MC6809, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(sound_prog_map)
 
-	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL(8'000'000)/4) // FIXME
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	ptm6840_device &ptm1(PTM6840(config, "6840ptm_1", XTAL(8'000'000) / 8));  // FIXME
+	ptm1.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL(8'000'000)/8) // FIXME
-	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, sigmab52_state, ptm2_irq))
+	PTM6840(config, m_6840ptm_2, XTAL(8'000'000) / 8);  // FIXME
+	m_6840ptm_2->irq_callback().set(FUNC(sigmab52_state::ptm2_irq));
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 544-1, 0, 436-1)
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_HD63484_ADD("hd63484", XTAL(8'000'000), jwildb52_hd63484_map)
+	HD63484(config, "hd63484", XTAL(8'000'000)).set_addrmap(0, &sigmab52_state::jwildb52_hd63484_map);
 
 	MCFG_PALETTE_ADD("palette", 16)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

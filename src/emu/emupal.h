@@ -90,84 +90,19 @@
 
 ******************************************************************************/
 
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_EMUPAL_H
 #define MAME_EMU_EMUPAL_H
+
+#pragma once
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-#define PALETTE_INIT_NAME(_Name) palette_init_##_Name
-#define DECLARE_PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &palette)
-#define PALETTE_INIT_MEMBER(_Class, _Name) void _Class::PALETTE_INIT_NAME(_Name)(palette_device &palette)
-
-#define PALETTE_DECODER_NAME(_Name) _Name##_decoder
-#define DECLARE_PALETTE_DECODER(_Name) static rgb_t PALETTE_DECODER_NAME(_Name)(u32 raw)
-#define PALETTE_DECODER_MEMBER(_Class, _Name) rgb_t _Class::PALETTE_DECODER_NAME(_Name)(u32 raw)
-
-// standard 3-3-2 formats
-#define PALETTE_FORMAT_BBGGGRRR raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 0,3,6>)
-#define PALETTE_FORMAT_RRRGGGBB raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 5,2,0>)
-
-// data-inverted 3-3-2 formats
-#define PALETTE_FORMAT_BBGGGRRR_inverted raw_to_rgb_converter(1, &raw_to_rgb_converter::inverted_rgb_decoder<3,3,2, 0,3,6>)
-#define PALETTE_FORMAT_RRRGGGBB_inverted raw_to_rgb_converter(1, &raw_to_rgb_converter::inverted_rgb_decoder<3,3,2, 5,2,0>)
-
-// standard 3-3-3 formats
-#define PALETTE_FORMAT_xxxxxxxBBBGGGRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 0,3,6>)
-#define PALETTE_FORMAT_xxxxxxxRRRBBBGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 6,0,3>)
-#define PALETTE_FORMAT_xxxxxxxRRRGGGBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<3,3,3, 6,3,0>)
-
-// standard 4-4-4 formats
-#define PALETTE_FORMAT_xxxxBBBBGGGGRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 0,4,8>)
-#define PALETTE_FORMAT_xxxxBBBBRRRRGGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 4,0,8>)
-#define PALETTE_FORMAT_xxxxRRRRBBBBGGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 8,0,4>)
-#define PALETTE_FORMAT_xxxxRRRRGGGGBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 8,4,0>)
-#define PALETTE_FORMAT_RRRRGGGGBBBBxxxx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 12,8,4>)
-#define PALETTE_FORMAT_GGGGBBBBRRRRxxxx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<4,4,4, 4,12,8>)
-
-// standard 4-4-4-4 formats
-#define PALETTE_FORMAT_IIIIRRRRGGGGBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_irgb_decoder<4,4,4,4, 12,8,4,0>)
-#define PALETTE_FORMAT_RRRRGGGGBBBBIIII raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_irgb_decoder<4,4,4,4, 0,12,8,4>)
-
-// standard 5-5-5 formats
-#define PALETTE_FORMAT_xBBBBBGGGGGRRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 0,5,10>)
-#define PALETTE_FORMAT_xBBBBBRRRRRGGGGG raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 5,0,10>)
-#define PALETTE_FORMAT_xRRRRRGGGGGBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>)
-#define PALETTE_FORMAT_xGGGGGRRRRRBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 5,10,0>)
-#define PALETTE_FORMAT_xGGGGGBBBBBRRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 0,10,5>)
-#define PALETTE_FORMAT_BBBBBRRRRRGGGGGx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 6,1,11>)
-#define PALETTE_FORMAT_GGGGGRRRRRBBBBBx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 6,11,1>)
-#define PALETTE_FORMAT_RRRRRGGGGGBBBBBx raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 11,6,1>)
-#define PALETTE_FORMAT_RRRRGGGGBBBBRGBx raw_to_rgb_converter(2, &raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder)
+// exotic 5-5-5 formats
 #define PALETTE_FORMAT_xRGBRRRRGGGGBBBB_bit0 raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder)
 #define PALETTE_FORMAT_xRGBRRRRGGGGBBBB_bit4 raw_to_rgb_converter(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder)
-
-// data-inverted 5-5-5 formats
-#define PALETTE_FORMAT_xRRRRRBBBBBGGGGG_inverted raw_to_rgb_converter(2, &raw_to_rgb_converter::inverted_rgb_decoder<5,5,5, 10,0,5>)
-
-// standard 5-6-5 formats
-#define PALETTE_FORMAT_RRRRRGGGGGGBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,6,5, 11,5,0>)
-#define PALETTE_FORMAT_BBBBBGGGGGGRRRRR raw_to_rgb_converter(2, &raw_to_rgb_converter::standard_rgb_decoder<5,6,5, 0,5,11>)
-
-// standard 5-5-5-1 formats
-#define PALETTE_FORMAT_IRRRRRGGGGGBBBBB raw_to_rgb_converter(2, &raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder)
-
-// standard 8-8-8 formats
-#define PALETTE_FORMAT_XRGB raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,8,0>)
-#define PALETTE_FORMAT_XBGR raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 0,8,16>)
-#define PALETTE_FORMAT_XBRG raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 8,0,16>)
-#define PALETTE_FORMAT_XGRB raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 8,16,0>)
-#define PALETTE_FORMAT_RGBX raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 24,16,8>)
-#define PALETTE_FORMAT_GRBX raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 16,24,8>)
-#define PALETTE_FORMAT_BGRX raw_to_rgb_converter(4, &raw_to_rgb_converter::standard_rgb_decoder<8,8,8, 8,16,24>)
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
@@ -175,106 +110,12 @@
 
 #define MCFG_PALETTE_ADD(_tag, _entries) \
 	MCFG_DEVICE_ADD(_tag, PALETTE, 0) \
-	MCFG_PALETTE_ENTRIES(_entries)
-#define MCFG_PALETTE_ADD_INIT_BLACK(_tag, _entries) \
-	MCFG_PALETTE_ADD(_tag, _entries) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_all_black), downcast<palette_device *>(device)));
+	downcast<palette_device &>(*device).set_entries(_entries);
 
-#define MCFG_PALETTE_MODIFY MCFG_DEVICE_MODIFY
-
-
-#define MCFG_PALETTE_INIT_OWNER(_class, _method) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, this));
-#define MCFG_PALETTE_INIT_DEVICE(_tag, _class, _method) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, _tag));
 
 #define MCFG_PALETTE_FORMAT(_format) \
 	downcast<palette_device &>(*device).set_format(PALETTE_FORMAT_##_format);
 
-#define MCFG_PALETTE_FORMAT_CLASS(_bytes_per_entry, _class, _method) \
-	downcast<palette_device &>(*device).set_format(raw_to_rgb_converter(_bytes_per_entry, &_class::PALETTE_DECODER_NAME(_method)));
-
-#define MCFG_PALETTE_MEMBITS(_width) \
-	downcast<palette_device &>(*device).set_membits(_width);
-
-#define MCFG_PALETTE_ENDIANNESS(_endianness) \
-	downcast<palette_device &>(*device).set_endianness(_endianness);
-
-#define MCFG_PALETTE_ENTRIES(_entries) \
-	downcast<palette_device &>(*device).set_entries(_entries);
-
-#define MCFG_PALETTE_INDIRECT_ENTRIES(_entries) \
-	downcast<palette_device &>(*device).set_indirect_entries(_entries);
-
-#define MCFG_PALETTE_ENABLE_SHADOWS() \
-	downcast<palette_device &>(*device).enable_shadows();
-
-#define MCFG_PALETTE_ENABLE_HILIGHTS() \
-	downcast<palette_device &>(*device).enable_hilights();
-
-
-// monochrome palettes
-#define MCFG_PALETTE_ADD_MONOCHROME(_tag) \
-	MCFG_PALETTE_ADD(_tag, 2) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_monochrome), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_MONOCHROME_INVERTED(_tag) \
-	MCFG_PALETTE_ADD(_tag, 2) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(_tag) \
-	MCFG_PALETTE_ADD(_tag, 3) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), downcast<palette_device *>(device)));
-
-// 8-bit palettes
-#define MCFG_PALETTE_ADD_3BIT_RGB(_tag) \
-	MCFG_PALETTE_ADD(_tag, 8) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_rgb), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_3BIT_RBG(_tag) \
-	MCFG_PALETTE_ADD(_tag, 8) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_rbg), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_3BIT_BRG(_tag) \
-	MCFG_PALETTE_ADD(_tag, 8) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_brg), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_3BIT_GRB(_tag) \
-	MCFG_PALETTE_ADD(_tag, 8) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_grb), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_3BIT_GBR(_tag) \
-	MCFG_PALETTE_ADD(_tag, 8) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_gbr), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_3BIT_BGR(_tag) \
-	MCFG_PALETTE_ADD(_tag, 8) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_3bit_bgr), downcast<palette_device *>(device)));
-
-// 15-bit palettes
-#define MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB(_tag) \
-	MCFG_PALETTE_ADD(_tag, 32768) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB), downcast<palette_device *>(device)));
-
-// 16-bit palettes
-#define MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR(_tag) \
-	MCFG_PALETTE_ADD(_tag, 32768) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_BBBBBGGGGGRRRRR), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB(_tag) \
-	MCFG_PALETTE_ADD(_tag, 65536) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB), downcast<palette_device *>(device)));
-
-#define MCFG_PALETTE_ADD_BBBBBGGGGGGRRRRR(_tag) \
-	MCFG_PALETTE_ADD(_tag, 65536) \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_BBBBBGGGGGGRRRRR), downcast<palette_device *>(device)));
-
-
-// other standard palettes
-#define MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS(_tag, _region, _entries) \
-	MCFG_PALETTE_ADD(_tag, _entries) \
-	downcast<palette_device &>(*device).set_prom_region(_region); \
-	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms), downcast<palette_device *>(device)));
 
 // not implemented yet
 #if 0
@@ -289,6 +130,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class palette_device;
 typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
 
@@ -296,14 +138,16 @@ typedef device_delegate<void (palette_device &)> palette_init_delegate;
 
 class raw_to_rgb_converter
 {
+public:
 	// helper function
 	typedef rgb_t (*raw_to_rgb_func)(u32 raw);
 
-public:
 	// constructor
-	raw_to_rgb_converter(int bytes_per_entry = 0, raw_to_rgb_func func = nullptr)
-		: m_bytes_per_entry(bytes_per_entry),
-			m_func(func) { }
+	raw_to_rgb_converter() { }
+	raw_to_rgb_converter(int bytes_per_entry, raw_to_rgb_func func)
+		: m_bytes_per_entry(bytes_per_entry)
+		, m_func(func)
+	{ }
 
 	// getters
 	int bytes_per_entry() const { return m_bytes_per_entry; }
@@ -312,7 +156,7 @@ public:
 	rgb_t operator()(u32 raw) const { return (*m_func)(raw); }
 
 	// generic raw-to-RGB conversion helpers
-	template<int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
+	template <int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t standard_rgb_decoder(u32 raw)
 	{
 		u8 const r = palexpand<RedBits>(raw >> RedShift);
@@ -322,7 +166,7 @@ public:
 	}
 
 	// data-inverted generic raw-to-RGB conversion helpers
-	template<int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
+	template <int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t inverted_rgb_decoder(u32 raw)
 	{
 		u8 const r = palexpand<RedBits>(~raw >> RedShift);
@@ -331,7 +175,7 @@ public:
 		return rgb_t(r, g, b);
 	}
 
-	template<int IntBits, int RedBits, int GreenBits, int BlueBits, int IntShift, int RedShift, int GreenShift, int BlueShift>
+	template <int IntBits, int RedBits, int GreenBits, int BlueBits, int IntShift, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t standard_irgb_decoder(u32 raw)
 	{
 		u8 const i = palexpand<IntBits>(raw >> IntShift);
@@ -347,11 +191,10 @@ public:
 	static rgb_t xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw);  // bits 14/13/12 are LSb
 	static rgb_t xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw);  // bits 14/13/12 are MSb
 
-
 private:
 	// internal data
-	int                 m_bytes_per_entry;
-	raw_to_rgb_func     m_func;
+	int                 m_bytes_per_entry = 0;
+	raw_to_rgb_func     m_func = nullptr;
 };
 
 
@@ -363,19 +206,189 @@ DECLARE_DEVICE_TYPE(PALETTE, palette_device)
 class palette_device : public device_t, public device_palette_interface
 {
 public:
+	typedef device_delegate<void (palette_device &)> init_delegate;
+
+	// black-fill on start
+	enum black_t        { BLACK };
+
+	// monochrome
+	enum mono_t         { MONOCHROME };
+	enum mono_inv_t     { MONOCHROME_INVERTED };
+	enum mono_hi_t      { MONOCHROME_HIGHLIGHT };
+
+	// 3-bit (8-colour) - components here are LSB to MSB
+	enum rgb_3b_t       { RGB_3BIT };
+	enum rbg_3b_t       { RBG_3BIT };
+	enum grb_3b_t       { GRB_3BIT };
+	enum gbr_3b_t       { GBR_3BIT };
+	enum brg_3b_t       { BRG_3BIT };
+	enum bgr_3b_t       { BGR_3BIT };
+
+	// 8-bit
+	enum rgb_332_t      { RGB_332, RRRGGGBB };
+	enum bgr_233_t      { BGR_233, BBGGGRRR };
+	enum rgb_332_inv_t  { RGB_332_inverted, RRRGGGBB_inverted };
+	enum bgr_233_inv_t  { BGR_233_inverted, BBGGGRRR_inverted };
+
+	// 15-bit
+	enum rgb_555_t      { RGB_555, RRRRRGGGGGBBBBB };
+	enum grb_555_t      { GRB_555, GGGGGRRRRRBBBBB };
+	enum bgr_555_t      { BGR_555, BBBBBGGGGGRRRRR };
+
+	// 16-bit
+	enum xrgb_333_t     { xRGB_333, xxxxxxxRRRGGGBBB };
+	enum xrbg_333_t     { xRBG_333, xxxxxxxRRRBBBGGG };
+	enum xbgr_333_t     { xBGR_333, xxxxxxxBBBGGGRRR };
+	enum xrgb_444_t     { xRGB_444, xxxxRRRRGGGGBBBB };
+	enum xrbg_444_t     { xRBG_444, xxxxRRRRBBBBGGGG };
+	enum xbrg_444_t     { xBRG_444, xxxxBBBBRRRRGGGG };
+	enum xbgr_444_t     { xBGR_444, xxxxBBBBGGGGRRRR };
+	enum rgbx_444_t     { RGBx_444, RRRRGGGGBBBBxxxx };
+	enum gbrx_444_t     { GBRx_444, GGGGBBBBRRRRxxxx };
+	enum irgb_4444_t    { IRGB_4444, IIIIRRRRGGGGBBBB };
+	enum rgbi_4444_t    { RGBI_4444, RRRRGGGGBBBBIIII };
+	enum xrgb_555_t     { xRGB_555, xRRRRRGGGGGBBBBB };
+	enum xgrb_555_t     { xGRB_555, xGGGGGRRRRRBBBBB };
+	enum xgbr_555_t     { xGBR_555, xGGGGGBBBBBRRRRR };
+	enum xbrg_555_t     { xBRG_555, xBBBBBRRRRRGGGGG };
+	enum xbgr_555_t     { xBGR_555, xBBBBBGGGGGRRRRR };
+	enum rgbx_555_t     { RGBx_555, RRRRRGGGGGBBBBBx };
+	enum grbx_555_t     { GRBx_555, GGGGGRRRRRBBBBBx };
+	enum brgx_555_t     { BRGx_555, BBBBBRRRRRGGGGGx };
+	enum xrbg_inv_t     { xRBG_555_inverted, xRRRRRBBBBBGGGGG_inverted };
+	enum irgb_1555_t    { IRGB_1555, IRRRRRGGGGGBBBBB };
+	enum rgb_565_t      { RGB_565, RRRRRGGGGGGBBBBB };
+	enum bgr_565_t      { BGR_565, BBBBBGGGGGGBBBBB };
+
+	// 32-bit
+	enum xrgb_888_t     { xRGB_888 };
+	enum xgrb_888_t     { xGRB_888 };
+	enum xbrg_888_t     { xBRG_888 };
+	enum xbgr_888_t     { xBGR_888 };
+	enum rgbx_888_t     { RGBx_888 };
+	enum grbx_888_t     { GRBx_888 };
+	enum bgrx_888_t     { BGRx_888 };
+
+	// other standard formats
+	enum rgb_444_prom_t { RGB_444_PROMS, RRRRGGGGBBBB_PROMS };
+
+	// exotic formats
+	enum rrrrggggbbbbrgbx_t { RRRRGGGGBBBBRGBx };
+
 	// construction/destruction
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, init_delegate &&init, u32 entries = 0U, u32 indirect = 0U);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, black_t, u32 entries = 0U);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_inv_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_hi_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_3b_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rbg_3b_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_3b_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, gbr_3b_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, brg_3b_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_3b_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_555_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_555_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_565_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_565_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	template <typename T>
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_444_prom_t, T &&region, u32 entries)
+		: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_444_proms), tag, this), entries)
+	{
+		set_prom_region(std::forward<T>(region));
+	}
+
+	// FIXME: these should be aware of current device for resolving the tag
+	template <class FunctionClass>
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, void (FunctionClass::*init)(palette_device &), const char *name, u32 entries = 0U, u32 indirect = 0U)
+		: palette_device(mconfig, tag, owner, init_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr)), entries, indirect)
+	{ }
+	template <class FunctionClass>
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, void (FunctionClass::*init)(palette_device &) const, const char *name, u32 entries = 0U, u32 indirect = 0U)
+		: palette_device(mconfig, tag, owner, init_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr)), entries, indirect)
+	{ }
+	template <class FunctionClass>
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *devname, void (FunctionClass::*init)(palette_device &), const char *name, u32 entries = 0U, u32 indirect = 0U)
+		: palette_device(mconfig, tag, owner, init_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr)), entries, indirect)
+	{ }
+	template <class FunctionClass>
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *devname, void (FunctionClass::*init)(palette_device &) const, const char *name, u32 entries = 0U, u32 indirect = 0U)
+		: palette_device(mconfig, tag, owner, init_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr)), entries, indirect)
+	{ }
 
 	// configuration
 	template <typename Object> void set_init(Object &&init) { m_init = std::forward<Object>(init); }
-	void set_format(raw_to_rgb_converter raw_to_rgb) { m_raw_to_rgb = raw_to_rgb; }
-	void set_membits(int membits) { m_membits = membits; m_membits_supplied = true; }
-	void set_endianness(endianness_t endianness) { m_endianness = endianness; m_endianness_supplied = true; }
-	void set_entries(u32 entries) { m_entries = entries; }
-	void set_indirect_entries(u32 entries) { m_indirect_entries = entries; }
-	void enable_shadows() { m_enable_shadows = true; }
-	void enable_hilights() { m_enable_hilights = true; }
-	void set_prom_region(const char *region) { m_prom_region.set_tag(region); }
+	palette_device &set_format(raw_to_rgb_converter raw_to_rgb) { m_raw_to_rgb = raw_to_rgb; return *this; }
+	palette_device &set_format(int bytes_per_entry, raw_to_rgb_converter::raw_to_rgb_func func, u32 entries);
+	palette_device &set_format(rgb_332_t, u32 entries);
+	palette_device &set_format(bgr_233_t, u32 entries);
+	palette_device &set_format(rgb_332_inv_t, u32 entries);
+	palette_device &set_format(bgr_233_inv_t, u32 entries);
+	palette_device &set_format(xrgb_333_t, u32 entries);
+	palette_device &set_format(xrbg_333_t, u32 entries);
+	palette_device &set_format(xbgr_333_t, u32 entries);
+	palette_device &set_format(xrgb_444_t, u32 entries);
+	palette_device &set_format(xrbg_444_t, u32 entries);
+	palette_device &set_format(xbrg_444_t, u32 entries);
+	palette_device &set_format(xbgr_444_t, u32 entries);
+	palette_device &set_format(rgbx_444_t, u32 entries);
+	palette_device &set_format(gbrx_444_t, u32 entries);
+	palette_device &set_format(irgb_4444_t, u32 entries);
+	palette_device &set_format(rgbi_4444_t, u32 entries);
+	palette_device &set_format(xrgb_555_t, u32 entries);
+	palette_device &set_format(xgrb_555_t, u32 entries);
+	palette_device &set_format(xgbr_555_t, u32 entries);
+	palette_device &set_format(xbrg_555_t, u32 entries);
+	palette_device &set_format(xbgr_555_t, u32 entries);
+	palette_device &set_format(rgbx_555_t, u32 entries);
+	palette_device &set_format(grbx_555_t, u32 entries);
+	palette_device &set_format(brgx_555_t, u32 entries);
+	palette_device &set_format(xrbg_inv_t, u32 entries);
+	palette_device &set_format(irgb_1555_t, u32 entries);
+	palette_device &set_format(rgb_565_t, u32 entries);
+	palette_device &set_format(bgr_565_t, u32 entries);
+	palette_device &set_format(xrgb_888_t, u32 entries);
+	palette_device &set_format(xgrb_888_t, u32 entries);
+	palette_device &set_format(xbrg_888_t, u32 entries);
+	palette_device &set_format(xbgr_888_t, u32 entries);
+	palette_device &set_format(rgbx_888_t, u32 entries);
+	palette_device &set_format(grbx_888_t, u32 entries);
+	palette_device &set_format(bgrx_888_t, u32 entries);
+	palette_device &set_format(rrrrggggbbbbrgbx_t, u32 entries);
+	template <typename T> palette_device &set_format(T x, u32 entries, u32 indirect) { set_format(x, entries); set_indirect_entries(indirect); return *this; }
+	palette_device &set_membits(int membits) { m_membits = membits; m_membits_supplied = true; return *this; }
+	palette_device &set_endianness(endianness_t endianness) { m_endianness = endianness; m_endianness_supplied = true; return *this; }
+	palette_device &set_entries(u32 entries) { m_entries = entries; return *this; }
+	palette_device &set_entries(u32 entries, u32 indirect) { m_entries = entries; m_indirect_entries = indirect; return *this; }
+	palette_device &set_indirect_entries(u32 entries) { m_indirect_entries = entries; return *this; }
+	palette_device &enable_shadows() { m_enable_shadows = true; return *this; }
+	palette_device &enable_hilights() { m_enable_hilights = true; return *this; }
+	template <typename T> palette_device &set_prom_region(T &&region) { m_prom_region.set_tag(std::forward<T>(region)); return *this; }
+
+	// FIXME: these should be aware of current device for resolving the tag
+	template <class FunctionClass>
+	void set_init(void (FunctionClass::*init)(palette_device &), const char *name)
+	{
+		m_init = init_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_init(void (FunctionClass::*init)(palette_device &) const, const char *name)
+	{
+		m_init = init_delegate(init, name, nullptr, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_init(const char *devname, void (FunctionClass::*init)(palette_device &), const char *name)
+	{
+		m_init = init_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
+	template <class FunctionClass>
+	void set_init(const char *devname, void (FunctionClass::*init)(palette_device &) const, const char *name)
+	{
+		m_init = init_delegate(init, name, devname, static_cast<FunctionClass *>(nullptr));
+	}
 
 	// palette RAM accessors
 	memory_array &basemem() { return m_paletteram; }
@@ -392,32 +405,17 @@ public:
 
 	// generic read/write handlers
 	DECLARE_READ8_MEMBER(read8);
+	DECLARE_READ8_MEMBER(read8_ext);
 	DECLARE_WRITE8_MEMBER(write8);
 	DECLARE_WRITE8_MEMBER(write8_ext);
 	DECLARE_WRITE8_MEMBER(write_indirect);
 	DECLARE_WRITE8_MEMBER(write_indirect_ext);
 	DECLARE_READ16_MEMBER(read16);
+	DECLARE_READ16_MEMBER(read16_ext);
 	DECLARE_WRITE16_MEMBER(write16);
 	DECLARE_WRITE16_MEMBER(write16_ext);
 	DECLARE_READ32_MEMBER(read32);
 	DECLARE_WRITE32_MEMBER(write32);
-
-	// generic palette init routines
-	void palette_init_all_black(palette_device &palette);
-	void palette_init_monochrome(palette_device &palette);
-	void palette_init_monochrome_inverted(palette_device &palette);
-	void palette_init_monochrome_highlight(palette_device &palette);
-	void palette_init_3bit_rgb(palette_device &palette);
-	void palette_init_3bit_rbg(palette_device &palette);
-	void palette_init_3bit_brg(palette_device &palette);
-	void palette_init_3bit_grb(palette_device &palette);
-	void palette_init_3bit_gbr(palette_device &palette);
-	void palette_init_3bit_bgr(palette_device &palette);
-	void palette_init_RRRRGGGGBBBB_proms(palette_device &palette);
-	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);
-	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);
-	void palette_init_RRRRRGGGGGGBBBBB(palette_device &palette);
-	void palette_init_BBBBBGGGGGGRRRRR(palette_device &palette);
 
 	// helper to update palette when data changed
 	void update() { if (!m_init.isnull()) m_init(*this); }
@@ -432,6 +430,24 @@ protected:
 	virtual bool palette_shadows_enabled() const override { return m_enable_shadows; }
 	virtual bool palette_hilights_enabled() const override { return m_enable_hilights; }
 
+	// generic palette init routines
+	void palette_init_all_black(palette_device &palette);
+	void palette_init_monochrome(palette_device &palette);
+	void palette_init_monochrome_inverted(palette_device &palette);
+	void palette_init_monochrome_highlight(palette_device &palette);
+	void palette_init_3bit_rgb(palette_device &palette);
+	void palette_init_3bit_rbg(palette_device &palette);
+	void palette_init_3bit_brg(palette_device &palette);
+	void palette_init_3bit_grb(palette_device &palette);
+	void palette_init_3bit_gbr(palette_device &palette);
+	void palette_init_3bit_bgr(palette_device &palette);
+	void palette_init_rgb_444_proms(palette_device &palette);
+	void palette_init_rgb_555(palette_device &palette);
+	void palette_init_grb_555(palette_device &palette);
+	void palette_init_bgr_555(palette_device &palette);
+	void palette_init_rgb_565(palette_device &palette);
+	void palette_init_bgr_565(palette_device &palette);
+
 private:
 	void update_for_write(offs_t byte_offset, int bytes_modified, bool indirect = false);
 
@@ -445,7 +461,7 @@ private:
 	endianness_t        m_endianness;           // endianness of palette RAM, if different from native
 	bool                m_endianness_supplied;  // true if endianness forced in static config
 	optional_memory_region m_prom_region;       // region where the color PROMs are
-	palette_init_delegate m_init;
+	init_delegate       m_init;
 
 	// palette RAM
 	raw_to_rgb_converter m_raw_to_rgb;          // format of palette RAM

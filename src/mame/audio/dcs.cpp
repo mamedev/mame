@@ -258,7 +258,8 @@ enum
 
 #define DENV_DM_PG      ((m_dsio.reg[2] >> 0) & 0x1fff)
 
-#define DENV_BANK_END 0x3ff
+#define DENV_NUM_BANK 0x800
+
 
 /*************************************
  *
@@ -277,26 +278,26 @@ void dcs_audio_device::dcs_2k_program_map(address_map &map)
 
 void dcs_audio_device::dcs_2k_data_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x1800).rw(this, FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
+	map(0x0000, 0x07ff).mirror(0x1800).rw(FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
 	map(0x2000, 0x2fff).bankr("databank");
-	map(0x3000, 0x33ff).w(this, FUNC(dcs_audio_device::dcs_data_bank_select_w));
-	map(0x3400, 0x37ff).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
+	map(0x3000, 0x33ff).w(FUNC(dcs_audio_device::dcs_data_bank_select_w));
+	map(0x3400, 0x37ff).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
 	map(0x3800, 0x39ff).ram();
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 
 /* DCS 2k with UART memory map */
 void dcs_audio_device::dcs_2k_uart_data_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x1800).rw(this, FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
+	map(0x0000, 0x07ff).mirror(0x1800).rw(FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
 	map(0x2000, 0x2fff).bankr("databank");
-	map(0x3000, 0x33ff).w(this, FUNC(dcs_audio_device::dcs_data_bank_select_w));
+	map(0x3000, 0x33ff).w(FUNC(dcs_audio_device::dcs_data_bank_select_w));
 	map(0x3400, 0x3402).noprw();                             /* UART (ignored) */
-	map(0x3403, 0x3403).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
+	map(0x3403, 0x3403).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w));
 	map(0x3404, 0x3405).noprw();                             /* UART (ignored) */
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 
@@ -305,18 +306,18 @@ void dcs_audio_device::dcs_8k_program_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("dcsint");
 	map(0x0800, 0x1fff).ram().share("dcsext");
-	map(0x3000, 0x3003).rw(this, FUNC(dcs_audio_device::input_latch32_r), FUNC(dcs_audio_device::output_latch32_w)); // why?
+	map(0x3000, 0x3003).rw(FUNC(dcs_audio_device::input_latch32_r), FUNC(dcs_audio_device::output_latch32_w)); // why?
 }
 
 void dcs_audio_device::dcs_8k_data_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x1fff).rw(this, FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
+	map(0x0800, 0x1fff).rw(FUNC(dcs_audio_device::dcs_dataram_r), FUNC(dcs_audio_device::dcs_dataram_w));
 	map(0x2000, 0x2fff).bankr("databank");
-	map(0x3000, 0x3000).w(this, FUNC(dcs_audio_device::dcs_data_bank_select_w));
-	map(0x3400, 0x3403).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w)); // mk3 etc. need this
+	map(0x3000, 0x3000).w(FUNC(dcs_audio_device::dcs_data_bank_select_w));
+	map(0x3400, 0x3403).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::output_latch_w)); // mk3 etc. need this
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 /* Williams WPC DCS/Security Pinball */
@@ -329,12 +330,12 @@ void dcs_audio_device::dcs_wpc_program_map(address_map &map)
 void dcs_audio_wpc_device::dcs_wpc_data_map(address_map &map)
 {
 	map(0x0000, 0x07ff).bankr("databank");
-	map(0x1000, 0x2fff).rw(this, FUNC(dcs_audio_wpc_device::dcs_dataram_r), FUNC(dcs_audio_wpc_device::dcs_dataram_w));
-	map(0x3000, 0x3000).w(this, FUNC(dcs_audio_wpc_device::dcs_data_bank_select_w));
-	map(0x3100, 0x3100).w(this, FUNC(dcs_audio_wpc_device::dcs_data_bank_select2_w));
-	map(0x3300, 0x3303).rw(this, FUNC(dcs_audio_wpc_device::input_latch_r), FUNC(dcs_audio_wpc_device::output_latch_w));
+	map(0x1000, 0x2fff).rw(FUNC(dcs_audio_wpc_device::dcs_dataram_r), FUNC(dcs_audio_wpc_device::dcs_dataram_w));
+	map(0x3000, 0x3000).w(FUNC(dcs_audio_wpc_device::dcs_data_bank_select_w));
+	map(0x3100, 0x3100).w(FUNC(dcs_audio_wpc_device::dcs_data_bank_select2_w));
+	map(0x3300, 0x3303).rw(FUNC(dcs_audio_wpc_device::input_latch_r), FUNC(dcs_audio_wpc_device::output_latch_w));
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_wpc_device::adsp_control_r), FUNC(dcs_audio_wpc_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_wpc_device::adsp_control_r), FUNC(dcs_audio_wpc_device::adsp_control_w));
 }
 
 /*************************************
@@ -359,27 +360,27 @@ void dcs_audio_device::dcs2_2104_program_map(address_map &map)
 void dcs_audio_device::dcs2_2115_data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0400, 0x0400).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
-	map(0x0401, 0x0401).w(this, FUNC(dcs_audio_device::output_latch_w));
-	map(0x0402, 0x0402).rw(this, FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
-	map(0x0403, 0x0403).r(this, FUNC(dcs_audio_device::latch_status_r));
-	map(0x0404, 0x0407).r(this, FUNC(dcs_audio_device::fifo_input_r));
-	map(0x0480, 0x0483).rw(this, FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).w(FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 void dcs_audio_device::dcs2_2104_data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0400, 0x0400).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
-	map(0x0401, 0x0401).w(this, FUNC(dcs_audio_device::output_latch_w));
-	map(0x0402, 0x0402).rw(this, FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
-	map(0x0403, 0x0403).r(this, FUNC(dcs_audio_device::latch_status_r));
-	map(0x0404, 0x0407).r(this, FUNC(dcs_audio_device::fifo_input_r));
-	map(0x0480, 0x0483).rw(this, FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).w(FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
 	map(0x3800, 0x39ff).ram().share("iram");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 
@@ -402,7 +403,7 @@ void dcs_audio_device::dsio_data_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).m("data_map_bank", FUNC(address_map_bank_device::amap16));
 	map(0x2000, 0x3fdf).ram().share("dcsint_data");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 void dcs_audio_device::dsio_rambank_map(address_map &map)
@@ -414,12 +415,12 @@ void dcs_audio_device::dsio_rambank_map(address_map &map)
 void dcs_audio_device::dsio_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0400, 0x0400).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
-	map(0x0401, 0x0401).w(this, FUNC(dcs_audio_device::output_latch_w));
-	map(0x0402, 0x0402).rw(this, FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
-	map(0x0403, 0x0403).r(this, FUNC(dcs_audio_device::latch_status_r));
-	map(0x0404, 0x0407).r(this, FUNC(dcs_audio_device::fifo_input_r));
-	map(0x0480, 0x0483).rw(this, FUNC(dcs_audio_device::dsio_r), FUNC(dcs_audio_device::dsio_w));
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).w(FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::dsio_r), FUNC(dcs_audio_device::dsio_w));
 }
 
 
@@ -442,25 +443,25 @@ void dcs_audio_device::denver_data_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).m("data_map_bank", FUNC(address_map_bank_device::amap16));
 	map(0x2000, 0x3fdf).ram().share("dcsint_data");
-	map(0x3fe0, 0x3fff).rw(this, FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
 void dcs_audio_device::denver_rambank_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).bankrw("databank");
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0x7fff).bankrw("databank");
 }
 
 
 void dcs_audio_device::denver_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0400, 0x0400).rw(this, FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
-	map(0x0401, 0x0401).w(this, FUNC(dcs_audio_device::output_latch_w));
-	map(0x0402, 0x0402).rw(this, FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
-	map(0x0403, 0x0403).r(this, FUNC(dcs_audio_device::latch_status_r));
-	map(0x0404, 0x0407).r(this, FUNC(dcs_audio_device::fifo_input_r));
-	map(0x0480, 0x0483).rw(this, FUNC(dcs_audio_device::denver_r), FUNC(dcs_audio_device::denver_w));
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).w(FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::denver_r), FUNC(dcs_audio_device::denver_w));
 }
 
 
@@ -591,6 +592,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 	dcs_boot();
 
 	/* reset timers */
+	m_timer_ignore = false;
 	m_timer_enable = 0;
 	m_timer_scale = 1;
 	m_internal_timer->reset();
@@ -727,7 +729,8 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_external_program_ram(nullptr),
 	m_internal_data_ram(nullptr),
 	m_dram_in_mb(0),
-	m_iram(*this, "iram")
+	m_iram(*this, "iram"),
+	m_maincpu(*this, ":maincpu")
 {
 	m_dmadac[0] = m_dmadac[1] = m_dmadac[2] = m_dmadac[3] = m_dmadac[4] = m_dmadac[5] = nullptr;
 	memset(m_control_regs, 0, sizeof(m_control_regs));
@@ -829,7 +832,7 @@ void dcs2_audio_device::device_start()
 	{
 		m_cpu = subdevice<adsp21xx_device>("denver");
 		m_rev = REV_DENV;
-		soundbank_words = DENV_BANK_END + 1;
+		soundbank_words = ((m_dram_in_mb << 20) / 2) / DENV_NUM_BANK;
 	}
 	if (m_cpu != nullptr && !m_cpu->started())
 		throw device_missing_dependencies();
@@ -1263,6 +1266,7 @@ void dcs_audio_device::denver_reset()
 	dmovlay_remap_memory();
 	dmadac_enable(&m_dmadac[0], m_channels, 0);
 	m_reg_timer->reset();
+	m_sport0_timer->reset();
 }
 
 void dcs_audio_device::denver_alloc_dmadac()
@@ -1291,7 +1295,8 @@ READ16_MEMBER( dcs_audio_device::denver_r )
 		// SDRC Revision
 		result = 0x0003;
 	}
-	if (LOG_DCS_IO) logerror("%s denver_r %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, result);
+	if (LOG_DCS_IO && offset != 0x2) logerror("%s denver_r %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, result);
+
 	return result;
 }
 
@@ -1325,6 +1330,11 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 				if (m_channels < 6)
 					dmadac_enable(&m_dmadac[m_channels], 6 - m_channels, false);
 			}
+			// Disable timer after DENV_RES_TFS
+			if (!m_timer_ignore && DENV_RES_TFS && DENV_MUTE) {
+				logerror("%s denver_w: Disabling timer\n", machine().describe_context());
+				m_timer_ignore = true;
+			}
 			break;
 
 		/* offset 2 controls RAM pages */
@@ -1338,7 +1348,7 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 				m_fifo_reset_w(1);
 			break;
 	}
-	if (LOG_DCS_IO) logerror("%s denver_w %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, data);
+	if (LOG_DCS_IO && offset != 0x2) logerror("%s denver_w %s 0x%x = %04x\n", machine().describe_context(), denver_regname[offset], offset, data);
 }
 
 
@@ -1351,12 +1361,11 @@ WRITE16_MEMBER( dcs_audio_device::denver_w )
 
 WRITE32_MEMBER( dcs_audio_device::dsio_idma_addr_w )
 {
-	dsio_state &dsio = m_dsio;
 	if (LOG_DCS_TRANSFERS)
 		logerror("%s IDMA_addr = %04X\n", machine().describe_context(), data);
 	downcast<adsp2181_device *>(m_cpu)->idma_addr_w(data);
 	if (data == 0)
-		dsio.start_on_next_write = 2;
+		m_dsio.start_on_next_write = 2;
 }
 
 
@@ -1364,7 +1373,8 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 {
 	dsio_state &dsio = m_dsio;
 	// IDMA is to internal memory only
-	m_ram_map->set_bank(0);
+	if (m_dmovlay_val)
+		m_ram_map->set_bank(0);
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS && !(downcast<adsp2181_device *>(m_cpu)->idma_addr_r() & 0x00ff))
@@ -1379,11 +1389,13 @@ WRITE32_MEMBER( dcs_audio_device::dsio_idma_data_w )
 	}
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
-		logerror("%08X: Starting DSIO CPU\n", machine().device<cpu_device>("maincpu")->pc());
+		logerror("%s: Starting DSIO CPU\n", machine().describe_context());
 		m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 	// Restore internal/external mapping
-	m_ram_map->set_bank(m_dmovlay_val);
+	if (m_dmovlay_val)
+		m_ram_map->set_bank(m_dmovlay_val);
+
 }
 
 
@@ -1554,6 +1566,7 @@ WRITE16_MEMBER( dcs_audio_device::input_latch_ack_w )
 		m_input_empty_cb(m_last_input_empty = 1);
 	SET_INPUT_EMPTY();
 	m_cpu->set_input_line(ADSP2105_IRQ2, CLEAR_LINE);
+
 	if (LOG_DCS_IO)
 		logerror("%s input_latch_ack_w\n", machine().describe_context());
 }
@@ -1563,6 +1576,7 @@ READ16_MEMBER( dcs_audio_device::input_latch_r )
 {
 	if (m_auto_ack)
 		input_latch_ack_w(space,0,0,0xffff);
+
 	if (LOG_DCS_IO)
 		logerror("%s input_latch_r(%04X)\n", machine().describe_context(), m_input_data);
 	return m_input_data;
@@ -1633,7 +1647,7 @@ uint16_t dcs_audio_device::data_r()
 {
 	// If the cpu is reading empty data it is probably polling so eat some cyles
 	if IS_OUTPUT_EMPTY()
-		machine().device<cpu_device>("maincpu")->eat_cycles(4444);
+		m_maincpu->eat_cycles(4444);
 
 	/* data is actually only 8 bit (read from d8-d15, which is d0-d7 from the data access instructions POV) on early dcs, but goes 16 on later (seattle) */
 	if (m_last_output_full && !m_output_full_cb.isnull())
@@ -1681,7 +1695,7 @@ READ16_MEMBER( dcs_audio_device::output_control_r )
 int dcs_audio_device::data2_r()
 {
 	if (LOG_DCS_IO)
-		logerror("%08X dcs:data2_r = %04X\n", machine().device<cpu_device>("maincpu")->pc(), m_output_control);
+		logerror("%s: dcs:data2_r = %04X\n", machine().describe_context(), m_output_control);
 
 	return m_output_control;
 }
@@ -1760,22 +1774,30 @@ void dcs_audio_device::reset_timer()
 	/* if that's all the timer does, we don't really need to fire */
 	if (!m_timer_ignore)
 	{
+		// Denver variants (mwskins and sf2049) use the timer as a scaler for another count so we can't disable here
+		// Denver gets disabled when reset TFS in the adsp control written
+		// Road Burners: Code gets moved after initial diagnostic checks
 		/* Road Burners: @ 28: JMP $0032  18032F, same code at $32 */
-
-		if (m_program->read_dword(0x18) == 0x0c0030 &&      /* ENA SEC_REG */
+		/* Road Burners: @ 28: JMP $0030  18030F, same code at $30 */
+		if (m_rev < REV_DSIO &&
+			m_program->read_dword(0x18) == 0x0c0030 &&      /* ENA SEC_REG */
 			m_program->read_dword(0x19) == 0x804828 &&      /* SI = DM($0482) */
 			m_program->read_dword(0x1a) == 0x904828 &&      /* DM($0482) = SI */
 			m_program->read_dword(0x1b) == 0x0C0020 &&      /* DIS SEC_REG */
 			m_program->read_dword(0x1c) == 0x0A001F)            /* RTI */
 		{
+			if (LOG_DCS_IO)
+				logerror("reset_timer: Disabled timer %llu\n", m_timer_start_cycles);
 			m_timer_ignore = true;
-		} else if (
-			// ADSP 2181 (DSIO and DENVER)
-			m_program->read_dword(0x28) == 0x18032F &&      /* JUMP $0032 */
-			m_program->read_dword(0x32) == 0x0c0030 &&      /* ENA SEC_REG */
-			m_program->read_dword(0x33) == 0x014828 &&      /* SI = IO($482) */
-			m_program->read_dword(0x34) == 0x01C828)        /* IO($482) = SI */
+		} else if (m_rev == REV_DSIO &&
+			m_program->read_dword(0x30) == 0x0c0030 &&      /* ENA SEC_REG */
+			m_program->read_dword(0x31) == 0x014828 &&      /* SI = IO($0482) */
+			m_program->read_dword(0x32) == 0x01c828 &&      /* IO($0482) = SI */
+			m_program->read_dword(0x33) == 0x0C0020 &&      /* DIS SEC_REG */
+			m_program->read_dword(0x34) == 0x0A001F)            /* RTI */
 		{
+			if (LOG_DCS_IO)
+				logerror("reset_timer: Disabled timer %llu\n", m_timer_start_cycles);
 			m_timer_ignore = true;
 		}
 	}
@@ -1792,7 +1814,6 @@ WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
 	{
 		//logerror("Timer enabled @ %d cycles/int, or %f Hz\n", m_timer_scale * (m_timer_period + 1), 1.0 / m_cpu->cycles_to_attotime(m_timer_scale * (m_timer_period + 1)).as_double());
 		m_timer_enable = state;
-		m_timer_ignore = false;
 		reset_timer();
 	}
 	else
@@ -1892,7 +1913,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 				if (data & 0x1000) {
 					// Start the SPORT0 timer
 					// SPORT0 is used as a 1kHz timer
-					m_sport0_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
+					m_sport0_timer->adjust(attotime::from_usec(10), 0, attotime::from_hz(1000));
 					if (LOG_DCS_IO)
 						logerror("adsp_control_w: Setting SPORT0 freqency to 1kHz\n");
 				}
@@ -1945,7 +1966,7 @@ WRITE16_MEMBER(dcs_audio_device:: adsp_control_w )
 
 		case IDMA_CONTROL_REG:
 			if (m_rev == REV_DSIO || m_rev == REV_DENV)
-				downcast<adsp2181_device *>(m_cpu)->idma_addr_w(data);
+				dsio_idma_addr_w(space, offset, data);
 			break;
 	}
 	if (LOG_DCS_IO)
@@ -1962,7 +1983,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 	/* get the index register */
 	int reg = m_cpu->state_int(ADSP2100_I0 + m_ireg);
 	if (LOG_DCS_IO)
-		logerror("dcs_irq: m_size: %x m_incs: %x m_channels: %d m_ireg_base: %x reg: %06x\n", m_size, m_incs, m_channels, m_ireg_base, reg);
+		logerror("dcs_irq: m_ireg: %x m_size: %x m_incs: %x m_channels: %d m_ireg_base: %x reg: %06x\n", m_ireg, m_size, m_incs, m_channels, m_ireg_base, reg);
 
 	/* copy the current data into the buffer */
 	{
@@ -2002,11 +2023,13 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 
 TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
 {
+
 	/* this latches internally, so we just pulse */
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
-	if ((m_cpu->total_cycles() - m_output_control_cycles) > 5)
+	uint64_t diff = m_cpu->total_cycles() - m_output_control_cycles;
+	if (diff > 5)
 	{
 		m_cpu->set_input_line(ADSP2115_SPORT0_RX, ASSERT_LINE);
 		m_cpu->set_input_line(ADSP2115_SPORT0_RX, CLEAR_LINE);
@@ -2031,10 +2054,10 @@ void dcs_audio_device::recompute_sample_rate()
 		sample_period = attotime::from_hz(31250);
 	}
 
-	dmadac_set_frequency(&m_dmadac[0], m_channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
+	dmadac_set_frequency(&m_dmadac[0], m_channels, sample_period.as_hz());
 	dmadac_enable(&m_dmadac[0], m_channels, 1);
 	if (LOG_DCS_IO)
-		logerror("recompute_sample_rate: Channels: %d Freq: %e Size: 0x%x m_incs: 0x%x\n", m_channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds()), m_size, m_incs);
+		logerror("recompute_sample_rate: Channels: %d Freq: %e Size: 0x%x m_incs: 0x%x\n", m_channels, sample_period.as_hz(), m_size, m_incs);
 
 	/* fire off a timer which will hit every half-buffer */
 	if (m_incs)
@@ -2110,7 +2133,7 @@ WRITE32_MEMBER(dcs_audio_device::sound_tx_callback)
 READ16_MEMBER( dcs_audio_device::dcs_polling_r )
 {
 	if (m_polling_count++ > 5)
-		space.device().execute().eat_cycles(10000);
+		space.device().execute().eat_cycles(2000);
 	return m_polling_value;
 }
 
@@ -2470,21 +2493,21 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 
-MACHINE_CONFIG_START(dcs_audio_device::add_mconfig_dcs )
-	MCFG_DEVICE_ADD("dcs", ADSP2105, XTAL(10'000'000))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(*this, dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
-	MCFG_DEVICE_PROGRAM_MAP(dcs_2k_program_map)
-	MCFG_DEVICE_DATA_MAP(dcs_2k_data_map)
+void dcs_audio_device::add_mconfig_dcs(machine_config &config)
+{
+	adsp2105_device &dcs(ADSP2105(config, "dcs", XTAL(10'000'000)));
+	dcs.sport_tx().set(FUNC(dcs_audio_device::sound_tx_callback)); /* callback for serial transmit */
+	dcs.timer_fired().set(FUNC(dcs_audio_device::timer_enable_callback)); /* callback for timer fired */
+	dcs.set_addrmap(AS_PROGRAM, &dcs_audio_device::dcs_2k_program_map);
+	dcs.set_addrmap(AS_DATA, &dcs_audio_device::dcs_2k_data_map);
 
-	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
+	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
+	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("dac", DMADAC) // AD-1851 16bit mono
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DMADAC(config, "dac").add_route(ALL_OUTPUTS, "mono", 1.0); // AD-1851 16bit mono
+}
 
 DEFINE_DEVICE_TYPE(DCS_AUDIO_2K, dcs_audio_2k_device, "dcs_audio_2k", "DCS Audio 2K")
 
@@ -2497,10 +2520,10 @@ dcs_audio_2k_device::dcs_audio_2k_device(const machine_config &mconfig, const ch
 {
 }
 
-MACHINE_CONFIG_START(dcs_audio_2k_device::device_add_mconfig)
-
+void dcs_audio_2k_device::device_add_mconfig(machine_config &config)
+{
 	dcs_audio_device::add_mconfig_dcs(config);
-MACHINE_CONFIG_END
+}
 
 DEFINE_DEVICE_TYPE(DCS_AUDIO_2K_UART, dcs_audio_2k_uart_device, "dcs_audio_2k_uart", "DCS Audio 2K UART")
 
@@ -2514,13 +2537,11 @@ dcs_audio_2k_uart_device::dcs_audio_2k_uart_device(const machine_config &mconfig
 }
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM, using a UART for communications (X-unit) */
-MACHINE_CONFIG_START(dcs_audio_2k_uart_device::device_add_mconfig)
-
+void dcs_audio_2k_uart_device::device_add_mconfig(machine_config &config)
+{
 	dcs_audio_device::add_mconfig_dcs(config);
-
-	MCFG_DEVICE_MODIFY("dcs")
-	MCFG_DEVICE_DATA_MAP(dcs_2k_uart_data_map)
-MACHINE_CONFIG_END
+	subdevice<adsp21xx_device>("dcs")->set_addrmap(AS_DATA, &dcs_audio_2k_uart_device::dcs_2k_uart_data_map);
+}
 
 DEFINE_DEVICE_TYPE(DCS_AUDIO_8K, dcs_audio_8k_device, "dcs_audio_8k", "DCS Audio 8K")
 
@@ -2534,14 +2555,12 @@ dcs_audio_8k_device::dcs_audio_8k_device(const machine_config &mconfig, const ch
 }
 
 /* Basic DCS system with ADSP-2105 and 8k of SRAM (Wolf-unit) */
-MACHINE_CONFIG_START(dcs_audio_8k_device::device_add_mconfig)
-
+void dcs_audio_8k_device::device_add_mconfig(machine_config &config)
+{
 	dcs_audio_device::add_mconfig_dcs(config);
-
-	MCFG_DEVICE_MODIFY("dcs")
-	MCFG_DEVICE_PROGRAM_MAP(dcs_8k_program_map)
-	MCFG_DEVICE_DATA_MAP(dcs_8k_data_map)
-MACHINE_CONFIG_END
+	subdevice<adsp21xx_device>("dcs")->set_addrmap(AS_PROGRAM, &dcs_audio_8k_device::dcs_8k_program_map);
+	subdevice<adsp21xx_device>("dcs")->set_addrmap(AS_DATA, &dcs_audio_8k_device::dcs_8k_data_map);
+}
 
 DEFINE_DEVICE_TYPE(DCS_AUDIO_WPC, dcs_audio_wpc_device, "dcs_audio_wpc", "DCS Audio WPC")
 
@@ -2554,14 +2573,12 @@ dcs_audio_wpc_device::dcs_audio_wpc_device(const machine_config &mconfig, const 
 {
 }
 
-MACHINE_CONFIG_START(dcs_audio_wpc_device::device_add_mconfig)
-
+void dcs_audio_wpc_device::device_add_mconfig(machine_config &config)
+{
 	dcs_audio_device::add_mconfig_dcs(config);
-
-	MCFG_DEVICE_MODIFY("dcs")
-	MCFG_DEVICE_PROGRAM_MAP(dcs_wpc_program_map)
-	MCFG_DEVICE_DATA_MAP(dcs_wpc_data_map)
-MACHINE_CONFIG_END
+	subdevice<adsp21xx_device>("dcs")->set_addrmap(AS_PROGRAM, &dcs_audio_wpc_device::dcs_wpc_program_map);
+	subdevice<adsp21xx_device>("dcs")->set_addrmap(AS_DATA, &dcs_audio_wpc_device::dcs_wpc_data_map);
+}
 
 
 //-------------------------------------------------
@@ -2573,27 +2590,25 @@ dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type 
 {
 }
 
-MACHINE_CONFIG_START(dcs2_audio_device::add_mconfig_dcs2 )
-	MCFG_DEVICE_ADD("dcs2", ADSP2115, XTAL(16'000'000))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(*this, dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
-	MCFG_DEVICE_PROGRAM_MAP(dcs2_2115_program_map)
-	MCFG_DEVICE_DATA_MAP(dcs2_2115_data_map)
+void dcs2_audio_device::add_mconfig_dcs2(machine_config &config)
+{
+	adsp2115_device &dcs2(ADSP2115(config, "dcs2", XTAL(16'000'000)));
+	dcs2.sport_tx().set(FUNC(dcs_audio_device::sound_tx_callback)); /* callback for serial transmit */
+	dcs2.timer_fired().set(FUNC(dcs_audio_device::timer_enable_callback)); /* callback for timer fired */
+	dcs2.set_addrmap(AS_PROGRAM, &dcs2_audio_device::dcs2_2115_program_map);
+	dcs2.set_addrmap(AS_DATA, &dcs2_audio_device::dcs2_2115_data_map);
 
-	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_sport0_timer", DEVICE_SELF, dcs_audio_device, sport0_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
-	MCFG_TIMER_DEVICE_ADD("dcs_hle_timer", DEVICE_SELF, dcs_audio_device, transfer_watchdog_callback)
+	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
+	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs_audio_device::sport0_irq));
+	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
+	TIMER(config, "dcs_hle_timer").configure_generic(FUNC(dcs_audio_device::transfer_watchdog_callback));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("dac1", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_DEVICE_ADD("dac2", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+}
 
 DEFINE_DEVICE_TYPE(DCS2_AUDIO_2115, dcs2_audio_2115_device, "dcs2_audio_2115", "DCS2 Audio 2115")
 
@@ -2606,11 +2621,10 @@ dcs2_audio_2115_device::dcs2_audio_2115_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_START(dcs2_audio_2115_device::device_add_mconfig)
-
+void dcs2_audio_2115_device::device_add_mconfig(machine_config &config)
+{
 	dcs2_audio_device::add_mconfig_dcs2(config);
-
-MACHINE_CONFIG_END
+}
 
 DEFINE_DEVICE_TYPE(DCS2_AUDIO_2104, dcs2_audio_2104_device, "dcs2_audio_2104", "DCS2 Audio 2104")
 
@@ -2624,16 +2638,16 @@ dcs2_audio_2104_device::dcs2_audio_2104_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_START(dcs2_audio_2104_device::device_add_mconfig)
-
+void dcs2_audio_2104_device::device_add_mconfig(machine_config &config)
+{
 	dcs2_audio_device::add_mconfig_dcs2(config);
 
-	MCFG_DEVICE_REPLACE("dcs2", ADSP2104, XTAL(16'000'000))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(*this, dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
-	MCFG_DEVICE_PROGRAM_MAP(dcs2_2104_program_map)
-	MCFG_DEVICE_DATA_MAP(dcs2_2104_data_map)
-MACHINE_CONFIG_END
+	adsp2104_device &dcs2(ADSP2104(config.replace(), "dcs2", XTAL(16'000'000)));
+	dcs2.sport_tx().set(FUNC(dcs_audio_device::sound_tx_callback)); /* callback for serial transmit */
+	dcs2.timer_fired().set(FUNC(dcs_audio_device::timer_enable_callback)); /* callback for timer fired */
+	dcs2.set_addrmap(AS_PROGRAM, &dcs2_audio_2104_device::dcs2_2104_program_map);
+	dcs2.set_addrmap(AS_DATA, &dcs2_audio_2104_device::dcs2_2104_data_map);
+}
 
 DEFINE_DEVICE_TYPE(DCS2_AUDIO_DSIO, dcs2_audio_dsio_device, "dcs2_audio_dsio", "DCS2 Audio DSIO")
 
@@ -2646,86 +2660,95 @@ dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, co
 {
 }
 
-MACHINE_CONFIG_START(dcs2_audio_dsio_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dsio", ADSP2181, XTAL(32'000'000))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(*this, dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
-	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(*this, dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
-	MCFG_DEVICE_PROGRAM_MAP(dsio_program_map)
-	MCFG_DEVICE_DATA_MAP(dsio_data_map)
-	MCFG_DEVICE_IO_MAP(dsio_io_map)
+void dcs2_audio_dsio_device::device_add_mconfig(machine_config &config)
+{
+	adsp2181_device &dsio(ADSP2181(config, "dsio", XTAL(32'000'000)));
+	dsio.sport_tx().set(FUNC(dcs_audio_device::sound_tx_callback)); /* callback for serial transmit */
+	dsio.timer_fired().set(FUNC(dcs_audio_device::timer_enable_callback)); /* callback for timer fired */
+	dsio.dmovlay().set(FUNC(dcs_audio_device::dmovlay_callback)); /* callback for adsp 2181 dmovlay instruction */
+	dsio.set_addrmap(AS_PROGRAM, &dcs2_audio_dsio_device::dsio_program_map);
+	dsio.set_addrmap(AS_DATA, &dcs2_audio_dsio_device::dsio_data_map);
+	dsio.set_addrmap(AS_IO, &dcs2_audio_dsio_device::dsio_io_map);
 
-	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(dsio_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_dsio_device::dsio_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 14, 0x2000);
 
-	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
-	MCFG_TIMER_DEVICE_ADD("dcs_sport0_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // roadburn needs this to pass harware test
+	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
+	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
+	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs_audio_device::sport0_irq)); // roadburn needs this to pass harware test
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("dac1", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+}
 
-	MCFG_DEVICE_ADD("dac2", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_CONFIG_END
-
-
-DEFINE_DEVICE_TYPE(DCS2_AUDIO_DENVER, dcs2_audio_denver_device, "dcs2_audio_denver", "DCS2 Audio Denver")
 
 //-------------------------------------------------
 //  dcs2_audio_denver_device - constructor
 //-------------------------------------------------
-
-dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	dcs2_audio_device(mconfig, DCS2_AUDIO_DENVER, tag, owner, clock)
+dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	dcs2_audio_device(mconfig, type, tag, owner, clock)
 {
 }
 
-MACHINE_CONFIG_START(dcs2_audio_denver_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("denver", ADSP2181, XTAL(33'333'000))
-	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(*this, dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
-	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(*this, dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
-	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(*this, dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
-	MCFG_DEVICE_PROGRAM_MAP(denver_program_map)
-	MCFG_DEVICE_DATA_MAP(denver_data_map)
-	MCFG_DEVICE_IO_MAP(denver_io_map)
+void dcs2_audio_denver_device::device_add_mconfig(machine_config &config)
+{
+	adsp2181_device &denver(ADSP2181(config, "denver", XTAL(33'333'000)));
+	denver.sport_tx().set(FUNC(dcs_audio_device::sound_tx_callback)); /* callback for serial transmit */
+	denver.timer_fired().set(FUNC(dcs_audio_device::timer_enable_callback)); /* callback for timer fired */
+	denver.dmovlay().set(FUNC(dcs_audio_device::dmovlay_callback)); /* callback for adsp 2181 dmovlay instruction */
+	denver.set_addrmap(AS_PROGRAM, &dcs2_audio_denver_device::denver_program_map);
+	denver.set_addrmap(AS_DATA, &dcs2_audio_denver_device::denver_data_map);
+	denver.set_addrmap(AS_IO, &dcs2_audio_denver_device::denver_io_map);
 
-	MCFG_DEVICE_ADD("data_map_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(denver_rambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "data_map_bank").set_map(&dcs2_audio_denver_device::denver_rambank_map).set_options(ENDIANNESS_LITTLE, 16, 15, 0x2000*2);
 
-	MCFG_TIMER_DEVICE_ADD("dcs_reg_timer", DEVICE_SELF, dcs_audio_device, dcs_irq)
-	MCFG_TIMER_DEVICE_ADD("dcs_int_timer", DEVICE_SELF, dcs_audio_device, internal_timer_callback)
-	MCFG_TIMER_DEVICE_ADD("dcs_sport0_timer", DEVICE_SELF, dcs_audio_device, sport0_irq) // Atlantis driver waits for sport0 rx interrupts
+	TIMER(config, "dcs_reg_timer").configure_generic(FUNC(dcs_audio_device::dcs_irq));
+	TIMER(config, "dcs_int_timer").configure_generic(FUNC(dcs_audio_device::internal_timer_callback));
+	TIMER(config, "dcs_sport0_timer").configure_generic(FUNC(dcs_audio_device::sport0_irq)); // Atlantis driver waits for sport0 rx interrupts
+}
+
+dcs2_audio_denver_5ch_device::dcs2_audio_denver_5ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dcs2_audio_denver_device(mconfig, DCS2_AUDIO_DENVER_5CH, tag, owner, clock)
+{
+}
+
+void dcs2_audio_denver_5ch_device::device_add_mconfig(machine_config &config)
+{
+	dcs2_audio_denver_device::device_add_mconfig(config);
+
+	SPEAKER(config, "flspeaker").front_left();
+	SPEAKER(config, "frspeaker").front_right();
+	SPEAKER(config, "rlspeaker").rear_left();
+	SPEAKER(config, "rrspeaker").rear_right();
+	SPEAKER(config, "subwoofer").subwoofer();
+
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "flspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "frspeaker", 1.0);
+	DMADAC(config, "dac3").add_route(ALL_OUTPUTS, "rlspeaker", 1.0);
+	DMADAC(config, "dac4").add_route(ALL_OUTPUTS, "rrspeaker", 1.0);
+	DMADAC(config, "dac5").add_route(ALL_OUTPUTS, "subwoofer", 1.0);
+	DMADAC(config, "dac6");
+	// Does not produce sound
+}
+
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_DENVER_5CH, dcs2_audio_denver_5ch_device, "dcs2_audio_denver_5ch", "DCS2 Audio Denver 5 Channel")
+
+dcs2_audio_denver_2ch_device::dcs2_audio_denver_2ch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dcs2_audio_denver_device(mconfig, DCS2_AUDIO_DENVER_2CH, tag, owner, clock)
+{
+}
+
+void dcs2_audio_denver_2ch_device::device_add_mconfig(machine_config &config)
+{
+	dcs2_audio_denver_device::device_add_mconfig(config);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("dac1", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+}
 
-	MCFG_DEVICE_ADD("dac2", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-	MCFG_DEVICE_ADD("dac3", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_DEVICE_ADD("dac4", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-
-	MCFG_DEVICE_ADD("dac5", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_DEVICE_ADD("dac6", DMADAC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_DENVER_2CH, dcs2_audio_denver_2ch_device, "dcs2_audio_denver_2ch", "DCS2 Audio Denver 2 Channel")

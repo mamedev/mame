@@ -30,7 +30,7 @@ void tms32082_mp_device::mp_internal_map(address_map &map)
 	map(0x00009000, 0x00009fff).ram().share("pp1_data1");
 	map(0x01000000, 0x01000fff).ram().share("pp0_param");
 	map(0x01001000, 0x01001fff).ram().share("pp1_param");
-	map(0x01010000, 0x010107ff).rw(this, FUNC(tms32082_mp_device::mp_param_r), FUNC(tms32082_mp_device::mp_param_w));
+	map(0x01010000, 0x010107ff).rw(FUNC(tms32082_mp_device::mp_param_r), FUNC(tms32082_mp_device::mp_param_w));
 }
 
 const uint32_t tms32082_mp_device::SHIFT_MASK[] =

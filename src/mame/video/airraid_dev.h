@@ -6,14 +6,11 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
 
 
 DECLARE_DEVICE_TYPE(AIRRAID_VIDEO, airraid_video_device)
-
-#define MCFG_AIRRAID_VIDEO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, AIRRAID_VIDEO, 0)
-
 
 class airraid_video_device :  public device_t
 /*  public device_video_interface */

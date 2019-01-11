@@ -52,6 +52,9 @@ public:
 		, m_mainsndbank(*this, "mainsndbank")
 		, m_dspsndbank(*this, "dspsndbank")
 		, m_config_io(*this, "CONFIG")
+		, m_joy(*this, "JOY%u", 0U)
+		, m_buttons(*this, "BUTTONS%u", 0U)
+		, m_system(*this, "SYSTEM")
 		, m_is_r3000(false)
 		, m_is_cojag(false)
 		, m_hacks_enabled(false)
@@ -75,6 +78,29 @@ public:
 	{
 	}
 
+	void cojag68k(machine_config &config);
+	void cojagr3k(machine_config &config);
+	void cojagr3k_rom(machine_config &config);
+	void jaguarcd(machine_config &config);
+	void jaguar(machine_config &config);
+
+	void init_jaguar();
+	void init_jaguarcd();
+	void init_area51mx();
+	void init_maxforce();
+	void init_freezeat();
+	void init_fishfren();
+	void init_a51mxr3k();
+	void init_area51();
+	void init_freezeat4();
+	void init_freezeat5();
+	void init_freezeat6();
+	void init_vcircle();
+	void init_freezeat3();
+	void init_freezeat2();
+	void init_area51a();
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<jaguargpu_cpu_device> m_gpu;
@@ -95,12 +121,15 @@ public:
 	optional_memory_region      m_romboard_region;
 	optional_shared_ptr<uint32_t> m_mainram;
 	optional_shared_ptr<uint32_t> m_mainram2;
-	
+
 	optional_memory_bank m_maingfxbank;
 	optional_memory_bank m_gpugfxbank;
 	optional_memory_bank m_mainsndbank;
 	optional_memory_bank m_dspsndbank;
 	optional_ioport m_config_io;
+	optional_ioport_array<8> m_joy;
+	optional_ioport_array<8> m_buttons;
+	optional_ioport m_system;
 
 	// configuration
 	bool m_is_r3000;
@@ -220,21 +249,6 @@ public:
 	DECLARE_WRITE16_MEMBER(butch_regs_w16);
 	DECLARE_READ32_MEMBER(butch_regs_r);
 	DECLARE_WRITE32_MEMBER(butch_regs_w);
-	void init_jaguar();
-	void init_jaguarcd();
-	void init_area51mx();
-	void init_maxforce();
-	void init_freezeat();
-	void init_fishfren();
-	void init_a51mxr3k();
-	void init_area51();
-	void init_freezeat4();
-	void init_freezeat5();
-	void init_freezeat6();
-	void init_vcircle();
-	void init_freezeat3();
-	void init_freezeat2();
-	void init_area51a();
 
 	// from audio/jaguar.c
 	DECLARE_READ16_MEMBER( jerry_regs_r );
@@ -260,11 +274,6 @@ public:
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
-	void cojag68k(machine_config &config);
-	void cojagr3k(machine_config &config);
-	void cojagr3k_rom(machine_config &config);
-	void jaguarcd(machine_config &config);
-	void jaguar(machine_config &config);
 	void dsp_map(address_map &map);
 	void dsp_rom_map(address_map &map);
 	void gpu_map(address_map &map);
@@ -278,7 +287,7 @@ public:
 	void m68020_map(address_map &map);
 	void r3000_map(address_map &map);
 	void r3000_rom_map(address_map &map);
-protected:
+
 	// timer IDs
 	enum
 	{

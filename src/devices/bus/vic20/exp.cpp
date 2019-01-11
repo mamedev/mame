@@ -201,6 +201,14 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 	}
 }
 
+void vic20_expansion_slot_device::add_passthrough(machine_config &config, const char *_tag)
+{
+	vic20_expansion_slot_device &slot(VIC20_EXPANSION_SLOT(config, _tag, DERIVED_CLOCK(1, 1), vic20_expansion_cards, nullptr));
+	slot.irq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::irq_w));
+	slot.nmi_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::nmi_w));
+	slot.res_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::res_w));
+}
+
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( vic20_expansion_cards )

@@ -21,14 +21,14 @@ DEFINE_DEVICE_TYPE(NCR5380N, ncr5380n_device, "ncr5380_new", "NCR 5380 SCSI (new
 
 void ncr5380n_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(this, FUNC(ncr5380n_device::scsidata_r), FUNC(ncr5380n_device::outdata_w));
-	map(0x1, 0x1).rw(this, FUNC(ncr5380n_device::icmd_r), FUNC(ncr5380n_device::icmd_w));
-	map(0x2, 0x2).rw(this, FUNC(ncr5380n_device::mode_r), FUNC(ncr5380n_device::mode_w));
-	map(0x3, 0x3).rw(this, FUNC(ncr5380n_device::command_r), FUNC(ncr5380n_device::command_w));
-	map(0x4, 0x4).rw(this, FUNC(ncr5380n_device::status_r), FUNC(ncr5380n_device::selenable_w));
-	map(0x5, 0x5).rw(this, FUNC(ncr5380n_device::busandstatus_r), FUNC(ncr5380n_device::startdmasend_w));
-	map(0x6, 0x6).rw(this, FUNC(ncr5380n_device::indata_r), FUNC(ncr5380n_device::startdmatargetrx_w));
-	map(0x7, 0x7).rw(this, FUNC(ncr5380n_device::resetparityirq_r), FUNC(ncr5380n_device::startdmainitrx_w));
+	map(0x0, 0x0).rw(FUNC(ncr5380n_device::scsidata_r), FUNC(ncr5380n_device::outdata_w));
+	map(0x1, 0x1).rw(FUNC(ncr5380n_device::icmd_r), FUNC(ncr5380n_device::icmd_w));
+	map(0x2, 0x2).rw(FUNC(ncr5380n_device::mode_r), FUNC(ncr5380n_device::mode_w));
+	map(0x3, 0x3).rw(FUNC(ncr5380n_device::command_r), FUNC(ncr5380n_device::command_w));
+	map(0x4, 0x4).rw(FUNC(ncr5380n_device::status_r), FUNC(ncr5380n_device::selenable_w));
+	map(0x5, 0x5).rw(FUNC(ncr5380n_device::busandstatus_r), FUNC(ncr5380n_device::startdmasend_w));
+	map(0x6, 0x6).rw(FUNC(ncr5380n_device::indata_r), FUNC(ncr5380n_device::startdmatargetrx_w));
+	map(0x7, 0x7).rw(FUNC(ncr5380n_device::resetparityirq_r), FUNC(ncr5380n_device::startdmainitrx_w));
 }
 
 ncr5380n_device::ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -18,9 +18,6 @@
 #include "emu.h"
 #include "mmc5.h"
 
-#include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
-#include "sound/nes_apu.h"  // temp hack to pass the additional sound regs to APU...
-
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -48,6 +45,12 @@ nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *ta
 	, m_irq_status(0), m_irq_enable(0), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0)
 	, m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0)
 	, m_split_chr(0), m_ex1_bank(0), m_high_chr(0), m_split_scr(0), m_split_rev(0), m_split_ctrl(0), m_split_yst(0), m_split_bank(0), m_vcount(0)
+	, m_ppu(*this, ":ppu") // FIXME: this dependency should not exist
+	, m_sound(*this, ":maincpu:nesapu") // FIXME: this is a hack, it should have extra channels, not pass to the existing APU!!!
+{
+}
+
+nes_exrom_device::~nes_exrom_device()
 {
 }
 
@@ -272,8 +275,7 @@ void nes_exrom_device::set_mirror(int page, int src)
 
 inline bool nes_exrom_device::in_split()
 {
-	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
-	int tile = ppu->get_tilenum();
+	int tile = m_ppu->get_tilenum();
 
 	if (tile < 34)
 	{
@@ -309,8 +311,7 @@ READ8_MEMBER(nes_exrom_device::nt_r)
 			// but it does not work yet
 			if (m_split_scr && !(m_exram_control & 0x02) && in_split())
 			{
-				ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
-				int tile = ppu->get_tilenum();
+				int tile = m_ppu->get_tilenum();
 
 				if ((offset & 0x3ff) >= 0x3c0)
 				{
@@ -399,22 +400,21 @@ inline uint8_t nes_exrom_device::bg_ex1_chr_r(uint32_t offset)
 READ8_MEMBER(nes_exrom_device::chr_r)
 {
 	int bank = offset >> 10;
-	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 
 	// Extended Attribute Mode (Ex1) does affect BG drawing even for 8x16 sprites (JustBreed uses it extensively!)
 	// However, if a game enables Ex1 but does not write a new m_ex1_bank, I'm not sure here we get the correct behavior
-	if (m_exram_control == 1 && ppu->get_draw_phase() == PPU_DRAW_BG && m_ex1_chr)
+	if (m_exram_control == 1 && m_ppu->get_draw_phase() == PPU_DRAW_BG && m_ex1_chr)
 		return bg_ex1_chr_r(offset & 0xfff);
 
-	if (m_split_scr && !(m_exram_control & 0x02) && in_split() && ppu->get_draw_phase() == PPU_DRAW_BG && m_split_chr)
+	if (m_split_scr && !(m_exram_control & 0x02) && in_split() && m_ppu->get_draw_phase() == PPU_DRAW_BG && m_split_chr)
 		return split_chr_r(offset & 0xfff);
 
-	if (ppu->is_sprite_8x16())
+	if (m_ppu->is_sprite_8x16())
 	{
-		if (ppu->get_draw_phase() == PPU_DRAW_OAM)
+		if (m_ppu->get_draw_phase() == PPU_DRAW_OAM)
 			return base_chr_r(bank & 7, offset & 0x1fff);
 
-		if (ppu->get_draw_phase() == PPU_DRAW_BG)
+		if (m_ppu->get_draw_phase() == PPU_DRAW_BG)
 			return base_chr_r((bank & 3) + 8, offset & 0x1fff);
 	}
 
@@ -467,9 +467,7 @@ WRITE8_MEMBER(nes_exrom_device::write_l)
 
 	if ((offset >= 0x1000) && (offset <= 0x1015))
 	{
-		// SOUND (this is a hack, it should have extra channels, not pass to the existing APU!!!)
-		nesapu_device *m_sound = machine().device<nesapu_device>("maincpu:nesapu");
-		m_sound->write(space, offset & 0x1f, data);
+		m_sound->write(offset & 0x1f, data);
 		return;
 	}
 

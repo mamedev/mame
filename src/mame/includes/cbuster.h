@@ -5,12 +5,17 @@
     Crude Buster
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CBUSTER_H
+#define MAME_INCLUDES_CBUSTER_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "cpu/h6280/h6280.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
+#include "emupal.h"
 
 class cbuster_state : public driver_device
 {
@@ -62,3 +67,5 @@ public:
 	void sound_map(address_map &map);
 	void twocrude_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CBUSTER_H

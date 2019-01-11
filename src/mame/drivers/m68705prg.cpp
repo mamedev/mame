@@ -61,7 +61,7 @@ protected:
 
 	void m68705prg(machine_config &config);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eprom_load)
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(eprom)
 	{
 		auto const desired(m_mcu_region.bytes());
 		auto const actual(m_eprom_image->common_get_size("rom"));
@@ -78,7 +78,7 @@ protected:
 		}
 	}
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mcu_load)
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mcu)
 	{
 		auto const desired(m_mcu_region.bytes());
 		auto const actual(m_mcu_image->common_get_size("rom"));
@@ -227,43 +227,46 @@ INPUT_PORTS_START(m68705prg)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(m68705prg_state_base::m68705prg)
-	MCFG_QUANTUM_PERFECT_CPU("mcu")
+void m68705prg_state_base::m68705prg(machine_config &config)
+{
+	config.m_perfect_cpu_quantum = subtag("mcu");
 
-	MCFG_GENERIC_SOCKET_ADD("eprom_image", generic_plain_slot, "eprom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(m68705prg_state_base, eprom_load)
+	GENERIC_SOCKET(config, m_eprom_image, generic_plain_slot, "eprom", "bin,rom");
+	m_eprom_image->set_device_load(device_image_load_delegate(&m68705prg_state_base::device_image_load_eprom, this));
 
-	MCFG_GENERIC_SOCKET_ADD("mcu_image", generic_plain_slot, "mcu")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(m68705prg_state_base, mcu_load)
+	GENERIC_SOCKET(config, m_mcu_image, generic_plain_slot, "mcu", "bin,rom");
+	m_mcu_image->set_device_load(device_image_load_delegate(&m68705prg_state_base::device_image_load_mcu, this));
 
-	MCFG_DEFAULT_LAYOUT(layout_m68705prg)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_m68705prg);
+}
 
-template<> MACHINE_CONFIG_START(p3prg_state::prg)
+template<> void p3prg_state::prg(machine_config &config)
+{
 	m68705prg(config);
-	MCFG_DEVICE_ADD("mcu", M68705P3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, p3prg_state, pb_w))
-MACHINE_CONFIG_END
+	M68705P3(config, m_mcu, 1_MHz_XTAL);
+	m_mcu->portb_w().set(FUNC(p3prg_state::pb_w));
+}
 
-template<> MACHINE_CONFIG_START(p5prg_state::prg)
+template<> void p5prg_state::prg(machine_config &config)
+{
 	m68705prg(config);
-	MCFG_DEVICE_ADD("mcu", M68705P5, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, p5prg_state, pb_w))
-MACHINE_CONFIG_END
+	M68705P5(config, m_mcu, 1_MHz_XTAL);
+	m_mcu->portb_w().set(FUNC(p5prg_state::pb_w));
+}
 
-template<> MACHINE_CONFIG_START(r3prg_state::prg)
+template<> void r3prg_state::prg(machine_config &config)
+{
 	m68705prg(config);
-	MCFG_DEVICE_ADD("mcu", M68705R3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, r3prg_state, pb_w))
-MACHINE_CONFIG_END
+	M68705R3(config, m_mcu, 1_MHz_XTAL);
+	m_mcu->portb_w().set(FUNC(r3prg_state::pb_w));
+}
 
-template<> MACHINE_CONFIG_START(u3prg_state::prg)
+template<> void u3prg_state::prg(machine_config &config)
+{
 	m68705prg(config);
-	MCFG_DEVICE_ADD("mcu", M68705U3, 1_MHz_XTAL)
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, u3prg_state, pb_w))
-MACHINE_CONFIG_END
+	M68705U3(config, m_mcu, 1_MHz_XTAL);
+	m_mcu->portb_w().set(FUNC(u3prg_state::pb_w));
+}
 
 
 ROM_START( 705p3prg )

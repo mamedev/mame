@@ -5,23 +5,24 @@
     Super Contra / Thunder Cross
 
 *************************************************************************/
-#include "cpu/m6809/konami.h"
+#ifndef MAME_INCLUDES_THUNDERX_H
+#define MAME_INCLUDES_THUNDERX_H
+
+#pragma once
+
+#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
 #include "machine/bankdev.h"
 #include "sound/k007232.h"
-#include "video/k052109.h"
 #include "video/k051960.h"
+#include "video/k052109.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 
 class thunderx_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_THUNDERX_FIRQ
-	};
-
-	thunderx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	thunderx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank5800(*this, "bank5800"),
@@ -30,10 +31,23 @@ public:
 		m_k051960(*this, "k051960"),
 		m_palette(*this, "palette"),
 		m_rombank(*this, "rombank"),
-		m_pmcram(*this, "pmcram") { }
+		m_pmcram(*this, "pmcram")
+	{ }
+
+	void scontra(machine_config &config);
+	void gbusters(machine_config &config);
+	void thunderx(machine_config &config);
+
+	void init_thunderx();
+
+private:
+	enum
+	{
+		TIMER_THUNDERX_FIRQ
+	};
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank5800;
 	optional_device<k007232_device> m_k007232;
@@ -66,7 +80,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void init_thunderx();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
@@ -78,9 +91,6 @@ public:
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
-	void scontra(machine_config &config);
-	void gbusters(machine_config &config);
-	void thunderx(machine_config &config);
 	void gbusters_map(address_map &map);
 	void scontra_bank5800_map(address_map &map);
 	void scontra_map(address_map &map);
@@ -88,6 +98,8 @@ public:
 	void thunderx_bank5800_map(address_map &map);
 	void thunderx_map(address_map &map);
 	void thunderx_sound_map(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_THUNDERX_H

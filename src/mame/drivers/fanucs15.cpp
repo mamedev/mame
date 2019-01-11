@@ -319,17 +319,19 @@ public:
 		, m_convcpu(*this, "convcpu")       // conversational 80286-8
 	{ }
 
+	void fanucs15(machine_config &config);
+
+private:
 	required_device<m68020_device> m_maincpu;
 	required_device<m68000_device> m_pmccpu;
 	required_device<m68000_device> m_gfxcpu;
 	required_device<i80286_cpu_device> m_convcpu;
 
-	void fanucs15(machine_config &config);
 	void convcpu_mem(address_map &map);
 	void gfxcpu_mem(address_map &map);
 	void maincpu_mem(address_map &map);
 	void pmccpu_mem(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 };
 

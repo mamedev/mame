@@ -44,9 +44,10 @@ DEFINE_DEVICE_TYPE(MPU_PC98, mpu_pc98_device, "mpu_pc98", "Roland MPU-401 MIDI I
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mpu_pc98_device::device_add_mconfig)
-	MCFG_MPU401_ADD(MPU_CORE_TAG, WRITELINE(*this, mpu_pc98_device, mpu_irq_out))
-MACHINE_CONFIG_END
+void mpu_pc98_device::device_add_mconfig(machine_config &config)
+{
+	MPU401(config, m_mpu401).irq_cb().set(FUNC(mpu_pc98_device::mpu_irq_out));
+}
 
 
 //**************************************************************************
@@ -62,7 +63,7 @@ mpu_pc98_device::mpu_pc98_device(const machine_config &mconfig, const char *tag,
 
 void mpu_pc98_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(MPU_CORE_TAG, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w));
+	map(0x0, 0x3).rw(MPU_CORE_TAG, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w)).umask16(0x00ff);
 }
 
 //-------------------------------------------------
@@ -71,8 +72,7 @@ void mpu_pc98_device::map(address_map &map)
 
 void mpu_pc98_device::device_start()
 {
-	address_space &iospace = m_bus->io_space();
-	iospace.install_device(0xe0d0, 0xe0d3, *this, &mpu_pc98_device::map);
+	m_bus->io_space().install_device(0xe0d0, 0xe0d3, *this, &mpu_pc98_device::map);
 }
 
 //-------------------------------------------------

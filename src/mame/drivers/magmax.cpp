@@ -30,7 +30,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
 
 
@@ -39,7 +38,7 @@ WRITE16_MEMBER(magmax_state::cpu_irq_ack_w)
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-READ8_MEMBER(magmax_state::magmax_sound_r)
+READ8_MEMBER(magmax_state::sound_r)
 {
 	return (m_soundlatch->read(space, 0) << 1) | m_LS74_q;
 }
@@ -96,11 +95,6 @@ void magmax_state::machine_reset()
 
 WRITE8_MEMBER(magmax_state::ay8910_portA_0_w)
 {
-ay8910_device *ay1 = machine().device<ay8910_device>("ay1");
-ay8910_device *ay2 = machine().device<ay8910_device>("ay2");
-ay8910_device *ay3 = machine().device<ay8910_device>("ay3");
-float percent;
-
 /*There are three AY8910 chips and four(!) separate amplifiers on the board
 * Each of AY channels is hardware mapped in following way:
 * amplifier 0 gain x 1.00 <- AY0 CHA
@@ -108,10 +102,10 @@ float percent;
 * amplifier 2 gain x 4.54 (150K/33K) <- AY1 CHC + AY2 CHA
 * amplifier 3 gain x 4.54 (150K/33K) <- AY2 CHB + AY2 CHC
 *
-* Each of the amps has its own analog cuircit:
+* Each of the amps has its own analog circuit:
 * amp0, amp1 and amp2 are different from each other; amp3 is the same as amp2
 *
-* Outputs of those amps are inputs to post amps, each having own cuircit
+* Outputs of those amps are inputs to post amps, each having own circuit
 * that is partially controlled by AY #0 port A.
 * PORT A BIT 0 - control postamp 0 (gain x10.0 | gain x 5.00)
 * PORT A BIT 1 - control postamp 1 (gain x4.54 | gain x 2.27)
@@ -120,7 +114,7 @@ float percent;
 *
 * The "control" means assert/clear input pins on chip called 4066 (it is analog switch)
 * which results in volume gain (exactly 2 times).
-* I use mixer_set_volume() to emulate the effect.
+* I use set_output_gain() to emulate the effect.
 
 gain summary:
 port A control ON         OFF
@@ -152,30 +146,30 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 
 	/*popmessage("gain_ctrl = %2x",data&0x0f);*/
 
-	percent = (m_gain_control & 1) ? 1.0 : 0.50;
-	ay1->set_output_gain(0, percent);
+	float percent = (m_gain_control & 1) ? 1.0 : 0.50;
+	m_ay[0]->set_output_gain(0, percent);
 //fixme:    set_RC_filter(0,10000,100000000,0,10000);   /* 10K, 10000pF = 0.010uF */
 
 	percent = (m_gain_control & 2) ? 0.45 : 0.23;
-	ay1->set_output_gain(1, percent);
-	ay1->set_output_gain(2, percent);
-	ay2->set_output_gain(0, percent);
-	ay2->set_output_gain(1, percent);
+	m_ay[0]->set_output_gain(1, percent);
+	m_ay[0]->set_output_gain(2, percent);
+	m_ay[1]->set_output_gain(0, percent);
+	m_ay[1]->set_output_gain(1, percent);
 //fixme:    set_RC_filter(1,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(2,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(3,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(4,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 
 	percent = (m_gain_control & 4) ? 0.45 : 0.23;
-	ay2->set_output_gain(2, percent);
-	ay3->set_output_gain(0, percent);
+	m_ay[1]->set_output_gain(2, percent);
+	m_ay[2]->set_output_gain(0, percent);
 
 	percent = (m_gain_control & 8) ? 0.45 : 0.23;
-	ay3->set_output_gain(1, percent);
-	ay3->set_output_gain(2, percent);
+	m_ay[2]->set_output_gain(1, percent);
+	m_ay[2]->set_output_gain(2, percent);
 }
 
-WRITE16_MEMBER(magmax_state::magmax_vreg_w)
+WRITE16_MEMBER(magmax_state::vreg_w)
 {
 	/* VRAM CONTROL REGISTER */
 	/* bit0 - coin counter 1    */
@@ -186,28 +180,31 @@ WRITE16_MEMBER(magmax_state::magmax_vreg_w)
 	/* bit5 - sprite bank MSB (DP1) */
 	/* bit6 - BG display enable (BE)*/
 	COMBINE_DATA(m_vreg);
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 
 
-void magmax_state::magmax_map(address_map &map)
+void magmax_state::main_map(address_map &map)
 {
 	map(0x000000, 0x013fff).rom();
 	map(0x018000, 0x018fff).ram();
-	map(0x020000, 0x0207ff).ram().share("videoram");
-	map(0x028000, 0x0281ff).ram().share("spriteram");
+	map(0x020000, 0x0207ff).ram().share(m_videoram);
+	map(0x028000, 0x0281ff).ram().share(m_spriteram);
 	map(0x030000, 0x030001).portr("P1");
 	map(0x030002, 0x030003).portr("P2");
 	map(0x030004, 0x030005).portr("SYSTEM");
 	map(0x030006, 0x030007).portr("DSW");
-	map(0x030010, 0x030011).w(this, FUNC(magmax_state::magmax_vreg_w)).share("vreg");
-	map(0x030012, 0x030013).writeonly().share("scroll_x");
-	map(0x030014, 0x030015).writeonly().share("scroll_y");
+	map(0x030010, 0x030011).w(FUNC(magmax_state::vreg_w)).share(m_vreg);
+	map(0x030012, 0x030013).writeonly().share(m_scroll_x);
+	map(0x030014, 0x030015).writeonly().share(m_scroll_y);
 	map(0x03001d, 0x03001d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x03001e, 0x03001f).w(this, FUNC(magmax_state::cpu_irq_ack_w));
+	map(0x03001e, 0x03001f).w(FUNC(magmax_state::cpu_irq_ack_w));
 }
 
-void magmax_state::magmax_sound_map(address_map &map)
+void magmax_state::sound_map(address_map &map)
 {
 	map.global_mask(0x7fff); // A15 not connected
 	map(0x0000, 0x3fff).rom();
@@ -215,13 +212,13 @@ void magmax_state::magmax_sound_map(address_map &map)
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
 }
 
-void magmax_state::magmax_sound_io_map(address_map &map)
+void magmax_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
-	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
-	map(0x06, 0x06).r(this, FUNC(magmax_state::magmax_sound_r));
+	map(0x00, 0x01).w(m_ay[0], FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x03).w(m_ay[1], FUNC(ay8910_device::address_data_w));
+	map(0x04, 0x05).w(m_ay[2], FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r(FUNC(magmax_state::sound_r));
 }
 
 
@@ -323,55 +320,51 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_magmax )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0,  1 ) /*no color codes*/
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,      1*16, 16 ) /*16 color codes*/
+	GFXDECODE_ENTRY( "chars", 0, charlayout,           0,  1 ) /*no color codes*/
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,      1*16, 16 ) /*16 color codes*/
 GFXDECODE_END
 
 
 MACHINE_CONFIG_START(magmax_state::magmax)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(magmax_map)
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(16'000'000)/2)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", magmax_state,  irq1_line_assert)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(20'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(magmax_sound_map)
-	MCFG_DEVICE_IO_MAP(magmax_sound_io_map)
+	MCFG_DEVICE_ADD(m_audiocpu, Z80,XTAL(20'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(magmax_state, screen_update_magmax)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_UPDATE_DRIVER(magmax_state, screen_update)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magmax)
-	MCFG_PALETTE_ADD("palette", 1*16 + 16*16 + 256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(magmax_state, magmax)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magmax);
+	PALETTE(config, m_palette, FUNC(magmax_state::magmax_palette), 1*16 + 16*16 + 256, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(20'000'000)/16) /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, magmax_state, ay8910_portA_0_w))  /*write port A*/
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, magmax_state, ay8910_portB_0_w))  /*write port B*/
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, m_ay[0], XTAL(20'000'000)/16); /* verified on pcb */
+	m_ay[0]->port_a_write_callback().set(FUNC(magmax_state::ay8910_portA_0_w));
+	m_ay[0]->port_b_write_callback().set(FUNC(magmax_state::ay8910_portB_0_w));
+	m_ay[0]->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(20'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, m_ay[1], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(20'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	AY8910(config, m_ay[2], XTAL(20'000'000)/16).add_route(ALL_OUTPUTS, "mono", 0.40); /* verified on pcb */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch->set_separate_acknowledge(true);
 MACHINE_CONFIG_END
 
 
@@ -388,10 +381,10 @@ ROM_START( magmax )
 	ROM_LOAD( "15.17b", 0x00000, 0x2000, CRC(19e7b983) SHA1(b1cd0b728e7cce87d9b1039be179d0915d939a4f) )
 	ROM_LOAD( "16.18b", 0x02000, 0x2000, CRC(055e3126) SHA1(8c9b03eb7588512ef17f8c1b731a2fd7cf372bf8) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 ) /* chars */
+	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "23.15g", 0x00000, 0x2000, CRC(a7471da2) SHA1(ec2815a5801bc55955e612173a845399fd493eb7) )
 
-	ROM_REGION( 0x10000, "gfx2", 0 ) /* sprites */
+	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "17.3e",  0x00000, 0x2000, CRC(8e305b2e) SHA1(74c318089f6bebafbee31c22302e93a09d3ffa32) )
 	ROM_LOAD( "18.5e",  0x02000, 0x2000, CRC(14c55a60) SHA1(fd2a1b434bb65502f0f791995caf1cd869ccd254) )
 	ROM_LOAD( "19.6e",  0x04000, 0x2000, CRC(fa4141d8) SHA1(a5279d1ada5a13df14a8bbc18ceeea79f82a4c23) )

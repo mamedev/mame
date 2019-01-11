@@ -11,21 +11,6 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_K053260_ADD(tag, clock) \
-		MCFG_DEVICE_ADD((tag), K053260, (clock))
-
-#define MCFG_K053260_REPLACE(tag, clock) \
-		MCFG_DEVICE_REPLACE((tag), K053260, (clock))
-
-#define MCFG_K053260_REGION(tag) \
-		k053260_device::set_region_tag(*device, ("^" tag));
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -47,6 +32,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 
 	// sound stream update overrides

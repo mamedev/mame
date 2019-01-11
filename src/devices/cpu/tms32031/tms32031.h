@@ -88,25 +88,6 @@ enum
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TMS3203X_MCBL(_mode) \
-	downcast<tms3203x_device &>(*device).set_mcbl_mode(_mode);
-
-#define MCFG_TMS3203X_XF0_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_xf0_callback(DEVCB_##_devcb);
-
-#define MCFG_TMS3203X_XF1_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_xf1_callback(DEVCB_##_devcb);
-
-#define MCFG_TMS3203X_IACK_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_iack_callback(DEVCB_##_devcb);
-
-#define MCFG_TMS3203X_HOLDA_CB(_devcb) \
-	devcb = &downcast<tms3203x_device &>(*device).set_holda_callback(DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -143,10 +124,10 @@ public:
 
 	// inline configuration helpers
 	void set_mcbl_mode(bool mode) { m_mcbl_mode = mode; }
-	template <class Object> devcb_base &set_xf0_callback(Object &&cb) { return m_xf0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xf1_callback(Object &&cb) { return m_xf1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_iack_callback(Object &&cb) { return m_iack_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_holda_callback(Object &&cb) { return m_holda_cb.set_callback(std::forward<Object>(cb)); }
+	auto xf0() { return m_xf0_cb.bind(); }
+	auto xf1() { return m_xf1_cb.bind(); }
+	auto iack() { return m_iack_cb.bind(); }
+	auto holda() { return m_holda_cb.bind(); }
 
 	// public interfaces
 	static float fp_to_float(uint32_t floatdata);
@@ -780,16 +761,15 @@ protected:
 	uint32_t            m_primary_bus_control;
 
 	// internal stuff
-	uint16_t              m_irq_state;
+	uint16_t            m_irq_state;
 	bool                m_delayed;
 	bool                m_irq_pending;
 	bool                m_is_idling;
 	int                 m_icount;
 
-	uint32_t              m_iotemp;
+	uint32_t            m_iotemp;
 	address_space *     m_program;
 	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
-	uint32_t *            m_bootrom;
 
 	bool                m_mcbl_mode;
 	bool                m_hold_state;

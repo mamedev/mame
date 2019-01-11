@@ -51,7 +51,7 @@ void darkmist_state::memmap(address_map &map)
 	map(0xc801, 0xc801).portr("P1");
 	map(0xc802, 0xc802).portr("P2");
 	map(0xc803, 0xc803).portr("START");
-	map(0xc804, 0xc804).w(this, FUNC(darkmist_state::hw_w));
+	map(0xc804, 0xc804).w(FUNC(darkmist_state::hw_w));
 	map(0xc805, 0xc805).writeonly().share("spritebank");
 	map(0xc806, 0xc806).portr("DSW1");
 	map(0xc807, 0xc807).portr("DSW2");
@@ -64,7 +64,7 @@ void darkmist_state::memmap(address_map &map)
 	map(0xd681, 0xd681).r(m_t5182, FUNC(t5182_device::sharedram_semaphore_snd_r));
 	map(0xd682, 0xd682).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_acquire_w));
 	map(0xd683, 0xd683).w(m_t5182, FUNC(t5182_device::sharedram_semaphore_main_release_w));
-	map(0xd800, 0xdfff).ram().w(this, FUNC(darkmist_state::tx_vram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(darkmist_state::tx_vram_w)).share("videoram");
 	map(0xe000, 0xefff).ram().share("workram");
 	map(0xf000, 0xffff).ram().share("spriteram");
 }
@@ -255,22 +255,20 @@ MACHINE_CONFIG_START(darkmist_state::darkmist)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkmist)
-	MCFG_PALETTE_ADD("palette", 0x100*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_INIT_OWNER(darkmist_state, darkmist)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darkmist);
+	PALETTE(config, m_palette, FUNC(darkmist_state::darkmist_palette));
+	m_palette->set_format(palette_device::xRGB_444, 0x100*4);
+	m_palette->set_indirect_entries(256+1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 14318180/4)    /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("t5182", t5182_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 14318180/4));    /* 3.579545 MHz */
+	ymsnd.irq_handler().set(m_t5182, FUNC(t5182_device::ym2151_irq_handler));
+	ymsnd.add_route(0, "mono", 1.0);
+	ymsnd.add_route(1, "mono", 1.0);
 MACHINE_CONFIG_END
 
 ROM_START( darkmist )

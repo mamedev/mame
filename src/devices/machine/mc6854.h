@@ -14,25 +14,6 @@
 #pragma once
 
 
-#define MC6854_OUT_FRAME_CB(name)  void name(uint8_t * data, int length)
-
-
-#define MCFG_MC6854_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<mc6854_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_MC6854_OUT_TXD_CB(_devcb) \
-	devcb = &downcast<mc6854_device &>(*device).set_out_txd_callback(DEVCB_##_devcb);
-
-#define MCFG_MC6854_OUT_FRAME_CB(_class, _method) \
-	downcast<mc6854_device &>(*device).set_out_frame_callback(mc6854_device::out_frame_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_MC6854_OUT_RTS_CB(_devcb) \
-	devcb = &downcast<mc6854_device &>(*device).set_out_rts_callback(DEVCB_##_devcb);
-
-#define MCFG_MC6854_OUT_DTR_CB(_devcb) \
-	devcb = &downcast<mc6854_device &>(*device).set_out_dtr_callback(DEVCB_##_devcb);
-
-
 class mc6854_device : public device_t
 {
 public:
@@ -40,13 +21,23 @@ public:
 
 	typedef device_delegate<void (uint8_t *data, int length)> out_frame_delegate;
 
-	mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_txd_callback(Object &&cb) { return m_out_txd_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_irq_cb() { return m_out_irq_cb.bind(); }
+	auto out_txd_cb() { return m_out_txd_cb.bind(); }
+	auto out_rts_cb() { return m_out_rts_cb.bind(); }
+	auto out_dtr_cb() { return m_out_dtr_cb.bind(); }
+
 	template <typename Object> void set_out_frame_callback(Object &&cb) { m_out_frame_cb = std::forward<Object>(cb); }
-	template <class Object> devcb_base &set_out_rts_callback(Object &&cb) { return m_out_rts_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_dtr_callback(Object &&cb) { return m_out_dtr_cb.set_callback(std::forward<Object>(cb)); }
+	void set_out_frame_callback(out_frame_delegate callback) { m_out_frame_cb = callback; }
+	template <class FunctionClass> void set_out_frame_callback(const char *devname, void (FunctionClass::*callback)(uint8_t *, int), const char *name)
+	{
+		set_out_frame_callback(out_frame_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_out_frame_callback(void (FunctionClass::*callback)(uint8_t *, int), const char *name)
+	{
+		set_out_frame_callback(out_frame_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	/* interface to CPU via address/data bus*/
 	DECLARE_READ8_MEMBER( read );

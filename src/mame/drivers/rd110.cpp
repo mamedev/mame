@@ -23,6 +23,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"
+#include "emupal.h"
 #include "screen.h"
 
 static INPUT_PORTS_START( d110 )
@@ -59,8 +60,16 @@ public:
 		, m_memcs(*this, "memcs")
 		, m_lcd(*this, "lcd")
 		, m_midi_timer(*this, "midi_timer")
-		, m_maincpu(*this, "maincpu") { }
+		, m_maincpu(*this, "maincpu")
+	{ }
 
+	void d110(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_WRITE8_MEMBER(so_w);
 	DECLARE_WRITE16_MEMBER(midi_w);
@@ -70,21 +79,16 @@ public:
 	DECLARE_READ16_MEMBER(port0_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
-	DECLARE_PALETTE_INIT(d110);
+	void d110_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void d110(machine_config &config);
-	void d110_io(address_map &map);
 	void d110_map(address_map &map);
-private:
 
 	uint8_t  m_lcd_data_buffer[256];
 	int      m_lcd_data_buffer_pos;
 	uint8_t  m_midi;
 	int      m_midi_pos;
 	uint8_t  m_port0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_rams;
 	required_device<ram_device> m_memc;
@@ -210,7 +214,7 @@ WRITE8_MEMBER(d110_state::so_w)
 	//  logerror("so: rw=%d bank=%d led=%d\n", (data >> 3) & 1, (data >> 1) & 3, data & 1);
 }
 
-PALETTE_INIT_MEMBER(d110_state, d110)
+void d110_state::d110_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0, 255, 0));
 	palette.set_pen_color(1, rgb_t(0, 0, 0));
@@ -218,38 +222,30 @@ PALETTE_INIT_MEMBER(d110_state, d110)
 
 void d110_state::d110_map(address_map &map)
 {
-	map(0x0100, 0x0100).w(this, FUNC(d110_state::bank_w));
-	map(0x0200, 0x0200).w(this, FUNC(d110_state::so_w));
+	map(0x0100, 0x0100).w(FUNC(d110_state::bank_w));
+	map(0x0200, 0x0200).w(FUNC(d110_state::so_w));
 	map(0x021a, 0x021a).portr("SC0").nopw();
 	map(0x021c, 0x021c).portr("SC1");
-	map(0x0300, 0x0300).w(this, FUNC(d110_state::lcd_data_w));
-	map(0x0380, 0x0380).rw(this, FUNC(d110_state::lcd_ctrl_r), FUNC(d110_state::lcd_ctrl_w));
+	map(0x0300, 0x0300).w(FUNC(d110_state::lcd_data_w));
+	map(0x0380, 0x0380).rw(FUNC(d110_state::lcd_ctrl_r), FUNC(d110_state::lcd_ctrl_w));
 	map(0x1000, 0x7fff).rom().region("maincpu", 0x1000);
 	map(0x8000, 0xbfff).bankrw("bank");
 	map(0xc000, 0xffff).bankrw("fixed");
 }
 
-void d110_state::d110_io(address_map &map)
-{
-	map(i8x9x_device::SERIAL, i8x9x_device::SERIAL).w(this, FUNC(d110_state::midi_w));
-	map(i8x9x_device::P0, i8x9x_device::P0).r(this, FUNC(d110_state::port0_r));
-}
-
 MACHINE_CONFIG_START(d110_state::d110)
-	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(12'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP( d110_map )
-	MCFG_DEVICE_IO_MAP( d110_io )
+	P8098(config, m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &d110_state::d110_map);
+	m_maincpu->serial_tx_cb().set(FUNC(d110_state::midi_w));
+	m_maincpu->in_p0_cb().set(FUNC(d110_state::port0_r));
 
 // Battery-backed main ram
-	MCFG_RAM_ADD( "ram" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
-	MCFG_NVRAM_ADD_0FILL( "rams" )
-
+	RAM( config, "ram" ).set_default_size( "32K" );
+	NVRAM(config, m_rams, nvram_device::DEFAULT_ALL_0);
 
 // Shall become a proper memcard device someday
-	MCFG_RAM_ADD( "memc" )
-	MCFG_RAM_DEFAULT_SIZE( "32K" )
-	MCFG_NVRAM_ADD_0FILL( "memcs" )
+	RAM( config, m_memc ).set_default_size( "32K" );
+	NVRAM( config, m_memcs, nvram_device::DEFAULT_ALL_0 );
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -259,12 +255,11 @@ MACHINE_CONFIG_START(d110_state::d110)
 	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-2, 0, (16*6-1)*3/4-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(d110_state, d110)
+	PALETTE(config, "palette", FUNC(d110_state::d110_palette), 2);
 
-	MCFG_MSM6222B_01_ADD( "lcd" )
+	MSM6222B_01(config, m_lcd, 0);
 
-	MCFG_TIMER_DRIVER_ADD( "midi_timer", d110_state, midi_timer_cb )
+	MCFG_TIMER_DRIVER_ADD( m_midi_timer, d110_state, midi_timer_cb )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC( "samples_timer", d110_state, samples_timer_cb, attotime::from_hz(32000*2) )
 MACHINE_CONFIG_END
@@ -274,10 +269,10 @@ ROM_START( d110 )
 	ROM_DEFAULT_BIOS( "110" )
 
 	ROM_SYSTEM_BIOS( 0, "106", "Firmware 1.06" )
-	ROMX_LOAD( "d-110.v1.06.ic19.bin",         0,   0x8000, CRC(3dd5b6e9) SHA1(73b155fb0a8adc2362e73cb0803dafba9ccfb508), ROM_BIOS(1) )
+	ROMX_LOAD( "d-110.v1.06.ic19.bin",         0,   0x8000, CRC(3dd5b6e9) SHA1(73b155fb0a8adc2362e73cb0803dafba9ccfb508), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS( 1, "110", "Firmware 1.10" )
-	ROMX_LOAD( "d-110.v1.10.ic19.bin",         0,   0x8000, CRC(3ae68187) SHA1(28635510f30d6c1fb88e00da03e5b4e045c380cb), ROM_BIOS(2) )
+	ROMX_LOAD( "d-110.v1.10.ic19.bin",         0,   0x8000, CRC(3ae68187) SHA1(28635510f30d6c1fb88e00da03e5b4e045c380cb), ROM_BIOS(1) )
 
 	ROM_REGION( 0x20000, "presets", 0 )
 	ROM_LOAD(  "r15179873-lh5310-97.ic12.bin", 0,  0x20000, CRC(580a8f9e) SHA1(05587a0542b01625dcde37de5bb339880e47eb93) )

@@ -216,10 +216,10 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 
 	m_screen->register_screen_bitmap(m_sprite_buffer_bitmap);
 
-	save_pointer(NAME(m_buffer_objectram.get()), 0x2000);
-	save_pointer(NAME(m_buffer_spriteram16.get()), 0x2000);
-	save_pointer(NAME(m_buffer2_objectram.get()), 0x2000);
-	save_pointer(NAME(m_buffer2_spriteram16.get()), 0x2000);
+	save_pointer(NAME(m_buffer_objectram), 0x2000);
+	save_pointer(NAME(m_buffer_spriteram16), 0x2000);
+	save_pointer(NAME(m_buffer2_objectram), 0x2000);
+	save_pointer(NAME(m_buffer2_spriteram16), 0x2000);
 	save_item(NAME(m_screen_flag));
 	save_item(NAME(m_active_layers));
 	save_item(NAME(m_sprite_flag));
@@ -752,7 +752,7 @@ void megasys1_state::priority_create()
 
 }
 
-PALETTE_INIT_MEMBER(megasys1_state,megasys1)
+void megasys1_state::megasys1_palette(palette_device &palette)
 {
 	priority_create();
 }

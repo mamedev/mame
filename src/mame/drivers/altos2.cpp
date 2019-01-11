@@ -19,11 +19,13 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
-#include "machine/clock.h"
 #include "machine/x2212.h"
-//#include "video/crt9007.h"
+#include "sound/beep.h"
+//#include "video/crt9006.h"
+#include "video/crt9007.h"
 //#include "video/crt9021.h"
 #include "screen.h"
+#include "speaker.h"
 
 class altos2_state : public driver_device
 {
@@ -32,13 +34,17 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_novram(*this, "novram")
+		, m_vpac(*this, "vpac")
+		, m_bell(*this, "bell")
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 	{ }
 
 	void altos2(machine_config &config);
 
-protected:
+private:
+	DECLARE_READ8_MEMBER(vpac_r);
+	DECLARE_WRITE8_MEMBER(vpac_w);
 	DECLARE_WRITE8_MEMBER(video_mode_w);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -47,9 +53,10 @@ protected:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<x2210_device> m_novram;
+	required_device<crt9007_device> m_vpac;
+	required_device<beep_device> m_bell;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
 };
@@ -60,11 +67,34 @@ void altos2_state::machine_reset()
 	m_novram->recall(CLEAR_LINE);
 }
 
+READ8_MEMBER(altos2_state::vpac_r)
+{
+	return m_vpac->read(space, offset >> 1);
+}
+
+WRITE8_MEMBER(altos2_state::vpac_w)
+{
+	m_vpac->write(space, offset >> 1, data);
+}
+
 WRITE8_MEMBER(altos2_state::video_mode_w)
 {
-	// D5 = 1 for 132-column mode (6-pixel char width)
-	// D5 = 0 for 80-column mode (10-pixel char width)
-	logerror("Writing %02X to mode register at %s\n", data, machine().describe_context());
+	if (BIT(data, 5))
+	{
+		// D5 = 1 for 132-column mode
+		m_vpac->set_unscaled_clock(40_MHz_XTAL / 12);
+		m_vpac->set_character_width(6);
+	}
+	else
+	{
+		// D5 = 0 for 80-column mode
+		m_vpac->set_unscaled_clock(40_MHz_XTAL / 20);
+		m_vpac->set_character_width(10);
+	}
+
+	m_bell->set_state(BIT(data, 4));
+
+	//logerror("Writing %02X to mode register at %s\n", data, machine().describe_context());
 }
 
 u32 altos2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -85,12 +115,12 @@ void altos2_state::io_map(address_map &map)
 	map(0x00, 0x03).rw("dart1", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x04, 0x07).rw("dart2", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x0c, 0x0c).w(this, FUNC(altos2_state::video_mode_w));
+	map(0x0c, 0x0c).w(FUNC(altos2_state::video_mode_w));
 	map(0x40, 0x7f).rw(m_novram, FUNC(x2210_device::read), FUNC(x2210_device::write));
-	//AM_RANGE(0x80, 0xff) AM_DEVREADWRITE_MOD("vpac", crt9007_device, read, write, rshift<1>)
+	map(0x80, 0xff).rw(FUNC(altos2_state::vpac_r), FUNC(altos2_state::vpac_w));
 }
 
-static INPUT_PORTS_START( altos2 )
+static INPUT_PORTS_START(altos2)
 INPUT_PORTS_END
 
 static const z80_daisy_config daisy_chain[] =
@@ -101,42 +131,45 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(altos2_state::altos2)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000)) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void altos2_state::altos2(machine_config &config)
+{
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &altos2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &altos2_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, 4915200) // ctc & dart connections are guesswork
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("ctc", z80ctc_device, trg0))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg1))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ctc", z80ctc_device, trg2))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 8_MHz_XTAL / 2));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.set_clk<0>(4.9152_MHz_XTAL / 4);
+	ctc.set_clk<1>(4.9152_MHz_XTAL / 4);
+	ctc.set_clk<2>(4.9152_MHz_XTAL / 4);
+	ctc.zc_callback<0>().set("dart1", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<0>().append("dart1", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<1>().set("dart2", FUNC(z80dart_device::rxca_w));
+	ctc.zc_callback<1>().append("dart2", FUNC(z80dart_device::txca_w));
+	ctc.zc_callback<2>().set("dart1", FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("dart1", z80dart_device, txca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart1", z80dart_device, rxca_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("dart1", z80dart_device, rxtxcb_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("dart2", z80dart_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("dart2", z80dart_device, txca_w))
+	z80dart_device &dart1(Z80DART(config, "dart1", 8_MHz_XTAL / 2));
+	dart1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL(4'000'000))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL(4'000'000)) // channel B not used for communications
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE("novram", x2210_device, store)) MCFG_DEVCB_INVERT // FIXME: no inverter should be needed
+	z80dart_device &dart2(Z80DART(config, "dart2", 8_MHz_XTAL / 2)); // channel B not used for communications
+	dart2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dart2.out_dtrb_callback().set(m_novram, FUNC(x2210_device::store)).invert(); // FIXME: no inverter should be needed
 
-	MCFG_DEVICE_ADD("novram", X2210, 0)
+	X2210(config, m_novram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000) / 2, 960, 0, 800, 347, 0, 325)
-	MCFG_SCREEN_UPDATE_DRIVER(altos2_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(40_MHz_XTAL / 2, 960, 0, 800, 347, 0, 325);
+	screen.set_screen_update(FUNC(altos2_state::screen_update));
 
-	//MCFG_DEVICE_ADD("vpac", CRT9007, VPAC_CLOCK)
-	//MCFG_CRT9007_INT_CALLBACK(WRITELINE("ctc", z80ctc_device, trg3))
-	//MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	CRT9007(config, m_vpac, 40_MHz_XTAL / 20);
+	m_vpac->set_screen("screen");
+	m_vpac->set_character_width(10);
+	m_vpac->int_callback().set("ctc", FUNC(z80ctc_device::trg3));
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_bell, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 ROM_START( altos2 )
 	ROM_REGION( 0x4000, "roms", 0 )
@@ -145,6 +178,9 @@ ROM_START( altos2 )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "us_v1.1_14410.u34", 0x0000, 0x2000, CRC(0ebb78bf) SHA1(96a1f7d34ff35037cbbc93049c0e2b9c9f11f1db) )
+
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "358_7258", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-COMP( 1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos", "Altos II Terminal", MACHINE_IS_SKELETON )
+COMP(1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos Computer Systems", "Altos II Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

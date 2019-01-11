@@ -182,22 +182,22 @@
 
 DEFINE_DEVICE_TYPE(VME_FCSCSI1, vme_fcscsi1_card_device, "fcscsi1", "Force Computer SYS68K/ISCSI-1 Intelligent Mass Storage Controller Board")
 
-#define CPU_CRYSTAL XTAL(20'000'000) /* Jauch */
-#define PIT_CRYSTAL XTAL(16'000'000) /* Jauch */
+#define CPU_CRYSTAL 20_MHz_XTAL /* Jauch */
+#define PIT_CRYSTAL 16_MHz_XTAL /* Jauch */
 
 void vme_fcscsi1_card_device::fcscsi1_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x000007).rom().r(this, FUNC(vme_fcscsi1_card_device::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0x000000, 0x000007).rom().r(FUNC(vme_fcscsi1_card_device::bootvect_r));       /* Vectors mapped from System EPROM */
 	map(0x000008, 0x001fff).ram(); /* SRAM */
 	map(0x002000, 0x01ffff).ram(); /* Dual Ported RAM */
 	map(0xe00000, 0xe7ffff).rom(); /* System EPROM Area 32Kb DEBUGGER supplied */
 	map(0xd00000, 0xd0003f).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 //  AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
-	map(0xc40000, 0xc4001f).rw(this, FUNC(vme_fcscsi1_card_device::scsi_r), FUNC(vme_fcscsi1_card_device::scsi_w)).umask16(0x00ff);
+	map(0xc40000, 0xc4001f).rw(FUNC(vme_fcscsi1_card_device::scsi_r), FUNC(vme_fcscsi1_card_device::scsi_w)).umask16(0x00ff);
 	map(0xc80000, 0xc800ff).rw("mc68450", FUNC(hd63450_device::read), FUNC(hd63450_device::write));  /* DMA Controller interface */
 	map(0xcc0000, 0xcc0007).rw("fdc", FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);      /* Floppy Controller interface */
-	map(0xcc0009, 0xcc0009).rw(this, FUNC(vme_fcscsi1_card_device::tcr_r), FUNC(vme_fcscsi1_card_device::tcr_w)); /* The Control Register, SCSI ID and FD drive select bits */
+	map(0xcc0009, 0xcc0009).rw(FUNC(vme_fcscsi1_card_device::tcr_r), FUNC(vme_fcscsi1_card_device::tcr_w)); /* The Control Register, SCSI ID and FD drive select bits */
 }
 
 
@@ -217,48 +217,48 @@ ROM_START (fcscsi1)
 
 	/* Besta ROM:s - apparantly patched Force ROM:s */
 	ROM_SYSTEM_BIOS(0, "besta88", "Besta 88")
-	ROMX_LOAD ("besta88_scsi_lower.rom", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD ("besta88_scsi_upper.rom", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("besta88_scsi_lower.rom", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD ("besta88_scsi_upper.rom", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(0))
 
 	/* Force ROM:s  */
 	ROM_SYSTEM_BIOS(1, "iscsi-1_v3.7", "Force Computer SYS68K/ISCSI-1 firmware v3.7")
-	ROMX_LOAD ("iscsi-1_v3.7_l.bin", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD ("iscsi-1_v3.7_u.bin", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD ("iscsi-1_v3.7_l.bin", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("iscsi-1_v3.7_u.bin", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(1))
 
 ROM_END
 
 
-MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
+void vme_fcscsi1_card_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_DEVICE_PROGRAM_MAP (fcscsi1_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vme_fcscsi1_card_device, maincpu_irq_acknowledge_callback)
+	M68010(config, m_maincpu, CPU_CRYSTAL / 2); /* 7474 based frequency divide by 2 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_fcscsi1_card_device::fcscsi1_mem);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(vme_fcscsi1_card_device::maincpu_irq_acknowledge_callback));
 
 	/* FDC  */
-	MCFG_WD1772_ADD("fdc", PIT_CRYSTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(*this, vme_fcscsi1_card_device, fdc_irq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("mc68450", hd63450_device, drq1_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
+	WD1772(config, m_fdc, PIT_CRYSTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(vme_fcscsi1_card_device::fdc_irq));
+	m_fdc->drq_wr_callback().set("mc68450", FUNC(hd63450_device::drq1_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
 
 	/* PIT Parallel Interface and Timer device */
-	MCFG_DEVICE_ADD ("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, vme_fcscsi1_card_device, led_w))
+	PIT68230(config, m_pit, PIT_CRYSTAL / 2); /* 7474 based frequency divide by 2 */
+	m_pit->pb_out_callback().set(FUNC(vme_fcscsi1_card_device::led_w));
 
 	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */
-	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible
-	MCFG_HD63450_CPU("maincpu") // CPU - 68010
-	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
-	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
-	MCFG_HD63450_DMA_END_CB(WRITE8(*this, vme_fcscsi1_card_device, dma_end))
-	MCFG_HD63450_DMA_ERROR_CB(WRITE8(*this, vme_fcscsi1_card_device, dma_error))
-	//MCFG_HD63450_DMA_READ_0_CB(READ8(*this, vme_fcscsi1_card_device, scsi_read_byte))  // ch 0 = SCSI
-	//MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(*this, vme_fcscsi1_card_device, scsi_write_byte))
-	MCFG_HD63450_DMA_READ_1_CB(READ8(*this, vme_fcscsi1_card_device, fdc_read_byte))  // ch 1 = fdc
-	MCFG_HD63450_DMA_WRITE_1_CB(WRITE8(*this, vme_fcscsi1_card_device, fdc_write_byte))
-MACHINE_CONFIG_END
+	HD63450(config, m_dmac, CPU_CRYSTAL / 2, "maincpu");   // MC68450 compatible
+	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
+	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
+	m_dmac->dma_end().set(FUNC(vme_fcscsi1_card_device::dma_end));
+	m_dmac->dma_error().set(FUNC(vme_fcscsi1_card_device::dma_error));
+	//m_dmac->dma_read<0>().set(FUNC(vme_fcscsi1_card_device::scsi_read_byte));  // ch 0 = SCSI
+	//m_dmac->dma_write<0>().set(FUNC(vme_fcscsi1_card_device::scsi_write_byte));
+	m_dmac->dma_read<1>().set(FUNC(vme_fcscsi1_card_device::fdc_read_byte));  // ch 1 = fdc
+	m_dmac->dma_write<1>().set(FUNC(vme_fcscsi1_card_device::fdc_write_byte));
+}
 
 const tiny_rom_entry *vme_fcscsi1_card_device::device_rom_region() const
 {

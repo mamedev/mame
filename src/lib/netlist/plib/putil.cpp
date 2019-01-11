@@ -36,7 +36,7 @@ namespace plib
 			if (getenv(var.c_str()) == nullptr)
 				return default_val;
 			else
-				return pstring(getenv(var.c_str()), pstring::UTF8);
+				return pstring(getenv(var.c_str()));
 		}
 	}
 
@@ -62,6 +62,36 @@ namespace plib
 				ret.push_back(t);
 		}
 		return ret;
+	}
+
+	std::vector<std::string> psplit_r(const std::string &stri,
+			const std::string &token,
+			const std::size_t maxsplit)
+	{
+		std::string str(stri);
+		std::vector<std::string> result;
+		std::size_t splits = 0;
+
+		while(str.size())
+		{
+			std::size_t index = str.rfind(token);
+			bool found = index!=std::string::npos;
+			if (found)
+				splits++;
+			if ((splits <= maxsplit || maxsplit == 0) && found)
+			{
+				result.push_back(str.substr(index+token.size()));
+				str = str.substr(0, index);
+				if (str.size()==0)
+					result.push_back(str);
+			}
+			else
+			{
+				result.push_back(str);
+				str = "";
+			}
+		}
+		return result;
 	}
 
 	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl)
@@ -92,7 +122,7 @@ namespace plib
 			}
 			else
 			{
-				pstring::code_t c = *i;
+				pstring::value_type c = *i;
 				col += c;
 				i++;
 			}
@@ -143,7 +173,7 @@ namespace plib
 				if (*str == ',')
 				{
 					*bufp = 0;
-					return pstring(buf, pstring::UTF8);
+					return pstring(buf);
 				}
 				else if (*str != ' ')
 					*bufp++ = *str;
@@ -156,6 +186,6 @@ namespace plib
 			str++;
 		}
 		*bufp = 0;
-		return pstring(buf, pstring::UTF8);
+		return pstring(buf);
 	}
 } // namespace plib

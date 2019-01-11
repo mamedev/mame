@@ -217,6 +217,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "mgames.lh"
@@ -231,9 +232,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void mgames(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(mixport_r);
 	DECLARE_WRITE8_MEMBER(outport0_w);
 	DECLARE_WRITE8_MEMBER(outport1_w);
@@ -243,13 +247,11 @@ public:
 	DECLARE_WRITE8_MEMBER(outport5_w);
 	DECLARE_WRITE8_MEMBER(outport6_w);
 	DECLARE_WRITE8_MEMBER(outport7_w);
-	DECLARE_PALETTE_INIT(mgames);
+	void mgames_palette(palette_device &palette) const;
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mgames(machine_config &config);
 	void main_map(address_map &map);
 
-protected:
-	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
 
 	uint8_t m_output[8];
@@ -258,7 +260,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<10> m_lamp;
+	output_finder<9> m_lamps;
 };
 
 
@@ -268,30 +270,25 @@ void mgames_state::video_start()
 
 uint32_t mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y,x;
-	int count;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *const gfx = m_gfxdecode->gfx(0);
 
-	count = 0;
-	for (y = 0; y < 32; y++)
+	int count = 0;
+	for (int y = 0; y < 32; y++)
 	{
-		for (x = 0; x < 32; x++)
+		for (int x = 0; x < 32; x++)
 		{
-			uint16_t dat = m_video[count];
-			uint16_t col = m_video[count + 0x400] & 0x7f;
+			uint16_t const dat = m_video[count];
+			uint16_t const col = m_video[count + 0x400] & 0x7f;
 			gfx->opaque(bitmap, cliprect, dat, col, 0, 0, x * 16, y * 16);
 			count++;
 		}
-
 	}
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(mgames_state, mgames)
+void mgames_state::mgames_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		rgb_t color;
 
@@ -356,8 +353,8 @@ READ8_MEMBER(mgames_state::mixport_r)
 
 WRITE8_MEMBER(mgames_state::outport0_w)
 {
-	m_lamp[1] = BIT(data, 0);      /* Lamp 1 - BET */
-	m_lamp[5] = BIT(data, 1);      /* Lamp 5 - HOLD 1 */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - BET */
+	m_lamps[4] = BIT(data, 1);      /* Lamp 5 - HOLD 1 */
 
 	m_output[0] = data;
 	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -377,8 +374,8 @@ WRITE8_MEMBER(mgames_state::outport0_w)
 
 WRITE8_MEMBER(mgames_state::outport1_w)
 {
-	m_lamp[2] = BIT(data, 0);      /* Lamp 2 - DEAL */
-	m_lamp[6] = BIT(data, 1);      /* Lamp 6 - HOLD 2 */
+	m_lamps[1] = BIT(data, 0);      /* Lamp 2 - DEAL */
+	m_lamps[5] = BIT(data, 1);      /* Lamp 6 - HOLD 2 */
 
 	m_output[1] = data;
 	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -398,8 +395,8 @@ WRITE8_MEMBER(mgames_state::outport1_w)
 
 WRITE8_MEMBER(mgames_state::outport2_w)
 {
-	m_lamp[3] = BIT(data, 0);      /* Lamp 3 - CANCEL */
-	m_lamp[7] = BIT(data, 1);      /* Lamp 7 - HOLD 3 */
+	m_lamps[2] = BIT(data, 0);      /* Lamp 3 - CANCEL */
+	m_lamps[6] = BIT(data, 1);      /* Lamp 7 - HOLD 3 */
 
 	m_output[2] = data;
 	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -419,8 +416,8 @@ WRITE8_MEMBER(mgames_state::outport2_w)
 
 WRITE8_MEMBER(mgames_state::outport3_w)
 {
-	m_lamp[4] = BIT(data, 0);      /* Lamp 4 - STAND */
-	m_lamp[8] = BIT(data, 1);      /* Lamp 8 - HOLD 4 */
+	m_lamps[3] = BIT(data, 0);      /* Lamp 4 - STAND */
+	m_lamps[7] = BIT(data, 1);      /* Lamp 8 - HOLD 4 */
 
 	m_output[3] = data;
 	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -440,7 +437,7 @@ WRITE8_MEMBER(mgames_state::outport3_w)
 
 WRITE8_MEMBER(mgames_state::outport4_w)
 {
-	m_lamp[9] = BIT(data, 1);      /* Lamp 9 - HOLD 5 */
+	m_lamps[8] = BIT(data, 1);      /* Lamp 9 - HOLD 5 */
 
 	m_output[4] = data;
 	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -538,17 +535,17 @@ void mgames_state::main_map(address_map &map)
 	map(0x3800, 0x38ff).ram().share("nvram");   /* NVRAM = 2x SCM5101E */
 	map(0x4000, 0x47ff).ram().share("video");   /* 4x MM2114N-3 */
 	map(0x8000, 0x8000).portr("SW1");
-	map(0x8001, 0x8001).r(this, FUNC(mgames_state::mixport_r)); /* DIP switch bank 2 + a sort of watchdog */
+	map(0x8001, 0x8001).r(FUNC(mgames_state::mixport_r)); /* DIP switch bank 2 + a sort of watchdog */
 	map(0x8002, 0x8002).portr("IN1");
 	map(0x8003, 0x8003).portr("IN2");
-	map(0x8000, 0x8000).w(this, FUNC(mgames_state::outport0_w));
-	map(0x8001, 0x8001).w(this, FUNC(mgames_state::outport1_w));
-	map(0x8002, 0x8002).w(this, FUNC(mgames_state::outport2_w));
-	map(0x8003, 0x8003).w(this, FUNC(mgames_state::outport3_w));
-	map(0x8004, 0x8004).w(this, FUNC(mgames_state::outport4_w));
-	map(0x8005, 0x8005).w(this, FUNC(mgames_state::outport5_w));
-	map(0x8006, 0x8006).w(this, FUNC(mgames_state::outport6_w));
-	map(0x8007, 0x8007).w(this, FUNC(mgames_state::outport7_w));
+	map(0x8000, 0x8000).w(FUNC(mgames_state::outport0_w));
+	map(0x8001, 0x8001).w(FUNC(mgames_state::outport1_w));
+	map(0x8002, 0x8002).w(FUNC(mgames_state::outport2_w));
+	map(0x8003, 0x8003).w(FUNC(mgames_state::outport3_w));
+	map(0x8004, 0x8004).w(FUNC(mgames_state::outport4_w));
+	map(0x8005, 0x8005).w(FUNC(mgames_state::outport5_w));
+	map(0x8006, 0x8006).w(FUNC(mgames_state::outport6_w));
+	map(0x8007, 0x8007).w(FUNC(mgames_state::outport7_w));
 }
 
 
@@ -648,7 +645,7 @@ MACHINE_CONFIG_START(mgames_state::mgames)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -657,11 +654,10 @@ MACHINE_CONFIG_START(mgames_state::mgames)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mgames_state, screen_update_mgames)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mgames)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mgames);
+	PALETTE(config, m_palette, FUNC(mgames_state::mgames_palette), 0x200);
 
 	/* sound hardware */
 	//  to do...

@@ -61,12 +61,12 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 void travrusa_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(travrusa_state::travrusa_videoram_w)).share("videoram");
-	map(0x9000, 0x9000).w(this, FUNC(travrusa_state::travrusa_scroll_x_low_w));
-	map(0xa000, 0xa000).w(this, FUNC(travrusa_state::travrusa_scroll_x_high_w));
+	map(0x8000, 0x8fff).ram().w(FUNC(travrusa_state::travrusa_videoram_w)).share("videoram");
+	map(0x9000, 0x9000).w(FUNC(travrusa_state::travrusa_scroll_x_low_w));
+	map(0xa000, 0xa000).w(FUNC(travrusa_state::travrusa_scroll_x_high_w));
 	map(0xc800, 0xc9ff).writeonly().share("spriteram");
 	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).w(this, FUNC(travrusa_state::travrusa_flipscreen_w));    /* + coin counters - not written by shtrider */
+	map(0xd001, 0xd001).w(FUNC(travrusa_state::travrusa_flipscreen_w));    /* + coin counters - not written by shtrider */
 	map(0xd000, 0xd000).portr("SYSTEM");     /* IN0 */
 	map(0xd001, 0xd001).portr("P1");         /* IN1 */
 	map(0xd002, 0xd002).portr("P2");         /* IN2 */
@@ -321,35 +321,32 @@ MACHINE_CONFIG_START(travrusa_state::travrusa)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(travrusa_state, screen_update_travrusa)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_travrusa)
-
-	MCFG_PALETTE_ADD("palette", 16*8+16*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128+16)
-	MCFG_PALETTE_INIT_OWNER(travrusa_state, travrusa)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_travrusa);
+	PALETTE(config, m_palette, FUNC(travrusa_state::travrusa_palette), 16*8+16*8, 128+16);
 
 	/* sound hardware */
 	//m52_sound_c_audio(config);
-	MCFG_DEVICE_ADD("irem_audio", IREM_M52_SOUNDC_AUDIO, 0)
-
+	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(travrusa_state::shtrider)
+void travrusa_state::shtrider(machine_config &config)
+{
 	travrusa(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
+	m_gfxdecode->set_info(gfx_shtrider);
+	m_palette->set_init(FUNC(travrusa_state::shtrider_palette));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(travrusa_state::shtriderb)
+void travrusa_state::shtriderb(machine_config &config)
+{
 	travrusa(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shtrider)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_shtrider);
+}
 
 /***************************************************************************
 

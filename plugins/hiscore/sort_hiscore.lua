@@ -82,7 +82,7 @@ lstfile:close()
 
 local sorted = {}
 local sindex = {}
-local comments = "" 
+local comments = ""
 
 for num, entry in pairs(entries) do
 	if not entry.name then
@@ -118,7 +118,7 @@ end
 for src, entries in pairs(sindex) do
 	for num1, entry in pairs(entries) do
 		for num2, entry2 in pairs(entries) do
-			if entry ~= entry2 and entry.data == entry2.data then
+			if entry.name and entry ~= entry2 and entry.data == entry2.data then
 				for num3, name in pairs(entry2.name) do
 					entry.name[#entry.name + 1] = name
 				end
@@ -210,7 +210,7 @@ for num, entry in ipairs(sorted) do
 		if entry.comment then
 			print(entry.comment)
 		end
-		print(table.concat(entry.name, "\n"))
+		print((table.concat(entry.name, "\n"):gsub("\n+","\n"):gsub("\n$","")))
 		print(entry.data)
 		print("\n")
 	end

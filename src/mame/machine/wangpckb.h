@@ -19,38 +19,18 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define WANGPC_KEYBOARD_TAG "wangpckb"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_WANGPC_KEYBOARD_ADD() \
-	MCFG_DEVICE_ADD(WANGPC_KEYBOARD_TAG, WANGPC_KEYBOARD, 0)
-
-#define MCFG_WANGPCKB_TXD_HANDLER(_devcb) \
-	devcb = &downcast<wangpc_keyboard_device &>(*device).set_txd_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> wangpc_keyboard_device
 
-class wangpc_keyboard_device :  public device_t,
-						   public device_serial_interface
+class wangpc_keyboard_device :  public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_txd_handler(Object &&cb) { return m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	auto txd_handler() { return m_txd_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
@@ -81,7 +61,7 @@ private:
 	required_device<i8051_device> m_maincpu;
 	required_ioport_array<16> m_y;
 	devcb_write_line m_txd_handler;
-	output_finder<6> m_led;
+	output_finder<6> m_leds;
 
 	uint8_t m_keylatch;
 	int m_rxd;

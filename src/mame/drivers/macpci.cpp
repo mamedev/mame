@@ -41,6 +41,7 @@
 #include "cpu/powerpc/ppc.h"
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -72,10 +73,10 @@ void macpci_state::pippin_mem(address_map &map)
 
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
 
-	map(0xf00dfff8, 0xf00dffff).r(this, FUNC(macpci_state::unk2_r));
-	map(0xf3008800, 0xf3008807).r(this, FUNC(macpci_state::unk1_r));
+	map(0xf00dfff8, 0xf00dffff).r(FUNC(macpci_state::unk2_r));
+	map(0xf3008800, 0xf3008807).r(FUNC(macpci_state::unk1_r));
 
-	map(0xf3016000, 0xf3017fff).rw(this, FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
+	map(0xf3016000, 0xf3017fff).rw(FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
@@ -90,54 +91,56 @@ uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-MACHINE_CONFIG_START(macpci_state::pippin)
+void macpci_state::pippin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC603, 66000000)
-	MCFG_DEVICE_PROGRAM_MAP(pippin_mem)
+	PPC603(config, m_maincpu, 66000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macpci_state::pippin_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(macpci_state, screen_update_pippin)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(macpci_state::screen_update_pippin));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD( "cdda", CDDA )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	cdda_device &cdda(CDDA(config, "cdda"));
+	cdda.add_route(0, "lspeaker", 1.00);
+	cdda.add_route(1, "rspeaker", 1.00);
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("pippin_cdrom")
-	MCFG_SOFTWARE_LIST_ADD("cd_list","pippin")
+	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
+	cdrom.set_interface("pippin_cdrom");
+	SOFTWARE_LIST(config, "cd_list").set_type("pippin", SOFTWARE_LIST_ORIGINAL_SYSTEM);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32M")
+	RAM(config, m_ram);
+	m_ram->set_default_size("32M");
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, C7M/10)
-	MCFG_VIA6522_READPA_HANDLER(READ8(*this, macpci_state, mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(*this, macpci_state, mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, macpci_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, macpci_state,mac_via_out_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, macpci_state, mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, macpci_state,mac_via_irq))
+	VIA6522(config, m_via1, C7M/10);
+	m_via1->readpa_handler().set(FUNC(macpci_state::mac_via_in_a));
+	m_via1->readpb_handler().set(FUNC(macpci_state::mac_via_in_b));
+	m_via1->writepa_handler().set(FUNC(macpci_state::mac_via_out_a));
+	m_via1->writepb_handler().set(FUNC(macpci_state::mac_via_out_b));
+	m_via1->cb2_handler().set(FUNC(macpci_state::mac_adb_via_out_cb2));
+	m_via1->irq_handler().set(FUNC(macpci_state::mac_via_irq));
 
-	//MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	//MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(*this, macpci_state, set_scc_interrupt))
-	MCFG_CUDA_ADD(CUDA_341S0060)
-	MCFG_CUDA_RESET_CALLBACK(WRITELINE(*this, macpci_state, cuda_reset_w))
-	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(*this, macpci_state, cuda_adb_linechange_w))
-	MCFG_CUDA_VIA_CLOCK_CALLBACK(WRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_CUDA_VIA_DATA_CALLBACK(WRITELINE("via6522_0", via6522_device, write_cb2))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-MACHINE_CONFIG_END
+	//scc8530_t &scc(SCC8530(config, "scc", C7M));
+	//scc.intrq_callback().set(FUNC(macpci_state::set_scc_interrupt));
+	CUDA(config, m_cuda, 0);
+	m_cuda->set_type(CUDA_341S0060);
+	m_cuda->reset_callback().set(FUNC(macpci_state::cuda_reset_w));
+	m_cuda->linechange_callback().set(FUNC(macpci_state::cuda_adb_linechange_w));
+	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
+	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+}
 
 /* ROM definition */
 /*
@@ -155,22 +158,22 @@ MACHINE_CONFIG_END
 ROM_START( pippin )
 	ROM_REGION( 0x400000, "bootrom",  ROMREGION_64BIT | ROMREGION_BE )
 	ROM_SYSTEM_BIOS(0, "v13", "Kinka v 1.3")
-	ROMX_LOAD( "bandai pippin,19960920 - kinka 1.3,- 3e6b3ee4-a52528e9ce8c.rom", 0x000000, 0x400000, CRC(87a1337d) SHA1(8e512af6e34dd823f3defec77d43ecbff1ecad54), ROM_BIOS(1) )
+	ROMX_LOAD( "bandai pippin,19960920 - kinka 1.3,- 3e6b3ee4-a52528e9ce8c.rom", 0x000000, 0x400000, CRC(87a1337d) SHA1(8e512af6e34dd823f3defec77d43ecbff1ecad54), ROM_BIOS(0) )
 
 	ROM_SYSTEM_BIOS(1, "v12", "Kinka v 1.2")
-	ROMX_LOAD( "bandai pippin,19960628 - kinka 1.2,- 3e10e14c-72c40c1af23a.rom", 0x000000, 0x400000, CRC(4fead4b3) SHA1(3fa02e9b0fa702ac6e02edc08911eac8b50e2d1f), ROM_BIOS(2) )
+	ROMX_LOAD( "bandai pippin,19960628 - kinka 1.2,- 3e10e14c-72c40c1af23a.rom", 0x000000, 0x400000, CRC(4fead4b3) SHA1(3fa02e9b0fa702ac6e02edc08911eac8b50e2d1f), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(2, "v1", "Kinka v 1.0")
-	ROMX_LOAD( "341s0251.u1", 0x000006, 0x100000, CRC(aaea2449) SHA1(2f63e215260a42fb7c5f2364682d5e8c0604646f),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(3))
-	ROMX_LOAD( "341s0252.u2", 0x000004, 0x100000, CRC(3d584419) SHA1(e29c764816755662693b25f1fb3c24faef4e9470),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(3))
-	ROMX_LOAD( "341s0253.u3", 0x000002, 0x100000, CRC(d8ae5037) SHA1(d46ce4d87ca1120dfe2cf2ba01451f035992b6f6),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(3))
-	ROMX_LOAD( "341s0254.u4", 0x000000, 0x100000, CRC(3e2851ba) SHA1(7cbf5d6999e890f5e9ab2bc4b10ca897c4dc2016),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(3))
+	ROMX_LOAD( "341s0251.u1", 0x000006, 0x100000, CRC(aaea2449) SHA1(2f63e215260a42fb7c5f2364682d5e8c0604646f),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(2))
+	ROMX_LOAD( "341s0252.u2", 0x000004, 0x100000, CRC(3d584419) SHA1(e29c764816755662693b25f1fb3c24faef4e9470),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(2))
+	ROMX_LOAD( "341s0253.u3", 0x000002, 0x100000, CRC(d8ae5037) SHA1(d46ce4d87ca1120dfe2cf2ba01451f035992b6f6),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(2))
+	ROMX_LOAD( "341s0254.u4", 0x000000, 0x100000, CRC(3e2851ba) SHA1(7cbf5d6999e890f5e9ab2bc4b10ca897c4dc2016),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "vgm", "Kinka GM version")
-	ROMX_LOAD( "bandai pippin,19960128 - kinka gm flash,- 2bf65931-318e40f6a1f4.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb), ROM_BIOS(4) )
+	ROMX_LOAD( "bandai pippin,19960128 - kinka gm flash,- 2bf65931-318e40f6a1f4.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb), ROM_BIOS(3) )
 
 	ROM_SYSTEM_BIOS(4, "pre", "Kinka pre-release")
-	ROMX_LOAD( "kinka-pre.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb),ROM_BIOS(5) )
+	ROMX_LOAD( "kinka-pre.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb),ROM_BIOS(4) )
 
 	ROM_REGION( 0x10000, "cdrom", 0 ) /* MATSUSHITA CR504-L OEM */
 	ROM_LOAD( "504par4.0i.ic7", 0x0000, 0x10000, CRC(25f7dd46) SHA1(ec3b3031742807924c6259af865e701827208fec) )

@@ -71,7 +71,7 @@
  *
  * History of Heurikon
  *---------------------
- * The company was founded 1972 as cellar company. Heurikon was aquired
+ * The company was founded 1972 as cellar company. Heurikon was acquired
  * 1989 by Computer Products, 1990 by Artesyn and finally in 2005 by Emerson
  * Electric who consolidated it fully by 2009 and closed the office.
  *
@@ -186,57 +186,57 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define BAUDGEN_CLOCK XTAL(19'660'800) /* Raltron */
+#define BAUDGEN_CLOCK 19.6608_MHz_XTAL /* Raltron */
 #define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* through a 74LS393 counter */
 
 class hk68v10_state : public driver_device
 {
 public:
-hk68v10_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device (mconfig, type, tag),
-		m_maincpu (*this, "maincpu")
-		,m_sccterm(*this, "scc")
-//        ,m_cart(*this, "exp_rom1")
-{
-}
+	hk68v10_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		, m_sccterm(*this, "scc")
+		//        ,m_cart(*this, "exp_rom1")
+	{
+	}
 
-DECLARE_READ16_MEMBER (bootvect_r);
-DECLARE_WRITE16_MEMBER (bootvect_w);
-//DECLARE_READ16_MEMBER (vme_a24_r);
-//DECLARE_WRITE16_MEMBER (vme_a24_w);
-//DECLARE_READ16_MEMBER (vme_a16_r);
-//DECLARE_WRITE16_MEMBER (vme_a16_w);
-virtual void machine_start () override;
-virtual void machine_reset () override;
-
-void hk68v10(machine_config &config);
-void hk68v10_mem(address_map &map);
-protected:
+	void hk68v10(machine_config &config);
 
 private:
-required_device<cpu_device> m_maincpu;
-required_device<scc8530_device> m_sccterm;
+	DECLARE_READ16_MEMBER(bootvect_r);
+	DECLARE_WRITE16_MEMBER(bootvect_w);
+	//DECLARE_READ16_MEMBER (vme_a24_r);
+	//DECLARE_WRITE16_MEMBER (vme_a24_w);
+	//DECLARE_READ16_MEMBER (vme_a16_r);
+	//DECLARE_WRITE16_MEMBER (vme_a16_w);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
+	void hk68v10_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<scc8530_device> m_sccterm;
+
+	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	uint16_t  *m_sysrom;
 	uint16_t  m_sysram[4];
 };
 
 void hk68v10_state::hk68v10_mem(address_map &map)
 {
-map.unmap_value_high();
-map(0x000000, 0x000007).ram().w(this, FUNC(hk68v10_state::bootvect_w));       /* After first write we act as RAM */
-map(0x000000, 0x000007).rom().r(this, FUNC(hk68v10_state::bootvect_r));       /* ROM mirror just durin reset */
-map(0x000008, 0x1fffff).ram(); /* 2 Mb RAM */
-map(0xFC0000, 0xFC3fff).rom(); /* System EPROM Area 16Kb HBUG */
-map(0xFC4000, 0xFDffff).rom(); /* System EPROM Area an additional 112Kb for System ROM */
-map(0xFE9000, 0xFE9007).rw("cio", FUNC(z8536_device::read), FUNC(z8536_device::write)).umask16(0xff00);
-map(0xfea000, 0xfea000).rw(m_sccterm, FUNC(scc8530_device::ca_r), FUNC(scc8530_device::ca_w)); /* Dual serial port Z80-SCC */
-map(0xfea002, 0xfea002).rw(m_sccterm, FUNC(scc8530_device::cb_r), FUNC(scc8530_device::cb_w)); /* Dual serial port Z80-SCC */
-map(0xfea004, 0xfea004).rw(m_sccterm, FUNC(scc8530_device::da_r), FUNC(scc8530_device::da_w)); /* Dual serial port Z80-SCC */
-map(0xfea006, 0xfea006).rw(m_sccterm, FUNC(scc8530_device::db_r), FUNC(scc8530_device::db_w)); /* Dual serial port Z80-SCC */
-//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+	map.unmap_value_high();
+	map(0x000000, 0x000007).ram().w(FUNC(hk68v10_state::bootvect_w));       /* After first write we act as RAM */
+	map(0x000000, 0x000007).rom().r(FUNC(hk68v10_state::bootvect_r));       /* ROM mirror just durin reset */
+	map(0x000008, 0x1fffff).ram(); /* 2 Mb RAM */
+	map(0xFC0000, 0xFC3fff).rom(); /* System EPROM Area 16Kb HBUG */
+	map(0xFC4000, 0xFDffff).rom(); /* System EPROM Area an additional 112Kb for System ROM */
+	map(0xFE9000, 0xFE9007).rw("cio", FUNC(z8536_device::read), FUNC(z8536_device::write)).umask16(0xff00);
+	map(0xfea000, 0xfea000).rw(m_sccterm, FUNC(scc8530_device::ca_r), FUNC(scc8530_device::ca_w)); /* Dual serial port Z80-SCC */
+	map(0xfea002, 0xfea002).rw(m_sccterm, FUNC(scc8530_device::cb_r), FUNC(scc8530_device::cb_w)); /* Dual serial port Z80-SCC */
+	map(0xfea004, 0xfea004).rw(m_sccterm, FUNC(scc8530_device::da_r), FUNC(scc8530_device::da_w)); /* Dual serial port Z80-SCC */
+	map(0xfea006, 0xfea006).rw(m_sccterm, FUNC(scc8530_device::db_r), FUNC(scc8530_device::db_w)); /* Dual serial port Z80-SCC */
+	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
+	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */
@@ -339,23 +339,23 @@ static void hk68_vme_cards(device_slot_interface &device)
  */
 MACHINE_CONFIG_START(hk68v10_state::hk68v10)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD ("maincpu", M68010, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("maincpu", M68010, 10_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP (hk68v10_mem)
 
-	MCFG_DEVICE_ADD("cio", Z8536, SCC_CLOCK)
+	Z8536(config, "cio", SCC_CLOCK);
 
 	/* Terminal Port config */
-	MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232trm", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232trm", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232trm", rs232_port_device, write_rts))
+	SCC8530N(config, m_sccterm, SCC_CLOCK);
+	m_sccterm->out_txda_callback().set("rs232trm", FUNC(rs232_port_device::write_txd));
+	m_sccterm->out_dtra_callback().set("rs232trm", FUNC(rs232_port_device::write_dtr));
+	m_sccterm->out_rtsa_callback().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD ("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8530_device, ctsa_w))
+	rs232_port_device &rs232trm(RS232_PORT(config, "rs232trm", default_rs232_devices, "terminal"));
+	rs232trm.rxd_handler().set(m_sccterm, FUNC(scc8530_device::rxa_w));
+	rs232trm.cts_handler().set(m_sccterm, FUNC(scc8530_device::ctsa_w));
 
 	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, hk68_vme_cards, nullptr)
+	MCFG_VME_SLOT_ADD("vme", 1, hk68_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */

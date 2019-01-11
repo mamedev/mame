@@ -42,16 +42,13 @@
 
 #include "emu.h"
 #include "includes/tx1.h"
-#include "audio/tx1.h"
 
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
-#include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "rendlay.h"
-#include "speaker.h"
 
 #include "tx1.lh"
 #include "buggyboy.lh"
@@ -64,12 +61,6 @@
  *
  *************************************/
 
-/* Main CPU and Z80 synchronisation */
-WRITE16_MEMBER(tx1_state::z80_busreq_w)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-}
-
 WRITE16_MEMBER(tx1_state::resume_math_w)
 {
 	m_mathcpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
@@ -78,398 +69,6 @@ WRITE16_MEMBER(tx1_state::resume_math_w)
 WRITE16_MEMBER(tx1_state::halt_math_w)
 {
 	m_mathcpu->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
-}
-
-/* Z80 can trigger its own interrupts */
-WRITE8_MEMBER(tx1_state::z80_intreq_w)
-{
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-/* Periodic Z80 interrupt */
-INTERRUPT_GEN_MEMBER(tx1_state::z80_irq)
-{
-	device.execute().set_input_line(0, HOLD_LINE);
-}
-
-READ16_MEMBER(tx1_state::z80_shared_r)
-{
-	address_space &cpu2space = m_audiocpu->space(AS_PROGRAM);
-	return cpu2space.read_byte(offset);
-}
-
-WRITE16_MEMBER(tx1_state::z80_shared_w)
-{
-	address_space &cpu2space = m_audiocpu->space(AS_PROGRAM);
-	cpu2space.write_byte(offset, data & 0xff);
-}
-
-
-/*************************************
- *
- *  Port definitions
- *
- *************************************/
-
-static INPUT_PORTS_START( tx1 )
-	PORT_START("DSW")
-	/* Dipswitch DS.2 is 6 switches but "maps" to switches 2 to 8 (at 6P according to the manual)  */
-	PORT_DIPNAME( 0x000c, 0x0000, "Game Cost" )         PORT_DIPLOCATION("DS.2:1,2")
-	PORT_DIPSETTING(      0x0000, "1 Coin Unit for 1 Credit" )
-	PORT_DIPSETTING(      0x0004, "2 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x0008, "3 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x000c, "4 Coin Units for 1 Credit" )
-
-	PORT_DIPNAME( 0x0010, 0x0000, "Left Coin Mechanism" )       PORT_DIPLOCATION("DS.2:3")
-	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
-	PORT_DIPSETTING(      0x0010, "1 Coin for 2 Coin Units" )
-
-	PORT_DIPNAME( 0x0060, 0x0000, "Right Coin Mechanism" )      PORT_DIPLOCATION("DS.2:4,5")
-	PORT_DIPSETTING(      0x0000, "1 Coin for 1 Coin Unit" )
-	PORT_DIPSETTING(      0x0020, "1 Coin for 4 Coin Units" )
-	PORT_DIPSETTING(      0x0040, "1 Coin for 5 Coin Units" )
-	PORT_DIPSETTING(      0x0060, "1 Coin for 6 Coin Units" )
-
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )      PORT_DIPLOCATION("DS.2:6") /* Manual states switches 6 to 8 unused (physically it's only 6 switches) */
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	/* Dipswitch DS.1 is 8 switches (at 8P according to the manual) */
-	PORT_DIPNAME( 0x0700, 0x0300, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("DS.1:1,2,3")
-	PORT_DIPSETTING(      0x0000, "A (Easiest)" )
-	PORT_DIPSETTING(      0x0100, "B" )
-	PORT_DIPSETTING(      0x0200, "C" )
-	PORT_DIPSETTING(      0x0300, "D" )
-	PORT_DIPSETTING(      0x0400, "E" )
-	PORT_DIPSETTING(      0x0500, "F" )
-	PORT_DIPSETTING(      0x0600, "G" )
-	PORT_DIPSETTING(      0x0700, "H (Hardest)" )
-
-	PORT_DIPNAME( 0x1800, 0x1000, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("DS.1:4,5")
-	PORT_DIPSETTING(      0x0000, "A (Longest)" )
-	PORT_DIPSETTING(      0x0800, "B" )
-	PORT_DIPSETTING(      0x1000, "C" )
-	PORT_DIPSETTING(      0x1800, "D (Shortest)" )
-
-	PORT_DIPNAME( 0xe000, 0xe000, "Bonus Adder" )       PORT_DIPLOCATION("DS.1:6,7,8")
-	PORT_DIPSETTING(      0x0000, "No Bonus" )
-	PORT_DIPSETTING(      0x2000, "2 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x4000, "3 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x6000, "4 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0x8000, "5 Coin Units for 1 Credit" )
-	PORT_DIPSETTING(      0xa000, "4 Coin Units for 2 Credit" )
-	PORT_DIPSETTING(      0xc000, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(      0xe000, "No Bonus" )
-
-	PORT_START("AN_STEERING")
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-
-	PORT_START("AN_ACCELERATOR")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-
-	PORT_START("AN_BRAKE")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-
-	PORT_START("PPI_PORTC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
-
-	PORT_START("PPI_PORTD")
-	/* Wire jumper setting on sound PCB - actually unpopulated 4 switch DS.3 */
-	PORT_DIPNAME( 0xf0, 0x80, "Sound PCB Jumper (DS.3)" )
-	PORT_DIPSETTING(    0x10, "1" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x40, "3" )
-	PORT_DIPSETTING(    0x80, "4" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( tx1j )
-	PORT_INCLUDE(tx1)
-
-	PORT_MODIFY("DSW")
-	/* Dipswitch DS.2 is 6 switches but "maps" to switches 2 to 8 (at 6P according to the manual)  */
-	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("DS.2:1,2,3") /* As silkscreened on the PCB */
-	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
-
-	PORT_DIPNAME( 0x00e0, 0x0000, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("DS.2:4,5,6") /* As silkscreened on the PCB */
-	PORT_DIPSETTING(      0x0040, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x00e0, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_6C ) )
-
-	/* Dipswitch DS.1 is 8 switches (at 8P according to the manual) */
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DS.1:6,7,8")
-	PORT_DIPSETTING(      0x0000, "0" )
-	PORT_DIPSETTING(      0x2000, "1" )
-	PORT_DIPSETTING(      0x4000, "2" )
-	PORT_DIPSETTING(      0x6000, "3" )
-	PORT_DIPSETTING(      0x8000, "4" )
-	PORT_DIPSETTING(      0xa000, "5" )
-	PORT_DIPSETTING(      0xc000, "6" )
-	PORT_DIPSETTING(      0xe000, "7" )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( buggyboy )
-	PORT_START("DSW")
-	/* Dipswitch 0 is unconnected */
-	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )    PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
-	PORT_DIPSETTING(      0x0000, "0" )
-	PORT_DIPSETTING(      0x0001, "1" )
-	PORT_DIPSETTING(      0x0002, "2" )
-	PORT_DIPSETTING(      0x0003, "3" )
-
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
-	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
-
-	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )  PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )     PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(      0x0000, "A (Longest)" )
-	PORT_DIPSETTING(      0x0010, "B" )
-	PORT_DIPSETTING(      0x0020, "C" )
-	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
-
-	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )     PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(      0x0000, "A (Easy)")
-	PORT_DIPSETTING(      0x0040, "B" )
-	PORT_DIPSETTING(      0x0080, "C" )
-	PORT_DIPSETTING(      0x00c0, "D (Difficult)" )
-
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6")
-	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0xc000, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0xe000, "Free-Play" )
-
-	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:5,4")
-	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_5C ) )
-
-	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )    PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
-	PORT_DIPSETTING(      0x0000, "0" )
-	PORT_DIPSETTING(      0x0100, "1" )
-	PORT_DIPSETTING(      0x0200, "2" )
-	PORT_DIPSETTING(      0x0300, "3" )
-	PORT_DIPSETTING(      0x0400, "4" )
-	PORT_DIPSETTING(      0x0500, "5" )
-	PORT_DIPSETTING(      0x0600, "6" )
-	PORT_DIPSETTING(      0x0700, "7" )
-
-	PORT_START("PPI_PORTA")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
-
-	PORT_START("PPI_PORTC")
-	PORT_DIPNAME( 0xff, 0x80, "Sound PCB Jumper" )
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x20, "Speed Buggy/Data East" )
-	PORT_DIPSETTING(    0x40, "Buggy Boy/Taito" )
-	PORT_DIPSETTING(    0x80, "Buggy Boy/Tatsumi" )
-
-	PORT_START("AN_STEERING")
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
-
-	PORT_START("AN_ACCELERATOR")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-
-	PORT_START("AN_BRAKE")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( buggybjr )
-	PORT_START("DSW")
-	/* Dipswitch 0 is unconnected */
-	PORT_DIPNAME( 0x0003, 0x0003, "Do not change DSW2 1&2" )    PORT_DIPLOCATION("SW2:1,2") /* Listed in manual as "Do Not Change" */
-	PORT_DIPSETTING(      0x0000, "0" )
-	PORT_DIPSETTING(      0x0001, "1" )
-	PORT_DIPSETTING(      0x0002, "2" )
-	PORT_DIPSETTING(      0x0003, "3" )
-
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:3") /* Language of game instructions */
-	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
-
-	PORT_DIPNAME( 0x0008, 0x0008, "Do not Change DSW2 4" )  PORT_DIPLOCATION("SW2:4") /* Listed in manual as "Do Not Change" */
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x0030, 0x0010, "Time Rank" )     PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(      0x0000, "A (Longest)" )
-	PORT_DIPSETTING(      0x0010, "B" )
-	PORT_DIPSETTING(      0x0020, "C" )
-	PORT_DIPSETTING(      0x0030, "D (Shortest)" )
-
-	PORT_DIPNAME( 0x00c0, 0x0040, "Game Rank" )     PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(      0x0000, "A (Easy)")
-	PORT_DIPSETTING(      0x0040, "B" )
-	PORT_DIPSETTING(      0x0080, "C" )
-	PORT_DIPSETTING(      0x00c0, "D (Difficult)" )
-
-	PORT_DIPNAME( 0xe000, 0x0000, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6")
-	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0xc000, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0xe000, "Free-Play" )
-
-	PORT_DIPNAME( 0x1800, 0x0800, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW1:5,4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_6C ) )
-
-	PORT_DIPNAME( 0x0700, 0x0700, "Do not change DSW1 1-3" )    PORT_DIPLOCATION("SW1:3,2,1") /* Listed in manual as "Do Not Change" */
-	PORT_DIPSETTING(      0x0000, "0" )
-	PORT_DIPSETTING(      0x0100, "1" )
-	PORT_DIPSETTING(      0x0200, "2" )
-	PORT_DIPSETTING(      0x0300, "3" )
-	PORT_DIPSETTING(      0x0400, "4" )
-	PORT_DIPSETTING(      0x0500, "5" )
-	PORT_DIPSETTING(      0x0600, "6" )
-	PORT_DIPSETTING(      0x0700, "7" )
-
-	PORT_START("YM2149_IC19_A")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
-
-	/* Wire jumper setting on sound PCB */
-	PORT_START("YM2149_IC19_B")
-	PORT_DIPNAME( 0xff, 0x80, "Sound PCB Jumper" )
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x01, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x20, "Speed Buggy/Data East" )
-	PORT_DIPSETTING(    0x40, "Buggy Boy/Taito" )
-	PORT_DIPSETTING(    0x80, "Buggy Boy/Tatsumi" )
-
-	PORT_START("AN_STEERING")
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
-
-	PORT_START("AN_ACCELERATOR")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-
-	PORT_START("AN_BRAKE")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-INPUT_PORTS_END
-
-READ16_MEMBER(tx1_state::dipswitches_r)
-{
-	return (ioport("DSW")->read() & 0xfffe) | m_ts;
-}
-
-/*
-    (TODO) TS: Connected in place of dipswitch A bit 0
-    Accessed on startup as some sort of acknowledgement
-*/
-WRITE8_MEMBER(tx1_state::ts_w)
-{
-//  TS = 1;
-	m_z80_ram[offset] = data;
-}
-
-READ8_MEMBER(tx1_state::ts_r)
-{
-//  TS = 1;
-	return m_z80_ram[offset];
-}
-
-
-WRITE8_MEMBER(tx1_state::tx1_coin_cnt_w)
-{
-	machine().bookkeeping().coin_counter_w(0, data & 0x80);
-	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-//  machine().bookkeeping().coin_counter_w(2, data & 0x40);
-}
-
-WRITE8_MEMBER(tx1_state::bb_coin_cnt_w)
-{
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
-//  machine().bookkeeping().coin_counter_w(2, data & 0x04);
-}
-
-WRITE8_MEMBER(tx1_state::tx1_ppi_latch_w)
-{
-	m_ppi_latch_a = ((ioport("AN_BRAKE")->read() & 0xf) << 4) | (ioport("AN_ACCELERATOR")->read() & 0xf);
-	m_ppi_latch_b = ioport("AN_STEERING")->read();
-}
-
-READ8_MEMBER(tx1_state::tx1_ppi_porta_r)
-{
-	return m_ppi_latch_a;
-}
-
-READ8_MEMBER(tx1_state::tx1_ppi_portb_r)
-{
-	return ioport("PPI_PORTD")->read() | m_ppi_latch_b;
-}
-
-
-static uint8_t bit_reverse8(uint8_t val)
-{
-	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
-	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);
-	val = ((val & 0xAA) >>  1) | ((val & 0x55) <<  1);
-
-	return val;
-}
-
-// Tazmi TZ2103 custom 4-channel A/D converter @ 7.5 MHz
-READ8_MEMBER(tx1_state::bb_analog_r)
-{
-	if (offset == 0)
-		return bit_reverse8(((ioport("AN_ACCELERATOR")->read() & 0xf) << 4) | ioport("AN_STEERING")->read());
-	else
-		return bit_reverse8((ioport("AN_BRAKE")->read() & 0xf) << 4);
-}
-
-READ8_MEMBER(tx1_state::bbjr_analog_r)
-{
-	if (offset == 0)
-		return ((ioport("AN_ACCELERATOR")->read() & 0xf) << 4) | ioport("AN_STEERING")->read();
-	else
-		return (ioport("AN_BRAKE")->read() & 0xf) << 4;
 }
 
 
@@ -484,48 +83,32 @@ void tx1_state::tx1_main(address_map &map)
 	map(0x00000, 0x00fff).mirror(0x1000).ram();
 	map(0x02000, 0x02fff).mirror(0x1000).ram();
 	map(0x04000, 0x04fff).mirror(0x1000).ram().share("nvram");
-	map(0x06000, 0x06fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x06000, 0x06fff).rw(FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
 	map(0x08000, 0x09fff).ram().share("vram");
 	map(0x0a000, 0x0afff).ram().share("rcram");
-	map(0x0b000, 0x0b001).rw(this, FUNC(tx1_state::dipswitches_r), FUNC(tx1_state::z80_busreq_w));
-	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::tx1_scolst_w));
-	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
-	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::tx1_slock_w));
-	map(0x0f000, 0x0f001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
-	map(0x10000, 0x1ffff).rw(this, FUNC(tx1_state::z80_shared_r), FUNC(tx1_state::z80_shared_w));
+	map(0x0b000, 0x0b001).rw(m_sound, FUNC(tx1_sound_device::dipswitches_r), FUNC(tx1_sound_device::z80_busreq_w));
+	map(0x0c000, 0x0c001).w(FUNC(tx1_state::tx1_scolst_w));
+	map(0x0d000, 0x0d003).w(FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(FUNC(tx1_state::tx1_slock_w));
+	map(0x0f000, 0x0f001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(FUNC(tx1_state::resume_math_w));
+	map(0x10000, 0x1ffff).rw(m_sound, FUNC(tx1_sound_device::z80_shared_r), FUNC(tx1_sound_device::z80_shared_w));
 	map(0x20000, 0x2ffff).mirror(0xd0000).rom();
 }
 
 void tx1_state::tx1_math(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("math_ram");
-	map(0x00800, 0x00fff).rw(this, FUNC(tx1_state::tx1_spcs_ram_r), FUNC(tx1_state::tx1_spcs_ram_w));
+	map(0x00800, 0x00fff).rw(FUNC(tx1_state::tx1_spcs_ram_r), FUNC(tx1_state::tx1_spcs_ram_w));
 	map(0x01000, 0x01fff).ram().share("rcram");
 	map(0x02000, 0x022ff).ram().share("objram");
-	map(0x02400, 0x027ff).w(this, FUNC(tx1_state::tx1_bankcs_w));
-	map(0x02800, 0x02bff).w(this, FUNC(tx1_state::halt_math_w));
-	map(0x02C00, 0x02fff).w(this, FUNC(tx1_state::tx1_flgcs_w));
-	map(0x03000, 0x03fff).rw(this, FUNC(tx1_state::tx1_math_r), FUNC(tx1_state::tx1_math_w));
+	map(0x02400, 0x027ff).w(FUNC(tx1_state::tx1_bankcs_w));
+	map(0x02800, 0x02bff).w(FUNC(tx1_state::halt_math_w));
+	map(0x02C00, 0x02fff).w(FUNC(tx1_state::tx1_flgcs_w));
+	map(0x03000, 0x03fff).rw(FUNC(tx1_state::tx1_math_r), FUNC(tx1_state::tx1_math_w));
 	map(0x04000, 0x07fff).mirror(0xf8000).rom();
-	map(0x05000, 0x07fff).r(this, FUNC(tx1_state::tx1_spcs_rom_r));
+	map(0x05000, 0x07fff).r(FUNC(tx1_state::tx1_spcs_rom_r));
 }
 
-void tx1_state::tx1_sound_prg(address_map &map)
-{
-	map(0x0000, 0x1fff).rom();
-	map(0x3000, 0x37ff).ram().mirror(0x800).share("z80_ram");
-	map(0x4000, 0x4000).w(this, FUNC(tx1_state::z80_intreq_w));
-	map(0x5000, 0x5003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x6000, 0x6003).rw("tx1", FUNC(tx1_sound_device::pit8253_r), FUNC(tx1_sound_device::pit8253_w));
-	map(0x7000, 0x7fff).w(this, FUNC(tx1_state::tx1_ppi_latch_w));
-	map(0xb000, 0xbfff).rw(this, FUNC(tx1_state::ts_r), FUNC(tx1_state::ts_w));
-}
-
-void tx1_state::tx1_sound_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::data_address_w));
-}
 
 
 /*************************************
@@ -537,15 +120,15 @@ void tx1_state::tx1_sound_io(address_map &map)
 void tx1_state::buggyboy_main(address_map &map)
 {
 	map(0x00000, 0x03fff).ram().share("nvram");
-	map(0x04000, 0x04fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x04000, 0x04fff).rw(FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
 	map(0x08000, 0x09fff).ram().share("vram");
 	map(0x0a000, 0x0afff).ram().share("rcram");
-	map(0x0b000, 0x0b001).rw(this, FUNC(tx1_state::dipswitches_r), FUNC(tx1_state::z80_busreq_w));
-	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::buggyboy_scolst_w));
-	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
-	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::buggyboy_sky_w));
-	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
-	map(0x10000, 0x1ffff).rw(this, FUNC(tx1_state::z80_shared_r), FUNC(tx1_state::z80_shared_w));
+	map(0x0b000, 0x0b001).rw(m_sound, FUNC(tx1_sound_device::dipswitches_r), FUNC(tx1_sound_device::z80_busreq_w));
+	map(0x0c000, 0x0c001).w(FUNC(tx1_state::buggyboy_scolst_w));
+	map(0x0d000, 0x0d003).w(FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(FUNC(tx1_state::buggyboy_sky_w));
+	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(FUNC(tx1_state::resume_math_w));
+	map(0x10000, 0x1ffff).rw(m_sound, FUNC(tx1_sound_device::z80_shared_r), FUNC(tx1_sound_device::z80_shared_w));
 	map(0x20000, 0x2ffff).rom();
 	map(0xf0000, 0xfffff).rom();
 }
@@ -553,15 +136,15 @@ void tx1_state::buggyboy_main(address_map &map)
 void tx1_state::buggybjr_main(address_map &map)
 {
 	map(0x00000, 0x03fff).ram().share("nvram");
-	map(0x04000, 0x04fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x04000, 0x04fff).rw(FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
 	map(0x08000, 0x08fff).ram().share("vram");
 	map(0x0a000, 0x0afff).ram().share("rcram");
-	map(0x0b000, 0x0b001).rw(this, FUNC(tx1_state::dipswitches_r), FUNC(tx1_state::z80_busreq_w));
-	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::buggyboy_scolst_w));
-	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
-	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::buggyboy_sky_w));
-	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
-	map(0x10000, 0x1ffff).rw(this, FUNC(tx1_state::z80_shared_r), FUNC(tx1_state::z80_shared_w));
+	map(0x0b000, 0x0b001).rw(m_sound, FUNC(tx1_sound_device::dipswitches_r), FUNC(tx1_sound_device::z80_busreq_w));
+	map(0x0c000, 0x0c001).w(FUNC(tx1_state::buggyboy_scolst_w));
+	map(0x0d000, 0x0d003).w(FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(FUNC(tx1_state::buggyboy_sky_w));
+	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(FUNC(tx1_state::resume_math_w));
+	map(0x10000, 0x1ffff).rw(m_sound, FUNC(tx1_sound_device::z80_shared_r), FUNC(tx1_sound_device::z80_shared_w));
 	map(0x20000, 0x2ffff).rom();
 	map(0xf0000, 0xfffff).rom();
 }
@@ -569,46 +152,13 @@ void tx1_state::buggybjr_main(address_map &map)
 void tx1_state::buggyboy_math(address_map &map)
 {
 	map(0x00000, 0x007ff).ram().share("math_ram");
-	map(0x00800, 0x00fff).rw(this, FUNC(tx1_state::buggyboy_spcs_ram_r), FUNC(tx1_state::buggyboy_spcs_ram_w));
+	map(0x00800, 0x00fff).rw(FUNC(tx1_state::buggyboy_spcs_ram_r), FUNC(tx1_state::buggyboy_spcs_ram_w));
 	map(0x01000, 0x01fff).ram().share("rcram");
 	map(0x02000, 0x022ff).ram().share("objram");
-	map(0x02400, 0x024ff).w(this, FUNC(tx1_state::buggyboy_gas_w));
-	map(0x03000, 0x03fff).rw(this, FUNC(tx1_state::buggyboy_math_r), FUNC(tx1_state::buggyboy_math_w));
+	map(0x02400, 0x024ff).w(FUNC(tx1_state::buggyboy_gas_w));
+	map(0x03000, 0x03fff).rw(FUNC(tx1_state::buggyboy_math_r), FUNC(tx1_state::buggyboy_math_w));
 	map(0x04000, 0x07fff).mirror(0xf8000).rom();
-	map(0x05000, 0x07fff).r(this, FUNC(tx1_state::buggyboy_spcs_rom_r));
-}
-
-/* Buggy Boy Sound PCB TC033A */
-void tx1_state::buggyboy_sound_prg(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram().share("z80_ram");
-	map(0x6000, 0x6001).r(this, FUNC(tx1_state::bb_analog_r));
-	map(0x6800, 0x6803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7000, 0x7003).rw("buggyboy", FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
-	map(0x7800, 0x7800).w(this, FUNC(tx1_state::z80_intreq_w));
-	map(0xc000, 0xc7ff).rw(this, FUNC(tx1_state::ts_r), FUNC(tx1_state::ts_w));
-}
-
-/* Buggy Boy Jr Sound PCB TC043 */
-void tx1_state::buggybjr_sound_prg(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram().share("z80_ram");
-	map(0x5000, 0x5003).rw("buggyboy", FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
-	map(0x6000, 0x6001).r(this, FUNC(tx1_state::bbjr_analog_r));
-	map(0x7000, 0x7000).w(this, FUNC(tx1_state::z80_intreq_w));
-	map(0xc000, 0xc7ff).rw(this, FUNC(tx1_state::ts_r), FUNC(tx1_state::ts_w));
-}
-
-/* Common */
-void tx1_state::buggyboy_sound_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x40, 0x40).r("ym1", FUNC(ay8910_device::data_r));
-	map(0x40, 0x41).w("ym1", FUNC(ay8910_device::data_address_w));
-	map(0x80, 0x80).r("ym2", FUNC(ay8910_device::data_r));
-	map(0x80, 0x81).w("ym2", FUNC(ay8910_device::data_address_w));
+	map(0x05000, 0x07fff).r(FUNC(tx1_state::buggyboy_spcs_rom_r));
 }
 
 /*************************************
@@ -621,30 +171,18 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(tx1_main)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(tx1_math)
 
-	MCFG_DEVICE_ADD("audio_cpu", Z80, TX1_PIXEL_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tx1_sound_prg)
-	MCFG_DEVICE_IO_MAP(tx1_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, irq0_line_hold,  TX1_PIXEL_CLOCK / 4 / 2048 / 2)
-
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, tx1_state, tx1_ppi_porta_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, tx1_state, tx1_ppi_portb_r))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, tx1_state, tx1_coin_cnt_w))
+	PALETTE(config, "palette", FUNC(tx1_state::tx1_palette), 256);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,tx1)
-
-	MCFG_DEFAULT_LAYOUT(layout_triphsxs)
+	config.set_default_layout(layout_triphsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART)
@@ -664,48 +202,31 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,tx1)
 
-	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
-	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
-//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
-//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
-
-	MCFG_DEVICE_ADD("aysnd", AY8910, TX1_PIXEL_CLOCK / 8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("tx1", tx1_sound_device, ay8910_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("tx1", tx1_sound_device, ay8910_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
-
-	MCFG_DEVICE_ADD("tx1", TX1_SOUND, TX1_PIXEL_CLOCK)
-	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
-	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
+	MCFG_DEVICE_ADD("soundbrd", TX1_SOUND, TX1_PIXEL_CLOCK)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(tx1_state::tx1j)
+	tx1(config);
+
+	MCFG_DEVICE_REMOVE("soundbrd")
+
+	MCFG_DEVICE_ADD("soundbrd", TX1J_SOUND, TX1_PIXEL_CLOCK)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_main)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
 
-	MCFG_DEVICE_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(buggyboy_sound_prg)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
-	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
-
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("PPI_PORTA"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, tx1_state, bb_coin_cnt_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("PPI_PORTC"))
-
-	MCFG_DEFAULT_LAYOUT(layout_triphsxs)
+	config.set_default_layout(layout_triphsxs);
 
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
@@ -723,27 +244,10 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
+	PALETTE(config, "palette", FUNC(tx1_state::buggyboy_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
-	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
-	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
-//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5); /* Atari TX-1 TM262 manual shows 4 speakers (TX-1 Audio PCB Assembly A042016-01 A) */
-//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
-
-	MCFG_DEVICE_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym1_a_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
-
-	MCFG_DEVICE_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym2_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
-
-	MCFG_DEVICE_ADD("buggyboy", BUGGYBOY_SOUND, BUGGYBOY_ZCLK)
-	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
-	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
+	MCFG_DEVICE_ADD("soundbrd", BUGGYBOY_SOUND, BUGGYBOY_ZCLK)
 MACHINE_CONFIG_END
 
 
@@ -751,19 +255,14 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_DEVICE_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(buggybjr_main)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 //  MCFG_WATCHDOG_TIME_INIT(5)
 
 	MCFG_DEVICE_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MCFG_DEVICE_PROGRAM_MAP(buggyboy_math)
 
-	MCFG_DEVICE_ADD("audio_cpu", Z80, BUGGYBOY_ZCLK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(buggybjr_sound_prg)
-	MCFG_DEVICE_IO_MAP(buggyboy_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tx1_state, z80_irq,  BUGGYBOY_ZCLK / 2 / 4 / 2048)
-
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,buggyboy)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
@@ -771,28 +270,10 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
+	PALETTE(config, "palette", FUNC(tx1_state::buggyboy_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
-	SPEAKER(config, "frontleft", -0.2, 0.0, 1.0);
-	SPEAKER(config, "frontright", 0.2, 0.0, 1.0);
-//  SPEAKER(config, "rearleft", -0.2, 0.0, -0.5);
-//  SPEAKER(config, "rearright", 0.2, 0.0, -0.5);
-
-	MCFG_DEVICE_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC19 */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2149_IC19_A"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM2149_IC19_B"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
-
-	MCFG_DEVICE_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4) /* YM2149 IC24 */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym2_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("buggyboy", buggyboy_sound_device, ym2_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
-
-	MCFG_DEVICE_ADD("buggyboy", BUGGYBOY_SOUND, BUGGYBOY_ZCLK)
-	MCFG_SOUND_ROUTE(0, "frontleft", 0.2)
-	MCFG_SOUND_ROUTE(1, "frontright", 0.2)
+	MCFG_DEVICE_ADD("soundbrd", BUGGYBOYJR_SOUND, BUGGYBOY_ZCLK)
 MACHINE_CONFIG_END
 
 
@@ -820,7 +301,7 @@ ROM_START( tx1 )
 	ROM_LOAD16_BYTE( "8411-136027-152.146", 0x04000, 0x2000, CRC(b65eeea2) SHA1(b5f26e17520c598132b93c5cd7af7ebd03b10012) )
 	ROM_LOAD16_BYTE( "8411-136027-151.132", 0x04001, 0x2000, CRC(0d63dadc) SHA1(0954174b25c08967d3efb31f5721fd05502d66dd) )
 
-	ROM_REGION( 0x10000, "audio_cpu", 0 )
+	ROM_REGION( 0x10000, "soundbrd:audio_cpu", 0 )
 	ROM_LOAD( "8411-136027-157.11", 0x00000, 0x2000, CRC(10ae3075) SHA1(69c5f62f2473aba848383eed3cecf15e273d86ca) )
 
 	ROM_REGION( 0x8000, "char_tiles", 0 )
@@ -907,7 +388,7 @@ ROM_START( tx1jb )
 	ROM_LOAD16_BYTE( "tx1_9b.ic146", 0x04000, 0x2000, CRC(af677ff4) SHA1(3968d7f3811ed7552efe1e1c5c416ec740503ee4) )
 	ROM_LOAD16_BYTE( "tx1_8b.ic132", 0x04001, 0x2000, CRC(dd4356f8) SHA1(b666d2aa93e61f6bcdb8326b8b06635be743b64e) )
 
-	ROM_REGION( 0x10000, "audio_cpu", 0 )
+	ROM_REGION( 0x10000, "soundbrd:audio_cpu", 0 )
 	ROM_LOAD( "tx1_22h.ic9", 0x00000, 0x2000, CRC(66376232) SHA1(b8a026dae47173e7760eea4f52e67e525ad1b70b) )
 
 	ROM_REGION( 0x8000, "char_tiles", 0 )
@@ -988,7 +469,7 @@ ROM_START( tx1jc )
 	ROM_LOAD16_BYTE( "tx1_9c.ic146", 0x04000, 0x2000, CRC(b65eeea2) SHA1(b5f26e17520c598132b93c5cd7af7ebd03b10012) )
 	ROM_LOAD16_BYTE( "tx1_8c.ic132", 0x04001, 0x2000, CRC(0d63dadc) SHA1(0954174b25c08967d3efb31f5721fd05502d66dd) )
 
-	ROM_REGION( 0x10000, "audio_cpu", 0 ) /* Label was missing */
+	ROM_REGION( 0x10000, "soundbrd:audio_cpu", 0 ) /* Label was missing */
 	ROM_LOAD( "8411-136027-157.11", 0x00000, 0x2000, CRC(10ae3075) SHA1(69c5f62f2473aba848383eed3cecf15e273d86ca) ) /* Unconfirmed TC013A or the later TC013B */
 
 	ROM_REGION( 0x8000, "char_tiles", 0 )
@@ -1073,7 +554,7 @@ ROM_START( buggyboy )
 	ROM_LOAD16_BYTE( "bug8a.061", 0x04000, 0x2000, CRC(512291cd) SHA1(60f87133c86b88b982ba4680f96d0ac55970cb8d) )
 	ROM_LOAD16_BYTE( "bug7a.060", 0x04001, 0x2000, CRC(d24dfdef) SHA1(37d05a8bf9567380523df01265afb9780e39ea2a) )
 
-	ROM_REGION( 0x10000, "audio_cpu", 0 )
+	ROM_REGION( 0x10000, "soundbrd:audio_cpu", 0 )
 	ROM_LOAD( "bug35.11", 0x00000, 0x4000,  CRC(7aa16e9e) SHA1(ea54e56270f70351a62a78fa32027bb41ef9861e) )
 
 	ROM_REGION( 0x8000, "char_tiles", 0 )
@@ -1174,7 +655,7 @@ ROM_START( buggyboyjr )
 	ROM_LOAD16_BYTE( "bug8s.26", 0x04000, 0x2000, CRC(efd66282) SHA1(8355422c0732c92951659930eb399129fe8d6230) )
 	ROM_LOAD16_BYTE( "bug7s.25", 0x04001, 0x2000, CRC(bd75b5eb) SHA1(f2b55f84f4c968df177a56103924ac64705285cd) )
 
-	ROM_REGION( 0x10000, "audio_cpu", 0 )
+	ROM_REGION( 0x10000, "soundbrd:audio_cpu", 0 )
 	ROM_LOAD( "bug35s.21", 0x00000, 0x4000, CRC(65d9af57) SHA1(17b09404942d17e7254550c43b56ae96a8c55680) )
 
 	ROM_REGION( 0x8000, "char_tiles", 0 )
@@ -1259,8 +740,8 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1983, tx1,        0,        tx1,      tx1,      tx1_state, empty_init, ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jb,      tx1,      tx1,      tx1j,     tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1983, tx1jc,      tx1,      tx1,      tx1j,     tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
-GAMEL( 1985, buggyboy,   0,        buggyboy, buggyboy, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
-GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, buggybjr, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )
+GAMEL( 1983, tx1,        0,        tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi (Atari/Namco/Taito license)", "TX-1 (World)",        MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1jb,      tx1,      tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. B)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1jc,      tx1,      tx1,      0, tx1_state, empty_init, ROT0, "Tatsumi",                             "TX-1 (Japan rev. C)", MACHINE_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1985, buggyboy,   0,        buggyboy, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy/Speed Buggy (cockpit)",          0, layout_buggyboy )
+GAMEL( 1986, buggyboyjr, buggyboy, buggybjr, 0, tx1_state, empty_init, ROT0, "Tatsumi",                             "Buggy Boy Junior/Speed Buggy (upright)",   0, layout_buggybjr )

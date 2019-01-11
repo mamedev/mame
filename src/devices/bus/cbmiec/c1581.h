@@ -14,6 +14,7 @@
 #include "cbmiec.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/d81_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/mos6526.h"
 #include "machine/wd_fdc.h"
 
@@ -82,7 +83,7 @@ private:
 	required_device<wd1772_device> m_fdc;
 	required_device<floppy_image_device> m_floppy;
 	required_ioport m_address;
-	output_finder<2> m_led;
+	output_finder<2> m_leds;
 
 	int m_data_out;             // serial data out
 	int m_atn_ack;              // attention acknowledge

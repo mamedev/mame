@@ -445,6 +445,7 @@
 #include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/eeprompar.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -594,7 +595,7 @@ WRITE8_MEMBER(mastboy_state::msm5205_data_w)
 
 WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 {
-	m_msm->data_w(m_m5205_next);
+	m_msm->write_data(m_m5205_next);
 	m_m5205_next >>= 4;
 
 	m_m5205_part ^= 1;
@@ -637,9 +638,9 @@ void mastboy_state::mastboy_map(address_map &map)
 	map(0xff810, 0xff817).portr("DSW1");
 	map(0xff818, 0xff81f).portr("DSW2");
 
-	map(0xff820, 0xff827).w(this, FUNC(mastboy_state::bank_w));
+	map(0xff820, 0xff827).w(FUNC(mastboy_state::bank_w));
 	map(0xff828, 0xff829).w("saa", FUNC(saa1099_device::write));
-	map(0xff830, 0xff830).w(this, FUNC(mastboy_state::msm5205_data_w));
+	map(0xff830, 0xff830).w(FUNC(mastboy_state::msm5205_data_w));
 	map(0xff838, 0xff83f).w(m_outlatch, FUNC(ls259_device::write_d0));
 
 	map(0xffc00, 0xfffff).ram(); // Internal RAM
@@ -648,7 +649,7 @@ void mastboy_state::mastboy_map(address_map &map)
 // TODO : banked map is mirrored?
 void mastboy_state::bank_c000_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(this, FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share("vram");
+	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share("vram");
 	map(0x010000, 0x01ffff).mirror(0x1e0000).rom().region("vrom", 0);
 	map(0x200000, 0x3fffff).rom().region("bankedrom", 0);
 }
@@ -668,8 +669,8 @@ READ8_MEMBER(mastboy_state::nmi_read)
 
 void mastboy_state::mastboy_io_map(address_map &map)
 {
-	map(0x38, 0x38).r(this, FUNC(mastboy_state::port_38_read));
-	map(0x39, 0x39).r(this, FUNC(mastboy_state::nmi_read));
+	map(0x38, 0x38).r(FUNC(mastboy_state::port_38_read));
+	map(0x39, 0x39).r(FUNC(mastboy_state::nmi_read));
 }
 
 /* Input Ports */
@@ -805,52 +806,45 @@ void mastboy_state::machine_reset()
 	std::fill(&m_vram[0],    &m_vram[m_vram.bytes()],       0);
 }
 
+void mastboy_state::mastboy(machine_config &config)
+{
+	Z180(config, m_maincpu, 12000000/2);   /* HD647180X0CP6-1M1R */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mastboy_state::mastboy_map);
+	m_maincpu->set_addrmap(AS_IO, &mastboy_state::mastboy_io_map);
 
+	EEPROM_2816(config, m_earom);
 
-MACHINE_CONFIG_START(mastboy_state::mastboy)
-	MCFG_DEVICE_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
-	MCFG_DEVICE_PROGRAM_MAP(mastboy_map)
-	MCFG_DEVICE_IO_MAP(mastboy_io_map)
+	LS259(config, m_outlatch); // IC17
+	m_outlatch->q_out_cb<0>().set(FUNC(mastboy_state::irq0_ack_w));
+	m_outlatch->q_out_cb<1>().set("msm", FUNC(msm5205_device::s2_w));
+	m_outlatch->q_out_cb<2>().set("msm", FUNC(msm5205_device::s1_w));
+	m_outlatch->q_out_cb<3>().set("msm", FUNC(msm5205_device::reset_w));
+	m_outlatch->q_out_cb<4>().set("earom", FUNC(eeprom_parallel_28xx_device::oe_w));
 
-	MCFG_EEPROM_2816_ADD("earom")
-
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // IC17
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mastboy_state, irq0_ack_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("msm", msm5205_device, s2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("msm", msm5205_device, s1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("msm", msm5205_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("earom", eeprom_parallel_28xx_device, oe_w))
-
-	MCFG_DEVICE_ADD("bank_c000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_c000_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "bank_c000").set_map(&mastboy_state::bank_c000_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(6000000.0f / 384.0f / 282.0f)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mastboy_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(6000000.0f / 384.0f / 282.0f);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(mastboy_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(mastboy_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastboy)
-	MCFG_PALETTE_ADD("palette", 0x100)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mastboy);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_SAA1099_ADD("saa", 6000000 )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SAA1099(config, "saa", 6000000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mastboy_state, adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* 4KHz 4-bit */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(mastboy_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);      /* 4KHz 4-bit */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /* Romsets */
 

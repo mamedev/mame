@@ -36,11 +36,11 @@ void bsmt2000_device::tms_program_map(address_map &map)
 // I/O map for the DSP
 void bsmt2000_device::tms_io_map(address_map &map)
 {
-	map(0, 0).rw(this, FUNC(bsmt2000_device::tms_register_r), FUNC(bsmt2000_device::tms_rom_addr_w));
-	map(1, 1).rw(this, FUNC(bsmt2000_device::tms_data_r), FUNC(bsmt2000_device::tms_rom_bank_w));
-	map(2, 2).r(this, FUNC(bsmt2000_device::tms_rom_r));
-	map(3, 3).w(this, FUNC(bsmt2000_device::tms_left_w));
-	map(7, 7).w(this, FUNC(bsmt2000_device::tms_right_w));
+	map(0, 0).rw(FUNC(bsmt2000_device::tms_register_r), FUNC(bsmt2000_device::tms_rom_addr_w));
+	map(1, 1).rw(FUNC(bsmt2000_device::tms_data_r), FUNC(bsmt2000_device::tms_rom_bank_w));
+	map(2, 2).r(FUNC(bsmt2000_device::tms_rom_r));
+	map(3, 3).w(FUNC(bsmt2000_device::tms_left_w));
+	map(7, 7).w(FUNC(bsmt2000_device::tms_right_w));
 }
 
 
@@ -94,13 +94,14 @@ const tiny_rom_entry *bsmt2000_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bsmt2000_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
-	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
+void bsmt2000_device::device_add_mconfig(machine_config &config)
+{
+	tms32015_device &tms(TMS32015(config, "bsmt2000", DERIVED_CLOCK(1,1)));
+	tms.set_addrmap(AS_PROGRAM, &bsmt2000_device::tms_program_map);
 	// data map is internal to the CPU
-	MCFG_DEVICE_IO_MAP(tms_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, bsmt2000_device, tms_write_pending_r))
-MACHINE_CONFIG_END
+	tms.set_addrmap(AS_IO, &bsmt2000_device::tms_io_map);
+	tms.bio().set(FUNC(bsmt2000_device::tms_write_pending_r));
+}
 
 
 //-------------------------------------------------

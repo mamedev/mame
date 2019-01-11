@@ -18,6 +18,7 @@
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -47,7 +48,7 @@ private:
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(eolith16_custom_r);
 
-	DECLARE_PALETTE_INIT(eolith16);
+	void eolith16_palette(palette_device &palette) const;
 
 	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void eolith16_map(address_map &map);
@@ -78,8 +79,8 @@ void eolith16_state::eolith16_map(address_map &map)
 	map(0x90000000, 0x9000002f).nopw(); //?
 	map(0xff000000, 0xff1fffff).rom().region("maindata", 0);
 	map(0xffe40001, 0xffe40001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xffe80000, 0xffe80001).w(this, FUNC(eolith16_state::eeprom_w));
-	map(0xffea0000, 0xffea0001).r(this, FUNC(eolith16_state::eolith16_custom_r));
+	map(0xffe80000, 0xffe80001).w(FUNC(eolith16_state::eeprom_w));
+	map(0xffea0000, 0xffea0001).r(FUNC(eolith16_state::eolith16_custom_r));
 	map(0xffea0002, 0xffea0003).portr("SYSTEM");
 	map(0xffec0000, 0xffec0001).nopr(); // not used?
 	map(0xffec0002, 0xffec0003).portr("INPUTS");
@@ -136,24 +137,24 @@ uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_in
 
 
 // setup a custom palette because pixels use 8 bits per color
-PALETTE_INIT_MEMBER(eolith16_state,eolith16)
+void eolith16_state::eolith16_palette(palette_device &palette) const
 {
 	for (int c = 0; c < 256; c++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-		bit0 = (c >> 0) & 0x01;
-		bit1 = (c >> 1) & 0x01;
-		bit2 = (c >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (c >> 3) & 0x01;
-		bit1 = (c >> 4) & 0x01;
-		bit2 = (c >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (c >> 6) & 0x01;
-		bit1 = (c >> 7) & 0x01;
-		b = 0x55 * bit0 + 0xaa * bit1;
+		int bit0, bit1, bit2;
+		bit0 = BIT(c, 0);
+		bit1 = BIT(c, 1);
+		bit2 = BIT(c, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(c, 3);
+		bit1 = BIT(c, 4);
+		bit2 = BIT(c, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(c, 6);
+		bit1 = BIT(c, 7);
+		int const b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette.set_pen_color(c,rgb_t(r,g,b));
+		palette.set_pen_color(c, rgb_t(r, g, b));
 	}
 }
 
@@ -163,7 +164,7 @@ MACHINE_CONFIG_START(eolith16_state::eolith16)
 	MCFG_DEVICE_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)
 
-	MCFG_EEPROM_SERIAL_93C66_8BIT_ADD("eeprom")
+	EEPROM_93C66_8BIT(config, "eeprom");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -174,9 +175,7 @@ MACHINE_CONFIG_START(eolith16_state::eolith16)
 	MCFG_SCREEN_UPDATE_DRIVER(eolith16_state, screen_update_eolith16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-
-	MCFG_PALETTE_INIT_OWNER(eolith16_state,eolith16)
+	PALETTE(config, "palette", FUNC(eolith16_state::eolith16_palette), 256);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

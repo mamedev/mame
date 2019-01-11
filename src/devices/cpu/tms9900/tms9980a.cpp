@@ -39,12 +39,20 @@
     - Memory accesses are always 2 bytes (even address byte, odd address byte)
       even for byte operations. Thus the 9980A, like the TMS9900, needs to
       pre-fetch the word at the destination before overwriting it.
+    - Whereas the TMS9900 relies on the TMS9904 to generate its four phase
+      clocks, the TMS9980A takes a single 6 MHz to 10 MHz clock input and
+      divides it by four internally. Only the phase 3 clock is provided as an
+      output for peripherals.
     - On the cycle level both TMS9900 and TMS9980A are equal, except for the
       additional cycles needed for memory read and write access. Accordingly,
       the emulation shares the core and the microprograms and redefines the
       memory access and the interrupt handling only.
     - The 9980A has the same external instructions as the TMS9900, but it
       indicates the command via A0, A1, and A13 (instead of A0-A2).
+
+  TMS9981 is almost identical to TMS9980A except for deleting the -5V Vbb input
+  and allowing a crystal oscillator to be connected to pins 34 and 33 (OSCOUT).
+  The D0-D7, INT0-2 and /PHI3 pins are shifted to accommodate this feature.
 
     For pin definitions see tms9900.c
 
@@ -76,8 +84,18 @@
     Constructor
 ****************************************************************************/
 
+tms9980a_device::tms9980a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: tms99xx_device(mconfig, type, tag, 8, 14, 11, owner, clock)
+{
+}
+
 tms9980a_device::tms9980a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms99xx_device(mconfig, TMS9980A, tag, 8, 14, 11, owner, clock)
+	: tms9980a_device(mconfig, TMS9980A, tag, owner, clock)
+{
+}
+
+tms9981_device::tms9981_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms9980a_device(mconfig, TMS9981, tag, owner, clock)
 {
 }
 
@@ -183,7 +201,8 @@ void tms9980a_device::mem_read()
 	case 1:
 		m_pass = 4;         // make the CPU visit this method more than once
 		if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & ~1);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & ~1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
 		m_check_ready = true;
 		break;
@@ -194,7 +213,8 @@ void tms9980a_device::mem_read()
 		m_current_value = (value << 8) & 0xff00;
 		break;
 	case 3:
-		m_prgspace->set_address((m_address & m_prgaddr_mask) | 1);
+		if (m_sospace)
+			m_sospace->read_byte((m_address & m_prgaddr_mask) | 1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		break;
 	case 4:
@@ -216,7 +236,8 @@ void tms9980a_device::mem_write()
 	case 1:
 		m_pass = 4;         // make the CPU visit this method once more
 		if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
-		m_prgspace->set_address(m_address & m_prgaddr_mask & ~1);
+		if (m_sospace)
+			m_sospace->read_byte(m_address & m_prgaddr_mask & ~1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", m_address & m_prgaddr_mask & ~1);
 		m_prgspace->write_byte(m_address & 0x3ffe & ~1, (m_current_value >> 8)&0xff);
 		if (TRACE_MEM) logerror("tms9980a: memory write high byte %04x <- %02x\n", m_address & m_prgaddr_mask & ~1, (m_current_value >> 8)&0xff);
@@ -226,7 +247,8 @@ void tms9980a_device::mem_write()
 		// no action here, just wait for READY
 		break;
 	case 3:
-		m_prgspace->set_address((m_address & m_prgaddr_mask) | 1);
+		if (m_sospace)
+			m_sospace->read_byte((m_address & m_prgaddr_mask) | 1);
 		if (TRACE_ADDRESSBUS) logerror("tms9980a: set address bus %04x\n", (m_address & m_prgaddr_mask) | 1);
 		m_prgspace->write_byte((m_address & m_prgaddr_mask) | 1, m_current_value & 0xff);
 		if (TRACE_MEM) logerror("tms9980a: memory write low byte %04x <- %02x\n", (m_address & m_prgaddr_mask) | 1,  m_current_value & 0xff);
@@ -290,3 +312,4 @@ std::unique_ptr<util::disasm_interface> tms9980a_device::create_disassembler()
 }
 
 DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "Texas Instruments TMS9980A")
+DEFINE_DEVICE_TYPE(TMS9981, tms9981_device, "tms9981", "Texas Instruments TMS9981")

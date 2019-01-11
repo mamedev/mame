@@ -179,7 +179,7 @@ void tek4051_state::tek4051_mem(address_map &map)
 	map(0x8798, 0x879b).rw(MC6820_TAPE_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87a8, 0x87ab).rw(MC6820_KB_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x87b0, 0x87b3).rw(m_gpib_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x87c0, 0x87c0).mirror(0x03).w(this, FUNC(tek4051_state::lbs_w));
+	map(0x87c0, 0x87c0).mirror(0x03).w(FUNC(tek4051_state::lbs_w));
 //  AM_RANGE(0x87c0, 0x87c3) AM_DEVREADWRITE(MC6820_COM_TAG, pia6821_device, read, write)
 //  AM_RANGE(0x87c4, 0x87c5) AM_MIRROR(0x02) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, read, write)
 //  AM_RANGE(0x87c8, 0x87cb) XPC2
@@ -627,13 +627,13 @@ WRITE8_MEMBER( tek4051_state::kb_pia_pb_w )
 	m_lamps[2] = BIT(~data, 7);
 
 	// end or identify
-	m_gpib->eoi_w(!BIT(data, 4));
+	m_gpib->host_eoi_w(!BIT(data, 4));
 
 	// speaker
 	m_speaker->level_w(!BIT(data, 7));
 
 	// remote enable
-	m_gpib->ren_w(!BIT(data, 7));
+	m_gpib->host_ren_w(!BIT(data, 7));
 }
 
 WRITE_LINE_MEMBER( tek4051_state::kb_halt_w )
@@ -741,7 +741,7 @@ WRITE8_MEMBER( tek4051_state::dio_w )
 
 	if (m_talk)
 	{
-		m_gpib->dio_w(data);
+		m_gpib->write_dio(data);
 	}
 }
 
@@ -800,21 +800,21 @@ WRITE8_MEMBER( tek4051_state::gpib_pia_pb_w )
 	*/
 
 	// end or identify
-	m_gpib->eoi_w(!BIT(data, 0));
+	m_gpib->host_eoi_w(!BIT(data, 0));
 
 	// interface clear
-	m_gpib->ifc_w(!BIT(data, 1));
+	m_gpib->host_ifc_w(!BIT(data, 1));
 
 	// attention
-	m_gpib->atn_w(BIT(data, 3));
+	m_gpib->host_atn_w(BIT(data, 3));
 
 	if (m_talk)
 	{
 		// not ready for data
-		m_gpib->nrfd_w(!BIT(data, 4));
+		m_gpib->host_nrfd_w(!BIT(data, 4));
 
 		// not data acknowledged
-		m_gpib->ndac_w(!BIT(data, 7));
+		m_gpib->host_ndac_w(!BIT(data, 7));
 	}
 }
 
@@ -824,9 +824,9 @@ WRITE_LINE_MEMBER( tek4051_state::talk_w )
 
 	if (!m_talk)
 	{
-		m_gpib->dio_w(0xff);
-		m_gpib->nrfd_w(1);
-		m_gpib->ndac_w(1);
+		m_gpib->write_dio(0xff);
+		m_gpib->host_nrfd_w(1);
+		m_gpib->host_ndac_w(1);
 	}
 }
 
@@ -1006,7 +1006,7 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_DEVICE_PROGRAM_MAP(tek4051_mem)
 
 	// video hardware
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, "vector", 0);
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, VECTOR, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
@@ -1014,7 +1014,7 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1024,66 +1024,66 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	// devices
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", tek4051_state, keyboard_tick, attotime::from_hz(XTAL(12'500'000)/15/4))
 
-	MCFG_DEVICE_ADD(MC6820_X_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, x_pia_pa_r))
+	pia6821_device &piax(PIA6821(config, MC6820_X_TAG, 0));
+	piax.readpa_handler().set(FUNC(tek4051_state::x_pia_pa_r));
 	// CB1 viewcause
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, x_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, x_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, adot_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tek4051_state, bufclk_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, x_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, x_pia_irqb_w))
+	piax.writepa_handler().set(FUNC(tek4051_state::x_pia_pa_w));
+	piax.writepb_handler().set(FUNC(tek4051_state::x_pia_pb_w));
+	piax.ca2_handler().set(FUNC(tek4051_state::adot_w));
+	piax.cb2_handler().set(FUNC(tek4051_state::bufclk_w));
+	piax.irqa_handler().set(FUNC(tek4051_state::x_pia_irqa_w));
+	piax.irqb_handler().set(FUNC(tek4051_state::x_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_Y_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, sa_r))
+	pia6821_device &piay(PIA6821(config, MC6820_Y_TAG, 0));
+	piay.readpa_handler().set(FUNC(tek4051_state::sa_r));
 	// CA1 rdbyte
 	// CB1 mdata
 	// CB2 fmark
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, y_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, sb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, sot_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, y_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, y_pia_irqb_w))
+	piay.writepa_handler().set(FUNC(tek4051_state::y_pia_pa_w));
+	piay.writepb_handler().set(FUNC(tek4051_state::sb_w));
+	piay.ca2_handler().set(FUNC(tek4051_state::sot_w));
+	piay.irqa_handler().set(FUNC(tek4051_state::y_pia_irqa_w));
+	piay.irqb_handler().set(FUNC(tek4051_state::y_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_KB_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, kb_pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, kb_pia_pb_r))
+	pia6821_device &piakbd(PIA6821(config, MC6820_KB_TAG, 0));
+	piakbd.readpa_handler().set(FUNC(tek4051_state::kb_pia_pa_r));
+	piakbd.readpb_handler().set(FUNC(tek4051_state::kb_pia_pb_r));
 	// CA1 key
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, kb_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, kb_halt_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, kb_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, kb_pia_irqb_w))
+	piakbd.writepb_handler().set(FUNC(tek4051_state::kb_pia_pb_w));
+	piakbd.ca2_handler().set(FUNC(tek4051_state::kb_halt_w));
+	piakbd.irqa_handler().set(FUNC(tek4051_state::kb_pia_irqa_w));
+	piakbd.irqb_handler().set(FUNC(tek4051_state::kb_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_TAPE_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, tape_pia_pa_r))
+	pia6821_device &piatape(PIA6821(config, MC6820_TAPE_TAG, 0));
+	piatape.readpa_handler().set(FUNC(tek4051_state::tape_pia_pa_r));
 	// CA1 rmark
 	// CB1 lohole
 	// CA2 filfnd
 	// CB2 uphole
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, tape_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, tape_pia_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, tape_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, tape_pia_irqb_w))
+	piatape.writepa_handler().set(FUNC(tek4051_state::tape_pia_pa_w));
+	piatape.writepb_handler().set(FUNC(tek4051_state::tape_pia_pb_w));
+	piatape.irqa_handler().set(FUNC(tek4051_state::tape_pia_irqa_w));
+	piatape.irqb_handler().set(FUNC(tek4051_state::tape_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_GPIB_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, gpib_pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, dio_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, gpib_pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tek4051_state, talk_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, gpib_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, gpib_pia_irqb_w))
+	PIA6821(config, m_gpib_pia, 0);
+	m_gpib_pia->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
+	m_gpib_pia->readpb_handler().set(FUNC(tek4051_state::gpib_pia_pb_r));
+	m_gpib_pia->writepa_handler().set(FUNC(tek4051_state::dio_w));
+	m_gpib_pia->writepb_handler().set(FUNC(tek4051_state::gpib_pia_pb_w));
+	m_gpib_pia->cb2_handler().set(FUNC(tek4051_state::talk_w));
+	m_gpib_pia->irqa_handler().set(FUNC(tek4051_state::gpib_pia_irqa_w));
+	m_gpib_pia->irqb_handler().set(FUNC(tek4051_state::gpib_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6820_COM_TAG, PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, com_pia_pb_r))
+	PIA6821(config, m_com_pia, 0);
+	m_com_pia->readpb_handler().set(FUNC(tek4051_state::com_pia_pb_r));
 	//CA1 - SRX (RS-232 pin 12)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, com_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, com_pia_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, com_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, com_pia_irqb_w))
+	m_com_pia->writepa_handler().set(FUNC(tek4051_state::com_pia_pa_w));
+	m_com_pia->writepb_handler().set(FUNC(tek4051_state::com_pia_pb_w));
+	m_com_pia->irqa_handler().set(FUNC(tek4051_state::com_pia_irqa_w));
+	m_com_pia->irqb_handler().set(FUNC(tek4051_state::com_pia_irqb_w));
 
-	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, tek4051_state, acia_irq_w))
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set(FUNC(tek4051_state::acia_irq_w));
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 38400)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, tek4051_state, write_acia_clock))
@@ -1093,9 +1093,7 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MC6820_GPIB_TAG, pia6821_device, cb1_w))
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
+	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K,24K,32K");
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "tek4050_cart")
@@ -1113,7 +1111,7 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 	MCFG_DEVICE_PROGRAM_MAP(tek4052_mem)
 
 	// video hardware
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, "vector", 0);
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, VECTOR, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
@@ -1121,7 +1119,7 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 780-1)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1129,9 +1127,7 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");
 
 	// cartridge
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "tek4050_cart")

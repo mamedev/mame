@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nubus.h"
+#include "emupal.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -57,35 +57,15 @@
 
 #pragma once
 
-
-#define MCFG_7416x_QA_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_qa_cb(DEVCB_##_devcb);
-
-#define MCFG_7416x_QB_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_qb_cb(DEVCB_##_devcb);
-
-#define MCFG_7416x_QC_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_qc_cb(DEVCB_##_devcb);
-
-#define MCFG_7416x_QD_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_qd_cb(DEVCB_##_devcb);
-
-#define MCFG_7416x_OUTPUT_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_output_cb(DEVCB_##_devcb);
-
-#define MCFG_7416x_TC_CB(_devcb) \
-	devcb = &downcast<ttl7416x_device &>(*device).set_tc_cb(DEVCB_##_devcb);
-
 class ttl7416x_device : public device_t
 {
 public:
-	// static configuration helpers
-	template <class Object> devcb_base &set_qa_cb(Object &&cb) { return m_qa_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_qb_cb(Object &&cb) { return m_qb_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_qc_cb(Object &&cb) { return m_qc_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_qd_cb(Object &&cb) { return m_qd_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_output_cb(Object &&cb) { return m_output_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tc_cb(Object &&cb) { return m_tc_func.set_callback(std::forward<Object>(cb)); }
+	auto qa_cb() { return m_qa_func.bind(); }
+	auto qb_cb() { return m_qb_func.bind(); }
+	auto qc_cb() { return m_qc_func.bind(); }
+	auto qd_cb() { return m_qd_func.bind(); }
+	auto out_cb() { return m_output_func.bind(); }
+	auto tc_cb() { return m_tc_func.bind(); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
@@ -128,7 +108,7 @@ private:
 	uint8_t m_pe;       // pin 9
 	uint8_t m_cet;      // pin 10
 	uint8_t m_cep;      // pin 7
-	uint8_t m_clock;    // pin 2
+	uint8_t m_pclock;   // pin 2
 	uint8_t m_p;        // pins 3-6 from LSB to MSB
 
 	// outputs

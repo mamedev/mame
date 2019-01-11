@@ -1,7 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Priest, David Haywood
+#ifndef MAME_INCLUDES_MCATADV_H
+#define MAME_INCLUDES_MCATADV_H
+
+#pragma once
 
 #include "machine/watchdog.h"
+#include "emupal.h"
 
 class mcatadv_state : public driver_device
 {
@@ -21,6 +26,10 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
+	void nost(machine_config &config);
+	void mcatadv(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 	required_shared_ptr_array<uint16_t, 2> m_scroll;
@@ -53,11 +62,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mcatadv);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcatadv_draw_tilemap_part( screen_device &screen, int layer, int i, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void nost(machine_config &config);
-	void mcatadv(machine_config &config);
 	void mcatadv_map(address_map &map);
 	void mcatadv_sound_io_map(address_map &map);
 	void mcatadv_sound_map(address_map &map);
 	void nost_sound_io_map(address_map &map);
 	void nost_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MCATADV_H

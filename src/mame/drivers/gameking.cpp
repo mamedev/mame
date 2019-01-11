@@ -29,6 +29,7 @@
 #include "cpu/m6502/r65c02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -37,18 +38,26 @@
 class gameking_state : public driver_device
 {
 public:
-	gameking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gameking_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_io_joy(*this, "JOY"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
+
+	void gameking(machine_config &config);
+	void gameking3(machine_config &config);
+	void gameking1(machine_config &config);
 
 	void init_gameking();
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(gameking);
+
+private:
+	void gameking_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(lcd_r);
@@ -69,11 +78,8 @@ public:
 		uint8_t bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
 		uint8_t res2[0x4c];
 	};
-	void gameking(machine_config &config);
-	void gameking3(machine_config &config);
-	void gameking1(machine_config &config);
 	void gameking_mem(address_map &map);
-protected:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
@@ -150,11 +156,11 @@ READ8_MEMBER(gameking_state::lcd_r)
 
 void gameking_state::gameking_mem(address_map &map)
 {
-	map(0x0000, 0x007f).rw(this, FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
+	map(0x0000, 0x007f).rw(FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
 	map(0x0080, 0x01ff).ram();
 	map(0x0200, 0x03ff).ram(); // lcd 2nd copy
 
-	map(0x0600, 0x077f).rw(this, FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
+	map(0x0600, 0x077f).rw(FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
 	map(0x0d00, 0x0fff).ram(); // d00, e00, f00 prooved on handheld
 //  AM_RANGE(0x1000, 0x1fff) AM_RAM    // sthero writes to $19xx
 
@@ -177,18 +183,17 @@ static INPUT_PORTS_START( gameking )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
 INPUT_PORTS_END
 
-static const unsigned char gameking_palette[] =
+static constexpr rgb_t gameking_pens[] =
 {
-	255, 255, 255,
-	127, 127, 127,
-	63, 63, 63,
-	0, 0, 0
+	{ 255, 255, 255 },
+	{ 127, 127, 127 },
+	{  63,  63,  63 },
+	{   0,   0,   0 }
 };
 
-PALETTE_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::gameking_palette(palette_device &palette) const
 {
-	for (int i = 0; i < sizeof(gameking_palette) / 3; i++)
-		palette.set_pen_color(i, gameking_palette[i*3], gameking_palette[i*3+1], gameking_palette[i*3+2]);
+	palette.set_pen_colors(0, gameking_pens);
 }
 
 
@@ -293,10 +298,9 @@ MACHINE_CONFIG_START(gameking_state::gameking)
 	MCFG_SCREEN_SIZE(48, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 48-1, 0, 32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gameking_state, screen_update_gameking)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(gameking_palette) * 3)
-	MCFG_PALETTE_INIT_OWNER(gameking_state, gameking )
+	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "gameking_cart")

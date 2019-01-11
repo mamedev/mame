@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, ???
+// copyright-holders:David Haywood, Pierpaolo Prazzoli
 /***************************************************************************
 
  GX545 Scooter Shooter - (c) 1985 Konami
@@ -66,18 +66,18 @@ WRITE8_MEMBER(scotrsht_state::soundlatch_w)
 
 void scotrsht_state::scotrsht_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(this, FUNC(scotrsht_state::colorram_w)).share("colorram");
-	map(0x0800, 0x0fff).ram().w(this, FUNC(scotrsht_state::videoram_w)).share("videoram");
+	map(0x0000, 0x07ff).ram().w(FUNC(scotrsht_state::colorram_w)).share("colorram");
+	map(0x0800, 0x0fff).ram().w(FUNC(scotrsht_state::videoram_w)).share("videoram");
 	map(0x1000, 0x10bf).ram().share("spriteram"); /* sprites */
 	map(0x10c0, 0x1fff).ram(); /* work ram */
 	map(0x2000, 0x201f).ram().share("scroll"); /* scroll registers */
 	map(0x2040, 0x2040).nopw();
 	map(0x2041, 0x2041).nopw();
 	map(0x2042, 0x2042).nopw();  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
-	map(0x2043, 0x2043).w(this, FUNC(scotrsht_state::charbank_w));
-	map(0x2044, 0x2044).w(this, FUNC(scotrsht_state::ctrl_w));
-	map(0x3000, 0x3000).w(this, FUNC(scotrsht_state::palettebank_w));
-	map(0x3100, 0x3100).w(this, FUNC(scotrsht_state::soundlatch_w));
+	map(0x2043, 0x2043).w(FUNC(scotrsht_state::charbank_w));
+	map(0x2044, 0x2044).w(FUNC(scotrsht_state::ctrl_w));
+	map(0x3000, 0x3000).w(FUNC(scotrsht_state::palettebank_w));
+	map(0x3100, 0x3100).w(FUNC(scotrsht_state::soundlatch_w));
 	map(0x3200, 0x3200).nopw(); /* it writes 0, 1 */
 	map(0x3100, 0x3100).portr("DSW2");
 	map(0x3200, 0x3200).portr("DSW3");
@@ -197,7 +197,7 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	MCFG_DEVICE_PROGRAM_MAP(scotrsht_sound_map)
 	MCFG_DEVICE_IO_MAP(scotrsht_sound_port)
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -206,18 +206,16 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, scotrsht_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scotrsht)
-	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(scotrsht_state, scotrsht)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scotrsht);
+	PALETTE(config, m_palette, FUNC(scotrsht_state::scotrsht_palette), 16*8*16+16*8*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

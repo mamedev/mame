@@ -13,6 +13,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "imagedev/floppy.h"
 #include "machine/mc68901.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -20,6 +21,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
+#include "emupal.h"
 #include "screen.h"
 
 #define M68000_TAG      "m68000"
@@ -85,6 +87,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M68000_TAG),
 			m_fdc(*this, WD1772_TAG),
+			m_floppy(*this, WD1772_TAG ":%u", 0U),
 			m_mfp(*this, MC68901_TAG),
 			m_acia0(*this, MC6850_0_TAG),
 			m_acia1(*this, MC6850_1_TAG),
@@ -92,6 +95,7 @@ public:
 			m_cart(*this, "cartslot"),
 			m_ram(*this, RAM_TAG),
 			m_rs232(*this, RS232_TAG),
+			m_ymsnd(*this, YM2149_TAG),
 			m_p31(*this, "P31"),
 			m_p32(*this, "P32"),
 			m_p33(*this, "P33"),
@@ -112,8 +116,6 @@ public:
 			m_mousex(*this, "IKBD_MOUSEX"),
 			m_mousey(*this, "IKBD_MOUSEY"),
 			m_config(*this, "config"),
-			m_acia_ikbd_irq(1),
-			m_acia_midi_irq(1),
 			m_ikbd_mouse_x(0),
 			m_ikbd_mouse_y(0),
 			m_ikbd_mouse_px(IKBD_MOUSE_PHASE_STATIC),
@@ -128,6 +130,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<wd1772_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mc68901_device> m_mfp;
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
@@ -135,6 +138,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
+	required_device<ym2149_device> m_ymsnd;
 	required_ioport m_p31;
 	required_ioport m_p32;
 	required_ioport m_p33;
@@ -233,8 +237,6 @@ public:
 	DECLARE_WRITE8_MEMBER( psg_pa_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_ikbd_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_midi_irq_w );
 
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
@@ -253,8 +255,6 @@ public:
 	uint8_t m_mmu;
 
 	/* keyboard state */
-	int m_acia_ikbd_irq;
-	int m_acia_midi_irq;
 	uint16_t m_ikbd_keylatch;
 	uint8_t m_ikbd_mouse;
 	uint8_t m_ikbd_mouse_x;
@@ -325,8 +325,6 @@ public:
 
 	bitmap_rgb32 m_bitmap;
 
-	floppy_image_device *floppy_devices[2];
-
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	IRQ_CALLBACK_MEMBER(atarist_int_ack);
 
@@ -335,11 +333,13 @@ public:
 	required_device<screen_device> m_screen;
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
+	void common(machine_config &config);
 	void st(machine_config &config);
-	void ikbd_io_map(address_map &map);
 	void ikbd_map(address_map &map);
 	void st_map(address_map &map);
 protected:
+	void keyboard(machine_config &config);
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;

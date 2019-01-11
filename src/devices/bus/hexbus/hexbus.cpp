@@ -246,8 +246,8 @@ void hexbus_chained_device::hexbus_write(uint8_t data)
 	// This is emulated by pulling the data lines to ones.
 	uint8_t newvalue = (otherval | 0xc3) & m_myvalue;
 
-	// If it changed, propagate to both directions.
-	if (newvalue != m_current_bus_value)
+	// If it changed (with respect to HSK* or BAV*), propagate to both directions.
+	if ((newvalue & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)) != (m_current_bus_value & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)))
 	{
 		LOGMASKED(LOG_WRITE, "Trying to write %02x, actually: %02x (current=%02x)\n", data, newvalue, m_current_bus_value);
 
@@ -260,6 +260,7 @@ void hexbus_chained_device::hexbus_write(uint8_t data)
 			m_hexbus_outbound->write(OUTBOUND, m_current_bus_value);
 
 	}
+	else LOGMASKED(LOG_WRITE, "No change on hexbus\n");
 }
 
 /*
@@ -318,9 +319,9 @@ void hexbus_chained_device::bus_write(int dir, uint8_t data)
 	m_current_bus_value = data;
 
 	// Notify device
-	// Caution: Calling hexbus_value_changed may cause further activities
-	// that change the bus again
-	if (data != oldvalue)
+	// Caution: Calling hexbus_value_changed may cause further activities that change the bus again
+	// Data changes alone shall not trigger the callback
+	if ((data & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)) != (oldvalue & (HEXBUS_LINE_HSK | HEXBUS_LINE_BAV)))
 	{
 		LOGMASKED(LOG_WRITE, "Hexbus value changed: %02x -> %02x\n", oldvalue, data);
 		hexbus_value_changed(data);
@@ -342,8 +343,7 @@ uint8_t hexbus_chained_device::to_line_state(uint8_t data, bool bav, bool hsk)
 
 }   }   // end namespace bus::hexbus
 
-void hexbus_conn(device_slot_interface &device)
+void hexbus_options(device_slot_interface &device)
 {
 	device.option_add("hx5102", HX5102);
 }
-

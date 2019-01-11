@@ -16,16 +16,30 @@ class nsc810_device :  public device_t
 {
 public:
 	// construction/destruction
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t clk0, uint32_t clk1)
+		: nsc810_device(mconfig, tag, owner, clock)
+	{
+		set_timer0_clock(clk0);
+		set_timer1_clock(clk1);
+	}
+
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const XTAL &clk0, const XTAL &clk1)
+		: nsc810_device(mconfig, tag, owner, clock)
+	{
+		set_timer0_clock(clk0.value());
+		set_timer1_clock(clk1.value());
+	}
+	
 	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_portA_read_callback(Object &&cb) { return m_portA_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portB_read_callback(Object &&cb) { return m_portB_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portC_read_callback(Object &&cb) { return m_portC_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portA_write_callback(Object &&cb) { return m_portA_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portB_write_callback(Object &&cb) { return m_portB_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_portC_write_callback(Object &&cb) { return m_portC_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_timer0_callback(Object &&cb) { return m_timer0_out.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_timer1_callback(Object &&cb) { return m_timer1_out.set_callback(std::forward<Object>(cb)); }
+	auto portA_read_callback() { return m_portA_r.bind(); }
+	auto portB_read_callback() { return m_portB_r.bind(); }
+	auto portC_read_callback() { return m_portC_r.bind(); }
+	auto portA_write_callback() { return m_portA_w.bind(); }
+	auto portB_write_callback() { return m_portB_w.bind(); }
+	auto portC_write_callback() { return m_portC_w.bind(); }
+	auto timer0_callback() { return m_timer0_out.bind(); }
+	auto timer1_callback() { return m_timer1_out.bind(); }
 
 	void set_timer0_clock(uint32_t clk) { m_timer0_clock = clk; }
 	void set_timer0_clock(const XTAL &clk) { set_timer0_clock(clk.value()); }
@@ -108,28 +122,28 @@ private:
 	downcast<nsc810_device *>(device)->set_timer1_clock(_t1clk);
 
 #define MCFG_NSC810_PORTA_READ(_read) \
-	devcb = &downcast<nsc810_device &>(*device).set_portA_read_callback(DEVCB_##_read);
+	downcast<nsc810_device &>(*device).set_portA_read_callback(DEVCB_##_read);
 
 #define MCFG_NSC810_PORTB_READ(_read) \
-	devcb = &downcast<nsc810_device &>(*device).set_portB_read_callback(DEVCB_##_read);
+	downcast<nsc810_device &>(*device).set_portB_read_callback(DEVCB_##_read);
 
 #define MCFG_NSC810_PORTC_READ(_read) \
-	devcb = &downcast<nsc810_device &>(*device).set_portC_read_callback(DEVCB_##_read);
+	downcast<nsc810_device &>(*device).set_portC_read_callback(DEVCB_##_read);
 
 #define MCFG_NSC810_PORTA_WRITE(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_portA_write_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_portA_write_callback(DEVCB_##_write);
 
 #define MCFG_NSC810_PORTB_WRITE(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_portB_write_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_portB_write_callback(DEVCB_##_write);
 
 #define MCFG_NSC810_PORTC_WRITE(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_portC_write_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_portC_write_callback(DEVCB_##_write);
 
 #define MCFG_NSC810_TIMER0_OUT(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_timer0_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_timer0_callback(DEVCB_##_write);
 
 #define MCFG_NSC810_TIMER1_OUT(_write) \
-	devcb = &downcast<nsc810_device &>(*device).set_timer1_callback(DEVCB_##_write);
+	downcast<nsc810_device &>(*device).set_timer1_callback(DEVCB_##_write);
 
 // device type definition
 DECLARE_DEVICE_TYPE(NSC810, nsc810_device)

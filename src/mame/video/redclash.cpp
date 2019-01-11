@@ -21,83 +21,80 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(redclash_state,redclash)
+void redclash_state::redclash_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 5) & 0x01;
-		r = 0x47 * bit0 + 0x97 * bit1;
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 5);
+		int const r = 0x47 * bit0 + 0x97 * bit1;
 
-		/* green component */
-		bit0 = (color_prom[i] >> 2) & 0x01;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		g = 0x47 * bit0 + 0x97 * bit1;
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 6);
+		int const g = 0x47 * bit0 + 0x97 * bit1;
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 4) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = 0x47 * bit0 + 0x97 * bit1;
+		// blue component
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x47 * bit0 + 0x97 * bit1;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* star colors */
-	for (i = 0x20; i < 0x40; i++)
+	// star colors
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1;
-		int r, g, b;
 
-		/* red component */
-		bit0 = ((i - 0x20) >> 3) & 0x01;
-		bit1 = ((i - 0x20) >> 4) & 0x01;
-		b = 0x47 * bit0 + 0x97 * bit1;
+		// red component
+		bit0 = BIT(i, 3);
+		bit1 = BIT(i, 4);
+		int const b = 0x47 * bit0 + 0x97 * bit1;
 
-		/* green component */
-		bit0 = ((i - 0x20) >> 1) & 0x01;
-		bit1 = ((i - 0x20) >> 2) & 0x01;
-		g = 0x47 * bit0 + 0x97 * bit1;
+		// green component
+		bit0 = BIT(i, 1);
+		bit1 = BIT(i, 2);
+		int const g = 0x47 * bit0 + 0x97 * bit1;
 
-		/* blue component */
-		bit0 = ((i - 0x20) >> 0) & 0x01;
-		r = 0x47 * bit0;
+		// blue component
+		bit0 = BIT(i, 0);
+		int const r = 0x47 * bit0;
 
-		palette.set_indirect_color(i, rgb_t(r, g, b));
+		palette.set_indirect_color(i + 0x20, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x20;
 
-	/* characters */
-	for (i = 0; i < 0x20; i++)
+	// characters
+	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
+		uint8_t const ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* sprites */
-	for (i = 0x20; i < 0x40; i++)
+	// sprites
+	for (int i = 0; i < 0x20; i++)
 	{
-		uint8_t ctabentry = color_prom[(i - 0x20) >> 1];
+		uint8_t ctabentry;
 
-		ctabentry = bitswap<8>((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
-		palette.set_pen_indirect(i + 0x00, ctabentry);
-
-		ctabentry = bitswap<8>((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
+		ctabentry = bitswap<4>((color_prom[i] >> 0) & 0x0f, 0,1,2,3);
 		palette.set_pen_indirect(i + 0x20, ctabentry);
+
+		ctabentry = bitswap<4>((color_prom[i] >> 4) & 0x0f, 0,1,2,3);
+		palette.set_pen_indirect(i + 0x40, ctabentry);
 	}
 
-	/* stars */
-	for (i = 0x60; i < 0x80; i++)
-		palette.set_pen_indirect(i, (i - 0x60) + 0x20);
+	// stars
+	for (int i = 0; i < 0x20; i++)
+		palette.set_pen_indirect(i + 0x60, i + 0x20);
 }
 
 

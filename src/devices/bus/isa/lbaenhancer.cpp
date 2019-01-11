@@ -6,7 +6,7 @@
 
 ***********************************************************************
 
-    Generic BIOS extension card. Adds 28 bit LBA mode to any pre-1994 
+    Generic BIOS extension card. Adds 28 bit LBA mode to any pre-1994
        board with an empty ISA slot.
 
     Supports 1 to 4 large hard disks. Bios boot remains possible.
@@ -18,13 +18,13 @@
     See: ftp://ami.com/archive/utility/LBA.TXT
 
     Usage:
-      select type 47 for each LBA drive and set C,H,S (params) to '8', 
+      select type 47 for each LBA drive and set C,H,S (params) to '8',
       then repartition and reformat (Fdisk and Format). Data is lost.
 
     Other notes: ROM bank should be excluded in EMM386.
-      C8000 - CBFFF is sometimes occupied (by graphics). 
+      C8000 - CBFFF is sometimes occupied (by graphics).
       Changes to the ROM location require a hard reset!
-				 
+
     Requirements:
       Compatible OS (DOS >= 6.22) and LBA capable drive(s).
 ***********************************************************************
@@ -48,7 +48,7 @@ Notes:
 
 J3, J2, J1 set BIOS (start) address to C800, CC00, D000, D400, D800 or DC00
 
-- one CD74LS245 
+- one CD74LS245
 - one PALCE16V8H-25
 - one 32 K EPROM : 27C256 (STM) (mirrored after 16 K)
 
@@ -85,23 +85,23 @@ const tiny_rom_entry *lba_enhancer_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 MACHINE_CONFIG_START( lba_enhancer_device::device_add_mconfig )
-//	MCFG_DEVICE_ADD("lba_enhancer", lba_enhancer, 0)
+//  MCFG_DEVICE_ADD("lba_enhancer", lba_enhancer, 0)
 MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  jumpers  
+//  jumpers
 //-------------------------------------------------
 static INPUT_PORTS_START( lba_enhancer_dsw )
 
 	PORT_START("ROM_ADDRESS")
 	PORT_CONFNAME( 0x07, 0x00, "16 K ROM bank")
 	PORT_CONFSETTING(    0, "C8000 - CBFFF" )
-	PORT_CONFSETTING(    1, "CC000 - CFFFF" ) 
-	PORT_CONFSETTING(    2, "D0000 - D3FFF" ) 
-	PORT_CONFSETTING(    3, "D4000 - D7FFF" ) 
-	PORT_CONFSETTING(    4, "D8000 - DBFFF" ) 
-	PORT_CONFSETTING(    5, "DC000 - DFFFF" ) 
+	PORT_CONFSETTING(    1, "CC000 - CFFFF" )
+	PORT_CONFSETTING(    2, "D0000 - D3FFF" )
+	PORT_CONFSETTING(    3, "D4000 - D7FFF" )
+	PORT_CONFSETTING(    4, "D8000 - DBFFF" )
+	PORT_CONFSETTING(    5, "DC000 - DFFFF" )
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -133,7 +133,7 @@ void lba_enhancer_device::device_reset()
 		uint32_t current_rom_end   = m_current_rom_start + 0x04000 - 1;
 
 		m_isa->install_rom(this, m_current_rom_start, current_rom_end,  "lbabios",  "lbabios");
-		
+
 		logerror("LBA enhancer (for 28 bit LBA) located at BIOS address %x - %x\n", m_current_rom_start, current_rom_end);
 	}
 }

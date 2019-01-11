@@ -104,7 +104,7 @@ void nes_state::machine_start()
 
 	// register saves
 	save_item(NAME(m_last_frame_flip));
-	save_pointer(NAME(m_ciram.get()), 0x800);
+	save_pointer(NAME(m_ciram), 0x800);
 }
 
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER(nes_state::fc_in0_w)
 void nes_state::init_famicom()
 {
 	// setup alt input handlers for additional FC input devices
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler(0x4016, 0x4016, read8_delegate(FUNC(nes_state::fc_in0_r), this));
 	space.install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(nes_state::fc_in0_w), this));
 	space.install_read_handler(0x4017, 0x4017, read8_delegate(FUNC(nes_state::fc_in1_r), this));

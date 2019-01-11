@@ -21,7 +21,7 @@ The 6502 family
 The MOS 6502 family has been large and productive. A large number of variants exist, varying on bus sizes, I/O, and even opcodes. Some offshots (g65c816, hu6280) even exist that live elsewhere in the mame tree. The final class hierarchy is this:
 
 ::
- 
+
                            6502
                             |
          +------+--------+--+--+-------+-------+
@@ -35,8 +35,8 @@ The MOS 6502 family has been large and productive. A large number of variants ex
                                         65ce02   65sc02
                                            |
                                          4510
- 
- 
+
+
 
 The 6510 adds an up to 8 bits I/O port, with the 6510t, 7501 and 8502 being software-identical variants with different pin count (hence I/O count), die process (NMOS, HNMOS, etc) and clock support.
 
@@ -181,7 +181,7 @@ The generated code
 
 A code generator is used to support interrupting and restarting an instruction in the middle. This is done through a two-level state machine with updates only at the boundaries. More precisely, inst_state tells you which main state you're in. It's equal to the opcode byte when 0-255, and 0xff00 means reset. It's always valid and used by instructions like rmb. inst_substate indicates at which step we are in an instruction, but it set only when an instruction has been interrupted. Let's go back to the asl <abs> code:
 
-| 
+|
 | asl_aba
 |     TMP = read_pc();
 |     TMP = set_h(TMP, read_pc());
@@ -190,7 +190,7 @@ A code generator is used to support interrupting and restarting an instruction i
 |     TMP2 = do_asl(TMP2);
 |     write(TMP, TMP2);
 |     prefetch();
-| 
+|
 
 The complete generated code is:
 
@@ -226,11 +226,11 @@ The complete generated code is:
 | }
 |     inst_substate = 0;
 | }
-| 
+|
 
 One can see that the initial switch() restarts the instruction at the appropriate substate, that icount is updated after each access, and upon reaching 0 the instruction is interrupted and the substate updated. Since most instructions are started from the beginning a specific variant is generated for when inst_substate is known to be 0:
 
-| 
+|
 | void m6502_device::asl_aba_full()
 | {
 |     if(icount == 0) { inst_substate = 1; return; }
@@ -253,7 +253,7 @@ One can see that the initial switch() restarts the instruction at the appropriat
 |     prefetch();
 |     icount--;
 | }
-| 
+|
 
 That variant removes the switch, avoiding a costly computed branch and also an inst_substate write. There is in addition a fair chance that the decrement-test with zero pair is compiled into something efficient.
 
@@ -265,7 +265,7 @@ The execute main call ends up very simple:
 | {
 |     if(inst_substate)
 |         do_exec_partial();
-| 
+|
 |     while(icount > 0) {
 |         if(inst_state < 0x100) {
 |             PPC = NPC;
@@ -342,10 +342,10 @@ A modern try/catch costs nothing if an exception is not thrown. Using this the c
 |         icount -= waiting_cycles;
 |         waiting_cycles = 0;
 |     }
-| 
+|
 |     if(icount > 0 && inst_substate)
 |         do_exec_partial();
-| 
+|
 |     while(icount > 0) {
 |         if(inst_state < 0x100) {
 |             PPC = NPC;
@@ -355,7 +355,7 @@ A modern try/catch costs nothing if an exception is not thrown. Using this the c
 |         }
 |         do_exec_full();
 |     }
-| 
+|
 |     waiting_cycles = -icount;
 |     icount = 0;
 | }

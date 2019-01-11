@@ -771,79 +771,79 @@ static const char *const jf33_sample_names[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_jf13_device::device_add_mconfig)
-
+void nes_jf13_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(16)
-	MCFG_SAMPLES_NAMES(jf13_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(16);
+	m_samples->set_samples_names(jf13_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf17_adpcm_device::device_add_mconfig)
-
+void nes_jf17_adpcm_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf17_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf17_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf19_adpcm_device::device_add_mconfig)
-
+void nes_jf19_adpcm_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf19_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf19_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf23_device::device_add_mconfig)
-
+void nes_jf23_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf23_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf23_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf24_device::device_add_mconfig)
-
+void nes_jf24_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(jf24_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(jf24_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf29_device::device_add_mconfig)
-
+void nes_jf29_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf29_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf29_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf33_device::device_add_mconfig)
-
+void nes_jf33_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf33_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf33_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}

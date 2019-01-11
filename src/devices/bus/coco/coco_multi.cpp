@@ -100,6 +100,7 @@ namespace
 		virtual void device_add_mconfig(machine_config &config) override;
 
 		virtual uint8_t* get_cart_base() override;
+		virtual uint32_t get_cart_size() override;
 
 		// these are only public so they can be in a MACHINE_CONFIG_START
 		// declaration; don't think about them as publically accessable
@@ -214,8 +215,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_MULTIPAK, device_cococart_interface, coco_multipak_device, "coco_multipack", "CoCo Multi-Pak Interface")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 
 
@@ -442,6 +441,16 @@ void coco_multipak_device::set_sound_enable(bool sound_enable)
 uint8_t* coco_multipak_device::get_cart_base()
 {
 	return active_cts_slot().get_cart_base();
+}
+
+
+//-------------------------------------------------
+//  get_cart_size
+//-------------------------------------------------
+
+uint32_t coco_multipak_device::get_cart_size()
+{
+	return active_cts_slot().get_cart_size();
 }
 
 

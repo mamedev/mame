@@ -253,8 +253,8 @@ void mcatadv_state::video_start()
 
 	m_palette_bank[0] = m_palette_bank[1] = 0;
 
-	save_pointer(NAME(m_spriteram_old.get()), m_spriteram.bytes() / 2);
-	save_pointer(NAME(m_vidregs_old.get()), m_vidregs.bytes() / 2);
+	save_pointer(NAME(m_spriteram_old), m_spriteram.bytes() / 2);
+	save_pointer(NAME(m_vidregs_old), m_vidregs.bytes() / 2);
 }
 
 WRITE_LINE_MEMBER(mcatadv_state::screen_vblank_mcatadv)

@@ -77,11 +77,11 @@ void dai_state::dai_mem(address_map &map)
 	map(0x0000, 0xbfff).bankrw("bank1");
 	map(0xc000, 0xdfff).rom();
 	map(0xe000, 0xefff).bankr("bank2");
-	map(0xf000, 0xf7ff).w(this, FUNC(dai_state::dai_stack_interrupt_circuit_w));
+	map(0xf000, 0xf7ff).w(FUNC(dai_state::dai_stack_interrupt_circuit_w));
 	map(0xf800, 0xf8ff).ram();
-	map(0xfb00, 0xfbff).rw(this, FUNC(dai_state::dai_amd9511_r), FUNC(dai_state::dai_amd9511_w));
-	map(0xfc00, 0xfcff).rw(this, FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	map(0xfd00, 0xfdff).rw(this, FUNC(dai_state::dai_io_discrete_devices_r), FUNC(dai_state::dai_io_discrete_devices_w));
+	map(0xfb00, 0xfbff).rw(FUNC(dai_state::dai_amd9511_r), FUNC(dai_state::dai_amd9511_w));
+	map(0xfc00, 0xfcff).rw(FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	map(0xfd00, 0xfdff).rw(FUNC(dai_state::dai_io_discrete_devices_r), FUNC(dai_state::dai_io_discrete_devices_w));
 	map(0xfe00, 0xfeff).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xff00, 0xff0f).mirror(0xf0).m(m_tms5501, FUNC(tms5501_device::io_map));
 }
@@ -195,15 +195,15 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dai_state,int_ack)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch0))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("custom", dai_sound_device, set_input_ch2))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(2000000);
+	m_pit->out_handler<0>().set(m_sound, FUNC(dai_sound_device::set_input_ch0));
+	m_pit->set_clk<1>(2000000);
+	m_pit->out_handler<1>().set(m_sound, FUNC(dai_sound_device::set_input_ch1));
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set(m_sound, FUNC(dai_sound_device::set_input_ch2));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	I8255(config, "ppi8255");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -212,11 +212,10 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_SCREEN_SIZE(1056, 542)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1056-1, 0, 302-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dai_state, screen_update_dai)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dai)
-	MCFG_PALETTE_ADD("palette", sizeof (dai_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(dai_state, dai)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_dai)
+	PALETTE(config, m_palette, FUNC(dai_state::dai_palette), ARRAY_LENGTH(s_palette));
 
 
 	/* sound hardware */
@@ -224,7 +223,7 @@ MACHINE_CONFIG_START(dai_state::dai)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAI_SOUND(config, "custom").add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
+	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -232,14 +231,13 @@ MACHINE_CONFIG_START(dai_state::dai)
 	MCFG_CASSETTE_INTERFACE("dai_cass")
 
 	/* tms5501 */
-	MCFG_DEVICE_ADD("tms5501", TMS5501, 2000000)
-	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
-	MCFG_TMS5501_XI_CALLBACK(READ8(*this, dai_state, dai_keyboard_r))
-	MCFG_TMS5501_XO_CALLBACK(WRITE8(*this, dai_state, dai_keyboard_w))
+	TMS5501(config, m_tms5501, 2000000);
+	m_tms5501->int_callback().set_inputline("maincpu", I8085_INTR_LINE);
+	m_tms5501->xi_callback().set(FUNC(dai_state::dai_keyboard_r));
+	m_tms5501->xo_callback().set(FUNC(dai_state::dai_keyboard_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
+	RAM(config, RAM_TAG).set_default_size("48K");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "dai_cass")

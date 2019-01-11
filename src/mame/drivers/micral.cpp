@@ -53,6 +53,7 @@ Other things...
 #include "cpu/z80/z80.h"
 #include "video/tms9927.h"
 //#include "sound/beep.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/ay31015.h"
@@ -72,7 +73,11 @@ public:
 		, m_crtc(*this, "crtc")
 	{ }
 
+	void micral(machine_config &config);
+
 	void init_micral();
+
+private:
 	DECLARE_MACHINE_RESET(micral);
 	DECLARE_READ8_MEMBER(keyin_r);
 	DECLARE_READ8_MEMBER(status_r);
@@ -81,11 +86,10 @@ public:
 	DECLARE_WRITE8_MEMBER(video_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void micral(machine_config &config);
 	void io_kbd(address_map &map);
 	void mem_kbd(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u16 s_curpos;
 	u8 s_command;
 	u8 s_data;
@@ -154,10 +158,10 @@ void micral_state::mem_map(address_map &map)
 	map(0xf800, 0xfeff).rom();
 	map(0xff00, 0xffef).ram();
 	map(0xfff6, 0xfff7); // AM_WRITENOP // unknown ports
-	map(0xfff8, 0xfff9).rw(this, FUNC(micral_state::video_r), FUNC(micral_state::video_w));
-	map(0xfffa, 0xfffa).r(this, FUNC(micral_state::keyin_r));
-	map(0xfffb, 0xfffb).r(this, FUNC(micral_state::unk_r));
-	map(0xfffc, 0xfffc).r(this, FUNC(micral_state::status_r));
+	map(0xfff8, 0xfff9).rw(FUNC(micral_state::video_r), FUNC(micral_state::video_w));
+	map(0xfffa, 0xfffa).r(FUNC(micral_state::keyin_r));
+	map(0xfffb, 0xfffb).r(FUNC(micral_state::unk_r));
+	map(0xfffc, 0xfffc).r(FUNC(micral_state::status_r));
 	map(0xfffd, 0xffff); // more unknown ports
 }
 
@@ -392,25 +396,25 @@ MACHINE_CONFIG_START(micral_state::micral)
 	MCFG_SCREEN_SIZE(640, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_micral)
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, 4000000 / 8)  // xtal freq unknown
-	MCFG_TMS9927_CHAR_WIDTH(8)  // unknown
-	//MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(TMS5501_TAG, tms5501_device, sens_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5037(config, m_crtc, 4000000 / 8);  // xtal freq unknown
+	m_crtc->set_char_width(8);  // unknown
+	//m_crtc->vsyn_callback().set(TMS5501_TAG, FUNC(tms5501_device::sens_w));
+	m_crtc->set_screen("screen");
 
 	/* sound hardware */
 	//MCFG_SPEAKER_STANDARD_MONO("mono")
 	//MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("uart", AY51013, 0) // CDP6402
-	MCFG_AY51013_TX_CLOCK(153600)
-	MCFG_AY51013_RX_CLOCK(153600)
-	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	AY31015(config, m_uart); // CDP6402
+	m_uart->set_tx_clock(153600);
+	m_uart->set_rx_clock(153600);
+	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
+	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	RS232_PORT(config, "rs232", default_rs232_devices, "keyboard");
 MACHINE_CONFIG_END
 
 ROM_START( micral )

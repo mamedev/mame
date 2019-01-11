@@ -13,6 +13,7 @@
 #define NLD_MS_GMRES_H_
 
 #include <algorithm>
+#include <cmath>
 
 #include "mat_cr.h"
 #include "nld_ms_direct.h"
@@ -167,21 +168,19 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 		new_V[k] = this->m_nets[k]->Q_Analog();
 
 	}
-	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
 
+	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
 	const nl_double accuracy = this->m_params.m_accuracy;
 
-	unsigned mr = iN;
-	if (iN > 3 )
-		mr = static_cast<unsigned>(std::sqrt(iN) * 2.0);
+	const std::size_t mr = (iN > 3 ) ? static_cast<std::size_t>(std::sqrt(iN) * 2.0) : iN;
 	unsigned iter = std::max(1u, this->m_params.m_gs_loops);
 	unsigned gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
-	unsigned failed = mr * iter;
+	const std::size_t failed = mr * iter;
 
 	this->m_iterative_total += gsl;
 	this->m_stat_calculations++;
 
-	if (gsl>=failed)
+	if (gsl >= failed)
 	{
 		this->m_iterative_fail++;
 		return matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(newton_raphson);

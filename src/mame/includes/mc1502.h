@@ -43,6 +43,11 @@ public:
 		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
+	void mc1502(machine_config &config);
+
+	void init_mc1502();
+
+private:
 	required_device<cpu_device>  m_maincpu;
 	required_device<i8251_device> m_upd8251;
 	required_device<pic8259_device>  m_pic8259;
@@ -56,7 +61,6 @@ public:
 	required_device<ram_device> m_ram;
 	required_ioport_array<12> m_kbdio;
 
-	void init_mc1502();
 	DECLARE_MACHINE_START(mc1502);
 	DECLARE_MACHINE_RESET(mc1502);
 
@@ -84,10 +88,9 @@ public:
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
 	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
 
-	void mc1502(machine_config &config);
 	void mc1502_io(address_map &map);
 	void mc1502_map(address_map &map);
-private:
+
 	int m_pit_out2;
 };
 

@@ -53,13 +53,13 @@ public:
 		, m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
+	void segajw(machine_config &config);
+
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
-	void segajw(machine_config &config);
-
-protected:
+private:
 	DECLARE_READ8_MEMBER(coin_counter_r);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
@@ -77,7 +77,6 @@ protected:
 	void segajw_hd63484_map(address_map &map);
 	void segajw_map(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -371,60 +370,63 @@ void segajw_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(segajw_state::segajw)
+void segajw_state::segajw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,8000000) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(segajw_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segajw_state, irq4_line_hold)
+	M68000(config, m_maincpu, 8000000); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segajw_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unknown clock
-	MCFG_DEVICE_PROGRAM_MAP(segajw_audiocpu_map)
-	MCFG_DEVICE_IO_MAP(segajw_audiocpu_io_map)
+	Z80(config, m_audiocpu, 4000000); // unknown clock
+	m_audiocpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_audiocpu_map);
+	m_audiocpu->set_addrmap(AS_IO, &segajw_state::segajw_audiocpu_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2000))
+	config.m_minimum_quantum = attotime::from_hz(2000);
 
-	MCFG_NVRAM_ADD_NO_FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	MCFG_DEVICE_ADD("io1a", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_OUT_PORTA_CB(WRITE8(*this, segajw_state, coin_counter_w))
-	MCFG_315_5296_OUT_PORTB_CB(WRITE8(*this, segajw_state, lamps1_w))
-	MCFG_315_5296_OUT_PORTC_CB(WRITE8(*this, segajw_state, lamps2_w))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segajw_state, hopper_w))
-	MCFG_315_5296_IN_PORTF_CB(READ8(*this, segajw_state, coin_counter_r))
+	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a", 0)); // unknown clock
+	io1a.out_pa_callback().set(FUNC(segajw_state::coin_counter_w));
+	io1a.out_pb_callback().set(FUNC(segajw_state::lamps1_w));
+	io1a.out_pc_callback().set(FUNC(segajw_state::lamps2_w));
+	io1a.out_pd_callback().set(FUNC(segajw_state::hopper_w));
+	io1a.in_pf_callback().set(FUNC(segajw_state::coin_counter_r));
 
-	MCFG_DEVICE_ADD("io1c", SEGA_315_5296, 0) // unknown clock
-	MCFG_315_5296_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_315_5296_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_315_5296_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_315_5296_IN_PORTD_CB(IOPORT("IN3"))
-	MCFG_315_5296_OUT_PORTG_CB(WRITE8(*this, segajw_state, coinlockout_w))
+	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c", 0)); // unknown clock
+	io1c.in_pa_callback().set_ioport("IN0");
+	io1c.in_pb_callback().set_ioport("IN1");
+	io1c.in_pc_callback().set_ioport("IN2");
+	io1c.in_pd_callback().set_ioport("IN3");
+	io1c.out_pg_callback().set(FUNC(segajw_state::coinlockout_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
-	MCFG_SCREEN_SIZE(720, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 448-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
+	screen.set_size(720, 480);
+	screen.set_visarea(0, 720-1, 0, 448-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	PALETTE(config, "palette").set_entries(16);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 
-	MCFG_HD63484_ADD("hd63484", 8000000, segajw_hd63484_map) // unknown clock
+	hd63484_device &hd63484(HD63484(config, "hd63484", 8000000));
+	hd63484.set_addrmap(0, &segajw_state::segajw_hd63484_map); // unknown clock
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, 8000000)   // unknown clock
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("maincpu", 5))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 8000000));   // unknown clock
+	ymsnd.irq_handler().set_inputline("maincpu", 5);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /***************************************************************************
 

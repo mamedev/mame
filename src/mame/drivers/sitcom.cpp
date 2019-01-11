@@ -66,9 +66,9 @@ public:
 	{
 	}
 
-	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
-
 	void sitcom(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(update_buttons);
 
 protected:
 	template <unsigned D> DECLARE_WRITE16_MEMBER(update_ds) { m_digits[(D << 2) | offset] = data; }
@@ -76,8 +76,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(sod_led)                      { output().set_value("sod_led", state); }
 	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
 
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pa);
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pb);
+	virtual DECLARE_WRITE8_MEMBER(update_ppi_pa);
+	virtual DECLARE_WRITE8_MEMBER(update_ppi_pb);
 
 	void sitcom_bank(address_map &map);
 	void sitcom_io(address_map &map);
@@ -87,7 +87,7 @@ protected:
 	virtual void machine_reset() override;
 
 	required_ioport                          m_buttons;
-	required_device<cpu_device>              m_maincpu;
+	required_device<i8085a_cpu_device>       m_maincpu;
 	required_device<address_map_bank_device> m_bank;
 	output_finder<15>                        m_digits;
 	output_finder<2, 8>                      m_leds;
@@ -107,7 +107,7 @@ public:
 	sitcom_timer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sitcom_state(mconfig, type, tag)
 		, m_speed(*this, "SPEED")
-		, m_pia(*this, "pia")
+		, m_ppi(*this, "ppi")
 		, m_ds2(*this, "ds2")
 		, m_shutter_timer(nullptr)
 		, m_shutter(false)
@@ -123,8 +123,8 @@ public:
 	void sitcomtmr(machine_config &config);
 
 protected:
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pa) override;
-	virtual DECLARE_WRITE8_MEMBER(update_pia_pb) override;
+	virtual DECLARE_WRITE8_MEMBER(update_ppi_pa) override;
+	virtual DECLARE_WRITE8_MEMBER(update_ppi_pb) override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -134,7 +134,7 @@ protected:
 	void update_dac(uint8_t value);
 
 	required_ioport                 m_speed;
-	required_device<i8255_device>   m_pia;
+	required_device<i8255_device>   m_ppi;
 	required_device<dl1414_device>  m_ds2;
 	emu_timer                       *m_shutter_timer;
 
@@ -161,7 +161,7 @@ void sitcom_state::sitcom_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x03).mirror(0x1c).rw("pia", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x00, 0x03).mirror(0x1c).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc0, 0xc3).mirror(0x1c).w("ds0", FUNC(dl1414_device::bus_w));
 	map(0xe0, 0xe3).mirror(0x1c).w("ds1", FUNC(dl1414_device::bus_w));
 }
@@ -224,13 +224,13 @@ void sitcom_state::machine_reset()
 	m_bank->set_bank(0);
 }
 
-WRITE8_MEMBER( sitcom_state::update_pia_pa )
+WRITE8_MEMBER( sitcom_state::update_ppi_pa )
 {
 	for (int i = 0; 8 > i; ++i)
 		m_leds[0][i] = BIT(data, i);
 }
 
-WRITE8_MEMBER( sitcom_state::update_pia_pb )
+WRITE8_MEMBER( sitcom_state::update_ppi_pb )
 {
 	for (int i = 0; 8 > i; ++i)
 		m_leds[1][i] = BIT(data, i);
@@ -250,7 +250,7 @@ INPUT_CHANGED_MEMBER( sitcom_state::update_buttons )
 }
 
 
-WRITE8_MEMBER( sitcom_timer_state::update_pia_pa )
+WRITE8_MEMBER( sitcom_timer_state::update_ppi_pa )
 {
 	if (!m_dac_cs && !m_dac_wr)
 		update_dac(data);
@@ -258,10 +258,10 @@ WRITE8_MEMBER( sitcom_timer_state::update_pia_pa )
 	m_ds2->data_w(data & 0x7f);
 }
 
-WRITE8_MEMBER( sitcom_timer_state::update_pia_pb )
+WRITE8_MEMBER( sitcom_timer_state::update_ppi_pb )
 {
 	if (!m_dac_cs && !BIT(data, 0))
-		update_dac(m_pia->pa_r());
+		update_dac(m_ppi->pa_r());
 	m_dac_wr = BIT(data, 0);
 	m_dac_cs = BIT(data, 1);
 
@@ -347,52 +347,42 @@ void sitcom_timer_state::update_dac(uint8_t value)
 }
 
 
-MACHINE_CONFIG_START(sitcom_state::sitcom)
+void sitcom_state::sitcom(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // 3.072MHz can be used for an old slow 8085
-	MCFG_DEVICE_PROGRAM_MAP(sitcom_mem)
-	MCFG_DEVICE_IO_MAP(sitcom_io)
-	MCFG_I8085A_SID(READLINE(*this, sitcom_state, sid_line))
-	MCFG_I8085A_SOD(WRITELINE(*this, sitcom_state, sod_led))
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL); // 3.072MHz can be used for an old slow 8085
+	m_maincpu->set_addrmap(AS_PROGRAM, &sitcom_state::sitcom_mem);
+	m_maincpu->set_addrmap(AS_IO, &sitcom_state::sitcom_io);
+	m_maincpu->in_sid_func().set(FUNC(sitcom_state::sid_line));
+	m_maincpu->out_sod_func().set(FUNC(sitcom_state::sod_led));
 
-	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(sitcom_bank)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+	ADDRESS_MAP_BANK(config, "bank").set_map(&sitcom_state::sitcom_bank).set_options(ENDIANNESS_LITTLE, 8, 16, 0x8000);
 
-	MCFG_CLOCK_ADD("100hz", 100)
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I8085_RST75_LINE))
+	CLOCK(config, "100hz", 100).signal_handler().set_inputline("maincpu", I8085_RST75_LINE);
 
-	MCFG_DEVICE_ADD("pia", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, sitcom_state, update_pia_pa))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sitcom_state, update_pia_pb))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("PORTC"))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(sitcom_state::update_ppi_pa));
+	ppi.out_pb_callback().set(FUNC(sitcom_state::update_ppi_pb));
+	ppi.in_pc_callback().set_ioport("PORTC");
 
 	// video hardware
-	MCFG_DEVICE_ADD("ds0", DL1414T, u32(0)) // left display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_state, update_ds<0>))
-	MCFG_DEVICE_ADD("ds1", DL1414T, u32(0)) // right display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_state, update_ds<1>))
+	DL1414T(config, "ds0", u32(0)).update().set(FUNC(sitcom_state::update_ds<0>)); // left display
+	DL1414T(config, "ds1", u32(0)).update().set(FUNC(sitcom_state::update_ds<1>)); // right display
 
 	// host interface
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, sitcom_state, update_rxd))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "null_modem"));
+	rs232.rxd_handler().set(FUNC(sitcom_state::update_rxd));
 
-	MCFG_SOFTWARE_LIST_ADD("bitb_list", "sitcom")
-	MCFG_DEFAULT_LAYOUT(layout_sitcom)
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "bitb_list").set_original("sitcom");
+	config.set_default_layout(layout_sitcom);
+}
 
-
-MACHINE_CONFIG_START(sitcom_timer_state::sitcomtmr)
+void sitcom_timer_state::sitcomtmr(machine_config &config)
+{
 	sitcom(config);
-
-	MCFG_DEVICE_ADD("ds2", DL1414T, u32(0)) // remote display
-	MCFG_DL1414_UPDATE_HANDLER(WRITE16(*this, sitcom_timer_state, update_ds<2>))
-
-	MCFG_DEFAULT_LAYOUT(layout_sitcomtmr)
-MACHINE_CONFIG_END
+	DL1414T(config, m_ds2, u32(0)).update().set(FUNC(sitcom_timer_state::update_ds<2>)); // remote display
+	config.set_default_layout(layout_sitcomtmr);
+}
 
 
 ROM_START( sitcom )

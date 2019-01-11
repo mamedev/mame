@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "decodmd2.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(DECODMD2, decodmd_type2_device, "decodmd2", "Data East Pinball Dot Matrix Display Type 2")
@@ -121,51 +120,52 @@ MC6845_UPDATE_ROW( decodmd_type2_device::crtc_update_row )
 void decodmd_type2_device::decodmd2_map(address_map &map)
 {
 	map(0x0000, 0x2fff).bankrw("dmdram");
-	map(0x3000, 0x3000).rw(this, FUNC(decodmd_type2_device::crtc_status_r), FUNC(decodmd_type2_device::crtc_address_w));
-	map(0x3001, 0x3001).w(this, FUNC(decodmd_type2_device::crtc_register_w));
-	map(0x3002, 0x3002).w(this, FUNC(decodmd_type2_device::bank_w));
-	map(0x3003, 0x3003).r(this, FUNC(decodmd_type2_device::latch_r));
-	map(0x4000, 0x7fff).bankr("dmdbank1").w(this, FUNC(decodmd_type2_device::status_w));
+	map(0x3000, 0x3000).rw(FUNC(decodmd_type2_device::crtc_status_r), FUNC(decodmd_type2_device::crtc_address_w));
+	map(0x3001, 0x3001).w(FUNC(decodmd_type2_device::crtc_register_w));
+	map(0x3002, 0x3002).w(FUNC(decodmd_type2_device::bank_w));
+	map(0x3003, 0x3003).r(FUNC(decodmd_type2_device::latch_r));
+	map(0x4000, 0x7fff).bankr("dmdbank1").w(FUNC(decodmd_type2_device::status_w));
 	map(0x8000, 0xffff).bankr("dmdbank2"); // last 32k of ROM
 }
 
-MACHINE_CONFIG_START(decodmd_type2_device::device_add_mconfig)
+void decodmd_type2_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("dmdcpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(decodmd2_map)
+	MC6809E(config, m_cpu, XTAL(8'000'000) / 4);
+	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type2_device::decodmd2_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq_timer", decodmd_type2_device, dmd_firq, attotime::from_hz(80))
+	TIMER(config, "firq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(decodmd_type2_device::dmd_firq), this), attotime::from_hz(80));
 
-	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL(8'000'000) / 8)  // TODO: confirm clock speed
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type2_device, crtc_update_row)
+	MC6845(config, m_mc6845, XTAL(8'000'000) / 8);  // TODO: confirm clock speed
+	m_mc6845->set_screen(nullptr);
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
+	m_mc6845->set_update_row_callback(FUNC(decodmd_type2_device::crtc_update_row), this);
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	screen_device &screen(SCREEN(config, "dmd", SCREEN_TYPE_RASTER));
+	screen.set_native_aspect();
+	screen.set_size(128, 32);
+	screen.set_visarea(0, 128-1, 0, 32-1);
+	screen.set_screen_update("dmd6845", FUNC(mc6845_device::screen_update));
+	screen.set_refresh_hz(60);
 
-	MCFG_SCREEN_ADD("dmd",RASTER)
-	MCFG_SCREEN_SIZE(128, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DEVICE("dmd6845", mc6845_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("12K")
-
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("12K");
+}
 
 
 decodmd_type2_device::decodmd_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECODMD2, tag, owner, clock),
-		m_cpu(*this,"dmdcpu"),
-		m_mc6845(*this,"dmd6845"),
-		m_rombank1(*this,"dmdbank1"),
-		m_rombank2(*this,"dmdbank2"),
-		m_rambank(*this,"dmdram"),
-		m_ram(*this,RAM_TAG)
-{}
+	: device_t(mconfig, DECODMD2, tag, owner, clock)
+	, m_cpu(*this, "dmdcpu")
+	, m_mc6845(*this, "dmd6845")
+	, m_rombank1(*this, "dmdbank1")
+	, m_rombank2(*this, "dmdbank2")
+	, m_rambank(*this, "dmdram")
+	, m_ram(*this, RAM_TAG)
+	, m_rom(*this, finder_base::DUMMY_TAG)
+{
+}
 
 void decodmd_type2_device::device_start()
 {
@@ -173,15 +173,12 @@ void decodmd_type2_device::device_start()
 
 void decodmd_type2_device::device_reset()
 {
-	uint8_t* ROM;
 	uint8_t* RAM = m_ram->pointer();
-	m_rom = memregion(m_gfxtag);
 
 	memset(RAM,0,0x3000);
 
-	ROM = m_rom->base();
-	m_rombank1->configure_entries(0, 32, &ROM[0x0000], 0x4000);
-	m_rombank2->configure_entry(0, &ROM[0x78000]);
+	m_rombank1->configure_entries(0, 32, &m_rom[0x0000], 0x4000);
+	m_rombank2->configure_entry(0, &m_rom[0x78000]);
 	m_rambank->configure_entry(0, &RAM[0]);
 	m_rombank1->set_entry(0);
 	m_rombank2->set_entry(0);

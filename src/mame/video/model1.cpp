@@ -1562,7 +1562,7 @@ void model1_state::tgp_scan()
 	m_render_done = 0;
 }
 
-VIDEO_START_MEMBER(model1_state, model1)
+void model1_state::video_start()
 {
 	m_view = std::make_unique<model1_state::view_t>();
 
@@ -1585,8 +1585,8 @@ VIDEO_START_MEMBER(model1_state, model1)
 	m_clipfn[3].m_isclipped = &model1_state::fclip_isc_right;
 	m_clipfn[3].m_clip = &model1_state::fclip_clip_right;
 
-	save_pointer(NAME(m_tgp_ram.get()), 0x100000-0x40000);
-	save_pointer(NAME(m_poly_ram.get()), 0x40000);
+	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
+	save_pointer(NAME(m_poly_ram), 0x40000);
 	save_item(NAME(m_listctl));
 }
 

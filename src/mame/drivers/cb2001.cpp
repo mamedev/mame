@@ -46,6 +46,7 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #include "cpu/nec/v25.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -53,16 +54,27 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 class cb2001_state : public driver_device
 {
 public:
-	cb2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cb2001_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram_fg(*this, "vrafg"),
 		m_vram_bg(*this, "vrabg"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void cb2001(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint16_t> m_vram_fg;
 	required_shared_ptr<uint16_t> m_vram_bg;
+	required_device<v35_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
 	int m_videobank;
 	int m_videomode;
 	tilemap_t *m_reel1_tilemap;
@@ -70,21 +82,17 @@ public:
 	tilemap_t *m_reel3_tilemap;
 	int m_other1;
 	int m_other2;
+
 	DECLARE_WRITE16_MEMBER(cb2001_vidctrl_w);
 	DECLARE_WRITE16_MEMBER(cb2001_vidctrl2_w);
 	DECLARE_WRITE16_MEMBER(cb2001_bg_w);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cb2001);
+	void cb2001_palette(palette_device &palette) const;
 	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	DECLARE_READ8_MEMBER(irq_ack_r);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void cb2001(machine_config &config);
 	void cb2001_io(address_map &map);
 	void cb2001_map(address_map &map);
 };
@@ -573,7 +581,7 @@ void cb2001_state::cb2001_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0x20fff).ram().share("vrafg");
-	map(0x21000, 0x21fff).ram().w(this, FUNC(cb2001_state::cb2001_bg_w)).share("vrabg");
+	map(0x21000, 0x21fff).ram().w(FUNC(cb2001_state::cb2001_bg_w)).share("vrabg");
 	map(0xc0000, 0xfffff).rom().region("boot_prg", 0);
 }
 
@@ -584,9 +592,9 @@ void cb2001_state::cb2001_io(address_map &map)
 	map(0x21, 0x21).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x22, 0x23).w("aysnd", FUNC(ay8910_device::data_address_w));
 
-	map(0x30, 0x30).r(this, FUNC(cb2001_state::irq_ack_r));
-	map(0x30, 0x31).w(this, FUNC(cb2001_state::cb2001_vidctrl_w));
-	map(0x32, 0x33).w(this, FUNC(cb2001_state::cb2001_vidctrl2_w));
+	map(0x30, 0x30).r(FUNC(cb2001_state::irq_ack_r));
+	map(0x30, 0x31).w(FUNC(cb2001_state::cb2001_vidctrl_w));
+	map(0x32, 0x33).w(FUNC(cb2001_state::cb2001_vidctrl2_w));
 }
 
 static INPUT_PORTS_START( cb2001 )
@@ -791,25 +799,20 @@ static GFXDECODE_START( gfx_cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(cb2001_state, cb2001)
+void cb2001_state::cb2001_palette(palette_device &palette) const
 {
-	int i;
-	for (i = 0; i < 0x200; i++)
+	uint8_t const *const proms = memregion("proms")->base();
+	int const length = memregion("proms")->bytes();
+
+	for (int i = 0; i < 0x200; i++)
 	{
-		int r,g,b;
+		uint16_t dat = (proms[0x000+i] << 8) | proms[0x200+i];
 
-		uint8_t*proms = memregion("proms")->base();
-		int length = memregion("proms")->bytes();
-		uint16_t dat;
+		int const b = ((dat >> 1) & 0x1f) << 3;
+		int const r = ((dat >> 6 )& 0x1f) << 3;
+		int const g = ((dat >> 11 ) & 0x1f) << 3;
 
-		dat = (proms[0x000+i] << 8) | proms[0x200+i];
-
-
-		b = ((dat >> 1) & 0x1f)<<3;
-		r = ((dat >> 6 )& 0x1f)<<3;
-		g = ((dat >> 11 ) & 0x1f)<<3;
-
-		if (length==0x400) // are the cb2001 proms dumped incorrectly?
+		if (length == 0x400) // are the cb2001 proms dumped incorrectly?
 		{
 			if (!(i&0x20)) palette.set_pen_color((i&0x1f) | ((i&~0x3f)>>1), rgb_t(r, g, b));
 		}
@@ -820,42 +823,42 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 	}
 }
 
-MACHINE_CONFIG_START(cb2001_state::cb2001)
-	MCFG_DEVICE_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
-	MCFG_V25_CONFIG(cb2001_decryption_table)
-	MCFG_DEVICE_PROGRAM_MAP(cb2001_map)
-	MCFG_DEVICE_IO_MAP(cb2001_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cb2001_state,  vblank_irq)
+void cb2001_state::cb2001(machine_config &config)
+{
+	V35(config, m_maincpu, 20000000); // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
+	m_maincpu->set_decryption_table(cb2001_decryption_table);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cb2001_state::cb2001_map);
+	m_maincpu->set_addrmap(AS_IO, &cb2001_state::cb2001_io);
+	m_maincpu->set_vblank_int("screen", FUNC(cb2001_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW3"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW1");
+	ppi1.in_pb_callback().set_ioport("DSW2");
+	ppi1.in_pc_callback().set_ioport("DSW3");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cb2001)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cb2001);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cb2001_state, screen_update_cb2001)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(cb2001_state::screen_update_cb2001));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(cb2001_state, cb2001)
+	PALETTE(config, m_palette, FUNC(cb2001_state::cb2001_palette), 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) // wrong
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW5"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000)); // wrong
+	aysnd.port_a_read_callback().set_ioport("DSW4");
+	aysnd.port_b_read_callback().set_ioport("DSW5");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 ROM_START( cb2001 )

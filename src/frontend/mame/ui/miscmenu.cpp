@@ -15,6 +15,7 @@
 #include "pluginopts.h"
 #include "drivenum.h"
 #include "natkeyboard.h"
+#include "romload.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"
@@ -892,8 +893,7 @@ void menu_plugins_configure::populate(float &customtop, float &custombottom)
 		if (curentry->type() != OPTION_HEADER)
 		{
 			auto enabled = !strcmp(curentry->value(), "1");
-			item_append(curentry->description(), enabled ? _("On") : _("Off"),
-				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)curentry->name().c_str());
+			item_append_on_off(curentry->description(), enabled, 0, (void *)(uintptr_t)curentry->name().c_str());
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);

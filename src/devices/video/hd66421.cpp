@@ -123,18 +123,16 @@ inline void hd66421_device::writebyte(offs_t address, uint8_t data)
 //-------------------------------------------------
 
 hd66421_device::hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HD66421, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(hd66421_device::hd66421), this)),
-		m_cmd(0),
-		m_x(0),
-		m_y(0),
-		m_palette(*this, "palette")
+	: device_t(mconfig, HD66421, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(hd66421_device::hd66421), this))
+	, m_cmd(0)
+	, m_x(0)
+	, m_y(0)
+	, m_palette(*this, "palette")
 {
-	for (auto & elem : m_reg)
-	{
+	for (auto &elem : m_reg)
 		elem = 0;
-	}
 }
 
 
@@ -264,14 +262,14 @@ uint32_t hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(hd66421_device, hd66421)
+void hd66421_device::hd66421_palette(palette_device &palette) const
 {
 	// init palette
 	for (int i = 0; i < 4; i++)
 	{
 		palette.set_pen_color(i, rgb_t::white());
 #ifndef HD66421_BRIGHTNESS_DOES_NOT_WORK
-		palette.set_pen_contrast(i, 1.0 * i / (4 - 1));
+		palette.set_pen_contrast(i, double(i) / (4 - 1));
 #endif
 	}
 }
@@ -281,7 +279,7 @@ PALETTE_INIT_MEMBER(hd66421_device, hd66421)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(hd66421_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(hd66421_device, hd66421)
-MACHINE_CONFIG_END
+void hd66421_device::device_add_mconfig(machine_config &config)
+{
+	PALETTE(config, m_palette, FUNC(hd66421_device::hd66421_palette), 4);
+}

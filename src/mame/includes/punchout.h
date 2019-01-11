@@ -5,16 +5,21 @@
     Punch Out / Super Punch Out / Arm Wrestling
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_PUNCHOUT_H
+#define MAME_INCLUDES_PUNCHOUT_H
+
+#pragma once
 
 #include "machine/rp5c01.h"
 #include "machine/rp5h01.h"
 #include "sound/vlm5030.h"
+#include "emupal.h"
 
 class punchout_state : public driver_device
 {
 public:
-	punchout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	punchout_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_rtc(*this, "rtc"),
@@ -32,6 +37,11 @@ public:
 		m_armwrest_fg_videoram(*this, "armwrest_fgram")
 	{ }
 
+	void spnchout(machine_config &config);
+	void armwrest(machine_config &config);
+	void punchout(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<rp5c01_device> m_rtc;
@@ -90,9 +100,6 @@ public:
 	void drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void punchout_copy_top_palette(int bank);
 	void punchout_copy_bot_palette(int bank);
-	void spnchout(machine_config &config);
-	void armwrest(machine_config &config);
-	void punchout(machine_config &config);
 	void armwrest_map(address_map &map);
 	void punchout_io_map(address_map &map);
 	void punchout_map(address_map &map);
@@ -100,3 +107,5 @@ public:
 	void punchout_vlm_map(address_map &map);
 	void spnchout_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PUNCHOUT_H

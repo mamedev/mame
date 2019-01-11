@@ -156,7 +156,6 @@ Player 2 and Player 1 share the same controls !
 #include "includes/thepit.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -210,15 +209,15 @@ void thepit_state::thepit_main_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).mirror(0x0400).ram().w(this, FUNC(thepit_state::colorram_w)).share("colorram");
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(thepit_state::videoram_w)).share("videoram");
+	map(0x8800, 0x8bff).mirror(0x0400).ram().w(FUNC(thepit_state::colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(thepit_state::videoram_w)).share("videoram");
 	map(0x9800, 0x983f).mirror(0x0700).ram().share("attributesram");
 	map(0x9840, 0x985f).ram().share("spriteram");
 	map(0x9860, 0x98ff).ram();
-	map(0xa000, 0xa000).r(this, FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
+	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xb007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -226,15 +225,15 @@ void thepit_state::desertdan_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8bff).mirror(0x0400).ram().w(this, FUNC(thepit_state::colorram_w)).share("colorram");
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(thepit_state::videoram_w)).share("videoram");
+	map(0x8800, 0x8bff).mirror(0x0400).ram().w(FUNC(thepit_state::colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(thepit_state::videoram_w)).share("videoram");
 	map(0x9800, 0x983f).mirror(0x0700).ram().share("attributesram");
 	map(0x9840, 0x985f).ram().share("spriteram");
 	map(0x9860, 0x98ff).ram();
-	map(0xa000, 0xa000).r(this, FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
+	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xb007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -242,16 +241,16 @@ void thepit_state::intrepid_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x8c00, 0x8fff).r(this, FUNC(thepit_state::intrepid_colorram_mirror_r)).w(this, FUNC(thepit_state::colorram_w)); /* mirror for intrepi2 */
-	map(0x9000, 0x93ff).ram().w(this, FUNC(thepit_state::videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(thepit_state::colorram_w)).share("colorram");
+	map(0x8c00, 0x8fff).r(FUNC(thepit_state::intrepid_colorram_mirror_r)).w(FUNC(thepit_state::colorram_w)); /* mirror for intrepi2 */
+	map(0x9000, 0x93ff).ram().w(FUNC(thepit_state::videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(thepit_state::colorram_w)).share("colorram");
 	map(0x9800, 0x983f).mirror(0x0700).ram().share("attributesram");
 	map(0x9840, 0x985f).ram().share("spriteram");
 	map(0x9860, 0x98ff).ram();
-	map(0xa000, 0xa000).r(this, FUNC(thepit_state::input_port_0_r));
+	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r));
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xb007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -728,43 +727,41 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	MCFG_DEVICE_IO_MAP(audio_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC42
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, thepit_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // marked "LOCK OUT" on Centuri schematic but never written
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, thepit_state, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, thepit_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, thepit_state, flip_screen_y_w))
+	LS259(config, m_mainlatch); // IC42
+	m_mainlatch->q_out_cb<0>().set(FUNC(thepit_state::nmi_mask_w));
+	m_mainlatch->q_out_cb<2>().set_nop(); // marked "LOCK OUT" on Centuri schematic but never written
+	m_mainlatch->q_out_cb<3>().set(FUNC(thepit_state::sound_enable_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(thepit_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(thepit_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thepit)
-	MCFG_PALETTE_ADD("palette", 32+8)
-	MCFG_PALETTE_INIT_OWNER(thepit_state, thepit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thepit);
+	PALETTE(config, m_palette, FUNC(thepit_state::thepit_palette), 32+8);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", PIXEL_CLOCK/4));
+	ay1.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, PIXEL_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay2", PIXEL_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(thepit_state::fitter)
+void thepit_state::fitter(machine_config &config)
+{
 	thepit(config);
-	MCFG_DEVICE_MODIFY("mainlatch") // IC42
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, thepit_state, coin_lockout_w))
-MACHINE_CONFIG_END
+	m_mainlatch->q_out_cb<2>().set(FUNC(thepit_state::coin_lockout_w));
+}
 
 MACHINE_CONFIG_START(thepit_state::desertdn)
 	fitter(config);
@@ -777,7 +774,7 @@ MACHINE_CONFIG_START(thepit_state::desertdn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
+	m_gfxdecode->set_info(gfx_intrepid);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::intrepid)
@@ -787,24 +784,21 @@ MACHINE_CONFIG_START(thepit_state::intrepid)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(intrepid_main_map)
 
-	MCFG_DEVICE_MODIFY("mainlatch") // 2F on Funny Mouse main board; IC46 on Port Man main board
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, thepit_state, intrepid_graphics_bank_w))
+	m_mainlatch->q_out_cb<5>().set(FUNC(thepit_state::intrepid_graphics_bank_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
+	m_gfxdecode->set_info(gfx_intrepid);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(thepit_state::suprmous)
+void thepit_state::suprmous(machine_config &config)
+{
 	intrepid(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(thepit_state,suprmous)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
-MACHINE_CONFIG_END
+	m_palette->set_init(FUNC(thepit_state::suprmous_palette));
+	m_gfxdecode->set_info(gfx_suprmous);
+}
 
 
 

@@ -30,10 +30,8 @@ Notes:
   * The Japanese text on the Roads Edge network screen says : "waiting to connect network... please wait without touching machine"
 
   * Xrally and Roads Edge have a symbols table at respectively 0xb2f30 and 0xe10c0
-    Also, to enter into service mode you need to change value of 0xa2363  / 0xcfb53 to 1 during gameplay (of course, if you put into free play mode games are playable)
 
 ToDo:
-  * Buriki One / Xrally and Roads Edge doesn't coin it up, irq issue?
   * Sprite garbage in Beast Busters 2nd Nightmare, another irq issue?
   * Samurai Shodown 64 2 puts "Press 1p & 2p button" msg in gameplay, known to be a MCU simulation issue, i/o port 4 doesn't
     seem to be just an input port but controls program flow too.
@@ -59,11 +57,11 @@ ToDo:
   Other:
   * Translate KL5C80 docs and finish up the implementation
   * Figure out what IO $54 & $72 are on the communications CPU
-  * Hook up CPU2 (v30 based?) no rom? (maybe its the 'sound driver' the game uploads?)
-  * Add sound
+  * Fix sound
   * Backup ram etc.
   * Correct cpu speed
-  * What is ROM1?  Data for the KL5C80?  There's plenty of physical space to map it to.
+  * How to use the FPGA data ('ROM1')
+
 */
 
 /*
@@ -107,7 +105,7 @@ No.  PCB Label  IC Markings               IC Package
 06   ASIC10     NEO64-SCC                 QFP208
 07   CPU1       NEC D30200GD-100 VR4300   QFP120
 08   CPU3       KL5C80A12CFP              QFP80
-09   DPRAM1     DT7133 LA35J              PLCC68
+09   DPRAM1*    IDT7133 LA35J             PLCC68
 10   DSP1       L7A1045 L6028 DSP-A       QFP120
 11   FPGA1      ALTERA EPF10K10QC208-4    QFP208
 12   FROM1      MBM29F400B-12             TSOP48 (archived as FROM1.BIN)
@@ -123,6 +121,10 @@ No.  PCB Label  IC Markings               IC Package
 22   PSRAM2     TC551001BFL-70L           SOP32
 23   ROM1       ALTERA EPC1PC8            DIP8   (130817 bytes, archived as ROM1.BIN)
 24   SRAM5      TC55257DFL-85L            SOP28
+
+    * The IDT 7133 / 7143 lack interrupts and just act as 0x1000 bytes (2x 0x800 16-bit words) of RAM
+     IDT 7133 - 32K (2K X 16 Bit) MASTER Dual-Port SRAM
+     IDT 7143 - 32K (2K X 16 Bit) SLAVE Dual-Port SRAM
 
 
 PCB Layout (Bottom)
@@ -188,7 +190,7 @@ LVS-JAM SNK 1999.1.20
 
 No.  PCB Label  IC Markings               IC Package
 ----------------------------------------------------
-01   DPRAM1     DT 71321 LA55PF           QFP64
+01   DPRAM1     IDT 71321 LA55PF          QFP64 *
 02   IC1        MC44200FT                 QFP44
 03   IOCTR1     TOSHIBA TMP87CH40N-4828   SDIP64
 04   BACKUP     EPSON RTC62423            SOP24
@@ -204,6 +206,9 @@ Notes:
        2. If the game cart is not plugged in, the hardware shows nothing on screen.
        3. The IOCTR I/O MCU runs at 8 MHz.
 
+       *"IDT71321 is function-compatible (but not pin-compatible) with MB8421" ( src\devices\machine\mb8421.cpp )
+        It appears unlikely the interrupt function of the DPRAM is unused unless address pins are all inverted as
+        there aren't any accesses to 7ff / 7fe outside of the RAM testing, commands are put at byte 0 by the MIPS
 
 Hyper Neo Geo game cartridges
 -----------------------------
@@ -442,41 +447,19 @@ or Fatal Fury for example).
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 
-
-/* TODO: NOT measured! */
-#define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
-
-#define HTOTAL              (0x200+0x100)
-#define HBEND               (0)
-#define HBSTART             (0x200)
-
-#define VTOTAL              (264*2)
-#define VBEND               (0)
-#define VBSTART             (224*2)
-
-
-#ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(hng64_state::trap_write)
-{
-	logerror("Remapped write... %08x %08x\n",offset,data);
-}
-
-READ32_MEMBER(hng64_state::hng64_random_read)
-{
-	return machine().rand()&0xffffffff;
-}
-#endif
+#define VERBOSE 1
+#include "logmacro.h"
 
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
-	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
-	return m_com_ram[offset];
+	//LOG("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
+	return m_idt7133_dpram[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_com_w)
 {
-	//logerror("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
-	COMBINE_DATA(&m_com_ram[offset]);
+	//LOG("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
+	COMBINE_DATA(&m_idt7133_dpram[offset]);
 }
 
 /* TODO: fully understand this */
@@ -503,50 +486,34 @@ READ8_MEMBER(hng64_state::hng64_com_share_r)
 	return m_com_shared[offset];
 }
 
-READ32_MEMBER(hng64_state::hng64_sysregs_r)
+
+READ32_MEMBER(hng64_state::hng64_rtc_r)
 {
-	uint16_t rtc_addr;
-
-#if 0
-	if((offset*4) != 0x1084)
-		printf("HNG64 port read (PC=%08x) 0x%08x\n", m_maincpu->pc(), offset*4);
-#endif
-
-	rtc_addr = offset >> 1;
-
-	if((rtc_addr & 0xff0) == 0x420)
+	if (offset & 1)
 	{
-		if((rtc_addr & 0xf) == 0xd)
-			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10; // bit 4 disables "system log reader"
+		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
+		int rtc_addr = offset >> 1;
+
+		// bit 4 disables "system log reader" (the device is 4-bit? so this bit is not from the device?)
+		if ((rtc_addr & 0xf) == 0xd)
+			return m_rtc->read(space, (rtc_addr) & 0xf) | 0x10;
 
 		return m_rtc->read(space, (rtc_addr) & 0xf);
 	}
-
-	switch(offset*4)
+	else
 	{
-		case 0x001c: return machine().rand(); // hng64 hangs on start-up if zero.
-		//case 0x106c:
-		//case 0x107c:
-		case 0x1084: return 0x00000002; //MCU->MIPS latch port
-		//case 0x108c:
-		case 0x1104: return m_irq_level;
-		case 0x111c:
-			//printf("Read to IRQ ACK?\n");
-			break;
-		case 0x1254: return 0x00000000; //dma status, 0x800
+		// shouldn't happen unless something else is mapped here too
+		LOG("%s: unhandled hng64_rtc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+		return 0xffffffff;
 	}
-
-//  printf("%08x\n",offset*4);
-
-//  return machine().rand()&0xffffffff;
-	return m_sysregs[offset];
 }
 
 /* preliminary dma code, dma is used to copy program code -> ram */
 void hng64_state::do_dma(address_space &space)
 {
-	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
+	// check if this determines how long the crosshatch is visible for, we might need to put it on a timer.
 
+	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
 	while (m_dma_len >= 0)
 	{
 		uint32_t dat;
@@ -559,27 +526,144 @@ void hng64_state::do_dma(address_space &space)
 	}
 }
 
-/*
-//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITENOP        // ?? often
-//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITENOP        // fatfur,strange
-//  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
-//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITENOP        // irq ack
+READ32_MEMBER(hng64_state::hng64_dmac_r)
+{
+	// DMAC seems to be mapped as 4 bytes in every 8
+	if ((offset * 4) == 0x54)
+		return 0x00000000; //dma status, 0x800
 
-//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
-//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
+	LOG("%s: unhandled hng64_dmac_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(hng64_state::hng64_dmac_w)
+{
+	// DMAC seems to be mapped as 4 bytes in every 8
+	switch (offset * 4)
+	{
+	case 0x04: COMBINE_DATA(&m_dma_start); break;
+	case 0x14: COMBINE_DATA(&m_dma_dst); break;
+	case 0x24: COMBINE_DATA(&m_dma_len);
+		do_dma(space);
+		break;
+
+	// these are touched during startup when setting up the DMA, maybe mode selection?
+	case 0x34: // (0x0075)
+	case 0x44: // (0x0000)
+
+	// written immediately after length, maybe one of these is the actual trigger?, 4c is explicitly set to 0 after all operations are complete
+	case 0x4c: // (0x0101 - trigger) (0x0000 - after DMA)
+	case 0x5c: // (0x0008 - trigger?) after 0x4c
+	default:
+		LOG("%s: unhandled hng64_dmac_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+		break;
+	}
+}
+
+WRITE32_MEMBER(hng64_state::hng64_rtc_w)
+{
+	if (offset & 1)
+	{
+		// RTC is mapped to 1 byte (4-bits used) in every 8 bytes so we can't even install this with a umask
+		m_rtc->write(space, (offset >> 1) & 0xf, data);
+	}
+	else
+	{
+		// shouldn't happen unless something else is mapped here too
+		LOG("%s: unhandled hng64_rtc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+	}
+}
+
+WRITE32_MEMBER(hng64_state::hng64_mips_to_iomcu_irq_w)
+{
+	// guess, written after a write to 0x00 in dpram, which is where the command goes, and the IRQ onthe MCU reads the command
+	LOG("%s: HNG64 writing to SYSTEM Registers %08x (%08x) (IO MCU IRQ TRIGGER?)\n", machine().describe_context(), data, mem_mask);
+	if (mem_mask & 0xffff0000) m_tempio_irqon_timer->adjust(attotime::zero);
+}
+
+READ32_MEMBER(hng64_state::hng64_irqc_r)
+{
+	if ((offset * 4) == 0x04)
+	{
+		LOG("%s: irq level READ %04x\n", machine().describe_context(), m_irq_level);
+		return m_irq_level;
+	}
+	else
+	{
+		LOG("%s: unhandled hng64_irqc_r (%04x) (%08x)\n", machine().describe_context(), offset*4, mem_mask);
+	}
+
+	return 0xffffffff;
+}
+
+WRITE32_MEMBER(hng64_state::hng64_irqc_w)
+{
+	switch (offset * 4)
+	{
+		//case 0x0c: // global irq mask? (probably not)
+	case 0x1c:
+		// IRQ ack
+		m_irq_pending &= ~(data&mem_mask);
+		set_irq(0x0000);
+		break;
+
+	default:
+		LOG("%s: unhandled hng64_irqc_w (%04x) %08x (%08x)\n", machine().describe_context(), offset * 4, data, mem_mask);
+		break;
+	}
+}
+
+/*
+  These 'sysregs' seem to be multiple sets of the same thing
+  (based on xrally)
+
+  the 0x1084 addresses appear to be related to the IO MCU, but neither sending commands to the MCU, not controlling lines directly
+  0x20 is written to 0x1084 in the MIPS IRQ handlers for the IO MCU (both 0x11 and 0x17 irq levels)
+
+  the 0x1074 address seems to be the same thing but for the network CPU
+  0x20 is written to 0x1074 in the MIPS IRQ handlers that seem to be associated with communication (levels 0x09, 0x0a, 0x0b, 0x0c)
+
+
+  -----
+  the following notes are taken from the old 'fake IO' function, in reality it turned out that these 'commands' were not needed
+  with the real IO MCU hooked up, although we still use the 0x0c one as a hack in order to provide the 'm_no_machine_error_code' value
+  in order to bypass a startup check, in reality it looks like that should be written by the MCU after reading it via serial.
+
+  ---- OUTDATED NOTES ----
+
+  I'm not really convinced these are commands in this sense based on code analysis, probably just a non-standard way of controlling the lines
+
+    command table:
+    0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
+    0x0c = cut down connections, treats the dualport to be normal RAM
+    0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
+    0x20 = asks for MCU machine code (probably not, this is also written in the function after the TLCS870 requests an interrupt on the MIPS)
+
+    (*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
+  ----
 */
+
+READ32_MEMBER(hng64_state::hng64_sysregs_r)
+{
+	//LOG("%s: hng64_sysregs_r (%04x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);
+
+	switch(offset*4)
+	{
+		case 0x001c: return 0x00000000; // 0x00000040 must not be set or games won't boot
+		//case 0x106c:
+		//case 0x107c:
+		case 0x1084:
+			LOG("%s: HNG64 reading MCU status port (%08x)\n", machine().describe_context(), mem_mask);
+			return 0x00000002; //MCU->MIPS latch port
+	}
+
+	return m_sysregs[offset];
+}
 
 WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 {
 	COMBINE_DATA (&m_sysregs[offset]);
-
-	if(((offset >> 1) & 0xff0) == 0x420)
-	{
-		m_rtc->write(space, (offset >> 1) & 0xf,data);
-		return;
-	}
 
 #if 0
 	if(((offset*4) & 0xff00) == 0x1100)
@@ -590,184 +674,32 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 	{
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
+			LOG("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
-		//0x110c global irq mask?
-		/* irq ack */
-		case 0x111c: m_irq_pending &= ~m_sysregs[offset]; set_irq(0x0000); break;
-		case 0x1204: m_dma_start = m_sysregs[offset]; break;
-		case 0x1214: m_dma_dst = m_sysregs[offset]; break;
-		case 0x1224:
-			m_dma_len = m_sysregs[offset];
-			do_dma(space);
-			break;
-		//default:
-		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
+		default:
+			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
 	}
 }
+
 
 /**************************************
-* MCU simulations
+* MIPS side Dual Port RAM hookup for MCU
 **************************************/
 
-/* Fatal Fury Wild Ambition / Buriki One */
-READ32_MEMBER(hng64_state::fight_io_r)
+READ8_MEMBER(hng64_state::hng64_dualport_r)
 {
-	/*
-	TODO: reads to i/o but coins doesn't work? Let's put a cheap hack for now
-	*/
-	if(ioport("SYSTEM")->read() & 0x00030000 && m_mcu_type == BURIKI_MCU)
-	{
-		m_maincpu->space(AS_PROGRAM).write_byte(0xf3ce4, 1);
-	}
+	LOG("%s: dualport R %04x\n", machine().describe_context(), offset);
 
-	switch (offset*4)
+	// hack, this should just be put in ram at 0x600 by the MCU.
+	if (!(m_mcu_en == 0x0c))
 	{
-		case 0x000: return 0x00000400;
-		case 0x004: return ioport("SYSTEM")->read();
-		case 0x008: return ioport("P1_P2")->read();
+		switch (offset)
+		{
 		case 0x600: return m_no_machine_error_code;
+		}
 	}
 
-	return m_dualport[offset];
-}
-
-/* Samurai Shodown 64 / Samurai Shodown 64 2 */
-READ32_MEMBER(hng64_state::samsho_io_r)
-{
-	switch (offset*4)
-	{
-		case 0x000:
-		{
-			/* this is used on post by the io mcu to signal that a init task is complete, zeroed otherwise. */
-			//popmessage("%04x", m_mcu_fake_time);
-
-			if(m_mcu_fake_time < 0x100)
-				m_mcu_fake_time++;
-
-			if(m_mcu_fake_time < 0x80) //i/o init 1
-				return 0x300;
-			else if(m_mcu_fake_time < 0x100)//i/o init 2
-				return 0x400;
-			else
-				return 0x000;
-		}
-		case 0x004: return ioport("SYSTEM")->read();
-		case 0x008: return ioport("P1_P2")->read();
-		case 0x600: return m_no_machine_error_code;
-	}
-
-	return m_dualport[offset];
-}
-
-/* Beast Busters 2 */
-/* FIXME: trigger input doesn't work? */
-READ32_MEMBER(hng64_state::shoot_io_r)
-{
-	switch (offset*4)
-	{
-		case 0x000:
-		{
-			if(m_mcu_fake_time < 0x100)//i/o init
-			{
-				m_mcu_fake_time++;
-				return 0x400;
-			}
-			else
-				return 0x000;
-		}
-		case 0x010:
-		{
-			/* Quick kludge for use the input test items */
-			if(ioport("D_IN")->read() & 0x01000000)
-				m_p1_trig = machine().rand() & 0x01000000;
-
-			return (ioport("D_IN")->read() & ~0x01000000) | (m_p1_trig);
-		}
-		case 0x018:
-		{
-			uint8_t p1_x, p1_y, p2_x, p2_y;
-			p1_x = ioport("LIGHT_P1_X")->read() & 0xff;
-			p1_y = ioport("LIGHT_P1_Y")->read() & 0xff;
-			p2_x = ioport("LIGHT_P2_X")->read() & 0xff;
-			p2_y = ioport("LIGHT_P2_Y")->read() & 0xff;
-
-			return p1_x<<24 | p1_y<<16 | p2_x<<8 | p2_y;
-		}
-		case 0x01c:
-		{
-			uint8_t p3_x, p3_y;
-			p3_x = ioport("LIGHT_P3_X")->read() & 0xff;
-			p3_y = ioport("LIGHT_P3_Y")->read() & 0xff;
-
-			return p3_x<<24 | p3_y<<16 | p3_x<<8 | p3_y; //FIXME: see what's the right bank here when the trigger works
-		}
-		case 0x600: return m_no_machine_error_code;
-	}
-
-	return m_dualport[offset];
-}
-
-/* Roads Edge / Xtreme Rally */
-READ32_MEMBER(hng64_state::racing_io_r)
-{
-	switch (offset*4)
-	{
-		case 0x000:
-		{
-			if(m_mcu_fake_time < 0x100)//i/o init
-			{
-				m_mcu_fake_time++;
-				return 0x400;
-			}
-			else
-				return 0x000;
-		}
-		case 0x004: return ioport("SYSTEM")->read();
-		case 0x008: return ioport("IN0")->read();
-		case 0x014: return ioport("VIEW")->read();
-		case 0x018:
-		{
-			uint8_t handle, acc, brake;
-			handle = ioport("HANDLE")->read() & 0xff;
-			acc = ioport("ACCELERATOR")->read() & 0xff;
-			brake = ioport("BRAKE")->read() & 0xff;
-
-			return (handle<<24) | (acc<<16) | (brake<<8) | (0xff<<0);
-		}
-
-		case 0x600: return m_no_machine_error_code;
-	}
-
-	return m_dualport[offset];
-}
-
-READ32_MEMBER(hng64_state::hng64_dualport_r)
-{
-	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
-
-	/*
-	command table:
-	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
-	0x0c = cut down connections, treats the dualport to be normal RAM
-	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
-	0x20 = asks for MCU machine code
-
-	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
-	*/
-	if (m_mcu_en == 0x0c)
-		return m_dualport[offset];
-
-	switch (m_mcu_type)
-	{
-		case FIGHT_MCU:
-		case BURIKI_MCU: return fight_io_r(space, offset,0xffffffff);
-		case SHOOT_MCU:  return shoot_io_r(space, offset,0xffffffff);
-		case RACING_MCU: return racing_io_r(space, offset,0xffffffff);
-		case SAMSHO_MCU: return samsho_io_r(space, offset,0xffffffff);
-	}
-
-	return m_dualport[offset];
+	return m_dt71321_dpram->right_r(space, offset);
 }
 
 /*
@@ -780,68 +712,28 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 0x00004000 gun #3
 */
 
-WRITE32_MEMBER(hng64_state::hng64_dualport_w)
+
+/*
+    MIPS clearly writes commands for the TLCS870 MCU at 00 here
+    first command it writes after the startup checks is 0x0a, it should also trigger an EXTINT0 on the TLCS870
+    around that time, as the EXTINT0 reads the command.
+
+    call at CBB0 in the MCU is to read the command from shared RAM
+    value is used in the jump table at CBC5
+    command 0x0a points at ccbd
+    which starts with a call to copy 0x40 bytes of data from 0x200 in shared RAM to the internal RAM of the MCU
+    the MIPS (at least in Fatal Fury) uploads this data to shared RAM prior to the call.
+
+    need to work out what triggers the interrupt, as a write to 0 wouldn't as the Dual Port RAM interrupts
+    are on addresses 0x7fe and 0x7ff (we're using an address near the system regs, based on code analysis
+    it seems correct, see hng64_mips_to_iomcu_irq_w )
+*/
+
+WRITE8_MEMBER(hng64_state::hng64_dualport_w)
 {
-	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
-	COMBINE_DATA (&m_dualport[offset]);
+	m_dt71321_dpram->right_w(space,offset, data);
+	LOG("%s: dualport WRITE %04x %02x\n", machine().describe_context(), offset, data);
 }
-
-
-// Transition Control memory.
-WRITE32_MEMBER(hng64_state::tcram_w)
-{
-	uint32_t *hng64_tcram = m_tcram;
-
-	COMBINE_DATA (&hng64_tcram[offset]);
-
-	if(offset == 0x02)
-	{
-		uint16_t min_x, min_y, max_x, max_y;
-		rectangle visarea = m_screen->visible_area();
-
-		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
-		min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
-		max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
-		max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
-
-		if(max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
-		{
-			m_screen_dis = 1;
-			return;
-		}
-
-		m_screen_dis = 0;
-
-		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds() );
-	}
-}
-
-READ32_MEMBER(hng64_state::tcram_r)
-{
-	//printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
-	if(offset == 0x12)
-		return ioport("VBLANK")->read();
-
-	return m_tcram[offset];
-}
-
-/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high,
-   unknown purpose (vblank? related to the display list?).
-
-   bit 1 needs to be off, otherwise Fatal Fury WA locks up (FIFO full?)
-   bit 0 is likely to be fifo empty (active low)
-   */
-READ32_MEMBER(hng64_state::unk_vreg_r)
-{
-//  m_unk_vreg_toggle^=0x8000;
-
-	return 0;
-
-//  return ++m_unk_vreg_toggle;
-}
-
-
 
 /************************************************************************************************************/
 
@@ -892,18 +784,6 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 	}
 }
 
-/*
-<ElSemi> 0xE0000000 sound
-<ElSemi> 0xD0100000 3D bank A
-<ElSemi> 0xD0200000 3D bank B
-<ElSemi> 0xC0000000-0xC000C000 Sprite
-<ElSemi> 0xC0200000-0xC0204000 palette
-<ElSemi> 0xC0100000-0xC0180000 Tilemap
-<ElSemi> 0xBF808000-0xBF808800 Dualport ram
-<ElSemi> 0xBF800000-0xBF808000 S-RAM
-<ElSemi> 0x60000000-0x60001000 Comm dualport ram
-*/
-
 WRITE32_MEMBER(hng64_state::hng64_vregs_w)
 {
 //  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
@@ -949,321 +829,495 @@ WRITE16_MEMBER(hng64_state::main_sound_comms_w)
 
 void hng64_state::hng_map(address_map &map)
 {
-
+	// main RAM / ROM
 	map(0x00000000, 0x00ffffff).ram().share("mainram");
 	map(0x04000000, 0x05ffffff).nopw().rom().region("gameprg", 0).share("cart");
 
-	// Ports
-	map(0x1f700000, 0x1f702fff).rw(this, FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs");
+	// Misc Peripherals
+	map(0x1f700000, 0x1f7010ff).rw(FUNC(hng64_state::hng64_sysregs_r), FUNC(hng64_state::hng64_sysregs_w)).share("sysregs"); // various things
+
+	map(0x1f701100, 0x1f70111f).rw(FUNC(hng64_state::hng64_irqc_r), FUNC(hng64_state::hng64_irqc_w));
+	map(0x1f701200, 0x1f70127f).rw(FUNC(hng64_state::hng64_dmac_r), FUNC(hng64_state::hng64_dmac_w));
+	// 1f702004 used (rarely writes 01 or a random looking value as part of init sequences)
+	map(0x1f702100, 0x1f70217f).rw(FUNC(hng64_state::hng64_rtc_r), FUNC(hng64_state::hng64_rtc_w));
+	map(0x1f7021c4, 0x1f7021c7).w(FUNC(hng64_state::hng64_mips_to_iomcu_irq_w));
 
 	// SRAM.  Coin data, Player Statistics, etc.
-	map(0x1F800000, 0x1F803fff).ram().share("nvram");
+	map(0x1f800000, 0x1f803fff).ram().share("nvram");
 
-	// Dualport RAM
-	map(0x1F808000, 0x1F8087ff).rw(this, FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).share("dualport");
+	// Dualport RAM (shared with IO MCU)
+	map(0x1f808000, 0x1f8087ff).rw(FUNC(hng64_state::hng64_dualport_r), FUNC(hng64_state::hng64_dualport_w)).umask32(0xffffffff);
 
-	// BIOS
+	// BIOS ROM
 	map(0x1fc00000, 0x1fc7ffff).nopw().rom().region("user1", 0).share("rombase");
 
-	// Video
+	// Sprites
 	map(0x20000000, 0x2000bfff).ram().share("spriteram");
-	map(0x2000d800, 0x2000e3ff).w(this, FUNC(hng64_state::hng64_sprite_clear_even_w));
-	map(0x2000e400, 0x2000efff).w(this, FUNC(hng64_state::hng64_sprite_clear_odd_w));
+	map(0x2000d800, 0x2000e3ff).w(FUNC(hng64_state::hng64_sprite_clear_even_w));
+	map(0x2000e400, 0x2000efff).w(FUNC(hng64_state::hng64_sprite_clear_odd_w));
 	map(0x20010000, 0x20010013).ram().share("spriteregs");
-	map(0x20100000, 0x2017ffff).ram().w(this, FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
-	map(0x20190000, 0x20190037).ram().w(this, FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
-	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x20208000, 0x2020805f).rw(this, FUNC(hng64_state::tcram_r), FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
-	map(0x20300000, 0x203001ff).w(this, FUNC(hng64_state::dl_w)); // 3d Display List
-	map(0x20300200, 0x20300203).w(this, FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
-	map(0x20300214, 0x20300217).w(this, FUNC(hng64_state::dl_control_w));
-	map(0x20300218, 0x2030021b).r(this, FUNC(hng64_state::unk_vreg_r));
 
-	// 3d?
-	map(0x30000000, 0x3000002f).ram().share("3dregs");
-	map(0x30100000, 0x3015ffff).rw(this, FUNC(hng64_state::hng64_3d_1_r), FUNC(hng64_state::hng64_3d_1_w)).share("3d_1");  // 3D Display Buffer A
-	map(0x30200000, 0x3025ffff).rw(this, FUNC(hng64_state::hng64_3d_2_r), FUNC(hng64_state::hng64_3d_2_w)).share("3d_2");  // 3D Display Buffer B
+	// Backgrounds
+	map(0x20100000, 0x2017ffff).ram().w(FUNC(hng64_state::hng64_videoram_w)).share("videoram");    // Tilemap
+	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
+
+	// Mixing
+	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
+	map(0x20208000, 0x2020805f).r(FUNC(hng64_state::tcram_r));
+
+	// 3D display list control
+	map(0x20300000, 0x203001ff).w(FUNC(hng64_state::dl_w)); // 3d Display List
+	map(0x20300200, 0x20300203).w(FUNC(hng64_state::dl_upload_w));  // 3d Display List Upload
+	map(0x20300210, 0x20300213).w(FUNC(hng64_state::dl_unk_w)); // once, on startup
+	map(0x20300214, 0x20300217).w(FUNC(hng64_state::dl_control_w));
+	map(0x20300218, 0x2030021b).r(FUNC(hng64_state::dl_vreg_r));
+
+	// 3D framebuffer
+	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);
+	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbunkpair_w)).umask32(0xffff);
+	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).umask32(0xffff);
+	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).umask32(0xffffffff);
+	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_fbtable_r), FUNC(hng64_state::hng64_fbtable_w)).share("fbtable");
+
+	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_fbram1_r), FUNC(hng64_state::hng64_fbram1_w)).share("fbram1");  // 3D Display Buffer A
+	map(0x30200000, 0x3025ffff).rw(FUNC(hng64_state::hng64_fbram2_r), FUNC(hng64_state::hng64_fbram2_w)).share("fbram2");  // 3D Display Buffer B
 
 	// Sound
-	map(0x60000000, 0x601fffff).rw(this, FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
-	map(0x60200000, 0x603fffff).rw(this, FUNC(hng64_state::hng64_soundram_r), FUNC(hng64_state::hng64_soundram_w));   // program + data for V53A gets uploaded here
+	map(0x60000000, 0x601fffff).rw(FUNC(hng64_state::hng64_soundram2_r), FUNC(hng64_state::hng64_soundram2_w)); // actually seems unmapped, see note in audio/hng64.c
+	map(0x60200000, 0x603fffff).rw(FUNC(hng64_state::hng64_soundram_r), FUNC(hng64_state::hng64_soundram_w));   // program + data for V53A gets uploaded here
 
 	// These are sound ports of some sort
-	map(0x68000000, 0x6800000f).rw(this, FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
-	map(0x6f000000, 0x6f000003).w(this, FUNC(hng64_state::hng64_soundcpu_enable_w));
+	map(0x68000000, 0x6800000f).rw(FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
+	map(0x6f000000, 0x6f000003).w(FUNC(hng64_state::hng64_soundcpu_enable_w));
 
-	// Communications
-	map(0xc0000000, 0xc0000fff).rw(this, FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
-	map(0xc0001000, 0xc0001007).rw(this, FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
-
-	/* 6e000000-6fffffff */
-	/* 80000000-81ffffff */
-	/* 88000000-89ffffff */
-	/* 90000000-97ffffff */
-	/* 98000000-9bffffff */
-	/* a0000000-a3ffffff */
+	// Dualport RAM (shared with Communications CPU)
+	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::hng64_com_r), FUNC(hng64_state::hng64_com_w)).share("com_ram");
+	map(0xc0001000, 0xc0001007).ram().share("comhack");//.rw(FUNC(hng64_state::hng64_com_share_mips_r), FUNC(hng64_state::hng64_com_share_mips_w));
 }
 
 
-static INPUT_PORTS_START( hng64 )
+static INPUT_PORTS_START( hng64 ) // base port, for debugging
 	PORT_START("VBLANK")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
-	PORT_START("IPT_TEST")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE( KEYCODE_Q )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SERVICE )
-
-	PORT_START("P1_P2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-
-CUSTOM_INPUT_MEMBER(hng64_state::left_handle_r)
-{
-	return (ioport("HANDLE")->read() == 0);
-}
-
-CUSTOM_INPUT_MEMBER(hng64_state::right_handle_r)
-{
-	return (ioport("HANDLE")->read() == 0xff);
-}
-
-CUSTOM_INPUT_MEMBER(hng64_state::acc_down_r)
-{
-	return (ioport("ACCELERATOR")->read() == 0);
-}
-
-CUSTOM_INPUT_MEMBER(hng64_state::brake_down_r)
-{
-	return (ioport("BRAKE")->read() == 0);
-}
-
-static INPUT_PORTS_START( roadedge )
-	PORT_START("VBLANK")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
-	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Shift Up")
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Shift Down")
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, left_handle_r, nullptr)
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, right_handle_r, nullptr)
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, acc_down_r, nullptr)
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, brake_down_r, nullptr)
-
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x010000, 0x000000, "SYSA" )
-	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x010000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x020000, 0x000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x020000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x040000, 0x000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x040000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x080000, 0x000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x080000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x100000, 0x000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x100000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x200000, 0x000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x200000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x400000, 0x000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x400000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x800000, 0x000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x800000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01000000, 0x00000000, "SYSA" )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02000000, 0x00000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x00000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x00000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x00000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20000000, 0x00000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40000000, 0x00000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80000000, 0x00000000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80000000, DEF_STR( On ) )
-
 
 	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("BGM 1")
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("BGM 2")
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("BGM 3")
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("BGM 4")
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("VIEW")
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("View 1")
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("View 2")
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("HANDLE")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("Handle")
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("ACCELERATOR")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("Accelerator")
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x01, 0x01, "IN4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("BRAKE")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_REVERSE PORT_NAME("Brake")
+	PORT_START("IN5")
+	PORT_DIPNAME( 0x01, 0x01, "IN5" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN6")
+	PORT_DIPNAME( 0x01, 0x01, "IN6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN7")
+	PORT_DIPNAME( 0x01, 0x01, "IN7" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("AN0")
+	PORT_START("AN1")
+	PORT_START("AN2")
+	PORT_START("AN3")
+	PORT_START("AN4")
+	PORT_START("AN5")
+	PORT_START("AN6")
+	PORT_START("AN7")
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( bbust2 )
-	PORT_START("VBLANK")
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+static INPUT_PORTS_START( hng64_fight )
+	PORT_INCLUDE( hng64 )
 
-	PORT_START("D_IN")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SERVICE3 )
-	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_SERVICE )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) //trigger
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) //pump
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) //bomb
-	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_START3 )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) //trigger
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) //pump
-	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) //bomb
-	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) //trigger
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) //pump
-	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) //bomb
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("LIGHT_P1_X")
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+
+	PORT_MODIFY("IN5") // why is this shifted, is it a bug in the TLCS870 emulation or intentional?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Service
+	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( hng64_drive )
+	PORT_INCLUDE( hng64 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN5")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("BGM 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("BGM 2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("BGM 3")
+
+	PORT_MODIFY("IN6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("BGM 4")
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("View 1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("View 2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) // Service
+	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("Handle")
+
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("Accelerator")
+
+	PORT_MODIFY("AN2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(60) PORT_PLAYER(1) PORT_NAME("Brake")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( hng64_shoot )
+	PORT_INCLUDE( hng64 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) //trigger
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) //pump
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) //bomb
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) //trigger
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) //pump
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) //bomb
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) //trigger
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) //pump
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) //bomb
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_SERVICE_NO_TOGGLE(0x80, IP_ACTIVE_LOW)
+
+	PORT_MODIFY("IN3") // Debug Port? - there are inputs to pause game, bring up a test menu, move the camera around etc.
+	PORT_DIPNAME( 0x01, 0x01, "DEBUG" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("IN4") // usual inputs are disconnected
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN5") // usual inputs are disconnected
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN6") // usual inputs are disconnected
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN7") // usual inputs are disconnected
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("AN0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("LIGHT_P1_Y")
+	PORT_MODIFY("AN1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("LIGHT_P2_X")
+	PORT_MODIFY("AN2")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("LIGHT_P2_Y")
+	PORT_MODIFY("AN3")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("LIGHT_P3_X")
+	PORT_MODIFY("AN4")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(3)
 
-	PORT_START("LIGHT_P3_Y")
+	PORT_MODIFY("AN5")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(3)
 INPUT_PORTS_END
 
@@ -1407,40 +1461,31 @@ void hng64_state::init_hng64()
 
 void hng64_state::init_hng64_fght()
 {
-	m_no_machine_error_code = 0x01000000;
+	m_no_machine_error_code = 0x01;
 	init_hng64();
-}
-
-void hng64_state::init_fatfurwa()
-{
-	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
-	init_hng64_fght();
-	m_mcu_type = FIGHT_MCU;
-}
-
-void hng64_state::init_buriki()
-{
-	init_hng64_fght();
-	m_mcu_type = BURIKI_MCU;
 }
 
 void hng64_state::init_ss64()
 {
 	init_hng64_fght();
-	m_mcu_type = SAMSHO_MCU;
+	m_samsho64_3d_hack = 1;
 }
 
-void hng64_state::init_hng64_race()
+void hng64_state::init_hng64_drive()
 {
-	m_no_machine_error_code = 0x02000000;
-	m_mcu_type = RACING_MCU;
+	m_no_machine_error_code = 0x02;
 	init_hng64();
+}
+
+void hng64_state::init_roadedge()
+{
+	init_hng64_drive();
+	m_roadedge_3d_hack = 1;
 }
 
 void hng64_state::init_hng64_shoot()
 {
-	m_mcu_type = SHOOT_MCU;
-	m_no_machine_error_code = 0x03000000;
+	m_no_machine_error_code = 0x03;
 	init_hng64();
 }
 
@@ -1453,15 +1498,229 @@ void hng64_state::set_irq(uint32_t irq_vector)
 	    - is there an irq mask mechanism?
 	    - is irq level cleared too when the irq acks?
 
-	    This is written with irqs DISABLED
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0 vblank irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 1 <empty>
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 2 <empty>
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 3 3d fifo processed irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 9
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 10
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 17 MCU related irq
-	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 11 network irq, needed by xrally and roadedge
+	    IRQ level read at 0x80008cac
+	    IO RAM is at bf808000 on the MIPS
+
+	    -- irq table in Fatal Fury WA - 'empty' entries just do minimum 'interrupt service' with no real function.
+	    80000400: 80039F20         irq00 vblank irq
+	    80000404: 80039F84         1rq01 jump based on ram content
+	    80000408: 8003A08C         irq02 'empty'
+	    8000040C: 8006FF04         irq03 3d FIFO?
+	    80000410: A0000410         irq04 INVALID
+	    80000414: A0000414         irq05 INVALID
+	    80000418: A0000418         irq06 INVALID
+	    8000041C: A000041C         irq07 INVALID
+	    80000420: A0000420         irq08 INVALID
+	    80000424: 8003A00C         irq09 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+	    80000428: 80039FD0         irq0a 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+	    8000042C: 8003A0C0         irq0b 'empty'(network on xrally?)   writes to sysreg 1074 instead of loading/storing regs tho
+	    80000430: 8003A050         irq0c 'empty'                       writes to sysreg 1074 instead of loading/storing regs tho
+	    80000434: A0000434         irq0d INVALID
+	    80000438: A0000438         irq0e INVALID
+	    8000043C: A000043C         irq0f INVALID
+	    80000440: A0000440         irq10 INVALID
+	    80000444: 8003A0FC         irq11 IO MCU related?               write to sysreg 1084 instead of loading/storing regs, accesses dualport RAM
+	    80000448: A0000448         irq12 INVALID
+	    8000044C: A000044C         irq13 INVALID
+	    80000450: A0000450         irq14 INVALID
+	    80000454: A0000454         irq15 INVALID
+	    80000458: A0000458         irq16 INVALID
+	    8000045C: 8003A1D4         irq17 'empty'                       write to sysreg 1084 instead of loading/storing regs tho (like irq 0x11)
+	    80000460: A0000460         irq18 INVALID
+	    (all other entries, invalid)
+
+	    Xrally (invalid IRQs are more obviously invalid, pointing at 0)
+	    80000400: 80016ED0         irq00
+	    80000404: 80016F58         irq01
+	    80000408: 80017048         irq02
+	    8000040C: 80013484         irq03
+	    80000410: 00000000         irq04 INVALID
+	    80000414: 00000000         irq05 INVALID
+	    80000418: 00000000         irq06 INVALID
+	    8000041C: 00000000         irq07 INVALID
+	    80000420: 00000000         irq08 INVALID
+	    80000424: 80016FC8         irq09
+	    80000428: 80016F8C         irq0a
+	    8000042C: 8001707C         irq0b
+	    80000430: 8001700C         irq0c
+	    80000434: 00000000         irq0d INVALID
+	    80000438: 00000000         irq0e INVALID
+	    8000043C: 00000000         irq0f INVALID
+	    80000440: 00000000         irq10 INVALID
+	    80000444: 800170C0         irq11
+	    80000448: 00000000         irq12 INVALID
+	    8000044C: 00000000         irq13 INVALID
+	    80000450: 00000000         irq14 INVALID
+	    80000454: 00000000         irq15 INVALID
+	    80000458: 00000000         irq16 INVALID
+	    8000045C: 80017198         irq17
+	    80000460: 00000000         irq18 INVALID
+	    (all other entries, invalid)
+
+	    Buriki
+	    80000400: 800C49C4
+	    80000404: 800C4748
+	    80000408: 800C4828
+	    8000040C: 800C4B80
+	    80000410: 00000000
+	    80000414: 00000000
+	    80000418: 00000000
+	    8000041C: 00000000
+	    80000420: 00000000
+	    80000424: 800C47B0
+	    80000428: 800C4778
+	    8000042C: 800C4858
+	    80000430: 800C47F0
+	    80000434: 00000000
+	    80000438: 00000000
+	    8000043C: 00000000
+	    80000440: 00000000
+	    80000444: 800C4890
+	    80000448: 00000000
+	    8000044C: 00000000
+	    80000450: 00000000
+	    80000454: 00000000
+	    80000458: 00000000
+	    8000045C: 800C498C
+	    80000460: 00000000
+
+	    Beast Busters 2
+	    80000400: 8000E9D8
+	    80000404: 8000EAFC
+	    80000408: 8000EBFC
+	    8000040C: 80012D90
+	    80000410: FFFFFFFF
+	    80000414: FFFFFFFF
+	    80000418: FFFFFFFF
+	    8000041C: FFFFFFFF
+	    80000420: FFFFFFFF
+	    80000424: 8000EB74
+	    80000428: 8000EB34
+	    8000042C: 8000EC34
+	    80000430: 8000EBBC
+	    80000434: FFFFFFFF
+	    80000438: FFFFFFFF
+	    8000043C: FFFFFFFF
+	    80000440: FFFFFFFF
+	    80000444: 8000E508
+	    80000448: FFFFFFFF
+	    8000044C: FFFFFFFF
+	    80000450: FFFFFFFF
+	    80000454: FFFFFFFF
+	    80000458: FFFFFFFF
+	    8000045C: FFFFFFFF irq17 INVALID (not even a stub routine here)
+	    80000460: FFFFFFFF
+
+	    Roads Edge
+	    80000400: 80028B04
+	    80000404: 80028B88
+	    80000408: 80028C68
+	    8000040C: 80036FAC
+	    80000410: 00000000
+	    80000414: 00000000
+	    80000418: 00000000
+	    8000041C: 00000000
+	    80000420: 00000000
+	    80000424: 80028BF0
+	    80000428: 80028BB8
+	    8000042C: 80028C98
+	    80000430: 80028C30
+	    80000434: 00000000
+	    80000438: 00000000
+	    8000043C: 00000000
+	    80000440: 00000000
+	    80000444: 80027340
+	    80000448: 00000000
+	    8000044C: 00000000
+	    80000450: 00000000
+	    80000454: 00000000
+	    80000458: 00000000
+	    8000045C: 00000000 irq17 INVALID (not even a stub routine here)
+	    80000460: 00000000
+
+	    SamSho 64 code is more complex, irqs point to functions that get a jump address from a fixed ram location for each IRQ, most are invalid tho?
+	    the ingame table is copied from 80005DD0
+	                                      bootup   ingame
+	    80000400: 800C03E0 irq00 80005dd0 800c02e0 800cfcc8
+	    80000404: 800C041C irq01 80005dd4 800c0000
+	    80000408: 800C0458 irq02 80005dd8 800c0000
+	    8000040C: 800C0494 irq03 80005ddc 800c3054 800cfd58
+	    80000410: 800C04D0 irq04 80005de0 800c3070 800cfdf8 - interesting because this level is invalid on other games
+	    80000414: 800C032C irq05 80000478 00000000
+	    80000418: 800C0368 irq06 80000478 00000000
+	    8000041C: 800C03A4 irq07 80000478 00000000
+	    80000420: 800C050C irq08 80005df0 800c0000
+	    80000424: 800C0548 irq09 80005df4 800c0000
+	    80000428: 800C0584 irq0a 80005df8 800c0000
+	    8000042C: 800C05C0 irq0b 80005dfc 800c0000
+	    80000430: 800C05FC irq0c 80005e00 800c0000
+	    80000434: 800C02F0 irq0d 80000478 00000000
+	    80000438: 800C02F0 irq0e 80000478 00000000
+	    8000043C: 800C02F0 irq0f 80000478 00000000
+	    80000440: 800C0638 irq10 80005e10 800c0000
+	    80000444: 800C0674 irq11 80005e14 800c0000
+	    80000448: 800C06B0 irq12 80005e18 800c0000
+	    8000044C: 800C06EC irq13 80005e1c 800c0000
+	    80000450: 800C0728 irq14 80005e20 800c0000
+	    80000454: 800C0764 irq15 80005e24 800c0000
+	    80000458: 800C07A0 irq16 80005e28 800c0000
+	    8000045C: 800C07DC irq17 80005e2c 800c0000
+	    80000460: 00000000 (invalid)
+
+	    SamSho 64 2 is the same types as SamSho 64
+	                                      bootup   ingame
+	    80000400: 801008DC irq00 802011e0 801007e0 8011f6b4
+	    80000404: 80100918 irq01 802011e4 80100500
+	    80000408: 80100954 irq02 802011e8 80100500
+	    8000040C: 80100990 irq03 802011ec 80101b38 8011f7b8
+	    80000410: 801009CC irq04 802011f0 80101b54 80101b54
+	    80000414: 80100828 irq05 80000478 0000000b
+	    80000418: 80100864 irq06 80000478 0000000b
+	    8000041C: 801008A0 irq07 80000478 0000000b
+	    80000420: 80100A08 irq08 80201200 80100500
+	    80000424: 80100A44 irq09 80201204 80100500
+	    80000428: 80100A80 irq0a 80201208 80100500
+	    8000042C: 80100ABC irq0b 8020120c 80100500
+	    80000430: 80100AF8 irq0c 80201210 80100500
+	    80000434: 801007EC irq0d 80000478 0000000b
+	    80000438: 801007EC irq0e 80000478 0000000b
+	    8000043C: 801007EC irq0f 80000478 0000000b
+	    80000440: 80100B34 irq10 80201220 80100500
+	    80000444: 80100B70 irq11 80201224 80100500
+	    80000448: 80100BAC irq12 80201228 80100500
+	    8000044C: 80100BE8 irq13 8020122c 80100500
+	    80000450: 80100C24 irq14 80201230 80100500
+	    80000454: 80100C60 irq15 80201234 80100500
+	    80000458: 80100C9C irq16 80201238 80100500
+	    8000045C: 80100CD8 irq17 8020123c 80100500
+	    80000460: 00000000 (invalid)
+
+	    Register 111c is connected to the interrupts and written in each one (IRQ ack / latch clear?)
+
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000001. (PC=80009b54) 0x00 vblank irq
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000002. (PC=80009b5c) 0x01 <empty> (not empty of ffwa)
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000004. (PC=80009b64) 0x02 <empty>
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000008. (PC=80009b6c) 0x03 3d fifo processed irq
+	                                                         00010
+	                                                         00020
+	                                                         00040
+	                                                         00080
+	                                                         00100
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000200. (PC=80009b70) 0x09
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000400. (PC=80009b78) 0x0a
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000800. (PC=80009b88) 0x0b network irq, needed by xrally and roadedge
+	                                                         01000
+	                                                         02000
+	                                                         04000
+	                                                         08000
+	                                                         10000
+	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00020000. (PC=80009b80) 0x11 MCU related irq?
+	                                                         40000
+	                                                         80000
+	                                                        100000
+	                                                        200000
+	                                                        400000
+	                                                        800000 0x17 MCU related irq?
 
 	    samsho64 / samsho64_2 does this during running:
 	    HNG64 writing to SYSTEM Registers 0x0000111c == 0x00000000. (PC=800008fc) just checking?
@@ -1520,55 +1779,450 @@ void hng64_state::machine_start()
 	}
 
 	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
+	m_comhack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::comhack_callback), this));
+
+	init_io();
 }
+
+TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
+{
+	LOG("comhack_callback %04x\n\n", m_comhack[0]);
+
+	m_comhack[0] = m_comhack[0] | 0x0002;
+}
+
 
 void hng64_state::machine_reset()
 {
 	/* For simulate MCU stepping */
-	m_mcu_fake_time = 0;
 	m_mcu_en = 0;
 
 	reset_net();
 	reset_sound();
+
+	// on real hardware, even with no network, it takes until the counter reaches about 37 (Xtreme Rally) to boot, this kicks in at around 7
+	m_comhack_timer->adjust(m_maincpu->cycles_to_attotime(400000000));
+
+	// does the HW init these to anything?
+	m_fbcontrol[0] = 0x00;
+	m_fbcontrol[1] = 0x00;
+	m_fbcontrol[2] = 0x00;
+	m_fbcontrol[3] = 0x00;
+
+}
+
+/***********************************************
+
+  Control / Lamp etc. access from MCU side?
+
+  this is probably 8 multiplexed 8-bit input / output ports (probably joysticks, coins etc.)
+
+***********************************************/
+
+WRITE8_MEMBER(hng64_state::ioport1_w)
+{
+	//LOG("%s: ioport1_w %02x\n", machine().describe_context(), data);
+
+	/* Port bits
+
+	  aaac w-?-
+
+	  a = external port number / address?
+	  c = toggled during read / write accesses, probably clocking byte from/to latch
+
+	  ? = toggled at the start of extint 0 , set during reads?
+
+	  w = set during writes?
+
+	*/
+
+	m_port1 = data;
+}
+
+// it does write 0xff here before each set of reading, but before setting a new output address?
+WRITE8_MEMBER(hng64_state::ioport3_w)
+{
+
+	if (m_port1 & 0x08) // 0x08 in port1 enables write? otherwise it writes 0xff to port 7 all the time, when port 7 is also lamps
+	{
+		int addr = (m_port1 & 0xe0) >> 5;
+		m_lamps->lamps_w(space, addr, data);
+	}
+}
+
+
+READ8_MEMBER(hng64_state::ioport3_r)
+{
+	int addr = (m_port1&0xe0)>>5;
+
+	//LOG("%s: ioport3_r (from address %02x) (other bits of m_port1 %02x)\n", machine().describe_context(), addr, m_port1 & 0x1f);
+	return m_in[addr]->read();
+}
+
+DEFINE_DEVICE_TYPE(HNG64_LAMPS, hng64_lamps_device, "hng64_lamps", "HNG64 Lamps")
+
+hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, HNG64_LAMPS, tag, owner, clock)
+	, m_lamps_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+{
+}
+
+void hng64_lamps_device::device_start()
+{
+	for (auto &cb : m_lamps_out_cb)
+		cb.resolve_safe();
+}
+
+WRITE8_MEMBER(hng64_state::hng64_drive_lamps7_w)
+{
+	/*
+	   0x80 - BGM Select #2 (Active High)
+	   0x40 - BGM Select #1 (Active High)
+	   0x20
+	   0x10
+	   0x08
+	   0x04
+	   0x02
+	   0x01
+	*/
+}
+
+WRITE8_MEMBER(hng64_state::hng64_drive_lamps6_w)
+{
+	/*
+	   0x80 - BGM Select #4 (Active High)
+	   0x40 - BGM Select #3 (Active High)
+	   0x20 - Winning Lamp (0x00 = ON, 0x10 = Blink 1, 0x20 = Blink 2, 0x30 = OFF)
+	   0x10 -  ^^
+	   0x08 - Breaking Lamp (Active Low?)
+	   0x04 - Start Lamp (Active High)
+	   0x02
+	   0x01 - Coin Counter #1
+	*/
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+}
+
+WRITE8_MEMBER(hng64_state::hng64_drive_lamps5_w)
+{
+	// force feedback steering position
+}
+
+WRITE8_MEMBER(hng64_state::hng64_shoot_lamps7_w)
+{
+	/*
+	   0x80
+	   0x40 - Gun #3
+	   0x20 - Gun #2
+	   0x10 - Gun #1
+	   0x08
+	   0x04
+	   0x02
+	   0x01
+	*/
+}
+
+/*
+    Beast Busters 2 outputs (all written to offset 0x1c in dualport ram):
+    0x00000001 start #1
+    0x00000002 start #2
+    0x00000004 start #3
+    0x00001000 gun #1
+    0x00002000 gun #2
+    0x00004000 gun #3
+*/
+
+WRITE8_MEMBER(hng64_state::hng64_shoot_lamps6_w)
+{
+	// Start Lamp #1 / #2 don't get written to the output port, is this a TLCS870 bug or are they not connected to the 'lamp' outputs, they do get written to the DP ram, see above notes
+	/*
+	   0x80
+	   0x40
+	   0x20
+	   0x10
+	   0x08
+	   0x04 - Start Lamp #3
+	   0x02
+	   0x01
+	*/
+}
+
+WRITE8_MEMBER(hng64_state::hng64_fight_lamps6_w)
+{
+	/*
+	   0x80
+	   0x40
+	   0x20
+	   0x10
+	   0x08
+	   0x04
+	   0x02 - Coin Counter #2
+	   0x01 - Coin Counter #1
+	*/
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+}
+
+
+/***********************************************
+
+ Dual Port RAM access from MCU side
+
+***********************************************/
+
+WRITE8_MEMBER(hng64_state::ioport7_w)
+{
+	/* Port bits
+
+	 i?xR Aacr
+
+	 a = 0x200 of address bit to external RAM (direct?)
+	 A = 0x400 of address bit to external RAM (direct?)
+	 R = read / write mode? (if 1, write, if 0, read?)
+
+	 r = counter reset? ( 1->0 ?)
+	 c = clock address? ( 1->0 ?)
+
+	 x = written with clock bits, might be latch related?
+	 ? = written before some operations
+
+	 i = generate interrupt on MIPS? (written after the MCU has completed writing 'results' of some operations to shared ram, before executing more code to write another result, so needs to be processed quickly by the MIPS?)
+
+	*/
+
+	//LOG("%s: ioport7_w %02x\n", machine().describe_context(), data);
+
+	m_ex_ramaddr_upper = (data & 0x0c) >> 2;
+
+	if ((!(data & 0x80)) && (m_port7 & 0x80))
+	{
+		LOG("%s: MCU request MIPS IRQ?\n", machine().describe_context());
+		set_irq(0x00020000);
+	}
+
+	if ((!(data & 0x01)) && (m_port7 & 0x01))
+	{
+		m_ex_ramaddr = 0;
+	}
+
+	if ((!(data & 0x02)) && (m_port7 & 0x02))
+	{
+		m_ex_ramaddr++;
+		m_ex_ramaddr &= 0x1ff;
+	}
+
+	m_port7 = data;
+}
+
+READ8_MEMBER(hng64_state::ioport0_r)
+{
+	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
+	uint8_t ret = m_dt71321_dpram->left_r(space, addr);
+
+	LOG("%s: ioport0_r %02x (from address %04x)\n", machine().describe_context(), ret, addr);
+	return ret;
+}
+
+WRITE8_MEMBER(hng64_state::ioport0_w)
+{
+	uint16_t addr = (m_ex_ramaddr | (m_ex_ramaddr_upper<<9)) & 0x7ff;
+	m_dt71321_dpram->left_w(space, addr, data);
+
+	LOG("%s: ioport0_w %02x (to address %04x)\n", machine().describe_context(), data, addr);
+}
+
+
+/***********************************************
+
+ Unknown (LED?) access from MCU side
+
+***********************************************/
+
+/* This port is dual purpose, with the upper pins being used as a serial input / output / clock etc. and the output latch (written data) being configured appropriately however the lower 2 bits also seem to be used
+   maybe these lower 2 bits were intended for serial comms LEDs, although none are documented in the PCB layouts.
+*/
+WRITE8_MEMBER(hng64_state::ioport4_w)
+{
+	LOG("%s: ioport4_w %02x\n", machine().describe_context(), data);
+}
+
+/***********************************************
+
+ Other port accesses from MCU side
+
+***********************************************/
+
+READ8_MEMBER(hng64_state::anport0_r) { return m_an_in[0]->read(); }
+READ8_MEMBER(hng64_state::anport1_r) { return m_an_in[1]->read(); }
+READ8_MEMBER(hng64_state::anport2_r) { return m_an_in[2]->read(); }
+READ8_MEMBER(hng64_state::anport3_r) { return m_an_in[3]->read(); }
+READ8_MEMBER(hng64_state::anport4_r) { return m_an_in[4]->read(); }
+READ8_MEMBER(hng64_state::anport5_r) { return m_an_in[5]->read(); }
+READ8_MEMBER(hng64_state::anport6_r) { return m_an_in[6]->read(); }
+READ8_MEMBER(hng64_state::anport7_r) { return m_an_in[7]->read(); }
+
+/***********************************************
+
+ Serial Accesses from MCU side
+
+***********************************************/
+
+/* I think the serial reads / writes actually go to the network hardware, and the IO MCU is acting as an interface between the actual network and the KL5C80A12CFP
+   because the network connectors are on the IO board.  This might also be related to the 'm_no_machine_error_code' value required which differs per IO board
+   type as the game startup sequences read that from the 0x6xx region of shared RAM, which also seems to be where a lot of the serial stuff is stored.
+*/
+
+// there are also serial reads, TLCS870 core doesn't support them yet
+
+WRITE_LINE_MEMBER( hng64_state::sio0_w )
+{
+	// tlcs870 core provides better logging than anything we could put here at the moment
+}
+
+
+
+
+TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqon_callback)
+{
+	LOG("timer_hack_on\n");
+	m_iomcu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE );
+	m_tempio_irqoff_timer->adjust(m_maincpu->cycles_to_attotime(1000));
+}
+
+TIMER_CALLBACK_MEMBER(hng64_state::tempio_irqoff_callback)
+{
+	LOG("timer_hack_off\n");
+	m_iomcu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE );
+}
+
+
+void hng64_state::init_io()
+{
+	m_tempio_irqon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqon_callback), this));
+	m_tempio_irqoff_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::tempio_irqoff_callback), this));
+
+	m_port7 = 0x00;
+	m_port1 = 0x00;
+	m_ex_ramaddr = 0;
+	m_ex_ramaddr_upper = 0;
 }
 
 MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_DEVICE_PROGRAM_MAP(hng_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hng64_state, hng64_irq, "screen", 0, 1)
+	VR4300BE(config, m_maincpu, HNG64_MASTER_CLOCK);     // actually R4300
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hng64_state::hng_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	TIMER(config, "scantimer", 0).configure_scanline(FUNC(hng64_state::hng64_irq), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL(32'768))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hng64)
+	RTC62423(config, m_rtc, XTAL(32'768));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(hng64_state, screen_update_hng64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hng64_state, screen_vblank_hng64))
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hng64);
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(XRGB)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(hng64_state::screen_update_hng64));
+	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
+
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x1000);
 
 	hng64_audio(config);
 	hng64_network(config);
 
-	MCFG_DEVICE_ADD("iomcu", TMP87PH40AN, 8000000)
-	MCFG_DEVICE_DISABLE() // work in progress
+	tmp87ph40an_device &iomcu(TMP87PH40AN(config, m_iomcu, 8_MHz_XTAL));
+	iomcu.p0_in_cb().set(FUNC(hng64_state::ioport0_r)); // reads from shared ram
+	//iomcu.p1_in_cb().set(FUNC(hng64_state::ioport1_r)); // the IO MCU code uses opcodes that only access the output latch, never read from the port
+	//iomcu.p2_in_cb().set(FUNC(hng64_state::ioport2_r)); // the IO MCU uses EXTINT0 which shares one of the pins on this port, but the port is not used for IO
+	iomcu.p3_in_cb().set(FUNC(hng64_state::ioport3_r)); // probably reads input ports?
+	//iomcu.p4_in_cb().set(FUNC(hng64_state::ioport4_r)); // the IO MCU code uses opcodes that only access the output latch, never read from the port
+	//iomcu.p5_in_cb().set(FUNC(hng64_state::ioport5_r)); // simply seems to be unused, neither used for an IO port, nor any of the other features
+	//iomcu.p6_in_cb().set(FUNC(hng64_state::ioport6_r)); // the IO MCU code uses the ADC which shares pins with port 6, meaning port 6 isn't used as an IO port
+	//iomcu.p7_in_cb().set(FUNC(hng64_state::ioport7_r)); // the IO MCU code uses opcodes that only access the output latch, never read from the port
+	iomcu.p0_out_cb().set(FUNC(hng64_state::ioport0_w)); // writes to shared ram
+	iomcu.p1_out_cb().set(FUNC(hng64_state::ioport1_w));  // configuration / clocking for input port (port 3) accesses
+	//iomcu.p2_out_cb().set(FUNC(hng64_state::ioport2_w)); // the IO MCU uses EXTINT0 which shares one of the pins on this port, but the port is not used for IO
+	iomcu.p3_out_cb().set(FUNC(hng64_state::ioport3_w)); // writes to ports for lamps, coin counters, force feedback etc.
+	iomcu.p4_out_cb().set(FUNC(hng64_state::ioport4_w)); // unknown, lower 2 IO bits accessed along with serial accesses
+	//iomcu.p5_out_cb().set(FUNC(hng64_state::ioport5_w));  // simply seems to be unused, neither used for an IO port, nor any of the other features
+	//iomcu.p6_out_cb().set(FUNC(hng64_state::ioport6_w)); // the IO MCU code uses the ADC which shares pins with port 6, meaning port 6 isn't used as an IO port
+	iomcu.p7_out_cb().set(FUNC(hng64_state::ioport7_w)); // configuration / clocking for shared ram (port 0) accesses
+	// most likely the analog inputs, up to a maximum of 8
+	iomcu.an0_in_cb().set(FUNC(hng64_state::anport0_r));
+	iomcu.an1_in_cb().set(FUNC(hng64_state::anport1_r));
+	iomcu.an2_in_cb().set(FUNC(hng64_state::anport2_r));
+	iomcu.an3_in_cb().set(FUNC(hng64_state::anport3_r));
+	iomcu.an4_in_cb().set(FUNC(hng64_state::anport4_r));
+	iomcu.an5_in_cb().set(FUNC(hng64_state::anport5_r));
+	iomcu.an6_in_cb().set(FUNC(hng64_state::anport6_r));
+	iomcu.an7_in_cb().set(FUNC(hng64_state::anport7_r));
+	// network related?
+	iomcu.serial0_out_cb().set(FUNC(hng64_state::sio0_w));
+	//iomcu.serial1_out_cb().set(FUNC(hng64_state::sio1_w)); // not initialized / used
 
-MACHINE_CONFIG_END
+	IDT71321(config, "dt71321_dpram", 0);
+	//MCFG_MB8421_INTL_AN0R(INPUTLINE("xxx", 0)) // I don't think the IRQs are connected
+}
+
+void hng64_state::hng64_default(machine_config &config)
+{
+	hng64(config);
+
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	lamps.lamps0_out_cb().set(FUNC(hng64_state::hng64_default_lamps0_w));
+	lamps.lamps1_out_cb().set(FUNC(hng64_state::hng64_default_lamps1_w));
+	lamps.lamps2_out_cb().set(FUNC(hng64_state::hng64_default_lamps2_w));
+	lamps.lamps3_out_cb().set(FUNC(hng64_state::hng64_default_lamps3_w));
+	lamps.lamps4_out_cb().set(FUNC(hng64_state::hng64_default_lamps4_w));
+	lamps.lamps5_out_cb().set(FUNC(hng64_state::hng64_default_lamps5_w));
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_default_lamps6_w));
+	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_default_lamps7_w));
+}
+
+void hng64_state::hng64_drive(machine_config &config)
+{
+	hng64(config);
+
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	lamps.lamps5_out_cb().set(FUNC(hng64_state::hng64_drive_lamps5_w)); // force feedback steering
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_drive_lamps6_w)); // lamps + coin counter
+	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_drive_lamps7_w)); // lamps
+}
+
+void hng64_state::hng64_shoot(machine_config &config)
+{
+	hng64(config);
+
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some misisng?!)
+	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps7_w)); // gun lamps
+}
+
+void hng64_state::hng64_fight(machine_config &config)
+{
+	hng64(config);
+
+	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
+	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_fight_lamps6_w)); // coin counters
+}
 
 
 #define ROM_LOAD_HNG64_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash,  ROM_BIOS(bios))
 
-// all BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, or only the MCU internal ROM
+/* All main BIOS roms are said to be from 'fighting' type PCB, it is unknown if the actual MIPS BIOS differs on the others, but it appears unlikely.
+
+  The IO MCU was dumped from a TMP87PH40AN type chip taken from an unknown IO board type.
+
+  Some boards instead use a TMP87CH40N but in all cases they're stickered SNK-IOJ1.00A so the content is possibly the same on all types.
+
+  This needs further studying of the MCU code as it is known that the different IO boards return a different ident value.
+*/
+
 #define HNG64_BIOS \
-	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */ \
+	/* R4300 BIOS code (main CPU) */ \
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "japan", "Japan" ) \
 	ROM_LOAD_HNG64_BIOS( 0, "brom1.bin",         0x00000, 0x080000, CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) ) \
 	ROM_SYSTEM_BIOS( 1, "us", "USA" ) \
@@ -1577,12 +2231,14 @@ MACHINE_CONFIG_END
 	ROM_LOAD_HNG64_BIOS( 2, "bios_export.bin",   0x00000, 0x080000, CRC(bbf07ec6) SHA1(5656aa077f6a6d43953f15b5123eea102a9d5313) ) \
 	ROM_SYSTEM_BIOS( 3, "korea", "Korea" ) \
 	ROM_LOAD_HNG64_BIOS( 3, "bios_korea.bin",    0x00000, 0x080000, CRC(ac953e2e) SHA1(f502188ef252b7c9d04934c4b525730a116de48b) ) \
-	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS */ \
+	/* KL5C80 BIOS (network CPU) */ \
+	ROM_REGION( 0x0100000, "user2", 0 ) \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
+	/* FPGA (unknown) */ \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
 	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
+	/* TMP87PH40AN (I/O MCU) */ \
 	ROM_REGION( 0x10000, "iomcu", 0 ) /* "64Bit I/O Controller Ver 1.0 1997.06.29(C)SNK" internal ID string */ \
-	/* this was dumped from a TMP87PH40AN type chip.  Some boards use a TMP87CH40N, in all cases they're stickered SNK-IOJ1.00A so likely the same content */ \
 	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) )
 
 
@@ -2002,13 +2658,13 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,     hng64, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,     hng64_default, hng64,    hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64, roadedge, hng64_state, init_hng64_race,  ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64, hng64, hng64,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64, hng64, roadedge, hng64_state, init_hng64_race,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64, hng64, bbust2,   hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64, hng64, hng64,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64, hng64, hng64,    hng64_state, init_fatfurwa,    ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64, hng64, hng64,    hng64_state, init_buriki,      ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )  /* 007 */
+GAME( 1997, roadedge, hng64, hng64_drive, hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
+GAME( 1998, sams64,   hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
+GAME( 1998, xrally,   hng64, hng64_drive, hng64_drive,    hng64_state, init_hng64_drive,  ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
+GAME( 1998, bbust2,   hng64, hng64_shoot, hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters 2nd Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
+GAME( 1998, sams64_2, hng64, hng64_fight, hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64, hng64_fight, hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */

@@ -26,13 +26,6 @@ struct h8_dma_state {
 	bool mode_16;
 };
 
-#define MCFG_H8_DMA_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, H8_DMA, 0 )
-
-#define MCFG_H8_DMA_CHANNEL_ADD( _tag, intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf ) \
-	MCFG_DEVICE_ADD( _tag, H8_DMA_CHANNEL, 0 )  \
-	downcast<h8_dma_channel_device *>(device)->set_info(intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
-
 class h8_dma_channel_device;
 
 enum {
@@ -50,7 +43,7 @@ enum {
 
 class h8_dma_device : public device_t {
 public:
-	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_READ8_MEMBER(dmawer_r);
 	DECLARE_WRITE8_MEMBER(dmawer_w);
@@ -96,7 +89,19 @@ public:
 	};
 
 	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
+	h8_dma_channel_device(const machine_config &mconfig, const char *tag, device_t *owner,
+			const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
+			int v9 = h8_dma_channel_device::NONE,
+			int va = h8_dma_channel_device::NONE,
+			int vb = h8_dma_channel_device::NONE,
+			int vc = h8_dma_channel_device::NONE,
+			int vd = h8_dma_channel_device::NONE,
+			int ve = h8_dma_channel_device::NONE,
+			int vf = h8_dma_channel_device::NONE)
+		: h8_dma_channel_device(mconfig, tag, owner, 0)
+	{
+		set_info(intc, irq_base, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, va, vb, vc, vd, ve, vf);
+	}
 	void set_info(const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
 
 	DECLARE_READ16_MEMBER(marah_r);

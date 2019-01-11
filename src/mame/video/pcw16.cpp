@@ -16,40 +16,40 @@ static const unsigned short pcw16_colour_table[PCW16_NUM_COLOURS] =
 };
 #endif
 
-static const rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
+static constexpr rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
 {
-	rgb_t(0x080, 0x080, 0x080),  /* light grey */
-	rgb_t(0x080, 0x080, 0x080),  /* light grey */
-	rgb_t(0x000, 0x080, 0x080),  /* magenta */
-	rgb_t(0x000, 0x080, 0x080),  /* magenta */
-	rgb_t(0x080, 0x080, 0x080),  /* light grey */
-	rgb_t(0x080, 0x080, 0x080),  /* light grey */
-	rgb_t(0x0ff, 0x080, 0x080),  /* pastel green */
-	rgb_t(0x0ff, 0x080, 0x080),  /* pastel green */
-	rgb_t(0x000, 0x000, 0x080),  /* blue */
-	rgb_t(0x000, 0x000, 0x000),  /* black */
-	rgb_t(0x000, 0x080, 0x0ff),  /* mauve */
-	rgb_t(0x000, 0x000, 0x0ff),  /* bright blue */
-	rgb_t(0x000, 0x080, 0x000),  /* red */
-	rgb_t(0x000, 0x0ff, 0x000),  /* bright red */
-	rgb_t(0x000, 0x0ff, 0x080),  /* purple */
-	rgb_t(0x000, 0x0ff, 0x0ff),  /* bright magenta */
-	rgb_t(0x0ff, 0x000, 0x080),  /* sea green */
-	rgb_t(0x0ff, 0x000, 0x0ff),  /* bright green */
-	rgb_t(0x0ff, 0x080, 0x0ff),  /* pastel cyan */
-	rgb_t(0x0ff, 0x000, 0x0ff),  /* bright cyan */
-	rgb_t(0x0ff, 0x080, 0x000),  /* lime green */
-	rgb_t(0x0ff, 0x0ff, 0x000),  /* bright yellow */
-	rgb_t(0x0ff, 0x0ff, 0x080),  /* pastel yellow */
-	rgb_t(0x0ff, 0x0ff, 0x0ff),  /* bright white */
-	rgb_t(0x080, 0x000, 0x080),  /* cyan */
-	rgb_t(0x080, 0x000, 0x000),  /* green */
-	rgb_t(0x080, 0x080, 0x0ff),  /* pastel blue */
-	rgb_t(0x080, 0x000, 0x0ff),  /* sky blue */
-	rgb_t(0x080, 0x080, 0x000),  /* yellow */
-	rgb_t(0x080, 0x0ff, 0x000),  /* orange */
-	rgb_t(0x080, 0x0ff, 0x080),  /* pink */
-	rgb_t(0x080, 0x0ff, 0x0ff),  /* pastel magenta */
+	{ 0x080, 0x080, 0x080 },  // light grey
+	{ 0x080, 0x080, 0x080 },  // light grey
+	{ 0x000, 0x080, 0x080 },  // magenta
+	{ 0x000, 0x080, 0x080 },  // magenta
+	{ 0x080, 0x080, 0x080 },  // light grey
+	{ 0x080, 0x080, 0x080 },  // light grey
+	{ 0x0ff, 0x080, 0x080 },  // pastel green
+	{ 0x0ff, 0x080, 0x080 },  // pastel green
+	{ 0x000, 0x000, 0x080 },  // blue
+	{ 0x000, 0x000, 0x000 },  // black
+	{ 0x000, 0x080, 0x0ff },  // mauve
+	{ 0x000, 0x000, 0x0ff },  // bright blue
+	{ 0x000, 0x080, 0x000 },  // red
+	{ 0x000, 0x0ff, 0x000 },  // bright red
+	{ 0x000, 0x0ff, 0x080 },  // purple
+	{ 0x000, 0x0ff, 0x0ff },  // bright magenta
+	{ 0x0ff, 0x000, 0x080 },  // sea green
+	{ 0x0ff, 0x000, 0x0ff },  // bright green
+	{ 0x0ff, 0x080, 0x0ff },  // pastel cyan
+	{ 0x0ff, 0x000, 0x0ff },  // bright cyan
+	{ 0x0ff, 0x080, 0x000 },  // lime green
+	{ 0x0ff, 0x0ff, 0x000 },  // bright yellow
+	{ 0x0ff, 0x0ff, 0x080 },  // pastel yellow
+	{ 0x0ff, 0x0ff, 0x0ff },  // bright white
+	{ 0x080, 0x000, 0x080 },  // cyan
+	{ 0x080, 0x000, 0x000 },  // green
+	{ 0x080, 0x080, 0x0ff },  // pastel blue
+	{ 0x080, 0x000, 0x0ff },  // sky blue
+	{ 0x080, 0x080, 0x000 },  // yellow
+	{ 0x080, 0x0ff, 0x000 },  // orange
+	{ 0x080, 0x0ff, 0x080 },  // pink
+	{ 0x080, 0x0ff, 0x0ff }   // pastel magenta
 };
 
 
@@ -59,9 +59,9 @@ inline void pcw16_state::pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, ui
 }
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(pcw16_state, pcw16)
+void pcw16_state::pcw16_colours(palette_device &palette) const
 {
-	palette.set_pen_colors(0, pcw16_palette, ARRAY_LENGTH(pcw16_palette));
+	palette.set_pen_colors(0, pcw16_palette);
 }
 
 void pcw16_state::video_start()
@@ -69,7 +69,7 @@ void pcw16_state::video_start()
 }
 
 /* 640, 1 bit per pixel */
-void pcw16_state::pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
+void pcw16_state::pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, uint8_t byte)
 {
 	int b;
 	int local_byte;
@@ -92,7 +92,7 @@ void pcw16_state::pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsi
 }
 
 /* 320, 2 bits per pixel */
-void pcw16_state::pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
+void pcw16_state::pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, uint8_t byte)
 {
 	int b;
 	int px;
@@ -123,7 +123,7 @@ void pcw16_state::pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsi
 }
 
 /* 160, 4 bits per pixel */
-void pcw16_state::pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
+void pcw16_state::pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, uint8_t byte)
 {
 	int px;
 	int b;

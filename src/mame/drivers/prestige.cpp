@@ -86,7 +86,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -108,6 +108,20 @@ public:
 		, m_bank5(*this, "bank5")
 	{ }
 
+	void prestige_base(machine_config &config);
+	void princ(machine_config &config);
+	void gl6000sl(machine_config &config);
+	void gjmovie(machine_config &config);
+	void snotec(machine_config &config);
+	void glmcolor(machine_config &config);
+	void glcolor(machine_config &config);
+	void prestige(machine_config &config);
+	void gl7007sl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<generic_slot_device> m_cart;
@@ -135,12 +149,11 @@ public:
 		uint8_t   split_pos;
 	} m_lcdc;
 
-	virtual void machine_start() override;
+	memory_region *m_cart_rom;
+
 	uint32_t screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	memory_region *m_cart_rom;
 
 	DECLARE_READ8_MEMBER( bankswitch_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -149,19 +162,11 @@ public:
 	DECLARE_READ8_MEMBER( mouse_r );
 	DECLARE_WRITE8_MEMBER( mouse_w );
 	DECLARE_WRITE8_MEMBER( lcdc_w );
-	DECLARE_PALETTE_INIT(prestige);
-	DECLARE_PALETTE_INIT(glcolor);
+	void prestige_palette(palette_device &palette) const;
+	void glcolor_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
-	void prestige_base(machine_config &config);
-	void princ(machine_config &config);
-	void gl6000sl(machine_config &config);
-	void gjmovie(machine_config &config);
-	void snotec(machine_config &config);
-	void glmcolor(machine_config &config);
-	void glcolor(machine_config &config);
-	void prestige(machine_config &config);
-	void gl7007sl(machine_config &config);
+
 	void glcolor_io(address_map &map);
 	void prestige_io(address_map &map);
 	void prestige_mem(address_map &map);
@@ -336,21 +341,21 @@ void prestige_state::prestige_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x05).rw(this, FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
-	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
-	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
-	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
-	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+	map(0x04, 0x05).rw(FUNC(prestige_state::mouse_r), FUNC(prestige_state::mouse_w));
+	map(0x30, 0x3f).w(FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
 }
 
 void prestige_state::glcolor_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x30, 0x3f).w(this, FUNC(prestige_state::lcdc_w));
-	map(0x40, 0x40).w(this, FUNC(prestige_state::kb_w));
-	map(0x41, 0x42).r(this, FUNC(prestige_state::kb_r));
-	map(0x50, 0x56).rw(this, FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
+	map(0x30, 0x3f).w(FUNC(prestige_state::lcdc_w));
+	map(0x40, 0x40).w(FUNC(prestige_state::kb_w));
+	map(0x41, 0x42).r(FUNC(prestige_state::kb_r));
+	map(0x50, 0x56).rw(FUNC(prestige_state::bankswitch_r), FUNC(prestige_state::bankswitch_w));
 }
 
 /* Input ports */
@@ -676,18 +681,18 @@ void prestige_state::machine_start()
 	m_vram = ram;
 }
 
-PALETTE_INIT_MEMBER(prestige_state, prestige)
+void prestige_state::prestige_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(39, 108, 51));
-	palette.set_pen_color(1, rgb_t(16, 37, 84));
+	palette.set_pen_color(1, rgb_t(16,  37, 84));
 }
 
-PALETTE_INIT_MEMBER(prestige_state, glcolor)
+void prestige_state::glcolor_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x3f,0xbf,0x3f));
-	palette.set_pen_color(1, rgb_t(0xff,0x3f,0x5f));
-	palette.set_pen_color(2, rgb_t(0x1f,0x1f,0x3f));
-	palette.set_pen_color(3, rgb_t(0xff,0xdf,0x1f));
+	palette.set_pen_color(0, rgb_t(0x3f, 0xbf, 0x3f));
+	palette.set_pen_color(1, rgb_t(0xff, 0x3f, 0x5f));
+	palette.set_pen_color(2, rgb_t(0x1f, 0x1f, 0x3f));
+	palette.set_pen_color(3, rgb_t(0xff, 0xdf, 0x1f));
 }
 
 uint32_t prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -756,22 +761,18 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEFAULT_LAYOUT( layout_lcd )
-
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(prestige_state, prestige)
+	PALETTE(config, "palette", FUNC(prestige_state::prestige_palette), 2);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_EXTRA_OPTIONS("64K")
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::glcolor)
 	prestige_base(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(glcolor_io)
 
@@ -781,9 +782,7 @@ MACHINE_CONFIG_START(prestige_state::glcolor)
 	MCFG_SCREEN_SIZE( 160, 80 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 160-1, 0, 80-1 )
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4)
-	MCFG_PALETTE_INIT_OWNER(prestige_state, glcolor)
+	subdevice<palette_device>("palette")->set_entries(4).set_init(FUNC(prestige_state::glcolor_palette));
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "glcolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("snotec_cart", "snotec")
@@ -791,12 +790,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::glmcolor)
 	glcolor(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(prestige_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::snotec)
 	glcolor(config);
+
 	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_REMOVE("snotec_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snotec")
@@ -805,6 +806,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::prestige)
 	prestige_base(config);
+
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
@@ -812,6 +814,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::gl6000sl)
 	prestige_base(config);
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
@@ -819,6 +822,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::gl7007sl)
 	prestige_base(config);
+
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
@@ -826,11 +830,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::gjmovie)
 	prestige_base(config);
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::princ)
 	prestige_base(config);
+
 	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "princ_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "princ")

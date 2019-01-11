@@ -22,10 +22,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-constexpr u8 WATCHPOINT_READ        = 1;
-constexpr u8 WATCHPOINT_WRITE       = 2;
-constexpr u8 WATCHPOINT_READWRITE   = WATCHPOINT_READ | WATCHPOINT_WRITE;
-
 constexpr int COMMENT_VERSION       = 1;
 
 
@@ -74,7 +70,6 @@ public:
 	private:
 		// internals
 		bool hit(offs_t pc);
-
 		const device_debug * m_debugInterface;           // the interface we were created from
 		breakpoint *         m_next;                     // next in the list
 		int                  m_index;                    // user reported index
@@ -96,18 +91,18 @@ public:
 				symbol_table &symbols,
 				int index,
 				address_space &space,
-				int type,
+				read_or_write type,
 				offs_t address,
 				offs_t length,
 				const char *condition = nullptr,
 				const char *action = nullptr);
+		~watchpoint();
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
-		watchpoint *next() const { return m_next; }
 		address_space &space() const { return m_space; }
 		int index() const { return m_index; }
-		int type() const { return m_type; }
+		read_or_write type() const { return m_type; }
 		bool enabled() const { return m_enabled; }
 		offs_t address() const { return m_address; }
 		offs_t length() const { return m_length; }
@@ -115,22 +110,31 @@ public:
 		const std::string &action() const { return m_action; }
 
 		// setters
-		void setEnabled(bool value) { m_enabled = value; }
+		void setEnabled(bool value);
 
 		// internals
 		bool hit(int type, offs_t address, int size);
 
 	private:
-		const device_debug * m_debugInterface;           // the interface we were created from
-		watchpoint *         m_next;                     // next in the list
+		device_debug * m_debugInterface;                 // the interface we were created from
+		memory_passthrough_handler *m_phr;               // passthrough handler reference, read access
+		memory_passthrough_handler *m_phw;               // passthrough handler reference, write access
 		address_space &      m_space;                    // address space
 		int                  m_index;                    // user reported index
 		bool                 m_enabled;                  // enabled?
-		u8                   m_type;                     // type (read/write)
+		read_or_write        m_type;                     // type (read/write)
 		offs_t               m_address;                  // start address
 		offs_t               m_length;                   // length of watch area
 		parsed_expression    m_condition;                // condition
 		std::string          m_action;                   // action
+		int                  m_notifier;                 // address map change notifier id
+
+		offs_t               m_start_address[3];         // the start addresses of the checks to install
+		offs_t               m_end_address[3];           // the end addresses
+		u64                  m_masks[3];                 // the access masks
+		bool                 m_installing;               // prevent recursive multiple installs
+		void install(read_or_write mode);
+		void triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask);
 	};
 
 	// registerpoint class
@@ -178,9 +182,8 @@ public:
 	void stop_hook();
 	void interrupt_hook(int irqline);
 	void exception_hook(int exception);
+	void privilege_hook();
 	void instruction_hook(offs_t curpc);
-	void memory_read_hook(address_space &space, offs_t address, u64 mem_mask);
-	void memory_write_hook(address_space &space, offs_t address, u64 data, u64 mem_mask);
 
 	// hooks into our operations
 	void set_instruction_hook(debug_instruction_hook_func hook);
@@ -204,6 +207,7 @@ public:
 	void go_interrupt(int irqline = -1);
 	void go_exception(int exception);
 	void go_milliseconds(u64 milliseconds);
+	void go_privilege(const char *condition);
 	void go_next_device();
 
 	template <typename Format, typename... Params>
@@ -222,8 +226,8 @@ public:
 
 	// watchpoints
 	int watchpoint_space_count() const { return m_wplist.size(); }
-	watchpoint *watchpoint_first(int spacenum) const { return m_wplist[spacenum]; }
-	int watchpoint_set(address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action);
+	const std::vector<std::unique_ptr<watchpoint>> &watchpoint_vector(int spacenum) const { return m_wplist[spacenum]; }
+	int watchpoint_set(address_space &space, read_or_write type, offs_t address, offs_t length, const char *condition, const char *action);
 	bool watchpoint_clear(int wpnum);
 	void watchpoint_clear_all();
 	bool watchpoint_enable(int index, bool enable = true);
@@ -289,9 +293,10 @@ private:
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
 	void breakpoint_check(offs_t pc);
-	void watchpoint_update_flags(address_space &space);
-	void watchpoint_check(address_space &space, int type, offs_t address, u64 value_to_write, u64 mem_mask);
 	void hotspot_check(address_space &space, offs_t address);
+	void reinstall_all(read_or_write mode);
+	void reinstall(address_space &space, read_or_write mode);
+	void write_tracking(address_space &space, offs_t address, u64 data);
 
 	// symbol get/set callbacks
 	static u64 get_current_pc(symbol_table &table);
@@ -322,6 +327,7 @@ private:
 	attotime                m_stoptime;                 // stop time for DEBUG_FLAG_STOP_TIME
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
+	std::unique_ptr<parsed_expression> m_privilege_condition;      // expression to evaluate on privilege change
 	attotime                m_endexectime;              // ending time of the current execution
 	u64                     m_total_cycles;             // current total cycles
 	u64                     m_last_total_cycles;        // last total cycles
@@ -332,7 +338,7 @@ private:
 
 	// breakpoints and watchpoints
 	breakpoint *            m_bplist;                   // list of breakpoints
-	std::vector<watchpoint *> m_wplist;                 // watchpoint lists for each address space
+	std::vector<std::vector<std::unique_ptr<watchpoint>>> m_wplist;  // watchpoint lists for each address space
 	registerpoint *         m_rplist;                   // list of registerpoints
 
 	// tracing
@@ -373,8 +379,12 @@ private:
 		address_space *     m_space;                    // space where the access occurred
 		u32                 m_count;                    // number of hits
 	};
-	std::vector<hotspot_entry> m_hotspots;            // hotspot list
+	std::vector<hotspot_entry> m_hotspots;              // hotspot list
 	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
+
+	std::vector<memory_passthrough_handler *> m_phr;    // passthrough handler reference for each space, read mode
+	std::vector<memory_passthrough_handler *> m_phw;    // passthrough handler reference for each space, write mode
+	std::vector<int>        m_notifiers;                // notifiers for each space
 
 	// pc tracking
 	class dasm_pc_tag
@@ -453,11 +463,13 @@ private:
 	static constexpr u32 DEBUG_FLAG_STOP_TIME       = 0x00002000;       // there is a pending stop at cpu->stoptime
 	static constexpr u32 DEBUG_FLAG_SUSPENDED       = 0x00004000;       // CPU currently suspended
 	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
+	static constexpr u32 DEBUG_FLAG_STOP_PRIVILEGE  = 0x00020000;       // run until execution level changes
 
 	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
 	static constexpr u32 DEBUG_FLAG_TRACING_ANY     = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
 	static constexpr u32 DEBUG_FLAG_TRANSIENT       = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
-			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
+			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK |
+			DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PRIVILEGE;
 };
 
 //**************************************************************************
@@ -496,12 +508,6 @@ public:
 
 	/* return the locally-visible symbol table */
 	symbol_table *get_visible_symtable();
-
-
-	/* ----- misc debugger functions ----- */
-
-	/* specifies a debug command script to execute */
-	void source_script(const char *file);
 
 
 	/* ----- debugger comment helpers ----- */
@@ -564,6 +570,7 @@ public:
 	void set_memory_modified(bool memory_modified) { m_memory_modified = memory_modified; }
 	void set_execution_stopped() { m_execution_state = exec_state::STOPPED; }
 	void set_execution_running() { m_execution_state = exec_state::RUNNING; }
+	void set_wpinfo(offs_t address, u64 data) { m_wpaddr = address; m_wpdata = data; }
 
 	// device_debug helpers
 	// [TODO] [RH]: Look into this more later, can possibly merge these two classes
@@ -574,8 +581,6 @@ public:
 	void halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args);
 	void ensure_comments_loaded();
 	void reset_transient_flags();
-	void process_source_file();
-	void watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist);
 
 private:
 	static const size_t NUM_TEMP_VARIABLES;
@@ -604,8 +609,6 @@ private:
 	device_t *  m_livecpu;
 	device_t *  m_visiblecpu;
 	device_t *  m_breakcpu;
-
-	std::unique_ptr<std::istream> m_source_file;        // script source file
 
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 

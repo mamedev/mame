@@ -273,7 +273,13 @@ void cbm_iec_slot_device::device_start()
 	if (dev) bus->add_device(this, get_card_device());
 }
 
-
+void cbm_iec_slot_device::add_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
+{
+	cbm_iec_slot_device &slot(CBM_IEC_SLOT(config, _tag, 0));
+	cbm_iec_devices(slot);
+	slot.set_default_option(_def_slot);
+	slot.set_address(_address);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -319,8 +325,8 @@ void cbm_iec_device::device_start()
 
 void cbm_iec_device::device_reset()
 {
-	reset_w(0);
-	reset_w(1);
+	host_reset_w(0);
+	host_reset_w(1);
 }
 
 

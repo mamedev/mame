@@ -6,9 +6,6 @@
 #pragma once
 
 
-#define MCFG_YM3526_IRQ_HANDLER(cb) \
-		devcb = &downcast<ym3526_device &>(*device).set_irq_handler((DEVCB_##cb));
-
 class ym3526_device : public device_t, public device_sound_interface
 {
 public:
@@ -16,6 +13,7 @@ public:
 
 	// configuration helpers
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

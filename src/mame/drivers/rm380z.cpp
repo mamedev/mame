@@ -168,26 +168,27 @@ Module timer tag static_vblank_timer name m_expire.seconds
 #include "emu.h"
 #include "includes/rm380z.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
 void rm380z_state::rm380z_mem(address_map &map)
 {
 	map(0xe000, 0xefff).rom().region(RM380Z_MAINCPU_TAG, 0);
-	map(0xf000, 0xf5ff).rw(this, FUNC(rm380z_state::videoram_read), FUNC(rm380z_state::videoram_write));
+	map(0xf000, 0xf5ff).rw(FUNC(rm380z_state::videoram_read), FUNC(rm380z_state::videoram_write));
 	map(0xf600, 0xf9ff).rom().region(RM380Z_MAINCPU_TAG, 0x1000);     /* Extra ROM space for COS4.0 */
 	map(0xfa00, 0xfaff).ram();
-	map(0xfb00, 0xfbff).rw(this, FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
-	map(0xfc00, 0xffff).rw(this, FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
+	map(0xfb00, 0xfbff).rw(FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
+	map(0xfc00, 0xffff).rw(FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
 }
 
 void rm380z_state::rm380z_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xbf).rw(this, FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
+	map(0x00, 0xbf).rw(FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
 	map(0xc0, 0xc3).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0xc4, 0xc4).w(this, FUNC(rm380z_state::disk_0_control));
-	map(0xc5, 0xff).rw(this, FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
+	map(0xc4, 0xc4).w(FUNC(rm380z_state::disk_0_control));
+	map(0xc5, 0xff).rw(FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
 }
 
 void rm380z_state::rm480z_mem(address_map &map)
@@ -235,7 +236,7 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(rm380z_state::rm380z)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(rm380z_mem)
 	MCFG_DEVICE_IO_MAP(rm380z_io)
 
@@ -250,7 +251,7 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -259,23 +260,22 @@ MACHINE_CONFIG_START(rm380z_state::rm380z)
 	//m_cassette->change_state((BIT(data,x)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* RAM configurations */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("56K")
+	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	MCFG_FD1771_ADD("wd1771", XTAL(1'000'000))
+	FD1771(config, m_fdc, 1_MHz_XTAL);
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(rm380z_state::rm480z)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_ADD(RM380Z_MAINCPU_TAG, Z80, 16_MHz_XTAL / 4)
 	MCFG_DEVICE_PROGRAM_MAP(rm480z_mem)
 	MCFG_DEVICE_IO_MAP(rm480z_io)
 
@@ -292,8 +292,8 @@ MACHINE_CONFIG_START(rm380z_state::rm480z)
 //  MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* keyboard */
-//  MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-//  MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
+//  generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+//  keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
 MACHINE_CONFIG_END
 
 

@@ -37,23 +37,7 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-#define LC8670_LCD_UPDATE(name) uint32_t name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad)
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LC8670_SET_CLOCK_SOURCES(_sub_clock, _rc_clock, _cf_clock) \
-	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::SUB, _sub_clock); \
-	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::RC, _rc_clock); \
-	downcast<lc8670_cpu_device &>(*device).set_cpu_clock(lc8670_cpu_device::clock_source::CF, _cf_clock);
-#define MCFG_LC8670_BANKSWITCH_CB(_devcb) \
-	devcb = &downcast<lc8670_cpu_device &>(*device).set_bankswitch_cb(DEVCB_##_devcb);
-
-#define MCFG_LC8670_LCD_UPDATE_CB(_cb) \
-	downcast<lc8670_cpu_device &>(*device).set_lcd_update_cb(_cb);
-
+#define LC8670_LCD_UPDATE(name) uint32_t name(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad)
 
 // ======================> lc8670_cpu_device
 
@@ -67,7 +51,7 @@ public:
 		CF
 	};
 
-	typedef uint32_t (*lcd_update)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad);
+	typedef device_delegate<uint32_t (bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* vram, bool lcd_enabled, uint8_t stad)> lcd_update_delegate;
 
 	// construction/destruction
 	lc8670_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
@@ -86,8 +70,28 @@ public:
 	// configuration helpers
 	void set_cpu_clock(clock_source source, uint32_t clock) { m_clocks[unsigned(source)] = clock; }
 	void set_cpu_clock(clock_source source, const XTAL &clock) { set_cpu_clock(source, clock.value()); }
+	template <typename T, typename U, typename V>
+	void set_clock_sources(T &&sub_clock, U &&rc_clock, V &&cf_clock)
+	{
+		set_cpu_clock(lc8670_cpu_device::clock_source::SUB, sub_clock);
+		set_cpu_clock(lc8670_cpu_device::clock_source::RC, rc_clock);
+		set_cpu_clock(lc8670_cpu_device::clock_source::CF, cf_clock);
+	}
+
+	auto bank_cb() { return m_bankswitch_func.bind(); }
+
 	template <typename Object> void set_lcd_update_cb(Object &&cb) { m_lcd_update_func = std::forward<Object>(cb); }
-	template <class Object> devcb_base &set_bankswitch_cb(Object &&cb) { return m_bankswitch_func.set_callback(std::forward<Object>(cb)); }
+	void set_lcd_update_cb(lcd_update_delegate callback) { m_lcd_update_func = callback; }
+	template <class FunctionClass> void set_lcd_update_cb(const char *devname,
+		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t*, bool, uint8_t), const char *name)
+	{
+		set_lcd_update_cb(lcd_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_lcd_update_cb(
+		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t*, bool, uint8_t), const char *name)
+	{
+		set_lcd_update_cb(lcd_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	void lc8670_internal_map(address_map &map);
 protected:
@@ -192,23 +196,23 @@ private:
 	int op_rolc();
 	int op_xor();
 
-	address_space_config m_program_config;
-	address_space_config m_data_config;
-	address_space_config m_io_config;
+	address_space_config  m_program_config;
+	address_space_config  m_data_config;
+	address_space_config  m_io_config;
 
-	address_space *     m_program;              // program space (ROM or flash)
-	address_space *     m_data;                 // internal RAM/register
-	address_space *     m_io;                   // I/O ports
+	address_space *       m_program;              // program space (ROM or flash)
+	address_space *       m_data;                 // internal RAM/register
+	address_space *       m_io;                   // I/O ports
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 
 	// timers
 	static const device_timer_id BASE_TIMER = 1;
 	static const device_timer_id CLOCK_TIMER = 2;
-	emu_timer *         m_basetimer;
-	emu_timer *         m_clocktimer;
+	emu_timer *           m_basetimer;
+	emu_timer *           m_clocktimer;
 
 	// internal state
-	int                 m_icount;
+	int                   m_icount;
 	uint16_t              m_pc;
 	uint16_t              m_ppc;
 	uint8_t               m_op;
@@ -218,20 +222,20 @@ private:
 	uint8_t               m_vtrbf[0x200];         // work RAM
 	uint16_t              m_irq_flag;
 	uint8_t               m_irq_lev;
-	bool                m_after_reti;
+	bool                  m_after_reti;
 	uint8_t               m_p1_data;
 	uint8_t               m_timer0_prescaler;
 	uint8_t               m_timer0[2];
 	uint8_t               m_timer1[2];
 	uint8_t               m_timer1_comparator[2];
 	uint8_t               m_base_timer[2];
-	bool                m_clock_changed;
-	int                 m_input_lines[4];
+	bool                  m_clock_changed;
+	int                   m_input_lines[4];
 
 	// configuration
-	uint32_t              m_clocks[3];            // clock sources
-	devcb_write8       m_bankswitch_func;      // bankswitch CB
-	lcd_update   m_lcd_update_func;      // LCD update CB
+	uint32_t              m_clocks[3];       // clock sources
+	devcb_write8          m_bankswitch_func; // bankswitch CB
+	lcd_update_delegate   m_lcd_update_func; // LCD update CB
 
 	// interrupts vectors
 	static const uint16_t s_irq_vectors[16];

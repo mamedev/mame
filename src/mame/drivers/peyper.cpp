@@ -18,7 +18,6 @@
   Ator (Video Dens)
 
   Others not emulated (need roms):
-  Night Fever (Sonic)
   Storm (Sonic)
 
   Sir Lancelot (Peyper, 1994)
@@ -50,7 +49,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_switch(*this, "SWITCH.%u", 0)
-		, m_led(*this, "led_%u", 1U)
+		, m_leds(*this, "led_%u", 1U)
 		, m_dpl(*this, "dpl_%u", 0U)
 	{ }
 
@@ -61,7 +60,7 @@ public:
 
 	void peyper(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
@@ -79,12 +78,11 @@ protected:
 	void peyper_io(address_map &map);
 	void peyper_map(address_map &map);
 
-private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_switch;
-	output_finder<4> m_led;
+	output_finder<4> m_leds;
 	output_finder<34> m_dpl; // 0 used as black hole
 };
 
@@ -134,10 +132,10 @@ WRITE8_MEMBER( peyper_state::disp_w )
 		switch (q)
 		{
 			case 34: // player indicator lights (7-digit only)
-				m_led[0] = BIT(a, 0); // PLAYER 1
-				m_led[1] = BIT(a, 1); // PLAYER 2
-				m_led[2] = BIT(a, 2); // PLAYER 3
-				m_led[3] = BIT(a, 3); // PLAYER 4
+				m_leds[0] = BIT(a, 0); // PLAYER 1
+				m_leds[1] = BIT(a, 1); // PLAYER 2
+				m_leds[2] = BIT(a, 2); // PLAYER 3
+				m_leds[3] = BIT(a, 3); // PLAYER 4
 				break;
 
 			case 35: // units digits show 0
@@ -160,7 +158,7 @@ WRITE8_MEMBER( peyper_state::disp_w )
 			case 38: // player 2 indicators (6-digit only)
 			case 39: // player 3 indicators (6-digit only)
 			case 40: // player 4 indicators (6-digit only)
-				m_led[q - 37] = BIT(a, 1); // player indicator
+				m_leds[q - 37] = BIT(a, 1); // player indicator
 				m_dpl[q - 7] = BIT(a, 2) ? 6 : 0; // million led (we show blank or 1 in millions digit)
 				// bit 3, looks like it turns on all the decimal points, reason unknown
 				break;
@@ -223,12 +221,12 @@ void peyper_state::peyper_io(address_map &map)
 	map(0x08, 0x08).w("ay2", FUNC(ay8910_device::address_w));
 	map(0x09, 0x09).r("ay2", FUNC(ay8910_device::data_r)); // never actually read?
 	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
-	map(0x0c, 0x0c).w(this, FUNC(peyper_state::sol_w));
-	map(0x10, 0x18).w(this, FUNC(peyper_state::lamp_w));
+	map(0x0c, 0x0c).w(FUNC(peyper_state::sol_w));
+	map(0x10, 0x18).w(FUNC(peyper_state::lamp_w));
 	map(0x20, 0x20).portr("DSW0");
 	map(0x24, 0x24).portr("DSW1");
 	map(0x28, 0x28).portr("SYSTEM");
-	map(0x2c, 0x2c).w(this, FUNC(peyper_state::lamp7_w));
+	map(0x2c, 0x2c).w(FUNC(peyper_state::lamp7_w));
 }
 
 static INPUT_PORTS_START( pbsonic_generic )
@@ -591,7 +589,7 @@ void peyper_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_led.resolve();
+	m_leds.resolve();
 	m_dpl.resolve();
 
 	save_item(NAME(m_digit));
@@ -609,30 +607,30 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	MCFG_DEVICE_PROGRAM_MAP(peyper_map)
 	MCFG_DEVICE_IO_MAP(peyper_io)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_peyper)
+	config.set_default_layout(layout_peyper);
 
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p1a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p1b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_DEVICE_ADD("ay2", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p2a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p2b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	ay8910_device &ay1(AY8910(config, "ay1", 2500000));
+	ay1.port_a_write_callback().set(FUNC(peyper_state::p1a_w));
+	ay1.port_b_write_callback().set(FUNC(peyper_state::p1b_w));
+	ay1.add_route(ALL_OUTPUTS, "ayvol", 1.0);
+	ay8910_device &ay2(AY8910(config, "ay2", 2500000));
+	ay2.port_a_write_callback().set(FUNC(peyper_state::p2a_w));
+	ay2.port_b_write_callback().set(FUNC(peyper_state::p2b_w));
+	ay2.add_route(ALL_OUTPUTS, "ayvol", 1.0);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8279", I8279, 2500000)
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, peyper_state, col_w))             // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, peyper_state, disp_w))          // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, peyper_state, sw_r))                // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(VCC)                                   // Shift key
-	MCFG_I8279_IN_CTRL_CB(VCC)
+	i8279_device &kbdc(I8279(config, "i8279", 2500000));
+	kbdc.out_sl_callback().set(FUNC(peyper_state::col_w));      // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(peyper_state::disp_w));   // display A&B
+	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));        // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                   // Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
 MACHINE_CONFIG_END
 
 // Not allowed to set up an array all at once, so we have this mess
@@ -757,9 +755,6 @@ void peyper_state::init_wolfman()
 }
 
 
-/*-------------------------------------------------------------------
-/ Night Fever (1979)
-/-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------
 / Odin (1985)

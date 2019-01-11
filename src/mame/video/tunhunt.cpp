@@ -84,7 +84,7 @@ void tunhunt_state::video_start()
 	save_item(NAME(m_control));
 }
 
-PALETTE_INIT_MEMBER(tunhunt_state, tunhunt)
+void tunhunt_state::tunhunt_palette(palette_device &palette) const
 {
 	/* Tunnel Hunt uses a combination of color proms and palette RAM to specify a 16 color
 	 * palette.  Here, we manage only the mappings for alphanumeric characters and SHELL
@@ -102,20 +102,20 @@ PALETTE_INIT_MEMBER(tunhunt_state, tunhunt)
 	 */
 
 	/* alpha hilite#0 */
-	palette.set_pen_indirect(0x10, 0x0); /* background color#0 (transparent) */
-	palette.set_pen_indirect(0x11, 0x4); /* foreground color */
+	palette.set_pen_indirect(0x10, 0x0); // background color#0 (transparent)
+	palette.set_pen_indirect(0x11, 0x4); // foreground color
 
 	/* alpha hilite#1 */
-	palette.set_pen_indirect(0x12, 0x5); /* background color#1 */
-	palette.set_pen_indirect(0x13, 0x4); /* foreground color */
+	palette.set_pen_indirect(0x12, 0x5); // background color#1
+	palette.set_pen_indirect(0x13, 0x4); // foreground color
 
 	/* alpha hilite#2 */
-	palette.set_pen_indirect(0x14, 0x6); /* background color#2 */
-	palette.set_pen_indirect(0x15, 0x4); /* foreground color */
+	palette.set_pen_indirect(0x14, 0x6); // background color#2
+	palette.set_pen_indirect(0x15, 0x4); // foreground color
 
 	/* alpha hilite#3 */
-	palette.set_pen_indirect(0x16, 0xf); /* background color#3 */
-	palette.set_pen_indirect(0x17, 0x4); /* foreground color */
+	palette.set_pen_indirect(0x16, 0xf); // background color#3
+	palette.set_pen_indirect(0x17, 0x4); // foreground color
 
 	/* shell graphics; these are either 1bpp (2 banks) or 2bpp.  It isn't clear which.
 	 * In any event, the following pens are associated with the shell graphics:
@@ -291,7 +291,7 @@ void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 	for( y=0; y<256; y++ )
 	{
-		if (0xff-y >= cliprect.min_y && 0xff-y <= cliprect.max_y)
+		if (0xff-y >= cliprect.top() && 0xff-y <= cliprect.bottom())
 			for( x=0; x<256; x++ )
 			{
 				color = 0;
@@ -308,7 +308,7 @@ void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
 						z = x0; /* give priority to rightmost spans */
 					}
 				}
-				if (x >= cliprect.min_x && x <= cliprect.max_x)
+				if (x >= cliprect.left() && x <= cliprect.right())
 					bitmap.pix16(0xff-y, x) = color;
 			}
 	}

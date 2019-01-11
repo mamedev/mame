@@ -32,8 +32,8 @@ DEFINE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device, "cgenie_fdc", "Colour Genie FD
 
 void cgenie_fdc_device::mmio(address_map &map)
 {
-	map(0xe0, 0xe3).mirror(0x10).rw(this, FUNC(cgenie_fdc_device::irq_r), FUNC(cgenie_fdc_device::select_w));
-	map(0xec, 0xec).mirror(0x10).r("fd1793", FUNC(fd1793_device::status_r)).w(this, FUNC(cgenie_fdc_device::command_w));
+	map(0xe0, 0xe3).mirror(0x10).rw(FUNC(cgenie_fdc_device::irq_r), FUNC(cgenie_fdc_device::select_w));
+	map(0xec, 0xec).mirror(0x10).r("fd1793", FUNC(fd1793_device::status_r)).w(FUNC(cgenie_fdc_device::command_w));
 	map(0xed, 0xed).mirror(0x10).rw("fd1793", FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
 	map(0xee, 0xee).mirror(0x10).rw("fd1793", FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
 	map(0xef, 0xef).mirror(0x10).rw("fd1793", FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
@@ -74,8 +74,8 @@ const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 MACHINE_CONFIG_START(cgenie_fdc_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", cgenie_fdc_device, timer_callback, attotime::from_msec(25))
 
-	MCFG_FD1793_ADD("fd1793", XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, cgenie_fdc_device, intrq_w))
+	FD1793(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(cgenie_fdc_device::intrq_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)

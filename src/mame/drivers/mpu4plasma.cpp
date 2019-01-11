@@ -23,6 +23,9 @@ public:
 	{
 	}
 
+	void mpu4plasma(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_plasmaram;
 
 	DECLARE_READ16_MEMBER( mpu4plasma_unk_r )
@@ -34,7 +37,6 @@ public:
 	{
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mpu4plasma(machine_config &config);
 	void mpu4plasma_map(address_map &map);
 };
 
@@ -47,8 +49,8 @@ void mpu4plasma_state::mpu4plasma_map(address_map &map)
 	// why does it test this much ram, just sloppy code expecting mirroring?
 	map(0x400000, 0x4fffff).ram().share("plasmaram");
 	// comms?
-	map(0xffff00, 0xffff01).r(this, FUNC(mpu4plasma_state::mpu4plasma_unk_r));
-	map(0xffff04, 0xffff05).w(this, FUNC(mpu4plasma_state::mpu4plasma_unk_w));
+	map(0xffff00, 0xffff01).r(FUNC(mpu4plasma_state::mpu4plasma_unk_r));
+	map(0xffff04, 0xffff05).w(FUNC(mpu4plasma_state::mpu4plasma_unk_w));
 }
 
 uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

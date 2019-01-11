@@ -236,11 +236,10 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 {
 	offs_t gfx_chunk = m_gfx_rom.bytes() / 4;
 	uint8_t d1, d2, d3, d4, d5, d6;
-	uint8_t *base;
 	int i;
 
 	/* load graphics ROMs */
-	base = memregion("gfx1")->base();
+	uint8_t *base = memregion("gfx1")->base();
 	switch (bpp)
 	{
 		case 4:
@@ -287,20 +286,20 @@ void midyunit_state::init_generic(int bpp, int sound, int prot_start, int prot_e
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
-			machine().device("cvsd:cpu")->memory().space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w), this));
+			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_write_handler(prot_start, prot_end, write8_delegate(FUNC(midyunit_state::cvsd_protection_w), this));
 			m_cvsd_protection_base = memregion("cvsd:cpu")->base() + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
-			machine().device("cvsd:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_cvsd_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_ADPCM:
-			machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_NARC:
-			machine().device("narcsnd:cpu0")->memory().space(AS_PROGRAM).install_ram(prot_start, prot_end);
+			m_narc_sound->get_cpu()->space(AS_PROGRAM).install_ram(prot_start, prot_end);
 			break;
 
 		case SOUND_YAWDIM:

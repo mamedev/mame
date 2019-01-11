@@ -80,7 +80,7 @@ void imm4_22_device::device_start()
 	save_item(NAME(m_rom_mirror));
 	save_item(NAME(m_memory));
 	save_item(NAME(m_status));
-	save_pointer(NAME(m_prom.get()), 1024U);
+	save_pointer(NAME(m_prom), 1024U);
 }
 
 void imm4_22_device::device_reset()

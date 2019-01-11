@@ -36,13 +36,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
-		m_pit8253_0(*this, "pit8253_0"),
-		m_pit8253_1(*this, "pit8253_1"),
+		m_pit8253(*this, "pit8253%u", 0U),
 		m_ticket(*this, "ticket"),
 		m_samples(*this, "oki"),
 		m_alligator(*this, "alligator%u", 0U),
 		m_digit(*this, "digit%u", 0U),
-		m_lamp(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
@@ -50,7 +49,7 @@ public:
 
 	void wackygtr(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -76,16 +75,14 @@ protected:
 
 	void program_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
-	required_device<pit8253_device> m_pit8253_0;
-	required_device<pit8253_device> m_pit8253_1;
+	required_device_array<pit8253_device, 2> m_pit8253;
 	required_device<ticket_dispenser_device> m_ticket;
 	required_memory_region m_samples;
 	output_finder<5> m_alligator;
 	output_finder<8> m_digit;
-	output_finder<32> m_lamp;
+	output_finder<32> m_lamps;
 
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -127,11 +124,11 @@ WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
 
 WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
 {
-	m_pit8253_0->write_gate0(BIT(data, 0));
-	m_pit8253_0->write_gate1(BIT(data, 1));
-	m_pit8253_0->write_gate2(BIT(data, 2));
-	m_pit8253_1->write_gate1(BIT(data, 3));
-	m_pit8253_1->write_gate2(BIT(data, 4));
+	m_pit8253[0]->write_gate0(BIT(data, 0));
+	m_pit8253[0]->write_gate1(BIT(data, 1));
+	m_pit8253[0]->write_gate2(BIT(data, 2));
+	m_pit8253[1]->write_gate1(BIT(data, 3));
+	m_pit8253[1]->write_gate2(BIT(data, 4));
 
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40 ? 0 : 1);
 }
@@ -185,7 +182,7 @@ void wackygtr_state::machine_start()
 {
 	m_alligator.resolve();
 	m_digit.resolve();
-	m_lamp.resolve();
+	m_lamps.resolve();
 
 	save_item(NAME(m_adpcm_sel));
 	save_item(NAME(m_adpcm_pos));
@@ -211,7 +208,7 @@ void wackygtr_state::set_digits(int p, uint8_t value)
 void wackygtr_state::set_lamps(int p, uint8_t value)
 {
 	for (int i=0; i<8; i++)
-		m_lamp[p + i] = BIT(value, i);
+		m_lamps[p + i] = BIT(value, i);
 }
 
 static INPUT_PORTS_START( wackygtr )
@@ -255,7 +252,7 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	if (!(m_adpcm_ctrl & 0x80))
 	{
 		uint8_t data = m_samples->base()[m_adpcm_pos & 0xffff];
-		m_msm->data_w((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
+		m_msm->write_data((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
 		m_adpcm_pos += m_adpcm_sel;
 		m_adpcm_sel ^= 1;
 	}
@@ -263,18 +260,18 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 
 void wackygtr_state::program_map(address_map &map)
 {
-	map(0x0200, 0x0200).nopr().w(this, FUNC(wackygtr_state::irq_ack_w));
-	map(0x0400, 0x0400).nopr().w(this, FUNC(wackygtr_state::firq_ack_w));
-	map(0x0600, 0x0600).w(this, FUNC(wackygtr_state::disp_w<0>));
-	map(0x0800, 0x0800).w(this, FUNC(wackygtr_state::disp_w<1>));
-	map(0x0a00, 0x0a00).w(this, FUNC(wackygtr_state::disp_w<2>));
-	map(0x0c00, 0x0c00).w(this, FUNC(wackygtr_state::disp_w<3>));
-	map(0x0e00, 0x0e00).w(this, FUNC(wackygtr_state::sample_ctrl_w));
+	map(0x0200, 0x0200).nopr().w(FUNC(wackygtr_state::irq_ack_w));
+	map(0x0400, 0x0400).nopr().w(FUNC(wackygtr_state::firq_ack_w));
+	map(0x0600, 0x0600).w(FUNC(wackygtr_state::disp_w<0>));
+	map(0x0800, 0x0800).w(FUNC(wackygtr_state::disp_w<1>));
+	map(0x0a00, 0x0a00).w(FUNC(wackygtr_state::disp_w<2>));
+	map(0x0c00, 0x0c00).w(FUNC(wackygtr_state::disp_w<3>));
+	map(0x0e00, 0x0e00).w(FUNC(wackygtr_state::sample_ctrl_w));
 
 	map(0x1000, 0x1001).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x2000, 0x2003).rw(m_pit8253_0, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x3000, 0x3003).rw(m_pit8253_1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x2000, 0x2003).rw(m_pit8253[0], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x3000, 0x3003).rw(m_pit8253[1], FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
 	map(0x4000, 0x4003).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5000, 0x5003).rw("i8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -286,58 +283,58 @@ void wackygtr_state::program_map(address_map &map)
 
 MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(3'579'545))   // HD68B09P
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wackygtr_state, irq0_line_assert, 50)  // FIXME
+	MC6809(config, m_maincpu, XTAL(3'579'545));	// HD68B09P
+	m_maincpu->set_addrmap(AS_PROGRAM, &wackygtr_state::program_map);
+	m_maincpu->set_periodic_int(FUNC(wackygtr_state::irq0_line_assert), attotime::from_hz(50));	// FIXME
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", wackygtr_state, nmi_timer, attotime::from_hz(100))  // FIXME
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(wackygtr_state::nmi_timer), attotime::from_hz(100));	// FIXME
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_wackygtr)
+	config.set_default_layout(layout_wackygtr);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000) )
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, wackygtr_state, adpcm_int))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(wackygtr_state::adpcm_int));	/* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 KHz, 4 Bits  */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545) )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, wackygtr_state, status_lamps_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, wackygtr_state, alligators_ctrl1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wackygtr_state, alligators_ctrl2_w))
+	i8255_device &ppi0(I8255(config, "i8255_0"));
+	ppi0.out_pa_callback().set(FUNC(wackygtr_state::status_lamps_w));
+	ppi0.out_pb_callback().set(FUNC(wackygtr_state::alligators_ctrl1_w));
+	ppi0.out_pc_callback().set(FUNC(wackygtr_state::alligators_ctrl2_w));
 
-	MCFG_DEVICE_ADD("i8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, wackygtr_state, timing_lamps_w<0>))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, wackygtr_state, timing_lamps_w<1>))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, wackygtr_state, timing_lamps_w<2>))
+	i8255_device &ppi1(I8255(config, "i8255_1"));
+	ppi1.out_pa_callback().set(FUNC(wackygtr_state::timing_lamps_w<0>));
+	ppi1.out_pb_callback().set(FUNC(wackygtr_state::timing_lamps_w<1>));
+	ppi1.out_pc_callback().set(FUNC(wackygtr_state::timing_lamps_w<2>));
 
-	MCFG_DEVICE_ADD("i8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi2(I8255(config, "i8255_2"));
+	ppi2.in_pa_callback().set_ioport("IN0");
+	ppi2.in_pb_callback().set_ioport("IN1");
+	ppi2.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("pit8253_0", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<0>))
-	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<1>))
-	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<2>))
+	PIT8253(config, m_pit8253[0], 0);
+	m_pit8253[0]->set_clk<0>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[0]->out_handler<0>().set(FUNC(wackygtr_state::alligator_ck<0>));
+	m_pit8253[0]->set_clk<1>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[0]->out_handler<1>().set(FUNC(wackygtr_state::alligator_ck<1>));
+	m_pit8253[0]->set_clk<2>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[0]->out_handler<2>().set(FUNC(wackygtr_state::alligator_ck<2>));
 
-	MCFG_DEVICE_ADD("pit8253_1", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT0_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<3>))
-	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, wackygtr_state, alligator_ck<4>))
+	PIT8253(config, m_pit8253[1], 0);
+	m_pit8253[1]->set_clk<0>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[1]->out_handler<0>().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	m_pit8253[1]->set_clk<1>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[1]->out_handler<1>().set(FUNC(wackygtr_state::alligator_ck<3>));
+	m_pit8253[1]->set_clk<2>(XTAL(3'579'545)/16);  // this is a guess
+	m_pit8253[1]->out_handler<2>().set(FUNC(wackygtr_state::alligator_ck<4>));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+}
 
 
 ROM_START( wackygtr )

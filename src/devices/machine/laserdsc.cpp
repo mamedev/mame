@@ -14,6 +14,7 @@
 #include "vbiparse.h"
 #include "config.h"
 #include "render.h"
+#include "romload.h"
 #include "chd.h"
 
 

@@ -16,6 +16,7 @@
 #include "a2bus.h"
 #include "machine/wd_fdc.h"
 #include "formats/imd_dsk.h"
+#include "imagedev/floppy.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

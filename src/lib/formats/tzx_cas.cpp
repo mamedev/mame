@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol,???
+// copyright-holders:Wilbert Pol
 /*
 
 TZX (currently spectrum only) and spectrum TAP cassette format support by Wilbert Pol
@@ -282,13 +282,15 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 		}
 	}
 	/* pause */
+	int start_pause_samples = millisec_to_samplecount(1);
+
+	tzx_output_wave(buffer, start_pause_samples);
+	size += start_pause_samples;
+
 	if (pause > 0)
 	{
-		int start_pause_samples = millisec_to_samplecount(1);
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
-		tzx_output_wave(buffer, start_pause_samples);
-		size += start_pause_samples;
 		wave_data = WAVE_LOW;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;

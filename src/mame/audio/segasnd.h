@@ -15,22 +15,32 @@
 
 class segag80snd_common : public driver_device {
 public:
-	segag80snd_common(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-	{}
+	segag80snd_common(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu")
+	{ }
 
 	virtual ~segag80snd_common() = default;
 
+	DECLARE_WRITE_LINE_MEMBER(segaspeech_int_w);
+
 	void sega_speech_board(machine_config &config);
 
+protected:
 	void speech_map(address_map &map);
 	void speech_portmap(address_map &map);
+
+	optional_device<cpu_device> m_audiocpu;
 };
+
+#define SEGASND_SEGASPEECH_REGION "segaspeech:speech"
 
 class speech_sound_device : public device_t, public device_sound_interface
 {
 public:
 	speech_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	auto int_cb() { return m_int_cb.bind(); }
 
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -52,24 +62,30 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
+	devcb_write_line m_int_cb;
+	required_memory_region m_speech;
+
 	// internal state
 	u8 m_drq;
 	u8 m_latch;
 	u8 m_t0;
 	u8 m_p2;
-	u8 *m_speech;
 
 	TIMER_CALLBACK_MEMBER( delayed_speech_w );
 };
 
 DECLARE_DEVICE_TYPE(SEGASPEECH, speech_sound_device)
 
-
 class usb_sound_device : public device_t, public device_sound_interface
 {
 public:
+	template <typename T> usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&maincpu_tag)
+		: usb_sound_device(mconfig, tag, owner, clock)
+	{
+		m_maincpu.set_tag(maincpu_tag);
+	}
+
 	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	required_device<i8035_device> m_ourcpu;                 /* CPU index of the 8035 */
 
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -84,6 +100,7 @@ public:
 	void usb_map(address_map &map);
 	void usb_map_rom(address_map &map);
 	void usb_portmap(address_map &map);
+
 protected:
 	usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -94,6 +111,9 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	required_device<i8035_device> m_ourcpu;
+	required_device<cpu_device> m_maincpu;
 
 private:
 	struct g80_filter_state
@@ -140,10 +160,8 @@ private:
 		u8                  config = 0;     // configuration for this timer
 	};
 
-
 	// internal state
 	sound_stream            *m_stream;              // output stream
-	device_t                *m_maincpu;
 	u8                      m_in_latch;             // input latch
 	u8                      m_out_latch;            // output latch
 	u8                      m_last_p2_value;        // current P2 output value
@@ -178,6 +196,12 @@ DECLARE_DEVICE_TYPE(SEGAUSB, usb_sound_device)
 class usb_rom_sound_device : public usb_sound_device
 {
 public:
+	template <typename T> usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&maincpu_tag)
+		: usb_rom_sound_device(mconfig, tag, owner, clock)
+	{
+		m_maincpu.set_tag(maincpu_tag);
+	}
+
 	usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
@@ -186,14 +210,5 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(SEGAUSBROM, usb_rom_sound_device)
-
-
-#define MCFG_SEGAUSB_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGAUSB, 0) \
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-
-#define MCFG_SEGAUSBROM_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGAUSBROM, 0) \
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 #endif // MAME_AUDIO_SEGASND_H

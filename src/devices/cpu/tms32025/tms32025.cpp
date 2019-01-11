@@ -184,17 +184,25 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #define IND     m_AR[ARP]                       /* address used in indirect memory access operations */
 
 
+/*
+   Processor can be operated in one of two modes based on Pin 1 (MP/MC)
+   MP/MC = 1 (Microprocessor Mode)
+   MP/MC = 0 (Microcomputer Mode)
+   in 'Microcomputer' mode the 4K Word internal ROM is used (TMS320C25)
+
+   use set_mp_mc in the device configuration to set the pin for internal ROM mode
+*/
 DEFINE_DEVICE_TYPE(TMS32025, tms32025_device, "tms32025", "Texas Instruments TMS32025")
 DEFINE_DEVICE_TYPE(TMS32026, tms32026_device, "tms32026", "Texas Instruments TMS32026")
 
 void tms32025_device::tms32025_data(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
-	map(0x0001, 0x0001).rw(this, FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
-	map(0x0002, 0x0002).rw(this, FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
-	map(0x0003, 0x0003).rw(this, FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
-	map(0x0004, 0x0004).rw(this, FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
-	map(0x0005, 0x0005).rw(this, FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
+	map(0x0000, 0x0000).rw(FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
+	map(0x0001, 0x0001).rw(FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
+	map(0x0002, 0x0002).rw(FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
+	map(0x0003, 0x0003).rw(FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
+	map(0x0004, 0x0004).rw(FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
+	map(0x0005, 0x0005).rw(FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
 	map(0x0060, 0x007f).ram().share("b2");
 	map(0x0200, 0x02ff).ram().share("b0");
 	map(0x0300, 0x03ff).ram().share("b1");
@@ -202,30 +210,41 @@ void tms32025_device::tms32025_data(address_map &map)
 
 void tms32025_device::tms32026_data(address_map &map)
 {
-	map(0x0000, 0x0000).rw(this, FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
-	map(0x0001, 0x0001).rw(this, FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
-	map(0x0002, 0x0002).rw(this, FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
-	map(0x0003, 0x0003).rw(this, FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
-	map(0x0004, 0x0004).rw(this, FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
-	map(0x0005, 0x0005).rw(this, FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
+	map(0x0000, 0x0000).rw(FUNC(tms32025_device::drr_r), FUNC(tms32025_device::drr_w));
+	map(0x0001, 0x0001).rw(FUNC(tms32025_device::dxr_r), FUNC(tms32025_device::dxr_w));
+	map(0x0002, 0x0002).rw(FUNC(tms32025_device::tim_r), FUNC(tms32025_device::tim_w));
+	map(0x0003, 0x0003).rw(FUNC(tms32025_device::prd_r), FUNC(tms32025_device::prd_w));
+	map(0x0004, 0x0004).rw(FUNC(tms32025_device::imr_r), FUNC(tms32025_device::imr_w));
+	map(0x0005, 0x0005).rw(FUNC(tms32025_device::greg_r), FUNC(tms32025_device::greg_w));
 	map(0x0060, 0x007f).ram().share("b2");
 	map(0x0200, 0x03ff).ram().share("b0");
 	map(0x0400, 0x05ff).ram().share("b1");
 	map(0x0600, 0x07ff).ram().share("b3");
 }
 
-
-tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, TMS32025, tag, owner, clock, address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+#if 0
+// Instead of using the map here we install the ROM depending on the MP/MC pin set in the config
+void tms32025_device::tms32025_program(address_map &map)
 {
-	m_fixed_STR1 = 0x0180;
+	map(0x0000, 0x0fff).rom().region("internal", 0); // 4K Words Internal ROM / EPROM
+}
+#endif
+
+ROM_START( tms32025 )
+	ROM_REGION16_BE( 0x2000, "internal", ROMREGION_ERASE00 )
+	// use blank data if internal ROM is not programmed
+ROM_END
+
+const tiny_rom_entry *tms32025_device::device_rom_region() const
+{
+	return ROM_NAME(tms32025);
 }
 
 
-tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map)
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
-	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1, map)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1, prgmap)
+	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1, datamap)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 16, -1)
 	, m_b0(*this, "b0")
 	, m_b1(*this, "b1")
@@ -237,12 +256,24 @@ tms32025_device::tms32025_device(const machine_config &mconfig, device_type type
 	, m_xf_out(*this)
 	, m_dr_in(*this)
 	, m_dx_out(*this)
+	, m_mp_mc(true)
 {
 }
 
+tms32025_device::tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms32025_device(mconfig, TMS32025, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+{
+	m_fixed_STR1 = 0x0180;
+}
+
+tms32025_device::tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: tms32025_device(mconfig, type, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms32025_device::tms32025_data), this))
+{
+	m_fixed_STR1 = 0x0180;
+}
 
 tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32025_device(mconfig, TMS32026, tag, owner, clock, address_map_constructor(FUNC(tms32026_device::tms32026_data), this))
+	: tms32025_device(mconfig, TMS32026, tag, owner, clock, address_map_constructor(), address_map_constructor(FUNC(tms32026_device::tms32026_data), this))
 {
 	m_fixed_STR1 = 0x0100;
 }
@@ -1625,6 +1656,11 @@ void tms32025_device::device_start()
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
+	if (!m_mp_mc) // if pin 1 is 0 then we're using internal ROM
+	{
+		m_program->install_rom(0x0000, 0x0fff, memregion("internal")->base());
+	}
+
 	m_bio_in.resolve_safe(0xffff);
 	m_hold_in.resolve_safe(0xffff);
 	m_hold_ack_out.resolve_safe();
@@ -1653,42 +1689,37 @@ void tms32025_device::device_start()
 	m_mHackIgnoreARP = 0;
 	m_waiting_for_serial_frame = 0;
 
+	save_item(NAME(m_PREVPC));
 	save_item(NAME(m_PC));
+	save_item(NAME(m_PFC));
 	save_item(NAME(m_STR0));
 	save_item(NAME(m_STR1));
-	save_item(NAME(m_PFC));
 	save_item(NAME(m_IFR));
 	save_item(NAME(m_RPTC));
 	save_item(NAME(m_ACC.d));
 	save_item(NAME(m_ALU.d));
 	save_item(NAME(m_Preg.d));
 	save_item(NAME(m_Treg));
-	save_item(NAME(m_AR[0]));
-	save_item(NAME(m_AR[1]));
-	save_item(NAME(m_AR[2]));
-	save_item(NAME(m_AR[3]));
-	save_item(NAME(m_AR[4]));
-	save_item(NAME(m_AR[5]));
-	save_item(NAME(m_AR[6]));
-	save_item(NAME(m_AR[7]));
-	save_item(NAME(m_STACK[0]));
-	save_item(NAME(m_STACK[1]));
-	save_item(NAME(m_STACK[2]));
-	save_item(NAME(m_STACK[3]));
-	save_item(NAME(m_STACK[4]));
-	save_item(NAME(m_STACK[5]));
-	save_item(NAME(m_STACK[6]));
-	save_item(NAME(m_STACK[7]));
+	save_item(NAME(m_AR));
+	save_item(NAME(m_STACK));
 
-	save_item(NAME(m_oldacc));
-	save_item(NAME(m_memaccess));
-	save_item(NAME(m_mHackIgnoreARP));
+	save_item(NAME(m_drr));
+	save_item(NAME(m_dxr));
+	save_item(NAME(m_tim));
+	save_item(NAME(m_prd));
+	save_item(NAME(m_imr));
+	save_item(NAME(m_greg));
+	save_item(NAME(m_timerover));
 
 	save_item(NAME(m_idle));
 	save_item(NAME(m_hold));
 	save_item(NAME(m_external_mem_access));
 	save_item(NAME(m_init_load_addr));
-	save_item(NAME(m_PREVPC));
+
+	save_item(NAME(m_oldacc.d));
+	save_item(NAME(m_memaccess));
+	save_item(NAME(m_waiting_for_serial_frame));
+	save_item(NAME(m_mp_mc));
 
 	state_add( TMS32025_PC,   "PC",   m_PC).formatstr("%04X");
 	state_add( TMS32025_STR0, "STR0", m_STR0).formatstr("%04X");

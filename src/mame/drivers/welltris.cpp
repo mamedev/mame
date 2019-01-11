@@ -50,7 +50,7 @@ V-SYSTEM VS8803 6082 9040 EBBB
 
 ********************************************************************************
 
- its impossible to know what some of the video registers do due to lack of
+ it's impossible to know what some of the video registers do due to lack of
  evidence (bg palette has a selector, but I'm not sure which ... test mode
  colours use different palette on rgb test
 
@@ -319,6 +319,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "video/vsystem_gga.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -339,14 +340,14 @@ void welltris_state::main_map(address_map &map)
 	map(0x800000, 0x81ffff).ram().share("pixelram");    /* Graph_1 & 2*/
 	map(0xff8000, 0xffbfff).ram();                             /* work */
 	map(0xffc000, 0xffc3ff).ram().share("spriteram");           /* Sprite */
-	map(0xffd000, 0xffdfff).ram().w(this, FUNC(welltris_state::charvideoram_w)).share("charvideoram");     /* Char */
+	map(0xffd000, 0xffdfff).ram().w(FUNC(welltris_state::charvideoram_w)).share("charvideoram");     /* Char */
 	map(0xffe000, 0xffefff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    /* Palette */
 	map(0xfff000, 0xfff001).portr("P1");                 /* Bottom Controls */
-	map(0xfff000, 0xfff001).w(this, FUNC(welltris_state::palette_bank_w));
+	map(0xfff000, 0xfff001).w(FUNC(welltris_state::palette_bank_w));
 	map(0xfff002, 0xfff003).portr("P2");                 /* Top Controls */
-	map(0xfff002, 0xfff003).w(this, FUNC(welltris_state::gfxbank_w));
+	map(0xfff002, 0xfff003).w(FUNC(welltris_state::gfxbank_w));
 	map(0xfff004, 0xfff005).portr("P3");                 /* Left Side Ctrls */
-	map(0xfff004, 0xfff007).w(this, FUNC(welltris_state::scrollreg_w));
+	map(0xfff004, 0xfff007).w(FUNC(welltris_state::scrollreg_w));
 	map(0xfff006, 0xfff007).portr("P4");                 /* Right Side Ctrls */
 	map(0xfff008, 0xfff009).portr("SYSTEM");             /* Bit 5 Tested at start of irq 1 */
 	map(0xfff009, 0xfff009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -366,7 +367,7 @@ void welltris_state::sound_map(address_map &map)
 void welltris_state::sound_port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(welltris_state::sound_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(welltris_state::sound_bankswitch_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x10, 0x10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x18, 0x18).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
@@ -670,62 +671,59 @@ void welltris_state::machine_start()
 	membank("soundbank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
 }
 
-MACHINE_CONFIG_START(welltris_state::welltris)
-
+void welltris_state::welltris(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)  /* 10 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", welltris_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 20000000/2);	/* 10 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &welltris_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(welltris_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_port_map) /* IRQs are triggered by the YM2610 */
+	Z80(config, m_audiocpu, 8000000/2);		/* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &welltris_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &welltris_state::sound_port_map); /* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(15, 367-1, 8, 248-1)
-	MCFG_SCREEN_UPDATE_DRIVER(welltris_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(15, 367-1, 8, 248-1);
+	m_screen->set_screen_update(FUNC(welltris_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_welltris)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_welltris);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
-	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
-	MCFG_VSYSTEM_SPR2_SET_PRITYPE(-1)
-	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
+	VSYSTEM_SPR2(config, m_spr_old, 0);
+	m_spr_old->set_gfx_region(1);
+	m_spr_old->set_pritype(-1);
+	m_spr_old->set_gfxdecode_tag(m_gfxdecode);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(welltris_state::quiz18k)
+void welltris_state::quiz18k(machine_config &config)
+{
 	welltris(config);
 
 	/* basic machine hardware */
+	m_screen->set_visarea(15, 335-1, 0, 224-1);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(15, 335-1, 0, 224-1)
-
-	MCFG_DEVICE_MODIFY("vsystem_spr_old")
-	MCFG_VSYSTEM_SPR2_SET_OFFSETS(6, 1)
-MACHINE_CONFIG_END
+	m_spr_old->set_offsets(6, 1);
+}
 
 
 

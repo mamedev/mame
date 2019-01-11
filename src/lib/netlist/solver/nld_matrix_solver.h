@@ -232,7 +232,7 @@ void matrix_solver_t::build_LE_A()
 	for (std::size_t k = 0; k < iN; k++)
 	{
 		terms_for_net_t *terms = m_terms[k].get();
-		nl_double * Ak = &child.A(k, 0);
+		nl_double * Ak = &child.A(k, 0ul);
 
 		for (std::size_t i=0; i < iN; i++)
 			Ak[i] = 0.0;

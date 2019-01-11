@@ -65,15 +65,14 @@
 
 void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	uint8_t *spriteram_2 = m_spriteram2;
-	uint8_t   *indx_ram   =   m_spriteram + 0x2000,    // this ram contains indexes into offs_ram
-			*offs_ram   =   m_spriteram + 0x2400,    // this ram contains x,y offsets or indexes into spriteram_2
+	uint8_t *indx_ram   =   m_spriteram + 0x2000,    // this ram contains indexes into offs_ram
+			*offs_ram   =   m_spriteram + 0x2400,    // this ram contains x,y offsets or indexes into m_spriteram2
 			*ram        =   m_spriteram,         // current sprite pointer in spriteram
 			*ram2       =   indx_ram;           // current sprite pointer in indx_ram
 
 	// wheelrun is the only game with a smaller visible area
 	const rectangle &visarea = m_screen->visible_area();
-	int special = (visarea.max_y - visarea.min_y + 1) < 0x100;
+	int special = visarea.height() < 0x100;
 
 	for ( ; ram < indx_ram; ram += 8,ram2++)
 	{
@@ -100,12 +99,12 @@ void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		if (offs_ram[idx + 2] & 0x80)
 		{
-			// x,y & code offset is in spriteram_2, this is its index
+			// x,y & code offset is in m_spriteram2, this is its index
 
 			idx     =   (((offs_ram[idx + 2] << 8) + offs_ram[idx + 3]) & 0x3fff) * 4;
 
-			yoffs   =   spriteram_2[idx + 0] + (spriteram_2[idx + 1] << 8);
-			xoffs   =   spriteram_2[idx + 2] + (spriteram_2[idx + 3] << 8);
+			yoffs   =   m_spriteram2[idx + 0] + (m_spriteram2[idx + 1] << 8);
+			xoffs   =   m_spriteram2[idx + 2] + (m_spriteram2[idx + 3] << 8);
 
 			code    +=  (yoffs & 0x3e00) >> 9;
 			flipy   ^=  (yoffs & 0x4000) ? 1 : 0;
@@ -140,7 +139,7 @@ void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-uint32_t fantland_state::screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fantland_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_sprites(bitmap,cliprect);

@@ -69,7 +69,7 @@
 #include "dragon_fdc.h"
 
 #include "coco_fdc.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
@@ -82,12 +82,7 @@
 ***************************************************************************/
 
 #define LOG_FDC                 0
-#define WD2791_TAG              "wd2791"
-#define WD2797_TAG              "wd2797"
 
-
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 
 /***************************************************************************
@@ -149,36 +144,28 @@ static void dragon_fdc_drives(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(dragon_fdc_device_base::device_add_mconfig)
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL(4'000'000) / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dragon_fdc_device_base, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dragon_fdc_device_base, fdc_drq_w))
-	MCFG_WD_FDC_FORCE_READY
+void dragon_fdc_device_base::device_add_mconfig(machine_config &config)
+{
+	WD2797(config, m_wd2797, 4_MHz_XTAL / 4).set_force_ready(true);
+	m_wd2797->intrq_wr_callback().set(FUNC(dragon_fdc_device_base::fdc_intrq_w));
+	m_wd2797->drq_wr_callback().set(FUNC(dragon_fdc_device_base::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppies[0], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+}
 
 
-MACHINE_CONFIG_START(premier_fdc_device_base::device_add_mconfig)
-	MCFG_WD2791_ADD(WD2791_TAG, XTAL(2'000'000) / 2)
-	MCFG_WD_FDC_FORCE_READY
+void premier_fdc_device_base::device_add_mconfig(machine_config &config)
+{
+	WD2791(config, m_wd2791, 2_MHz_XTAL / 2).set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":0", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":1", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":2", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":3", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppies[0], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+}
 
 
 //**************************************************************************
@@ -190,16 +177,16 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 dragon_fdc_device_base::dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
-	, m_wd2797(*this, WD2797_TAG)
-	, m_floppies(*this, WD2797_TAG ":%u", 0)
+	, m_wd2797(*this, "wd2797")
+	, m_floppies(*this, "wd2797:%u", 0)
 {
 }
 
 
 premier_fdc_device_base::premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: coco_family_fdc_device_base(mconfig, type, tag, owner, clock)
-	, m_wd2791(*this, WD2791_TAG)
-	, m_floppies(*this, WD2791_TAG ":%u", 0)
+	, m_wd2791(*this, "wd2791")
+	, m_floppies(*this, "wd2791:%u", 0)
 {
 }
 
@@ -312,7 +299,7 @@ READ8_MEMBER(dragon_fdc_device_base::scs_read)
 	case 1:
 	case 2:
 	case 3:
-		result = m_wd2797->read(space, offset & 0xef);
+		result = m_wd2797->read(offset & 0xef);
 		break;
 	}
 	return result;
@@ -328,7 +315,7 @@ READ8_MEMBER(premier_fdc_device_base::scs_read)
 	case 1:
 	case 2:
 	case 3:
-		result = m_wd2791->read(space, offset);
+		result = m_wd2791->read(offset);
 		break;
 	}
 	return result;
@@ -347,7 +334,7 @@ WRITE8_MEMBER(dragon_fdc_device_base::scs_write)
 	case 1:
 	case 2:
 	case 3:
-		m_wd2797->write(space, offset & 0xef, data);
+		m_wd2797->write(offset & 0xef, data);
 		break;
 	case 8: case 9: case 10: case 11:
 	case 12: case 13: case 14: case 15:
@@ -365,7 +352,7 @@ WRITE8_MEMBER(premier_fdc_device_base::scs_write)
 	case 1:
 	case 2:
 	case 3:
-		m_wd2791->write(space, offset, data);
+		m_wd2791->write(offset, data);
 		break;
 	case 4:
 		dskreg_w(data);
@@ -380,7 +367,7 @@ WRITE8_MEMBER(premier_fdc_device_base::scs_write)
 
 ROM_START(dragon_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("ddos10.rom", 0x0000, 0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
+	ROM_LOAD("ddos10.rom", 0x0000, 0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
 ROM_END
 
 namespace
@@ -412,7 +399,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_FDC, device_cococart_interface, dragon_fdc_dev
 
 ROM_START(premier_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
+	ROM_LOAD("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
 ROM_END
 
 namespace
@@ -444,7 +431,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(PREMIER_FDC, device_cococart_interface, premier_fdc_d
 
 ROM_START(sdtandy_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("sdtandy.rom", 0x0000, 0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
+	ROM_LOAD("sdtandy.rom", 0x0000, 0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
 ROM_END
 
 namespace

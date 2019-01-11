@@ -890,7 +890,7 @@ void pia6821_device::reg_w(uint8_t offset, uint8_t data)
 
 void pia6821_device::set_a_input(uint8_t data, uint8_t z_mask)
 {
-	assert_always(m_in_a_handler.isnull(), "pia6821_porta_w() called when in_a_func implemented");
+	assert_always(m_in_a_handler.isnull(), "pia6821_device::set_a_input() called when m_in_a_handler set");
 
 	LOG("Set PIA input port A = %02X\n", data);
 
@@ -901,10 +901,10 @@ void pia6821_device::set_a_input(uint8_t data, uint8_t z_mask)
 
 
 //-------------------------------------------------
-//  pia6821_porta_w
+//  write_porta
 //-------------------------------------------------
 
-void pia6821_device::porta_w(uint8_t data)
+void pia6821_device::write_porta(uint8_t data)
 {
 	set_a_input(data, 0);
 }
@@ -1008,10 +1008,10 @@ bool pia6821_device::ca2_output_z()
 
 
 //-------------------------------------------------
-//  portb_w
+//  write_portb
 //-------------------------------------------------
 
-void pia6821_device::portb_w(uint8_t data)
+void pia6821_device::write_portb(uint8_t data)
 {
 	assert_always(m_in_b_handler.isnull(), "pia_set_input_b() called when in_b_func implemented");
 

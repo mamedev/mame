@@ -43,7 +43,7 @@ private:
 
 	uint8_t    m_last_irq_state;
 
-	void filter_w(filter_rc_device &device, int data);
+	void set_filter(filter_rc_device &device, int data);
 };
 
 class locomotn_audio_device : public timeplt_audio_device

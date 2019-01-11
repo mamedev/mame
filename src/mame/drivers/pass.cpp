@@ -109,6 +109,7 @@
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -118,8 +119,8 @@ void pass_state::pass_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram();
-	map(0x200000, 0x200fff).ram().w(this, FUNC(pass_state::pass_bg_videoram_w)).share("bg_videoram"); // Background
-	map(0x210000, 0x213fff).ram().w(this, FUNC(pass_state::pass_fg_videoram_w)).share("fg_videoram"); // Foreground
+	map(0x200000, 0x200fff).ram().w(FUNC(pass_state::pass_bg_videoram_w)).share("bg_videoram"); // Background
+	map(0x210000, 0x213fff).ram().w(FUNC(pass_state::pass_fg_videoram_w)).share("fg_videoram"); // Foreground
 	map(0x220000, 0x2203ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x230001, 0x230001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x230100, 0x230101).portr("DSW");
@@ -261,15 +262,14 @@ MACHINE_CONFIG_START(pass_state::pass)
 	MCFG_SCREEN_UPDATE_DRIVER(pass_state, screen_update_pass)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pass)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_pass);
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	MCFG_DEVICE_ADD("ymsnd", YM2203, 14318180/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

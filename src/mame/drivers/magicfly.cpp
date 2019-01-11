@@ -446,6 +446,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -456,35 +457,41 @@
 class magicfly_state : public driver_device
 {
 public:
-	magicfly_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	magicfly_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
+	void bchance(machine_config &config);
+	void magicfly(machine_config &config);
+	void _7mezzo(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_input_selector;
+	required_device<cpu_device> m_maincpu;
+	required_device<dac_bit_interface> m_dac;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	DECLARE_WRITE8_MEMBER(magicfly_videoram_w);
 	DECLARE_WRITE8_MEMBER(magicfly_colorram_w);
 	DECLARE_READ8_MEMBER(mux_port_r);
 	DECLARE_WRITE8_MEMBER(mux_port_w);
 	TILE_GET_INFO_MEMBER(get_magicfly_tile_info);
 	TILE_GET_INFO_MEMBER(get_7mezzo_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(magicfly);
-	DECLARE_PALETTE_INIT(bchance);
+	void magicfly_palette(palette_device &palette) const;
+	void bchance_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(7mezzo);
 	uint32_t screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<dac_bit_interface> m_dac;
-	required_device<gfxdecode_device> m_gfxdecode;
-	void bchance(machine_config &config);
-	void magicfly(machine_config &config);
-	void _7mezzo(machine_config &config);
 	void magicfly_map(address_map &map);
 };
 
@@ -549,10 +556,10 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
     x--- ----   Mirrored from bit 2. The code check this one to boot the game.
 
 */
-	int attr = m_colorram[tile_index];
-	int code = m_videoram[tile_index];
-	int bank = (attr & 0x10) >> 4;    /* bit 4 switch the gfx banks */
-	int color = attr & 0x07;          /* bits 0-2 for color */
+	int const attr = m_colorram[tile_index];
+	int const code = m_videoram[tile_index];
+	int const bank = (attr & 0x10) >> 4;    /* bit 4 switch the gfx banks */
+	int const color = attr & 0x07;          /* bits 0-2 for color */
 
 	/* Seems that bit 7 is mirrored from bit 2 to have a normal boot */
 	/* Boot only check the first color RAM offset */
@@ -576,11 +583,9 @@ uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(magicfly_state, magicfly)
+void magicfly_state::magicfly_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0x00; i < 0x10; i += 0x10)
+	for (int i = 0x00; i < 0x10; i += 0x10)
 	{
 		/* 1st gfx bank */
 		palette.set_pen_color(i + 0, rgb_t(0x00, 0x00, 0x00));
@@ -603,11 +608,9 @@ PALETTE_INIT_MEMBER(magicfly_state, magicfly)
 	}
 }
 
-PALETTE_INIT_MEMBER(magicfly_state, bchance)
+void magicfly_state::bchance_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0x00; i < 0x10; i += 0x10)
+	for (int i = 0x00; i < 0x10; i += 0x10)
 	{
 		/* 1st gfx bank */
 		palette.set_pen_color(i + 0, rgb_t(0x00, 0x00, 0x00));
@@ -682,10 +685,10 @@ void magicfly_state::magicfly_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");    /* MK48Z02B NVRAM */
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(magicfly_state::magicfly_videoram_w)).share("videoram"); /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	map(0x1800, 0x1bff).ram().w(this, FUNC(magicfly_state::magicfly_colorram_w)).share("colorram"); /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
-	map(0x2800, 0x2800).r(this, FUNC(magicfly_state::mux_port_r));    /* multiplexed input port */
-	map(0x3000, 0x3000).w(this, FUNC(magicfly_state::mux_port_w));   /* output port */
+	map(0x1000, 0x13ff).ram().w(FUNC(magicfly_state::magicfly_videoram_w)).share("videoram"); /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	map(0x1800, 0x1bff).ram().w(FUNC(magicfly_state::magicfly_colorram_w)).share("colorram"); /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	map(0x2800, 0x2800).r(FUNC(magicfly_state::mux_port_r));    /* multiplexed input port */
+	map(0x3000, 0x3000).w(FUNC(magicfly_state::mux_port_w));   /* output port */
 	map(0xc000, 0xffff).rom();                 /* ROM space */
 }
 
@@ -943,7 +946,7 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(magicfly_map)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -954,14 +957,14 @@ MACHINE_CONFIG_START(magicfly_state::magicfly)
 	MCFG_SCREEN_UPDATE_DRIVER(magicfly_state, screen_update_magicfly)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_magicfly)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(magicfly_state, magicfly)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_magicfly);
+	PALETTE(config, "palette", FUNC(magicfly_state::magicfly_palette), 32);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -980,14 +983,13 @@ MACHINE_CONFIG_START(magicfly_state::_7mezzo)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(magicfly_state::bchance)
+void magicfly_state::bchance(machine_config &config)
+{
 	magicfly(config);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(magicfly_state, bchance)
-
-MACHINE_CONFIG_END
+	subdevice<palette_device>("palette")->set_init(FUNC(magicfly_state::bchance_palette));
+}
 
 
 /*********************************************

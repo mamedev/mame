@@ -51,10 +51,9 @@ public:
 
 	void mpu2(machine_config &config);
 
-protected:
+private:
 	void mpu2_basemap(address_map &map);
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 };

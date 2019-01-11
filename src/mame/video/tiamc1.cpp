@@ -109,36 +109,35 @@ void tiamc1_state::update_bg_palette()
 		m_palette->set_pen_color(i + 16, m_palette_ptr[m_paletteram[i | bplmask]]);
 }
 
-PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
+void tiamc1_state::tiamc1_palette(palette_device &palette)
 {
 	// Voltage computed by Proteus
-	//static const float g_v[8]={1.05f,0.87f,0.81f,0.62f,0.44f,0.25f,0.19f,0.00f};
-	//static const float r_v[8]={1.37f,1.13f,1.00f,0.75f,0.63f,0.38f,0.25f,0.00f};
-	//static const float b_v[4]={1.16f,0.75f,0.42f,0.00f};
+	//static constexpr float g_v[8] = {1.05F, 0.87F, 0.81f, 0.62F, 0.44F, 0.25F, 0.19F, 0.00F };
+	//static constexpr float r_v[8] = {1.37F, 1.13F, 1.00f, 0.75F, 0.63F, 0.38F, 0.25F, 0.00F };
+	//static constexpr float b_v[4] = {1.16F, 0.75F, 0.42f, 0.00F };
 
 	// Voltage adjusted by Shiru
-	static const float g_v[8] = { 1.2071f,0.9971f,0.9259f,0.7159f,0.4912f,0.2812f,0.2100f,0.0000f};
-	static const float r_v[8] = { 1.5937f,1.3125f,1.1562f,0.8750f,0.7187f,0.4375f,0.2812f,0.0000f};
-	static const float b_v[4] = { 1.3523f,0.8750f,0.4773f,0.0000f};
-
-	int col;
-	int r, g, b, ir, ig, ib;
-	float tcol;
+	static constexpr float g_v[8] = { 1.2071F, 0.9971F, 0.9259F, 0.7159F, 0.4912F, 0.2812F, 0.2100F, 0.0000F };
+	static constexpr float r_v[8] = { 1.5937F, 1.3125F, 1.1562F, 0.8750F, 0.7187F, 0.4375F, 0.2812F, 0.0000F };
+	static constexpr float b_v[4] = { 1.3523F, 0.8750F, 0.4773F, 0.0000F };
 
 	m_palette_ptr = std::make_unique<rgb_t[]>(256);
 
-	for (col = 0; col < 256; col++) {
-		ir = (col >> 3) & 7;
-		ig = col & 7;
-		ib = (col >> 6) & 3;
-		tcol = 255.0f * r_v[ir] / r_v[0];
-		r = 255 - (((int)tcol) & 255);
-		tcol = 255.0f * g_v[ig] / g_v[0];
-		g = 255 - (((int)tcol) & 255);
-		tcol = 255.0f * b_v[ib] / b_v[0];
-		b = 255 - (((int)tcol) & 255);
+	for (int col = 0; col < 256; col++)
+	{
+		float tcol;
 
-		m_palette_ptr[col] = rgb_t(r,g,b);
+		int const ir = (col >> 3) & 7;
+		int const ig = col & 7;
+		int const ib = (col >> 6) & 3;
+		tcol = 255.0f * r_v[ir] / r_v[0];
+		int const r = 255 - (int(tcol) & 255);
+		tcol = 255.0f * g_v[ig] / g_v[0];
+		int const g = 255 - (int(tcol) & 255);
+		tcol = 255.0f * b_v[ib] / b_v[0];
+		int const b = 255 - (int(tcol) & 255);
+
+		m_palette_ptr[col] = rgb_t(r, g, b);
 	}
 }
 
@@ -156,8 +155,8 @@ void tiamc1_state::video_start()
 {
 	m_videoram = make_unique_clear<uint8_t[]>(0x3050);
 
-		m_charram = m_videoram.get() + 0x0800;     /* Ram is banked */
-		m_tileram = m_videoram.get() + 0x0000;
+	m_charram = m_videoram.get() + 0x0800;     /* Ram is banked */
+	m_tileram = m_videoram.get() + 0x0000;
 
 	m_spriteram_y = m_videoram.get() + 0x3000;
 	m_spriteram_x = m_videoram.get() + 0x3010;
@@ -165,7 +164,7 @@ void tiamc1_state::video_start()
 	m_spriteram_a = m_videoram.get() + 0x3030;
 	m_paletteram  = m_videoram.get() + 0x3040;
 
-	save_pointer(NAME(m_videoram.get()), 0x3050);
+	save_pointer(NAME(m_videoram), 0x3050);
 
 	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
@@ -200,7 +199,7 @@ VIDEO_START_MEMBER(tiamc1_state, kot)
 	m_spriteram_a = m_videoram.get() + 0x430;
 	m_paletteram  = m_videoram.get() + 0x440;
 
-	save_pointer(NAME(m_videoram.get()), 0x450);
+	save_pointer(NAME(m_videoram), 0x450);
 
 	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info), this), TILEMAP_SCAN_ROWS,
 		8, 8, 32, 32);
@@ -232,10 +231,10 @@ void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		if (!(m_spriteram_a[offs] & 0x01))
 			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-				spritecode,
-				0,
-				flipx, flipy,
-				sx, sy, 15);
+					spritecode,
+					0,
+					flipx, flipy,
+					sx, sy, 15);
 	}
 }
 
@@ -259,7 +258,6 @@ uint32_t tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 
 		m_bg_tilemap2->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		m_bg_tilemap1->draw(screen, bitmap, cliprect, 0, 0);
-
 
 	draw_sprites(bitmap, cliprect);
 

@@ -68,6 +68,8 @@ i960 CPU, needs to write its clip and raster values byteswapped.
 #include "emu.h"
 #include "video/namco_c116.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(NAMCO_C116, namco_c116_device, "namco_c116", "Namco C116 Video Controller")
 
 //-------------------------------------------------
@@ -75,9 +77,10 @@ DEFINE_DEVICE_TYPE(NAMCO_C116, namco_c116_device, "namco_c116", "Namco C116 Vide
 //-------------------------------------------------
 
 namco_c116_device::namco_c116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C116, tag, owner, clock),
-		device_gfx_interface(mconfig, *this),
-		device_video_interface(mconfig, *this)
+	: device_t(mconfig, NAMCO_C116, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_enable_shadows(false)
 {
 }
 
@@ -91,7 +94,7 @@ void namco_c116_device::device_start()
 	m_ram_r.resize(0x2000);
 	m_ram_g.resize(0x2000);
 	m_ram_b.resize(0x2000);
-	memset(m_regs, 0, sizeof(m_regs));
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 
 	save_item(NAME(m_ram_r));
 	save_item(NAME(m_ram_g));
@@ -122,6 +125,8 @@ READ8_MEMBER(namco_c116_device::read)
 				return m_regs[reg] & 0xff;
 			else
 				return m_regs[reg] >> 8;
+		/* registers 6,7: unmapped? */
+		//if (reg > 0x6) return 0xff;
 		}
 	}
 
@@ -145,17 +150,33 @@ WRITE8_MEMBER(namco_c116_device::write)
 			RAM = &m_ram_b[0];
 			break;
 		default: // case 0x1800 (internal registers)
-		{
+		{   /* notes from namcos2.cpp */
+			/* registers 0-3: clipping */
+
+			/* register 4: ? */
+			/* sets using it:
+			assault:    $0020
+			burnforc:   $0130 after titlescreen
+			dirtfoxj:   $0108 at game start
+			finalap1/2/3:   $00C0
+			finehour:   $0168 after titlescreen
+			fourtrax:   $00E8 and $00F0
+			luckywld:   $00E8 at titlescreen, $00A0 in game and $0118 if in tunnel
+			suzuka8h1/2:    $00E8 and $00A0 */
+
+			/* register 5: POSIRQ scanline (only 8 bits used) */
+
+			/* registers 6,7: nothing? */
 			int reg = (offset & 0xf) >> 1;
 			if (offset & 1)
 				m_regs[reg] = (m_regs[reg] & 0xff00) | data;
 			else
 				m_regs[reg] = (m_regs[reg] & 0x00ff) | (data << 8);
-			//printf("reg%d = %d\n", reg, m_regs[reg]);
+			//logerror("reg%d = %d\n", reg, m_regs[reg]);
 			return;
 		}
 	}
 	int color = ((offset & 0x6000) >> 2) | (offset & 0x7ff);
 	RAM[color] = data;
-	palette().set_pen_color(color,m_ram_r[color],m_ram_g[color],m_ram_b[color]);
+	set_pen_color(color,m_ram_r[color],m_ram_g[color],m_ram_b[color]);
 }

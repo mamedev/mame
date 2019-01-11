@@ -524,10 +524,9 @@ inline render_font::glyph &render_font::get_char(char32_t chnum)
 			gl.bmheight = int(glyph_ch.bmheight * scale + 0.5f);
 
 			gl.bitmap.allocate(gl.bmwidth, gl.bmheight);
-			rectangle clip;
-			clip.min_x = clip.min_y = 0;
-			clip.max_x = glyph_ch.bitmap.width() - 1;
-			clip.max_y = glyph_ch.bitmap.height() - 1;
+			rectangle clip(
+					0, glyph_ch.bitmap.width() - 1,
+					0, glyph_ch.bitmap.height() - 1);
 			render_texture::hq_scale(gl.bitmap, glyph_ch.bitmap, clip, nullptr);
 
 			/* wrap a texture around the bitmap */

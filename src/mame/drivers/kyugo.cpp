@@ -43,14 +43,14 @@
 void kyugo_state::kyugo_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(this, FUNC(kyugo_state::bgvideoram_w)).share("bgvideoram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(kyugo_state::bgattribram_w)).share("bgattribram");
-	map(0x9000, 0x97ff).ram().w(this, FUNC(kyugo_state::fgvideoram_w)).share("fgvideoram");
-	map(0x9800, 0x9fff).ram().r(this, FUNC(kyugo_state::spriteram_2_r)).share("spriteram_2");
+	map(0x8000, 0x87ff).ram().w(FUNC(kyugo_state::bgvideoram_w)).share("bgvideoram");
+	map(0x8800, 0x8fff).ram().w(FUNC(kyugo_state::bgattribram_w)).share("bgattribram");
+	map(0x9000, 0x97ff).ram().w(FUNC(kyugo_state::fgvideoram_w)).share("fgvideoram");
+	map(0x9800, 0x9fff).ram().r(FUNC(kyugo_state::spriteram_2_r)).share("spriteram_2");
 	map(0xa000, 0xa7ff).ram().share("spriteram_1");
-	map(0xa800, 0xa800).w(this, FUNC(kyugo_state::scroll_x_lo_w));
-	map(0xb000, 0xb000).w(this, FUNC(kyugo_state::gfxctrl_w));
-	map(0xb800, 0xb800).w(this, FUNC(kyugo_state::scroll_y_w));
+	map(0xa800, 0xa800).w(FUNC(kyugo_state::scroll_x_lo_w));
+	map(0xb000, 0xb000).w(FUNC(kyugo_state::gfxctrl_w));
+	map(0xb800, 0xb800).w(FUNC(kyugo_state::scroll_y_w));
 	map(0xf000, 0xf7ff).ram().share("shared_ram");
 }
 
@@ -165,7 +165,7 @@ void kyugo_state::repulse_sub_portmap(address_map &map)
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x02).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xc0, 0xc1).w(this, FUNC(kyugo_state::coin_counter_w));
+	map(0xc0, 0xc1).w(FUNC(kyugo_state::coin_counter_w));
 }
 
 
@@ -175,7 +175,7 @@ void kyugo_state::flashgala_sub_portmap(address_map &map)
 	map(0x40, 0x41).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x42, 0x42).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x80, 0x81).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xc0, 0xc1).w(this, FUNC(kyugo_state::coin_counter_w));
+	map(0xc0, 0xc1).w(FUNC(kyugo_state::coin_counter_w));
 }
 
 
@@ -185,7 +185,7 @@ void kyugo_state::srdmissn_sub_portmap(address_map &map)
 	map(0x80, 0x81).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x82, 0x82).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x84, 0x85).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x90, 0x91).w(this, FUNC(kyugo_state::coin_counter_w));
+	map(0x90, 0x91).w(FUNC(kyugo_state::coin_counter_w));
 }
 
 
@@ -534,10 +534,10 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kyugo_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kyugo_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(kyugo_state::nmi_mask_w));
+	mainlatch.q_out_cb<1>().set(FUNC(kyugo_state::flipscreen_w));
+	mainlatch.q_out_cb<2>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -546,27 +546,26 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kyugo)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(18'432'000)/12));  /* verified on pcb */
+	ay1.port_a_read_callback().set_ioport("DSW1");
+	ay1.port_b_read_callback().set_ioport("DSW2");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30);  /* verified on pcb */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kyugo_state::gyrodine)
 	kyugo_base(config);
 	/* add watchdog */
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gyrodine_main_map)
 MACHINE_CONFIG_END

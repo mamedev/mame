@@ -217,7 +217,7 @@ Interesting memory locations
 TODO :
     - Figure out the ports for the "PayOut" stuff (a006/a00c?);
     - Hook up the OKI M5202;
-	- lagging sprites on witch (especially noticeable when game scrolls up/down)
+    - lagging sprites on witch (especially noticeable when game scrolls up/down)
 */
 
 #include "emu.h"
@@ -461,7 +461,7 @@ WRITE8_MEMBER(keirinou_state::write_keirinou_a002)
 		m_bg_bank = new_bg_bank;
 		m_gfx1_tilemap->mark_all_dirty();
 	}
-//	m_mainbank->set_entry((data >> 6) & 3);
+//  m_mainbank->set_entry((data >> 6) & 3);
 }
 
 WRITE8_MEMBER(witch_state::write_a006)
@@ -515,11 +515,16 @@ READ8_MEMBER(witch_state::prot_read_700x)
 
 WRITE8_MEMBER(witch_state::xscroll_w)
 {
-	m_scrollx=data;
+	m_scrollx = data;
+	// need to mark tiles dirty here, as the tilemap writes are affected by scrollx, see FIX_OFFSET macro.
+	// without it keirin ou can seldomly draw garbage after a big/small bonus game
+	// TODO: rewrite tilemap code so that it doesn't need FIX_OFFSET at all!
+	m_gfx1_tilemap->mark_all_dirty();
 }
+
 WRITE8_MEMBER(witch_state::yscroll_w)
 {
-	m_scrolly=data;
+	m_scrolly = data;
 }
 
 WRITE8_MEMBER(keirinou_state::palette_w)
@@ -565,14 +570,14 @@ WRITE8_MEMBER(keirinou_state::palette_w)
 
 void witch_state::common_map(address_map &map)
 {
-	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa004, 0xa007).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
 	map(0xa00e, 0xa00e).portr("COINS");      // coins/attendant keys
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
-	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
-	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
+	map(0xc000, 0xc3ff).ram().w(FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
+	map(0xc400, 0xc7ff).ram().w(FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
+	map(0xc800, 0xcbff).rw(FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
+	map(0xcc00, 0xcfff).rw(FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
 }
 
 /************************************
@@ -600,7 +605,7 @@ void witch_state::witch_main_map(address_map &map)
 	witch_common_map(map);
 	map(0x0000, UNBANKED_SIZE-1).rom();
 	map(UNBANKED_SIZE, 0x7fff).bankr("mainbank");
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::main_write_a008));
 }
 
 
@@ -608,7 +613,7 @@ void witch_state::witch_sub_map(address_map &map)
 {
 	witch_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::sub_write_a008));
 }
 
 /************************************
@@ -623,7 +628,7 @@ void keirinou_state::keirinou_common_map(address_map &map)
 	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xd000, 0xd7ff).ram().share("sprite_ram");
-	map(0xd800, 0xd9ff).ram().w(this, FUNC(keirinou_state::palette_w)).share("paletteram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(keirinou_state::palette_w)).share("paletteram");
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().share("nvram"); // shared with sub
 }
@@ -632,14 +637,14 @@ void keirinou_state::keirinou_main_map(address_map &map)
 {
 	keirinou_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::main_write_a008));
 }
 
 void keirinou_state::keirinou_sub_map(address_map &map)
 {
 	keirinou_common_map(map);
 	map(0x0000, 0x7fff).rom();
-	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
+	map(0xa008, 0xa008).w(FUNC(witch_state::sub_write_a008));
 }
 
 static INPUT_PORTS_START( witch )
@@ -849,8 +854,8 @@ static INPUT_PORTS_START( keirinou )
 	PORT_DIPSETTING(    0x05, "90%" )
 	PORT_DIPSETTING(    0x04, "95%" )
 	PORT_DIPSETTING(    0x03, "100%" )
-//	PORT_DIPSETTING(    0x01, "80%" )
-//	PORT_DIPSETTING(    0x00, "90%" )
+//  PORT_DIPSETTING(    0x01, "80%" )
+//  PORT_DIPSETTING(    0x00, "90%" )
 	PORT_DIPNAME( 0x08, 0x08, "Double-Up Rate" )
 	PORT_DIPSETTING(    0x08, "90%" )
 	PORT_DIPSETTING(    0x00, "100%" )
@@ -962,20 +967,20 @@ MACHINE_CONFIG_START(witch_state::witch)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	// 82C255 (actual chip on PCB) is equivalent to two 8255s
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, witch_state, read_a000))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("UNK"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, witch_state, write_a002))
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set(FUNC(witch_state::read_a000));
+	m_ppi[0]->in_pb_callback().set_ioport("UNK");
+	m_ppi[0]->out_pc_callback().set(FUNC(witch_state::write_a002));
 
-	MCFG_DEVICE_ADD("ppi2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("A004"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("A005"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, witch_state, write_a006))
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("A004");
+	m_ppi[1]->in_pb_callback().set_ioport("A005");
+	m_ppi[1]->out_pc_callback().set(FUNC(witch_state::write_a006));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -984,33 +989,32 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_witch)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_witch);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm5205_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	es8712_device &essnd(ES8712(config, "essnd", 0));
+	essnd.msm_write_handler().set("msm", FUNC(msm5205_device::data_w));
+	essnd.set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM5205, MSM5202_CLOCK)   /* actually MSM5202 */
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S48_4B)         /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	msm5205_device &msm(MSM5205(config, "msm", MSM5202_CLOCK));   /* actually MSM5202 */
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
+	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, YM2203_CLOCK)     /* 3 MHz */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM_PortA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM_PortB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ym2203_device &ym1(YM2203(config, "ym1", YM2203_CLOCK));     /* 3 MHz */
+	ym1.port_a_read_callback().set_ioport("YM_PortA");
+	ym1.port_b_read_callback().set_ioport("YM_PortB");
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, YM2203_CLOCK)     /* 3 MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, witch_state, xscroll_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, witch_state, yscroll_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ym2203_device &ym2(YM2203(config, "ym2", YM2203_CLOCK));     /* 3 MHz */
+	ym2.port_a_write_callback().set(FUNC(witch_state::xscroll_w));
+	ym2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(keirinou_state::keirinou)
@@ -1022,24 +1026,23 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 0x200+0x80)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
+	PALETTE(config.replace(), m_palette).set_entries(0x200+0x80);
+	m_gfxdecode->set_info(gfx_keirinou);
 
-//	MCFG_PALETTE_FORMAT(IIBBGGRR)
+//  MCFG_PALETTE_FORMAT(IIBBGGRR)
 
-	MCFG_DEVICE_MODIFY("ppi1") // Keirin Ou does have two individual PPIs (NEC D8255AC-2)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, keirinou_state, write_keirinou_a002))
+	// Keirin Ou does have two individual PPIs (NEC D8255AC-2)
+	m_ppi[0]->out_pc_callback().set(FUNC(keirinou_state::write_keirinou_a002));
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM_PortA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM_PortB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &ay1(AY8910(config, "ay1", AY8910_CLOCK));
+	ay1.port_a_read_callback().set_ioport("YM_PortA");
+	ay1.port_b_read_callback().set_ioport("YM_PortB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, witch_state, xscroll_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, witch_state, yscroll_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &ay2(AY8910(config, "ay2", AY8910_CLOCK));
+	ay2.port_a_write_callback().set(FUNC(witch_state::xscroll_w));
+	ay2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	MCFG_DEVICE_REMOVE("essnd")
 	MCFG_DEVICE_REMOVE("msm")
@@ -1137,20 +1140,20 @@ ROM_END
 
 ROM_START( keirinou ) /* ES8611 PCB */
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
+	ROM_LOAD( "y5-03.y5",     0x000000, 0x008000, CRC(df2acc37) SHA1(9ad953843ba7859a55888fb87591cc8d322136ad) )
 
 	ROM_REGION( 0x10000, "sub", ROMREGION_ERASE00 )
-    ROM_LOAD( "y8.y8",        0x000000, 0x008000, CRC(b34111ac) SHA1(4ed7229846adbb27695bf3dd532247b1f8f6e83e) )
+	ROM_LOAD( "y8.y8",        0x000000, 0x008000, CRC(b34111ac) SHA1(4ed7229846adbb27695bf3dd532247b1f8f6e83e) )
 
 	// rearranged so that it fits available gfx decode
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "a6.a6",        0x0000, 0x4000, CRC(6d59a5e4) SHA1(4580756ee7db4a088ad02cd56f78fd55fef6ec0a) )
 	ROM_CONTINUE(             0x8000, 0x4000 )
-    ROM_LOAD( "c6-02.c6",     0x4000, 0x4000, CRC(c3ecc620) SHA1(9d5e18acef2ad48b8f1c4ed5bb002bb48ab6e7a7) )
+	ROM_LOAD( "c6-02.c6",     0x4000, 0x4000, CRC(c3ecc620) SHA1(9d5e18acef2ad48b8f1c4ed5bb002bb48ab6e7a7) )
 	ROM_CONTINUE(             0xc000, 0x4000 )
 
 	ROM_REGION( 0x10000, "gfx2", ROMREGION_ERASE00 )
-    ROM_LOAD( "k5.k5",        0x0000, 0x04000, CRC(1ba6d1c0) SHA1(95203af518c52d731969086e326c9335dee8c465) )
+	ROM_LOAD( "k5.k5",        0x0000, 0x04000, CRC(1ba6d1c0) SHA1(95203af518c52d731969086e326c9335dee8c465) )
 	ROM_CONTINUE(             0x8000, 0x04000 )
 	ROM_CONTINUE(             0x4000, 0x04000 )
 	ROM_CONTINUE(             0xc000, 0x04000 )
@@ -1167,8 +1170,8 @@ void witch_state::init_witch()
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 }
 
-GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System",     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch (With ranking)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System", "Keirin Ou", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch (with ranking)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Sega license)", "Witch (Sega license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pbchmp95, witch, witch,    witch,    witch_state,    init_witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", MACHINE_SUPPORTS_SAVE )

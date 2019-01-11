@@ -187,9 +187,7 @@ void abc890_device::device_reset()
 void abc890_device::abcbus_cs(uint8_t data)
 {
 	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
-	{
-		slot.cs_w(data);
-	}
+		slot.write_cs(data);
 }
 
 
@@ -202,9 +200,7 @@ uint8_t abc890_device::abcbus_inp()
 	uint8_t data = 0xff;
 
 	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
-	{
-		data &= slot.inp_r();
-	}
+		data &= slot.read_inp();
 
 	return data;
 }
@@ -217,9 +213,7 @@ uint8_t abc890_device::abcbus_inp()
 void abc890_device::abcbus_out(uint8_t data)
 {
 	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
-	{
-		slot.out_w(data);
-	}
+		slot.write_out(data);
 }
 
 
@@ -232,9 +226,7 @@ uint8_t abc890_device::abcbus_stat()
 	uint8_t data = 0xff;
 
 	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
-	{
-		data &= slot.stat_r();
-	}
+		data &= slot.read_stat();
 
 	return data;
 }
@@ -247,9 +239,7 @@ uint8_t abc890_device::abcbus_stat()
 void abc890_device::abcbus_c1(uint8_t data)
 {
 	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
-	{
-		slot.c1_w(data);
-	}
+		slot.write_c1(data);
 }
 
 
@@ -260,9 +250,7 @@ void abc890_device::abcbus_c1(uint8_t data)
 void abc890_device::abcbus_c2(uint8_t data)
 {
 	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
-	{
-		slot.c2_w(data);
-	}
+		slot.write_c2(data);
 }
 
 
@@ -273,9 +261,7 @@ void abc890_device::abcbus_c2(uint8_t data)
 void abc890_device::abcbus_c3(uint8_t data)
 {
 	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
-	{
-		slot.c3_w(data);
-	}
+		slot.write_c3(data);
 }
 
 
@@ -286,9 +272,7 @@ void abc890_device::abcbus_c3(uint8_t data)
 void abc890_device::abcbus_c4(uint8_t data)
 {
 	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
-	{
-		slot.c4_w(data);
-	}
+		slot.write_c4(data);
 }
 
 

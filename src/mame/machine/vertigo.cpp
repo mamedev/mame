@@ -19,12 +19,12 @@
  *
  *************************************/
 
-TTL74148_OUTPUT_CB(vertigo_state::update_irq)
+WRITE8_MEMBER(vertigo_state::update_irq)
 {
 	if (m_irq_state < 7)
 		m_maincpu->set_input_line(m_irq_state ^ 7, CLEAR_LINE);
 
-	m_irq_state = m_ttl74148->output_r();
+	m_irq_state = data;
 
 	if (m_irq_state < 7)
 		m_maincpu->set_input_line(m_irq_state ^ 7, ASSERT_LINE);
@@ -48,8 +48,7 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq4_w)
 
 WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
 {
-	if (state)
-		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_custom->sound_interrupt_w(state);
 
 	update_irq_encoder(INPUT_LINE_IRQ3, state);
 }
@@ -101,9 +100,9 @@ WRITE16_MEMBER(vertigo_state::vertigo_wsot_w)
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_custom->sound_reset_w(ASSERT_LINE);
 	else
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_custom->sound_reset_w(CLEAR_LINE);
 }
 
 

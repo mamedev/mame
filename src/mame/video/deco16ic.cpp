@@ -268,9 +268,9 @@ void deco16ic_device::device_start()
 
 	save_item(NAME(m_pf1_8bpp_mode));
 
-	save_pointer(NAME(m_pf1_data.get()), 0x2000 / 2);
-	save_pointer(NAME(m_pf2_data.get()), 0x2000 / 2);
-	save_pointer(NAME(m_pf12_control.get()), 0x10 / 2);
+	save_pointer(NAME(m_pf1_data), 0x2000 / 2);
+	save_pointer(NAME(m_pf2_data), 0x2000 / 2);
+	save_pointer(NAME(m_pf12_control), 0x10 / 2);
 }
 
 //-------------------------------------------------
@@ -460,8 +460,8 @@ void deco16ic_device::custom_tilemap_draw(
 	if (!BIT(control0, 7))
 		return;
 
-	int starty = cliprect.min_y;
-	int endy = cliprect.max_y+1;
+	int starty = cliprect.top();
+	int endy = cliprect.bottom() + 1;
 
 	width_mask = src_bitmap0->width() - 1;
 	height_mask = src_bitmap0->height() - 1;
@@ -560,7 +560,7 @@ void deco16ic_device::pf12_set_gfxbank( int small, int big )
 	m_pf12_8x8_gfx_bank = small;
 }
 
-/* stoneage has broken scroll registers */
+/* stoneage has broken scroll registers, original tumble pop expects a 1 pixel offset */
 void deco16ic_device::set_scrolldx( int tmap, int size, int dx, int dx_if_flipped )
 {
 	switch (tmap)
@@ -621,7 +621,9 @@ READ16_MEMBER( deco16ic_device::pf2_data_r )
 
 WRITE16_MEMBER( deco16ic_device::pf_control_w )
 {
-	screen().update_partial(screen().vpos());
+	// update until current scanline (inclusive if we're in hblank)
+	int ydelta = (screen().hpos() > screen().visible_area().right()) ? 0 : 1;
+	screen().update_partial(screen().vpos() - ydelta);
 
 	COMBINE_DATA(&m_pf12_control[offset]);
 }

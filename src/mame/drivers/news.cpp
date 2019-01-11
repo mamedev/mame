@@ -20,6 +20,7 @@ driver by David Haywood
 
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -27,13 +28,13 @@ driver by David Haywood
 void news_state::news_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();     /* 4000-7fff is written to during startup, probably leftover code */
-	map(0x8000, 0x87ff).ram().w(this, FUNC(news_state::news_fgram_w)).share("fgram");
-	map(0x8800, 0x8fff).ram().w(this, FUNC(news_state::news_bgram_w)).share("bgram");
+	map(0x8000, 0x87ff).ram().w(FUNC(news_state::news_fgram_w)).share("fgram");
+	map(0x8800, 0x8fff).ram().w(FUNC(news_state::news_bgram_w)).share("bgram");
 	map(0x9000, 0x91ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xc000, 0xc000).portr("DSW");
 	map(0xc001, 0xc001).portr("INPUTS");
 	map(0xc002, 0xc002).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc003, 0xc003).w(this, FUNC(news_state::news_bgpic_w));
+	map(0xc003, 0xc003).w(FUNC(news_state::news_bgpic_w));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -146,10 +147,8 @@ MACHINE_CONFIG_START(news_state::news)
 	MCFG_SCREEN_UPDATE_DRIVER(news_state, screen_update_news)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_news)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_news);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

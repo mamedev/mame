@@ -189,20 +189,22 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void pluto5(machine_config &config);
+
+	void init_hb();
+
+private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
 
-	void pluto5(machine_config &config);
 	void pluto5_map(address_map &map);
-protected:
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
-public:
-	void init_hb();
+
 	virtual void machine_start() override;
 };
 
@@ -241,7 +243,7 @@ WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 
 void pluto5_state::pluto5_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(pluto5_state::pluto5_mem_r), FUNC(pluto5_state::pluto5_mem_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(pluto5_state::pluto5_mem_r), FUNC(pluto5_state::pluto5_mem_w));
 }
 
 static INPUT_PORTS_START(  pluto5 )
@@ -254,16 +256,16 @@ void pluto5_state::machine_start()
 
 }
 
-MACHINE_CONFIG_START(pluto5_state::pluto5)
-	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(pluto5_map)
-
+void pluto5_state::pluto5(machine_config &config)
+{
+	M68340(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pluto5_state::pluto5_map);
 
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
-MACHINE_CONFIG_END
+}
 
 ROM_START( hb_cr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )

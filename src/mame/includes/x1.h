@@ -16,7 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
@@ -31,6 +31,7 @@
 
 #include "formats/x1_tap.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -56,7 +57,7 @@ class x1_state : public driver_device
 public:
 	x1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"x1_cpu"),
+		m_maincpu(*this, "x1_cpu"),
 		m_cassette(*this, "cassette"),
 		m_cart(*this, "cartslot"),
 		m_fdc(*this, "fdc"),
@@ -67,6 +68,8 @@ public:
 		m_palette(*this, "palette"),
 		m_dma(*this, "dma"),
 		m_iobank(*this, "iobank"),
+		m_ym(*this, "ym"),
+		m_sound_sw(*this, "SOUND_SW"),
 		m_tvram(*this, "tvram"),
 		m_avram(*this, "avram"),
 		m_kvram(*this, "kvram"),
@@ -78,7 +81,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;
 	required_device<mb8877_device> m_fdc;
@@ -135,7 +138,6 @@ public:
 	DECLARE_MACHINE_START(x1);
 	DECLARE_MACHINE_RESET(x1);
 	DECLARE_VIDEO_START(x1);
-	DECLARE_PALETTE_INIT(x1);
 	DECLARE_MACHINE_RESET(x1turbo);
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
@@ -221,6 +223,8 @@ protected:
 	uint16_t jis_convert(int kanji_addr);
 
 	required_device<address_map_bank_device> m_iobank;
+	optional_device<ym2151_device> m_ym; // turbo-only
+	optional_ioport m_sound_sw; // turbo-only
 	required_shared_ptr<uint8_t> m_tvram;   /**< Pointer for Text Video RAM */
 	required_shared_ptr<uint8_t> m_avram;   /**< Pointer for Attribute Video RAM */
 	optional_shared_ptr<uint8_t> m_kvram;   /**< Pointer for Extended Kanji Video RAM (X1 Turbo) */

@@ -34,24 +34,24 @@ ROM_START( plus1 )
 	ROM_REGION( 0x2000, "exp_rom", 0 )
 	ROM_DEFAULT_BIOS("plus1")
 	ROM_SYSTEM_BIOS(0, "plus1", "Expansion 1.00")
-	ROMX_LOAD("plus1.rom", 0x0000, 0x1000, CRC(ac30b0ed) SHA1(2de04ab7c81414d6c9c967f965c53fc276392463), ROM_BIOS(1))
+	ROMX_LOAD("plus1.rom", 0x0000, 0x1000, CRC(ac30b0ed) SHA1(2de04ab7c81414d6c9c967f965c53fc276392463), ROM_BIOS(0))
 	ROM_RELOAD(            0x1000, 0x1000)
 
 	ROM_SYSTEM_BIOS(1, "presap1", "PRES Expansion 1.1")
-	ROMX_LOAD("presplus1.rom", 0x0000, 0x1000, CRC(8ef1e0e5) SHA1(080e1b788b3fe4fa272cd2cc792293eb7b874e82), ROM_BIOS(2))
+	ROMX_LOAD("presplus1.rom", 0x0000, 0x1000, CRC(8ef1e0e5) SHA1(080e1b788b3fe4fa272cd2cc792293eb7b874e82), ROM_BIOS(1))
 	ROM_RELOAD(                0x1000, 0x1000)
 
 	ROM_SYSTEM_BIOS(2, "presap2", "PRES AP2 Support 1.23")
-	ROMX_LOAD("presap2_123.rom", 0x0000, 0x2000, CRC(f796689c) SHA1(bc40a79e6d2b4cb5e549d5d21f673c66a661850d), ROM_BIOS(3))
+	ROMX_LOAD("presap2_123.rom", 0x0000, 0x2000, CRC(f796689c) SHA1(bc40a79e6d2b4cb5e549d5d21f673c66a661850d), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "sl200", "Slogger Expansion 2.00")
-	ROMX_LOAD("elkexp200.rom", 0x0000, 0x2000, CRC(dee02843) SHA1(5c9b940b4ddb46e9a223160310683a32266300c8), ROM_BIOS(4))
+	ROMX_LOAD("elkexp200.rom", 0x0000, 0x2000, CRC(dee02843) SHA1(5c9b940b4ddb46e9a223160310683a32266300c8), ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(4, "sl201", "Slogger Expansion 2.01")
-	ROMX_LOAD("elkexp201.rom", 0x0000, 0x2000, CRC(0e896892) SHA1(4e0794f1083fe529b01bd4fa100996a533ed8b10), ROM_BIOS(5))
+	ROMX_LOAD("elkexp201.rom", 0x0000, 0x2000, CRC(0e896892) SHA1(4e0794f1083fe529b01bd4fa100996a533ed8b10), ROM_BIOS(4))
 
 	ROM_SYSTEM_BIOS(5, "sl202", "Slogger Expansion 2.02")
-	ROMX_LOAD("elkexp202.rom", 0x0000, 0x2000, CRC(32b440be) SHA1(dbc73e8d919c5615d0241d99db60e06324e16c86), ROM_BIOS(6))
+	ROMX_LOAD("elkexp202.rom", 0x0000, 0x2000, CRC(32b440be) SHA1(dbc73e8d919c5615d0241d99db60e06324e16c86), ROM_BIOS(5))
 ROM_END
 
 //-------------------------------------------------
@@ -92,17 +92,17 @@ ioport_constructor electron_plus1_device::device_input_ports() const
 
 MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, electron_plus1_device, busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* adc */
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(WRITELINE(*this, electron_plus1_device, ready_w))
-	MCFG_ADC0844_CH1_CB(IOPORT("JOY1"))
-	MCFG_ADC0844_CH2_CB(IOPORT("JOY2"))
-	MCFG_ADC0844_CH3_CB(IOPORT("JOY3"))
-	MCFG_ADC0844_CH4_CB(IOPORT("JOY4"))
+	ADC0844(config, m_adc);
+	m_adc->intr_callback().set(FUNC(electron_plus1_device::ready_w));
+	m_adc->ch1_callback().set_ioport("JOY1");
+	m_adc->ch2_callback().set_ioport("JOY2");
+	m_adc->ch3_callback().set_ioport("JOY3");
+	m_adc->ch4_callback().set_ioport("JOY4");
 
 	/* cartridges */
 	MCFG_ELECTRON_CARTSLOT_ADD("cart_sk1", electron_cart, nullptr)
@@ -130,9 +130,9 @@ const tiny_rom_entry *electron_plus1_device::device_rom_region() const
 //  electron_plus1_device - constructor
 //-------------------------------------------------
 
-electron_plus1_device::electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_PLUS1, tag, owner, clock),
-		device_electron_expansion_interface(mconfig, *this),
+electron_plus1_device::electron_plus1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ELECTRON_PLUS1, tag, owner, clock),
+	device_electron_expansion_interface(mconfig, *this),
 	m_exp_rom(*this, "exp_rom"),
 	m_cart_sk1(*this, "cart_sk1"),
 	m_cart_sk2(*this, "cart_sk2"),

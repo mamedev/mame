@@ -23,7 +23,6 @@
 #include "cpu/arm7/arm7core.h"
 #include "sound/volt_reg.h"
 
-#include "rendlay.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -1628,25 +1627,25 @@ void gp32_state::gp32_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x0c000000, 0x0c7fffff).ram().share("s3c240x_ram");
-	map(0x14000000, 0x1400003b).rw(this, FUNC(gp32_state::s3c240x_memcon_r), FUNC(gp32_state::s3c240x_memcon_w));
-	map(0x14200000, 0x1420005b).rw(this, FUNC(gp32_state::s3c240x_usb_host_r), FUNC(gp32_state::s3c240x_usb_host_w));
-	map(0x14400000, 0x14400017).rw(this, FUNC(gp32_state::s3c240x_irq_r), FUNC(gp32_state::s3c240x_irq_w));
-	map(0x14600000, 0x1460007b).rw(this, FUNC(gp32_state::s3c240x_dma_r), FUNC(gp32_state::s3c240x_dma_w));
-	map(0x14800000, 0x14800017).rw(this, FUNC(gp32_state::s3c240x_clkpow_r), FUNC(gp32_state::s3c240x_clkpow_w));
-	map(0x14a00000, 0x14a003ff).rw(this, FUNC(gp32_state::s3c240x_lcd_r), FUNC(gp32_state::s3c240x_lcd_w));
-	map(0x14a00400, 0x14a007ff).rw(this, FUNC(gp32_state::s3c240x_lcd_palette_r), FUNC(gp32_state::s3c240x_lcd_palette_w));
-	map(0x15000000, 0x1500002b).rw(this, FUNC(gp32_state::s3c240x_uart_0_r), FUNC(gp32_state::s3c240x_uart_0_w));
-	map(0x15004000, 0x1500402b).rw(this, FUNC(gp32_state::s3c240x_uart_1_r), FUNC(gp32_state::s3c240x_uart_1_w));
-	map(0x15100000, 0x15100043).rw(this, FUNC(gp32_state::s3c240x_pwm_r), FUNC(gp32_state::s3c240x_pwm_w));
-	map(0x15200140, 0x152001fb).rw(this, FUNC(gp32_state::s3c240x_usb_device_r), FUNC(gp32_state::s3c240x_usb_device_w));
-	map(0x15300000, 0x1530000b).rw(this, FUNC(gp32_state::s3c240x_watchdog_r), FUNC(gp32_state::s3c240x_watchdog_w));
-	map(0x15400000, 0x1540000f).rw(this, FUNC(gp32_state::s3c240x_iic_r), FUNC(gp32_state::s3c240x_iic_w));
-	map(0x15508000, 0x15508013).rw(this, FUNC(gp32_state::s3c240x_iis_r), FUNC(gp32_state::s3c240x_iis_w));
-	map(0x15600000, 0x1560005b).rw(this, FUNC(gp32_state::s3c240x_gpio_r), FUNC(gp32_state::s3c240x_gpio_w));
-	map(0x15700040, 0x1570008b).rw(this, FUNC(gp32_state::s3c240x_rtc_r), FUNC(gp32_state::s3c240x_rtc_w));
-	map(0x15800000, 0x15800007).rw(this, FUNC(gp32_state::s3c240x_adc_r), FUNC(gp32_state::s3c240x_adc_w));
-	map(0x15900000, 0x15900017).rw(this, FUNC(gp32_state::s3c240x_spi_r), FUNC(gp32_state::s3c240x_spi_w));
-	map(0x15a00000, 0x15a0003f).rw(this, FUNC(gp32_state::s3c240x_mmc_r), FUNC(gp32_state::s3c240x_mmc_w));
+	map(0x14000000, 0x1400003b).rw(FUNC(gp32_state::s3c240x_memcon_r), FUNC(gp32_state::s3c240x_memcon_w));
+	map(0x14200000, 0x1420005b).rw(FUNC(gp32_state::s3c240x_usb_host_r), FUNC(gp32_state::s3c240x_usb_host_w));
+	map(0x14400000, 0x14400017).rw(FUNC(gp32_state::s3c240x_irq_r), FUNC(gp32_state::s3c240x_irq_w));
+	map(0x14600000, 0x1460007b).rw(FUNC(gp32_state::s3c240x_dma_r), FUNC(gp32_state::s3c240x_dma_w));
+	map(0x14800000, 0x14800017).rw(FUNC(gp32_state::s3c240x_clkpow_r), FUNC(gp32_state::s3c240x_clkpow_w));
+	map(0x14a00000, 0x14a003ff).rw(FUNC(gp32_state::s3c240x_lcd_r), FUNC(gp32_state::s3c240x_lcd_w));
+	map(0x14a00400, 0x14a007ff).rw(FUNC(gp32_state::s3c240x_lcd_palette_r), FUNC(gp32_state::s3c240x_lcd_palette_w));
+	map(0x15000000, 0x1500002b).rw(FUNC(gp32_state::s3c240x_uart_0_r), FUNC(gp32_state::s3c240x_uart_0_w));
+	map(0x15004000, 0x1500402b).rw(FUNC(gp32_state::s3c240x_uart_1_r), FUNC(gp32_state::s3c240x_uart_1_w));
+	map(0x15100000, 0x15100043).rw(FUNC(gp32_state::s3c240x_pwm_r), FUNC(gp32_state::s3c240x_pwm_w));
+	map(0x15200140, 0x152001fb).rw(FUNC(gp32_state::s3c240x_usb_device_r), FUNC(gp32_state::s3c240x_usb_device_w));
+	map(0x15300000, 0x1530000b).rw(FUNC(gp32_state::s3c240x_watchdog_r), FUNC(gp32_state::s3c240x_watchdog_w));
+	map(0x15400000, 0x1540000f).rw(FUNC(gp32_state::s3c240x_iic_r), FUNC(gp32_state::s3c240x_iic_w));
+	map(0x15508000, 0x15508013).rw(FUNC(gp32_state::s3c240x_iis_r), FUNC(gp32_state::s3c240x_iis_w));
+	map(0x15600000, 0x1560005b).rw(FUNC(gp32_state::s3c240x_gpio_r), FUNC(gp32_state::s3c240x_gpio_w));
+	map(0x15700040, 0x1570008b).rw(FUNC(gp32_state::s3c240x_rtc_r), FUNC(gp32_state::s3c240x_rtc_w));
+	map(0x15800000, 0x15800007).rw(FUNC(gp32_state::s3c240x_adc_r), FUNC(gp32_state::s3c240x_adc_w));
+	map(0x15900000, 0x15900017).rw(FUNC(gp32_state::s3c240x_spi_r), FUNC(gp32_state::s3c240x_spi_w));
+	map(0x15a00000, 0x15a0003f).rw(FUNC(gp32_state::s3c240x_mmc_r), FUNC(gp32_state::s3c240x_mmc_w));
 }
 
 static INPUT_PORTS_START( gp32 )
@@ -1687,9 +1686,6 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
 	MCFG_SCREEN_UPDATE_DRIVER(gp32_state, screen_update_gp32)
 
-	/* 320x240 is 4:3 but ROT270 causes an aspect ratio of 3:4 by default */
-	MCFG_DEFAULT_LAYOUT(layout_lcd_rot)
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
@@ -1698,9 +1694,9 @@ MACHINE_CONFIG_START(gp32_state::gp32)
 	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
+	SMARTMEDIA(config, m_smartmedia, 0);
 
 	MCFG_SOFTWARE_LIST_ADD("memc_list","gp32")
 MACHINE_CONFIG_END
@@ -1708,18 +1704,18 @@ MACHINE_CONFIG_END
 ROM_START( gp32 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "157e", "Firmware 1.5.7 (English)" )
-	ROMX_LOAD( "gp32157e.bin", 0x000000, 0x080000, CRC(b1e35643) SHA1(1566bc2a27980602e9eb501cf8b2d62939bfd1e5), ROM_BIOS(1) )
+	ROMX_LOAD( "gp32157e.bin", 0x000000, 0x080000, CRC(b1e35643) SHA1(1566bc2a27980602e9eb501cf8b2d62939bfd1e5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "100k", "Firmware 1.0.0 (Korean)" )
-	ROMX_LOAD( "gp32100k.bin", 0x000000, 0x080000, CRC(d9925ac9) SHA1(3604d0d7210ed72eddd3e3e0c108f1102508423c), ROM_BIOS(2) )
+	ROMX_LOAD( "gp32100k.bin", 0x000000, 0x080000, CRC(d9925ac9) SHA1(3604d0d7210ed72eddd3e3e0c108f1102508423c), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "156k", "Firmware 1.5.6 (Korean)" )
-	ROMX_LOAD( "gp32156k.bin", 0x000000, 0x080000, CRC(667fb1c8) SHA1(d179ab8e96411272b6a1d683e59da752067f9da8), ROM_BIOS(3) )
+	ROMX_LOAD( "gp32156k.bin", 0x000000, 0x080000, CRC(667fb1c8) SHA1(d179ab8e96411272b6a1d683e59da752067f9da8), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "166m", "Firmware 1.6.6 (European)" )
-	ROMX_LOAD( "gp32166m.bin", 0x000000, 0x080000, CRC(4548a840) SHA1(1ad0cab0af28fb45c182e5e8c87ead2aaa4fffe1), ROM_BIOS(4) )
+	ROMX_LOAD( "gp32166m.bin", 0x000000, 0x080000, CRC(4548a840) SHA1(1ad0cab0af28fb45c182e5e8c87ead2aaa4fffe1), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "mfv2", "Mr. Spiv Multi Firmware V2" )
-	ROMX_LOAD( "gp32mfv2.bin", 0x000000, 0x080000, CRC(7ddaaaeb) SHA1(5a85278f721beb3b00125db5c912d1dc552c5897), ROM_BIOS(5) )
+	ROMX_LOAD( "gp32mfv2.bin", 0x000000, 0x080000, CRC(7ddaaaeb) SHA1(5a85278f721beb3b00125db5c912d1dc552c5897), ROM_BIOS(4) )
 #if 0
 	ROM_SYSTEM_BIOS( 5, "test", "test" )
-	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(6) )
+	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(5) )
 #endif
 ROM_END
 

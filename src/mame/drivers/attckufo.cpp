@@ -29,14 +29,16 @@ public:
 		m_maincpu(*this, "maincpu")
 	{}
 
+	void attckufo(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
-	void attckufo(machine_config &config);
 	void cpu_map(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -57,12 +59,12 @@ void attckufo_state::cpu_map(address_map &map)
 
 void attckufo_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(this, FUNC(attckufo_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(attckufo_state::vic_videoram_r));
 }
 
 void attckufo_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(this, FUNC(attckufo_state::vic_colorram_r));
+	map(0x000, 0x3ff).r(FUNC(attckufo_state::vic_colorram_r));
 }
 
 
@@ -121,12 +123,23 @@ MACHINE_CONFIG_START(attckufo_state::attckufo)
 	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
 	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
-	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("INPUT"))
+	pia6821_device &pia(PIA6821(config, "pia", 0));
+	pia.readpa_handler().set_ioport("DSW");
+	pia.readpb_handler().set_ioport("INPUT");
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", XTAL(14'318'181) / 14, vic_videoram_map, vic_colorram_map)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE)
+	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1)
+	MCFG_SCREEN_UPDATE_DEVICE("mos6560", mos6560_device, screen_update)
+
+	MCFG_DEVICE_ADD("mos6560", MOS656X_ATTACK_UFO, XTAL(14'318'181) / 14)
+	MCFG_VIDEO_SET_SCREEN("screen")
+	MCFG_DEVICE_ADDRESS_MAP(0, vic_videoram_map)
+	MCFG_DEVICE_ADDRESS_MAP(1, vic_colorram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

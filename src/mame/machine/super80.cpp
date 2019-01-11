@@ -176,7 +176,7 @@ READ8_MEMBER( super80_state::super80_f2_r )
 WRITE8_MEMBER( super80_state::super80_dc_w )
 {
 	/* hardware strobe driven from port select, bit 7..0 = data */
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
 }

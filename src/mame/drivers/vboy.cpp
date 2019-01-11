@@ -33,6 +33,7 @@
 #include "bus/vboy/slot.h"
 #include "bus/vboy/rom.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -69,102 +70,83 @@
 	m_font[((woffs) + 0x1c000) ^ 7] = dat; /* flip x+y */
 
 
-/* FIXME: most if not all of these must be uint8_t */
-struct vboy_regs_t
-{
-	uint32_t lpc, lpc2, lpt, lpr;
-	uint32_t khb, klb;
-	uint8_t thb, tlb;
-	uint32_t tcr, wcr, kcr;
-};
-
-struct vip_regs_t
-{
-	uint16_t INTPND;
-	uint16_t INTENB;
-	uint16_t DPSTTS;
-	uint16_t DPCTRL;
-	uint16_t BRTA;
-	uint16_t BRTB;
-	uint16_t BRTC;
-	uint16_t REST;
-	uint16_t FRMCYC;
-	uint16_t CTA;
-	uint16_t XPSTTS;
-	uint16_t XPCTRL;
-	uint16_t VER;
-	uint16_t SPT[4];
-	uint16_t GPLT[4];
-	uint16_t JPLT[4];
-	uint16_t BKCOL;
-};
-
-struct vboy_timer_t
-{
-	uint16_t count;
-	uint16_t latch;
-};
-
-struct vboy_timer_t;
-
 class vboy_state : public driver_device
 {
 public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cart(*this, "cartslot"),
-			m_maintimer(*this, "timer_main"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cart(*this, "cartslot")
+		, m_maintimer(*this, "timer_main")
+		, m_palette(*this, "palette")
 	{
-		m_vip_regs.INTPND = 0;
-		m_vip_regs.INTENB = 0;
-		m_vip_regs.DPSTTS = 0;
-		m_vip_regs.DPCTRL = 0;
-		m_vip_regs.BRTA = 0;
-		m_vip_regs.BRTB = 0;
-		m_vip_regs.BRTC = 0;
-		m_vip_regs.REST = 0;
-		m_vip_regs.FRMCYC = 0;
-		m_vip_regs.CTA = 0;
-		m_vip_regs.XPSTTS = 0;
-		m_vip_regs.XPCTRL = 0;
-		m_vip_regs.VER = 0;
-		m_vip_regs.SPT[0] = 0;
-		m_vip_regs.SPT[1] = 0;
-		m_vip_regs.SPT[2] = 0;
-		m_vip_regs.SPT[3] = 0;
-		m_vip_regs.GPLT[0] = 0;
-		m_vip_regs.GPLT[1] = 0;
-		m_vip_regs.GPLT[2] = 0;
-		m_vip_regs.GPLT[3] = 0;
-		m_vip_regs.JPLT[0] = 0;
-		m_vip_regs.JPLT[1] = 0;
-		m_vip_regs.JPLT[2] = 0;
-		m_vip_regs.JPLT[3] = 0;
-		m_vip_regs.BKCOL = 0;
-
-		m_vboy_regs.lpc = 0;
-		m_vboy_regs.lpc2 = 0;
-		m_vboy_regs.lpt = 0;
-		m_vboy_regs.lpr = 0;
-		m_vboy_regs.khb = 0;
-		m_vboy_regs.klb = 0;
-		m_vboy_regs.thb = 0;
-		m_vboy_regs.tlb = 0;
-		m_vboy_regs.tcr = 0;
-		m_vboy_regs.wcr = 0;
-		m_vboy_regs.kcr = 0x80;
-
-		m_vboy_timer.count = 0;
-		m_vboy_timer.latch = 0;
 	}
+
+	void vboy(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// FIXME: most if not all of these must be uint8_t
+	struct vboy_regs_t
+	{
+		uint32_t lpc = 0, lpc2 = 0, lpt = 0, lpr = 0;
+		uint32_t khb = 0, klb = 0;
+		uint8_t thb = 0, tlb = 0;
+		uint32_t tcr = 0, wcr = 0, kcr = 0x80;
+	};
+
+	struct vip_regs_t
+	{
+		uint16_t INTPND = 0;
+		uint16_t INTENB = 0;
+		uint16_t DPSTTS = 0;
+		uint16_t DPCTRL = 0;
+		uint16_t BRTA = 0;
+		uint16_t BRTB = 0;
+		uint16_t BRTC = 0;
+		uint16_t REST = 0;
+		uint16_t FRMCYC = 0;
+		uint16_t CTA = 0;
+		uint16_t XPSTTS = 0;
+		uint16_t XPCTRL = 0;
+		uint16_t VER = 0;
+		uint16_t SPT[4] = { 0, 0, 0, 0 };
+		uint16_t GPLT[4] = { 0, 0, 0, 0 };
+		uint16_t JPLT[4] = { 0, 0, 0, 0 };
+		uint16_t BKCOL = 0;
+	};
+
+	struct vboy_timer_t
+	{
+		uint16_t count = 0;
+		uint16_t latch = 0;
+	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vboy_cart_slot_device> m_cart;
 	required_device<timer_device> m_maintimer;
 	required_device<palette_device> m_palette;
 	memory_region *m_cart_rom;
+
+	std::unique_ptr<uint16_t[]> m_font;
+	std::unique_ptr<uint16_t[]> m_bgmap;
+	std::unique_ptr<uint8_t[]> m_l_frame_0;
+	std::unique_ptr<uint8_t[]> m_l_frame_1;
+	std::unique_ptr<uint8_t[]> m_r_frame_0;
+	std::unique_ptr<uint8_t[]> m_r_frame_1;
+	vboy_regs_t m_vboy_regs;
+	vip_regs_t m_vip_regs;
+	vboy_timer_t m_vboy_timer;
+	std::unique_ptr<int32_t[]> m_ovr_tempdraw_map;
+	uint16_t m_frame_count;
+	uint8_t m_displayfb;
+	uint8_t m_drawfb;
+	uint8_t m_row_num;
+	attotime m_input_latch_time;
 
 	DECLARE_READ32_MEMBER(io_r);
 	DECLARE_WRITE32_MEMBER(io_w);
@@ -188,22 +170,8 @@ public:
 	DECLARE_WRITE8_MEMBER(lfb1_w);
 	DECLARE_WRITE8_MEMBER(rfb0_w);
 	DECLARE_WRITE8_MEMBER(rfb1_w);
-	std::unique_ptr<uint16_t[]> m_font;
-	std::unique_ptr<uint16_t[]> m_bgmap;
-	std::unique_ptr<uint8_t[]> m_l_frame_0;
-	std::unique_ptr<uint8_t[]> m_l_frame_1;
-	std::unique_ptr<uint8_t[]> m_r_frame_0;
-	std::unique_ptr<uint8_t[]> m_r_frame_1;
-	vboy_regs_t m_vboy_regs;
-	vip_regs_t m_vip_regs;
-	vboy_timer_t m_vboy_timer;
-	std::unique_ptr<int32_t[]> m_ovr_tempdraw_map;
-	uint16_t m_frame_count;
-	uint8_t m_displayfb;
-	uint8_t m_drawfb;
-	uint8_t m_row_num;
-	attotime m_input_latch_time;
-	void m_timer_tick(void);
+
+	void m_timer_tick();
 	void m_scanline_tick(int scanline, uint8_t screen_type);
 	void m_set_irq(uint16_t irq_vector);
 
@@ -215,17 +183,14 @@ public:
 	void draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int gx, int gp, int gy, int h, int w,
 												uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num);
 	uint8_t display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt);
-	void m_set_brightness(void);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vboy);
+	void m_set_brightness();
+	void vboy_palette(palette_device &palette) const;
 	uint32_t screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
-	void vboy(machine_config &config);
+
 	void vboy_io(address_map &map);
 	void vboy_mem(address_map &map);
 };
@@ -248,28 +213,25 @@ void vboy_state::video_start()
 
 void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal)
 {
-	uint16_t data;
-	uint8_t yi, xi, dat, col;
-
-	for (yi = 0; yi < 8; yi++)
+	for (uint8_t yi = 0; yi < 8; yi++)
 	{
-		data = READ_FONT(code * 8 + yi);
+		uint16_t const data = READ_FONT(code * 8 + yi);
 
-		for (xi = 0; xi < 8; xi++)
+		for (uint8_t xi = 0; xi < 8; xi++)
 		{
-			int res_x,res_y;
-
-			dat = ((data >> (xi << 1)) & 0x03);
-
-			res_x = x + xi;
-			res_y = y + yi;
-
-			col = (pal >> (dat*2)) & 3;
+			uint8_t const dat = ((data >> (xi << 1)) & 0x03);
 
 			if (dat)
 			{
+				uint8_t const res_x = x + xi;
+				uint8_t const res_y = y + yi;
+
 				if (cliprect.contains(res_x, res_y))
+				{
+					uint8_t const col = (pal >> (dat * 2)) & 3;
+
 					bitmap.pix16((res_y), (res_x)) = m_palette->pen(col);
+				}
 			}
 		}
 	}
@@ -279,23 +241,16 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 
 void vboy_state::fill_ovr_char(uint16_t code, uint8_t pal)
 {
-	uint16_t data;
-	uint8_t yi, xi, dat;
-	int col;
-
-	for (yi = 0; yi < 8; yi++)
+	for (uint8_t yi = 0; yi < 8; yi++)
 	{
-		data = READ_FONT(code * 8 + yi);
+		uint16_t const data = READ_FONT(code * 8 + yi);
 
-		for (xi = 0; xi < 8; xi++)
+		for (uint8_t xi = 0; xi < 8; xi++)
 		{
-			dat = ((data >> (xi << 1)) & 0x03);
-			col = (pal >> (dat*2)) & 3;
+			uint8_t const dat = ((data >> (xi << 1)) & 0x03);
+			int const col = (dat == 0) ? -1 : ((pal >> (dat * 2)) & 3);
 
-			if(dat == 0)
-				col = -1;
-
-			WRITE_OVR_TEMPDRAW_MAP(yi*8+xi, col);
+			WRITE_OVR_TEMPDRAW_MAP(yi * 8 + xi, col);
 		}
 	}
 }
@@ -743,9 +698,9 @@ WRITE32_MEMBER( vboy_state::io_w )
  *
  *********************************/
 /*
-TODO: brightness presumably isn't a linear algorythm, also REST needs to be taken into account (needs a working example)
+TODO: brightness presumably isn't a linear algorithm, also REST needs to be taken into account (needs a working example)
 */
-void vboy_state::m_set_brightness(void)
+void vboy_state::m_set_brightness()
 {
 	int a,b,c;
 
@@ -1097,27 +1052,27 @@ WRITE8_MEMBER( vboy_state::rfb1_w ) { m_r_frame_1[offset] = data; }
 void vboy_state::vboy_mem(address_map &map)
 {
 	map.global_mask(0x07ffffff);
-	map(0x00000000, 0x00005fff).rw(this, FUNC(vboy_state::lfb0_r), FUNC(vboy_state::lfb0_w)); // L frame buffer 0
-	map(0x00006000, 0x00007fff).rw(this, FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
-	map(0x00008000, 0x0000dfff).rw(this, FUNC(vboy_state::lfb1_r), FUNC(vboy_state::lfb1_w)); // L frame buffer 1
-	map(0x0000e000, 0x0000ffff).rw(this, FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
-	map(0x00010000, 0x00015fff).rw(this, FUNC(vboy_state::rfb0_r), FUNC(vboy_state::rfb0_w));  // R frame buffer 0
-	map(0x00016000, 0x00017fff).rw(this, FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
-	map(0x00018000, 0x0001dfff).rw(this, FUNC(vboy_state::rfb1_r), FUNC(vboy_state::rfb1_w));  // R frame buffer 1
-	map(0x0001e000, 0x0001ffff).rw(this, FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
+	map(0x00000000, 0x00005fff).rw(FUNC(vboy_state::lfb0_r), FUNC(vboy_state::lfb0_w)); // L frame buffer 0
+	map(0x00006000, 0x00007fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
+	map(0x00008000, 0x0000dfff).rw(FUNC(vboy_state::lfb1_r), FUNC(vboy_state::lfb1_w)); // L frame buffer 1
+	map(0x0000e000, 0x0000ffff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
+	map(0x00010000, 0x00015fff).rw(FUNC(vboy_state::rfb0_r), FUNC(vboy_state::rfb0_w));  // R frame buffer 0
+	map(0x00016000, 0x00017fff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
+	map(0x00018000, 0x0001dfff).rw(FUNC(vboy_state::rfb1_r), FUNC(vboy_state::rfb1_w));  // R frame buffer 1
+	map(0x0001e000, 0x0001ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
 
-	map(0x00020000, 0x0003ffff).rw(this, FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
+	map(0x00020000, 0x0003ffff).rw(FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
 
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
-	map(0x0005f800, 0x0005f87f).rw(this, FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
+	map(0x0005f800, 0x0005f87f).rw(FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
 
-	map(0x00078000, 0x00079fff).rw(this, FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
-	map(0x0007a000, 0x0007bfff).rw(this, FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
-	map(0x0007c000, 0x0007dfff).rw(this, FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
-	map(0x0007e000, 0x0007ffff).rw(this, FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
+	map(0x00078000, 0x00079fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
+	map(0x0007a000, 0x0007bfff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
+	map(0x0007c000, 0x0007dfff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
+	map(0x0007e000, 0x0007ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
 
 	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
-	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(this, FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
+	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	map(0x05000000, 0x0500ffff).mirror(0x0ff0000).ram().share("wram");// Main RAM - 64K mask 0xffff
 	map(0x06000000, 0x06003fff).rw(m_cart, FUNC(vboy_cart_slot_device::read_eeprom), FUNC(vboy_cart_slot_device::write_eeprom)); // Cart RAM - 8K NVRAM
@@ -1128,26 +1083,26 @@ void vboy_state::vboy_io(address_map &map)
 {
 	map.global_mask(0x07ffffff);
 	map(0x00000000, 0x00005fff).ram().share("l_frame_0"); // L frame buffer 0
-	map(0x00006000, 0x00007fff).rw(this, FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
+	map(0x00006000, 0x00007fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511
 	map(0x00008000, 0x0000dfff).ram().share("l_frame_1"); // L frame buffer 1
-	map(0x0000e000, 0x0000ffff).rw(this, FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
+	map(0x0000e000, 0x0000ffff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023
 	map(0x00010000, 0x00015fff).ram().share("r_frame_0"); // R frame buffer 0
-	map(0x00016000, 0x00017fff).rw(this, FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
+	map(0x00016000, 0x00017fff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535
 	map(0x00018000, 0x0001dfff).ram().share("r_frame_1"); // R frame buffer 1
-	map(0x0001e000, 0x0001ffff).rw(this, FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
+	map(0x0001e000, 0x0001ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047
 
-	map(0x00020000, 0x0003ffff).rw(this, FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
+	map(0x00020000, 0x0003ffff).rw(FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
 
 	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
-	map(0x0005f800, 0x0005f87f).rw(this, FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
+	map(0x0005f800, 0x0005f87f).rw(FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
 
-	map(0x00078000, 0x00079fff).rw(this, FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
-	map(0x0007a000, 0x0007bfff).rw(this, FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
-	map(0x0007c000, 0x0007dfff).rw(this, FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
-	map(0x0007e000, 0x0007ffff).rw(this, FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
+	map(0x00078000, 0x00079fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
+	map(0x0007a000, 0x0007bfff).rw(FUNC(vboy_state::font1_r), FUNC(vboy_state::font1_w)); // Font 512-1023 mirror
+	map(0x0007c000, 0x0007dfff).rw(FUNC(vboy_state::font2_r), FUNC(vboy_state::font2_w)); // Font 1024-1535 mirror
+	map(0x0007e000, 0x0007ffff).rw(FUNC(vboy_state::font3_r), FUNC(vboy_state::font3_w)); // Font 1536-2047 mirror
 
 	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
-	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(this, FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
+	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
 //  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	map(0x05000000, 0x0500ffff).mirror(0x0ff0000).ram().share("wram"); // Main RAM - 64K mask 0xffff
 	map(0x06000000, 0x06003fff).noprw(); // Cart RAM - 8K NVRAM ?
@@ -1258,7 +1213,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-PALETTE_INIT_MEMBER(vboy_state, vboy)
+void vboy_state::vboy_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::black());
@@ -1366,21 +1321,20 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_pad", vboy_state, timer_pad_tick, attotime::from_hz(50.038029f))
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_vboy)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(vboy_state, vboy)
+	config.set_default_layout(layout_vboy);
+	PALETTE(config, m_palette, FUNC(vboy_state::vboy_palette), 4);
 
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/2,757,0,384,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_left)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* Right screen */
 	MCFG_SCREEN_ADD("3dright", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/2,757,0,384,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_right)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* cartridge */
 	MCFG_VBOY_CARTRIDGE_ADD("cartslot", vboy_cart, nullptr)

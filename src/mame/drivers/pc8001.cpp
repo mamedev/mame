@@ -54,7 +54,7 @@ WRITE8_MEMBER( pc8001_state::port10_w )
 	m_rtc->data_in_w(BIT(data, 3));
 
 	// centronics
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 }
 
 WRITE8_MEMBER( pc8001_state::port30_w )
@@ -187,11 +187,10 @@ void pc8001_state::pc8001_io(address_map &map)
 	map(0x07, 0x07).portr("Y7");
 	map(0x08, 0x08).portr("Y8");
 	map(0x09, 0x09).portr("Y9");
-	map(0x10, 0x10).mirror(0x0f).w(this, FUNC(pc8001_state::port10_w));
-	map(0x20, 0x20).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x30, 0x30).mirror(0x0f).w(this, FUNC(pc8001_state::port30_w));
-	map(0x40, 0x40).mirror(0x0f).rw(this, FUNC(pc8001_state::port40_r), FUNC(pc8001_state::port40_w));
+	map(0x10, 0x10).mirror(0x0f).w(FUNC(pc8001_state::port10_w));
+	map(0x20, 0x21).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x30, 0x30).mirror(0x0f).w(FUNC(pc8001_state::port30_w));
+	map(0x40, 0x40).mirror(0x0f).rw(FUNC(pc8001_state::port40_r), FUNC(pc8001_state::port40_w));
 	map(0x50, 0x51).rw(m_crtc, FUNC(upd3301_device::read), FUNC(upd3301_device::write));
 	map(0x60, 0x68).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
 //  AM_RANGE(0x70, 0x7f) unused
@@ -232,8 +231,8 @@ void pc8001mk2_state::pc8001mk2_mem(address_map &map)
 void pc8001mk2_state::pc8001mk2_io(address_map &map)
 {
 	pc8001_io(map);
-	map(0x30, 0x30).w(this, FUNC(pc8001mk2_state::port30_w));
-	map(0x31, 0x31).w(this, FUNC(pc8001mk2_state::port31_w));
+	map(0x30, 0x30).w(FUNC(pc8001mk2_state::port30_w));
+	map(0x31, 0x31).w(FUNC(pc8001mk2_state::port31_w));
 //  AM_RANGE(0x5c, 0x5c) AM_WRITE(gram_on_w)
 //  AM_RANGE(0x5f, 0x5f) AM_WRITE(gram_off_w)
 //  AM_RANGE(0xe8, 0xe8) kanji_address_lo_w, kanji_data_lo_r
@@ -499,24 +498,24 @@ MACHINE_CONFIG_START(pc8001_state::pc8001)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	I8251(config, I8251_TAG, 0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	I8255A(config, I8255A_TAG, 0);
 
-	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, pc8001_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, pc8001_state, dma_mem_r))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(UPD3301_TAG, upd3301_device, dack_w))
+	I8257(config, m_dma, XTAL(4'000'000));
+	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
+	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
-	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
-	MCFG_UPD3301_CHARACTER_WIDTH(8)
-	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD3301(config, m_crtc, XTAL(14'318'181));
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc8001_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc8001_state, write_centronics_busy))
 
@@ -525,9 +524,7 @@ MACHINE_CONFIG_START(pc8001_state::pc8001)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,64K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,64K");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
@@ -549,32 +546,31 @@ MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	I8251(config, I8251_TAG, 0);
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
+	I8255A(config, I8255A_TAG, 0);
 
-	MCFG_DEVICE_ADD(I8257_TAG, I8257, XTAL(4'000'000))
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, pc8001_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, pc8001_state, dma_mem_r))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8(UPD3301_TAG, upd3301_device, dack_w))
+	I8257(config, m_dma, XTAL(4'000'000));
+	m_dma->out_hrq_cb().set(FUNC(pc8001_state::hrq_w));
+	m_dma->in_memr_cb().set(FUNC(pc8001_state::dma_mem_r));
+	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
-	MCFG_DEVICE_ADD(UPD3301_TAG, UPD3301, XTAL(14'318'181))
-	MCFG_UPD3301_CHARACTER_WIDTH(8)
-	MCFG_UPD3301_DRAW_CHARACTER_CALLBACK_OWNER(pc8001_state, pc8001_display_pixels)
-	MCFG_UPD3301_DRQ_CALLBACK(WRITELINE(I8257_TAG, i8257_device, dreq2_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	UPD3301(config, m_crtc, XTAL(14'318'181));
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(pc8001_state::pc8001_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	m_crtc->set_screen(SCREEN_TAG);
 
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -582,11 +578,11 @@ MACHINE_CONFIG_END
 ROM_START( pc8001 )
 	ROM_REGION( 0x6000, Z80_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "v101", "N-BASIC v1.01" )
-	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(1) )
+	ROMX_LOAD( "n80v101.rom", 0x00000, 0x6000, CRC(a2cc9f22) SHA1(6d2d838de7fea20ddf6601660d0525d5b17bf8a3), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v102", "N-BASIC v1.02" )
-	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(2) )
+	ROMX_LOAD( "n80v102.rom", 0x00000, 0x6000, CRC(ed01ca3f) SHA1(b34a98941499d5baf79e7c0e5578b81dbede4a58), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v110", "N-BASIC v1.10" )
-	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(3) )
+	ROMX_LOAD( "n80v110.rom", 0x00000, 0x6000, CRC(1e02d93f) SHA1(4603cdb7a3833e7feb257b29d8052c872369e713), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, UPD3301_TAG, 0)
 	ROM_LOAD( "font.rom", 0x000, 0x800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )

@@ -40,11 +40,10 @@ void pp01_state::pp01_io(address_map &map)
 {
 	map(0xc0, 0xc3).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
 	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // user
-	map(0xc8, 0xc8).mirror(2).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc9, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xcc, 0xcf).w(this, FUNC(pp01_state::pp01_video_write_mode_w));
+	map(0xc8, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xcc, 0xcf).w(FUNC(pp01_state::pp01_video_write_mode_w));
 	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe0, 0xef).mirror(0x10).rw(this, FUNC(pp01_state::pp01_mem_block_r), FUNC(pp01_state::pp01_mem_block_w));
+	map(0xe0, 0xef).mirror(0x10).rw(FUNC(pp01_state::pp01_mem_block_r), FUNC(pp01_state::pp01_mem_block_w));
 }
 
 /* Input ports */
@@ -215,8 +214,7 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 	MCFG_SCREEN_UPDATE_DRIVER(pp01_state, screen_update_pp01)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(pp01_state, pp01)
+	PALETTE(config, "palette", FUNC(pp01_state::pp01_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -227,26 +225,24 @@ MACHINE_CONFIG_START(pp01_state::pp01)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 	// when rts and dtr are both high, the uart is being used for cassette operations
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pp01_state,pp01_pit_out0))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pp01_state,pp01_pit_out1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk0))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(0);
+	m_pit->out_handler<0>().set(FUNC(pp01_state::pp01_pit_out0));
+	m_pit->set_clk<1>(2000000);
+	m_pit->out_handler<1>().set(FUNC(pp01_state::pp01_pit_out1));
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set(m_pit, FUNC(pit8253_device::write_clk0));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pp01_state, pp01_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pp01_state, pp01_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pp01_state, pp01_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pp01_state, pp01_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pp01_state, pp01_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pp01_state, pp01_8255_portc_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_r));
+	ppi.out_pa_callback().set(FUNC(pp01_state::pp01_8255_porta_w));
+	ppi.in_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_r));
+	ppi.out_pb_callback().set(FUNC(pp01_state::pp01_8255_portb_w));
+	ppi.in_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_r));
+	ppi.out_pc_callback().set(FUNC(pp01_state::pp01_8255_portc_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
 MACHINE_CONFIG_END
 
 /* ROM definition */

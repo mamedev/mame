@@ -434,14 +434,14 @@ void cubeqst_state::m68k_program_map(address_map &map)
 {
 	map.global_mask(0x03ffff);
 	map(0x000000, 0x01ffff).rom();
-	map(0x020000, 0x027fff).rw(this, FUNC(cubeqst_state::read_rotram), FUNC(cubeqst_state::write_rotram));
-	map(0x028000, 0x028fff).rw(this, FUNC(cubeqst_state::read_sndram), FUNC(cubeqst_state::write_sndram));
-	map(0x038000, 0x038001).rw(this, FUNC(cubeqst_state::io_r), FUNC(cubeqst_state::io_w));
-	map(0x038002, 0x038003).rw(this, FUNC(cubeqst_state::chop_r), FUNC(cubeqst_state::ldaud_w));
-	map(0x038008, 0x038009).rw(this, FUNC(cubeqst_state::line_r), FUNC(cubeqst_state::reset_w));
-	map(0x03800e, 0x03800f).rw(this, FUNC(cubeqst_state::laserdisc_r), FUNC(cubeqst_state::laserdisc_w));
-	map(0x03c800, 0x03c9ff).ram().w(this, FUNC(cubeqst_state::palette_w)).share("paletteram");
-	map(0x03cc00, 0x03cc01).w(this, FUNC(cubeqst_state::control_w));
+	map(0x020000, 0x027fff).rw(FUNC(cubeqst_state::read_rotram), FUNC(cubeqst_state::write_rotram));
+	map(0x028000, 0x028fff).rw(FUNC(cubeqst_state::read_sndram), FUNC(cubeqst_state::write_sndram));
+	map(0x038000, 0x038001).rw(FUNC(cubeqst_state::io_r), FUNC(cubeqst_state::io_w));
+	map(0x038002, 0x038003).rw(FUNC(cubeqst_state::chop_r), FUNC(cubeqst_state::ldaud_w));
+	map(0x038008, 0x038009).rw(FUNC(cubeqst_state::line_r), FUNC(cubeqst_state::reset_w));
+	map(0x03800e, 0x03800f).rw(FUNC(cubeqst_state::laserdisc_r), FUNC(cubeqst_state::laserdisc_w));
+	map(0x03c800, 0x03c9ff).ram().w(FUNC(cubeqst_state::palette_w)).share("paletteram");
+	map(0x03cc00, 0x03cc01).w(FUNC(cubeqst_state::control_w));
 	map(0x03e000, 0x03efff).ram().share("nvram");
 	map(0x03f000, 0x03ffff).ram();
 }
@@ -524,76 +524,74 @@ WRITE16_MEMBER( cubeqst_state::sound_dac_w )
  *
  *************************************/
 
-MACHINE_CONFIG_START(cubeqst_state::cubeqst)
-	MCFG_DEVICE_ADD("main_cpu", M68000, XTAL(16'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(m68k_program_map)
+void cubeqst_state::cubeqst(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(16'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cubeqst_state::m68k_program_map);
 
-	MCFG_DEVICE_ADD("rotate_cpu", CQUESTROT, XTAL(10'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(rotate_map)
-	MCFG_CQUESTROT_CONFIG( WRITE16( "line_cpu", cquestlin_cpu_device, linedata_w ) )
+	CQUESTROT(config, m_rotatecpu, XTAL(10'000'000) / 2);
+	m_rotatecpu->set_addrmap(AS_PROGRAM, &cubeqst_state::rotate_map);
+	m_rotatecpu->linedata_w().set(m_linecpu, FUNC(cquestlin_cpu_device::linedata_w));
 
-	MCFG_DEVICE_ADD("line_cpu", CQUESTLIN, XTAL(10'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(line_sound_map)
-	MCFG_CQUESTLIN_CONFIG( READ16( "rotate_cpu", cquestrot_cpu_device, linedata_r ) )
+	CQUESTLIN(config, m_linecpu, XTAL(10'000'000) / 2);
+	m_linecpu->set_addrmap(AS_PROGRAM, &cubeqst_state::line_sound_map);
+	m_linecpu->linedata_r().set(m_rotatecpu, FUNC(cquestrot_cpu_device::linedata_r));
 
-	MCFG_DEVICE_ADD("sound_cpu", CQUESTSND, XTAL(10'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(line_sound_map)
-	MCFG_CQUESTSND_CONFIG( WRITE16( *this, cubeqst_state, sound_dac_w ), "soundproms" )
+	CQUESTSND(config, m_soundcpu, XTAL(10'000'000) / 2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &cubeqst_state::line_sound_map);
+	m_soundcpu->dac_w().set(FUNC(cubeqst_state::sound_dac_w));
+	m_soundcpu->set_sound_region("soundproms");
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(48000))
+	config.m_minimum_quantum = attotime::from_hz(48000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_LASERDISC_SIMUTREK_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DRIVER(CUBEQST_HBLANK, CUBEQST_VCOUNT, cubeqst_state, screen_update_cubeqst)
-	MCFG_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
-	MCFG_LASERDISC_OVERLAY_POSITION(0.002f, -0.018f)
-	MCFG_LASERDISC_OVERLAY_SCALE(1.0f, 1.030f)
+	SIMUTREK_SPECIAL(config, m_laserdisc, 0);
+	m_laserdisc->set_overlay(CUBEQST_HBLANK, CUBEQST_VCOUNT, FUNC(cubeqst_state::screen_update_cubeqst));
+	m_laserdisc->set_overlay_clip(0, 320-1, 0, 256-8);
+	m_laserdisc->set_overlay_position(0.002f, -0.018f);
+	m_laserdisc->set_overlay_scale(1.0f, 1.030f);
+	m_laserdisc->set_screen(m_screen);
 
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cubeqst_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
+	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
+	m_screen->screen_vblank().set(FUNC(cubeqst_state::vblank_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("rdac0", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c22 (34) + tl074cn.1b (53) + r10k.rn1 (30)
-	MCFG_DEVICE_ADD("ldac0", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c13 (34) + tl074cn.3b (53) + r10k.rn3 (30)
-	MCFG_DEVICE_ADD("rdac1", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c21 (34) + tl074cn.1c (53) + r10k.rn2 (30)
-	MCFG_DEVICE_ADD("ldac1", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c12 (34) + tl074cn.3c (53) + r10k.rn4 (30)
-	MCFG_DEVICE_ADD("rdac2", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c20 (34) + tl074cn.1c (53) + r10k.rn2 (30)
-	MCFG_DEVICE_ADD("ldac2", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c11 (34) + tl074cn.3c (53) + r10k.rn4 (30)
-	MCFG_DEVICE_ADD("rdac3", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c19 (34) + tl074cn.1b (53) + r10k.rn1 (30)
-	MCFG_DEVICE_ADD("ldac3", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c10 (34) + tl074cn.3b (53) + r10k.rn3 (30)
-	MCFG_DEVICE_ADD("rdac4", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c18 (34) + tl074cn.1c (53) + r10k.rn2 (30)
-	MCFG_DEVICE_ADD("ldac4", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c9  (34) + tl074cn.3c (53) + r10k.rn4 (30)
-	MCFG_DEVICE_ADD("rdac5", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c17 (34) + tl074cn.1b (53) + r10k.rn1 (30)
-	MCFG_DEVICE_ADD("ldac5", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c8  (34) + tl074cn.3b (53) + r10k.rn3 (30)
-	MCFG_DEVICE_ADD("rdac6", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c16 (34) + tl074cn.1c (53) + r10k.rn2 (30)
-	MCFG_DEVICE_ADD("ldac6", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c7  (34) + tl074cn.3c (53) + r10k.rn4 (30)
-	MCFG_DEVICE_ADD("rdac7", AD7521, 0) MCFG_SOUND_ROUTE(0, "rspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c15 (34) + tl074cn.1b (53) + r10k.rn1 (30)
-	MCFG_DEVICE_ADD("ldac7", AD7521, 0) MCFG_SOUND_ROUTE(0, "lspeaker", 0.125) // ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c6  (34) + tl074cn.3b (53) + r10k.rn3 (30)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "rdac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac7", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac7", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	for (int i = 0; i < 8; i++)
+	{
+		// ad7521jn.2d (59) + cd4051be.1d (24) + 1500pf.c22 (34) + tl074cn.1b (53) + r10k.rn1 (30)
+		AD7521(config, m_dacs[i*2+0], 0).add_route(0, "rspeaker", 0.125);
+
+		// ad7521jn.2d (59) + cd4051be.3d (24) + 1500pf.c13 (34) + tl074cn.3b (53) + r10k.rn3 (30)
+		AD7521(config, m_dacs[i*2+1], 0).add_route(0, "lspeaker", 0.125);
+	}
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "rdac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac0", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac0", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac0", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac3", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac3", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac3", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac4", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac4", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac4", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac5", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac5", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac5", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac6", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac6", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac6", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac7", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac7", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac7", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /*************************************

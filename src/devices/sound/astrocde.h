@@ -36,51 +36,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ASTROCADE_IO_SI_READ_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_si_callback(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_SO0_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_SO1_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_SO2_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_SO3_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<3>(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_SO4_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<4>(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_SO5_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<5>(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_SO6_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<6>(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_SO7_STROBE_CB(_devcb) \
-	devcb = &downcast<astrocade_io_device &>(*device).set_so_callback<7>(DEVCB_##_devcb);
-
-#define MCFG_ASTROCADE_IO_POT0(_tag) \
-	downcast<astrocade_io_device &>(*device).set_pot_tag<0>(_tag);
-
-#define MCFG_ASTROCADE_IO_POT1(_tag) \
-	downcast<astrocade_io_device &>(*device).set_pot_tag<1>(_tag);
-
-#define MCFG_ASTROCADE_IO_POT2(_tag) \
-	downcast<astrocade_io_device &>(*device).set_pot_tag<2>(_tag);
-
-#define MCFG_ASTROCADE_IO_POT3(_tag) \
-	downcast<astrocade_io_device &>(*device).set_pot_tag<3>(_tag);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -92,9 +47,9 @@ public:
 	astrocade_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration access
-	template<class Object> devcb_base &set_si_callback(Object &&cb) { return m_si_callback.set_callback(std::forward<Object>(cb)); }
-	template<int N, class Object> devcb_base &set_so_callback(Object &&cb) { return m_so_callback[N].set_callback(std::forward<Object>(cb)); }
-	template<int N> void set_pot_tag(const char *tag) { m_pots[N].set_tag(tag); }
+	auto si_cb() { return m_si_callback.bind(); }
+	template <std::size_t Bit> auto so_cb() { return m_so_callback[Bit].bind(); }
+	template <std::size_t Pot> void set_pot_tag(const char *tag) { m_pots[Pot].set_tag(tag); }
 
 protected:
 	// device-level overrides

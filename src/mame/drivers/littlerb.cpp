@@ -117,6 +117,13 @@ public:
 	{
 	}
 
+	void littlerb(machine_config &config);
+
+	void init_littlerb();
+
+	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<inder_vid_device> m_indervid;
 
@@ -126,7 +133,6 @@ public:
 	uint16_t m_sound_pointer_l,m_sound_pointer_r;
 	int m_soundframe;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
 	DECLARE_WRITE16_MEMBER(littlerb_l_sound_w);
 	DECLARE_WRITE16_MEMBER(littlerb_r_sound_w);
 	uint8_t sound_data_shift();
@@ -134,8 +140,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
 
-	void init_littlerb();
-	void littlerb(machine_config &config);
 	void littlerb_main(address_map &map);
 };
 
@@ -172,8 +176,8 @@ void littlerb_state::littlerb_main(address_map &map)
 
 	map(0x700000, 0x700007).rw("inder_vid:tms", FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 
-	map(0x740000, 0x740001).w(this, FUNC(littlerb_state::littlerb_l_sound_w));
-	map(0x760000, 0x760001).w(this, FUNC(littlerb_state::littlerb_r_sound_w));
+	map(0x740000, 0x740001).w(FUNC(littlerb_state::littlerb_l_sound_w));
+	map(0x760000, 0x760001).w(FUNC(littlerb_state::littlerb_r_sound_w));
 	map(0x780000, 0x780001).nopw(); // generic outputs
 	map(0x7c0000, 0x7c0001).portr("DSW");
 	map(0x7e0000, 0x7e0001).portr("P1");
@@ -287,7 +291,7 @@ MACHINE_CONFIG_START(littlerb_state::littlerb)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // 10MHz rated part, near 16Mhz XTAL
 	MCFG_DEVICE_PROGRAM_MAP(littlerb_main)
 
-	MCFG_INDER_VIDEO_ADD("inder_vid") // XTAL(40'000'000)
+	INDER_VIDEO(config, m_indervid, 0); // XTAL(40'000'000)
 
 	// TODO: not accurate - driven by XTAL(6'000'000)?
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150))

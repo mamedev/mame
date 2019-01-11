@@ -15,25 +15,16 @@
 
 #include "imagedev/bitbngr.h"
 
-#define MCFG_9845PRT_IRL_HANDLER(_devcb)                                \
-	devcb = &downcast<hp9845_printer_device &>(*device).set_irl_handler(DEVCB_##_devcb);
-
-#define MCFG_9845PRT_FLG_HANDLER(_devcb)                                \
-	devcb = &downcast<hp9845_printer_device &>(*device).set_flg_handler(DEVCB_##_devcb);
-
-#define MCFG_9845PRT_STS_HANDLER(_devcb)                                \
-	devcb = &downcast<hp9845_printer_device &>(*device).set_sts_handler(DEVCB_##_devcb);
-
 class hp9845_printer_device : public device_t
 {
 public:
 	// construction/destruction
 	hp9845_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// configuration helpers
-	template <class Object> devcb_base &set_irl_handler(Object &&cb) { return m_irl_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_flg_handler(Object &&cb) { return m_flg_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sts_handler(Object &&cb) { return m_sts_handler.set_callback(std::forward<Object>(cb)); }
+	// callbacks
+	auto irq() { return m_irl_handler.bind(); }
+	auto flg() { return m_flg_handler.bind(); }
+	auto sts() { return m_sts_handler.bind(); }
 
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

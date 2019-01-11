@@ -47,6 +47,11 @@ Notes:
   during soundlatch operations, resulting in double or missing sound
   effects.
 
+  Trojan (Romstar) Manual has some bonus live values as well as locations
+  which do no jive with actual emulation.  One can only assume this means
+  the manual is incorrect and software was adjusted later but the game could
+  use some PCB comparisons of DIP selections to be certain.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -280,7 +285,7 @@ READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
 WRITE8_MEMBER(lwings_state::msm5205_w)
 {
 	m_msm->reset_w(BIT(data, 7));
-	m_msm->data_w(data);
+	m_msm->write_data(data);
 	m_msm->vclk_w(1);
 	m_msm->vclk_w(0);
 }
@@ -292,22 +297,22 @@ void lwings_state::avengers_map(address_map &map)
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdf7f).ram().share("spriteram");
 	map(0xdf80, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xf800, 0xf801).w(this, FUNC(lwings_state::lwings_bg1_scrollx_w));
-	map(0xf802, 0xf803).w(this, FUNC(lwings_state::lwings_bg1_scrolly_w));
-	map(0xf804, 0xf804).w(this, FUNC(lwings_state::trojan_bg2_scrollx_w));
-	map(0xf805, 0xf805).w(this, FUNC(lwings_state::trojan_bg2_image_w));
+	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
+	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
 
 	map(0xf808, 0xf808).portr("SERVICE").nopw(); /* ? */
-	map(0xf809, 0xf809).portr("P1").w(this, FUNC(lwings_state::avengers_protection_w));
+	map(0xf809, 0xf809).portr("P1").w(FUNC(lwings_state::avengers_protection_w));
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWB");
-	map(0xf80c, 0xf80c).portr("DSWA").w(this, FUNC(lwings_state::avengers_prot_bank_w));
-	map(0xf80d, 0xf80d).rw(this, FUNC(lwings_state::avengers_protection_r), FUNC(lwings_state::avengers_adpcm_w));
-	map(0xf80e, 0xf80e).w(this, FUNC(lwings_state::lwings_bankswitch_w));
+	map(0xf80c, 0xf80c).portr("DSWA").w(FUNC(lwings_state::avengers_prot_bank_w));
+	map(0xf80d, 0xf80d).rw(FUNC(lwings_state::avengers_protection_r), FUNC(lwings_state::avengers_adpcm_w));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 void lwings_state::lwings_map(address_map &map)
@@ -316,20 +321,20 @@ void lwings_state::lwings_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf808, 0xf808).portr("SERVICE");
 	map(0xf809, 0xf809).portr("P1");
-	map(0xf808, 0xf809).w(this, FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf808, 0xf809).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWA");
-	map(0xf80a, 0xf80b).w(this, FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf80a, 0xf80b).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf80c, 0xf80c).portr("DSWB").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf80d, 0xf80d).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xf80e, 0xf80e).w(this, FUNC(lwings_state::lwings_bankswitch_w));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 void lwings_state::trojan_map(address_map &map)
@@ -339,22 +344,22 @@ void lwings_state::trojan_map(address_map &map)
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdf7f).ram().share("spriteram");
 	map(0xdf80, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	map(0xf800, 0xf801).w(this, FUNC(lwings_state::lwings_bg1_scrollx_w));
-	map(0xf802, 0xf803).w(this, FUNC(lwings_state::lwings_bg1_scrolly_w));
-	map(0xf804, 0xf804).w(this, FUNC(lwings_state::trojan_bg2_scrollx_w));
-	map(0xf805, 0xf805).w(this, FUNC(lwings_state::trojan_bg2_image_w));
+	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
+	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
 	map(0xf808, 0xf808).portr("SERVICE").nopw(); //watchdog
 	map(0xf809, 0xf809).portr("P1");
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWA");
 	map(0xf80c, 0xf80c).portr("DSWB").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf80d, 0xf80d).w("soundlatch2", FUNC(generic_latch_8_device::write));
-	map(0xf80e, 0xf80e).w(this, FUNC(lwings_state::lwings_bankswitch_w));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 void lwings_state::lwings_sound_map(address_map &map)
@@ -364,7 +369,7 @@ void lwings_state::lwings_sound_map(address_map &map)
 	map(0xc800, 0xc800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe001).w("2203a", FUNC(ym2203_device::write));
 	map(0xe002, 0xe003).w("2203b", FUNC(ym2203_device::write));
-	map(0xe006, 0xe006).r(this, FUNC(lwings_state::avengers_soundlatch2_r)); //AT: (avengers061gre)
+	map(0xe006, 0xe006).r(FUNC(lwings_state::avengers_soundlatch2_r)); //AT: (avengers061gre)
 	map(0xe006, 0xe006).writeonly().share("soundlatch_2");
 }
 
@@ -376,22 +381,22 @@ void lwings_state::fball_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe7ff).ram().w(this, FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
-	map(0xe800, 0xefff).ram().w(this, FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
+	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
 	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf808, 0xf808).portr("SERVICE");
 	map(0xf809, 0xf809).portr("P1");
-	map(0xf808, 0xf809).w(this, FUNC(lwings_state::lwings_bg1_scrollx_w));
+	map(0xf808, 0xf809).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWA");
-	map(0xf80a, 0xf80b).w(this, FUNC(lwings_state::lwings_bg1_scrolly_w));
+	map(0xf80a, 0xf80b).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf80c, 0xf80c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf80d, 0xf80d).portr("P3").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xf80e, 0xf80e).portr("P4");
 
-	map(0xf80e, 0xf80e).w(this, FUNC(lwings_state::lwings_bankswitch_w));
+	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 
@@ -416,7 +421,7 @@ void lwings_state::fball_sound_map(address_map &map)
 
 	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	map(0xA000, 0xA000).w(this, FUNC(lwings_state::fball_oki_bank_w));
+	map(0xA000, 0xA000).w(FUNC(lwings_state::fball_oki_bank_w));
 
 	map(0xc000, 0xc7ff).ram();
 
@@ -432,15 +437,15 @@ void lwings_state::trojan_adpcm_map(address_map &map)
 void lwings_state::avengers_adpcm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(lwings_state::avengers_adpcm_r));
-	map(0x01, 0x01).w(this, FUNC(lwings_state::msm5205_w));
+	map(0x00, 0x00).r(FUNC(lwings_state::avengers_adpcm_r));
+	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
 }
 
 void lwings_state::trojan_adpcm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(this, FUNC(lwings_state::msm5205_w));
+	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
 }
 
 /*************************************
@@ -669,12 +674,12 @@ static INPUT_PORTS_START( trojanls )
 
 	/* DSW tags inverted to use lwings map */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:8,7")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x00, "Upright 1 Player" )
 	PORT_DIPSETTING(    0x02, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x03, DEF_STR( Cocktail ) )
 /* 0x01 same as 0x02 or 0x03 */
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:6,5,4")
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:3,4,5")
 	PORT_DIPSETTING(    0x10, "20000 60000" )
 	PORT_DIPSETTING(    0x0c, "20000 70000" )
 	PORT_DIPSETTING(    0x08, "20000 80000" )
@@ -683,30 +688,30 @@ static INPUT_PORTS_START( trojanls )
 	PORT_DIPSETTING(    0x14, "30000 80000" )
 	PORT_DIPSETTING(    0x04, "40000 80000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:2" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:8,7")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:6,5")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:4,3")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -715,7 +720,7 @@ static INPUT_PORTS_START( trojan )
 	PORT_INCLUDE( trojanls )
 
 	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0xe0, 0xe0, "Starting Level" ) PORT_DIPLOCATION("SWB:3,2,1")
+	PORT_DIPNAME( 0xe0, 0xe0, "Starting Level" ) PORT_DIPLOCATION("SWB:6,7,8")
 	PORT_DIPSETTING(    0xe0, "1" )
 	PORT_DIPSETTING(    0xc0, "2" )
 	PORT_DIPSETTING(    0xa0, "3" )
@@ -926,150 +931,140 @@ void lwings_state::machine_reset()
 	m_adpcm = 0;
 }
 
-MACHINE_CONFIG_START(lwings_state::lwings)
-
+void lwings_state::lwings(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(lwings_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lwings_state,  lwings_interrupt)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);		/* verified on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::lwings_interrupt));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/4) /* verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(lwings_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222) // approximation from pcb music recording - where is the frequency actually derived from??
+	Z80(config, m_soundcpu, XTAL(12'000'000)/4);	/* verified on PCB */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_sound_map);
+	m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
+	// above frequency is an approximation from PCB music recording - where is the frequency actually derived from?
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lwings)
-
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("2203a", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.10)
+	ym2203_device &ym2203a(YM2203(config, "2203a", XTAL(12'000'000)/8));	/* verified on PCB */
+	ym2203a.add_route(0, "mono", 0.20);
+	ym2203a.add_route(1, "mono", 0.20);
+	ym2203a.add_route(2, "mono", 0.20);
+	ym2203a.add_route(3, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("2203b", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
-	MCFG_SOUND_ROUTE(0, "mono", 0.20)
-	MCFG_SOUND_ROUTE(1, "mono", 0.20)
-	MCFG_SOUND_ROUTE(2, "mono", 0.20)
-	MCFG_SOUND_ROUTE(3, "mono", 0.10)
-MACHINE_CONFIG_END
+	ym2203_device &ym2203b(YM2203(config, "2203b", XTAL(12'000'000)/8));	/* verified on PCB */
+	ym2203b.add_route(0, "mono", 0.20);
+	ym2203b.add_route(1, "mono", 0.20);
+	ym2203b.add_route(2, "mono", 0.20);
+	ym2203b.add_route(3, "mono", 0.10);
+}
 
-
-
-MACHINE_CONFIG_START(lwings_state::fball)
-
+void lwings_state::fball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(fball_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::avengers_interrupt));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(12'000'000)/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(fball_sound_map)
-//  MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
+	Z80(config, m_soundcpu, XTAL(12'000'000)/4); // ?
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_sound_map);
+//  m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // the 16-pixel black border on left edge is correct, test mode actually uses that area
-	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_lwings)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // the 16-pixel black border on left edge is correct, test mode actually uses that area
+	screen.set_screen_update(FUNC(lwings_state::screen_update_lwings));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lwings)
-
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, fball_oki_map)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH));	// clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.set_addrmap(0, &lwings_state::fball_oki_map);
+}
 
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(lwings_state::trojan)
+void lwings_state::trojan(machine_config &config)
+{
 	lwings(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(trojan_map)
+	m_maincpu->set_clock(XTAL(12'000'000)/4);	/* verified on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::trojan_map);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
+	m_soundcpu->set_clock(XTAL(12'000'000)/4);	/* verified on PCB */
 
-	MCFG_DEVICE_ADD("adpcm", Z80, XTAL(12'000'000)/4)    /* verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(trojan_adpcm_map)
-	MCFG_DEVICE_IO_MAP(trojan_adpcm_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold,  4000)
+	z80_device &adpcm(Z80(config, "adpcm", XTAL(12'000'000)/4));	/* verified on PCB */
+	adpcm.set_addrmap(AS_PROGRAM, &lwings_state::trojan_adpcm_map);
+	adpcm.set_addrmap(AS_IO, &lwings_state::trojan_adpcm_io_map);
+	adpcm.set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(4000));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_trojan)
+	m_gfxdecode->set_info(gfx_trojan);
 
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,trojan)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(lwings_state, screen_update_trojan)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(lwings_state::screen_update_trojan));
 
 	/* sound hardware */
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MSM5205(config, m_msm, XTAL(384'000));					/* verified on PCB */
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);	/* slave mode */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-	MCFG_DEVICE_ADD("5205", MSM5205, XTAL(384'000))    /* verified on PCB */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* slave mode */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(lwings_state::avengers)
+void lwings_state::avengers(machine_config &config)
+{
 	trojan(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(avengers_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt) // RST 38h triggered by software
+	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
 
-	MCFG_DEVICE_MODIFY("adpcm")
-	MCFG_DEVICE_IO_MAP(avengers_adpcm_io_map)
+	subdevice<cpu_device>("adpcm")->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(lwings_state::avengersb)
+void lwings_state::avengersb(machine_config &config)
+{
 	avengers(config);
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengersb)
-MACHINE_CONFIG_END
+}
 
 
 /*************************************
@@ -1791,10 +1786,10 @@ GAME( 1986, lwingsja,  lwings,   lwings,    lwings,   lwings_state, empty_init, 
 GAME( 1986, lwingsb,   lwings,   lwings,    lwingsb,  lwings_state, empty_init,     ROT90, "bootleg",          "Legendary Wings (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, trojan,    0,        trojan,    trojanls, lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojana,   trojan,   trojan,    trojanls, lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojana,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom",           "Trojan (US set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, trojanr,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, trojanj,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "Capcom",           "Tatakai no Banka (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, trojanb,   trojan,   trojan,    trojanls, lwings_state, empty_init,     ROT0,  "bootleg",          "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, trojanb,   trojan,   trojan,    trojan,   lwings_state, empty_init,     ROT0,  "bootleg",          "Trojan (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, avengers,  0,        avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, avengers2, avengers, avengers,  avengers, lwings_state, empty_init,     ROT90, "Capcom",           "Avengers (US set 2)", MACHINE_SUPPORTS_SAVE )

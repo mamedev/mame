@@ -22,6 +22,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "machine/ldv1000.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,9 +40,13 @@ public:
 	{
 	}
 
+	void konblands(machine_config &config);
+	void konblandsh(machine_config &config);
+
+private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(konblands);
+	void konblands_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(ldp_r);
 	DECLARE_WRITE8_MEMBER(ldp_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
@@ -51,18 +56,15 @@ public:
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
 
-	void konblands(machine_config &config);
-	void konblandsh(machine_config &config);
 	void konblands_map(address_map &map);
 	void konblandsh_map(address_map &map);
-protected:
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -72,26 +74,25 @@ private:
 	bool m_nmi_enable, m_irq_enable, m_firq_enable;
 };
 
-PALETTE_INIT_MEMBER(konblands_state, konblands)
+void konblands_state::konblands_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
-
-	for (i = 0; i < 0x20; ++i)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 0x20; ++i)
 	{
+		int bit0, bit1, bit2;
+
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -150,16 +151,16 @@ WRITE8_MEMBER(konblands_state::firq_enable_w)
 void konblands_state::konblands_map(address_map &map)
 {
 	map(0x0000, 0x0000).portr("DSW1").nopw(); // sn latch
-	map(0x0800, 0x0800).portr("DSW2").w(this, FUNC(konblands_state::ldp_w));
-	map(0x1000, 0x1000).nopw().r(this, FUNC(konblands_state::ldp_r)); // led
+	map(0x0800, 0x0800).portr("DSW2").w(FUNC(konblands_state::ldp_w));
+	map(0x1000, 0x1000).nopw().r(FUNC(konblands_state::ldp_r)); // led
 	map(0x1001, 0x1001).nopw(); // coin counter 2
 	map(0x1002, 0x1002).nopw(); // coin counter 1
 	map(0x1003, 0x1003).nopw(); // enable overlay transparency
-	map(0x1004, 0x1004).w(this, FUNC(konblands_state::nmi_enable_w));
+	map(0x1004, 0x1004).w(FUNC(konblands_state::nmi_enable_w));
 	map(0x1005, 0x1005).nopw(); // enable audio
-	map(0x1006, 0x1006).w(this, FUNC(konblands_state::irq_enable_w));
-	map(0x1007, 0x1007).w(this, FUNC(konblands_state::firq_enable_w));
-	map(0x1800, 0x1800).portr("INPUTS").w("sn", FUNC(sn76496_device::write));
+	map(0x1006, 0x1006).w(FUNC(konblands_state::irq_enable_w));
+	map(0x1007, 0x1007).w(FUNC(konblands_state::firq_enable_w));
+	map(0x1800, 0x1800).portr("INPUTS").w("sn", FUNC(sn76496_device::command_w));
 	map(0x4000, 0x47ff).ram().share("vram");
 	map(0x4800, 0x4bff).ram();
 	map(0x5800, 0x5800).nopw(); // watchdog
@@ -169,15 +170,15 @@ void konblands_state::konblands_map(address_map &map)
 
 void konblands_state::konblandsh_map(address_map &map)
 {
-	map(0x0000, 0x0000).r(this, FUNC(konblands_state::ldp_r));
-	map(0x0400, 0x0400).w(this, FUNC(konblands_state::ldp_w));
+	map(0x0000, 0x0000).r(FUNC(konblands_state::ldp_r));
+	map(0x0400, 0x0400).w(FUNC(konblands_state::ldp_w));
 	map(0x0802, 0x0802).nopw(); // led
 	map(0x0803, 0x0803).nopw(); // enable overlay transparency
-	map(0x0806, 0x0806).nopr().w(this, FUNC(konblands_state::irq_enable_w));
-	map(0x0807, 0x0807).nopr().w(this, FUNC(konblands_state::firq_enable_w));
+	map(0x0806, 0x0806).nopr().w(FUNC(konblands_state::irq_enable_w));
+	map(0x0807, 0x0807).nopr().w(FUNC(konblands_state::firq_enable_w));
 	map(0x0c00, 0x0c00).portr("INPUTS");
 	map(0x1000, 0x1000).portr("DSW1");
-	map(0x1400, 0x1400).w("sn", FUNC(sn76496_device::write));
+	map(0x1400, 0x1400).w("sn", FUNC(sn76496_device::command_w));
 	map(0x1800, 0x1800).nopw(); // sn latch
 	map(0x2000, 0x27ff).ram().share("vram");
 	map(0x2800, 0x2fff).ram();
@@ -293,10 +294,9 @@ MACHINE_CONFIG_START(konblands_state::konblands)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_konblands)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_konblands);
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(konblands_state, konblands)
+	PALETTE(config, "palette", FUNC(konblands_state::konblands_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

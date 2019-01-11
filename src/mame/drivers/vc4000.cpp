@@ -189,8 +189,8 @@ void vc4000_state::vc4000_mem(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x1fff);
 	map(0x0000, 0x07ff).rom();
-	map(0x1680, 0x16ff).rw(this, FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl)).mirror(0x0800);
-	map(0x1700, 0x17ff).rw(this, FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w)).mirror(0x0800);
+	map(0x1680, 0x16ff).rw(FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl)).mirror(0x0800);
+	map(0x1700, 0x17ff).rw(FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w)).mirror(0x0800);
 }
 
 void vc4000_state::elektor_mem(address_map &map)
@@ -199,9 +199,9 @@ void vc4000_state::elektor_mem(address_map &map)
 	map.global_mask(0x1fff);
 	map(0x0000, 0x07ff).rom();
 	map(0x0800, 0x15ff).ram();
-	map(0x1980, 0x19ff).mirror(0x400).rw(this, FUNC(vc4000_state::elektor_cass_r), FUNC(vc4000_state::elektor_cass_w));
-	map(0x1680, 0x168f).mirror(0x800).rw(this, FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl));
-	map(0x1700, 0x17ff).mirror(0x800).rw(this, FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w));
+	map(0x1980, 0x19ff).mirror(0x400).rw(FUNC(vc4000_state::elektor_cass_r), FUNC(vc4000_state::elektor_cass_w));
+	map(0x1680, 0x168f).mirror(0x800).rw(FUNC(vc4000_state::vc4000_key_r), FUNC(vc4000_state::vc4000_sound_ctl));
+	map(0x1700, 0x17ff).mirror(0x800).rw(FUNC(vc4000_state::vc4000_video_r), FUNC(vc4000_state::vc4000_video_w));
 }
 
 static INPUT_PORTS_START( vc4000 )
@@ -340,7 +340,7 @@ PORT_BIT(0xff,0x70,IPT_AD_STICK_Y) PORT_SENSITIVITY(70) PORT_KEYDELTA(5) PORT_CE
 #endif
 INPUT_PORTS_END
 
-static const rgb_t vc4000_palette[] =
+static constexpr rgb_t vc4000_pens[] =
 {
 	// background colors
 	rgb_t(0, 0, 0), // black
@@ -356,9 +356,9 @@ static const rgb_t vc4000_palette[] =
 	We can do that in the code with ^7 */
 };
 
-PALETTE_INIT_MEMBER(vc4000_state, vc4000)
+void vc4000_state::vc4000_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, vc4000_palette, ARRAY_LENGTH(vc4000_palette));
+	palette.set_pen_colors(0, vc4000_pens);
 }
 
 
@@ -526,80 +526,78 @@ static void vc4000_cart(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(vc4000_state::vc4000)
+void vc4000_state::vc4000(machine_config &config)
+{
 	/* basic machine hardware */
 //  MCFG_DEVICE_ADD("maincpu", S2650, 865000)        /* 3550000/4, 3580000/3, 4430000/3 */
-	MCFG_DEVICE_ADD("maincpu", S2650, 3546875/4)
-	MCFG_DEVICE_PROGRAM_MAP(vc4000_mem)
-	MCFG_S2650_SENSE_INPUT(READLINE(*this, vc4000_state, vc4000_vsync_r))
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(vc4000_state, vc4000_video_line,  312*53)  // GOLF needs this exact value
+	S2650(config, m_maincpu, 3546875/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::vc4000_mem);
+	m_maincpu->sense_handler().set(FUNC(vc4000_state::vc4000_vsync_r));
+	m_maincpu->set_periodic_int(FUNC(vc4000_state::vc4000_video_line), attotime::from_hz(312*53));  // GOLF needs this exact value
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(226, 312)
-	MCFG_SCREEN_VISIBLE_AREA(8, 184, 0, 269)
-	MCFG_SCREEN_UPDATE_DRIVER(vc4000_state, screen_update_vc4000)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_size(226, 312);
+	m_screen->set_visarea(8, 184, 0, 269);
+	m_screen->set_screen_update(FUNC(vc4000_state::screen_update_vc4000));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(vc4000_state, vc4000)
+	PALETTE(config, "palette", FUNC(vc4000_state::vc4000_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("custom", VC4000_SND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	VC4000_SND(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", vc4000_state, vc4000, "pgm,tvc", 0)
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(vc4000_state, vc4000), this), "pgm,tvc", 0);
 
 	/* cartridge */
-	MCFG_VC4000_CARTRIDGE_ADD("cartslot", vc4000_cart, nullptr)
+	VC4000_CART_SLOT(config, "cartslot", vc4000_cart, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "vc4000")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("vc4000");
+}
 
-MACHINE_CONFIG_START(vc4000_state::cx3000tc)
+void vc4000_state::cx3000tc(machine_config &config)
+{
 	vc4000(config);
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "cx3000tc")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("cx3000tc");
+}
 
-MACHINE_CONFIG_START(vc4000_state::mpu1000)
+void vc4000_state::mpu1000(machine_config &config)
+{
 	vc4000(config);
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "mpu1000")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("mpu1000");
+}
 
-MACHINE_CONFIG_START(vc4000_state::database)
+void vc4000_state::database(machine_config &config)
+{
 	vc4000(config);
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "database")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("database");
+}
 
-MACHINE_CONFIG_START(vc4000_state::rwtrntcs)
+void vc4000_state::rwtrntcs(machine_config &config)
+{
 	vc4000(config);
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "rwtrntcs")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("rwtrntcs");
+}
 
-MACHINE_CONFIG_START(vc4000_state::h21)
+void vc4000_state::h21(machine_config &config)
+{
 	vc4000(config);
-	MCFG_DEVICE_REMOVE("cartslot")
-	MCFG_H21_CARTRIDGE_ADD("cartslot", vc4000_cart, nullptr)
+	H21_CART_SLOT(config.replace(), "cartslot", vc4000_cart, nullptr);
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("h21");
+}
 
-	MCFG_DEVICE_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "h21")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(vc4000_state::elektor)
+void vc4000_state::elektor(machine_config &config)
+{
 	vc4000(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(elektor_mem)
-	MCFG_CASSETTE_ADD( "cassette" )
+	m_maincpu->set_addrmap(AS_PROGRAM, &vc4000_state::elektor_mem);
+	CASSETTE(config, "cassette");
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( vc4000 )

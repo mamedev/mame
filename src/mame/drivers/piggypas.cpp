@@ -16,6 +16,7 @@ game details unknown
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "video/hd44780.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -111,9 +112,9 @@ WRITE8_MEMBER(piggypas_state::lcd_control_w)
 	if (BIT(data, 0))
 	{
 		if (BIT(data, 2))
-			m_lcd_latch = m_hd44780->read(space, BIT(data, 1));
+			m_lcd_latch = m_hd44780->read(BIT(data, 1));
 		else
-			m_hd44780->write(space, BIT(data, 1), m_lcd_latch);
+			m_hd44780->write(BIT(data, 1), m_lcd_latch);
 	}
 
 	// T0 (P3.4) = output shift clock (serial data present at P1.0)
@@ -200,57 +201,57 @@ HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
-MACHINE_CONFIG_START(piggypas_state::piggypas)
-
+void piggypas_state::piggypas(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(8'448'000)) // OKI M80C31F or M80C154S
-	MCFG_DEVICE_PROGRAM_MAP(piggypas_map)
-	MCFG_DEVICE_IO_MAP(piggypas_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, piggypas_state, led_strobe_w))
-	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("IN2"))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, piggypas_state, mcs51_tx_callback))
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
+	I80C31(config, m_maincpu, XTAL(8'448'000)); // OKI M80C31F or M80C154S
+	m_maincpu->set_addrmap(AS_PROGRAM, &piggypas_state::piggypas_map);
+	m_maincpu->set_addrmap(AS_IO, &piggypas_state::piggypas_io);
+	m_maincpu->port_out_cb<1>().set(FUNC(piggypas_state::led_strobe_w));
+	m_maincpu->port_in_cb<3>().set_ioport("IN2");
+	m_maincpu->serial_tx_cb().set(FUNC(piggypas_state::mcs51_tx_callback));
+//  m_maincpu->set_vblank_int("screen", FUNC(piggypas_state::irq0_line_hold));
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // DS1220AD
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220AD
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(16*6, 8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 16*6-1, 0, 8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(16*6, 8);
+	screen.set_visarea(0, 16*6-1, 0, 8-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_DEFAULT_LAYOUT(layout_piggypas)
+	PALETTE(config, "palette").set_entries(2);
+	config.set_default_layout(layout_piggypas);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(1, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(piggypas_state, piggypas_pixel_update)
+	hd44780_device &hd44780(HD44780(config, "hd44780"));
+	hd44780.set_lcd_size(1, 16);
+	hd44780.set_pixel_update_cb(FUNC(piggypas_state::piggypas_pixel_update), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(8'448'000) / 8, okim6295_device::PIN7_HIGH) // clock and pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(8'448'000) / 8, okim6295_device::PIN7_HIGH)); // clock and pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0) // OKI M82C55A-2
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, piggypas_state, ctrl_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))
+	i8255_device &ppi(I8255A(config, "ppi")); // OKI M82C55A-2
+	ppi.in_pa_callback().set_ioport("IN1");
+	ppi.out_pb_callback().set(FUNC(piggypas_state::ctrl_w));
+	ppi.in_pc_callback().set_ioport("IN0");
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+}
 
-MACHINE_CONFIG_START(piggypas_state::fidlstix)
+void piggypas_state::fidlstix(machine_config &config)
+{
 	piggypas(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(fidlstix_io)
-	MCFG_MCS51_SERIAL_TX_CB(NOOP)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, piggypas_state, lcd_latch_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, piggypas_state, lcd_latch_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, piggypas_state, lcd_control_w))
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &piggypas_state::fidlstix_io);
+	m_maincpu->serial_tx_cb().set_nop();
+	m_maincpu->port_in_cb<1>().set(FUNC(piggypas_state::lcd_latch_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(piggypas_state::lcd_latch_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(piggypas_state::lcd_control_w));
+}
 
 
 

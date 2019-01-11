@@ -289,6 +289,11 @@ public:
 	{
 	}
 
+	void rollext(machine_config &config);
+
+	void init_rollext();
+
+private:
 	required_device<tms32082_mp_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_palette_ram;
 	required_shared_ptr<uint32_t> m_texture_mask;
@@ -305,13 +310,11 @@ public:
 	std::unique_ptr<rollext_renderer> m_renderer;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	void init_rollext();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void preprocess_texture_data();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void rollext(machine_config &config);
 	void memmap(address_map &map);
 };
 
@@ -515,8 +518,8 @@ void rollext_state::memmap(address_map &map)
 	map(0x60000000, 0x600fffff).ram().share("disp_ram");
 	map(0x80000000, 0x8000ffff).ram().share("palette_ram");
 	map(0x90000000, 0x9007ffff).ram().share("texture_mask");
-	map(0xa0000000, 0xa00000ff).rw(this, FUNC(rollext_state::a0000000_r), FUNC(rollext_state::a0000000_w));
-	map(0xb0000000, 0xb0000007).r(this, FUNC(rollext_state::b0000000_r));
+	map(0xa0000000, 0xa00000ff).rw(FUNC(rollext_state::a0000000_r), FUNC(rollext_state::a0000000_w));
+	map(0xb0000000, 0xb0000007).r(FUNC(rollext_state::b0000000_r));
 	map(0xc0000000, 0xc03fffff).rom().region("rom1", 0);
 	map(0xff000000, 0xffffffff).ram().region("rom0", 0);
 }

@@ -184,8 +184,8 @@ WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
 void speedatk_state::speedatk_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8000).rw(this, FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
-	map(0x8001, 0x8001).rw(this, FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
+	map(0x8000, 0x8000).rw(FUNC(speedatk_state::key_matrix_r), FUNC(speedatk_state::key_matrix_w));
+	map(0x8001, 0x8001).rw(FUNC(speedatk_state::key_matrix_status_r), FUNC(speedatk_state::key_matrix_status_w));
 	map(0x8800, 0x8fff).ram();
 	map(0xa000, 0xa3ff).ram().share("videoram");
 	map(0xb000, 0xb3ff).ram().share("colorram");
@@ -195,7 +195,7 @@ void speedatk_state::speedatk_mem(address_map &map)
 void speedatk_state::speedatk_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
+	map(0x00, 0x01).w(FUNC(speedatk_state::m6845_w)); //h46505 address / data routing
 	map(0x24, 0x24).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
@@ -313,8 +313,7 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_DEVICE_IO_MAP(speedatk_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8); // timing is unknown
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -323,24 +322,23 @@ MACHINE_CONFIG_START(speedatk_state::speedatk)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(speedatk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", MASTER_CLOCK/16)   /* hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	H46505(config, m_crtc, MASTER_CLOCK/16);   /* hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedatk)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(speedatk_state, speedatk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_speedatk);
+	PALETTE(config, m_palette, FUNC(speedatk_state::speedatk_palette), 0x100, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, speedatk_state, output_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/4)); //divider is unknown
+	aysnd.port_b_read_callback().set_ioport("DSW");
+	aysnd.port_a_write_callback().set(FUNC(speedatk_state::output_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 ROM_START( speedatk )

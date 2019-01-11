@@ -6,10 +6,10 @@
 class input_buffer_device : public device_t
 {
 public:
-	input_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	input_buffer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t read() { return m_input_data; }
-	DECLARE_READ8_MEMBER(read) { return read(); }
+	DECLARE_READ8_MEMBER(bus_r) { return read(); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_bit0) { if (state) m_input_data |= 0x01; else m_input_data &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(write_bit1) { if (state) m_input_data |= 0x02; else m_input_data &= ~0x02; }

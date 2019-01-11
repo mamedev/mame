@@ -338,7 +338,7 @@ Notes:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/jaguar/jaguar.h"
 #include "imagedev/chd_cd.h"
 #include "imagedev/snapquik.h"
@@ -406,7 +406,7 @@ void cojag_devices(device_slot_interface &device)
  *  Machine init
  *
  *************************************/
- 
+
 void jaguar_state::machine_start()
 {
 	/* configure banks for gfx/sound ROMs */
@@ -446,7 +446,7 @@ void jaguar_state::machine_reset()
 			m_butch_cmd_size = 1;
 		}
 	}
-	
+
 	/* reset banks for gfx/sound ROMs */
 	if (m_romboard_region != nullptr)
 	{
@@ -702,12 +702,6 @@ READ32_MEMBER(jaguar_state::joystick_r)
 {
 	uint16_t joystick_result = 0xfffe;
 	uint16_t joybuts_result = 0xffef;
-	int i;
-	static const char *const keynames[2][8] =
-	{
-		{ "JOY0", "JOY1", "JOY2", "JOY3", "JOY4", "JOY5", "JOY6", "JOY7" },
-		{ "BUTTONS0", "BUTTONS1", "BUTTONS2", "BUTTONS3", "BUTTONS4", "BUTTONS5", "BUTTONS6", "BUTTONS7" }
-	};
 
 	/*
 	 *   16        12        8         4         0
@@ -723,12 +717,12 @@ READ32_MEMBER(jaguar_state::joystick_r)
 	 *   to the buttons.
 	 */
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if ((m_joystick_data & (0x10000 << i)) == 0)
 		{
-			joystick_result &= ioport(keynames[0][i])->read();
-			joybuts_result &= ioport(keynames[1][i])->read();
+			joystick_result &= m_joy[i]->read();
+			joybuts_result &= m_buttons[i]->read();
 		}
 	}
 
@@ -1128,22 +1122,22 @@ WRITE16_MEMBER(jaguar_state::gpu_ram_w16){ if (!(offset&1)) { gpu_ram_w(space, o
 void jaguar_state::jaguar_map(address_map &map)
 {
 	map.global_mask(0xffffff);
-	map(0x000000, 0x1fffff).mirror(0x200000).rw(this, FUNC(jaguar_state::shared_ram_r16), FUNC(jaguar_state::shared_ram_w16));
-	map(0x800000, 0xdfffff).rw(this, FUNC(jaguar_state::cart_base_r16), FUNC(jaguar_state::cart_base_w16));
-	map(0xe00000, 0xe1ffff).rw(this, FUNC(jaguar_state::rom_base_r16), FUNC(jaguar_state::rom_base_w16));
-	map(0xf00000, 0xf003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
-	map(0xf00400, 0xf005ff).mirror(0x000200).rw(this, FUNC(jaguar_state::gpu_clut_r16), FUNC(jaguar_state::gpu_clut_w16));
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(this, FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
-	map(0xf02200, 0xf022ff).mirror(0x008000).rw(this, FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
-	map(0xf03000, 0xf03fff).mirror(0x008000).rw(this, FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
-	map(0xf14000, 0xf14003).rw(this, FUNC(jaguar_state::joystick_r16), FUNC(jaguar_state::joystick_w16));
-	map(0xf14800, 0xf14803).rw(this, FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPI00
-	map(0xf15000, 0xf15003).r(this, FUNC(jaguar_state::eeprom_cs16));               // GPI01
-	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r16), FUNC(jaguar_state::dspctrl_w16));
-	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r16), FUNC(jaguar_state::serial_w16));
-	map(0xf1b000, 0xf1cfff).rw(this, FUNC(jaguar_state::dsp_ram_r16), FUNC(jaguar_state::dsp_ram_w16));
-	map(0xf1d000, 0xf1dfff).rw(this, FUNC(jaguar_state::wave_rom_r16), FUNC(jaguar_state::wave_rom_w16));
+	map(0x000000, 0x1fffff).mirror(0x200000).rw(FUNC(jaguar_state::shared_ram_r16), FUNC(jaguar_state::shared_ram_w16));
+	map(0x800000, 0xdfffff).rw(FUNC(jaguar_state::cart_base_r16), FUNC(jaguar_state::cart_base_w16));
+	map(0xe00000, 0xe1ffff).rw(FUNC(jaguar_state::rom_base_r16), FUNC(jaguar_state::rom_base_w16));
+	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
+	map(0xf00400, 0xf005ff).mirror(0x000200).rw(FUNC(jaguar_state::gpu_clut_r16), FUNC(jaguar_state::gpu_clut_w16));
+	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
+	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
+	map(0xf03000, 0xf03fff).mirror(0x008000).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
+	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r16), FUNC(jaguar_state::joystick_w16));
+	map(0xf14800, 0xf14803).rw(FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPI00
+	map(0xf15000, 0xf15003).r(FUNC(jaguar_state::eeprom_cs16));               // GPI01
+	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r16), FUNC(jaguar_state::dspctrl_w16));
+	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r16), FUNC(jaguar_state::serial_w16));
+	map(0xf1b000, 0xf1cfff).rw(FUNC(jaguar_state::dsp_ram_r16), FUNC(jaguar_state::dsp_ram_w16));
+	map(0xf1d000, 0xf1dfff).rw(FUNC(jaguar_state::wave_rom_r16), FUNC(jaguar_state::wave_rom_w16));
 }
 
 /*
@@ -1317,23 +1311,23 @@ WRITE32_MEMBER(jaguar_state::butch_regs_w)
 void jaguar_state::jaguarcd_map(address_map &map)
 {
 	map.global_mask(0xffffff);
-	map(0x000000, 0x1fffff).mirror(0x200000).rw(this, FUNC(jaguar_state::shared_ram_r16), FUNC(jaguar_state::shared_ram_w16));
+	map(0x000000, 0x1fffff).mirror(0x200000).rw(FUNC(jaguar_state::shared_ram_r16), FUNC(jaguar_state::shared_ram_w16));
 	map(0x800000, 0x83ffff).rom().region("cdbios", 0);
-	map(0xdfff00, 0xdfff3f).rw(this, FUNC(jaguar_state::butch_regs_r16), FUNC(jaguar_state::butch_regs_w16));
-	map(0xe00000, 0xe1ffff).rw(this, FUNC(jaguar_state::rom_base_r16), FUNC(jaguar_state::rom_base_w16));
-	map(0xf00000, 0xf003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
-	map(0xf00400, 0xf005ff).mirror(0x000200).rw(this, FUNC(jaguar_state::gpu_clut_r16), FUNC(jaguar_state::gpu_clut_w16));
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(this, FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
-	map(0xf02200, 0xf022ff).mirror(0x008000).rw(this, FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
-	map(0xf03000, 0xf03fff).mirror(0x008000).rw(this, FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
-	map(0xf14000, 0xf14003).rw(this, FUNC(jaguar_state::joystick_r16), FUNC(jaguar_state::joystick_w16));
-	map(0xf14800, 0xf14803).rw(this, FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPI00
-	map(0xf15000, 0xf15003).r(this, FUNC(jaguar_state::eeprom_cs16));               // GPI01
-	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r16), FUNC(jaguar_state::dspctrl_w16));
-	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r16), FUNC(jaguar_state::serial_w16));
-	map(0xf1b000, 0xf1cfff).rw(this, FUNC(jaguar_state::dsp_ram_r16), FUNC(jaguar_state::dsp_ram_w16));
-	map(0xf1d000, 0xf1dfff).rw(this, FUNC(jaguar_state::wave_rom_r16), FUNC(jaguar_state::wave_rom_w16));
+	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguar_state::butch_regs_r16), FUNC(jaguar_state::butch_regs_w16));
+	map(0xe00000, 0xe1ffff).rw(FUNC(jaguar_state::rom_base_r16), FUNC(jaguar_state::rom_base_w16));
+	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
+	map(0xf00400, 0xf005ff).mirror(0x000200).rw(FUNC(jaguar_state::gpu_clut_r16), FUNC(jaguar_state::gpu_clut_w16));
+	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
+	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
+	map(0xf03000, 0xf03fff).mirror(0x008000).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
+	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r16), FUNC(jaguar_state::joystick_w16));
+	map(0xf14800, 0xf14803).rw(FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPI00
+	map(0xf15000, 0xf15003).r(FUNC(jaguar_state::eeprom_cs16));               // GPI01
+	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r16), FUNC(jaguar_state::dspctrl_w16));
+	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r16), FUNC(jaguar_state::serial_w16));
+	map(0xf1b000, 0xf1cfff).rw(FUNC(jaguar_state::dsp_ram_r16), FUNC(jaguar_state::dsp_ram_w16));
+	map(0xf1d000, 0xf1dfff).rw(FUNC(jaguar_state::wave_rom_r16), FUNC(jaguar_state::wave_rom_w16));
 }
 
 /*************************************
@@ -1341,33 +1335,33 @@ void jaguar_state::jaguarcd_map(address_map &map)
  *  Main CPU memory handlers
  *
  *************************************/
- 
+
 void jaguar_state::r3000_map(address_map &map)
 {
 	map(0x04000000, 0x047fffff).ram().share("sharedram");
-	map(0x04e00030, 0x04e0003f).rw(m_ide, FUNC(vt83c461_device::read_config), FUNC(vt83c461_device::write_config));
-	map(0x04e001f0, 0x04e001f7).rw(m_ide, FUNC(vt83c461_device::read_cs0), FUNC(vt83c461_device::write_cs0));
-	map(0x04e003f0, 0x04e003f7).rw(m_ide, FUNC(vt83c461_device::read_cs1), FUNC(vt83c461_device::write_cs1));
-	map(0x04f00000, 0x04f003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
+	map(0x04e00030, 0x04e0003f).rw(m_ide, FUNC(vt83c461_device::config_r), FUNC(vt83c461_device::config_w));
+	map(0x04e001f0, 0x04e001f7).rw(m_ide, FUNC(vt83c461_device::cs0_r), FUNC(vt83c461_device::cs0_w));
+	map(0x04e003f0, 0x04e003f7).rw(m_ide, FUNC(vt83c461_device::cs1_r), FUNC(vt83c461_device::cs1_w));
+	map(0x04f00000, 0x04f003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0x04f00400, 0x04f007ff).ram().share("gpuclut");
-	map(0x04f02100, 0x04f021ff).rw(this, FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
-	map(0x04f02200, 0x04f022ff).rw(this, FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
+	map(0x04f02100, 0x04f021ff).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0x04f02200, 0x04f022ff).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0x04f03000, 0x04f03fff).mirror(0x00008000).ram().share("gpuram");
-	map(0x04f10000, 0x04f103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0x04f16000, 0x04f1600b).r(this, FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0x04f17000, 0x04f17003).portr("SYSTEM");     // GPI03
-	map(0x04f17800, 0x04f17803).w(this, FUNC(jaguar_state::latch_w));          // GPI04
+	map(0x04f10000, 0x04f103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
+	map(0x04f16000, 0x04f1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
+	map(0x04f17000, 0x04f17003).lr16("4f17000", [this]() { return uint16_t(m_system->read()); }); // GPI03
+	map(0x04f17800, 0x04f17803).w(FUNC(jaguar_state::latch_w));          // GPI04
 	map(0x04f17c00, 0x04f17c03).portr("P1_P2");      // GPI05
-	map(0x04f1a100, 0x04f1a13f).rw(this, FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
-	map(0x04f1a140, 0x04f1a17f).rw(this, FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
+	map(0x04f1a100, 0x04f1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
+	map(0x04f1a140, 0x04f1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0x04f1b000, 0x04f1cfff).ram().share("dspram");
 
-	map(0x06000000, 0x06000003).rw(this, FUNC(jaguar_state::misc_control_r), FUNC(jaguar_state::misc_control_w));
+	map(0x06000000, 0x06000003).rw(FUNC(jaguar_state::misc_control_r), FUNC(jaguar_state::misc_control_w));
 	map(0x10000000, 0x1007ffff).ram().share("mainram");
 	map(0x12000000, 0x120fffff).ram().share("mainram2");    // tested in self-test only?
 	map(0x14000004, 0x14000007).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
-	map(0x16000000, 0x16000003).w(this, FUNC(jaguar_state::eeprom_enable_w));
-	map(0x18000000, 0x18001fff).rw(this, FUNC(jaguar_state::eeprom_data_r), FUNC(jaguar_state::eeprom_data_w)).share("nvram");
+	map(0x16000000, 0x16000003).w(FUNC(jaguar_state::eeprom_enable_w));
+	map(0x18000000, 0x18001fff).rw(FUNC(jaguar_state::eeprom_data_r), FUNC(jaguar_state::eeprom_data_w)).share("nvram");
 	map(0x1fc00000, 0x1fdfffff).rom().region("maincpu", 0).share("rom");
 }
 
@@ -1384,26 +1378,26 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0x000000, 0x7fffff).ram().share("sharedram");
 	map(0x800000, 0x9fffff).rom().region("maincpu", 0).share("rom");
 	map(0xa00000, 0xa1ffff).ram().share("mainram");
-	map(0xa20000, 0xa21fff).rw(this, FUNC(jaguar_state::eeprom_data_r), FUNC(jaguar_state::eeprom_data_w)).share("nvram");
+	map(0xa20000, 0xa21fff).rw(FUNC(jaguar_state::eeprom_data_r), FUNC(jaguar_state::eeprom_data_w)).share("nvram");
 	map(0xa30000, 0xa30003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
-	map(0xa40000, 0xa40003).w(this, FUNC(jaguar_state::eeprom_enable_w));
-	map(0xb70000, 0xb70003).rw(this, FUNC(jaguar_state::misc_control_r), FUNC(jaguar_state::misc_control_w));
+	map(0xa40000, 0xa40003).w(FUNC(jaguar_state::eeprom_enable_w));
+	map(0xb70000, 0xb70003).rw(FUNC(jaguar_state::misc_control_r), FUNC(jaguar_state::misc_control_w));
 	map(0xc00000, 0xdfffff).bankr("mainsndbank");
-	map(0xe00030, 0xe0003f).rw(m_ide, FUNC(vt83c461_device::read_config), FUNC(vt83c461_device::write_config));
-	map(0xe001f0, 0xe001f7).rw(m_ide, FUNC(vt83c461_device::read_cs0), FUNC(vt83c461_device::write_cs0));
-	map(0xe003f0, 0xe003f7).rw(m_ide, FUNC(vt83c461_device::read_cs1), FUNC(vt83c461_device::write_cs1));
-	map(0xf00000, 0xf003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
+	map(0xe00030, 0xe0003f).rw(m_ide, FUNC(vt83c461_device::config_r), FUNC(vt83c461_device::config_w));
+	map(0xe001f0, 0xe001f7).rw(m_ide, FUNC(vt83c461_device::cs0_r), FUNC(vt83c461_device::cs0_w));
+	map(0xe003f0, 0xe003f7).rw(m_ide, FUNC(vt83c461_device::cs1_r), FUNC(vt83c461_device::cs1_w));
+	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf007ff).ram().share("gpuclut");
-	map(0xf02100, 0xf021ff).rw(this, FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
-	map(0xf02200, 0xf022ff).rw(this, FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
+	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0xf02200, 0xf022ff).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0xf16000, 0xf1600b).r(this, FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0xf17000, 0xf17003).portr("SYSTEM");     // GPI03
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
+	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
+	map(0xf17000, 0xf17003).lr16("f17000", [this]() { return uint16_t(m_system->read()); }); // GPI03
 //  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)          // GPI04
 	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPI05
-	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
-	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
+	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
+	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");
 }
 
@@ -1417,15 +1411,15 @@ void jaguar_state::m68020_map(address_map &map)
 void jaguar_state::gpu_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).ram().share("sharedram");
-	map(0xe00030, 0xe0003f).rw(m_ide, FUNC(vt83c461_device::read_config), FUNC(vt83c461_device::write_config));
-	map(0xe001f0, 0xe001f7).rw(m_ide, FUNC(vt83c461_device::read_cs0), FUNC(vt83c461_device::write_cs0));
-	map(0xe003f0, 0xe003f7).rw(m_ide, FUNC(vt83c461_device::read_cs1), FUNC(vt83c461_device::write_cs1));
-	map(0xf00000, 0xf003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
+	map(0xe00030, 0xe0003f).rw(m_ide, FUNC(vt83c461_device::config_r), FUNC(vt83c461_device::config_w));
+	map(0xe001f0, 0xe001f7).rw(m_ide, FUNC(vt83c461_device::cs0_r), FUNC(vt83c461_device::cs0_w));
+	map(0xe003f0, 0xe003f7).rw(m_ide, FUNC(vt83c461_device::cs1_r), FUNC(vt83c461_device::cs1_w));
+	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf007ff).ram().share("gpuclut");
-	map(0xf02100, 0xf021ff).rw(this, FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
-	map(0xf02200, 0xf022ff).rw(this, FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
+	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0xf02200, 0xf022ff).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).ram().share("gpuram");
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
 }
 
 void jaguar_state::gpu_rom_map(address_map &map)
@@ -1445,11 +1439,11 @@ void jaguar_state::gpu_rom_map(address_map &map)
 void jaguar_state::dsp_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).ram().share("sharedram");
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
-	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
+	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
+	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");
-	map(0xf1d000, 0xf1dfff).r(this, FUNC(jaguar_state::wave_rom_r)).share("waverom").region("waverom", 0);
+	map(0xf1d000, 0xf1dfff).r(FUNC(jaguar_state::wave_rom_r)).share("waverom").region("waverom", 0);
 }
 
 void jaguar_state::dsp_rom_map(address_map &map)
@@ -1467,15 +1461,15 @@ void jaguar_state::jag_gpu_map(address_map &map)
 	map(0x000000, 0x1fffff).ram().mirror(0x200000).share("sharedram").region("maincpu", 0);
 	map(0x800000, 0xdfffff).rom().share("cart").region("maincpu", 0x800000);
 	map(0xe00000, 0xe1ffff).rom().share("rom").region("maincpu", 0xe00000);
-	map(0xf00000, 0xf003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
+	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf005ff).mirror(0x000200).ram().share("gpuclut");
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(this, FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
-	map(0xf02200, 0xf022ff).mirror(0x008000).rw(this, FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
+	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0xf14000, 0xf14003).rw(this, FUNC(jaguar_state::joystick_r), FUNC(jaguar_state::joystick_w));
-	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
-	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
+	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r), FUNC(jaguar_state::joystick_w));
+	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
+	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");
 	map(0xf1d000, 0xf1dfff).rom().share("waverom").region("waverom", 0);
 }
@@ -1486,15 +1480,15 @@ void jaguar_state::jag_dsp_map(address_map &map)
 	map(0x000000, 0x1fffff).mirror(0x200000).ram().share("sharedram").region("maincpu", 0);
 	map(0x800000, 0xdfffff).rom().share("cart").region("maincpu", 0x800000);
 	map(0xe00000, 0xe1ffff).rom().share("rom").region("maincpu", 0xe00000);
-	map(0xf00000, 0xf003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
+	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf005ff).mirror(0x000200).ram().share("gpuclut");
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(this, FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
-	map(0xf02200, 0xf022ff).mirror(0x008000).rw(this, FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
+	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0xf14000, 0xf14003).rw(this, FUNC(jaguar_state::joystick_r), FUNC(jaguar_state::joystick_w));
-	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
-	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
+	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r), FUNC(jaguar_state::joystick_w));
+	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
+	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");
 	map(0xf1d000, 0xf1dfff).rom().region("waverom", 0);
 }
@@ -1504,17 +1498,17 @@ void jaguar_state::jagcd_gpu_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).ram().mirror(0x200000).share("sharedram").region("maincpu", 0);
 	map(0x800000, 0x83ffff).rom().region("cdbios", 0);
-	map(0xdfff00, 0xdfff3f).rw(this, FUNC(jaguar_state::butch_regs_r), FUNC(jaguar_state::butch_regs_w));
+	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguar_state::butch_regs_r), FUNC(jaguar_state::butch_regs_w));
 	map(0xe00000, 0xe1ffff).rom().share("rom").region("maincpu", 0xe00000);
-	map(0xf00000, 0xf003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
+	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf005ff).mirror(0x000200).ram().share("gpuclut");
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(this, FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
-	map(0xf02200, 0xf022ff).mirror(0x008000).rw(this, FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
+	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0xf14000, 0xf14003).rw(this, FUNC(jaguar_state::joystick_r), FUNC(jaguar_state::joystick_w));
-	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
-	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
+	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r), FUNC(jaguar_state::joystick_w));
+	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
+	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");
 	map(0xf1d000, 0xf1dfff).rom().share("waverom").region("waverom", 0);
 }
@@ -1524,17 +1518,17 @@ void jaguar_state::jagcd_dsp_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).mirror(0x200000).ram().share("sharedram").region("maincpu", 0);
 	map(0x800000, 0x83ffff).rom().region("cdbios", 0);
-	map(0xdfff00, 0xdfff3f).rw(this, FUNC(jaguar_state::butch_regs_r), FUNC(jaguar_state::butch_regs_w));
+	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguar_state::butch_regs_r), FUNC(jaguar_state::butch_regs_w));
 	map(0xe00000, 0xe1ffff).rom().share("rom").region("maincpu", 0xe00000);
-	map(0xf00000, 0xf003ff).rw(this, FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
+	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf005ff).mirror(0x000200).ram().share("gpuclut");
-	map(0xf02100, 0xf021ff).mirror(0x008000).rw(this, FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
-	map(0xf02200, 0xf022ff).mirror(0x008000).rw(this, FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
+	map(0xf02100, 0xf021ff).mirror(0x008000).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
+	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
-	map(0xf10000, 0xf103ff).rw(this, FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
-	map(0xf14000, 0xf14003).rw(this, FUNC(jaguar_state::joystick_r), FUNC(jaguar_state::joystick_w));
-	map(0xf1a100, 0xf1a13f).rw(this, FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
-	map(0xf1a140, 0xf1a17f).rw(this, FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
+	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
+	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r), FUNC(jaguar_state::joystick_w));
+	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
+	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r), FUNC(jaguar_state::serial_w));
 	map(0xf1b000, 0xf1cfff).ram().share("dspram");
 	map(0xf1d000, 0xf1dfff).rom().region("waverom", 0);
 }
@@ -1545,7 +1539,7 @@ void jaguar_state::jagcd_dsp_map(address_map &map)
  *
  *************************************/
 
-/* "FAKE0" is read at 0x04f17000
+/* "SYSTEM" is read at 0x04f17000
     D23-20 = /SER-4-1
     D19-16 = COINR4-1
     D7     = /VSYNCNEQ
@@ -1565,10 +1559,6 @@ static INPUT_PORTS_START( area51 )
 	PORT_BIT( 0xfe000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-
-	PORT_START("FAKE0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1623,10 +1613,6 @@ static INPUT_PORTS_START( freezeat )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-
-	PORT_START("FAKE0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1667,10 +1653,6 @@ static INPUT_PORTS_START( fishfren )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-
-	PORT_START("FAKE0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1717,10 +1699,6 @@ static INPUT_PORTS_START( vcircle )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE0")
-
-	PORT_START("FAKE0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1844,131 +1822,128 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(jaguar_state::cojagr3k)
-
+void jaguar_state::cojagr3k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", R3041, R3000_CLOCK)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_DEVICE_PROGRAM_MAP(r3000_map)
+	R3041(config, m_maincpu, R3000_CLOCK).set_endianness(ENDIANNESS_BIG);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
-	MCFG_DEVICE_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(gpu_map)
+	JAGUARGPU(config, m_gpu, COJAG_CLOCK/2);
+	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::gpu_map);
 
-	MCFG_DEVICE_ADD("dsp", JAGUARDSP, COJAG_CLOCK/2)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(dsp_map)
+	JAGUARDSP(config, m_dsp, COJAG_CLOCK/2);
+	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
+	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::dsp_map);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_VT83C461_ADD("ide", cojag_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, jaguar_state, external_int))
+	VT83C461(config, m_ide).options(cojag_devices, "hdd", nullptr, true);
+	m_ide->irq_handler().set(FUNC(jaguar_state::external_int));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257)
-	MCFG_SCREEN_UPDATE_DRIVER(jaguar_state,screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257);
+	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(jaguar_state::cojagr3k_rom)
+void jaguar_state::cojagr3k_rom(machine_config &config)
+{
 	cojagr3k(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(r3000_rom_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_rom_map);
+	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::gpu_rom_map);
+	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::dsp_rom_map);
 
-	MCFG_DEVICE_MODIFY("gpu")
-	MCFG_DEVICE_PROGRAM_MAP(gpu_rom_map)
+	m_ide->slot(0).set_default_option(nullptr);
+}
 
-	MCFG_DEVICE_MODIFY("dsp")
-	MCFG_DEVICE_PROGRAM_MAP(dsp_rom_map)
-
-	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(jaguar_state::cojag68k)
+void jaguar_state::cojag68k(machine_config &config)
+{
 	cojagr3k(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", M68EC020, M68K_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(m68020_map)
-MACHINE_CONFIG_END
+	M68EC020(config.replace(), m_maincpu, M68K_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::m68020_map);
+}
 
-
-MACHINE_CONFIG_START(jaguar_state::jaguar)
-
+void jaguar_state::jaguar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, JAGUAR_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(jaguar_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jaguar_state,jaguar_irq_callback)
+	M68000(config, m_maincpu, JAGUAR_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguar_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(jaguar_state::jaguar_irq_callback));
 
-	MCFG_DEVICE_ADD("gpu", JAGUARGPU, JAGUAR_CLOCK)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(jag_gpu_map)
+	JAGUARGPU(config, m_gpu, JAGUAR_CLOCK);
+	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::jag_gpu_map);
 
-	MCFG_DEVICE_ADD("dsp", JAGUARDSP, JAGUAR_CLOCK)
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(jag_dsp_map)
+	JAGUARDSP(config, m_dsp, JAGUAR_CLOCK);
+	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
+	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::jag_dsp_map);
 
 //  MCFG_NVRAM_HANDLER(jaguar)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257)
-	MCFG_SCREEN_UPDATE_DRIVER(jaguar_state,screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257);
+	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", jaguar_state, jaguar, "abs,bin,cof,jag,prg", 2)
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
+	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jaguar_state, jaguar), this), "abs,bin,cof,jag,prg", 0);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "jaguar_cart")
-	MCFG_GENERIC_EXTENSIONS("j64,rom,bin")
-	MCFG_GENERIC_LOAD(jaguar_state, jaguar_cart)
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64,rom,bin"));
+	cartslot.set_device_load(device_image_load_delegate(&jaguar_state::device_image_load_jaguar_cart, this));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
+	SOFTWARE_LIST(config, "cart_list").set_original("jaguar");
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-MACHINE_CONFIG_END
+	EEPROM_93C46_16BIT(config, m_eeprom);
+}
 
-MACHINE_CONFIG_START(jaguar_state::jaguarcd)
+void jaguar_state::jaguarcd(machine_config &config)
+{
 	jaguar(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jaguarcd_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguarcd_map);
 
-	MCFG_DEVICE_MODIFY("gpu")
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, gpu_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(jagcd_gpu_map)
+	m_gpu->irq().set(FUNC(jaguar_state::gpu_cpu_int));
+	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::jagcd_gpu_map);
 
-	MCFG_DEVICE_MODIFY("dsp")
-	MCFG_JAGUAR_IRQ_HANDLER(WRITELINE(*this, jaguar_state, dsp_cpu_int))
-	MCFG_DEVICE_PROGRAM_MAP(jagcd_dsp_map)
+	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
+	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::jagcd_dsp_map);
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("jag_cdrom")
-MACHINE_CONFIG_END
+	CDROM(config, "cdrom").set_interface("jag_cdrom");
+}
 
 /*************************************
  *
@@ -2177,9 +2152,9 @@ ROM_START( jaguarcd )
 
 	ROM_REGION(0x40000, "cdbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Jaguar CD" )
-	ROMX_LOAD( "jag_cd.bin", 0x00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
+	ROMX_LOAD( "jag_cd.bin", 0x00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "dev", "Jaguar Developer CD" )
-	ROMX_LOAD( "jagdevcd.bin", 0x00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
+	ROMX_LOAD( "jagdevcd.bin", 0x00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
 
 	ROM_REGION16_BE( 0x1000, "waverom", 0 )
 	ROM_LOAD16_WORD("jagwave.rom", 0x0000, 0x1000, CRC(7a25ee5b) SHA1(58117e11fd6478c521fbd3fdbe157f39567552f0) )

@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -33,6 +34,14 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void rpc700(machine_config &config);
+	void rpc600(machine_config &config);
+	void sarpc(machine_config &config);
+	void sarpc_j233(machine_config &config);
+	void a7000(machine_config &config);
+	void a7000p(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -69,12 +78,7 @@ public:
 	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
 	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
 	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
-	void rpc700(machine_config &config);
-	void rpc600(machine_config &config);
-	void sarpc(machine_config &config);
-	void sarpc_j233(machine_config &config);
-	void a7000(machine_config &config);
-	void a7000p(machine_config &config);
+
 	void a7000_mem(address_map &map);
 };
 
@@ -192,10 +196,11 @@ void riscpc_state::vidc20_dynamic_screen_change()
 			hblank_period = (m_vidc20_horz_reg[HCR] & 0x3ffc);
 			vblank_period = (m_vidc20_vert_reg[VCR] & 0x3fff);
 			/* note that we use the border registers as the visible area */
-			visarea.min_x = (m_vidc20_horz_reg[HBSR] & 0x3ffe);
-			visarea.max_x = (m_vidc20_horz_reg[HBER] & 0x3ffe)-1;
-			visarea.min_y = (m_vidc20_vert_reg[VBSR] & 0x1fff);
-			visarea.max_y = (m_vidc20_vert_reg[VBER] & 0x1fff)-1;
+			visarea.set(
+					(m_vidc20_horz_reg[HBSR] & 0x3ffe),
+					(m_vidc20_horz_reg[HBER] & 0x3ffe) - 1,
+					(m_vidc20_vert_reg[VBSR] & 0x1fff),
+					(m_vidc20_vert_reg[VBER] & 0x1fff) - 1);
 
 			m_screen->configure(hblank_period, vblank_period, visarea, m_screen->frame_period().attoseconds() );
 			logerror("VIDC20: successfully changed the screen to:\n Display Size = %d x %d\n Border Size %d x %d\n Cycle Period %d x %d\n",
@@ -771,10 +776,10 @@ void riscpc_state::a7000_mem(address_map &map)
 //  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
 //  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
-	map(0x03200000, 0x032001ff).rw(this, FUNC(riscpc_state::a7000_iomd_r), FUNC(riscpc_state::a7000_iomd_w)); //IOMD Registers //mirrored at 0x03000000-0x1ff?
+	map(0x03200000, 0x032001ff).rw(FUNC(riscpc_state::a7000_iomd_r), FUNC(riscpc_state::a7000_iomd_w)); //IOMD Registers //mirrored at 0x03000000-0x1ff?
 //  AM_RANGE(0x03310000, 0x03310003) //Mouse Buttons
 
-	map(0x03400000, 0x037fffff).w(this, FUNC(riscpc_state::a7000_vidc20_w));
+	map(0x03400000, 0x037fffff).w(FUNC(riscpc_state::a7000_vidc20_w));
 //  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
 	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
 	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
@@ -894,8 +899,8 @@ ROM_START(rpc600)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.50
 	ROM_SYSTEM_BIOS( 0, "350", "RiscOS 3.50" )
-	ROMX_LOAD( "0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(1))
-	ROMX_LOAD( "0277,522-01.bin", 0x100000, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_BIOS(1))
+	ROMX_LOAD("0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(0))
+	ROMX_LOAD("0277,522-01.bin", 0x100000, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -903,8 +908,8 @@ ROM_START(rpc700)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.60
 	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
-	ROMX_LOAD( "1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -912,8 +917,8 @@ ROM_START(a7000)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.60
 	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
-	ROMX_LOAD( "1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -921,16 +926,16 @@ ROM_START(a7000p)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.71
 	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
-	ROMX_LOAD( "1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	// Version 4.02
 	ROM_SYSTEM_BIOS( 1, "402", "RiscOS 4.02" )
-	ROMX_LOAD( "riscos402_1.bin", 0x000000, 0x200000, CRC(4c32f7e2) SHA1(d290e29a4de7be9eb36cbafbb2dc99b1c4ce7f72), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
-	ROMX_LOAD( "riscos402_2.bin", 0x000002, 0x200000, CRC(7292b790) SHA1(67f999c1ccf5419e0a142b7e07f809e13dfed425), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("riscos402_1.bin", 0x000000, 0x200000, CRC(4c32f7e2) SHA1(d290e29a4de7be9eb36cbafbb2dc99b1c4ce7f72), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("riscos402_2.bin", 0x000002, 0x200000, CRC(7292b790) SHA1(67f999c1ccf5419e0a142b7e07f809e13dfed425), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
 	// Version 4.39
 	ROM_SYSTEM_BIOS( 2, "439", "RiscOS 4.39" )
-	ROMX_LOAD( "riscos439_1.bin", 0x000000, 0x200000, CRC(dab94cb8) SHA1(a81fb7f1a8117f85e82764675445092d769aa9af), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
-	ROMX_LOAD( "riscos439_2.bin", 0x000002, 0x200000, CRC(22e6a5d4) SHA1(b73b73c87824045130840a19ce16fa12e388c039), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("riscos439_1.bin", 0x000000, 0x200000, CRC(dab94cb8) SHA1(a81fb7f1a8117f85e82764675445092d769aa9af), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("riscos439_2.bin", 0x000002, 0x200000, CRC(22e6a5d4) SHA1(b73b73c87824045130840a19ce16fa12e388c039), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -938,8 +943,8 @@ ROM_START(sarpc)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.70
 	ROM_SYSTEM_BIOS( 0, "370", "RiscOS 3.70" )
-	ROMX_LOAD( "1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,192-01.bin", 0x000002, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,192-01.bin", 0x000002, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
@@ -947,8 +952,8 @@ ROM_START(sarpc_j233)
 	ROM_REGION( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.71
 	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
-	ROMX_LOAD( "1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
-	ROMX_LOAD( "1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROM_REGION( 0x800000, "vram", ROMREGION_ERASE00 )
 ROM_END
 

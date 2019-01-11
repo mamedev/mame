@@ -62,7 +62,7 @@ WRITE8_MEMBER(contra_state::contra_coin_counter_w)
 
 void contra_state::contra_map(address_map &map)
 {
-	map(0x0000, 0x0007).w(this, FUNC(contra_state::contra_K007121_ctrl_0_w));
+	map(0x0000, 0x0007).w(FUNC(contra_state::contra_K007121_ctrl_0_w));
 	map(0x0010, 0x0010).portr("SYSTEM");
 	map(0x0011, 0x0011).portr("P1");
 	map(0x0012, 0x0012).portr("P2");
@@ -71,29 +71,29 @@ void contra_state::contra_map(address_map &map)
 	map(0x0015, 0x0015).portr("DSW2");
 	map(0x0016, 0x0016).portr("DSW3");
 
-	map(0x0018, 0x0018).w(this, FUNC(contra_state::contra_coin_counter_w));
-	map(0x001a, 0x001a).w(this, FUNC(contra_state::contra_sh_irqtrigger_w));
+	map(0x0018, 0x0018).w(FUNC(contra_state::contra_coin_counter_w));
+	map(0x001a, 0x001a).w(FUNC(contra_state::contra_sh_irqtrigger_w));
 	map(0x001c, 0x001c).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x001e, 0x001e).nopw();    /* ? */
-	map(0x0060, 0x0067).w(this, FUNC(contra_state::contra_K007121_ctrl_1_w));
+	map(0x0060, 0x0067).w(FUNC(contra_state::contra_K007121_ctrl_1_w));
 
 	map(0x0c00, 0x0cff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 
 	map(0x1000, 0x1fff).ram();
 
 	map(0x2000, 0x5fff).readonly();
-	map(0x2000, 0x23ff).w(this, FUNC(contra_state::contra_fg_cram_w)).share("fg_cram");
-	map(0x2400, 0x27ff).w(this, FUNC(contra_state::contra_fg_vram_w)).share("fg_vram");
-	map(0x2800, 0x2bff).w(this, FUNC(contra_state::contra_text_cram_w)).share("tx_cram");
-	map(0x2c00, 0x2fff).w(this, FUNC(contra_state::contra_text_vram_w)).share("tx_vram");
-	map(0x3000, 0x37ff).writeonly().share("spriteram");/* 2nd bank is at 0x5000 */
-	map(0x3800, 0x3fff).writeonly(); // second sprite buffer
-	map(0x4000, 0x43ff).w(this, FUNC(contra_state::contra_bg_cram_w)).share("bg_cram");
-	map(0x4400, 0x47ff).w(this, FUNC(contra_state::contra_bg_vram_w)).share("bg_vram");
-	map(0x4800, 0x5fff).writeonly();
+	map(0x2000, 0x23ff).w(FUNC(contra_state::contra_fg_cram_w)).share("fg_cram");
+	map(0x2400, 0x27ff).w(FUNC(contra_state::contra_fg_vram_w)).share("fg_vram");
+	map(0x2800, 0x2bff).w(FUNC(contra_state::contra_text_cram_w)).share("tx_cram");
+	map(0x2c00, 0x2fff).w(FUNC(contra_state::contra_text_vram_w)).share("tx_vram");
+	map(0x3000, 0x3fff).ram().share("spriteram");
+	map(0x4000, 0x43ff).w(FUNC(contra_state::contra_bg_cram_w)).share("bg_cram");
+	map(0x4400, 0x47ff).w(FUNC(contra_state::contra_bg_vram_w)).share("bg_vram");
+	map(0x4800, 0x4fff).ram();
+	map(0x5000, 0x5fff).ram().share("spriteram_2");
 
 	map(0x6000, 0x7fff).bankr("bank1");
-	map(0x7000, 0x7000).w(this, FUNC(contra_state::contra_bankswitch_w));
+	map(0x7000, 0x7000).w(FUNC(contra_state::contra_bankswitch_w));
 
 	map(0x8000, 0xffff).rom();
 }
@@ -102,7 +102,7 @@ void contra_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x4000, 0x4000).w(this, FUNC(contra_state::sirq_clear_w)); /* read triggers irq reset and latch read (in the hardware only). */
+	map(0x4000, 0x4000).w(FUNC(contra_state::sirq_clear_w)); /* read triggers irq reset and latch read (in the hardware only). */
 	map(0x6000, 0x67ff).ram();
 	map(0x8000, 0xffff).rom();
 }
@@ -226,30 +226,27 @@ MACHINE_CONFIG_START(contra_state::contra)
 	MCFG_SCREEN_SIZE(37*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(contra_state, screen_update_contra)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_contra)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_contra);
 
-	MCFG_PALETTE_ADD("palette", 2*8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_PALETTE_INIT_OWNER(contra_state, contra)
+	PALETTE(config, m_palette, FUNC(contra_state::contra_palette));
+	m_palette->set_format(palette_device::xBGR_555, 2 * 8 * 16 * 16);
+	m_palette->set_indirect_entries(128);
+	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
-	MCFG_K007121_ADD("k007121_1")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K007121_ADD("k007121_2")
-	MCFG_K007121_PALETTE("palette")
+	K007121(config, m_k007121_1, 0);
+	m_k007121_1->set_palette_tag(m_palette);
+	K007121(config, m_k007121_2, 0);
+	m_k007121_2->set_palette_tag(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
 MACHINE_CONFIG_END
 
 

@@ -86,10 +86,10 @@ WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 
 
 
-WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
+void cabal_state::sound_irq_trigger_word_w(offs_t, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		m_seibu_sound->main_w(space, 4, data & 0x00ff);
+		m_seibu_sound->main_w(4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	m_maincpu->spin_until_time(attotime::from_usec(50));
@@ -108,17 +108,17 @@ void cabal_state::main_map(address_map &map)
 	map(0x40000, 0x437ff).ram();
 	map(0x43800, 0x43fff).ram().share("spriteram");
 	map(0x44000, 0x4ffff).ram();
-	map(0x60000, 0x607ff).ram().w(this, FUNC(cabal_state::text_videoram_w)).share("colorram");
-	map(0x80000, 0x801ff).ram().w(this, FUNC(cabal_state::background_videoram_w)).share("videoram");
+	map(0x60000, 0x607ff).ram().w(FUNC(cabal_state::text_videoram_w)).share("colorram");
+	map(0x80000, 0x801ff).ram().w(FUNC(cabal_state::background_videoram_w)).share("videoram");
 	map(0x80200, 0x803ff).ram();
 	map(0xa0000, 0xa0001).portr("DSW");
 	map(0xa0008, 0xa0009).portr("IN2");
 	map(0xa0010, 0xa0011).portr("INPUTS");
 	map(0xc0040, 0xc0041).nopw(); /* ??? */
-	map(0xc0080, 0xc0081).w(this, FUNC(cabal_state::flipscreen_w));
+	map(0xc0080, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
 	map(0xe0000, 0xe07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xe8000, 0xe800d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
-	map(0xe8008, 0xe8009).w(this, FUNC(cabal_state::sound_irq_trigger_word_w)); // fix coin insertion
+	map(0xe8008, 0xe8009).w(FUNC(cabal_state::sound_irq_trigger_word_w)); // fix coin insertion
 }
 
 
@@ -128,8 +128,8 @@ void cabal_state::trackball_main_map(address_map &map)
 	main_map(map);
 	map(0xa0008, 0xa000f).r("upd4701l", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
 	map(0xa0008, 0xa000f).r("upd4701h", FUNC(upd4701_device::read_xy)).umask16(0xff00);
-	map(0xc0001, 0xc0001).w("upd4701l", FUNC(upd4701_device::reset_xy));
-	map(0xc0000, 0xc0000).w("upd4701h", FUNC(upd4701_device::reset_xy));
+	map(0xc0001, 0xc0001).w("upd4701l", FUNC(upd4701_device::reset_xy_w));
+	map(0xc0000, 0xc0000).w("upd4701h", FUNC(upd4701_device::reset_xy_w));
 }
 
 
@@ -140,18 +140,18 @@ void cabal_state::cabalbl_main_map(address_map &map)
 	map(0x40000, 0x437ff).ram();
 	map(0x43800, 0x43fff).ram().share("spriteram");
 	map(0x44000, 0x4ffff).ram();
-	map(0x60000, 0x607ff).ram().w(this, FUNC(cabal_state::text_videoram_w)).share("colorram");
-	map(0x80000, 0x801ff).ram().w(this, FUNC(cabal_state::background_videoram_w)).share("videoram");
+	map(0x60000, 0x607ff).ram().w(FUNC(cabal_state::text_videoram_w)).share("colorram");
+	map(0x80000, 0x801ff).ram().w(FUNC(cabal_state::background_videoram_w)).share("videoram");
 	map(0x80200, 0x803ff).ram();
 	map(0xa0000, 0xa0001).portr("DSW");
 	map(0xa0008, 0xa0009).portr("JOY");
 	map(0xa0010, 0xa0011).portr("INPUTS");
 	map(0xc0040, 0xc0041).nopw(); /* ??? */
-	map(0xc0080, 0xc0081).w(this, FUNC(cabal_state::flipscreen_w));
+	map(0xc0080, 0xc0081).w(FUNC(cabal_state::flipscreen_w));
 	map(0xe0000, 0xe07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xe8000, 0xe8003).w(this, FUNC(cabal_state::cabalbl_sndcmd_w));
+	map(0xe8000, 0xe8003).w(FUNC(cabal_state::cabalbl_sndcmd_w));
 	map(0xe8005, 0xe8005).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xe8008, 0xe8009).w(this, FUNC(cabal_state::cabalbl_sound_irq_trigger_word_w));
+	map(0xe8008, 0xe8009).w(FUNC(cabal_state::cabalbl_sound_irq_trigger_word_w));
 }
 
 /*********************************************************************/
@@ -207,10 +207,10 @@ void cabal_state::cabalbl_sound_map(address_map &map)
 	map(0x2000, 0x2fff).ram();
 	map(0x4000, 0x4000).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0x4002, 0x4002).w("soundlatch3", FUNC(generic_latch_8_device::write));
-	map(0x4004, 0x4004).w(this, FUNC(cabal_state::cabalbl_coin_w));
+	map(0x4004, 0x4004).w(FUNC(cabal_state::cabalbl_coin_w));
 	map(0x4006, 0x4006).portr("COIN");
-	map(0x4008, 0x4008).r(this, FUNC(cabal_state::cabalbl_snd2_r));
-	map(0x400a, 0x400a).r(this, FUNC(cabal_state::cabalbl_snd1_r));
+	map(0x4008, 0x4008).r(FUNC(cabal_state::cabalbl_snd2_r));
+	map(0x400a, 0x400a).r(FUNC(cabal_state::cabalbl_snd1_r));
 	map(0x400c, 0x400c).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x400e, 0x400f).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x6000, 0x6000).nopw();  /* ??? */
@@ -249,7 +249,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
 {
 	m_msm1->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm1->data_w(data);
+	m_msm1->write_data(data);
 	m_msm1->vclk_w(1);
 	m_msm1->vclk_w(0);
 }
@@ -257,7 +257,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
 {
 	m_msm2->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
-	m_msm2->data_w(data);
+	m_msm2->write_data(data);
 	m_msm2->vclk_w(1);
 	m_msm2->vclk_w(0);
 }
@@ -270,7 +270,7 @@ void cabal_state::cabalbl_talk1_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(this, FUNC(cabal_state::cabalbl_1_adpcm_w));
+	map(0x01, 0x01).w(FUNC(cabal_state::cabalbl_1_adpcm_w));
 }
 
 void cabal_state::cabalbl_talk2_map(address_map &map)
@@ -282,7 +282,7 @@ void cabal_state::cabalbl_talk2_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch3", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w(this, FUNC(cabal_state::cabalbl_2_adpcm_w));
+	map(0x01, 0x01).w(FUNC(cabal_state::cabalbl_2_adpcm_w));
 }
 
 /***************************************************************************/
@@ -501,135 +501,131 @@ static GFXDECODE_START( gfx_cabal )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(cabal_state::cabal)
-
+void cabal_state::cabal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cabal_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cabal_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_OPCODES_MAP(sound_decrypted_opcodes_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cabal_state::sound_map);
+	m_audiocpu->set_addrmap(AS_OPCODES, &cabal_state::sound_decrypted_opcodes_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
-	MCFG_DEVICE_ROM("audiocpu")
+	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.60)   /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.60);   /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(cabal_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cabal);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_YM_READ_CB(READ8("ymsnd", ym2151_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(WRITE8("ymsnd", ym2151_device, write))
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("adpcm1", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	SEIBU_ADPCM(config, m_adpcm1, 8000).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
+	SEIBU_ADPCM(config, m_adpcm2, 8000).add_route(ALL_OUTPUTS, "mono", 0.40); /* it should use the msm5205 */
+}
 
-	MCFG_DEVICE_ADD("adpcm2", SEIBU_ADPCM, 8000) /* it should use the msm5205 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(cabal_state::cabalt)
+void cabal_state::cabalt(machine_config &config)
+{
 	cabal(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(trackball_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cabal_state::trackball_main_map);
 
-	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("IN0")
-	MCFG_UPD4701_PORTY("IN1")
+	upd4701_device &upd4701l(UPD4701A(config, "upd4701l"));
+	upd4701l.set_portx_tag("IN0");
+	upd4701l.set_porty_tag("IN1");
 
-	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("IN2")
-	MCFG_UPD4701_PORTY("IN3")
-MACHINE_CONFIG_END
+	upd4701_device &upd4701h(UPD4701A(config, "upd4701h"));
+	upd4701h.set_portx_tag("IN2");
+	upd4701h.set_porty_tag("IN3");
+}
 
-MACHINE_CONFIG_START(cabal_state::cabalbl2)
+void cabal_state::cabalbl2(machine_config &config)
+{
 	cabal(config);
-	MCFG_DEVICE_REMOVE("sei80bu")
+	config.device_remove("sei80bu");
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(cabalbl2_sound_map)
-	MCFG_DEVICE_OPCODES_MAP(cabalbl2_predecrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cabal_state::cabalbl2_sound_map);
+	m_audiocpu->set_addrmap(AS_OPCODES, &cabal_state::cabalbl2_predecrypted_opcodes_map);
+}
 
 
 /* the bootleg has different sound hardware (2 extra Z80s for ADPCM playback) */
-MACHINE_CONFIG_START(cabal_state::cabalbl)
-
+void cabal_state::cabalbl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cabalbl_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cabal_state::cabalbl_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cabal_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cabalbl_sound_map)
+	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cabal_state::cabalbl_sound_map);
 
 	/* there are 2x z80s for the ADPCM */
-	MCFG_DEVICE_ADD("adpcm_1", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cabalbl_talk1_map)
-	MCFG_DEVICE_IO_MAP(cabalbl_talk1_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
+	z80_device &adpcm_1(Z80(config, "adpcm_1", XTAL(3'579'545))); /* verified on pcb */
+	adpcm_1.set_addrmap(AS_PROGRAM, &cabal_state::cabalbl_talk1_map);
+	adpcm_1.set_addrmap(AS_IO, &cabal_state::cabalbl_talk1_portmap);
+	adpcm_1.set_periodic_int(FUNC(cabal_state::irq0_line_hold), attotime::from_hz(8000));
 
-	MCFG_DEVICE_ADD("adpcm_2", Z80, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cabalbl_talk2_map)
-	MCFG_DEVICE_IO_MAP(cabalbl_talk2_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
+	z80_device &adpcm_2(Z80(config, "adpcm_2", XTAL(3'579'545))); /* verified on pcb */
+	adpcm_2.set_addrmap(AS_PROGRAM, &cabal_state::cabalbl_talk2_map);
+	adpcm_2.set_addrmap(AS_IO, &cabal_state::cabalbl_talk2_portmap);
+	adpcm_2.set_periodic_int(FUNC(cabal_state::irq0_line_hold), attotime::from_hz(8000));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.m_minimum_quantum = attotime::from_hz(600);
 
 	MCFG_MACHINE_START_OVERRIDE(cabal_state,cabalbl)
 	MCFG_MACHINE_RESET_OVERRIDE(cabal_state,cabalbl)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cabal_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(cabal_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabal)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cabal);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, "soundlatch3");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545)) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("msm1", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator) */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MSM5205(config, m_msm1, XTAL(12'000'000)/32); /* verified on pcb (no resonator) */
+	m_msm1->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("msm2", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator)*/
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm2, XTAL(12'000'000)/32); /* verified on pcb (no resonator)*/
+	m_msm2->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
 ROM_START( cabal )
 	ROM_REGION( 0x50000, "maincpu", 0 ) /* 64k for cpu code */

@@ -49,6 +49,7 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -59,7 +60,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void pgm3(machine_config &config);
+
 	void init_kov3hd();
+
+private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -67,7 +72,6 @@ public:
 	uint32_t screen_update_pgm3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm3);
 	required_device<cpu_device> m_maincpu;
-	void pgm3(machine_config &config);
 	void pgm3_map(address_map &map);
 };
 

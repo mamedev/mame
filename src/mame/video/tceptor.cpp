@@ -8,6 +8,8 @@
 #include "emu.h"
 #include "includes/tceptor.h"
 
+#include <algorithm>
+
 
 #define TX_TILE_OFFSET_CENTER   (32 * 2)
 #define TX_TILE_OFFSET_RIGHT    (32 * 0 + 2)
@@ -19,67 +21,67 @@
 
 /*******************************************************************/
 
-PALETTE_INIT_MEMBER(tceptor_state, tceptor)
+void tceptor_state::tceptor_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x400; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x400; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x400]);
-		int b = pal4bit(color_prom[i + 0x800]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x400]);
+		int const b = pal4bit(color_prom[i + 0x800]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0xc00;
 
-
 	/*
-	      color lookup table:
-	        0-    +1024 ( 4 * 256) colors: text   (use 0-   256 colors)
-	        1024- +1024 (16 *  64) colors: sprite (use 768- 256 colors)
-	        2048-  +512 ( 8 *  64) colors: bg     (use 0-   512 colors)
-	        3840-  +256 ( 4 *  64) colors: road   (use 512- 256 colors)
-	    */
+	    color lookup table:
+	     0-    +1024 ( 4 * 256) colors: text   (use 0-   256 colors)
+	     1024- +1024 (16 *  64) colors: sprite (use 768- 256 colors)
+	     2048-  +512 ( 8 *  64) colors: bg     (use 0-   512 colors)
+	     3840-  +256 ( 4 *  64) colors: road   (use 512- 256 colors)
+	*/
 
-	/* tiles lookup table (1024 colors) */
-	for (i = 0; i < 0x0400; i++)
+	// tiles lookup table (1024 colors)
+	for (int i = 0; i < 0x0400; i++)
 	{
-		int ctabentry = color_prom[i];
+		int const ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* sprites lookup table (1024 colors) */
-	for (i = 0x0400; i < 0x0800; i++)
+	// sprites lookup table (1024 colors)
+	for (int i = 0x0400; i < 0x0800; i++)
 	{
-		int ctabentry = color_prom[i] | 0x300;
+		int const ctabentry = color_prom[i] | 0x300;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* background: no lookup PROM, use directly (512 colors) */
-	for (i = 0x0a00; i < 0x0c00; i++)
+	// background: no lookup PROM, use directly (512 colors)
+	for (int i = 0x0a00; i < 0x0c00; i++)
 	{
-		int ctabentry = i & 0x1ff;
+		int const ctabentry = i & 0x1ff;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* road lookup table (256 colors) */
-	for (i = 0x0f00; i < 0x1000; i++)
+	// road lookup table (256 colors)
+	for (int i = 0x0f00; i < 0x1000; i++)
 	{
-		int ctabentry = color_prom[i - 0x700] | 0x200;
+		int const ctabentry = color_prom[i - 0x700] | 0x200;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* setup sprite mask color map */
-	/* tceptor2: only 0x23 */
-	memset(m_is_mask_spr, 0, sizeof m_is_mask_spr);
-	for (i = 0; i < 0x400; i++)
+	// setup sprite mask color map
+	// tceptor2: only 0x23
+	std::fill(std::begin(m_is_mask_spr), std::end(m_is_mask_spr), 0);
+	for (int i = 0; i < 0x400; i++)
+	{
 		if (palette.pen_indirect(i | 0x400) == SPR_MASK_COLOR)
 			m_is_mask_spr[i >> 4] = 1;
+	}
 }
 
 
@@ -182,11 +184,7 @@ WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)
 {
 	m_bg_ram[offset] = data;
 
-	offset /= 2;
-	if (offset < 0x800)
-		m_bg1_tilemap->mark_tile_dirty(offset);
-	else
-		m_bg2_tilemap->mark_tile_dirty(offset - 0x800);
+	m_bg_tilemap[offset >> 12]->mark_tile_dirty((offset & 0xfff) >> 1);
 }
 
 WRITE8_MEMBER(tceptor_state::tceptor_bg_scroll_w)
@@ -194,27 +192,27 @@ WRITE8_MEMBER(tceptor_state::tceptor_bg_scroll_w)
 	switch (offset)
 	{
 	case 0:
-		m_bg1_scroll_x &= 0xff;
-		m_bg1_scroll_x |= data << 8;
+		m_bg_scroll_x[0] &= 0xff;
+		m_bg_scroll_x[0] |= data << 8;
 		break;
 	case 1:
-		m_bg1_scroll_x &= 0xff00;
-		m_bg1_scroll_x |= data;
+		m_bg_scroll_x[0] &= 0xff00;
+		m_bg_scroll_x[0] |= data;
 		break;
 	case 2:
-		m_bg1_scroll_y = data;
+		m_bg_scroll_y[0] = data;
 		break;
 
 	case 4:
-		m_bg2_scroll_x &= 0xff;
-		m_bg2_scroll_x |= data << 8;
+		m_bg_scroll_x[1] &= 0xff;
+		m_bg_scroll_x[1] |= data << 8;
 		break;
 	case 5:
-		m_bg2_scroll_x &= 0xff00;
-		m_bg2_scroll_x |= data;
+		m_bg_scroll_x[1] &= 0xff00;
+		m_bg_scroll_x[1] |= data;
 		break;
 	case 6:
-		m_bg2_scroll_y = data;
+		m_bg_scroll_y[1] = data;
 		break;
 	}
 }
@@ -385,14 +383,14 @@ void tceptor_state::video_start()
 	m_tx_tilemap->set_scrolly(0, 0);
 	m_tx_tilemap->configure_groups(*m_gfxdecode->gfx(0), 7);
 
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-	save_pointer(NAME(m_sprite_ram_buffered.get()), 0x200 / 2);
-	save_item(NAME(m_bg1_scroll_x));
-	save_item(NAME(m_bg1_scroll_y));
-	save_item(NAME(m_bg2_scroll_x));
-	save_item(NAME(m_bg2_scroll_y));
+	save_pointer(NAME(m_sprite_ram_buffered), 0x200 / 2);
+	save_item(NAME(m_bg_scroll_x[0]));
+	save_item(NAME(m_bg_scroll_y[0]));
+	save_item(NAME(m_bg_scroll_x[1]));
+	save_item(NAME(m_bg_scroll_y[1]));
 }
 
 
@@ -502,21 +500,21 @@ uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind1
 {
 	rectangle rect;
 	int pri;
-	int bg_center = 144 - ((((m_bg1_scroll_x + m_bg2_scroll_x ) & 0x1ff) - 288) / 2);
+	int bg_center = 144 - ((((m_bg_scroll_x[0] + m_bg_scroll_x[1] ) & 0x1ff) - 288) / 2);
 
 	// left background
 	rect = cliprect;
 	rect.max_x = bg_center;
-	m_bg1_tilemap->set_scrollx(0, m_bg1_scroll_x + 12);
-	m_bg1_tilemap->set_scrolly(0, m_bg1_scroll_y + 20); //32?
-	m_bg1_tilemap->draw(screen, bitmap, rect, 0, 0);
+	m_bg_tilemap[0]->set_scrollx(0, m_bg_scroll_x[0] + 12);
+	m_bg_tilemap[0]->set_scrolly(0, m_bg_scroll_y[0] + 20); //32?
+	m_bg_tilemap[0]->draw(screen, bitmap, rect, 0, 0);
 
 	// right background
 	rect.min_x = bg_center;
 	rect.max_x = cliprect.max_x;
-	m_bg2_tilemap->set_scrollx(0, m_bg2_scroll_x + 20);
-	m_bg2_tilemap->set_scrolly(0, m_bg2_scroll_y + 20); // 32?
-	m_bg2_tilemap->draw(screen, bitmap, rect, 0, 0);
+	m_bg_tilemap[1]->set_scrollx(0, m_bg_scroll_x[1] + 20);
+	m_bg_tilemap[1]->set_scrolly(0, m_bg_scroll_y[1] + 20); // 32?
+	m_bg_tilemap[1]->draw(screen, bitmap, rect, 0, 0);
 
 	for (pri = 0; pri < 8; pri++)
 	{

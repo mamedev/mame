@@ -19,53 +19,47 @@ Differences between these sets include
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
 #include "includes/fgoal.h"
+#include "cpu/m6800/m6800.h"
 
 
 int fgoal_state::intensity(int bits)
 {
 	int v = 0;
 
-	/* contrary to the schems pull-up resistors are 270 and not 390 */
+	// contrary to the schems pull-up resistors are 270 and not 390
 
 	if (1)
-	{
-		v += 0x2e; /* 100 + 270 */
-	}
+		v += 0x2e; // 100 + 270
+
 	if (bits & 1)
-	{
-		v += 0x27; /* 100 + 330 */
-	}
+		v += 0x27; // 100 + 330
+
 	if (bits & 2)
-	{
-		v += 0xaa; /* 100 */
-	}
+		v += 0xaa; // 100
 
 	return v;
 }
 
 
-PALETTE_INIT_MEMBER(fgoal_state, fgoal)
+void fgoal_state::fgoal_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	// for B/W screens PCB can be jumpered to use lower half of PROM
 
-	/* for B/W screens PCB can be jumpered to use lower half of PROM */
-
-	for (i = 0; i < 128; i++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 128; i++)
 	{
-		uint8_t color = color_prom[0x80 | i] & 63;
+		uint8_t const color = color_prom[0x80 | i] & 63;
 		palette.set_pen_color(i, intensity(color >> 4), intensity(color >> 2), intensity(color >> 0));
 	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		palette.set_pen_color(128 + 0*8 + i, rgb_t(0x2e,0x80,0x2e));
-		palette.set_pen_color(128 + 1*8 + i, rgb_t(0x2e,0x2e,0x2e));
+		palette.set_pen_color(128 + 0*8 + i, rgb_t(0x2e, 0x80, 0x2e));
+		palette.set_pen_color(128 + 1*8 + i, rgb_t(0x2e, 0x2e, 0x2e));
 	}
 
-	/* ball is a fixed color */
+	// ball is a fixed color
 	palette.set_pen_color(128 + 16, intensity(0x38 >> 4), intensity(0x38 >> 2), intensity(0x38 >> 0));
 }
 
@@ -212,31 +206,31 @@ void fgoal_state::cpu_map(address_map &map)
 
 	map(0x0000, 0x00ef).ram();
 
-	map(0x00f0, 0x00f0).r(this, FUNC(fgoal_state::row_r));
-	map(0x00f1, 0x00f1).r(this, FUNC(fgoal_state::analog_r));
+	map(0x00f0, 0x00f0).r(FUNC(fgoal_state::row_r));
+	map(0x00f1, 0x00f1).r(FUNC(fgoal_state::analog_r));
 	map(0x00f2, 0x00f2).portr("IN0");
 	map(0x00f3, 0x00f3).portr("IN1");
-	map(0x00f4, 0x00f4).r(this, FUNC(fgoal_state::address_hi_r));
-	map(0x00f5, 0x00f5).r(this, FUNC(fgoal_state::address_lo_r));
-	map(0x00f6, 0x00f6).r(this, FUNC(fgoal_state::shifter_r));
-	map(0x00f7, 0x00f7).r(this, FUNC(fgoal_state::shifter_reverse_r));
-	map(0x00f8, 0x00fb).r(this, FUNC(fgoal_state::nmi_reset_r));
-	map(0x00fc, 0x00ff).r(this, FUNC(fgoal_state::irq_reset_r));
+	map(0x00f4, 0x00f4).r(FUNC(fgoal_state::address_hi_r));
+	map(0x00f5, 0x00f5).r(FUNC(fgoal_state::address_lo_r));
+	map(0x00f6, 0x00f6).r(FUNC(fgoal_state::shifter_r));
+	map(0x00f7, 0x00f7).r(FUNC(fgoal_state::shifter_reverse_r));
+	map(0x00f8, 0x00fb).r(FUNC(fgoal_state::nmi_reset_r));
+	map(0x00fc, 0x00ff).r(FUNC(fgoal_state::irq_reset_r));
 
-	map(0x00f0, 0x00f0).w(this, FUNC(fgoal_state::row_w));
-	map(0x00f1, 0x00f1).w(this, FUNC(fgoal_state::col_w));
-	map(0x00f2, 0x00f2).w(this, FUNC(fgoal_state::row_w));
-	map(0x00f3, 0x00f3).w(this, FUNC(fgoal_state::col_w));
+	map(0x00f0, 0x00f0).w(FUNC(fgoal_state::row_w));
+	map(0x00f1, 0x00f1).w(FUNC(fgoal_state::col_w));
+	map(0x00f2, 0x00f2).w(FUNC(fgoal_state::row_w));
+	map(0x00f3, 0x00f3).w(FUNC(fgoal_state::col_w));
 	map(0x00f4, 0x00f7).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x00f8, 0x00fb).w(this, FUNC(fgoal_state::sound1_w));
-	map(0x00fc, 0x00ff).w(this, FUNC(fgoal_state::sound2_w));
+	map(0x00f8, 0x00fb).w(FUNC(fgoal_state::sound1_w));
+	map(0x00fc, 0x00ff).w(FUNC(fgoal_state::sound2_w));
 
 	map(0x0100, 0x03ff).ram();
 	map(0x4000, 0x7fff).ram().share("video_ram");
 
-	map(0x8000, 0x8000).w(this, FUNC(fgoal_state::ypos_w));
-	map(0x8001, 0x8001).w(this, FUNC(fgoal_state::xpos_w));
-	map(0x8002, 0x8002).w(this, FUNC(fgoal_state::color_w));
+	map(0x8000, 0x8000).w(FUNC(fgoal_state::ypos_w));
+	map(0x8001, 0x8001).w(FUNC(fgoal_state::xpos_w));
+	map(0x8002, 0x8002).w(FUNC(fgoal_state::color_w));
 
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xffff).rom();
@@ -371,9 +365,8 @@ MACHINE_CONFIG_START(fgoal_state::fgoal)
 	MCFG_DEVICE_ADD("maincpu", M6800, 10065000 / 10) /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
-
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -381,11 +374,10 @@ MACHINE_CONFIG_START(fgoal_state::fgoal)
 	MCFG_SCREEN_SIZE(256, 263)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(fgoal_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fgoal)
-	MCFG_PALETTE_ADD("palette", 128 + 16 + 1)
-	MCFG_PALETTE_INIT_OWNER(fgoal_state, fgoal)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fgoal);
+	PALETTE(config, m_palette, FUNC(fgoal_state::fgoal_palette), 128 + 16 + 1);
 
 	/* sound hardware */
 MACHINE_CONFIG_END
