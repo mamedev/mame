@@ -142,7 +142,7 @@ void fs3216_state::mmu_reg_w(offs_t offset, u16 data)
 READ16_MEMBER(fs3216_state::mmu_read)
 {
 	const bool a23 = BIT(offset, 22);
-	const bool mmu_disable = !a23 /*&& BIT(m_maincpu->get_fc(), 2)*/;
+	const bool mmu_disable = !a23 && BIT(m_maincpu->get_fc(), 2);
 	const u32 mmu_reg = mmu_disable ? (m_from_reset ? 0xfffe00 : 0xfff000) : m_mmu_reg[(offset >> 20) & 3];
 
 	if (!mmu_disable && !machine().side_effects_disabled())
@@ -158,7 +158,7 @@ READ16_MEMBER(fs3216_state::mmu_read)
 WRITE16_MEMBER(fs3216_state::mmu_write)
 {
 	const bool a23 = BIT(offset, 22);
-	const bool mmu_disable = !a23 /*&& BIT(m_maincpu->get_fc(), 2)*/;
+	const bool mmu_disable = !a23 && BIT(m_maincpu->get_fc(), 2);
 	const u32 mmu_reg = mmu_disable ? (m_from_reset ? 0xfffe00 : 0xfff000) : m_mmu_reg[(offset >> 20) & 3];
 
 	if (!mmu_disable && !machine().side_effects_disabled())
