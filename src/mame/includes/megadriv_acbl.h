@@ -25,6 +25,7 @@ public:
 	void init_puckpkmn();
 	void init_hshavoc();
 	void init_barek3();
+	void init_sonic2mb();
 	void init_twinktmb();
 
 private:
@@ -32,6 +33,8 @@ private:
 	DECLARE_READ16_MEMBER(bl_710000_r);
 	DECLARE_WRITE16_MEMBER(aladmdb_w);
 	DECLARE_READ16_MEMBER(aladmdb_r);
+	DECLARE_READ16_MEMBER(sonic2mb_r);
+	DECLARE_READ16_MEMBER(twinktmb_r);
 	DECLARE_READ16_MEMBER(mk3mdb_dsw_r);
 	DECLARE_READ16_MEMBER(ssf2mdb_dsw_r);
 	DECLARE_READ16_MEMBER(srmdb_dsw_r);

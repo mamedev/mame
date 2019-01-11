@@ -309,7 +309,7 @@ WRITE16_MEMBER(md_boot_state::aladmdb_w )
 	  - aladmdb_w : 1b2d18 - data = aa00 (only once on reset)
 	  - aladmdb_w : 1b2d42 - data = 0000 (only once on reset)
 	*/
-	logerror("aladmdb_w : %06x - data = %04x\n",m_maincpu->pc(),data);
+	//logerror("aladmdb_w : %06x - data = %04x\n",m_maincpu->pc(),data);
 }
 
 READ16_MEMBER(md_boot_state::aladmdb_r )
@@ -328,6 +328,35 @@ READ16_MEMBER(md_boot_state::aladmdb_r )
 	if (m_maincpu->pc()==0x1b2d4e) return 0x0000;
 
 	logerror("aladbl_r : %06x\n",m_maincpu->pc());
+	return 0x0000;
+}
+
+READ16_MEMBER(md_boot_state::sonic2mb_r )
+{
+	if (m_maincpu->pc()==0x00010a)
+	{
+		m_aladmdb_mcu_port = ioport("MCU")->read();
+
+		return ioport("COIN")->read() & 0x03;
+	}
+	
+	if (m_maincpu->pc()==0x000318) { return ((m_aladmdb_mcu_port) << 8); } // DSW
+
+	//logerror("sonic2mb_r : %06x\n",m_maincpu->pc());
+
+	return 0x0000;
+}
+
+READ16_MEMBER(md_boot_state::twinktmb_r )
+{
+	if (m_maincpu->pc()==0x02f81e)
+	{
+		return machine().rand() & 0xffff; // TODO: obviously wrong, rand() gets in game
+	}
+
+	if (m_maincpu->pc()==0x02f84e) return 0x0000; // what's this?
+
+	//logerror("twinktmb_r : %06x\n",m_maincpu->pc());
 
 	return 0x0000;
 }
@@ -606,6 +635,45 @@ INPUT_PORTS_START( aladmdb )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)     /* needed to avoid credits getting mad */
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sonic2mb )
+	PORT_INCLUDE( aladmdb )
+
+	/* As I don't know how it is on real hardware, this is more a guess than anything */
+	PORT_MODIFY("MCU")
+	PORT_DIPNAME(          0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2") // recognized only after soft reset?
+	PORT_DIPSETTING(       0x00, "1" )
+	PORT_DIPSETTING(       0x01, "2" )
+	PORT_DIPSETTING(       0x02, "3" )
+	PORT_DIPSETTING(       0x03, "4" )
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_DIPUNUSED( 0x100, IP_ACTIVE_HIGH )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( twinktmb )
+	PORT_INCLUDE( aladmdb )
+
+	/* As I don't know how it is on real hardware, this is more a guess than anything */
+
+	PORT_MODIFY("MCU")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 INPUT_PORTS_END
 
 /* verified from M68000 code */
@@ -977,6 +1045,15 @@ void md_boot_state::init_barek3()
 	init_megadrij();
 }
 
+void md_boot_state::init_sonic2mb()
+{
+	// 100000 = writes to mcu? 300000 = reads?
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(md_boot_state::sonic2mb_r),this));
+
+	init_megadrij();
+}
+
 void md_boot_state::init_twinktmb()
 {
 	// boot vectors don't seem to be valid, so they are patched...
@@ -987,7 +1064,7 @@ void md_boot_state::init_twinktmb()
 	rom[0x07] = 0x46;
 	rom[0x06] = 0xcc;
 
-	init_megadrij();
+	init_sonic2mb();
 }
 
 /*************************************
@@ -1001,6 +1078,6 @@ GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_state, init_mk3mdb,   R
 GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_state, init_ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
 GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)
-GAME( 1993, sonic2mb, 0, megadrvb,     aladmdb,  md_boot_state, init_aladmdb,  ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", MACHINE_NOT_WORKING )
+GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION ) // simulation incomplete, needs PIC decap
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )
-GAME( 1993, twinktmb, 0, megadrvb,     aladmdb,  md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)", MACHINE_NOT_WORKING ) // inputs not hooked up, possibly go through pic?
+GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
