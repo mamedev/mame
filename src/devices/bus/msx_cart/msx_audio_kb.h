@@ -5,7 +5,14 @@
 
 #pragma once
 
+
 DECLARE_DEVICE_TYPE(MSX_AUDIO_KBDC_PORT, msx_audio_kbdc_port_device)
+
+
+#define MCFG_MSX_AUDIO_KBDC_PORT_ADD(_tag, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, MSX_AUDIO_KBDC_PORT, 0 ) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
 
 class msx_audio_kb_port_interface : public device_slot_card_interface
 {
@@ -24,15 +31,6 @@ class msx_audio_kbdc_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	template <typename T>
-	msx_audio_kbdc_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: msx_audio_kbdc_port_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
 	msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides

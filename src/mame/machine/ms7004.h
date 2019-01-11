@@ -13,6 +13,17 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_MS7004_TX_HANDLER(_cb) \
+	devcb = &downcast<ms7004_device &>(*device).set_tx_handler(DEVCB_##_cb);
+
+#define MCFG_MS7004_RTS_HANDLER(_cb) \
+	devcb = &downcast<ms7004_device &>(*device).set_rts_handler(DEVCB_##_cb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -24,8 +35,8 @@ public:
 	// construction/destruction
 	ms7004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto tx_handler() { return m_tx_handler.bind(); }
-	auto rts_handler() { return m_rts_handler.bind(); }
+	template <class Object> devcb_base &set_tx_handler(Object &&wr) { return m_tx_handler.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_rts_handler(Object &&wr) { return m_rts_handler.set_callback(std::forward<Object>(wr)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 
@@ -39,7 +50,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<i8035_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_speaker;
 	required_device<i8243_device> m_i8243;
 
@@ -55,7 +66,7 @@ private:
 	DECLARE_WRITE8_MEMBER( p1_w );
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ_LINE_MEMBER( t1_r );
-	template<int P> void i8243_port_w(uint8_t data);
+	DECLARE_WRITE8_MEMBER( i8243_port_w );
 };
 
 // device type definition

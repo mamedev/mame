@@ -66,7 +66,6 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
-#include "imagedev/floppy.h"
 #include "machine/ins8250.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -74,8 +73,8 @@ ToDo:
 class ccs_state : public driver_device
 {
 public:
-	ccs_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	ccs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
@@ -90,31 +89,25 @@ public:
 	{
 	}
 
-	void init_ccs2810();
-	void init_ccs2422();
-
-	void ccs2810(machine_config &config);
-	void ccs2422(machine_config &config);
-
-protected:
 	DECLARE_READ8_MEMBER(memory_read);
 	DECLARE_WRITE8_MEMBER(memory_write);
 	DECLARE_READ8_MEMBER(io_read);
 	DECLARE_WRITE8_MEMBER(io_write);
-
+	void init_ccs2810();
+	void init_ccs2422();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_READ8_MEMBER(port34_r);
 	DECLARE_WRITE8_MEMBER(port04_w);
 	DECLARE_WRITE8_MEMBER(port34_w);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
+	void ccs2810(machine_config &config);
+	void ccs2422(machine_config &config);
 	void ccs2422_io(address_map &map);
 	void ccs2810_io(address_map &map);
 	void ccs2810_mem(address_map &map);
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -187,21 +180,21 @@ WRITE8_MEMBER(ccs_state::io_write)
 
 void ccs_state::ccs2810_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(ccs_state::memory_read), FUNC(ccs_state::memory_write));
+	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::memory_read), FUNC(ccs_state::memory_write));
 }
 
 void ccs_state::ccs2810_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
+	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
 }
 
 void ccs_state::ccs2422_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
-	map(0x04, 0x04).mirror(0xff00).rw(FUNC(ccs_state::port04_r), FUNC(ccs_state::port04_w));
+	map(0x0000, 0xffff).rw(this, FUNC(ccs_state::io_read), FUNC(ccs_state::io_write));
+	map(0x04, 0x04).mirror(0xff00).rw(this, FUNC(ccs_state::port04_r), FUNC(ccs_state::port04_w));
 	map(0x30, 0x33).mirror(0xff00).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write));
-	map(0x34, 0x34).mirror(0xff00).rw(FUNC(ccs_state::port34_r), FUNC(ccs_state::port34_w));
-	map(0x40, 0x40).mirror(0xff00).w(FUNC(ccs_state::port40_w));
+	map(0x34, 0x34).mirror(0xff00).rw(this, FUNC(ccs_state::port34_r), FUNC(ccs_state::port34_w));
+	map(0x40, 0x40).mirror(0xff00).w(this, FUNC(ccs_state::port40_w));
 }
 
 /* Input ports */
@@ -912,50 +905,52 @@ static void ccs_floppies(device_slot_interface &device)
 
 MACHINE_CONFIG_START(ccs_state::ccs2810)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
 	MCFG_DEVICE_IO_MAP(ccs2810_io)
 
-	RAM(config, RAM_TAG).set_default_size("64K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* Devices */
-	INS8250(config, m_ins8250, 1.8432_MHz_XTAL);
-	m_ins8250->out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_ins8250->out_dtr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
-	m_ins8250->out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
-	m_ins8250->out_out1_callback().set("rs232", FUNC(rs232_port_device::write_spds)); // RLSD
+	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL(1'843'200))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_OUT1_CB(WRITELINE("rs232", rs232_port_device, write_spds)) // RLSD
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_ins8250, FUNC(ins8250_device::rx_w));
-	rs232.rxd_handler().append(m_ins8250, FUNC(ins8250_device::ri_w));
-	rs232.dcd_handler().set(m_ins8250, FUNC(ins8250_device::dcd_w));
-	rs232.dsr_handler().set(m_ins8250, FUNC(ins8250_device::dsr_w));
-	rs232.cts_handler().set(m_ins8250, FUNC(ins8250_device::cts_w));
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_device, rx_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ins8250", ins8250_device, ri_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ins8250", ins8250_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ins8250", ins8250_device, dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_device, cts_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ccs_state::ccs2422)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(ccs2810_mem)
 	MCFG_DEVICE_IO_MAP(ccs2422_io)
 
-	RAM(config, RAM_TAG).set_default_size("64K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* Devices */
-	INS8250(config, m_ins8250, 1.8432_MHz_XTAL);
-	m_ins8250->out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_ins8250->out_dtr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
-	m_ins8250->out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
-	m_ins8250->out_out1_callback().set("rs232", FUNC(rs232_port_device::write_etc)); // RLSD
+	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL(1'843'200))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_OUT1_CB(WRITELINE("rs232", rs232_port_device, write_etc)) // RLSD
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(m_ins8250, FUNC(ins8250_device::rx_w));
-	rs232.rxd_handler().append(m_ins8250, FUNC(ins8250_device::ri_w));
-	rs232.dcd_handler().set(m_ins8250, FUNC(ins8250_device::dcd_w));
-	rs232.dsr_handler().set(m_ins8250, FUNC(ins8250_device::dsr_w));
-	rs232.cts_handler().set(m_ins8250, FUNC(ins8250_device::cts_w));
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_device, rx_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("ins8250", ins8250_device, ri_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ins8250", ins8250_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ins8250", ins8250_device, dsr_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_device, cts_w))
 
-	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // UB1793 or MB8877
+	MCFG_MB8877_ADD("fdc", XTAL(16'000'000) / 8) // UB1793 or MB8877
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

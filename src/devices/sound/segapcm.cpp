@@ -42,7 +42,7 @@ void segapcm_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / 128);
 
 	save_item(NAME(m_low));
-	save_pointer(NAME(m_ram), 0x800);
+	save_pointer(NAME(m_ram.get()), 0x800);
 }
 
 

@@ -25,7 +25,7 @@ copyright-holders:Vas Crabb
 		<rect state="0"><color red="0.4" green="0.4" blue="0.4" /></rect>
 		<rect state="1"><color red="1" green="0.3" blue="0.2" /></rect>
 	</element>
-
+	
 	<element name="timerlamp">
 		<disk state="0"><color red="0.3" green="0" blue="0" /></disk>
 		<disk state="1"><color red="1" green="0.3" blue="0.1" /></disk>
@@ -70,7 +70,7 @@ copyright-holders:Vas Crabb
 
 		<bezel element="marquee"><bounds x="0" y="0" width="23" height="2.5" /></bezel>
 		<bezel element="colorlamp" name="sit13"><bounds x="0" y="0" width="11.5" height="1" /></bezel>
-		<bezel element="colorlamp" name="sit12"><bounds x="11.5" y="0" width="11.5" height="1" /></bezel>
+		<bezel element="colorlamp" name="sit12"><bounds x="11.5" y="0" width="11.5" height="1" /></bezel>		
 		<bezel element="timerlamp" name="sit9"><bounds x="2" y="1.25" width="1" height="1" /></bezel>
 		<bezel element="timerlamp" name="sit8"><bounds x="4" y="1.25" width="1" height="1" /></bezel>
 		<bezel element="timerlamp" name="sit7"><bounds x="6" y="1.25" width="1" height="1" /></bezel>

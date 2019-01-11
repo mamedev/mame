@@ -22,7 +22,6 @@ sound system appears to be the same as 'spartanxtec.cpp'
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -48,11 +47,7 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void spyhuntertec(machine_config &config);
 
-	void init_spyhuntertec();
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_analog_timer;
@@ -73,6 +68,8 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+
+
 	uint8_t m_spyhunt_sprite_color_mask;
 	int16_t m_spyhunt_scroll_offset;
 	int16_t m_spyhunt_scrollx;
@@ -83,8 +80,8 @@ private:
 	tilemap_t *m_alpha_tilemap;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(spyhuntertec_paletteram_w);
-
-	//  DECLARE_VIDEO_START(spyhuntertec);
+	void init_spyhuntertec();
+//  DECLARE_VIDEO_START(spyhuntertec);
 //  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_port04_w);
 	DECLARE_WRITE8_MEMBER(spyhuntertec_portf0_w);
@@ -114,6 +111,7 @@ private:
 
 	uint8_t m_analog_select;
 	uint8_t m_analog_count;
+	void spyhuntertec(machine_config &config);
 	void spyhuntertec_map(address_map &map);
 	void spyhuntertec_portmap(address_map &map);
 	void spyhuntertec_sound_map(address_map &map);
@@ -434,16 +432,16 @@ void spyhuntertec_state::spyhuntertec_map(address_map &map)
 	map(0xa800, 0xa8ff).ram(); // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
 	map(0xa900, 0xa9ff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
-	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(this, FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
 	map(0xf000, 0xf7ff).ram(); //AM_SHARE("nvram")
 	map(0xf800, 0xf9ff).ram().share("spriteram"); // origional spriteram
-	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
+	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(this, FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
 
 	map(0xfc00, 0xfc00).portr("DSW0");
 	map(0xfc01, 0xfc01).portr("DSW1");
-	map(0xfc02, 0xfc02).r(FUNC(spyhuntertec_state::spyhuntertec_in2_r));
-	map(0xfc03, 0xfc03).r(FUNC(spyhuntertec_state::spyhuntertec_in3_r));
+	map(0xfc02, 0xfc02).r(this, FUNC(spyhuntertec_state::spyhuntertec_in2_r));
+	map(0xfc03, 0xfc03).r(this, FUNC(spyhuntertec_state::spyhuntertec_in3_r));
 
 	map(0xfd00, 0xfd00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
@@ -464,11 +462,11 @@ void spyhuntertec_state::spyhuntertec_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x04).w(FUNC(spyhuntertec_state::spyhuntertec_port04_w));
-	map(0x84, 0x86).w(FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
+	map(0x04, 0x04).w(this, FUNC(spyhuntertec_state::spyhuntertec_port04_w));
+	map(0x84, 0x86).w(this, FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).nopw(); // was watchdog
 //  AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	map(0xf0, 0xf0).w(FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
+	map(0xf0, 0xf0).w(this, FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
 }
 
 
@@ -491,7 +489,7 @@ void spyhuntertec_state::spyhuntertec_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 
-	map(0x00, 0x00).w(FUNC(spyhuntertec_state::sound_irq_ack));
+	map(0x00, 0x00).w(this, FUNC(spyhuntertec_state::sound_irq_ack));
 
 	map(0x0012, 0x0013).w("ay3", FUNC(ay8912_device::address_data_w));
 	map(0x0012, 0x0012).r("ay3", FUNC(ay8912_device::data_r));
@@ -704,20 +702,21 @@ MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ay8912_device &ay1(AY8912(config, "ay1", 3000000/2)); // AY-3-8912
-	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
-	ay1.port_a_read_callback().set(FUNC(spyhuntertec_state::ay1_porta_r));
-	ay1.port_a_write_callback().set(FUNC(spyhuntertec_state::ay1_porta_w));
+	MCFG_DEVICE_ADD("ay1", AY8912, 3000000/2) // AY-3-8912
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spyhuntertec_state, ay1_porta_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, spyhuntertec_state, ay1_porta_w))
 
-	ay8912_device &ay2(AY8912(config, "ay2", 3000000/2)); // "
-	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
-	ay2.port_a_read_callback().set(FUNC(spyhuntertec_state::ay2_porta_r));
-	ay2.port_a_write_callback().set(FUNC(spyhuntertec_state::ay2_porta_w));
+	MCFG_DEVICE_ADD("ay2", AY8912, 3000000/2) // "
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, spyhuntertec_state, ay2_porta_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, spyhuntertec_state, ay2_porta_w))
 
-	AY8912(config, "ay3", 3000000/2).add_route(ALL_OUTPUTS, "mono", 0.25); // "
+	MCFG_DEVICE_ADD("ay3", AY8912, 3000000/2) // "
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 

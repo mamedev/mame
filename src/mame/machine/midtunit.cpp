@@ -361,6 +361,10 @@ void midtunit_state::init_tunit_generic(int sound)
 
 	/* load sound ROMs and set up sound handlers */
 	m_chip_type = sound;
+
+
+	/* default graphics functionality */
+	m_gfx_rom_large = 0;
 }
 
 
@@ -382,7 +386,7 @@ void midtunit_state::init_mktunit()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(FUNC(midtunit_state::mk_prot_r),this), write16_delegate(FUNC(midtunit_state::mk_prot_w),this));
 
 	/* sound chip protection (hidden RAM) */
-	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
+	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
 }
 
 void midtunit_state::init_mkturbo()
@@ -413,9 +417,9 @@ void midtunit_state::init_nbajam_common(int te_protection)
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
+		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
 	else
-		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
+		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
 }
 
 void midtunit_state::init_nbajam()
@@ -440,8 +444,8 @@ void midtunit_state::init_jdreddp()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1bfffff, read16_delegate(FUNC(midtunit_state::jdredd_prot_r),this), write16_delegate(FUNC(midtunit_state::jdredd_prot_w),this));
 
 	/* sound chip protection (hidden RAM) */
-	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
-	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
+	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
+	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
 	membank("adpcm:bank9")->set_base(auto_alloc_array(machine(), uint8_t, 0x80));
 }
 
@@ -459,7 +463,7 @@ void midtunit_state::init_mk2()
 {
 	/* common init */
 	init_tunit_generic(SOUND_DCS);
-	m_video->set_gfx_rom_large(true);
+	m_gfx_rom_large = 1;
 
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f20c60, 0x00f20c7f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),this));
@@ -479,7 +483,7 @@ void midtunit_state::init_mk2()
  *
  *************************************/
 
-void midtunit_state::machine_reset()
+MACHINE_RESET_MEMBER(midtunit_state,midtunit)
 {
 	/* reset sound */
 	switch (m_chip_type)

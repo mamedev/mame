@@ -20,7 +20,6 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -33,16 +32,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void rd100(machine_config &config);
-
 	void init_rd100();
-
-private:
 	DECLARE_MACHINE_RESET(rd100);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void rd100(machine_config &config);
 	void mem_map(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -119,7 +115,7 @@ MACHINE_CONFIG_START(rd100_state::rd100)
 	MCFG_SCREEN_UPDATE_DRIVER(rd100_state, screen_update)
 	MCFG_SCREEN_SIZE(64*6, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	//MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rd100)
 MACHINE_CONFIG_END
 

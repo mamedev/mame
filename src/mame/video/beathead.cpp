@@ -145,29 +145,29 @@ uint32_t beathead_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	int x, y;
 
 	/* generate the final screen */
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		pen_t pen_base = (*m_palette_select & 0x7f) * 256;
 		uint16_t scanline[336];
 
 		/* blanking */
 		if (m_finescroll & 8)
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				scanline[x] = pen_base;
 
 		/* non-blanking */
 		else
 		{
 			offs_t scanline_offset = m_vram_latch_offset + (m_finescroll & 3);
-			offs_t src = scanline_offset + cliprect.left();
+			offs_t src = scanline_offset + cliprect.min_x;
 
 			/* unswizzle the scanline first */
-			for (x = cliprect.left(); x <= cliprect.right(); x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				scanline[x] = pen_base | videoram[BYTE4_XOR_LE(src++)];
 		}
 
 		/* then draw it */
-		draw_scanline16(bitmap, cliprect.left(), y, cliprect.width(), &scanline[cliprect.left()], nullptr);
+		draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], nullptr);
 	}
 	return 0;
 }

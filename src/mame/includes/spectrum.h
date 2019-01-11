@@ -17,12 +17,10 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "imagedev/cassette.h"
-#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
-#include "emupal.h"
 #include "screen.h"
 
 /* Spectrum crystals */
@@ -66,8 +64,14 @@ struct EVENT_LIST_ITEM
 class spectrum_state : public driver_device
 {
 public:
-	spectrum_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+		enum
+		{
+				TIMER_IRQ_ON,
+				TIMER_IRQ_OFF,
+				TIMER_SCANLINE
+		};
+	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -95,30 +99,7 @@ public:
 		m_io_plus3(*this, "PLUS3"),
 		m_io_plus4(*this, "PLUS4"),
 		m_io_joy1(*this, "JOY1"),
-		m_io_joy2(*this, "JOY2")
-	{ }
-
-	void spectrum_common(machine_config &config);
-	void spectrum(machine_config &config);
-	void ts2068(machine_config &config);
-	void uk2086(machine_config &config);
-	void tc2048(machine_config &config);
-	void spectrum_plus3(machine_config &config);
-	void spectrum_128(machine_config &config);
-
-	void init_spectrum();
-	void init_spec128();
-	void init_timex();
-	void init_plus2();
-	void init_plus3();
-
-protected:
-	enum
-	{
-		TIMER_IRQ_ON,
-		TIMER_IRQ_OFF,
-		TIMER_SCANLINE
-	};
+		m_io_joy2(*this, "JOY2") { }
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
@@ -136,8 +117,6 @@ protected:
 	uint8_t *m_screen_location;
 
 	int m_ROMSelection;
-
-	emu_timer *m_irq_off_timer;
 
 	// Build up the screen bitmap line-by-line as the z80 uses CPU cycles.
 	// Elimiates sprite flicker on various games (E.g. Marauder and
@@ -178,9 +157,12 @@ protected:
 	DECLARE_WRITE8_MEMBER(ts2068_port_ff_w);
 	DECLARE_WRITE8_MEMBER(tc2048_port_ff_w);
 
+	void init_spectrum();
+	void init_plus2();
+	void init_plus3();
 	DECLARE_MACHINE_RESET(spectrum);
 	DECLARE_VIDEO_START(spectrum);
-	void spectrum_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(spectrum);
 	DECLARE_MACHINE_RESET(tc2048);
 	DECLARE_VIDEO_START(spectrum_128);
 	DECLARE_MACHINE_RESET(spectrum_128);
@@ -195,7 +177,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
 
 	// for timex cart only
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(timex_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( timex_cart );
 	int m_dock_cart_type, m_ram_chunks;
 	memory_region *m_dock_crt;
 
@@ -204,17 +186,24 @@ protected:
 	unsigned int m_previous_screen_x, m_previous_screen_y;
 	bitmap_ind16 m_screen_bitmap;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void spectrum_128_update_memory();
 	void spectrum_plus3_update_memory();
 	void ts2068_update_memory();
 
-	DECLARE_SNAPSHOT_LOAD_MEMBER(spectrum);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(spectrum);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( spectrum );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( spectrum );
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
+	void spectrum_common(machine_config &config);
+	void spectrum(machine_config &config);
+	void ts2068(machine_config &config);
+	void uk2086(machine_config &config);
+	void tc2048(machine_config &config);
+	void spectrum_plus3(machine_config &config);
+	void spectrum_128(machine_config &config);
 	void spectrum_128_io(address_map &map);
 	void spectrum_128_mem(address_map &map);
 	void spectrum_io(address_map &map);
@@ -225,7 +214,7 @@ protected:
 	void tc2048_mem(address_map &map);
 	void ts2068_io(address_map &map);
 	void ts2068_mem(address_map &map);
-
+protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;

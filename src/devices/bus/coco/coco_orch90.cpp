@@ -123,3 +123,5 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_ORCH90, device_cococart_interface, coco_orch90_device, "coco_orch90", "CoCo Orch-90 PAK")
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;

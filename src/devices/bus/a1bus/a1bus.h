@@ -20,10 +20,10 @@
 	downcast<a1bus_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_A1BUS_OUT_IRQ_CB(_devcb) \
-	downcast<a1bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	devcb = &downcast<a1bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_A1BUS_OUT_NMI_CB(_devcb) \
-	downcast<a1bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	devcb = &downcast<a1bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

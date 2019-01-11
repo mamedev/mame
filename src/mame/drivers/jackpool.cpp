@@ -23,7 +23,6 @@ TODO:
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
 #include "sound/okim6295.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -31,28 +30,20 @@ TODO:
 class jackpool_state : public driver_device
 {
 public:
-	jackpool_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	jackpool_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette")  { }
 
-	void jackpool(machine_config &config);
-
-	void init_jackpool();
-
-protected:
-	virtual void video_start() override;
-
-private:
 	DECLARE_READ8_MEMBER(jackpool_io_r);
 	DECLARE_WRITE_LINE_MEMBER(map_vreg_w);
+	void init_jackpool();
+	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
-	void jackpool_mem(address_map &map);
 
 	required_shared_ptr<uint16_t> m_vram;
 	uint8_t m_map_vreg;
@@ -60,6 +51,8 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void jackpool(machine_config &config);
+	void jackpool_mem(address_map &map);
 };
 
 
@@ -154,7 +147,7 @@ void jackpool_state::jackpool_mem(address_map &map)
 	map(0x348000, 0x34ffff).ram(); //<- vram banks 2 & 3?
 
 	map(0x360000, 0x3603ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x380000, 0x38002f).r(FUNC(jackpool_state::jackpool_io_r)).umask16(0x00ff);
+	map(0x380000, 0x38002f).r(this, FUNC(jackpool_state::jackpool_io_r)).umask16(0x00ff);
 	map(0x380030, 0x38003f).w("latch1", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x380040, 0x38004f).w("latch2", FUNC(ls259_device::write_d0)).umask16(0x00ff);
 	map(0x380050, 0x38005f).w("latch3", FUNC(ls259_device::write_d0)).umask16(0x00ff);
@@ -238,7 +231,7 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_DEVICE_PROGRAM_MAP(jackpool_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackpool);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jackpool)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -248,32 +241,33 @@ MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_SCREEN_UPDATE_DRIVER(jackpool_state, screen_update_jackpool)
 	MCFG_SCREEN_PALETTE("palette")
 
-	ls259_device &latch1(LS259(config, "latch1"));
-	latch1.q_out_cb<0>().set_nop(); // HOLD3 lamp
-	latch1.q_out_cb<1>().set_nop(); // HOLD4 lamp
-	latch1.q_out_cb<2>().set_nop(); // HOLD2 lamp
-	latch1.q_out_cb<3>().set_nop(); // HOLD1 lamp
-	latch1.q_out_cb<4>().set_nop(); // HOLD5 lamp
-	latch1.q_out_cb<5>().set_nop(); // START1 lamp
-	latch1.q_out_cb<6>().set_nop(); // BET lamp
+	MCFG_DEVICE_ADD("latch1", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // HOLD3 lamp
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // HOLD4 lamp
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // HOLD2 lamp
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // HOLD1 lamp
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // HOLD5 lamp
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // START1 lamp
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // BET lamp
 
-	ls259_device &latch2(LS259(config, "latch2"));
-	latch2.q_out_cb<0>().set_nop(); // PAYOUT lamp
-	latch2.q_out_cb<3>().set_nop(); // Coin counter
-	latch2.q_out_cb<5>().set_nop(); // Ticket motor
-	latch2.q_out_cb<6>().set_nop(); // Hopper motor
-	latch2.q_out_cb<7>().set(FUNC(jackpool_state::map_vreg_w));
+	MCFG_DEVICE_ADD("latch2", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // PAYOUT lamp
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // Coin counter
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // Ticket motor
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // Hopper motor
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, jackpool_state, map_vreg_w))
 
-	ls259_device &latch3(LS259(config, "latch3"));
-	latch3.q_out_cb<0>().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write));
-	latch3.q_out_cb<1>().set("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write));
-	latch3.q_out_cb<2>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write));
+	MCFG_DEVICE_ADD("latch3", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	NS16550(config, "uart", 1843200); // exact type and clock unknown
+	MCFG_DEVICE_ADD("uart", NS16550, 1843200) // exact type and clock unknown
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200);
+	MCFG_PALETTE_ADD("palette", 0x200)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	SPEAKER(config, "mono").front_center();
 

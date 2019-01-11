@@ -38,6 +38,48 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CRT9007_CHARACTER_WIDTH(_value) \
+	downcast<crt9007_device &>(*device).config_set_character_width(_value);
+
+#define MCFG_CRT9007_INT_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_int_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_DMAR_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_dmar_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_VS_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_vs_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_HS_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_hs_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_VLT_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_vlt_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_CURS_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_curs_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_DRB_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_drb_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_WBEN_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_wben_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_CBLANK_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_cblank_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_SLG_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_slg_wr_callback(DEVCB_##_write);
+
+#define MCFG_CRT9007_SLD_CALLBACK(_write) \
+	devcb = &downcast<crt9007_device &>(*device).set_sld_wr_callback(DEVCB_##_write);
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -51,32 +93,32 @@ public:
 	// construction/destruction
 	crt9007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto int_callback() { return m_write_int.bind(); }
-	auto dmar_callback() { return m_write_dmar.bind(); }
-	auto vs_callback() { return m_write_vs.bind(); }
-	auto hs_callback() { return m_write_hs.bind(); }
-	auto vlt_callback() { return m_write_vlt.bind(); }
-	auto curs_callback() { return m_write_curs.bind(); }
-	auto drb_callback() { return m_write_drb.bind(); }
-	auto wben_callback() { return m_write_wben.bind(); }
-	auto cblank_callback() { return m_write_cblank.bind(); }
-	auto slg_callback() { return m_write_slg.bind(); }
-	auto sld_callback() { return m_write_sld.bind(); }
+	void config_set_character_width(int value) { m_hpixels_per_column = value; }
+
+	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dmar_wr_callback(Object &&cb) { return m_write_dmar.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vs_wr_callback(Object &&cb) { return m_write_vs.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_hs_wr_callback(Object &&cb) { return m_write_hs.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vlt_wr_callback(Object &&cb) { return m_write_vlt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_curs_wr_callback(Object &&cb) { return m_write_curs.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drb_wr_callback(Object &&cb) { return m_write_drb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_wben_wr_callback(Object &&cb) { return m_write_wben.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cblank_wr_callback(Object &&cb) { return m_write_cblank.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_slg_wr_callback(Object &&cb) { return m_write_slg.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sld_wr_callback(Object &&cb) { return m_write_sld.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	void set_character_width(unsigned value);
+	void set_character_width(int value);
 
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( lpstb_w );
 
 protected:
 	// device-level overrides
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -91,8 +133,7 @@ private:
 		TIMER_VLT,
 		TIMER_CURS,
 		TIMER_DRB,
-		TIMER_DMA,
-		TIMER_FRAME
+		TIMER_DMA
 	};
 
 	void crt9007(address_map &map);
@@ -101,11 +142,11 @@ private:
 
 	inline void trigger_interrupt(int line);
 	inline void update_cblank_line();
-	inline void update_hsync_timer(bool state);
-	inline void update_vsync_timer(bool state);
-	inline void update_vlt_timer(bool state);
-	inline void update_curs_timer(bool state);
-	inline void update_drb_timer(bool state);
+	inline void update_hsync_timer(int state);
+	inline void update_vsync_timer(int state);
+	inline void update_vlt_timer(int state);
+	inline void update_curs_timer(int state);
+	inline void update_drb_timer(int state);
 	inline void update_dma_timer();
 
 	inline void recompute_parameters();
@@ -129,16 +170,8 @@ private:
 	uint8_t m_reg[0x3d];
 	uint8_t m_status;
 
-	uint8_t m_hpixels_per_column;
-
-	// booleans
-	bool m_disp;
-	bool m_hs;
-	bool m_vs;
-	bool m_cblank;
-	bool m_vlt;
-	bool m_drb;
-	bool m_lpstb;
+	int m_disp;
+	int m_hpixels_per_column;
 
 	// runtime variables, do not state save
 	int m_vsync_start;
@@ -149,16 +182,22 @@ private:
 	int m_vlt_end;
 	int m_vlt_bottom;
 	int m_drb_bottom;
+	int m_hs;
+	int m_vs;
+	int m_cblank;
+	int m_vlt;
+	int m_drb;
 	//int m_wben;
 	//int m_slg;
 	//int m_sld;
+	int m_lpstb;
 
 	// DMA
-	bool m_dmar;
-	bool m_ack;
-	uint16_t m_dma_count;
-	uint16_t m_dma_burst;
-	uint8_t m_dma_delay;
+	int m_dmar;
+	int m_ack;
+	int m_dma_count;
+	int m_dma_burst;
+	int m_dma_delay;
 
 	// timers
 	emu_timer *m_vsync_timer;
@@ -167,7 +206,6 @@ private:
 	emu_timer *m_curs_timer;
 	emu_timer *m_drb_timer;
 	emu_timer *m_dma_timer;
-	emu_timer *m_frame_timer;
 };
 
 

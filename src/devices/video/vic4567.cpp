@@ -1906,25 +1906,25 @@ void vic3_device::draw_bitplanes()
 
 	if (XPOS > 0)
 	{
-		vis.set(0, XPOS - 1, 0, visarea.bottom());
+		vis.set(0, XPOS - 1, 0, visarea.max_y);
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
-	if (XPOS + VIC3_BITPLANES_WIDTH < visarea.right())
+	if (XPOS + VIC3_BITPLANES_WIDTH < visarea.max_x)
 	{
-		vis.set(XPOS + VIC3_BITPLANES_WIDTH, visarea.right(), 0, visarea.bottom());
+		vis.set(XPOS + VIC3_BITPLANES_WIDTH, visarea.max_x, 0, visarea.max_y);
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
 	if (YPOS > 0)
 	{
-		vis.set(0, visarea.right(), 0, YPOS - 1);
+		vis.set(0, visarea.max_x, 0, YPOS - 1);
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 
-	if (YPOS + VIC3_LINES < visarea.bottom())
+	if (YPOS + VIC3_LINES < visarea.max_y)
 	{
-		vis.set(0, visarea.right(), YPOS + VIC3_LINES, visarea.bottom());
+		vis.set(0, visarea.max_x, YPOS + VIC3_LINES, visarea.max_y);
 		m_bitmap->fill(FRAMECOLOR, vis);
 	}
 }

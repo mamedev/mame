@@ -22,20 +22,19 @@ class zt8802_state : public driver_device
 public:
 	zt8802_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		//      , m_maincpu(*this, "maincpu")
+//      , m_maincpu(*this, "maincpu")
 	{ }
 
-	void zt8802(machine_config &config);
+void zt8802(machine_config &config);
 private:
-	//  required_device<cpu_device> m_maincpu;
+//  required_device<cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START( zt8802 )
 INPUT_PORTS_END
 
-void zt8802_state::zt8802(machine_config &config)
-{
-}
+MACHINE_CONFIG_START(zt8802_state::zt8802)
+MACHINE_CONFIG_END
 
 ROM_START( zt8802 )
 	ROM_REGION( 0x80000, "roms", 0 )

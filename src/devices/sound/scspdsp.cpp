@@ -61,8 +61,8 @@ static int32_t UNPACK(uint16_t val)
 void SCSPDSP::Init()
 {
 	std::memset(this, 0, sizeof(*this));
-	RBL = (8*1024); // Initial RBL is 0
-	Stopped = true;
+	RBL = 0x8000;
+	Stopped = 1;
 }
 
 void SCSPDSP::Step()
@@ -80,6 +80,8 @@ void SCSPDSP::Step()
 #endif
 
 	int32_t ACC = 0;    //26 bit
+	int32_t SHIFTED = 0;    //24 bit
+	int32_t Y = 0;  //13 bit
 	int32_t MEMVAL = 0;
 	int32_t FRC_REG = 0;    //13 bit
 	int32_t Y_REG = 0;      //24 bit
@@ -160,7 +162,7 @@ void SCSPDSP::Step()
 		else if (IRA <= 0x2F)
 			INPUTS = MIXS[IRA - 0x20] << 4;  //MIXS is 20 bit
 		else if (IRA <= 0x31)
-			INPUTS = EXTS[IRA - 0x30] << 8;  //EXTS is 16 bit
+			INPUTS = 0;
 		else
 			return;
 
@@ -208,7 +210,6 @@ void SCSPDSP::Step()
 				//X |= 0xFF000000;
 		}
 
-		int32_t Y = 0;  //13 bit
 		if (YSEL == 0)
 			Y = FRC_REG;
 		else if (YSEL == 1)
@@ -222,7 +223,6 @@ void SCSPDSP::Step()
 			Y_REG = INPUTS;
 
 		//Shifter
-		int32_t SHIFTED = 0;    //24 bit
 		if (SHIFT == 0)
 			SHIFTED = std::max<int32_t>(std::min<int32_t>(ACC, 0x007FFFFF), -0x00800000);
 		else if (SHIFT == 1)
@@ -236,7 +236,7 @@ void SCSPDSP::Step()
 			//if (SHIFTED & 0x00800000)
 				//SHIFTED |= 0xFF000000;
 		}
-		else if (SHIFT == 3)
+		else if(SHIFT==3)
 		{
 			SHIFTED = ACC;
 			SHIFTED <<= 8;
@@ -280,21 +280,24 @@ void SCSPDSP::Step()
 				ADDR &= RBL - 1;
 			else
 				ADDR &= 0xFFFF;
+			//ADDR <<= 1;
+			//ADDR += RBP << 13;
+			//MEMVAL = SCSPRAM[ADDR >> 1];
 			ADDR += RBP << 12;
-			ADDR <<= 1;
+			if (ADDR > 0x7ffff) ADDR = 0;
 			if (MRD && (step & 1)) //memory only allowed on odd? DoA inserts NOPs on even
 			{
 				if (NOFL)
-					MEMVAL = space->read_word(ADDR) << 8;
+					MEMVAL = SCSPRAM[ADDR] << 8;
 				else
-					MEMVAL = UNPACK(space->read_word(ADDR));
+					MEMVAL = UNPACK(SCSPRAM[ADDR]);
 			}
 			if (MWT && (step & 1))
 			{
 				if (NOFL)
-					space->write_word(ADDR, SHIFTED >> 8);
+					SCSPRAM[ADDR] = SHIFTED >> 8;
 				else
-					space->write_word(ADDR, PACK(SHIFTED));
+					SCSPRAM[ADDR] = PACK(SHIFTED);
 			}
 		}
 
@@ -325,7 +328,7 @@ void SCSPDSP::SetSample(int32_t sample, int SEL, int MXL)
 
 void SCSPDSP::Start()
 {
-	Stopped = false;
+	Stopped = 0;
 	int i;
 	for (i = 127; i >= 0; --i)
 	{

@@ -24,14 +24,19 @@
 #include "formats/rk_cas.h"
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
-#include "emupal.h"
 
 
 class special_state : public driver_device
 {
 public:
-	special_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	enum
+	{
+		TIMER_RESET,
+		TIMER_PIT8253_GATES
+	};
+
+	special_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255"),
 		m_fdc(*this, "fd1793"),
@@ -49,27 +54,7 @@ public:
 		m_bank5(*this, "bank5"),
 		m_bank6(*this, "bank6"),
 		m_io_line(*this, "LINE%u", 0U),
-		m_palette(*this, "palette")
-	{ }
-
-	void special(machine_config &config);
-	void erik(machine_config &config);
-	void specimx(machine_config &config);
-	void specialp(machine_config &config);
-	void specialm(machine_config &config);
-
-	void init_erik();
-	void init_special();
-
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
-	enum
-	{
-		TIMER_RESET,
-		TIMER_PIT8253_GATES
-	};
+		m_palette(*this, "palette")  { }
 
 	DECLARE_WRITE8_MEMBER(specimx_select_bank);
 	DECLARE_WRITE8_MEMBER(video_memory_w);
@@ -90,14 +75,18 @@ private:
 	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
-
+	void init_erik();
+	void init_special();
 	DECLARE_MACHINE_RESET(special);
+	DECLARE_VIDEO_START(special);
 	DECLARE_MACHINE_RESET(erik);
-	void erik_palette(palette_device &palette) const;
+	DECLARE_VIDEO_START(erik);
+	DECLARE_PALETTE_INIT(erik);
+	DECLARE_VIDEO_START(specialp);
 	DECLARE_MACHINE_START(specimx);
 	DECLARE_MACHINE_RESET(specimx);
 	DECLARE_VIDEO_START(specimx);
-	void specimx_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(specimx);
 	uint32_t screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_specialp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -105,12 +94,17 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
 
+	void special(machine_config &config);
+	void erik(machine_config &config);
+	void specimx(machine_config &config);
+	void specialp(machine_config &config);
+	void specialm(machine_config &config);
 	void erik_io_map(address_map &map);
 	void erik_mem(address_map &map);
 	void specialist_mem(address_map &map);
 	void specialp_mem(address_map &map);
 	void specimx_mem(address_map &map);
-
+private:
 	void specimx_set_bank(offs_t i, uint8_t data);
 	void erik_set_bank();
 	std::unique_ptr<uint8_t[]> m_specimx_colorram;
@@ -142,6 +136,7 @@ private:
 	optional_memory_bank m_bank6;
 	required_ioport_array<13> m_io_line;
 	required_device<palette_device> m_palette;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_SPECIAL_H

@@ -11,7 +11,7 @@ public:
 	tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
 
 	DECLARE_READ16_MEMBER( tc0280grd_word_r );
@@ -49,5 +49,17 @@ private:
 DECLARE_DEVICE_TYPE(TC0280GRD, tc0280grd_device)
 
 #define TC0430GRW TC0280GRD
+
+#define MCFG_TC0280GRD_GFX_REGION(_region) \
+	downcast<tc0280grd_device &>(*device).set_gfx_region(_region);
+
+#define MCFG_TC0430GRW_GFX_REGION(_region) \
+	downcast<tc0280grd_device &>(*device).set_gfx_region(_region);
+
+#define MCFG_TC0280GRD_GFXDECODE(_gfxtag) \
+	downcast<tc0280grd_device &>(*device).set_gfxdecode_tag(_gfxtag);
+
+#define MCFG_TC0430GRW_GFXDECODE(_gfxtag) \
+	downcast<tc0280grd_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_TC0280GRD_H

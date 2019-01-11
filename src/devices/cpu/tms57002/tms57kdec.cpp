@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "debugger.h"
 #include "tms57002.h"
-#include <algorithm>
 
 inline int tms57002_device::xmode(uint32_t opcode, char type, cstate *cs)
 {
@@ -41,10 +40,6 @@ inline int tms57002_device::dbp(uint32_t st1)
 
 inline int tms57002_device::crm(uint32_t st1)
 {
-	// value overridden during cvar update
-	if(update_counter_head != update_counter_tail)
-		return 0;
-
 	int crm = (st1 & ST1_CRM) >> ST1_CRM_SHIFT;
 	return crm <= 2 ? crm : 0;
 }
@@ -95,7 +90,6 @@ void tms57002_device::decode_cat1(uint32_t opcode, unsigned short *op, cstate *c
 #undef CDEC1
 
 	default:
-		logerror("Unhandled cat1 opcode %02x\n",opcode >> 18);
 		decode_error(opcode);
 		break;
 	}
@@ -112,7 +106,6 @@ void tms57002_device::decode_cat2_pre(uint32_t opcode, unsigned short *op, cstat
 #undef CDEC2A
 
 	default:
-		logerror("Unhandled cat2_pre opcode %02x \n",(opcode >> 11) & 0x7f);
 		decode_error(opcode);
 		break;
 	}
@@ -129,7 +122,6 @@ void tms57002_device::decode_cat2_post(uint32_t opcode, unsigned short *op, csta
 #undef CDEC2B
 
 	default:
-		logerror("Unhandled cat2_post opcode %02x\n",(opcode >> 11) & 0x7f);
 		decode_error(opcode);
 		break;
 	}
@@ -146,7 +138,6 @@ void tms57002_device::decode_cat3(uint32_t opcode, unsigned short *op, cstate *c
 #undef CDEC3
 
 	default:
-		logerror("Unhandled cat3  opcode %02x\n",(opcode >> 11) & 0x7f);
 		decode_error(opcode);
 		break;
 	}

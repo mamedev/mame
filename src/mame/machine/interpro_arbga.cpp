@@ -24,39 +24,39 @@
 // this might be for an earlier revision of the device
 void interpro_arbga_device::map(address_map &map)
 {
-	map(0x00, 0x03).rw(FUNC(interpro_arbga_device::sdepid_r), FUNC(interpro_arbga_device::sdepid_w));
-	map(0x04, 0x07).rw(FUNC(interpro_arbga_device::snapid_r), FUNC(interpro_arbga_device::snapid_w));
-	map(0x08, 0x0b).rw(FUNC(interpro_arbga_device::prilo_r), FUNC(interpro_arbga_device::prilo_w));
-	map(0x0c, 0x0f).rw(FUNC(interpro_arbga_device::prihi_r), FUNC(interpro_arbga_device::prihi_w));
-	map(0x10, 0x13).rw(FUNC(interpro_arbga_device::errdomlo_r), FUNC(interpro_arbga_device::errdomlo_w));
-	map(0x14, 0x17).rw(FUNC(interpro_arbga_device::errdomhi_r), FUNC(interpro_arbga_device::errdomhi_w));
-	map(0x18, 0x1b).rw(FUNC(interpro_arbga_device::tmctrl_r), FUNC(interpro_arbga_device::tmctrl_w));
+	map(0x00, 0x03).rw(this, FUNC(interpro_arbga_device::sdepid_r), FUNC(interpro_arbga_device::sdepid_w));
+	map(0x04, 0x07).rw(this, FUNC(interpro_arbga_device::snapid_r), FUNC(interpro_arbga_device::snapid_w));
+	map(0x08, 0x0b).rw(this, FUNC(interpro_arbga_device::prilo_r), FUNC(interpro_arbga_device::prilo_w));
+	map(0x0c, 0x0f).rw(this, FUNC(interpro_arbga_device::prihi_r), FUNC(interpro_arbga_device::prihi_w));
+	map(0x10, 0x13).rw(this, FUNC(interpro_arbga_device::errdomlo_r), FUNC(interpro_arbga_device::errdomlo_w));
+	map(0x14, 0x17).rw(this, FUNC(interpro_arbga_device::errdomhi_r), FUNC(interpro_arbga_device::errdomhi_w));
+	map(0x18, 0x1b).rw(this, FUNC(interpro_arbga_device::tmctrl_r), FUNC(interpro_arbga_device::tmctrl_w));
 
-	map(0x24, 0x27).rw(FUNC(interpro_arbga_device::tmsrnem_r), FUNC(interpro_arbga_device::tmsrnem_w));
-	map(0x28, 0x2b).rw(FUNC(interpro_arbga_device::tmsrhog_r), FUNC(interpro_arbga_device::tmsrhog_w));
-	map(0x2c, 0x2f).rw(FUNC(interpro_arbga_device::tmscale_r), FUNC(interpro_arbga_device::tmscale_w));
+	map(0x24, 0x27).rw(this, FUNC(interpro_arbga_device::tmsrnem_r), FUNC(interpro_arbga_device::tmsrnem_w));
+	map(0x28, 0x2b).rw(this, FUNC(interpro_arbga_device::tmsrhog_r), FUNC(interpro_arbga_device::tmsrhog_w));
+	map(0x2c, 0x2f).rw(this, FUNC(interpro_arbga_device::tmscale_r), FUNC(interpro_arbga_device::tmscale_w));
 }
 #endif
 
 // derived from the FDM "dump_arb" command
 void interpro_arbga_device::map(address_map &map)
 {
-	map(0x00, 0x03).rw(FUNC(interpro_arbga_device::sdepid_r), FUNC(interpro_arbga_device::sdepid_w));
-	map(0x04, 0x07).rw(FUNC(interpro_arbga_device::arbsnap_r), FUNC(interpro_arbga_device::arbsnap_w));
-	map(0x08, 0x0b).rw(FUNC(interpro_arbga_device::fixprils_r), FUNC(interpro_arbga_device::fixprils_w));
-	map(0x0c, 0x0f).rw(FUNC(interpro_arbga_device::fixprims_r), FUNC(interpro_arbga_device::fixprims_w));
-	map(0x10, 0x13).rw(FUNC(interpro_arbga_device::sysdomls_r), FUNC(interpro_arbga_device::sysdomls_w));
-	map(0x14, 0x17).rw(FUNC(interpro_arbga_device::sysdomms_r), FUNC(interpro_arbga_device::sysdomms_w));
-	map(0x18, 0x1b).rw(FUNC(interpro_arbga_device::tctrl_r), FUNC(interpro_arbga_device::tctrl_w));
-	map(0x1d, 0x1d).rw(FUNC(interpro_arbga_device::inem_r), FUNC(interpro_arbga_device::inem_w)); // boot code writes 0x10
-	map(0x21, 0x21).rw(FUNC(interpro_arbga_device::enem_r), FUNC(interpro_arbga_device::enem_w)); // boot code writes 0x07
-	map(0x24, 0x27).rw(FUNC(interpro_arbga_device::hog_r), FUNC(interpro_arbga_device::hog_w));
-	map(0x28, 0x2b).rw(FUNC(interpro_arbga_device::lock_r), FUNC(interpro_arbga_device::lock_w));
-	map(0x2c, 0x2f).rw(FUNC(interpro_arbga_device::lockprs_r), FUNC(interpro_arbga_device::lockprs_w));
-	map(0x30, 0x33).rw(FUNC(interpro_arbga_device::hiblockls_r), FUNC(interpro_arbga_device::hiblockls_w));
-	map(0x34, 0x37).rw(FUNC(interpro_arbga_device::hiblockms_r), FUNC(interpro_arbga_device::hiblockms_w));
+	map(0x00, 0x03).rw(this, FUNC(interpro_arbga_device::sdepid_r), FUNC(interpro_arbga_device::sdepid_w));
+	map(0x04, 0x07).rw(this, FUNC(interpro_arbga_device::arbsnap_r), FUNC(interpro_arbga_device::arbsnap_w));
+	map(0x08, 0x0b).rw(this, FUNC(interpro_arbga_device::fixprils_r), FUNC(interpro_arbga_device::fixprils_w));
+	map(0x0c, 0x0f).rw(this, FUNC(interpro_arbga_device::fixprims_r), FUNC(interpro_arbga_device::fixprims_w));
+	map(0x10, 0x13).rw(this, FUNC(interpro_arbga_device::sysdomls_r), FUNC(interpro_arbga_device::sysdomls_w));
+	map(0x14, 0x17).rw(this, FUNC(interpro_arbga_device::sysdomms_r), FUNC(interpro_arbga_device::sysdomms_w));
+	map(0x18, 0x1b).rw(this, FUNC(interpro_arbga_device::tctrl_r), FUNC(interpro_arbga_device::tctrl_w));
+	map(0x1d, 0x1d).rw(this, FUNC(interpro_arbga_device::inem_r), FUNC(interpro_arbga_device::inem_w)); // boot code writes 0x10
+	map(0x21, 0x21).rw(this, FUNC(interpro_arbga_device::enem_r), FUNC(interpro_arbga_device::enem_w)); // boot code writes 0x07
+	map(0x24, 0x27).rw(this, FUNC(interpro_arbga_device::hog_r), FUNC(interpro_arbga_device::hog_w));
+	map(0x28, 0x2b).rw(this, FUNC(interpro_arbga_device::lock_r), FUNC(interpro_arbga_device::lock_w));
+	map(0x2c, 0x2f).rw(this, FUNC(interpro_arbga_device::lockprs_r), FUNC(interpro_arbga_device::lockprs_w));
+	map(0x30, 0x33).rw(this, FUNC(interpro_arbga_device::hiblockls_r), FUNC(interpro_arbga_device::hiblockls_w));
+	map(0x34, 0x37).rw(this, FUNC(interpro_arbga_device::hiblockms_r), FUNC(interpro_arbga_device::hiblockms_w));
 
-	map(0x3c, 0x3f).rw(FUNC(interpro_arbga_device::arbrev_r), FUNC(interpro_arbga_device::arbrev_w));
+	map(0x3c, 0x3f).rw(this, FUNC(interpro_arbga_device::arbrev_r), FUNC(interpro_arbga_device::arbrev_w));
 }
 
 DEFINE_DEVICE_TYPE(INTERPRO_ARBGA, interpro_arbga_device, "arbga", "SRX Arbiter Gate Array")

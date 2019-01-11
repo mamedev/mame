@@ -53,24 +53,25 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void bbc_tube_80186_device::device_add_mconfig(machine_config &config)
-{
-	I80186(config, m_i80186, 20_MHz_XTAL / 2);
-	m_i80186->set_addrmap(AS_PROGRAM, &bbc_tube_80186_device::tube_80186_mem);
-	m_i80186->set_addrmap(AS_IO, &bbc_tube_80186_device::tube_80186_io);
-	m_i80186->tmrout0_handler().set_inputline(m_i80186, INPUT_LINE_HALT).invert();
-	m_i80186->tmrout1_handler().set_inputline(m_i80186, INPUT_LINE_NMI).invert();
+MACHINE_CONFIG_START(bbc_tube_80186_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("i80186", I80186, XTAL(20'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(tube_80186_mem)
+	MCFG_DEVICE_IO_MAP(tube_80186_io)
+	//MCFG_80186_CHIP_SELECT_CB(WRITE16(*this, bbc_tube_80186_device, chip_select_cb))
+	MCFG_80186_TMROUT0_HANDLER(INPUTLINE("i80186", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT
+	MCFG_80186_TMROUT1_HANDLER(INPUTLINE("i80186", INPUT_LINE_NMI)) MCFG_DEVCB_INVERT
 
-	TUBE(config, m_ula, 0);
-	m_ula->pirq_handler().set(m_i80186, FUNC(i80186_cpu_device::int0_w));
-	m_ula->drq_handler().set(m_i80186, FUNC(i80186_cpu_device::drq0_w));
+	MCFG_TUBE_ADD("ula")
+	MCFG_TUBE_PIRQ_HANDLER(WRITELINE("i80186", i80186_cpu_device, int0_w))
+	MCFG_TUBE_DRQ_HANDLER(WRITELINE("i80186", i80186_cpu_device, drq0_w))
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("512K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_80186").set_original("bbc_flop_80186");
-}
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_80186", "bbc_flop_80186")
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -105,6 +106,7 @@ bbc_tube_80186_device::bbc_tube_80186_device(const machine_config &mconfig, cons
 
 void bbc_tube_80186_device::device_start()
 {
+	m_slot = dynamic_cast<bbc_tube_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -113,6 +115,8 @@ void bbc_tube_80186_device::device_start()
 
 void bbc_tube_80186_device::device_reset()
 {
+	m_ula->reset();
+
 	address_space &program = m_i80186->space(AS_PROGRAM);
 
 	program.install_ram(0x00000, 0x3ffff, m_ram->pointer());

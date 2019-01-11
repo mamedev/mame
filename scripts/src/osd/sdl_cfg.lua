@@ -89,7 +89,7 @@ if BASE_TARGETOS=="unix" then
 					backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
 				}
 			end
-		end
+			end
 	else
 		buildoptions {
 			backtick(sdlconfigcmd() .. " --cflags"),

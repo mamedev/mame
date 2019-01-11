@@ -1,18 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Phil Stroffolino, Bryan McPhail
-#ifndef MAME_INCLUDES_SHOOTOUT_H
-#define MAME_INCLUDES_SHOOTOUT_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
-#include "emupal.h"
 
 class shootout_state : public driver_device
 {
 public:
-	shootout_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	shootout_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -20,18 +15,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
-		m_videoram(*this, "videoram")
-	{ }
+		m_videoram(*this, "videoram")  { }
 
-	void shootouj(machine_config &config);
-	void shootouk(machine_config &config);
-	void shootout(machine_config &config);
-
-	void init_shootout();
-
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -55,10 +40,14 @@ private:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(textram_w);
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+	void init_shootout();
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	void shootout_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(shootout);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -66,10 +55,10 @@ private:
 	uint32_t screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits );
-
+	void shootouj(machine_config &config);
+	void shootouk(machine_config &config);
+	void shootout(machine_config &config);
 	void shootouj_map(address_map &map);
 	void shootout_map(address_map &map);
 	void shootout_sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_SHOOTOUT_H

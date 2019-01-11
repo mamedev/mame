@@ -5,12 +5,6 @@
     Jaleco Exerion
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_EXERION_H
-#define MAME_INCLUDES_EXERION_H
-
-#pragma once
-
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -30,28 +24,16 @@
 class exerion_state : public driver_device
 {
 public:
-	exerion_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	exerion_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void exerion(machine_config &config);
-	void irion(machine_config &config);
-
-	void init_exerion();
-	void init_exerionb();
-	void init_irion();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_main_ram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -80,16 +62,21 @@ private:
 	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
 	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);
 	DECLARE_READ8_MEMBER(exerion_video_timing_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_READ8_MEMBER(exerion_porta_r);
 	DECLARE_WRITE8_MEMBER(exerion_portb_w);
+	void init_exerion();
+	void init_exerionb();
+	void init_irion();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void exerion_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(exerion);
 	uint32_t screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void exerion(machine_config &config);
+	void irion(machine_config &config);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_EXERION_H

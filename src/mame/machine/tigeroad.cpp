@@ -25,7 +25,7 @@ WRITE16_MEMBER(pushman_state::pushman_mcu_comm_w)
 	switch (offset & 0x01)
 	{
 	case 0:
-		m_host_latch = swapendian_int16(data);
+		m_host_latch = flipendian_int16(data);
 		break;
 	case 1:
 		m_mcu->pd_w(space, 0, data & 0x00ff);

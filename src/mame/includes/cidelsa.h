@@ -49,7 +49,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CDP1802_TAG)
 		, m_vis(*this, CDP1869_TAG)
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER( cdp1869_w );
@@ -87,7 +87,7 @@ protected:
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
-	output_finder<3> m_leds;
+	output_finder<3> m_led;
 
 	// cpu state
 	int m_reset;

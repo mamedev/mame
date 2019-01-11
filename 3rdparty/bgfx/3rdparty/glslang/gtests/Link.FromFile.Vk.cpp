@@ -52,7 +52,6 @@ TEST_P(LinkTestVulkan, FromFile)
     GlslangResult result;
 
     // Compile each input shader file.
-    bool success = true;
     std::vector<std::unique_ptr<glslang::TShader>> shaders;
     for (size_t i = 0; i < fileCount; ++i) {
         std::string contents;
@@ -62,7 +61,7 @@ TEST_P(LinkTestVulkan, FromFile)
                 new glslang::TShader(GetShaderStage(GetSuffix(fileNames[i]))));
         auto* shader = shaders.back().get();
         shader->setAutoMapLocations(true);
-        success &= compile(shader, contents, "", controls);
+        compile(shader, contents, "", controls);
         result.shaderResults.push_back(
             {fileNames[i], shader->getInfoLog(), shader->getInfoDebugLog()});
     }
@@ -70,25 +69,9 @@ TEST_P(LinkTestVulkan, FromFile)
     // Link all of them.
     glslang::TProgram program;
     for (const auto& shader : shaders) program.addShader(shader.get());
-    success &= program.link(controls);
+    program.link(controls);
     result.linkingOutput = program.getInfoLog();
     result.linkingError = program.getInfoDebugLog();
-
-    if (success && (controls & EShMsgSpvRules)) {
-        spv::SpvBuildLogger logger;
-        std::vector<uint32_t> spirv_binary;
-        glslang::SpvOptions options;
-        options.disableOptimizer = true;
-        options.validate = true;
-        glslang::GlslangToSpv(*program.getIntermediate(shaders.front()->getStage()),
-                                spirv_binary, &logger, &options);
-
-        std::ostringstream disassembly_stream;
-        spv::Parameterize();
-        spv::Disassemble(disassembly_stream, spirv_binary);
-        result.spirvWarningsErrors = logger.getAllMessages();
-        result.spirv = disassembly_stream.str();
-    }
 
     std::ostringstream stream;
     outputResultToStream(&stream, result, controls);
@@ -107,7 +90,6 @@ INSTANTIATE_TEST_CASE_P(
     Glsl, LinkTestVulkan,
     ::testing::ValuesIn(std::vector<std::vector<std::string>>({
         {"link1.vk.frag", "link2.vk.frag"},
-        {"spv.unit1.frag", "spv.unit2.frag", "spv.unit3.frag"},
     })),
 );
 // clang-format on

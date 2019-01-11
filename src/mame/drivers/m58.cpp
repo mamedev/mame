@@ -30,15 +30,15 @@
 void m58_state::yard_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0x8fff).ram().w(FUNC(m58_state::videoram_w)).share("videoram");
-	map(0x9000, 0x9fff).w(FUNC(m58_state::scroll_panel_w));
+	map(0x8000, 0x8fff).ram().w(this, FUNC(m58_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9fff).w(this, FUNC(m58_state::scroll_panel_w));
 	map(0xc820, 0xc87f).ram().share("spriteram");
 	map(0xa000, 0xa000).ram().share("scroll_x_low");
 	map(0xa200, 0xa200).ram().share("scroll_x_high");
 	map(0xa400, 0xa400).ram().share("scroll_y_low");
 	map(0xa800, 0xa800).ram().share("score_disable");
 	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).w(FUNC(m58_state::flipscreen_w));    /* + coin counters */
+	map(0xd001, 0xd001).w(this, FUNC(m58_state::flipscreen_w));    /* + coin counters */
 	map(0xd000, 0xd000).portr("IN0");
 	map(0xd001, 0xd001).portr("IN1");
 	map(0xd002, 0xd002).portr("IN2");
@@ -200,13 +200,15 @@ MACHINE_CONFIG_START(m58_state::yard)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m58_state,  irq0_line_hold)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_yard)
-	PALETTE(config, m_palette, FUNC(m58_state::m58_palette), 256+256+256, 256+256+16);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_yard)
+	MCFG_PALETTE_ADD("palette", 256+256+256)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256+256+16)
+	MCFG_PALETTE_INIT_OWNER(m58_state, m58)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
 	MCFG_SCREEN_UPDATE_DRIVER(m58_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("irem_audio", IREM_M52_LARGE_AUDIO, 0)

@@ -43,7 +43,7 @@ void neosprite_base_device::device_start()
 	m_auto_animation_frame_counter = 0;
 
 	/* register for state saving */
-	save_pointer(NAME(m_videoram), 0x8000 + 0x800);
+	save_pointer(NAME(m_videoram.get()), 0x8000 + 0x800);
 	save_item(NAME(m_vram_offset));
 	save_item(NAME(m_vram_read_buffer));
 	save_item(NAME(m_vram_modulo));
@@ -177,7 +177,7 @@ void neosprite_base_device::neogeo_set_fixed_layer_source(uint8_t data)
 
 void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 {
-	assert((m_fixed_layer_source && m_region_fixed != nullptr) || (m_region_fixedbios != nullptr));
+	int x;
 
 	uint8_t* gfx_base = m_fixed_layer_source ? m_region_fixed : m_region_fixedbios->base();
 	uint32_t addr_mask = ( m_fixed_layer_source ? m_region_fixed_size : m_region_fixedbios->bytes() ) - 1;
@@ -206,7 +206,7 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 		}
 	}
 
-	for (int x = 0; x < 40; x++)
+	for (x = 0; x < 40; x++)
 	{
 		uint16_t code_and_palette = *video_data;
 		uint16_t code = code_and_palette & 0x0fff;
@@ -227,19 +227,22 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 		}
 
 		{
+			int i;
 			int gfx_offset = ((code << 5) | (scanline & 0x07)) & addr_mask;
 
 			const pen_t *char_pens;
 
 			char_pens = &m_pens[code_and_palette >> 12 << m_bppshift];
 
+
 			static const uint32_t pix_offsets[] = { 0x10, 0x18, 0x00, 0x08 };
 
-			for (int i = 0; i < 4; i++)
+			for (i = 0; i < 4; i++)
 			{
 				draw_fixed_layer_2pixels(pixel_addr, gfx_offset + pix_offsets[i], gfx_base, char_pens);
 			}
 		}
+
 		video_data = video_data + 0x20;
 	}
 }
@@ -270,8 +273,26 @@ inline void neosprite_base_device::draw_fixed_layer_2pixels(uint32_t*&pixel_addr
 
 
 /* horizontal zoom table - verified on real hardware */
-static const u16 zoom_x_tables[16] =
-{ 0x0080, 0x0880, 0x0888, 0x2888, 0x288a, 0x2a8a, 0x2aaa, 0xaaaa, 0xaaea, 0xbaea, 0xbaeb, 0xbbeb, 0xbbef, 0xfbef, 0xfbff, 0xffff };
+static const int zoom_x_tables[][16] =
+{
+	{ 0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0 },
+	{ 0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0 },
+	{ 0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0 },
+	{ 0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0 },
+	{ 0,0,1,0,1,0,0,0,1,0,0,0,1,0,1,0 },
+	{ 0,0,1,0,1,0,1,0,1,0,0,0,1,0,1,0 },
+	{ 0,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0 },
+	{ 1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0 },
+	{ 1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,0 },
+	{ 1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0 },
+	{ 1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,1 },
+	{ 1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1 },
+	{ 1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1 },
+	{ 1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1 },
+	{ 1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1 },
+	{ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 }
+};
+
 
 
 inline bool neosprite_base_device::sprite_on_scanline(int scanline, int y, int rows)
@@ -280,9 +301,13 @@ inline bool neosprite_base_device::sprite_on_scanline(int scanline, int y, int r
 }
 
 
+
+
 void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 {
+	int sprite_index;
 	int max_sprite_index;
+
 	int y = 0;
 	int x = 0;
 	int rows = 0;
@@ -309,7 +334,7 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 	if (max_sprite_index != (MAX_SPRITES_PER_LINE - 1))
 		max_sprite_index = max_sprite_index + 1;
 
-	for (int sprite_index = 0; sprite_index <= max_sprite_index; sprite_index++)
+	for (sprite_index = 0; sprite_index <= max_sprite_index; sprite_index++)
 	{
 		uint16_t sprite_number = sprite_list[sprite_index] & 0x01ff;
 		uint16_t y_control = m_videoram_drawsource[0x8200 | sprite_number];
@@ -347,6 +372,7 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 			offs_t attr_and_code_offs;
 			uint16_t attr;
 			uint32_t code;
+			const int *zoom_x_table;
 			const pen_t *line_pens;
 			int x_inc;
 
@@ -396,12 +422,14 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 			if (attr & 0x0002)
 				sprite_y ^= 0x0f;
 
-			u16 zoom_x_table = zoom_x_tables[zoom_x];
+			zoom_x_table = zoom_x_tables[zoom_x];
 
 			/* compute offset in gfx ROM and mask it to the number of bits available */
 			int gfx_base = ((code << 8) | (sprite_y << 4)) & m_sprite_gfx_address_mask;
 
+
 			line_pens = &m_pens[attr >> 8 << m_bppshift];
+
 
 			/* horizontal flip? */
 			if (attr & 0x0001)
@@ -415,33 +443,34 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 			/* draw the line - no wrap-around */
 			if (x <= 0x01f0)
 			{
+				int i;
+
 				uint32_t *pixel_addr = &bitmap.pix32(scanline, x + NEOGEO_HBEND);
 
-				for (int i = 0; i < 0x10; i++)
+				for (i = 0; i < 0x10; i++)
 				{
-					if (zoom_x_table & 0x8000)
+					if (*zoom_x_table)
 					{
 						draw_pixel(gfx_base, pixel_addr, line_pens);
 
 						pixel_addr++;
 					}
 
-					zoom_x_table <<= 1;
-					if (zoom_x_table == 0)
-						break;
-
+					zoom_x_table++;
 					gfx_base += x_inc;
 				}
 			}
 			/* wrap-around */
 			else
 			{
+				int i;
+
 				int x_save = x;
 				uint32_t *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
 
-				for (int i = 0; i < 0x10; i++)
+				for (i = 0; i < 0x10; i++)
 				{
-					if (zoom_x_table & 0x8000)
+					if (*zoom_x_table)
 					{
 						if (x >= 0x200)
 						{
@@ -453,12 +482,10 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 						x++;
 					}
 
-					zoom_x_table <<= 1;
-					if (zoom_x_table == 0)
-						break;
-
+					zoom_x_table++;
 					gfx_base += x_inc;
 				}
+
 				x = x_save;
 			}
 		}

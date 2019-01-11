@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(A2BUS_TRANSWARP, a2bus_transwarp_device, "a2twarp", "Applied 
 
 void a2bus_transwarp_device::m65c02_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(a2bus_transwarp_device::dma_r), FUNC(a2bus_transwarp_device::dma_w));
+	map(0x0000, 0xffff).rw(this, FUNC(a2bus_transwarp_device::dma_r), FUNC(a2bus_transwarp_device::dma_w));
 }
 
 ROM_START( warprom )
@@ -162,6 +162,7 @@ void a2bus_transwarp_device::device_reset()
 	m_bEnabled = true;
 	m_bReadA2ROM = false;
 	set_maincpu_halt(ASSERT_LINE);
+
 	if (!(m_dsw2->read() & 0x80))
 	{
 		if (m_dsw1->read() & 0x80)
@@ -199,7 +200,7 @@ READ8_MEMBER( a2bus_transwarp_device::dma_r )
 		return m_rom[offset & 0xfff];
 	}
 
-	return slot_dma_read(offset);
+	return slot_dma_read(space, offset);
 }
 
 
@@ -221,7 +222,7 @@ WRITE8_MEMBER( a2bus_transwarp_device::dma_w )
 		hit_slot(((offset >> 4) & 0xf) - 8);
 	}
 
-	slot_dma_write(offset, data);
+	slot_dma_write(space, offset, data);
 }
 
 bool a2bus_transwarp_device::take_c800()
@@ -235,10 +236,10 @@ void a2bus_transwarp_device::hit_slot(int slot)
 	if (!(m_dsw2->read() & 0x80))
 	{
 		// accleration's on, check the specific slot
-		if (!(m_dsw2->read() & (1<<(slot-1))))
+		if (m_dsw2->read() & (1<<(slot-1)))
 		{
 			m_ourcpu->set_unscaled_clock(1021800);
-			// slow down for 20 uSec, should be more than enough
+			// slow down for around 20 cycles, should be more than enough
 			m_timer->adjust(attotime::from_usec(20));
 		}
 	}

@@ -15,6 +15,18 @@
 
 #include "dirtc.h"
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_PCF8593_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PCF8593, 0)
+
+#define MCFG_PCF8593_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
+
+
 // ======================> pcf8593_device
 
 class pcf8593_device :  public device_t,
@@ -22,7 +34,7 @@ class pcf8593_device :  public device_t,
 						public device_nvram_interface
 {
 public:
-	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pcf8593_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER(scl_w);
 	DECLARE_WRITE_LINE_MEMBER(sda_w);

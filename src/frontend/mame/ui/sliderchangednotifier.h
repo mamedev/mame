@@ -6,13 +6,15 @@
 //
 //======================================================================
 
-#ifndef MAME_FRONTEND_MAME_UI_SLIDERCHANGEDNOTIFIER_H
-#define MAME_FRONTEND_MAME_UI_SLIDERCHANGEDNOTIFIER_H
-
 #pragma once
+
+#ifndef __SLIDER_CHANGED_NOTIFIER__
+#define __SLIDER_CHANGED_NOTIFIER__
 
 #include <cstdint>
 #include <string>
+
+using int32_t = std::int32_t;
 
 class running_machine;
 
@@ -21,7 +23,7 @@ class slider_changed_notifier
 public:
 	virtual ~slider_changed_notifier() { }
 
-	virtual std::int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, std::int32_t newval) = 0;
+	virtual int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval) = 0;
 };
 
-#endif // MAME_FRONTEND_MAME_UI_SLIDERCHANGEDNOTIFIER_H
+#endif // __SLIDER_CHANGED_NOTIFIER__

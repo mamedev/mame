@@ -9,22 +9,22 @@
 
 
 #define MCFG_NSCSICB_RST_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_rst_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_rst_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_ATN_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_atn_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_atn_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_ACK_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_ack_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_ack_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_REQ_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_req_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_req_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_MSG_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_msg_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_msg_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_IO_HANDLER(_line) \
-	downcast<nscsi_callback_device *>(device)->set_io_callback(DEVCB_##_line);
+	devcb = &downcast<nscsi_callback_device *>(device)->set_io_callback(DEVCB_##_line);
 
 #define MCFG_NSCSICB_CD_HANDLER(_line) \
 	downcast<nscsi_callback_device *>(device)->set_cd_callback(DEVCB_##_line);

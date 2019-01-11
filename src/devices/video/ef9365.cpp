@@ -364,7 +364,6 @@ void ef9365_device::device_reset()
 	m_screen_out.fill(0);
 
 	set_video_mode();
-	screen_scanning(1);
 
 	m_irq_handler(false);
 }

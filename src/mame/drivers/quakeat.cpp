@@ -63,7 +63,6 @@ TODO:
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pcshare.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -74,12 +73,10 @@ public:
 		: pcat_base_state(mconfig, type, tag)
 		{ }
 
-	void quake(machine_config &config);
-
-private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void quake(machine_config &config);
 	void quake_io(address_map &map);
 	void quake_map(address_map &map);
 };

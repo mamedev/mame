@@ -18,12 +18,10 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "machine/cxd1095.h"
-#include "machine/i8251.h"
+#include "machine/gen_latch.h"
 #include "machine/mb3773.h"
-#include "machine/mb8421.h"
+#include "machine/watchdog.h"
 #include "video/resnet.h"
-#include "emupal.h"
 #include "screen.h"
 
 // ======================> segaxbd_state
@@ -35,15 +33,17 @@ public:
 	// construction/destruction
 	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void xboard_base_mconfig(machine_config &config);
+	// main CPU read/write handlers
+	DECLARE_READ16_MEMBER(adc_r);
+	DECLARE_WRITE16_MEMBER(adc_w);
+	DECLARE_WRITE16_MEMBER(iocontrol_w);
 
-	void install_aburner2(void);
-	void install_loffire(void);
-	void install_smgp(void);
-	void install_gprider(void);
-
-	// devices
-	required_device<m68000_device> m_maincpu;
+	// game-specific main CPU read/write handlers
+	DECLARE_WRITE16_MEMBER(loffire_sync0_w);
+	DECLARE_READ16_MEMBER(rascot_excs_r);
+	DECLARE_WRITE16_MEMBER(rascot_excs_w);
+	DECLARE_READ16_MEMBER(smgp_excs_r);
+	DECLARE_WRITE16_MEMBER(smgp_excs_w);
 
 	// custom I/O
 	DECLARE_READ8_MEMBER(aburner2_motor_r);
@@ -53,16 +53,8 @@ public:
 	DECLARE_READ8_MEMBER(lastsurv_port_r);
 	DECLARE_WRITE8_MEMBER(lastsurv_muxer_w);
 
-	// game-specific main CPU read/write handlers
-	DECLARE_WRITE16_MEMBER(loffire_sync0_w);
-	DECLARE_READ16_MEMBER(smgp_excs_r);
-	DECLARE_WRITE16_MEMBER(smgp_excs_w);
-
-protected:
-	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER(adc_r);
-	DECLARE_WRITE16_MEMBER(adc_w);
-	DECLARE_WRITE16_MEMBER(iocontrol_w);
+	// sound Z80 CPU read/write handlers
+	DECLARE_READ8_MEMBER(sound_data_r);
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -70,8 +62,15 @@ protected:
 	// palette helpers
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 
+	void install_aburner2(void);
+	void install_loffire(void);
+	void install_smgp(void);
+	void install_gprider(void);
+
 	void decrypted_opcodes_map(address_map &map);
 	void main_map(address_map &map);
+	void rascot_z80_map(address_map &map);
+	void rascot_z80_portmap(address_map &map);
 	void smgp_airdrive_map(address_map &map);
 	void smgp_airdrive_portmap(address_map &map);
 	void smgp_comm_map(address_map &map);
@@ -81,12 +80,13 @@ protected:
 	void sound_map(address_map &map);
 	void sound_portmap(address_map &map);
 	void sub_map(address_map &map);
-
+protected:
 	// timer IDs
 	enum
 	{
 		TID_SCANLINE,
-		TID_IRQ2_GEN
+		TID_IRQ2_GEN,
+		TID_SOUND_WRITE
 	};
 
 	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -101,23 +101,27 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 	void generic_iochip0_lamps_w(uint8_t data);
 
-	// compare/timer chip callbacks
-	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
+		// compare/timer chip callbacks
+	void timer_ack_callback();
+	DECLARE_WRITE8_MEMBER(sound_data_w);
 
 	DECLARE_WRITE8_MEMBER(pc_0_w);
 	DECLARE_WRITE8_MEMBER(pd_0_w);
 
 	// devices
+public:
+	required_device<m68000_device> m_maincpu;
+protected:
 	required_device<m68000_device> m_subcpu;
-	optional_device<z80_device> m_soundcpu;
+	required_device<z80_device> m_soundcpu;
 	optional_device<z80_device> m_soundcpu2;
 	optional_device<i8751_device> m_mcu;
 	required_device<mb3773_device> m_watchdog;
-	required_device_array<cxd1095_device, 2> m_iochip;
 	required_device<sega_315_5250_compare_timer_device> m_cmptimer_1;
 	required_device<sega_xboard_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint16_t> m_subram0;
 
 	// configuration
@@ -133,11 +137,12 @@ protected:
 	// game-specific state
 	uint16_t *        m_loffire_sync;
 	uint8_t           m_lastsurv_mux;
-
+public: // -- stupid system16.c
 	// memory pointers
 	required_shared_ptr<uint16_t> m_paletteram;
 	bool            m_gprider_hack;
 
+protected:
 	void palette_init();
 	uint32_t      m_palette_entries;          // number of palette entries
 	uint8_t       m_palette_normal[32];       // RGB translations for normal pixels
@@ -148,10 +153,12 @@ protected:
 	required_ioport m_io0_porta;
 	optional_ioport_array<8> m_adc_ports;
 	optional_ioport_array<4> m_mux_ports;
-	output_finder<4> m_lamps;
+	output_finder<4> m_lamp;
 
+protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	void xboard_base_mconfig(machine_config &config);
 };
 
 
@@ -232,20 +239,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-
-private:
-	DECLARE_READ8_MEMBER(commram_r);
-	DECLARE_WRITE8_MEMBER(commram_w);
-	DECLARE_WRITE8_MEMBER(commram_bank_w);
-
-	void sub_map(address_map &map);
-	void comm_map(address_map &map);
-
-	required_device<mb8421_device> m_commram;
-	required_device<i8251_device> m_usart;
-
-	uint8_t m_commram_bank;
 };
 
 #endif // MAME_INCLUDES_SEGAXBD_H

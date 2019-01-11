@@ -123,23 +123,6 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
 	}
 }
 
-INPUT_CHANGED_MEMBER( headonsa_state::headonsa_coin_inserted )
-{
-	if (newval)
-	{
-		/* increment the coin counter */
-		machine().bookkeeping().coin_counter_w(0, 1);
-		machine().bookkeeping().coin_counter_w(0, 0);
-
-		// hooked up to NMI instead of RESET line
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-
-		// checks for coin status in a much shorter time frame
-		// check headon2s at 0x5f80 onward
-		m_coin_status = 1;
-		m_coinstate_timer->adjust(attotime::from_msec(10));
-	}
-}
 
 #define PORT_COIN_DEFAULT                               \
 	PORT_START("COIN")                                  \
@@ -308,9 +291,9 @@ WRITE8_MEMBER(vicdual_state::depthch_io_w)
 void vicdual_state::depthch_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -320,7 +303,7 @@ void vicdual_state::depthch_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(FUNC(vicdual_state::depthch_io_r), FUNC(vicdual_state::depthch_io_w));
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::depthch_io_r), FUNC(vicdual_state::depthch_io_w));
 }
 
 
@@ -394,9 +377,9 @@ void vicdual_state::safari_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).noprw(); /* unused */
 	map(0x8000, 0x8fff).mirror(0x3000).ram();
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -406,7 +389,7 @@ void vicdual_state::safari_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(FUNC(vicdual_state::safari_io_r), FUNC(vicdual_state::safari_io_w));
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::safari_io_r), FUNC(vicdual_state::safari_io_w));
 }
 
 
@@ -478,9 +461,9 @@ WRITE8_MEMBER(vicdual_state::frogs_io_w)
 void vicdual_state::frogs_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -490,7 +473,7 @@ void vicdual_state::frogs_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(FUNC(vicdual_state::frogs_io_r), FUNC(vicdual_state::frogs_io_w));
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::frogs_io_r), FUNC(vicdual_state::frogs_io_w));
 }
 
 
@@ -606,9 +589,9 @@ void vicdual_state::headon_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x6000).rom();
 	map(0x8000, 0xbfff).noprw(); /* unused */
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -618,7 +601,7 @@ void vicdual_state::headon_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(FUNC(vicdual_state::headon_io_r), FUNC(vicdual_state::headon_io_w));
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::headon_io_r), FUNC(vicdual_state::headon_io_w));
 }
 
 
@@ -628,7 +611,7 @@ void vicdual_state::sspaceat_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(FUNC(vicdual_state::sspaceat_io_r), FUNC(vicdual_state::headon_io_w));
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::sspaceat_io_r), FUNC(vicdual_state::headon_io_w));
 }
 
 
@@ -692,30 +675,6 @@ static INPUT_PORTS_START( headons )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* no color/bw option */
 INPUT_PORTS_END
 
-// e7f1: coin counter
-static INPUT_PORTS_START( headonsa )
-	PORT_INCLUDE( headons )
-
-	// flipped activeness, added a start button while at it
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_4WAY
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, headonsa_state, headonsa_coin_inserted, nullptr)
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( supcrash )
 	PORT_START("IN0")
@@ -902,16 +861,16 @@ void vicdual_state::headon2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x6000).rom();
 	/* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
 void vicdual_state::headon2_io_map(address_map &map)
 {
 	map.global_mask(0x1f);
-	map(0x00, 0x1f).rw(FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
+	map(0x00, 0x1f).rw(this, FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
 }
 
 
@@ -921,42 +880,43 @@ void vicdual_state::digger_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x1f).rw(FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::digger_io_w));
+	map(0x00, 0x1f).rw(this, FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::digger_io_w));
 }
 
 
 static INPUT_PORTS_START( headon2 )
 	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_4WAY
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_4WAY
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_4WAY
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
 
 	PORT_START("IN1")
-	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME(0x18, 0x18, DEF_STR( Lives ) )
-	PORT_DIPSETTING(   0x18, "4" )
+	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x18, 0x08, DEF_STR( Lives ))
+	PORT_DIPSETTING(   0x08, "4" )
 	PORT_DIPSETTING(   0x10, "5" )
-//  PORT_DIPSETTING(   0x08, "5" )
+	PORT_DIPSETTING(   0x18, "5" )
 	PORT_DIPSETTING(   0x00, "6" )
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME(0x02, 0x02, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x02, DEF_STR( On ) )
-	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x02, 0x02, DEF_STR( Demo_Sounds ))
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x02, DEF_STR( On ))
+	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
+/* this actually seems to ignore the dipswitches and is hardcoded to 2 coins 1 credit, and 2 lives */
 static INPUT_PORTS_START( car2 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -970,34 +930,25 @@ static INPUT_PORTS_START( car2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_4WAY
 
 	PORT_START("IN1")
-	// seems to ignore lives dip-switches (hardcoded to 3 lives)
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* probably unused */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x18, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	/*PORT_DIPSETTING(    0x08, "5" )*/
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( headon2s )
-	PORT_INCLUDE( car2 )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, headonsa_state, headonsa_coin_inserted, nullptr)
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( digger )
 	PORT_START("IN0")
@@ -1222,17 +1173,17 @@ WRITE8_MEMBER(vicdual_state::headonn_io_w)
 void vicdual_state::vicdual_dualgame_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 void vicdual_state::carhntds_dualgame_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); // also has part of a rom mapped at 0x4000
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 void vicdual_state::invho2_io_map(address_map &map)
@@ -1246,7 +1197,7 @@ void vicdual_state::invho2_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::invho2_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::invho2_io_w));
 }
 
 
@@ -1261,7 +1212,7 @@ void vicdual_state::invds_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::invds_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::invds_io_w));
 }
 
 void vicdual_state::carhntds_io_map(address_map &map)
@@ -1275,7 +1226,7 @@ void vicdual_state::carhntds_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::carhntds_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::carhntds_io_w));
 }
 
 void vicdual_state::sspacaho_io_map(address_map &map)
@@ -1289,7 +1240,7 @@ void vicdual_state::sspacaho_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::sspacaho_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::sspacaho_io_w));
 }
 
 
@@ -1304,7 +1255,7 @@ void vicdual_state::tranqgun_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x0f).w(FUNC(vicdual_state::tranqgun_io_w));
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::tranqgun_io_w));
 }
 
 
@@ -1319,7 +1270,7 @@ void vicdual_state::spacetrk_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::spacetrk_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::spacetrk_io_w));
 }
 
 
@@ -1334,7 +1285,7 @@ void vicdual_state::carnival_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::carnival_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::carnival_io_w));
 }
 
 
@@ -1349,7 +1300,7 @@ void vicdual_state::brdrline_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x0f).w(FUNC(vicdual_state::brdrline_io_w));
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::brdrline_io_w));
 }
 
 
@@ -1364,7 +1315,7 @@ void vicdual_state::pulsar_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::pulsar_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::pulsar_io_w));
 }
 
 
@@ -1379,7 +1330,7 @@ void vicdual_state::heiankyo_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x0f).w(FUNC(vicdual_state::heiankyo_io_w));
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::heiankyo_io_w));
 }
 
 
@@ -1394,7 +1345,7 @@ void vicdual_state::alphaho_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::alphaho_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::alphaho_io_w));
 }
 
 
@@ -1409,7 +1360,7 @@ void vicdual_state::headonn_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::headonn_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::headonn_io_w));
 }
 
 
@@ -2324,10 +2275,10 @@ WRITE8_MEMBER(vicdual_state::samurai_io_w)
 /* dual game hardware */
 void vicdual_state::samurai_map(address_map &map)
 {
-	map(0x0000, 0x3fff).mirror(0x4000).rom().w(FUNC(vicdual_state::samurai_protection_w));
-	map(0x8000, 0x83ff).mirror(0x7000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x0000, 0x3fff).mirror(0x4000).rom().w(this, FUNC(vicdual_state::samurai_protection_w));
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0x8400, 0x87ff).mirror(0x7000).ram();
-	map(0x8800, 0x8fff).mirror(0x7000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -2342,7 +2293,7 @@ void vicdual_state::samurai_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::samurai_io_w));
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::samurai_io_w));
 }
 
 
@@ -2458,9 +2409,9 @@ void nsub_state::nsub_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
 	map(0x8000, 0xbfff).noprw(); /* unused */
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(nsub_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(nsub_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(nsub_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(nsub_state::characterram_w)).share("characterram");
 }
 
 
@@ -2470,7 +2421,7 @@ void nsub_state::nsub_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(FUNC(nsub_state::nsub_io_r), FUNC(nsub_state::nsub_io_w));
+	map(0x00, 0x0f).rw(this, FUNC(nsub_state::nsub_io_r), FUNC(nsub_state::nsub_io_w));
 }
 
 
@@ -2606,14 +2557,13 @@ MACHINE_CONFIG_START(nsub_state::nsub)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(nsub_state, screen_update_color)
-
-	MCFG_DEVICE_ADD("s97269pb", S97269PB, 0)
+	MCFG_S97269PB_ADD("s97269pb")
 
 	MCFG_MACHINE_START_OVERRIDE(nsub_state, nsub)
 	MCFG_MACHINE_RESET_OVERRIDE(nsub_state, nsub)
 
 	/* audio hardware */
-	S97271P(config, m_s97271p, 0);
+	MCFG_S97271P_ADD("s97271p")
 MACHINE_CONFIG_END
 
 
@@ -2648,9 +2598,9 @@ void vicdual_state::invinco_map(address_map &map)
 {
 	map(0x0000, 0x3fff).mirror(0x4000).rom();
 	map(0x8000, 0xbfff).noprw(); /* unused */
-	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
 	map(0xc400, 0xc7ff).mirror(0x3000).ram();
-	map(0xc800, 0xcfff).mirror(0x3000).ram().w(FUNC(vicdual_state::characterram_w)).share("characterram");
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
 }
 
 
@@ -2660,7 +2610,7 @@ void vicdual_state::invinco_io_map(address_map &map)
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	map(0x00, 0x0f).rw(FUNC(vicdual_state::invinco_io_r), FUNC(vicdual_state::invinco_io_w));
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::invinco_io_r), FUNC(vicdual_state::invinco_io_w));
 }
 
 
@@ -3883,12 +3833,12 @@ GAME( 1979, headon,     0,        headon,    headon,    vicdual_state, empty_ini
 GAME( 1979, headon1,    headon,   headon,    headon,    vicdual_state, empty_init, ROT0,   "Gremlin", "Head On (1 player)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state, empty_init, ROT270, "Nintendo", "Head On N", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headonsa,   headon,   headons,   headonsa,  headonsa_state,empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonsa,   headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
 GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state, empty_init, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state, empty_init, ROT0,   "bootleg (VGG)", "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, hocrash,    headon,   headons,   headons,   vicdual_state, empty_init, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state, empty_init, ROT0,   "Sega", "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2s,   headon2,  headon2bw, car2,      vicdual_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state, empty_init, ROT0,   "bootleg (RZ Bologna)", "Car 2 (bootleg of Head On 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state, empty_init, ROT270, "Sega", "Invinco / Head On 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,    empty_init, ROT270, "Sega", "N-Sub (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped

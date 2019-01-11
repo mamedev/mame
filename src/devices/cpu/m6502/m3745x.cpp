@@ -40,9 +40,22 @@ DEFINE_DEVICE_TYPE(M37450, m37450_device, "m37450", "Mitsubishi M37450")
 m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
-	m_read_p{{*this}, {*this}, {*this}, {*this}},
-	m_write_p{{*this}, {*this}, {*this}, {*this}},
-	m_read_ad{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}},
+	read_p3(*this),
+	read_p4(*this),
+	read_p5(*this),
+	read_p6(*this),
+	write_p3(*this),
+	write_p4(*this),
+	write_p5(*this),
+	write_p6(*this),
+	read_ad_0(*this),
+	read_ad_1(*this),
+	read_ad_2(*this),
+	read_ad_3(*this),
+	read_ad_4(*this),
+	read_ad_5(*this),
+	read_ad_6(*this),
+	read_ad_7(*this),
 	m_intreq1(0),
 	m_intreq2(0),
 	m_intctrl1(0),
@@ -58,15 +71,22 @@ m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, co
 
 void m3745x_device::device_start()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_read_p[i].resolve_safe(0);
-		m_write_p[i].resolve_safe();
-	}
-	for (int i = 0; i < 8; i++)
-	{
-		m_read_ad[i].resolve_safe(0);
-	}
+	read_p3.resolve_safe(0);
+	read_p4.resolve_safe(0);
+	read_p5.resolve_safe(0);
+	read_p6.resolve_safe(0);
+	write_p3.resolve_safe();
+	write_p4.resolve_safe();
+	write_p5.resolve_safe();
+	write_p6.resolve_safe();
+	read_ad_0.resolve_safe(0);
+	read_ad_1.resolve_safe(0);
+	read_ad_2.resolve_safe(0);
+	read_ad_3.resolve_safe(0);
+	read_ad_4.resolve_safe(0);
+	read_ad_5.resolve_safe(0);
+	read_ad_6.resolve_safe(0);
+	read_ad_7.resolve_safe(0);
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
@@ -232,14 +252,50 @@ void m3745x_device::recalc_irqs()
 	m_last_all_ints = all_ints;
 }
 
-void m3745x_device::send_port(uint8_t offset, uint8_t data)
+void m3745x_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 {
-	m_write_p[offset](data);
+	switch (offset)
+	{
+		case 0:
+			write_p3(data);
+			break;
+
+		case 1:
+			write_p4(data);
+			break;
+
+		case 2:
+			write_p5(data);
+			break;
+
+		case 3:
+			write_p6(data);
+			break;
+	}
 }
 
 uint8_t m3745x_device::read_port(uint8_t offset)
 {
-	uint8_t incoming = m_read_p[offset]();
+	uint8_t incoming = 0;
+
+	switch (offset)
+	{
+		case 0:
+			incoming = read_p3();
+			break;
+
+		case 1:
+			incoming = read_p4();
+			break;
+
+		case 2:
+			incoming = read_p5();
+			break;
+
+		case 3:
+			incoming = read_p6();
+			break;
+	}
 
 	// apply data direction registers
 	incoming &= (m_ddrs[offset] ^ 0xff);
@@ -283,37 +339,37 @@ WRITE8_MEMBER(m3745x_device::ports_w)
 	switch (offset)
 	{
 		case 0: // p3
-			send_port(0, data & m_ddrs[0]);
+			send_port(space, 0, data & m_ddrs[0]);
 			m_ports[0] = data;
 			break;
 
 		case 1: // p3 ddr
-			send_port(0, m_ports[0] & data);
+			send_port(space, 0, m_ports[0] & data);
 			m_ddrs[0] = data;
 			break;
 
 		case 2: // p4
-			send_port(1, data & m_ddrs[1]);
+			send_port(space, 1, data & m_ddrs[1]);
 			m_ports[1] = data;
 			break;
 
 		case 4: // p5
-			send_port(2, data & m_ddrs[2]);
+			send_port(space, 2, data & m_ddrs[2]);
 			m_ports[2] = data;
 			break;
 
 		case 5: // p5 ddr
-			send_port(2, m_ports[2] & data);
+			send_port(space, 2, m_ports[2] & data);
 			m_ddrs[2] = data;
 			break;
 
 		case 6: // p6
-			send_port(3, data & m_ddrs[3]);
+			send_port(space, 3, data & m_ddrs[3]);
 			m_ports[3] = data;
 			break;
 
 		case 7: // p6 ddr
-			send_port(3, m_ports[3] & data);
+			send_port(space, 3, m_ports[3] & data);
 			m_ddrs[3] = data;
 			break;
 	}
@@ -367,12 +423,49 @@ WRITE8_MEMBER(m3745x_device::intregs_w)
 
 READ8_MEMBER(m3745x_device::adc_r)
 {
+	uint8_t rv = 0;
+
 	switch (offset)
 	{
 		case 0:
 			m_intreq2 &= ~IRQ2_ADC;
 			recalc_irqs();
-			return m_read_ad[m_adctrl & 7]();
+
+			switch (m_adctrl & 7)
+			{
+				case 0:
+					rv = read_ad_0();
+					break;
+
+				case 1:
+					rv = read_ad_1();
+					break;
+
+				case 2:
+					rv = read_ad_2();
+					break;
+
+				case 3:
+					rv = read_ad_3();
+					break;
+
+				case 4:
+					rv = read_ad_4();
+					break;
+
+				case 5:
+					rv = read_ad_5();
+					break;
+
+				case 6:
+					rv = read_ad_6();
+					break;
+
+				case 7:
+					rv = read_ad_7();
+					break;
+			}
+			return rv;
 
 		case 1:
 			return m_adctrl;
@@ -406,9 +499,9 @@ WRITE8_MEMBER(m3745x_device::adc_w)
 void m37450_device::m37450_map(address_map &map)
 {
 	map(0x0000, 0x00bf).ram();
-	map(0x00d6, 0x00dd).rw(FUNC(m37450_device::ports_r), FUNC(m37450_device::ports_w));
-	map(0x00e2, 0x00e3).rw(FUNC(m37450_device::adc_r), FUNC(m37450_device::adc_w));
-	map(0x00fc, 0x00ff).rw(FUNC(m37450_device::intregs_r), FUNC(m37450_device::intregs_w));
+	map(0x00d6, 0x00dd).rw(this, FUNC(m37450_device::ports_r), FUNC(m37450_device::ports_w));
+	map(0x00e2, 0x00e3).rw(this, FUNC(m37450_device::adc_r), FUNC(m37450_device::adc_w));
+	map(0x00fc, 0x00ff).rw(this, FUNC(m37450_device::intregs_r), FUNC(m37450_device::intregs_w));
 	map(0x0100, 0x01ff).ram();
 }
 

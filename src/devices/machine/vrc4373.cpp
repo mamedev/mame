@@ -73,35 +73,34 @@ DEFINE_DEVICE_TYPE(VRC4373, vrc4373_device, "vrc4373", "NEC VRC4373 System Contr
 void vrc4373_device::config_map(address_map &map)
 {
 	pci_bridge_device::config_map(map);
-	map(0x40, 0x43).rw(FUNC(vrc4373_device::pcictrl_r), FUNC(vrc4373_device::pcictrl_w));
+	map(0x40, 0x43).rw(this, FUNC(vrc4373_device::pcictrl_r), FUNC(vrc4373_device::pcictrl_w));
 }
 
 // cpu i/f map
 void vrc4373_device::cpu_map(address_map &map)
 {
-	map(0x00000000, 0x0000007b).rw(FUNC(vrc4373_device::cpu_if_r), FUNC(vrc4373_device::cpu_if_w));
+	map(0x00000000, 0x0000007b).rw(this, FUNC(vrc4373_device::cpu_if_r), FUNC(vrc4373_device::cpu_if_w));
 }
 
 // Target Window 1 map
 void vrc4373_device::target1_map(address_map &map)
 {
-	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc4373_device::target1_r), FUNC(vrc4373_device::target1_w));
+	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc4373_device::target1_r), FUNC(vrc4373_device::target1_w));
 }
 
 // Target Window 2 map
 void vrc4373_device::target2_map(address_map &map)
 {
-	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc4373_device::target2_r), FUNC(vrc4373_device::target2_w));
+	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc4373_device::target2_r), FUNC(vrc4373_device::target2_w));
 }
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, VRC4373, tag, owner, clock)
-	, m_cpu_space(nullptr), m_irq_cb(*this), m_cpu(*this, finder_base::DUMMY_TAG), m_ram_size(0x0), m_simm0_size(0x0)
-	, m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32)
-	, m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0)
-	, m_romRegion(*this, "rom")
+	: pci_host_device(mconfig, VRC4373, tag, owner, clock),
+		m_cpu_space(nullptr), m_irq_cb(*this), m_cpu(nullptr), cpu_tag(nullptr), m_ram_size(0x0), m_simm0_size(0x0),
+		m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
+		m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0),
+		m_romRegion(*this, "rom")
 {
-	set_ids_host(0x1033005B, 0x00, 0x00000000);
 }
 
 device_memory_interface::space_config_vector vrc4373_device::memory_space_config() const
@@ -115,13 +114,13 @@ device_memory_interface::space_config_vector vrc4373_device::memory_space_config
 void vrc4373_device::device_start()
 {
 	pci_host_device::device_start();
-
+	m_cpu = machine().device<mips3_device>(cpu_tag);
 	m_cpu_space = &m_cpu->space(AS_PCI_CONFIG);
 	memory_space = &space(AS_PCI_MEM);
 	io_space = &space(AS_PCI_IO);
 	is_multifunction_device = false;
 
-	std::fill(std::begin(m_cpu_regs), std::end(m_cpu_regs), 0);
+	memset(m_cpu_regs, 0, sizeof(m_cpu_regs));
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;

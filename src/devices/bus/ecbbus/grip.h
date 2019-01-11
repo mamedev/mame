@@ -21,7 +21,6 @@
 #include "machine/z80sti.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 
 
 

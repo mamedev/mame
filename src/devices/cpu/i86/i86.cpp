@@ -468,7 +468,7 @@ void i8086_common_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-
+	
 	if(m_opcodes->data_width() == 8) {
 		auto cache = m_opcodes->cache<0, 0, ENDIANNESS_LITTLE>();
 		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };

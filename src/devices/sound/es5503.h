@@ -5,6 +5,20 @@
 
 #pragma once
 
+// channels must be a power of two
+
+#define MCFG_ES5503_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, ES5503, _clock)
+
+#define MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
+	downcast<es5503_device &>(*device).set_channels(_channels);
+
+#define MCFG_ES5503_IRQ_FUNC(_write) \
+	devcb = &downcast<es5503_device &>(*device).set_irqf(DEVCB_##_write);
+
+#define MCFG_ES5503_ADC_FUNC(_read) \
+	devcb = &downcast<es5503_device &>(*device).set_adcf(DEVCB_##_read);
+
 // ======================> es5503_device
 
 class es5503_device : public device_t,
@@ -15,13 +29,10 @@ public:
 	// construction/destruction
 	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// channels must be a power of two
 	void set_channels(int channels) { output_channels = channels; }
 
 	template <class Object> devcb_base &set_irqf(Object &&cb) { return m_irq_func.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_adcf(Object &&cb) { return m_adc_func.set_callback(std::forward<Object>(cb)); }
-	auto irq_func() { return m_irq_func.bind(); }
-	auto adc_func() { return m_adc_func.bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -31,7 +42,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
 

@@ -311,8 +311,7 @@ void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 			m_topleft.x = 0;
 			m_topleft.y = 0;
 		}
-		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-		generate_from_address(buffer, m_expression.value() & source.m_space.logaddrmask());
+		generate_from_address(buffer, m_expression.value());
 		return;
 	}
 

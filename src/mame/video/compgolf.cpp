@@ -11,27 +11,28 @@
 #include "includes/compgolf.h"
 
 
-void compgolf_state::compgolf_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(compgolf_state, compgolf)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2;
+		int bit0,bit1,bit2,r,g,b;
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 

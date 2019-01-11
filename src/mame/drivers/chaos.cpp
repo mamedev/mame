@@ -73,10 +73,10 @@ void chaos_state::mem_map(address_map &map)
 void chaos_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x1e, 0x1e).r(FUNC(chaos_state::port1e_r));
-	map(0x1f, 0x1f).rw(FUNC(chaos_state::port90_r), FUNC(chaos_state::port1f_w));
-	map(0x90, 0x90).r(FUNC(chaos_state::port90_r));
-	map(0x91, 0x91).r(FUNC(chaos_state::port91_r));
+	map(0x1e, 0x1e).r(this, FUNC(chaos_state::port1e_r));
+	map(0x1f, 0x1f).rw(this, FUNC(chaos_state::port90_r), FUNC(chaos_state::port1f_w));
+	map(0x90, 0x90).r(this, FUNC(chaos_state::port90_r));
+	map(0x91, 0x91).r(this, FUNC(chaos_state::port91_r));
 	map(0x92, 0x92).w(m_terminal, FUNC(generic_terminal_device::write));
 }
 
@@ -156,8 +156,8 @@ MACHINE_CONFIG_START(chaos_state::chaos)
 	MCFG_DEVICE_DATA_MAP(data_map)
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(chaos_state::kbd_put));
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(chaos_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */

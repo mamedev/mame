@@ -25,6 +25,59 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_315_5338A_READ_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_read_callback(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_WRITE_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_write_callback(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_IN_PA_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_in_callback<0>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_OUT_PA_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_out_callback<0>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_IN_PB_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_in_callback<1>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_OUT_PB_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_out_callback<1>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_IN_PC_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_in_callback<2>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_OUT_PC_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_out_callback<2>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_IN_PD_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_in_callback<3>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_OUT_PD_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_out_callback<3>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_IN_PE_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_in_callback<4>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_OUT_PE_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_out_callback<4>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_IN_PF_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_in_callback<5>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_OUT_PF_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_out_callback<5>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_IN_PG_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_in_callback<6>(DEVCB_##_devcb);
+
+#define MCFG_315_5338A_OUT_PG_CB(_devcb) \
+	devcb = &downcast<sega_315_5338a_device &>(*device).set_out_callback<6>(DEVCB_##_devcb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -35,25 +88,17 @@ public:
 	sega_315_5338a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	auto read_callback() { return m_read_cb.bind(); }
+	template <class Object> devcb_base &set_read_callback(Object &&cb)
+	{ return m_read_cb.set_callback(std::forward<Object>(cb)); }
 
-	auto write_callback() { return m_write_cb.bind(); }
+	template <class Object> devcb_base &set_write_callback(Object &&cb)
+	{ return m_write_cb.set_callback(std::forward<Object>(cb)); }
 
-	auto in_pa_callback() { return m_in_port_cb[0].bind(); }
-	auto in_pb_callback() { return m_in_port_cb[1].bind(); }
-	auto in_pc_callback() { return m_in_port_cb[2].bind(); }
-	auto in_pd_callback() { return m_in_port_cb[3].bind(); }
-	auto in_pe_callback() { return m_in_port_cb[4].bind(); }
-	auto in_pf_callback() { return m_in_port_cb[5].bind(); }
-	auto in_pg_callback() { return m_in_port_cb[6].bind(); }
+	template <int Port, class Object> devcb_base &set_out_callback(Object &&cb)
+	{ return m_out_port_cb[Port].set_callback(std::forward<Object>(cb)); }
 
-	auto out_pa_callback() { return m_out_port_cb[0].bind(); }
-	auto out_pb_callback() { return m_out_port_cb[1].bind(); }
-	auto out_pc_callback() { return m_out_port_cb[2].bind(); }
-	auto out_pd_callback() { return m_out_port_cb[3].bind(); }
-	auto out_pe_callback() { return m_out_port_cb[4].bind(); }
-	auto out_pf_callback() { return m_out_port_cb[5].bind(); }
-	auto out_pg_callback() { return m_out_port_cb[6].bind(); }
+	template <int Port, class Object> devcb_base &set_in_callback(Object &&cb)
+	{ return m_in_port_cb[Port].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

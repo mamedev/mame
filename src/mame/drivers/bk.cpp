@@ -12,10 +12,10 @@
 #include "emu.h"
 #include "includes/bk.h"
 
+#include "cpu/t11/t11.h"
 #include "sound/wave.h"
 #include "formats/rk_cas.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -31,10 +31,10 @@ void bk_state::bk0010_mem(address_map &map)
 	map(0xa000, 0xbfff).rom();  // ROM
 	map(0xc000, 0xdfff).rom();  // ROM
 	map(0xe000, 0xfeff).rom();  // ROM
-	map(0xffb0, 0xffb1).rw(FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
-	map(0xffb2, 0xffb3).r(FUNC(bk_state::bk_key_code_r));
-	map(0xffb4, 0xffb5).rw(FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
-	map(0xffce, 0xffcf).rw(FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
+	map(0xffb0, 0xffb1).rw(this, FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
+	map(0xffb2, 0xffb3).r(this, FUNC(bk_state::bk_key_code_r));
+	map(0xffb4, 0xffb5).rw(this, FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
+	map(0xffce, 0xffcf).rw(this, FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
 }
 
 void bk_state::bk0010fd_mem(address_map &map)
@@ -45,12 +45,12 @@ void bk_state::bk0010fd_mem(address_map &map)
 	map(0x8000, 0x9fff).rom();  // ROM
 	map(0xa000, 0xdfff).ram();  // RAM
 	map(0xe000, 0xfdff).rom();  // ROM
-	map(0xfe58, 0xfe59).rw(FUNC(bk_state::bk_floppy_cmd_r), FUNC(bk_state::bk_floppy_cmd_w));
-	map(0xfe5a, 0xfe5b).rw(FUNC(bk_state::bk_floppy_data_r), FUNC(bk_state::bk_floppy_data_w));
-	map(0xffb0, 0xffb1).rw(FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
-	map(0xffb2, 0xffb3).r(FUNC(bk_state::bk_key_code_r));
-	map(0xffb4, 0xffb5).rw(FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
-	map(0xffce, 0xffcf).rw(FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
+	map(0xfe58, 0xfe59).rw(this, FUNC(bk_state::bk_floppy_cmd_r), FUNC(bk_state::bk_floppy_cmd_w));
+	map(0xfe5a, 0xfe5b).rw(this, FUNC(bk_state::bk_floppy_data_r), FUNC(bk_state::bk_floppy_data_w));
+	map(0xffb0, 0xffb1).rw(this, FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
+	map(0xffb2, 0xffb3).r(this, FUNC(bk_state::bk_key_code_r));
+	map(0xffb4, 0xffb5).rw(this, FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
+	map(0xffce, 0xffcf).rw(this, FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
 }
 
 /* Input ports */
@@ -164,34 +164,34 @@ static INPUT_PORTS_START( bk0010 )
 INPUT_PORTS_END
 
 
-void bk_state::bk0010(machine_config &config)
-{
+MACHINE_CONFIG_START(bk_state::bk0010)
 	/* basic machine hardware */
-	T11(config, m_maincpu, 3000000);
-	m_maincpu->set_initial_mode(0x36ff); /* initial mode word has DAL15,14,11,8 pulled low */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bk_state::bk0010_mem);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(bk_state::bk0010_irq_callback));
+	MCFG_DEVICE_ADD("maincpu", T11, 3000000)
+	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
+	MCFG_DEVICE_PROGRAM_MAP(bk0010_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(bk_state,bk0010_irq_callback)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(bk_state::screen_update_bk0010));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(bk_state, screen_update_bk0010)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
-	m_cassette->set_interface("bk0010_cass");
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	MCFG_CASSETTE_INTERFACE("bk0010_cass")
 
-	SOFTWARE_LIST(config, "cass_list").set_original("bk0010");
-}
+	MCFG_SOFTWARE_LIST_ADD("cass_list","bk0010")
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bk_state::bk0010fd)
 	bk0010(config);

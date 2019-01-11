@@ -105,9 +105,6 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void mekd2(machine_config &config);
-
-private:
 	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
 	DECLARE_READ8_MEMBER(mekd2_key_r);
 	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
@@ -118,8 +115,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
+	void mekd2(machine_config &config);
 	void mekd2_mem(address_map &map);
-
+private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_cass_data[4];
 	uint8_t m_segment;
@@ -380,7 +378,7 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	MCFG_DEVICE_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_DEVICE_PROGRAM_MAP(mekd2_mem)
 
-	config.set_default_layout(layout_mekd2);
+	MCFG_DEFAULT_LAYOUT(layout_mekd2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -389,21 +387,21 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	MCFG_CASSETTE_ADD("cassette")
 
 	/* Devices */
-	PIA6821(config, m_pia_s, 0);
-	m_pia_s->readpa_handler().set(FUNC(mekd2_state::mekd2_key_r));
-	m_pia_s->readcb1_handler().set(FUNC(mekd2_state::mekd2_key40_r));
-	m_pia_s->writepa_handler().set(FUNC(mekd2_state::mekd2_segment_w));
-	m_pia_s->writepb_handler().set(FUNC(mekd2_state::mekd2_digit_w));
-	m_pia_s->ca2_handler().set(FUNC(mekd2_state::mekd2_nmi_w));
-	m_pia_s->irqa_handler().set_inputline("maincpu", INPUT_LINE_NMI);
-	m_pia_s->irqb_handler().set_inputline("maincpu", INPUT_LINE_NMI);
+	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, mekd2_state, mekd2_key_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, mekd2_state, mekd2_key40_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, mekd2_state, mekd2_segment_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, mekd2_state, mekd2_digit_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, mekd2_state, mekd2_nmi_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PIA6821(config, m_pia_u, 0);
-	m_pia_u->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
+	MCFG_DEVICE_ADD("pia_u", PIA6821, 0)
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 
-	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set(FUNC(mekd2_state::cass_w));
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, mekd2_state, cass_w))
 
 	MCFG_DEVICE_ADD("acia_tx_clock", CLOCK, XTAL_MEKD2 / 256) // 4800Hz
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))

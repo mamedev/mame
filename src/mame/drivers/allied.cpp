@@ -68,9 +68,6 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void allied(machine_config &config);
-
-private:
 	DECLARE_WRITE8_MEMBER(ic1_b_w);
 	DECLARE_WRITE8_MEMBER(ic2_b_w);
 	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
@@ -91,8 +88,9 @@ private:
 	DECLARE_READ8_MEMBER(ic7_a_r);
 	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void allied(machine_config &config);
 	void allied_map(address_map &map);
-
+private:
 	uint32_t m_player_score[6];
 	uint8_t m_display;
 	uint8_t m_bit_counter;
@@ -628,61 +626,61 @@ MACHINE_CONFIG_START(allied_state::allied)
 	MCFG_DEVICE_PROGRAM_MAP(allied_map)
 
 	/* Video */
-	config.set_default_layout(layout_allied);
+	MCFG_DEFAULT_LAYOUT(layout_allied)
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	PIA6821(config, m_ic1, 0);
-	m_ic1->readpa_handler().set(FUNC(allied_state::ic1_a_r));
-	//m_ic1->writepa_handler().set(FUNC(allied_state::ic1_a_w));
-	//m_ic1->readpb_handler().set(FUNC(allied_state::ic1_b_r));
-	m_ic1->writepb_handler().set(FUNC(allied_state::ic1_b_w));
-	//m_ic1->ca2_handler().set(FUNC(allied_state::ic1_ca2_w));
-	//m_ic1->cb2_handler().set(FUNC(allied_state::ic1_cb2_w));
-	m_ic1->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic1->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	MCFG_DEVICE_ADD("ic1", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, allied_state, ic1_a_r))
+	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, allied_state, ic1_a_w))
+	//MCFG_PIA_READPB_HANDLER(READ8(*this, allied_state, ic1_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, allied_state, ic1_b_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, allied_state, ic1_ca2_w))
+	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, allied_state, ic1_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
 
-	PIA6821(config, m_ic2, 0);
-	m_ic2->readpa_handler().set(FUNC(allied_state::ic2_a_r));
-	//m_ic2->writepa_handler().set(FUNC(allied_state::ic2_a_w));
-	//m_ic2->readpb_handler().set(FUNC(allied_state::ic2_b_r));
-	m_ic2->writepb_handler().set(FUNC(allied_state::ic2_b_w));
-	//m_ic2->ca2_handler().set(FUNC(allied_state::ic2_ca2_w));
-	m_ic2->cb2_handler().set(FUNC(allied_state::ic2_cb2_w));
-	m_ic2->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic2->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	MCFG_DEVICE_ADD("ic2", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, allied_state, ic2_a_r))
+	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, allied_state, ic2_a_w))
+	//MCFG_PIA_READPB_HANDLER(READ8(*this, allied_state, ic2_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, allied_state, ic2_b_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, allied_state, ic2_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, allied_state, ic2_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
 
-	PIA6821(config, m_ic4, 0);
-	m_ic4->readpa_handler().set(FUNC(allied_state::ic4_a_r));
-	//m_ic4->writepa_handler().set(FUNC(allied_state::ic4_a_w));
-	//m_ic4->readpb_handler().set(FUNC(allied_state::ic4_b_r));
-	m_ic4->writepb_handler().set(FUNC(allied_state::ic4_b_w));
-	//m_ic4->ca2_handler().set(FUNC(allied_state::ic4_ca2_w));
-	m_ic4->cb2_handler().set(FUNC(allied_state::ic4_cb2_w));
-	m_ic4->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic4->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	MCFG_DEVICE_ADD("ic4", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, allied_state, ic4_a_r))
+	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, allied_state, ic4_a_w))
+	//MCFG_PIA_READPB_HANDLER(READ8(*this, allied_state, ic4_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, allied_state, ic4_b_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, allied_state, ic4_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, allied_state, ic4_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
 
-	PIA6821(config, m_ic7, 0);
-	m_ic7->readpa_handler().set(FUNC(allied_state::ic7_a_r));
-	//m_ic7->writepa_handler().set(FUNC(allied_state::ic7_a_w));
-	//m_ic7->readpb_handler().set(FUNC(allied_state::ic7_b_r));
-	m_ic7->writepb_handler().set(FUNC(allied_state::ic7_b_w));
-	//m_ic7->ca2_handler().set(FUNC(allied_state::ic7_ca2_w));
-	//m_ic7->cb2_handler().set(FUNC(allied_state::ic7_cb2_w));
-	m_ic7->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic7->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	MCFG_DEVICE_ADD("ic7", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, allied_state, ic7_a_r))
+	//MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, allied_state, ic7_a_w))
+	//MCFG_PIA_READPB_HANDLER(READ8(*this, allied_state, ic7_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, allied_state, ic7_b_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, allied_state, ic7_ca2_w))
+	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, allied_state, ic7_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
 
-	PIA6821(config, m_ic8, 0);
-	//m_ic8->readpa_handler().set(FUNC(allied_state::ic8_a_r));
-	m_ic8->writepa_handler().set(FUNC(allied_state::ic8_a_w));
-	//m_ic8->readpb_handler().set(FUNC(allied_state::ic8_b_r));
-	m_ic8->writepb_handler().set(FUNC(allied_state::ic8_b_w));
-	//m_ic8->ca2_handler().set(FUNC(allied_state::ic8_ca2_w));
-	m_ic8->cb2_handler().set(FUNC(allied_state::ic8_cb2_w));
-	m_ic8->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
-	m_ic8->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
+	MCFG_DEVICE_ADD("ic8", PIA6821, 0)
+	//MCFG_PIA_READPA_HANDLER(READ8(*this, allied_state, ic8_a_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, allied_state, ic8_a_w))
+	//MCFG_PIA_READPB_HANDLER(READ8(*this, allied_state, ic8_b_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, allied_state, ic8_b_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, allied_state, ic8_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, allied_state, ic8_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6504_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("ic3", MOS6530, 3572549/4) // unknown where the ram and i/o is located
 	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, allied_state, ic3_b_w))

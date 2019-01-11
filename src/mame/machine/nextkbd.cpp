@@ -8,12 +8,12 @@ DEFINE_DEVICE_TYPE(NEXTKBD, nextkbd_device, "nextkbd", "NeXT Keyboard")
 
 void nextkbd_device::amap(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(nextkbd_device::status_snd_r), FUNC(nextkbd_device::ctrl_snd_w));
-	map(0x1, 0x1).rw(FUNC(nextkbd_device::status_kms_r), FUNC(nextkbd_device::ctrl_kms_w));
-	map(0x2, 0x2).rw(FUNC(nextkbd_device::status_dma_r), FUNC(nextkbd_device::ctrl_dma_w));
-	map(0x3, 0x3).rw(FUNC(nextkbd_device::status_cmd_r), FUNC(nextkbd_device::ctrl_cmd_w));
-	map(0x4, 0x7).rw(FUNC(nextkbd_device::cdata_r), FUNC(nextkbd_device::cdata_w));
-	map(0x8, 0xb).rw(FUNC(nextkbd_device::kmdata_r), FUNC(nextkbd_device::kmdata_w));
+	map(0x0, 0x0).rw(this, FUNC(nextkbd_device::status_snd_r), FUNC(nextkbd_device::ctrl_snd_w));
+	map(0x1, 0x1).rw(this, FUNC(nextkbd_device::status_kms_r), FUNC(nextkbd_device::ctrl_kms_w));
+	map(0x2, 0x2).rw(this, FUNC(nextkbd_device::status_dma_r), FUNC(nextkbd_device::ctrl_dma_w));
+	map(0x3, 0x3).rw(this, FUNC(nextkbd_device::status_cmd_r), FUNC(nextkbd_device::ctrl_cmd_w));
+	map(0x4, 0x7).rw(this, FUNC(nextkbd_device::cdata_r), FUNC(nextkbd_device::cdata_w));
+	map(0x8, 0xb).rw(this, FUNC(nextkbd_device::kmdata_r), FUNC(nextkbd_device::kmdata_w));
 }
 
 nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

@@ -7,9 +7,8 @@
 
 #include "cpu/z80/z80.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/scsi/scsi.h"
-#include "imagedev/floppy.h"
 #include "machine/ram.h"
+#include "bus/scsi/scsi.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
@@ -93,7 +92,7 @@ protected:
 
 	void update_dma_rdy();
 
-	required_device<z80_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
 	required_device<z80dma_device> m_dmac;

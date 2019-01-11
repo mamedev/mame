@@ -3,32 +3,33 @@
 #include "emu.h"
 #include "includes/jailbrek.h"
 
-void jailbrek_state::jailbrek_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(jailbrek_state, jailbrek)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	// create a lookup table for the palette
-	for (int i = 0; i < 0x20; i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int const r = pal4bit(color_prom[i + 0x00] >> 0);
-		int const g = pal4bit(color_prom[i + 0x00] >> 4);
-		int const b = pal4bit(color_prom[i + 0x20] >> 0);
+		int r = pal4bit(color_prom[i + 0x00] >> 0);
+		int g = pal4bit(color_prom[i + 0x00] >> 4);
+		int b = pal4bit(color_prom[i + 0x20] >> 0);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	// color_prom now points to the beginning of the lookup table
+	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x40;
 
-	for (int i = 0; i < 0x100; i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	for (int i = 0x100; i < 0x200; i++)
+	for (i = 0x100; i < 0x200; i++)
 	{
-		uint8_t const ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

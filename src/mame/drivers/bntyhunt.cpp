@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "emupal.h"
 #include "screen.h"
 
 

@@ -34,8 +34,7 @@ public:
 	// Timers
 	enum {
 		TMR_ID_POLL,
-		TMR_ID_HEARTBEAT,
-		TMR_ID_AH
+		TMR_ID_HEARTBEAT
 	};
 
 protected:
@@ -94,20 +93,17 @@ private:
 	bool m_ib_eoi;
 	emu_timer *m_poll_timer;
 	emu_timer *m_hb_timer;
-	emu_timer *m_ah_timer;
 	unsigned m_connect_cnt;
 	bool m_connected;
 	uint8_t m_pp_data;
 	bool m_pp_requested;
 	uint8_t m_pp_dio;
 	uint8_t m_sh_dio;
-	bool m_waiting_cp;
 
 	void bus_reset();
 	void process_input_msgs();
 	void set_connection(bool state);
 	void recvd_data_byte(uint8_t data , bool eoi);
-	void flush_data();
 	void update_signals_from_rem(uint8_t to_set , uint8_t to_clear);
 	void update_signal(signal_bit bit , int state);
 	void update_state(uint8_t new_signals);
@@ -118,7 +114,6 @@ private:
 	static bool is_space(char c);
 	char recv_update(uint8_t& data);
 	bool is_local_atn_active() const;
-	void ah_checkpoint();
 	void update_ah_fsm();
 	void update_sh_fsm();
 	bool is_local_pp_active() const;

@@ -172,16 +172,16 @@
 
 // callbacks
 #define MCFG_EXPANSION_SLOT_OVR_HANDLER(_devcb) \
-	downcast<zorro_device &>(*device).set_ovr_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro_device &>(*device).set_ovr_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_SLOT_INT2_HANDLER(_devcb) \
-	downcast<zorro_device &>(*device).set_int2_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro_device &>(*device).set_int2_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_SLOT_INT6_HANDLER(_devcb) \
-	downcast<zorro_device &>(*device).set_int6_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro_device &>(*device).set_int6_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_SLOT_IPL_HANDLER(_devcb) \
-	downcast<exp_slot_device &>(*device).set_ipl_handler(DEVCB_##_devcb);
+	devcb = &downcast<exp_slot_device &>(*device).set_ipl_handler(DEVCB_##_devcb);
 
 // ======================> zorro 2 bus
 
@@ -193,25 +193,25 @@
 	MCFG_ZORRO_SLOT_ADD(ZORROBUS_TAG, _tag, _slot_intf, _def_slot)
 
 #define MCFG_ZORRO2_OVR_HANDLER(_devcb) \
-	downcast<zorro_device &>(*device).set_ovr_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro_device &>(*device).set_ovr_handler(DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_INT2_HANDLER(_devcb) \
-	downcast<zorro_device &>(*device).set_int2_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro_device &>(*device).set_int2_handler(DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_INT6_HANDLER(_devcb) \
-	downcast<zorro_device &>(*device).set_int6_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro_device &>(*device).set_int6_handler(DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_EINT1_HANDLER(_devcb) \
-	downcast<zorro2_device &>(*device).set_eint1_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro2_device &>(*device).set_eint1_handler(DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_EINT4_HANDLER(_devcb) \
-	downcast<zorro2_device &>(*device).set_eint4_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro2_device &>(*device).set_eint4_handler(DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_EINT5_HANDLER(_devcb) \
-	downcast<zorro2_device &>(*device).set_eint5_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro2_device &>(*device).set_eint5_handler(DEVCB_##_devcb);
 
 #define MCFG_ZORRO2_EINT7_HANDLER(_devcb) \
-	downcast<zorro2_device &>(*device).set_eint7_handler(DEVCB_##_devcb);
+	devcb = &downcast<zorro2_device &>(*device).set_eint7_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

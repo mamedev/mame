@@ -3,8 +3,6 @@
 #include "emu.h"
 #include "wd_fdc.h"
 
-#include "imagedev/floppy.h"
-
 #include "debugger.h"
 
 //#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
@@ -1234,7 +1232,7 @@ uint8_t wd_fdc_device_base::data_r()
 	return val;
 }
 
-void wd_fdc_device_base::write(offs_t reg, uint8_t val)
+void wd_fdc_device_base::gen_w(int reg, uint8_t val)
 {
 	LOGFUNC("%s %02x: %02x\n", FUNCNAME, reg, val);
 	switch(reg) {
@@ -1245,7 +1243,7 @@ void wd_fdc_device_base::write(offs_t reg, uint8_t val)
 	}
 }
 
-uint8_t wd_fdc_device_base::read(offs_t reg)
+uint8_t wd_fdc_device_base::gen_r(int reg)
 {
 	switch(reg) {
 	case 0: return status_r();

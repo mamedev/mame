@@ -26,7 +26,16 @@ public:
 			out(*this, "out")
 	{ }
 
-	void wpc_s(machine_config &config);
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(watchdog_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(firq_src_r);
+	DECLARE_READ8_MEMBER(zc_r);
+	DECLARE_READ8_MEMBER(dcs_data_r);
+	DECLARE_WRITE8_MEMBER(dcs_data_w);
+	DECLARE_READ8_MEMBER(dcs_ctrl_r);
+	DECLARE_WRITE8_MEMBER(dcs_reset_w);
+	DECLARE_READ8_MEMBER(rtc_r);
 
 	void init();
 	void init_corv();
@@ -43,23 +52,12 @@ public:
 	void init_wcs();
 	void init_tfs();
 
-private:
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(firq_src_r);
-	DECLARE_READ8_MEMBER(zc_r);
-	DECLARE_READ8_MEMBER(dcs_data_r);
-	DECLARE_WRITE8_MEMBER(dcs_data_w);
-	DECLARE_READ8_MEMBER(dcs_ctrl_r);
-	DECLARE_WRITE8_MEMBER(dcs_reset_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
+	void wpc_s(machine_config &config);
 	void wpc_s_map(address_map &map);
-
+protected:
 	// devices
 	required_device<cpu_device> maincpu;
 	required_device<dcs_audio_8k_device> dcs;
@@ -73,6 +71,7 @@ private:
 	// driver_device overrides
 	virtual void machine_reset() override;
 
+private:
 	static const char *const lamps_corv[64];
 	static const char *const outputs_corv[54];
 	static const char *const lamps_dh[64];
@@ -115,8 +114,8 @@ void wpc_s_state::wpc_s_map(address_map &map)
 
 	map(0x3fd4, 0x3fd4).portr("FLIPPERS").w(out, FUNC(wpc_out_device::out4_w));
 
-	map(0x3fdc, 0x3fdc).rw(FUNC(wpc_s_state::dcs_data_r), FUNC(wpc_s_state::dcs_data_w));
-	map(0x3fdd, 0x3fdd).rw(FUNC(wpc_s_state::dcs_ctrl_r), FUNC(wpc_s_state::dcs_reset_w));
+	map(0x3fdc, 0x3fdc).rw(this, FUNC(wpc_s_state::dcs_data_r), FUNC(wpc_s_state::dcs_data_w));
+	map(0x3fdd, 0x3fdd).rw(this, FUNC(wpc_s_state::dcs_ctrl_r), FUNC(wpc_s_state::dcs_reset_w));
 
 	map(0x3fe0, 0x3fe3).w(out, FUNC(wpc_out_device::out_w));
 	map(0x3fe4, 0x3fe4).nopr().w(lamp, FUNC(wpc_lamp_device::row_w));
@@ -128,13 +127,13 @@ void wpc_s_state::wpc_s_map(address_map &map)
 	map(0x3fea, 0x3fea).w(pic, FUNC(wpc_pic_device::write));
 
 	map(0x3ff2, 0x3ff2).w(out, FUNC(wpc_out_device::led_w));
-	map(0x3ff3, 0x3ff3).nopr().w(FUNC(wpc_s_state::irq_ack_w));
+	map(0x3ff3, 0x3ff3).nopr().w(this, FUNC(wpc_s_state::irq_ack_w));
 	map(0x3ff4, 0x3ff7).m("shift", FUNC(wpc_shift_device::registers));
-	map(0x3ff8, 0x3ff8).r(FUNC(wpc_s_state::firq_src_r)).nopw(); // ack?
-	map(0x3ffa, 0x3ffb).r(FUNC(wpc_s_state::rtc_r));
-	map(0x3ffc, 0x3ffc).w(FUNC(wpc_s_state::bank_w));
+	map(0x3ff8, 0x3ff8).r(this, FUNC(wpc_s_state::firq_src_r)).nopw(); // ack?
+	map(0x3ffa, 0x3ffb).r(this, FUNC(wpc_s_state::rtc_r));
+	map(0x3ffc, 0x3ffc).w(this, FUNC(wpc_s_state::bank_w));
 	map(0x3ffd, 0x3ffe).noprw(); // memory protection stuff?
-	map(0x3fff, 0x3fff).rw(FUNC(wpc_s_state::zc_r), FUNC(wpc_s_state::watchdog_w));
+	map(0x3fff, 0x3fff).rw(this, FUNC(wpc_s_state::zc_r), FUNC(wpc_s_state::watchdog_w));
 
 	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom().region("maincpu", 0x78000);
@@ -1978,14 +1977,14 @@ MACHINE_CONFIG_START(wpc_s_state::wpc_s)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_s_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_s_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
-	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
-	MCFG_DEVICE_ADD("pic", WPC_PIC, 0)
-	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
-	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 5)
-	WPC_DMD(config, "dmd", 0).scanline_callback().set(FUNC(wpc_s_state::scanline_irq));
+	MCFG_WPC_SHIFT_ADD("shift")
+	MCFG_WPC_PIC_ADD("pic")
+	MCFG_WPC_LAMP_ADD("lamp")
+	MCFG_WPC_OUT_ADD("out", 5)
+	MCFG_WPC_DMD_ADD("dmd", WRITELINE(*this, wpc_s_state, scanline_irq))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	DCS_AUDIO_8K(config, dcs, 0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
 MACHINE_CONFIG_END
 
 /*-----------------
@@ -2134,17 +2133,6 @@ ROM_START(jb_10b)
 	ROM_LOAD("jack1_0b.rom", 0x00000, 0x80000, CRC(da3b2735) SHA1(f895b1548107052f469d8e3fa205bce6113962d9))
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD16_BYTE("jbsnd_u2.rom", 0x000000, 0x080000, CRC(b116d59f) SHA1(c87c82d7fa4ca40d337fb59476b0b1c90dff86f0))
-	ROM_LOAD16_BYTE("jbsnd_u3.rom", 0x200000, 0x080000, CRC(76ad3aad) SHA1(012b44c48d1cbb282eb763e40db40b141397f426))
-	ROM_LOAD16_BYTE("jbsnd_u4.rom", 0x400000, 0x080000, CRC(038b1309) SHA1(a6e337476902ed9ec5123fe4e088a0608c0d5f48))
-	ROM_LOAD16_BYTE("jbsnd_u5.rom", 0x600000, 0x080000, CRC(0957e2ad) SHA1(0fb4e3fdb949b0979721064162a41cfba84d0013))
-	ROM_LOAD16_BYTE("jbsnd_u6.rom", 0x800000, 0x080000, CRC(7a1e2c3d) SHA1(0c6ccb937328509cb0a87e4c557a64c13bbed2db))
-ROM_END
-
-ROM_START(jb_04a) // WPC-S 5-Board
-	ROM_REGION(0x80000, "maincpu", 0)
-	ROM_LOAD("jack0_4a.rom", 0x00000, 0x80000, CRC(cc02e024) SHA1(5de886e4631c3c99b83f6692482259e2a6bf0bca))
-	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
-	ROM_LOAD16_BYTE("jbsnd_04a.u2", 0x000000, 0x080000, CRC(f90ebf0f) SHA1(d18362c1946504dd456f6edc28bb5812d584874a))
 	ROM_LOAD16_BYTE("jbsnd_u3.rom", 0x200000, 0x080000, CRC(76ad3aad) SHA1(012b44c48d1cbb282eb763e40db40b141397f426))
 	ROM_LOAD16_BYTE("jbsnd_u4.rom", 0x400000, 0x080000, CRC(038b1309) SHA1(a6e337476902ed9ec5123fe4e088a0608c0d5f48))
 	ROM_LOAD16_BYTE("jbsnd_u5.rom", 0x600000, 0x080000, CRC(0957e2ad) SHA1(0fb4e3fdb949b0979721064162a41cfba84d0013))
@@ -2763,7 +2751,6 @@ GAME(1995,  i500_10r,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0
 GAME(1995,  i500_11b,   i500_11r,   wpc_s,  i500, wpc_s_state,  init_i500,  ROT0,  "Bally",        "Indianapolis 500 (1.1 Belgium)",    MACHINE_MECHANICAL)
 GAME(1995,  jb_10r,     0,          wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0R)",                   MACHINE_MECHANICAL)
 GAME(1995,  jb_10b,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (1.0B) (Belgium/Canada)",  MACHINE_MECHANICAL)
-GAME(1995,  jb_04a,     jb_10r,     wpc_s,  jb,   wpc_s_state,  init_jb,    ROT0,  "Williams",     "Jack*Bot (0.4A prototype)",         MACHINE_MECHANICAL)
 GAME(1995,  jm_12r,     0,          wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2R)",            MACHINE_MECHANICAL)
 GAME(1995,  jm_12b,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (1.2B) Belgium",    MACHINE_MECHANICAL)
 GAME(1995,  jm_05r,     jm_12r,     wpc_s,  jm,   wpc_s_state,  init_jm,    ROT0,  "Williams",     "Johnny Mnemonic (0.5R)",            MACHINE_MECHANICAL)

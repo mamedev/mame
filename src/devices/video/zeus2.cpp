@@ -117,8 +117,8 @@ void zeus2_device::device_start()
 	save_item(NAME(zeus_quad_size));
 	save_item(NAME(m_useZOffset));
 	save_pointer(NAME(waveram), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / 4);
-	save_pointer(NAME(m_frameColor), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	save_pointer(NAME(m_frameDepth), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	save_pointer(NAME(m_frameColor.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	save_pointer(NAME(m_frameDepth.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	save_item(NAME(m_pal_table));
 	// m_ucode
 	save_item(NAME(m_curUCodeSrc));

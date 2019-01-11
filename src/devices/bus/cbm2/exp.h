@@ -65,16 +65,7 @@ class cbm2_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	cbm2_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
-		: cbm2_expansion_slot_device(mconfig, tag, owner, clock)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
-	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// computer interface
 	uint8_t read(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);

@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 
 typedef device_delegate<void (int *code, int *color)> k007420_delegate;
 
@@ -15,9 +13,9 @@ class k007420_device : public device_t
 public:
 	k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 	void set_bank_limit(int limit) { m_banklimit = limit; }
-	template <typename... T> void set_sprite_callback(T &&... args) { m_callback = k007420_delegate(std::forward<T>(args)...); }
+	void set_callback(k007420_delegate callback) { m_callback = callback; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -39,6 +37,18 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K007420, k007420_device)
+
+#define MCFG_K007420_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K007420, 0)
+
+#define MCFG_K007420_PALETTE(_palette_tag) \
+	downcast<k007420_device &>(*device).set_palette_tag(_palette_tag);
+
+#define MCFG_K007420_BANK_LIMIT(_limit) \
+	downcast<k007420_device &>(*device).set_bank_limit(_limit);
+
+#define MCFG_K007420_CALLBACK_OWNER(_class, _method) \
+	downcast<k007420_device &>(*device).set_callback(k007420_delegate(&_class::_method, #_class "::" #_method, this));
 
 // function definition for a callback
 #define K007420_CALLBACK_MEMBER(_name)     void _name(int *code, int *color)

@@ -8,6 +8,7 @@
 #include "bus/msx_cart/cartridge.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd765.h"
+#include "imagedev/flopdrv.h"
 #include "imagedev/floppy.h"
 
 

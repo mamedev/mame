@@ -148,11 +148,11 @@ void bishi_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x407fff).ram();                     // Work RAM
-	map(0x800000, 0x800001).rw(FUNC(bishi_state::control_r), FUNC(bishi_state::control_w));
+	map(0x800000, 0x800001).rw(this, FUNC(bishi_state::control_r), FUNC(bishi_state::control_w));
 	map(0x800004, 0x800005).portr("DSW");
 	map(0x800006, 0x800007).portr("SYSTEM");
 	map(0x800008, 0x800009).portr("INPUTS");
-	map(0x810000, 0x810003).w(FUNC(bishi_state::control2_w));       // bank switch for K056832 character ROM test
+	map(0x810000, 0x810003).w(this, FUNC(bishi_state::control2_w));       // bank switch for K056832 character ROM test
 	map(0x820000, 0x820001).nopw();            // lamps (see lamp test in service menu)
 	map(0x830000, 0x83003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x840000, 0x840007).w(m_k056832, FUNC(k056832_device::b_word_w));    // VSCCS
@@ -161,8 +161,8 @@ void bishi_state::main_map(address_map &map)
 	map(0x880000, 0x880003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  // Graphic planes
 	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb04000, 0xb047ff).r(FUNC(bishi_state::bishi_mirror_r));    // bug in the ram/rom test?
-	map(0xc00000, 0xc01fff).r(FUNC(bishi_state::bishi_K056832_rom_r));
+	map(0xb04000, 0xb047ff).r(this, FUNC(bishi_state::bishi_mirror_r));    // bug in the ram/rom test?
+	map(0xc00000, 0xc01fff).r(this, FUNC(bishi_state::bishi_K056832_rom_r));
 }
 
 static INPUT_PORTS_START( bishi )
@@ -445,53 +445,54 @@ void bishi_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-void bishi_state::bishi(machine_config &config)
-{
+MACHINE_CONFIG_START(bishi_state::bishi)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, CPU_CLOCK); /* 12MHz (24MHz OSC / 2 ) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &bishi_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(bishi_state::bishi_scanline), "screen", 0, 1);
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bishi_state, bishi_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(29, 29+288-1, 16, 16+224-1);
-	m_screen->set_screen_update(FUNC(bishi_state::screen_update_bishi));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(29, 29+288-1, 16, 16+224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(bishi_state, screen_update_bishi)
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 4096)
+	MCFG_PALETTE_FORMAT(XBGR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(bishi_state::tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_8, 1, 0);
-	m_k056832->set_palette(m_palette);
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(bishi_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+	MCFG_K056832_PALETTE("palette")
 
-	K054338(config, m_k054338, 0);
+	MCFG_DEVICE_ADD("k054338", K054338, 0)
 	// FP 201404: any reason why this is not connected to the k055555 below?
 
-	K055555(config, m_k055555, 0);
+	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", SOUND_CLOCK)); /* 16.9344MHz */
-	ymz.irq_handler().set_inputline("maincpu", M68K_IRQ_1);
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("ymz", YMZ280B, SOUND_CLOCK) /* 16.9344MHz */
+	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
-void bishi_state::dobouchn(machine_config &config)
-{
+MACHINE_CONFIG_START(bishi_state::dobouchn)
 	bishi(config);
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
-//  m_k056832->set_tile_callback(FUNC(bishi_state::dobouchn_tile_callback), this);
-	m_k056832->set_config("gfx1", K056832_BPP_8, 1, 0);
-}
+	MCFG_DEVICE_MODIFY("k056832")
+//  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
+MACHINE_CONFIG_END
 
 // ROM definitions
 

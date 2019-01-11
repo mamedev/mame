@@ -17,7 +17,6 @@
 #include "ui/uimain.h"
 
 #include "emuopts.h"
-#include "romload.h"
 #include "speaker.h"
 #include "screen.h"
 
@@ -38,6 +37,9 @@ public:
 		, m_last_controls(0)
 		, m_playing(false) { }
 
+	// callback hook
+	static chd_file *get_disc_static(device_t *dummy, laserdisc_device &device) { return device.machine().driver_data<ldplayer_state>()->get_disc(); }
+
 	void ldplayer_ntsc(machine_config &config);
 
 protected:
@@ -46,10 +48,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	// callback hook
-	chd_file *get_disc(laserdisc_device &device);
-
 	// internal helpers
+	chd_file *get_disc();
 	void process_commands();
 
 	// derived classes
@@ -164,7 +164,7 @@ protected:
  *
  *************************************/
 
-chd_file *ldplayer_state::get_disc(laserdisc_device &device)
+chd_file *ldplayer_state::get_disc()
 {
 	bool found = false;
 	// open a path to the ROMs and find the first CHD file
@@ -634,7 +634,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ldv1000_state::ldv1000)
 	ldplayer_ntsc(config);
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldv1000_state::get_disc, this))
+	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -648,7 +648,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pr8210_state::pr8210)
 	ldplayer_ntsc(config);
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&pr8210_state::get_disc, this))
+	MCFG_LASERDISC_GET_DISC(laserdisc_device::get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	SPEAKER(config, "lspeaker").front_left();

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "machine/nscsi_bus.h"
-#include "imagedev/harddriv.h"
+#include "harddisk.h"
 
 class nscsi_harddisk_device : public nscsi_full_device
 {
@@ -24,7 +24,6 @@ protected:
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 
-	required_device<harddisk_image_device> image;
 	uint8_t block[512];
 	hard_disk_file *harddisk;
 	int lba, cur_lba, blocks;

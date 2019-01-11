@@ -97,8 +97,8 @@ void speedspn_state::program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); /* RAM COLOUR */
-	map(0x8800, 0x8fff).ram().w(FUNC(speedspn_state::attram_w)).share("attram");
-	map(0x9000, 0x9fff).rw(FUNC(speedspn_state::vidram_r), FUNC(speedspn_state::vidram_w));  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
+	map(0x8800, 0x8fff).ram().w(this, FUNC(speedspn_state::attram_w)).share("attram");
+	map(0x9000, 0x9fff).rw(this, FUNC(speedspn_state::vidram_r), FUNC(speedspn_state::vidram_w));  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
 	map(0xa000, 0xa7ff).ram();
 	map(0xa800, 0xafff).ram();
 	map(0xb000, 0xbfff).ram();                                             /* RAM PROGRAM */
@@ -108,14 +108,14 @@ void speedspn_state::program_map(address_map &map)
 void speedspn_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x07, 0x07).w(FUNC(speedspn_state::display_disable_w));
+	map(0x07, 0x07).w(this, FUNC(speedspn_state::display_disable_w));
 	map(0x10, 0x10).portr("SYSTEM");
 	map(0x11, 0x11).portr("P1");
-	map(0x12, 0x12).portr("P2").w(FUNC(speedspn_state::rombank_w));
-	map(0x13, 0x13).portr("DSW1").w(FUNC(speedspn_state::sound_w));
+	map(0x12, 0x12).portr("P2").w(this, FUNC(speedspn_state::rombank_w));
+	map(0x13, 0x13).portr("DSW1").w(this, FUNC(speedspn_state::sound_w));
 	map(0x14, 0x14).portr("DSW2");
-	map(0x16, 0x16).r(FUNC(speedspn_state::irq_ack_r)); // @@@ could be watchdog, value is discarded
-	map(0x17, 0x17).w(FUNC(speedspn_state::vidram_bank_w));
+	map(0x16, 0x16).r(this, FUNC(speedspn_state::irq_ack_r)); // @@@ could be watchdog, value is discarded
+	map(0x17, 0x17).w(this, FUNC(speedspn_state::vidram_bank_w));
 }
 
 /* sound cpu */
@@ -124,7 +124,7 @@ void speedspn_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(FUNC(speedspn_state::okibank_w));
+	map(0x9000, 0x9000).w(this, FUNC(speedspn_state::okibank_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -299,15 +299,16 @@ MACHINE_CONFIG_START(speedspn_state::speedspn)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(speedspn_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_speedspn);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x400);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speedspn)
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1122000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

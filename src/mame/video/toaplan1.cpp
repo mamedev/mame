@@ -227,10 +227,10 @@ void toaplan1_state::toaplan1_vram_alloc()
 	m_pf3_tilevram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_TILEVRAM_SIZE/2);
 	m_pf4_tilevram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_TILEVRAM_SIZE/2);
 
-	save_pointer(NAME(m_pf1_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
-	save_pointer(NAME(m_pf2_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
-	save_pointer(NAME(m_pf3_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
-	save_pointer(NAME(m_pf4_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf1_tilevram16.get()), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf2_tilevram16.get()), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf3_tilevram16.get()), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf4_tilevram16.get()), TOAPLAN1_TILEVRAM_SIZE/2);
 
 #ifdef MAME_DEBUG
 	m_display_pf1 = 1;
@@ -248,9 +248,9 @@ void toaplan1_state::toaplan1_spritevram_alloc()
 	m_spritesizeram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_SPRITESIZERAM_SIZE/2);
 	m_buffered_spritesizeram16 = make_unique_clear<uint16_t[]>(TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
-	save_pointer(NAME(m_buffered_spriteram), TOAPLAN1_SPRITERAM_SIZE/2);
-	save_pointer(NAME(m_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
-	save_pointer(NAME(m_buffered_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	save_pointer(NAME(m_buffered_spriteram.get()), TOAPLAN1_SPRITERAM_SIZE/2);
+	save_pointer(NAME(m_spritesizeram16.get()), TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	save_pointer(NAME(m_buffered_spritesizeram16.get()), TOAPLAN1_SPRITESIZERAM_SIZE/2);
 }
 
 void toaplan1_state::toaplan1_set_scrolls()
@@ -295,7 +295,7 @@ VIDEO_START_MEMBER(toaplan1_rallybik_state,rallybik)
 	toaplan1_vram_alloc();
 
 	m_buffered_spriteram = make_unique_clear<uint16_t[]>(m_spriteram.bytes()/2);
-	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes()/2);
+	save_pointer(NAME(m_buffered_spriteram.get()), m_spriteram.bytes()/2);
 
 	m_pf1_tilemap->set_scrolldx(-0x00d-6, -0x80+6);
 	m_pf2_tilemap->set_scrolldx(-0x00d-4, -0x80+4);

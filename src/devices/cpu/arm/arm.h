@@ -16,6 +16,10 @@
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
 
+#define MCFG_ARM_COPRO(_type) \
+	downcast<arm_cpu_device &>(*device).set_copro_type(arm_cpu_device::copro_type::_type);
+
+
 class arm_cpu_device : public cpu_device
 {
 public:

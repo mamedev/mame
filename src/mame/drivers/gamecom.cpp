@@ -10,22 +10,16 @@ Todo:
 - RS232 port
 - Sound ports 1,2 do not sound anything like the real thing
 - Sound port 3 (noise channel)
-- Sound dac port (mostly works but is the wrong speed in some places).
-  dac pitch is controlled by how often TIM1_INT occurs. This same
-  interrupt also controls the seconds countdown in some games, such as
-  Quiz Wiz and Scrabble. Currently this countdown goes twice as fast
-  as it should. If the INT is slowed down to compensate, the dac sound
-  is so slow as to be unintelligible. Need to find a way to keep both happy.
-- System seems slower than it should. Probably wrong cycle count in the CPU.
-  What we have there is a guess as the real info has not been found.
-  -speed 1.2 makes the sound more natural
-  -speed 1.7 if TIM1_INT is slowed to fix the countdown.
+- Sound dac port (mostly works but is the wrong speed in some places)
 
 Game Status:
 - Inbuilt ROM and PDA functions all work
+- On the screen where the cart goes into the slot, there are vertical bands of randomness
 - Due to an irritating message, the NVRAM is commented out in the machine config
-- All carts appear to work, from my limited testing.
--- indy500 skips some speech just before the trial race starts.
+- All carts appear to work except:
+- - Henry: crash just after "HENRY" button clicked
+- - Lost World: freeze just after entering Stage 2 (the nest)
+- Weblink and Internet are of no use as there is nothing to connect to.
 
 ***************************************************************************/
 
@@ -43,9 +37,9 @@ Game Status:
 void gamecom_state::gamecom_mem_map(address_map &map)
 {
 	map(0x0000, 0x0013).ram().region("maincpu", 0x00);
-	map(0x0014, 0x0017).rw(FUNC(gamecom_state::gamecom_pio_r), FUNC(gamecom_state::gamecom_pio_w));        // buttons
+	map(0x0014, 0x0017).rw(this, FUNC(gamecom_state::gamecom_pio_r), FUNC(gamecom_state::gamecom_pio_w));        // buttons
 	map(0x0018, 0x001F).ram().region("maincpu", 0x18);
-	map(0x0020, 0x007F).rw(FUNC(gamecom_state::gamecom_internal_r), FUNC(gamecom_state::gamecom_internal_w));/* CPU internal register file */
+	map(0x0020, 0x007F).rw(this, FUNC(gamecom_state::gamecom_internal_r), FUNC(gamecom_state::gamecom_internal_w));/* CPU internal register file */
 	map(0x0080, 0x03FF).ram().region("maincpu", 0x80);                     /* RAM */
 	map(0x0400, 0x0FFF).noprw();                                                /* Nothing */
 	map(0x1000, 0x1FFF).rom();                                                /* Internal ROM (initially), or External ROM/Flash. Controlled by MMU0 (never swapped out in game.com) */
@@ -53,7 +47,7 @@ void gamecom_state::gamecom_mem_map(address_map &map)
 	map(0x4000, 0x5FFF).bankr("bank2");                                   /* External ROM/Flash. Controlled by MMU2 */
 	map(0x6000, 0x7FFF).bankr("bank3");                                   /* External ROM/Flash. Controlled by MMU3 */
 	map(0x8000, 0x9FFF).bankr("bank4");                                   /* External ROM/Flash. Controlled by MMU4 */
-	map(0xA000, 0xDFFF).writeonly().share("videoram").nopr();             /* VRAM - writeonly, returns 0 on read, as expected by lostwrld */
+	map(0xA000, 0xDFFF).ram().share("videoram");             /* VRAM */
 	map(0xE000, 0xFFFF).ram().share("nvram");           /* Extended I/O, Extended RAM */
 }
 
@@ -77,7 +71,6 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Button D" ) PORT_CODE( KEYCODE_D ) PORT_CODE( KEYCODE_LSHIFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "Stylus press" ) PORT_CODE( KEYCODE_Z ) PORT_CODE( MOUSECODE_BUTTON1 )
 
-	// These are used by the "Default Grid" artwork to detect mouse clicks
 	PORT_START("GRID.0")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_OTHER)
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_OTHER)
@@ -235,13 +228,13 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
 	INPUT_PORTS_END
 
-void gamecom_state::gamecom_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(gamecom_state, gamecom)
 {
-	palette.set_pen_color(0, 0x00, 0x00, 0x00); // Black
-	palette.set_pen_color(1, 0x0f, 0x4f, 0x2f); // Gray 1
-	palette.set_pen_color(2, 0x6f, 0x8f, 0x4f); // Gray 2
-	palette.set_pen_color(3, 0x8f, 0xcf, 0x8f); // Grey 3
-	palette.set_pen_color(4, 0xdf, 0xff, 0x8f); // White
+	palette.set_pen_color(0, 0x00, 0x00, 0x00 ); // Black
+	palette.set_pen_color(1, 0x0F, 0x4F, 0x2F ); // Gray 1
+	palette.set_pen_color(2, 0x6F, 0x8F, 0x4F ); // Gray 2
+	palette.set_pen_color(3, 0x8F, 0xCF, 0x8F ); // Grey 3
+	palette.set_pen_color(4, 0xDF, 0xFF, 0x8F ); // White
 }
 
 uint32_t gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -257,15 +250,15 @@ INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 
 MACHINE_CONFIG_START(gamecom_state::gamecom)
 	/* basic machine hardware */
-	SM8500(config, m_maincpu, XTAL(11'059'200)/2);   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
-	m_maincpu->set_addrmap(AS_PROGRAM, &gamecom_state::gamecom_mem_map);
-	m_maincpu->dma_cb().set(FUNC(gamecom_state::gamecom_handle_dma));
-	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
-	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
+	MCFG_DEVICE_ADD( "maincpu", SM8500, XTAL(11'059'200)/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
+	MCFG_DEVICE_PROGRAM_MAP( gamecom_mem_map)
+	MCFG_SM8500_DMA_CB( WRITE8( *this, gamecom_state, gamecom_handle_dma ) )
+	MCFG_SM8500_TIMER_CB( WRITE8( *this, gamecom_state, gamecom_update_timers ) )
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -276,8 +269,9 @@ MACHINE_CONFIG_START(gamecom_state::gamecom)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
 	MCFG_SCREEN_PALETTE("palette")
 
-	config.set_default_layout(layout_gamecom);
-	PALETTE(config, "palette", FUNC(gamecom_state::gamecom_palette), 5);
+	MCFG_DEFAULT_LAYOUT(layout_gamecom)
+	MCFG_PALETTE_ADD("palette", 5)
+	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

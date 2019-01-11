@@ -76,16 +76,16 @@ public:
 		m_rombank(*this, "rombank")
 	{ }
 
+	void init_virus();
 	void virus(machine_config &config);
 
-	void init_virus();
-
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void virus_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
 };

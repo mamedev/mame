@@ -73,4 +73,11 @@ private:
 DECLARE_DEVICE_TYPE(BFM_ADDER2, bfm_adder2_device)
 
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_BFM_ADDER2_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, BFM_ADDER2, 0)
+
 #endif // MAME_INCLUDES_BFM_ADR2_H

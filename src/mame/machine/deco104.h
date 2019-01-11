@@ -22,4 +22,8 @@ protected:
 
 DECLARE_DEVICE_TYPE(DECO104PROT, deco104_device)
 
+
+#define MCFG_DECO104_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DECO104PROT, 0)
+
 #endif // MAME_MACHINE_DECO104_H

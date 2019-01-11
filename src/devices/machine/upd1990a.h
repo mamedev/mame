@@ -24,6 +24,23 @@
 #include "dirtc.h"
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_UPD1990A_ADD(_tag, _clock, _data, _tp) \
+	MCFG_DEVICE_ADD((_tag), UPD1990A, _clock) \
+	downcast<upd1990a_device *>(device)->set_data_callback(DEVCB_##_data); \
+	downcast<upd1990a_device *>(device)->set_tp_callback(DEVCB_##_tp);
+
+#define MCFG_UPD4990A_ADD(_tag, _clock, _data, _tp) \
+	MCFG_DEVICE_ADD((_tag), UPD4990A, _clock) \
+	downcast<upd1990a_device *>(device)->set_data_callback(DEVCB_##_data); \
+	downcast<upd1990a_device *>(device)->set_tp_callback(DEVCB_##_tp);
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -34,10 +51,10 @@ class upd1990a_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto data_callback() { return m_write_data.bind(); }
-	auto tp_callback() { return m_write_tp.bind(); }
+	template <class Object> void set_data_callback(Object &&data) { m_write_data.set_callback(std::forward<Object>(data)); }
+	template <class Object> void set_tp_callback(Object &&tp) { m_write_tp.set_callback(std::forward<Object>(tp)); }
 
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
@@ -131,7 +148,7 @@ private:
 class upd4990a_device : public upd1990a_device
 {
 public:
-	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

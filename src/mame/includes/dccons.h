@@ -18,7 +18,6 @@ public:
 	dc_cons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dc_state(mconfig, type, tag)
 		, m_ata(*this, "ata")
-		, atapi_xfercomplete(0)
 //      , m_dcflash(*this, "dcflash")
 	{ }
 
@@ -56,7 +55,7 @@ public:
 private:
 	uint64_t PDTRA, PCTRA;
 	emu_timer *atapi_timer;
-	int atapi_xferlen, atapi_xferbase, atapi_xfercomplete;
+	int atapi_xferlen, atapi_xferbase;
 };
 
 #endif // MAME_INCLUDES_DCCONS_H

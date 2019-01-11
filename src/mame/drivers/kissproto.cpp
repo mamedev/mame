@@ -20,28 +20,22 @@ public:
 	{ }
 
 	void kissp(machine_config &config);
-
-	void init_kissp();
-
-private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void kissp_map(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
+public:
+	void init_kissp();
 };
 
 
-void kissp_state::mem_map(address_map &map)
+void kissp_state::kissp_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rom().region("maincpu", 0);
-}
-
-void kissp_state::io_map(address_map &map)
-{
+	map(0x0000, 0x0fff).noprw();
 }
 
 static INPUT_PORTS_START( kissp )
@@ -55,13 +49,11 @@ void kissp_state::init_kissp()
 {
 }
 
-void kissp_state::kissp(machine_config &config)
-{
+MACHINE_CONFIG_START(kissp_state::kissp)
 	/* basic machine hardware */
-	I8035(config, m_maincpu, 6000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kissp_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &kissp_state::io_map);
-}
+	MCFG_DEVICE_ADD("maincpu", I8035, 6000000/15)
+	MCFG_DEVICE_PROGRAM_MAP(kissp_map)
+MACHINE_CONFIG_END
 
 ROM_START(kissp)
 	ROM_REGION(0x10000, "maincpu", 0)

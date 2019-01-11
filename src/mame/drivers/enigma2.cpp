@@ -27,7 +27,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -61,26 +60,16 @@ TODO:
 class enigma2_state : public driver_device
 {
 public:
-	enigma2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	enigma2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_colors(*this, "colors"),
-		m_stars(*this, "stars")
-	{ }
+		m_stars(*this, "stars"){ }
 
-	void enigma2(machine_config &config);
-	void enigma2a(machine_config &config);
-
-	void init_enigma2();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -105,8 +94,11 @@ private:
 	DECLARE_READ8_MEMBER(dip_switch_r);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(enigma2_flip_screen_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(protection_data_w);
+	void init_enigma2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -117,6 +109,8 @@ private:
 	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
 	void create_interrupt_timers(  );
 	void start_interrupt_timers(  );
+	void enigma2(machine_config &config);
+	void enigma2a(machine_config &config);
 	void enigma2_audio_cpu_map(address_map &map);
 	void enigma2_main_cpu_map(address_map &map);
 	void enigma2a_main_cpu_io_map(address_map &map);
@@ -450,13 +444,13 @@ void enigma2_state::enigma2_main_cpu_map(address_map &map)
 	map(0x0000, 0x1fff).rom().nopw();
 	map(0x2000, 0x3fff).mirror(0x4000).ram().share("videoram");
 	map(0x4000, 0x4fff).rom().nopw();
-	map(0x5000, 0x57ff).r(FUNC(enigma2_state::dip_switch_r)).nopw();
+	map(0x5000, 0x57ff).r(this, FUNC(enigma2_state::dip_switch_r)).nopw();
 	map(0x5800, 0x5800).mirror(0x07f8).noprw();
 	map(0x5801, 0x5801).mirror(0x07f8).portr("IN0").nopw();
 	map(0x5802, 0x5802).mirror(0x07f8).portr("IN1").nopw();
-	map(0x5803, 0x5803).mirror(0x07f8).nopr().w(FUNC(enigma2_state::sound_data_w));
+	map(0x5803, 0x5803).mirror(0x07f8).nopr().w(this, FUNC(enigma2_state::sound_data_w));
 	map(0x5804, 0x5804).mirror(0x07f8).noprw();
-	map(0x5805, 0x5805).mirror(0x07f8).nopr().w(FUNC(enigma2_state::enigma2_flip_screen_w));
+	map(0x5805, 0x5805).mirror(0x07f8).nopr().w(this, FUNC(enigma2_state::enigma2_flip_screen_w));
 	map(0x5806, 0x5807).mirror(0x07f8).noprw();
 }
 
@@ -466,7 +460,7 @@ void enigma2_state::enigma2a_main_cpu_map(address_map &map)
 	map(0x0000, 0x1fff).rom().nopw();
 	map(0x2000, 0x3fff).mirror(0x4000).ram().share("videoram");
 	map(0x4000, 0x4fff).rom().nopw();
-	map(0x5000, 0x57ff).r(FUNC(enigma2_state::dip_switch_r)).nopw();
+	map(0x5000, 0x57ff).r(this, FUNC(enigma2_state::dip_switch_r)).nopw();
 	map(0x5800, 0x5fff).noprw();
 }
 
@@ -477,9 +471,9 @@ void enigma2_state::enigma2a_main_cpu_io_map(address_map &map)
 	map(0x00, 0x00).noprw();
 	map(0x01, 0x01).portr("IN0").nopw();
 	map(0x02, 0x02).portr("IN1").nopw();
-	map(0x03, 0x03).nopr().w(FUNC(enigma2_state::sound_data_w));
+	map(0x03, 0x03).nopr().w(this, FUNC(enigma2_state::sound_data_w));
 	map(0x04, 0x04).noprw();
-	map(0x05, 0x05).nopr().w(FUNC(enigma2_state::enigma2_flip_screen_w));
+	map(0x05, 0x05).nopr().w(this, FUNC(enigma2_state::enigma2_flip_screen_w));
 	map(0x06, 0x07).noprw();
 }
 
@@ -621,15 +615,15 @@ MACHINE_CONFIG_START(enigma2_state::enigma2)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2)
 
-	PALETTE(config, m_palette, palette_device::BGR_3BIT);
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
-	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
-	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -653,10 +647,10 @@ MACHINE_CONFIG_START(enigma2_state::enigma2a)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
-	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
-	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

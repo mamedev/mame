@@ -15,6 +15,43 @@
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
 
+#define MCFG_DECOCPU_TYPE1_ADD(_tag, _clock, _region) \
+	MCFG_DEVICE_ADD(_tag, DECOCPU1, _clock) \
+	downcast<decocpu_type1_device &>(*device).set_cpuregion(_region);
+
+#define MCFG_DECOCPU_TYPE2_ADD(_tag, _clock, _region) \
+	MCFG_DEVICE_ADD(_tag, DECOCPU2, _clock) \
+	downcast<decocpu_type1_device &>(*device).set_cpuregion(_region);
+
+#define MCFG_DECOCPU_TYPE3_ADD(_tag, _clock, _region) \
+	MCFG_DEVICE_ADD(_tag, DECOCPU3, _clock) \
+	downcast<decocpu_type1_device &>(*device).set_cpuregion(_region);
+
+#define MCFG_DECOCPU_TYPE3B_ADD(_tag, _clock, _region) \
+	MCFG_DEVICE_ADD(_tag, DECOCPU3B, _clock) \
+	downcast<decocpu_type1_device &>(*device).set_cpuregion(_region);
+
+#define MCFG_DECOCPU_DISPLAY(_disp_r, _disp_w) \
+	downcast<decocpu_type1_device *>(device)->set_display_read_callback(DEVCB_##_disp_r); \
+	downcast<decocpu_type1_device *>(device)->set_display_write_callback(DEVCB_##_disp_w);
+
+#define MCFG_DECOCPU_DMDSTATUS(_dmdstat_r) \
+	downcast<decocpu_type1_device *>(device)->set_dmdstatus_read_callback(DEVCB_##_dmdstat_r);
+
+#define MCFG_DECOCPU_SOUNDLATCH(_soundlatch_w) \
+	downcast<decocpu_type1_device *>(device)->set_soundlatch_write_callback(DEVCB_##_soundlatch_w);
+
+#define MCFG_DECOCPU_SWITCH(_switch_r, _switch_w) \
+	downcast<decocpu_type1_device *>(device)->set_switch_read_callback(DEVCB_##_switch_r); \
+	downcast<decocpu_type1_device *>(device)->set_switch_write_callback(DEVCB_##_switch_w);
+
+#define MCFG_DECOCPU_LAMP(_lamp_w) \
+	downcast<decocpu_type1_device *>(device)->set_lamp_write_callback(DEVCB_##_lamp_w);
+
+#define MCFG_DECOCPU_SOLENOIDS(_sol_w) \
+	downcast<decocpu_type1_device *>(device)->set_solenoid_write_callback(DEVCB_##_sol_w);
+
+
 // 6808 CPU's input clock is 4MHz
 // but because it has an internal /4 divider, its E clock runs at 1/4 that frequency
 #define E_CLOCK (XTAL(4'000'000)/4)
@@ -28,30 +65,23 @@
 class decocpu_type1_device : public device_t
 {
 public:
-	template <typename T>
-	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpuregion_tag)
-		: decocpu_type1_device(mconfig, tag, owner, clock)
-	{
-		set_cpuregion(std::forward<T>(cpuregion_tag));
-	}
-
 	decocpu_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	auto display_read_callback() { return m_read_display.bind(); }
-	auto display_write_callback() { return m_write_display.bind(); }
-	auto dmdstatus_read_callback() { return m_read_dmdstatus.bind(); }
-	auto soundlatch_write_callback() { return m_write_soundlatch.bind(); }
-	auto switch_read_callback() { return m_read_switch.bind(); }
-	auto switch_write_callback() { return m_write_switch.bind(); }
-	auto lamp_write_callback() { return m_write_lamp.bind(); }
-	auto solenoid_write_callback() { return m_write_solenoid.bind(); }
+	template <class Object> void set_display_read_callback(Object &&cb) { m_read_display.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_display_write_callback(Object &&cb) { m_write_display.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_dmdstatus_read_callback(Object &&cb) { m_read_dmdstatus.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_soundlatch_write_callback(Object &&cb) { m_write_soundlatch.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_switch_read_callback(Object &&cb) { m_read_switch.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_switch_write_callback(Object &&cb) { m_write_switch.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_lamp_write_callback(Object &&cb) { m_write_lamp.set_callback(std::forward<Object>(cb)); }
+	template <class Object> void set_solenoid_write_callback(Object &&cb) { m_write_solenoid.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(solenoid2_w);
 	INPUT_CHANGED_MEMBER(main_nmi);
 	INPUT_CHANGED_MEMBER(audio_nmi);
 
-	template <typename T> void set_cpuregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); } // region for cpu board code and data
+	void set_cpuregion(const char *tag) { m_cputag = tag; }
 
 protected:
 	static constexpr device_timer_id TIMER_IRQ = 0;
@@ -73,9 +103,9 @@ protected:
 	required_device<pia6821_device> m_pia2c;
 	required_device<pia6821_device> m_pia30;
 	required_device<pia6821_device> m_pia34;
-	required_region_ptr<uint8_t> m_rom;
 
 private:
+	const char* m_cputag;  // region for cpu board code and data
 	emu_timer* m_irq_timer;
 	bool m_irq_active;
 	bool m_ca2;
@@ -111,12 +141,6 @@ private:
 class decocpu_type2_device : public decocpu_type1_device
 {
 public:
-	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *cpuregion_tag)
-		: decocpu_type2_device(mconfig, tag, owner, clock)
-	{
-		set_cpuregion(cpuregion_tag);
-	}
-
 	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void decocpu2_map(address_map &map);
@@ -131,12 +155,6 @@ protected:
 class decocpu_type3_device : public decocpu_type2_device
 {
 public:
-	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *cpuregion_tag)
-		: decocpu_type3_device(mconfig, tag, owner, clock)
-	{
-		set_cpuregion(cpuregion_tag);
-	}
-
 	decocpu_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -149,12 +167,6 @@ protected:
 class decocpu_type3b_device : public decocpu_type3_device
 {
 public:
-	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *cpuregion_tag)
-		: decocpu_type3b_device(mconfig, tag, owner, clock)
-	{
-		set_cpuregion(cpuregion_tag);
-	}
-
 	decocpu_type3b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

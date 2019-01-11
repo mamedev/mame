@@ -66,7 +66,6 @@ protected:
 		LED_ERR
 	};
 
-	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -82,7 +81,7 @@ protected:
 	required_device<c2040_fdc_device> m_fdc;
 	required_memory_region m_gcr;
 	required_ioport m_address;
-	output_finder<4> m_leds;
+	output_finder<4> m_led;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

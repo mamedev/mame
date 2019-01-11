@@ -56,9 +56,6 @@ public:
 		: pcat_base_state(mconfig, type, tag)
 			{ }
 
-	void xtom3d(machine_config &config);
-
-private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
@@ -81,7 +78,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-
+	void xtom3d(machine_config &config);
 	void xtom3d_io(address_map &map);
 	void xtom3d_map(address_map &map);
 
@@ -358,13 +355,13 @@ void xtom3d_state::xtom3d_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(FUNC(xtom3d_state::isa_ram1_w));
-	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(FUNC(xtom3d_state::isa_ram2_w));
-	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(FUNC(xtom3d_state::bios_ext1_ram_w));
-	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(FUNC(xtom3d_state::bios_ext2_ram_w));
-	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(FUNC(xtom3d_state::bios_ext3_ram_w));
-	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(FUNC(xtom3d_state::bios_ext4_ram_w));
-	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(xtom3d_state::bios_ram_w));
+	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(this, FUNC(xtom3d_state::isa_ram1_w));
+	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(this, FUNC(xtom3d_state::isa_ram2_w));
+	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(this, FUNC(xtom3d_state::bios_ext1_ram_w));
+	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(this, FUNC(xtom3d_state::bios_ext2_ram_w));
+	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(this, FUNC(xtom3d_state::bios_ext3_ram_w));
+	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(this, FUNC(xtom3d_state::bios_ext4_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(this, FUNC(xtom3d_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }

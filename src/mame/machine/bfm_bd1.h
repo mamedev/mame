@@ -6,15 +6,15 @@
 #pragma once
 
 
+#define MCFG_BFMBD1_ADD(_tag,_val) \
+		MCFG_DEVICE_ADD(_tag, BFM_BD1, 60)\
+		MCFG_BD1_PORT(_val)
+#define MCFG_BD1_PORT(_val) \
+		downcast<bfm_bd1_device &>(*device).set_port_val(_val);
+
 class bfm_bd1_device : public device_t
 {
 public:
-	bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t port_val)
-		: bfm_bd1_device(mconfig, tag, owner, clock)
-	{
-		set_port_val(port_val);
-	}
-
 	bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers

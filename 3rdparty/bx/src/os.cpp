@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -7,6 +7,10 @@
 #include <bx/string.h>
 #include <bx/os.h>
 #include <bx/uint32_t.h>
+
+#if !BX_PLATFORM_NONE
+
+#include <stdio.h>
 
 #if BX_CRT_MSVC
 #	include <direct.h>
@@ -47,13 +51,11 @@
 #	elif   BX_PLATFORM_LINUX     \
 		|| BX_PLATFORM_RPI       \
 		|| BX_PLATFORM_STEAMLINK
-#		include <stdio.h>  // fopen
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
 #	elif BX_PLATFORM_OSX
 #		include <mach/mach.h> // mach_task_basic_info
 #	elif BX_PLATFORM_HURD
-#		include <stdio.h>           // fopen
 #		include <pthread/pthread.h> // pthread_self
 #	elif BX_PLATFORM_ANDROID
 #		include "debug.h" // getTid is not implemented...
@@ -68,8 +70,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		::Sleep(_ms);
 #elif  BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT   \
-	|| BX_CRT_NONE
+	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_ms);
 		debugOutput("sleep is not implemented"); debugBreak();
 #else
@@ -84,8 +85,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		::SwitchToThread();
 #elif  BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT   \
-	|| BX_CRT_NONE
+	|| BX_PLATFORM_WINRT
 		debugOutput("yield is not implemented"); debugBreak();
 #else
 		::sched_yield();
@@ -171,19 +171,18 @@ namespace bx
 #endif // BX_PLATFORM_*
 	}
 
-	void* dlopen(const FilePath& _filePath)
+	void* dlopen(const char* _filePath)
 	{
 #if BX_PLATFORM_WINDOWS
-		return (void*)::LoadLibraryA(_filePath.get() );
+		return (void*)::LoadLibraryA(_filePath);
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
-	|| BX_PLATFORM_WINRT      \
-	|| BX_CRT_NONE
+	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_filePath);
 		return NULL;
 #else
-		return ::dlopen(_filePath.get(), RTLD_LOCAL|RTLD_LAZY);
+		return ::dlopen(_filePath, RTLD_LOCAL|RTLD_LAZY);
 #endif // BX_PLATFORM_
 	}
 
@@ -194,53 +193,42 @@ namespace bx
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
-	|| BX_PLATFORM_WINRT      \
-	|| BX_CRT_NONE
+	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_handle);
 #else
 		::dlclose(_handle);
 #endif // BX_PLATFORM_
 	}
 
-	void* dlsym(void* _handle, const StringView& _symbol)
+	void* dlsym(void* _handle, const char* _symbol)
 	{
-		const int32_t symbolMax = _symbol.getLength()+1;
-		char* symbol = (char*)alloca(symbolMax);
-		bx::strCopy(symbol, symbolMax, _symbol);
-
 #if BX_PLATFORM_WINDOWS
-		return (void*)::GetProcAddress( (HMODULE)_handle, symbol);
+		return (void*)::GetProcAddress( (HMODULE)_handle, _symbol);
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
-	|| BX_PLATFORM_WINRT      \
-	|| BX_CRT_NONE
-		BX_UNUSED(_handle, symbol);
+	|| BX_PLATFORM_WINRT
+		BX_UNUSED(_handle, _symbol);
 		return NULL;
 #else
-		return ::dlsym(_handle, symbol);
+		return ::dlsym(_handle, _symbol);
 #endif // BX_PLATFORM_
 	}
 
-	bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name)
+	bool getenv(const char* _name, char* _out, uint32_t* _inOutSize)
 	{
-		const int32_t nameMax = _name.getLength()+1;
-		char* name = (char*)alloca(nameMax);
-		bx::strCopy(name, nameMax, _name);
-
 #if BX_PLATFORM_WINDOWS
-		DWORD len = ::GetEnvironmentVariableA(name, _out, *_inOutSize);
+		DWORD len = ::GetEnvironmentVariableA(_name, _out, *_inOutSize);
 		bool result = len != 0 && len < *_inOutSize;
 		*_inOutSize = len;
 		return result;
 #elif  BX_PLATFORM_PS4     \
 	|| BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT   \
-	|| BX_CRT_NONE
-		BX_UNUSED(name, _out, _inOutSize);
+	|| BX_PLATFORM_WINRT
+		BX_UNUSED(_name, _out, _inOutSize);
 		return false;
 #else
-		const char* ptr = ::getenv(name);
+		const char* ptr = ::getenv(_name);
 		uint32_t len = 0;
 		bool result = false;
 		if (NULL != ptr)
@@ -259,36 +247,29 @@ namespace bx
 #endif // BX_PLATFORM_
 	}
 
-	void setEnv(const StringView& _name, const StringView& _value)
+	void setenv(const char* _name, const char* _value)
 	{
-		const int32_t nameMax = _name.getLength()+1;
-		char* name = (char*)alloca(nameMax);
-		bx::strCopy(name, nameMax, _name);
-
-		char* value = NULL;
-		if (!_value.isEmpty() )
-		{
-			int32_t valueMax = _value.getLength()+1;
-			value = (char*)alloca(valueMax);
-			bx::strCopy(value, valueMax, _value);
-		}
-
 #if BX_PLATFORM_WINDOWS
-		::SetEnvironmentVariableA(name, value);
+		::SetEnvironmentVariableA(_name, _value);
 #elif  BX_PLATFORM_PS4     \
 	|| BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT   \
-	|| BX_CRT_NONE
-		BX_UNUSED(name, value);
+	|| BX_PLATFORM_WINRT
+		BX_UNUSED(_name, _value);
 #else
-		if (NULL != value)
-		{
-			::setenv(name, value, 1);
-		}
-		else
-		{
-			::unsetenv(name);
-		}
+		::setenv(_name, _value, 1);
+#endif // BX_PLATFORM_
+	}
+
+	void unsetenv(const char* _name)
+	{
+#if BX_PLATFORM_WINDOWS
+		::SetEnvironmentVariableA(_name, NULL);
+#elif  BX_PLATFORM_PS4     \
+	|| BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
+		BX_UNUSED(_name);
+#else
+		::unsetenv(_name);
 #endif // BX_PLATFORM_
 	}
 
@@ -296,8 +277,7 @@ namespace bx
 	{
 #if BX_PLATFORM_PS4     \
  || BX_PLATFORM_XBOXONE \
- || BX_PLATFORM_WINRT   \
- || BX_CRT_NONE
+ || BX_PLATFORM_WINRT
 		BX_UNUSED(_path);
 		return -1;
 #elif BX_CRT_MSVC
@@ -369,3 +349,5 @@ namespace bx
 	}
 
 } // namespace bx
+
+#endif // !BX_PLATFORM_NONE

@@ -210,11 +210,11 @@ void aquarius_state::init_aquarius()
 void aquarius_state::aquarius_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x3000, 0x33ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
-	map(0x3400, 0x37ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
+	map(0x3000, 0x33ff).ram().w(this, FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
+	map(0x3400, 0x37ff).ram().w(this, FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
 	map(0x3800, 0x3fff).ram();
 	map(0x4000, 0xbfff).noprw(); /* expansion ram */
-	map(0xc000, 0xffff).r(FUNC(aquarius_state::cartridge_r));
+	map(0xc000, 0xffff).r(this, FUNC(aquarius_state::cartridge_r));
 }
 
 void aquarius_state::aquarius_io(address_map &map)
@@ -222,10 +222,10 @@ void aquarius_state::aquarius_io(address_map &map)
 //  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
 	map(0xf6, 0xf6).mirror(0xff00).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xf7, 0xf7).mirror(0xff00).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0xfc, 0xfc).mirror(0xff00).rw(FUNC(aquarius_state::cassette_r), FUNC(aquarius_state::cassette_w));
-	map(0xfd, 0xfd).mirror(0xff00).rw(FUNC(aquarius_state::vsync_r), FUNC(aquarius_state::mapper_w));
-	map(0xfe, 0xfe).mirror(0xff00).rw(FUNC(aquarius_state::printer_r), FUNC(aquarius_state::printer_w));
-	map(0xff, 0xff).select(0xff00).rw(FUNC(aquarius_state::keyboard_r), FUNC(aquarius_state::scrambler_w));
+	map(0xfc, 0xfc).mirror(0xff00).rw(this, FUNC(aquarius_state::cassette_r), FUNC(aquarius_state::cassette_w));
+	map(0xfd, 0xfd).mirror(0xff00).rw(this, FUNC(aquarius_state::vsync_r), FUNC(aquarius_state::mapper_w));
+	map(0xfe, 0xfe).mirror(0xff00).rw(this, FUNC(aquarius_state::printer_r), FUNC(aquarius_state::printer_w));
+	map(0xff, 0xff).select(0xff00).rw(this, FUNC(aquarius_state::keyboard_r), FUNC(aquarius_state::scrambler_w));
 }
 
 
@@ -363,20 +363,23 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_SIZE(40 * 8, 25 * 8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarius_state, screen_update_aquarius)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarius);
-	TEA1002(config, m_tea1002, XTAL(8'867'238));
-	PALETTE(config, m_palette, FUNC(aquarius_state::aquarius_palette), 512, 16);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarius)
+	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INDIRECT_ENTRIES(16)
+	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(3'579'545)/2)); // ??? AY-3-8914
-	ay8910.port_a_read_callback().set_ioport("RIGHT");
-	ay8910.port_b_read_callback().set_ioport("LEFT");
-	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -386,7 +389,9 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "aquarius_cart")
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("8K,20K,36K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,20K,36K")
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aquarius")
@@ -403,9 +408,9 @@ ROM_START( aquarius )
 	/* basic rom */
 	ROM_DEFAULT_BIOS("rev2")
 	ROM_SYSTEM_BIOS(0, "rev1", "Revision 1")
-	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(0))
+	ROMX_LOAD("aq1.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "rev2", "Revision 2")
-	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(1))
+	ROMX_LOAD("aq2.u2", 0x0000, 0x2000, CRC(a2d15bcf) SHA1(ca6ef55e9ead41453efbf5062d6a60285e9661a6), ROM_BIOS(2))
 
 	/* charrom */
 	ROM_REGION(0x800, "gfx1", 0)

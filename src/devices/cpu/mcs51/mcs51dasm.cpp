@@ -293,14 +293,16 @@ std::string mcs51_disassembler::get_bit_address( uint8_t arg ) const
 	}
 }
 
-offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op)
+offs_t mcs51_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
+	unsigned PC = pc;
 	std::string sym, sym2;
-	uint8_t data;
+	uint8_t op, data;
 	uint16_t addr;
 	int8_t rel;
 
+	op = opcodes.r8(PC++);
 	switch( op )
 	{
 		//NOP
@@ -1105,13 +1107,6 @@ offs_t mcs51_disassembler::disassemble_op(std::ostream &stream, unsigned PC, off
 	}
 
 	return (PC - pc) | flags | SUPPORTED;
-}
-
-offs_t mcs51_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
-{
-	unsigned PC = pc;
-	uint8_t op = opcodes.r8(PC++);
-	return disassemble_op(stream, PC, pc,  opcodes, params, op);
 }
 
 i8051_disassembler::i8051_disassembler() : mcs51_disassembler(default_names)

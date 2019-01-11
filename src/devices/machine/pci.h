@@ -6,6 +6,25 @@
 #pragma once
 
 
+#define MCFG_PCI_ROOT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, PCI_ROOT, 0)
+
+#define MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subsystem_id) \
+	MCFG_DEVICE_ADD(_tag, _type, 0) \
+	downcast<pci_device *>(device)->set_ids(_main_id, _revision, _pclass, _subsystem_id);
+
+#define MCFG_AGP_DEVICE_ADD(_tag, _type, _main_id, _revision, _subsystem_id) \
+	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x030000, _subsystem_id)
+
+#define MCFG_PCI_HOST_ADD(_tag, _type, _main_id, _revision, _subsystem_id) \
+	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x060000, _subsystem_id)
+
+#define MCFG_PCI_BRIDGE_ADD(_tag, _main_id, _revision) \
+	MCFG_PCI_DEVICE_ADD(_tag, PCI_BRIDGE, _main_id, _revision, 0x060400, 0x00000000)
+
+#define MCFG_AGP_BRIDGE_ADD(_tag, _type, _main_id, _revision) \
+	MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, 0x060400, 0x00000000)
+
 class pci_device : public device_t {
 public:
 	typedef delegate<void ()> mapper_cb;
@@ -13,9 +32,6 @@ public:
 	mapper_cb remap_cb, remap_config_cb;
 
 	void set_ids(uint32_t main_id, uint8_t revision, uint32_t pclass, uint32_t subsystem_id);
-	void set_ids_host(uint32_t main_id, uint32_t revision, uint64_t subsystem_id) { set_ids(main_id, revision, 0x060000, subsystem_id); }
-	void set_ids_bridge(uint32_t main_id, uint32_t revision) { set_ids(main_id, revision, 0x060400, 0x00000000); }
-	void set_ids_agp(uint64_t main_id, uint32_t revision, uint32_t subsystem_id) { set_ids(main_id, revision, 0x030000, subsystem_id); }
 	void set_multifunction_device(bool enable);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb);
@@ -140,11 +156,6 @@ protected:
 
 class pci_bridge_device : public pci_device, public device_memory_interface {
 public:
-	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision)
-		: pci_bridge_device(mconfig, tag, owner, clock)
-	{
-		set_ids_bridge(main_id, revision);
-	}
 	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb) override;

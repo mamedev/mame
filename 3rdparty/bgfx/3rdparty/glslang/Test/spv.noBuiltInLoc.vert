@@ -10,8 +10,6 @@ uniform vec4 uv1;
 uniform float uv2;
 uniform vec3 uv3;
 
-layout(binding = 0) uniform atomic_uint a_uint;
-
 void main()
 {
     bar = foo;

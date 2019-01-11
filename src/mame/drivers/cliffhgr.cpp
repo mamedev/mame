@@ -193,8 +193,8 @@ READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
 WRITE8_MEMBER(cliffhgr_state::cliff_sound_overlay_w)
 {
 	/* audio */
-	m_discrete->write(CLIFF_ENABLE_SND_1, data & 1);
-	m_discrete->write(CLIFF_ENABLE_SND_2, (data >> 1) & 1);
+	m_discrete->write(space, CLIFF_ENABLE_SND_1, data & 1);
+	m_discrete->write(space, CLIFF_ENABLE_SND_2, (data >> 1) & 1);
 
 	// bit 4 (data & 0x10) is overlay related?
 }
@@ -259,21 +259,21 @@ void cliffhgr_state::mainmem(address_map &map)
 void cliffhgr_state::mainport(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x44, 0x44).w("tms9928a", FUNC(tms9928a_device::vram_w));
-	map(0x45, 0x45).r("tms9928a", FUNC(tms9928a_device::vram_r));
-	map(0x46, 0x46).w(FUNC(cliffhgr_state::cliff_sound_overlay_w));
-	map(0x50, 0x52).r(FUNC(cliffhgr_state::cliff_phillips_code_r));
-	map(0x53, 0x53).r(FUNC(cliffhgr_state::cliff_irq_ack_r));
-	map(0x54, 0x54).w("tms9928a", FUNC(tms9928a_device::register_w));
-	map(0x55, 0x55).r("tms9928a", FUNC(tms9928a_device::register_r));
-	map(0x57, 0x57).w(FUNC(cliffhgr_state::cliff_phillips_clear_w));
-	map(0x60, 0x60).w(FUNC(cliffhgr_state::cliff_port_bank_w));
-	map(0x62, 0x62).r(FUNC(cliffhgr_state::cliff_port_r));
+	map(0x44, 0x44).w("tms9928a", FUNC(tms9928a_device::vram_write));
+	map(0x45, 0x45).r("tms9928a", FUNC(tms9928a_device::vram_read));
+	map(0x46, 0x46).w(this, FUNC(cliffhgr_state::cliff_sound_overlay_w));
+	map(0x50, 0x52).r(this, FUNC(cliffhgr_state::cliff_phillips_code_r));
+	map(0x53, 0x53).r(this, FUNC(cliffhgr_state::cliff_irq_ack_r));
+	map(0x54, 0x54).w("tms9928a", FUNC(tms9928a_device::register_write));
+	map(0x55, 0x55).r("tms9928a", FUNC(tms9928a_device::register_read));
+	map(0x57, 0x57).w(this, FUNC(cliffhgr_state::cliff_phillips_clear_w));
+	map(0x60, 0x60).w(this, FUNC(cliffhgr_state::cliff_port_bank_w));
+	map(0x62, 0x62).r(this, FUNC(cliffhgr_state::cliff_port_r));
 	map(0x64, 0x64).nopw(); /* unused in schematics, may be used as timing delay for IR interface */
-	map(0x66, 0x66).w(FUNC(cliffhgr_state::cliff_ldwire_w));
-	map(0x68, 0x68).w(FUNC(cliffhgr_state::cliff_coin_counter_w));
+	map(0x66, 0x66).w(this, FUNC(cliffhgr_state::cliff_ldwire_w));
+	map(0x68, 0x68).w(this, FUNC(cliffhgr_state::cliff_coin_counter_w));
 	map(0x6a, 0x6a).nopw(); /* /LAMP0 (Infrared?) */
-	map(0x6e, 0x6f).w(FUNC(cliffhgr_state::cliff_test_led_w));
+	map(0x6e, 0x6f).w(this, FUNC(cliffhgr_state::cliff_test_led_w));
 }
 
 
@@ -695,16 +695,16 @@ MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
 	MCFG_DEVICE_IO_MAP(mainport)
 
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
 	MCFG_LASERDISC_OVERLAY_DEVICE(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", tms9928a_device, screen_update)
 	MCFG_LASERDISC_OVERLAY_CLIP(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1)
 
 	/* start with the TMS9928a video configuration */
-	tms9128_device &vdp(TMS9128(config, "tms9928a", XTAL(10'738'635)));   /* TMS9128NL on the board */
-	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* override video rendering and raw screen info */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

@@ -42,7 +42,7 @@ const tiny_rom_entry *m24_z8000_device::device_rom_region() const
 
 void m24_z8000_device::z8000_prog(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(m24_z8000_device::pmem_r), FUNC(m24_z8000_device::pmem_w));
+	map(0x00000, 0xfffff).rw(this, FUNC(m24_z8000_device::pmem_r), FUNC(m24_z8000_device::pmem_w));
 
 	map(0x40000, 0x43fff).rom().region("z8000", 0);
 	map(0x50000, 0x53fff).rom().region("z8000", 0);
@@ -51,7 +51,7 @@ void m24_z8000_device::z8000_prog(address_map &map)
 
 void m24_z8000_device::z8000_data(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(m24_z8000_device::dmem_r), FUNC(m24_z8000_device::dmem_w));
+	map(0x00000, 0xfffff).rw(this, FUNC(m24_z8000_device::dmem_r), FUNC(m24_z8000_device::dmem_w));
 
 	map(0x40000, 0x43fff).rom().region("z8000", 0);
 	map(0x70000, 0x73fff).rom().region("z8000", 0);
@@ -59,34 +59,33 @@ void m24_z8000_device::z8000_data(address_map &map)
 
 void m24_z8000_device::z8000_io(address_map &map)
 {
-	map(0x0081, 0x0081).w(FUNC(m24_z8000_device::irqctl_w));
-	map(0x00a1, 0x00a1).w(FUNC(m24_z8000_device::serctl_w));
+	map(0x0081, 0x0081).w(this, FUNC(m24_z8000_device::irqctl_w));
+	map(0x00a1, 0x00a1).w(this, FUNC(m24_z8000_device::serctl_w));
 	map(0x00c1, 0x00c1).rw("i8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x00c3, 0x00c3).rw("i8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x0120, 0x0127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x8000, 0x83ff).rw(FUNC(m24_z8000_device::i86_io_r), FUNC(m24_z8000_device::i86_io_w));
-	map(0x80c1, 0x80c1).rw(FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
+	map(0x8000, 0x83ff).rw(this, FUNC(m24_z8000_device::i86_io_r), FUNC(m24_z8000_device::i86_io_w));
+	map(0x80c1, 0x80c1).rw(this, FUNC(m24_z8000_device::handshake_r), FUNC(m24_z8000_device::handshake_w));
 }
 
-void m24_z8000_device::device_add_mconfig(machine_config &config)
-{
-	Z8001(config, m_z8000, XTAL(8'000'000)/2);
-	m_z8000->set_addrmap(AS_PROGRAM, &m24_z8000_device::z8000_prog);
-	m_z8000->set_addrmap(AS_DATA, &m24_z8000_device::z8000_data);
-	m_z8000->set_addrmap(AS_IO, &m24_z8000_device::z8000_io);
-	m_z8000->set_irq_acknowledge_callback(FUNC(m24_z8000_device::int_cb));
-	m_z8000->mo().set(FUNC(m24_z8000_device::mo_w));
+MACHINE_CONFIG_START(m24_z8000_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("z8000", Z8001, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(z8000_prog)
+	MCFG_DEVICE_DATA_MAP(z8000_data)
+	MCFG_DEVICE_IO_MAP(z8000_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(m24_z8000_device, int_cb)
+	MCFG_Z8000_MO(WRITELINE(*this, m24_z8000_device, mo_w))
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
-	pit8253.set_clk<0>(19660000/15); //8251
-	pit8253.out_handler<0>().set_nop();
-	pit8253.set_clk<1>(19660000/15);
-	pit8253.out_handler<1>().set_nop();
-	pit8253.set_clk<2>(19660000/15);
-	pit8253.out_handler<2>().set(FUNC(m24_z8000_device::timer_irq_w));
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(19660000/15)
+	MCFG_PIT8253_OUT0_HANDLER(NOOP) //8251
+	MCFG_PIT8253_CLK1(19660000/15)
+	MCFG_PIT8253_OUT1_HANDLER(NOOP)
+	MCFG_PIT8253_CLK2(19660000/15)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, m24_z8000_device, timer_irq_w))
 
-	I8251(config, "i8251", 0);
-}
+	MCFG_DEVICE_ADD("i8251", I8251, 0)
+MACHINE_CONFIG_END
 
 const uint8_t m24_z8000_device::pmem_table[16][4] =
 	{{0, 1, 2, 3}, {1, 2, 3, 255}, {4, 5, 6, 7}, {46, 40, 41, 42},

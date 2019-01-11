@@ -278,22 +278,22 @@ void exprraid_state::master_map(address_map &map)
 {
 	map(0x0000, 0x05ff).ram().share("main_ram");
 	map(0x0600, 0x07ff).ram().share("spriteram");
-	map(0x0800, 0x0bff).ram().w(FUNC(exprraid_state::exprraid_videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(FUNC(exprraid_state::exprraid_colorram_w)).share("colorram");
+	map(0x0800, 0x0bff).ram().w(this, FUNC(exprraid_state::exprraid_videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(exprraid_state::exprraid_colorram_w)).share("colorram");
 	map(0x1800, 0x1800).portr("DSW0");   /* DSW 0 */
 	map(0x1801, 0x1801).portr("IN1");    /* Controls */
 	map(0x1802, 0x1802).portr("IN2");    /* Coins */
 	map(0x1803, 0x1803).portr("DSW1");   /* DSW 1 */
-	map(0x2000, 0x2000).w(FUNC(exprraid_state::exprraid_int_clear_w));
+	map(0x2000, 0x2000).w(this, FUNC(exprraid_state::exprraid_int_clear_w));
 	map(0x2001, 0x2001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x2002, 0x2002).w(FUNC(exprraid_state::exprraid_flipscreen_w));
+	map(0x2002, 0x2002).w(this, FUNC(exprraid_state::exprraid_flipscreen_w));
 	map(0x2003, 0x2003).nopw(); // DMA SWAP - Allow writes to video and sprite RAM
-	map(0x2800, 0x2800).r(FUNC(exprraid_state::exprraid_prot_data_r));
-	map(0x2801, 0x2801).r(FUNC(exprraid_state::exprraid_prot_status_r));
-	map(0x2800, 0x2803).w(FUNC(exprraid_state::exprraid_bgselect_w));
-	map(0x2804, 0x2804).w(FUNC(exprraid_state::exprraid_scrolly_w));
-	map(0x2805, 0x2806).w(FUNC(exprraid_state::exprraid_scrollx_w));
-	map(0x2807, 0x2807).w(FUNC(exprraid_state::exprraid_prot_data_w));
+	map(0x2800, 0x2800).r(this, FUNC(exprraid_state::exprraid_prot_data_r));
+	map(0x2801, 0x2801).r(this, FUNC(exprraid_state::exprraid_prot_status_r));
+	map(0x2800, 0x2803).w(this, FUNC(exprraid_state::exprraid_bgselect_w));
+	map(0x2804, 0x2804).w(this, FUNC(exprraid_state::exprraid_scrolly_w));
+	map(0x2805, 0x2806).w(this, FUNC(exprraid_state::exprraid_scrollx_w));
+	map(0x2807, 0x2807).w(this, FUNC(exprraid_state::exprraid_prot_data_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -490,53 +490,52 @@ void exprraid_state::machine_reset()
 }
 
 
-void exprraid_state::exprraid(machine_config &config)
-{
-	/* basic machine hardware */
-	DECO16(config, m_maincpu, XTAL(12'000'000) / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::master_map);
-	m_maincpu->set_addrmap(AS_IO, &exprraid_state::master_io_map);
+MACHINE_CONFIG_START(exprraid_state::exprraid)
 
-	MC6809(config, m_slave, XTAL(12'000'000) / 2); // MC68B09P
-	m_slave->set_addrmap(AS_PROGRAM, &exprraid_state::slave_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", DECO16, XTAL(12'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io_map)
+
+	MCFG_DEVICE_ADD("slave", MC6809, XTAL(12'000'000) / 2) // MC68B09P
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 	/* IRQs are caused by the YM3526 */
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	screen.set_raw(XTAL(12'000'000)/2, 384, 0, 256, 262, 8, 256-8); /* not accurate */
-	screen.set_screen_update(FUNC(exprraid_state::screen_update_exprraid));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 262, 8, 256-8) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(exprraid_state, screen_update_exprraid)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exprraid);
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exprraid)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_slave, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("slave", INPUT_LINE_NMI))
 
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8));
-	ym1.add_route(ALL_OUTPUTS, "mono", 0.30);
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	ym3526_device &ym2(YM3526(config, "ym2", XTAL(12'000'000) / 4));
-	ym2.irq_handler().set(FUNC(exprraid_state::irqhandler));
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.60);
-}
+	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(12'000'000) / 4)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, exprraid_state, irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+MACHINE_CONFIG_END
 
-void exprraid_state::exprboot(machine_config &config)
-{
+MACHINE_CONFIG_START(exprraid_state::exprboot)
 	exprraid(config);
 
-	M6502(config.replace(), m_maincpu, 1500000);        /* 1.5 MHz ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::master_map);
-}
+	MCFG_DEVICE_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -14,7 +14,6 @@
 #pragma once
 
 #include "cpcexp.h"
-#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 
 class cpc_ddi1_device : public device_t, public device_cpc_expansion_card_interface

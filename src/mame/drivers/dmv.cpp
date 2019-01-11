@@ -13,14 +13,12 @@
 
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/dmv_keyb.h"
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "video/upd7220.h"
-#include "emupal.h"
 
 // expansion slots
 #include "bus/dmv/dmvbus.h"
@@ -71,12 +69,9 @@ public:
 		, m_slot6(*this, "slot6")
 		, m_slot7(*this, "slot7")
 		, m_slot7a(*this, "slot7a")
-		, m_leds(*this, "led%u", 1U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void dmv(machine_config &config);
-
-private:
 	void update_halt_line();
 
 	DECLARE_WRITE8_MEMBER(leds_w);
@@ -146,13 +141,16 @@ private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void dmv(machine_config &config);
 	void dmv_io(address_map &map);
 	void dmv_mem(address_map &map);
 	void upd7220_map(address_map &map);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
@@ -178,7 +176,7 @@ private:
 	required_device<dmvcart_slot_device> m_slot6;
 	required_device<dmvcart_slot_device> m_slot7;
 	required_device<dmvcart_slot_device> m_slot7a;
-	output_finder<8> m_leds;
+	output_finder<9> m_led;
 
 	bool        m_ramoutdis;
 	int         m_switch16;
@@ -222,7 +220,7 @@ WRITE8_MEMBER(dmv_state::leds_w)
 	*/
 
 	for(int i=0; i<8; i++)
-		m_leds[7-i] = BIT(data, i);
+		m_led[8-i] = BIT(data, i);
 }
 
 READ8_MEMBER(dmv_state::ramsel_r)
@@ -564,32 +562,32 @@ uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
 void dmv_state::dmv_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(dmv_state::program_r), FUNC(dmv_state::program_w));
+	map(0x0000, 0xffff).rw(this, FUNC(dmv_state::program_r), FUNC(dmv_state::program_w));
 }
 
 void dmv_state::dmv_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(dmv_state::leds_w));
-	map(0x10, 0x10).rw(FUNC(dmv_state::ramsel_r), FUNC(dmv_state::ramsel_w));
-	map(0x11, 0x11).rw(FUNC(dmv_state::romsel_r), FUNC(dmv_state::romsel_w));
-	map(0x12, 0x12).w(FUNC(dmv_state::tc_set_w));
-	map(0x13, 0x13).r(FUNC(dmv_state::sys_status_r));
-	map(0x14, 0x14).w(FUNC(dmv_state::fdd_motor_w));
+	map(0x00, 0x00).w(this, FUNC(dmv_state::leds_w));
+	map(0x10, 0x10).rw(this, FUNC(dmv_state::ramsel_r), FUNC(dmv_state::ramsel_w));
+	map(0x11, 0x11).rw(this, FUNC(dmv_state::romsel_r), FUNC(dmv_state::romsel_w));
+	map(0x12, 0x12).w(this, FUNC(dmv_state::tc_set_w));
+	map(0x13, 0x13).r(this, FUNC(dmv_state::sys_status_r));
+	map(0x14, 0x14).w(this, FUNC(dmv_state::fdd_motor_w));
 	map(0x20, 0x2f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x40, 0x41).rw("kb_ctrl_mcu", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 	map(0x50, 0x51).m(m_fdc, FUNC(i8272a_device::map));
 	map(0x80, 0x83).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xa0, 0xa1).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-	map(0xd0, 0xd7).w(FUNC(dmv_state::switch16_w));
-	map(0xe0, 0xe7).w(FUNC(dmv_state::rambank_w));
+	map(0xd0, 0xd7).w(this, FUNC(dmv_state::switch16_w));
+	map(0xe0, 0xe7).w(this, FUNC(dmv_state::rambank_w));
 
-	map(0x60, 0x6f).rw(FUNC(dmv_state::ifsel0_r), FUNC(dmv_state::ifsel0_w));
-	map(0x70, 0x7f).rw(FUNC(dmv_state::ifsel1_r), FUNC(dmv_state::ifsel1_w));
-	map(0x30, 0x3f).rw(FUNC(dmv_state::ifsel2_r), FUNC(dmv_state::ifsel2_w));
-	map(0xb0, 0xbf).rw(FUNC(dmv_state::ifsel3_r), FUNC(dmv_state::ifsel3_w));
-	map(0xc0, 0xcf).rw(FUNC(dmv_state::ifsel4_r), FUNC(dmv_state::ifsel4_w));
+	map(0x60, 0x6f).rw(this, FUNC(dmv_state::ifsel0_r), FUNC(dmv_state::ifsel0_w));
+	map(0x70, 0x7f).rw(this, FUNC(dmv_state::ifsel1_r), FUNC(dmv_state::ifsel1_w));
+	map(0x30, 0x3f).rw(this, FUNC(dmv_state::ifsel2_r), FUNC(dmv_state::ifsel2_w));
+	map(0xb0, 0xbf).rw(this, FUNC(dmv_state::ifsel3_r), FUNC(dmv_state::ifsel3_w));
+	map(0xc0, 0xcf).rw(this, FUNC(dmv_state::ifsel4_r), FUNC(dmv_state::ifsel4_w));
 }
 
 READ8_MEMBER(dmv_state::kb_mcu_port1_r)
@@ -626,7 +624,7 @@ INPUT_PORTS_END
 
 void dmv_state::machine_start()
 {
-	m_leds.resolve();
+	m_led.resolve();
 }
 
 void dmv_state::machine_reset()
@@ -781,14 +779,14 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DEVICE_PROGRAM_MAP(dmv_mem)
 	MCFG_DEVICE_IO_MAP(dmv_io)
 
-	i8741_device &kbmcu(I8741(config, "kb_ctrl_mcu", XTAL(6'000'000)));
-	kbmcu.p1_in_cb().set(FUNC(dmv_state::kb_mcu_port1_r)); // bit 0 data from kb
-	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
-	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));
+	MCFG_DEVICE_ADD("kb_ctrl_mcu", I8741, XTAL(6'000'000))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, dmv_state, kb_mcu_port1_r)) // bit 0 data from kb
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, dmv_state, kb_mcu_port1_w)) // bit 1 data to kb
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, dmv_state, kb_mcu_port2_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	DMV_KEYBOARD(config, m_keyboard, 0);
+	MCFG_DMV_KEYBOARD_ADD("keyboard")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -798,41 +796,41 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dmv)
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
-	config.set_default_layout(layout_dmv);
+	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices
-	UPD7220(config, m_hgdc, XTAL(5'000'000)/2); // unk clock
-	m_hgdc->set_addrmap(0, &dmv_state::upd7220_map);
-	m_hgdc->set_display_pixels_callback(FUNC(dmv_state::hgdc_display_pixels), this);
-	m_hgdc->set_draw_text_callback(FUNC(dmv_state::hgdc_draw_text), this);
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(5'000'000)/2) // unk clock
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
+	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(dmv_state, hgdc_display_pixels)
+	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(dmv_state, hgdc_draw_text)
 
-	AM9517A(config, m_dmac, 4_MHz_XTAL);
-	m_dmac->out_hreq_callback().set(FUNC(dmv_state::dma_hrq_changed));
-	m_dmac->out_eop_callback().set(FUNC(dmv_state::dmac_eop));
-	m_dmac->in_memr_callback().set(FUNC(dmv_state::program_r));
-	m_dmac->out_memw_callback().set(FUNC(dmv_state::program_w));
-	m_dmac->in_ior_callback<0>().set_log("Read DMA CH1");
-	m_dmac->out_iow_callback<0>().set_log("Write DMA CH1");
-	m_dmac->in_ior_callback<1>().set_log("Read DMA CH2");
-	m_dmac->out_iow_callback<1>().set_log("Write DMA CH2");
-	m_dmac->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
-	m_dmac->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
-	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_r));
-	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(i8272a_device::mdma_w));
-	m_dmac->out_dack_callback<3>().set(FUNC(dmv_state::dmac_dack3));
+	MCFG_DEVICE_ADD( "dma8237", AM9517A, XTAL(4'000'000) )
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, dmv_state, dma_hrq_changed))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, dmv_state, dmac_eop))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, dmv_state, program_r))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, dmv_state, program_w))
+	MCFG_I8237_IN_IOR_0_CB(LOGGER("Read DMA CH1"))
+	MCFG_I8237_OUT_IOW_0_CB(LOGGER("Write DMA CH1"))
+	MCFG_I8237_IN_IOR_1_CB(LOGGER("Read DMA CH2"))
+	MCFG_I8237_OUT_IOW_1_CB(LOGGER("Write DMA CH2"))
+	MCFG_I8237_IN_IOR_2_CB(READ8("upd7220", upd7220_device, dack_r))
+	MCFG_I8237_OUT_IOW_2_CB(WRITE8("upd7220", upd7220_device, dack_w))
+	MCFG_I8237_IN_IOR_3_CB(READ8("i8272", i8272a_device, mdma_r))
+	MCFG_I8237_OUT_IOW_3_CB(WRITE8("i8272", i8272a_device, mdma_w))
+	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(*this, dmv_state, dmac_dack3))
 
-	I8272A(config, m_fdc, 8'000'000, true);
-	m_fdc->intrq_wr_callback().set(FUNC(dmv_state::fdc_irq));
-	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
+	MCFG_I8272A_ADD( "i8272", true )
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, dmv_state, fdc_irq))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dma8237", am9517a_device, dreq3_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", dmv_floppies, "525dd", dmv_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", dmv_floppies, "525dd", dmv_state::floppy_formats)
 
-	PIT8253(config, m_pit, 0);
-	m_pit->set_clk<0>(50);
-	m_pit->out_handler<0>().set(FUNC(dmv_state::pit_out0));
-	m_pit->set_clk<2>(XTAL(24'000'000) / 3 / 16);
-	m_pit->out_handler<2>().set(FUNC(dmv_state::timint_w));
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(50)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, dmv_state, pit_out0))
+	MCFG_PIT8253_CLK2(XTAL(24'000'000) / 3 / 16)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, dmv_state, timint_w))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -894,18 +892,18 @@ ROM_START( dmv )
 	ROM_SYSTEM_BIOS(3, "m06", "M.06.00")    // Mono machine
 	ROM_SYSTEM_BIOS(4, "m05", "M.05.00")    // Mono machine, marked "updated"
 
-	ROMX_LOAD( "dmv_mb_rom_33610.bin", 0x00000,    0x02000,    CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964), ROM_BIOS(0) )
-	ROMX_LOAD( "dmv_mb_rom_32838.bin", 0x00000,    0x02000,    CRC(d5ceb559) SHA1(e3a05e43aa1b09f0a857b8d54b00bcd321215bf6), ROM_BIOS(1) )
-	ROMX_LOAD( "dmv_mb_rom_33609.bin", 0x00000,    0x02000,    CRC(120951b6) SHA1(57bef9cc6379dea5730bc1477e8896508e00a349), ROM_BIOS(2) )
-	ROMX_LOAD( "dmv_mb_rom_32676.bin", 0x00000,    0x02000,    CRC(7796519e) SHA1(8d5dd9c1e66c96fcca271b6f673d6a0e784acb33), ROM_BIOS(3) )
-	ROMX_LOAD( "dmv_mb_rom_32664.bin", 0x00000,    0x02000,    CRC(6624610e) SHA1(e9226be897d2c5f875784ab77dad8807f14c7714), ROM_BIOS(4) )
+	ROMX_LOAD( "dmv_mb_rom_33610.bin", 0x00000,    0x02000,    CRC(bf25f3f0) SHA1(0c7dd37704db4799e340cc836f887cd543e5c964), ROM_BIOS(1) )
+	ROMX_LOAD( "dmv_mb_rom_32838.bin", 0x00000,    0x02000,    CRC(d5ceb559) SHA1(e3a05e43aa1b09f0a857b8d54b00bcd321215bf6), ROM_BIOS(2) )
+	ROMX_LOAD( "dmv_mb_rom_33609.bin", 0x00000,    0x02000,    CRC(120951b6) SHA1(57bef9cc6379dea5730bc1477e8896508e00a349), ROM_BIOS(3) )
+	ROMX_LOAD( "dmv_mb_rom_32676.bin", 0x00000,    0x02000,    CRC(7796519e) SHA1(8d5dd9c1e66c96fcca271b6f673d6a0e784acb33), ROM_BIOS(4) )
+	ROMX_LOAD( "dmv_mb_rom_32664.bin", 0x00000,    0x02000,    CRC(6624610e) SHA1(e9226be897d2c5f875784ab77dad8807f14c7714), ROM_BIOS(5) )
 
 	ROM_REGION(0x400, "kb_ctrl_mcu", 0)
-	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(0) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(1) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(2) )
 	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(3) )
-	ROMX_LOAD( "dmv_mb_8741_32121.bin",    0x00000,    0x00400,    CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775), ROM_BIOS(4) )
+	ROMX_LOAD( "dmv_mb_8741_32678.bin",    0x00000,    0x00400,    CRC(50d1dc4c) SHA1(2c8251d6c8df9f507e11bf920869657f4d074db1), ROM_BIOS(4) )
+	ROMX_LOAD( "dmv_mb_8741_32121.bin",    0x00000,    0x00400,    CRC(a03af298) SHA1(144cba41294c46f5ca79b7ad8ced0e4408168775), ROM_BIOS(5) )
 
 	ROM_REGION(0x800, "chargen", 0)
 	ROM_LOAD( "76161.bin",    0x00000,    0x00800,  CRC(6e4df4f9) SHA1(20ff4fc48e55eaf5131f6573fff93e7f97d2f45d)) // same for both color and monochrome board

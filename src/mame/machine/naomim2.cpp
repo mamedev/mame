@@ -125,7 +125,7 @@ void naomi_m2_board::device_start()
 	ram = std::make_unique<uint8_t[]>(RAM_SIZE);
 
 	save_item(NAME(rom_cur_address));
-	save_pointer(NAME(ram), RAM_SIZE);
+	save_pointer(NAME(ram.get()), RAM_SIZE);
 }
 
 void naomi_m2_board::device_reset()
@@ -200,8 +200,7 @@ uint16_t naomi_m2_board::read_callback(uint32_t addr)
 	}
 }
 
-void naomi_m2_board::device_add_mconfig(machine_config &config)
-{
-	SEGA315_5881_CRYPT(config, m_cryptdevice, 0);
-	m_cryptdevice->set_read_cb(FUNC(naomi_m2_board::read_callback));
-}
+MACHINE_CONFIG_START(naomi_m2_board::device_add_mconfig)
+	MCFG_DEVICE_ADD("segam2crypt", SEGA315_5881_CRYPT, 0)
+	MCFG_SET_READ_CALLBACK(naomi_m2_board, read_callback)
+MACHINE_CONFIG_END

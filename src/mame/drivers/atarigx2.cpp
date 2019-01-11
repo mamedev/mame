@@ -29,7 +29,6 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
-#include "emupal.h"
 #include "speaker.h"
 
 
@@ -1191,22 +1190,22 @@ void atarigx2_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom();
 	map(0xc80000, 0xc80fff).ram();
-	map(0xd00000, 0xd0000f).r(FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
+	map(0xd00000, 0xd0000f).r(this, FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
-	map(0xd40000, 0xd40fff).ram().w("palette", FUNC(palette_device::write32)).share("palette");
+	map(0xd40000, 0xd40fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xd70000, 0xd7ffff).ram();
 	map(0xd72000, 0xd75fff).w(m_playfield_tilemap, FUNC(tilemap_device::write32)).share("playfield");
 	map(0xd76000, 0xd76fff).w(m_alpha_tilemap, FUNC(tilemap_device::write32)).share("alpha");
 	map(0xd78000, 0xd78fff).ram().share("rle");
-	map(0xd7a200, 0xd7a203).w(FUNC(atarigx2_state::mo_command_w)).share("mo_command");
+	map(0xd7a200, 0xd7a203).w(this, FUNC(atarigx2_state::mo_command_w)).share("mo_command");
 	map(0xd80000, 0xd9ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xe06000, 0xe06000).w(m_jsa, FUNC(atari_jsa_iiis_device::main_command_w));
-	map(0xe08000, 0xe08003).w(FUNC(atarigx2_state::latch_w));
-	map(0xe0c000, 0xe0c003).w(FUNC(atarigx2_state::video_int_ack_w));
+	map(0xe08000, 0xe08003).w(this, FUNC(atarigx2_state::latch_w));
+	map(0xe0c000, 0xe0c003).w(this, FUNC(atarigx2_state::video_int_ack_w));
 	map(0xe0e000, 0xe0e003).nopw();//watchdog_reset_w },
 	map(0xe80000, 0xe80003).portr("P1_P2");
-	map(0xe82000, 0xe82003).r(FUNC(atarigx2_state::special_port2_r));
-	map(0xe82004, 0xe82007).r(FUNC(atarigx2_state::special_port3_r));
+	map(0xe82000, 0xe82003).r(this, FUNC(atarigx2_state::special_port2_r));
+	map(0xe82004, 0xe82007).r(this, FUNC(atarigx2_state::special_port3_r));
 	map(0xe86000, 0xe86000).r(m_jsa, FUNC(atari_jsa_iiis_device::main_response_r));
 	map(0xff8000, 0xffffff).ram();
 }
@@ -1491,21 +1490,23 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
-	m_adc->in_callback<0>().set_ioport("A2D0");
-	m_adc->in_callback<1>().set_ioport("A2D1");
-	m_adc->in_callback<2>().set_ioport("A2D2");
-	m_adc->in_callback<3>().set_ioport("A2D3");
-	m_adc->in_callback<4>().set_ioport("A2D4");
-	m_adc->in_callback<5>().set_ioport("A2D5");
-	m_adc->in_callback<6>().set_ioport("A2D6");
-	m_adc->in_callback<7>().set_ioport("A2D7");
+	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
+	MCFG_ADC0808_IN0_CB(IOPORT("A2D0"))
+	MCFG_ADC0808_IN1_CB(IOPORT("A2D1"))
+	MCFG_ADC0808_IN2_CB(IOPORT("A2D2"))
+	MCFG_ADC0808_IN3_CB(IOPORT("A2D3"))
+	MCFG_ADC0808_IN4_CB(IOPORT("A2D4"))
+	MCFG_ADC0808_IN5_CB(IOPORT("A2D5"))
+	MCFG_ADC0808_IN6_CB(IOPORT("A2D6"))
+	MCFG_ADC0808_IN7_CB(IOPORT("A2D7"))
 
-	EEPROM_2816(config, "eeprom").lock_after_write(true);
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarigx2)
-	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
 	MCFG_TILEMAP_ADD_CUSTOM("playfield", "gfxdecode", 2, atarigx2_state, get_playfield_tile_info, 8,8, atarigx2_playfield_scan, 128,64)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, atarigx2_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
@@ -1523,27 +1524,24 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ATARI_JSA_IIIS(config, m_jsa, 0);
-	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
-	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
-	m_jsa->add_route(0, "lspeaker", 1.0);
-	m_jsa->add_route(1, "rspeaker", 1.0);
+	MCFG_ATARI_JSA_IIIS_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_5))
+	MCFG_ATARI_JSA_TEST_PORT("SERVICE", 6)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
-void atarigx2_state::atarigx2_0x200(machine_config &config)
-{
+MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x200)
 	atarigx2(config);
-	ATARI_136094_0072(config, m_xga, 0);
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
-}
+	MCFG_DEVICE_ADD("xga", ATARI_136094_0072, 0)
+	MCFG_ATARIRLE_ADD("rle", modesc_0x200)
+MACHINE_CONFIG_END
 
-void atarigx2_state::atarigx2_0x400(machine_config &config)
-{
+MACHINE_CONFIG_START(atarigx2_state::atarigx2_0x400)
 	atarigx2(config);
-	ATARI_136095_0072(config, m_xga, 0);
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
-}
+	MCFG_DEVICE_ADD("xga", ATARI_136095_0072, 0)
+	MCFG_ATARIRLE_ADD("rle", modesc_0x400)
+MACHINE_CONFIG_END
 
 
 

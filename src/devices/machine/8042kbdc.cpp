@@ -2,9 +2,175 @@
 // copyright-holders:Peter Trauner
 /*********************************************************************
 
-    8042kbdc.cpp
+    8042kbdc.c
 
-    8042-based keyboard/mouse controller simulation
+    Code specific to fun IBM AT stuff
+
+
+    PeT's notes about various Power On Self Tests (POSTs)
+
+        at post
+        -------
+        f81d2 01
+        f82e6 05
+        f8356 07
+        f83e5 0a
+        f847e 0e
+        f8e7c 10
+        f8f3a 13
+        f9058 1a
+        f913a 1e
+        fa8ba 30
+        fa96c 36
+        fa9d3 3c
+        fa9f4 3e
+        ff122 50
+        ff226 5b
+        ff29f 5f
+        f9228 70
+        f92b2 74 ide?
+
+        ibm at bios
+        -----------
+        f0101 after switch to real mode jump back!!!!!!!!!!
+        jumping table
+        f0123
+        f098e memory tests
+        f10b4 ???
+        not reached
+        f1050
+        f1617
+        f0119
+        f10d8
+        f10b7 system board error
+
+        f019f
+        f025b
+        f02e6
+        f0323
+        f03b3 0e
+        f03d7 0f
+        f058d
+        at8042 signal timing test
+        sets errorcode!
+
+        f0655
+        f06a3 postcode 15
+        f06ba 16
+        f0747 18
+        f0763 enter pm! (0x81, 0x85)
+        f0766 1a
+        f07b3 first 640kb memory test
+        f084c 1c
+        f086e extended memory test
+        f0928 1f
+        f097d 20
+        ???
+        f0ff4 34
+        ???
+        f1675 f0
+        f16cb f2
+        illegal access trap test!!!!
+        f16fe f3
+        task descriptor test!!!!
+        f174a f4
+        f17af f5
+        f1800 f6 writing to non write segment
+        f1852 f7 arpl
+        f1880 f8 lar, lsl
+        f18ca fa
+        f10d8
+        f10ec 35
+        f1106 36
+        f1137 !!!!!!!keyboard test fails
+
+        f11aa 3a
+        f1240 3c harddisk controller test!!!
+        f13f3 3b
+        f1a6d xthdd bios init
+        f1429
+        f1462
+        f1493 40
+        f1532
+        keyboard lock
+        f1 to unlock
+        f155c
+        jumps to f0050 (reset)  without enabling of the a20 gate --> hangs
+        0412 bit 5 must be set to reach f1579
+        f1579
+        f15c3 41
+        f1621 43
+
+        routines
+        f1945 read cmos ram
+        f195f write to cmos al value ah
+        f1a3a poll 0x61 bit 4
+        f1a49 sets something in cmos ram
+        f1d30 switch to protected mode
+
+        neat
+        ----
+        f80b9
+
+        at386
+        -----
+        fd28c fd
+        fd2c3 fc
+        f40dc
+        fd949
+        fd8e3
+        fd982
+        f4219 01
+        f4296 03
+        f42f3 04
+        f4377 05
+        f43ec 06
+        f4430 08
+        f6017 switches to PM
+        f4456 09
+        f55a2
+        f44ec 0d
+        f4557 20
+        f462d 27 my special friend, the keyboard controller once more
+        ed0a1
+        f4679 28
+        fa16a
+        f46d6
+        f4768 2c
+        f47f0 2e
+        f5081
+        fa16a
+        f9a83
+            Message: "Checksum Error on Extended CMOS"
+        f4840 34
+        f488c 35
+        reset
+        f48ee
+        f493e 3a
+        f49cd
+        f4fc7
+        fe842
+        f4a5a
+        f4b01 38
+            (Memory Test)
+        f4b41 3b
+        f4c0f
+            Message: "Invalid configuration information - please run SETUP program"
+        f4c5c
+            f86fc
+            f8838
+        f4c80
+        f4ca2
+        f4d4c
+        f4e15   (int 19h)
+
+        [f9a83 output text at return address!, return after text]
+
+
+        at486
+        -----
+        f81a5 03
+        f1096 0f 09 wbinvd i486 instruction
 
 *********************************************************************/
 
@@ -25,7 +191,7 @@
 #define LOG_KEYBOARD    0
 #define LOG_ACCESSES    0
 
-DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard/Mouse Controller")
+DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard Controller")
 
 //-------------------------------------------------
 //  kbdc8042_device - constructor
@@ -34,9 +200,6 @@ DEFINE_DEVICE_TYPE(KBDC8042, kbdc8042_device, "kbdc8042", "8042 Keyboard/Mouse C
 kbdc8042_device::kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KBDC8042, tag, owner, clock)
 	, m_keyboard_dev(*this, "at_keyboard")
-	, m_mousex_port(*this, "MOUSEX")
-	, m_mousey_port(*this, "MOUSEY")
-	, m_mousebtn_port(*this, "MOUSEBTN")
 	, m_system_reset_cb(*this)
 	, m_gate_a20_cb(*this)
 	, m_input_buffer_full_cb(*this)
@@ -65,7 +228,6 @@ void kbdc8042_device::device_start()
 	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 	memset(&m_keyboard, 0x00, sizeof(m_keyboard));
 	memset(&m_mouse, 0x00, sizeof(m_mouse));
-	m_mouse.sample_rate = 100;
 	m_sending = 0;
 	m_last_write_to_control = 0;
 	m_status_read_mode = 0;
@@ -82,15 +244,12 @@ void kbdc8042_device::device_reset()
 	/* ibmat bios wants 0x20 set! (keyboard locked when not set) 0x80 */
 	m_inport = 0xa0;
 	at_8042_set_outport(0xfe, 1);
-
-	m_mouse_x = 0;
-	m_mouse_y = 0;
-	m_mouse_btn = 0;
 }
 
 void kbdc8042_device::at_8042_set_outport(uint8_t data, int initial)
 {
-	uint8_t change = initial ? 0xFF : (m_outport ^ data);
+	uint8_t change;
+	change = initial ? 0xFF : (m_outport ^ data);
 	m_outport = data;
 	if (change & 0x02)
 	{
@@ -105,18 +264,15 @@ WRITE_LINE_MEMBER( kbdc8042_device::keyboard_w )
 		at_8042_check_keyboard();
 }
 
-void kbdc8042_device::at_8042_receive(uint8_t data, bool mouse)
+void kbdc8042_device::at_8042_receive(uint8_t data)
 {
 	if (LOG_KEYBOARD)
 		logerror("at_8042_receive Received 0x%02x\n", data);
 
 	m_data = data;
-	if(!(m_speaker & 0x80) || mouse)
+	if(!(m_speaker & 0x80))
 	{
-		if (mouse)
-			m_mouse.received = 1;
-		else
-			m_keyboard.received = 1;
+		m_keyboard.received = 1;
 
 		if (!m_input_buffer_full_cb.isnull())
 			m_input_buffer_full_cb(1);
@@ -125,62 +281,15 @@ void kbdc8042_device::at_8042_receive(uint8_t data, bool mouse)
 
 void kbdc8042_device::at_8042_check_keyboard()
 {
+	int data;
+
 	if (!m_keyboard.received && !m_mouse.received)
 	{
-		int data = m_keyboard_dev->read(machine().dummy_space(), 0);
-		if (data)
+		if((data = m_keyboard_dev->read(machine().dummy_space(), 0)))
 			at_8042_receive(data);
 	}
 }
 
-void kbdc8042_device::at_8042_check_mouse()
-{
-	if (!m_keyboard.received && !m_mouse.received)
-	{
-		if (m_mouse.to_transmit == 0)
-		{
-			uint16_t x = m_mousex_port->read();
-			uint16_t y = m_mousey_port->read();
-			uint8_t buttons = m_mousebtn_port->read();
-
-			uint16_t old_mouse_x = m_mouse_x;
-			uint16_t old_mouse_y = m_mouse_y;
-			uint16_t old_mouse_btn = m_mouse_btn;
-
-			if(m_mouse_x == 0xffff)
-			{
-				old_mouse_x = x & 0x3ff;
-				old_mouse_y = y & 0x3ff;
-				old_mouse_btn = buttons;
-			}
-
-			m_mouse_x = x & 0x3ff;
-			m_mouse_y = y & 0x3ff;
-			m_mouse_btn = buttons;
-
-			uint16_t dx = m_mouse_x - old_mouse_x;
-			uint16_t dy = old_mouse_y - m_mouse_y;
-
-			if (dx != 0 || dy != 0 || buttons != old_mouse_btn)
-			{
-				m_mouse.to_transmit = 3;
-				m_mouse.transmit_buf[0] = buttons | 0x08 | (BIT(dx, 8) << 4) | (BIT(dy, 8) << 5);
-				m_mouse.transmit_buf[1] = dx & 0xff;
-				m_mouse.transmit_buf[2] = dy & 0xff;
-			}
-		}
-
-		if (m_mouse.to_transmit)
-		{
-			at_8042_receive(m_mouse.transmit_buf[0], true);
-			m_mouse.to_transmit--;
-			for (int i = 0; i < m_mouse.to_transmit; i++)
-			{
-				m_mouse.transmit_buf[i] = m_mouse.transmit_buf[i + 1];
-			}
-		}
-	}
-}
 
 void kbdc8042_device::at_8042_clear_keyboard_received()
 {
@@ -261,7 +370,6 @@ READ8_MEMBER(kbdc8042_device::data_r)
 
 	case 4:
 		at_8042_check_keyboard();
-		at_8042_check_mouse();
 
 		if (m_keyboard.received || m_mouse.received)
 			data |= 1;
@@ -336,29 +444,6 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 		case 4:
 			/* preceded by writing 0xD4 to port 60h */
 			m_data = data;
-			if (m_mouse.receiving_sample_rate)
-			{
-				m_mouse.received = 1;
-				m_mouse.sample_rate = data;
-				m_data = 0xfa;
-				break;
-			}
-
-			switch (m_data)
-			{
-				case 0xf6:
-					m_mouse.received = 1;
-					m_data = 0xfa;
-					break;
-				case 0xf3:
-					m_mouse.received = 1;
-					m_data = 0xfa;
-					m_mouse.receiving_sample_rate = true;
-					break;
-				default:
-					logerror("%s: Unknown mouse command: %02x\n", machine().describe_context(), m_data);
-					break;
-			}
 			break;
 
 		case 5:
@@ -378,7 +463,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 		}
 		m_speaker &= ~0x80;
 		if (!m_speaker_cb.isnull())
-			m_speaker_cb((offs_t)0, m_speaker);
+					m_speaker_cb((offs_t)0, m_speaker);
 
 		break;
 
@@ -388,7 +473,7 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 		/* switch based on the command */
 		switch(data) {
 		case 0x20:  /* current 8042 command byte is placed on port 60h */
-			at_8042_receive(m_command);
+			m_data = m_command;
 			break;
 		case 0x60:  /* next data byte is placed in 8042 command byte */
 			m_operation_write_state = 5;
@@ -463,16 +548,12 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 			 * written to input register a port at 60h is sent to the
 			 * auxiliary device  */
 			m_operation_write_state = 4;
-			m_send_to_mouse = 1;
 			break;
 		case 0xe0:
 			/* read test inputs; read T1/T0 test inputs into bit 1/0 */
 			at_8042_receive(0x00);
 			break;
-		case 0xed:
-			/* set/unset keyboard LEDs */
-			at_8042_receive(0xfa);
-			break;
+
 		case 0xf0:
 		case 0xf2:
 		case 0xf4:
@@ -499,22 +580,4 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 WRITE_LINE_MEMBER(kbdc8042_device::write_out2)
 {
 	m_out2 = state;
-}
-
-INPUT_PORTS_START( kbdc8042_mouse )
-	PORT_START("MOUSEX")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2)
-
-	PORT_START("MOUSEY")
-	PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2)
-
-	PORT_START("MOUSEBTN")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2")
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
-INPUT_PORTS_END
-
-ioport_constructor kbdc8042_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(kbdc8042_mouse);
 }

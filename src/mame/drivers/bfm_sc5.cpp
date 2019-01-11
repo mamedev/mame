@@ -30,7 +30,7 @@ WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_duart->write(offset,(data>>8)&0x00ff);
+		m_duart->write(space,offset,(data>>8)&0x00ff);
 	}
 	else
 	{
@@ -89,7 +89,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 
 #if 1
 	// dev1
-	map(0x01010000, 0x010101ff).rw(FUNC(bfm_sc5_state::sc5_mux1_r), FUNC(bfm_sc5_state::sc5_mux1_w)); // guess
+	map(0x01010000, 0x010101ff).rw(this, FUNC(bfm_sc5_state::sc5_mux1_r), FUNC(bfm_sc5_state::sc5_mux1_w)); // guess
 #endif
 
 #if 0
@@ -119,7 +119,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 
 #if 1
 	// dev2
-	map(0x01020000, 0x010201ff).w(FUNC(bfm_sc5_state::sc5_mux2_w)); // guess
+	map(0x01020000, 0x010201ff).w(this, FUNC(bfm_sc5_state::sc5_mux2_w)); // guess
 #endif
 
 #if 0
@@ -135,7 +135,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 	map(0x010202b0, 0x010202b3).nopw();
 	map(0x010202c0, 0x010202c3).nopw();
 #endif
-	map(0x010202F0, 0x010202F3).rw(FUNC(bfm_sc5_state::sc5_10202F0_r), FUNC(bfm_sc5_state::sc5_10202F0_w));
+	map(0x010202F0, 0x010202F3).rw(this, FUNC(bfm_sc5_state::sc5_10202F0_r), FUNC(bfm_sc5_state::sc5_10202F0_w));
 #if 1
 	map(0x01020330, 0x01020333).nopw();
 
@@ -145,7 +145,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 
 	map(0x01020390, 0x01020393).nopw();
 #endif
-	map(0x02000000, 0x0200001f).w(FUNC(bfm_sc5_state::sc5_duart_w));
+	map(0x02000000, 0x0200001f).w(this, FUNC(bfm_sc5_state::sc5_duart_w));
 
 	// ram
 	map(0x40000000, 0x4000ffff).ram();
@@ -213,7 +213,7 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
 	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_DEVICE_PROGRAM_MAP(sc5_map)
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -225,9 +225,9 @@ MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
 	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, bfm_sc5_state, bfm_sc5_duart_input_r))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, bfm_sc5_state, bfm_sc5_duart_output_w))
 
-	BFM_BDA(config, m_vfd0, 60, 0);
+	MCFG_BFMBDA_ADD("vfd0",0)
 
-	config.set_default_layout(layout_bfm_sc5);
+	MCFG_DEFAULT_LAYOUT(layout_bfm_sc5)
 
 	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

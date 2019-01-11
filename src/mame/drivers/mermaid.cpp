@@ -120,6 +120,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/mermaid.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "sound/msm5205.h"
 #include "speaker.h"
 
@@ -162,21 +163,21 @@ void mermaid_state::mermaid_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcbff).ram().w(FUNC(mermaid_state::mermaid_videoram2_w)).share("videoram2");
-	map(0xd000, 0xd3ff).ram().w(FUNC(mermaid_state::mermaid_videoram_w)).share("videoram");
-	map(0xd800, 0xd81f).ram().w(FUNC(mermaid_state::mermaid_bg_scroll_w)).share("bg_scrollram");
-	map(0xd840, 0xd85f).ram().w(FUNC(mermaid_state::mermaid_fg_scroll_w)).share("fg_scrollram");
+	map(0xc800, 0xcbff).ram().w(this, FUNC(mermaid_state::mermaid_videoram2_w)).share("videoram2");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(mermaid_state::mermaid_videoram_w)).share("videoram");
+	map(0xd800, 0xd81f).ram().w(this, FUNC(mermaid_state::mermaid_bg_scroll_w)).share("bg_scrollram");
+	map(0xd840, 0xd85f).ram().w(this, FUNC(mermaid_state::mermaid_fg_scroll_w)).share("fg_scrollram");
 	map(0xd880, 0xd8bf).ram().share("spriteram");
-	map(0xdc00, 0xdfff).ram().w(FUNC(mermaid_state::mermaid_colorram_w)).share("colorram");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(mermaid_state::mermaid_colorram_w)).share("colorram");
 	map(0xe000, 0xe000).portr("DSW");
 	map(0xe000, 0xe007).w("latch1", FUNC(ls259_device::write_d0));
 	map(0xe800, 0xe800).portr("P1");
 	map(0xe800, 0xe807).w("latch2", FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).portr("P2");
-	map(0xf800, 0xf800).r(FUNC(mermaid_state::mermaid_collision_r));
+	map(0xf800, 0xf800).r(this, FUNC(mermaid_state::mermaid_collision_r));
 	map(0xf802, 0xf802).nopw();    // ???
-	map(0xf806, 0xf806).w(FUNC(mermaid_state::mermaid_ay8910_write_port_w));
-	map(0xf807, 0xf807).w(FUNC(mermaid_state::mermaid_ay8910_control_port_w));
+	map(0xf806, 0xf806).w(this, FUNC(mermaid_state::mermaid_ay8910_write_port_w));
+	map(0xf807, 0xf807).w(this, FUNC(mermaid_state::mermaid_ay8910_control_port_w));
 }
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
@@ -400,7 +401,7 @@ void mermaid_state::machine_reset()
 WRITE8_MEMBER(mermaid_state::adpcm_data_w)
 {
 	m_adpcm_data = data;
-	m_adpcm->write_data(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
+	m_adpcm->data_w(m_adpcm_trigger ? (data & 0x0f) : (data & 0xf0) >> 4);
 }
 
 WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
@@ -409,7 +410,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 		return;
 
 	m_adpcm_trigger ^= 1;
-	m_adpcm->write_data(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
+	m_adpcm->data_w(m_adpcm_trigger ? (m_adpcm_data & 0x0f) : (m_adpcm_data & 0xf0) >> 4);
 	m_adpcm_counter->clock_w(m_adpcm_trigger);
 	if (m_adpcm_trigger == 0 && m_adpcm_counter->count() == 0)
 	{
@@ -419,67 +420,75 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 	}
 }
 
-void mermaid_state::mermaid(machine_config &config)
-{
+MACHINE_CONFIG_START(mermaid_state::mermaid)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);	// ???
-	m_maincpu->set_addrmap(AS_PROGRAM, &mermaid_state::mermaid_map);
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   // ???
+	MCFG_DEVICE_PROGRAM_MAP(mermaid_map)
 
-	LS259(config, m_latch[0]);
-	m_latch[0]->q_out_cb<0>().set(FUNC(mermaid_state::ay1_enable_w));
-	m_latch[0]->q_out_cb<1>().set(FUNC(mermaid_state::ay2_enable_w));
-	m_latch[0]->q_out_cb<4>().set_nop(); // ???
-	m_latch[0]->q_out_cb<5>().set(FUNC(mermaid_state::flip_screen_x_w));
-	m_latch[0]->q_out_cb<6>().set(FUNC(mermaid_state::flip_screen_y_w));
-	m_latch[0]->q_out_cb<7>().set(FUNC(mermaid_state::nmi_mask_w));
+	MCFG_DEVICE_ADD("latch1", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mermaid_state, ay1_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mermaid_state, ay2_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ???
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mermaid_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mermaid_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mermaid_state, nmi_mask_w))
 
-	LS259(config, m_latch[1]);
-	m_latch[1]->q_out_cb<0>().set_nop(); // ???
-	m_latch[1]->q_out_cb<4>().set(FUNC(mermaid_state::rougien_gfxbankswitch1_w));
-	m_latch[1]->q_out_cb<5>().set(FUNC(mermaid_state::rougien_gfxbankswitch2_w));
-	m_latch[1]->q_out_cb<7>().set_nop(); // very frequent
+	MCFG_DEVICE_ADD("latch2", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // ???
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, mermaid_state, rougien_gfxbankswitch1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mermaid_state, rougien_gfxbankswitch2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // very frequent
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(mermaid_state::screen_update_mermaid));
-	m_screen->screen_vblank().set(FUNC(mermaid_state::screen_vblank_mermaid));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(mermaid_state, screen_update_mermaid)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mermaid_state, screen_vblank_mermaid))
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mermaid);
-	PALETTE(config, m_palette, FUNC(mermaid_state::mermaid_palette), 4*16+2*2, 64+1);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mermaid)
+	MCFG_PALETTE_ADD("palette", 4*16+2*2)
+	MCFG_PALETTE_INDIRECT_ENTRIES(64+1)
+	MCFG_PALETTE_INIT_OWNER(mermaid_state, mermaid)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay8910[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, m_ay8910[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-void mermaid_state::rougien(machine_config &config)
-{
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(mermaid_state::rougien)
 	mermaid(config);
 
-	m_latch[0]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_playback_w));
+	MCFG_DEVICE_MODIFY("latch1")
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_playback_w))
 
-	m_latch[1]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_rom_hi_w));
-	m_latch[1]->q_out_cb<3>().set(FUNC(mermaid_state::rougien_sample_rom_lo_w));
+	MCFG_DEVICE_MODIFY("latch2")
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_rom_hi_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, mermaid_state, rougien_sample_rom_lo_w))
 
-	m_palette->set_init(FUNC(mermaid_state::rougien_palette));
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(mermaid_state,rougien)
 
-	MSM5205(config, m_adpcm, 384000);
-	m_adpcm->vck_callback().set(FUNC(mermaid_state::rougien_adpcm_int));
-	m_adpcm->set_prescaler_selector(msm5205_device::S96_4B);
-	m_adpcm->add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD("adpcm", MSM5205, 384000)
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, mermaid_state, rougien_adpcm_int))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	RIPPLE_COUNTER(config, m_adpcm_counter);
-	m_adpcm_counter->set_device_rom_tag("adpcm");
-	m_adpcm_counter->set_stages(12);
-	m_adpcm_counter->rom_out_cb().set(FUNC(mermaid_state::adpcm_data_w));
-}
+	MCFG_DEVICE_ADD("adpcm_counter", RIPPLE_COUNTER, 0)
+	MCFG_DEVICE_ROM("adpcm")
+	MCFG_RIPPLE_COUNTER_STAGES(12)
+	MCFG_RIPPLE_COUNTER_ROM_OUT_CB(WRITE8(*this, mermaid_state, adpcm_data_w))
+MACHINE_CONFIG_END
 
 /* ROMs */
 

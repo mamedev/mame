@@ -10,6 +10,8 @@
 
 #define DECOBSMT_TAG "decobsmt"
 
+#define MCFG_DECOBSMT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DECOBSMT, 0)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

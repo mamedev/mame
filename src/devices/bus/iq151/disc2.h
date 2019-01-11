@@ -6,7 +6,6 @@
 #pragma once
 
 #include "iq151.h"
-#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 
 //**************************************************************************

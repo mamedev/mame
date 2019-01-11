@@ -148,9 +148,9 @@ WRITE8_MEMBER(dribling_state::shr_w)
 READ8_MEMBER(dribling_state::ioread)
 {
 	if (offset & 0x08)
-		return m_ppi8255_0->read(offset & 3);
+		return m_ppi8255_0->read(space, offset & 3);
 	else if (offset & 0x10)
-		return m_ppi8255_1->read(offset & 3);
+		return m_ppi8255_1->read(space, offset & 3);
 	return 0xff;
 }
 
@@ -158,9 +158,9 @@ READ8_MEMBER(dribling_state::ioread)
 WRITE8_MEMBER(dribling_state::iowrite)
 {
 	if (offset & 0x08)
-		m_ppi8255_0->write(offset & 3, data);
+		m_ppi8255_0->write(space, offset & 3, data);
 	else if (offset & 0x10)
-		m_ppi8255_1->write(offset & 3, data);
+		m_ppi8255_1->write(space, offset & 3, data);
 	else if (offset & 0x40)
 	{
 		m_dr = m_ds;
@@ -180,14 +180,14 @@ void dribling_state::dribling_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("videoram");
 	map(0x4000, 0x7fff).rom();
-	map(0xc000, 0xdfff).ram().w(FUNC(dribling_state::dribling_colorram_w)).share("colorram");
+	map(0xc000, 0xdfff).ram().w(this, FUNC(dribling_state::dribling_colorram_w)).share("colorram");
 }
 
 
 void dribling_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(FUNC(dribling_state::ioread), FUNC(dribling_state::iowrite));
+	map(0x00, 0xff).rw(this, FUNC(dribling_state::ioread), FUNC(dribling_state::iowrite));
 }
 
 
@@ -276,18 +276,18 @@ MACHINE_CONFIG_START(dribling_state::dribling)
 	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dribling_state,  dribling_irq_gen)
 
-	I8255A(config, m_ppi8255_0);
-	m_ppi8255_0->in_pa_callback().set(FUNC(dribling_state::dsr_r));
-	m_ppi8255_0->in_pb_callback().set(FUNC(dribling_state::input_mux0_r));
-	m_ppi8255_0->out_pc_callback().set(FUNC(dribling_state::misc_w));
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, dribling_state, dsr_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, dribling_state, input_mux0_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dribling_state, misc_w))
 
-	I8255A(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set(FUNC(dribling_state::sound_w));
-	m_ppi8255_1->out_pb_callback().set(FUNC(dribling_state::pb_w));
-	m_ppi8255_1->in_pc_callback().set_ioport("IN0");
-	m_ppi8255_1->out_pc_callback().set(FUNC(dribling_state::shr_w));
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dribling_state, sound_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dribling_state, pb_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dribling_state, shr_w))
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -299,7 +299,8 @@ MACHINE_CONFIG_START(dribling_state::dribling)
 	MCFG_SCREEN_UPDATE_DRIVER(dribling_state, screen_update_dribling)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(dribling_state::dribling_palette), 256);
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(dribling_state, dribling)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

@@ -139,8 +139,8 @@ namespace netlist
 		m_CARRYQ.push(tCarry, NLTIME_FROM_NS(20)); //FIXME timing
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(74193)
-	NETLIB_DEVICE_IMPL_DEPRECATED(74193_dip)
+	NETLIB_DEVICE_IMPL(74193)
+	NETLIB_DEVICE_IMPL(74193_dip)
 
 	} //namespace devices
 } // namespace netlist

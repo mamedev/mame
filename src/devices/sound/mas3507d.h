@@ -7,6 +7,16 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_MAS3507D_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MAS3507D, 0)
+
+#define MCFG_MAS3507D_REPLACE(_tag) \
+	MCFG_DEVICE_REPLACE(_tag, MAS3507D, 0)
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -14,7 +24,7 @@ class mas3507d_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	int i2c_scl_r();
 	int i2c_sda_r();

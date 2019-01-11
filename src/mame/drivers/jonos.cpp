@@ -19,7 +19,6 @@ There are interrupt handlers at 5.5 (0x002c) and 6.5 (0x0034).
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/keyboard.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -31,18 +30,16 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-	{ }
+		{ }
 
-	void jonos(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(cursor_w);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 
+	void jonos(machine_config &config);
 	void jonos_mem(address_map &map);
-
+private:
 	u8 m_framecnt;
 	u8 m_term_data;
 	u8 m_curs_ctrl;
@@ -60,9 +57,9 @@ void jonos_state::jonos_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom().region("roms", 0);
 	map(0x1800, 0x27ff).ram().share("videoram");
-	map(0x3000, 0x3001).w(FUNC(jonos_state::cursor_w)); // unknown device
+	map(0x3000, 0x3001).w(this, FUNC(jonos_state::cursor_w)); // unknown device
 	map(0x4000, 0x4001); // unknown device
-	map(0x5000, 0x5003).r(FUNC(jonos_state::keyboard_r)); // unknown device
+	map(0x5000, 0x5003).r(this, FUNC(jonos_state::keyboard_r)); // unknown device
 	map(0x6000, 0x6001); // unknown device
 }
 
@@ -190,10 +187,10 @@ MACHINE_CONFIG_START(jonos_state::jonos)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jonos)
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(jonos_state::kbd_put));
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(jonos_state, kbd_put))
 MACHINE_CONFIG_END
 
 

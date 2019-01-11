@@ -60,15 +60,14 @@ void iq151_staper_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void iq151_staper_device::device_add_mconfig(machine_config &config)
-{
-	I8255A(config, m_ppi);
-	m_ppi->in_pa_callback().set(FUNC(iq151_staper_device::ppi_porta_r));
-	m_ppi->out_pb_callback().set(FUNC(iq151_staper_device::ppi_portb_w));
-	m_ppi->out_pc_callback().set(FUNC(iq151_staper_device::ppi_portc_w));
+MACHINE_CONFIG_START(iq151_staper_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, iq151_staper_device, ppi_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, iq151_staper_device, ppi_portb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iq151_staper_device, ppi_portc_w))
 
-	PRINTER(config, "printer", 0);
-}
+	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  device_timer - handler timer events
@@ -87,8 +86,10 @@ void iq151_staper_device::device_timer(emu_timer &timer, device_timer_id id, int
 
 void iq151_staper_device::io_read(offs_t offset, uint8_t &data)
 {
+	address_space& space = machine().device("maincpu")->memory().space(AS_IO);
+
 	if (offset >= 0xf8 && offset < 0xfc)
-		data = m_ppi->read(offset & 0x03);
+		data = m_ppi->read(space, offset & 0x03);
 }
 
 //-------------------------------------------------
@@ -97,8 +98,10 @@ void iq151_staper_device::io_read(offs_t offset, uint8_t &data)
 
 void iq151_staper_device::io_write(offs_t offset, uint8_t data)
 {
+	address_space& space = machine().device("maincpu")->memory().space(AS_IO);
+
 	if (offset >= 0xf8 && offset < 0xfc)
-		m_ppi->write(offset & 0x03, data);
+		m_ppi->write(space, offset & 0x03, data);
 }
 
 

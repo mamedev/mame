@@ -97,13 +97,13 @@ MACHINE_RESET_MEMBER(ut88_state,ut88)
 
 READ8_MEMBER( ut88_state::ut88_keyboard_r )
 {
-	return m_ppi->read(offset^0x03);
+	return m_ppi->read(space, offset^0x03);
 }
 
 
 WRITE8_MEMBER( ut88_state::ut88_keyboard_w )
 {
-	m_ppi->write(offset^0x03, data);
+	m_ppi->write(space, offset^0x03, data);
 }
 
 WRITE8_MEMBER( ut88_state::ut88_sound_w )

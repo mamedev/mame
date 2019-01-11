@@ -27,12 +27,12 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cdrom.h"
-#include "romload.h"
 #include "sound/cdda.h"
+#include "imagedev/chd_cd.h"
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CDICDIC")
+DEFINE_DEVICE_TYPE(MACHINE_CDICDIC, cdicdic_device, "cdicdic", "CDICDIC")
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -418,6 +418,8 @@ void cdicdic_device::decode_xa_stereo8(int32_t *cdic_xa_last, const uint8_t *xa,
 void cdicdic_device::decode_audio_sector(const uint8_t *xa, int32_t triggered)
 {
 	// Get XA format from sector header
+
+	cdi_state *state = machine().driver_data<cdi_state>();
 	const uint8_t *hdr = xa + 4;
 	int32_t channels;
 	int32_t bits = 4;
@@ -479,11 +481,8 @@ void cdicdic_device::decode_audio_sector(const uint8_t *xa, int32_t triggered)
 			fatalerror("play_xa: unhandled xa mode %08x\n",hdr[2]);
 	}
 
-	m_dmadac[0]->set_frequency(m_audio_sample_freq);
-	m_dmadac[0]->enable(1);
-
-	m_dmadac[1]->set_frequency(m_audio_sample_freq);
-	m_dmadac[1]->enable(1);
+	dmadac_set_frequency(&state->m_dmadac[0], 2, m_audio_sample_freq);
+	dmadac_enable(&state->m_dmadac[0], 2, 1);
 
 	switch(channels)
 	{
@@ -530,11 +529,7 @@ void cdicdic_device::decode_audio_sector(const uint8_t *xa, int32_t triggered)
 			break;
 	}
 
-	m_dmadac[0]->flush();
-	m_dmadac[1]->flush();
-
-	m_dmadac[0]->transfer(0, 1, 2, 18*28*2*m_audio_sample_size, samples);
-	m_dmadac[1]->transfer(1, 1, 2, 18*28*2*m_audio_sample_size, samples);
+	dmadac_transfer(&state->m_dmadac[0], 2, 1, 2, 18*28*2*m_audio_sample_size, samples);
 }
 
 // After an appropriate delay for decoding to take place...
@@ -545,6 +540,8 @@ TIMER_CALLBACK_MEMBER( cdicdic_device::audio_sample_trigger )
 
 void cdicdic_device::sample_trigger()
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	if(m_decode_addr == 0xffff)
 	{
 		verboselog(*this, 0, "%s", "Decode stop requested, stopping playback\n" );
@@ -560,8 +557,8 @@ void cdicdic_device::sample_trigger()
 
 		// Set the CDIC interrupt line
 		verboselog(*this, 0, "%s", "Setting CDIC interrupt line for soundmap decode\n" );
-		m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+		state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+		state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 	}
 	else
 	{
@@ -604,6 +601,8 @@ TIMER_CALLBACK_MEMBER( cdicdic_device::trigger_readback_int )
 
 void cdicdic_device::process_delayed_command()
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	switch(m_command)
 	{
 		case 0x23: // Reset Mode 1
@@ -713,8 +712,8 @@ void cdicdic_device::process_delayed_command()
 
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(*this, 0, "%s", "Setting CDIC interrupt line for audio sector\n" );
-					m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-					m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+					state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+					state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 				}
 				else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 				{
@@ -732,8 +731,8 @@ void cdicdic_device::process_delayed_command()
 					{
 						//printf( "Setting CDIC interrupt line\n" );
 						verboselog(*this, 0, "%s", "Setting CDIC interrupt line for message sector\n" );
-						m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-						m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+						state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+						state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 					}
 					else
 					{
@@ -752,8 +751,8 @@ void cdicdic_device::process_delayed_command()
 
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(*this, 0, "%s", "Setting CDIC interrupt line for data sector\n" );
-					m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-					m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+					state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+					state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 				}
 
 				if((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == 0 && m_command != 0x23)
@@ -817,7 +816,7 @@ void cdicdic_device::process_delayed_command()
 //              next_lba = next_nybbles[0] + next_nybbles[1]*10 + ((next_nybbles[2] + next_nybbles[3]*10)*75) + ((next_nybbles[4] + next_nybbles[5]*10)*75*60);
 				verboselog(*this, 0, "Playing CDDA sector from MSF location %06x\n", m_time | 2 );
 
-				m_cdda->start_audio(lba, rounded_next_msf);
+				state->m_cdda->start_audio(lba, rounded_next_msf);
 			}
 
 			m_ram[(m_data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0001;                      //  CTRL
@@ -847,8 +846,8 @@ void cdicdic_device::process_delayed_command()
 			}
 
 			verboselog(*this, 0, "%s", "Setting CDIC interrupt line for CDDA sector\n" );
-			m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+			state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+			state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
 		case 0x2c: // Seek
@@ -898,8 +897,8 @@ void cdicdic_device::process_delayed_command()
 			m_time = next_msf << 8;
 
 			verboselog(*this, 0, "%s", "Setting CDIC interrupt line for Seek sector\n" );
-			m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
-			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
+			state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+			state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
 	}
@@ -907,6 +906,7 @@ void cdicdic_device::process_delayed_command()
 
 READ16_MEMBER( cdicdic_device::regs_r )
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
 	uint32_t addr = offset + 0x3c00/2;
 
 	switch(addr)
@@ -945,7 +945,7 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			m_audio_buffer &= 0x7fff;
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
-				m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+				state->m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 				verboselog(*this, 0, "%s", "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
@@ -959,7 +959,7 @@ READ16_MEMBER( cdicdic_device::regs_r )
 			m_x_buffer &= 0x7fff;
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
-				m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+				state->m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 				verboselog(*this, 0, "%s", "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
@@ -990,6 +990,8 @@ READ16_MEMBER( cdicdic_device::regs_r )
 
 WRITE16_MEMBER( cdicdic_device::regs_w )
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	uint32_t addr = offset + 0x3c00/2;
 
 	switch(addr)
@@ -1045,18 +1047,18 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 
 		case 0x3ff8/2:
 		{
-			uint32_t start = m_scc->dma().channel[0].memory_address_counter;
-			uint32_t count = m_scc->dma().channel[0].transfer_counter;
+			uint32_t start = state->m_scc->dma().channel[0].memory_address_counter;
+			uint32_t count = state->m_scc->dma().channel[0].transfer_counter;
 			uint32_t index = 0;
 			uint32_t device_index = (data & 0x3fff) >> 1;
-			address_space &memory_space = m_maincpu->space(AS_PROGRAM);
-			verboselog(*this, 0, "memory address counter: %08x\n", m_scc->dma().channel[0].memory_address_counter);
+			address_space &memory_space = state->m_maincpu->space(AS_PROGRAM);
+			verboselog(*this, 0, "memory address counter: %08x\n", state->m_scc->dma().channel[0].memory_address_counter);
 			verboselog(*this, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
 			verboselog(*this, 0, "Doing copy, transferring %04x bytes\n", count * 2 );
 			////printf("Doing copy, transferring %04x bytes\n", count * 2 );
 			for(index = start / 2; index < (start / 2 + count); index++)
 			{
-				if(m_scc->dma().channel[0].operation_control & OCR_D)
+				if(state->m_scc->dma().channel[0].operation_control & OCR_D)
 				{
 					memory_space.write_word(index * 2, m_ram[device_index++]);
 				}
@@ -1065,7 +1067,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 					m_ram[device_index++] = memory_space.read_word(index * 2);
 				}
 			}
-			m_scc->dma().channel[0].memory_address_counter += m_scc->dma().channel[0].transfer_counter * 2;
+			state->m_scc->dma().channel[0].memory_address_counter += state->m_scc->dma().channel[0].transfer_counter * 2;
 			break;
 		}
 
@@ -1106,13 +1108,12 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 					case 0x2e: // Abort
 					{
 						m_interrupt_timer->adjust(attotime::never);
-						m_dmadac[0]->enable(0);
-						m_dmadac[1]->enable(0);
+						dmadac_enable(&state->m_dmadac[0], 2, 0);
 						//m_data_buffer &= 0xbfff;
 						break;
 					}
 					case 0x2b: // Stop CDDA
-						m_cdda->stop_audio();
+						state->m_cdda->stop_audio();
 						m_interrupt_timer->adjust(attotime::never);
 						break;
 					case 0x23: // Reset Mode 1
@@ -1158,12 +1159,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 //-------------------------------------------------
 
 cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDI_CDIC, tag, owner, clock)
-	, m_maincpu(*this, ":maincpu")
-	, m_dmadac(*this, ":dac%u", 1U)
-	, m_scc(*this, ":scc68070")
-	, m_cdda(*this, ":cdda")
-	, m_cdrom_dev(*this, ":cdrom")
+	: device_t(mconfig, MACHINE_CDICDIC, tag, owner, clock)
 {
 }
 
@@ -1203,6 +1199,8 @@ void cdicdic_device::device_start()
 
 void cdicdic_device::device_reset()
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	m_command = 0;
 	m_time = 0;
 	m_file = 0;
@@ -1221,17 +1219,18 @@ void cdicdic_device::device_reset()
 	m_decode_addr = 0;
 	m_decode_delay = 0;
 
-	if (m_cdrom_dev)
+	cdrom_image_device *cdrom_dev = machine().device<cdrom_image_device>("cdrom");
+	if( cdrom_dev )
 	{
 		// MESS case (has CDROM device)
-		m_cd = m_cdrom_dev->get_cdrom_file();
-		m_cdda->set_cdrom(m_cd);
+		m_cd = cdrom_dev->get_cdrom_file();
+		state->m_cdda->set_cdrom(m_cd);
 	}
 	else
 	{
 		// MAME case
 		m_cd = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
-		m_cdda->set_cdrom(m_cd);
+		state->m_cdda->set_cdrom(m_cd);
 	}
 }
 

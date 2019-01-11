@@ -665,7 +665,7 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 			else if (!memcmp(cpm22_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;
-			}   // check for subnodule disk
+			}	// check for subnodule disk
 			else if (!memcmp(subnod_block1, &sector_data[0x100], 8))
 			{
 				m_prodos_order = true;
@@ -1672,15 +1672,12 @@ bool a2_woz_format::supports_save() const
 }
 
 const uint8_t a2_woz_format::signature[8] = { 0x57, 0x4f, 0x5a, 0x31, 0xff, 0x0a, 0x0d, 0x0a };
-const uint8_t a2_woz_format::signature2[8] = { 0x57, 0x4f, 0x5a, 0x32, 0xff, 0x0a, 0x0d, 0x0a };
 
 int a2_woz_format::identify(io_generic *io, uint32_t form_factor)
 {
 	uint8_t header[8];
 	io_generic_read(io, header, 0, 8);
-	if (!memcmp(header, signature, 8)) return 100;
-	if (!memcmp(header, signature2, 8)) return 100;
-	return 0;
+	return !memcmp(header, signature, 8) ? 100 : 0;
 }
 
 bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
@@ -1689,11 +1686,8 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 	io_generic_read(io, &img[0], 0, img.size());
 
 	// Check signature
-	if ((memcmp(&img[0], signature, 8)) && (memcmp(&img[0], signature2, 8)))
+	if(memcmp(&img[0], signature, 8))
 		return false;
-
-	uint32_t woz_vers = 1;
-	if (!memcmp(&img[0], signature2, 8)) woz_vers = 2;
 
 	// Check integrity
 	uint32_t crc = crc32r(&img[12], img.size() - 12);
@@ -1703,14 +1697,10 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 	uint32_t off_info = find_tag(img, 0x4f464e49);
 	uint32_t off_tmap = find_tag(img, 0x50414d54);
 	uint32_t off_trks = find_tag(img, 0x534b5254);
-//  uint32_t off_writ = find_tag(img, 0x54495257);
 
 	if(!off_info || !off_tmap || !off_trks)
 		return false;
-
-	uint32_t info_vers = r8(img, off_info + 0);
-
-	if ((info_vers != 1) && (info_vers != 2))
+	if(r8(img, off_info + 0) != 1)
 		return false;
 
 	bool is_35 = r8(img, off_info + 1) == 2;
@@ -1718,42 +1708,17 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 		return false;
 
 	unsigned int limit = is_35 ? 160 : 141;
+	for(unsigned int trkid = 0; trkid != limit; trkid++) {
+		int head = is_35 && trkid >= 80 ? 1 : 0;
+		int track = is_35 ? trkid % 80 : trkid / 4;
+		int subtrack = is_35 ? 0 : trkid & 3;
 
-	if (woz_vers == 1) {
-		for (unsigned int trkid = 0; trkid != limit; trkid++) {
-			int head = is_35 && trkid >= 80 ? 1 : 0;
-			int track = is_35 ? trkid % 80 : trkid / 4;
-			int subtrack = is_35 ? 0 : trkid & 3;
-
-			uint8_t idx = r8(img, off_tmap + trkid);
-			if(idx != 0xff) {
-				uint32_t boff = off_trks + 6656*idx;
-				if (r16(img, boff + 6648) == 0)
-					return false;
-				generate_track_from_bitstream(track, head, &img[boff], r16(img, boff + 6648), image, subtrack, r16(img, boff + 6650));
-			}
-		}
-	} else if (woz_vers == 2) {
-		for (unsigned int trkid = 0; trkid != limit; trkid++) {
-			int head = is_35 && trkid & 1 ? 1 : 0;
-			int track = is_35 ? trkid >> 1 : trkid / 4;
-			int subtrack = is_35 ? 0 : trkid & 3;
-
-			uint8_t idx = r8(img, off_tmap + trkid);
-			if(idx != 0xff) {
-				uint32_t trks_off = off_trks + (idx * 8);
-
-				uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
-
-				if (r16(img, trks_off + 4) == 0)
-					return false;
-
-				// TODO: when write capability is added, use the WRIT chunk data if it's present
-				generate_track_from_bitstream(track, head, &img[boff], r16(img, trks_off + 4), image, subtrack, 0xffff);
-			}
+		uint8_t idx = r8(img, off_tmap + trkid);
+		if(idx != 0xff) {
+			uint32_t boff = off_trks + 6656*idx;
+			generate_track_from_bitstream(track, head, &img[boff], r16(img, boff + 6648), image, subtrack, r16(img, boff + 6650));
 		}
 	}
-	else return false;
 
 	return true;
 }

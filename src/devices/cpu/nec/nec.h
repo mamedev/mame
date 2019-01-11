@@ -14,7 +14,6 @@ enum
 	NEC_PC=0,
 	NEC_IP, NEC_AW, NEC_CW, NEC_DW, NEC_BW, NEC_SP, NEC_BP, NEC_IX, NEC_IY,
 	NEC_FLAGS, NEC_ES, NEC_CS, NEC_SS, NEC_DS,
-	NEC_XA,
 	NEC_PENDING
 };
 
@@ -23,7 +22,7 @@ class nec_common_device : public cpu_device
 {
 protected:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map = address_map_constructor());
+	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -94,7 +93,7 @@ private:
 	uint8_t   m_prefetch_cycles;
 	int8_t    m_prefetch_count;
 	uint8_t   m_prefetch_reset;
-	const uint32_t m_chip_type;
+	uint32_t  m_chip_type;
 
 	uint32_t  m_prefix_base;    /* base address of the latest prefix segment */
 	uint8_t   m_seg_prefix;     /* prefix segment indicator */
@@ -110,14 +109,6 @@ private:
 	static const nec_ophandler s_nec_instruction[256];
 	static const nec_eahandler s_GetEA[192];
 
-protected:
-	// FIXME: these belong in v33_base_device
-	bool m_xa;
-	optional_shared_ptr<uint16_t> m_v33_transtable;
-
-	offs_t v33_translate(offs_t addr);
-
-private:
 	inline void prefetch();
 	void do_prefetch(int previous_ICount);
 	inline uint8_t fetch();
@@ -125,7 +116,6 @@ private:
 	uint8_t fetchop();
 	void nec_interrupt(unsigned int_num, int source);
 	void nec_trap();
-	void nec_brk(unsigned int_num);
 	void external_int();
 
 	void i_add_br8();
@@ -416,25 +406,13 @@ public:
 };
 
 
-class v33_base_device : public nec_common_device
-{
-protected:
-	v33_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_port_map);
-
-	// device_memory_interface overrides
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
-
-	void v33_internal_port_map(address_map &map);
-	uint16_t xam_r();
-};
-
-class v33_device : public v33_base_device
+class v33_device : public nec_common_device
 {
 public:
 	v33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class v33a_device : public v33_base_device
+class v33a_device : public nec_common_device
 {
 public:
 	v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

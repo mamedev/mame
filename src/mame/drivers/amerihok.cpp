@@ -33,9 +33,6 @@ public:
 		, m_oki(*this, "oki")
 	{ }
 
-	void amerihok(machine_config &config);
-
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -43,6 +40,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_oki;
+	void amerihok(machine_config &config);
 	void amerihok_data_map(address_map &map);
 	void amerihok_map(address_map &map);
 };
@@ -55,12 +53,12 @@ WRITE8_MEMBER(amerihok_state::control_w)
 
 void amerihok_state::amerihok_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().region("maincpu", 0);
+	map(0x0000, 0xffff).rom();
 }
 
 void amerihok_state::amerihok_data_map(address_map &map)
 {
-	map(0x2000, 0x2000).w(FUNC(amerihok_state::control_w));
+	map(0x2000, 0x2000).w(this, FUNC(amerihok_state::control_w));
 	map(0x4000, 0x4000).w(m_oki, FUNC(okim6376_device::write));
 }
 
@@ -81,7 +79,7 @@ void amerihok_state::machine_reset()
 MACHINE_CONFIG_START(amerihok_state::amerihok)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z8681, 12_MHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", Z8681, XTAL(12'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(amerihok_map)
 	MCFG_DEVICE_DATA_MAP(amerihok_data_map)
 

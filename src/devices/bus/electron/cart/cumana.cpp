@@ -45,16 +45,17 @@ void cumana_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void electron_cumana_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(electron_cumana_device::device_add_mconfig)
 	/* fdc */
-	FD1793(config, m_fdc, 16_MHz_XTAL / 16); // TODO: Not known whether DRQ and INTRQ are connected
-	FLOPPY_CONNECTOR(config, m_floppy0, cumana_floppies, "525qd", electron_cumana_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, cumana_floppies, nullptr, electron_cumana_device::floppy_formats).enable_sound(true);
+	MCFG_FD1793_ADD("fdc", 16_MHz_XTAL / 16) // TODO: Not known whether DRQ and INTRQ are connected
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", cumana_floppies, "525qd", electron_cumana_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", cumana_floppies, nullptr, electron_cumana_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* rtc */
-	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-}
+	MCFG_MC146818_ADD("rtc", 32.768_kHz_XTAL)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -98,7 +99,7 @@ uint8_t electron_cumana_device::read(address_space &space, offs_t offset, int in
 		case 0x91:
 		case 0x92:
 		case 0x93:
-			data = m_fdc->read(offset & 0x03);
+			data = m_fdc->read(space, offset & 0x03);
 			break;
 		case 0x98:
 		case 0x9c:
@@ -144,7 +145,7 @@ void electron_cumana_device::write(address_space &space, offs_t offset, uint8_t 
 		case 0x91:
 		case 0x92:
 		case 0x93:
-			m_fdc->write(offset & 0x03, data);
+			m_fdc->write(space, offset & 0x03, data);
 			break;
 		case 0x94:
 			wd1793_control_w(space, 0, data);

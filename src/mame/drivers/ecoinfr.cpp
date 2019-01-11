@@ -57,23 +57,19 @@ public:
 	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reel(*this, "reel%u", 0U),
+		m_reel0(*this, "reel0"),
+		m_reel1(*this, "reel1"),
+		m_reel2(*this, "reel2"),
+		m_reel3(*this, "reel3"),
 		m_digits(*this, "digit%u", 0U)
 		{ }
 
-	void ecoinfr(machine_config &config);
-
-	void init_ecoinfrbr();
-	void init_ecoinfr();
-	void init_ecoinfrmab();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
-
-private:
 	int irq_toggle;
 	int m_optic_pattern;
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	uint8_t port09_value;
 	uint8_t port10_value;
@@ -85,7 +81,6 @@ private:
 	uint8_t port16_value;
 	uint8_t port17_value;
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
 	DECLARE_WRITE8_MEMBER(ec_port00_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port01_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port02_out_w);
@@ -111,7 +106,13 @@ private:
 	DECLARE_WRITE8_MEMBER(ec_port16_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port17_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port18_out_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
 
+	void init_ecoinfrbr();
+	void init_ecoinfr();
+	void init_ecoinfrmab();
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
@@ -120,8 +121,12 @@ private:
 	uint8_t m_credsel;
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<stepper_device, 4> m_reel;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
 	output_finder<16> m_digits;
+	void ecoinfr(machine_config &config);
 	void memmap(address_map &map);
 	void portmap(address_map &map);
 };
@@ -167,9 +172,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 		printf("ec_port0a_out_w (reel 1 port) unk bits used %02x\n", data);
 	}
 
-	m_reel[0]->update(data&0x0f);
+	m_reel0->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel1", *m_reel[0]);
+	awp_draw_reel(machine(),"reel1", *m_reel0);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
@@ -179,9 +184,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 		printf("ec_port01_out_w (reel 2 port) unk bits used %02x\n", data);
 	}
 
-	m_reel[1]->update(data&0x0f);
+	m_reel1->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel2", *m_reel[1]);
+	awp_draw_reel(machine(),"reel2", *m_reel1);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
@@ -191,9 +196,9 @@ WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 		printf("ec_port02_out_w (reel 3 port) unk bits used %02x\n", data);
 	}
 
-	m_reel[2]->update(data&0x0f);
+	m_reel2->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel3", *m_reel[2]);
+	awp_draw_reel(machine(),"reel3", *m_reel2);
 }
 
 
@@ -479,7 +484,8 @@ void ecoinfr_state::memmap(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 
-	map(0xa000, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xa000, 0xa000).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xa001, 0xa001).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
 }
 
@@ -488,31 +494,31 @@ void ecoinfr_state::memmap(address_map &map)
 void ecoinfr_state::portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(ecoinfr_state::ec_port00_out_w)).portr("IN0"); // Reel 1 Write
-	map(0x01, 0x01).w(FUNC(ecoinfr_state::ec_port01_out_w)).portr("IN1"); // Reel 2 Write + Reels Opto Read
-	map(0x02, 0x02).w(FUNC(ecoinfr_state::ec_port02_out_w)).portr("IN2"); // Reel 3 Write
-	map(0x03, 0x03).w(FUNC(ecoinfr_state::ec_port03_out_w)).portr("IN3");
-	map(0x04, 0x04).w(FUNC(ecoinfr_state::ec_port04_out_w)).portr("IN4");
-	map(0x05, 0x05).w(FUNC(ecoinfr_state::ec_port05_out_w)).portr("IN5");
-	map(0x06, 0x06).w(FUNC(ecoinfr_state::ec_port06_out_w)).portr("IN6");
-	map(0x07, 0x07).w(FUNC(ecoinfr_state::ec_port07_out_w)).portr("IN7");
-	map(0x08, 0x08).w(FUNC(ecoinfr_state::ec_port08_out_bank_strobe_w));
-	map(0x09, 0x09).w(FUNC(ecoinfr_state::ec_port09_out_reelen_w)); // 09 Reel Enables
-	map(0x0a, 0x0a).w(FUNC(ecoinfr_state::ec_port0a_out_w)); // 10 (Sound 1)
-	map(0x0b, 0x0b).w(FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
-	map(0x0c, 0x0c).w(FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
-	map(0x0d, 0x0d).w(FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
+	map(0x00, 0x00).w(this, FUNC(ecoinfr_state::ec_port00_out_w)).portr("IN0"); // Reel 1 Write
+	map(0x01, 0x01).w(this, FUNC(ecoinfr_state::ec_port01_out_w)).portr("IN1"); // Reel 2 Write + Reels Opto Read
+	map(0x02, 0x02).w(this, FUNC(ecoinfr_state::ec_port02_out_w)).portr("IN2"); // Reel 3 Write
+	map(0x03, 0x03).w(this, FUNC(ecoinfr_state::ec_port03_out_w)).portr("IN3");
+	map(0x04, 0x04).w(this, FUNC(ecoinfr_state::ec_port04_out_w)).portr("IN4");
+	map(0x05, 0x05).w(this, FUNC(ecoinfr_state::ec_port05_out_w)).portr("IN5");
+	map(0x06, 0x06).w(this, FUNC(ecoinfr_state::ec_port06_out_w)).portr("IN6");
+	map(0x07, 0x07).w(this, FUNC(ecoinfr_state::ec_port07_out_w)).portr("IN7");
+	map(0x08, 0x08).w(this, FUNC(ecoinfr_state::ec_port08_out_bank_strobe_w));
+	map(0x09, 0x09).w(this, FUNC(ecoinfr_state::ec_port09_out_reelen_w)); // 09 Reel Enables
+	map(0x0a, 0x0a).w(this, FUNC(ecoinfr_state::ec_port0a_out_w)); // 10 (Sound 1)
+	map(0x0b, 0x0b).w(this, FUNC(ecoinfr_state::ec_port0b_out_w)); // 11 (Sound 2)
+	map(0x0c, 0x0c).w(this, FUNC(ecoinfr_state::ec_port0c_out_cred_strobe_w));
+	map(0x0d, 0x0d).w(this, FUNC(ecoinfr_state::ec_port0d_out_cred_data_w));
 //  AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
-	map(0x0f, 0x0f).w(FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
-	map(0x10, 0x10).w(FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
-	map(0x11, 0x11).w(FUNC(ecoinfr_state::ec_port11_out_w)); // SEC
-	map(0x12, 0x12).w(FUNC(ecoinfr_state::ec_port12_out_w)); // SEC
-	map(0x13, 0x13).w(FUNC(ecoinfr_state::ec_port13_out_w));
-	map(0x14, 0x14).w(FUNC(ecoinfr_state::ec_port14_out_w));
-	map(0x15, 0x15).w(FUNC(ecoinfr_state::ec_port15_out_w)); // SEC + VDF (3rd party)
-	map(0x16, 0x16).w(FUNC(ecoinfr_state::ec_port16_out_w));
-	map(0x17, 0x17).w(FUNC(ecoinfr_state::ec_port17_out_w)); // Hopper + VDF (3rd party)
-	map(0x18, 0x18).w(FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
+	map(0x0f, 0x0f).w(this, FUNC(ecoinfr_state::ec_port0f_out_bank_segdata_w));
+	map(0x10, 0x10).w(this, FUNC(ecoinfr_state::ec_port10_out_w)); // 16 (Meter)
+	map(0x11, 0x11).w(this, FUNC(ecoinfr_state::ec_port11_out_w)); // SEC
+	map(0x12, 0x12).w(this, FUNC(ecoinfr_state::ec_port12_out_w)); // SEC
+	map(0x13, 0x13).w(this, FUNC(ecoinfr_state::ec_port13_out_w));
+	map(0x14, 0x14).w(this, FUNC(ecoinfr_state::ec_port14_out_w));
+	map(0x15, 0x15).w(this, FUNC(ecoinfr_state::ec_port15_out_w)); // SEC + VDF (3rd party)
+	map(0x16, 0x16).w(this, FUNC(ecoinfr_state::ec_port16_out_w));
+	map(0x17, 0x17).w(this, FUNC(ecoinfr_state::ec_port17_out_w)); // Hopper + VDF (3rd party)
+	map(0x18, 0x18).w(this, FUNC(ecoinfr_state::ec_port18_out_w)); // 24 (Watchdog)
 }
 
 CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel1_opto_r)
@@ -772,28 +778,32 @@ void ecoinfr_state::machine_reset()
 }
 
 
-void ecoinfr_state::ecoinfr(machine_config &config)
-{
+MACHINE_CONFIG_START(ecoinfr_state::ecoinfr)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinfr_state::memmap);
-	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
-	TIMER(config , "ectimer" , 0).configure_periodic(timer_device::expired_delegate(FUNC(ecoinfr_state::ecoinfr_irq_timer) , this) , attotime::from_hz(250));
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_IO_MAP(portmap)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ectimer", ecoinfr_state, ecoinfr_irq_timer, attotime::from_hz(250))
 
-	config.set_default_layout(layout_ecoinfr);
+	MCFG_DEFAULT_LAYOUT(layout_ecoinfr)
 
 
-	I8251(config, UPD8251_TAG, 0);
+	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
 
-	REEL(config, m_reel[0], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[0]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[1]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[2]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
-	m_reel[3]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<3>));
-}
+	MCFG_ECOIN_200STEP_ADD("reel0")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinfr_state, reel0_optic_cb))
+	MCFG_ECOIN_200STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinfr_state, reel1_optic_cb))
+	MCFG_ECOIN_200STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinfr_state, reel2_optic_cb))
+	MCFG_ECOIN_200STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinfr_state, reel3_optic_cb))
+MACHINE_CONFIG_END
+
+
+
+
+
 
 
 /********************************************************************************************************************

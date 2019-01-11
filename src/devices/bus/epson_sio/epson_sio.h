@@ -22,10 +22,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, _def_slot, false)
 
 #define MCFG_EPSON_SIO_RX(_rx) \
-	downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
+	devcb = &downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
 
 #define MCFG_EPSON_SIO_PIN(_pin) \
-	downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
+	devcb = &downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
 
 
 //**************************************************************************

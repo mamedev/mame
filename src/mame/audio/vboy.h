@@ -21,8 +21,10 @@
 class vboysnd_device : public device_t, public device_sound_interface
 {
 public:
+	static constexpr unsigned AUDIO_FREQ      = 44100;
+
 	// construction/destruction
-	vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 5'000'000);
+	vboysnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = AUDIO_FREQ);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -68,7 +70,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

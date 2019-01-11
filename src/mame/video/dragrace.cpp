@@ -63,7 +63,8 @@ uint32_t dragrace_state::screen_update_dragrace(screen_device &screen, bitmap_in
 		m_bg_tilemap->set_scrollx(0, 16 * xh + xl - 8);
 		m_bg_tilemap->set_scrolly(0, 16 * yh + yl);
 
-		rect.sety((std::max)(rect.top(), y + 0), (std::min)(rect.bottom(), y + 3));
+		if (rect.min_y < y + 0) rect.min_y = y + 0;
+		if (rect.max_y > y + 3) rect.max_y = y + 3;
 
 		m_bg_tilemap->draw(screen, bitmap, rect, 0, 0);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -116,13 +116,8 @@ public:
 		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -192,8 +187,8 @@ public:
 			// if no other draw calls are submitted to viewZ 0.
 			bgfx::touch(0);
 
-			const bx::Vec3 at  = { 0.0f, 0.0f,   0.0f };
-			const bx::Vec3 eye = { 0.0f, 0.0f, -15.0f };
+			float at[3]  = { 0.0f, 0.0f,   0.0f };
+			float eye[3] = { 0.0f, 0.0f, -15.0f };
 
 			float view[16];
 			float proj[16];

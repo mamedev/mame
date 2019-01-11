@@ -75,9 +75,9 @@ DEFINE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device, "seibu_sound", "Seibu Sound 
 
 seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_SOUND, tag, owner, clock),
-		m_int_cb(*this),
 		m_ym_read_cb(*this),
 		m_ym_write_cb(*this),
+		m_sound_cpu(*this, finder_base::DUMMY_TAG),
 		m_sound_rom(*this, finder_base::DUMMY_TAG),
 		m_rom_bank(*this, finder_base::DUMMY_TAG),
 		m_main2sub_pending(0),
@@ -93,7 +93,6 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 
 void seibu_sound_device::device_start()
 {
-	m_int_cb.resolve_safe();
 	m_ym_read_cb.resolve_safe(0);
 	m_ym_write_cb.resolve_safe();
 
@@ -131,11 +130,6 @@ void seibu_sound_device::device_reset()
 
 void seibu_sound_device::update_irq_lines(int param)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(seibu_sound_device::update_irq_synced), this), param);
-}
-
-TIMER_CALLBACK_MEMBER(seibu_sound_device::update_irq_synced)
-{
 	// note: we use 0xff here for inactive irqline
 
 	switch (param)
@@ -161,27 +155,30 @@ TIMER_CALLBACK_MEMBER(seibu_sound_device::update_irq_synced)
 			break;
 	}
 
-	m_int_cb((m_rst10_irq & m_rst18_irq) == 0xff ? CLEAR_LINE : ASSERT_LINE);
+	if (m_sound_cpu.found())
+	{
+		if ((m_rst10_irq & m_rst18_irq) == 0xff) /* no IRQs pending */
+			m_sound_cpu->set_input_line(0, CLEAR_LINE);
+		else /* IRQ pending */
+			m_sound_cpu->set_input_line_and_vector(0, ASSERT_LINE, m_rst10_irq & m_rst18_irq);
+	}
+	else
+		return;
 }
 
-IRQ_CALLBACK_MEMBER(seibu_sound_device::im0_vector_cb)
-{
-	return m_rst10_irq & m_rst18_irq;
-}
 
-
-void seibu_sound_device::irq_clear_w(u8)
+WRITE8_MEMBER( seibu_sound_device::irq_clear_w )
 {
 	/* Denjin Makai and SD Gundam doesn't like this, it's tied to the rst18 ack ONLY so it could be related to it. */
 	//update_irq_lines(VECTOR_INIT);
 }
 
-void seibu_sound_device::rst10_ack_w(u8)
+WRITE8_MEMBER( seibu_sound_device::rst10_ack_w )
 {
 	/* Unused for now */
 }
 
-void seibu_sound_device::rst18_ack_w(u8)
+WRITE8_MEMBER( seibu_sound_device::rst18_ack_w )
 {
 	update_irq_lines(RST18_CLEAR);
 }
@@ -191,51 +188,51 @@ WRITE_LINE_MEMBER( seibu_sound_device::fm_irqhandler )
 	update_irq_lines(state ? RST10_ASSERT : RST10_CLEAR);
 }
 
-u8 seibu_sound_device::ym_r(offs_t offset)
+READ8_MEMBER( seibu_sound_device::ym_r )
 {
 	return m_ym_read_cb(offset);
 }
 
-void seibu_sound_device::ym_w(offs_t offset, u8 data)
+WRITE8_MEMBER( seibu_sound_device::ym_w )
 {
 	m_ym_write_cb(offset, data);
 }
 
-void seibu_sound_device::bank_w(u8 data)
+WRITE8_MEMBER( seibu_sound_device::bank_w )
 {
 	if (m_rom_bank.found())
 		m_rom_bank->set_entry(data & 1);
 }
 
-void seibu_sound_device::coin_w(u8 data)
+WRITE8_MEMBER( seibu_sound_device::coin_w )
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-u8 seibu_sound_device::soundlatch_r(offs_t offset)
+READ8_MEMBER( seibu_sound_device::soundlatch_r )
 {
 	return m_main2sub[offset];
 }
 
-u8 seibu_sound_device::main_data_pending_r()
+READ8_MEMBER( seibu_sound_device::main_data_pending_r )
 {
 	return m_sub2main_pending ? 1 : 0;
 }
 
-void seibu_sound_device::main_data_w(offs_t offset, u8 data)
+WRITE8_MEMBER( seibu_sound_device::main_data_w )
 {
 	m_sub2main[offset] = data;
 }
 
-void seibu_sound_device::pending_w(u8)
+WRITE8_MEMBER( seibu_sound_device::pending_w )
 {
 	/* just a guess */
 	m_main2sub_pending = 0;
 	m_sub2main_pending = 1;
 }
 
-u8 seibu_sound_device::main_r(offs_t offset)
+READ8_MEMBER( seibu_sound_device::main_r )
 {
 	//logerror("%s: seibu_main_r(%x)\n",machine().describe_context(),offset);
 	switch (offset)
@@ -251,7 +248,7 @@ u8 seibu_sound_device::main_r(offs_t offset)
 	}
 }
 
-void seibu_sound_device::main_w(offs_t offset, u8 data)
+WRITE8_MEMBER( seibu_sound_device::main_w )
 {
 	switch (offset)
 	{
@@ -275,7 +272,7 @@ void seibu_sound_device::main_w(offs_t offset, u8 data)
 }
 
 // used only by NMK16 bootlegs
-void seibu_sound_device::main_mustb_w(offs_t, u16 data, u16 mem_mask)
+WRITE16_MEMBER( seibu_sound_device::main_mustb_w )
 {
 	if (ACCESSING_BITS_0_7)
 		m_main2sub[0] = data & 0xff;
@@ -318,7 +315,7 @@ sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-u8 sei80bu_device::data_r(offs_t offset)
+READ8_MEMBER(sei80bu_device::data_r)
 {
 	u16 a = offset;
 	u8 src = read_byte(offset);
@@ -335,7 +332,7 @@ u8 sei80bu_device::data_r(offs_t offset)
 	return src;
 }
 
-u8 sei80bu_device::opcode_r(offs_t offset)
+READ8_MEMBER(sei80bu_device::opcode_r)
 {
 	u16 a = offset;
 	u8 src = read_byte(offset);
@@ -406,7 +403,7 @@ void seibu_adpcm_device::decrypt()
 	}
 }
 
-void seibu_adpcm_device::adr_w(offs_t offset, u8 data)
+WRITE8_MEMBER( seibu_adpcm_device::adr_w )
 {
 	if (m_stream)
 		m_stream->update();
@@ -422,7 +419,7 @@ void seibu_adpcm_device::adr_w(offs_t offset, u8 data)
 	}
 }
 
-void seibu_adpcm_device::ctl_w(u8 data)
+WRITE8_MEMBER( seibu_adpcm_device::ctl_w )
 {
 	// sequence is 00 02 01 each time.
 	if (m_stream)

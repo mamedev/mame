@@ -97,6 +97,7 @@ Todo & FIXME:
 
 #include "emu.h"
 #include "includes/cvs.h"
+#include "cpu/s2650/s2650.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
@@ -159,7 +160,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636[0]->read_data(space, offset);
+		return m_s2636_0->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
@@ -171,7 +172,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636[0]->write_data(space, offset, data);
+		m_s2636_0->write_data(space, offset, data);
 }
 
 
@@ -180,7 +181,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636[1]->read_data(space, offset);
+		return m_s2636_1->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
@@ -192,7 +193,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636[1]->write_data(space, offset, data);
+		m_s2636_1->write_data(space, offset, data);
 }
 
 
@@ -201,7 +202,7 @@ READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 	if (m_s2650_flag)
 		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return m_s2636[2]->read_data(space, offset);
+		return m_s2636_2->read_data(space, offset);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
@@ -213,7 +214,7 @@ WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 		m_gfxdecode->gfx(1)->mark_dirty((offset / 8) % 256);
 	}
 	else
-		m_s2636[2]->write_data(space, offset, data);
+		m_s2636_2->write_data(space, offset, data);
 }
 
 
@@ -448,11 +449,11 @@ void cvs_state::cvs_main_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x13ff).rom();
-	map(0x1400, 0x14ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_bullet_ram_or_palette_r), FUNC(cvs_state::cvs_bullet_ram_or_palette_w)).share("bullet_ram");
-	map(0x1500, 0x15ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_2_or_character_ram_r), FUNC(cvs_state::cvs_s2636_2_or_character_ram_w));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_1_or_character_ram_r), FUNC(cvs_state::cvs_s2636_1_or_character_ram_w));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(FUNC(cvs_state::cvs_s2636_0_or_character_ram_r), FUNC(cvs_state::cvs_s2636_0_or_character_ram_w));
-	map(0x1800, 0x1bff).mirror(0x6000).rw(FUNC(cvs_state::cvs_video_or_color_ram_r), FUNC(cvs_state::cvs_video_or_color_ram_w)).share("video_ram");
+	map(0x1400, 0x14ff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_bullet_ram_or_palette_r), FUNC(cvs_state::cvs_bullet_ram_or_palette_w)).share("bullet_ram");
+	map(0x1500, 0x15ff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_s2636_2_or_character_ram_r), FUNC(cvs_state::cvs_s2636_2_or_character_ram_w));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_s2636_1_or_character_ram_r), FUNC(cvs_state::cvs_s2636_1_or_character_ram_w));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_s2636_0_or_character_ram_r), FUNC(cvs_state::cvs_s2636_0_or_character_ram_w));
+	map(0x1800, 0x1bff).mirror(0x6000).rw(this, FUNC(cvs_state::cvs_video_or_color_ram_r), FUNC(cvs_state::cvs_video_or_color_ram_w)).share("video_ram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x33ff).rom();
 	map(0x4000, 0x53ff).rom();
@@ -461,13 +462,13 @@ void cvs_state::cvs_main_cpu_map(address_map &map)
 
 void cvs_state::cvs_main_cpu_io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(FUNC(cvs_state::cvs_input_r), FUNC(cvs_state::cvs_scroll_w));
+	map(0x00, 0xff).rw(this, FUNC(cvs_state::cvs_input_r), FUNC(cvs_state::cvs_scroll_w));
 }
 
 void cvs_state::cvs_main_cpu_data_map(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(cvs_state::cvs_collision_r), FUNC(cvs_state::audio_command_w));
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(cvs_state::cvs_collision_clear), FUNC(cvs_state::cvs_video_fx_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(cvs_state::cvs_collision_r), FUNC(cvs_state::audio_command_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(cvs_state::cvs_collision_clear), FUNC(cvs_state::cvs_video_fx_w));
 }
 
 /*************************************
@@ -482,9 +483,9 @@ void cvs_state::cvs_dac_cpu_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x1000, 0x107f).ram();
 	map(0x1800, 0x1800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::data_w));
-	map(0x1880, 0x1883).w(FUNC(cvs_state::cvs_4_bit_dac_data_w)).share("4bit_dac");
-	map(0x1884, 0x1887).w(FUNC(cvs_state::cvs_unknown_w)).share("dac3_state");  /* ???? not connected to anything */
+	map(0x1840, 0x1840).w("dac1", FUNC(dac_byte_interface::write));
+	map(0x1880, 0x1883).w(this, FUNC(cvs_state::cvs_4_bit_dac_data_w)).share("4bit_dac");
+	map(0x1884, 0x1887).w(this, FUNC(cvs_state::cvs_unknown_w)).share("dac3_state");  /* ???? not connected to anything */
 }
 
 
@@ -499,11 +500,11 @@ void cvs_state::cvs_speech_cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x07ff).rom();
-	map(0x1d00, 0x1d00).w(FUNC(cvs_state::cvs_speech_rom_address_lo_w));
-	map(0x1d40, 0x1d40).w(FUNC(cvs_state::cvs_speech_rom_address_hi_w));
-	map(0x1d80, 0x1d80).r(FUNC(cvs_state::cvs_speech_command_r));
-	map(0x1ddc, 0x1dde).w(FUNC(cvs_state::cvs_tms5110_ctl_w)).share("tms5110_ctl");
-	map(0x1ddf, 0x1ddf).w(FUNC(cvs_state::cvs_tms5110_pdc_w));
+	map(0x1d00, 0x1d00).w(this, FUNC(cvs_state::cvs_speech_rom_address_lo_w));
+	map(0x1d40, 0x1d40).w(this, FUNC(cvs_state::cvs_speech_rom_address_hi_w));
+	map(0x1d80, 0x1d80).r(this, FUNC(cvs_state::cvs_speech_command_r));
+	map(0x1ddc, 0x1dde).w(this, FUNC(cvs_state::cvs_tms5110_ctl_w)).share("tms5110_ctl");
+	map(0x1ddf, 0x1ddf).w(this, FUNC(cvs_state::cvs_tms5110_pdc_w));
 }
 
 
@@ -963,73 +964,73 @@ void cvs_state::machine_reset()
 	m_stars_scroll = 0;
 }
 
-void cvs_state::cvs(machine_config &config)
-{
-	/* basic machine hardware */
-	S2650(config, m_maincpu, XTAL(14'318'181)/16);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_main_cpu_map);
-	m_maincpu->set_addrmap(AS_IO, &cvs_state::cvs_main_cpu_io_map);
-	m_maincpu->set_addrmap(AS_DATA, &cvs_state::cvs_main_cpu_data_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cvs_state::cvs_main_cpu_interrupt));
-	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
-	m_maincpu->flag_handler().set(FUNC(cvs_state::write_s2650_flag));
 
-	S2650(config, m_audiocpu, XTAL(14'318'181)/16);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_dac_cpu_map);
+MACHINE_CONFIG_START(cvs_state::cvs)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/16)
+	MCFG_DEVICE_PROGRAM_MAP(cvs_main_cpu_map)
+	MCFG_DEVICE_IO_MAP(cvs_main_cpu_io_map)
+	MCFG_DEVICE_DATA_MAP(cvs_main_cpu_data_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cvs_state, cvs_main_cpu_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
+
+	MCFG_DEVICE_ADD("audiocpu", S2650, XTAL(14'318'181)/16)
+	MCFG_DEVICE_PROGRAM_MAP(cvs_dac_cpu_map)
 	/* doesn't look like it is used at all */
 	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
 
-	S2650(config, m_speechcpu, XTAL(14'318'181)/16);
-	m_speechcpu->set_addrmap(AS_PROGRAM, &cvs_state::cvs_speech_cpu_map);
+	MCFG_DEVICE_ADD("speechcpu", S2650, XTAL(14'318'181)/16)
+	MCFG_DEVICE_PROGRAM_MAP(cvs_speech_cpu_map)
 	/* romclk is much more probable, 393 Hz results in timing issues */
 	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
-	m_speechcpu->sense_handler().set("tms", FUNC(tms5110_device::romclk_hack_r));
+	MCFG_S2650_SENSE_INPUT(READLINE("tms", tms5110_device, romclk_hack_r))
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(cvs_state,cvs)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cvs);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cvs)
 
-	PALETTE(config, m_palette, FUNC(cvs_state::cvs_palette), (256 + 4) * 8 + 8 + 1, 16);
+	MCFG_PALETTE_ADD("palette", (256+4)*8+8+1)
+	MCFG_PALETTE_INDIRECT_ENTRIES(16)
+	MCFG_PALETTE_INIT_OWNER(cvs_state,cvs)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 30*8-1, 1*8, 32*8-1);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000));
-	m_screen->set_screen_update(FUNC(cvs_state::screen_update_cvs));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 1*8, 32*8-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
+	MCFG_SCREEN_UPDATE_DRIVER(cvs_state, screen_update_cvs)
+	MCFG_SCREEN_PALETTE("palette")
 
-	S2636(config, m_s2636[0], 0);
-	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
 
-	S2636(config, m_s2636[1], 0);
-	m_s2636[1]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
 
-	S2636(config, m_s2636[2], 0);
-	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET)
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_4BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
-	DAC_1BIT(config, m_dac3, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "dac3", 1.0, DAC_VREF_POS_INPUT);
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 
-	TMS5100(config, m_tms5110, XTAL(640'000));
-	m_tms5110->data().set(FUNC(cvs_state::speech_rom_read_bit));
-	m_tms5110->add_route(ALL_OUTPUTS, "speaker", 1.0);
-}
+	MCFG_DEVICE_ADD("tms", TMS5100, XTAL(640'000))
+	MCFG_TMS5110_DATA_CB(READLINE(*this, cvs_state, speech_rom_read_bit))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -1548,23 +1549,23 @@ ROM_END
  *
  *************************************/
 
-READ8_MEMBER(cvs_state::huncholy_prot_r)
-{
-	if (offset == 1)
-	{
-		m_protection_counter++;
-		if ((m_protection_counter & 0x0f) == 0x01) return 0x00;
-		return 0xff;
-	}
-
-	return 0; // offset 0
-}
-
 void cvs_state::init_huncholy()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6ff1, 0x6ff2, read8_delegate(FUNC(cvs_state::huncholy_prot_r),this));
+	uint8_t *ROM = memregion("maincpu")->base();
 
-	save_item(NAME(m_protection_counter));
+	/* patch out protection */
+	ROM[0x0082] = 0xc0;
+	ROM[0x0083] = 0xc0;
+	ROM[0x0084] = 0xc0;
+	ROM[0x00b7] = 0xc0;
+	ROM[0x00b8] = 0xc0;
+	ROM[0x00b9] = 0xc0;
+	ROM[0x00d9] = 0xc0;
+	ROM[0x00da] = 0xc0;
+	ROM[0x00db] = 0xc0;
+	ROM[0x4456] = 0xc0;
+	ROM[0x4457] = 0xc0;
+	ROM[0x4458] = 0xc0;
 }
 
 
@@ -1577,50 +1578,57 @@ void cvs_state::init_hunchbaka()
 }
 
 
-READ8_MEMBER(cvs_state::superbik_prot_r)
-{
-	m_protection_counter++;
-	if ((m_protection_counter & 0x0f) == 0x02) return 0;
-	return 0xff;
-}
-
 void cvs_state::init_superbik()
 {
-	m_protection_counter = 0;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f1, 0x73f2, read8_delegate(FUNC(cvs_state::superbik_prot_r),this));
+	uint8_t *ROM = memregion("maincpu")->base();
 
-	save_item(NAME(m_protection_counter));
+	/* patch out protection */
+	ROM[0x0079] = 0xc0;
+	ROM[0x007a] = 0xc0;
+	ROM[0x007b] = 0xc0;
+	ROM[0x0081] = 0xc0;
+	ROM[0x0082] = 0xc0;
+	ROM[0x0083] = 0xc0;
+	ROM[0x00b6] = 0xc0;
+	ROM[0x00b7] = 0xc0;
+	ROM[0x00b8] = 0xc0;
+	ROM[0x0168] = 0xc0;
+	ROM[0x0169] = 0xc0;
+	ROM[0x016a] = 0xc0;
+
+	ROM[0x413f] = 0xc0;
+	ROM[0x4140] = 0xc0;
+	ROM[0x4141] = 0xc0;
+
+	/* and speed up the protection check */
+	ROM[0x0099] = 0xc0;
+	ROM[0x009a] = 0xc0;
+	ROM[0x009b] = 0xc0;
+	ROM[0x00bb] = 0xc0;
+	ROM[0x00bc] = 0xc0;
+	ROM[0x00bd] = 0xc0;
 }
 
-
-READ8_MEMBER(cvs_state::hero_prot_r)
-{
-	u8 *ROM = memregion("maincpu")->base() + 0x73f0;
-
-	switch (offset + 0x73f0)
-	{
-		case 0x73f0: // pc: 7d, ab9
-			return 0xff; // 0x03 at this address in ROM
-
-		case 0x73f1: // pc: 83, read and then overwritten by 0x73f2 read
-			return 0; // 0x02 at this address in ROM
-
-		case 0x73f2: // pc: 86, needs to match read from 0x73f0
-			return 0xff & 0x7e; // 0x04 at this address in ROM
-
-		case 0x73f9: // pc: A9f, not sure what this is suppose to do?
-			return 0x00; // 0x1e at this address in ROM
-
-		case 0x73fe: // aa8
-			return 0xff; // 0x5e at this address in ROM
-	}
-
-	return ROM[offset];
-}
 
 void cvs_state::init_hero()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x73f0, 0x73ff, read8_delegate(FUNC(cvs_state::hero_prot_r),this));
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	/* patch out protection */
+	ROM[0x0087] = 0xc0;
+	ROM[0x0088] = 0xc0;
+	ROM[0x0aa1] = 0xc0;
+	ROM[0x0aa2] = 0xc0;
+	ROM[0x0aa3] = 0xc0;
+	ROM[0x0aaf] = 0xc0;
+	ROM[0x0ab0] = 0xc0;
+	ROM[0x0ab1] = 0xc0;
+	ROM[0x0abd] = 0xc0;
+	ROM[0x0abe] = 0xc0;
+	ROM[0x0abf] = 0xc0;
+	ROM[0x4de0] = 0xc0;
+	ROM[0x4de1] = 0xc0;
+	ROM[0x4de2] = 0xc0;
 }
 
 
@@ -1664,8 +1672,8 @@ GAME( 1982, diggerc,   0,        cvs, diggerc,  cvs_state, empty_init,     ROT90
 GAME( 1983, heartatk,  0,        cvs, heartatk, cvs_state, empty_init,     ROT90, "Century Electronics", "Heart Attack", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbak,  0,        cvs, hunchbak, cvs_state, empty_init,     ROT90, "Century Electronics", "Hunchback (set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, hunchbaka, hunchbak, cvs, hunchbak, cvs_state, init_hunchbaka, ROT90, "Century Electronics", "Hunchback (set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, superbik,  0,        cvs, superbik, cvs_state, init_superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION| MACHINE_SUPPORTS_SAVE )
+GAME( 1983, superbik,  0,        cvs, superbik, cvs_state, init_superbik,  ROT90, "Century Electronics", "Superbike", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raiders,   0,        cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raidersr3, raiders,  cvs, raiders,  cvs_state, init_raiders,   ROT90, "Century Electronics", "Raiders (Rev.3)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, hero,      0,        cvs, hero,     cvs_state, init_hero,      ROT90, "Century Electronics / Seatongrove Ltd", "Hero", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // (C) 1984 CVS on titlescreen, (C) 1983 Seatongrove on highscore screen
 GAME( 1984, huncholy,  0,        cvs, huncholy, cvs_state, init_huncholy,  ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

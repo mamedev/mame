@@ -53,10 +53,9 @@ void z88_1024k_flash_device::device_start()
 //  device_add_mconfig
 //-------------------------------------------------
 
-void z88_1024k_flash_device::device_add_mconfig(machine_config &config)
-{
-	INTEL_E28F008SA(config, FLASH_TAG);
-}
+MACHINE_CONFIG_START(z88_1024k_flash_device::device_add_mconfig)
+	MCFG_INTEL_E28F008SA_ADD(FLASH_TAG)
+MACHINE_CONFIG_END
 
 /*-------------------------------------------------
     get_cart_base
@@ -73,7 +72,7 @@ uint8_t* z88_1024k_flash_device::get_cart_base()
 
 READ8_MEMBER(z88_1024k_flash_device::read)
 {
-	return m_flash->read(space, offset & (get_cart_size() - 1));
+	return m_flash->read(offset & (get_cart_size() - 1));
 }
 
 /*-------------------------------------------------
@@ -82,5 +81,5 @@ READ8_MEMBER(z88_1024k_flash_device::read)
 
 WRITE8_MEMBER(z88_1024k_flash_device::write)
 {
-	m_flash->write(space, offset & (get_cart_size() - 1), data);
+	m_flash->write(offset & (get_cart_size() - 1), data);
 }

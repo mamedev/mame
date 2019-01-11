@@ -288,7 +288,7 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 	m_keylatch = data;
 
 	if (m_io_sound->read())
-		m_discrete->write(NODE_01, (data >> 2) & 0x0f);
+		m_discrete->write(space, NODE_01, (data >> 2) & 0x0f);
 }
 
 WRITE8_MEMBER( uk101_state::keyboard_w )
@@ -316,7 +316,7 @@ WRITE8_MEMBER( sb2m600_state::ctrl_w )
 	m_32 = BIT(data, 0);
 	m_coloren = BIT(data, 1);
 
-	m_discrete->write(NODE_10, BIT(data, 4));
+	m_discrete->write(space, NODE_10, BIT(data, 4));
 }
 
 WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
@@ -453,7 +453,7 @@ void sb2m600_state::osi600_mem(address_map &map)
 	map(0x0000, 0x1fff).bankrw("bank1");
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xd3ff).ram().share("video_ram");
-	map(0xdf00, 0xdf00).rw(FUNC(sb2m600_state::keyboard_r), FUNC(sb2m600_state::keyboard_w));
+	map(0xdf00, 0xdf00).rw(this, FUNC(sb2m600_state::keyboard_r), FUNC(sb2m600_state::keyboard_w));
 	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf800, 0xffff).rom();
 }
@@ -464,7 +464,7 @@ void uk101_state::uk101_mem(address_map &map)
 	map(0xa000, 0xbfff).rom();
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xd400, 0xd7ff).noprw();  // bios sets this to spaces at boot
-	map(0xdc00, 0xdfff).r(FUNC(uk101_state::keyboard_r)).w(FUNC(uk101_state::keyboard_w));
+	map(0xdc00, 0xdfff).r(this, FUNC(uk101_state::keyboard_r)).w(this, FUNC(uk101_state::keyboard_w));
 	map(0xf000, 0xf001).mirror(0x00fe).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0xf800, 0xffff).rom();
 }
@@ -478,11 +478,11 @@ void c1p_state::c1p_mem(address_map &map)
 	map(0xc70c, 0xc70f).rw("pia_3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xd400, 0xd7ff).ram().share("color_ram");
-	map(0xd800, 0xd800).w(FUNC(c1p_state::ctrl_w));
-	map(0xdf00, 0xdf00).rw(FUNC(c1p_state::keyboard_r), FUNC(c1p_state::keyboard_w));
+	map(0xd800, 0xd800).w(this, FUNC(c1p_state::ctrl_w));
+	map(0xdf00, 0xdf00).rw(this, FUNC(c1p_state::keyboard_r), FUNC(c1p_state::keyboard_w));
 	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xf7c0, 0xf7c0).w(FUNC(c1p_state::osi630_sound_w));
-	map(0xf7e0, 0xf7e0).w(FUNC(c1p_state::osi630_ctrl_w));
+	map(0xf7c0, 0xf7c0).w(this, FUNC(c1p_state::osi630_sound_w));
+	map(0xf7e0, 0xf7e0).w(this, FUNC(c1p_state::osi630_ctrl_w));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -497,11 +497,11 @@ void c1pmf_state::c1pmf_mem(address_map &map)
 	map(0xc70c, 0xc70f).rw("pia_3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xd000, 0xd3ff).ram().share("video_ram");
 	map(0xd400, 0xd7ff).ram().share("color_ram");
-	map(0xd800, 0xd800).w(FUNC(c1pmf_state::ctrl_w));
-	map(0xdf00, 0xdf00).rw(FUNC(c1pmf_state::keyboard_r), FUNC(c1pmf_state::keyboard_w));
+	map(0xd800, 0xd800).w(this, FUNC(c1pmf_state::ctrl_w));
+	map(0xdf00, 0xdf00).rw(this, FUNC(c1pmf_state::keyboard_r), FUNC(c1pmf_state::keyboard_w));
 	map(0xf000, 0xf001).rw(m_acia_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xf7c0, 0xf7c0).w(FUNC(c1pmf_state::osi630_sound_w));
-	map(0xf7e0, 0xf7e0).w(FUNC(c1pmf_state::osi630_ctrl_w));
+	map(0xf7c0, 0xf7c0).w(this, FUNC(c1pmf_state::osi630_sound_w));
+	map(0xf7e0, 0xf7e0).w(this, FUNC(c1pmf_state::osi630_ctrl_w));
 	map(0xf800, 0xffff).rom();
 }
 
@@ -681,7 +681,7 @@ void c1pmf_state::machine_start()
 
 	// drive select logic missing
 	if (m_floppy0->get_device())
-		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&c1pmf_state::floppy_index_callback, this));
+		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&sb2m600_state::floppy_index_callback, this));
 }
 
 // disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
@@ -711,120 +711,123 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-void sb2m600_state::osi600(machine_config &config)
-{
+MACHINE_CONFIG_START(sb2m600_state::osi600)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, X1/4); // .98304 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &sb2m600_state::osi600_mem);
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
+	MCFG_DEVICE_PROGRAM_MAP(osi600_mem)
 
 	/* video hardware */
 	osi600_video(config);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_osi);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete);
-	m_discrete->set_intf(osi600_discrete_interface);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
+	MCFG_DISCRETE_INTF(osi600_discrete_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
+	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
 
-	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(sb2m600_state::write_cassette_clock));
+	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	RAM(config, m_ram);
-	m_ram->set_default_size("4K");
-	m_ram->set_extra_options("8K");
-}
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("8K")
+MACHINE_CONFIG_END
 
-void uk101_state::uk101(machine_config &config)
-{
+MACHINE_CONFIG_START(uk101_state::uk101)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, UK101_X1/8); // 1 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &uk101_state::uk101_mem);
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
+	MCFG_DEVICE_PROGRAM_MAP(uk101_mem)
 
 	/* video hardware */
 	uk101_video(config);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_osi);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(uk101_state::cassette_tx));
+	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
 
-	CLOCK(config, "cassette_clock", 500000).signal_handler().set(FUNC(uk101_state::write_cassette_clock));
+	MCFG_DEVICE_ADD("cassette_clock", CLOCK, 500000)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	RAM(config, m_ram);
-	m_ram->set_default_size("4K");
-	m_ram->set_extra_options("8K");
-}
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("8K")
+MACHINE_CONFIG_END
 
-void c1p_state::c1p(machine_config &config)
-{
+MACHINE_CONFIG_START(c1p_state::c1p)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, X1/4); // .98304 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1p_state::c1p_mem);
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
+	MCFG_DEVICE_PROGRAM_MAP(c1p_mem)
 
 	/* video hardware */
 	osi630_video(config);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_osi);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_osi)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	DISCRETE(config, m_discrete);
-	m_discrete->set_intf(osi600c_discrete_interface);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.50);
-	BEEP(config, "beeper", 300).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE)
+	MCFG_DISCRETE_INTF(osi600c_discrete_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_DEVICE_ADD("beeper", BEEP, 300)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	PIA6821(config, "pia_1", 0);
-	PIA6821(config, "pia_2", 0);
-	PIA6821(config, "pia_3", 0);
+	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
+	MCFG_DEVICE_ADD("pia_3", PIA6821, 0)
 
 	/* cassette ACIA */
-	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(c1p_state::cassette_tx));
+	MCFG_DEVICE_ADD("acia_0", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, sb2m600_state, cassette_tx))
 
-	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(c1p_state::write_cassette_clock));
+	MCFG_DEVICE_ADD("cassette_clock", CLOCK, X1/32)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, sb2m600_state, write_cassette_clock))
 
 	/* cassette */
-	CASSETTE(config, m_cassette);
+	MCFG_CASSETTE_ADD("cassette")
 
 	/* internal ram */
-	RAM(config, m_ram);
-	m_ram->set_default_size("8K");
-	m_ram->set_extra_options("20K");
-}
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("8K")
+	MCFG_RAM_EXTRA_OPTIONS("20K")
+MACHINE_CONFIG_END
 
-void c1pmf_state::c1pmf(machine_config &config)
-{
+MACHINE_CONFIG_START(c1pmf_state::c1pmf)
 	c1p(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c1pmf_state::c1pmf_mem);
+	MCFG_DEVICE_MODIFY(M6502_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(c1pmf_mem)
 
-	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
-	pia0.readpa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_r));
-	pia0.writepa_handler().set(FUNC(c1pmf_state::osi470_pia_pa_w));
-	pia0.writepb_handler().set(FUNC(c1pmf_state::osi470_pia_pb_w));
-	pia0.cb2_handler().set(FUNC(c1pmf_state::osi470_pia_cb2_w));
+	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(READ8(*this, c1pmf_state, osi470_pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, c1pmf_state, osi470_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, c1pmf_state, osi470_pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, c1pmf_state, osi470_pia_cb2_w))
 
 	/* floppy ACIA */
-	ACIA6850(config, "acia_1", 0);
+	MCFG_DEVICE_ADD("acia_1", ACIA6850, 0)
 
-	CLOCK(config, "floppy_clock", XTAL(4'000'000)/8).signal_handler().set("acia_1", FUNC(acia6850_device::write_txc)); // 250 kHz
+	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL(4'000'000)/8) // 250 kHz
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia_1", acia6850_device, write_txc))
 
-	FLOPPY_CONNECTOR(config, "floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats);
+	MCFG_FLOPPY_DRIVE_ADD("floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("floppy1", osi_floppies, nullptr,   floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
-	m_ram->set_default_size("20K");
-}
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("20K")
+MACHINE_CONFIG_END
 
 /* ROMs */
 
@@ -837,9 +840,9 @@ ROM_START( sb2m600b )
 	ROM_LOAD( "basus04.u12", 0xb800, 0x0800, CRC(8ee6030e) SHA1(71f210163e4268cba2dd78a97c4d8f5dcebf980e) )
 	ROM_LOAD( "monde01.u13", 0xf800, 0x0800, CRC(95a44d2e) SHA1(4a0241c4015b94c436d0f0f58b3dd9d5207cd847) ) // also known as syn600.rom
 	ROM_SYSTEM_BIOS(0, "original", "Original")
-	ROMX_LOAD("basus03.u11", 0xb000, 0x0800, CRC(ca25f8c1) SHA1(f5e8ee93a5e0656657d0cc60ef44e8a24b8b0a80), ROM_BIOS(0) )
+	ROMX_LOAD("basus03.u11", 0xb000, 0x0800, CRC(ca25f8c1) SHA1(f5e8ee93a5e0656657d0cc60ef44e8a24b8b0a80), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "fixed", "Fixed")
-	ROMX_LOAD( "basic3.rom", 0xb000, 0x0800, CRC(ac37d575) SHA1(11407eb24d1ba7afb889b7677c987e8be1a61aab), ROM_BIOS(1) )
+	ROMX_LOAD( "basic3.rom", 0xb000, 0x0800, CRC(ac37d575) SHA1(11407eb24d1ba7afb889b7677c987e8be1a61aab), ROM_BIOS(2) )
 
 	ROM_REGION( 0x0800, "chargen",0)
 	ROM_LOAD( "chgsup2.u41", 0x0000, 0x0800, CRC(735f5e0a) SHA1(87c6271497c5b00a974d905766e91bb965180594) ) // see below, is this the same rom, but on a different pcb/form factor?
@@ -862,10 +865,10 @@ ROM_START( uk101 )
 	ROM_LOAD( "basuk04.ic12",  0xb800, 0x0800, CRC(667223e8) SHA1(dca78be4b98317413376d69119942d692e39575a) )
 	// This monitor came from another emulator and works well on the 64x16 screen
 	ROM_SYSTEM_BIOS(0, "final", "64x16 screen final? rom")
-	ROMX_LOAD( "monuk02.ic13",  0xf800, 0x0800, CRC(e5b7028d) SHA1(74f0934014fdf83d33c8d3579e562b53c0683270), ROM_BIOS(0) )
+	ROMX_LOAD( "monuk02.ic13",  0xf800, 0x0800, CRC(e5b7028d) SHA1(74f0934014fdf83d33c8d3579e562b53c0683270), ROM_BIOS(1) )
 	// This monitor is for a 32x32 screen, and could be the prototype referred to in Practical Electronics
 	ROM_SYSTEM_BIOS(1, "proto", "32x32 screen proto? rom")
-	ROMX_LOAD( "monuk02_alt.ic13",  0xf800, 0x0800, CRC(04ac5822) SHA1(2bbbcd0ca18103fd68afcf64a7483653b925d83e), ROM_BIOS(1) )
+	ROMX_LOAD( "monuk02_alt.ic13",  0xf800, 0x0800, CRC(04ac5822) SHA1(2bbbcd0ca18103fd68afcf64a7483653b925d83e), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "chguk101.ic41", 0x0000, 0x0800, CRC(fce2c84a) SHA1(baa66a7a48e4d62282671ef53abfaf450b888b70) )

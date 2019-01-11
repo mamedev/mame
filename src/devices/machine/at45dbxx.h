@@ -18,6 +18,23 @@
 #pragma once
 
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_AT45DB041_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AT45DB041, 0)
+
+#define MCFG_AT45DB081_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AT45DB081, 0)
+
+#define MCFG_AT45DB161_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AT45DB161, 0)
+
+#define MCFG_AT45DBXXX_SO_CALLBACK(_cb) \
+	devcb = &downcast<at45db041_device &>(*device).set_so_cb(DEVCB_##_cb);
+
+
 // ======================> at45db041_device
 
 class at45db041_device : public device_t,
@@ -33,7 +50,7 @@ public:
 
 	uint8_t *get_ptr() {  return &m_data[0];  }
 
-	auto so_callback() { return write_so.bind(); }
+	template <class Object> devcb_base &set_so_cb(Object &&cb) { return write_so.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	at45db041_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

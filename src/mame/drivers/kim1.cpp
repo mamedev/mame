@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(kim1_state::kim1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	// video hardware
-	config.set_default_layout(layout_kim1);
+	MCFG_DEFAULT_LAYOUT( layout_kim1 )
 
 	// devices
 	MCFG_DEVICE_ADD("miot_u2", MOS6530, 1000000)

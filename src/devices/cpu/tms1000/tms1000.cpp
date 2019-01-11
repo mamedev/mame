@@ -107,12 +107,14 @@ mc141200_cpu_device::mc141200_cpu_device(const machine_config &mconfig, const ch
 
 
 // machine configs
-void tms1000_cpu_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(tms1000_cpu_device::device_add_mconfig)
+
 	// microinstructions PLA, output PLA
-	PLA(config, "mpla", 8, 16, 30).set_format(pla_device::FMT::BERKELEY);
-	PLA(config, "opla", 5, 8, 20).set_format(pla_device::FMT::BERKELEY);
-}
+	MCFG_PLA_ADD("mpla", 8, 16, 30)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+	MCFG_PLA_ADD("opla", 5, 8, 20)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+MACHINE_CONFIG_END
 
 
 // disasm

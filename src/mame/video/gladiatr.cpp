@@ -132,6 +132,11 @@ WRITE_LINE_MEMBER(gladiatr_state_base::spritebuffer_w)
 	m_sprite_buffer = state;
 }
 
+WRITE8_MEMBER(gladiatr_state_base::spritebuffer_w)
+{
+	m_sprite_buffer = data & 0x01;
+}
+
 WRITE_LINE_MEMBER(gladiatr_state::spritebank_w)
 {
 	m_sprite_bank = state ? 4 : 2;

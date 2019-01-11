@@ -22,15 +22,14 @@ DEFINE_DEVICE_TYPE(VIC1010, vic1010_device, "vic1010", "VIC-1010 Expansion Modul
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void vic1010_device::device_add_mconfig(machine_config &config)
-{
-	vic20_expansion_slot_device::add_passthrough(config, "slot1");
-	vic20_expansion_slot_device::add_passthrough(config, "slot2");
-	vic20_expansion_slot_device::add_passthrough(config, "slot3");
-	vic20_expansion_slot_device::add_passthrough(config, "slot4");
-	vic20_expansion_slot_device::add_passthrough(config, "slot5");
-	vic20_expansion_slot_device::add_passthrough(config, "slot6");
-}
+MACHINE_CONFIG_START(vic1010_device::device_add_mconfig)
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot1")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot2")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot3")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot4")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot5")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot6")
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

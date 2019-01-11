@@ -11,9 +11,6 @@
 #ifndef MAME_INCLUDES_BEBOX_H
 #define MAME_INCLUDES_BEBOX_H
 
-#include "cpu/powerpc/ppc.h"
-
-#include "imagedev/floppy.h"
 #include "machine/53c810.h"
 #include "machine/am9517a.h"
 #include "machine/idectrl.h"
@@ -23,7 +20,6 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/intelfsh.h"
-
 #include "bus/lpci/pci.h"
 
 
@@ -36,23 +32,29 @@ public:
 	};
 
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_ppc(*this, "ppc%u", 1U)
-		, m_lsi53c810(*this, "lsi53c810")
-		, m_dma8237(*this, "dma8237_%u", 1U)
-		, m_pic8259(*this, "pic8259_%u", 1U)
-		, m_pit8254(*this, "pit8254")
-		, m_ram(*this, RAM_TAG)
-		, m_smc37c78(*this, "smc37c78")
-		, m_flash(*this, "flash")
-		, m_pcibus(*this, "pcibus")
+		: driver_device(mconfig, type, tag),
+			m_ppc1(*this, "ppc1"),
+			m_ppc2(*this, "ppc2"),
+			m_lsi53c810(*this, "lsi53c810"),
+			m_dma8237_1(*this, "dma8237_1"),
+			m_dma8237_2(*this, "dma8237_2"),
+			m_pic8259_1(*this, "pic8259_1"),
+			m_pic8259_2(*this, "pic8259_2"),
+			m_pit8254(*this, "pit8254"),
+			m_ram(*this, RAM_TAG),
+			m_smc37c78(*this, "smc37c78"),
+			m_flash(*this, "flash"),
+			m_pcibus(*this, "pcibus")
 	{
 	}
 
-	required_device_array<ppc_device, 2> m_ppc;
+	required_device<cpu_device> m_ppc1;
+	required_device<cpu_device> m_ppc2;
 	required_device<lsi53c810_device> m_lsi53c810;
-	required_device_array<am9517a_device, 2> m_dma8237;
-	required_device_array<pic8259_device, 2> m_pic8259;
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
+	required_device<pic8259_device> m_pic8259_1;
+	required_device<pic8259_device> m_pic8259_2;
 	required_device<pit8254_device> m_pit8254;
 	required_device<ram_device> m_ram;
 	required_device<smc37c78_device> m_smc37c78;
@@ -111,22 +113,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	uint32_t scsi_fetch(uint32_t dsp);
-	void scsi_irq_callback(int state);
-	void scsi_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap);
+	LSI53C810_FETCH_CB(scsi_fetch);
+	LSI53C810_IRQ_CB(scsi_irq_callback);
+	LSI53C810_DMA_CB(scsi_dma_callback);
 
 	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
 	void bebox_update_interrupts();
 
 	static void mpc105_config(device_t *device);
-
-	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag);
-	void bebox_peripherals(machine_config &config);
 	void bebox(machine_config &config);
 	void bebox2(machine_config &config);
-
-	void main_mem(address_map &map);
-	void slave_mem(address_map &map);
+	void bebox_mem(address_map &map);
+	void bebox_slave_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

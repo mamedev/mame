@@ -15,6 +15,7 @@
 
   TODO:
   - source organiziation between files is a mess
+  - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
   - wake up after CEND doesn't work right
 
   for more, see the *core.cpp file notes
@@ -49,7 +50,11 @@ void sm510_base_device::device_start()
 	m_read_b.resolve_safe(1);
 	m_write_s.resolve_safe();
 	m_write_r.resolve_safe();
-	m_write_segs.resolve_safe();
+
+	m_write_sega.resolve_safe();
+	m_write_segb.resolve_safe();
+	m_write_segbs.resolve_safe();
+	m_write_segc.resolve_safe();
 
 	// init/zerofill
 	memset(m_stack, 0, sizeof(m_stack));
@@ -194,14 +199,13 @@ void sm510_base_device::lcd_update()
 	for (int h = 0; h < 4; h++)
 	{
 		// 16 segments per row from upper part of RAM
-		m_write_segs(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
-		m_write_segs(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
-		m_write_segs(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
+		m_write_sega(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
+		m_write_segb(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
+		m_write_segc(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
 
 		// bs output from L/X and Y regs
-		u8 blink = (m_div & 0x4000) ? m_y : 0;
-		u8 bs = ((m_l & ~blink) >> h & 1) | ((m_x*2) >> h & 2);
-		m_write_segs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
+		u8 bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
+		m_write_segbs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
 }
 

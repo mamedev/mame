@@ -28,7 +28,7 @@ void vectrex_state::vectrex_map(address_map &map)
 {
 	map(0x0000, 0x7fff).noprw(); // cart area, handled at machine_start
 	map(0xc800, 0xcbff).ram().mirror(0x0400).share("gce_vectorram");
-	map(0xd000, 0xd7ff).rw(FUNC(vectrex_state::vectrex_via_r), FUNC(vectrex_state::vectrex_via_w));
+	map(0xd000, 0xd7ff).rw(this, FUNC(vectrex_state::vectrex_via_r), FUNC(vectrex_state::vectrex_via_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -90,74 +90,72 @@ static INPUT_PORTS_START(vectrex)
 
 INPUT_PORTS_END
 
-void vectrex_base_state::vectrex_cart(device_slot_interface &device)
+static void vectrex_cart(device_slot_interface &device)
 {
 	device.option_add_internal("vec_rom",    VECTREX_ROM_STD);
 	device.option_add_internal("vec_rom64k", VECTREX_ROM_64K);
 	device.option_add_internal("vec_sram",   VECTREX_ROM_SRAM);
 }
 
-void vectrex_base_state::vectrex_base(machine_config &config)
-{
-	MC6809(config, m_maincpu, 6_MHz_XTAL); // 68A09
+MACHINE_CONFIG_START(vectrex_base_state::vectrex_base)
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", MC6809, 6_MHz_XTAL) // 68A09
 
 	/* video hardware */
-	VECTOR(config, m_vector, 0);
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 399, 0, 299);
-	m_screen->set_screen_update(FUNC(vectrex_base_state::screen_update_vectrex));
+	MCFG_VECTOR_ADD("vector")
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 399, 0, 299)
+	MCFG_SCREEN_UPDATE_DRIVER(vectrex_base_state, screen_update_vectrex)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MC1408(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // mc1408.ic301 (also used for vector generation)
-	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref", 0));
-	vreg.set_output(5.0);
-	vreg.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vreg.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic301 (also used for vector generation)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	AY8912(config, m_ay8912, 6_MHz_XTAL / 4);
-	m_ay8912->port_a_read_callback().set_ioport("BUTTONS");
-	m_ay8912->port_a_write_callback().set(FUNC(vectrex_base_state::vectrex_psg_port_w));
-	m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.2);
+	MCFG_DEVICE_ADD("ay8912", AY8912, 6_MHz_XTAL / 4)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, vectrex_base_state, vectrex_psg_port_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
 	/* via */
-	VIA6522(config, m_via6522_0, 6_MHz_XTAL / 4);
-	m_via6522_0->readpa_handler().set(FUNC(vectrex_base_state::vectrex_via_pa_r));
-	m_via6522_0->readpb_handler().set(FUNC(vectrex_base_state::vectrex_via_pb_r));
-	m_via6522_0->writepa_handler().set(FUNC(vectrex_base_state::v_via_pa_w));
-	m_via6522_0->writepb_handler().set(FUNC(vectrex_base_state::v_via_pb_w));
-	m_via6522_0->ca2_handler().set(FUNC(vectrex_base_state::v_via_ca2_w));
-	m_via6522_0->cb2_handler().set(FUNC(vectrex_base_state::v_via_cb2_w));
-	m_via6522_0->irq_handler().set(FUNC(vectrex_base_state::vectrex_via_irq));
-}
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 6_MHz_XTAL / 4)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vectrex_base_state, vectrex_via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, vectrex_base_state, vectrex_via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, vectrex_base_state, v_via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vectrex_base_state, v_via_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, vectrex_base_state, v_via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, vectrex_base_state, v_via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, vectrex_base_state, vectrex_via_irq))
+MACHINE_CONFIG_END
 
-void vectrex_state::vectrex(machine_config &config)
-{
+MACHINE_CONFIG_START(vectrex_state::vectrex)
 	vectrex_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &vectrex_state::vectrex_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(vectrex_map)
 
-	vectrex_cart_slot_device &slot(VECTREX_CART_SLOT(config, "cartslot", 0));
-	vectrex_cart(slot);
+	/* cartridge */
+	MCFG_VECTREX_CARTRIDGE_ADD("cartslot", vectrex_cart, nullptr)
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_type("vectrex", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list","vectrex")
+MACHINE_CONFIG_END
 
 ROM_START(vectrex)
 	ROM_REGION(0x2000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "bios0", "exec rom")
-	ROMX_LOAD("exec_rom.bin", 0x0000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(0) )
+	ROMX_LOAD("exec_rom.bin", 0x0000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "bios1", "exec rom intl 284001-1")
-	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0x0000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(1) )
+	ROMX_LOAD("exec_rom_intl_284001-1.bin", 0x0000, 0x2000, CRC(6d2bd167) SHA1(77a220d5d98846b606dff608f7b5d00183ec3bab), ROM_BIOS(2) )
 
 //  The following fastboots are listed here for reference and documentation
 //  ROM_SYSTEM_BIOS(2, "bios2", "us-fastboot hack")
-//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(2) )
+//  ROMX_LOAD("us-fastboot.bin", 0x0000, 0x2000, CRa6e4dac4) SHA1(e0900be6d6858b985fd7f0999d864b2fceaf01a1), ROM_BIOS(3) )
 //  ROM_SYSTEM_BIOS(3, "bios3", "intl-fastboot hack")
-//  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(3) )
+//  ROMX_LOAD("intl-fastboot.bin", 0x0000, 0x2000, CRC(71dcf0f4) SHA1(2a257c5111f5cee841bd14acaa9df6496aaf3d8b), ROM_BIOS(4) )
 
 ROM_END
 
@@ -201,9 +199,9 @@ void raaspec_state::raaspec_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0xa000, 0xa000).w(FUNC(raaspec_state::raaspec_led_w));
+	map(0xa000, 0xa000).w(this, FUNC(raaspec_state::raaspec_led_w));
 	map(0xc800, 0xcbff).ram().mirror(0x0400).share("gce_vectorram");
-	map(0xd000, 0xd7ff).rw(FUNC(raaspec_state::vectrex_via_r), FUNC(raaspec_state::vectrex_via_w));
+	map(0xd000, 0xd7ff).rw(this, FUNC(raaspec_state::vectrex_via_r), FUNC(raaspec_state::vectrex_via_w));
 	map(0xe000, 0xffff).rom();
 }
 
@@ -226,16 +224,17 @@ static INPUT_PORTS_START(raaspec)
 INPUT_PORTS_END
 
 
-void raaspec_state::raaspec(machine_config &config)
-{
+MACHINE_CONFIG_START(raaspec_state::raaspec)
 	vectrex_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &raaspec_state::raaspec_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(raaspec_map)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	m_via6522_0->readpb_handler().set(FUNC(raaspec_state::vectrex_s1_via_pb_r));
-}
+	/* via */
+	MCFG_DEVICE_MODIFY("via6522_0")
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, raaspec_state, vectrex_s1_via_pb_r))
+MACHINE_CONFIG_END
 
 ROM_START(raaspec)
 	ROM_REGION(0x10000,"maincpu", 0)

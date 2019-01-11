@@ -72,15 +72,12 @@ public:
 		: hec2hrp_state(mconfig, type, tag),
 			m_videoram(*this, "videoram") { }
 
-	void hector1(machine_config &config);
-	void interact(machine_config &config);
-
-private:
-
 	required_shared_ptr<uint8_t> m_videoram;
 	DECLARE_MACHINE_START(interact);
 	DECLARE_MACHINE_RESET(interact);
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hector1(machine_config &config);
+	void interact(machine_config &config);
 	void interact_mem(address_map &map);
 };
 
@@ -93,13 +90,13 @@ void interact_state::interact_mem(address_map &map)
 	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
 	/* Hardware address mapping*/
-/*  AM_RANGE(0x0800,0x0808) AM_WRITE(switch_bank_w)// Bank management not udsed in BR machine*/
-	map(0x1000, 0x1000).w(FUNC(interact_state::color_a_w));  /* Color c0/c1*/
-	map(0x1800, 0x1800).w(FUNC(interact_state::color_b_w));  /* Color c2/c3*/
-	map(0x2000, 0x2003).w(FUNC(interact_state::sn_2000_w));  /* Sound*/
-	map(0x2800, 0x2803).w(FUNC(interact_state::sn_2800_w));  /* Sound*/
-	map(0x3000, 0x3000).rw(FUNC(interact_state::cassette_r), FUNC(interact_state::sn_3000_w));/* Write necessary*/
-	map(0x3800, 0x3807).rw(FUNC(interact_state::keyboard_r), FUNC(interact_state::keyboard_w));  /* Keyboard*/
+/*  AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)// Bank management not udsed in BR machine*/
+	map(0x1000, 0x1000).w(this, FUNC(interact_state::hector_color_a_w));  /* Color c0/c1*/
+	map(0x1800, 0x1800).w(this, FUNC(interact_state::hector_color_b_w));  /* Color c2/c3*/
+	map(0x2000, 0x2003).w(this, FUNC(interact_state::hector_sn_2000_w));  /* Sound*/
+	map(0x2800, 0x2803).w(this, FUNC(interact_state::hector_sn_2800_w));  /* Sound*/
+	map(0x3000, 0x3000).rw(this, FUNC(interact_state::hector_cassette_r), FUNC(interact_state::hector_sn_3000_w));/* Write necessary*/
+	map(0x3800, 0x3807).rw(this, FUNC(interact_state::hector_keyboard_r), FUNC(interact_state::hector_keyboard_w));  /* Keyboard*/
 
 	/* Video br mapping*/
 	map(0x4000, 0x49ff).ram().share("videoram");

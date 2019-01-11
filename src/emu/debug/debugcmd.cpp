@@ -156,11 +156,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("gv",        CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_go_vblank, this, _1, _2));
 	m_console.register_command("gint",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1, _2));
 	m_console.register_command("gi",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_interrupt, this, _1, _2));
-	m_console.register_command("gex",       CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
-	m_console.register_command("ge",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_exception, this, _1, _2));
 	m_console.register_command("gtime",     CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
 	m_console.register_command("gt",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_time, this, _1, _2));
-	m_console.register_command("gp",        CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_go_privilege, this, _1, _2));
 	m_console.register_command("next",      CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
 	m_console.register_command("n",         CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_next, this, _1, _2));
 	m_console.register_command("focus",     CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_commands::execute_focus, this, _1, _2));
@@ -295,7 +292,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* set up the initial debugscript if specified */
 	const char* name = m_machine.options().debug_script();
 	if (name[0] != 0)
-		m_console.source_script(name);
+		m_cpu.source_script(name);
 
 	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
 }
@@ -657,18 +654,6 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					param++;
 					params--;
 					break;
-				case 'C':
-				case 'c':
-					if (params == 0)
-					{
-						m_console.printf("Not enough parameters for format!\n");
-						return 0;
-					}
-					p += sprintf(p, "%c", char(*param));
-					param++;
-					params--;
-					break;
-
 			}
 		}
 
@@ -880,21 +865,6 @@ void debugger_commands::execute_go_interrupt(int ref, const std::vector<std::str
 	m_cpu.get_visible_cpu()->debug()->go_interrupt(irqline);
 }
 
-/*-------------------------------------------------
-    execute_go_exception - execute the goex command
--------------------------------------------------*/
-
-void debugger_commands::execute_go_exception(int ref, const std::vector<std::string> &params)
-{
-	u64 exception = -1;
-
-	/* if we have a parameter, use it instead */
-	if (params.size() > 0 && !validate_number_parameter(params[0], exception))
-		return;
-
-	m_cpu.get_visible_cpu()->debug()->go_exception(exception);
-}
-
 
 /*-------------------------------------------------
     execute_go_time - execute the gtime command
@@ -911,19 +881,6 @@ void debugger_commands::execute_go_time(int ref, const std::vector<std::string> 
 	m_cpu.get_visible_cpu()->debug()->go_milliseconds(milliseconds);
 }
 
-
-
-/*-------------------------------------------------
-    execute_go_privilege - execute the gp command
--------------------------------------------------*/
-void debugger_commands::execute_go_privilege(int ref, const std::vector<std::string> &params)
-{
-	parsed_expression condition(&m_cpu.get_visible_cpu()->debug()->symtable());
-	if (params.size() > 0 && !debug_command_parameter_expression(params[0], condition))
-		return;
-
-	m_cpu.get_visible_cpu()->debug()->go_privilege((condition.is_empty()) ? "1" : condition.original_string());
-}
 
 /*-------------------------------------------------
     execute_next - execute the next command
@@ -1426,7 +1383,7 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 	address_space *space;
 	const char *action = nullptr;
 	u64 address, length;
-	read_or_write type;
+	int type;
 	int wpnum;
 
 	/* CPU is implicit */
@@ -1443,11 +1400,11 @@ void debugger_commands::execute_wpset(int ref, const std::vector<std::string> &p
 
 	/* param 3 is the type */
 	if (params[2] == "r")
-		type = read_or_write::READ;
+		type = WATCHPOINT_READ;
 	else if (params[2] == "w")
-		type = read_or_write::WRITE;
+		type = WATCHPOINT_WRITE;
 	else if (params[2] == "rw" || params[2] == "wr")
-		type = read_or_write::READWRITE;
+		type = WATCHPOINT_READWRITE;
 	else
 	{
 		m_console.printf("Invalid watchpoint type: expected r, w, or rw\n");
@@ -1553,20 +1510,20 @@ void debugger_commands::execute_wplist(int ref, const std::vector<std::string> &
 	/* loop over all CPUs */
 	for (device_t &device : device_iterator(m_machine.root_device()))
 		for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
-			if (!device.debug()->watchpoint_vector(spacenum).empty())
+			if (device.debug()->watchpoint_first(spacenum) != nullptr)
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
 				m_console.printf("Device '%s' %s space watchpoints:\n", device.tag(),
-								 device.debug()->watchpoint_vector(spacenum).front()->space().name());
+																						device.debug()->watchpoint_first(spacenum)->space().name());
 
 				/* loop over the watchpoints */
-				for (const auto &wp : device.debug()->watchpoint_vector(spacenum))
+				for (device_debug::watchpoint *wp = device.debug()->watchpoint_first(spacenum); wp != nullptr; wp = wp->next())
 				{
 					buffer = string_format("%c%4X @ %0*X-%0*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
 							wp->space().addrchars(), wp->address(),
 							wp->space().addrchars(), wp->address() + wp->length() - 1,
-							types[int(wp->type())]);
+							types[wp->type() & 3]);
 					if (std::string(wp->condition()).compare("1") != 0)
 						buffer.append(string_format(" if %s", wp->condition()));
 					if (std::string(wp->action()).compare("") != 0)
@@ -1845,37 +1802,29 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 	case -3:
 		for (offs_t i = offset; i != endoffset; i++)
 		{
-			offs_t curaddr = i;
-			u64 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
-				space->read_qword(curaddr) : space->unmap();
+			u64 data = space->read_qword(i);
 			fwrite(&data, 8, 1, f);
 		}
 		break;
 	case -2:
 		for (offs_t i = offset; i != endoffset; i++)
 		{
-			offs_t curaddr = i;
-			u32 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
-				space->read_dword(curaddr) : space->unmap();
+			u32 data = space->read_dword(i);
 			fwrite(&data, 4, 1, f);
 		}
 		break;
 	case -1:
 		for (offs_t i = offset; i != endoffset; i++)
 		{
-			offs_t curaddr = i;
-			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
-				space->read_word(curaddr) : space->unmap();
-			fwrite(&data, 2, 1, f);
+			u16 byte = space->read_word(i);
+			fwrite(&byte, 2, 1, f);
 		}
 		break;
 	case  0:
 		for (offs_t i = offset; i != endoffset; i++)
 		{
-			offs_t curaddr = i;
-			u8 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
-				space->read_byte(curaddr) : space->unmap();
-			fwrite(&data, 1, 1, f);
+			u8 byte = space->read_byte(i);
+			fwrite(&byte, 1, 1, f);
 		}
 		break;
 	case  3:
@@ -1883,10 +1832,8 @@ void debugger_commands::execute_save(int ref, const std::vector<std::string> &pa
 		endoffset &= ~15;
 		for (offs_t i = offset; i != endoffset; i+=16)
 		{
-			offs_t curaddr = i >> 4;
-			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
-				space->read_word(curaddr) : space->unmap();
-			fwrite(&data, 2, 1, f);
+			u16 byte = space->read_word(i >> 4);
+			fwrite(&byte, 2, 1, f);
 		}
 		break;
 	}
@@ -1945,41 +1892,37 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 	case -3:
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
 		{
-			offs_t curaddr = i;
 			u64 data;
 			f.read((char *)&data, 8);
-			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
-				space->write_qword(curaddr, data);
+			if (f)
+				space->write_qword(i, data);
 		}
 		break;
 	case -2:
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
 		{
-			offs_t curaddr = i;
 			u32 data;
 			f.read((char *)&data, 4);
-			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
-				space->write_dword(curaddr, data);
+			if (f)
+				space->write_dword(i, data);
 		}
 		break;
 	case -1:
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
 		{
-			offs_t curaddr = i;
 			u16 data;
 			f.read((char *)&data, 2);
-			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
-				space->write_word(curaddr, data);
+			if (f)
+				space->write_word(i, data);
 		}
 		break;
 	case  0:
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
 		{
-			offs_t curaddr = i;
 			u8 data;
 			f.read((char *)&data, 1);
-			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
-				space->write_byte(curaddr, data);
+			if (f)
+				space->write_byte(i, data);
 		}
 		break;
 	case  3:
@@ -1987,11 +1930,10 @@ void debugger_commands::execute_load(int ref, const std::vector<std::string> &pa
 		endoffset &= ~15;
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 16); i+=16)
 		{
-			offs_t curaddr = i >> 4;
 			u16 data;
 			f.read((char *)&data, 2);
-			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
-				space->write_word(curaddr, data);
+			if (f)
+				space->write_word(i >> 4, data);
 		}
 		break;
 	}
@@ -3027,6 +2969,9 @@ void debugger_commands::execute_trackmem(int ref, const std::vector<std::string>
 	// Inform the CPU it's time to start tracking memory writes
 	cpu->debug()->set_track_mem(turnOn);
 
+	// Use the watchpoint system to catch memory writes
+	space->enable_write_watchpoints(true);
+
 	// Clear out the existing data if requested
 	if (clear)
 		space->device().debug()->track_mem_data_clear();
@@ -3120,7 +3065,7 @@ void debugger_commands::execute_snap(int ref, const std::vector<std::string> &pa
 
 void debugger_commands::execute_source(int ref, const std::vector<std::string> &params)
 {
-	m_console.source_script(params[0].c_str());
+	m_cpu.source_script(params[0].c_str());
 }
 
 
@@ -3150,7 +3095,7 @@ void debugger_commands::execute_map(int ref, const std::vector<std::string> &par
 		taddress = address & space->addrmask();
 		if (space->device().memory().translate(space->spacenum(), intention, taddress))
 		{
-			std::string mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
+			const char *mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
 					"%7s: %0*X logical == %0*X physical -> %s\n",
 					intnames[intention & 3],
@@ -3181,31 +3126,8 @@ void debugger_commands::execute_memdump(int ref, const std::vector<std::string> 
 	if (file)
 	{
 		memory_interface_iterator iter(m_machine.root_device());
-		for (device_memory_interface &memory : iter) {
-			for (int space = 0; space != memory.max_space_count(); space++)
-				if (memory.has_space(space))
-				{
-					address_space &sp = memory.space(space);
-					bool octal = sp.is_octal();
-					int nc = octal ? (sp.addr_width() + 2) / 3 : (sp.addr_width() + 3) / 4;
-
-					std::vector<memory_entry> entries[2];
-					sp.dump_maps(entries[0], entries[1]);
-					for (int mode = 0; mode < 2; mode ++)
-					{
-						fprintf(file, "  device %s space %s %s:\n", memory.device().tag(), sp.name(), mode ? "write" : "read");
-						for (memory_entry &entry : entries[mode])
-						{
-							if (octal)
-								fprintf(file, "%0*o - %0*o", nc, entry.start, nc, entry.end);
-							else
-								fprintf(file, "%0*x - %0*x", nc, entry.start, nc, entry.end);
-							fprintf(file, ": %s\n", entry.entry->name().c_str());
-						}
-						fprintf(file, "\n");
-					}
-				}
-		}
+		for (device_memory_interface &memory : iter)
+			memory.dump(file);
 		fclose(file);
 	}
 }

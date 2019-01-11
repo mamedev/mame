@@ -786,7 +786,7 @@ WRITE8_MEMBER(at_keyboard_device::write)
 				/* bits: 0 scroll lock, 1 num lock, 2 capslock */
 
 				/* led's in same order as my keyboard leds. */
-				/* num lock, caps lock, scroll lock */
+				/* num lock, caps lock, scroll lock */				
 				m_leds[2] = BIT(data, 0);
 				m_leds[0] = BIT(data, 1);
 				m_leds[1] = BIT(data, 2);

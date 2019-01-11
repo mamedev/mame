@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, hap, AJR
+// copyright-holders:Angelo Salese, hap
 /***************************************************************************
 
 prelim notes:
@@ -14,6 +14,7 @@ ram: 2*8KB, 4*2KB
 rom: see romdefs
 
 TODO:
+- flipscreen
 - remaining gfx/color issues
 - measure clocks
 
@@ -77,74 +78,66 @@ ________________________|___________________________
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    16_MHz_XTAL
-#define VIDEO_CLOCK     6_MHz_XTAL
+#define MASTER_CLOCK    XTAL(16'000'000)
+#define VIDEO_CLOCK     XTAL(6'000'000)
 
 
 class flipjack_state : public driver_device
 {
 public:
-	flipjack_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	flipjack_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_prgbank(*this, "prgbank"),
+		m_crtc(*this, "crtc"),
 		m_fbram(*this, "fb_ram"),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
-		m_tiles(*this, "tiles"),
-		m_playfield(*this, "playfield"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{
+		m_soundlatch = 0;
+		m_bank = 0;
+		m_layer = 0;
 	}
 
-	void flipjack(machine_config &config);
-
-	DECLARE_WRITE_LINE_MEMBER(coin_nmi_w);
-
-protected:
-	virtual void machine_start() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<hd6845_device> m_crtc;
 
-	required_memory_bank m_prgbank;
 	required_shared_ptr<uint8_t> m_fbram;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
-	required_region_ptr<uint8_t> m_tiles;
-	required_region_ptr<uint8_t> m_playfield;
 
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 
-	uint8_t m_bank = 0;
-	uint8_t m_layer = 0;
+	uint8_t m_soundlatch;
+	uint8_t m_bank;
+	uint8_t m_layer;
 
-	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(layer_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	void flipjack_palette(palette_device &palette) const;
-	MC6845_UPDATE_ROW(update_row);
-
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	DECLARE_WRITE8_MEMBER(flipjack_sound_nmi_ack_w);
+	DECLARE_WRITE8_MEMBER(flipjack_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(flipjack_bank_w);
+	DECLARE_WRITE8_MEMBER(flipjack_layer_w);
+	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
+	DECLARE_READ8_MEMBER(flipjack_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(flipjack_portc_w);
+	virtual void machine_start() override;
+	DECLARE_PALETTE_INIT(flipjack);
+	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void flipjack(machine_config &config);
+	void flipjack_main_io_map(address_map &map);
+	void flipjack_main_map(address_map &map);
+	void flipjack_sound_io_map(address_map &map);
+	void flipjack_sound_map(address_map &map);
 };
 
 
@@ -154,10 +147,10 @@ private:
 
 ***************************************************************************/
 
-void flipjack_state::flipjack_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(flipjack_state, flipjack)
 {
-	// from PROM
-	uint8_t const *const color_prom = memregion("proms")->base();
+	// from prom
+	const uint8_t *color_prom = memregion("proms")->base();
 	for (int i = 0; i < 0x40; i++)
 	{
 		palette.set_pen_color(2*i+1, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
@@ -170,67 +163,90 @@ void flipjack_state::flipjack_palette(palette_device &palette) const
 }
 
 
-MC6845_UPDATE_ROW(flipjack_state::update_row)
+uint32_t flipjack_state::screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const bool flip = !BIT(m_layer, 0);
-	const uint16_t row_base = ((ma & 0x03e0) << 3 | (ra & 7) << 5) ^ (flip ? 0x1fff : 0);
-	uint32_t *const pbegin = &bitmap.pix32(y);
-	uint32_t *const pend = &bitmap.pix32(y, x_count * 8);
+	int x,y,count;
 
-	std::fill(pbegin, pend, rgb_t::black());
+	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	// draw playfield
-	if (BIT(m_layer, 1))
+	if (m_layer & 2)
 	{
-		uint16_t a1 = row_base;
-		for (uint32_t *p = pbegin; p < pend; a1 = (flip ? a1 - 1 : a1 + 1) & 0x1fff)
-		{
-			uint8_t pen_r = (m_playfield[a1] & 0xff)>>0;
-			uint8_t pen_g = (m_playfield[a1 + 0x2000] & 0xff)>>0;
-			uint8_t pen_b = (m_playfield[a1 + 0x4000] & 0xff)>>0;
+		const uint8_t *blit_data = memregion("gfx2")->base();
 
-			for (int xi = 0; xi < 8; xi++, p++)
+		count = 0;
+
+		for(y=0;y<192;y++)
+		{
+			for(x=0;x<256;x+=8)
 			{
-				int xxi = flip ? xi : 7 - xi;
-				int color = BIT(pen_r, xxi) << 0;
-				color |= BIT(pen_g, xxi) << 1;
-				color |= BIT(pen_b, xxi) << 2;
-				*p = m_palette->pen(color+0x80);
+				uint32_t pen_r,pen_g,pen_b,color;
+				int xi;
+
+				pen_r = (blit_data[count] & 0xff)>>0;
+				pen_g = (blit_data[count+0x2000] & 0xff)>>0;
+				pen_b = (blit_data[count+0x4000] & 0xff)>>0;
+
+				for(xi=0;xi<8;xi++)
+				{
+					if(cliprect.contains(x+xi, y))
+					{
+						color = ((pen_r >> (7-xi)) & 1)<<0;
+						color|= ((pen_g >> (7-xi)) & 1)<<1;
+						color|= ((pen_b >> (7-xi)) & 1)<<2;
+						bitmap.pix32(y, x+xi) = m_palette->pen(color+0x80);
+					}
+				}
+
+				count++;
 			}
 		}
 	}
 
 	// draw tiles
-	uint16_t a2 = row_base & 0x1f1f;
-	const uint8_t *const tile_data = &m_tiles[((m_bank & 3) << 11) | ((flip ? ~ra : ra) & 7)];
-	for (uint32_t *p = pbegin; p < pend; a2 = (flip ? a2 - 1 : a2 + 1) & 0x1f1f)
+	for (y=0;y<32;y++)
 	{
-		uint8_t tile = tile_data[m_vram[a2] << 3];
-		rgb_t color = m_palette->pen((m_cram[a2] & 0x3f) * 2 + 1);
-
-		for (int xi = 0; xi < 8; xi++, p++)
+		for (x=0;x<32;x++)
 		{
-			int xxi = flip ? xi : 7 - xi;
-			if (BIT(tile, xxi))
-				*p = color;
+			gfx_element *gfx = m_gfxdecode->gfx(0);
+			int tile = m_bank << 8 | m_vram[x+y*0x100];
+			int color = m_cram[x+y*0x100] & 0x3f;
+
+				gfx->transpen(bitmap,cliprect, tile, color, 0, 0, x*8, y*8, 0);
 		}
 	}
 
 	// draw framebuffer
-	if (BIT(m_layer, 2))
+	if (m_layer & 4)
 	{
-		uint16_t a3 = row_base;
-		for (uint32_t *p = pbegin; p < pend; a3 = (flip ? a3 - 1 : a3 + 1) & 0x1fff)
+		count = 0;
+
+		for(y=0;y<192;y++)
 		{
-			uint8_t pen = m_fbram[a3];
-			for (int xi = 0; xi < 8; xi++, p++)
+			for(x=0;x<256;x+=8)
 			{
-				int xxi = flip ? xi : 7 - xi;
-				if (BIT(pen, xxi))
-					*p = rgb_t::white();
+				uint32_t pen,color;
+				int xi;
+
+				pen = (m_fbram[count] & 0xff)>>0;
+
+				for(xi=0;xi<8;xi++)
+				{
+					if(cliprect.contains(x+xi, y))
+					{
+						color = ((pen >> (7-xi)) & 1) ? 0x87 : 0;
+						if(color)
+							bitmap.pix32(y, x+xi) = m_palette->pen(color);
+					}
+				}
+
+				count++;
 			}
 		}
 	}
+
+
+	return 0;
 }
 
 
@@ -240,17 +256,17 @@ MC6845_UPDATE_ROW(flipjack_state::update_row)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(flipjack_state::bank_w)
+WRITE8_MEMBER(flipjack_state::flipjack_bank_w)
 {
 	// d0-d1: tile bank
 	// d2: prg bank
 	// d4: ?
 	// other bits: unused?
 	m_bank = data;
-	m_prgbank->set_entry(BIT(data, 2));
+	membank("bank1")->set_entry(data >> 2 & 1);
 }
 
-WRITE8_MEMBER(flipjack_state::layer_w)
+WRITE8_MEMBER(flipjack_state::flipjack_layer_w)
 {
 	// d0: flip screen
 	// d1: enable playfield layer
@@ -260,55 +276,60 @@ WRITE8_MEMBER(flipjack_state::layer_w)
 	m_layer = data;
 }
 
-WRITE8_MEMBER(flipjack_state::soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	if (BIT(data, 7))
-		m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-WRITE8_MEMBER(flipjack_state::sound_nmi_ack_w)
+READ8_MEMBER(flipjack_state::flipjack_soundlatch_r)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return m_soundlatch;
+}
+
+WRITE8_MEMBER(flipjack_state::flipjack_soundlatch_w)
+{
+	m_soundlatch = data;
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(flipjack_state::flipjack_sound_nmi_ack_w)
+{
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(flipjack_state::portc_w)
+WRITE8_MEMBER(flipjack_state::flipjack_portc_w)
 {
-	// vestigial hopper output?
+	// watchdog?
 }
 
-WRITE_LINE_MEMBER(flipjack_state::coin_nmi_w)
+INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? CLEAR_LINE : ASSERT_LINE);
+	if (newval)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-void flipjack_state::main_map(address_map &map)
+void flipjack_state::flipjack_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x3fff).bankr("prgbank");
+	map(0x2000, 0x3fff).bankr("bank1");
 	map(0x4000, 0x5fff).ram();
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x7000, 0x7000).w(FUNC(flipjack_state::soundlatch_w));
-	map(0x7010, 0x7010).w("crtc", FUNC(hd6845_device::address_w));
-	map(0x7011, 0x7011).w("crtc", FUNC(hd6845_device::register_w));
+	map(0x7000, 0x7000).w(this, FUNC(flipjack_state::flipjack_soundlatch_w));
+	map(0x7010, 0x7010).w(m_crtc, FUNC(hd6845_device::address_w));
+	map(0x7011, 0x7011).w(m_crtc, FUNC(hd6845_device::register_w));
 	map(0x7020, 0x7020).portr("DSW");
-	map(0x7800, 0x7800).w(FUNC(flipjack_state::layer_w));
+	map(0x7800, 0x7800).w(this, FUNC(flipjack_state::flipjack_layer_w));
 	map(0x8000, 0x9fff).rom();
 	map(0xa000, 0xbfff).ram().share("cram");
 	map(0xc000, 0xdfff).ram().share("vram");
 	map(0xe000, 0xffff).ram().share("fb_ram");
 }
 
-void flipjack_state::main_io_map(address_map &map)
+void flipjack_state::flipjack_main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xff, 0xff).w(FUNC(flipjack_state::bank_w));
+	map(0xff, 0xff).w(this, FUNC(flipjack_state::flipjack_bank_w));
 }
 
-void flipjack_state::sound_map(address_map &map)
+void flipjack_state::flipjack_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x27ff).ram();
@@ -318,10 +339,10 @@ void flipjack_state::sound_map(address_map &map)
 	map(0xa000, 0xa000).w("ay1", FUNC(ay8910_device::address_w));
 }
 
-void flipjack_state::sound_io_map(address_map &map)
+void flipjack_state::flipjack_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(flipjack_state::sound_nmi_ack_w));
+	map(0x00, 0x00).w(this, FUNC(flipjack_state::flipjack_sound_nmi_ack_w));
 }
 
 
@@ -333,7 +354,7 @@ void flipjack_state::sound_io_map(address_map &map)
 
 static INPUT_PORTS_START( flipjack )
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, flipjack_state, coin_nmi_w) // not mapped in P1/P2/P3?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, flipjack_state, flipjack_coin, 0) // where in P1/P2/P3 is it mapped?
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Shoot")
@@ -356,8 +377,10 @@ static INPUT_PORTS_START( flipjack )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // read only by unused routine?
-	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // output
 
 	PORT_START("DSW")
@@ -382,6 +405,7 @@ static INPUT_PORTS_START( flipjack )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )        PORT_DIPLOCATION("A0:8")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
+
 INPUT_PORTS_END
 
 
@@ -397,13 +421,13 @@ static const gfx_layout tilelayout =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
 
 static GFXDECODE_START( gfx_flipjack )
-	GFXDECODE_ENTRY( "tiles", 0, tilelayout, 0, 64 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 64 )
 GFXDECODE_END
 
 
@@ -411,9 +435,10 @@ GFXDECODE_END
 void flipjack_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	m_prgbank->configure_entries(0, 2, &ROM[0x10000], 0x2000);
-	m_prgbank->set_entry(0);
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
+	membank("bank1")->set_entry(0);
 
+	save_item(NAME(m_soundlatch));
 	save_item(NAME(m_bank));
 	save_item(NAME(m_layer));
 }
@@ -422,46 +447,45 @@ void flipjack_state::machine_start()
 MACHINE_CONFIG_START(flipjack_state::flipjack)
 
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &flipjack_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &flipjack_state::main_io_map);
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(flipjack_main_map)
+	MCFG_DEVICE_IO_MAP(flipjack_main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flipjack_state,  irq0_line_hold)
 
-	Z80(config, m_audiocpu, MASTER_CLOCK/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &flipjack_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &flipjack_state::sound_io_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(flipjack_sound_map)
+	MCFG_DEVICE_IO_MAP(flipjack_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
 
-	i8255_device &ppi(I8255A(config, "ppi8255"));
-	ppi.in_pa_callback().set_ioport("P1");
-	ppi.in_pb_callback().set_ioport("P2");
-	ppi.in_pc_callback().set_ioport("P3");
-	ppi.out_pc_callback().set(FUNC(flipjack_state::portc_w));
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("P3"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, flipjack_state, flipjack_portc_w))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0); // from crtc
-	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 0x188, 0, 0x100, 0x100, 0, 0xc0) // from crtc
+	MCFG_SCREEN_UPDATE_DRIVER(flipjack_state, screen_update_flipjack)
 
-	hd6845_device &crtc(HD6845(config, "crtc", VIDEO_CLOCK/8));
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.out_vsync_callback().set_inputline("maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
-	crtc.out_vsync_callback().append_inputline("audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
-	crtc.set_update_row_callback(FUNC(flipjack_state::update_row), this);
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", VIDEO_CLOCK/8)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_flipjack);
-	PALETTE(config, m_palette, FUNC(flipjack_state::flipjack_palette), 128+8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_flipjack)
+
+	MCFG_PALETTE_ADD("palette", 128+8)
+	MCFG_PALETTE_INIT_OWNER(flipjack_state, flipjack)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, flipjack_state, flipjack_soundlatch_r))  /* Port A read */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	ay8910_device &ay1(AY8910(config, "ay1", MASTER_CLOCK/8));
-	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	AY8910(config, "ay2", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -475,10 +499,10 @@ ROM_START( flipjack )
 	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "s.s5",  0x0000, 0x2000, CRC(34515a7b) SHA1(affe34198b77bddd314fae2851fd6a29d80f734e) )
 
-	ROM_REGION( 0x2000, "tiles", 0 )
+	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "cg.l6", 0x0000, 0x2000, CRC(8d87f6b9) SHA1(55ca726f190eac9ee7e26b8f4e519f1634bec0dd) )
 
-	ROM_REGION( 0x6000, "playfield", 0 )
+	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "b.h6",  0x0000, 0x2000, CRC(bbc8fdcc) SHA1(93758ca13cc49b87508f01c86c652155945dd484) )
 	ROM_LOAD( "r.f6",  0x2000, 0x2000, CRC(8c02fe71) SHA1(148e7382dc9b7678c447ada5ad19e03a3a051a7f) )
 	ROM_LOAD( "g.d6",  0x4000, 0x2000, CRC(8624d07f) SHA1(fb51c9c785d56854a6530b71868e95ad6be7cbee) )
@@ -488,4 +512,4 @@ ROM_START( flipjack )
 ROM_END
 
 
-GAME( 1983?, flipjack, 0, flipjack, flipjack, flipjack_state, empty_init, ROT270, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983
+GAME( 1983?, flipjack, 0, flipjack, flipjack, flipjack_state, empty_init, ROT90, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983

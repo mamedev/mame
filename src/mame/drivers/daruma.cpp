@@ -29,15 +29,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker") { }
 
-	void daruma(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(dev0_r);
 	DECLARE_WRITE8_MEMBER(dev1_w);
 	DECLARE_WRITE8_MEMBER(dev2_w);
 	DECLARE_READ8_MEMBER(dev4_r);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	void daruma(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
 };
@@ -92,11 +90,11 @@ void daruma_state::mem_prg(address_map &map)
 
 void daruma_state::mem_io(address_map &map)
 {
-	map(0x0000, 0x0000).r(FUNC(daruma_state::dev0_r));
-	map(0x1000, 0x1000).w(FUNC(daruma_state::dev1_w));
+	map(0x0000, 0x0000).r(this, FUNC(daruma_state::dev0_r));
+	map(0x1000, 0x1000).w(this, FUNC(daruma_state::dev1_w));
 //    AM_RANGE(0x2000, 0x2000) AM_WRITE(dev2_w)
 //    AM_RANGE(0x3000, 0x3000) AM_WRITE(dev3_w)
-	map(0x4000, 0x4000).r(FUNC(daruma_state::dev4_r));
+	map(0x4000, 0x4000).r(this, FUNC(daruma_state::dev4_r));
 	map(0x8000, 0xffff).ram(); /* 32K CMOS SRAM (HYUNDAY hy62256a) */
 }
 
@@ -131,7 +129,7 @@ MACHINE_CONFIG_START(daruma_state::daruma)
 	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
 /*  TODO:
-    config.set_default_layout(layout_daruma);
+    MCFG_DEFAULT_LAYOUT(layout_daruma)
 
     Motors: MTA011
     http://pdf.datasheetcatalog.com/datasheet/Shindengen/mXstzvq.pdf

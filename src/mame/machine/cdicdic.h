@@ -26,11 +26,18 @@ TODO:
 
 #pragma once
 
-#include "imagedev/chd_cd.h"
-#include "machine/cdi070.h"
-#include "sound/cdda.h"
-#include "sound/dmadac.h"
 #include "cdrom.h"
+#include "sound/cdda.h"
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CDICDIC_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MACHINE_CDICDIC, 0)
+#define MCFG_CDICDIC_REPLACE(_tag) \
+	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDICDIC, 0)
 
 
 //**************************************************************************
@@ -65,12 +72,6 @@ protected:
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device_array<dmadac_sound_device, 2> m_dmadac;
-	required_device<cdi68070_device> m_scc;
-	required_device<cdda_device> m_cdda;
-	optional_device<cdrom_image_device> m_cdrom_dev;
-
 	// internal state
 	uint16_t m_command;           // CDIC Command Register            (0x303c00)
 	uint32_t m_time;              // CDIC Time Register               (0x303c02)
@@ -114,6 +115,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(CDI_CDIC, cdicdic_device)
+DECLARE_DEVICE_TYPE(MACHINE_CDICDIC, cdicdic_device)
 
 #endif // MAME_MACHINE_CDICDIC_H

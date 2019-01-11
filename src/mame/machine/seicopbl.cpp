@@ -69,13 +69,13 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_host_space->write_word((m_reg[6] + offs + 4), ((m_host_space->read_word(m_reg[5] + offs + 4) + dir_offset) / div));
 			break;
 		}
-
+		
 		/*
-		    read32 10(r0)
-		    add32 4(r0)
-		    addmem32 4(r0)
-		    addmem16 1c(r0)
-		    write16h 1c(r0)
+			read32 10(r0)
+			add32 4(r0)
+			addmem32 4(r0)
+			addmem16 1c(r0)
+			write16h 1c(r0)
 		*/
 		// 0x0204 variant used from time to time (goal post collision)
 		case 0x0204:
@@ -89,51 +89,51 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_host_space->write_word(m_reg[0] + 0x1c + offs, m_host_space->read_word(m_reg[0] + 0x1c + offs) + delta);
 			break;
 		}
-
+		
 		// jumping is done with this
 		case 0x0905:
 		{
 			//printf("%08x %08x\n",m_reg[0],offs);
-
+			
 			int val = m_host_space->read_dword(m_reg[0] + 16 + offs);
 			int delta = m_host_space->read_dword(m_reg[0] + 0x28 + offs);
-
+		
 			//printf("%08x + %08x = ",val,delta);
 			val += delta;
 			//printf("%08x\n",val);
-
+			
 			m_host_space->write_dword(m_reg[0] + 16 + offs, val);
 
 			break;
 		}
-
+		
 		/*
-		    0x138e
-		    write16h 8(r0)
-		    sub32 8(r1)
-		    ? 4(r0)
-		    sub32 4(r1)
-		    ? 36(r0)
-		    addmem16 34(r0)
-		    addmem16 34(r0)
-		    sub32 34(r0)
-		    0xe38e
-		    write16h 8(r0)
-		    sub32 8(r2)
-		    ? 4(r0)
-		    sub32 4(r2)
-		    ? 36(r0)
-		    addmem16 34(r0)
-		    addmem16 34(r0)
-		    sub32 34(r0)
+			0x138e
+			write16h 8(r0)
+			sub32 8(r1)
+			? 4(r0)
+			sub32 4(r1)
+			? 36(r0)
+			addmem16 34(r0)
+			addmem16 34(r0)
+			sub32 34(r0)
+			0xe38e
+			write16h 8(r0)
+			sub32 8(r2)
+			? 4(r0)
+			sub32 4(r2)
+			? 36(r0)
+			addmem16 34(r0)
+			addmem16 34(r0)
+			sub32 34(r0)
 
 		*/
 		// normal tackle
-		case 0x118e:
+		case 0x118e: 
 		case 0x130e:
 		case 0x138e:
 		// tackling ball hit?
-		case 0x330e:
+		case 0x330e: 
 		case 0xe30e:
 		case 0xe18e:
 		{
@@ -142,7 +142,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			int sx = (m_host_space->read_dword(m_reg[0]+8) >> 16);
 			int dy = (m_host_space->read_dword(m_reg[target_reg]+4) >> 16);
 			int dx = (m_host_space->read_dword(m_reg[target_reg]+8) >> 16);
-
+			
 			#if 0
 			if(data == 0xe30e)
 			{
@@ -152,7 +152,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			#endif
 			dy -= sy;
 			dx -= sx;
-
+		
 			#if 0
 			if(data == 0xe30e)
 			{
@@ -162,25 +162,25 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			#endif
 
 			//m_status = 7;
-			if(!dx)
+			if(!dx) 
 			{
 				m_status = 0x8000;
 				m_angle = 0;
-			}
+			} 
 			else
 			{
 				m_status = 0;
 
 				m_angle =  atan(double(dy)/double(dx)) * 128.0 / M_PI;
-
+				
 				//printf("%f\n",atan(double(dy)/double(dx)));
-
+				
 				if(dx<0)
 				{
 					m_angle += 0x80;
 				}
 			}
-
+			
 			m_dy = dy;
 			m_dx = dx;
 
@@ -190,7 +190,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			{
 				return;
 			}
-
+			
 			if(data & 0x80)
 				m_host_space->write_byte(m_reg[0]+(0x37), m_angle & 0xff);
 
@@ -213,7 +213,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 		case 0x42c2:
 		{
 			int div = m_host_space->read_word(m_reg[0] + (0x34));
-
+			
 			if (!div)
 			{
 				m_status |= 0x8000;
@@ -229,11 +229,11 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 
 		// shoot/pass is done with this
 		/*
-		    0x5105
-		    sub32 (r0)
-		    write16h 8(r0)
-		    addmem32 4(r0)
-		    outputs to 0x046/0x047 (d104_move_offset ?)
+			0x5105
+			sub32 (r0)
+			write16h 8(r0)
+			addmem32 4(r0)
+			outputs to 0x046/0x047 (d104_move_offset ?)
 		*/
 		case 0x5105:
 		{
@@ -243,10 +243,10 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			break;
 		}
 		/*
-		    0x5905
-		    write16h 10(r2)
-		    sub32 8(r0)
-		    addmem32 4(r1)
+			0x5905
+			write16h 10(r2)
+			sub32 8(r0)
+			addmem32 4(r1)
 		*/
 		case 0x5905:
 		{
@@ -255,7 +255,7 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 			m_host_space->write_dword(m_reg[1] + 4 + offs,val);
 			break;
 		}
-
+		
 		/*
 		    00000-0ffff:
 		    amp = x/256
@@ -308,10 +308,10 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 		}
 
 		/*
-		    sub32 4(r2)
-		    write16h (r3)
-		    addmem32 4(r1)
-		    outputs to 0x046/0x047 (d104_move_offset ?)
+			sub32 4(r2)
+			write16h (r3)
+			addmem32 4(r1)
+			outputs to 0x046/0x047 (d104_move_offset ?)
 		*/
 		case 0xd104:
 		{
@@ -384,30 +384,29 @@ void seibu_cop_bootleg_device::seibucopbl_map(address_map &map)
 {
 	map(0x01e, 0x01f).ram(); // angle step, PC=0xc0186
 	map(0x028, 0x02b).ram(); // DMA fill latches
-	map(0x02c, 0x02d).rw(FUNC(seibu_cop_bootleg_device::prng_max_r), FUNC(seibu_cop_bootleg_device::prng_max_w));
+	map(0x02c, 0x02d).rw(this, FUNC(seibu_cop_bootleg_device::prng_max_r), FUNC(seibu_cop_bootleg_device::prng_max_w));
 	map(0x040, 0x043).ram(); // n/a
-	map(0x044, 0x045).rw(FUNC(seibu_cop_bootleg_device::scale_r), FUNC(seibu_cop_bootleg_device::scale_w));
-	map(0x046, 0x049).rw(FUNC(seibu_cop_bootleg_device::d104_move_r), FUNC(seibu_cop_bootleg_device::d104_move_w));
+	map(0x044, 0x045).rw(this, FUNC(seibu_cop_bootleg_device::scale_r), FUNC(seibu_cop_bootleg_device::scale_w));
+	map(0x046, 0x049).rw(this, FUNC(seibu_cop_bootleg_device::d104_move_r), FUNC(seibu_cop_bootleg_device::d104_move_w));
 	map(0x04a, 0x04f).ram(); // n/a
 	map(0x050, 0x05f).ram(); // n/a
 	map(0x070, 0x07f).ram(); // DMA registers, PC=0xc0034
 
-	map(0x0a0, 0x0af).rw(FUNC(seibu_cop_bootleg_device::reg_hi_addr_r), FUNC(seibu_cop_bootleg_device::reg_hi_addr_w));
+	map(0x0a0, 0x0af).rw(this, FUNC(seibu_cop_bootleg_device::reg_hi_addr_r), FUNC(seibu_cop_bootleg_device::reg_hi_addr_w));
 	map(0x0b0, 0x0b3).ram(); // unknown, not in original COP
-	map(0x0c0, 0x0cf).rw(FUNC(seibu_cop_bootleg_device::reg_lo_addr_r), FUNC(seibu_cop_bootleg_device::reg_lo_addr_w));
+	map(0x0c0, 0x0cf).rw(this, FUNC(seibu_cop_bootleg_device::reg_lo_addr_r), FUNC(seibu_cop_bootleg_device::reg_lo_addr_w));
 
-	map(0x100, 0x105).w(FUNC(seibu_cop_bootleg_device::cmd_trigger_w));
-	map(0x1a0, 0x1a7).r(FUNC(seibu_cop_bootleg_device::prng_r));
-	map(0x1b0, 0x1b1).r(FUNC(seibu_cop_bootleg_device::status_r));
-	map(0x1b2, 0x1b3).r(FUNC(seibu_cop_bootleg_device::dist_r));
-	map(0x1b4, 0x1b5).r(FUNC(seibu_cop_bootleg_device::angle_r));
+	map(0x100, 0x105).w(this, FUNC(seibu_cop_bootleg_device::cmd_trigger_w));
+	map(0x1a0, 0x1a7).r(this, FUNC(seibu_cop_bootleg_device::prng_r));
+	map(0x1b0, 0x1b1).r(this, FUNC(seibu_cop_bootleg_device::status_r));
+	map(0x1b2, 0x1b3).r(this, FUNC(seibu_cop_bootleg_device::dist_r));
+	map(0x1b4, 0x1b5).r(this, FUNC(seibu_cop_bootleg_device::angle_r));
 }
 
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	m_host_cpu(*this, finder_base::DUMMY_TAG),
-	m_space_config("regs", ENDIANNESS_BIG, 16, 9, 0, address_map_constructor(), address_map_constructor(FUNC(seibu_cop_bootleg_device::seibucopbl_map), this))
+		device_memory_interface(mconfig, *this),
+		m_space_config("regs", ENDIANNESS_BIG, 16, 9, 0, address_map_constructor(), address_map_constructor(FUNC(seibu_cop_bootleg_device::seibucopbl_map), this))
 {
 }
 
@@ -436,6 +435,7 @@ void seibu_cop_bootleg_device::device_start()
 
 void seibu_cop_bootleg_device::device_reset()
 {
+	m_host_cpu = machine().device<cpu_device>("maincpu");
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 }
 

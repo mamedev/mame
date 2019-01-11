@@ -26,7 +26,7 @@ ROM_START( kempston_disk_system )
 	ROM_REGION( 0x2000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v114")
 	ROM_SYSTEM_BIOS( 0, "v114", "v1.14" )
-	ROMX_LOAD( "kempston_disk_system_v1.14_1984.rom", 0x0000, 0x2000, CRC(0b70ad2e) SHA1(ff8158d25864d920f3f6df259167e91c2784692c), ROM_BIOS(0) )
+	ROMX_LOAD( "kempston_disk_system_v1.14_1984.rom", 0x0000, 0x2000, CRC(0b70ad2e) SHA1(ff8158d25864d920f3f6df259167e91c2784692c), ROM_BIOS(1) )
 ROM_END
 
 

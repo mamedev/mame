@@ -369,8 +369,8 @@ void dmg_ppu_device::common_start()
 
 	m_program_space = &m_lr35902->space(AS_PROGRAM);
 
-	save_pointer(NAME(m_oam), m_oam_size);
-	save_pointer(NAME(m_vram), m_vram_size);
+	save_pointer(NAME(m_oam.get()), m_oam_size);
+	save_pointer(NAME(m_vram.get()), m_vram_size);
 	save_item(NAME(m_window_lines_drawn));
 	save_item(NAME(m_vid_regs));
 	save_item(NAME(m_bg_zbuf));
@@ -515,7 +515,7 @@ void sgb_ppu_device::device_start()
 	common_start();
 
 	m_sgb_tile_data = make_unique_clear<uint8_t[]>(0x2000);
-	save_pointer(NAME(m_sgb_tile_data), 0x2000);
+	save_pointer(NAME(m_sgb_tile_data.get()), 0x2000);
 
 	memset(m_sgb_tile_map, 0, sizeof(m_sgb_tile_map));
 

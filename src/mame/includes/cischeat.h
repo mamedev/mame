@@ -1,11 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_CISCHEAT_H
-#define MAME_INCLUDES_CISCHEAT_H
 
-#pragma once
-
-// TODO: better inheritance, eventually split individual driver files
+/* TODO: some variables are per-game specifics */
 
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
@@ -13,7 +9,6 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/ms1_tmap.h"
-#include "emupal.h"
 #include "screen.h"
 
 class cischeat_state : public driver_device
@@ -44,7 +39,7 @@ public:
 		, m_captflag_motor_right(*this, "motor_right")
 		, m_oki1_bank(*this, "oki1_bank")
 		, m_oki2_bank(*this, "oki2_bank")
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{
 		for (int side = 0; side < 2; ++side)
 			m_captflag_motor_command[side] = m_captflag_motor_pos[side] = 0;
@@ -87,7 +82,6 @@ public:
 	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_1_w);
 	DECLARE_WRITE16_MEMBER(cischeat_soundbank_2_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	void init_cischeat();
 	void init_bigrun();
 	void init_f1gpstar();
@@ -123,6 +117,7 @@ public:
 	void f1gpstar(machine_config &config);
 	void captflag(machine_config &config);
 	void bigrun(machine_config &config);
+	void wildplt(machine_config &config);
 	void armchmp2_map(address_map &map);
 	void bigrun_map(address_map &map);
 	void bigrun_map2(address_map &map);
@@ -143,9 +138,10 @@ public:
 	void f1gpstr2_map(address_map &map);
 	void f1gpstr2_sound_map(address_map &map);
 	void scudhamm_map(address_map &map);
+	void wildplt_map(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_start() override { m_led.resolve(); }
 	virtual void video_start() override;
 
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
@@ -196,26 +192,5 @@ protected:
 	optional_memory_bank m_oki2_bank;
 
 	uint16_t m_captflag_leds;
-	output_finder<5> m_leds;
+	output_finder<5> m_led;
 };
-
-class wildplt_state : public cischeat_state
-{
-public:
-	wildplt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cischeat_state(mconfig, type, tag)
-	{}
-
-	uint16_t *m_buffer_spriteram;
-	void wildplt_map(address_map &map);
-	void wildplt(machine_config &config);
-	DECLARE_WRITE16_MEMBER(sprite_dma_w);
-
-protected:
-	virtual void video_start() override;
-
-private:
-	uint16_t m_sprite_dma_reg;
-};
-
-#endif

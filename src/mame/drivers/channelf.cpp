@@ -16,10 +16,15 @@
 
 #include "emu.h"
 #include "includes/channelf.h"
-
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+
+#ifndef VERBOSE
+#define VERBOSE 0
+#endif
+
+#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 #define MASTER_CLOCK_PAL    2000000  /* PAL unit has a separate crystal at 4.000 MHz */
 #define PAL_VBLANK_TIME     4623
@@ -122,10 +127,10 @@ void channelf_state::channelf_map(address_map &map)
 
 void channelf_state::channelf_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(channelf_state::port_0_r), FUNC(channelf_state::port_0_w)); /* Front panel switches */
-	map(0x01, 0x01).rw(FUNC(channelf_state::port_1_r), FUNC(channelf_state::port_1_w)); /* Right controller     */
-	map(0x04, 0x04).rw(FUNC(channelf_state::port_4_r), FUNC(channelf_state::port_4_w)); /* Left controller      */
-	map(0x05, 0x05).rw(FUNC(channelf_state::port_5_r), FUNC(channelf_state::port_5_w));
+	map(0x00, 0x00).rw(this, FUNC(channelf_state::port_0_r), FUNC(channelf_state::port_0_w)); /* Front panel switches */
+	map(0x01, 0x01).rw(this, FUNC(channelf_state::port_1_r), FUNC(channelf_state::port_1_w)); /* Right controller     */
+	map(0x04, 0x04).rw(this, FUNC(channelf_state::port_4_r), FUNC(channelf_state::port_4_w)); /* Left controller      */
+	map(0x05, 0x05).rw(this, FUNC(channelf_state::port_5_r), FUNC(channelf_state::port_5_w));
 }
 
 
@@ -221,7 +226,8 @@ MACHINE_CONFIG_START(channelf_state::channelf)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -247,7 +253,8 @@ MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -274,7 +281,8 @@ MACHINE_CONFIG_START(channelf_state::channlf2)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -301,7 +309,8 @@ MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	MCFG_SCREEN_UPDATE_DRIVER(channelf_state, screen_update_channelf)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(channelf_state::channelf_palette), 8);
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(channelf_state, channelf)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -314,9 +323,9 @@ MACHINE_CONFIG_END
 ROM_START( channelf )
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "sl90025", "Luxor Video Entertainment System" )
-	ROMX_LOAD("sl90025.rom",  0x0000, 0x0400, CRC(015c1e38) SHA1(759e2ed31fbde4a2d8daf8b9f3e0dffebc90dae2), ROM_BIOS(0))
+	ROMX_LOAD("sl90025.rom",  0x0000, 0x0400, CRC(015c1e38) SHA1(759e2ed31fbde4a2d8daf8b9f3e0dffebc90dae2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sl31253", "Channel F" )
-	ROMX_LOAD("sl31253.rom",  0x0000, 0x0400, CRC(04694ed9) SHA1(81193965a374d77b99b4743d317824b53c3e3c78), ROM_BIOS(1))
+	ROMX_LOAD("sl31253.rom",  0x0000, 0x0400, CRC(04694ed9) SHA1(81193965a374d77b99b4743d317824b53c3e3c78), ROM_BIOS(2))
 	ROM_LOAD("sl31254.rom",   0x0400, 0x0400, CRC(9c047ba3) SHA1(8f70d1b74483ba3a37e86cf16c849d601a8c3d2c))
 	ROM_REGION(0x2000, "vram", ROMREGION_ERASE00)
 ROM_END
@@ -336,7 +345,7 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS           INIT        COMPANY         FULLNAME                                FLAGS
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS           INIT        COMPANY         FULLNAME                                FLAGS */
 CONS( 1976, channelf, 0,        0,        channelf, channelf, channelf_state, empty_init, "Fairchild",    "Channel F",                            0 )
 CONS( 1977, sabavdpl, channelf, 0,        sabavdpl, channelf, channelf_state, empty_init, "SABA",         "SABA Videoplay",                       0 )
 CONS( 197?, luxorves, channelf, 0,        sabavdpl, channelf, channelf_state, empty_init, "Luxor",        "Luxor Video Entertainment System",     0 )

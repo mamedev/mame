@@ -1,9 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_FLSTORY_H
-#define MAME_INCLUDES_FLSTORY_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
@@ -11,13 +7,12 @@
 #include "machine/taito68705interface.h"
 #include "sound/ta7630.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 
 class flstory_state : public driver_device
 {
 public:
-	flstory_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	flstory_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_scrlram(*this, "scrlram"),
@@ -32,22 +27,8 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_soundnmi(*this, "soundnmi")
-	{ }
+		m_soundnmi(*this, "soundnmi") { }
 
-	void common(machine_config &config);
-	void flstory(machine_config &config);
-	void rumba(machine_config &config);
-	void onna34ro(machine_config &config);
-	void victnine(machine_config &config);
-	void onna34ro_mcu(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
-
-protected:
-	virtual void machine_start() override;
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -98,6 +79,7 @@ private:
 	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
 	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
 	DECLARE_WRITE8_MEMBER(sound_control_0_w);
 	DECLARE_WRITE8_MEMBER(sound_control_1_w);
 	DECLARE_WRITE8_MEMBER(sound_control_2_w);
@@ -105,6 +87,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(victnine_get_tile_info);
 	TILE_GET_INFO_MEMBER(get_rumba_tile_info);
+	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(flstory);
 	DECLARE_VIDEO_START(flstory);
 	DECLARE_VIDEO_START(victnine);
@@ -116,6 +99,11 @@ private:
 	uint32_t screen_update_rumba(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void flstory(machine_config &config);
+	void rumba(machine_config &config);
+	void onna34ro(machine_config &config);
+	void victnine(machine_config &config);
+	void onna34ro_mcu(machine_config &config);
 	void base_map(address_map &map);
 	void flstory_map(address_map &map);
 	void onna34ro_map(address_map &map);
@@ -124,5 +112,3 @@ private:
 	void sound_map(address_map &map);
 	void victnine_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_FLSTORY_H

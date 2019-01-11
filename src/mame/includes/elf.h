@@ -39,11 +39,6 @@ public:
 		, m_led(*this, "led0")
 	{ }
 
-	void elf2(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER( input_w );
-
-private:
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
@@ -55,15 +50,18 @@ private:
 	DECLARE_READ8_MEMBER( dma_r );
 	DECLARE_WRITE8_MEMBER( sc_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
+	DECLARE_INPUT_CHANGED_MEMBER( input_w );
 	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
+	void elf2(machine_config &config);
 	void elf2_io(address_map &map);
 	void elf2_mem(address_map &map);
 
+protected:
 	virtual void machine_start() override;
 
-	required_device<cosmac_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
 	required_device<mm74c922_device> m_kb;
 	required_device<dm9368_device> m_led_l;

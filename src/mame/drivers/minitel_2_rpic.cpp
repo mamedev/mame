@@ -26,7 +26,6 @@
     - Modem and sound output.
     - The rear serial port.
     - Parameters I2C 24C02 EEPROM.
-    - Screen should go blank when switched off
 
     The original firmware and the experimental demo rom are currently both working.
 
@@ -53,7 +52,6 @@
 #include "machine/timer.h"
 #include "video/ef9345.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -94,10 +92,7 @@ public:
 		{
 		}
 
-	void minitel2(machine_config &config);
-
-private:
-	required_device<i80c32_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<ts9347_device> m_ts9347;
 	required_device<palette_device> m_palette;
 
@@ -114,9 +109,10 @@ private:
 	DECLARE_READ8_MEMBER ( ts9347_io_r );
 	DECLARE_WRITE8_MEMBER ( ts9347_io_w );
 
+	void minitel2(machine_config &config);
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
-
+protected:
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
 
@@ -288,9 +284,9 @@ void minitel_state::mem_prg(address_map &map)
 
 void minitel_state::mem_io(address_map &map)
 {
-	map(0x2000, 0x3fff).rw(FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
+	map(0x2000, 0x3fff).rw(this, FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
 	/* ts9347 */
-	map(0x4000, 0x5ffF).rw(FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
+	map(0x4000, 0x5ffF).rw(this, FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
 }
 
 /* Input ports */
@@ -401,31 +397,29 @@ static INPUT_PORTS_START( minitel2 )
 
 INPUT_PORTS_END
 
-void minitel_state::minitel2(machine_config &config)
-{
+MACHINE_CONFIG_START(minitel_state::minitel2)
 	/* basic machine hardware */
-	I80C32(config, m_maincpu, XTAL(14'318'181)); //verified on pcb
-	m_maincpu->set_addrmap(AS_PROGRAM, &minitel_state::mem_prg);
-	m_maincpu->set_addrmap(AS_IO, &minitel_state::mem_io);
-	m_maincpu->port_in_cb<1>().set(FUNC(minitel_state::port1_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(minitel_state::port1_w));
-	m_maincpu->port_in_cb<3>().set(FUNC(minitel_state::port3_r));
-	m_maincpu->port_out_cb<3>().set(FUNC(minitel_state::port3_w));
+	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, minitel_state, port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, minitel_state, port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, minitel_state, port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, minitel_state, port3_w))
 
-	TS9347(config, m_ts9347, 0);
-	m_ts9347->set_palette_tag(m_palette);
-
-	TIMER(config, "minitel_sl", 0).configure_scanline(FUNC(minitel_state::minitel_scanline), "screen", 0, 10);
+	MCFG_DEVICE_ADD("ts9347", TS9347, 0)
+	MCFG_EF9345_PALETTE("palette")
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("minitel_sl", minitel_state, minitel_scanline, "screen", 0, 10)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_screen_update("ts9347", FUNC(ts9347_device::screen_update));
-	screen.set_size(512, 312);
-	screen.set_visarea(2, 512-10, 0, 278-1);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DEVICE("ts9347", ts9347_device, screen_update)
+	MCFG_SCREEN_SIZE(512, 312)
+	MCFG_SCREEN_VISIBLE_AREA(2, 512-10, 0, 278-1)
+	MCFG_PALETTE_ADD("palette", 8+1)
 
-	PALETTE(config, m_palette).set_entries(8+1);
-}
+MACHINE_CONFIG_END
 
 ROM_START( minitel2 )
 
@@ -433,13 +427,10 @@ ROM_START( minitel2 )
 	ROM_DEFAULT_BIOS("ft_bv4")
 
 	ROM_SYSTEM_BIOS(0, "ft_bv4", "Minitel 2 ROM BV4")
-	ROMX_LOAD( "minitel2_bv4.bin",   0x0000, 0x8000, CRC(8844a0a7) SHA1(d3e9079b080dbcee27ad870ec6c39ac42e7deacf), ROM_BIOS(0) )
+	ROMX_LOAD( "minitel2_bv4.bin",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(1, "demov1", "Minitel 2 Demo")
-	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607f2482) SHA1(7965edbef68e45d09dc67a4684da56003eff6328), ROM_BIOS(1) )
-
-	ROM_SYSTEM_BIOS(2, "ft_bv9", "Minitel 2 ROM Bv9")
-	ROMX_LOAD( "bv9.1402",           0x0000, 0x8000, CRC(ace5d65e) SHA1(c8d589f8af6bd7d339964fdece937a76db972115), ROM_BIOS(2) )
+	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607F2482) SHA1(7965EDBEF68E45D09DC67A4684DA56003EFF6328), ROM_BIOS(2) )
 
 	ROM_REGION( 0x4000, "ts9347", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k

@@ -11,6 +11,9 @@
 struct ssg_callbacks;
 
 
+#define MCFG_YM2203_IRQ_HANDLER(cb) \
+		devcb = &downcast<ym2203_device &>(*device).set_irq_handler((DEVCB_##cb));
+
 class ym2203_device : public ay8910_device
 {
 public:
@@ -18,7 +21,6 @@ public:
 
 	// configuration helpers
 	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	auto irq_handler() { return m_irq_handler.bind(); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

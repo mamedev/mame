@@ -25,10 +25,9 @@ public:
 	{ }
 
 	void summit(machine_config &config);
-
-private:
 	void sumt_map(address_map &map);
 	void sumt_portmap(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

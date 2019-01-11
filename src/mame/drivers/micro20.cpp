@@ -30,8 +30,8 @@
 class micro20_state : public driver_device
 {
 public:
-	micro20_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	micro20_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_rom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
@@ -40,9 +40,6 @@ public:
 	{
 	}
 
-	void micro20(machine_config &config);
-
-private:
 	required_device<m68020_device> m_maincpu;
 	required_memory_region m_rom;
 	required_shared_ptr<uint32_t> m_mainram;
@@ -65,8 +62,9 @@ private:
 		m_maincpu->set_input_line(M68K_IRQ_4, state);
 	}
 
+	void micro20(machine_config &config);
 	void micro20_map(address_map &map);
-
+private:
 	u8 m_tin;
 	u8 m_h4;
 };
@@ -145,7 +143,7 @@ READ32_MEMBER(micro20_state::buserror_r)
 void micro20_state::micro20_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("mainram");
-	map(0x00200000, 0x002fffff).r(FUNC(micro20_state::buserror_r));
+	map(0x00200000, 0x002fffff).r(this, FUNC(micro20_state::buserror_r));
 	map(0x00800000, 0x0083ffff).rom().region("bootrom", 0);
 	map(0xffff8000, 0xffff8000).rw(FDC_TAG, FUNC(wd1772_device::status_r), FUNC(wd1772_device::cmd_w));
 	map(0xffff8001, 0xffff8001).rw(FDC_TAG, FUNC(wd1772_device::track_r), FUNC(wd1772_device::track_w));
@@ -156,38 +154,28 @@ void micro20_state::micro20_map(address_map &map)
 	map(0xffff80c0, 0xffff80df).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
 }
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
-DEVICE_INPUT_DEFAULTS_END
-
 MACHINE_CONFIG_START(micro20_state::micro20)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, M68020, 16.67_MHz_XTAL)
+	MCFG_DEVICE_ADD(MAINCPU_TAG, M68020, XTAL(16'670'000))
 	MCFG_DEVICE_PROGRAM_MAP(micro20_map)
 
-	MCFG_DEVICE_ADD(DUART_A_TAG, MC68681, 3.6864_MHz_XTAL)
+	MCFG_DEVICE_ADD(DUART_A_TAG, MC68681, XTAL(3'686'400))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set(DUART_A_TAG, FUNC(mc68681_device::rx_a_w));
-	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(DUART_A_TAG, mc68681_device, rx_a_w))
 
-	MCFG_DEVICE_ADD(DUART_B_TAG, MC68681, 3.6864_MHz_XTAL)
+	MCFG_DEVICE_ADD(DUART_B_TAG, MC68681, XTAL(3'686'400))
 
-	WD1772(config, FDC_TAG, 16.67_MHz_XTAL / 2);
+	MCFG_WD1772_ADD(FDC_TAG, XTAL(16'670'000) / 2)
 
-	PIT68230(config, m_pit, 16.67_MHz_XTAL / 2);
-	m_pit->timer_irq_callback().set(FUNC(micro20_state::timerirq_w));
-	m_pit->h4_out_callback().set(FUNC(micro20_state::h4_w));
-	m_pit->pb_out_callback().set(FUNC(micro20_state::portb_w));
-	m_pit->pc_out_callback().set(FUNC(micro20_state::portc_w));
+	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, XTAL(16'670'000) / 2)
+	MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE(*this, micro20_state, timerirq_w))
+	MCFG_PIT68230_H4_CB(WRITELINE(*this, micro20_state, h4_w))
+	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(*this, micro20_state, portb_w))
+	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(*this, micro20_state, portc_w))
 
-	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, 32.768_kHz_XTAL)
+	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL(32'768))
 	MCFG_MSM58321_DEFAULT_24H(false)
 	MCFG_MSM58321_D0_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb0_w))
 	MCFG_MSM58321_D1_HANDLER(WRITELINE(PIT_TAG, pit68230_device, pb1_w))

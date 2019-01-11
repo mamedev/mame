@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -7,6 +7,10 @@
 #define BX_EASING_H_HEADER_GUARD
 
 #include "math.h"
+
+// Reference:
+// http://easings.net/
+// http://robertpenner.com/easing/
 
 namespace bx
 {
@@ -93,7 +97,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeLinear(float _t);
+	float easeLinear(float _t);
 
 	/// Step.
 	///
@@ -119,7 +123,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeStep(float _t);
+	float easeStep(float _t);
 
 	/// Smooth step.
 	///
@@ -144,7 +148,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeSmoothStep(float _t);
+	float easeSmoothStep(float _t);
 
 	/// Quad.
 	///
@@ -170,7 +174,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInQuad(float _t);
+	float easeInQuad(float _t);
 
 	/// Out quad.
 	///
@@ -196,7 +200,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutQuad(float _t);
+	float easeOutQuad(float _t);
 
 	/// In out quad.
 	///
@@ -222,7 +226,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutQuad(float _t);
+	float easeInOutQuad(float _t);
 
 	/// Out in quad.
 	///
@@ -248,7 +252,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInQuad(float _t);
+	float easeOutInQuad(float _t);
 
 	/// In cubic.
 	///
@@ -274,7 +278,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInCubic(float _t);
+	float easeInCubic(float _t);
 
 	/// Out cubic.
 	///
@@ -300,7 +304,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutCubic(float _t);
+	float easeOutCubic(float _t);
 
 	/// In out cubic.
 	///
@@ -326,7 +330,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutCubic(float _t);
+	float easeInOutCubic(float _t);
 
 	/// Out in cubic.
 	///
@@ -352,7 +356,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInCubic(float _t);
+	float easeOutInCubic(float _t);
 
 	/// In quart.
 	///
@@ -378,7 +382,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInQuart(float _t);
+	float easeInQuart(float _t);
 
 	/// Out quart.
 	///
@@ -404,7 +408,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutQuart(float _t);
+	float easeOutQuart(float _t);
 
 	/// In out quart.
 	///
@@ -430,7 +434,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutQuart(float _t);
+	float easeInOutQuart(float _t);
 
 	/// Out in quart.
 	///
@@ -456,7 +460,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInQuart(float _t);
+	float easeOutInQuart(float _t);
 
 	/// In quint.
 	///
@@ -482,7 +486,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInQuint(float _t);
+	float easeInQuint(float _t);
 
 	/// Out quint.
 	///
@@ -508,7 +512,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutQuint(float _t);
+	float easeOutQuint(float _t);
 
 	/// In out quint.
 	///
@@ -534,7 +538,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutQuint(float _t);
+	float easeInOutQuint(float _t);
 
 	/// Out in quint.
 	///
@@ -560,7 +564,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInQuint(float _t);
+	float easeOutInQuint(float _t);
 
 	/// In sine.
 	///
@@ -586,7 +590,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInSine(float _t);
+	float easeInSine(float _t);
 
 	/// Out sine.
 	///
@@ -612,7 +616,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutSine(float _t);
+	float easeOutSine(float _t);
 
 	/// In out sine.
 	///
@@ -638,7 +642,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutSine(float _t);
+	float easeInOutSine(float _t);
 
 	/// Out in sine.
 	///
@@ -664,7 +668,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInSine(float _t);
+	float easeOutInSine(float _t);
 
 	/// In exponential.
 	///
@@ -690,7 +694,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInExpo(float _t);
+	float easeInExpo(float _t);
 
 	/// Out exponential.
 	///
@@ -716,7 +720,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutExpo(float _t);
+	float easeOutExpo(float _t);
 
 	/// In out exponential.
 	///
@@ -742,7 +746,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutExpo(float _t);
+	float easeInOutExpo(float _t);
 
 	/// Out in exponential.
 	///
@@ -768,7 +772,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInExpo(float _t);
+	float easeOutInExpo(float _t);
 
 	/// In circle.
 	///
@@ -794,7 +798,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInCirc(float _t);
+	float easeInCirc(float _t);
 
 	/// Out circle.
 	///
@@ -820,7 +824,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutCirc(float _t);
+	float easeOutCirc(float _t);
 
 	/// In out circle.
 	///
@@ -846,7 +850,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutCirc(float _t);
+	float easeInOutCirc(float _t);
 
 	/// Out in circle.
 	///
@@ -872,7 +876,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInCirc(float _t);
+	float easeOutInCirc(float _t);
 
 	/// Out elastic.
 	///
@@ -898,7 +902,7 @@ namespace bx
 	///      |                                                     *****
 	///      |
 	///
-	BX_CONST_FUNC float easeOutElastic(float _t);
+	float easeOutElastic(float _t);
 
 	/// In elastic.
 	///
@@ -924,7 +928,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInElastic(float _t);
+	float easeInElastic(float _t);
 
 	/// In out elastic.
 	///
@@ -950,7 +954,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutElastic(float _t);
+	float easeInOutElastic(float _t);
 
 	/// Out in elastic.
 	///
@@ -976,7 +980,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInElastic(float _t);
+	float easeOutInElastic(float _t);
 
 	/// In back.
 	///
@@ -1002,7 +1006,7 @@ namespace bx
 	///      |                        ******************
 	///      |
 	///
-	BX_CONST_FUNC float easeInBack(float _t);
+	float easeInBack(float _t);
 
 	/// Out back.
 	///
@@ -1028,7 +1032,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutBack(float _t);
+	float easeOutBack(float _t);
 
 	/// In out back.
 	///
@@ -1054,7 +1058,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutBack(float _t);
+	float easeInOutBack(float _t);
 
 	/// Out in back.
 	///
@@ -1080,7 +1084,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInBack(float _t);
+	float easeOutInBack(float _t);
 
 	/// Out bounce.
 	///
@@ -1106,7 +1110,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutBounce(float _t);
+	float easeOutBounce(float _t);
 
 	/// In bounce.
 	///
@@ -1132,7 +1136,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInBounce(float _t);
+	float easeInBounce(float _t);
 
 	/// In out bounce.
 	///
@@ -1158,7 +1162,7 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeInOutBounce(float _t);
+	float easeInOutBounce(float _t);
 
 	/// Out in bounce.
 	///
@@ -1184,7 +1188,9 @@ namespace bx
 	///      |
 	///      |
 	///
-	BX_CONST_FUNC float easeOutInBounce(float _t);
+	float easeOutInBounce(float _t);
+
+	float easeInOutLinear(float _t);
 
 } // namespace bx
 

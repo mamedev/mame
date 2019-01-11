@@ -82,6 +82,17 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="essvitam" supported="no">
+		<description>PC-9801N/NS/NV Essential Vitamins</description>
+		<year>19??</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="746496">
+				<rom name="pc-9801n_ns_nv-essential_vitamins.hdm" size="746496" crc="ee60cb77" sha1="5540f386bb708cff61e41387c9760184083fcad8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="n88basms">
 		<description>N88 BASIC + compiler (for MS-DOS)</description>
 		<year>19??</year>
@@ -1527,12 +1538,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="asscalc">
+	<software name="asscalc" supported="no">
 		<description>Assist Calc</description>
 		<year>1990</year>
 		<publisher>アシスト (Assist)</publisher>
 		<info name="alt_title" value="アシストカルク" />
-		<info name="usage" value="From DOS, run S2020.EXE, or INSTALL.EXE to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -1987,19 +1997,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Keyboard doesn't work on PC-9801F; runs too fast on later models -->
-	<software name="177" supported="partial">
-		<description>177</description>
-		<year>1986</year>
-		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
-		<info name="release" value="198609xx" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="359676">
-				<rom name="177.fdd" size="359676" crc="b70eba3f" sha1="f2a33a0b3b37dd097bb5145e6be9f0281c73831d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="2069ad" supported="yes">
 		<description>2069AD</description>
 		<year>1991</year>
@@ -2021,32 +2018,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2069ad_c.fdi" size="1265664" crc="25c601a5" sha1="a6b6b7096fedf6a0536fee0b380e976ebd0eb63b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="2601">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>2601 - Teikoku Kidoubutai no Koubou</description>
-		<year>1994</year>
-		<publisher>ネクサスインターラクト (Nexus Interact)</publisher>
-		<info name="alt_title" value="2601 帝國機動部隊の興亡" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="2601 - teikoku kidoubutai no koubou (system disk).hdm" size="1261568" crc="9b36d20d" sha1="c6bdff06b7fc3db664621d2c2894a3d21671efea" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="2601 - teikoku kidoubutai no koubou (data disk a).hdm" size="1261568" crc="d63adc5a" sha1="c06e607038212cf11d00fe2e83407c7ee2e8d2c8" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="2601 - teikoku kidoubutai no koubou (data disk b).hdm" size="1261568" crc="a8d4825b" sha1="0fc7d0220c4029d2cd379e2876c5688b0cf1b474" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2106,29 +2077,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="3negai">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>3tsu no Negai</description>
-		<year>1995</year>
-		<publisher>アップルパイ／コーヒーぶれいく (Apple Pie / Coffee Break)</publisher>
-		<info name="alt_title" value="3つの願い" />
-		<info name="usage" value="Run HDINST.EXE from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="3tsu no negai (disk a).hdm" size="1261568" crc="7a7006a1" sha1="cbe12f663037d8f93204188e77335271a11ca71c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="3tsu no negai (disk b).hdm" size="1261568" crc="20cfb83b" sha1="440b875ba041ad51f700f6ccee5f646a76a6ce75" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alaskanm">
-		<description>Alaskan Malamute G.C. (Alt Format)</description>
+		<description>3D Real Simulation Golf - Alaskan Malamute G.C.</description>
 		<year>1992</year>
 		<publisher>ホームデータ (Home Data)</publisher>
 		<info name="alt_title" value="アラスカンマラミュートＧ．Ｃ．" />
@@ -2153,29 +2103,34 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>エニックス (Enix)</publisher>
 		<info name="alt_title" value="４６億年物語 －ＴＨＥ進化論－" />
 		<info name="release" value="19900526" />
-		<info name="usage" value="Boot DOS from floppy, insert system disk, run INST.EXE to create user disk" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="46okumd1.fdi" size="1265664" crc="8ae2f4d6" sha1="64141c28b2ba388c040bd77102cc20cc846b5938" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="46okumd2.fdi" size="1265664" crc="0f6175e7" sha1="0099130f3c66f9f0fa86920b7dc12b1999bc0878" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="46okumd3.fdi" size="1265664" crc="5b4cae32" sha1="930f0d0a1b8d26fbf1b9c597737ea1039fec4e90" offset="0" />
+			</dataarea>
+		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="46okumsy.fdi" size="1265664" crc="7b08bf98" sha1="3de0c3a70af6bd482189831c1da26a92e8e294ff" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk No. 2"/>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
 			<dataarea name="flop" size="1265664">
-				<rom name="46okumd1.fdi" size="1265664" crc="8ae2f4d6" sha1="64141c28b2ba388c040bd77102cc20cc846b5938" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk No. 3"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="46okumd2.fdi" size="1265664" crc="0f6175e7" sha1="0099130f3c66f9f0fa86920b7dc12b1999bc0878" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk No. 4"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="46okumd3.fdi" size="1265664" crc="5b4cae32" sha1="930f0d0a1b8d26fbf1b9c597737ea1039fec4e90" offset="0" />
+				<rom name="46okumus.fdi" size="1265664" crc="69588099" sha1="43fcccab5015a016c5632d13bcca7549925c95e9" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2228,6 +2183,12 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="diskb.fdi" size="1265664" crc="9d0c9843" sha1="3c754860c55f29050560d63a1070ee758c21fd23" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="user.fdi" size="1265664" crc="bdd16875" sha1="e359458fd99329791ec4b3302d13f9e5a22eb575" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2299,55 +2260,38 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="4thunit2">
-		<description>The 4th Unit 2</description>
-		<year>1988</year>
-		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="第４のユニット２" />
-		<info name="release" value="19880714" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1093136">
-				<rom name="4th2.nfd" size="1093136" crc="1b5718fa" sha1="fd48174695ceadd0f772e70c20a15d0a9236da57" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--
-	    After the intro the game asks for a disk in drive A. It doesn't work with any of the disks here.
-	    Works when installed to HDD.
-	-->
-	<software name="5jikanm" supported="partial">
+	<software name="5jikanm">
 		<description>5 Jikanme no Venus</description>
 		<year>1995</year>
 		<publisher>フェアリーダスト (Fairy Dust)</publisher>
 		<info name="alt_title" value="５時間目のヴィーナス" />
 		<info name="release" value="19950407" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="1 Jikanme Disk"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="1.fdi" size="1265664" crc="4e61658a" sha1="48e72f12c8381b147fcd3ba4c6f0ba3c8688f403" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="2 Jikanme Disk"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2.fdi" size="1265664" crc="6c8ea134" sha1="08ef1e7de96623549d9700e40f9b23c874de564f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="3 Jikanme Disk"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="3.fdi" size="1265664" crc="9df49009" sha1="00bc897384bf330b802200adf08fddef6499214d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="4 Jikanme Disk"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="4.fdi" size="1265664" crc="cc073751" sha1="f0ac3e76e54ddb89b1f1dc2391b7f5069a5142a2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="5 Jikanme Disk"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="5.fdi" size="1265664" crc="ea95d9c5" sha1="34519c7bcb0424931f77be517922b47b8fa548b0" offset="0" />
 			</dataarea>
@@ -2367,31 +2311,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="714midij">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>714 MIDI Jr.</description>
-		<year>1995?</year>
-		<publisher>Packen Software</publisher>
-		<info name="usage" value="Requires a MIDI interface" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="714 midi jr..hdm" size="1261568" crc="5d770b47" sha1="7c1e78d7dfe41aadb0066211f86f71b00de66d12" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="714midis">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>714 MIDI Special</description>
-		<year>1995?</year>
-		<publisher>Packen Software</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="714 midi special.hdm" size="1261568" crc="b9fd2854" sha1="9dfc4b5e4a005537299f08cb9722b373b9e23086" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="7colors">
 		<description>The 7 Colors</description>
 		<year>1992</year>
@@ -2405,80 +2324,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="88kantai">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>88 Kantai Monogatari</description>
-		<year>1995</year>
-		<publisher>徳間書店 (Tokuma Shoten)</publisher>
-		<info name="alt_title" value="八八艦隊物語" />
-		<info name="usage" value="Run INST.EXE from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="88 kantai monogatari (disk 1).hdm" size="1261568" crc="ce264710" sha1="8311b5e8d895eb9bcd9a80336bfbae8ce405b340" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="88 kantai monogatari (disk 2).hdm" size="1261568" crc="7f0f49fc" sha1="8198ab31437dd32ccaa801d036b4c71081dea003" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="88 kantai monogatari (disk 3).hdm" size="1261568" crc="2ba08a83" sha1="411ea29e987876ef261e3e7ce9b2393acf21b3b2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="88 kantai monogatari (disk 4).hdm" size="1261568" crc="fc17242a" sha1="b425abdf6bdeca91ea95413053cc2f5be10c0123" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- The 1.2 MB image seems to be reconstructed from the files of the 720 KB one, which is marked as a bad dump and has a non-standard size. Keeping both for now. -->
-	<software name="98amino">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>PC-9801N/NS/NV Teiban Free Software Shuu - 98NOTE no Hissu Aminosan</description>
-		<year>1991</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="PC-9801N/NS/NV定番フリーソフトウェア集　～９８ノートの必須アミノ酸～" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="98 note no hissu aminosan [recovered data].hdm" size="1261568" crc="51120af7" sha1="debe32a9dc0a7cb30b1a21353528b7edfc536948" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="746496">
-				<rom name="98 note no hissu aminosan [b].img" size="746496" crc="ee60cb77" sha1="5540f386bb708cff61e41387c9760184083fcad8" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="98eiwa">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>98 Eiwa Jiten</description>
-		<year>1987</year>
-		<publisher>ハイスコア (Hi-Score)</publisher>
-		<info name="alt_title" value="98英和辞典" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 eiwa jiten (disk 1).hdm" size="1261568" crc="3377cdc0" sha1="aef25da61971675ae5db6cd68ff8ecabc65e5225" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 eiwa jiten (disk 2).hdm" size="1261568" crc="61396602" sha1="9f7e01c08b477403d04f32a165cd38d25775c059" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- MAME fails to mount the image with "Incorrect layout on track 0 head 0, expected_size=100000, current_size=134624" -->
-	<software name="98lespro" supported="no">
+	<software name="98lespro">
 		<description>98 Lesson Pro</description>
 		<year>1990</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -2498,39 +2344,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="konica_typing_2_boot.fdi" size="1265664" crc="2ef8d247" sha1="695468c25e48ce0b5ede03823253ff41db776a5b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="98stad">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>98 Stadium</description>
-		<year>1994</year>
-		<publisher>日本ソフテック (Nihon Softec)</publisher>
-		<info name="alt_title" value="98スタジアム" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="98 stadium.hdm" size="1261568" crc="02483bc3" sha1="0a417df194924f175b59e0dde3d1d9b2595b10a8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="98stad2">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>98 Stadium 2 - Shouko no Chousen</description>
-		<year>1995</year>
-		<publisher>日本ソフテック (Nihon Softec)</publisher>
-		<info name="alt_title" value="98スタジアム2 翔子の挑戦" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 stadium 2 (disk a).hdm" size="1261568" crc="ce1a835e" sha1="4d7ef7a12149222b89ca55b12aeea1bfa8570d34" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data 1 Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 stadium 2 (disk b).hdm" size="1261568" crc="63e74c4d" sha1="9e999b209991617df7da52344d6b39d2ce02c53a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2607,39 +2420,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="aressh3hd" cloneof="aressh3">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>A Ressha de Ikou III HD - Hard Disk Only</description>
-		<year>1992</year>
-		<publisher>アートディンク (Artdink)</publisher>
-		<info name="alt_title" value="Ａ列車で行こう３ＨＤ" />
-		<info name="usage" value="Boot DOS from floppy, insert system disk 1 and run INSTALL.EXE. Only works with small HDDs (probably less than 500 MB)." />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="a ressha de ikou iii hd - hard disk only (system disk 1).hdm" size="1261568" crc="323eb5d5" sha1="d90ecebc18587606a5312941f6803f3a45a59798" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="a ressha de ikou iii hd - hard disk only (system disk 2).hdm" size="1261568" crc="37b641ee" sha1="477805feb31ed44adca4311a1aa35359b20bac1e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="a ressha de ikou iii hd - hard disk only (data disk).hdm" size="1261568" crc="96fbd050" sha1="31f45857153bd10b2a18322157546d254bc3d43b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aressh3log" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Login Tokubetsu Map Shuu</description>
 		<year>199?</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="Ａ列車で行こう３ ログイン特別マップ集" />
-		<info name="usage" value="Expansion disk for A Ressha de Ikou III. Insert the System Disk on drive A and this disk on drive B, and boot the game." />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="a3_login.fdi" size="1265664" crc="cb8a2134" sha1="5f288d6be88da1cead473589f69440a891a78c05" offset="0" />
@@ -2667,8 +2452,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Can't select any options in the menu. It doesn't seem to be an emulation bug. -->
-	<software name="aressh3oms" cloneof="aressh3" supported="no">
+	<software name="aressh3oms" cloneof="aressh3">
 		<description>A Ressha de Ikou III - Original Meitetsu Sharyou Disk</description>
 		<year>1991</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -2726,68 +2510,12 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- MAME fails to mount the system disk image with "Incorrect layout on track 7 head 0, expected_size=166666, current_size=172992" error -->
-	<software name="aressh4m" supported="no">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>A Ressha de Ikou 4 ~ Take the A-Train IV - Map Construction + Power Up Kit</description>
-		<year>1994</year>
-		<publisher>アートディンク (Artdink)</publisher>
-		<info name="alt_title" value="Ａ列車で行こう４" />
-		<info name="release" value="19931203" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1283808">
-				<rom name="a ressha de ikou iv map construction + power up kit (system disk).d88" size="1283808" crc="c763fe4a" sha1="b78aea8802da39e1f96fd31053bc676fe4ecb08c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="a ressha de ikou iv map construction + power up kit (data disk).hdm" size="1261568" crc="dd082e65" sha1="21751af9e20ef0b378e13d58e1d8bf199ec4f91b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Map Construction Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="a ressha de ikou iv map construction + power up kit (construction disk).hdm" size="1261568" crc="baf166ee" sha1="25ed9e5e8ee2754ce5c297010febc86676d6ff32" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aressh4mcr" cloneof="aressh4m">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>A Ressha de Ikou 4 ~ Take the A-Train IV - Map Construction + Power Up Kit (Cracked)</description>
-		<year>1994</year>
-		<publisher>アートディンク (Artdink)</publisher>
-		<info name="alt_title" value="Ａ列車で行こう４ マップコンストラクション" />
-		<info name="release" value="19931203" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="a ressha de ikou iv map construction + power up kit (system disk).hdm" size="1261568" crc="72d9ff93" sha1="3a21e9927287407227edcb943701a77172926386" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="a ressha de ikou iv map construction + power up kit (data disk).hdm" size="1261568" crc="dd082e65" sha1="21751af9e20ef0b378e13d58e1d8bf199ec4f91b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Map Construction Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="a ressha de ikou iv map construction + power up kit (construction disk).hdm" size="1261568" crc="baf166ee" sha1="25ed9e5e8ee2754ce5c297010febc86676d6ff32" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aresshaf">
 		<description>A Ressha de Ikou Fukkokuban</description>
 		<year>1994</year>
 		<publisher>アートディンク (Artdink)</publisher>
 		<info name="alt_title" value="Ａ列車で行こう 復刻版" />
 		<info name="release" value="19940805" />
-		<info name="usage" value="Run START.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="disk.fdi" size="1265664" crc="79083d16" sha1="66461c2d83e1498676cb955906e1dced09ac8a3c" offset="0" />
@@ -2808,8 +2536,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="abunaten" supported="no">
+	<software name="abunaten">
 		<description>Abunai Tengu Densetsu - Yomigaetta Tengu ga Yozora o Mau</description>
 		<year>1989</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -2886,8 +2613,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="adrecona" cloneof="adrecon" supported="no">
+	<software name="adrecona" cloneof="adrecon">
 		<description>Adrenalin Connection (Fix?)</description>
 		<year>1987</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -2906,24 +2632,23 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="アドベンチャーツクール９８" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk M"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="avgtkool_m.d88" size="1281968" crc="01762828" sha1="1563da7ef20a3f9668db14236f7cbc9190f8af82" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="avgtkool_a.d88" size="1281968" crc="1b62dd63" sha1="9d01d2cd39efccf94f9febb13a67e8a1da71cfa1" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="avgtkool_b.d88" size="1281968" crc="a26c1914" sha1="b7fa4356ef0244bc052181c5128857c37b2d134e" offset="0" />
 			</dataarea>
 		</part>
-
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk M"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="avgtkool_m.d88" size="1281968" crc="01762828" sha1="1563da7ef20a3f9668db14236f7cbc9190f8af82" offset="0" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="advtsuk2">
@@ -2931,7 +2656,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="アドベンチャーツクール２" />
-		<info name="usage" value="Run INSTALL.EXE from DOS. Each disk has to be installed separately." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -3037,8 +2761,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- 2d disk -->
-	<!-- Black screen on boot -->
+<!-- 2d disk -->
 	<software name="advland" supported="no">
 		<description>Adventureland</description>
 		<year>1984</year>
@@ -3085,51 +2808,50 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>イリュージョンコア (Illusion Core)</publisher>
 		<info name="alt_title" value="エーゲ海の雫 １６色版" />
 		<info name="release" value="19951215" />
-		<info name="usage" value="Run INST.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="1.fdi" size="1265664" crc="58f6e5af" sha1="003206e872014bedc5815f7067c3b3f3c8e66fef" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2.fdi" size="1265664" crc="7521056c" sha1="c66d6f79fd622957f5fe21cfbfcc5aabbc86bd67" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="3.fdi" size="1265664" crc="2a96a9a4" sha1="9a74de38cbb6c9eb2e48a67c371778b630aa7904" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="4.fdi" size="1265664" crc="714e4ab7" sha1="2bb5b1ca564fc52a3395091a45c9efe6c48fbb24" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="5.fdi" size="1265664" crc="65042370" sha1="22732e4c1080cea6815f7fd8d6bc17d4df861c61" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="6.fdi" size="1265664" crc="960b3578" sha1="b64f4f96441a1c406fe3b74cb969a62d491964ad" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk G"/>
+			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="7.fdi" size="1265664" crc="b4a99c87" sha1="6cef0442e1f31d253f289e3d9c5575e15246314d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk H"/>
+			<feature name="part_id" value="Disk 8"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="8.fdi" size="1265664" crc="e6326bc2" sha1="1a191f73f9e538bd7a3067eae65c03e6ea9f086d" offset="0" />
 			</dataarea>
@@ -3198,7 +2920,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アグミックス (Agumix)</publisher>
 		<info name="alt_title" value="アグミックスセレクト特選グラフィック集" />
 		<info name="release" value="19920901" />
-		<info name="usage" value="Requires 5 MHz GDC clock" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -3239,7 +2960,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="aishogi">
 		<description>AI Shogi</description>
 		<year>1993</year>
@@ -3253,13 +2973,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- There's some kind of background noise constantly playing. This is not a bug, it also happens on real hardware. -->
 	<software name="aids">
 		<description>AIDS - Watashi o Aishite... Jinai Seijin</description>
 		<year>1993</year>
 		<publisher>メディック (Medic)</publisher>
 		<info name="alt_title" value="ＡＩＤＳ私を愛して・・・神愛聖人" />
-		<info name="usage" value="Run INSTF.EXE or INSTH.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -3292,9 +3010,28 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Runs too fast and has graphical glitches on 386 and faster CPUs. This is probably accurate to real hardware. -->
 	<software name="aircomb">
 		<description>Air Combat - Yuugeki Ou II</description>
+		<year>1989</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="エアーコンバット 遊撃王２" />
+		<info name="release" value="198910xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_1.fdi" size="1265664" crc="8e049350" sha1="8c812710807d36bc6053ef22170f68647462b3bb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_2.fdi" size="1265664" crc="d3464132" sha1="00d3a6cf610632f3472478bbd7fe4fc51cd5c51b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aircomba" cloneof="aircomb">
+		<description>Air Combat - Yuugeki Ou II (Alt Disk 2)</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="エアーコンバット 遊撃王２" />
@@ -3307,6 +3044,12 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="air combat 1 - yuugekiou 2 (j) 2.fdi" size="1265664" crc="7fce06e2" sha1="4461f21915688b8ad7136ad8d2b54839163fc096" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="air combat 1 - yuugekiou 2 (j) user.fdi" size="1265664" crc="24578676" sha1="56f92b4e3f28320665cdb7b69f19bed01f20e84b" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3337,7 +3080,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="エアーコンバット２ 追加シナリオ Ｖｏｌ．１" />
 		<info name="release" value="19910920" />
-		<info name="usage" value="Requires &quot;Air Combat 2&quot; to work. Insert disk 1 of AC2 on drive A, and this disk on drive B." />
+		<info name="usage" value="Requires &quot;Air Combat 2&quot; to work" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="data disk 1.d88" size="1281968" crc="837bec4b" sha1="972ff445fade08b24d2f7576b4ed9cef9c44d99f" offset="0" />
@@ -3351,7 +3094,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="エアーコンバット２ 追加シナリオ Ｖｏｌ．２" />
 		<info name="release" value="19920313" />
-		<info name="usage" value="Requires &quot;Air Combat 2&quot; to work. Insert disk 1 of AC2 on drive A, and this disk on drive B." />
+		<info name="usage" value="Requires &quot;Air Combat 2&quot; to work" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="data disk 2.d88" size="1281968" crc="951eb1fc" sha1="11b783c2f39307fcc85e46386d3491d2cb6406c5" offset="0" />
@@ -3429,79 +3172,16 @@ only have some part of Windows file and a Video driver(CLGD?).
 				<rom name="c.fdi" size="1265664" crc="3ff30a58" sha1="e32ad7c9a312babc8ebfb6a1f64b3b899bcfdac7" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="aitd2">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Alone in the Dark 2</description>
-		<year>1994</year>
-		<publisher>アローマイクロテックス (Arrow Micro-Techs)</publisher>
-		<info name="alt_title" value="アローン イン ザ ダーク2" />
-		<info name="usage" value="Requires a PC-9821 machine. To install, boot DOS, mount disk 1 and run AITDINST.EXE." />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 01).hdm" size="1261568" crc="01574945" sha1="4ea34c2f720bf0382a0f333ad98f0f4d18a6893b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 02).hdm" size="1261568" crc="aa76cb1d" sha1="2110ea735fc4391af6e0bbb4616a349d341ea082" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 03).hdm" size="1261568" crc="34126e0f" sha1="a12465ea359527cd4cb8ad8e7c7687c5df58c61e" offset="0" />
-			</dataarea>
-		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 04).hdm" size="1261568" crc="c2abb8c4" sha1="9159812aab5e0925797ad95d5743e1d7e13ac157" offset="0" />
+			<feature name="part_id" value="HD Boot"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="hd boot.fdi" size="1265664" crc="ccb72cf3" sha1="8c5d5aada7d18e6a4cfe6cd9009a2405c14b8b48" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 05).hdm" size="1261568" crc="17f01068" sha1="65090b02cbfc945a82ca22a13813326ef13ad3a4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 06).hdm" size="1261568" crc="b0659d65" sha1="943942143ac8daab617f8bd6e1a76cebec41a483" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 07).hdm" size="1261568" crc="b6708d44" sha1="cbe301f49b211255a0d308908a7d861bba7dc38a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 8"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 08).hdm" size="1261568" crc="60b8a9ba" sha1="cef558d0c2ba7b377a14d5669e0808fec73d69b1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 9"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 09).hdm" size="1261568" crc="6b6f1eae" sha1="100307c6234cff03abacd5ce177d20e96dbe6cc2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop10" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 10"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 10).hdm" size="1261568" crc="4d9c7249" sha1="c6dd27cb276ef446e6c404c5b82473b894f4829c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop11" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 11"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alone in the dark 2 (disk 11).hdm" size="1261568" crc="8c7c7c86" sha1="79ade2ece4f093fd8fa551d98bf7dc7ce915acf4" offset="0" />
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="user.fdi" size="1265664" crc="970d97ee" sha1="3e1de2225485e45b832a00fba3fc68b4ad36c770" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3651,40 +3331,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!--
-	    Works only on 286-based machines (e.g. PC-9801UX). Doesn't seem to happen on real hardware.
-	    Also, this game modifies its own disk (the NAME.DEF and FLAG* files), so the image of Disk A has been rebuilt with files from three
-	    separate dumps to be as close as possible to an unmodified copy.
-	    It should still be considered a bad dump, though.
-	-->
-	<software name="akikoprm" supported="partial">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Akiko - Premium Version</description>
-		<year>1993</year>
-		<publisher>フェアリーテール レッドゾーン (Fairytale Red-Zone)</publisher>
-		<info name="alt_title" value="亜紀子 プレミアムバージョン" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="akiko premium version (disk a).hdm" size="1261568" crc="52c26562" sha1="9cba54534a688152bc00dfde5f7bae26bd0e4099" offset="0" status="baddump"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="akiko premium version (disk b).hdm" size="1261568" crc="32f5f180" sha1="c62f3ef5b3842fc754d32d5caa74cc99b45d8aa5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="akiko premium version (disk c).hdm" size="1261568" crc="ec0b31a4" sha1="4ac50cdcf1a137ecf0be9cbcfa23eb68521b880f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Fails to boot with "初期データが設定できません" (cannot set initial data) error -->
-	<software name="akitsuka" supported="no">
+	<software name="akitsuka">
 		<description>Aki to Tsukasa no Fushigi no Kabe</description>
 		<year>1988</year>
 		<publisher>ニューシステムハウスオー！ (New System House Oh!)</publisher>
@@ -3696,8 +3343,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Works only with a PC-9801-26K sound card. Doesn't happen on real hardware. -->
-	<software name="aktie" supported="partial">
+	<software name="aktie">
 		<description>Aktie - Kabushiki Toushi Simulation Game</description>
 		<year>1991</year>
 		<publisher>風雅システム (Fuga System)</publisher>
@@ -3743,76 +3389,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="albatros">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Albatross</description>
-		<year>1986</year>
-		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="アルバトロス" />
-		<info name="usage" value="Runs best on 8086-based machines (e.g. PC-9801F)" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="albatross.hdm" size="1261568" crc="a0804e61" sha1="58ae017f07386c1e2f66d7773cd1d366563d6f4e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="albatexp">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Albatross - Expert Course</description>
-		<year>1986?</year>
-		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="アルバトロス エキスパートコース" />
-		<info name="usage" value="Expansion disk for Albatross. Load the main game, then mount this disk and select DISK CHANGE on the course menu." />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="albatross (expert course).hdm" size="1261568" crc="abcebdc9" sha1="fbfc0c970c1226881eb5ec0bf4aedf01ae1ef1ce" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="albatoak">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Albatross - Meimon Course I - Oak Hills</description>
-		<year>1986?</year>
-		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="アルバトロス 名門コースI オークヒルズ" />
-		<info name="usage" value="Expansion disk for Albatross. Load the main game, then mount this disk and select DISK CHANGE on the course menu." />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="albatross (oak hills course).hdm" size="1261568" crc="d8b8f24e" sha1="1c60a85a2718afa056e169c6d1f0170a8880ea16" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="albatvis">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Albatross - Visual Course</description>
-		<year>1986?</year>
-		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="アルバトロス ビジュアルコース" />
-		<info name="usage" value="Expansion disk for Albatross. Load the main game, then mount this disk and select DISK CHANGE on the course menu." />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="albatross (visual course).hdm" size="1261568" crc="fc6a29d8" sha1="f127c6b0e85e1a7f42a5e3de78573b7b671fb694" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="albatwld">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Albatross - World Course</description>
-		<year>1986?</year>
-		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="アルバトロス ワールドコース" />
-		<info name="usage" value="Expansion disk for Albatross. Load the main game, then mount this disk and select DISK CHANGE on the course menu." />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="albatross (world course).hdm" size="1261568" crc="1c5fe3e8" sha1="3821783b226f39e5a7ea97d15f3beae9fbcdae79" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="albatr2">
 		<description>Albatross 2 - Masters' History</description>
 		<year>1989</year>
@@ -3853,6 +3429,26 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="albiona" cloneof="albion">
+		<description>Albion - Domino Soldier (another)</description>
+		<year>1989</year>
+		<publisher>カオス (Chaos)</publisher>
+		<info name="alt_title" value="アルビオン Ｄｏｍｉｎｏ Ｓｏｌｄｉｅｒ" />
+		<info name="release" value="19890710" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_a.fdi" size="1265664" crc="c5f892df" sha1="7440a28499b40e91828e8dbb6d8539b4fa871b7a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_b.fdi" size="1265664" crc="caf71dc4" sha1="31ec40fd9a9936581a8e70d5e4e66f9560969b14" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="algtsub">
 		<description>Algeese no Tsubasa - Youka Ankoku Hen</description>
 		<year>1988</year>
@@ -3878,7 +3474,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Seems to work only on 286-based machines (e.g. PC-9801UX). Seems to happen on real hardware too (PC-9821Nw150). -->
 	<software name="alice">
 		<description>Alice no Yakata</description>
 		<year>1990</year>
@@ -4088,85 +3683,49 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="アルシャーク" />
 		<info name="release" value="19910524" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Opening Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="alsk_opn.fdi" size="1265664" crc="fbf0a53e" sha1="d68f0e567d4546fd7128bd1e5b16119ff5264d20" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="alsk_sys.fdi" size="1265664" crc="9d4e1396" sha1="41a49a05677758d4610cd28af7f8fda0028d89fc" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="alsk_dat.fdi" size="1265664" crc="44e6d790" sha1="2875dbfc61463284ef9a740650811040fa8f0c78" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Visual Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="alsk_vis.fdi" size="1265664" crc="90e02dd8" sha1="3540261d1281c322900fd79912fa729b4130e1e5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="End Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="alsk_end.fdi" size="1265664" crc="bcc3b50a" sha1="31b25440e80a49462fcce2a4c8318e4acfd09637" offset="0" />
 			</dataarea>
 		</part>
-	</software>
-
-	<!--
-	    Seems to have some kind of trouble with changing disks. Starting the game from the opening sequence (オープニングから始める) doesn't work
-	    because it doesn't recognize Data Disk A afterwards, but starting from the beginning of the game itself (最初から始める) works.
-
-	    Needs further testing in order to confirm if later disk changes also fail.
-	-->
-	<software name="alvaleak" supported="partial">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Alvaleak Boukenki</description>
-		<year>1993</year>
-		<publisher>グローディア (Glodia)</publisher>
-		<info name="alt_title" value="アルヴァリーク冒険記" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alvaleak boukenki (system disk).hdm" size="1261568" crc="89f80237" sha1="d221207bd11be89c2370dd826b163f0820cf86dd" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Opening Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alvaleak boukenki (opening disk).hdm" size="1261568" crc="da1cf468" sha1="88c920f0e579836c6e0096d91019384cd1126c79" offset="0" />
-			</dataarea>
-		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alvaleak boukenki (data disk a).hdm" size="1261568" crc="5d2e38f4" sha1="c4066550caa445ce96edd0403d736dd0053ad6a0" offset="0" />
+			<feature name="part_id" value="Opening Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="alsk_opn.fdi" size="1265664" crc="fbf0a53e" sha1="d68f0e567d4546fd7128bd1e5b16119ff5264d20" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alvaleak boukenki (data disk b).hdm" size="1261568" crc="48f2732a" sha1="3d678ecd8a275e37b88ef400fcef4a9469881552" offset="0" />
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="alsk_sys.fdi" size="1265664" crc="9d4e1396" sha1="41a49a05677758d4610cd28af7f8fda0028d89fc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="alvaleak boukenki (data disk c).hdm" size="1261568" crc="a94b8a3c" sha1="c38dbcc1e4bcdc3613bc1273b87ebf6d25c2506c" offset="0" />
+			<feature name="part_id" value="Visual Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="alsk_vis.fdi" size="1265664" crc="90e02dd8" sha1="3540261d1281c322900fd79912fa729b4130e1e5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="alsk_usr.fdi" size="1265664" crc="bdf94781" sha1="39a6ae81584be7d216ae2a679d474e21977884a0" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Blank Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="brank.fdi" size="1265664" crc="22650aec" sha1="53e08011b661e201c0919ae9209907db729fa25e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!--
-	    Runs without sound on a PC-9801-86 sound card, works fine with the PC-9801-26K.
-	    Sound has been confirmed to work on a real PC-9821Nw150 (PC-9801-118 compatible audio), so it's probably an emulation bug.
-	-->
 	<software name="amaranth">
 		<description>Amaranth - Phantasie RPG</description>
 		<year>1990</year>
@@ -4189,71 +3748,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="amarnthc.fdi" size="1265664" crc="d801324b" sha1="f53edacfba3219a283972edea20e604cb4f691ff" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="amarant2">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Amaranth II</description>
-		<year>1992</year>
-		<publisher>風雅システム (Fuga System)</publisher>
-		<info name="alt_title" value="アマランスII" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="amaranth ii (system disk).hdm" size="1261568" crc="a172902a" sha1="4760f2bbe07f2686d4fa05ab48a7a240238d595a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="amaranth ii (disk a).hdm" size="1261568" crc="8503e292" sha1="a6be00f4729c9cd04d9fe9fe1768cdfeb001710f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="amaranth ii (disk b).hdm" size="1261568" crc="442157eb" sha1="59b695b2562b740b335625635ff168e90e9271e5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="amaranth ii (disk c).hdm" size="1261568" crc="f8e84648" sha1="52e948c098a17d8566bc3bd67b40238b2c0573a8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- The main executable (AMARAN2.EXE) is slightly different in this set -->
-	<software name="amarant2a" cloneof="amarant2">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Amaranth II (Alt System Disk)</description>
-		<year>1992</year>
-		<publisher>風雅システム (Fuga System)</publisher>
-		<info name="alt_title" value="アマランスII" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="amaranth ii (system disk) [alt 1].hdm" size="1261568" crc="aefee2a9" sha1="dd735dd2e74b9a16aad4b6ea822e1d07794fc147" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="amaranth ii (disk a).hdm" size="1261568" crc="8503e292" sha1="a6be00f4729c9cd04d9fe9fe1768cdfeb001710f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="amaranth ii (disk b).hdm" size="1261568" crc="442157eb" sha1="59b695b2562b740b335625635ff168e90e9271e5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="amaranth ii (disk c).hdm" size="1261568" crc="f8e84648" sha1="52e948c098a17d8566bc3bd67b40238b2c0573a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4296,102 +3790,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="ambition">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Ambition</description>
-		<year>1993</year>
-		<publisher>ハッピータイム (Happy Time)</publisher>
-		<info name="alt_title" value="アンビション" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ambition (disk a).hdm" size="1261568" crc="2e30e215" sha1="acd749b610ac915c0bfa68c82931c8270c14cb49" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ambition (disk b).hdm" size="1261568" crc="e35e4e9a" sha1="182f1df03183517f75d49882e2651a9cea382e55" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ambition (disk c).hdm" size="1261568" crc="c8b24300" sha1="bcf809c7e95e6e043f1c00f55986d4909c012783" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Erratic mouse movement. Cannot be played with the keyboard. -->
-	<software name="ami" supported="no">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Ami - Kaze Tachinu</description>
-		<year>1994</year>
-		<publisher>フェアリーダスト (Fairy Dust)</publisher>
-		<info name="alt_title" value="亜美 ～風立ちぬ～" />
-		<info name="usage" value="Boot with disk 0 in drive A and a DOS disk in drive B, let it copy the system files, insert disk 6 in drive B and reboot" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 0"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 0).hdm" size="1261568" crc="f1434720" sha1="9b8ee448641f6bad8019238f9f31ebe1865a9be5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 1).hdm" size="1261568" crc="8b78fba6" sha1="92582541cca7b1e1c586cbcd1ed28f8d1c2856bf" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 2).hdm" size="1261568" crc="3b12381b" sha1="b7594009053c6868ad09bf6c1517a26c119795ca" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 3).hdm" size="1261568" crc="a0fc8e0d" sha1="495ad3d53e7196f5950caa8e756ece4061cdf48f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 4).hdm" size="1261568" crc="f2e7102d" sha1="7050fca93a04dbcf4577e194d6ec2f94c64eca18" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 5).hdm" size="1261568" crc="a9b3d0ae" sha1="930c799968f73845dd9ef805fa5169fe6925aaa9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 6).hdm" size="1261568" crc="798b8d4a" sha1="205f8fa0e2b240c90225f6575e5295e1e0dd70bf" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 7).hdm" size="1261568" crc="7bd547f5" sha1="89bc5721bed70c1aaa4a8b0e240aa5073b574d08" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 8"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 8).hdm" size="1261568" crc="1b2da4d7" sha1="9aadfc082cb6111d9c3941e4300163133856b665" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop10" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 9"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ami - kaze tachinu (disk 9).hdm" size="1261568" crc="cedeaa56" sha1="5a0779026fec76ca6bf77b2af6081f5f98e35440" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="amidaext">
 		<description>Amida Extra</description>
 		<year>1991</year>
@@ -4410,71 +3808,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Corrupted text and wrong sound effects (they are supposed to have different tones, not just a constant beep). The game is mostly playable, though. -->
-	<software name="ancdragn" supported="partial">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Ancient Dragon</description>
-		<year>1991</year>
-		<publisher>ソフトハウスアラジン (Software House Aladdin)</publisher>
-		<info name="alt_title" value="エンシェント・ドラゴン" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ancient dragon (game disk).hdm" size="1261568" crc="aab5cf93" sha1="274e8dbbb72e4703595d789b286a9848419ccc60" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ancient dragon (data disk).hdm" size="1261568" crc="e33307ab" sha1="ff23234bbd6d61bbf2351406f37413ea3d6643e7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--
-	    The system disk is supposed to come without OS files, and the user is expected to run the setup process (SETUP.EXE) to copy them from
-	    an existing bootable disk. All currently available images of the system disk are modified, so we'll mark it as a bad dump in case a "clean" one appears.
-	-->
-	<software name="angelarm">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Angel Army</description>
-		<year>1994</year>
-		<publisher>フェアリーダスト (Fairy Dust)</publisher>
-		<info name="alt_title" value="エンジェル☆アーミー" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (system disk).hdm" size="1261568" crc="047eb492" sha1="6915c00585ff77c805af7acc38583ea7d812ab11" offset="0" status="baddump"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Game Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (game disk).hdm" size="1261568" crc="3e0a06a2" sha1="bb6faf008f74eebc6ebc3bde6e8c8c75b0bae594" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (data disk 1).hdm" size="1261568" crc="c9588dbe" sha1="aa37d095cf11b6ba16dbd9378e835f6523f99f78" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (data disk 2).hdm" size="1261568" crc="851e4a56" sha1="faa803c8a5f0382c6ce664355333b18867490260" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="angel army (data disk 3).hdm" size="1261568" crc="82a0687d" sha1="6b5219dbc95aba9b62b3267dda176a61e185d516" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Runs too fast on anything except (presumably) a 8086 CPU, but it doesn't boot on the PC-9801F, which may or may not be an emulation bug. -->
-	<software name="angelhrt" supported="partial">
+	<software name="angelhrt">
 		<description>Angel Hearts</description>
 		<year>1989</year>
 		<publisher>エルフ (Elf)</publisher>
@@ -4552,73 +3886,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- These two sets only differ in the volume serial number. The game data is identical. -->
-	<software name="animjxpf">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Animahjong X Perfect File</description>
-		<year>1994</year>
-		<publisher>ソニア (Sogna)</publisher>
-		<info name="alt_title" value="あにまーじゃんX パーフェクトファイル" />
-		<info name="usage" value="Expansion for Animahjong X. With the original game already installed to HDD, insert disk A and run SETUP.COM to install." />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="animahjong x perfect file (disk a).hdm" size="1261568" crc="f704ce40" sha1="a9e2d5a5fbd2e955e4614cca69a946f3fba9f54a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="animahjong x perfect file (disk b).hdm" size="1261568" crc="cd932450" sha1="500258a09ce8d066646b33b3722f8449faf747b4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="animahjong x perfect file (disk c).hdm" size="1261568" crc="e97ed0b5" sha1="7d1cea5be558181c1621db787c6ef1f82728f480" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="animahjong x perfect file (disk d).hdm" size="1261568" crc="9de2dcb1" sha1="350c6c8d12bb4575aae841ed7d1b4d21038e92e2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="animjxpfa" cloneof="animjxpf">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Animahjong X Perfect File (Alt)</description>
-		<year>1994</year>
-		<publisher>ソニア (Sogna)</publisher>
-		<info name="alt_title" value="あにまーじゃんX パーフェクトファイル" />
-		<info name="usage" value="Expansion disk for Animahjong X. With the original game already installed to HDD, insert disk A and run SETUP.COM to install." />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="animahjong x perfect file [set 1] (disk a).hdm" size="1261568" crc="02717d03" sha1="39994f5cf2eabc0dfaedfac5b1eab87a0a97749c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="animahjong x perfect file [set 1] (disk b).hdm" size="1261568" crc="62e887e4" sha1="4cf02929cd9735df0e9c876228602838a9ca8715" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="animahjong x perfect file [set 1] (disk c).hdm" size="1261568" crc="cf2597de" sha1="73918c9e37d908ea735f426ce099d2acaa71331a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="animahjong x perfect file [set 1] (disk d).hdm" size="1261568" crc="06777660" sha1="2534a65fbe270ee9f6533eb158e63652443b8430" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="magcubic">
 		<description>Ankoku Sennen Oukoku - Magical Cubic</description>
 		<year>1993</year>
@@ -4689,7 +3956,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Seems to work only on 286-based machines (e.g. PC-9801UX). Seems to happen on real hardware too (PC-9821Nw150). -->
 	<software name="agenesis">
 		<description>Another Genesis</description>
 		<year>1990</year>
@@ -4762,7 +4028,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>テイジイエル (TGL)</publisher>
 		<info name="alt_title" value="あっぱれ伝＜伏龍の章＞" />
 		<info name="release" value="19951208" />
-		<info name="usage" value="Run SETUP.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -4933,35 +4198,34 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Incorrect colors -->
-	<software name="apros" supported="partial">
+	<software name="apros">
 		<description>Apros - Daichi no Shou - Kaze no Tankyuusha Hen</description>
 		<year>1992</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="アプロス ～大地の章 風の探求者編～" />
 		<info name="release" value="19921225" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="aprs_sys.fdi" size="1265664" crc="61d54044" sha1="e5c02feacd5a01437b75f98b3a95eb54ad62484a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="aprs_d1.fdi" size="1265664" crc="f29b3cdd" sha1="846d10e71ca1125d8ab7d5e6201130b71314ca7d" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario Disk 2"/>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="aprs_d2.fdi" size="1265664" crc="24c57b18" sha1="4e05230d8f56de3e1ba39e332a812726b507d50b" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario Disk 3"/>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="aprs_d3.fdi" size="1265664" crc="e8c6b139" sha1="428eae311aca9429f5f45ff829be56224cb6ad07" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="aprs_sys.fdi" size="1265664" crc="61d54044" sha1="e5c02feacd5a01437b75f98b3a95eb54ad62484a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5075,8 +4339,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Some graphical glitches in the intro -->
-	<software name="arcus2" supported="partial">
+	<software name="arcus2">
 		<description>Arcus II - Silent Symphony</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
@@ -5140,7 +4403,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="エリア８８ エトランジェ１９９５" />
 		<info name="release" value="19950116" />
-		<info name="usage" value="Boot DOS from floppy, insert disks 1 and 2, and run A88DISK.BAT. To install to HDD, run A88INST.EXE." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -5167,55 +4429,52 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Doesn't recognize disk C when booting from floppy. Installing the game to HDD works. -->
-	<software name="area88i" supported="partial">
+	<software name="area88i">
 		<description>Area 88 - Ikkakujuu no Kiseki</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="エリア８８ 一角獣の軌跡" />
 		<info name="release" value="19950210" />
-		<info name="usage" value="Run INSTALL.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="area 88 - ikkakujou no kiseki 1.fdi" size="1265664" crc="368ef929" sha1="7ea3dc63e2fdfe291d3721ec945c837248bcfe7f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="area 88 - ikkakujou no kiseki 2.fdi" size="1265664" crc="d2229d87" sha1="c050e006be5ce5d6d0da98fdb4258d71951cfeae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="area 88 - ikkakujou no kiseki 3.fdi" size="1265664" crc="8f3569dc" sha1="e478554f978b19e71ee4f8d913f966709dd5d4bb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="area88ia" cloneof="area88i" supported="partial">
-		<description>Area 88 - Ikkakujuu no Kiseki (Alt Disk C)</description>
+	<software name="area88ia" cloneof="area88i">
+		<description>Area 88 - Ikkakujuu no Kiseki (Alt Disk 3)</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="エリア８８ 一角獣の軌跡" />
 		<info name="release" value="19950210" />
-		<info name="usage" value="Run INSTALL.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="area 88 - ikkakujou no kiseki 1.fdi" size="1265664" crc="368ef929" sha1="7ea3dc63e2fdfe291d3721ec945c837248bcfe7f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="area 88 - ikkakujou no kiseki 2.fdi" size="1265664" crc="d2229d87" sha1="c050e006be5ce5d6d0da98fdb4258d71951cfeae" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk 3 alt.fdi" size="1265664" crc="045761f1" sha1="bcd407aa3405049369cd68b3870ae70218888b7d" offset="0" />
 			</dataarea>
@@ -5228,7 +4487,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>ガスト (Gust)</publisher>
 		<info name="alt_title" value="アレス王の物語" />
 		<info name="release" value="19940318" />
-		<info name="usage" value="Run INST.COM from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261824">
 				<rom name="ares_1.dip" size="1261824" crc="9f77a0bc" sha1="ec734291f8753e1f0838df8edd69b6fafd67daa9" offset="0" />
@@ -5272,7 +4530,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>1987</year>
 		<publisher>タイトー (Taito)</publisher>
 		<info name="alt_title" value="アルカノイド" />
-		<info name="usage" value="Runs best on 8086-based machines (e.g. PC-9801F)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="659456">
 				<rom name="arkanoid.fdi" size="659456" crc="6ee434e8" sha1="8ce3c8dcb47f026dae0033e0d3314294d6324fe9" offset="0" />
@@ -5331,8 +4588,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- This game plays sampled voices through the beeper, but it doesn't work in MAME - it just outputs a constant beep -->
-	<software name="arquelph" supported="partial">
+	<software name="arquelph">
 		<description>Arquelphos</description>
 		<year>1993</year>
 		<publisher>ディー・オー (D.O.)</publisher>
@@ -5469,49 +4725,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- The PC-9801F doesn't display kanji characters, making the text unreadable. Runs too fast on later models. -->
-	<software name="artwar" supported="partial">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Art of War</description>
-		<year>1987</year>
-		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
-		<info name="alt_title" value="アート オブ ウォー" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="art of war.hdm" size="1261568" crc="453f9ebf" sha1="25942e0d28e2542494117d1965d392108c0851c5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Crashes on boot on PC-9801F, runs too fast on later models -->
-	<software name="artwarka" supported="partial">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Art of War - Kaisenban</description>
-		<year>1988</year>
-		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
-		<info name="alt_title" value="アート オブ ウォー 海戦版" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="art of war kaisenban.hdm" size="1261568" crc="db11c1e2" sha1="b8d79749e73eb6a5b0865ac39c16aa2c5d415e5d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="artwarsc">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Art of War Scenario Shuu</description>
-		<year>1988</year>
-		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
-		<info name="alt_title" value="アート オブ ウォー シナリオ集" />
-		<info name="usage" value="Expansion disk for Art of War. Boot the game, select DATA DISK in the main menu, and insert this disk." />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="art of war scenario shuu.hdm" size="1261568" crc="f73131ad" sha1="967fb1ea9d183c5fff5c4ba2e09c3390d209d9f8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ash">
+	<software name="ash" supported="no">
 		<description>Ash.</description>
 		<year>1994</year>
 		<publisher>姫屋ソフト (Himeya Soft)</publisher>
@@ -5535,7 +4749,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<description>Asoko no Koufuku - Yamamoto-san-chi no Baai ni Okeru Asoko no Fukou ni Tsuite</description>
 		<year>1989</year>
 		<publisher>Zeit (ツァイト)</publisher>
-		<info name="alt_title" value="アソコの幸福 山本さん家の場合に於るアソコの不幸に就いて" />
+		<info name="alt_title" value="アソコの幸福" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1265664">
@@ -5562,36 +4776,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="assart">
+	<software name="assisart">
 		<description>Assist Art</description>
 		<year>19??</year>
-		<publisher>アシスト (Assist)</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="アシストアート" />
-		<info name="usage" value="From DOS, run ART.EXE, or INSTALL.EXE to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="assist.d88" size="1281968" crc="7cd2348f" sha1="38d181cf919d0184bcfef662c9764cfa004ab046" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="assartpm">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Assist Art - Paint Master</description>
-		<year>1992</year>
-		<publisher>アシスト (Assist)</publisher>
-		<info name="alt_title" value="アシストアートペイントマスター" />
-		<info name="usage" value="Boot DOS, insert system disk, run INSTALL.EXE" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="assist art - paint master (system disk).hdm" size="1261568" crc="912f33c9" sha1="2ba79e4ef927d8c8f7cc64b57fc812f68c7ce774" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Utility Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="assist art - paint master (utility disk).hdm" size="1261568" crc="156addbf" sha1="b84e8924bee3c0072a3cf724c792bfdae338b673" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5668,6 +4860,12 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Data Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="atlas_data.fdi" size="1265664" crc="15a09862" sha1="919dbaa413bc3e1204f2d4aa056414cd4448e3e5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="atlas_user.fdi" size="1265664" crc="b27f3356" sha1="7bc9ff60496f592048ee402ef21bb4e0ffa7d056" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -5805,8 +5003,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Fails to boot with "Disk I/O Error" -->
-	<software name="azusa108" supported="no">
+	<software name="azusa108">
 		<description>Azusa 108 Jimusho</description>
 		<year>1988</year>
 		<publisher>アグミックス (Agumix)</publisher>
@@ -5895,11 +5092,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Error on the title screen: 正常なシステムの状態ではありません (the system state is not correct). Doesn't happen on real hardware. -->
-	<software name="bakendo" supported="no">
+	<software name="bakendo">
 		<description>Bakendou - Horse Racing Analyzer</description>
-		<year>1991</year>
-		<publisher>Real Softs</publisher>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="馬券道" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Opening Disk"/>
@@ -5979,23 +5175,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アクイレムジャパン (Acclaim Japan)</publisher>
 		<info name="alt_title" value="バランス オブ プラネット" />
 		<info name="release" value="19920228" />
-		<info name="usage" value="Run INSTALL.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="balance of the planet.fdi" size="1265664" crc="a862ba7f" sha1="2c3a64fbeb44c31123d0d42bdd6c39ec3cb39319" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ballade3">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Ballade3</description>
-		<year>1994?</year>
-		<publisher>ローランド (Roland)</publisher>
-		<info name="usage" value="Requires a MIDI interface" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="ballade 3.hdm" size="1261568" crc="7fa0d64e" sha1="dd8236596007e11916cf2baec366e21d7fc1a31a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6056,22 +5238,20 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Can't play any music. It recognizes the MIDI interface correctly, but complains about the interrupt line settings not being correct. -->
-	<software name="bandkun" supported="partial">
+	<software name="bandkun">
 		<description>Band-kun - Sound Entertainment</description>
 		<year>1990</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="alt_title" value="バンドくん" />
 		<info name="release" value="199011xx" />
-		<info name="usage" value="Requires a MIDI interface. Run KOEI.COM from DOS to boot, or BKINST.EXE to install to HDD." />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Program Disk"/>
+			<feature name="part_id" value="Disk P?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="band_p.d88" size="1281968" crc="1ea7710a" sha1="2944fc60356ddae5dba5b260d88a632faf9d68cf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario Disk"/>
+			<feature name="part_id" value="Disk S?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="band_s.d88" size="1281968" crc="51fc21d4" sha1="d501f5db3204ab83f37dc2b20520dc3a3f52a193" offset="0" />
 			</dataarea>
@@ -6084,7 +5264,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アーテック (Artec)</publisher>
 		<info name="alt_title" value="バルバトゥスの魔女" />
 		<info name="release" value="19910405" />
-		<info name="usage" value="Create the user disk by booting from disk 2, then copy DOS files to disk 1 with the SYS command, and boot from it." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -6105,12 +5284,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!--
-	    Runs only on 286-class and older machines (e.g. PC-9801F, PC-9801UX), otherwise gives a "Packed file is corrupt" error.
-	    FM sound only works with a PC-9801-26K sound card.
-	    None of those issues happen happen on real hardware.
-	-->
-	<software name="brdtale" supported="partial">
+<!-- Corrupt packet file in the loader? -->
+	<software name="brdtale" supported="no">
 		<description>The Bard's Tale - Tales of the Unknown</description>
 		<year>1990</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
@@ -6130,8 +5305,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- FM sound only works with a PC-9801-26K sound card. Doesn't happen on real hardware. -->
-	<software name="brdtale2" supported="partial">
+	<software name="brdtale2">
 		<description>The Bard's Tale II - The Destiny Knight</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
@@ -6157,8 +5331,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- FM sound only works with a PC-9801-26K sound card. Doesn't happen on real hardware. -->
-	<software name="brdtale3" supported="partial">
+	<software name="brdtale3">
 		<description>The Bard's Tale III - Thief of Fate</description>
 		<year>1992</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
@@ -6178,7 +5351,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Works only on 286-based machines (e.g. PC-9801UX). Seems to happen on real hardware too. -->
 	<software name="battle">
 		<description>Battle</description>
 		<year>1990</year>
@@ -6217,8 +5389,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Starting in mouse mode hangs the game, but keyboard mode works -->
-	<software name="btlchess" supported="partial">
+	<software name="btlchess">
 		<description>Battle Chess</description>
 		<year>1990</year>
 		<publisher>パック・イン・ビデオ (Pack-in Video)</publisher>
@@ -6327,7 +5498,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="btech">
-		<description>BattleTech - Ubawareta Seihai</description>
+		<description>BattleTech Ubawareta Seihai</description>
 		<year>1993</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="alt_title" value="バトルテック ～奪われた聖杯" />
@@ -6398,7 +5569,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 
 	<software name="begirl">
 		<description>Be Girl</description>
-		<year>1988</year>
+		<year>19??</year>
 		<publisher>パスカル2 (Pascal2)</publisher>
 		<info name="alt_title" value="Ｂｅガール" />
 		<part name="flop1" interface="floppy_5_25">
@@ -6469,8 +5640,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="beast" supported="no">
+	<software name="beast">
 		<description>Beast - Injuu no Yakata</description>
 		<year>1990</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -6528,8 +5698,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Doesn't display any graphics, only text -->
-	<software name="beast3" supported="no">
+	<software name="beast3">
 		<description>Beast III</description>
 		<year>1993</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -6579,7 +5748,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>ホビージャパン (Hobby Japan)</publisher>
 		<info name="alt_title" value="ビーストロード ～覇王への道～" />
 		<info name="release" value="19910601" />
-		<info name="usage" value="Run SYSTEMON.EXE to copy DOS files from HDD, then reboot. Requires the game manual to pass the protection check." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk"/>
 			<dataarea name="flop" size="1281968">
@@ -6620,14 +5788,12 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Hangs at the Fuga System logo -->
-	<software name="beatvice" supported="no">
+	<software name="beatvice">
 		<description>BeatVice</description>
 		<year>1989</year>
 		<publisher>風雅システム (Fuga System)</publisher>
 		<info name="alt_title" value="ビートバイス" />
 		<info name="release" value="19891215" />
-		<info name="usage" value="Insert disk 1 on drive 2 and run SI.BAT to copy DOS files, or run HI.BAT to install to HDD." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -6686,21 +5852,20 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
 		<info name="alt_title" value="ベルズアベニュー３" />
 		<info name="release" value="19941031" />
-		<info name="usage" value="Run INSTALL.EXE to copy DOS files, then reboot. DOS 5.0 is recommended, later versions may not fit in the disk." />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_1.fdi" size="1265664" crc="cb50f55d" sha1="6fbcf1de2af7d94817bda452f99a0f724c6bd4ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_2.fdi" size="1265664" crc="31503afb" sha1="093419dcc2b82b92a502fc69f692645cb3484ce6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_3.fdi" size="1265664" crc="5107c50b" sha1="a77bdaa9e552f4ab47f00e53fdd89613ec168fca" offset="0" />
 			</dataarea>
@@ -6714,80 +5879,15 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ベストプレー ベースボール９８" />
 		<info name="release" value="19910419" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="bestply1.d88" size="1281968" crc="e0e50c24" sha1="3dc2dab04c7831a7ca4abfd56ed3c16712a76788" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="bestply2.d88" size="1281968" crc="bcb14c57" sha1="56ddf50815e6a82fe564e59489cbea22bbba9967" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="biblemas">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Bible Master - Crash of the Blleot Rutz</description>
-		<year>1993</year>
-		<publisher>グローディア (Glodia)</publisher>
-		<info name="alt_title" value="バイブルマスター" />
-		<info name="release" value="19930717" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bible master (system disk).hdm" size="1261568" crc="80c0d965" sha1="0931eda057f0f17c872dbcc5eb4d648ee1713811" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bible master (data disk).hdm" size="1261568" crc="a2a0bec0" sha1="4bf6f6d13ec75a41bd8dae78806dba40bbb6a3fb" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Opening Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bible master (opening disk 1).hdm" size="1261568" crc="5762159b" sha1="1e62f73d28f7ce434fd10b5ef2457913ee19d555" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Opening Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bible master (opening disk 2).hdm" size="1261568" crc="ac11c3ec" sha1="d45b3a83c0635d91b4015cc429014b49fda1afff" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="biblemasa" cloneof="biblemas">
-		<description>Bible Master - Crash of the Blleot Rutz (Alt)</description>
-		<year>1993</year>
-		<publisher>グローディア (Glodia)</publisher>
-		<info name="alt_title" value="バイブルマスター" />
-		<info name="release" value="19930717" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bible master [set 1] (system disk).hdm" size="1261568" crc="639e1fcd" sha1="201e39ed3a19c170f696616db85458ca1f272a28" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bible master [set 1] (data disk).hdm" size="1261568" crc="f6aafdbd" sha1="1a8c5ed44d2f161b23fdb77f594599cefbd4321b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Opening Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bible master [set 1] (opening disk 1).hdm" size="1261568" crc="68a727c7" sha1="a03478b14a069de37aced0068a1566d42f67fe1d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Opening Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bible master [set 1] (opening disk 2).hdm" size="1261568" crc="2f92cf80" sha1="4fd3d5c5daf96dee58c3b70e879d43a0091a60ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6852,33 +5952,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Visual Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="bighovis.d88" size="1281968" crc="d01b6757" sha1="87200e792ed07a9bcfce9bd62df1c5ba9f806699" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bind">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Bind - Kinbaku Jinmon Densetsu</description>
-		<year>1996</year>
-		<publisher>桜桃書房/淫SIDE (Outou Shobou / InSIDE)</publisher>
-		<info name="alt_title" value="BIND 緊縛尋問伝説" />
-		<info name="release" value="19961020" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bind - kinbaku jinmon densetsu (disk 1).hdm" size="1261568" crc="0ea5eb3e" sha1="07fc71da0e9e12fa7870fa9c4fdf194d2b58a107" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bind - kinbaku jinmon densetsu (disk 2).hdm" size="1261568" crc="e04fb0ee" sha1="3220038811f95b9b378df42d708851a32f871dac" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bind - kinbaku jinmon densetsu (disk 3).hdm" size="1261568" crc="e91210a9" sha1="e27fd0420d7bc8eeaeb902332244a263b212377f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7085,8 +6158,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Doesn't recognize disk A properly -->
-	<software name="bishoten" supported="no">
+	<software name="bishoten">
 		<description>Bishoujo Tengoku</description>
 		<year>1994</year>
 		<publisher>ひょうたんプロダクション (Gourd Production)</publisher>
@@ -7145,40 +6217,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="blckbird">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Black Bird - Tori-tachi no Tooboe</description>
-		<year>1995</year>
-		<publisher>ビビアン (Vi Vi an)</publisher>
-		<info name="alt_title" value="BLACK BIRD～鳥達の遠吠～" />
-		<info name="release" value="19951208" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="black bird (system disk).hdm" size="1261568" crc="fe96864b" sha1="28f8d176a60f9fe141bd7e4030bee18abb81f216" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="black bird (data disk 1).hdm" size="1261568" crc="b5fe2850" sha1="e19c8e7a5c369964579f18008653af9ef966c623" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="black bird (data disk 2).hdm" size="1261568" crc="587c1ab8" sha1="b05b74d71b50ef22f0def41a3fe62107581e502b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="black bird (data disk 3).hdm" size="1261568" crc="c1f589f7" sha1="04cede30652cedda71d4700eefe063456112e0f4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Black screen on boot -->
 	<software name="blckonyx">
 		<description>The Black Onyx</description>
 		<year>1984</year>
@@ -7198,21 +6236,21 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ブラック・レインボウ" />
 		<info name="release" value="19900823" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Util Disk"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="blackrut.d88" size="1281968" crc="ea0ad5d6" sha1="05b96796aedf7d3b7aaa09b13f01d41bd20e9119" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="blackrsy.d88" size="1281968" crc="b0fadc3c" sha1="3a97fba84b13fe0ced8416e151ab1078582dfad8" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Scenario Disk"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="blackrsc.d88" size="1281968" crc="b1e93a12" sha1="d6593705316fe39b70d9ebbe38928fb34eb5fb85" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Util Disk"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="blackrut.d88" size="1281968" crc="ea0ad5d6" sha1="05b96796aedf7d3b7aaa09b13f01d41bd20e9119" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7224,70 +6262,25 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ブラック・レインボウ２" />
 		<info name="release" value="19921127" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="System Disk"/>
-			<dataarea name="flop" size="1265664">
-				<rom name="disk_s.fdi" size="1265664" crc="ce7e9e1b" sha1="ab2f53ee93bf74fb120cb25134c264f556e75fc4" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario Disk"/>
+			<feature name="part_id" value="Disk N"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_n.fdi" size="1265664" crc="c3ccf284" sha1="2326cfb6a6792492433701991f0202b95e0757e0" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk S"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="disk_s.fdi" size="1265664" crc="ce7e9e1b" sha1="ab2f53ee93bf74fb120cb25134c264f556e75fc4" offset="0" />
+			</dataarea>
+		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Utility Disk"/>
+			<feature name="part_id" value="Disk U?"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_u.fdi" size="1265664" crc="7b711899" sha1="1bf3669b66b2f1d7f83090906fd27c4f0286fe69" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="bthor16">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Blackthorne - Jigoku no Fukushuu (16-color version)</description>
-		<year>1996</year>
-		<publisher>マイクロマウス (Micro Mouse)</publisher>
-		<info name="alt_title" value="ブラックソーン 地獄の復讐" />
-		<info name="release" value="19960131" />
-		<info name="usage" value="To install run SETBT.COM from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blackthorne - jigoku no fukushuu (16-color version) (disk 1).hdm" size="1261568" crc="a612dbfb" sha1="f97d09c1455a08e4863fa85c2830a57211155a7d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blackthorne - jigoku no fukushuu (16-color version) (disk 2).hdm" size="1261568" crc="4f0a87dd" sha1="0fd9fe0d5838ef57e212ae753607730ac950e0c6" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bthor256" cloneof="bthor16">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Blackthorne - Jigoku no Fukushuu (256-color version)</description>
-		<year>1996</year>
-		<publisher>マイクロマウス (Micro Mouse)</publisher>
-		<info name="alt_title" value="ブラックソーン 地獄の復讐" />
-		<info name="release" value="19960131" />
-		<info name="usage" value="Requires a PC-9821 machine. To install run SETBT.COM from DOS." />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blackthorne - jigoku no fukushuu (256-color version) (disk 1).hdm" size="1261568" crc="1264ec3b" sha1="3669d593906d639ec13db989163b6785883c98f2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blackthorne - jigoku no fukushuu (256-color version) (disk 2).hdm" size="1261568" crc="a5d7aa2c" sha1="abcddd49c3bd699c0fbc5363eadedfba6a945f43" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Black screen on boot -->
 	<software name="blackpol" supported="no">
 		<description>The Blade of Blackpoole</description>
 		<year>1984</year>
@@ -7308,66 +6301,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="blandia">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Blandia 98</description>
-		<year>1995</year>
-		<publisher>ビング (Ving)</publisher>
-		<info name="alt_title" value="ブランディア98" />
-		<info name="release" value="19950622" />
-		<info name="usage" value="Requires a PC-9821 machine. To install, boot DOS from HDD, create a directory, and run X:INSTALL X:, where X: is the floppy drive where the startup disk is inserted" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Startup Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blandia 98 (startup disk).hdm" size="1261568" crc="16301cee" sha1="fa9414195c1a106f2c5c9731d5a0389c9cd51dca" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Install Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blandia 98 (install disk 1).hdm" size="1261568" crc="0772e284" sha1="95b24f58235b4d44a485ed2b365a817c3b55742c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Install Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blandia 98 (install disk 2).hdm" size="1261568" crc="1c5c8273" sha1="db9c8c1b0a3391c012bb4838e3b4a84e0b3e4e4c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="blindgam">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Blind Games</description>
-		<year>1996</year>
-		<publisher>メイビーソフト (May-Be Soft)</publisher>
-		<info name="alt_title" value="ブラインドゲーム" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blind games (disk a).hdm" size="1261568" crc="ecbcbcdf" sha1="b1d6e7cd363174b5203e22fbebc4e14e6f380bda" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blind games (disk b).hdm" size="1261568" crc="304a1b3d" sha1="2aeb7394e4fc7b8db9ee9441ee5313a8ebc7f037" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blind games (disk c).hdm" size="1261568" crc="25c60b82" sha1="10ae5e6641526140b8860ff8598ec79664b826da" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blind games (disk d).hdm" size="1261568" crc="4320669a" sha1="8e9135ee83c6f98352be174ddf1ae4eb8f280e3a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="blitzkrg">
 		<description>Blitzkrieg Toubu Sensen 1941-45</description>
 		<year>1990</year>
@@ -7375,13 +6308,13 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ブリッツクリーク 東部戦線 １９４１－４５" />
 		<info name="release" value="199012xx" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="brtzkrg1.d88" size="1281968" crc="9b40d0ea" sha1="ef15b59189ae42e0c2b02b002b95a4f7ef8bcdfc" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Game Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="brtzkrg2.d88" size="1281968" crc="03e78967" sha1="c2214736901277b63713f89ad92aa9248a62271f" offset="0" />
 			</dataarea>
@@ -7394,41 +6327,39 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>シーライオン (Sea Lion)</publisher>
 		<info name="alt_title" value="ザ・ブロックバスター" />
 		<info name="release" value="19950630" />
-		<info name="usage" value="Boot from HDD, then run X:HDINST.BAT X:, where X: is the floppy drive where disk A is inserted" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="block_1.d88" size="1281968" crc="fa1d60cd" sha1="c44f0e8ab43af88ecf06f967e94f3daec99d22b9" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="block_2.d88" size="1281968" crc="e2966799" sha1="3839fe8df0fd155befec45ef5d14caf1492e4cc4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="block_3.d88" size="1281968" crc="d39722c4" sha1="341e8b1fc432ebb9e35a346b14cb65d03214f3bb" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="block_4.d88" size="1281968" crc="1d422a7c" sha1="03525f125d600f3c52e72e5f463f39d58be8081d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="block_5.d88" size="1281968" crc="002ac49f" sha1="2f4ee3f7dc47f1be209417a9b4777d9bea41ad83" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep -->
-	<software name="blockouta" cloneof="blockout" supported="partial">
+	<software name="blockouta" cloneof="blockout" supported="yes">
 		<description>Block Out (Patched?)</description>
 		<year>1991</year>
 		<publisher>アクイレムジャパン (Acclaim Japan)</publisher>
@@ -7461,7 +6392,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>きんぷくりん (Kinpukurin)</publisher>
 		<info name="alt_title" value="ブルー" />
 		<info name="release" value="19920117" />
-		<info name="usage" value="The first time playing the game insert a blank disk on drive B: to create the user disk, otherwise the intro will just loop endlessly" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1281968">
@@ -7488,7 +6418,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>トラッシュ (Trush)</publisher>
 		<info name="alt_title" value="ブルー・ガーネット" />
 		<info name="release" value="19940715" />
-		<info name="usage" value="From DOS, run DOSINST.EXE to copy DOS files to disk A, or HDINST.EXE to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -7515,51 +6444,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="blueruin">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Blue Ruins - Harukanaru Bibanon no Hihou</description>
-		<year>1996</year>
-		<publisher>ビビアン (Vi Vi an)</publisher>
-		<info name="alt_title" value="BLUE RUINS 遥かなるビバノンの秘宝" />
-		<info name="release" value="19960405" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blue ruins (disk a).hdm" size="1261568" crc="951a21f4" sha1="e5d910eed534f7d8ad70a207545dbf513012baf3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blue ruins (disk b).hdm" size="1261568" crc="ab7ab502" sha1="cfbc24b024e8fcff0e627666057fb1aa69b5624b" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blue ruins (disk c).hdm" size="1261568" crc="460bda0a" sha1="f64ba969ce6cce7494397b7bcb4b7e93e941107d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blue ruins (disk d).hdm" size="1261568" crc="688148da" sha1="457d5a1842093e06ac0d25096287725d8e43c8e1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blue ruins (disk e).hdm" size="1261568" crc="51127b54" sha1="52f69de3001eddefd333e9c966b8f054473332e7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="blue ruins (disk f).hdm" size="1261568" crc="c55d9357" sha1="bbf218a4515c982f2df82eb923ca1b0f9cb3ef79" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bellonch">
 		<description>Body Inspection in Belloncho - Belloncho Shintai Kensa</description>
 		<year>1990</year>
@@ -7579,11 +6463,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="bokosuka">
+	<software name="bokosuka" supported="no">
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<info name="usage" value="Runs best on 8086-based machines (e.g. PC-9801F)" />
 		<info name="alt_title" value="ボコスカウォーズ" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1111904">
@@ -7599,49 +6482,49 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="ボンバークエスト" />
 		<info name="release" value="19941014" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="bquest_1.fdi" size="1265664" crc="8a4f7226" sha1="492fa4db6c6aca9e20dc9a7f24ff6ec12798e3ff" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="bquest_2.fdi" size="1265664" crc="ba8bbed1" sha1="48bc62608a3d9e5cb67080ea76d5bc2c21b179ab" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="bquest_3.fdi" size="1265664" crc="2fb5f6f2" sha1="23bb0ad3bc7231fbdbc43fd852fe590a7c489865" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="bquest_4.fdi" size="1265664" crc="2d35cb09" sha1="b4311cc03e227a166ead9766c39d28cab91d1d91" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="bquest_5.fdi" size="1265664" crc="7a398402" sha1="6c8de2f29adb9e090b63dfb8d6b79056d2c31f15" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="bquest_6.fdi" size="1265664" crc="45786897" sha1="9d1407d67643c1fb3b7106a9c7eb3907238e251a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk G"/>
+			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="bquest_7.fdi" size="1265664" crc="534bcd7d" sha1="0a209df0012af2851cd72b6bf1e1f6715c60e22c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk H"/>
+			<feature name="part_id" value="Disk 8"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="bquest_8.fdi" size="1265664" crc="f4789165" sha1="62bbd61f9df701a112ec30dcccdd53f8a18bc7a4" offset="0" />
 			</dataarea>
@@ -7661,7 +6544,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Only works with a PC-9801-26K -->
 	<software name="bonnoyob">
 		<description>Bonnou Yobikou</description>
 		<year>1990</year>
@@ -7674,7 +6556,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 				<rom name="disk_a.fdi" size="1265664" crc="c0ca173c" sha1="198127be6187b96bdcdf87eab625039f7e1b8620" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="dddb5b58" sha1="446fc865c6ae0bdeaf1950716a76652d4d04d995" offset="0" />
@@ -7698,59 +6580,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="disk_b.fdi" size="1265664" crc="2b4b7067" sha1="8733f6cd7615b3b2ae93b07b6abb43a67f44187f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Seems to have some trouble with disk changes. Works when installed to HDD. -->
-	<software name="bhludy" supported="partial">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Bounty Hunter Ludy</description>
-		<year>1996</year>
-		<publisher>スクープ (Scoop)</publisher>
-		<info name="alt_title" value="バウンティハンター ルディ" />
-		<info name="release" value="19961025" />
-		<info name="usage" value="To install to HDD, run HDINST.EXE from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bounty hunter ludy (disk 1).hdm" size="1261568" crc="ed76b03d" sha1="11c847ced2439ecb7bd8811cd450a821597f7f9c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bounty hunter ludy (disk 2).hdm" size="1261568" crc="6c59cf89" sha1="95250a87cf258880efbe4248282ef48fb131bbfc" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bounty hunter ludy (disk 3).hdm" size="1261568" crc="f209e5c7" sha1="ec58aeb05a4910534b44bce1602563ea75c2ccb9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bounty hunter ludy (disk 4).hdm" size="1261568" crc="bcdc75e1" sha1="198f34e245dac1c92e0e93d6c3eed68a223c2612" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bounty hunter ludy (disk 5).hdm" size="1261568" crc="5a6f9964" sha1="dd6f2770bf085a29d25986cb01e29841cb541d19" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bounty hunter ludy (disk 6).hdm" size="1261568" crc="90e01b31" sha1="eb3e5fa13af699161a50f536193f1f8f85917ee5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bounty hunter ludy (disk 7).hdm" size="1261568" crc="6556173f" sha1="13542e108868ffd61d3a90c660f6bf6402af37a8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7849,29 +6678,33 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ" />
 		<info name="release" value="19911025" />
-		<info name="usage" value="To create the user disk, boot from disk 2 with a blank disk on drive B." />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="blandisha.fdi" size="1265664" crc="ea3d3f0c" sha1="cd7c5bd4bf80214627204c01fec098a92b87088c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="blandishb.fdi" size="1265664" crc="f30811c1" sha1="9662a48421f08162c2001c4ed8f9da117183102b" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="blandishc.fdi" size="1265664" crc="c917c94c" sha1="7b596b11dd81be65f62f8da01788a2e3e569c2c6" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="blandishuser.fdi" size="1265664" crc="cc72de5b" sha1="462f2390fa732b04d10f4d9093a7d285c1eb469b" offset="0" status="baddump" />
+			</dataarea>
+		</part>
 	</software>
 
-	<!-- After creating the program disk and booting from it, the game asks for "disk 3", but none of the disks included here work -->
-	<software name="brand2pb" supported="no">
+	<software name="brand2pb">
 		<description>Brandish 2 - The Planet Buster</description>
 		<year>1993</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -7915,7 +6748,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="brand2pba" cloneof="brand2pb" supported="no">
+	<software name="brand2pba" cloneof="brand2pb">
 		<description>Brandish 2 - The Planet Buster (Alt Program Disk)</description>
 		<year>1993</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -7965,93 +6798,64 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ３ スピリット オブ バルカン" />
 		<info name="release" value="19941125" />
-		<info name="usage" value="Boot DOS, mount disk 7 and run INSTALL.EXE from it. Requires DOS 5.0, later versions will not work." />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 / Scenario Disk"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="1.fdi" size="1265664" crc="cd0c8d12" sha1="65f42960818d148e265fc48a0dfcfa97a3c625db" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 / Scenario Disk"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2.fdi" size="1265664" crc="ae7a40a5" sha1="fe7c79f314ae2c461e79200b172847d6e7be3c65" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3 / Scenario Disk"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="3.fdi" size="1265664" crc="9663f29b" sha1="9e1544de806000d1f3a94efda050e3e940957a1e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4 / Scenario Disk"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="4.fdi" size="1265664" crc="06e36690" sha1="3f9580c6ab947411c40db401c8b5a8b784491761" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5 / Visual Disk"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="5.fdi" size="1265664" crc="d3a516a9" sha1="c861f6baea9539e812cb449140e1707d178f1164" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6 / Visual Disk"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="6.fdi" size="1265664" crc="4c13a1e6" sha1="d2d13bf5b043833ee3c0b6077888de53c473a576" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7 / Visual Disk"/>
+			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="7.fdi" size="1265664" crc="a8f104e6" sha1="5c373464d2d597e00df39b1660504e66112b6c31" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 8 / Master Disk"/>
+			<feature name="part_id" value="Disk 8"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="8.fdi" size="1265664" crc="e88acd45" sha1="983893c67598ba8c197969cdf1eb8533d40d8974" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Doesn't pass the protection check -->
-	<software name="brandnew" supported="no">
-		<!-- Origin: private dump (r09) -->
+	<software name="brandnew">
 		<description>Brandish Renewal</description>
 		<year>1995</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ リニューアル" />
 		<info name="release" value="19950310" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="3536856">
-				<rom name="brandish_renewal_disk1.mfm" size="3536856" crc="24056f4f" sha1="6acc923430a1f5165e69a099d25156b533c044a7" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="3594434">
-				<rom name="brandish_renewal_disk2.mfm" size="3594434" crc="ff09f243" sha1="9c8e3c99ac406b2501aa83867fa9e78424efb408" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="3540493">
-				<rom name="brandish_renewal_disk3.mfm" size="3540493" crc="921fcfd9" sha1="f2f0360687115190dcd220b92f3b7232c917c65c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="brandnewc" cloneof="brandnew">
-		<description>Brandish Renewal (cracked)</description>
-		<year>1995</year>
-		<publisher>日本ファルコム (Nihon Falcom)</publisher>
-		<info name="alt_title" value="ブランディッシュ リニューアル" />
-		<info name="release" value="19950310" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Master Disk"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="master disk.fdi" size="1265664" crc="6cb4f3cf" sha1="b009291260eb382d27cb82fc407371cf033973a0" offset="0" />
 			</dataarea>
@@ -8068,28 +6872,34 @@ only have some part of Windows file and a Video driver(CLGD?).
 				<rom name="disk 3.fdi" size="1265664" crc="4266a633" sha1="13c021d7f049b9ef1807da976db81056ca1c8216" offset="0" />
 			</dataarea>
 		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="User Disk"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="userdisk.fdi" size="1265664" crc="e6c9b225" sha1="75ef5d3858447854f9d3491814cb9655a907dbc2" offset="0" status="baddump" />
+			</dataarea>
+		</part>
 	</software>
 
-	<software name="brandnewca" cloneof="brandnew">
-		<description>Brandish Renewal (Alt, cracked)</description>
+	<software name="brandnewa" cloneof="brandnew">
+		<description>Brandish Renewal (Alt)</description>
 		<year>1995</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ リニューアル" />
 		<info name="release" value="19950310" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="bran_a.d88" size="1281968" crc="a4c64fa5" sha1="22291dc9281f4c407fe96bb32782a00d6c95fb5f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="bran_b.d88" size="1281968" crc="01300e87" sha1="f12fd6ac50c963d320648c4c238361eff9134f26" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="bran_c.d88" size="1281968" crc="61ce0af9" sha1="d1d00087fab5ac536c32d6c7bb3475e78dce2f59" offset="0" />
 			</dataarea>
@@ -8172,88 +6982,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="branmar2">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Branmarker 2</description>
-		<year>1995</year>
-		<publisher>ディー・オー (D.O.)</publisher>
-		<info name="alt_title" value="ブランマーカー２" />
-		<info name="release" value="19951014" />
-		<info name="usage" value="Run HDINST.BAT from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1330192">
-				<rom name="branmarker 2 (disk a).nfd" size="1330192" crc="b9f6b834" sha1="db1f728b829d17f56ec2b1003cdf8c88faac7c61" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk b).hdm" size="1261568" crc="dba2c1c7" sha1="994e23cc7e865d67e25b8349e73890fb6c26d53e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk c).hdm" size="1261568" crc="7d10554d" sha1="b851eff87afc53e1d6e51026ec53822906e5176d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk d).hdm" size="1261568" crc="670d42f7" sha1="d6b2526d9d0fdfaa1058fd29b67f47e0370279f9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk e).hdm" size="1261568" crc="44b38dd8" sha1="4c91b1e416c9761041b142d0cb244648ed79609a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk f).hdm" size="1261568" crc="bd25c3b5" sha1="a6a36140ad9eb4a0742c854cf4d84f0f6f168c4f" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk G"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk g).hdm" size="1261568" crc="fd2eea16" sha1="30e4c743961457081983996795cd126611c55608" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk H"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk h).hdm" size="1261568" crc="cb87e1dc" sha1="bf746be3f4870d366750152090f438f317aaa76d" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Disk I"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk i).hdm" size="1261568" crc="f23a69c5" sha1="14d77c354734506250df2c95aabeb783762180d9" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop10" interface="floppy_5_25">
-			<feature name="part_id" value="Disk J"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk j).hdm" size="1261568" crc="a66ae6ed" sha1="37fd301492edccd903a2645902c42f7a25c96ff1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop11" interface="floppy_5_25">
-			<feature name="part_id" value="Disk K"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk k).hdm" size="1261568" crc="a3964e7d" sha1="78f44c1a4f6c967eae70cb5a8c1b54ddf46d37d2" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop12" interface="floppy_5_25">
-			<feature name="part_id" value="Disk L"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="branmarker 2 (disk l).hdm" size="1261568" crc="fd250143" sha1="95f452cb72dbdf3aa116fd47e1160ee8880f95e8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bretlays">
 		<description>Bretonne Lays</description>
 		<year>1989</year>
@@ -8291,28 +7019,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="beditorb.d88" size="1281968" crc="883c5db1" sha1="d5213d70c333bbc85c0c5e1c70c132ded06d7e56" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bretlayss1" cloneof="bretlays">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Bretonne Lays Scenario Shuu 1</description>
-		<year>1990</year>
-		<publisher>システムソフト (SystemSoft)</publisher>
-		<info name="alt_title" value="ブルトン・レイ シナリオ集1" />
-		<info name="release" value="19900102" />
-		<info name="usage" value="Requires &quot;Bretonne Lays&quot; to work" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Powerup Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bretonne lais scenario shuu 1 (powerup disk).hdm" size="1261568" crc="312e12cb" sha1="b40f7c5ba5e011f66e38a6e41367494cbc2feea5" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario Disk"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bretonne lais scenario shuu 1 (scenario disk).hdm" size="1261568" crc="bbf0a381" sha1="9d25e4a200d07f6fba6f9ff3e7a420ba24432030" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -8359,52 +7065,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="briganty">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Briganty - The Roots of Darkness</description>
-		<year>1995</year>
-		<publisher>戯画 (Giga)</publisher>
-		<info name="alt_title" value="ブリガンティ The roots of darkness" />
-		<info name="release" value="19951027" />
-		<info name="usage" value="Requires the game manual to pass the protection check" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="briganty (disk a).hdm" size="1261568" crc="330e957b" sha1="ce656769e233ca82474de1f705f9da310aafa2fc" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="briganty (disk b).hdm" size="1261568" crc="df1ce536" sha1="17331e9a7ace4a1d18e9fc5123d0f01780dd95d1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="briganty (disk c).hdm" size="1261568" crc="86f2d0f4" sha1="eca7740f959c95f03518204bce1d01f647845ad3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="briganty (disk d).hdm" size="1261568" crc="d35e3447" sha1="1c4c7341be0a655d814f46859053307dc56c1a2e" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="briganty (disk e).hdm" size="1261568" crc="31810b7c" sha1="e94860b781b2c5b3d64ea7b9e3cb1e9d4e3c2c84" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="briganty (disk f).hdm" size="1261568" crc="bd634e6c" sha1="d1d431a3b5fdbff7f92faf4f8a803064cabec7dd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bringup">
 		<description>Bring Up</description>
 		<year>1991</year>
@@ -8444,7 +7104,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>クロスメディアソフト (Cross Media Soft)</publisher>
 		<info name="alt_title" value="バブルガムクライシス ＣＲＩＭＥ ＷＡＶＥ" />
 		<info name="release" value="198909xx" />
-		<info name="usage" value="Runs best on 8086 or 286-based machines" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1086448">
@@ -8491,45 +7150,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="bunhuntz">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Bunny Hunter Zero</description>
-		<year>1995</year>
-		<publisher>ジャニス (Janis)</publisher>
-		<info name="alt_title" value="ばにぃはんたぁ零" />
-		<info name="release" value="19950428" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bunny hunter zero (disk a).hdm" size="1261568" crc="379bf71d" sha1="af72e0d58edf295cb6fc554a4c25fa1a44603107" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bunny hunter zero (disk b).hdm" size="1261568" crc="00eae4d7" sha1="c20d240a373cabb2dd514071da44a7e1c65793a3" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bunny hunter zero (disk c).hdm" size="1261568" crc="74af8042" sha1="227e34639a39e67a1887ba46c446ae7f0be6f184" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bunny hunter zero (disk d).hdm" size="1261568" crc="2c9c3cf2" sha1="9ae1f15abd7ca626ff984b21aa7c08475793127a" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="bunny hunter zero (disk e).hdm" size="1261568" crc="6e63e149" sha1="4de9e9a1c2f908249a3f3bb3b1ed48d05dd86026" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="burai2">
 		<description>Burai Gekan - Kanketsu Hen</description>
 		<year>1990</year>
@@ -8568,8 +7188,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- During the intro the graphics become corrupted and eventually disappear completely, while the music keeps playing -->
-	<software name="burai" supported="no">
+	<software name="burai">
 		<description>Burai Joukan</description>
 		<year>1989</year>
 		<publisher>リバーヒルソフト (Riverhill Soft)</publisher>
@@ -10617,8 +9236,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Fails to boot with "E4" error -->
-	<software name="blassty" supported="no">
+	<software name="blassty">
 		<description>Cruise Chaser Blassty</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
@@ -10912,8 +9530,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Seems to have some trouble creating the save disk. Without it it's not possible to start the game. -->
-	<software name="azurebnd" supported="no">
+	<software name="azurebnd">
 		<description>Curse of the Azure Bonds</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
@@ -10931,7 +9548,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="azurebnda" cloneof="azurebnd" supported="no">
+	<software name="azurebnda" cloneof="azurebnd">
 		<description>Curse of the Azure Bonds (Alt)</description>
 		<year>1991</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
@@ -11016,18 +9633,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="cyber_writer_dx.fdi" size="1265664" crc="1bfb1798" sha1="fead561bd4bacf2e4383bff82c1fa8432f941c78" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="davinci">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Animation Editor 'da Vinci-98'</description>
-		<year>1987</year>
-		<publisher>HAL研究所 (HAL Laboratory) / 新企画社 (Shinkikakusha)</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="animation editor da vinci-98.hdm" size="1261568" crc="4d31c43a" sha1="8ec37a7fe3e006e3c4827762f6041d6f813e1c0b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14114,6 +12719,26 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<software name="bishod91a" cloneof="bishod91">
+		<description>Bishoujo Daizukan 91 (Alt)</description>
+		<year>1991</year>
+		<publisher>サンタ・フェ (Santa Fe)</publisher>
+		<info name="alt_title" value="美少女大図鑑＇９１" />
+		<info name="release" value="199111xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="zukan_a_alt.fdi" size="1265664" crc="1376494c" sha1="10ad06e5291a972c0ca258b268798e0324a4c2ae" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1265664">
+				<rom name="zukan_b.fdi" size="1265664" crc="01fdfbfb" sha1="df87123766eb0ee483d47ab6e1e7d82244158fd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="twinkstr">
 		<description>Division Guardian Twinkle-Star</description>
 		<year>1993</year>
@@ -15074,26 +13699,6 @@ only have some part of Windows file and a Video driver(CLGD?).
 			<feature name="part_id" value="Scenario 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="ed2_s3.fdi" size="1265664" crc="1ce6911a" sha1="ace726e6efe12dc224d9dae52c91955bc5835ef0" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dragflam">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>Dragons of Flame</description>
-		<year>1992</year>
-		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
-		<info name="alt_title" value="ＡＤ＆Ｄ ドラゴン オブ フレイム" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ad&amp;d dragons of flame (disk 1).hdm" size="1261568" crc="52576516" sha1="0a229353833987a6eb7982b0fe7f7ad8a99aefc6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="ad&amp;d dragons of flame (disk 2).hdm" size="1261568" crc="97776cd8" sha1="3d106ed9ad2232023eb6d99fba5e8987dc2a12d3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -16761,8 +15366,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Fails to boot with "packed file is corrupt" error. Works when installed to HDD. -->
-	<software name="5element" supported="partial">
+	<software name="5element">
 		<description>Fifth Element - Tamashii no Genso</description>
 		<year>1992</year>
 		<publisher>遊演体 (You-en-tai)</publisher>
@@ -17520,43 +16124,43 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<info name="alt_title" value="復活祭 ～アスティカーヤの魔女～" />
 		<info name="release" value="19920925" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="asticaya_1.fdi" size="1265664" crc="0261c461" sha1="699df9127642366507e01ab70f702b9c3f460be5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="asticaya_2.fdi" size="1265664" crc="f605d18e" sha1="678794be437a5f3391a7ecc5e816c54ee1153824" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="asticaya_3.fdi" size="1265664" crc="74cba375" sha1="5e50e92de02a1e709b6e8023ae23db02770e79d4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="asticaya_4.fdi" size="1265664" crc="f03313d8" sha1="4c371b0000c28628eca3f563a0ce00658f46b34d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="asticaya_5.fdi" size="1265664" crc="f3ed9bd5" sha1="0f7b92d1058e18b7b6b82f87278de2a4b23df838" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="asticaya_6.fdi" size="1265664" crc="a5bc3e0f" sha1="e4799688cd0b5ccc59707b678b23fad5d4fa6e8d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk G"/>
+			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="asticaya_7.fdi" size="1265664" crc="c7110456" sha1="1f72fd2ae2e00ff3d6f881f1fe1b02de35191166" offset="0" />
 			</dataarea>
@@ -39307,8 +37911,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- Runs too fast on anything but a PC-9801F, but kanji display doesn't work on that model -->
-	<software name="asteka2" supported="partial">
+	<software name="asteka2">
 		<description>Taiyou no Shinden - Asteka II</description>
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -39817,7 +38420,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<publisher>ムービック (Movic)</publisher>
 		<info name="alt_title" value="鉄甲旗艦アトラゴン" />
 		<info name="release" value="19950224" />
-		<info name="usage" value="Run INSTALL.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -41760,6 +40362,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+<!-- is there a "correct" disk order? -->
 	<software name="2shot">
 		<description>Two Shot Diary</description>
 		<year>1994</year>
@@ -41773,73 +40376,73 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Hoshi Hikaru"/>
+			<feature name="part_id" value="Hoshi Hika?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_hoshihika.d88" size="1281968" crc="65183146" sha1="9a7264ffcb72d32fbc821f9ac76e6f7d9b979c7c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Ichinose Eri"/>
+			<feature name="part_id" value="Ichinose Eri?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_ichinoseeri.d88" size="1281968" crc="ed1fa4d9" sha1="1eb3798835c011cf39973df3cebaf9174609c459" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Iida Rika"/>
+			<feature name="part_id" value="Iida Rika?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_iidarika.d88" size="1281968" crc="4e884f19" sha1="c6f759836fc06d3a86cf4ff105fdf2e76c55f20e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Miyashita Kumiko"/>
+			<feature name="part_id" value="Miyashi Takumi?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_miyashitakumi.d88" size="1281968" crc="76025885" sha1="961c5957792a1a1ea379154031cf61cad6968f11" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Nakahara Yoshimi"/>
+			<feature name="part_id" value="Nakahara Yoshi?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_nakaharayoshi.d88" size="1281968" crc="6bc8248a" sha1="91a7c802613c8fcaa3ad215839e8c5649ea06270" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Nakamura Aya"/>
+			<feature name="part_id" value="Nakamura Aya?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_nakamuraaya.d88" size="1281968" crc="969eb70f" sha1="c9ef3e76d96b5c0addae167cd376b1e5b5e8d212" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Nishino Kazumi"/>
+			<feature name="part_id" value="Nishino Kazu?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_nishinokazu.d88" size="1281968" crc="d8f9c114" sha1="73e00bc2a7c514990008012b4a8f5a7e3d46574a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Oka Yuuko"/>
+			<feature name="part_id" value="Oka Yuu?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_okayuu.d88" size="1281968" crc="ee92ef0e" sha1="6da1119bf9c4ad86cd6144bd6fa22dd5b4333042" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
-			<feature name="part_id" value="Saeki Mimi"/>
+			<feature name="part_id" value="Sae Kimi?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_saekimi.d88" size="1281968" crc="6a38948d" sha1="38ee55894fe3001be037a4515d6927c61e93eb1d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_5_25">
-			<feature name="part_id" value="Shiina Mari"/>
+			<feature name="part_id" value="Shiina Ma?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_shiinama.d88" size="1281968" crc="6b62dc28" sha1="0bc74df9347de0d7edcf122a3dd16c98cce4ba9f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
-			<feature name="part_id" value="Suzuki Mina"/>
+			<feature name="part_id" value="Suzuki Mina?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_suzukimina.d88" size="1281968" crc="64e8826c" sha1="61175d182625aba54209d0b227e0ffaaa145ca3d" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_5_25">
-			<feature name="part_id" value="Taniguchi Maki"/>
+			<feature name="part_id" value="Taniguchi Ma?"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="2shot_taniguchima.d88" size="1281968" crc="c29ef135" sha1="2d471854b122f81b5eed20bd168ca54e1a06d579" offset="0" />
 			</dataarea>
@@ -41852,7 +40455,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<publisher>ミンク (Mink)</publisher>
 		<info name="alt_title" value="ツーショットＤｉａｒｙ２ ｍｅｍｏｒｙ ３／４" />
 		<info name="release" value="19960406" />
-		<info name="usage" value="Run HDINST.EXE from DOS to install" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -41897,39 +40499,38 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<publisher>ミンク (Mink)</publisher>
 		<info name="alt_title" value="ツーショットＤｉａｒｙ２ ｍｅｍｏｒｙ ４／４" />
 		<info name="release" value="19960524" />
-		<info name="usage" value="Run HDINST.EXE from DOS to install" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2shot4_1.fdi" size="1265664" crc="0cee1342" sha1="b51ef1481260eb50d1c32b8ba65f78a161febbbf" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2shot4_2.fdi" size="1265664" crc="d6c02124" sha1="5b20dd7b94b706c0197b54889adc0ae286dc954f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2shot4_3.fdi" size="1265664" crc="aa19dc3e" sha1="5ba6bc2ae6cfe54ed32c44f663c0567821a43661" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk D"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2shot4_4.fdi" size="1265664" crc="2036ac19" sha1="2a3a9510de74a1b76ac58adc9853604c02c3bd3f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk E"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2shot4_5.fdi" size="1265664" crc="3356fe56" sha1="6ed96d94ea8b6eae43ba3126f17ace0ca0282d62" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk F"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1265664">
 				<rom name="2shot4_6.fdi" size="1265664" crc="7a9db8e9" sha1="e8cc9fc59f0ab50ff300c242d12fe35906399905" offset="0" />
 			</dataarea>
@@ -46395,6 +44996,19 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
  -->
 
 
+<!-- .FDD isn't supported yet -->
+	<software name="177" supported="no">
+		<description>177</description>
+		<year>1986</year>
+		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<info name="release" value="198609xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="359676">
+				<rom name="177.fdd" size="359676" crc="b70eba3f" sha1="f2a33a0b3b37dd097bb5145e6be9f0281c73831d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="4thunit" supported="no">
 		<description>Dai4 no Unit - The 4th Unit</description>
 		<year>1988</year>
@@ -46407,8 +45021,19 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<software name="4thunit2" supported="no">
+		<description>The 4th Unit 2</description>
+		<year>1988</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="第４のユニット２" />
+		<info name="release" value="19880714" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1093136">
+				<rom name="4th2.nfd" size="1093136" crc="1b5718fa" sha1="fd48174695ceadd0f772e70c20a15d0a9236da57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-	<!-- Black screen on boot -->
 	<software name="aressha" supported="no">
 		<description>A Ressha de Ikou 98 ~ Take the A Train.</description>
 		<year>1987</year>
@@ -46421,7 +45046,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
 	<software name="abunatena" cloneof="abunaten" supported="no">
 		<description>Abunai Tengu Densetsu - Yomigaetta Tengu ga Yozora o Mau (Alt Format)</description>
 		<year>1989</year>
@@ -46448,7 +45072,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- Hangs after entering your name -->
 	<software name="adrecon" supported="no">
 		<description>Adrenalin Connection</description>
 		<year>1987</year>
@@ -46501,8 +45124,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- This is a compilation of pictures and information about the enemies in Last Armageddon. Apparently it was sold only by mail order. -->
-	<software name="alienzuk">
+<!-- Last Armageddon expansion? -->
+	<software name="alienzuk" supported="no">
 		<description>Alien Zukan</description>
 		<year>1988</year>
 		<publisher>ブレイングレイ (Brain Grey)</publisher>
@@ -46515,7 +45138,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="amarant3">
+	<software name="amarant3" supported="no">
 		<description>Amaranth III - Phantasie RPG</description>
 		<year>1991</year>
 		<publisher>風雅システム (Fuga System)</publisher>
@@ -46553,13 +45176,12 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="amarant4">
+	<software name="amarant4" supported="no">
 		<description>Amaranth IV - Abenteuerroman in Langsam</description>
 		<year>1995</year>
 		<publisher>風雅システム (Fuga System)</publisher>
 		<info name="alt_title" value="アマランス４" />
 		<info name="release" value="19950804" />
-		<info name="usage" value="Run AMA4INST.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System"/>
 			<dataarea name="flop" size="600060">
@@ -46604,31 +45226,30 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="arcus">
+	<software name="arcus" supported="no">
 		<description>Arcus</description>
 		<year>1988</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<info name="alt_title" value="アークス" />
 		<info name="release" value="19880710" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Game Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="arcus_1.nfd" size="1329680" crc="60a24369" sha1="0d31346723d7556fd81a6a66e455e5d1e3706366" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Game Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="arcus_2.nfd" size="1329680" crc="694db61d" sha1="ab816b45527bb841aa880fa7ff37ef245ecd3c38" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="artactn">
+	<software name="artactn" supported="no">
 		<description>Art Action</description>
 		<year>1992</year>
 		<publisher>Wachi Electronics</publisher>
-		<info name="usage" value="Run G98.EXE from DOS, or INSTALL.BAT to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -46643,11 +45264,10 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="asscardd">
+	<software name="asscardd" supported="no">
 		<description>Assist Card (Demo)</description>
 		<year>19??</year>
 		<publisher>アシスト (Assist)</publisher>
-		<info name="usage" value="Run ACD.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="assist_card_demo.hdm" size="1261568" crc="f315c7db" sha1="773c631bccb24586155c535203c0a3f98f8b44f7" offset="0" />
@@ -46655,11 +45275,10 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="astrog94">
+	<software name="astrog94" supported="no">
 		<description>Astroguide 1994</description>
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<info name="usage" value="Run MAOIX.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="astroguide_1994.hdm" size="1261568" crc="1a03d750" sha1="feaa9d627c72c3aa1bf3e6d12471341c171830be" offset="0" />
@@ -46667,9 +45286,9 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="begirla" cloneof="begirl">
+	<software name="begirla" cloneof="begirl" supported="no">
 		<description>Be Girl (Alt Format)</description>
-		<year>1988</year>
+		<year>19??</year>
 		<publisher>パスカル2 (Pascal2)</publisher>
 		<info name="alt_title" value="Ｂｅガール" />
 		<part name="flop1" interface="floppy_5_25">
@@ -46679,14 +45298,12 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- The installer asks for disk A, but none of these images work. Happens on other emulators and real hardware too. Maybe some kind of copy protection? -->
 	<software name="beastbrd" supported="no">
 		<description>The Beast Breeders</description>
 		<year>1996</year>
 		<publisher>ぷち (Petit)</publisher>
 		<info name="alt_title" value="ビーストブリーダーズ" />
 		<info name="release" value="19960628" />
-		<info name="usage" value="Run HDINST.COM from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1329680">
@@ -46719,7 +45336,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="beastlr2" supported="no">
 		<description>Beast Lord II</description>
 		<year>1992</year>
@@ -46740,7 +45356,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="bestplayd" cloneof="bestplay">
+	<software name="bestplayd" cloneof="bestplay" supported="no">
 		<description>The Best Play Baseball (Demo)</description>
 		<year>1991?</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -46751,7 +45367,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="bshashos">
+	<software name="bshashos" supported="no">
 		<description>Bishoujo Shashinkan Bangaihen - Outside Story</description>
 		<year>1990</year>
 		<publisher>ハード (Hard)</publisher>
@@ -49590,7 +48206,6 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>Lotus 1-2-3 Notebook</description>
 		<year>19??</year>
 		<publisher>Lotus</publisher>
-		<info name="usage" value="Run INSTALL.BAT from DOS, select 1 (98NOTE), then run 123.EXE" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="123notebook.hdm" size="1261568" crc="d8b21297" sha1="ff4a65eb9556cec58a72bd0f28aeff1155ded31e" offset="0" />
@@ -52521,11 +51136,10 @@ SPACE EMPIRE
 
 
 
-<!-- These come from TOSEC set -->
+<!-- These come from TOSEC set. we need to either convert them to FDI/D88 or add support for FDD directly! -->
 
 
-	<!-- Asks for disk C after the first part of the intro, but doesn't recognize it. Works when installed to HDD. -->
-	<software name="3x3eyes" supported="partial">
+	<software name="3x3eyes" supported="no">
 		<description>3x3 Eyes - Sanjiyan Henjou</description>
 		<year>1993</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
@@ -52605,7 +51219,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="3x3eyesa" cloneof="3x3eyes" supported="partial">
+	<software name="3x3eyesa" cloneof="3x3eyes" supported="no">
 		<description>3x3 Eyes - Sanjiyan Henjou (Alt Disk 1)</description>
 		<year>1993</year>
 		<publisher>日本クリエイト (Nihon Create)</publisher>
@@ -52729,13 +51343,12 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="acespade">
+	<software name="acespade" supported="no">
 		<description>Ace of Spades</description>
 		<year>1995</year>
 		<publisher>ラブ・ガン (Love Gun)</publisher>
 		<info name="alt_title" value="エース オブ スペード" />
 		<info name="release" value="19951207" />
-		<info name="usage" value="Boot DOS, insert disk A, and run HDINST.EXE" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="586748">
@@ -52750,14 +51363,12 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- For some reason the installer doesn't display any numbers; it's still possible to install and run the game correctly, though -->
-	<software name="advpowd2">
+	<software name="advpowd2" supported="no">
 		<description>Advanced Power Dolls 2</description>
 		<year>1996</year>
 		<publisher>工画堂 (Kogado)</publisher>
 		<info name="alt_title" value="アドヴァンスド パワードール２" />
 		<info name="release" value="19960223" />
-		<info name="usage" value="Boot DOS from floppy, insert disk 1 and run INST.EXE" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1092604">
@@ -52814,7 +51425,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="aishimai">
+	<software name="aishimai" supported="no">
 		<description>Ai Shimai - Futari no Kajitsu</description>
 		<year>1994</year>
 		<publisher>シルキーズ (Silky's)</publisher>
@@ -52846,7 +51457,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="akumu">
+	<software name="akumu" supported="no">
 		<description>Akumu - Aoi Kajitsu no Sanka</description>
 		<year>1996</year>
 		<publisher>スタジオメビウス (Studio Mobius)</publisher>
@@ -52890,7 +51501,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="alaskan">
+	<software name="alaskan" supported="no">
 		<description>Alaskan Malamute G.C.</description>
 		<year>1992</year>
 		<publisher>ホームデータ (Home Data)</publisher>
@@ -52910,11 +51521,11 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="alice2">
-		<description>Alice no Yakata II</description>
+	<software name="alice2" supported="no">
+		<description>Alice no Yakata 2</description>
 		<year>1992</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="アリスの館II" />
+		<info name="alt_title" value="アリスの館２" />
 		<info name="release" value="19920715" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -52942,11 +51553,11 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="alice3">
-		<description>Alice no Yakata III</description>
+	<software name="alice3" supported="no">
+		<description>Alice no Yakata 3</description>
 		<year>1995</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="アリスの館III" />
+		<info name="alt_title" value="アリスの館３" />
 		<info name="release" value="19950407" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -52986,13 +51597,12 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="aitd">
+	<software name="aitd" supported="no">
 		<description>Alone in the Dark</description>
 		<year>1994</year>
 		<publisher>アローマイクロテックス (Arrow Micro-Techs)</publisher>
 		<info name="alt_title" value="アローン イン ザ ダーク" />
 		<info name="release" value="19940311" />
-		<info name="usage" value="Requires a PC-9821 machine. To install, boot DOS, mount disk 1 and run INSTALL.EXE." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1216508">
@@ -53019,7 +51629,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="ambivalz">
+	<software name="ambivalz" supported="no">
 		<description>AmbivalenZ - Niritsu Haihan</description>
 		<year>1994</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -53113,7 +51723,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="angel">
+	<software name="angel" supported="no">
 		<description>U-Jin Presents - Angel</description>
 		<year>1993</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
@@ -53145,13 +51755,12 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="anglhalo">
+	<software name="anglhalo" supported="no">
 		<description>Angel Halo</description>
 		<year>1996</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="alt_title" value="エンジェルハイロウ" />
 		<info name="release" value="19961017" />
-		<info name="usage" value="Run INSTALL.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="634876">
@@ -53178,13 +51787,12 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="angelngt">
+	<software name="angelngt" supported="no">
 		<description>Angel Night - Yamiyo o Kakeru Tenshi-tachi no Monogatari</description>
 		<year>1996</year>
 		<publisher>フォア・ナイン (Fournine)</publisher>
 		<info name="alt_title" value="えんじぇる☆ないと ～闇夜を翔ける天使たちの物語～" />
 		<info name="release" value="19960426" />
-		<info name="usage" value="Boot DOS, insert disk B, and run INSTHD.EXE. " />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1069052">
@@ -53223,8 +51831,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- Doesn't recognize Data Disk 2 when booted from floppy, but it works when installed to HDD -->
-	<software name="animemah" supported="partial">
+	<software name="animemah" supported="no">
 		<description>Animahjong X</description>
 		<year>1994</year>
 		<publisher>ソニア (Sogna)</publisher>
@@ -53237,92 +51844,91 @@ SPACE EMPIRE
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 1"/>
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1232892">
 				<rom name="anime mahjong x (1994)(sogna)(disk 02 of 14)(disk 01).fdd" size="1232892" crc="26dc4f36" sha1="13328c30319ef786a5f7cd4cbcf1a0caa3db36e1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 2"/>
+			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1245180">
 				<rom name="anime mahjong x (1994)(sogna)(disk 03 of 14)(disk 02).fdd" size="1245180" crc="59084345" sha1="acd6822f7556ea160d50cd19381c575c33fb5837" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 3"/>
+			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1298428">
 				<rom name="anime mahjong x (1994)(sogna)(disk 04 of 14)(disk 03).fdd" size="1298428" crc="f295859f" sha1="6f74d83e967d505ff787fc29db9bb23511627041" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 4"/>
+			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1282044">
 				<rom name="anime mahjong x (1994)(sogna)(disk 05 of 14)(disk 04).fdd" size="1282044" crc="69593133" sha1="9d26f00f92be53448efd0c7bbf3d25d40cbdd1b0" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 5"/>
+			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1299452">
 				<rom name="anime mahjong x (1994)(sogna)(disk 06 of 14)(disk 05).fdd" size="1299452" crc="7a9dcd9f" sha1="5a2b7193655db8caab2c15edc1b6f5664bdb5ce4" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 6"/>
+			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1233916">
 				<rom name="anime mahjong x (1994)(sogna)(disk 07 of 14)(disk 06).fdd" size="1233916" crc="d9aa45ff" sha1="8547fe8694a5bb8f7c7258ebec00a1bcc43887d7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 7"/>
+			<feature name="part_id" value="Disk 7"/>
 			<dataarea name="flop" size="1282044">
 				<rom name="anime mahjong x (1994)(sogna)(disk 08 of 14)(disk 07).fdd" size="1282044" crc="71ddf8ec" sha1="5c1a54df7339dced17d0643600228666f2d9f3d1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 8"/>
+			<feature name="part_id" value="Disk 8"/>
 			<dataarea name="flop" size="1299452">
 				<rom name="anime mahjong x (1994)(sogna)(disk 09 of 14)(disk 08).fdd" size="1299452" crc="f1bd4ab2" sha1="704010ecdefdea787c2f252b0d94628431b2fbb6" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 9"/>
+			<feature name="part_id" value="Disk 9"/>
 			<dataarea name="flop" size="1241084">
 				<rom name="anime mahjong x (1994)(sogna)(disk 10 of 14)(disk 09).fdd" size="1241084" crc="7ae3eaa1" sha1="53201270169ec044efaa6e66ed71f7b8b6226090" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 10"/>
+			<feature name="part_id" value="Disk 10"/>
 			<dataarea name="flop" size="1273852">
 				<rom name="anime mahjong x (1994)(sogna)(disk 11 of 14)(disk 10).fdd" size="1273852" crc="a4ee51d3" sha1="9526897b5c38d1f1e207e89941d27f919bfa4448" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 11"/>
+			<feature name="part_id" value="Disk 11"/>
 			<dataarea name="flop" size="1286140">
 				<rom name="anime mahjong x (1994)(sogna)(disk 12 of 14)(disk 11).fdd" size="1286140" crc="4159874e" sha1="e2552af4b1836466a7f58ffd3e9d470e7fc138be" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 12"/>
+			<feature name="part_id" value="Disk 12"/>
 			<dataarea name="flop" size="1298428">
 				<rom name="anime mahjong x (1994)(sogna)(disk 13 of 14)(disk 12).fdd" size="1298428" crc="32f070f9" sha1="24f85a94607a4281030fe7aba371539ce944d2e7" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop14" interface="floppy_5_25">
-			<feature name="part_id" value="Data Disk 13"/>
+			<feature name="part_id" value="Disk 13"/>
 			<dataarea name="flop" size="1257468">
 				<rom name="anime mahjong x (1994)(sogna)(disk 14 of 14)(disk 13).fdd" size="1257468" crc="a431310f" sha1="749c3d2cd5c8e89c372d56f3362e95c3c53e008d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="btlqueen">
-		<description>Battle Queen - Saikyou Fighters Retsuden</description>
+	<software name="btlqueen" supported="no">
+		<description>Battle Queen - Saikou Fighters Retsuden</description>
 		<year>1996</year>
 		<publisher>スペースプロジェクト (Space Project)</publisher>
 		<info name="alt_title" value="バトルクィーン 最強ファイターズ列伝" />
 		<info name="release" value="19960628" />
-		<info name="usage" value="Run BQ.BAT from DOS to play the game or INST.EXE to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1301500">
@@ -53361,12 +51967,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!--
-	    MAME fails to mount the image with "Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648"
-	    The game code (BL.EXE and BL2.OVL) is exactly the same between this and the "patched" version, so either both of them are cracked,
-	    or one of them is a rebuilt image.
-	-->
-	<software name="blockout" supported="no">
+	<software name="blockout" supported="yes">
 		<description>Block Out</description>
 		<year>1991</year>
 		<publisher>アクイレムジャパン (Acclaim Japan)</publisher>
@@ -53379,13 +51980,12 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="brandvt">
+	<software name="brandvt" supported="no">
 		<description>Brandish VT</description>
 		<year>1996</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュＶＴ" />
 		<info name="release" value="19961004" />
-		<info name="usage" value="Run INSTALL.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1285116">
@@ -60476,7 +59076,7 @@ SPACE EMPIRE
 <!-- The I/O Disks contain software for X68000 and FM-Towns machines too... we shall share them with these other systems!! -->
 
 
-	<software name="ascod06">
+	<software name="ascod06" supported="no">
 		<description>ASCII Otanoshimi Disk Vol. 6</description>
 		<year>1991</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
@@ -60489,7 +59089,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="ascod07">
+	<software name="ascod07" supported="no">
 		<description>ASCII Otanoshimi Disk Vol. 7</description>
 		<year>1991</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
@@ -60502,7 +59102,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="ascod08">
+	<software name="ascod08" supported="no">
 		<description>ASCII Otanoshimi Disk Vol. 8</description>
 		<year>1991</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
@@ -60515,7 +59115,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="ascod09">
+	<software name="ascod09" supported="no">
 		<description>ASCII Otanoshimi Disk Vol. 9</description>
 		<year>1992</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
@@ -60528,7 +59128,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="ascod13">
+	<software name="ascod13" supported="no">
 		<description>ASCII Otanoshimi Disk Vol. 13</description>
 		<year>1992</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
@@ -60541,7 +59141,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="ascod18">
+	<software name="ascod18" supported="no">
 		<description>ASCII Otanoshimi Disk Vol. 18</description>
 		<year>1993</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
@@ -62070,7 +60670,7 @@ SPACE EMPIRE
 	</software>
 
 <!-- confirmed as good by peter_j -->
-	<software name="bio100a" cloneof="bio100">
+	<software name="bio100a" cloneof="bio100" supported="no">
 		<description>Bio 100% Free Games Collection (Alt Format)</description>
 		<year>199?</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -62089,7 +60689,6 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="bkturb">
 		<description>BK Turb</description>
 		<year>199?</year>
@@ -62387,10 +60986,9 @@ SPACE EMPIRE
 	</software>
 
 	<software name="aida">
-		<description>Aida Tairiku Senki</description>
+		<description>Aida</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
-		<info name="alt_title" value="アイーダ大陸戦記" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="aida.fdi" size="1265664" crc="69bd6f05" sha1="cd5e07b2811eaeee2c6c7eb1bb8c2b02c8539e49" offset="0" />
@@ -62398,8 +60996,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- This game plays music through the beeper, but it doesn't work in MAME - it just outputs a constant beep -->
-	<software name="aisland" supported="partial">
+	<software name="aisland">
 		<description>Aisland</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
@@ -62421,8 +61018,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- Wrong sound effects (they are supposed to have different tones, not just a constant beep) -->
-	<software name="baka" supported="partial">
+	<software name="baka">
 		<description>BAKA - Boss of the Sunset</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
@@ -62906,8 +61502,7 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<!-- Crashes after the title screen with "初期設定データがありません" (initial settings data not present) error -->
-	<software name="ambcaptn" supported="no">
+	<software name="ambcaptn">
 		<description>The Ambition of Captain</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
@@ -63027,12 +61622,10 @@ doujin?!?
 -->
 
 
-	<!-- X68000 / PC-9801 hybrid -->
-	<software name="0x0f">
+	<software name="0x0f" supported="no">
 		<description>0x0F exp.3</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="usage" value="Run PC98.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="0x0f_exp3.hdm" size="1261568" crc="5e51b3e3" sha1="df99f88c8202d39d3ab8f0ffa8205f89c91e8885" offset="0" />
@@ -63040,8 +61633,7 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- Black screen -->
-	<software name="5galscon" supported="no">
+	<software name="5galscon">
 		<description>Five Gals Connection</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>   <!-- is this really a doujin soft? -->
@@ -63054,8 +61646,7 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- MAME fails to mount the image with "Incorrect layout on track 0 head 0, expected_size=166666, current_size=167648" -->
-	<software name="5x5go" supported="no">
+	<software name="5x5go">
 		<description>5x5 [Go! Go!]</description>
 		<year>1995?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -63140,12 +61731,10 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- Hybrid disk. Supports PC-9801, PC-88VA, FM Towns and X68000. -->
-	<software name="akazucc">
+	<software name="akazucc" supported="no">
 		<description>Akazukin Cha Cha - CG Works ver 1.00</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="usage" value="Run PC98.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="little_red_riding_hood_chacha_-_cg_works_ver1.hdm" size="1261568" crc="6062e4cf" sha1="910c826b387519601db369b8064e4eb488cdd00c" offset="0" />
@@ -63153,7 +61742,6 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="akihime">
 		<description>Akihime - Goddess in the Caeseress</description>
 		<year>19??</year>
@@ -63189,8 +61777,7 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="armormai" supported="no">
+	<software name="armormai">
 		<description>Armored Girl Nirvana Mai</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -63214,8 +61801,7 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="atompunk" supported="no">
+	<software name="atompunk">
 		<description>Atomic Punker</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -63250,12 +61836,11 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="batsu">
+	<software name="batsu" supported="no">
 		<description>Batsu</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Studio Pal" />
-		<info name="usage" value="Run CG.BAT from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="batsu.hdm" size="1261568" crc="b493f398" sha1="862a5e8393f888acbf59134eb1fcc5b104538744" offset="0" />
@@ -63263,7 +61848,6 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="bbalfin" supported="no">
 		<description>Battle Block Alfin</description>
 		<year>1991</year>
@@ -63295,7 +61879,6 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
 	<software name="akemi">
 		<description>Bounty Hunter Akemi</description>
 		<year>19??</year>
@@ -63331,8 +61914,7 @@ doujin?!?
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="btbsoft" supported="no">
+	<software name="btbsoft">
 		<description>CG Gallery 1 (B.T.B Software)</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -63415,19 +61997,6 @@ doujin?!?
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="chinghai (zepher).fdi" size="1478656" crc="e7e9516b" sha1="13265908ce7cb694f2c845db36f6afe33ddd6274" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chizuru">
-		<description>Chizuru</description>
-		<year>1993</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="author" value="POP Software" />
-		<info name="alt_title" value="千鶴" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1265664">
-				<rom name="thousand cranes (pop software).fdi" size="1265664" crc="3f92a3f8" sha1="e92aa96344afe46425c3ec9c998aa81b82e9bfe1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -65238,6 +63807,18 @@ doujin?!?
 		</part>
 	</software>
 
+	<software name="1000cran">
+		<description>Thousand Cranes</description>
+		<year>1993</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="author" value="POP Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="thousand cranes (pop software).fdi" size="1265664" crc="3f92a3f8" sha1="e92aa96344afe46425c3ec9c998aa81b82e9bfe1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3perpair">
 		<description>&quot;Three of a Perfect Pair&quot; - Puzzle Just for Tonight!</description>
 		<year>19??</year>
@@ -65809,6 +64390,35 @@ doujin?!?
 
 <!-- FD + CD sets, CD files required -->
 
+<!-- Runs in PC-9821 only, requires CD-Rom, there's also a .nfd version -->
+	<software name="msdetef2" supported="no">
+		<description>Ms. Detective File #2 - Sugatanaki Iraisha</description>
+		<year>1993</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="alt_title" value="ミス ディテクティブ ファイル＃２ 姿なき依頼者" />
+		<info name="release" value="19931029" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="detective2.fdi" size="1265664" crc="fd8c837d" sha1="fee06cd29f37de318732ac4d4b55b0188a7fe1a0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- requires CD-Rom -->
+	<software name="inhearth" supported="no">
+		<description>Inherit the Earth - Arashi no Orb</description>
+		<year>1995</year>
+		<publisher>スタークラフト (Starcraft)</publisher>
+		<info name="alt_title" value="インヘリット ジ アース 嵐のオーブ" />
+		<info name="release" value="19950714" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="inherit.hdm" size="1261568" crc="c7315ec7" sha1="d41c552cb523f95187e38a12334ce865664ac61b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- requires CD-Rom -->
 	<software name="ppersia2" supported="no">
 		<description>Prince of Persia 2 - The Shadow And The Flame</description>
@@ -65823,7 +64433,48 @@ doujin?!?
 		</part>
 	</software>
 
+<!-- requires CD-Rom -->
+	<software name="elhazard" supported="no">
+		<description>Shinpi no Sekai El-Hazard</description>
+		<year>1996</year>
+		<publisher>パイオニアＬＤＣ (Pioneer LDC)</publisher>
+		<info name="alt_title" value="神秘の世界エルハザード" />
+		<info name="release" value="19960322" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="elhazard (t98next cd boot disk).fdi" size="1265664" crc="f6b77664" sha1="007448bdb45c8c0aa3bdf836dffe6ecc1a4265a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
+<!-- requires CD-Rom -->
+	<software name="viperf40" supported="no">
+		<description>Viper-F40</description>
+		<year>1997</year>
+		<publisher>ソニア (Sogna)</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1265664">
+				<rom name="boot.fdi" size="1265664" crc="904235a4" sha1="ceafd2899752517e45f6eeb3fa9f74f9e6145e1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
+<!--
+Fake disk?
+
+    <software name="golflin">
+        <description>Golf Links 386 Pro</description>
+        <year>19??</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="1265664">
+                <rom name="golf links 386 pro anex86 cd & hd boot disk.fdi" size="1265664" crc="05559a9e" sha1="77510219ec879af55a90da092e268c5fa4b0257c" offset="0" />
+            </dataarea>
+        </part>
+    </software>
+-->
 
 <!-- same as disk 02 fugasel1
     <software name="mazeque">

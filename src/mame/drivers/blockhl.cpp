@@ -29,7 +29,6 @@
 #include "video/k052109.h"
 #include "video/k051960.h"
 
-#include "emupal.h"
 #include "speaker.h"
 
 
@@ -40,15 +39,14 @@
 class blockhl_state : public driver_device
 {
 public:
-	blockhl_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	blockhl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_bank5800(*this, "bank5800"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
-		m_rombank(*this, "rombank")
-	{ }
+		m_rombank(*this, "rombank") { }
 
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
@@ -68,7 +66,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<konami_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bank5800;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k052109_device> m_k052109;
@@ -83,9 +81,9 @@ private:
 
 void blockhl_state::main_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rw(FUNC(blockhl_state::k052109_051960_r), FUNC(blockhl_state::k052109_051960_w));
+	map(0x0000, 0x3fff).rw(this, FUNC(blockhl_state::k052109_051960_r), FUNC(blockhl_state::k052109_051960_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x1f88, 0x1f88).w(FUNC(blockhl_state::sound_irq_w));
+	map(0x1f88, 0x1f88).w(this, FUNC(blockhl_state::sound_irq_w));
 	map(0x1f8c, 0x1f8c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1f94, 0x1f94).portr("DSW3");
 	map(0x1f95, 0x1f95).portr("P1");
@@ -279,48 +277,56 @@ INPUT_PORTS_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-void blockhl_state::blockhl(machine_config &config)
-{
+MACHINE_CONFIG_START(blockhl_state::blockhl)
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/8); // Konami 052526
-	m_maincpu->set_addrmap(AS_PROGRAM, &blockhl_state::main_map);
-	m_maincpu->line().set(FUNC(blockhl_state::banking_callback));
+	MCFG_DEVICE_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)     // Konami 052526
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_KONAMICPU_LINE_CB(WRITE8(*this, blockhl_state, banking_callback))
 
-	ADDRESS_MAP_BANK(config, "bank5800").set_map(&blockhl_state::bank5800_map).set_options(ENDIANNESS_BIG, 8, 12, 0x800);
+	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank5800_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &blockhl_state::audio_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240)
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
-	screen.set_screen_update(FUNC(blockhl_state::screen_update_blockhl));
-	screen.set_palette("palette");
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(blockhl_state, screen_update_blockhl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024).enable_shadows();
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette("palette");
-	m_k052109->set_screen_tag("screen");
-	m_k052109->set_tile_callback(FUNC(blockhl_state::tile_callback), this);
-	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_SCREEN_TAG("screen")
+	MCFG_K052109_CB(blockhl_state, tile_callback)
+	MCFG_K052109_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_IRQ_LINE))
 
-	K051960(config, m_k051960, 0);
-	m_k051960->set_palette("palette");
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(blockhl_state::sprite_callback), this);
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(blockhl_state, sprite_callback)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

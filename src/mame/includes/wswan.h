@@ -21,7 +21,6 @@
 #include "video/wswan.h"
 #include "bus/wswan/slot.h"
 #include "bus/wswan/rom.h"
-#include "emupal.h"
 
 
 class wswan_state : public driver_device
@@ -94,11 +93,10 @@ protected:
 	void common_start();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void wswan_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(wswan);
 
 	void wswan_io(address_map &map);
 	void wswan_mem(address_map &map);
-	void wswan_snd(address_map &map);
 
 	void register_save();
 	void handle_irqs();
@@ -114,7 +112,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	void wscolor_mem(address_map &map);
-	void wscolor_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(wscolor);
 };
 
 #endif // MAME_INCLUDES_WSWAN_H

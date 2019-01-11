@@ -42,10 +42,10 @@ WRITE32_MEMBER(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w) { m_INTVEC
 
 void arcompact_device::arcompact_auxreg_map(address_map &map)
 {
-	map(0x000000002, 0x000000002).rw(FUNC(arcompact_device::arcompact_auxreg002_LPSTART_r), FUNC(arcompact_device::arcompact_auxreg002_LPSTART_w));
-	map(0x000000003, 0x000000003).rw(FUNC(arcompact_device::arcompact_auxreg003_LPEND_r), FUNC(arcompact_device::arcompact_auxreg003_LPEND_w));
-	map(0x000000009, 0x000000009).r(FUNC(arcompact_device::arcompact_auxreg00a_STATUS32_r)); // r/o
-	map(0x000000025, 0x000000025).rw(FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_r), FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w));
+	map(0x000000002, 0x000000002).rw(this, FUNC(arcompact_device::arcompact_auxreg002_LPSTART_r), FUNC(arcompact_device::arcompact_auxreg002_LPSTART_w));
+	map(0x000000003, 0x000000003).rw(this, FUNC(arcompact_device::arcompact_auxreg003_LPEND_r), FUNC(arcompact_device::arcompact_auxreg003_LPEND_w));
+	map(0x000000009, 0x000000009).r(this, FUNC(arcompact_device::arcompact_auxreg00a_STATUS32_r)); // r/o
+	map(0x000000025, 0x000000025).rw(this, FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_r), FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w));
 }
 
 #define AUX_SPACE_ADDRESS_WIDTH 32  // IO space is 32 bits of dwords

@@ -14,7 +14,6 @@ From disassembly: chips: Z80, 6845, 8251, 2x 8255, Z80CTC
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 
 class m3_state : public driver_device
@@ -28,14 +27,12 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void m3(machine_config &config);
-
-private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void m3(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-
+private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -128,14 +125,13 @@ MACHINE_CONFIG_START(m3_state::m3)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f4disp)
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	mc6845_device &crtc(MC6845(config, "crtc", 2'000'000)); // clk unknown
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(7);
-	crtc.set_update_row_callback(FUNC(m3_state::crtc_update_row), this);
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2'000'000) // clk unknown
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(7)
+	MCFG_MC6845_UPDATE_ROW_CB(m3_state, crtc_update_row)
 MACHINE_CONFIG_END
 
 ROM_START( m3 )

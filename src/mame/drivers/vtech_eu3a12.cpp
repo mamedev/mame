@@ -13,10 +13,8 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	void vreadere(machine_config &config);
-
-private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vreadere(machine_config &config);
 };
 
 uint32_t vreadere_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

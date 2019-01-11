@@ -23,6 +23,7 @@
 #include "emu.h"
 #include "includes/psion.h"
 
+#include "rendlay.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -199,7 +200,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	switch (offset & 0x0ffc0)
 	{
 	case 0x80:
-		m_lcdc->write(offset & 0x01, data);
+		m_lcdc->write(space, offset & 0x01, data);
 		break;
 	default:
 		io_rw(space, offset);
@@ -211,7 +212,7 @@ READ8_MEMBER( psion_state::io_r )
 	switch (offset & 0xffc0)
 	{
 	case 0x80:
-		return m_lcdc->read(offset & 0x01);
+		return m_lcdc->read(space, offset & 0x01);
 	default:
 		io_rw(space, offset);
 	}
@@ -250,13 +251,13 @@ READ8_MEMBER( psion1_state::switchoff_r )
 
 void psion1_state::psion1_mem(address_map &map)
 {
-	map(0x0000, 0x001f).rw(FUNC(psion1_state::hd63701_int_reg_r), FUNC(psion1_state::hd63701_int_reg_w));
+	map(0x0000, 0x001f).rw(this, FUNC(psion1_state::hd63701_int_reg_r), FUNC(psion1_state::hd63701_int_reg_w));
 	map(0x0040, 0x00ff).ram().share("sys_register");
 	map(0x2000, 0x2000).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::control_read), FUNC(hd44780_device::control_write));
 	map(0x2001, 0x2001).mirror(0x07fe).rw(m_lcdc, FUNC(hd44780_device::data_read), FUNC(hd44780_device::data_write));
-	map(0x2800, 0x2800).r(FUNC(psion1_state::reset_kb_counter_r));
-	map(0x2e00, 0x2e00).r(FUNC(psion1_state::switchoff_r));
-	map(0x3000, 0x3000).r(FUNC(psion1_state::inc_kb_counter_r));
+	map(0x2800, 0x2800).r(this, FUNC(psion1_state::reset_kb_counter_r));
+	map(0x2e00, 0x2e00).r(this, FUNC(psion1_state::switchoff_r));
+	map(0x3000, 0x3000).r(this, FUNC(psion1_state::inc_kb_counter_r));
 	map(0x4000, 0x47ff).ram().share("ram");
 	map(0xf000, 0xffff).rom();
 }
@@ -264,9 +265,9 @@ void psion1_state::psion1_mem(address_map &map)
 void psion_state::psioncm_mem(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x001f).rw(FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
 	map(0x0040, 0x00ff).ram().share("sys_register");
-	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x2000, 0x3fff).ram().share("ram");
 	map(0x8000, 0xffff).rom();
 }
@@ -274,9 +275,9 @@ void psion_state::psioncm_mem(address_map &map)
 void psion_state::psionla_mem(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x001f).rw(FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
 	map(0x0040, 0x00ff).ram().share("sys_register");
-	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x5fff).ram().share("ram");
 	map(0x8000, 0xffff).rom();
 }
@@ -284,9 +285,9 @@ void psion_state::psionla_mem(address_map &map)
 void psion_state::psionp350_mem(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x001f).rw(FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
 	map(0x0040, 0x00ff).ram().share("sys_register");
-	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x3fff).ram().share("ram");
 	map(0x4000, 0x7fff).bankrw("rambank");
 	map(0x8000, 0xffff).rom();
@@ -295,9 +296,9 @@ void psion_state::psionp350_mem(address_map &map)
 void psion_state::psionlam_mem(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x001f).rw(FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
 	map(0x0040, 0x00ff).ram().share("sys_register");
-	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x7fff).ram().share("ram");
 	map(0x8000, 0xbfff).bankr("rombank");
 	map(0xc000, 0xffff).rom();
@@ -306,9 +307,9 @@ void psion_state::psionlam_mem(address_map &map)
 void psion_state::psionlz_mem(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x001f).rw(FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
+	map(0x0000, 0x001f).rw(this, FUNC(psion_state::hd63701_int_reg_r), FUNC(psion_state::hd63701_int_reg_w));
 	map(0x0040, 0x00ff).ram().share("sys_register");
-	map(0x0100, 0x03ff).rw(FUNC(psion_state::io_r), FUNC(psion_state::io_w));
+	map(0x0100, 0x03ff).rw(this, FUNC(psion_state::io_r), FUNC(psion_state::io_w));
 	map(0x0400, 0x3fff).ram().share("ram");
 	map(0x4000, 0x7fff).bankrw("rambank");
 	map(0x8000, 0xbfff).bankr("rombank");
@@ -503,7 +504,7 @@ void psion_state::machine_start()
 	save_item(NAME(m_port2));
 	save_item(NAME(m_port6_ddr));
 	save_item(NAME(m_port6));
-	save_pointer(NAME(m_paged_ram), m_ram_bank_count * 0x4000);
+	save_pointer(NAME(m_paged_ram.get()), m_ram_bank_count * 0x4000);
 }
 
 void psion_state::machine_reset()
@@ -547,7 +548,7 @@ HD44780_PIXEL_UPDATE(psion1_state::psion1_pixel_update)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
-void psion_state::psion_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(psion_state, psion)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -582,24 +583,27 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(psion_state::psion_palette), 2);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_psion);
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(psion_state, psion)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psion)
 
-	HD44780(config, m_lcdc, 0);
-	m_lcdc->set_lcd_size(2, 16);
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
-	NVRAM(config, "nvram1").set_custom_handler(FUNC(psion_state::nvram_init)); // sys_regs
-	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
+	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram1", psion_state, nvram_init)     // sys_regs
+	MCFG_NVRAM_ADD_0FILL("nvram2")                                      // RAM
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
 
 	/* Datapack */
-	PSION_DATAPACK(config, m_pack1, 0);
-	PSION_DATAPACK(config, m_pack2, 0);
+	MCFG_PSION_DATAPACK_ADD("pack1")
+	MCFG_PSION_DATAPACK_ADD("pack2")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("pack_list", "psion2")
@@ -613,8 +617,9 @@ MACHINE_CONFIG_START(psion_state::psion_4lines)
 	MCFG_SCREEN_SIZE(6*20, 9*4)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*20-1, 0, 9*4-1)
 
-	m_lcdc->set_lcd_size(4, 20);
-	m_lcdc->set_pixel_update_cb(FUNC(psion_state::lz_pixel_update), this);
+	MCFG_DEVICE_MODIFY("hd44780")
+	MCFG_HD44780_LCD_SIZE(4, 20)
+	MCFG_HD44780_PIXEL_UPDATE_CB(psion_state,lz_pixel_update)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion1_state::psion1)
@@ -629,8 +634,9 @@ MACHINE_CONFIG_START(psion1_state::psion1)
 	MCFG_SCREEN_SIZE(6*16, 1*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 8*1-1)
 
-	m_lcdc->set_lcd_size(1, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(psion1_state::psion1_pixel_update), this);
+	MCFG_DEVICE_MODIFY("hd44780")
+	MCFG_HD44780_LCD_SIZE(1, 16)
+	MCFG_HD44780_PIXEL_UPDATE_CB(psion1_state,psion1_pixel_update)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("pack_list")
@@ -664,7 +670,7 @@ MACHINE_CONFIG_START(psion_state::psionp350)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psionp350_mem)
 
-	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
+	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psion_state::psionlz)
@@ -673,7 +679,7 @@ MACHINE_CONFIG_START(psion_state::psionlz)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psionlz_mem)
 
-	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0); // paged RAM
+	MCFG_NVRAM_ADD_0FILL("nvram3") // paged RAM
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -681,118 +687,118 @@ MACHINE_CONFIG_END
 ROM_START( psion1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v1", "Organiser I")
-	ROMX_LOAD( "psion1.rom",  0xf000, 0x1000, CRC(7e2609c1) SHA1(a3320ea8ac3ab9e0039ee16f7c571731adde5869), ROM_BIOS(0))
+	ROMX_LOAD( "psion1.rom",  0xf000, 0x1000, CRC(7e2609c1) SHA1(a3320ea8ac3ab9e0039ee16f7c571731adde5869), ROM_BIOS(1))
 ROM_END
 
 ROM_START( psioncm )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v24", "CM v2.4")
-	ROMX_LOAD("24-cm.dat",    0x8000, 0x8000,  CRC(f6798394) SHA1(736997f0db9a9ee50d6785636bdc3f8ff1c33c66), ROM_BIOS(0))
+	ROMX_LOAD( "24-cm.dat",    0x8000, 0x8000,  CRC(f6798394) SHA1(736997f0db9a9ee50d6785636bdc3f8ff1c33c66), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v26", "CM v2.6")
-	ROMX_LOAD("26-cm.rom",    0x8000, 0x8000,  CRC(21b7c94c) SHA1(e0a3168c96a3f0b37b8698e86574e40597fe3c62), ROM_BIOS(1))
+	ROMX_LOAD( "26-cm.rom",    0x8000, 0x8000,  CRC(21b7c94c) SHA1(e0a3168c96a3f0b37b8698e86574e40597fe3c62), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v33", "CM v3.3")
-	ROMX_LOAD("33-cm.rom",    0x8000, 0x8000,  CRC(5c10b167) SHA1(6deea00fe648bddae1d61a22858023bc80277ea0), ROM_BIOS(2))
+	ROMX_LOAD( "33-cm.rom",    0x8000, 0x8000,  CRC(5c10b167) SHA1(6deea00fe648bddae1d61a22858023bc80277ea0), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "v33f","CM v3.3 French")
-	ROMX_LOAD("33-cmf.rom",   0x8000, 0x8000,  CRC(4d626ce2) SHA1(82b96f11a0abfc1931b6022b84733d975ad7ab2b), ROM_BIOS(3))
+	ROMX_LOAD( "33-cmf.rom",   0x8000, 0x8000,  CRC(4d626ce2) SHA1(82b96f11a0abfc1931b6022b84733d975ad7ab2b), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "v36f","CM v3.6 French")
-	ROMX_LOAD("36-cmf.rom",   0x8000, 0x8000,  CRC(beabe0f5) SHA1(a5ef3bb92190a257cb0e94d58b2c23935436edeb), ROM_BIOS(4))
+	ROMX_LOAD( "36-cmf.rom",   0x8000, 0x8000,  CRC(beabe0f5) SHA1(a5ef3bb92190a257cb0e94d58b2c23935436edeb), ROM_BIOS(5))
 ROM_END
 
 ROM_START( psionxp )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v26", "XP v2.6")
-	ROMX_LOAD( "26-xp.rom",    0x8000, 0x8000,  CRC(a81db40f) SHA1(af72d94ccee1fa1dade8776bdbd39920665a68b7), ROM_BIOS(0) )
+	ROMX_LOAD( "26-xp.rom",    0x8000, 0x8000,  CRC(a81db40f) SHA1(af72d94ccee1fa1dade8776bdbd39920665a68b7), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( psionla )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v33", "LA v3.3")
-	ROMX_LOAD("33-la.dat",    0x8000, 0x8000,  CRC(02668ed4) SHA1(e5d4ee6b1cde310a2970ffcc6f29a0ce09b08c46), ROM_BIOS(0))
+	ROMX_LOAD( "33-la.dat",    0x8000, 0x8000,  CRC(02668ed4) SHA1(e5d4ee6b1cde310a2970ffcc6f29a0ce09b08c46), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v34g", "LA v3.4 German")
-	ROMX_LOAD("34-lag.rom",   0x8000, 0x8000,  CRC(13a92c4b) SHA1(dab8bd6a41a5fd509c5ad4b0b0ab80d14f2c421a), ROM_BIOS(1))
+	ROMX_LOAD( "34-lag.rom",   0x8000, 0x8000,  CRC(13a92c4b) SHA1(dab8bd6a41a5fd509c5ad4b0b0ab80d14f2c421a), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v36", "LA v3.6")
-	ROMX_LOAD("36-la.rom",    0x8000, 0x8000,  CRC(7442c7f6) SHA1(94f15bd06bd750be70fa4a4ab588237c5a703f65), ROM_BIOS(2))
+	ROMX_LOAD( "36-la.rom",    0x8000, 0x8000,  CRC(7442c7f6) SHA1(94f15bd06bd750be70fa4a4ab588237c5a703f65), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "v30", "LA v3.0")
-	ROMX_LOAD("30-lahp.rom",    0x8000, 0x8000,  CRC(50192528) SHA1(c556d53f70bf5ecae756b2ebfc6d954912316bbe), ROM_BIOS(3))
+	ROMX_LOAD( "30-lahp.rom",    0x8000, 0x8000,  CRC(50192528) SHA1(c556d53f70bf5ecae756b2ebfc6d954912316bbe), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "v36f", "LA v3.6 French")
-	ROMX_LOAD("36-laf.rom",    0x8000, 0x8000, CRC(036ef00e) SHA1(98f303273e570e94a1e25a58cf1ffcec0db32165), ROM_BIOS(4))
+	ROMX_LOAD( "36-laf.rom",    0x8000, 0x8000, CRC(036ef00e) SHA1(98f303273e570e94a1e25a58cf1ffcec0db32165), ROM_BIOS(5))
 ROM_END
 
 ROM_START( psionp200 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v33", "POS200a v3.3")
-	ROMX_LOAD("33-p200a.rom", 0x8000, 0x8000, CRC(91e94998) SHA1(e9e8106eb9283d20452697859894aa407cc07bd1), ROM_BIOS(0))
+	ROMX_LOAD( "33-p200a.rom", 0x8000, 0x8000, CRC(91e94998) SHA1(e9e8106eb9283d20452697859894aa407cc07bd1), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v36", "POS200 v3.6")
-	ROMX_LOAD("36-p200.rom",  0x8000, 0x8000, CRC(4569ef5b) SHA1(8c275474cc6e3f50156f0b6e32121cadd14ea8be), ROM_BIOS(1))
+	ROMX_LOAD( "36-p200.rom",  0x8000, 0x8000, CRC(4569ef5b) SHA1(8c275474cc6e3f50156f0b6e32121cadd14ea8be), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v36a", "POS200a v3.6")
-	ROMX_LOAD("36-p200a.rom", 0x8000, 0x8000, CRC(36cceeb7) SHA1(57069812c5a16babfff91dc7d7e0842e5dc68652), ROM_BIOS(2))
+	ROMX_LOAD( "36-p200a.rom", 0x8000, 0x8000, CRC(36cceeb7) SHA1(57069812c5a16babfff91dc7d7e0842e5dc68652), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "v36b", "POS250 v3.6")
-	ROMX_LOAD("36-p250.rom",  0x8000, 0x8000, CRC(235cc76a) SHA1(3229cdff4b049a1fbf9a758ce3abf3fdc9b547c9), ROM_BIOS(3))
+	ROMX_LOAD( "36-p250.rom",  0x8000, 0x8000, CRC(235cc76a) SHA1(3229cdff4b049a1fbf9a758ce3abf3fdc9b547c9), ROM_BIOS(4))
 ROM_END
 
 ROM_START( psionp350 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v36", "POS350 v3.6")
-	ROMX_LOAD("36-p350.dat",  0x8000, 0x8000,  CRC(3a371a74) SHA1(9167210b2c0c3bd196afc08ca44ab23e4e62635e), ROM_BIOS(0))
+	ROMX_LOAD( "36-p350.dat",  0x8000, 0x8000,  CRC(3a371a74) SHA1(9167210b2c0c3bd196afc08ca44ab23e4e62635e), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v38", "POS350 v3.8")
-	ROMX_LOAD("38-p350.dat",  0x8000, 0x8000,  CRC(1b8b082f) SHA1(a3e875a59860e344f304a831148a7980f28eaa4a), ROM_BIOS(1))
+	ROMX_LOAD( "38-p350.dat",  0x8000, 0x8000,  CRC(1b8b082f) SHA1(a3e875a59860e344f304a831148a7980f28eaa4a), ROM_BIOS(2))
 ROM_END
 
 ROM_START( psionlam )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v37", "LA v3.7")
-	ROMX_LOAD("37-lam.dat",   0x8000, 0x10000, CRC(7ee3a1bc) SHA1(c7fbd6c8e47c9b7d5f636e9f56e911b363d6796b), ROM_BIOS(0))
+	ROMX_LOAD( "37-lam.dat",   0x8000, 0x10000, CRC(7ee3a1bc) SHA1(c7fbd6c8e47c9b7d5f636e9f56e911b363d6796b), ROM_BIOS(1))
 ROM_END
 
 ROM_START( psionlz64 )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v44", "LZ64 v4.4")
-	ROMX_LOAD("44-lz64.dat",  0x8000, 0x10000, CRC(aa487913) SHA1(5a44390f63fc8c1bc94299ab2eb291bc3a5b989a), ROM_BIOS(0))
+	ROMX_LOAD( "44-lz64.dat",  0x8000, 0x10000, CRC(aa487913) SHA1(5a44390f63fc8c1bc94299ab2eb291bc3a5b989a), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v46si", "LZ64 v4.6 Spanish / Italian")
-	ROMX_LOAD("46-lz64i.rom", 0x8000, 0x10000, CRC(c96c7e65) SHA1(1b4af43657bbd3ecd92f370762bde166047b85e2), ROM_BIOS(1))
+	ROMX_LOAD( "46-lz64i.rom", 0x8000, 0x10000, CRC(c96c7e65) SHA1(1b4af43657bbd3ecd92f370762bde166047b85e2), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v43", "LZ64 v4.3")
-	ROMX_LOAD("43-lz64.rom",  0x8000, 0x10000, CRC(57e7a372) SHA1(46c2da1cfe991c0c1f2486e4aa28388767937ddd), ROM_BIOS(2))
+	ROMX_LOAD( "43-lz64.rom",  0x8000, 0x10000, CRC(57e7a372) SHA1(46c2da1cfe991c0c1f2486e4aa28388767937ddd), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "v46a", "LZ64 v4.6a")
-	ROMX_LOAD("46a-lz64.rom", 0x8000, 0x10000, CRC(9b0d5a7a) SHA1(f1cdd6ef43cd65ef18e148deca0500f0c1ad2f80), ROM_BIOS(3))
+	ROMX_LOAD( "46a-lz64.rom", 0x8000, 0x10000, CRC(9b0d5a7a) SHA1(f1cdd6ef43cd65ef18e148deca0500f0c1ad2f80), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "v46b", "LZ64 v4.6b")
-	ROMX_LOAD("46b-lz64.rom", 0x8000, 0x10000, CRC(8d1101e2) SHA1(eddd0c3a2881667a1485b0d66f82f8c7792995c2), ROM_BIOS(4))
+	ROMX_LOAD( "46b-lz64.rom", 0x8000, 0x10000, CRC(8d1101e2) SHA1(eddd0c3a2881667a1485b0d66f82f8c7792995c2), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(5, "v45", "LZ64 v4.5")
-	ROMX_LOAD("45-lz64.rom",  0x8000, 0x10000, CRC(4fbd5d88) SHA1(43f97549d2060840aa6313d526000530f384a08f), ROM_BIOS(5))
+	ROMX_LOAD( "45-lz64.rom",  0x8000, 0x10000, CRC(4fbd5d88) SHA1(43f97549d2060840aa6313d526000530f384a08f), ROM_BIOS(6))
 
 	ROM_REGION( 0x1000, "hd44780", 0 )
-	ROM_LOAD("psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
+	ROM_LOAD( "psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
 ROM_END
 
 ROM_START( psionlz64s )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v46", "LZ64 v4.6")
-	ROMX_LOAD("46-lz64s.dat", 0x8000, 0x10000, CRC(328d9772) SHA1(7f9e2d591d59ecfb0822d7067c2fe59542ea16dd), ROM_BIOS(0))
+	ROMX_LOAD( "46-lz64s.dat", 0x8000, 0x10000, CRC(328d9772) SHA1(7f9e2d591d59ecfb0822d7067c2fe59542ea16dd), ROM_BIOS(1))
 
 	ROM_REGION( 0x1000, "hd44780", 0 )
-	ROM_LOAD("psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
+	ROM_LOAD( "psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
 ROM_END
 
 ROM_START( psionlz )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v46", "LZ v4.6")
-	ROMX_LOAD("46-lz.dat",    0x8000, 0x10000, CRC(22715f48) SHA1(cf460c81cadb53eddb7afd8dadecbe8c38ea3fc2), ROM_BIOS(0))
+	ROMX_LOAD( "46-lz.dat",    0x8000, 0x10000, CRC(22715f48) SHA1(cf460c81cadb53eddb7afd8dadecbe8c38ea3fc2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v42", "LZ v4.2")
-	ROMX_LOAD("42-lz.rom",    0x8000, 0x10000, CRC(f2d6ad47) SHA1(ee8315ae872463068d805c6e0b71f62ae8eb65be), ROM_BIOS(1))
+	ROMX_LOAD( "42-lz.rom",    0x8000, 0x10000, CRC(f2d6ad47) SHA1(ee8315ae872463068d805c6e0b71f62ae8eb65be), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v44", "LZ v4.4")
-	ROMX_LOAD("44-lz.rom",    0x8000, 0x10000, CRC(4a0a990b) SHA1(dde0ba69a4a7f02b610ad6bd69a8b8552b060223), ROM_BIOS(2))
+	ROMX_LOAD( "44-lz.rom",    0x8000, 0x10000, CRC(4a0a990b) SHA1(dde0ba69a4a7f02b610ad6bd69a8b8552b060223), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "v45", "LZ v4.5")
-	ROMX_LOAD("45-lz.rom",    0x8000, 0x10000, CRC(f95d8f39) SHA1(cb64152c2418bf730c89999d1b13c1d1ada1f082), ROM_BIOS(3))
+	ROMX_LOAD( "45-lz.rom",    0x8000, 0x10000, CRC(f95d8f39) SHA1(cb64152c2418bf730c89999d1b13c1d1ada1f082), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "v45s", "LZ v4.5S")
-	ROMX_LOAD("45-lzs.rom",   0x8000, 0x10000, CRC(2d082d7f) SHA1(fcd00864a0cc617e61997240945ea70a8e9fa211), ROM_BIOS(4))
+	ROMX_LOAD( "45-lzs.rom",   0x8000, 0x10000, CRC(2d082d7f) SHA1(fcd00864a0cc617e61997240945ea70a8e9fa211), ROM_BIOS(5))
 
 	ROM_REGION( 0x1000, "hd44780", 0 )
-	ROM_LOAD("psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
+	ROM_LOAD( "psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))
 ROM_END
 
 ROM_START( psionp464 )
 	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v46", "POS464 v4.6")
-	ROMX_LOAD( "46-p464.dat",  0x8000, 0x10000, CRC(672a0945) SHA1(d2a6e3fe1019d1bd7ae4725e33a0b9973f8cd7d8), ROM_BIOS(0))
+	ROMX_LOAD( "46-p464.dat",  0x8000, 0x10000, CRC(672a0945) SHA1(d2a6e3fe1019d1bd7ae4725e33a0b9973f8cd7d8), ROM_BIOS(1))
 
 	ROM_REGION( 0x1000, "hd44780", 0 )
 	ROM_LOAD( "psion_lz_charset.bin",    0x0000, 0x1000,  BAD_DUMP CRC(44bff6f6) SHA1(aef544548b783d608a7d55456f6c46f421a11ed7))

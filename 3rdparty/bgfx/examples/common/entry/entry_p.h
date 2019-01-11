@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -9,12 +9,11 @@
 #define TINYSTL_ALLOCATOR entry::TinyStlAllocator
 
 #include <bx/spscqueue.h>
-#include <bx/filepath.h>
 
 #include "entry.h"
 
 #ifndef ENTRY_CONFIG_USE_NOOP
-#	define ENTRY_CONFIG_USE_NOOP 0
+#	define ENTRY_CONFIG_USE_NOOP (BX_PLATFORM_QNX)
 #endif // ENTRY_CONFIG_USE_NOOP
 
 #ifndef ENTRY_CONFIG_USE_SDL
@@ -85,7 +84,6 @@ namespace entry
 			Size,
 			Window,
 			Suspend,
-			DropFile,
 		};
 
 		Event(Enum _type)
@@ -170,13 +168,6 @@ namespace entry
 		ENTRY_IMPLEMENT_EVENT(SuspendEvent, Event::Suspend);
 
 		Suspend::Enum m_state;
-	};
-
-	struct DropFileEvent : public Event
-	{
-		ENTRY_IMPLEMENT_EVENT(DropFileEvent, Event::DropFile);
-
-		bx::FilePath m_filePath;
 	};
 
 	const Event* poll();
@@ -282,13 +273,6 @@ namespace entry
 		{
 			SuspendEvent* ev = BX_NEW(getAllocator(), SuspendEvent)(_handle);
 			ev->m_state = _state;
-			m_queue.push(ev);
-		}
-
-		void postDropFileEvent(WindowHandle _handle, const bx::FilePath& _filePath)
-		{
-			DropFileEvent* ev = BX_NEW(getAllocator(), DropFileEvent)(_handle);
-			ev->m_filePath = _filePath;
 			m_queue.push(ev);
 		}
 

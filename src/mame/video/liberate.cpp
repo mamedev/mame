@@ -212,7 +212,7 @@ VIDEO_START_MEMBER(liberate_state,prosoccr)
 	m_fg_gfx = memregion("fg_gfx")->base();
 	m_charram = std::make_unique<uint8_t[]>(0x1800 * 2);
 
-	save_pointer(NAME(m_charram), 0x1800 * 2);
+	save_pointer(NAME(m_charram.get()), 0x1800 * 2);
 	save_pointer(NAME(m_fg_gfx), 0x6000);
 }
 
@@ -243,35 +243,35 @@ VIDEO_START_MEMBER(liberate_state,prosport)
 
 /***************************************************************************/
 
-void liberate_state::liberate_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(liberate_state,liberate)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	for (int i = 0; i < 32; i++)
-	{
-		int bit0, bit1, bit2;
+	int i, bit0, bit1, bit2, g, r, b;
 
-		// red component
+	for (i = 0;i < 32;i++)
+	{
+		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
 		bit1 = (*color_prom >> 1) & 0x01;
 		bit2 = (*color_prom >> 2) & 0x01;
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// green component
+		/* green component */
 		bit0 = (*color_prom >> 3) & 0x01;
 		bit1 = (*color_prom >> 4) & 0x01;
 		bit2 = (*color_prom >> 5) & 0x01;
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// blue component
+		/* blue component */
 		bit0 = 0;
 		bit1 = (*color_prom >> 6) & 0x01;
 		bit2 = (*color_prom >> 7) & 0x01;
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		color_prom++;
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
-	palette.set_pen_color(32, rgb_t::black()); // Allocate black for when no background is displayed
+	palette.set_pen_color(32,rgb_t(0,0,0)); /* Allocate black for when no background is displayed */
 }
 
 /***************************************************************************/

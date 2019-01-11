@@ -83,18 +83,18 @@ Vgg                  18          -12V
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MM5740_MATRIX_X1(_cb)       downcast<mm5740_device &>(*device).set_x_cb<0>(DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X2(_cb)       downcast<mm5740_device &>(*device).set_x_cb<1>(DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X3(_cb)       downcast<mm5740_device &>(*device).set_x_cb<2>(DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X4(_cb)       downcast<mm5740_device &>(*device).set_x_cb<3>(DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X5(_cb)       downcast<mm5740_device &>(*device).set_x_cb<4>(DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X6(_cb)       downcast<mm5740_device &>(*device).set_x_cb<5>(DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X7(_cb)       downcast<mm5740_device &>(*device).set_x_cb<6>(DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X8(_cb)       downcast<mm5740_device &>(*device).set_x_cb<7>(DEVCB_##_cb);
-#define MCFG_MM5740_MATRIX_X9(_cb)       downcast<mm5740_device &>(*device).set_x_cb<8>(DEVCB_##_cb);
-#define MCFG_MM5740_SHIFT_CB(_cb)        downcast<mm5740_device &>(*device).set_shift_cb(DEVCB_##_cb);
-#define MCFG_MM5740_CONTROL_CB(_cb)      downcast<mm5740_device &>(*device).set_control_cb(DEVCB_##_cb);
-#define MCFG_MM5740_DATA_READY_CB(_cb)   downcast<mm5740_device &>(*device).set_data_ready_cb(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X1(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<0>(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X2(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<1>(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X3(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<2>(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X4(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<3>(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X5(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<4>(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X6(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<5>(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X7(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<6>(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X8(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<7>(DEVCB_##_cb);
+#define MCFG_MM5740_MATRIX_X9(_cb)       devcb = &downcast<mm5740_device &>(*device).set_x_cb<8>(DEVCB_##_cb);
+#define MCFG_MM5740_SHIFT_CB(_cb)        devcb = &downcast<mm5740_device &>(*device).set_shift_cb(DEVCB_##_cb);
+#define MCFG_MM5740_CONTROL_CB(_cb)      devcb = &downcast<mm5740_device &>(*device).set_control_cb(DEVCB_##_cb);
+#define MCFG_MM5740_DATA_READY_CB(_cb)   devcb = &downcast<mm5740_device &>(*device).set_data_ready_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

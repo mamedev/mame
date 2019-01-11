@@ -1,26 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:BUT
-#ifndef MAME_INCLUDES_CHAKNPOP_H
-#define MAME_INCLUDES_CHAKNPOP_H
-
-#pragma once
 
 #include "machine/taito68705interface.h"
-#include "emupal.h"
 
 class chaknpop_state : public driver_device
 {
 public:
-	chaknpop_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	chaknpop_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_tx_ram(*this, "tx_ram"),
 		m_attr_ram(*this, "attr_ram"),
-		m_spr_ram(*this, "spr_ram")
-	{ }
+		m_spr_ram(*this, "spr_ram") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -57,7 +51,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void chaknpop_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(chaknpop);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tx_tilemap_mark_all_dirty();
@@ -68,5 +62,3 @@ public:
 	void chaknpop(machine_config &config);
 	void chaknpop_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_CHAKNPOP_H

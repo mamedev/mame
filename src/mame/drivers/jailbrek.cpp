@@ -138,8 +138,8 @@ WRITE8_MEMBER(jailbrek_state::speech_w)
 
 void jailbrek_state::jailbrek_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().w(FUNC(jailbrek_state::colorram_w)).share("colorram");
-	map(0x0800, 0x0fff).ram().w(FUNC(jailbrek_state::videoram_w)).share("videoram");
+	map(0x0000, 0x07ff).ram().w(this, FUNC(jailbrek_state::colorram_w)).share("colorram");
+	map(0x0800, 0x0fff).ram().w(this, FUNC(jailbrek_state::videoram_w)).share("videoram");
 	map(0x1000, 0x10bf).ram().share("spriteram");
 	map(0x10c0, 0x14ff).ram(); /* ??? */
 	map(0x1500, 0x1fff).ram(); /* work ram */
@@ -148,17 +148,17 @@ void jailbrek_state::jailbrek_map(address_map &map)
 	map(0x2041, 0x2041).nopw(); /* ??? */
 	map(0x2042, 0x2042).ram().share("scroll_dir"); /* bit 2 = scroll direction */
 	map(0x2043, 0x2043).nopw(); /* ??? */
-	map(0x2044, 0x2044).w(FUNC(jailbrek_state::ctrl_w)); /* irq, nmi enable, screen flip */
-	map(0x3000, 0x3000).w(FUNC(jailbrek_state::coin_w));
-	map(0x3100, 0x3100).portr("DSW2").w("snsnd", FUNC(sn76489a_device::command_w));
+	map(0x2044, 0x2044).w(this, FUNC(jailbrek_state::ctrl_w)); /* irq, nmi enable, screen flip */
+	map(0x3000, 0x3000).w(this, FUNC(jailbrek_state::coin_w));
+	map(0x3100, 0x3100).portr("DSW2").w("snsnd", FUNC(sn76489a_device::write));
 	map(0x3200, 0x3200).portr("DSW3").nopw(); /* mirror of the previous? */
 	map(0x3300, 0x3300).portr("SYSTEM").w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x3301, 0x3301).portr("P1");
 	map(0x3302, 0x3302).portr("P2");
 	map(0x3303, 0x3303).portr("DSW1");
-	map(0x4000, 0x4000).w(FUNC(jailbrek_state::speech_w)); /* speech pins */
+	map(0x4000, 0x4000).w(this, FUNC(jailbrek_state::speech_w)); /* speech pins */
 	map(0x5000, 0x5000).w(m_vlm, FUNC(vlm5030_device::data_w)); /* speech data */
-	map(0x6000, 0x6000).r(FUNC(jailbrek_state::speech_r));
+	map(0x6000, 0x6000).r(this, FUNC(jailbrek_state::speech_r));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -268,16 +268,18 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	MCFG_DEVICE_PROGRAM_MAP(jailbrek_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(jailbrek_state, interrupt_nmi,  500) /* ? */
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jailbrek);
-	PALETTE(config, m_palette, FUNC(jailbrek_state::jailbrek_palette), 512, 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jailbrek)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
+	MCFG_PALETTE_INIT_OWNER(jailbrek_state, jailbrek)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(jailbrek_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jailbrek_state, vblank_irq))
 
 	/* sound hardware */

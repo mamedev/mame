@@ -37,16 +37,16 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 {
 	switch (offset)
 	{
-	case 0:
-		m_bg_ctrl = data;
-		break;
+		case 0:
+			m_bg_ctrl = data;
+			break;
 
-	case 1:
-		m_soundlatch->write(space, 0, data);
-		break;
+		case 1:
+			m_soundlatch->write(space, 0, data);
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }
 
@@ -59,7 +59,7 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0xe000, 0xe000).portr("INPUTS");
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
-	map(0xe008, 0xe00f).w(FUNC(skyfox_state::skyfox_vregs_w));
+	map(0xe008, 0xe00f).w(this, FUNC(skyfox_state::skyfox_vregs_w));
 	map(0xf001, 0xf001).portr("DSW2");
 }
 
@@ -239,15 +239,16 @@ MACHINE_CONFIG_START(skyfox_state::skyfox)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16) // from $30*2 to $CC*2+8
 	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyfox);
-	PALETTE(config, m_palette, FUNC(skyfox_state::skyfox_palette), 256+256); // 256 static colors (+256 for the background??)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skyfox)
+	MCFG_PALETTE_ADD("palette", 256+256) /* 256 static colors (+256 for the background??) */
+	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

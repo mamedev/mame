@@ -10,17 +10,21 @@
     TODO:
     - needs merging with ikki.cpp
     - look up schematics for all games
-    - hook up actual SUN 8212 and figure out ROM mode communications
+    - banbam and pettanp likely share the same MCU code, check once redumped
+    - fix banbam/pettanp simulated comms or hopefully hook up MCU ports and
+    at least get something out of the existing dump
 
     Notes:
     Banbam has a Fujitsu MB8841 4-Bit MCU for protection labeled SUN 8212.
     Its internal ROM has been imaged, manually typed, and decoded as sun-8212.ic3.
     Pettan Pyuu is a clone of Banbam although with different levels / play fields.
 
-    The MCU controls:
-      - general protection startup
-      - the time between when enemies spawn
-      - graphics selection for playfields
+    Protection currently fails on both Pettan Pyuu and Banbam if you play either
+    game to Round 11. When you get there, the music still plays but all you see is
+    "ERR-43" in red text at the bottom left of the screen and the game is no longer
+    playable.  Also, in some earlier rounds you notice the background graphics are
+    also not producing logical playfields as bits of graphics are in different
+    locations.
 
 *****************************************************************************/
 
@@ -46,25 +50,26 @@ READ8_MEMBER(markham_state::markham_e004_r)
 
 WRITE8_MEMBER(markham_state::coin_output_w)
 {
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-
-	// plain, flat out weird stuff needed to prevent phantom coins
-	// likely an activation mechanism to test individual chute behavior?
-	// this can't be boolean wise, because banbam triggers this three times
-	if (!m_coin2_lock_cnt)
+	/* only activated after first write? */
+	/* all machines write to slot B at selftest even without a coin */
+	if (m_coin_unlock)
 	{
+		/* banbam and pettanp write to both slot A and B when a coin
+		is inserted regardless of which; does this imply that they only
+		have one coin counter? */
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	}
-	else if (BIT(data, 1))
+	else
 	{
-		m_coin2_lock_cnt--;
+		m_coin_unlock = true;
 	}
 }
 
 template<int Bit>
 WRITE8_MEMBER(markham_state::flipscreen_w)
 {
-	// Strength & Skill hardware only
+	/* Strength & Skill hardware only */
 	m_scroll_ctrl = data >> 5;
 
 	if (flip_screen() != (BIT(data, Bit)))
@@ -78,7 +83,8 @@ WRITE8_MEMBER(markham_state::flipscreen_w)
 
 READ8_MEMBER(markham_state::strnskil_d800_r)
 {
-	// bit0: interrupt type?, bit1: CPU2 busack?
+	/* bit0: interrupt type?, bit1: CPU2 busack? */
+
 	return (m_irq_source);
 }
 
@@ -98,81 +104,45 @@ TIMER_DEVICE_CALLBACK_MEMBER(markham_state::strnskil_scanline)
 
 READ8_MEMBER(markham_state::banbam_protection_r)
 {
-	const uint8_t *prot_rom = (const uint8_t *)memregion("mcu_rom")->base();
+	int res;
 
-	const uint8_t init = m_packet_buffer[0] & 0x0f;
-	uint8_t comm = m_packet_buffer[1] & 0xf0;
-	uint8_t arg = m_packet_buffer[1] & 0x0f;
+	switch (m_maincpu->pc())
+	{
+		case 0x6094:    res = 0xa5; break;
+		case 0x6118:    res = 0x20; break;  /* bits 0-3 unknown */
+		case 0x6199:    res = 0x30; break;  /* bits 0-3 unknown */
+		case 0x61f5:    res = 0x60 | (machine().rand() & 0x0f); break;  /* bits 0-3 unknown */
+		case 0x6255:    res = 0x77; break;
+		case 0x62a8:    res = 0xb4; break;
+		default:        res = 0xff; break;
+	}
 
-	if (m_packet_reset)
-	{
-		// returning m_packet_buffer[0] breaks demo
-		return 0xa5;
-	}
-	else if (init == 0x08 || init == 0x05)
-	{
-		switch (comm)
-		{
-		case 0x30:
-			// palette/gfx select
-			arg = prot_rom[0x799 + (arg * 4)];
-			break;
-		case 0x40:
-			// palette/gfx select
-			arg = prot_rom[0x7C5 + (arg * 4)];
-			break;
-		case 0x60:
-			// enemy wave timer trigger
-			// randomized for now
-			arg = machine().rand();
-			break;
-		case 0x70:
-			// ??
-			arg++;
-			break;
-		case 0xb0:
-			// ??
-			arg = arg + 3;
-			break;
-		default:
-			logerror("unknown command %02x, argument is %02x \n", comm, arg);
-			arg = 0;
-		}
-		arg &= 0x0f;
-	}
-	else
-	{
-		comm = 0xf0;
-		arg = 0x0f;
-	}
-	return comm | arg;
+	logerror("%04x: protection_r -> %02x\n", m_maincpu->pc(), res);
+	return res;
 }
 
-WRITE8_MEMBER(markham_state::banbam_protection_w)
+READ8_MEMBER(markham_state::pettanp_protection_r)
 {
-	if (m_packet_write_pos)
+	int res;
+
+	switch (m_maincpu->pc())
 	{
-		m_packet_reset = false;
-	}
-	else
-	{
-		m_packet_reset = true;
+		case 0x6066:    res = 0xa5; break;
+		case 0x60dc:    res = 0x20; break;  /* bits 0-3 unknown */
+		case 0x615d:    res = 0x30; break;  /* bits 0-3 unknown */
+		case 0x61b9:    res = 0x60 | (machine().rand() & 0x0f); break;  /* bits 0-3 unknown */
+		case 0x6219:    res = 0x77; break;
+		case 0x626c:    res = 0xb4; break;
+		default:        res = 0xff; break;
 	}
 
-	m_packet_buffer[m_packet_write_pos] = data;
-	m_packet_write_pos++;
-
-	if (m_packet_write_pos > 1)
-	{
-		m_packet_write_pos = 0;
-	}
-	logerror("packet buffer is: %02x %02x, status: %s \n", m_packet_buffer[0], m_packet_buffer[1], m_packet_reset ? "reset" : "active" );
+	logerror("%04x: protection_r -> %02x\n", m_maincpu->pc(), res);
+	return res;
 }
 
-WRITE8_MEMBER(markham_state::mcu_reset_w)
+WRITE8_MEMBER(markham_state::protection_w)
 {
-	// clear or assert?
-	logerror("reset = %02x \n", data);
+	logerror("%04x: protection_w %02x\n", m_maincpu->pc(), data);
 }
 
 /****************************************************************************/
@@ -182,7 +152,7 @@ void markham_state::base_master_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd7ff).ram().w(FUNC(markham_state::videoram_w)).share("videoram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(markham_state::videoram_w)).share("videoram");
 }
 
 void markham_state::markham_master_map(address_map &map)
@@ -197,15 +167,15 @@ void markham_state::markham_master_map(address_map &map)
 	map(0xe002, 0xe002).portr("P1");
 	map(0xe003, 0xe003).portr("P2");
 
-	map(0xe004, 0xe004).r(FUNC(markham_state::markham_e004_r)); /* from CPU2 busack */
+	map(0xe004, 0xe004).r(this, FUNC(markham_state::markham_e004_r)); /* from CPU2 busack */
 
 	map(0xe005, 0xe005).portr("SYSTEM");
 
-	map(0xe008, 0xe008).w(FUNC(markham_state::coin_output_w));
+	map(0xe008, 0xe008).w(this, FUNC(markham_state::coin_output_w));
 	map(0xe009, 0xe009).nopw(); /* to CPU2 busreq */
 
 	map(0xe00c, 0xe00d).writeonly().share("xscroll");
-	map(0xe00e, 0xe00e).w(FUNC(markham_state::flipscreen_w<0>));
+	map(0xe00e, 0xe00e).w(this, FUNC(markham_state::flipscreen_w<0>));
 }
 
 void markham_state::strnskil_master_map(address_map &map)
@@ -216,7 +186,7 @@ void markham_state::strnskil_master_map(address_map &map)
 
 	map(0xc800, 0xcfff).ram().share("share1");
 
-	map(0xd800, 0xd800).r(FUNC(markham_state::strnskil_d800_r));
+	map(0xd800, 0xd800).r(this, FUNC(markham_state::strnskil_d800_r));
 	map(0xd801, 0xd801).portr("DSW1");
 	map(0xd802, 0xd802).portr("DSW2");
 	map(0xd803, 0xd803).portr("SYSTEM");
@@ -224,17 +194,9 @@ void markham_state::strnskil_master_map(address_map &map)
 	map(0xd805, 0xd805).portr("P2");
 
 	/* same write used here is used for scrolling */
-	map(0xd808, 0xd808).w(FUNC(markham_state::flipscreen_w<3>));
-	map(0xd809, 0xd809).w(FUNC(markham_state::coin_output_w));
+	map(0xd808, 0xd808).w(this, FUNC(markham_state::flipscreen_w<3>));
+	map(0xd809, 0xd809).w(this, FUNC(markham_state::coin_output_w));
 	map(0xd80a, 0xd80b).writeonly().share("xscroll");
-}
-
-void markham_state::banbam_master_map(address_map &map)
-{
-	strnskil_master_map(map);
-	map(0xd806, 0xd806).r(FUNC(markham_state::banbam_protection_r)); /* mcu data read */
-	map(0xd80d, 0xd80d).w(FUNC(markham_state::banbam_protection_w)); /* mcu data write */
-	map(0xd80c, 0xd80c).w(FUNC(markham_state::mcu_reset_w)); /* mcu reset? */
 }
 
 void markham_state::markham_slave_map(address_map &map)
@@ -242,8 +204,8 @@ void markham_state::markham_slave_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x87ff).ram().share("share1");
 
-	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xc000, 0xc000).w("sn1", FUNC(sn76496_device::write));
+	map(0xc001, 0xc001).w("sn2", FUNC(sn76496_device::write));
 
 	map(0xc002, 0xc002).nopw(); /* unknown */
 	map(0xc003, 0xc003).nopw(); /* unknown */
@@ -255,8 +217,8 @@ void markham_state::strnskil_slave_map(address_map &map)
 	map(0xc000, 0xc7ff).ram().share("spriteram");
 	map(0xc800, 0xcfff).ram().share("share1");
 
-	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::command_w));
-	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::command_w));
+	map(0xd801, 0xd801).w("sn1", FUNC(sn76496_device::write));
+	map(0xd802, 0xd802).w("sn2", FUNC(sn76496_device::write));
 }
 
 /****************************************************************************/
@@ -343,19 +305,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( strnskil )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Unknown 1-2" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x00, "Unknown 1-2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Coin Chutes" ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, "Individual" )
-	PORT_DIPSETTING(    0x08, "Common" )
-	PORT_DIPNAME( 0xf0, 0x00, "Coin1 / Coin2" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0x08, 0x00, "Unknown 1-4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0xf0, 0x00, "Coin1 / Coin2" )
 	PORT_DIPSETTING(    0x00, "1C 1C / 1C 1C" )
 	PORT_DIPSETTING(    0x10, "2C 1C / 2C 1C" )
 	PORT_DIPSETTING(    0x20, "2C 1C / 1C 3C" )
@@ -374,7 +336,7 @@ static INPUT_PORTS_START( strnskil )
 	PORT_DIPSETTING(    0xf0, DEF_STR( Free_Play ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x02, 0x00, "Unknown 2-2" )
@@ -441,9 +403,7 @@ static INPUT_PORTS_START( banbam )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME(0x08,  0x00, "Coin Chutes") PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, "Individual")
-	PORT_DIPSETTING(    0x08, "Common")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )
 	PORT_DIPNAME( 0xf0, 0x00, "Coin1 / Coin2" ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x00, "1C 1C / 1C 1C" )
 	PORT_DIPSETTING(    0x10, "2C 1C / 2C 1C" )
@@ -560,10 +520,12 @@ MACHINE_CONFIG_START(markham_state::markham)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(markham_state, screen_update_markham)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_markham);
-	PALETTE(config, m_palette, FUNC(markham_state::markham_palette), 1024, 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_markham)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_INIT_OWNER(markham_state, markham)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -603,22 +565,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(markham_state::banbam)
 
 	strnskil(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(banbam_master_map)
-
-	MB8841(config, m_mcu, CPU_CLOCK/2); /* 4.000MHz */
-	// m_mcu->read_k().set(FUNC(markham_state::mcu_portk_r));
-	// m_mcu->write_o().set(FUNC(markham_state::mcu_port_o_w));
-	// m_mcu->write_p().set(FUNC(markham_state::mcu_port_p_w));
-	// m_mcu->read_r<0>().set(FUNC(markham_state::mcu_port_r0_r));
-	// m_mcu->write_r<0>().set(FUNC(markham_state::mcu_port_r0_w));
-	// m_mcu->read_r<1>().set(FUNC(markham_state::mcu_port_r1_r));
-	// m_mcu->write_r<1>().set(FUNC(markham_state::mcu_port_r1_w));
-	// m_mcu->read_r<2>().set(FUNC(markham_state::mcu_port_r2_r));
-	// m_mcu->write_r<2>().set(FUNC(markham_state::mcu_port_r2_w));
-	// m_mcu->read_r<3>().set(FUNC(markham_state::mcu_port_r3_r));
-	// m_mcu->write_r<3>().set(FUNC(markham_state::mcu_port_r3_w));
-	m_mcu->set_disable();
+	MCFG_DEVICE_ADD("mcu", MB8841, CPU_CLOCK/2) /* 4.000MHz */
+	//  MCFG_MB88XX_READ_K_CB(READ8(*this, markham_state, mcu_portk_r))
+	//  MCFG_MB88XX_READ_R0_CB(READ8(*this, markham_state, mcu_portr0_r))
+	//  MCFG_MB88XX_WRITE_R0_CB(WRITE8(*this, markham_state, mcu_portr0_w))
+	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
 /****************************************************************************/
@@ -739,87 +690,83 @@ ROM_START( banbam )
 	ROM_LOAD( "ban-rom9.ic100",  0x4000, 0x2000, CRC(c0a5a4c8) SHA1(7f0978669218982d379a5d72c6198a33a8213ab5) )
 
 	ROM_REGION( 0x0700, "proms", 0 ) /* color PROMs */
-	ROM_LOAD( "16-3.66",         0x0000, 0x0100, CRC(dbcd3bec) SHA1(1baeec277b16c82b67e10da9d4c84cf383ef4a82) ) /* R      Prom type 24s10 */
-	ROM_LOAD( "16-4.67",         0x0100, 0x0100, CRC(9eb7b6cf) SHA1(86451e8a510f8cfbc0be7d4e7bb1ee7dfd67f1f4) ) /* G      Prom type 24s10 */
-	ROM_LOAD( "16-5.68",         0x0200, 0x0100, CRC(9b30a7f3) SHA1(a0aefc2c8325b95ea227e404583d14622b04a3b9) ) /* B      Prom type 24s10 */
-	ROM_LOAD( "16-1.148",        0x0300, 0x0200, CRC(777e2770) SHA1(7f4ef42ab4e0546c2932d498cf573bd4f4296db7) ) /* sprite Prom type mb7124h */
-	ROM_LOAD( "16-2.97",         0x0500, 0x0200, CRC(7f95d4b2) SHA1(68dc311739a4d5d72f4cfbace27f3a82f05316ff) ) /* bg     Prom type mb7124h */
+	ROM_LOAD( "16-3.66",         0x0000, 0x0100, CRC(dbcd3bec) SHA1(1baeec277b16c82b67e10da9d4c84cf383ef4a82) ) /* R       Prom type 24s10 */
+	ROM_LOAD( "16-4.67",         0x0100, 0x0100, CRC(9eb7b6cf) SHA1(86451e8a510f8cfbc0be7d4e7bb1ee7dfd67f1f4) ) /* G       Prom type 24s10 */
+	ROM_LOAD( "16-5.68",         0x0200, 0x0100, CRC(9b30a7f3) SHA1(a0aefc2c8325b95ea227e404583d14622b04a3b9) ) /* B       Prom type 24s10 */
+	ROM_LOAD( "16-1.148",        0x0300, 0x0200, CRC(777e2770) SHA1(7f4ef42ab4e0546c2932d498cf573bd4f4296db7) ) /* sprite  Prom type mb7124h */
+	ROM_LOAD( "16-2.97",         0x0500, 0x0200, CRC(7f95d4b2) SHA1(68dc311739a4d5d72f4cfbace27f3a82f05316ff) ) /* bg      Prom type mb7124h */
 
 	ROM_REGION( 0x0100, "scroll_prom", 0 ) /* scroll control PROM */
 	ROM_LOAD( "16-6.59",         0x0000, 0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
 
-	ROM_REGION( 0x2000, "mcu_rom", 0 ) /* protection, data used with Fujitsu MB8841 4-Bit MCU */
+	ROM_REGION( 0x2000, "prot_data", 0 ) /* protection, data used with Fujitsu MB8841 4-Bit MCU */
 	ROM_LOAD( "ban-rom12.ic2",   0x0000, 0x2000, CRC(044bb2f6) SHA1(829b2152740061e0506c7504885d8404fb8fe360) )
 
 	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
-	ROM_LOAD( "sun-8212.ic3",    0x000,  0x800,  CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
+	ROM_LOAD("sun-8212.ic3",     0x000,  0x800,  BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa))
 ROM_END
 
 ROM_START( pettanp )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
-	ROM_LOAD( "tvg2-16a.7",   0x0000, 0x2000, CRC(4cbbbd01) SHA1(3905cf9e9d324bb23688ab29c98d71529d3dbf0c) )
-	ROM_CONTINUE(             0x8000, 0x2000 )
-	ROM_LOAD( "tvg3-16a.8",   0x2000, 0x2000, CRC(aaa0420f) SHA1(aa7ead51002f8b1bbefd07ff23b9064804fc31b3) )
-	ROM_LOAD( "tvg4-16a.9",   0x4000, 0x2000, CRC(43306369) SHA1(1eadebd3d962da49fd204eff8692f1e1a1e3cc98) )
-	ROM_LOAD( "tvg5-16a.10",  0x6000, 0x2000, CRC(da9c635f) SHA1(3c084ad159dbabfd02a9772489c3193852d135b7) )
+	ROM_LOAD( "tvg2-16a.7",  0x0000, 0x2000, CRC(4cbbbd01) SHA1(3905cf9e9d324bb23688ab29c98d71529d3dbf0c) )
+	ROM_CONTINUE(            0x8000, 0x2000 )
+	ROM_LOAD( "tvg3-16a.8",  0x2000, 0x2000, CRC(aaa0420f) SHA1(aa7ead51002f8b1bbefd07ff23b9064804fc31b3) )
+	ROM_LOAD( "tvg4-16a.9",  0x4000, 0x2000, CRC(43306369) SHA1(1eadebd3d962da49fd204eff8692f1e1a1e3cc98) )
+	ROM_LOAD( "tvg5-16a.10", 0x6000, 0x2000, CRC(da9c635f) SHA1(3c084ad159dbabfd02a9772489c3193852d135b7) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 ) /* sub CPU */
-	ROM_LOAD( "tvg1-16.2",    0x0000, 0x2000, CRC(e36009f6) SHA1(72c485e8c19fbfc9c850094cfd87f1055154c0c5) )
+	ROM_LOAD( "tvg1-16.2",   0x0000, 0x2000, CRC(e36009f6) SHA1(72c485e8c19fbfc9c850094cfd87f1055154c0c5) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 ) /* sprite */
-	ROM_LOAD( "tvg6-16.90",   0x0000, 0x2000, CRC(6905d9d5) SHA1(586bf72bab5ab6e3e319c925decc16d7f3711af1) )
-	ROM_LOAD( "tvg7-16.92",   0x2000, 0x2000, CRC(40d02bfd) SHA1(2f6ca8197048318f7900b56169aba4c9fdf48693) )
-	ROM_LOAD( "tvg8-16.94",   0x4000, 0x2000, CRC(b18a2244) SHA1(168061e050530e6a5bc78c14a64e635370256dfd) )
+	ROM_LOAD( "tvg6-16.90",  0x0000, 0x2000, CRC(6905d9d5) SHA1(586bf72bab5ab6e3e319c925decc16d7f3711af1) )
+	ROM_LOAD( "tvg7-16.92",  0x2000, 0x2000, CRC(40d02bfd) SHA1(2f6ca8197048318f7900b56169aba4c9fdf48693) )
+	ROM_LOAD( "tvg8-16.94",  0x4000, 0x2000, CRC(b18a2244) SHA1(168061e050530e6a5bc78c14a64e635370256dfd) )
 
 	ROM_REGION( 0x6000, "gfx2", 0 ) /* bg */
-	ROM_LOAD( "tvg11-16.102", 0x0000, 0x2000, CRC(327b7a29) SHA1(4b8d57607c4a1e84c630c38eba3fa90b5496dcde) )
-	ROM_LOAD( "tvg10-16.101", 0x2000, 0x2000, CRC(624ac061) SHA1(9d479a8a256a8ff37c00bc7449b11357f9fe6cdc) )
-	ROM_LOAD( "tvg9-16.100",  0x4000, 0x2000, CRC(c477e74c) SHA1(864eddcd9c817aeecb09423071f87d3b39eb5fc4) )
+	ROM_LOAD( "tvg11-16.102",0x0000, 0x2000, CRC(327b7a29) SHA1(4b8d57607c4a1e84c630c38eba3fa90b5496dcde) )
+	ROM_LOAD( "tvg10-16.101",0x2000, 0x2000, CRC(624ac061) SHA1(9d479a8a256a8ff37c00bc7449b11357f9fe6cdc) )
+	ROM_LOAD( "tvg9-16.100", 0x4000, 0x2000, CRC(c477e74c) SHA1(864eddcd9c817aeecb09423071f87d3b39eb5fc4) )
 
 	ROM_REGION( 0x0700, "proms", 0 ) /* color PROMs */
-	ROM_LOAD( "16-3.66",      0x0000, 0x0100, CRC(dbcd3bec) SHA1(1baeec277b16c82b67e10da9d4c84cf383ef4a82) ) /* R      Prom type 24s10 */
-	ROM_LOAD( "16-4.67",      0x0100, 0x0100, CRC(9eb7b6cf) SHA1(86451e8a510f8cfbc0be7d4e7bb1ee7dfd67f1f4) ) /* G      Prom type 24s10 */
-	ROM_LOAD( "16-5.68",      0x0200, 0x0100, CRC(9b30a7f3) SHA1(a0aefc2c8325b95ea227e404583d14622b04a3b9) ) /* B      Prom type 24s10 */
-	ROM_LOAD( "16-1.148",     0x0300, 0x0200, CRC(777e2770) SHA1(7f4ef42ab4e0546c2932d498cf573bd4f4296db7) ) /* sprite Prom type mb7124h */
-	ROM_LOAD( "16-2.97",      0x0500, 0x0200, CRC(7f95d4b2) SHA1(68dc311739a4d5d72f4cfbace27f3a82f05316ff) ) /* bg     Prom type mb7124h */
+	ROM_LOAD( "16-3.66",     0x0000, 0x0100, CRC(dbcd3bec) SHA1(1baeec277b16c82b67e10da9d4c84cf383ef4a82) ) /* R       Prom type 24s10 */
+	ROM_LOAD( "16-4.67",     0x0100, 0x0100, CRC(9eb7b6cf) SHA1(86451e8a510f8cfbc0be7d4e7bb1ee7dfd67f1f4) ) /* G       Prom type 24s10 */
+	ROM_LOAD( "16-5.68",     0x0200, 0x0100, CRC(9b30a7f3) SHA1(a0aefc2c8325b95ea227e404583d14622b04a3b9) ) /* B       Prom type 24s10 */
+	ROM_LOAD( "16-1.148",    0x0300, 0x0200, CRC(777e2770) SHA1(7f4ef42ab4e0546c2932d498cf573bd4f4296db7) ) /* sprite  Prom type mb7124h */
+	ROM_LOAD( "16-2.97",     0x0500, 0x0200, CRC(7f95d4b2) SHA1(68dc311739a4d5d72f4cfbace27f3a82f05316ff) ) /* bg      Prom type mb7124h */
 
 	ROM_REGION( 0x0100, "scroll_prom", 0 ) /* scroll control PROM */
-	ROM_LOAD( "16-6.59",      0x0000, 0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
+	ROM_LOAD( "16-6.59",     0x0000, 0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
 
-	ROM_REGION( 0x1000, "mcu_rom", 0 ) /* protection data used with Fujitsu MB8841 4-Bit MCU */
-	ROM_LOAD( "tvg12-16.2",   0x0000, 0x1000, CRC(3abc6ba8) SHA1(15e0b0f9d068f6094e2be4f4f1dea0ff6e85686b) )
+	ROM_REGION( 0x1000, "prot_data", 0 ) /* protection data used with Fujitsu MB8841 4-Bit MCU */
+	ROM_LOAD( "tvg12-16.2",  0x0000, 0x1000, CRC(3abc6ba8) SHA1(15e0b0f9d068f6094e2be4f4f1dea0ff6e85686b) )
 
 	ROM_REGION(0x800, "mcu", 0) /* Fujitsu MB8841 4-Bit MCU internal ROM */
-	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800,  NO_DUMP ) // very much likely to be same as banbam and arabian
+	ROM_LOAD("sun-8212.ic3", 0x000,  0x800,  NO_DUMP)
 ROM_END
 
-void markham_state::machine_start()
+void markham_state::init_banbam()
 {
-	save_item(NAME(m_coin2_lock_cnt));
-
-	/* banbam specific */
-	save_item(NAME(m_packet_buffer));
-	save_item(NAME(m_packet_reset));
-	save_item(NAME(m_packet_write_pos));
+	/* Fujitsu MB8841 4-Bit MCU comms */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(markham_state::banbam_protection_r), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(markham_state::protection_w), this));
 }
 
-void markham_state::machine_reset()
+void markham_state::init_pettanp()
 {
-	/* prevent phantom coins again */
-	m_coin2_lock_cnt = 3;
+//  AM_RANGE(0xd80c, 0xd80c) AM_WRITENOP     /* protection reset? */
+//  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
+//  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
 
-	/* banbam specific */
-	m_packet_write_pos = 0;
-	m_packet_reset = true;
+	/* Fujitsu MB8841 4-Bit MCU comms */
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(markham_state::pettanp_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(markham_state::protection_w),this));
 }
 
 /* Markham hardware */
-GAME( 1983, markham,  0,        markham,  markham,  markham_state, empty_init, ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, markham,  0,        markham,  markham,  markham_state, empty_init,    ROT0, "Sun Electronics", "Markham", MACHINE_SUPPORTS_SAVE )
 
 /* Strength & Skill hardware */
-GAME( 1984, strnskil, 0,        strnskil, strnskil, markham_state, empty_init, ROT0, "Sun Electronics", "Strength & Skill", MACHINE_SUPPORTS_SAVE)
-GAME( 1984, guiness,  strnskil, strnskil, strnskil, markham_state, empty_init, ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE)
-
-/* Strength & Skill hardware with SUN 8212 MCU */
-GAME( 1984, banbam,   0,        banbam,   banbam,   markham_state, empty_init, ROT0, "Sun Electronics", "BanBam", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE)
-GAME( 1984, pettanp,  banbam,   banbam,   banbam,   markham_state, empty_init, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE)
+GAME( 1984, strnskil, 0,        strnskil, strnskil, markham_state, empty_init,    ROT0, "Sun Electronics", "Strength & Skill", MACHINE_SUPPORTS_SAVE)
+GAME( 1984, guiness,  strnskil, strnskil, strnskil, markham_state, empty_init,    ROT0, "Sun Electronics", "The Guiness (Japan)", MACHINE_SUPPORTS_SAVE)
+GAME( 1984, banbam,   0,        banbam,   banbam,   markham_state, init_banbam,   ROT0, "Sun Electronics", "BanBam", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE)
+GAME( 1984, pettanp,  banbam,   strnskil, banbam,   markham_state, init_pettanp,  ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE)

@@ -417,21 +417,24 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 
 *****************************************************************************************************/
 
-void mbee_state::standard_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER( mbee_state, standard )
 {
-	constexpr uint8_t bglevel[] = { 0, 0x54, 0xa0, 0xff };
-	constexpr uint8_t fglevel[] = { 0, 0xa0, 0xff, 0xff };
-	uint8_t i;
+	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t i=0, r, b, g, k, r1, g1, b1;
+	uint8_t bglevel[] = { 0, 0x54, 0xa0, 0xff };
+	uint8_t fglevel[] = { 0, 0xa0, 0xff, 0xff };
 
 	// set up background colours (00-63)
-	i = 0;
-	for (uint8_t b : bglevel)
+	for (b1 = 0; b1 < 4; b1++)
 	{
-		for (uint8_t g : bglevel)
+		b = bglevel[b1];
+		for (g1 = 0; g1 < 4; g1++)
 		{
-			for (uint8_t r : bglevel)
+			g = bglevel[g1];
+			for (r1 = 0; r1 < 4; r1++)
 			{
-				uint8_t const k = bitswap<8>(i, 7, 6, 5, 3, 1, 4, 2, 0);
+				r = bglevel[r1];
+				k = bitswap<8>(i, 7, 6, 5, 3, 1, 4, 2, 0);
 				palette.set_pen_color(k, rgb_t(r, g, b));
 				i++;
 			}
@@ -439,13 +442,12 @@ void mbee_state::standard_palette(palette_device &palette) const
 	}
 
 	// set up foreground palette (64-95) by reading the prom
-	uint8_t const *const color_prom = memregion("proms")->base();
 	for (i = 0; i < 32; i++)
 	{
-		uint8_t const k = color_prom[i];
-		uint8_t const r = fglevel[(BIT(k, 2))|(BIT(k, 5)<<1)];
-		uint8_t const g = fglevel[(BIT(k, 1))|(BIT(k, 4)<<1)];
-		uint8_t const b = fglevel[(BIT(k, 0))|(BIT(k, 3)<<1)];
+		k = color_prom[i];
+		r = fglevel[(BIT(k, 2))|(BIT(k, 5)<<1)];
+		g = fglevel[(BIT(k, 1))|(BIT(k, 4)<<1)];
+		b = fglevel[(BIT(k, 0))|(BIT(k, 3)<<1)];
 		palette.set_pen_color(i|64, rgb_t(r, g, b));
 	}
 
@@ -457,26 +459,28 @@ void mbee_state::standard_palette(palette_device &palette) const
 }
 
 
-void mbee_state::premium_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER( mbee_state, premium )
 {
-	// set up 8 low intensity colours
-	for (uint8_t i = 0; i < 7; i++)
+	uint8_t i, r, b, g;
+
+	/* set up 8 low intensity colours */
+	for (i = 0; i < 7; i++)
 	{
-		uint8_t const r = BIT(i, 0) ? 0xc0 : 0;
-		uint8_t const g = BIT(i, 1) ? 0xc0 : 0;
-		uint8_t const b = BIT(i, 2) ? 0xc0 : 0;
+		r = BIT(i, 0) ? 0xc0 : 0;
+		g = BIT(i, 1) ? 0xc0 : 0;
+		b = BIT(i, 2) ? 0xc0 : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	// colour 8 is dark grey, rather than black
 	palette.set_pen_color(8, rgb_t(96, 96, 96));
 
-	// set up 8 high intensity colours
-	for (uint8_t i = 9; i < 16; i++)
+	/* set up 8 high intensity colours */
+	for (i = 9; i < 16; i++)
 	{
-		uint8_t const r = BIT(i, 0) ? 0xff : 0;
-		uint8_t const g = BIT(i, 1) ? 0xff : 0;
-		uint8_t const b = BIT(i, 2) ? 0xff : 0;
+		r = BIT(i, 0) ? 0xff : 0;
+		g = BIT(i, 1) ? 0xff : 0;
+		b = BIT(i, 2) ? 0xff : 0;
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 

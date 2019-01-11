@@ -64,23 +64,18 @@ class scregg_state : public btime_state
 {
 public:
 	scregg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: btime_state(mconfig, type, tag)
-	{ }
+		: btime_state(mconfig, type, tag) { }
 
-	void scregg(machine_config &config);
-	void dommy(machine_config &config);
-
-	void init_rockduck();
-
-private:
 	DECLARE_WRITE8_MEMBER(scregg_irqack_w);
 	DECLARE_READ8_MEMBER(scregg_irqack_r);
 
+	void init_rockduck();
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
+	void scregg(machine_config &config);
+	void dommy(machine_config &config);
 	void dommy_map(address_map &map);
-
 	void eggs_map(address_map &map);
 };
 
@@ -109,12 +104,12 @@ void scregg_state::dommy_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x23ff).ram().share("videoram");
 	map(0x2400, 0x27ff).ram().share("colorram");
-	map(0x2800, 0x2bff).rw(FUNC(scregg_state::btime_mirrorvideoram_r), FUNC(scregg_state::btime_mirrorvideoram_w));
-	map(0x4000, 0x4000).portr("DSW1").w(FUNC(scregg_state::scregg_irqack_w));
-	map(0x4001, 0x4001).portr("DSW2").w(FUNC(scregg_state::btime_video_control_w));
+	map(0x2800, 0x2bff).rw(this, FUNC(scregg_state::btime_mirrorvideoram_r), FUNC(scregg_state::btime_mirrorvideoram_w));
+	map(0x4000, 0x4000).portr("DSW1").w(this, FUNC(scregg_state::scregg_irqack_w));
+	map(0x4001, 0x4001).portr("DSW2").w(this, FUNC(scregg_state::btime_video_control_w));
 	map(0x4002, 0x4002).portr("P1");
 	map(0x4003, 0x4003).portr("P2");
-	map(0x4004, 0x4005).w("ay1", FUNC(ay8910_device::address_data_w)).r(FUNC(scregg_state::scregg_irqack_r));
+	map(0x4004, 0x4005).w("ay1", FUNC(ay8910_device::address_data_w)).r(this, FUNC(scregg_state::scregg_irqack_r));
 	map(0x4006, 0x4007).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0xa000, 0xffff).rom();
 }
@@ -125,13 +120,13 @@ void scregg_state::eggs_map(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x1000, 0x13ff).ram().share("videoram");
 	map(0x1400, 0x17ff).ram().share("colorram");
-	map(0x1800, 0x1bff).rw(FUNC(scregg_state::btime_mirrorvideoram_r), FUNC(scregg_state::btime_mirrorvideoram_w));
-	map(0x1c00, 0x1fff).rw(FUNC(scregg_state::btime_mirrorcolorram_r), FUNC(scregg_state::btime_mirrorcolorram_w));
-	map(0x2000, 0x2000).portr("DSW1").w(FUNC(scregg_state::btime_video_control_w));
-	map(0x2001, 0x2001).portr("DSW2").w(FUNC(scregg_state::scregg_irqack_w));
+	map(0x1800, 0x1bff).rw(this, FUNC(scregg_state::btime_mirrorvideoram_r), FUNC(scregg_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(this, FUNC(scregg_state::btime_mirrorcolorram_r), FUNC(scregg_state::btime_mirrorcolorram_w));
+	map(0x2000, 0x2000).portr("DSW1").w(this, FUNC(scregg_state::btime_video_control_w));
+	map(0x2001, 0x2001).portr("DSW2").w(this, FUNC(scregg_state::scregg_irqack_w));
 	map(0x2002, 0x2002).portr("P1");
 	map(0x2003, 0x2003).portr("P2");
-	map(0x2004, 0x2005).w("ay1", FUNC(ay8910_device::address_data_w)).r(FUNC(scregg_state::scregg_irqack_r));
+	map(0x2004, 0x2005).w("ay1", FUNC(ay8910_device::address_data_w)).r(this, FUNC(scregg_state::scregg_irqack_r));
 	map(0x2006, 0x2007).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x3000, 0x7fff).rom();
 	map(0xf000, 0xffff).rom();    /* reset/interrupt vectors */
@@ -283,17 +278,21 @@ MACHINE_CONFIG_START(scregg_state::dommy)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scregg);
-	PALETTE(config, m_palette, FUNC(scregg_state::btime_palette), 8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scregg)
+	MCFG_PALETTE_ADD("palette", 8)
+
+	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.23);
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.23);
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
 
@@ -311,17 +310,21 @@ MACHINE_CONFIG_START(scregg_state::scregg)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scregg);
-	PALETTE(config, m_palette, FUNC(scregg_state::btime_palette), 8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scregg)
+	MCFG_PALETTE_ADD("palette", 8)
+
+	MCFG_PALETTE_INIT_OWNER(scregg_state,btime)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.23);
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.23);
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
 

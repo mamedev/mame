@@ -19,6 +19,9 @@ DECLARE_DEVICE_TYPE(EFO_ZSU,            efo_zsu_device)
 DECLARE_DEVICE_TYPE(EFO_ZSU1,           efo_zsu1_device)
 DECLARE_DEVICE_TYPE(CEDAR_MAGNET_SOUND, cedar_magnet_sound_device)
 
+#define MCFG_CEDAR_MAGNET_SOUND_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, CEDAR_MAGNET_SOUND, 0)
+
 
 class efo_zsu_device : public device_t
 {

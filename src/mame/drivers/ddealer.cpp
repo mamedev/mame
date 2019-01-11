@@ -11,7 +11,6 @@
     TODO:
     - Fix MCU simulation for credit subtractions & add coinage settings (currently set to free play for convenience);
     - Understand better the video emulation and convert it to tilemaps;
-    - 2 players mode gameplay is way too slow (protection related?)
     - Decap + emulate MCU, required if the random number generation is going to be accurate;
 
 ==========================================================================================================
@@ -117,15 +116,14 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class ddealer_state : public driver_device
 {
 public:
-	ddealer_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	ddealer_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_vregs(*this, "vregs"),
 		m_left_fg_vram_top(*this, "left_fg_vratop"),
 		m_right_fg_vram_top(*this, "right_fg_vratop"),
@@ -136,32 +134,9 @@ public:
 		m_mcu_shared_ram(*this, "mcu_shared_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	void ddealer(machine_config &config);
-
-	void init_ddealer();
-
-private:
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(back_vram_w);
-	DECLARE_WRITE16_MEMBER(mcu_shared_w);
-	DECLARE_READ16_MEMBER(mcu_r);
-
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
-
-	void ddealer_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-	// memory pointers
+	/* memory pointers */
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_left_fg_vram_top;
 	required_shared_ptr<uint16_t> m_right_fg_vram_top;
@@ -171,18 +146,35 @@ private:
 	required_shared_ptr<uint16_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mcu_shared_ram;
 
-	// devices
+	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	// video-related
+	/* video-related */
 	tilemap_t  *m_back_tilemap;
-
-	// MCU sim related
 	int      m_respcount;
+
+	/* misc */
 	uint8_t    m_input_pressed;
 	uint16_t   m_coin_input;
+
+	DECLARE_WRITE16_MEMBER(flipscreen_w);
+	DECLARE_WRITE16_MEMBER(back_vram_w);
+	DECLARE_WRITE16_MEMBER(mcu_shared_w);
+	DECLARE_READ16_MEMBER(mcu_r);
+
+	void init_ddealer();
+	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
+	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
+	void ddealer(machine_config &config);
+	void ddealer(address_map &map);
 };
 
 
@@ -330,15 +322,10 @@ uint32_t ddealer_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-// TODO: identify how game signals game overs to the MCU
-// maybe it reads areas 0x3000 (for p1) and 0x5000 (for p2)?
-// [+0x2c] bit 12 is active when continue screen occur.
 TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::mcu_sim)
 {
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
-	// TODO: I'm not bothering with coin/credit settings until this actually work properly
-	// (game is currently hardwired to free play)
 	m_coin_input = (~(ioport("IN0")->read()));
 
 	if (m_coin_input & 0x01)//coin 1
@@ -485,7 +472,7 @@ WRITE16_MEMBER(ddealer_state::mcu_shared_w)
 	}
 }
 
-void ddealer_state::ddealer_map(address_map &map)
+void ddealer_state::ddealer(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x080001).portr("IN0");
@@ -493,20 +480,19 @@ void ddealer_state::ddealer_map(address_map &map)
 	map(0x080006, 0x080007).portr("UNK");
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x084000, 0x084003).w("ymsnd", FUNC(ym2203_device::write)).umask16(0x00ff); // ym ?
-	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c1ff).ram().share("vregs"); // video registers
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08cfff).ram().share("vregs"); // palette ram
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
-	// certainly seems derivative of the design used in Urashima Mahjong (jalmah.cpp), not identical tho
 	map(0x090000, 0x090fff).ram().share("left_fg_vratop");
 	map(0x091000, 0x091fff).ram().share("right_fg_vratop");
 	map(0x092000, 0x092fff).ram().share("left_fg_vrabot");
 	map(0x093000, 0x093fff).ram().share("right_fg_vrabot");
-//  map(0x094000, 0x094001).noprw(); // Set at POST via clr.w, unused afterwards
-	map(0x098000, 0x098001).w(FUNC(ddealer_state::flipscreen_w));
-	map(0x09c000, 0x09cfff).ram().w(FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
+	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
+	map(0x098000, 0x098001).w(this, FUNC(ddealer_state::flipscreen_w));
+	map(0x09c000, 0x09cfff).ram().w(this, FUNC(ddealer_state::back_vram_w)).share("back_vram"); // bg tilemap
 	map(0x0f0000, 0x0fdfff).ram().share("work_ram");
-	map(0x0fe000, 0x0fefff).ram().w(FUNC(ddealer_state::mcu_shared_w)).share("mcu_shared_ram");
+	map(0x0fe000, 0x0fefff).ram().w(this, FUNC(ddealer_state::mcu_shared_w)).share("mcu_shared_ram");
 	map(0x0ff000, 0x0fffff).ram();
 }
 
@@ -610,7 +596,7 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_ddealer )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x100, 16 )
 GFXDECODE_END
 
@@ -628,16 +614,22 @@ void ddealer_state::machine_reset()
 	m_coin_input = 0;
 }
 
+INTERRUPT_GEN_MEMBER(ddealer_state::interrupt)
+{
+	device.execute().set_input_line(4, HOLD_LINE);
+}
+
 MACHINE_CONFIG_START(ddealer_state::ddealer)
 
 	MCFG_DEVICE_ADD("maincpu" , M68000, XTAL(16'000'000)/2) /* 8MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ddealer_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ddealer_state,  irq4_line_hold)
+	MCFG_DEVICE_PROGRAM_MAP(ddealer)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ddealer_state,  interrupt)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(ddealer_state, irq1_line_hold,  90)//guess, controls music tempo, 112 is way too fast
 
 	// M50747 or NMK-110 8131 MCU
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddealer);
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddealer)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -645,9 +637,10 @@ MACHINE_CONFIG_START(ddealer_state::ddealer)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddealer_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", ddealer_state, mcu_sim, attotime::from_hz(10000))
 

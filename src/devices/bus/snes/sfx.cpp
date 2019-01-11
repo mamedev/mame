@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "sfx.h"
+#include "cpu/g65816/g65816.h"
 
 //-------------------------------------------------
 //  sns_rom_superfx_device - constructor
@@ -70,27 +71,26 @@ WRITE8_MEMBER( sns_rom_superfx_device::superfx_w_bank3 )
 
 void sns_rom_superfx_device::sfx_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank1), FUNC(sns_rom_superfx_device::superfx_w_bank1));
-	map(0x400000, 0x5fffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank2), FUNC(sns_rom_superfx_device::superfx_w_bank2));
-	map(0x600000, 0x7dffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank3), FUNC(sns_rom_superfx_device::superfx_w_bank3));
-	map(0x800000, 0xbfffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank1), FUNC(sns_rom_superfx_device::superfx_w_bank1));
-	map(0xc00000, 0xdfffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank2), FUNC(sns_rom_superfx_device::superfx_w_bank2));
-	map(0xe00000, 0xffffff).rw(FUNC(sns_rom_superfx_device::superfx_r_bank3), FUNC(sns_rom_superfx_device::superfx_w_bank3));
+	map(0x000000, 0x3fffff).rw(this, FUNC(sns_rom_superfx_device::superfx_r_bank1), FUNC(sns_rom_superfx_device::superfx_w_bank1));
+	map(0x400000, 0x5fffff).rw(this, FUNC(sns_rom_superfx_device::superfx_r_bank2), FUNC(sns_rom_superfx_device::superfx_w_bank2));
+	map(0x600000, 0x7dffff).rw(this, FUNC(sns_rom_superfx_device::superfx_r_bank3), FUNC(sns_rom_superfx_device::superfx_w_bank3));
+	map(0x800000, 0xbfffff).rw(this, FUNC(sns_rom_superfx_device::superfx_r_bank1), FUNC(sns_rom_superfx_device::superfx_w_bank1));
+	map(0xc00000, 0xdfffff).rw(this, FUNC(sns_rom_superfx_device::superfx_r_bank2), FUNC(sns_rom_superfx_device::superfx_w_bank2));
+	map(0xe00000, 0xffffff).rw(this, FUNC(sns_rom_superfx_device::superfx_r_bank3), FUNC(sns_rom_superfx_device::superfx_w_bank3));
 }
 
 
 WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
 {
-	write_irq(state);
+	machine().device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, state);
 }
 
 
-void sns_rom_superfx_device::device_add_mconfig(machine_config &config)
-{
-	SUPERFX(config, m_superfx, DERIVED_CLOCK(1, 1));  /* 21.48MHz */
-	m_superfx->set_addrmap(AS_PROGRAM, &sns_rom_superfx_device::sfx_map);
-	m_superfx->irq().set(FUNC(sns_rom_superfx_device::snes_extern_irq_w));  /* IRQ line from cart */
-}
+MACHINE_CONFIG_START(sns_rom_superfx_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("superfx", SUPERFX, 21480000)  /* 21.48MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sfx_map)
+	MCFG_SUPERFX_OUT_IRQ(WRITELINE(*this, sns_rom_superfx_device, snes_extern_irq_w))  /* IRQ line from cart */
+MACHINE_CONFIG_END
 
 READ8_MEMBER( sns_rom_superfx_device::chip_read )
 {

@@ -32,7 +32,6 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -47,9 +46,6 @@ public:
 	{
 	}
 
-	void dlair2(machine_config &config);
-
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
@@ -57,11 +53,12 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
-	void dlair2_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(dlair2);
 
+	void dlair2(machine_config &config);
 	void dlair2_io(address_map &map);
 	void dlair2_map(address_map &map);
-
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -174,7 +171,7 @@ void dlair2_state::machine_reset()
 {
 }
 
-void dlair2_state::dlair2_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(dlair2_state, dlair2)
 {
 }
 
@@ -202,7 +199,8 @@ MACHINE_CONFIG_START(dlair2_state::dlair2)
 
 //  MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair2)
 
-	PALETTE(config, "palette", FUNC(dlair2_state::dlair2_palette), 256);
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(dlair2_state, dlair2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

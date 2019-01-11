@@ -111,14 +111,14 @@ void powerbal_state::magicstk_main_map(address_map &map)
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
-	map(0x098180, 0x09917f).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x094004, 0x094005).w(this, FUNC(powerbal_state::tile_banking_w));
+	map(0x098180, 0x09917f).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
-	map(0x0c2014, 0x0c2015).portr("IN2").w(FUNC(powerbal_state::magicstk_coin_eeprom_w));
+	map(0x0c2014, 0x0c2015).portr("IN2").w(this, FUNC(powerbal_state::magicstk_coin_eeprom_w));
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0e0000, 0x0fffff).ram();
@@ -131,15 +131,15 @@ void powerbal_state::powerbal_main_map(address_map &map)
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094000, 0x094001).nopw();
 	map(0x094002, 0x094003).nopw();
-	map(0x094004, 0x094005).w(FUNC(powerbal_state::tile_banking_w));
-	map(0x098000, 0x098fff).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x094004, 0x094005).w(this, FUNC(powerbal_state::tile_banking_w));
+	map(0x098000, 0x098fff).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x099000, 0x09bfff).ram(); // not used
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw();
 	map(0x0f0000, 0x0fffff).ram();
@@ -154,15 +154,15 @@ void powerbal_state::atombjt_map(address_map &map)
 	map(0x080008, 0x080009).nopr(); // remnant of the original?
 	map(0x080014, 0x080015).noprw(); // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x094000, 0x094001).w(FUNC(powerbal_state::atombjt_tile_banking_w));
+	map(0x094000, 0x094001).w(this, FUNC(powerbal_state::atombjt_tile_banking_w));
 	map(0x094002, 0x094003).noprw();    /* IRQ enable? */
-	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
+	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(this, FUNC(powerbal_state::magicstk_bgvideoram_w)).share("videoram1");
 	map(0x0c2010, 0x0c2011).portr("IN0");
 	map(0x0c2012, 0x0c2013).portr("IN1");
 	map(0x0c2014, 0x0c2015).portr("IN2");
 	map(0x0c2016, 0x0c2017).portr("DSW1");
 	map(0x0c2018, 0x0c2019).portr("DSW2");
-	map(0x0c201c, 0x0c201d).w(FUNC(powerbal_state::oki_banking));
+	map(0x0c201c, 0x0c201d).w(this, FUNC(powerbal_state::oki_banking));
 	map(0x0c201f, 0x0c201f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c4000, 0x0c4001).nopw(); // always 0?
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
@@ -551,7 +551,7 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 				code,
 				color,
 				flipx,0,
-				sx + m_xoffset,sy + m_yoffset,m_sprtranspen);
+				sx + m_xoffset,sy + m_yoffset,0);
 	}
 }
 
@@ -570,7 +570,6 @@ VIDEO_START_MEMBER(powerbal_state,atombjt)
 
 	m_xoffset = 32;
 	m_yoffset = 8;
-	m_sprtranspen = 0xf;
 
 	m_bg_tilemap->set_scrollx(0, -64);
 }
@@ -643,10 +642,11 @@ MACHINE_CONFIG_START(powerbal_state::powerbal)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
 
@@ -665,7 +665,8 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_DEVICE_PROGRAM_MAP(magicstk_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
 
-	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
 	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
@@ -677,10 +678,11 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_SCREEN_SIZE(128*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
 

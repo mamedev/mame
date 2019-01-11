@@ -14,6 +14,31 @@
 #pragma once
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_GAYLE_ADD(_tag, _clock, _id) \
+	MCFG_DEVICE_ADD(_tag, GAYLE, _clock) \
+	downcast<gayle_device &>(*device).set_id(_id);
+
+#define MCFG_GAYLE_INT2_HANDLER(_devcb) \
+	devcb = &downcast<gayle_device &>(*device).set_int2_handler(DEVCB_##_devcb);
+
+#define MCFG_GAYLE_CS0_READ_HANDLER(_devcb) \
+	devcb = &downcast<gayle_device &>(*device).set_cs0_read_handler(DEVCB_##_devcb);
+
+#define MCFG_GAYLE_CS0_WRITE_HANDLER(_devcb) \
+	devcb = &downcast<gayle_device &>(*device).set_cs0_write_handler(DEVCB_##_devcb);
+
+#define MCFG_GAYLE_CS1_READ_HANDLER(_devcb) \
+	devcb = &downcast<gayle_device &>(*device).set_cs1_read_handler(DEVCB_##_devcb);
+
+#define MCFG_GAYLE_CS1_WRITE_HANDLER(_devcb) \
+	devcb = &downcast<gayle_device &>(*device).set_cs1_write_handler(DEVCB_##_devcb);
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -27,11 +52,11 @@ public:
 	gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	auto int2_handler() { return m_int2_w.bind(); }
-	auto cs0_read_handler() { return m_cs0_read.bind(); }
-	auto cs0_write_handler() { return m_cs0_write.bind(); }
-	auto cs1_read_handler() { return m_cs1_read.bind(); }
-	auto cs1_write_handler() { return m_cs1_write.bind(); }
+	template <class Object> devcb_base &set_int2_handler(Object &&cb) { return m_int2_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cs0_read_handler(Object &&cb) { return m_cs0_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cs0_write_handler(Object &&cb) { return m_cs0_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cs1_read_handler(Object &&cb) { return m_cs1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cs1_write_handler(Object &&cb) { return m_cs1_write.set_callback(std::forward<Object>(cb)); }
 
 	// interface
 	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );

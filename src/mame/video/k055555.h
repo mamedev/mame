@@ -7,6 +7,11 @@
 #pragma once
 
 
+#define MCFG_K055555_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K055555, 0)
+
+
+
 /* K055555 registers */
 /* priority inputs */
 #define K55_PALBASE_BG      0   // background palette

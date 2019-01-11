@@ -6,7 +6,6 @@
 
 #include "cpu/z80/z80.h"
 #include "formats/sf7000_dsk.h"
-#include "imagedev/floppy.h"
 #include "imagedev/printer.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8255.h"
@@ -37,6 +36,11 @@
 class sg1000_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_LIGHTGUN_TICK
+	};
+
 	sg1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
@@ -47,17 +51,6 @@ public:
 			m_pa7(*this, "PA7"),
 			m_pb7(*this, "PB7")
 	{ }
-
-	void sg1000(machine_config &config);
-	void omv(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
-
-protected:
-	enum
-	{
-		TIMER_LIGHTGUN_TICK
-	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -71,10 +64,12 @@ protected:
 
 	DECLARE_READ8_MEMBER( peripheral_r );
 	DECLARE_WRITE8_MEMBER( peripheral_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	DECLARE_READ8_MEMBER( omv_r );
 	DECLARE_WRITE8_MEMBER( omv_w );
-
+	void sg1000(machine_config &config);
+	void omv(machine_config &config);
 	void omv_io_map(address_map &map);
 	void omv_map(address_map &map);
 	void sc3000_io_map(address_map &map);
@@ -90,10 +85,8 @@ public:
 		: sg1000_state(mconfig, type, tag)
 	{ }
 
-	void sc3000(machine_config &config);
-
-protected:
 	virtual void machine_start() override;
+	void sc3000(machine_config &config);
 };
 
 class sf7000_state : public sc3000_state
@@ -106,9 +99,6 @@ public:
 			m_floppy0(*this, UPD765_TAG ":0:3ssdd")
 	{ }
 
-	void sf7000(machine_config &config);
-
-private:
 	required_device<upd765a_device> m_fdc;
 	required_device<centronics_device> m_centronics;
 	required_device<floppy_image_device> m_floppy0;
@@ -122,6 +112,7 @@ private:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void sf7000(machine_config &config);
 	void sf7000_io_map(address_map &map);
 	void sf7000_map(address_map &map);
 };

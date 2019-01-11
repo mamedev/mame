@@ -218,11 +218,11 @@ DEFINE_DEVICE_TYPE(SEIBU_CRTC, seibu_crtc_device, "seibu_crtc", "Seibu CRT Contr
 void seibu_crtc_device::seibu_crtc_vregs(address_map &map)
 {
 	map(0x0000, 0x004f).ram(); // debug
-	map(0x0014, 0x0015).w(FUNC(seibu_crtc_device::decrypt_key_w));
-	map(0x001a, 0x001b).rw(FUNC(seibu_crtc_device::reg_1a_r), FUNC(seibu_crtc_device::reg_1a_w));
-	map(0x001c, 0x001d).w(FUNC(seibu_crtc_device::layer_en_w));
-	map(0x0020, 0x002b).w(FUNC(seibu_crtc_device::layer_scroll_w));
-	map(0x002c, 0x003b).w(FUNC(seibu_crtc_device::layer_scroll_base_w));
+	map(0x0014, 0x0015).w(this, FUNC(seibu_crtc_device::decrypt_key_w));
+	map(0x001a, 0x001b).rw(this, FUNC(seibu_crtc_device::reg_1a_r), FUNC(seibu_crtc_device::reg_1a_w));
+	map(0x001c, 0x001d).w(this, FUNC(seibu_crtc_device::layer_en_w));
+	map(0x0020, 0x002b).w(this, FUNC(seibu_crtc_device::layer_scroll_w));
+	map(0x002c, 0x003b).w(this, FUNC(seibu_crtc_device::layer_scroll_base_w));
 }
 
 WRITE16_MEMBER(seibu_crtc_device::decrypt_key_w)

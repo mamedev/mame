@@ -8,7 +8,6 @@
 #include "bus/bw2/exp.h"
 #include "cpu/z80/z80.h"
 #include "formats/bw2_dsk.h"
-#include "imagedev/floppy.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -16,12 +15,13 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "video/msm6255.h"
-#include "emupal.h"
 #include "rendlay.h"
 
 #define Z80_TAG         "ic1"
 #define I8255A_TAG      "ic4"
 #define WD2797_TAG      "ic5"
+#define I8253_TAG       "ic6"
+#define I8251_TAG       "ic7"
 #define MSM6255_TAG     "ic49"
 #define CENTRONICS_TAG  "centronics"
 #define RS232_TAG       "rs232"
@@ -33,10 +33,10 @@ public:
 	bw2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
-		m_uart(*this, "ic7"),
+		m_uart(*this, I8251_TAG),
 		m_fdc(*this, WD2797_TAG),
 		m_lcdc(*this, MSM6255_TAG),
-		m_pit(*this, "ic6"),
+		m_pit(*this, I8253_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_exp(*this, BW2_EXPANSION_SLOT_TAG),
 		m_ram(*this, RAM_TAG),
@@ -89,7 +89,7 @@ public:
 
 	// video state
 	optional_shared_ptr<uint8_t> m_video_ram;
-	void bw2_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(bw2);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;

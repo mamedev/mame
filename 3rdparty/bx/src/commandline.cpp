@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -9,14 +9,12 @@
 
 namespace bx
 {
-	// Reference(s):
-	// - https://web.archive.org/web/20180629044234/https://msdn.microsoft.com/en-us/library/a1y7w461.aspx
-	//
-	StringView tokenizeCommandLine(const StringView& _commandLine, char* _buffer, uint32_t& _bufferSize, int32_t& _argc, char* _argv[], int32_t _maxArgvs, char _term)
+	// Reference:
+	// http://msdn.microsoft.com/en-us/library/a1y7w461.aspx
+	const char* tokenizeCommandLine(const char* _commandLine, char* _buffer, uint32_t& _bufferSize, int32_t& _argc, char* _argv[], int32_t _maxArgvs, char _term)
 	{
 		int32_t argc = 0;
-		const char* curr = _commandLine.getPtr();
-		const char* end  = _commandLine.getTerm();
+		const char* curr = _commandLine;
 		char* currOut = _buffer;
 		char term = ' ';
 		bool sub = false;
@@ -32,7 +30,7 @@ namespace bx
 
 		ParserState state = SkipWhitespace;
 
-		while (end != curr
+		while ('\0' != *curr
 		&&     _term != *curr
 		&&     argc < _maxArgvs)
 		{
@@ -66,7 +64,7 @@ namespace bx
 						state = Escape;
 					}
 					else if ('"' == *curr
-					     &&  '"' != term)
+						&&  '"' != term)
 					{
 						sub = !sub;
 					}
@@ -137,7 +135,7 @@ namespace bx
 			++curr;
 		}
 
-		return StringView(curr, _commandLine.getTerm() );
+		return curr;
 	}
 
 	CommandLine::CommandLine(int32_t _argc, char const* const* _argv)

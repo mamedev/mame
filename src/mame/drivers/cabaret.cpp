@@ -27,7 +27,6 @@ are the same of IGS.  AMT may be previous IGS name.
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/ym2413.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -215,15 +214,15 @@ void cabaret_state::cabaret_portmap(address_map &map)
 
 	map(0x00e0, 0x00e1).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x2000, 0x27ff).ram().w(FUNC(cabaret_state::fg_tile_w)).share("fg_tile_ram");
-	map(0x2800, 0x2fff).ram().w(FUNC(cabaret_state::fg_color_w)).share("fg_color_ram");
+	map(0x2000, 0x27ff).ram().w(this, FUNC(cabaret_state::fg_tile_w)).share("fg_tile_ram");
+	map(0x2800, 0x2fff).ram().w(this, FUNC(cabaret_state::fg_color_w)).share("fg_color_ram");
 
 	map(0x3000, 0x37ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x3800, 0x3fff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 
-	map(0x1000, 0x103f).ram().w(FUNC(cabaret_state::bg_scroll_w)).share("bg_scroll");
+	map(0x1000, 0x103f).ram().w(this, FUNC(cabaret_state::bg_scroll_w)).share("bg_scroll");
 
-	map(0x1800, 0x19ff).ram().w(FUNC(cabaret_state::bg_tile_w)).share("bg_tile_ram");
+	map(0x1800, 0x19ff).ram().w(this, FUNC(cabaret_state::bg_tile_w)).share("bg_tile_ram");
 	map(0x8000, 0xffff).rom().region("gfx3", 0);
 }
 
@@ -372,21 +371,21 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 	MCFG_DEVICE_IO_MAP(cabaret_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
 
-	i8255_device &ppi1(I8255(config, "ppi1"));
-	ppi1.in_pa_callback().set_ioport("BUTTONS2");
-	ppi1.in_pb_callback().set_ioport("SERVICE");
-	ppi1.in_pc_callback().set_ioport("COINS");
+	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS2"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
 
-	i8255_device &ppi2(I8255(config, "ppi2"));
-	ppi2.in_pa_callback().set_ioport("BUTTONS1");
-	ppi2.out_pb_callback().set(FUNC(cabaret_state::ppi2_b_w));
-	ppi2.out_pc_callback().set(FUNC(cabaret_state::ppi2_c_w));
+	MCFG_DEVICE_ADD("ppi2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cabaret_state, ppi2_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cabaret_state, ppi2_c_w))
 
-	i8255_device &ppi3(I8255(config, "ppi3"));
-	ppi3.out_pa_callback().set(FUNC(cabaret_state::nmi_and_coins_w));
-	ppi3.tri_pa_callback().set_constant(0xf0);
-	ppi3.in_pb_callback().set_ioport("DSW1");
-	ppi3.in_pc_callback().set_ioport("DSW2");
+	MCFG_DEVICE_ADD("ppi3", I8255, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cabaret_state, nmi_and_coins_w))
+	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0xf0))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -395,10 +394,11 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_cabaret)
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabaret)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -447,4 +447,4 @@ ROM_START( cabaret )
 	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )   /* background maps, read by the CPU */
 ROM_END
 
-GAME( 1992, cabaret, 0, cabaret, cabaret, cabaret_state, init_cabaret, ROT0, "AMT Co. Ltd.", "Cabaret Show", MACHINE_NOT_WORKING )
+GAME( 1992, cabaret, 0, cabaret, cabaret, cabaret_state, init_cabaret, ROT0, "AMT Co. Ltd.", "Cabaret", MACHINE_NOT_WORKING )

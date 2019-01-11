@@ -12,7 +12,6 @@
 #pragma once
 
 #include "expansion.h"
-#include "imagedev/floppy.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "bus/generic/slot.h"

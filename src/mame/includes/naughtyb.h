@@ -1,19 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Sal and John Bugliarisi,Paul Priest
-#ifndef MAME_INCLUDES_NAUGHTYB_H
-#define MAME_INCLUDES_NAUGHTYB_H
-
-#pragma once
-
 #include "audio/pleiads.h"
-#include "emupal.h"
 #include "screen.h"
 
 class naughtyb_state : public driver_device
 {
 public:
-	naughtyb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	naughtyb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_naughtyb_custom(*this, "naughtyb_custom"),
 		m_popflame_custom(*this, "popflame_custom"),
@@ -22,10 +16,8 @@ public:
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
-		m_scrollreg(*this, "scrollreg")
-	{ }
+		m_scrollreg(*this, "scrollreg") { }
 
-	void naughtyb_base(machine_config &config);
 	void popflame(machine_config &config);
 	void naughtyb(machine_config &config);
 
@@ -67,12 +59,10 @@ private:
 	DECLARE_WRITE8_MEMBER(naughtyb_videoreg_w);
 	DECLARE_WRITE8_MEMBER(popflame_videoreg_w);
 
-	void naughtyb_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(naughtyb);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void naughtyb_map(address_map &map);
 	void popflame_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_NAUGHTYB_H

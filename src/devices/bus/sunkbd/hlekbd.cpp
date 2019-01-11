@@ -21,7 +21,7 @@
     0000 0011               bell off
     0000 1010               enable keyclick (5ms duration 480us period on make)
     0000 1011               disable keyclick
-    0000 1110  ---k lscn    LED (1 = on: k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
+    0000 1110  ---k lscn    LED (1 = on, k = kana, l = caps lock, s = scroll lock, c = compose, n = num lock)
     0000 1111               layout request (keyboard responds with layout response)
 
     message from keyboad to host:
@@ -101,7 +101,7 @@
     control on home row, caps lock at bottom left corner of main area
 
 
-    Type 5 International (ISO) layout:
+    Type 5 International layout:
 
       76      1d      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
 
@@ -114,7 +114,7 @@
     double-height return key, 58 (US backslash) moved to home row, 7c added on left of bottom row
 
 
-    Type 5 Japanese (JIS) layout:
+    Type 5 Japanese layout:
 
       76      1d      05  06  08  0a    0c  0e  10  11    12  07  09  0b    16  17  15    2d  02  04  30
 
@@ -127,8 +127,8 @@
     double-height return key
     yen/pipe replaces backtick/tilde at top left corner of main area
     linefeed scancode repurposed for backslash/underscore
-    kana (かな) replaces alt graph (with LED window)
-    extra kakutei (確定), henkan (変換) and nihongo on-off (日本語 On-Off) keys
+    kana replaces alt graph (with LED window)
+    extra kakutei, henkan and nihongo on-off keys
 */
 
 
@@ -148,7 +148,6 @@ DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_devic
 namespace bus { namespace sunkbd {
 
 namespace {
-
 /***************************************************************************
     INPUT PORT DEFINITIONS
 ***************************************************************************/
@@ -942,13 +941,13 @@ void hle_device_base::key_break(uint8_t row, uint8_t column)
 	assert(!fifo_full());
 	assert(m_make_count);
 
-	// send the break code, and the idle code if no other keys are down
+	// send the break code, and the idle code if no other keysa are down
 	transmit_byte(0x80U | (row << 4) | column);
 	if (!--m_make_count)
 		transmit_byte(0x7fU);
 
-	// this blows up if a key is pressed just as the last key is released
-	//assert(are_all_keys_up() == !bool(m_make_count));
+	// check our counting
+	assert(are_all_keys_up() == !bool(m_make_count));
 }
 
 

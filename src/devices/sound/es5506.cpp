@@ -269,7 +269,7 @@ void es5506_device::device_start()
 	save_item(NAME(m_lrend));
 	save_item(NAME(m_irqv));
 
-	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
+	save_pointer(NAME(m_scratch.get()), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{
@@ -298,17 +298,6 @@ void es5506_device::device_start()
 	}
 
 	/* success */
-}
-
-//-------------------------------------------------
-//  device_clock_changed
-//-------------------------------------------------
-
-void es550x_device::device_clock_changed()
-{
-	m_master_clock = clock();
-	m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
-	m_stream->set_sample_rate(m_sample_rate);
 }
 
 //-------------------------------------------------
@@ -412,7 +401,7 @@ void es5505_device::device_start()
 	save_item(NAME(m_lrend));
 	save_item(NAME(m_irqv));
 
-	save_pointer(NAME(m_scratch), 2 * MAX_SAMPLE_CHUNK);
+	save_pointer(NAME(m_scratch.get()), 2 * MAX_SAMPLE_CHUNK);
 
 	for (j = 0; j < 32; j++)
 	{

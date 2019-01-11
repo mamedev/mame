@@ -50,10 +50,7 @@ class TParserToken;
 
 class TScanContext {
 public:
-    explicit TScanContext(TParseContextBase& pc) :
-        parseContext(pc),
-        afterType(false), afterStruct(false),
-        field(false) { }
+    explicit TScanContext(TParseContextBase& pc) : parseContext(pc), afterType(false), field(false) { }
     virtual ~TScanContext() { }
 
     static void fillInKeywordMap();
@@ -79,7 +76,6 @@ protected:
 
     TParseContextBase& parseContext;
     bool afterType;           // true if we've recognized a type, so can only be looking for an identifier
-    bool afterStruct;         // true if we've recognized the STRUCT keyword, so can only be looking for an identifier
     bool field;               // true if we're on a field, right after a '.'
     TSourceLoc loc;
     TParserToken* parserToken;

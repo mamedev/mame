@@ -429,10 +429,10 @@ void othunder_state::othunder_map(address_map &map)
 	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
 	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
 	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
-	map(0x300000, 0x300003).rw(FUNC(othunder_state::sound_r), FUNC(othunder_state::sound_w));
+	map(0x300000, 0x300003).rw(this, FUNC(othunder_state::sound_r), FUNC(othunder_state::sound_w));
 	map(0x400000, 0x4005ff).ram().share("spriteram");
 	map(0x500000, 0x500007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
-	map(0x600000, 0x600003).w(FUNC(othunder_state::irq_ack_w));
+	map(0x600000, 0x600003).w(this, FUNC(othunder_state::irq_ack_w));
 }
 
 
@@ -446,12 +446,12 @@ void othunder_state::z80_sound_map(address_map &map)
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
-	map(0xe400, 0xe403).w(FUNC(othunder_state::tc0310fam_w)); /* pan */
+	map(0xe400, 0xe403).w(this, FUNC(othunder_state::tc0310fam_w)); /* pan */
 	map(0xe600, 0xe600).nopw(); /* ? */
 	map(0xea00, 0xea00).portr("ROTARY");  /* rotary input */
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(FUNC(othunder_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(this, FUNC(othunder_state::sound_bankswitch_w));
 }
 
 
@@ -604,66 +604,67 @@ void othunder_state::machine_start()
 	save_item(NAME(m_pan));
 }
 
-void othunder_state::othunder(machine_config &config)
-{
+MACHINE_CONFIG_START(othunder_state::othunder)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 24_MHz_XTAL/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &othunder_state::othunder_map);
+	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL/2)
+	MCFG_DEVICE_PROGRAM_MAP(othunder_map)
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL/2/2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &othunder_state::z80_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/2/2)
+	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
 
-	EEPROM_93C46_16BIT(config, m_eeprom);
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	adc0808_device &adc(ADC0808(config, "adc", 16_MHz_XTAL/2/2/8));
-	adc.eoc_callback().set(FUNC(othunder_state::adc_eoc_w));
-	adc.in_callback<0>().set_ioport("P1X");
-	adc.in_callback<1>().set_ioport("P1Y");
-	adc.in_callback<2>().set_ioport("P2X");
-	adc.in_callback<3>().set_ioport("P2Y");
+	MCFG_DEVICE_ADD("adc", ADC0808, 16_MHz_XTAL/2/2/8)
+	MCFG_ADC0808_EOC_CB(WRITELINE(*this, othunder_state, adc_eoc_w))
+	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("P2X"))
+	MCFG_ADC0808_IN3_CB(IOPORT("P2Y"))
 
-	TC0220IOC(config, m_tc0220ioc, 0);
-	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
-	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
-	m_tc0220ioc->read_2_callback().set_ioport("IN0");
-	m_tc0220ioc->read_3_callback().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
-	m_tc0220ioc->write_3_callback().set(FUNC(othunder_state::eeprom_w));
-	m_tc0220ioc->write_4_callback().set(FUNC(othunder_state::coins_w));
-	m_tc0220ioc->read_7_callback().set_ioport("IN2");
+	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
+	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0220IOC_READ_3_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_TC0220IOC_WRITE_3_CB(WRITE8(*this, othunder_state, eeprom_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, othunder_state, coins_w))
+	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
-	screen.set_screen_update(FUNC(othunder_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(othunder_state::vblank_w));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(othunder_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, othunder_state, vblank_w))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_othunder);
-	PALETTE(config, m_palette).set_entries(4096);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_othunder)
+	MCFG_PALETTE_ADD("palette", 4096)
 
-	TC0100SCN(config, m_tc0100scn, 0);
-	m_tc0100scn->set_gfx_region(1);
-	m_tc0100scn->set_tx_region(2);
-	m_tc0100scn->set_offsets(4, 0);
-	m_tc0100scn->set_gfxdecode_tag(m_gfxdecode);
-	m_tc0100scn->set_palette_tag(m_palette);
+	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
+	MCFG_TC0100SCN_GFX_REGION(1)
+	MCFG_TC0100SCN_TX_REGION(2)
+	MCFG_TC0100SCN_OFFSETS(4, 0)
+	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
+	MCFG_TC0100SCN_PALETTE("palette")
 
-	TC0110PCR(config, m_tc0110pcr, 0, m_palette);
+	MCFG_TC0110PCR_ADD("tc0110pcr")
+	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "2610.0l", 0.25);
-	ymsnd.add_route(0, "2610.0r", 0.25);
-	ymsnd.add_route(1, "2610.1l", 1.0);
-	ymsnd.add_route(1, "2610.1r", 1.0);
-	ymsnd.add_route(2, "2610.2l", 1.0);
-	ymsnd.add_route(2, "2610.2r", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "2610.0l", 0.25)
+	MCFG_SOUND_ROUTE(0, "2610.0r", 0.25)
+	MCFG_SOUND_ROUTE(1, "2610.1l", 1.0)
+	MCFG_SOUND_ROUTE(1, "2610.1r", 1.0)
+	MCFG_SOUND_ROUTE(2, "2610.2l", 1.0)
+	MCFG_SOUND_ROUTE(2, "2610.2r", 1.0)
 
 	FILTER_VOLUME(config, "2610.0l").add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_VOLUME(config, "2610.0r").add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -672,10 +673,10 @@ void othunder_state::othunder(machine_config &config)
 	FILTER_VOLUME(config, "2610.2l").add_route(ALL_OUTPUTS, "speaker", 1.0);
 	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag(m_audiocpu);
-}
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+MACHINE_CONFIG_END
 
 
 

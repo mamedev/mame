@@ -13,15 +13,12 @@
 class vr0video_device : public device_t
 {
 public:
-	template <typename T> vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: vr0video_device(mconfig, tag, owner, clock)
-	{
-		m_cpu.set_tag(std::forward<T>(cpu_tag));
-	}
-
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~vr0video_device() {}
 
 	int vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest, uint8_t *TEXTURE);
+
+	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
 
 protected:
 	// device-level overrides
@@ -63,5 +60,9 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device)
+
+
+#define MCFG_VIDEO_VRENDER0_CPU(_tag) \
+	downcast<vr0video_device &>(*device).set_cpu_tag(_tag);
 
 #endif // MAME_VIDEO_VRENDER0_H

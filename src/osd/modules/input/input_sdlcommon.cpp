@@ -79,8 +79,7 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 
 	if (window == nullptr)
 	{
-		// This condition may occur when the fullscreen toggle is used
-		osd_printf_verbose("Skipped window event due to missing window param from SDL\n");
+		osd_printf_warning("Skipped window event due to missing window param from SDL\n");
 		return;
 	}
 

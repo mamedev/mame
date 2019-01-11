@@ -279,15 +279,15 @@ GFXDECODE_END
 void shangkid_state::chinhero_main_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0xa000, 0xa000).w(FUNC(shangkid_state::nmiq_1_w));
-	map(0xa800, 0xa800).w(FUNC(shangkid_state::nmiq_2_w));
+	map(0xa000, 0xa000).w(this, FUNC(shangkid_state::nmiq_1_w));
+	map(0xa800, 0xa800).w(this, FUNC(shangkid_state::nmiq_2_w));
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).portr("DSW");
 	map(0xb801, 0xb801).portr("SYSTEM");
 	map(0xb802, 0xb802).portr("P2");
 	map(0xb803, 0xb803).portr("P1");
 	map(0xc000, 0xc002).writeonly().share("videoreg");
-	map(0xd000, 0xdfff).ram().w(FUNC(shangkid_state::videoram_w)).share("videoram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shangkid_state::videoram_w)).share("videoram");
 	map(0xe000, 0xfdff).ram().share("share2");
 	map(0xfe00, 0xffff).ram().share("spriteram");
 }
@@ -296,15 +296,15 @@ void shangkid_state::shangkid_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x9fff).bankr("bank1");
-	map(0xa000, 0xa000).w(FUNC(shangkid_state::nmiq_1_w));
-	map(0xa800, 0xa800).w(FUNC(shangkid_state::nmiq_2_w));
+	map(0xa000, 0xa000).w(this, FUNC(shangkid_state::nmiq_1_w));
+	map(0xa800, 0xa800).w(this, FUNC(shangkid_state::nmiq_2_w));
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).portr("DSW");
 	map(0xb801, 0xb801).portr("SYSTEM");
 	map(0xb802, 0xb802).portr("P2");
 	map(0xb803, 0xb803).portr("P1");
 	map(0xc000, 0xc002).writeonly().share("videoreg");
-	map(0xd000, 0xdfff).ram().w(FUNC(shangkid_state::videoram_w)).share("videoram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shangkid_state::videoram_w)).share("videoram");
 	map(0xe000, 0xfdff).ram().share("share2");
 	map(0xfe00, 0xffff).ram().share("spriteram");
 }
@@ -314,14 +314,14 @@ void shangkid_state::shangkid_main_map(address_map &map)
 void shangkid_state::chinhero_bbx_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0xa000, 0xa000).w(FUNC(shangkid_state::nmiq_1_w));
-	map(0xa800, 0xa800).w(FUNC(shangkid_state::nmiq_2_w));
+	map(0xa000, 0xa000).w(this, FUNC(shangkid_state::nmiq_1_w));
+	map(0xa800, 0xa800).w(this, FUNC(shangkid_state::nmiq_2_w));
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).portr("DSW");
 	map(0xb801, 0xb801).portr("SYSTEM");
 	map(0xb802, 0xb802).portr("P2");
 	map(0xb803, 0xb803).portr("P1");
-	map(0xd000, 0xdfff).ram().w(FUNC(shangkid_state::videoram_w)).share("videoram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shangkid_state::videoram_w)).share("videoram");
 	map(0xe000, 0xfdff).ram().share("share2");
 	map(0xfe00, 0xffff).ram().share("spriteram");
 }
@@ -329,14 +329,14 @@ void shangkid_state::chinhero_bbx_map(address_map &map)
 void shangkid_state::shangkid_bbx_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0xa000, 0xa000).w(FUNC(shangkid_state::nmiq_1_w));
-	map(0xa800, 0xa800).w(FUNC(shangkid_state::nmiq_2_w));
+	map(0xa000, 0xa000).w(this, FUNC(shangkid_state::nmiq_1_w));
+	map(0xa800, 0xa800).w(this, FUNC(shangkid_state::nmiq_2_w));
 	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).portr("DSW");
 	map(0xb801, 0xb801).portr("SYSTEM");
 	map(0xb802, 0xb802).portr("P2");
 	map(0xb803, 0xb803).portr("P1");
-	map(0xd000, 0xdfff).ram().w(FUNC(shangkid_state::videoram_w)).share("videoram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(shangkid_state::videoram_w)).share("videoram");
 	map(0xe000, 0xfdff).ram().share("share2");
 	map(0xfe00, 0xffff).ram().share("spriteram");
 }
@@ -370,7 +370,7 @@ void shangkid_state::shangkid_sound_map(address_map &map)
 void shangkid_state::sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(shangkid_state::soundlatch_r)).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x00, 0x00).r(this, FUNC(shangkid_state::soundlatch_r)).w("dac", FUNC(dac_byte_interface::write));
 }
 
 /***************************************************************************************/
@@ -378,43 +378,43 @@ void shangkid_state::sound_portmap(address_map &map)
 MACHINE_CONFIG_START(shangkid_state::chinhero)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(18'432'000)/6) /* verified on pcb */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(chinhero_main_map)
 
-	MCFG_DEVICE_ADD(m_bbx, Z80, XTAL(18'432'000)/6) /* verified on pcb */
+	MCFG_DEVICE_ADD("bbx", Z80, XTAL(18'432'000)/6) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(chinhero_bbx_map)
 	MCFG_DEVICE_IO_MAP(chinhero_bbx_portmap)
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(18'432'000)/6) /* verified on pcb */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(18'432'000)/6) /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(chinhero_sound_map)
 	MCFG_DEVICE_IO_MAP(sound_portmap)
 
-	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set_inputline(m_bbx, INPUT_LINE_RESET).invert(); // RESET2
-	mainlatch.q_out_cb<1>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert(); // RESET3
-	mainlatch.q_out_cb<1>().append(FUNC(shangkid_state::sound_enable_w));
-	mainlatch.q_out_cb<2>().set(FUNC(shangkid_state::int_enable_1_w)); // INTE1
-	mainlatch.q_out_cb<3>().set(FUNC(shangkid_state::int_enable_2_w)); // INTE2
-	mainlatch.q_out_cb<4>().set(FUNC(shangkid_state::nmi_enable_1_w)); // NMIE1
-	mainlatch.q_out_cb<5>().set(FUNC(shangkid_state::nmi_enable_2_w)); // NMIE2
-	mainlatch.q_out_cb<6>().set(FUNC(shangkid_state::coin_counter_1_w));
-	mainlatch.q_out_cb<7>().set(FUNC(shangkid_state::coin_counter_2_w));
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(INPUTLINE("bbx", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // RESET2
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // RESET3
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, shangkid_state, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, shangkid_state, int_enable_1_w)) // INTE1
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, shangkid_state, int_enable_2_w)) // INTE2
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, shangkid_state, nmi_enable_1_w)) // NMIE1
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, shangkid_state, nmi_enable_2_w)) // NMIE2
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, shangkid_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, shangkid_state, coin_counter_2_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(40*8, 28*8);
-	screen.set_visarea(16, 319-16, 0, 223);
-	screen.set_screen_update(FUNC(shangkid_state::screen_update_shangkid));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(shangkid_state::irq_1_w));
-	screen.screen_vblank().append(FUNC(shangkid_state::irq_2_w));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(40*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(16, 319-16, 0, 223)
+	MCFG_SCREEN_UPDATE_DRIVER(shangkid_state, screen_update_shangkid)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shangkid_state, irq_1_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, shangkid_state, irq_2_w))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chinhero);
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinhero)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(shangkid_state,shangkid)
 
 	/* sound hardware */
@@ -424,10 +424,10 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	AY8910(config, m_aysnd, XTAL(18'432'000)/12); /* verified on pcb */
-	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::chinhero_ay8910_porta_w));
-	m_aysnd->port_b_write_callback().set(FUNC(shangkid_state::ay8910_portb_w));
-	m_aysnd->add_route(ALL_OUTPUTS, "speaker", 0.1);
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(18'432'000)/12) /* verified on pcb */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shangkid_state, chinhero_ay8910_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shangkid_state, ay8910_portb_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 MACHINE_CONFIG_END
 
 
@@ -435,24 +435,29 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	chinhero(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &shangkid_state::shangkid_main_map);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(shangkid_main_map)
 
-	m_bbx->set_addrmap(AS_PROGRAM, &shangkid_state::shangkid_bbx_map);
-	m_bbx->set_addrmap(AS_IO, &shangkid_state::shangkid_bbx_portmap);
+	MCFG_DEVICE_MODIFY("bbx")
+	MCFG_DEVICE_PROGRAM_MAP(shangkid_bbx_map)
+	MCFG_DEVICE_IO_MAP(shangkid_bbx_portmap)
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &shangkid_state::shangkid_sound_map);
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(shangkid_sound_map)
 
-	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
+	MCFG_DEVICE_MODIFY("mainlatch")
 	// Q1 should *not* reset the AY-3-8910 here, or else banking writes will be lost!
-	mainlatch.q_out_cb<1>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
-	mainlatch.q_out_cb<7>().set_membank("bank1");
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(MEMBANK("bank1"))
 
 	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_shangkid);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shangkid)
 
-	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::shangkid_ay8910_porta_w));
+	MCFG_DEVICE_MODIFY("aysnd")
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shangkid_state, shangkid_ay8910_porta_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shangkid_state, ay8910_portb_w))
 MACHINE_CONFIG_END
 
 
@@ -486,10 +491,10 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	MCFG_DEVICE_PROGRAM_MAP(dynamski_map)
 	MCFG_DEVICE_IO_MAP(dynamski_portmap)
 
-	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set(FUNC(shangkid_state::int_enable_1_w));
-	mainlatch.q_out_cb<1>().set_nop(); // screen flip?
-	mainlatch.q_out_cb<2>().set_nop(); // screen flip?
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, shangkid_state, int_enable_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // screen flip?
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // screen flip?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -501,13 +506,16 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shangkid_state, irq_1_w))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dynamski);
-	PALETTE(config, m_palette, FUNC(shangkid_state::dynamski_palette), 16*4 + 16*4, 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynamski)
+	MCFG_PALETTE_ADD("palette", 16*4+16*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
+	MCFG_PALETTE_INIT_OWNER(shangkid_state,dynamski)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	AY8910(config, m_aysnd, 2000000).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 MACHINE_CONFIG_END
 
 /***************************************************************************************/

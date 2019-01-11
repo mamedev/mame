@@ -19,10 +19,14 @@
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/m6805/m6805.h"
+#include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/pit8253.h"
 #include "machine/nvram.h"
 #include "screen.h"
+
+#define EXIDY440_AUDIO_CLOCK    (XTAL(12'979'200) / 4)
+#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
 
 
 /*************************************
@@ -36,17 +40,32 @@ void vertigo_state::vertigo_map(address_map &map)
 	map(0x000000, 0x000007).rom();
 	map(0x000008, 0x001fff).ram().mirror(0x010000);
 	map(0x002000, 0x003fff).ram().share("vectorram");
-	map(0x004000, 0x00400f).r(FUNC(vertigo_state::vertigo_io_convert)).mirror(0x001000);
+	map(0x004000, 0x00400f).r(this, FUNC(vertigo_state::vertigo_io_convert)).mirror(0x001000);
 	map(0x004010, 0x00401f).r(m_adc, FUNC(adc0808_device::data_r)).mirror(0x001000);
-	map(0x004020, 0x00402f).r(FUNC(vertigo_state::vertigo_coin_r)).mirror(0x001000);
+	map(0x004020, 0x00402f).r(this, FUNC(vertigo_state::vertigo_coin_r)).mirror(0x001000);
 	map(0x004030, 0x00403f).portr("GIO").mirror(0x001000);
-	map(0x004040, 0x00404f).r(FUNC(vertigo_state::vertigo_sio_r)).mirror(0x001000);
-	map(0x004050, 0x00405f).w(FUNC(vertigo_state::vertigo_audio_w)).mirror(0x001000);
-	map(0x004060, 0x00406f).w(FUNC(vertigo_state::vertigo_motor_w)).mirror(0x001000);
-	map(0x004070, 0x00407f).w(FUNC(vertigo_state::vertigo_wsot_w)).mirror(0x001000);
+	map(0x004040, 0x00404f).r(this, FUNC(vertigo_state::vertigo_sio_r)).mirror(0x001000);
+	map(0x004050, 0x00405f).w(this, FUNC(vertigo_state::vertigo_audio_w)).mirror(0x001000);
+	map(0x004060, 0x00406f).w(this, FUNC(vertigo_state::vertigo_motor_w)).mirror(0x001000);
+	map(0x004070, 0x00407f).w(this, FUNC(vertigo_state::vertigo_wsot_w)).mirror(0x001000);
 	map(0x006000, 0x006007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0x007000, 0x0073ff).ram().share("nvram");
 	map(0x800000, 0x81ffff).rom();
+}
+
+void vertigo_state::exidy440_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).noprw();
+	map(0x8000, 0x801f).mirror(0x03e0).rw(m_custom, FUNC(exidy440_sound_device::m6844_r), FUNC(exidy440_sound_device::m6844_w));
+	map(0x8400, 0x840f).mirror(0x03f0).rw(m_custom, FUNC(exidy440_sound_device::sound_volume_r), FUNC(exidy440_sound_device::sound_volume_w));
+	map(0x8800, 0x8800).mirror(0x03ff).r(m_custom, FUNC(exidy440_sound_device::sound_command_r)).nopw();
+	map(0x8c00, 0x93ff).noprw();
+	map(0x9400, 0x9403).mirror(0x03fc).nopr().w(m_custom, FUNC(exidy440_sound_device::sound_banks_w));
+	map(0x9800, 0x9800).mirror(0x03ff).nopr().w(m_custom, FUNC(exidy440_sound_device::sound_interrupt_clear_w));
+	map(0x9c00, 0x9fff).noprw();
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).noprw();
+	map(0xe000, 0xffff).rom();
 }
 
 
@@ -113,42 +132,63 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	MCFG_DEVICE_PROGRAM_MAP(vertigo_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
 
-	ADC0808(config, m_adc, 24_MHz_XTAL / 30); // E clock from 68000
-	m_adc->eoc_ff_callback().set(FUNC(vertigo_state::adc_eoc_w));
-	m_adc->in_callback<0>().set_ioport("P1X");
-	m_adc->in_callback<1>().set_ioport("P1Y");
-	m_adc->in_callback<2>().set_ioport("PADDLE");
+	MCFG_DEVICE_ADD("adc", ADC0808, 24_MHz_XTAL / 30) // E clock from 68000
+	MCFG_ADC0808_EOC_FF_CB(WRITELINE(*this, vertigo_state, adc_eoc_w))
+	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("PADDLE"))
 	// IN3-IN7 tied to Vss
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	exidy440_audio(config);
 
-	MCFG_DEVICE_ADD("440audio", EXIDY440, EXIDY440_MC3418_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_DEVICE_ADD("pit", PIT8254, 0)
+	MCFG_PIT8253_CLK0(24_MHz_XTAL / 100)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vertigo_state, v_irq4_w))
+	MCFG_PIT8253_CLK1(24_MHz_XTAL / 100)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vertigo_state, v_irq3_w))
+	MCFG_PIT8253_CLK2(24_MHz_XTAL / 100)
 
-	pit8254_device &pit(PIT8254(config, "pit", 0));
-	pit.set_clk<0>(24_MHz_XTAL / 100);
-	pit.out_handler<0>().set(FUNC(vertigo_state::v_irq4_w));
-	pit.set_clk<1>(24_MHz_XTAL / 100);
-	pit.out_handler<1>().set(FUNC(vertigo_state::v_irq3_w));
-	pit.set_clk<2>(24_MHz_XTAL / 100);
-
-	TTL74148(config, m_ttl74148, 0);
-	m_ttl74148->out_cb().set(FUNC(vertigo_state::update_irq));
+	MCFG_DEVICE_ADD("74148", TTL74148, 0)
+	MCFG_74148_OUTPUT_CB(vertigo_state, update_irq)
 
 	/* motor controller */
-	M68705P3(config, "motorcpu", 24_MHz_XTAL / 6);
+	MCFG_DEVICE_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	VECTOR(config, m_vector, 0);
+	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(400, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 510, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(vertigo_state::exidy440_audio)
+
+	MCFG_DEVICE_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(exidy440_audio_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	MCFG_DEVICE_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+//  MCFG_DEVICE_ADD("cvsd1", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+//  MCFG_DEVICE_ADD("cvsd2", MC3418, EXIDY440_MC3418_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+//  MCFG_DEVICE_ADD("cvsd3", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+
+//  MCFG_DEVICE_ADD("cvsd4", MC3417, EXIDY440_MC3417_CLOCK)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -198,10 +238,10 @@ ROM_START( topgunnr )
 	ROMX_LOAD( "vuc.03", 7, 0x200, CRC(23c1f136) SHA1(0eb959aa8fb6028dd97bdaa28981cec16652bf2d), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(7))
 	ROMX_LOAD( "vuc.04", 7, 0x200, CRC(a5389228) SHA1(922d49c949e31413bbbff118c04965b649864a67), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(7))
 
-	ROM_REGION( 0x02000, "440audio:audiocpu", 0 )
-	ROM_LOAD( "vga1_7.g7",  0x00000, 0x2000, CRC(db109b19) SHA1(c3fbb28cb4679c021bc48f844097add39a2208a5) )
+	ROM_REGION( 0x010000, "audiocpu", 0 )
+	ROM_LOAD( "vga1_7.g7",  0x0e000, 0x2000, CRC(db109b19) SHA1(c3fbb28cb4679c021bc48f844097add39a2208a5) )
 
-	ROM_REGION( 0x20000, "440audio:samples", 0 )
+	ROM_REGION( 0x20000, "cvsd", 0 )
 	ROM_LOAD( "vga1_7.l6",  0x00000, 0x2000, CRC(20cbf97a) SHA1(13e138b08ba3328db6a2fba95a369422455d1c5c) )
 	ROM_LOAD( "vga1_7.m6",  0x02000, 0x2000, CRC(76197050) SHA1(d26701ba83a34384348fa34e3de78cc69dc5362e) )
 	ROM_LOAD( "vga1_7.n6",  0x04000, 0x2000, CRC(b93d7cbb) SHA1(1a4d05e03765b66ff20b963c5a0b5f7c3d5a360c) )

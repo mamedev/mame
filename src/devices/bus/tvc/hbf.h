@@ -6,7 +6,6 @@
 #pragma once
 
 #include "tvc.h"
-#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/tvc_dsk.h"
 

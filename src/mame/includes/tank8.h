@@ -11,7 +11,6 @@
 #pragma once
 
 #include "sound/discrete.h"
-#include "emupal.h"
 #include "screen.h"
 
 /* Discrete Sound Input Nodes */
@@ -34,6 +33,11 @@
 class tank8_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_COLLISION
+	};
+
 	tank8_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -48,16 +52,10 @@ public:
 		m_team(*this, "team")
 	{ }
 
+	void init_decode();
 	void tank8(machine_config &config);
 
-	void init_decode();
-
-private:
-	enum
-	{
-		TIMER_COLLISION
-	};
-
+protected:
 	DECLARE_READ8_MEMBER(collision_r);
 	DECLARE_WRITE8_MEMBER(lockout_w);
 	DECLARE_WRITE8_MEMBER(int_reset_w);
@@ -73,7 +71,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void tank8_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(tank8);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -87,6 +85,7 @@ private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void tank8_cpu_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;

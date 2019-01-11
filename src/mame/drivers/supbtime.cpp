@@ -61,7 +61,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "emu.h"
 #include "includes/supbtime.h"
-#include "emupal.h"
 
 #define TUMBLEP_HACK 0
 
@@ -81,7 +80,7 @@ void supbtime_state::supbtime_map(address_map &map)
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("SYSTEM");
-	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0001, 0x1a0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
@@ -100,7 +99,7 @@ void supbtime_state::chinatwn_map(address_map &map)
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("SYSTEM");
-	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0000, 0x1a3fff).ram();
 	map(0x300000, 0x30000f).rw(m_deco_tilegen, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
@@ -122,7 +121,7 @@ void supbtime_state::tumblep_map(address_map &map)
 	map(0x180000, 0x180001).portr("INPUTS");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("SYSTEM");
-	map(0x18000a, 0x18000b).r(FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
 	map(0x18000a, 0x18000d).nopw(); // ?
 	map(0x1a0000, 0x1a07ff).ram().share("spriteram");
 	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
@@ -143,6 +142,8 @@ void supbtime_state::sound_map(address_map &map)
 	map(0x130000, 0x130001).noprw(); // This board only has 1 oki chip
 	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -341,9 +342,8 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(supbtime_map)
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &supbtime_state::sound_map);
-	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -353,35 +353,37 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supbtime)
-	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_split(0);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_trans_mask(0x0f);
-	m_deco_tilegen->set_pf2_trans_mask(0x0f);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	MCFG_DEVICE_ADD("tilegen", DECO16IC, 0)
+	MCFG_DECO16IC_SPLIT(0)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
+	MCFG_DECO16IC_PF1_COL_BANK(0x00)
+	MCFG_DECO16IC_PF2_COL_BANK(0x10)
+	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
+	MCFG_DECO16IC_PF12_8X8_BANK(0)
+	MCFG_DECO16IC_PF12_16X16_BANK(1)
+	MCFG_DECO16IC_GFXDECODE("gfxdecode")
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DECO_SPRITE_GFX_REGION(2)
+	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9));
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 1);    /* IRQ2 */
-	ymsnd.add_route(0, "mono", 0.45);
-	ymsnd.add_route(1, "mono", 0.45);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'220'000) / 9)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ 2
+	MCFG_SOUND_ROUTE(0, "mono", 0.45)
+	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(21'477'272) / 20, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -391,9 +393,6 @@ MACHINE_CONFIG_START(supbtime_state::chinatwn)
 	supbtime(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(chinatwn_map)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_chinatwn)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(supbtime_state::tumblep)
@@ -437,7 +436,8 @@ ROM_START( supbtime )
 	ROM_LOAD("tg5.j1",  0x514, 0x104, CRC(21d02af7) SHA1(4b221a478cb3381e9551de770df7c491c5e59c90)) // PAL16L8
 ROM_END
 
-ROM_START( supbtimea ) // this set has no backgrounds ingame for most stages, but has been verifeid as good on multiple PCBs, design choice
+// is this actually a good dump?, there are no backgrounds ingame!
+ROM_START( supbtimea )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("3.11f", 0x00000, 0x20000, CRC(98b5f263) SHA1(ee4b0d2fcdc95aba0e78d066bd6c4d553a902848))
 	ROM_LOAD16_BYTE("4.12f", 0x00001, 0x20000, CRC(937e68b9) SHA1(4779e150518b9014c2154f33d38767c6a7447334))

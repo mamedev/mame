@@ -26,7 +26,7 @@
 #include "emu.h"
 #include "dp8510.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DP8510, dp8510_device, "dp8510", "National Semiconductor BITBLT Processing Unit")

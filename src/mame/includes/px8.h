@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Curt Coder,Dirk Best
+#pragma once
+
 #ifndef MAME_INCLUDES_PX8_H
 #define MAME_INCLUDES_PX8_H
-
-#pragma once
 
 
 #include "cpu/z80/z80.h"
@@ -13,7 +13,6 @@
 #include "machine/i8251.h"
 #include "bus/epson_sio/pf10.h"
 #include "sound/wave.h"
-#include "emupal.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -32,16 +31,12 @@ class px8_state : public driver_device
 {
 public:
 	px8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, UPD70008_TAG)
-		, m_cassette(*this, "cassette")
-		, m_ram(*this, RAM_TAG)
-		, m_video_ram(*this, "video_ram")
-	{ }
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, UPD70008_TAG),
+			m_cassette(*this, "cassette"),
+			m_ram(*this, RAM_TAG),
+		m_video_ram(*this, "video_ram"){ }
 
-	void px8(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -84,9 +79,11 @@ private:
 
 	/* keyboard state */
 	int m_ksc;              /* keyboard scan column */
-	void px8_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(px8);
+	void px8(machine_config &config);
 	void px8_io(address_map &map);
 	void px8_mem(address_map &map);
+	void px8_slave_io(address_map &map);
 	void px8_slave_mem(address_map &map);
 };
 

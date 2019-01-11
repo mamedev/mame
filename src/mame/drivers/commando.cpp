@@ -65,13 +65,13 @@ void commando_state::commando_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(commando_state::commando_c804_w));
-	map(0xc808, 0xc809).w(FUNC(commando_state::commando_scrollx_w));
-	map(0xc80a, 0xc80b).w(FUNC(commando_state::commando_scrolly_w));
-	map(0xd000, 0xd3ff).ram().w(FUNC(commando_state::commando_videoram2_w)).share("videoram2");
-	map(0xd400, 0xd7ff).ram().w(FUNC(commando_state::commando_colorram2_w)).share("colorram2");
-	map(0xd800, 0xdbff).ram().w(FUNC(commando_state::commando_videoram_w)).share("videoram");
-	map(0xdc00, 0xdfff).ram().w(FUNC(commando_state::commando_colorram_w)).share("colorram");
+	map(0xc804, 0xc804).w(this, FUNC(commando_state::commando_c804_w));
+	map(0xc808, 0xc809).w(this, FUNC(commando_state::commando_scrollx_w));
+	map(0xc80a, 0xc80b).w(this, FUNC(commando_state::commando_scrolly_w));
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(commando_state::commando_videoram2_w)).share("videoram2");
+	map(0xd400, 0xd7ff).ram().w(this, FUNC(commando_state::commando_colorram2_w)).share("colorram2");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(commando_state::commando_videoram_w)).share("videoram");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(commando_state::commando_colorram_w)).share("colorram");
 	map(0xe000, 0xfdff).ram();
 	map(0xfe00, 0xff7f).ram().share("spriteram");
 	map(0xff80, 0xffff).ram();
@@ -263,30 +263,33 @@ MACHINE_CONFIG_START(commando_state::commando)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(commando_state, irq0_line_hold,  4*60)
 
+
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(commando_state::screen_update_commando));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	screen.screen_vblank().append(FUNC(commando_state::vblank_irq));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(commando_state, screen_update_commando)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, commando_state, vblank_irq))
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_commando)
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
-	BUFFERED_SPRITERAM8(config, m_spriteram);
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	YM2203(config, "ym1", PHI_B/2).add_route(ALL_OUTPUTS, "mono", 0.15);
+	MCFG_DEVICE_ADD("ym1", YM2203, PHI_B/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	YM2203(config, "ym2", PHI_B/2).add_route(ALL_OUTPUTS, "mono", 0.15);
+	MCFG_DEVICE_ADD("ym2", YM2203, PHI_B/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
 

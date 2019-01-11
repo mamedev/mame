@@ -1252,7 +1252,7 @@
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="rtclink1.bin" size="0x1000" crc="07a33c49" sha1="5ec53bc279afecb74bc65f3f008a2694bc78f2f1" offset="0x0000" />
+				<rom name="rtclink1.bin" size="0x1000" crc="07a33c49" sha1="5EC53BC279AFECB74BC65F3F008A2694BC78F2F1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1528,7 +1528,7 @@
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x10000">
-				<rom name="mmcrbios.bin" size="0x10000" crc="63e35ca8" sha1="165934cee24fe6bcddefd370288b58e01ac985d8" offset="0x0000" />
+				<rom name="mmcrbios.bin" size="0x10000" crc="63E35CA8" sha1="165934CEE24FE6BCDDEFD370288B58E01AC985D8" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

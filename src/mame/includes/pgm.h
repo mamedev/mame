@@ -3,8 +3,6 @@
 #ifndef MAME_INCLUDES_PGM_H
 #define MAME_INCLUDES_PGM_H
 
-#pragma once
-
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/igs028.h"
@@ -19,7 +17,6 @@
 #include "machine/timer.h"
 #include "machine/v3021.h"
 #include "sound/ics2115.h"
-#include "emupal.h"
 
 #define PGMARM7LOGERROR 0
 

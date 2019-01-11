@@ -11,7 +11,6 @@
 
 #include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
-#include "emupal.h"
 
 /* defines for each bit and mask in input port "CSW" */
 enum
@@ -267,7 +266,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void pdp1_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(pdp1);
 	uint32_t screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pdp1);
 	INTERRUPT_GEN_MEMBER(pdp1_interrupt);

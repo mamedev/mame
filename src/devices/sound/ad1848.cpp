@@ -2,7 +2,6 @@
 // copyright-holders:Carl
 
 // Analog Devices AD1848, main codec in Windows Sound System adapters
-// TODO: Emulate pin-compatible Crystal Semiconductor CS4231 and its extra Mode 2 features
 
 #include "emu.h"
 #include "sound/ad1848.h"
@@ -11,7 +10,7 @@
 #include "speaker.h"
 
 
-DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "AD1848 16-bit SoundPort Stereo Codec")
+DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "Analog Device AD1848")
 
 ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AD1848, tag, owner, clock),
@@ -22,19 +21,15 @@ ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-void ad1848_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(ad1848_device::device_add_mconfig)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
-	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 
 void ad1848_device::device_start()
@@ -98,15 +93,14 @@ WRITE8_MEMBER(ad1848_device::write)
 			switch(m_addr)
 			{
 				case 8:
-					if(!m_mce)
+					if(m_mce)
 						return;
 					m_regs.dform &= 0x7f;
 					break;
 				case 9:
 				{
 					m_play = (data & 1) ? true : false;
-					// FIXME: provide external configuration for XTAL1 (24.576 MHz) and XTAL2 (16.9344 MHz) inputs
-					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
+					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? XTAL(24'576'000) : XTAL(16'934'400))
 							/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
 					m_timer->adjust(rate, 0 , rate);
 					m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);

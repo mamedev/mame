@@ -233,7 +233,7 @@ VIDEO_START_MEMBER(tetrisp2_state,tetrisp2)
 	ms32_rearrange_sprites(machine(), "gfx1");
 
 	save_item(NAME(m_flipscreen_old));
-	save_pointer(NAME(m_priority), 0x40000);
+	save_pointer(NAME(m_priority.get()), 0x40000);
 }
 
 VIDEO_START_MEMBER(tetrisp2_state,nndmseal)
@@ -259,7 +259,7 @@ VIDEO_START_MEMBER(tetrisp2_state,rockntread)
 	ms32_rearrange_sprites(machine(), "gfx1");
 
 	save_item(NAME(m_flipscreen_old));
-	save_pointer(NAME(m_priority), 0x40000);
+	save_pointer(NAME(m_priority.get()), 0x40000);
 }
 
 
@@ -322,7 +322,7 @@ VIDEO_START_MEMBER(tetrisp2_state,rocknms)
 */
 template<class _BitmapClass>
 static void tetrisp2_draw_sprites(_BitmapClass &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, uint8_t* priority_ram,
-									uint16_t *sprram_top, size_t sprram_size, gfx_element *gfx, int flip, bool is_yuv    )
+									uint16_t *sprram_top, size_t sprram_size, gfx_element *gfx, int flip    )
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
@@ -353,11 +353,7 @@ static void tetrisp2_draw_sprites(_BitmapClass &bitmap, bitmap_ind8 &bitmap_pri,
 		ty      =   (code >> 8) & 0xff;
 
 		code    =   (color & 0x0fff);
-		// encoded to first word when YUV sprites are used
-		if(is_yuv)
-			color   =   (attr & 0x7f00) >> 8;
-		else
-			color   =   (color >> 12) & 0xf;
+		color   =   (color >> 12) & 0xf;
 		size    =   source[ 3 ];
 
 		xsize   =   ((size >> 0) & 0xff) + 1;
@@ -492,7 +488,7 @@ uint32_t tetrisp2_state::screen_update_tetrisp2(screen_device &screen, bitmap_in
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02), false    );
+							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
 
@@ -577,7 +573,7 @@ uint32_t tetrisp2_state::screen_update_rockntread(screen_device &screen, bitmap_
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02), false    );
+							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)    );
 	return 0;
 }
 
@@ -639,7 +635,7 @@ uint32_t tetrisp2_state::screen_update_rocknms_left(screen_device &screen, bitma
 		m_tilemap_sub_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram2, m_spriteram2.bytes(), m_sub_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02), false  );
+							m_spriteram2, m_spriteram2.bytes(), m_sub_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)  );
 
 	return 0;
 }
@@ -700,7 +696,7 @@ uint32_t tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitm
 		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
 
 	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02), false    );
+							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)    );
 
 	return 0;
 }
@@ -752,7 +748,7 @@ uint32_t stepstag_state::screen_update_stepstag_left(screen_device &screen, bitm
 
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram1, m_spriteram1.bytes(), m_vj_gfxdecode_l->gfx(0), (m_systemregs[0x00] & 0x02), true);
+			m_spriteram1, m_spriteram1.bytes(), m_vj_gfxdecode_l->gfx(0), (m_systemregs[0x00] & 0x02));
 
 	return 0;
 }
@@ -764,7 +760,7 @@ uint32_t stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitma
 
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram2, m_spriteram2.bytes(), m_vj_gfxdecode_m->gfx(0), (m_systemregs[0x00] & 0x02), true);
+			m_spriteram2, m_spriteram2.bytes(), m_vj_gfxdecode_m->gfx(0), (m_systemregs[0x00] & 0x02));
 
 //  m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
 //  m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
@@ -775,13 +771,12 @@ uint32_t stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitma
 
 uint32_t stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// TODO: doesn't like pen 0?
-	bitmap.fill(m_vj_palette_r->black_pen(), cliprect);
+	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram3, m_spriteram3.bytes(), m_vj_gfxdecode_r->gfx(0), (m_systemregs[0x00] & 0x02), true);
+			m_spriteram3, m_spriteram3.bytes(), m_vj_gfxdecode_r->gfx(0), (m_systemregs[0x00] & 0x02));
 
 	return 0;
 }
@@ -854,51 +849,27 @@ uint32_t stepstag_state::screen_update_stepstag_main(screen_device &screen, bitm
 
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, m_priority.get(),
-			m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02), false);
+			m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02));
 
 	return 0;
 }
 
-// Stepping Stage encodes palette as YUV422.
-// Convert them on the fly
-void stepstag_state::convert_yuv422_to_rgb888(palette_device *paldev, uint16_t *palram, uint32_t offset)
+// scrambled palettes?
+inline int stepstag_state::mypal(int x)
 {
-	uint8_t u =  palram[offset/4*4+0] & 0xff;
-	uint8_t y1 = palram[offset/4*4+1] & 0xff;
-	uint8_t v =  palram[offset/4*4+2] & 0xff;
-	//uint8_t y2 = palram[offset/4*4+3] & 0xff;
-	double bf = y1+1.772*(u - 128);
-	double gf = y1-0.334*(u - 128) - 0.714 * (v - 128);
-	double rf = y1+1.772*(v - 128);
-	// clamp to 0-255 range
-	rf = std::min(rf,255.0);
-	rf = std::max(rf,0.0);
-	gf = std::min(gf,255.0);
-	gf = std::max(gf,0.0);
-	bf = std::min(bf,255.0);
-	bf = std::max(bf,0.0);
-
-	uint8_t r = (uint8_t)rf;
-	uint8_t g = (uint8_t)gf;
-	uint8_t b = (uint8_t)bf;
-
-	paldev->set_pen_color(offset/4, r, g, b);
+//  return pal5bit(x >> 3);
+	return pal5bit((x^0xff) >> 3);
+//  return (((x - 0x80) >= 0) ? (x - 0x80) : 0) ^ 0x7f;
+//  return (x - 0x80);
 }
 
-WRITE16_MEMBER(stepstag_state::stepstag_palette_left_w)
+WRITE16_MEMBER(stepstag_state::stepstag_palette_w)
 {
-	COMBINE_DATA(&m_vj_paletteram_l[offset]);
-	convert_yuv422_to_rgb888(m_vj_palette_l,m_vj_paletteram_l,offset);
-}
-
-WRITE16_MEMBER(stepstag_state::stepstag_palette_mid_w)
-{
-	COMBINE_DATA(&m_vj_paletteram_m[offset]);
-	convert_yuv422_to_rgb888(m_vj_palette_m,m_vj_paletteram_m,offset);
-}
-
-WRITE16_MEMBER(stepstag_state::stepstag_palette_right_w)
-{
-	COMBINE_DATA(&m_vj_paletteram_r[offset]);
-	convert_yuv422_to_rgb888(m_vj_palette_r,m_vj_paletteram_r,offset);
+	data = COMBINE_DATA(&m_paletteram[offset]);
+//  if ((offset & 1) == 0)
+		m_palette->set_pen_color(offset/4,
+			mypal(m_paletteram[offset/4*4+0] & 0xff),
+			mypal(m_paletteram[offset/4*4+1] & 0xff),
+			mypal(m_paletteram[offset/4*4+2] & 0xff)
+	);
 }

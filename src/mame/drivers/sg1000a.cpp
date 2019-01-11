@@ -286,20 +286,17 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
-	void sderbys(machine_config &config);
-	void sg1000ax(machine_config &config);
-	void sg1000a(machine_config &config);
-
-	void init_sderby();
-
-private:
 	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
+	void init_sg1000a();
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	void sderby2s(machine_config &config);
+	void sg1000ax(machine_config &config);
+	void sg1000a(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void io_map(address_map &map);
 	void program_map(address_map &map);
-	void sderby_io_map(address_map &map);
+	void sderby2_io_map(address_map &map);
 };
 
 
@@ -324,20 +321,20 @@ void sg1000a_state::decrypted_opcodes_map(address_map &map)
 void sg1000a_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::command_w));
-	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::write));
+	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
 	map(0xdc, 0xdf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void sg1000a_state::sderby_io_map(address_map &map)
+void sg1000a_state::sderby2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).w("snsnd", FUNC(sn76489a_device::command_w));
-	map(0x80, 0x80).mirror(0x3e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x81, 0x81).mirror(0x3e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-//  map(0xc0, 0xc1).mirror(0x06) NEC D8251AC UART
-	map(0xc8, 0xcb).mirror(0x04).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // NEC D8255AC-2
+	map(0x7f, 0x7f).w("snsnd", FUNC(sn76489a_device::write));
+	map(0xbe, 0xbe).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0xbf, 0xbf).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	// AM_RANGE(0xc0, 0xc1) NEC D8251AC UART
+	map(0xc8, 0xcb).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // NEC D8255AC-2
 }
 
 /*************************************
@@ -426,7 +423,7 @@ static INPUT_PORTS_START( dokidoki )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sderbys )
+static INPUT_PORTS_START( sderby2s )
 	PORT_INCLUDE( sg1000 )
 
 	PORT_MODIFY("DSW")
@@ -474,18 +471,19 @@ MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	MCFG_DEVICE_PROGRAM_MAP(program_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	i8255_device &ppi(I8255(config, "ppi8255"));
-	ppi.in_pa_callback().set_ioport("P1");
-	ppi.in_pb_callback().set_ioport("P2");
-	ppi.in_pc_callback().set_ioport("DSW");
-	ppi.out_pc_callback().set(FUNC(sg1000a_state::sg1000a_coin_counter_w));
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sg1000a_state, sg1000a_coin_counter_w))
 
 	/* video hardware */
-	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
-	vdp.set_screen("screen");
-	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -494,21 +492,20 @@ MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-void sg1000a_state::sg1000ax(machine_config &config)
-{
+MACHINE_CONFIG_START(sg1000a_state::sg1000ax)
 	sg1000a(config);
-	sega_315_5033_device &maincpu(SEGA_315_5033(config.replace(), m_maincpu, XTAL(3'579'545)));
-	maincpu.set_addrmap(AS_PROGRAM, &sg1000a_state::program_map);
-	maincpu.set_addrmap(AS_IO, &sg1000a_state::io_map);
-	maincpu.set_addrmap(AS_OPCODES, &sg1000a_state::decrypted_opcodes_map);
-	maincpu.set_decrypted_tag(":decrypted_opcodes");
-}
+	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5033, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(program_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sg1000a_state::sderbys)
+MACHINE_CONFIG_START(sg1000a_state::sderby2s)
 	sg1000a(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(10'738'635) / 3)
-	MCFG_DEVICE_IO_MAP(sderby_io_map)
+	MCFG_DEVICE_IO_MAP(sderby2_io_map)
 
 	// Actually uses a Sega 315-5066 chip, which is a TMS9918 and SN76489 in the same package but with RGB output
 MACHINE_CONFIG_END
@@ -521,9 +518,9 @@ MACHINE_CONFIG_END
 
 ROM_START( chwrestl )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )
-	ROM_LOAD( "5732", 0x0000, 0x4000, CRC(a4e44370) SHA1(a9dbf60e77327dd2bec6816f3142b42ad9ca4d09) ) /* encrypted */
-	ROM_LOAD( "5733", 0x4000, 0x4000, CRC(4f493538) SHA1(467862fe9337497e3cdebb29bf28f6cfe3066ccd) ) /* encrypted */
-	ROM_LOAD( "5734", 0x8000, 0x4000, CRC(d99b6301) SHA1(5e762ed45cde08d5223828c6b1d3569b2240462c) )
+	ROM_LOAD( "5732",   0x0000, 0x4000, CRC(a4e44370) SHA1(a9dbf60e77327dd2bec6816f3142b42ad9ca4d09) ) /* encrypted */
+	ROM_LOAD( "5733",   0x4000, 0x4000, CRC(4f493538) SHA1(467862fe9337497e3cdebb29bf28f6cfe3066ccd) ) /* encrypted */
+	ROM_LOAD( "5734",   0x8000, 0x4000, CRC(d99b6301) SHA1(5e762ed45cde08d5223828c6b1d3569b2240462c) )
 ROM_END
 
 ROM_START( chboxing )
@@ -535,22 +532,16 @@ ROM_END
 
 ROM_START( dokidoki )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-7356.ic1", 0x0000, 0x4000, CRC(95658c31) SHA1(f7b5638ab1b8b244b189317d954eb37b51923791) )
-	ROM_LOAD( "epr-7357.ic2", 0x4000, 0x4000, CRC(e8dbad85) SHA1(9f13dafacee370d6e4720d8e27cf889053e79eb3) )
-	ROM_LOAD( "epr-7358.ic3", 0x8000, 0x4000, CRC(c6f26b0b) SHA1(3753e05b6e77159832dbe88562ba7a818120d1a3) )
-ROM_END
-
-ROM_START( sderbys )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v1.2.ic10", 0x0000, 0x4000, CRC(cf29b579) SHA1(e695da9c61167d1d30b32bd70d342ac23b29f087) )
+	ROM_LOAD( "epr-7356.ic1",   0x0000, 0x4000, CRC(95658c31) SHA1(f7b5638ab1b8b244b189317d954eb37b51923791) )
+	ROM_LOAD( "epr-7357.ic2",   0x4000, 0x4000, CRC(e8dbad85) SHA1(9f13dafacee370d6e4720d8e27cf889053e79eb3) )
+	ROM_LOAD( "epr-7358.ic3",   0x8000, 0x4000, CRC(c6f26b0b) SHA1(3753e05b6e77159832dbe88562ba7a818120d1a3) )
 ROM_END
 
 ROM_START( sderby2s )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-6450d.ic10", 0x0000, 0x4000, CRC(e56986d3) SHA1(a2dbdc95128cc94a1492e080aeea402f2d4b89fe) )
-	ROM_LOAD( "epr-6504d.ic11", 0x4000, 0x4000, CRC(7bb364b9) SHA1(9f93572b6d999422d93ad5f7a251b4695565651f) )
+	ROM_LOAD( "epr-6450d.ic10",   0x0000, 0x4000, CRC(e56986d3) SHA1(a2dbdc95128cc94a1492e080aeea402f2d4b89fe) )
+	ROM_LOAD( "epr-6504d.ic11",   0x4000, 0x4000, CRC(7bb364b9) SHA1(9f93572b6d999422d93ad5f7a251b4695565651f) )
 ROM_END
-
 
 /*************************************
  *
@@ -558,16 +549,8 @@ ROM_END
  *
  *************************************/
 
-void sg1000a_state::init_sderby()
+void sg1000a_state::init_sg1000a()
 {
-	// mini daughterboard in ic10 socket, with TI 27C128 rom and unknown ic(label scraped off)
-	u8 *rom = machine().root_device().memregion("maincpu")->base();
-	const u32 len = memregion("maincpu")->bytes();
-
-	for (int i = 0; i < len; i++)
-		rom[i] = bitswap<8>(rom[i],3,7,4,6,5,2,1,0);
-
-	// TODO: decryption is unfinished
 }
 
 
@@ -578,11 +561,7 @@ void sg1000a_state::init_sderby()
  *
  *************************************/
 
-GAME( 1984, chboxing, 0, sg1000a,  chboxing, sg1000a_state, empty_init, ROT0, "Sega", "Champion Boxing",        0 )
-GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, empty_init, ROT0, "Sega", "Champion Pro Wrestling", 0 )
-GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, empty_init, ROT0, "Sega", "Doki Doki Penguin Land", 0 )
-
-// inputs aren't hooked up, probably needs to be connected to the main board anyway
-// TODO: move these guys over to sderby2.cpp
-GAME( 1984, sderbys,  0, sderbys, sderbys, sg1000a_state, init_sderby, ROT0, "Sega", "Super Derby (satellite board)", MACHINE_NOT_WORKING )
-GAME( 1985, sderby2s, 0, sderbys, sderbys, sg1000a_state, empty_init,  ROT0, "Sega", "Super Derby II (satellite board)", MACHINE_NOT_WORKING )
+GAME( 1984, chboxing, 0, sg1000a,  chboxing, sg1000a_state, init_sg1000a, ROT0, "Sega", "Champion Boxing",                  0 )
+GAME( 1985, chwrestl, 0, sg1000ax, chwrestl, sg1000a_state, init_sg1000a, ROT0, "Sega", "Champion Pro Wrestling",           0 )
+GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, init_sg1000a, ROT0, "Sega", "Doki Doki Penguin Land",           0 )
+GAME( 1985, sderby2s, 0, sderby2s, sderby2s, sg1000a_state, init_sg1000a, ROT0, "Sega", "Super Derby II (Satellite board)", MACHINE_NOT_WORKING ) // inputs aren't hooked up, probably needs to be connected to the main board anyway

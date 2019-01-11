@@ -13,18 +13,28 @@
 
 #include "video/voodoo.h"
 
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_K033906_VOODOO(_tag) \
+	downcast<k033906_device &>(*device).set_voodoo_tag(_tag);
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+
+// ======================> k033906_device
+
 class k033906_device :  public device_t
 {
 public:
 	// construction/destruction
-	template <typename T>
-	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&voodoo_tag)
-		: k033906_device(mconfig, tag, owner, clock)
-	{
-		m_voodoo.set_tag(std::forward<T>(voodoo_tag));
-	}
-
 	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_voodoo_tag(const char *tag) { m_voodoo.set_tag(tag); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
@@ -51,6 +61,8 @@ private:
 	uint32_t       m_ram[32768];
 };
 
+
+// device type definition
 DECLARE_DEVICE_TYPE(K033906, k033906_device)
 
 #endif // MAME_MACHINE_K033906_H

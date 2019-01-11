@@ -54,16 +54,15 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void bml3bus_mp1802_device::device_add_mconfig(machine_config &config)
-{
-	MB8866(config, m_fdc, 1_MHz_XTAL);
-	m_fdc->intrq_wr_callback().set(FUNC(bml3bus_mp1802_device::bml3_wd17xx_intrq_w));
+MACHINE_CONFIG_START(bml3bus_mp1802_device::device_add_mconfig)
+	MCFG_MB8866_ADD("fdc", XTAL(1'000'000))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, bml3bus_mp1802_device, bml3_wd17xx_intrq_w))
 
-	FLOPPY_CONNECTOR(config, m_floppy0, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy2, mp1802_floppies, "", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy3, mp1802_floppies, "", floppy_image_device::default_floppy_formats);
-}
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mp1802_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mp1802_floppies, "dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", mp1802_floppies, "", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", mp1802_floppies, "", floppy_image_device::default_floppy_formats)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -130,7 +129,7 @@ void bml3bus_mp1802_device::device_start()
 
 	// install into memory
 	address_space &space_prg = m_bml3bus->space();
-	space_prg.install_readwrite_handler(0xff00, 0xff03, read8sm_delegate(FUNC(mb8866_device::read), m_fdc.target()), write8sm_delegate(FUNC(mb8866_device::write), m_fdc.target()));
+	space_prg.install_readwrite_handler(0xff00, 0xff03, read8_delegate(FUNC(mb8866_device::read),(mb8866_device*)m_fdc), write8_delegate(FUNC(mb8866_device::write),(mb8866_device*)m_fdc));
 	space_prg.install_readwrite_handler(0xff04, 0xff04, read8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_r), this), write8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_w), this));
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
 	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();

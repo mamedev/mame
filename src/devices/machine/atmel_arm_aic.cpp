@@ -22,24 +22,24 @@ DEFINE_DEVICE_TYPE(ARM_AIC, arm_aic_device, "arm_aic", "ARM Advanced Interrupt C
 
 void arm_aic_device::regs_map(address_map &map)
 {
-	map(0x000, 0x07f).rw(FUNC(arm_aic_device::aic_smr_r), FUNC(arm_aic_device::aic_smr_w)); // AIC_SMR[32] (AIC_SMR)  Source Mode Register
-	map(0x080, 0x0ff).rw(FUNC(arm_aic_device::aic_svr_r), FUNC(arm_aic_device::aic_svr_w)); // AIC_SVR[32] (AIC_SVR)  Source Vector Register
-	map(0x100, 0x103).r(FUNC(arm_aic_device::irq_vector_r));      // AIC_IVR    IRQ Vector Register
-	map(0x104, 0x107).r(FUNC(arm_aic_device::firq_vector_r));     // AIC_FVR    FIQ Vector Register
-	map(0x108, 0x10b).r(FUNC(arm_aic_device::aic_isr_r));         // AIC_ISR Interrupt Status Register
-	map(0x10c, 0x10f).r(FUNC(arm_aic_device::aic_ipr_r));         // AIC_IPR Interrupt Pending Register
-	map(0x110, 0x113).r(FUNC(arm_aic_device::aic_imr_r));         // AIC_IMR Interrupt Mask Register
-	map(0x114, 0x117).r(FUNC(arm_aic_device::aic_cisr_r));        // AIC_CISR    Core Interrupt Status Register
-	map(0x120, 0x123).w(FUNC(arm_aic_device::aic_iecr_w));       // AIC_IECR    Interrupt Enable Command Register
-	map(0x124, 0x127).w(FUNC(arm_aic_device::aic_idcr_w));       // AIC_IDCR    Interrupt Disable Command Register
-	map(0x128, 0x12b).w(FUNC(arm_aic_device::aic_iccr_w));       // AIC_ICCR    Interrupt Clear Command Register
-	map(0x12c, 0x12f).w(FUNC(arm_aic_device::aic_iscr_w));       // AIC_ISCR    Interrupt Set Command Register
-	map(0x130, 0x133).w(FUNC(arm_aic_device::aic_eoicr_w));      // AIC_EOICR   End of Interrupt Command Register
-	map(0x134, 0x137).w(FUNC(arm_aic_device::aic_spu_w));        // AIC_SPU     Spurious Vector Register
-	map(0x138, 0x13b).w(FUNC(arm_aic_device::aic_dcr_w));        // AIC_DCR     Debug Control Register (Protect)
-	map(0x140, 0x143).w(FUNC(arm_aic_device::aic_ffer_w));       // AIC_FFER    Fast Forcing Enable Register
-	map(0x144, 0x147).w(FUNC(arm_aic_device::aic_ffdr_w));       // AIC_FFDR    Fast Forcing Disable Register
-	map(0x148, 0x14b).r(FUNC(arm_aic_device::aic_ffsr_r));        // AIC_FFSR    Fast Forcing Status Register
+	map(0x000, 0x07f).rw(this, FUNC(arm_aic_device::aic_smr_r), FUNC(arm_aic_device::aic_smr_w)); // AIC_SMR[32] (AIC_SMR)  Source Mode Register
+	map(0x080, 0x0ff).rw(this, FUNC(arm_aic_device::aic_svr_r), FUNC(arm_aic_device::aic_svr_w)); // AIC_SVR[32] (AIC_SVR)  Source Vector Register
+	map(0x100, 0x103).r(this, FUNC(arm_aic_device::irq_vector_r));      // AIC_IVR    IRQ Vector Register
+	map(0x104, 0x107).r(this, FUNC(arm_aic_device::firq_vector_r));     // AIC_FVR    FIQ Vector Register
+	map(0x108, 0x10b).r(this, FUNC(arm_aic_device::aic_isr_r));         // AIC_ISR Interrupt Status Register
+	map(0x10c, 0x10f).r(this, FUNC(arm_aic_device::aic_ipr_r));         // AIC_IPR Interrupt Pending Register
+	map(0x110, 0x113).r(this, FUNC(arm_aic_device::aic_imr_r));         // AIC_IMR Interrupt Mask Register
+	map(0x114, 0x117).r(this, FUNC(arm_aic_device::aic_cisr_r));        // AIC_CISR    Core Interrupt Status Register
+	map(0x120, 0x123).w(this, FUNC(arm_aic_device::aic_iecr_w));       // AIC_IECR    Interrupt Enable Command Register
+	map(0x124, 0x127).w(this, FUNC(arm_aic_device::aic_idcr_w));       // AIC_IDCR    Interrupt Disable Command Register
+	map(0x128, 0x12b).w(this, FUNC(arm_aic_device::aic_iccr_w));       // AIC_ICCR    Interrupt Clear Command Register
+	map(0x12c, 0x12f).w(this, FUNC(arm_aic_device::aic_iscr_w));       // AIC_ISCR    Interrupt Set Command Register
+	map(0x130, 0x133).w(this, FUNC(arm_aic_device::aic_eoicr_w));      // AIC_EOICR   End of Interrupt Command Register
+	map(0x134, 0x137).w(this, FUNC(arm_aic_device::aic_spu_w));        // AIC_SPU     Spurious Vector Register
+	map(0x138, 0x13b).w(this, FUNC(arm_aic_device::aic_dcr_w));        // AIC_DCR     Debug Control Register (Protect)
+	map(0x140, 0x143).w(this, FUNC(arm_aic_device::aic_ffer_w));       // AIC_FFER    Fast Forcing Enable Register
+	map(0x144, 0x147).w(this, FUNC(arm_aic_device::aic_ffdr_w));       // AIC_FFDR    Fast Forcing Disable Register
+	map(0x148, 0x14b).r(this, FUNC(arm_aic_device::aic_ffsr_r));        // AIC_FFSR    Fast Forcing Status Register
 }
 
 READ32_MEMBER(arm_aic_device::irq_vector_r)

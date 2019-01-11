@@ -259,12 +259,12 @@ pstdout::~pstdout()
 // -----------------------------------------------------------------------------
 
 pimemstream::pimemstream(const void *mem, const pos_type len)
-	: pistream(FLAG_SEEKABLE), m_pos(0), m_len(len), m_mem(static_cast<const char *>(mem))
+	: pistream(FLAG_SEEKABLE), m_pos(0), m_len(len), m_mem(static_cast<const pstring::mem_t *>(mem))
 {
 }
 
 pimemstream::pimemstream(const pomemstream &ostrm)
-: pistream(FLAG_SEEKABLE), m_pos(0), m_len(ostrm.size()), m_mem(reinterpret_cast<const char *>(ostrm.memory()))
+: pistream(FLAG_SEEKABLE), m_pos(0), m_len(ostrm.size()), m_mem(reinterpret_cast<pstring::mem_t *>(ostrm.memory()))
 {
 }
 
@@ -366,7 +366,7 @@ pstream::pos_type pomemstream::vtell()
 
 bool putf8_reader::readline(pstring &line)
 {
-	putf8string::code_t c = 0;
+	pstring::code_t c = 0;
 	m_linebuf = "";
 	if (!this->readcode(c))
 	{
@@ -378,11 +378,11 @@ bool putf8_reader::readline(pstring &line)
 		if (c == 10)
 			break;
 		else if (c != 13) /* ignore CR */
-			m_linebuf += putf8string(c);
+			m_linebuf += pstring(c);
 		if (!this->readcode(c))
 			break;
 	}
-	line = m_linebuf.c_str();
+	line = m_linebuf;
 	return true;
 }
 

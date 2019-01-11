@@ -7,6 +7,9 @@
 
 #include "lpc.h"
 
+#define MCFG_LPC_RTC_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, LPC_RTC, 0)
+
 class lpc_rtc_device : public lpc_device {
 public:
 	lpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

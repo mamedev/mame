@@ -112,10 +112,9 @@ void tc0040ioc_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void tc0040ioc_device::device_add_mconfig(machine_config &config)
-{
-	WATCHDOG_TIMER(config, m_watchdog);
-}
+MACHINE_CONFIG_START(tc0040ioc_device::device_add_mconfig)
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -256,11 +255,10 @@ void tc0220ioc_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void tc0220ioc_device::device_add_mconfig(machine_config &config)
-{
-	WATCHDOG_TIMER(config, m_watchdog);
-//  m_watchdog->set_time(attotime::from_msec(3200));
-}
+MACHINE_CONFIG_START(tc0220ioc_device::device_add_mconfig)
+	MCFG_WATCHDOG_ADD("watchdog")
+//  MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(3200))
+MACHINE_CONFIG_END
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -374,10 +372,9 @@ void tc0510nio_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void tc0510nio_device::device_add_mconfig(machine_config &config)
-{
-	WATCHDOG_TIMER(config, m_watchdog);
-}
+MACHINE_CONFIG_START(tc0510nio_device::device_add_mconfig)
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -514,10 +511,9 @@ void tc0640fio_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void tc0640fio_device::device_add_mconfig(machine_config &config)
-{
-	WATCHDOG_TIMER(config, m_watchdog);
-}
+MACHINE_CONFIG_START(tc0640fio_device::device_add_mconfig)
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************

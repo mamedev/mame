@@ -67,11 +67,11 @@ public:
 	DECLARE_VIDEO_START(atarig1);
 	uint32_t screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarig1(machine_config &config);
-	void pfslap111(machine_config &config);
-	void pfslap112(machine_config &config);
-	void pfslap113(machine_config &config);
-	void pfslap114(machine_config &config);
+	void pitfightj(machine_config &config);
+	void pitfight7(machine_config &config);
+	void pitfight9(machine_config &config);
 	void pitfightb(machine_config &config);
+	void pitfight(machine_config &config);
 	void hydrap(machine_config &config);
 	void hydra(machine_config &config);
 	void main_map(address_map &map);

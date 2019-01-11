@@ -85,52 +85,52 @@ void bking_state::bking_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram();
-	map(0x9000, 0x97ff).ram().w(FUNC(bking_state::bking_playfield_w)).share("playfield_ram");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(bking_state::bking_playfield_w)).share("playfield_ram");
 }
 
 void bking_state::bking_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(FUNC(bking_state::bking_xld1_w));
-	map(0x01, 0x01).portr("IN1").w(FUNC(bking_state::bking_yld1_w));
-	map(0x02, 0x02).portr("DSWA").w(FUNC(bking_state::bking_xld2_w));
-	map(0x03, 0x03).portr("DSWB").w(FUNC(bking_state::bking_yld2_w));
-	map(0x04, 0x04).portr("DSWC").w(FUNC(bking_state::bking_xld3_w));
-	map(0x05, 0x05).rw(FUNC(bking_state::bking_input_port_5_r), FUNC(bking_state::bking_yld3_w));
-	map(0x06, 0x06).rw(FUNC(bking_state::bking_input_port_6_r), FUNC(bking_state::bking_msk_w));
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(bking_state::bking_xld1_w));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(bking_state::bking_yld1_w));
+	map(0x02, 0x02).portr("DSWA").w(this, FUNC(bking_state::bking_xld2_w));
+	map(0x03, 0x03).portr("DSWB").w(this, FUNC(bking_state::bking_yld2_w));
+	map(0x04, 0x04).portr("DSWC").w(this, FUNC(bking_state::bking_xld3_w));
+	map(0x05, 0x05).rw(this, FUNC(bking_state::bking_input_port_5_r), FUNC(bking_state::bking_yld3_w));
+	map(0x06, 0x06).rw(this, FUNC(bking_state::bking_input_port_6_r), FUNC(bking_state::bking_msk_w));
 	map(0x07, 0x07).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x08, 0x08).w(FUNC(bking_state::bking_cont1_w));
-	map(0x09, 0x09).w(FUNC(bking_state::bking_cont2_w));
-	map(0x0a, 0x0a).w(FUNC(bking_state::bking_cont3_w));
-	map(0x0b, 0x0b).w(FUNC(bking_state::bking_soundlatch_w));
+	map(0x08, 0x08).w(this, FUNC(bking_state::bking_cont1_w));
+	map(0x09, 0x09).w(this, FUNC(bking_state::bking_cont2_w));
+	map(0x0a, 0x0a).w(this, FUNC(bking_state::bking_cont3_w));
+	map(0x0b, 0x0b).w(this, FUNC(bking_state::bking_soundlatch_w));
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
-	map(0x0d, 0x0d).w(FUNC(bking_state::bking_hitclr_w));
-	map(0x07, 0x1f).r(FUNC(bking_state::bking_pos_r));
+	map(0x0d, 0x0d).w(this, FUNC(bking_state::bking_hitclr_w));
+	map(0x07, 0x1f).r(this, FUNC(bking_state::bking_pos_r));
 }
 
 void bking_state::bking3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(FUNC(bking_state::bking_xld1_w));
-	map(0x01, 0x01).portr("IN1").w(FUNC(bking_state::bking_yld1_w));
-	map(0x02, 0x02).portr("DSWA").w(FUNC(bking_state::bking_xld2_w));
-	map(0x03, 0x03).portr("DSWB").w(FUNC(bking_state::bking_yld2_w));
-	map(0x04, 0x04).portr("DSWC").w(FUNC(bking_state::bking_xld3_w));
-	map(0x05, 0x05).rw(FUNC(bking_state::bking_input_port_5_r), FUNC(bking_state::bking_yld3_w));
-	map(0x06, 0x06).rw(FUNC(bking_state::bking_input_port_6_r), FUNC(bking_state::bking_msk_w));
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(bking_state::bking_xld1_w));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(bking_state::bking_yld1_w));
+	map(0x02, 0x02).portr("DSWA").w(this, FUNC(bking_state::bking_xld2_w));
+	map(0x03, 0x03).portr("DSWB").w(this, FUNC(bking_state::bking_yld2_w));
+	map(0x04, 0x04).portr("DSWC").w(this, FUNC(bking_state::bking_xld3_w));
+	map(0x05, 0x05).rw(this, FUNC(bking_state::bking_input_port_5_r), FUNC(bking_state::bking_yld3_w));
+	map(0x06, 0x06).rw(this, FUNC(bking_state::bking_input_port_6_r), FUNC(bking_state::bking_msk_w));
 	map(0x07, 0x07).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x08, 0x08).w(FUNC(bking_state::bking_cont1_w));
-	map(0x09, 0x09).w(FUNC(bking_state::bking_cont2_w));
-	map(0x0a, 0x0a).w(FUNC(bking_state::bking_cont3_w));
-	map(0x0b, 0x0b).w(FUNC(bking_state::bking_soundlatch_w));
+	map(0x08, 0x08).w(this, FUNC(bking_state::bking_cont1_w));
+	map(0x09, 0x09).w(this, FUNC(bking_state::bking_cont2_w));
+	map(0x0a, 0x0a).w(this, FUNC(bking_state::bking_cont3_w));
+	map(0x0b, 0x0b).w(this, FUNC(bking_state::bking_soundlatch_w));
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
-	map(0x0d, 0x0d).w(FUNC(bking_state::bking_hitclr_w));
-	map(0x07, 0x1f).r(FUNC(bking_state::bking_pos_r));
+	map(0x0d, 0x0d).w(this, FUNC(bking_state::bking_hitclr_w));
+	map(0x07, 0x1f).r(this, FUNC(bking_state::bking_pos_r));
 	map(0x2f, 0x2f).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
-	map(0x4f, 0x4f).rw(FUNC(bking_state::bking3_mcu_status_r), FUNC(bking_state::unk_w));
-	map(0x60, 0x60).r(FUNC(bking_state::bking3_extrarom_r));
-	map(0x6f, 0x6f).rw(FUNC(bking_state::bking3_ext_check_r), FUNC(bking_state::bking3_addr_h_w));
-	map(0x8f, 0x8f).w(FUNC(bking_state::bking3_addr_l_w));
+	map(0x4f, 0x4f).rw(this, FUNC(bking_state::bking3_mcu_status_r), FUNC(bking_state::unk_w));
+	map(0x60, 0x60).r(this, FUNC(bking_state::bking3_extrarom_r));
+	map(0x6f, 0x6f).rw(this, FUNC(bking_state::bking3_ext_check_r), FUNC(bking_state::bking3_addr_h_w));
+	map(0x8f, 0x8f).w(this, FUNC(bking_state::bking3_addr_l_w));
 }
 
 void bking_state::bking_audio_map(address_map &map)
@@ -143,7 +143,7 @@ void bking_state::bking_audio_map(address_map &map)
 	map(0x4402, 0x4403).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x4403, 0x4403).r("ay2", FUNC(ay8910_device::data_r));
 	map(0x4800, 0x4800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x4802, 0x4802).rw(FUNC(bking_state::bking_sndnmi_disable_r), FUNC(bking_state::bking_sndnmi_enable_w));
+	map(0x4802, 0x4802).rw(this, FUNC(bking_state::bking_sndnmi_disable_r), FUNC(bking_state::bking_sndnmi_enable_w));
 	map(0xe000, 0xefff).rom();   /* Space for diagnostic ROM */
 }
 
@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(bking_state::bking)
 	/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bking_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -415,24 +415,28 @@ MACHINE_CONFIG_START(bking_state::bking)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bking_state, screen_update_bking)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bking_state, screen_vblank_bking))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bking);
-	PALETTE(config, m_palette, FUNC(bking_state::bking_palette), 4*8 + 4*4 + 4*2 + 4*2);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bking)
+	MCFG_PALETTE_ADD("palette", 4*8+4*4+4*2+4*2)
+	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
-	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	AY8910(config, "ay1", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(6'000'000)/4));
-	ay2.port_a_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
-	ay2.port_b_write_callback().set(FUNC(bking_state::port_b_w));
-	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bking_state, port_b_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
@@ -498,43 +502,43 @@ ROM_START( bking )
 	ROM_LOAD( "dm_03.d1",  0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) ) /* palette */
 ROM_END
 
-ROM_START( bking2 ) // Top board: DMO70003A, middle board: DMO00001A, bottom board: DMO70002A
+ROM_START( bking2 )
 	ROM_REGION( 0x10000, "main_cpu", 0 )
-	ROM_LOAD( "ad6_01.13f",       0x0000, 0x1000, CRC(078ada3f) SHA1(5e82a6d27c65fe29d664dbfc2ede547c0f4869f0) )
-	ROM_LOAD( "ad6_02.11f",       0x1000, 0x1000, CRC(c37d110a) SHA1(7aec6c949d1cf136c3037140bd86597feaf29108) )
-	ROM_LOAD( "ad6_03.10f",       0x2000, 0x1000, CRC(2ba5c681) SHA1(d0df24f5e52e6162b40308d8aa38b0348a100f37) )
-	ROM_LOAD( "ad6_04.8f",        0x3000, 0x1000, CRC(8fad54e8) SHA1(55edc185914686d42efd848a402f78884d42292b) )
-	ROM_LOAD( "ad6_05.7f",        0x4000, 0x1000, CRC(b4de6b58) SHA1(f62bdc3128b226454b1f00a4cbe382e1219a11b0) )
-	ROM_LOAD( "ad6_06.5f",        0x5000, 0x1000, CRC(9ac43b87) SHA1(dd562fee01c81317978d1bd8a0178e3d9be6145a) )
-	ROM_LOAD( "ad6_07.4f",        0x6000, 0x1000, CRC(b3ed40b7) SHA1(d481094c0381234314f797928e3cdb22f36f4e32) )
-	ROM_LOAD( "ad6_08.2f",        0x7000, 0x1000, CRC(8fddb2e8) SHA1(6ee5f09d154440851f370a97b35450e3726e14e7) )
+	ROM_LOAD( "01.13f",       0x0000, 0x1000, CRC(078ada3f) SHA1(5e82a6d27c65fe29d664dbfc2ede547c0f4869f0) )
+	ROM_LOAD( "02.11f",       0x1000, 0x1000, CRC(c37d110a) SHA1(7aec6c949d1cf136c3037140bd86597feaf29108) )
+	ROM_LOAD( "03.10f",       0x2000, 0x1000, CRC(2ba5c681) SHA1(d0df24f5e52e6162b40308d8aa38b0348a100f37) )
+	ROM_LOAD( "04.8f",        0x3000, 0x1000, CRC(8fad54e8) SHA1(55edc185914686d42efd848a402f78884d42292b) )
+	ROM_LOAD( "05.7f",        0x4000, 0x1000, CRC(b4de6b58) SHA1(f62bdc3128b226454b1f00a4cbe382e1219a11b0) )
+	ROM_LOAD( "06.5f",        0x5000, 0x1000, CRC(9ac43b87) SHA1(dd562fee01c81317978d1bd8a0178e3d9be6145a) )
+	ROM_LOAD( "07.4f",        0x6000, 0x1000, CRC(b3ed40b7) SHA1(d481094c0381234314f797928e3cdb22f36f4e32) )
+	ROM_LOAD( "08.2f",        0x7000, 0x1000, CRC(8fddb2e8) SHA1(6ee5f09d154440851f370a97b35450e3726e14e7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )         /* Sound ROMs */
-	ROM_LOAD( "ad6_15.4f",           0x0000, 0x1000, CRC(f045d0fe) SHA1(3b34081fa6cd0423236d09b6f23e8cf8cfd627c5) )
-	ROM_LOAD( "ad6_16.4d",           0x1000, 0x1000, CRC(92d50410) SHA1(e6f4c27031744bbc832a1eb121a7dba4da5286c4) )
+	ROM_LOAD( "15",           0x0000, 0x1000, CRC(f045d0fe) SHA1(3b34081fa6cd0423236d09b6f23e8cf8cfd627c5) )
+	ROM_LOAD( "16",           0x1000, 0x1000, CRC(92d50410) SHA1(e6f4c27031744bbc832a1eb121a7dba4da5286c4) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "ad6_14.5a",        0x0000, 0x1000, CRC(52636a94) SHA1(185c4455bd9bb23d14aa2f6f7baa74959da08fc2) )
-	ROM_LOAD( "ad6_13.7a",        0x1000, 0x1000, CRC(6b9e0564) SHA1(6cdd3820caa3825e98b61fe260960cc05c04d032) )
-	ROM_LOAD( "ad6_12.8a",        0x2000, 0x1000, CRC(c6d685d9) SHA1(2dd2fda365e6bdf9aa26de90650f4a2588ea0515) )
-	ROM_LOAD( "ad6_11.10a",       0x3000, 0x1000, CRC(2b949987) SHA1(a94666c4f2fdc25399f7976ed2c25fd454387be6) )
-	ROM_LOAD( "ad6_10.11a",       0x4000, 0x1000, CRC(eb96f948) SHA1(295ba5a620a8a85a121d3e823804adceeeef64d9) )
-	ROM_LOAD( "ad6_09.13a",       0x5000, 0x1000, CRC(595e3dd4) SHA1(9dd3388ce704dd5473af034716cd8d48df3dc495) )
+	ROM_LOAD( "14.5a",        0x0000, 0x1000, CRC(52636a94) SHA1(185c4455bd9bb23d14aa2f6f7baa74959da08fc2) )
+	ROM_LOAD( "13.7a",        0x1000, 0x1000, CRC(6b9e0564) SHA1(6cdd3820caa3825e98b61fe260960cc05c04d032) )
+	ROM_LOAD( "12.8a",        0x2000, 0x1000, CRC(c6d685d9) SHA1(2dd2fda365e6bdf9aa26de90650f4a2588ea0515) )
+	ROM_LOAD( "11.10a",       0x3000, 0x1000, CRC(2b949987) SHA1(a94666c4f2fdc25399f7976ed2c25fd454387be6) )
+	ROM_LOAD( "10.11a",       0x4000, 0x1000, CRC(eb96f948) SHA1(295ba5a620a8a85a121d3e823804adceeeef64d9) )
+	ROM_LOAD( "09.13a",       0x5000, 0x1000, CRC(595e3dd4) SHA1(9dd3388ce704dd5473af034716cd8d48df3dc495) )
 
 	ROM_REGION( 0x0800, "gfx2", 0 )
-	ROM_LOAD( "dm_01.e10",           0x0000, 0x0800, CRC(e5663f0b) SHA1(b0fed8c4cdff7b12bb220e51d5b7188933934a34) )    /* crow graphics */
+	ROM_LOAD( "17",           0x0000, 0x0800, CRC(e5663f0b) SHA1(b0fed8c4cdff7b12bb220e51d5b7188933934a34) )    /* crow graphics */
 
 	ROM_REGION( 0x0800, "gfx3", 0 )
-	ROM_LOAD( "dm_02.e7",           0x0000, 0x0800, CRC(fc9cec31) SHA1(5ab1c9b3b15334c6ec06826005ecb66b34d8879a) )    /* ball 1 graphics. Only the first 128 bytes used */
+	ROM_LOAD( "18",           0x0000, 0x0800, CRC(fc9cec31) SHA1(5ab1c9b3b15334c6ec06826005ecb66b34d8879a) )    /* ball 1 graphics. Only the first 128 bytes used */
 
 	ROM_REGION( 0x0800, "gfx4", 0 )
-	ROM_LOAD( "dm_02.e9",           0x0000, 0x0800, CRC(fc9cec31) SHA1(5ab1c9b3b15334c6ec06826005ecb66b34d8879a) )  /* ball 2 graphics. Only the first 128 bytes used */
+	ROM_LOAD( "19",           0x0000, 0x0800, CRC(fc9cec31) SHA1(5ab1c9b3b15334c6ec06826005ecb66b34d8879a) )  /* ball 2 graphics. Only the first 128 bytes used */
 
 	ROM_REGION( 0x0020, "user1", 0 )
-	ROM_LOAD( "dm_04.2c",    0x0000, 0x0020, CRC(4cb5bd32) SHA1(8851bae033ba67516d5ff6888e5daef10c2116ee) )  /* collision detection, mb7051(?) */
+	ROM_LOAD( "mb7051.2c",    0x0000, 0x0020, CRC(4cb5bd32) SHA1(8851bae033ba67516d5ff6888e5daef10c2116ee) )  /* collision detection */
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "dm_03.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )    /* palette, 82s141 */
+	ROM_LOAD( "82s141.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )    /* palette */
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16l8.1",  0x0000, 0x0104, CRC(e75d19f5) SHA1(d51cbb247760312b8884bbd0478a321eee05034f) )

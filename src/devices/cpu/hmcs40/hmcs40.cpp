@@ -94,8 +94,8 @@ hmcs40_cpu_device::hmcs40_cpu_device(const machine_config &mconfig, device_type 
 	, m_family(family)
 	, m_polarity(polarity)
 	, m_stack_levels(stack_levels)
-	, m_read_r{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
-	, m_write_r{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_read_r0(*this), m_read_r1(*this), m_read_r2(*this), m_read_r3(*this), m_read_r4(*this), m_read_r5(*this), m_read_r6(*this), m_read_r7(*this)
+	, m_write_r0(*this), m_write_r1(*this), m_write_r2(*this), m_write_r3(*this), m_write_r4(*this), m_write_r5(*this), m_write_r6(*this), m_write_r7(*this)
 	, m_read_d(*this)
 	, m_write_d(*this)
 {
@@ -206,11 +206,23 @@ void hmcs40_cpu_device::device_start()
 	reset_prescaler();
 
 	// resolve callbacks
-	for (int i = 0; i < 8; i++)
-	{
-		m_read_r[i].resolve_safe(m_polarity & 0xf);
-		m_write_r[i].resolve_safe();
-	}
+	m_read_r0.resolve_safe(m_polarity & 0xf);
+	m_read_r1.resolve_safe(m_polarity & 0xf);
+	m_read_r2.resolve_safe(m_polarity & 0xf);
+	m_read_r3.resolve_safe(m_polarity & 0xf);
+	m_read_r4.resolve_safe(m_polarity & 0xf);
+	m_read_r5.resolve_safe(m_polarity & 0xf);
+	m_read_r6.resolve_safe(m_polarity & 0xf);
+	m_read_r7.resolve_safe(m_polarity & 0xf);
+
+	m_write_r0.resolve_safe();
+	m_write_r1.resolve_safe();
+	m_write_r2.resolve_safe();
+	m_write_r3.resolve_safe();
+	m_write_r4.resolve_safe();
+	m_write_r5.resolve_safe();
+	m_write_r6.resolve_safe();
+	m_write_r7.resolve_safe();
 
 	m_read_d.resolve_safe(m_polarity);
 	m_write_d.resolve_safe();
@@ -325,7 +337,19 @@ void hmcs40_cpu_device::device_reset()
 u8 hmcs40_cpu_device::read_r(int index)
 {
 	index &= 7;
-	u8 inp = m_read_r[index](index, 0xff);
+	u8 inp = 0;
+
+	switch (index)
+	{
+		case 0: inp = m_read_r0(index, 0xff); break;
+		case 1: inp = m_read_r1(index, 0xff); break;
+		case 2: inp = m_read_r2(index, 0xff); break;
+		case 3: inp = m_read_r3(index, 0xff); break;
+		case 4: inp = m_read_r4(index, 0xff); break;
+		case 5: inp = m_read_r5(index, 0xff); break;
+		case 6: inp = m_read_r6(index, 0xff); break;
+		case 7: inp = m_read_r7(index, 0xff); break;
+	}
 
 	if (m_polarity)
 		return (inp & m_r[index]) & 0xf;
@@ -338,7 +362,18 @@ void hmcs40_cpu_device::write_r(int index, u8 data)
 	index &= 7;
 	data &= 0xf;
 	m_r[index] = data;
-	m_write_r[index](index, data, 0xff);
+
+	switch (index)
+	{
+		case 0: m_write_r0(index, data, 0xff); break;
+		case 1: m_write_r1(index, data, 0xff); break;
+		case 2: m_write_r2(index, data, 0xff); break;
+		case 3: m_write_r3(index, data, 0xff); break;
+		case 4: m_write_r4(index, data, 0xff); break;
+		case 5: m_write_r5(index, data, 0xff); break;
+		case 6: m_write_r6(index, data, 0xff); break;
+		case 7: m_write_r7(index, data, 0xff); break;
+	}
 }
 
 int hmcs40_cpu_device::read_d(int index)

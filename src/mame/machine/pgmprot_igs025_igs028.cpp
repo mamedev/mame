@@ -192,10 +192,10 @@ MACHINE_CONFIG_START(pgm_028_025_state::pgm_028_025_ol)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(olds_mem)
 
-	IGS025(config, m_igs025, 0);
-	m_igs025->set_external_cb(FUNC(pgm_028_025_state::igs025_to_igs028_callback), this);
+	MCFG_DEVICE_ADD("igs025", IGS025, 0)
+	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_028_025_state, igs025_to_igs028_callback )
 
-	IGS028(config, m_igs028, 0);
+	MCFG_DEVICE_ADD("igs028", IGS028, 0)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_028_025_state,olds)
 MACHINE_CONFIG_END

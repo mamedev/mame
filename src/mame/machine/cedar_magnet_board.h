@@ -32,7 +32,6 @@ public:
 
 protected:
 	virtual void interface_pre_reset() override;
-	virtual void interface_pre_start() override;
 
 	virtual TIMER_CALLBACK_MEMBER(reset_assert_callback);
 
@@ -45,10 +44,6 @@ private:
 	TIMER_CALLBACK_MEMBER(reset_clear_callback);
 
 	bool m_is_running;
-	emu_timer *m_halt_assert_timer;
-	emu_timer *m_halt_clear_timer;
-	emu_timer *m_reset_assert_timer;
-	emu_timer *m_reset_clear_timer;
 };
 
 #endif // MAME_MACHINE_CEDAR_MAGNET_BOARD_H

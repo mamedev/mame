@@ -2,7 +2,6 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
-#include "emupal.h"
 
 class mugsmash_state : public driver_device
 {
@@ -20,9 +19,6 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
-	void mugsmash(machine_config &config);
-
-private:
 	required_shared_ptr<uint16_t> m_videoram1;
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_regs1;
@@ -48,6 +44,7 @@ private:
 	virtual void video_start() override;
 	uint32_t screen_update_mugsmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void mugsmash(machine_config &config);
 	void mugsmash_map(address_map &map);
 	void mugsmash_sound_map(address_map &map);
 };

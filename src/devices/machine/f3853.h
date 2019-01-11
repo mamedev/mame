@@ -39,57 +39,65 @@
 #pragma once
 
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_F3853_EXT_INPUT_CB(_class, _method) \
+	downcast<f3853_device &>(*device).set_interrupt_req_callback(f3853_device::interrupt_req_delegate(&_class::_method, #_class "::" #_method, this));
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
+#define F3853_INTERRUPT_REQ_CB(_name) void _name(uint16_t addr, int level)
+
+
 // ======================> f3853_device
 
-class f3853_device : public device_t
+class f3853_device :  public device_t
 {
 public:
+	typedef device_delegate<void (uint16_t addr, int level)> interrupt_req_delegate;
+
 	// construction/destruction
 	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto int_req_callback() { return m_int_req_callback.bind(); }
-	auto pri_out_callback() { return m_pri_out_callback.bind(); }
-	template<typename Object> void set_int_daisy_chain_callback(Object &&cb) { m_int_daisy_chain_callback = std::forward<Object>(cb); }
+	template <typename Object> void set_interrupt_req_callback(Object &&cb) { m_interrupt_req_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	DECLARE_WRITE_LINE_MEMBER(ext_int_w);
-	DECLARE_WRITE_LINE_MEMBER(pri_in_w);
+	void set_external_interrupt_in_line(int level);
+	void set_priority_in_line(int level);
 
 	TIMER_CALLBACK_MEMBER(timer_callback);
 
-	IRQ_CALLBACK_MEMBER(int_acknowledge);
-
 protected:
 	// device-level overrides
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override { }
+	virtual void device_clock_changed() override { }
 
 private:
-	uint16_t timer_interrupt_vector() const { return m_int_vector & ~uint16_t(0x0080); }
-	uint16_t external_interrupt_vector() const { return m_int_vector | uint16_t(0x0080); }
+	uint16_t interrupt_vector() const { return m_low | (uint16_t(m_high) << 8); }
+	uint16_t timer_interrupt_vector() const { return interrupt_vector() & ~uint16_t(0x0080); }
+	uint16_t external_interrupt_vector() const { return interrupt_vector() | uint16_t(0x0080); }
 
 	void set_interrupt_request_line();
 	void timer_start(uint8_t value);
 
-	devcb_write_line m_int_req_callback;
-	devcb_write_line m_pri_out_callback;
-	device_irq_acknowledge_delegate m_int_daisy_chain_callback;
+	interrupt_req_delegate m_interrupt_req_cb;
+	uint8_t m_high;
+	uint8_t m_low; // Bit 7 is set to 0 for timer interrupts, 1 for external interrupts
+	int32_t m_external_enable;
+	int32_t m_timer_enable;
 
-	uint16_t m_int_vector; // Bit 7 is set to 0 for timer interrupts, 1 for external interrupts
-	bool m_external_enable;
-	bool m_timer_enable;
+	int32_t m_request_flipflop;
 
-	bool m_request_flipflop;
-
-	bool m_priority_line;              /* inverted level*/
-	bool m_external_interrupt_line;    /* inverted level */
+	int32_t m_priority_line;              /* inverted level*/
+	int32_t m_external_interrupt_line;    /* inverted level */
 
 	emu_timer *m_timer;
 

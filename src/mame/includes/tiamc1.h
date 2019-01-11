@@ -7,7 +7,6 @@
 
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
-#include "emupal.h"
 
 class tiamc1_state : public driver_device
 {
@@ -20,14 +19,6 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
-	void kot(machine_config &config);
-	void tiamc1(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t *m_tileram;
 	uint8_t *m_charram;
@@ -60,20 +51,23 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	DECLARE_VIDEO_START(kot);
-	void tiamc1_palette(palette_device &palette);
+	DECLARE_PALETTE_INIT(tiamc1);
 	uint32_t screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
+	void kot(machine_config &config);
+	void tiamc1(machine_config &config);
 	void kotrybolov_io_map(address_map &map);
 	void kotrybolov_map(address_map &map);
 	void tiamc1_io_map(address_map &map);
 	void tiamc1_map(address_map &map);
-
+private:
 	optional_device<speaker_sound_device> m_speaker;
 	void update_bg_palette();
 };

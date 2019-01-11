@@ -62,9 +62,9 @@ void osd_process_kill()
 
 void *osd_alloc_executable(size_t size)
 {
-#if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX) || defined(SDLMAME_EMSCRIPTEN)
+#if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX)
 	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
-#else
+#elif defined(SDLMAME_UNIX)
 	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
 #endif
 }
@@ -124,15 +124,6 @@ char *osd_get_clipboard_text(void)
 }
 
 #endif
-
-//============================================================
-//  osd_getpid
-//============================================================
-
-int osd_getpid(void)
-{
-	return getpid();
-}
 
 //============================================================
 //  dynamic_module_posix_impl

@@ -7,8 +7,6 @@
 
 **********************************************************************
 
-    Known Issues:
-    - Currently the FC expansion port is emulated as a control port
 
 **********************************************************************/
 
@@ -43,6 +41,8 @@ protected:
 	nes_control_port_device *m_port;
 };
 
+
+typedef device_delegate<bool (int x, int y)> nesctrl_brightpixel_delegate;
 #define NESCTRL_BRIGHTPIXEL_CB(name)  bool name(int x, int y)
 
 
@@ -53,29 +53,10 @@ class nes_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	nes_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: nes_control_port_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
 	nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_control_port_device();
 
-	typedef device_delegate<bool (int x, int y)> nesctrl_brightpixel_delegate;
-
-	void set_brightpixel_callback(nesctrl_brightpixel_delegate callback) { m_brightpixel_cb = callback; }
-	template <class FunctionClass> void set_brightpixel_callback(const char *devname, bool (FunctionClass::*callback)(int, int), const char *name)
-	{
-		set_brightpixel_callback(nesctrl_brightpixel_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_brightpixel_callback(bool (FunctionClass::*callback)(int, int), const char *name)
-	{
-		set_brightpixel_callback(nesctrl_brightpixel_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename Object> void set_brightpixel_callback(Object &&cb) { m_brightpixel_cb = std::forward<Object>(cb); }
 
 	uint8_t read_bit0();
 	uint8_t read_bit34();
@@ -94,13 +75,29 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device)
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_NES_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, NES_CONTROL_PORT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+// currently this is emulated as a control port...
+#define MCFG_FC_EXPANSION_PORT_ADD(_tag, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, NES_CONTROL_PORT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+#define MCFG_NESCTRL_BRIGHTPIXEL_CB(_class, _method) \
+	downcast<nes_control_port_device &>(*device).set_brightpixel_callback(nesctrl_brightpixel_delegate(&_class::_method, #_class "::" #_method, this));
+
+
 void nes_control_port1_devices(device_slot_interface &device);
 void nes_control_port2_devices(device_slot_interface &device);
 void fc_control_port1_devices(device_slot_interface &device);
 void fc_control_port2_devices(device_slot_interface &device);
 void fc_expansion_devices(device_slot_interface &device);
-void majesco_control_port1_devices(device_slot_interface &device);
-void majesco_control_port2_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_NES_CTRL_CTRL_H

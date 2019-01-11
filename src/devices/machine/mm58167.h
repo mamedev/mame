@@ -15,6 +15,14 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_MM58167_IRQ_CALLBACK(_cb) \
+	devcb = &downcast<mm58167_device &>(*device).set_irq_cb(DEVCB_##_cb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -30,7 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	auto irq() { return m_irq_w.bind(); }
+	template <class Object> devcb_base &set_irq_cb(Object &&wr) { return m_irq_w.set_callback(std::forward<Object>(wr)); }
 
 	devcb_write_line m_irq_w;
 

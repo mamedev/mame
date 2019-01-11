@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_CHDCD_H
-#define MAME_UTIL_CHDCD_H
-
 #pragma once
+
+#ifndef __CHDCD_H__
+#define __CHDCD_H__
 
 #include "cdrom.h"
 
@@ -35,4 +35,4 @@ struct chdcd_track_input_info
 
 chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_input_info &outinfo);
 
-#endif // MAME_UTIL_CHDCD_H
+#endif  /* __CHDCD_H__ */

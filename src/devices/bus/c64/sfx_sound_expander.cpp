@@ -41,16 +41,14 @@ WRITE_LINE_MEMBER( c64_sfx_sound_expander_cartridge_device::opl_irq_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void c64_sfx_sound_expander_cartridge_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(c64_sfx_sound_expander_cartridge_device::device_add_mconfig)
 	SPEAKER(config, "mono").front_center();
-	YM3526(config, m_opl, XTAL(3'579'545));
-	m_opl->irq_handler().set(FUNC(c64_sfx_sound_expander_cartridge_device::opl_irq_w));
-	m_opl->add_route(ALL_OUTPUTS, "mono", 0.70);
+	MCFG_DEVICE_ADD(YM3526_TAG, YM3526, XTAL(3'579'545))
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, c64_sfx_sound_expander_cartridge_device, opl_irq_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
-	m_exp->set_passthrough();
-}
+	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -177,7 +175,7 @@ c64_sfx_sound_expander_cartridge_device::c64_sfx_sound_expander_cartridge_device
 	device_t(mconfig, C64_SFX_SOUND_EXPANDER, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_opl(*this, YM3526_TAG),
-	m_exp(*this, "exp"),
+	m_exp(*this, C64_EXPANSION_SLOT_TAG),
 	m_kb(*this, "KB%u", 0)
 {
 }

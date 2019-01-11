@@ -28,7 +28,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(CDI_68070, cdi68070_device, "cdi68070", "CDI68070")
+DEFINE_DEVICE_TYPE(MACHINE_CDI68070, cdi68070_device, "cdi68070", "CDI68070")
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)
@@ -56,8 +56,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 //-------------------------------------------------
 
 cdi68070_device::cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDI_68070, tag, owner, clock)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, MACHINE_CDI68070, tag, owner, clock)
 {
 }
 
@@ -248,6 +247,8 @@ void cdi68070_device::set_quizard_mcu_value(uint16_t value)
 
 TIMER_CALLBACK_MEMBER( cdi68070_device::timer0_callback )
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	m_timers.timer0 = m_timers.reload_register;
 	m_timers.timer_status_register |= TSR_OV0;
 	if(m_picr1 & 7)
@@ -256,8 +257,8 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::timer0_callback )
 		m_timers.timer_status_register |= TSR_OV0;
 		if(interrupt)
 		{
-			m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-			m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+			state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+			state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 		}
 	}
 
@@ -319,6 +320,8 @@ void cdi68070_device::uart_tx(uint8_t data)
 
 TIMER_CALLBACK_MEMBER( cdi68070_device::rx_callback )
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	if((m_uart.command_register & 3) == 1)
 	{
 		if(m_uart.receive_pointer >= 0)
@@ -339,8 +342,8 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::rx_callback )
 			uint8_t interrupt = (m_picr2 >> 4) & 7;
 			if(interrupt)
 			{
-				m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-				m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+				state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+				state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 			}
 
 			m_uart.status_register |= USR_RXRDY;
@@ -529,13 +532,15 @@ void cdi68070_device::quizard_handle_byte_tx()
 
 TIMER_CALLBACK_MEMBER( cdi68070_device::tx_callback )
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	if(((m_uart.command_register >> 2) & 3) == 1)
 	{
 		uint8_t interrupt = m_picr2 & 7;
 		if(interrupt)
 		{
-			m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-			m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+			state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+			state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 		}
 
 		if(m_uart.transmit_pointer > -1)
@@ -568,6 +573,8 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::tx_callback )
 
 READ16_MEMBER( cdi68070_device::periphs_r )
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	switch(offset)
 	{
 		// Interrupts: 80001001
@@ -630,12 +637,12 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 
 			if((m_picr2 >> 4) & 7)
 			{
-				m_maincpu->set_input_line(M68K_IRQ_1 + (((m_picr2 >> 4) & 7) - 1), ASSERT_LINE);
+				state->m_maincpu->set_input_line(M68K_IRQ_1 + (((m_picr2 >> 4) & 7) - 1), ASSERT_LINE);
 			}
 
 			if(m_picr2 & 7)
 			{
-				m_maincpu->set_input_line(M68K_IRQ_1 + ((m_picr2 & 7) - 1), ASSERT_LINE);
+				state->m_maincpu->set_input_line(M68K_IRQ_1 + ((m_picr2 & 7) - 1), ASSERT_LINE);
 			}
 
 			return m_uart.status_register;
@@ -681,7 +688,7 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 			}
 			if((m_picr2 >> 4) & 7)
 			{
-				m_maincpu->set_input_line(M68K_IRQ_1 + (((m_picr2 >> 4) & 7) - 1), CLEAR_LINE);
+				state->m_maincpu->set_input_line(M68K_IRQ_1 + (((m_picr2 >> 4) & 7) - 1), CLEAR_LINE);
 			}
 
 			m_uart.receive_holding_register = m_uart.receive_buffer[0];
@@ -856,6 +863,8 @@ READ16_MEMBER( cdi68070_device::periphs_r )
 
 WRITE16_MEMBER( cdi68070_device::periphs_w )
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	switch(offset)
 	{
 		// Interrupts: 80001001
@@ -986,7 +995,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 				if(!m_timers.timer_status_register)
 				{
 					uint8_t interrupt = m_picr1 & 7;
-					m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), CLEAR_LINE);
+					state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), CLEAR_LINE);
 				}
 			}
 			break;

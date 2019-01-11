@@ -49,6 +49,46 @@
  *
  *****************************************************************************/
 
+
+#define MCFG_SN76477_NOISE_PARAMS(_clock_res, _filter_res, _filter_cap) \
+	downcast<sn76477_device &>(*device).set_noise_params(_clock_res, _filter_res, _filter_cap);
+
+#define MCFG_SN76477_DECAY_RES(_decay_res) \
+	downcast<sn76477_device &>(*device).set_decay_res(_decay_res);
+
+#define MCFG_SN76477_ATTACK_PARAMS(_decay_cap, _res) \
+	downcast<sn76477_device &>(*device).set_attack_params(_decay_cap, _res);
+
+#define MCFG_SN76477_AMP_RES(_amp_res) \
+	downcast<sn76477_device &>(*device).set_amp_res(_amp_res);
+
+#define MCFG_SN76477_FEEDBACK_RES(_feedback_res) \
+	downcast<sn76477_device &>(*device).set_feedback_res(_feedback_res);
+
+#define MCFG_SN76477_VCO_PARAMS(_volt, _cap, _res) \
+	downcast<sn76477_device &>(*device).set_vco_params(_volt, _cap, _res);
+
+#define MCFG_SN76477_PITCH_VOLTAGE(_volt) \
+	downcast<sn76477_device &>(*device).set_pitch_voltage(_volt);
+
+#define MCFG_SN76477_SLF_PARAMS(_cap, _res) \
+	downcast<sn76477_device &>(*device).set_slf_params(_cap, _res);
+
+#define MCFG_SN76477_ONESHOT_PARAMS(_cap, _res) \
+	downcast<sn76477_device &>(*device).set_oneshot_params(_cap, _res);
+
+#define MCFG_SN76477_VCO_MODE(_mode) \
+	downcast<sn76477_device &>(*device).set_vco_mode(_mode);
+
+#define MCFG_SN76477_MIXER_PARAMS(_a, _b, _c) \
+	downcast<sn76477_device &>(*device).set_mixer_params(_a, _b, _c);
+
+#define MCFG_SN76477_ENVELOPE_PARAMS(_env1, _env2) \
+	downcast<sn76477_device &>(*device).set_envelope_params(_env1, _env2);
+
+#define MCFG_SN76477_ENABLE(_enable) \
+	downcast<sn76477_device &>(*device).set_enable(_enable);
+
 class sn76477_device : public device_t,
 						public device_sound_interface
 {

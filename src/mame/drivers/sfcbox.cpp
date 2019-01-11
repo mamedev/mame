@@ -137,9 +137,6 @@ public:
 		, m_s3520cf(*this, "s3520cf")
 	{ }
 
-	void sfcbox(machine_config &config);
-
-private:
 	required_device<cpu_device> m_bios;
 	required_device<mb90082_device> m_mb90082;
 	required_device<s3520cf_device> m_s3520cf;
@@ -157,6 +154,7 @@ private:
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	void sfcbox(machine_config &config);
 	void sfcbox_io(address_map &map);
 	void sfcbox_map(address_map &map);
 	void snes_map(address_map &map);
@@ -171,9 +169,9 @@ uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 
 void sfcbox_state::snes_map(address_map &map)
 {
-	map(0x000000, 0x7dffff).rw(FUNC(sfcbox_state::snes_r_bank1), FUNC(sfcbox_state::snes_w_bank1));
+	map(0x000000, 0x7dffff).rw(this, FUNC(sfcbox_state::snes_r_bank1), FUNC(sfcbox_state::snes_w_bank1));
 	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	map(0x800000, 0xffffff).rw(FUNC(sfcbox_state::snes_r_bank2), FUNC(sfcbox_state::snes_w_bank2));    /* Mirror and ROM */
+	map(0x800000, 0xffffff).rw(this, FUNC(sfcbox_state::snes_r_bank2), FUNC(sfcbox_state::snes_w_bank2));    /* Mirror and ROM */
 }
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
@@ -190,7 +188,7 @@ void sfcbox_state::spc_mem(address_map &map)
 {
 	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
 	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
-	map(0x0100, 0xffff).rw(FUNC(sfcbox_state::spc_ram_100_r), FUNC(sfcbox_state::spc_ram_100_w));
+	map(0x0100, 0xffff).rw(this, FUNC(sfcbox_state::spc_ram_100_r), FUNC(sfcbox_state::spc_ram_100_w));
 }
 
 void sfcbox_state::sfcbox_map(address_map &map)
@@ -292,17 +290,17 @@ void sfcbox_state::sfcbox_io(address_map &map)
 {
 	map(0x00, 0x3f).ram(); // internal i/o
 	map(0x0b, 0x0b).w(m_mb90082, FUNC(mb90082_device::write));
-	map(0x80, 0x80).portr("KEY").w(FUNC(sfcbox_state::port_80_w)); // Keyswitch and Button Inputs / SNES Transfer and Misc Output
-	map(0x81, 0x81).rw(FUNC(sfcbox_state::port_81_r), FUNC(sfcbox_state::port_81_w)); // SNES Transfer and Misc Input / Misc Output
+	map(0x80, 0x80).portr("KEY").w(this, FUNC(sfcbox_state::port_80_w)); // Keyswitch and Button Inputs / SNES Transfer and Misc Output
+	map(0x81, 0x81).rw(this, FUNC(sfcbox_state::port_81_r), FUNC(sfcbox_state::port_81_w)); // SNES Transfer and Misc Input / Misc Output
 //  AM_RANGE(0x82, 0x82) // Unknown/unused
-	map(0x83, 0x83).rw(FUNC(sfcbox_state::port_83_r), FUNC(sfcbox_state::port_83_w)); // Joypad Input/Status / Joypad Output/Control
+	map(0x83, 0x83).rw(this, FUNC(sfcbox_state::port_83_r), FUNC(sfcbox_state::port_83_w)); // Joypad Input/Status / Joypad Output/Control
 //  AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
 //  AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 //  AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
 //  AM_RANGE(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 	map(0xa0, 0xa0).portr("RTC_R").portw("RTC_W"); //  Real Time Clock
-	map(0xc0, 0xc0).w(FUNC(sfcbox_state::snes_map_0_w)); // SNES Mapping Register 0
-	map(0xc1, 0xc1).w(FUNC(sfcbox_state::snes_map_1_w)); // SNES Mapping Register 1
+	map(0xc0, 0xc0).w(this, FUNC(sfcbox_state::snes_map_0_w)); // SNES Mapping Register 0
+	map(0xc1, 0xc1).w(this, FUNC(sfcbox_state::snes_map_1_w)); // SNES Mapping Register 1
 }
 
 
@@ -473,8 +471,8 @@ MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 	MCFG_DEVICE_PROGRAM_MAP(sfcbox_map)
 	MCFG_DEVICE_IO_MAP(sfcbox_io)
 
-	MB90082(config, m_mb90082, XTAL(12'000'000) / 2); /* TODO: correct clock */
-	S3520CF(config, m_s3520cf); /* RTC */
+	MCFG_MB90082_ADD("mb90082",XTAL(12'000'000) / 2) /* TODO: correct clock */
+	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -485,16 +483,16 @@ MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
-	config.set_default_layout(layout_dualhsxs);
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	// SNES PPU
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
-	SNES_PPU(config, m_ppu, MCLK_NTSC);
-	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
-	m_ppu->set_screen("screen");
+	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// SFCBOX
 	MCFG_SCREEN_ADD("osd", RASTER)

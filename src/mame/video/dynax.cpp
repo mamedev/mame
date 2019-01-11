@@ -23,42 +23,42 @@
 #include "includes/dynax.h"
 
 // Log Blitter
-//#define VERBOSE 1
-#include "logmacro.h"
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-// x B01234 G01234 R01234
-void dynax_state::sprtmtch_palette(palette_device &palette) const
+/* x B01234 G01234 R01234 */
+PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	if (!color_prom)
 		return;
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int const x = (color_prom[i] << 8) | color_prom[0x200 + i];
-		// The bits are in reverse order!
-		int const r = bitswap<5>((x >>  0) & 0x1f, 0, 1, 2, 3, 4);
-		int const g = bitswap<5>((x >>  5) & 0x1f, 0, 1, 2, 3, 4);
-		int const b = bitswap<5>((x >> 10) & 0x1f, 0, 1, 2, 3, 4);
+		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
+		/* The bits are in reverse order! */
+		int r = bitswap<8>((x >>  0) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
+		int g = bitswap<8>((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
+		int b = bitswap<8>((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
-// x xB0123 xG0123 xR0123
-void dynax_state::janyuki_palette(palette_device &palette) const
+/* x xB0123 xG0123 xR0123 */
+PALETTE_INIT_MEMBER(dynax_state,janyuki)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	if (!color_prom)
 		return;
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int const x = (color_prom[i] << 8) + color_prom[0x200 + i];
-		// The bits are in reverse order!
-		int const r = bitswap<4>((x >>  0) & 0x0f, 0, 1, 2, 3);
-		int const g = bitswap<4>((x >>  5) & 0x0f, 0, 1, 2, 3);
-		int const b = bitswap<4>((x >> 10) & 0x0f, 0, 1, 2, 3);
+		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
+		/* The bits are in reverse order! */
+		int r = bitswap<8>((x >>  0) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		int g = bitswap<8>((x >>  5) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		int b = bitswap<8>((x >> 10) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
 		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
@@ -88,6 +88,20 @@ WRITE8_MEMBER(dynax_state::dynax_extra_scrolly_w)
 }
 
 
+/* Destination Pen */
+WRITE8_MEMBER(dynax_state::dynax_blit_pen_w)
+{
+	m_blit_pen = data;
+	LOG(("P=%02X ", data));
+}
+
+WRITE8_MEMBER(dynax_state::dynax_blit2_pen_w)
+{
+	m_blit2_pen = data;
+	LOG(("P'=%02X ", data));
+}
+
+
 /* Destination Layers */
 WRITE8_MEMBER(dynax_state::dynax_blit_dest_w)
 {
@@ -95,13 +109,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_dest_w)
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit_dest = bitswap<8>(m_blit_dest ^ 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
 
-	LOG("D=%02X ", data);
+	LOG(("D=%02X ", data));
 }
 
 WRITE8_MEMBER(dynax_state::dynax_blit2_dest_w)
 {
 	m_blit2_dest = data;
-	LOG("D'=%02X ", data);
+	LOG(("D'=%02X ", data));
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
@@ -123,7 +137,7 @@ WRITE8_MEMBER(dynax_state::mjembase_blit_dest_w)
 WRITE8_MEMBER(dynax_state::dynax_blit_backpen_w)
 {
 	m_blit_backpen = data;
-	LOG("B=%02X ", data);
+	LOG(("B=%02X ", data));
 }
 
 
@@ -134,13 +148,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette01_w)
 		m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	else
 		m_blit_palettes = (m_blit_palettes & 0xff00) | data;
-	LOG("P01=%02X ", data);
+	LOG(("P01=%02X ", data));
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_palette01_w)
 {
 	m_blit_palettes = (m_blit_palettes & 0xff00) | data;
-	LOG("P01=%02X ", data);
+	LOG(("P01=%02X ", data));
 }
 
 
@@ -151,7 +165,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette45_w)
 		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	else
 		m_blit2_palettes = (m_blit2_palettes & 0xff00) | data;
-	LOG("P45=%02X ", data);
+	LOG(("P45=%02X ", data));
 }
 
 
@@ -162,13 +176,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette23_w)
 		m_blit_palettes = (m_blit_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
 	else
 		m_blit_palettes = (m_blit_palettes & 0x00ff) | (data << 8);
-	LOG("P23=%02X ", data);
+	LOG(("P23=%02X ", data));
 }
 
 WRITE8_MEMBER(dynax_state::tenkai_blit_palette23_w)
 {
 	m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
-	LOG("P23=%02X ", data);
+	LOG(("P23=%02X ", data));
 }
 
 WRITE8_MEMBER(dynax_state::mjembase_blit_palette23_w)
@@ -184,7 +198,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
 		m_blit2_palettes = (m_blit2_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
 	else
 		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | (data << 8);
-	LOG("P67=%02X ", data);
+	LOG(("P67=%02X ", data));
 }
 
 
@@ -192,13 +206,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
 WRITE_LINE_MEMBER(dynax_state::blit_palbank_w)
 {
 	m_blit_palbank = state;
-	LOG("PB=%d ", state);
+	LOG(("PB=%d ", state));
 }
 
 WRITE_LINE_MEMBER(dynax_state::blit2_palbank_w)
 {
 	m_blit2_palbank = state;
-	LOG("PB'=%d ", state);
+	LOG(("PB'=%d ", state));
 }
 
 WRITE8_MEMBER(dynax_state::hnoridur_palbank_w)
@@ -212,7 +226,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_palbank_w)
 WRITE_LINE_MEMBER(dynax_state::layer_half_w)
 {
 	m_hanamai_layer_half = !state;
-	LOG("H=%d ", state);
+	LOG(("H=%d ", state));
 }
 
 
@@ -220,7 +234,7 @@ WRITE_LINE_MEMBER(dynax_state::layer_half_w)
 WRITE_LINE_MEMBER(dynax_state::layer_half2_w)
 {
 	m_hnoridur_layer_half2 = !state;
-	LOG("H2=%d ", state);
+	LOG(("H2=%d ", state));
 }
 
 WRITE_LINE_MEMBER(dynax_state::mjdialq2_blit_dest0_w)
@@ -242,7 +256,7 @@ WRITE_LINE_MEMBER(dynax_state::mjdialq2_blit_dest1_w)
 WRITE8_MEMBER(dynax_state::dynax_layer_enable_w)
 {
 	m_layer_enable = data;
-	LOG("E=%02X ", data);
+	LOG(("E=%02X ", data));
 }
 
 WRITE8_MEMBER(dynax_state::jantouki_layer_enable_w)
@@ -270,7 +284,7 @@ WRITE_LINE_MEMBER(dynax_state::mjdialq2_layer1_enable_w)
 WRITE_LINE_MEMBER(dynax_state::flipscreen_w)
 {
 	m_flipscreen = state;
-	LOG("F=%d ", state);
+	LOG(("F=%d ", state));
 }
 
 
@@ -279,153 +293,501 @@ WRITE_LINE_MEMBER(dynax_state::flipscreen_w)
 WRITE8_MEMBER(dynax_state::dynax_blit_romregion_w)
 {
 	if (data < 8)
-		m_blitter->set_rom_bank(data);
-	LOG("GFX%X ", data + 1);
+		m_blit_romregion = data;
+	LOG(("GFX%X ", data + 1));
 }
 
 WRITE8_MEMBER(dynax_state::dynax_blit2_romregion_w)
 {
 	if (data + 1 < 8)
-		m_blitter2->set_rom_bank(data);
-	LOG("GFX%X' ", data + 2);
+		m_blit2_romregion = data + 1;
+	LOG(("GFX%X' ", data + 2));
 }
 
+/***************************************************************************
 
-WRITE8_MEMBER(dynax_state::hanamai_blit_pixel_w)
+                            Blitter Data Format
+
+    The blitter reads its commands from the gfx ROMs. They are
+    instructions to draw an image pixel by pixel (in a compressed
+    form) in a frame buffer.
+
+    Fetch 1 Byte from the ROM:
+
+    7654 ----   Pen to draw with
+    ---- 3210   Command
+
+    Other bytes may follow, depending on the command
+
+    Commands:
+
+    0       Stop.
+    1-b     Draw 1-b pixels along X.
+    c       Followed by 1 byte (N): draw N pixels along X.
+    d       Followed by 2 bytes (X,N): skip X pixels, draw N pixels along X.
+    e       ? unused
+    f       Increment Y
+
+***************************************************************************/
+
+
+/* Plot a pixel (in the pixmaps specified by dynax_blit_dest) */
+void dynax_state::blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags )
 {
-	if (m_flipscreen)
-		offset ^= 0xffff;
+	int addr;
 
-	for (int layer = 0; layer < 4; layer++)
+	if ((y > 0xff) && (!(wrap & 2))) return;    // fixes mjdialq2 & mjangels title screens
+	if ((x > 0xff) && (!(wrap & 1))) return;
+
+	x &= 0xff;  // confirmed by some mjdialq2 gfx and especially by mjfriday, which
+				// uses the front layer to mask out the right side of the screen as
+				// it draws stuff on the left, when it shows the girls scrolling
+				// horizontally after you win.
+	y &= 0xff;  // seems confirmed by mjdialq2 last picture of gal 6, but it breaks
+				// mjdialq2 title screen so there's something we are missing. <fixed, see above>
+
+	/* "Flip Screen" just means complement the coordinates to 255 */
+	if (m_flipscreen)    { x ^= 0xff; y ^= 0xff; }
+
+	/* Rotate: rotation = SWAPXY + FLIPY */
+	if (flags & 0x08)   { int t = x; x = y; y = t; }
+
+	addr = x + (y << 8);
+
+	switch (m_layer_layout)
 	{
-		if (BIT(m_blit_dest, layer))
+		case LAYOUT_HANAMAI:
+			if (BIT(mask, 0)) m_pixmap[layer + 0][m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 1)) m_pixmap[layer + 1][m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 2)) m_pixmap[layer + 2][m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 3)) m_pixmap[layer + 3][m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			break;
+
+		case LAYOUT_HNORIDUR:
+			if (BIT(mask, 0)) m_pixmap[layer + 0][m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 1)) m_pixmap[layer + 1][m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 2)) m_pixmap[layer + 2][m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 3)) m_pixmap[layer + 3][m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (!m_hnoridur_layer_half2)
+				break;
+			if (BIT(mask, 0)) m_pixmap[layer + 0][1 ^ m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 1)) m_pixmap[layer + 1][1 ^ m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 2)) m_pixmap[layer + 2][1 ^ m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 3)) m_pixmap[layer + 3][1 ^ m_hanamai_layer_half ^ m_flipscreen][addr] = pen;
+			break;
+
+		case LAYOUT_JANTOUKI:
+			if (BIT(mask, 7)) m_pixmap[layer + 3][1 ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 6)) m_pixmap[layer + 3][0 ^ m_flipscreen][addr] = pen;
+		case LAYOUT_DRGPUNCH:
+			if (BIT(mask, 5)) m_pixmap[layer + 2][1 ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 4)) m_pixmap[layer + 2][0 ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 3)) m_pixmap[layer + 1][1 ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 2)) m_pixmap[layer + 1][0 ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 1)) m_pixmap[layer + 0][1 ^ m_flipscreen][addr] = pen;
+			if (BIT(mask, 0)) m_pixmap[layer + 0][0 ^ m_flipscreen][addr] = pen;
+			break;
+
+		case LAYOUT_MJDIALQ2:
+			if (BIT(mask, 0)) m_pixmap[layer + 0][0][addr] = pen;
+			if (BIT(mask, 1)) m_pixmap[layer + 1][0][addr] = pen;
+			break;
+	}
+}
+
+/*
+    Flags:
+
+    7654 ----   -
+    ---- 3---   Rotation = SWAPXY + FLIPY
+    ---- -2--   -
+    ---- --1-   0 = Ignore the pens specified in ROM, draw everything with the pen supplied as parameter
+    ---- ---0   Clear
+*/
+int dynax_state::blitter_drawgfx( int layer, int mask, memory_region *gfx, int src, int pen, int x, int y, int wrap, int flags )
+{
+	if (!gfx)
+		return 0;
+
+	size_t rom_size = gfx->bytes();
+	uint8_t* rom_data = gfx->base();
+
+	if (m_layer_layout == LAYOUT_HNORIDUR)   // e.g. yarunara
+		pen = ((pen >> 4) & 0xf) | ((mask & 0x10) ? ((pen & 0x08) << 1) : 0);
+	else
+		pen = (pen >> 4) & 0xf;
+
+	if (flags & 0xf4)
+		popmessage("flags %02x", flags);
+
+	if (flags & 1)
+	{
+		/* Clear the buffer(s) starting from the given scanline and exit */
+		int addr = x + (y << 8);
+
+		int start = addr;
+		if (m_flipscreen)
+			start = 0;
+
+		int len = 0x10000 - addr;
+
+		switch (m_layer_layout)
 		{
-			if (BIT(m_hanamai_priority, 4))
-				m_pixmap[layer][m_hanamai_layer_half ^ m_flipscreen][offset] = data;
+			case LAYOUT_HANAMAI:
+				if (BIT(mask, 0)) memset(&m_pixmap[layer + 0][0][start], pen, len);
+				if (BIT(mask, 0)) memset(&m_pixmap[layer + 0][1][start], pen, len);
+				if (BIT(mask, 1)) memset(&m_pixmap[layer + 1][0][start], pen, len);
+				if (BIT(mask, 1)) memset(&m_pixmap[layer + 1][1][start], pen, len);
+				if (BIT(mask, 2)) memset(&m_pixmap[layer + 2][0][start], pen, len);
+				if (BIT(mask, 2)) memset(&m_pixmap[layer + 2][1][start], pen, len);
+				if (BIT(mask, 3)) memset(&m_pixmap[layer + 3][0][start], pen, len);
+				if (BIT(mask, 3)) memset(&m_pixmap[layer + 3][1][start], pen, len);
+				break;
+
+			case LAYOUT_HNORIDUR:
+				if (BIT(mask, 0)) memset(&m_pixmap[layer + 0][m_hanamai_layer_half][start], pen, len);
+				if (BIT(mask, 1)) memset(&m_pixmap[layer + 1][m_hanamai_layer_half][start], pen, len);
+				if (BIT(mask, 2)) memset(&m_pixmap[layer + 2][m_hanamai_layer_half][start], pen, len);
+				if (BIT(mask, 3)) memset(&m_pixmap[layer + 3][m_hanamai_layer_half][start], pen, len);
+				if (!m_hnoridur_layer_half2)
+					break;
+				if (BIT(mask, 0)) memset(&m_pixmap[layer + 0][1 - m_hanamai_layer_half][start], pen, len);
+				if (BIT(mask, 1)) memset(&m_pixmap[layer + 1][1 - m_hanamai_layer_half][start], pen, len);
+				if (BIT(mask, 2)) memset(&m_pixmap[layer + 2][1 - m_hanamai_layer_half][start], pen, len);
+				if (BIT(mask, 3)) memset(&m_pixmap[layer + 3][1 - m_hanamai_layer_half][start], pen, len);
+				break;
+
+			case LAYOUT_JANTOUKI:
+				if (BIT(mask, 7)) memset(&m_pixmap[layer + 3][1][start], pen, len);
+				if (BIT(mask, 6)) memset(&m_pixmap[layer + 3][0][start], pen, len);
+			case LAYOUT_DRGPUNCH:
+				if (BIT(mask, 5)) memset(&m_pixmap[layer + 2][1][start], pen, len);
+				if (BIT(mask, 4)) memset(&m_pixmap[layer + 2][0][start], pen, len);
+				if (BIT(mask, 3)) memset(&m_pixmap[layer + 1][1][start], pen, len);
+				if (BIT(mask, 2)) memset(&m_pixmap[layer + 1][0][start], pen, len);
+				if (BIT(mask, 1)) memset(&m_pixmap[layer + 0][1][start], pen, len);
+				if (BIT(mask, 0)) memset(&m_pixmap[layer + 0][0][start], pen, len);
+				break;
+
+			case LAYOUT_MJDIALQ2:
+				if (BIT(mask, 0)) memset(&m_pixmap[layer + 0][0][start], pen, len);
+				if (BIT(mask, 1)) memset(&m_pixmap[layer + 1][0][start], pen, len);
+				break;
+		}
+
+		return src;
+	}
+
+	int sx = x;
+
+	src &= 0xfffff;
+
+	for ( ;; )
+	{
+		if (src >= rom_size)
+		{
+			popmessage("GFXROM %s OVER %08x",gfx,src);
+			LOG(("\nGFXROM %s OVER %08x",gfx,src));
+			return src;
+		}
+
+		uint8_t cmd = rom_data[src++];
+		src &= 0xfffff;
+		if (!(flags & 0x02))    // Ignore the pens specified in ROM, draw everything with the pen supplied as parameter
+			pen = (pen & 0xf0) | ((cmd & 0xf0) >> 4);
+		cmd = (cmd & 0x0f);
+
+		switch (cmd)
+		{
+		case 0xf:   // Increment Y
+			/* Rotate: rotation = SWAPXY + FLIPY */
+			if (flags & 0x08)
+				y--;
 			else
-				m_pixmap[layer][0][offset] = m_pixmap[layer][1][offset] = data;
+				y++;
+			x = sx;
+			break;
+
+		case 0xe:   // unused ? was "change dest mask" in the "rev1" blitter
+			popmessage("Blitter unknown command %06X: %02X\n", src - 1, cmd);
+
+		case 0xd:   // Skip X pixels
+			if (src >= rom_size)
+			{
+				popmessage("GFXROM %s OVER %08x",gfx,src);
+				LOG(("\nGFXROM %s OVER %08x",gfx,src));
+				return src;
+			}
+			x = sx + rom_data[src++];
+			src &= 0xfffff;
+			/* fall through into next case */
+
+		case 0xc:   // Draw N pixels
+			if (src >= rom_size)
+			{
+				popmessage("GFXROM %s OVER %08x",gfx,src);
+				LOG(("\nGFXROM %s OVER %08x",gfx,src));
+				return src;
+			}
+			cmd = rom_data[src++];
+			src &= 0xfffff;
+			/* fall through into next case */
+
+		case 0xb:
+		case 0xa:
+		case 0x9:
+		case 0x8:
+		case 0x7:
+		case 0x6:
+		case 0x5:
+		case 0x4:
+		case 0x3:
+		case 0x2:
+		case 0x1:   // Draw N pixels
+			while (cmd--)
+				blitter_plot_pixel(layer, mask, x++, y, pen, wrap, flags);
+			break;
+
+		case 0x0:   // Stop
+			return src;
 		}
 	}
 }
 
-WRITE8_MEMBER(dynax_state::cdracula_blit_pixel_w)
-{
-	if (m_flipscreen)
-		offset ^= 0xffff;
 
-	for (int layer = 0; layer < 4; layer++)
+
+void dynax_state::dynax_blitter_start(int flags )
+{
+	int blit_newsrc;
+
+	LOG(("XY=%X,%X SRC=%X BLIT=%X\n", m_blit_x, m_blit_y, m_blit_src, flags));
+
+	blit_newsrc = blitter_drawgfx(
+			0,                      // layer
+			m_blit_dest,     // layer mask
+			m_gfxregions[m_blit_romregion],    // rom region
+			m_blit_src,              // rom address
+			m_blit_pen,          // pen
+			m_blit_x, m_blit_y,           // x,y
+			m_blit_wrap_enable,  // wrap around
+			flags                   // flags
+		);
+
+	m_blit_src = (m_blit_src & ~0x0fffff) | (blit_newsrc & 0x0fffff);
+
+	/* Generate an IRQ */
+	if (m_update_irq_func)
 	{
-		if (BIT(m_blit_dest, layer + 4))
-			m_pixmap[layer][1 ^ m_flipscreen][offset] = data;
-		if (BIT(m_blit_dest, layer))
-			m_pixmap[layer][0 ^ m_flipscreen][offset] = data;
+		m_blitter_irq = 1;
+		(this->*m_update_irq_func)();
 	}
 }
 
-WRITE8_MEMBER(dynax_state::hnoridur_blit_pixel_w)
+void dynax_state::jantouki_blitter_start( int flags )
 {
-	if (m_flipscreen)
-		offset ^= 0xffff;
-	if (BIT(m_blit_dest, 4))
-		data |= (m_blitter->blit_pen() & 0x08) << 1;
+	int blit_newsrc;
 
-	for (int layer = 0; layer < 4; layer++)
+	LOG(("XY=%X,%X SRC=%X BLIT=%X\n", m_blit_x, m_blit_y, m_blit_src, flags));
+
+	blit_newsrc = blitter_drawgfx(
+			0,                      // layer
+			m_blit_dest,     // layer mask
+			m_gfxregions[m_blit_romregion],    // rom region
+			m_blit_src,              // rom address
+			m_blit_pen,          // pen
+			m_blit_x, m_blit_y,           // x,y
+			m_blit_wrap_enable,  // wrap around
+			flags                   // flags
+		);
+
+	m_blit_src = (m_blit_src & ~0x0fffff) | (blit_newsrc & 0x0fffff);
+
+	/* Generate an IRQ */
+	if (m_update_irq_func)
 	{
-		if (BIT(m_blit_dest, layer))
-		{
-			m_pixmap[layer][m_hanamai_layer_half ^ m_flipscreen][offset] = data;
-			if (m_hnoridur_layer_half2)
-				m_pixmap[layer][1 ^ m_hanamai_layer_half ^ m_flipscreen][offset] = data;
-		}
+		m_blitter_irq = 1;
+		(this->*m_update_irq_func)();
 	}
 }
 
-WRITE8_MEMBER(dynax_state::drgpunch_blit_pixel_w)
+void dynax_state::jantouki_blitter2_start( int flags )
 {
-	if (m_flipscreen)
-		offset ^= 0xffff;
+	int blit2_newsrc;
 
-	for (int layer = 2; layer >= 0; layer--)
+	LOG(("XY'=%X,%X SRC'=%X BLIT'=%02X\n", m_blit2_x, m_blit2_y, m_blit2_src, flags));
+
+	blit2_newsrc = blitter_drawgfx(
+			4,                          // layer
+			m_blit2_dest,            // layer mask
+			m_gfxregions[m_blit2_romregion],       // rom region
+			m_blit2_src,                 // rom address
+			m_blit2_pen,         // pen
+			m_blit2_x, m_blit2_y,         // x,y
+			m_blit2_wrap_enable, // wrap around
+			flags                       // flags
+		);
+
+	m_blit2_src = (m_blit2_src & ~0x0fffff) | (blit2_newsrc & 0x0fffff);
+
+	/* Generate an IRQ */
+	if (m_update_irq_func)
 	{
-		if (BIT(m_blit_dest, 2 * layer + 1))
-			m_pixmap[layer][1 ^ m_flipscreen][offset] = data;
-		if (BIT(m_blit_dest, 2 * layer))
-			m_pixmap[layer][0 ^ m_flipscreen][offset] = data;
+		m_blitter2_irq = 1;
+		(this->*m_update_irq_func)();
 	}
 }
 
-// two blitters/screens
-WRITE8_MEMBER(dynax_state::jantouki_blit_pixel_w)
-{
-	if (m_flipscreen)
-		offset ^= 0xffff;
 
-	for (int layer = 3; layer >= 0; layer--)
+
+WRITE8_MEMBER(dynax_state::dynax_blit_scroll_w)
+{
+	switch (m_blit_src & 0xc00000)
 	{
-		if (BIT(m_blit_dest, 2 * layer + 1))
-			m_pixmap[layer][1 ^ m_flipscreen][offset] = data;
-		if (BIT(m_blit_dest, 2 * layer))
-			m_pixmap[layer][0 ^ m_flipscreen][offset] = data;
+		case 0x000000:  m_blit_scroll_x = data;
+						LOG(("SX=%02X ", data));
+						break;
+		case 0x400000:  m_blit_scroll_y = data;
+						LOG(("SY=%02X ", data));
+						break;
+		case 0x800000:
+		case 0xc00000:  m_blit_wrap_enable = data;
+						LOG(("WE=%02X ", data));
+						break;
 	}
-}
-
-WRITE8_MEMBER(dynax_state::jantouki_blit2_pixel_w)
-{
-	if (m_flipscreen)
-		offset ^= 0xffff;
-
-	for (int layer = 3; layer >= 0; layer--)
-	{
-		if (BIT(m_blit2_dest, 2 * layer + 1))
-			m_pixmap[layer + 4][1 ^ m_flipscreen][offset] = data;
-		if (BIT(m_blit2_dest, 2 * layer))
-			m_pixmap[layer + 4][0 ^ m_flipscreen][offset] = data;
-	}
-}
-
-WRITE8_MEMBER(dynax_state::mjdialq2_blit_pixel_w)
-{
-	if (m_flipscreen)
-		offset ^= 0xffff;
-
-	for (int layer = 0; layer < 2; layer++)
-		if (BIT(m_blit_dest, layer))
-			m_pixmap[layer][0][offset] = data;
-}
-
-
-
-WRITE8_MEMBER(dynax_state::dynax_blit_scrollx_w)
-{
-	m_blit_scroll_x = data;
-}
-
-WRITE8_MEMBER(dynax_state::dynax_blit_scrolly_w)
-{
-	m_blit_scroll_y = data;
-}
-
-WRITE8_MEMBER(dynax_state::dynax_blit2_scrollx_w)
-{
-	m_blit2_scroll_x = data;
-}
-
-WRITE8_MEMBER(dynax_state::dynax_blit2_scrolly_w)
-{
-	m_blit2_scroll_y = data;
 }
 
 // inverted scroll values
-WRITE8_MEMBER(dynax_state::tenkai_blit_scrollx_w)
+WRITE8_MEMBER(dynax_state::tenkai_blit_scroll_w)
 {
-	m_blit_scroll_x = ((data ^ 0xff) + 1) & 0xff;
+	switch (m_blit_src & 0xc00000)
+	{
+		case 0x000000:  m_blit_scroll_x = ((data ^ 0xff) + 1) & 0xff;
+						LOG(("SX=%02X ", data));
+						break;
+		case 0x400000:  m_blit_scroll_y = data ^ 0xff;
+						LOG(("SY=%02X ", data));
+						break;
+		case 0x800000:
+		case 0xc00000:  m_blit_wrap_enable = data;
+						LOG(("WE=%02X ", data));
+						break;
+	}
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_blit_scrolly_w)
+WRITE8_MEMBER(dynax_state::dynax_blit2_scroll_w)
 {
-	m_blit_scroll_y = data ^ 0xff;
+	switch (m_blit2_src & 0xc00000)
+	{
+		case 0x000000:  m_blit2_scroll_x = data;
+						LOG(("SX'=%02X ", data));
+						break;
+		case 0x400000:  m_blit2_scroll_y = data;
+						LOG(("SY'=%02X ", data));
+						break;
+		case 0x800000:
+		case 0xc00000:  m_blit2_wrap_enable = data;
+						LOG(("WE'=%02X ", data));
+						break;
+	}
 }
 
+WRITE8_MEMBER(dynax_state::dynax_blitter_rev2_w)
+{
+	switch (offset)
+	{
+		case 0: dynax_blitter_start(data); break;
+		case 1: m_blit_x = data; break;
+		case 2: m_blit_y = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data << 16); break;
+		case 6: dynax_blit_scroll_w(space, 0, data); break;
+	}
+}
+
+// different scroll_w
+WRITE8_MEMBER(dynax_state::tenkai_blitter_rev2_w)
+{
+	switch (offset)
+	{
+		case 0: dynax_blitter_start(data); break;
+		case 1: m_blit_x = data; break;
+		case 2: m_blit_y = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data << 16); break;
+		case 6: tenkai_blit_scroll_w(space, 0, data); break;
+	}
+}
+
+
+// two blitters/screens
+WRITE8_MEMBER(dynax_state::jantouki_blitter_rev2_w)
+{
+	switch (offset)
+	{
+		case 0: jantouki_blitter_start(data); break;
+		case 1: m_blit_x = data; break;
+		case 2: m_blit_y = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data << 16); break;
+		case 6: dynax_blit_scroll_w(space, 0, data); break;
+	}
+}
+
+WRITE8_MEMBER(dynax_state::jantouki_blitter2_rev2_w)
+{
+	switch (offset)
+	{
+		case 0: jantouki_blitter2_start(data); break;
+		case 1: m_blit2_x = data; break;
+		case 2: m_blit2_y = data; break;
+		case 3: m_blit2_src = (m_blit2_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit2_src = (m_blit2_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit2_src = (m_blit2_src & 0x00ffff) | (data << 16); break;
+		case 6: dynax_blit2_scroll_w(space, 0, data); break;
+	}
+}
+
+// first register does not trigger a blit, it sets the destination
+WRITE8_MEMBER(dynax_state::cdracula_blitter_rev2_w)
+{
+	switch (offset)
+	{
+		case 0:
+			LOG(("DD=%02X ", data));
+
+			if (data & 0xf0)
+			{
+				layer_half_w(0);
+				dynax_blit_dest_w(space, offset, data >> 4, mem_mask);
+			}
+			if (data & 0x0f)
+			{
+				layer_half_w(1);
+				dynax_blit_dest_w(space, offset, data & 0x0f, mem_mask);
+			}
+			break;
+		case 1: m_blit_x = data; break;
+		case 2: m_blit_y = data; break;
+		case 3: m_blit_src = (m_blit_src & 0xffff00) | (data <<  0); break;
+		case 4: m_blit_src = (m_blit_src & 0xff00ff) | (data <<  8); break;
+		case 5: m_blit_src = (m_blit_src & 0x00ffff) | (data << 16); break;
+		case 6: dynax_blit_scroll_w(space, 0, data); break;
+	}
+}
+
+WRITE8_MEMBER(dynax_state::dynax_blit_flags_w)
+{
+	LOG(("FLG=%02X ", data));
+
+	int flags = (data & 0x08) ? 0x08 : 0x00;
+	flags    |= (data & 0x10) ? 0x02 : 0x00;
+	flags    |= (data & 0x80) ? 0x01 : 0x00;
+
+	dynax_blitter_start(flags);
+}
 
 /***************************************************************************
 
@@ -444,8 +806,22 @@ static const int priority_mjembase[8] = { 0x0231, 0x2031, 0x0321, 0x3021, 0x2301
 
 void dynax_state::dynax_common_reset()
 {
+	m_gfxregions[0] = memregion("gfx1");
+	m_gfxregions[1] = memregion("gfx2");
+	m_gfxregions[2] = memregion("gfx3");
+	m_gfxregions[3] = memregion("gfx4");
+	m_gfxregions[4] = memregion("gfx5");
+	m_gfxregions[5] = memregion("gfx6");
+	m_gfxregions[6] = memregion("gfx7");
+	m_gfxregions[7] = memregion("gfx8");
+
+
+	m_blit_romregion = 0;
+	m_blit2_romregion = 0;
 	m_blit_dest = -1;
 	m_blit2_dest = -1;
+	m_blit_pen = 0x7;
+	m_blit2_pen = 0x7;
 	m_blit_palbank = 0;
 	m_blit2_palbank = 0;
 	m_blit_palettes = 0;
@@ -458,16 +834,30 @@ void dynax_state::dynax_common_reset()
 
 	m_hnoridur_layer_half2 = 0;
 
+	m_update_irq_func = &dynax_state::sprtmtch_update_irq;
+
 	m_blit_scroll_x = 0;
 	m_blit2_scroll_x = 0;
 	m_blit_scroll_y = 0;
 	m_blit2_scroll_y = 0;
+	m_blit_wrap_enable = 0;
+	m_blit2_wrap_enable = 0;
+	m_blit_x = 0;
+	m_blit_y = 0;
+	m_blit2_x = 0;
+	m_blit2_y = 0;
+	m_blit_src = 0;
+	m_blit2_src = 0;
 	m_hanamai_layer_half = 0;
 	m_flipscreen = 0;
 	m_hanamai_priority = 0;
 
+	save_item(NAME(m_blit_romregion));
+	save_item(NAME(m_blit2_romregion));
 	save_item(NAME(m_blit_dest));
 	save_item(NAME(m_blit2_dest));
+	save_item(NAME(m_blit_pen));
+	save_item(NAME(m_blit2_pen));
 	save_item(NAME(m_blit_palbank));
 	save_item(NAME(m_blit2_palbank));
 	save_item(NAME(m_blit_palettes));
@@ -482,6 +872,14 @@ void dynax_state::dynax_common_reset()
 	save_item(NAME(m_blit2_scroll_x));
 	save_item(NAME(m_blit_scroll_y));
 	save_item(NAME(m_blit2_scroll_y));
+	save_item(NAME(m_blit_wrap_enable));
+	save_item(NAME(m_blit2_wrap_enable));
+	save_item(NAME(m_blit_x));
+	save_item(NAME(m_blit_y));
+	save_item(NAME(m_blit2_x));
+	save_item(NAME(m_blit2_y));
+	save_item(NAME(m_blit_src));
+	save_item(NAME(m_blit2_src));
 	save_item(NAME(m_hanamai_layer_half));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_hanamai_priority));
@@ -501,14 +899,14 @@ VIDEO_START_MEMBER(dynax_state,hanamai)
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_HANAMAI;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,hnoridur)
@@ -527,14 +925,14 @@ VIDEO_START_MEMBER(dynax_state,hnoridur)
 
 	m_priority_table = priority_hnoridur;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mcnpshnt)
@@ -555,12 +953,12 @@ VIDEO_START_MEMBER(dynax_state,sprtmtch)
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_DRGPUNCH;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,jantouki)
@@ -584,23 +982,24 @@ VIDEO_START_MEMBER(dynax_state,jantouki)
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_JANTOUKI;
+	m_update_irq_func = &dynax_state::jantouki_update_irq;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[0][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[2][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[3][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[4][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[4][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[5][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[5][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[6][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[6][1]), 256 * 256);
-	save_pointer(NAME(m_pixmap[7][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[7][1]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[2][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[3][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[4][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[4][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[5][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[5][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[6][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[6][1].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[7][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[7][1].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mjdialq2)
@@ -610,9 +1009,10 @@ VIDEO_START_MEMBER(dynax_state,mjdialq2)
 
 	dynax_common_reset();
 	m_layer_layout = LAYOUT_MJDIALQ2;
+	m_update_irq_func = nullptr;
 
-	save_pointer(NAME(m_pixmap[0][0]), 256 * 256);
-	save_pointer(NAME(m_pixmap[1][0]), 256 * 256);
+	save_pointer(NAME(m_pixmap[0][0].get()), 256 * 256);
+	save_pointer(NAME(m_pixmap[1][0].get()), 256 * 256);
 }
 
 VIDEO_START_MEMBER(dynax_state,mjelctrn)
@@ -620,6 +1020,7 @@ VIDEO_START_MEMBER(dynax_state,mjelctrn)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 	m_priority_table = priority_mjelctrn;
+	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
 VIDEO_START_MEMBER(dynax_state,mjembase)
@@ -627,6 +1028,7 @@ VIDEO_START_MEMBER(dynax_state,mjembase)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 	m_priority_table = priority_mjembase;
+	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
 }
 
 VIDEO_START_MEMBER(dynax_state,neruton)
@@ -634,6 +1036,15 @@ VIDEO_START_MEMBER(dynax_state,neruton)
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 //  m_priority_table = priority_mjelctrn;
+	m_update_irq_func = &dynax_state::mjelctrn_update_irq;
+}
+
+VIDEO_START_MEMBER(dynax_state,tenkai)
+{
+	VIDEO_START_CALL_MEMBER(hnoridur);
+
+	m_priority_table = priority_mjelctrn;
+	m_update_irq_func = &dynax_state::tenkai_update_irq;
 }
 
 /***************************************************************************
@@ -748,7 +1159,7 @@ void dynax_state::jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 			uint16_t *dst;
 			uint16_t *dstbase = &bitmap.pix16(sy);
 
-			if ((sy < cliprect.top()) || (sy > cliprect.bottom()))
+			if ((sy < cliprect.min_y) || (sy > cliprect.max_y))
 			{
 				src1 += 256;
 				src2 += 256;
@@ -879,13 +1290,13 @@ int dynax_state::debug_mask()
     R          -  move "tile" to the next 1/8th of the gfx  */
 int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-#if 0 // needs rewrite
+#ifdef MAME_DEBUG
 	static int toggle;
 	if (machine().input().code_pressed_once(KEYCODE_T))   toggle = 1 - toggle;
-	if (m_blitter_gfx.found() && toggle)
+	if (m_gfxregions[0] && toggle)
 	{
-		uint8_t *RAM = &m_blitter_gfx[0];
-		size_t size = m_blitter_gfx.bytes();
+		uint8_t *RAM = m_gfxregions[0]->base();
+		size_t size = m_gfxregions[0]->bytes();
 		static int i = 0, c = 0, r = 0;
 
 		if (machine().input().code_pressed_once(KEYCODE_I))   c = (c - 1) & 0x1f;
@@ -912,7 +1323,7 @@ int dynax_state::debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		if (m_layer_layout != LAYOUT_MJDIALQ2)
 			memset(m_pixmap[0][1].get(), 0, sizeof(uint8_t) * 0x100 * 0x100);
 		for (m_hanamai_layer_half = 0; m_hanamai_layer_half < 2; m_hanamai_layer_half++)
-			blitter_drawgfx(0, 1, m_blitter_gfx, i, 0, cliprect.left(), cliprect.top(), 3, 0);
+			blitter_drawgfx(0, 1, m_gfxregions[0], i, 0, cliprect.min_x, cliprect.min_y, 3, 0);
 
 		if (m_layer_layout != LAYOUT_MJDIALQ2)
 			hanamai_copylayer(bitmap, cliprect, 0);
@@ -1089,6 +1500,5 @@ uint32_t dynax_state::screen_update_cdracula(screen_device &screen, bitmap_ind16
 	if (BIT(layers_ctrl, 1))   hanamai_copylayer(bitmap, cliprect, 1);
 	if (BIT(layers_ctrl, 2))   hanamai_copylayer(bitmap, cliprect, 2);
 	if (BIT(layers_ctrl, 0))   hanamai_copylayer(bitmap, cliprect, 0);
-
 	return 0;
 }

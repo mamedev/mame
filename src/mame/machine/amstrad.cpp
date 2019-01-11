@@ -201,15 +201,15 @@ static const rgb_t amstrad_green_palette[32] =
 *******************************************************************/
 
 /* Initialise the palette */
-void amstrad_state::amstrad_cpc_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc)
 {
-	palette.set_pen_colors(0, amstrad_palette);
+	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette));
 }
 
 
-void amstrad_state::amstrad_cpc_green_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
 {
-	palette.set_pen_colors(0, amstrad_green_palette);
+	palette.set_pen_colors(0, amstrad_green_palette, ARRAY_LENGTH(amstrad_green_palette));
 }
 
 
@@ -268,18 +268,18 @@ Green value, Red value, Blue value: 0 = 0%, 01/10 = 50%, 11 = 100%.
 The 01 case is not used, it is unknown if this produces a different amount of colour.
 */
 
-uint8_t amstrad_state::kccomp_get_colour_element(int colour_value)
+unsigned char amstrad_state::kccomp_get_colour_element(int colour_value)
 {
 	switch (colour_value)
 	{
-	case 0:
-		return 0x00;
-	case 1:
-		return 0x60;
-	case 2:
-		return 0x60;
-	case 3:
-		return 0xff;
+		case 0:
+			return 0x00;
+		case 1:
+			return 0x60;
+		case 2:
+			return 0x60;
+		case 3:
+			return 0xff;
 	}
 
 	return 0xff;
@@ -289,18 +289,19 @@ uint8_t amstrad_state::kccomp_get_colour_element(int colour_value)
 /* the colour rom has the same 32 bytes repeated, but it might be possible to put a new rom in
 with different data and be able to select the other entries - not tested on a real kc compact yet
 and not supported by this driver */
-void amstrad_state::kccomp_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(amstrad_state,kccomp)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	color_prom += 0x018000;
+	color_prom = color_prom+0x018000;
 
-	for (int i=0; i<32; i++)
+	for (i=0; i<32; i++)
 	{
 		palette.set_pen_color(i,
-				kccomp_get_colour_element((color_prom[i]>>2) & 0x03),
-				kccomp_get_colour_element((color_prom[i]>>4) & 0x03),
-				kccomp_get_colour_element((color_prom[i]>>0) & 0x03));
+			kccomp_get_colour_element((color_prom[i]>>2) & 0x03),
+			kccomp_get_colour_element((color_prom[i]>>4) & 0x03),
+			kccomp_get_colour_element((color_prom[i]>>0) & 0x03));
 	}
 }
 
@@ -311,30 +312,42 @@ Amstrad Plus
 The Amstrad Plus has a 4096 colour palette
 *********************************************/
 
-void amstrad_state::amstrad_plus_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(amstrad_state,amstrad_plus)
 {
-	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette) / 3); // FIXME: isn't this overwritten by the loop?
-	for (int i = 0; i < 0x1000; i++)
-	{
-		int const g = ( i >> 8 ) & 0x0f;
-		int const r = ( i >> 4 ) & 0x0f;
-		int const b = i & 0x0f;
+	int i;
 
-		palette.set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette) / 3);
+	for ( i = 0; i < 0x1000; i++ )
+	{
+		int r, g, b;
+
+		g = ( i >> 8 ) & 0x0f;
+		r = ( i >> 4 ) & 0x0f;
+		b = i & 0x0f;
+
+		r = ( r << 4 ) | ( r );
+		g = ( g << 4 ) | ( g );
+		b = ( b << 4 ) | ( b );
+
+		palette.set_pen_color(i, r, g, b);
 	}
 }
 
 
-void amstrad_state::aleste_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(amstrad_state,aleste)
 {
-	/* CPC Colour data is stored in the colour ROM (RFCOLDAT.BIN) at 0x140-0x17f */
-	uint8_t const *const pal = memregion("user4")->base();
+	int i;
 
-	for (int i=0; i<32; i++)
+	/* CPC Colour data is stored in the colour ROM (RFCOLDAT.BIN) at 0x140-0x17f */
+	unsigned char* pal = memregion("user4")->base();
+
+	for(i=0; i<32; i++)
 	{
-		int b = (pal[0x140+i] >> 4) & 0x03;
-		int g = (pal[0x140+i] >> 2) & 0x03;
-		int r = pal[0x140+i] & 0x03;
+		int r,g,b;
+
+		b = (pal[0x140+i] >> 4) & 0x03;
+		g = (pal[0x140+i] >> 2) & 0x03;
+		r = pal[0x140+i] & 0x03;
 
 		r = (r << 6);
 		g = (g << 6);
@@ -344,11 +357,13 @@ void amstrad_state::aleste_palette(palette_device &palette) const
 	}
 
 	/* MSX colour palette is 6-bit RGB */
-	for (int i=0; i<64; i++)
+	for(i=0; i<64; i++)
 	{
-		int r = (i >> 4) & 0x03;
-		int g = (i >> 2) & 0x03;
-		int b = i & 0x03;
+		int r,g,b;
+
+		r = (i >> 4) & 0x03;
+		g = (i >> 2) & 0x03;
+		b = i & 0x03;
 
 		r = (r << 6);
 		g = (g << 6);
@@ -361,7 +376,9 @@ void amstrad_state::aleste_palette(palette_device &palette) const
 
 void amstrad_state::amstrad_init_lookups()
 {
-	for ( int i = 0; i < 256; i++ )
+	int i;
+
+	for ( i = 0; i < 256; i++ )
 	{
 		m_mode0_lookup[i] = ( ( i & 0x80 ) >> 7 ) | ( ( i & 0x20 ) >> 3 ) | ( ( i & 0x08 ) >> 2 ) | ( ( i & 0x02 ) << 2 );
 		m_mode1_lookup[i] = ( ( i & 0x80 ) >> 7 ) | ( ( i & 0x08 ) >> 2 );
@@ -1146,8 +1163,8 @@ void amstrad_state::amstrad_setLowerRom()
 			else
 				bank_base = m_AmstradCPC_RamBanks[0];
 		}
-		m_banks[0]->set_base(bank_base);
-		m_banks[1]->set_base(bank_base+0x02000);
+		m_bank1->set_base(bank_base);
+		m_bank2->set_base(bank_base+0x02000);
 		if ((m_gate_array.mrer & (1<<2)) == 0 && m_gate_array.romdis == 0)
 		{
 			if (m_exp)
@@ -1173,14 +1190,14 @@ void amstrad_state::amstrad_setLowerRom()
             space.install_write_bank(0x6000, 0x7fff, "bank12");
         }
 */
-		if (m_AmstradCPC_RamBanks[0])
+		if(m_AmstradCPC_RamBanks[0] != nullptr)
 		{
-			m_banks[0]->set_base(m_AmstradCPC_RamBanks[0]);
-			m_banks[1]->set_base(m_AmstradCPC_RamBanks[0]+0x2000);
-			m_banks[2]->set_base(m_AmstradCPC_RamBanks[1]);
-			m_banks[3]->set_base(m_AmstradCPC_RamBanks[1]+0x2000);
-			m_banks[4]->set_base(m_AmstradCPC_RamBanks[2]);
-			m_banks[5]->set_base(m_AmstradCPC_RamBanks[2]+0x2000);
+			m_bank1->set_base(m_AmstradCPC_RamBanks[0]);
+			m_bank2->set_base(m_AmstradCPC_RamBanks[0]+0x2000);
+			m_bank3->set_base(m_AmstradCPC_RamBanks[1]);
+			m_bank4->set_base(m_AmstradCPC_RamBanks[1]+0x2000);
+			m_bank5->set_base(m_AmstradCPC_RamBanks[2]);
+			m_bank6->set_base(m_AmstradCPC_RamBanks[2]+0x2000);
 		}
 
 		if ( (m_gate_array.mrer & (1<<2)) == 0 && m_gate_array.romdis == 0)
@@ -1193,30 +1210,30 @@ void amstrad_state::amstrad_setLowerRom()
 				{
 				case 0x00:
 //                  logerror("L-ROM: located at &0000\n");
-					m_banks[0]->set_base(bank_base);
-					m_banks[1]->set_base(bank_base+0x02000);
+					m_bank1->set_base(bank_base);
+					m_bank2->set_base(bank_base+0x02000);
 					break;
 				case 0x08:
 //                  logerror("L-ROM: located at &4000\n");
-					m_banks[2]->set_base(bank_base);
-					m_banks[3]->set_base(bank_base+0x02000);
+					m_bank3->set_base(bank_base);
+					m_bank4->set_base(bank_base+0x02000);
 					break;
 				case 0x10:
 //                  logerror("L-ROM: located at &8000\n");
-					m_banks[4]->set_base(bank_base);
-					m_banks[5]->set_base(bank_base+0x02000);
+					m_bank5->set_base(bank_base);
+					m_bank6->set_base(bank_base+0x02000);
 					break;
 				case 0x18:
 //                  logerror("L-ROM: located at &0000, ASIC registers enabled\n");
-					m_banks[0]->set_base(bank_base);
-					m_banks[1]->set_base(bank_base+0x02000);
+					m_bank1->set_base(bank_base);
+					m_bank2->set_base(bank_base+0x02000);
 					break;
 				}
 			}
 			else
 			{
-				m_banks[0]->set_base(m_region_cart->base());
-				m_banks[1]->set_base(m_region_cart->base() + 0x2000);
+				m_bank1->set_base(m_region_cart->base());
+				m_bank2->set_base(m_region_cart->base() + 0x2000);
 				if (m_exp)
 					m_exp->set_mapping(device_cpc_expansion_card_interface::MAP_LOWER);
 			}
@@ -1247,8 +1264,8 @@ void amstrad_state::amstrad_setUpperRom()
 
 	if (bank_base)
 	{
-		m_banks[6]->set_base(bank_base);
-		m_banks[7]->set_base(bank_base+0x2000);
+		m_bank7->set_base(bank_base);
+		m_bank8->set_base(bank_base+0x2000);
 	}
 	if ( ! ( m_gate_array.mrer & 0x08 ) && m_gate_array.romdis == 0)
 	{
@@ -1390,7 +1407,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_4000_w)
 		m_asic.ram[offset] = data & 0x0f;
 	else
 	{
-		uint8_t* RAM = (uint8_t*)m_banks[10]->base();
+		uint8_t* RAM = (uint8_t*)m_bank11->base();
 		RAM[offset] = data;
 	}
 }
@@ -1493,7 +1510,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 	}
 	else
 	{
-		uint8_t* RAM = (uint8_t*)m_banks[11]->base();
+		uint8_t* RAM = (uint8_t*)m_bank12->base();
 		RAM[offset] = data;
 	}
 }
@@ -1506,7 +1523,7 @@ READ8_MEMBER(amstrad_state::amstrad_plus_asic_4000_r)
 		return m_asic.ram[offset];
 	else
 	{
-		uint8_t* RAM = (uint8_t*)m_banks[2]->base();
+		uint8_t* RAM = (uint8_t*)m_bank3->base();
 		return RAM[offset];
 	}
 }
@@ -1549,7 +1566,7 @@ READ8_MEMBER(amstrad_state::amstrad_plus_asic_6000_r)
 	}
 	else
 	{
-		uint8_t* RAM = (uint8_t*)m_banks[3]->base();
+		uint8_t* RAM = (uint8_t*)m_bank4->base();
 		return RAM[offset];
 	}
 }
@@ -1735,37 +1752,37 @@ WRITE8_MEMBER(amstrad_state::aleste_msx_mapper)
 		switch(page)
 		{
 		case 0:  /* 0x0000 - 0x3fff */
-			m_banks[0]->set_base(ram+ramptr);
-			m_banks[1]->set_base(ram+ramptr+0x2000);
-			m_banks[8]->set_base(ram+ramptr);
-			m_banks[9]->set_base(ram+ramptr+0x2000);
+			m_bank1->set_base(ram+ramptr);
+			m_bank2->set_base(ram+ramptr+0x2000);
+			m_bank9->set_base(ram+ramptr);
+			m_bank10->set_base(ram+ramptr+0x2000);
 			m_Aleste_RamBanks[0] = ram+ramptr;
 			m_aleste_active_page[0] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x0000\n",ramptr,rampage);
 			break;
 		case 1:  /* 0x4000 - 0x7fff */
-			m_banks[2]->set_base(ram+ramptr);
-			m_banks[3]->set_base(ram+ramptr+0x2000);
-			m_banks[10]->set_base(ram+ramptr);
-			m_banks[11]->set_base(ram+ramptr+0x2000);
+			m_bank3->set_base(ram+ramptr);
+			m_bank4->set_base(ram+ramptr+0x2000);
+			m_bank11->set_base(ram+ramptr);
+			m_bank12->set_base(ram+ramptr+0x2000);
 			m_Aleste_RamBanks[1] = ram+ramptr;
 			m_aleste_active_page[1] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x4000\n",ramptr,rampage);
 			break;
 		case 2:  /* 0x8000 - 0xbfff */
-			m_banks[4]->set_base(ram+ramptr);
-			m_banks[5]->set_base(ram+ramptr+0x2000);
-			m_banks[12]->set_base(ram+ramptr);
-			m_banks[13]->set_base(ram+ramptr+0x2000);
+			m_bank5->set_base(ram+ramptr);
+			m_bank6->set_base(ram+ramptr+0x2000);
+			m_bank13->set_base(ram+ramptr);
+			m_bank14->set_base(ram+ramptr+0x2000);
 			m_Aleste_RamBanks[2] = ram+ramptr;
 			m_aleste_active_page[2] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x8000\n",ramptr,rampage);
 			break;
 		case 3:  /* 0xc000 - 0xffff */
-			m_banks[6]->set_base(ram+ramptr);
-			m_banks[7]->set_base(ram+ramptr+0x2000);
-			m_banks[14]->set_base(ram+ramptr);
-			m_banks[15]->set_base(ram+ramptr+0x2000);
+			m_bank7->set_base(ram+ramptr);
+			m_bank8->set_base(ram+ramptr+0x2000);
+			m_bank15->set_base(ram+ramptr);
+			m_bank16->set_base(ram+ramptr+0x2000);
 			m_Aleste_RamBanks[3] = ram+ramptr;
 			m_aleste_active_page[3] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0xc000\n",ramptr,rampage);
@@ -1839,7 +1856,7 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
 {
-	uint8_t data = 0xFF;
+	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
 //  m6845_personality_t crtc_type;
 	int page;
@@ -1906,7 +1923,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = m_ppi->read(r1r0);
+			data = m_ppi->read(space, r1r0);
 		if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )  // Plus systems return the data written to port C (I/O status is ignored)
 			if(r1r0 == 0x02)
 				data = m_last_write;
@@ -1930,22 +1947,28 @@ b8 b0 Function Read/Write state
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
 The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
  */
-	if (m_fdc.found())  // if FDC is present (it isn't on a 464 or GX4000)
+	if ( m_system_type != SYSTEM_GX4000 )
 	{
-		if ( ( offset & (1<<10) ) == 0 )
+		if(m_fdc)  // if FDC is present (it isn't on a 464)
 		{
-			int b8b0 = ( ( offset & (1<<8) ) >> (8 - 1) ) | ( offset & 0x01 );
-
-			switch (b8b0)
+			if ( ( offset & (1<<10) ) == 0 )
 			{
-			case 0x02:
-				data = m_fdc->msr_r(space, 0);
-				break;
-			case 0x03:
-				data = m_fdc->fifo_r(space, 0);
-				break;
-			default:
-				break;
+				if ( ( offset & (1<<10) ) == 0 )
+				{
+					int b8b0 = ( ( offset & (1<<8) ) >> (8 - 1) ) | ( offset & 0x01 );
+
+					switch (b8b0)
+					{
+					case 0x02:
+						data = m_fdc->msr_r(space, 0);
+						break;
+					case 0x03:
+						data = m_fdc->fifo_r(space, 0);
+						break;
+					default:
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -2111,7 +2134,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 	{
 		unsigned int idx = ((offset & 0x0300) >> 8);
 
-		m_ppi->write(idx, data);
+		m_ppi->write(space, idx, data);
 		if(idx == 0x02)
 			m_last_write = data;
 	}
@@ -2136,33 +2159,39 @@ b8 b0 Function Read/Write state
 If b10 is reset but none of b7-b5 are reset, user expansion peripherals are selected.
 The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which causes the expansion peripherals to reset.
 */
-		if (m_fdc.found())  // if FDC is present (it isn't on a 464 or GX4000)
+		if(m_system_type != SYSTEM_GX4000)
 		{
-			if ((offset & (1<<7)) == 0)
+			if(m_fdc)  // if FDC is present (it isn't on a 464)
 			{
-				unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
-
-				switch (b8b0)
+				if ((offset & (1<<7)) == 0)
 				{
-				case 0x00:
-				case 0x01:
-					/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
-					 * "1" the FDD motor will be active.
-					 * "0" the FDD motor will be in-active.*/
-					for (auto &fd : m_floppy)
+					unsigned int b8b0 = ((offset & 0x0100) >> (8 - 1)) | (offset & 0x01);
+
+					switch (b8b0)
 					{
-						floppy_image_device *floppy = fd->get_device();
-						if(floppy)
-							floppy->mon_w(!BIT(data, 0));
+					case 0x00:
+					case 0x01:
+						{
+							/* FDC Motor Control - Bit 0 defines the state of the FDD motor:
+							 * "1" the FDD motor will be active.
+							 * "0" the FDD motor will be in-active.*/
+							floppy_image_device *floppy;
+							floppy = machine().device<floppy_connector>(":upd765:0")->get_device();
+							if(floppy)
+								floppy->mon_w(!BIT(data, 0));
+							floppy = machine().device<floppy_connector>(":upd765:1")->get_device();
+							if(floppy)
+								floppy->mon_w(!BIT(data, 0));
+							break;
+						}
+
+					case 0x03: /* Write Data register of FDC */
+						m_fdc->fifo_w(space, 0,data);
+						break;
+
+					default:
+						break;
 					}
-					break;
-
-				case 0x03: /* Write Data register of FDC */
-					m_fdc->fifo_w(space, 0,data);
-					break;
-
-				default:
-					break;
 				}
 			}
 		}
@@ -2294,11 +2323,11 @@ void amstrad_state::amstrad_handle_snapshot(unsigned char *pSnapshot)
 	m_gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	m_ppi->write(3, pSnapshot[0x059] & 0x0ff);
+	m_ppi->write(space, 3, pSnapshot[0x059] & 0x0ff);
 
-	m_ppi->write(0, pSnapshot[0x056] & 0x0ff);
-	m_ppi->write(1, pSnapshot[0x057] & 0x0ff);
-	m_ppi->write(2, pSnapshot[0x058] & 0x0ff);
+	m_ppi->write(space, 0, pSnapshot[0x056] & 0x0ff);
+	m_ppi->write(space, 1, pSnapshot[0x057] & 0x0ff);
+	m_ppi->write(space, 2, pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)
@@ -2371,19 +2400,19 @@ void amstrad_state::amstrad_rethinkMemory()
 	{
 		if(m_aleste_mode & 0x04)
 		{
-			m_banks[2]->set_base(m_Aleste_RamBanks[1]);
-			m_banks[3]->set_base(m_Aleste_RamBanks[1]+0x2000);
+			m_bank3->set_base(m_Aleste_RamBanks[1]);
+			m_bank4->set_base(m_Aleste_RamBanks[1]+0x2000);
 			/* bank 2 - 0x08000..0x0bfff */
-			m_banks[4]->set_base(m_Aleste_RamBanks[2]);
-			m_banks[5]->set_base(m_Aleste_RamBanks[2]+0x2000);
+			m_bank5->set_base(m_Aleste_RamBanks[2]);
+			m_bank6->set_base(m_Aleste_RamBanks[2]+0x2000);
 		}
 		else
 		{
-			m_banks[2]->set_base(m_AmstradCPC_RamBanks[1]);
-			m_banks[3]->set_base(m_AmstradCPC_RamBanks[1]+0x2000);
+			m_bank3->set_base(m_AmstradCPC_RamBanks[1]);
+			m_bank4->set_base(m_AmstradCPC_RamBanks[1]+0x2000);
 			/* bank 2 - 0x08000..0x0bfff */
-			m_banks[4]->set_base(m_AmstradCPC_RamBanks[2]);
-			m_banks[5]->set_base(m_AmstradCPC_RamBanks[2]+0x2000);
+			m_bank5->set_base(m_AmstradCPC_RamBanks[2]);
+			m_bank6->set_base(m_AmstradCPC_RamBanks[2]+0x2000);
 		}
 	}
 	else
@@ -2397,25 +2426,25 @@ void amstrad_state::amstrad_rethinkMemory()
 	/* other banks */
 	if(m_aleste_mode & 0x04)
 	{
-		m_banks[8]->set_base(m_Aleste_RamBanks[0]);
-		m_banks[9]->set_base(m_Aleste_RamBanks[0]+0x2000);
-		m_banks[10]->set_base(m_Aleste_RamBanks[1]);
-		m_banks[11]->set_base(m_Aleste_RamBanks[1]+0x2000);
-		m_banks[12]->set_base(m_Aleste_RamBanks[2]);
-		m_banks[13]->set_base(m_Aleste_RamBanks[2]+0x2000);
-		m_banks[14]->set_base(m_Aleste_RamBanks[3]);
-		m_banks[15]->set_base(m_Aleste_RamBanks[3]+0x2000);
+		m_bank9->set_base(m_Aleste_RamBanks[0]);
+		m_bank10->set_base(m_Aleste_RamBanks[0]+0x2000);
+		m_bank11->set_base(m_Aleste_RamBanks[1]);
+		m_bank12->set_base(m_Aleste_RamBanks[1]+0x2000);
+		m_bank13->set_base(m_Aleste_RamBanks[2]);
+		m_bank14->set_base(m_Aleste_RamBanks[2]+0x2000);
+		m_bank15->set_base(m_Aleste_RamBanks[3]);
+		m_bank16->set_base(m_Aleste_RamBanks[3]+0x2000);
 	}
 	else
 	{
-		m_banks[8]->set_base(m_AmstradCPC_RamBanks[0]);
-		m_banks[9]->set_base(m_AmstradCPC_RamBanks[0]+0x2000);
-		m_banks[10]->set_base(m_AmstradCPC_RamBanks[1]);
-		m_banks[11]->set_base(m_AmstradCPC_RamBanks[1]+0x2000);
-		m_banks[12]->set_base(m_AmstradCPC_RamBanks[2]);
-		m_banks[13]->set_base(m_AmstradCPC_RamBanks[2]+0x2000);
-		m_banks[14]->set_base(m_AmstradCPC_RamBanks[3]);
-		m_banks[15]->set_base(m_AmstradCPC_RamBanks[3]+0x2000);
+		m_bank9->set_base(m_AmstradCPC_RamBanks[0]);
+		m_bank10->set_base(m_AmstradCPC_RamBanks[0]+0x2000);
+		m_bank11->set_base(m_AmstradCPC_RamBanks[1]);
+		m_bank12->set_base(m_AmstradCPC_RamBanks[1]+0x2000);
+		m_bank13->set_base(m_AmstradCPC_RamBanks[2]);
+		m_bank14->set_base(m_AmstradCPC_RamBanks[2]+0x2000);
+		m_bank15->set_base(m_AmstradCPC_RamBanks[3]);
+		m_bank16->set_base(m_AmstradCPC_RamBanks[3]+0x2000);
 	}
 
 	/* multiface hardware enabled? */
@@ -2752,8 +2781,8 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 				uint8_t data_x, data_y;
 
 				m_amx_mouse_data = 0x0f;
-				data_x = m_io_mouse[0].read_safe(0);
-				data_y = m_io_mouse[1].read_safe(0);
+				data_x = m_io_mouse1.read_safe(0);
+				data_y = m_io_mouse2.read_safe(0);
 
 				if(data_x > prev_x)
 					m_amx_mouse_data &= ~0x08;
@@ -2763,7 +2792,7 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 					m_amx_mouse_data &= ~0x02;
 				if(data_y < prev_y)
 					m_amx_mouse_data &= ~0x01;
-				m_amx_mouse_data |= (m_io_mouse[2].read_safe(0) << 4);
+				m_amx_mouse_data |= (m_io_mouse3.read_safe(0) << 4);
 				prev_x = data_x;
 				prev_y = data_y;
 

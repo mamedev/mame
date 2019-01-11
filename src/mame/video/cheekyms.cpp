@@ -11,31 +11,29 @@ Functions to emulate the video hardware of the machine.
 #include "emu.h"
 #include "includes/cheekyms.h"
 
-// bit 3 and 7 of the char color PROMs are used for something -- not currently emulated - thus GAME_IMPERFECT_GRAPHICS
+/* bit 3 and 7 of the char color PROMs are used for something -- not currently emulated -
+   thus GAME_IMPERFECT_GRAPHICS */
 
-void cheekyms_state::cheekyms_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i, j, bit, r, g, b;
 
-	for (int i = 0; i < 6; i++)
+	for (i = 0; i < 6; i++)
 	{
-		for (int j = 0; j < 0x20; j++)
+		for (j = 0; j < 0x20; j++)
 		{
-			int bit;
+			/* red component */
+			bit = (color_prom[0x20 * (i / 2) + j] >> ((4 * (i & 1)) + 0)) & 0x01;
+			r = 0xff * bit;
+			/* green component */
+			bit = (color_prom[0x20 * (i / 2) + j] >> ((4 * (i & 1)) + 1)) & 0x01;
+			g = 0xff * bit;
+			/* blue component */
+			bit = (color_prom[0x20 * (i / 2) + j] >> ((4 * (i & 1)) + 2)) & 0x01;
+			b = 0xff * bit;
 
-			// red component
-			bit = BIT(color_prom[0x20 * (i / 2) + j], (4 * (i & 1)) + 0);
-			int const r = 0xff * bit;
-
-			// green component
-			bit = BIT(color_prom[0x20 * (i / 2) + j], (4 * (i & 1)) + 1);
-			int const g = 0xff * bit;
-
-			// blue component
-			bit = BIT(color_prom[0x20 * (i / 2) + j], (4 * (i & 1)) + 2);
-			int const b = 0xff * bit;
-
-			palette.set_pen_color((i * 0x20) + j, rgb_t(r, g, b));
+			palette.set_pen_color((i * 0x20) + j, rgb_t(r,g,b));
 		}
 	}
 }

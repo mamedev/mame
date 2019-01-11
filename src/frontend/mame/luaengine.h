@@ -8,14 +8,14 @@
 
 ***************************************************************************/
 
-#ifndef MAME_FRONTEND_MAME_LUAENGINE_H
-#define MAME_FRONTEND_MAME_LUAENGINE_H
-
 #pragma once
 
 #ifndef __EMU_H__
 #error Dont include this file directly; include emu.h instead.
 #endif
+
+#ifndef __LUA_ENGINE_H__
+#define __LUA_ENGINE_H__
 
 #if defined(__GNUC__) && (__GNUC__ > 6)
 #pragma GCC diagnostic ignored "-Wnoexcept-type"
@@ -168,4 +168,4 @@ private:
 	};
 };
 
-#endif // MAME_FRONTEND_MAME_LUAENGINE_H
+#endif  /* __LUA_ENGINE_H__ */

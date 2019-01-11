@@ -28,7 +28,6 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 
 #include "emu.h"
 #include "cpu/sh/sh2.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -42,19 +41,14 @@ public:
 	{
 	}
 
-	void hideseek(machine_config &config);
-
 	void init_hideseek();
-
-protected:
 	virtual void video_start() override;
-
-private:
-	void hideseek_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(hideseek);
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void hideseek(machine_config &config);
 	void mem_map(address_map &map);
-
+protected:
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -95,10 +89,12 @@ static GFXDECODE_START( gfx_hideseek )
 GFXDECODE_END
 
 
-void hideseek_state::hideseek_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(hideseek_state, hideseek)
 {
-	for (int i = 0; i < 0x8000; i++)
-		palette.set_pen_color(i, rgb_t(pal5bit((i >> 10)&0x1f), pal5bit((i >> 5)&0x1f), pal5bit((i >> 0)&0x1f)));
+	int i;
+
+	for (i = 0; i < 0x8000; i++)
+		palette.set_pen_color(i, rgb_t( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
 }
 
 
@@ -119,8 +115,9 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 	MCFG_SCREEN_UPDATE_DRIVER(hideseek_state, screen_update_hideseek)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(hideseek_state::hideseek_palette), 0x10000);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_hideseek);
+	MCFG_PALETTE_ADD("palette", 0x10000)
+	MCFG_PALETTE_INIT_OWNER(hideseek_state, hideseek)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hideseek)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -163,4 +160,4 @@ void hideseek_state::init_hideseek()
 }
 
 
-GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, init_hideseek, ROT0, "<unknown>", "Hide & Seek", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, init_hideseek, ROT0, "<unknown>", "Hide & Seek",MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

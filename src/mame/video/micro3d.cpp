@@ -145,14 +145,15 @@ int micro3d_state::inside(micro3d_vtx *v, enum planes plane)
 	return 0;
 }
 
-// Calculate where two points intersect
-micro3d_state::micro3d_vtx micro3d_state::intersect(micro3d_vtx *v1, micro3d_vtx *v2, enum planes plane)
+/* Calculate where two points intersect */
+micro3d_vtx micro3d_state::intersect(micro3d_vtx *v1, micro3d_vtx *v2, enum planes plane)
 {
 	float m = 0.0;
-	if (v1->x != v2->x)
-		m = float(v1->y - v2->y) / float(v1->x - v2->x);
-
 	micro3d_vtx vo = { 0, 0, 0 };
+
+	if (v1->x != v2->x)
+		m = (float)(v1->y - v2->y) / (float)(v1->x - v2->x);
+
 	switch (plane)
 	{
 		case CLIP_Z_MIN:
@@ -161,8 +162,8 @@ micro3d_state::micro3d_vtx micro3d_state::intersect(micro3d_vtx *v1, micro3d_vtx
 
 			if (v1->z != v2->z)
 			{
-				mxz = float(v1->x - v2->x) / float(v1->z - v2->z);
-				myz = float(v1->y - v2->y) / float(v1->z - v2->z);
+				mxz = (float)(v1->x - v2->x) / (float)(v1->z - v2->z);
+				myz = (float)(v1->y - v2->y) / (float)(v1->z - v2->z);
 			}
 			else
 			{
@@ -181,8 +182,8 @@ micro3d_state::micro3d_vtx micro3d_state::intersect(micro3d_vtx *v1, micro3d_vtx
 
 			if (v1->z != v2->z)
 			{
-				mxz = float(v1->x - v2->x) / float(v1->z - v2->z);
-				myz = float(v1->y - v2->y) / float(v1->z - v2->z);
+				mxz = (float)(v1->x - v2->x) / (float)(v1->z - v2->z);
+				myz = (float)(v1->y - v2->y) / (float)(v1->z - v2->z);
 			}
 			else
 			{

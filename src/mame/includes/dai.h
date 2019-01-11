@@ -17,31 +17,26 @@
 #include "machine/tms5501.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
-#include "emupal.h"
 
 
 class dai_state : public driver_device
 {
 public:
-	dai_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	enum
+	{
+		TIMER_BOOTSTRAP,
+		TIMER_TMS5501
+	};
+
+	dai_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pit(*this, "pit8253"),
 		m_tms5501(*this, "tms5501"),
 		m_sound(*this, "custom"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
-		m_palette(*this, "palette")
-	{ }
-
-	void dai(machine_config &config);
-
-private:
-	enum
-	{
-		TIMER_BOOTSTRAP,
-		TIMER_TMS5501
-	};
+		m_palette(*this, "palette")  { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -65,21 +60,25 @@ private:
 	DECLARE_WRITE8_MEMBER(dai_pit_w);
 	DECLARE_READ8_MEMBER(dai_keyboard_r);
 	DECLARE_WRITE8_MEMBER(dai_keyboard_w);
-	void dai_palette(palette_device &palette) const;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(dai);
 	uint32_t screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dai_update_memory(int dai_rom_bank);
 	IRQ_CALLBACK_MEMBER(int_ack);
 
+	void dai(machine_config &config);
 	void dai_io(address_map &map);
 	void dai_mem(address_map &map);
-
-	static const rgb_t s_palette[16];
-
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+
+/*----------- defined in video/dai.c -----------*/
+
+extern const unsigned char dai_palette[16*3];
 
 
 #endif // MAME_INCLUDES_DAI_H

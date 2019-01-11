@@ -22,7 +22,8 @@
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
-#include "emupal.h"
+
+#define AVIGO_NUM_COLOURS 2
 
 #define AVIGO_SCREEN_WIDTH        160
 #define AVIGO_SCREEN_HEIGHT       240
@@ -33,27 +34,30 @@ class avigo_state : public driver_device
 {
 public:
 	avigo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_ram(*this, RAM_TAG)
-		, m_speaker(*this, "speaker")
-		, m_uart(*this, "ns16550")
-		, m_serport(*this, "serport")
-		, m_palette(*this, "palette")
-		, m_bankdev1(*this, "bank0")
-		, m_bankdev2(*this, "bank1")
-		, m_flash1(*this, "flash1")
-		, m_nvram(*this, "nvram")
-	{ }
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG),
+			m_speaker(*this, "speaker"),
+			m_uart(*this, "ns16550"),
+			m_serport(*this, "serport"),
+			m_palette(*this, "palette"),
+			m_bankdev1(*this, "bank0"),
+			m_bankdev2(*this, "bank1"),
+			m_flash1(*this, "flash1"),
+			m_nvram(*this, "nvram")
+		{ }
 
-	void avigo(machine_config &config);
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ns16550_device> m_uart;
+	required_device<rs232_port_device> m_serport;
+	required_device<palette_device> m_palette;
+	required_device<address_map_bank_device> m_bankdev1;
+	required_device<address_map_bank_device> m_bankdev2;
+	required_device<intelfsh8_device> m_flash1;
+	required_shared_ptr<uint8_t> m_nvram;
 
-	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
-
-protected:
 	// defined in drivers/avigo.c
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -78,30 +82,16 @@ protected:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(port_04_r);
 
+	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
+
 	// defined in video/avigo.c
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(vid_memory_r);
 	DECLARE_WRITE8_MEMBER(vid_memory_w);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
-
-	DECLARE_QUICKLOAD_LOAD_MEMBER( avigo);
-	void avigo_banked_map(address_map &map);
-	void avigo_io(address_map &map);
-	void avigo_mem(address_map &map);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<ns16550_device> m_uart;
-	required_device<rs232_port_device> m_serport;
-	required_device<palette_device> m_palette;
-	required_device<address_map_bank_device> m_bankdev1;
-	required_device<address_map_bank_device> m_bankdev2;
-	required_device<intelfsh8_device> m_flash1;
-	required_shared_ptr<uint8_t> m_nvram;
 
 	// driver state
 	uint8_t               m_key_line;
@@ -113,9 +103,18 @@ protected:
 	uint8_t               m_bank1_h;
 	uint8_t               m_ad_control_status;
 	uint16_t              m_ad_value;
-	std::unique_ptr<uint8_t[]> m_video_memory;
+	uint8_t *             m_video_memory;
 	uint8_t               m_screen_column;
 	uint8_t               m_warm_start;
+	DECLARE_PALETTE_INIT(avigo);
+	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( avigo);
+	void avigo(machine_config &config);
+	void avigo_banked_map(address_map &map);
+	void avigo_io(address_map &map);
+	void avigo_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_AVIGO_H

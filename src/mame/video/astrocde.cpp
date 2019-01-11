@@ -7,14 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/astrocde.h"
-
 #include "cpu/z80/z80.h"
+#include "includes/astrocde.h"
 #include "sound/astrocde.h"
 #include "video/resnet.h"
-
-#include <cmath>
-
 
 /*************************************
  *
@@ -79,7 +75,7 @@ inline int astrocde_state::mame_vpos_to_astrocade_vpos(int scanline)
  *
  *************************************/
 
-void astrocde_state::astrocade_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(astrocde_state, astrocde)
 {
 	/*
 	    The Astrocade has a 256 color palette: 32 colors with 8 luminance
@@ -92,71 +88,81 @@ void astrocde_state::astrocade_palette(palette_device &palette) const
 	    that has a 4-bit resolution.
 	*/
 
-	// loop over color values
-	for (int color = 0; color < 32; color++)
+	int color, luma;
+
+	/* loop over color values */
+	for (color = 0; color < 32; color++)
 	{
-		// color 0 maps to ry = by = 0
-		double const angle = (color / 32.0) * (2.0 * M_PI);
-		float const ry = color ? (0.75 * std::sin(angle)) : 0;
-		float const by = color ? (1.15 * std::cos(angle)) : 0;
+		float ry = 0.75 * sin((color / 32.0) * (2.0 * M_PI));
+		float by = 1.15 * cos((color / 32.0) * (2.0 * M_PI));
 
-		// iterate over luminence values
-		for (int luma = 0; luma < 16; luma++)
+		/* color 0 maps to ry = by = 0 */
+		if (color == 0)
+			ry = by = 0;
+
+		/* iterate over luminence values */
+		for (luma = 0; luma < 16; luma++)
 		{
-			float const y = luma / 15.0;
+			float y = luma / 15.0;
+			int r, g, b;
 
-			// transform to RGB
-			int r = (ry + y) * 255;
-			int g = ((y - 0.299f * (ry + y) - 0.114f * (by + y)) / 0.587f) * 255;
-			int b = (by + y) * 255;
+			/* transform to RGB */
+			r = (ry + y) * 255;
+			g = ((y - 0.299f * (ry + y) - 0.114f * (by + y)) / 0.587f) * 255;
+			b = (by + y) * 255;
 
-			// clamp and store
-			r = (std::min)((std::max)(r, 0), 255);
-			g = (std::min)((std::max)(g, 0), 255);
-			b = (std::min)((std::max)(b, 0), 255);
+			/* clamp and store */
+			r = std::max(r, 0);
+			r = std::min(r, 255);
+			g = std::max(g, 0);
+			g = std::min(g, 255);
+			b = std::max(b, 0);
+			b = std::min(b, 255);
 			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}
 }
 
 
-void astrocde_state::profpac_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(astrocde_state,profpac)
 {
-	// Professor Pac-Man uses a more standard 12-bit RGB palette layout
-	static constexpr int resistances[4] = { 6200, 3000, 1500, 750 };
-
-	// compute the color output resistor weights
+	/* Professor Pac-Man uses a more standard 12-bit RGB palette layout */
+	static const int resistances[4] = { 6200, 3000, 1500, 750 };
 	double weights[4];
+	int i;
+
+	/* compute the color output resistor weights */
 	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, weights, 1500, 0,
 			4, resistances, weights, 1500, 0,
 			4, resistances, weights, 1500, 0);
 
-	// initialize the palette with these colors
-	for (int i = 0; i < 4096; i++)
+	/* initialize the palette with these colors */
+	for (i = 0; i < 4096; i++)
 	{
 		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
-		// blue component
-		bit0 = BIT(i, 0);
-		bit1 = BIT(i, 1);
-		bit2 = BIT(i, 2);
-		bit3 = BIT(i, 3);
-		int const b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		/* blue component */
+		bit0 = (i >> 0) & 0x01;
+		bit1 = (i >> 1) & 0x01;
+		bit2 = (i >> 2) & 0x01;
+		bit3 = (i >> 3) & 0x01;
+		b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
-		// green component
-		bit0 = BIT(i, 4);
-		bit1 = BIT(i, 5);
-		bit2 = BIT(i, 6);
-		bit3 = BIT(i, 7);
-		int const g = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		/* green component */
+		bit0 = (i >> 4) & 0x01;
+		bit1 = (i >> 5) & 0x01;
+		bit2 = (i >> 6) & 0x01;
+		bit3 = (i >> 7) & 0x01;
+		g = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
-		// red component
-		bit0 = BIT(i, 8);
-		bit1 = BIT(i, 9);
-		bit2 = BIT(i, 10);
-		bit3 = BIT(i, 11);
-		int const r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		/* red component */
+		bit0 = (i >> 8) & 0x01;
+		bit1 = (i >> 9) & 0x01;
+		bit2 = (i >> 10) & 0x01;
+		bit3 = (i >> 11) & 0x01;
+		r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -200,7 +206,7 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	init_savestate();
 
 	/* register our specific save state data */
-	save_pointer(NAME(m_profpac_videoram), 0x4000 * 4);
+	save_pointer(NAME(m_profpac_videoram.get()), 0x4000 * 4);
 	save_item(NAME(m_profpac_palette));
 	save_item(NAME(m_profpac_colormap));
 	save_item(NAME(m_profpac_intercept));

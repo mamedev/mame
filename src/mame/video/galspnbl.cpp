@@ -4,10 +4,12 @@
 #include "includes/galspnbl.h"
 
 
-void galspnbl_state::galspnbl_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(galspnbl_state, galspnbl)
 {
-	// initialize 555 RGB lookup
-	for (int i = 0; i < 32768; i++)
+	int i;
+
+	/* initialize 555 RGB lookup */
+	for (i = 0; i < 32768; i++)
 		palette.set_pen_color(i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
@@ -15,12 +17,14 @@ void galspnbl_state::galspnbl_palette(palette_device &palette) const
 
 void galspnbl_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//  int const screenscroll = 4 - (m_scroll[0] & 0xff);
+	offs_t offs;
 
-	for (offs_t offs = 0; offs < 0x20000; offs++)
+//  int screenscroll = 4 - (m_scroll[0] & 0xff);
+
+	for (offs = 0; offs < 0x20000; offs++)
 	{
-		int const y = offs >> 9;
-		int const x = offs & 0x1ff;
+		int y = offs >> 9;
+		int x = offs & 0x1ff;
 
 		bitmap.pix16(y, x) = 1024 + (m_bgvideoram[offs] >> 1);
 	}
@@ -34,12 +38,12 @@ VIDEO_START_MEMBER(galspnbl_state,galspnbl)
 
 void galspnbl_state::mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t *dd = &bitmap.pix16(y);
 		uint16_t *sd2 = &m_sprite_bitmap.pix16(y);
 
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t sprpixel = (sd2[x]);
 			//uint16_t sprpri = (sprpixel >> 8) & 3;

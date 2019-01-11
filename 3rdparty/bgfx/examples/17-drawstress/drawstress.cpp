@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -126,16 +126,11 @@ public:
 		m_deltaTimeAvgNs = 0;
 		m_numFrames      = 0;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		const bgfx::Caps* caps = bgfx::getCaps();
-		m_maxDim = (int32_t)bx::pow(float(caps->limits.maxDrawCalls), 1.0f/3.0f);
+		m_maxDim = (int32_t)bx::fpow(float(caps->limits.maxDrawCalls), 1.0f/3.0f);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -304,7 +299,7 @@ public:
 
 			if (m_deltaTimeNs > 1000000)
 			{
-				m_deltaTimeAvgNs = m_deltaTimeNs / bx::max<int64_t>(1, m_numFrames);
+				m_deltaTimeAvgNs = m_deltaTimeNs / bx::int64_max(1, m_numFrames);
 
 				if (m_autoAdjust)
 				{
@@ -338,17 +333,12 @@ public:
 
 			showExampleDialog(this);
 
-			ImGui::SetNextWindowPos(
-				  ImVec2((float)m_width - (float)m_width / 4.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2((float)m_width / 4.0f, (float)m_height / 2.0f)
-				, ImGuiCond_FirstUseEver
-				);
+			ImGui::SetNextWindowPos(ImVec2((float)m_width - (float)m_width / 4.0f - 10.0f, 10.0f) );
+			ImGui::SetNextWindowSize(ImVec2((float)m_width / 4.0f, (float)m_height / 2.0f) );
 			ImGui::Begin("Settings"
 				, NULL
-				, 0
+				, ImVec2((float)m_width / 4.0f, (float)m_height / 2.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
 			ImGui::RadioButton("Rotate",&m_transform,0);
@@ -375,8 +365,8 @@ public:
 
 			imguiEndFrame();
 
-			const bx::Vec3 at  = { 0.0f, 0.0f,   0.0f };
-			const bx::Vec3 eye = { 0.0f, 0.0f, -35.0f };
+			float at[3] = { 0.0f, 0.0f, 0.0f };
+			float eye[3] = { 0.0f, 0.0f, -35.0f };
 
 			float view[16];
 			bx::mtxLookAt(view, eye, at);

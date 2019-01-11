@@ -2,7 +2,7 @@
 // copyright-holders: Bryan McPhail, David Haywood, Dirk Best
 /***************************************************************************
 
-    Super Burger Time
+	Super Burger Time
 
 ***************************************************************************/
 
@@ -33,17 +33,15 @@ public:
 		, m_sprgen(*this, "spritegen")
 	{ }
 
+	void init_tumblep();
+
 	void chinatwn(machine_config &config);
 	void supbtime(machine_config &config);
 	void tumblep(machine_config &config);
 
-	void init_tumblep();
-
-private:
+protected:
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 	DECLARE_READ16_MEMBER(vblank_ack_r);
-	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bool use_offsets);
-	uint32_t screen_update_chinatwn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_supbtime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -52,6 +50,7 @@ private:
 	void supbtime_map(address_map &map);
 	void tumblep_map(address_map &map);
 
+private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
 	required_device<cpu_device> m_maincpu;

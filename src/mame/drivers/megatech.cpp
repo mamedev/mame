@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Barry Rodewald
+// copyright-holders:David Haywood, ???
 /* Sega MegaTech
 
 About MegaTech:
@@ -43,13 +43,8 @@ Game                       PCB #       Sticker on PCB    Sticker on cart     IC1
 -------------------------------------------------------------------------------------------------------------------------------------------------
 Altered Beast              171-5782    837-6963-01       610-0239-01         MPR-12538F     (834200A)     EPR-12368-01   (27C256)  n/a
 Space Harrier II           171-5782    837-6963-02       610-0239-02         MPR-11934      (834200)      EPR-12368-02   (27256)   n/a
-Super Thunder Blade                                      610-0239-03
-Great Golf                                               610-0239-04
-Afterburner                                              610-0239-05
 Out Run                    171-5783    837-6963-06       610-0239-06         MPR-11078      (Mask)        EPR-12368-06   (27256)   n/a
 Alien Syndrome             171-5783    837-6963-07       610-0239-07         MPR-11194      (232011)      EPR-12368-07   (27256)   n/a
-Shinobi                                                  610-0239-08
-Fantasy Zone                                             610-0239-09
 Afterburner                171-5784    837-6963-10       610-0239-10         315-5235       (custom)      MPR-11271-T    (834000)  EPR-12368-10 (27256)
 Great Football             171-5783    837-6963-19       610-0239-19         MPR-10576F     (831000)      EPR-12368-19   (27256)   n/a
 World Championship Soccer  171-5782    837-6963-21       610-0239-21         MPR-12607B     (uPD23C4000)  EPR-12368-21   (27256)   n/a
@@ -109,16 +104,6 @@ public:
 		m_region_maincpu(*this, "maincpu")
 	{ }
 
-	void megatech_multislot(machine_config &config);
-	void megatech_fixedslot(machine_config &config);
-
-	void init_mt_crt();
-	void init_mt_slot();
-
-private:
-
-	void megatech(machine_config &config);
-
 	DECLARE_READ8_MEMBER(cart_select_r);
 	DECLARE_WRITE8_MEMBER(cart_select_w);
 	DECLARE_READ8_MEMBER(bios_portc_r);
@@ -135,11 +120,12 @@ private:
 	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_WRITE8_MEMBER(sms_sn_w);
 	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
 	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
 	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
 
+	void init_mt_crt();
+	void init_mt_slot();
 	DECLARE_MACHINE_RESET(megatech);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
@@ -156,9 +142,12 @@ private:
 	uint32_t screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_main);
 
+	void megatech(machine_config &config);
+	void megatech_multislot(machine_config &config);
+	void megatech_fixedslot(machine_config &config);
 	void megatech_bios_map(address_map &map);
 	void megatech_bios_portmap(address_map &map);
-
+private:
 	uint8_t m_mt_cart_select_reg;
 	uint32_t m_bios_port_ctrl;
 	int m_current_MACHINE_IS_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
@@ -331,11 +320,6 @@ READ8_MEMBER(mtech_state::sms_count_r)
 		return m_vdp->vcount_read(prg, offset);
 }
 
-WRITE8_MEMBER(mtech_state::sms_sn_w)
-{
-	address_space &prg = m_z80snd->space(AS_PROGRAM);
-	m_vdp->vdp_w(prg, 0x10 >> 1, data, 0x00ff);
-}
 
 READ8_MEMBER (mtech_state::sms_ioport_dc_r)
 {
@@ -399,9 +383,9 @@ void mtech_state::set_genz80_as_sms()
 
 	// ports
 	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8_delegate(FUNC(mtech_state::sms_count_r),this));
-	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(mtech_state::sms_sn_w),this));
-	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::data_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::data_write),(sega315_5124_device *)m_vdp));
-	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::control_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::control_write),(sega315_5124_device *)m_vdp));
+	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(sn76496_device::write),(sn76496_base_device *)m_snsnd));
+	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::vram_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::vram_write),(sega315_5124_device *)m_vdp));
+	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::register_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::register_write),(sega315_5124_device *)m_vdp));
 
 	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // super tetris
 
@@ -541,14 +525,14 @@ WRITE8_MEMBER(mtech_state::banked_ram_w )
 void mtech_state::megatech_bios_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom(); // from bios rom (0x0000-0x2fff populated in ROM)
-	map(0x3000, 0x3fff).rw(FUNC(mtech_state::banked_ram_r), FUNC(mtech_state::banked_ram_w)); // copies instruction data here at startup, must be banked
+	map(0x3000, 0x3fff).rw(this, FUNC(mtech_state::banked_ram_r), FUNC(mtech_state::banked_ram_w)); // copies instruction data here at startup, must be banked
 	map(0x4000, 0x5fff).ram(); // plain ram?
-	map(0x6000, 0x6000).w(FUNC(mtech_state::mt_z80_bank_w));
+	map(0x6000, 0x6000).w(this, FUNC(mtech_state::mt_z80_bank_w));
 	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
 	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
-	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
+	map(0x8000, 0x9fff).rw(this, FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 }
 
 
@@ -596,14 +580,14 @@ READ8_MEMBER(mtech_state::vdp1_count_r)
 void mtech_state::megatech_bios_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x3f, 0x3f).w(FUNC(mtech_state::bios_port_ctrl_w));
-	map(0x7f, 0x7f).w(FUNC(mtech_state::bios_port_7f_w));
+	map(0x3f, 0x3f).w(this, FUNC(mtech_state::bios_port_ctrl_w));
+	map(0x7f, 0x7f).w(this, FUNC(mtech_state::bios_port_7f_w));
 
-	map(0x40, 0x41).mirror(0x3e).r(FUNC(mtech_state::vdp1_count_r));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
+	map(0x40, 0x41).mirror(0x3e).r(this, FUNC(mtech_state::vdp1_count_r));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
 
-	map(0xdc, 0xdd).r(FUNC(mtech_state::bios_joypad_r));  // player inputs
+	map(0xdc, 0xdd).r(this, FUNC(mtech_state::bios_joypad_r));  // player inputs
 }
 
 
@@ -700,22 +684,22 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 	MCFG_DEVICE_PROGRAM_MAP(megatech_bios_map)
 	MCFG_DEVICE_IO_MAP(megatech_bios_portmap)
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
-	io1.in_porta_cb().set_ioport("BIOS_DSW0");
-	io1.in_portb_cb().set_ioport("BIOS_DSW1");
-	io1.out_porte_cb().set(FUNC(mtech_state::cart_select_w));
+	MCFG_DEVICE_ADD("io1", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("BIOS_DSW0"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("BIOS_DSW1"))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mtech_state, cart_select_w))
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
-	io2.in_porta_cb().set_ioport("BIOS_IN0");
-	io2.in_portb_cb().set_ioport("BIOS_IN1");
-	io2.in_portc_cb().set(FUNC(mtech_state::bios_portc_r));
-	io2.out_portd_cb().set(FUNC(mtech_state::bios_portd_w));
-	io2.in_porte_cb().set(FUNC(mtech_state::bios_porte_r));
-	io2.out_porte_cb().set(FUNC(mtech_state::bios_porte_w));
+	MCFG_DEVICE_ADD("io2", CXD1095, 0)
+	MCFG_CXD1095_IN_PORTA_CB(IOPORT("BIOS_IN0"))
+	MCFG_CXD1095_IN_PORTB_CB(IOPORT("BIOS_IN1"))
+	MCFG_CXD1095_IN_PORTC_CB(READ8(*this, mtech_state, bios_portc_r))
+	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mtech_state, bios_portd_w))
+	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mtech_state, bios_porte_r))
+	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mtech_state, bios_porte_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
-	config.set_default_layout(layout_dualhovu);
+	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
@@ -724,7 +708,8 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_main)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mtech_state, screen_vblank_main))
 
-	m_vdp->irq().set_inputline(m_z80snd, 0);
+	MCFG_DEVICE_MODIFY("gen_vdp")
+	MCFG_SEGA315_5313_INT_CB(INPUTLINE("genesis_snd_z80", 0))
 
 	MCFG_SCREEN_ADD("menu", RASTER)
 	// check frq
@@ -733,10 +718,10 @@ MACHINE_CONFIG_START(mtech_state::megatech)
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_menu)
 
-	SEGA315_5246(config, m_vdp1, 0);
-	m_vdp1->set_screen("menu");
-	m_vdp1->set_is_pal(false);
-	m_vdp1->irq().set_inputline(m_bioscpu, 0);
+	MCFG_DEVICE_ADD("vdp1", SEGA315_5246, 0)
+	MCFG_SEGA315_5246_SET_SCREEN("menu")
+	MCFG_SEGA315_5246_IS_PAL(false)
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("mtbios", 0))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
@@ -815,13 +800,13 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x10000, "mtbios", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "ver1", "Ver 1" ) \
-	ROMX_LOAD( "epr-12664.20",  0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953), ROM_BIOS(0)) \
+	ROMX_LOAD( "epr-12664.20",  0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953), ROM_BIOS(1)) \
 	ROM_SYSTEM_BIOS( 1, "ver0a", "Ver 0 Rev A" ) \
-	ROMX_LOAD( "epr-12263a.20", 0x000000, 0x8000, CRC(07c3f423) SHA1(50c28bbc2d4349c820d988ae3f20aae3f808545f), ROM_BIOS(1)) \
+	ROMX_LOAD( "epr-12263a.20", 0x000000, 0x8000, CRC(07c3f423) SHA1(50c28bbc2d4349c820d988ae3f20aae3f808545f), ROM_BIOS(2)) \
 	ROM_SYSTEM_BIOS( 2, "ver0b", "Ver 0 Rev B" ) \
-	ROMX_LOAD( "epr-12263b.20", 0x000000, 0x8000, CRC(ca26c87a) SHA1(987a18bede6e54cd73c4434426eb6c302a37cdc5), ROM_BIOS(2)) \
+	ROMX_LOAD( "epr-12263b.20", 0x000000, 0x8000, CRC(ca26c87a) SHA1(987a18bede6e54cd73c4434426eb6c302a37cdc5), ROM_BIOS(3)) \
 	ROM_SYSTEM_BIOS( 3, "ver0aa","Ver 0 Rev B (alt?)" ) \
-	ROMX_LOAD( "epr-12604a.20", 0x000000, 0x8000, CRC(884e4aa5) SHA1(c9008c431a937c084fb475273093ca0b434b5f47), ROM_BIOS(3))
+	ROMX_LOAD( "epr-12604a.20", 0x000000, 0x8000, CRC(884e4aa5) SHA1(c9008c431a937c084fb475273093ca0b434b5f47), ROM_BIOS(4))
 
 
 /* no games */

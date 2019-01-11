@@ -110,14 +110,14 @@ READ_LINE_MEMBER(quasar_state::audio_t1_r)
 
 // memory map taken from the manual
 
-void quasar_state::quasar_program(address_map &map)
+void quasar_state::quasar(address_map &map)
 {
 	map(0x0000, 0x13ff).rom();
-	map(0x1400, 0x14ff).mirror(0x6000).r(FUNC(quasar_state::cvs_bullet_ram_or_palette_r)).w(FUNC(quasar_state::quasar_bullet_w)).share("bullet_ram");
-	map(0x1500, 0x15ff).mirror(0x6000).rw(FUNC(quasar_state::cvs_s2636_0_or_character_ram_r), FUNC(quasar_state::cvs_s2636_0_or_character_ram_w));
-	map(0x1600, 0x16ff).mirror(0x6000).rw(FUNC(quasar_state::cvs_s2636_1_or_character_ram_r), FUNC(quasar_state::cvs_s2636_1_or_character_ram_w));
-	map(0x1700, 0x17ff).mirror(0x6000).rw(FUNC(quasar_state::cvs_s2636_2_or_character_ram_r), FUNC(quasar_state::cvs_s2636_2_or_character_ram_w));
-	map(0x1800, 0x1bff).mirror(0x6000).r(FUNC(quasar_state::cvs_video_or_color_ram_r)).w(FUNC(quasar_state::quasar_video_w)).share("video_ram");
+	map(0x1400, 0x14ff).mirror(0x6000).r(this, FUNC(quasar_state::cvs_bullet_ram_or_palette_r)).w(this, FUNC(quasar_state::quasar_bullet_w)).share("bullet_ram");
+	map(0x1500, 0x15ff).mirror(0x6000).rw(this, FUNC(quasar_state::cvs_s2636_0_or_character_ram_r), FUNC(quasar_state::cvs_s2636_0_or_character_ram_w));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(this, FUNC(quasar_state::cvs_s2636_1_or_character_ram_r), FUNC(quasar_state::cvs_s2636_1_or_character_ram_w));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(this, FUNC(quasar_state::cvs_s2636_2_or_character_ram_r), FUNC(quasar_state::cvs_s2636_2_or_character_ram_w));
+	map(0x1800, 0x1bff).mirror(0x6000).r(this, FUNC(quasar_state::cvs_video_or_color_ram_r)).w(this, FUNC(quasar_state::quasar_video_w)).share("video_ram");
 	map(0x1c00, 0x1fff).mirror(0x6000).ram();
 	map(0x2000, 0x33ff).rom();
 	map(0x4000, 0x53ff).rom();
@@ -126,14 +126,14 @@ void quasar_state::quasar_program(address_map &map)
 
 void quasar_state::quasar_io(address_map &map)
 {
-	map(0x00, 0x03).rw(FUNC(quasar_state::quasar_IO_r), FUNC(quasar_state::video_page_select_w));
-	map(0x08, 0x0b).w(FUNC(quasar_state::io_page_select_w));
+	map(0x00, 0x03).rw(this, FUNC(quasar_state::quasar_IO_r), FUNC(quasar_state::video_page_select_w));
+	map(0x08, 0x0b).w(this, FUNC(quasar_state::io_page_select_w));
 }
 
 void quasar_state::quasar_data(address_map &map)
 {
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).r(FUNC(quasar_state::cvs_collision_r)).nopw();
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(quasar_state::cvs_collision_clear), FUNC(quasar_state::quasar_sh_command_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).r(this, FUNC(quasar_state::cvs_collision_r)).nopw();
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(quasar_state::cvs_collision_clear), FUNC(quasar_state::quasar_sh_command_w));
 }
 
 /*************************************
@@ -150,7 +150,7 @@ void quasar_state::sound_map(address_map &map)
 void quasar_state::sound_portmap(address_map &map)
 {
 	map(0x00, 0x7f).ram();
-	map(0x80, 0x80).r(FUNC(quasar_state::quasar_sh_command_r));
+	map(0x80, 0x80).r(this, FUNC(quasar_state::quasar_sh_command_r));
 }
 
 /************************************************************************
@@ -279,7 +279,7 @@ INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
 // Quasar S2650 Main CPU, I8035 sound board
 // ****************************************
 
-void quasar_state::machine_start()
+MACHINE_START_MEMBER(quasar_state,quasar)
 {
 	cvs_state::machine_start();
 
@@ -289,7 +289,7 @@ void quasar_state::machine_start()
 	save_item(NAME(m_io_page));
 }
 
-void quasar_state::machine_reset()
+MACHINE_RESET_MEMBER(quasar_state,quasar)
 {
 	cvs_state::machine_reset();
 
@@ -298,55 +298,60 @@ void quasar_state::machine_reset()
 	m_io_page = 8;
 }
 
-void quasar_state::quasar(machine_config &config)
-{
+MACHINE_CONFIG_START(quasar_state::quasar)
+
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 14318000/4);  /* 14 mhz crystal divide by 4 on board */
-	m_maincpu->set_addrmap(AS_PROGRAM, &quasar_state::quasar_program);
-	m_maincpu->set_addrmap(AS_IO, &quasar_state::quasar_io);
-	m_maincpu->set_addrmap(AS_DATA, &quasar_state::quasar_data);
-	m_maincpu->set_vblank_int("screen", FUNC(quasar_state::quasar_interrupt));
-	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
+	MCFG_DEVICE_ADD("maincpu", S2650, 14318000/4)  /* 14 mhz crystal divide by 4 on board */
+	MCFG_DEVICE_PROGRAM_MAP(quasar)
+	MCFG_DEVICE_IO_MAP(quasar_io)
+	MCFG_DEVICE_DATA_MAP(quasar_data)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", quasar_state,  quasar_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 
-	i8035_device &soundcpu(I8035(config, "soundcpu", 6000000)); /* 6MHz crystal divide by 15 in CPU */
-	soundcpu.set_addrmap(AS_PROGRAM, &quasar_state::sound_map);
-	soundcpu.set_addrmap(AS_IO, &quasar_state::sound_portmap);
-	soundcpu.t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
-	soundcpu.p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
+	MCFG_DEVICE_ADD("soundcpu",I8035,6000000)          /* 6MHz crystal divide by 15 in CPU */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, quasar_state, audio_t1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	MCFG_MACHINE_START_OVERRIDE(quasar_state,quasar)
+	MCFG_MACHINE_RESET_OVERRIDE(quasar_state,quasar)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(50); /* From dot clock */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(1*8+1, 29*8-1, 2*8, 32*8-1);
-	m_screen->set_screen_update(FUNC(quasar_state::screen_update_quasar));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)                            /* From dot clock */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(quasar_state, screen_update_quasar)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quasar);
-	PALETTE(config, m_palette, FUNC(quasar_state::quasar_palette), (64 + 1) * 8 + (4 * 256), 0x500);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quasar)
+	MCFG_PALETTE_ADD("palette", (64+1)*8+(4*256))
+	MCFG_PALETTE_INDIRECT_ENTRIES(0x500)
+	MCFG_PALETTE_INIT_OWNER(quasar_state,quasar)
 
-	S2636(config, m_s2636[0], 0);
-	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	MCFG_DEVICE_ADD("s2636_0", S2636, 0)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9)
 
-	S2636(config, m_s2636[1], 0);
-	m_s2636[1]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	MCFG_DEVICE_ADD("s2636_1", S2636, 0)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9)
 
-	S2636(config, m_s2636[2], 0);
-	m_s2636[2]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);
+	MCFG_DEVICE_ADD("s2636_2", S2636, 0)
+	MCFG_S2636_OFFSETS(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9)
+
+	MCFG_VIDEO_START_OVERRIDE(quasar_state,quasar)
 
 	/* sound hardware */
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
 
 ROM_START( quasar )
 	ROM_REGION( 0x8000, "maincpu", 0 )

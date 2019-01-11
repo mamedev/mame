@@ -13,7 +13,6 @@
 #include "audit.h"
 #include "chd.h"
 #include "drivenum.h"
-#include "romload.h"
 #include "sound/samples.h"
 #include "softlist_dev.h"
 

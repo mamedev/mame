@@ -40,65 +40,76 @@
 
 ***************************************************************************/
 
-rgb_t lasso_state::get_color(int data)
+rgb_t lasso_state::get_color( int data )
 {
 	int bit0, bit1, bit2;
+	int r, g, b;
 
-	// red component
-	bit0 = BIT(data, 0);
-	bit1 = BIT(data, 1);
-	bit2 = BIT(data, 2);
-	int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	/* red component */
+	bit0 = (data >> 0) & 0x01;
+	bit1 = (data >> 1) & 0x01;
+	bit2 = (data >> 2) & 0x01;
+	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	// green component
-	bit0 = BIT(data, 3);
-	bit1 = BIT(data, 4);
-	bit2 = BIT(data, 5);
-	int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	/* green component */
+	bit0 = (data >> 3) & 0x01;
+	bit1 = (data >> 4) & 0x01;
+	bit2 = (data >> 5) & 0x01;
+	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	// blue component
-	bit0 = BIT(data, 6);
-	bit1 = BIT(data, 7);
-	int const b = 0x4f * bit0 + 0xa8 * bit1;
+	/* blue component */
+	bit0 = (data >> 6) & 0x01;
+	bit1 = (data >> 7) & 0x01;
+	b = 0x4f * bit0 + 0xa8 * bit1;
 
 	return rgb_t(r, g, b);
 }
 
 
-void lasso_state::lasso_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(lasso_state, lasso)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 0x40; i++)
+	for (i = 0; i < 0x40; i++)
 		palette.set_pen_color(i, get_color(color_prom[i]));
 }
 
 
-void lasso_state::wwjgtin_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 0x40; i++)
+	for (i = 0; i < 0x40; i++)
 		palette.set_indirect_color(i, get_color(color_prom[i]));
 
-	// characters/sprites
-	for (int i = 0; i < 0x40; i++)
+	/* characters/sprites */
+	for (i = 0; i < 0x40; i++)
 		palette.set_pen_indirect(i, i);
 
-	// track
-	for (int i = 0; i < 0x100; i++)
+	/* track */
+	for (i = 0x40; i < 0x140; i++)
 	{
-		uint8_t const ctabentry = (i & 0x03) ? ((((i & 0xf0) >> 2) + (i & 0x03)) & 0x3f) : 0;
+		uint8_t ctabentry;
+		int raw_pen = i - 0x40;
 
-		palette.set_pen_indirect(i + 0x40, ctabentry);
+		if (raw_pen & 0x03)
+			ctabentry = (((raw_pen & 0xf0) >> 2) + (raw_pen & 0x03)) & 0x3f;
+		else
+			ctabentry = 0;
+
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
 
 void lasso_state::wwjgtin_set_last_four_colors()
 {
-	// the last palette entries can be changed
-	for (int i = 0; i < 3; i++)
+	int i;
+
+	/* the last palette entries can be changed */
+	for(i = 0; i < 3; i++)
 		m_palette->set_indirect_color(0x3d + i, get_color(m_last_colors[i]));
 }
 

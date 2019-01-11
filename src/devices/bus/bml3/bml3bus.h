@@ -24,13 +24,13 @@
 	downcast<bml3bus_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_BML3BUS_OUT_NMI_CB(_devcb) \
-	downcast<bml3bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
+	devcb = &downcast<bml3bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_OUT_IRQ_CB(_devcb) \
-	downcast<bml3bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	devcb = &downcast<bml3bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_OUT_FIRQ_CB(_devcb) \
-	downcast<bml3bus_device &>(*device).set_out_firq_callback(DEVCB_##_devcb);
+	devcb = &downcast<bml3bus_device &>(*device).set_out_firq_callback(DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, BML3BUS_SLOT, 0) \

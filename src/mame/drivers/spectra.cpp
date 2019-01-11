@@ -57,17 +57,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void spectra(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
+	void spectra(machine_config &config);
 	void spectra_map(address_map &map);
-
+private:
 	uint8_t m_porta;
 	uint8_t m_portb;
 	uint8_t m_t_c;
@@ -229,46 +227,45 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 }
 
 
-void spectra_state::spectra(machine_config &config)
-{
+MACHINE_CONFIG_START(spectra_state::spectra)
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(3'579'545)/4);  // actually a M6503
-	m_maincpu->set_addrmap(AS_PROGRAM, &spectra_state::spectra_map);
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)  // actually a M6503
+	MCFG_DEVICE_PROGRAM_MAP(spectra_map)
 
-	riot6532_device &riot(RIOT6532(config, "riot", XTAL(3'579'545)/4));
-	riot.in_pa_callback().set(FUNC(spectra_state::porta_r));
-	riot.out_pa_callback().set(FUNC(spectra_state::porta_w));
-	riot.in_pb_callback().set(FUNC(spectra_state::portb_r));
-	riot.out_pb_callback().set(FUNC(spectra_state::portb_w));
-	riot.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
+	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL(3'579'545)/4)
+	MCFG_RIOT6532_IN_PA_CB(READ8(*this, spectra_state, porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8(*this, spectra_state, porta_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8(*this, spectra_state, portb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, spectra_state, portb_w))
+	MCFG_RIOT6532_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	TIMER(config, "nmitimer").configure_periodic(FUNC(spectra_state::nmitimer), attotime::from_hz(120));
-	TIMER(config, "outtimer").configure_periodic(FUNC(spectra_state::outtimer), attotime::from_hz(1200));
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", spectra_state, nmitimer, attotime::from_hz(120))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("outtimer", spectra_state, outtimer, attotime::from_hz(1200))
 
 	/* Video */
-	config.set_default_layout(layout_spectra);
+	MCFG_DEFAULT_LAYOUT(layout_spectra)
 
 	/* Sound */
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	SN76477(config, m_snsnd);
-	m_snsnd->set_noise_params(RES_M(1000), RES_M(1000), CAP_N(0));
-	m_snsnd->set_decay_res(RES_K(470));
-	m_snsnd->set_attack_params(CAP_N(1), RES_K(22));
-	m_snsnd->set_amp_res(RES_K(100));
-	m_snsnd->set_feedback_res(RES_K(52));
-	m_snsnd->set_vco_params(5.0, CAP_U(0.01), RES_K(390));
-	m_snsnd->set_pitch_voltage(0.0);
-	m_snsnd->set_slf_params(CAP_U(0.1), RES_M(1));
-	m_snsnd->set_oneshot_params(CAP_U(0.47), RES_K(470));
-	m_snsnd->set_vco_mode(0);
-	m_snsnd->set_mixer_params(0, 0, 0);
-	m_snsnd->set_envelope_params(0, 0);
-	m_snsnd->set_enable(1);
-	m_snsnd->add_route(ALL_OUTPUTS, "mono", 0.30);
+	MCFG_DEVICE_ADD("snsnd", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(RES_M(1000), RES_M(1000), CAP_N(0)) // noise + filter
+	MCFG_SN76477_DECAY_RES(RES_K(470))                    // decay_res
+	MCFG_SN76477_ATTACK_PARAMS(CAP_N(1), RES_K(22))       // attack_decay_cap + attack_res
+	MCFG_SN76477_AMP_RES(RES_K(100))                      // amplitude_res
+	MCFG_SN76477_FEEDBACK_RES(RES_K(52))                  // feedback_res
+	MCFG_SN76477_VCO_PARAMS(5.0, CAP_U(0.01), RES_K(390)) // VCO volt + cap + res
+	MCFG_SN76477_PITCH_VOLTAGE(0.0)                       // pitch_voltage
+	MCFG_SN76477_SLF_PARAMS(CAP_U(0.1), RES_M(1))         // slf caps + res
+	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.47), RES_K(470))  // oneshot caps + res
+	MCFG_SN76477_VCO_MODE(0)                              // VCO mode
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                    // mixer A, B, C
+	MCFG_SN76477_ENVELOPE_PARAMS(0, 0)                    // envelope 1, 2
+	MCFG_SN76477_ENABLE(1)                                // enable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /*--------------------------------

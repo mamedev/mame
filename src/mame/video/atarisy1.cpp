@@ -291,7 +291,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_yscroll_w )
 	/* because this latches a new value into the scroll base,
 	   we need to adjust for the scanline */
 	adjusted_scroll = newscroll;
-	if (scanline <= m_screen->visible_area().bottom())
+	if (scanline <= m_screen->visible_area().max_y)
 		adjusted_scroll -= (scanline + 1);
 	m_playfield_tilemap->set_scrolly(0, adjusted_scroll);
 
@@ -365,7 +365,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
 	int scanline = param;
 
 	/* update the state */
-	scanline_int_write_line(1);
+	scanline_int_gen(*m_maincpu);
 
 	/* set a timer to turn it off */
 	m_int3off_timer->adjust(m_screen->scan_period());
@@ -472,11 +472,11 @@ uint32_t atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_in
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
+		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
+			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{
 					/* high priority MO? */

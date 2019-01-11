@@ -101,7 +101,6 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -109,16 +108,12 @@
 class vpoker_state : public driver_device
 {
 public:
-	vpoker_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	vpoker_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette")  { }
 
-	void vpoker(machine_config &config);
-
-private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_blit_ram[8];
 	DECLARE_READ8_MEMBER(blitter_r);
@@ -129,6 +124,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void vpoker(machine_config &config);
 	void main_map(address_map &map);
 };
 
@@ -191,7 +187,7 @@ void vpoker_state::main_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x01ff).ram();     /* vpoker has 0x100, 5acespkr has 0x200 */
 	map(0x0400, 0x0407).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	map(0x0800, 0x0807).r(FUNC(vpoker_state::blitter_r)).w(FUNC(vpoker_state::blitter_w));
+	map(0x0800, 0x0807).r(this, FUNC(vpoker_state::blitter_r)).w(this, FUNC(vpoker_state::blitter_w));
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -637,7 +633,7 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 MACHINE_CONFIG_START(vpoker_state::vpoker)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("maincpu",M6809,XTAL(4'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
 
@@ -649,20 +645,21 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vpoker)
 
-	PALETTE(config, m_palette, palette_device::GBR_3BIT);
+	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
 	/* 6840 PTM */
-	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(4'000'000) / 4));
-	ptm.set_external_clocks(0, 0, 0);
-	ptm.irq_callback().set(FUNC(vpoker_state::ptm_irq));
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(4'000'000))
+	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, vpoker_state, ptm_irq))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  AY8910(config, "aysnd", 8000000/4 /* guess */).add_route(ALL_OUTPUTS, "mono", 0.30);
+//  MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4 /* guess */)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /***************************************************************************

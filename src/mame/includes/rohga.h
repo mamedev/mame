@@ -14,7 +14,6 @@
 #include "video/decospr.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
-#include "emupal.h"
 
 class rohga_state : public driver_device
 {
@@ -33,19 +32,6 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void wizdfire(machine_config &config);
-	void nitrobal(machine_config &config);
-	void hangzo(machine_config &config);
-	void schmeisr(machine_config &config);
-	void rohga(machine_config &config);
-
-	void init_wizdfire();
-	void init_nitrobal();
-	void init_schmeisr();
-	void init_hangzo();
-	void init_rohga();
-
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
@@ -66,7 +52,11 @@ private:
 	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-
+	void init_wizdfire();
+	void init_nitrobal();
+	void init_schmeisr();
+	void init_hangzo();
+	void init_rohga();
 	DECLARE_VIDEO_START(wizdfire);
 	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -80,6 +70,11 @@ private:
 
 	READ16_MEMBER( ioprot_r );
 	WRITE16_MEMBER( ioprot_w );
+	void wizdfire(machine_config &config);
+	void nitrobal(machine_config &config);
+	void hangzo(machine_config &config);
+	void schmeisr(machine_config &config);
+	void rohga(machine_config &config);
 	void hangzo_map(address_map &map);
 	void hotb_base_map(address_map &map);
 	void nitrobal_map(address_map &map);

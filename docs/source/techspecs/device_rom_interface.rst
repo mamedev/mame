@@ -46,7 +46,7 @@ present in the machine config.
 | void **set_rom_addr_width**\ (u8 width)
 
 These methods, intended for generic devices with indefinite hardware
-specifications, override the endianness, data bus width and address
+specifications, override the endianness, data bus width and address 
 bus width assigned through the constructor. They must be called from
 within the device before **config_complete** time.
 

@@ -10,7 +10,6 @@
 #define MAME_BUS_ELECTRON_CART_PEG400_H
 
 #include "slot.h"
-#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"
 

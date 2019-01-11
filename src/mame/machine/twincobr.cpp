@@ -55,14 +55,13 @@ READ16_MEMBER(twincobr_state::twincobr_dsp_r)
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
 	uint16_t input_data = 0;
-	switch (m_main_ram_seg)
-	{
-	case 0x30000:
-	case 0x40000:
-	case 0x50000:  {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
-					input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
-					break;}
-	default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
+	switch (m_main_ram_seg) {
+		case 0x30000:
+		case 0x40000:
+		case 0x50000:  {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
+						break;}
+		default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
 	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",m_dsp->pcbase(),input_data,m_main_ram_seg + m_dsp_addr_w));
 	return input_data;
@@ -72,14 +71,13 @@ WRITE16_MEMBER(twincobr_state::twincobr_dsp_w)
 {
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
-	switch (m_main_ram_seg)
-	{
-	case 0x30000:   if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
-	case 0x40000:
-	case 0x50000:  {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
-					mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
-					break;}
-	default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
+	switch (m_main_ram_seg) {
+		case 0x30000:   if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+		case 0x40000:
+		case 0x50000:  {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+						mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
+						break;}
+		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
 	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
 }
@@ -104,15 +102,14 @@ READ16_MEMBER(twincobr_state::wardner_dsp_r)
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
 	uint16_t input_data = 0;
-	switch (m_main_ram_seg)
-	{
-	case 0x7000:
-	case 0x8000:
-	case 0xa000:   {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
-					input_data =  mainspace.read_byte(m_main_ram_seg + (m_dsp_addr_w + 0))
-								| (mainspace.read_byte(m_main_ram_seg + (m_dsp_addr_w + 1)) << 8);
-					break;}
-	default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
+	switch (m_main_ram_seg) {
+		case 0x7000:
+		case 0x8000:
+		case 0xa000:   {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+						input_data =  mainspace.read_byte(m_main_ram_seg + (m_dsp_addr_w + 0))
+									| (mainspace.read_byte(m_main_ram_seg + (m_dsp_addr_w + 1)) << 8);
+						break;}
+		default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
 	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",m_dsp->pcbase(),input_data,m_main_ram_seg + m_dsp_addr_w));
 	return input_data;
@@ -122,15 +119,14 @@ WRITE16_MEMBER(twincobr_state::wardner_dsp_w)
 {
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
-	switch (m_main_ram_seg)
-	{
-	case 0x7000:    if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
-	case 0x8000:
-	case 0xa000:   {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
-					mainspace.write_byte(m_main_ram_seg + (m_dsp_addr_w + 0), (data & 0xff));
-					mainspace.write_byte(m_main_ram_seg + (m_dsp_addr_w + 1), ((data >> 8) & 0xff));
-					break;}
-	default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
+	switch (m_main_ram_seg) {
+		case 0x7000:    if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
+		case 0x8000:
+		case 0xa000:   {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+						mainspace.write_byte(m_main_ram_seg + (m_dsp_addr_w + 0), (data & 0xff));
+						mainspace.write_byte(m_main_ram_seg + (m_dsp_addr_w + 1), ((data >> 8) & 0xff));
+						break;}
+		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",m_dsp->pcbase(),m_main_ram_seg + m_dsp_addr_w); break;
 	}
 	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",m_dsp->pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
 }
@@ -143,19 +139,16 @@ WRITE16_MEMBER(twincobr_state::twincobr_dsp_bio_w)
 	/* data 0x0000  means set DSP BIO line active and disable */
 	/*              communication to main processor*/
 	LOG(("DSP PC:%04x IO write %04x at port 3\n",m_dsp->pcbase(),data));
-	if (data & 0x8000)
-	{
-		m_dsp_bio = CLEAR_LINE;
+	if (data & 0x8000) {
+		m_dsp_BIO = CLEAR_LINE;
 	}
-	if (data == 0)
-	{
-		if (m_dsp_execute)
-		{
+	if (data == 0) {
+		if (m_dsp_execute) {
 			LOG(("Turning the main CPU on\n"));
 			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_dsp_execute = 0;
 		}
-		m_dsp_bio = ASSERT_LINE;
+		m_dsp_BIO = ASSERT_LINE;
 	}
 }
 
@@ -178,9 +171,9 @@ WRITE16_MEMBER(twincobr_state::fsharkbt_dsp_w)
 #endif
 }
 
-READ_LINE_MEMBER(twincobr_state::twincobr_bio_r)
+READ_LINE_MEMBER(twincobr_state::twincobr_BIO_r)
 {
-	return m_dsp_bio;
+	return m_dsp_BIO;
 }
 
 
@@ -255,7 +248,7 @@ MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 	m_dsp_addr_w = 0;
 	m_main_ram_seg = 0;
 	m_dsp_execute = 0;
-	m_dsp_bio = CLEAR_LINE;
+	m_dsp_BIO = CLEAR_LINE;
 	m_fsharkbt_8741 = -1;
 }
 
@@ -265,7 +258,7 @@ void twincobr_state::twincobr_driver_savestate()
 	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));
 	save_item(NAME(m_main_ram_seg));
-	save_item(NAME(m_dsp_bio));
+	save_item(NAME(m_dsp_BIO));
 	save_item(NAME(m_dsp_execute));
 	save_item(NAME(m_fsharkbt_8741));
 

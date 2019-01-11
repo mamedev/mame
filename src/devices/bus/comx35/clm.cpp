@@ -72,17 +72,16 @@ DEFINE_DEVICE_TYPE(COMX_CLM, comx_clm_device, "comx_clm", "COMX 80 Column Card")
 //-------------------------------------------------
 
 ROM_START( comx_clm )
+	ROM_REGION( 0x2000, "c000", 0 )
 	ROM_DEFAULT_BIOS( "v11" )
 	ROM_SYSTEM_BIOS( 0, "v10", "v1.0" )
+	ROMX_LOAD( "p 1.0.cl1", 0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v11", "v1.1" )
-
-	ROM_REGION( 0x2000, "c000", 0 )
-	ROMX_LOAD( "p 1.0.cl1", 0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738), ROM_BIOS(0) )
-	ROMX_LOAD( "p 1.1.cl1", 0x0000, 0x0800, CRC(0a2eaf19) SHA1(3f1f640caef964fb47aaa147cab6d215c2b30e9d), ROM_BIOS(1) )
+	ROMX_LOAD( "p 1.1.cl1", 0x0000, 0x0800, CRC(0a2eaf19) SHA1(3f1f640caef964fb47aaa147cab6d215c2b30e9d), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
-	ROMX_LOAD( "c 1.0.cl4", 0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26), ROM_BIOS(0) )
-	ROMX_LOAD( "c 1.1.cl4", 0x0000, 0x0800, CRC(dc9b5046) SHA1(4e041cec03dda6dba5e2598d060c49908a4fab2a), ROM_BIOS(1) )
+	ROMX_LOAD( "c 1.0.cl4", 0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26), ROM_BIOS(1) )
+	ROMX_LOAD( "c 1.1.cl4", 0x0000, 0x0800, CRC(dc9b5046) SHA1(4e041cec03dda6dba5e2598d060c49908a4fab2a), ROM_BIOS(2) )
 ROM_END
 
 
@@ -146,13 +145,12 @@ MACHINE_CONFIG_START(comx_clm_device::device_add_mconfig)
 	MCFG_SCREEN_REFRESH_RATE(50)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_comx_clm)
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MC6845(config, m_crtc, XTAL(14'318'181)/7);
-	m_crtc->set_screen(MC6845_SCREEN_TAG);
-	m_crtc->set_show_border_area(true);
-	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(comx_clm_device::crtc_update_row), this);
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL(14'318'181)/7)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(comx_clm_device, crtc_update_row)
 MACHINE_CONFIG_END
 
 

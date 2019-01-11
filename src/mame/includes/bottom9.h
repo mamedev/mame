@@ -5,23 +5,17 @@
     Bottom of the Ninth
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BOTTOM9_H
-#define MAME_INCLUDES_BOTTOM9_H
-
-#pragma once
-
 #include "sound/k007232.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
 #include "video/k051316.h"
 #include "video/konami_helper.h"
-#include "emupal.h"
 
 class bottom9_state : public driver_device
 {
 public:
-	bottom9_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	bottom9_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007232_1(*this, "k007232_1"),
@@ -29,8 +23,7 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_k051316(*this, "k051316"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
 	/* misc */
 	int        m_video_enable;
@@ -72,5 +65,3 @@ public:
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_BOTTOM9_H

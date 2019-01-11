@@ -15,7 +15,6 @@
 
 #include "exp.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 
 
 

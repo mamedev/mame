@@ -381,10 +381,10 @@ MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(killbld_mem)
 
-	IGS025(config, m_igs025, 0);
-	m_igs025->set_external_cb(FUNC(pgm_022_025_state::igs025_to_igs022_callback), this);
+	MCFG_DEVICE_ADD("igs025", IGS025, 0)
+	MCFG_IGS025_SET_EXTERNAL_EXECUTE( pgm_022_025_state, igs025_to_igs022_callback )
 
-	IGS022(config, m_igs022, 0);
+	MCFG_DEVICE_ADD("igs022", IGS022, 0)
 
 MACHINE_CONFIG_END
 

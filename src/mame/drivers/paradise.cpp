@@ -132,9 +132,9 @@ void paradise_state::base_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* ROM */
 	map(0x8000, 0xbfff).bankr("prgbank");    /* ROM (banked) */
-	map(0xc000, 0xc7ff).ram().w(FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
-	map(0xc800, 0xcfff).ram().w(FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
-	map(0xd000, 0xd7ff).ram().w(FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
+	map(0xc800, 0xcfff).ram().w(this, FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
 }
 
 void paradise_state::paradise_map(address_map &map)
@@ -162,24 +162,24 @@ void paradise_state::torus_map(address_map &map)
 
 void paradise_state::torus_io_map(address_map &map)
 {
-	map(0x0000, 0x17ff).ram().w(FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
-	map(0x1800, 0x1800).w(FUNC(paradise_state::priority_w));  // Layers priority
-	map(0x2001, 0x2001).w(FUNC(paradise_state::flipscreen_w));    // Flip Screen
-	map(0x2004, 0x2004).w(FUNC(paradise_state::palbank_w));   // Layers palette bank
-	map(0x2006, 0x2006).w(FUNC(paradise_state::rombank_w));   // ROM bank
+	map(0x0000, 0x17ff).ram().w(this, FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
+	map(0x1800, 0x1800).w(this, FUNC(paradise_state::priority_w));  // Layers priority
+	map(0x2001, 0x2001).w(this, FUNC(paradise_state::flipscreen_w));    // Flip Screen
+	map(0x2004, 0x2004).w(this, FUNC(paradise_state::palbank_w));   // Layers palette bank
+	map(0x2006, 0x2006).w(this, FUNC(paradise_state::rombank_w));   // ROM bank
 	map(0x2010, 0x2010).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 0
 	map(0x2020, 0x2020).portr("DSW1");
 	map(0x2021, 0x2021).portr("DSW2");
 	map(0x2022, 0x2022).portr("P1");
 	map(0x2023, 0x2023).portr("P2");
 	map(0x2024, 0x2024).portr("SYSTEM");
-	map(0x8000, 0xffff).ram().w(FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
+	map(0x8000, 0xffff).ram().w(this, FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
 }
 
 void paradise_state::paradise_io_map(address_map &map)
 {
 	torus_io_map(map);
-	map(0x2007, 0x2007).w(FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
+	map(0x2007, 0x2007).w(this, FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
 	map(0x2030, 0x2030).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 1
 }
 
@@ -549,51 +549,51 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( madball )
 	PORT_START("DSW1")  /* port $2020 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:6") /* Spinner controls currently NOT hooked up */
-	PORT_DIPSETTING(    0x20, "Spinner" )
+	PORT_DIPNAME( 0x20, 0x00, "Control?" )
+	PORT_DIPSETTING(    0x20, "Disable / Spinner?" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Slide Show" ) PORT_DIPLOCATION("SW1:8") /* Use P1 button to advance */
+	PORT_DIPNAME( 0x80, 0x80, "Slide Show" ) /* Use P1 button to advance */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  /* port $2021 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -741,16 +741,16 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(54) /* 54 verified */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* we're using PORT_VBLANK */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
 	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_paradise)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_paradise);
-	PALETTE(config, m_palette).set_entries(0x800 + 16);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_paradise)
+	MCFG_PALETTE_ADD("palette", 0x800 + 16)
 
 
 	/* sound hardware */
@@ -779,20 +779,21 @@ MACHINE_CONFIG_START(paradise_state::torus)
 	MCFG_DEVICE_PROGRAM_MAP(torus_map)
 	MCFG_DEVICE_IO_MAP(torus_io_map)
 
-	m_gfxdecode->set_info(gfx_torus);
-	m_screen->set_screen_update(FUNC(paradise_state::screen_update_torus));
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_torus)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_torus)
 
-	config.device_remove("oki2");
+	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
 
-void paradise_state::madball(machine_config &config)
-{
+MACHINE_CONFIG_START(paradise_state::madball)
 	torus(config);
 
-	m_gfxdecode->set_info(gfx_madball);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_madball)
 
-	m_screen->set_screen_update(FUNC(paradise_state::screen_update_madball));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(paradise_state::penky)
 	paradise(config);
@@ -804,14 +805,13 @@ MACHINE_CONFIG_START(paradise_state::penky)
 MACHINE_CONFIG_END
 
 
-void paradise_state::penkyi(machine_config &config)
-{
+MACHINE_CONFIG_START(paradise_state::penkyi)
 	penky(config);
 
 	// TODO add ticket dispenser
 
-	config.device_remove("oki2");
-}
+	MCFG_DEVICE_REMOVE("oki2")
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -1327,6 +1327,7 @@ RAM 4 Hyundai HY62256ALP-70
     6 UMC UM6116K-3
 DSW 2 8-switch DIP
 
+
 P.u1  Intel i27C010A - Program (next to Z80A)
 s.u28 ST M27C4001    - Sound (next to AD-65)
 
@@ -1338,20 +1339,6 @@ s.u28 ST M27C4001    - Sound (next to AD-65)
 6.u106 TI 27C040
 
 All roms read with manufacturer's IDs and routines
-
-NOTE: A version of Mad Ball has been seen with a YS-1302 daughtercard that plugs in through the Z80 processor:
-
-YS-1302 Spinner Daughtercard
-+--------------------------+
-|   [Connector to Main]    |
-| CN1 R   Z8400B           |
-| CN2 S   GAL16V8  74LS669 |
-| CD4584  74LS374  74LS669 |
-| 74LS669 74LS374  74LS669 |
-+--------------------------+
-
-CN1 & CN2 are 4 pin headers for spinner controls
-RS is a 4.7K 5 pin resistor pack
 
 */
 

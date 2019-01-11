@@ -10,6 +10,12 @@
 #include "lpc-rtc.h"
 #include "lpc-pit.h"
 
+#define MCFG_I6300ESB_LPC_ADD(_tag) \
+	MCFG_PCI_DEVICE_ADD(_tag, I6300ESB_LPC, 0x808625a1, 0x02, 0x060100, 0x00000000)
+
+#define MCFG_I6300ESB_WATCHDOG_ADD(_tag, _subdevice_id) \
+	MCFG_PCI_DEVICE_ADD(_tag, I6300ESB_WATCHDOG, 0x808625ab, 0x02, 0x088000, _subdevice_id)
+
 class i6300esb_lpc_device : public pci_device {
 public:
 	i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -19,6 +25,7 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual void config_map(address_map &map) override;
+
 
 protected:
 	virtual void device_start() override;
@@ -138,11 +145,6 @@ private:
 
 class i6300esb_watchdog_device : public pci_device {
 public:
-	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
-		: i6300esb_watchdog_device(mconfig, tag, owner, clock)
-	{
-		set_ids(0x808625ab, 0x02, 0x088000, subdevice_id);
-	}
 	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

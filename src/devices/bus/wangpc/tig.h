@@ -13,7 +13,6 @@
 
 #include "wangpc.h"
 #include "video/upd7220.h"
-#include "emupal.h"
 
 
 

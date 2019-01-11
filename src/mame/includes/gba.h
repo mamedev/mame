@@ -28,11 +28,6 @@ public:
 		m_bios_hack(*this, "SKIP_CHECK")
 	{ }
 
-	void gbadv(machine_config &config);
-
-	void init_gbadv();
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_ldaca;
 	required_device<dac_byte_interface> m_rdaca;
@@ -72,6 +67,7 @@ private:
 	DECLARE_WRITE32_MEMBER(gba_io_w);
 	DECLARE_READ32_MEMBER(gba_bios_r);
 	DECLARE_READ32_MEMBER(gba_10000000_r);
+	void init_gbadv();
 	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);
@@ -83,8 +79,9 @@ private:
 	TIMER_CALLBACK_MEMBER(timer_expire);
 	TIMER_CALLBACK_MEMBER(handle_irq);
 
+	void gbadv(machine_config &config);
 	void gba_map(address_map &map);
-
+protected:
 	required_region_ptr<uint32_t> m_region_maincpu;
 	required_ioport m_io_inputs;
 	required_ioport m_bios_hack;

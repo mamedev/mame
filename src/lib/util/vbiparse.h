@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_VBIPARSE_H
-#define MAME_UTIL_VBIPARSE_H
-
 #pragma once
+
+#ifndef __VBIPARSE_H__
+#define __VBIPARSE_H__
 
 #include "osdcomm.h"
 
@@ -90,4 +90,4 @@ void vbi_metadata_pack(uint8_t *dest, uint32_t framenum, const vbi_metadata *vbi
 void vbi_metadata_unpack(vbi_metadata *vbi, uint32_t *framenum, const uint8_t *source);
 
 
-#endif // MAME_UTIL_VBIPARSE_H
+#endif /* __VBIPARSE_H__ */

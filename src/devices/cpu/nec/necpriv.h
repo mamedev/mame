@@ -52,10 +52,10 @@ enum BREGS {
 
 /************************************************************************/
 
-#define read_mem_byte(a)            m_program->read_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
-#define read_mem_word(a)            m_program->read_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
-#define write_mem_byte(a,d)         m_program->write_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
-#define write_mem_word(a,d)         m_program->write_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
+#define read_mem_byte(a)            m_program->read_byte(a)
+#define read_mem_word(a)            m_program->read_word_unaligned(a)
+#define write_mem_byte(a,d)         m_program->write_byte((a),(d))
+#define write_mem_word(a,d)         m_program->write_word_unaligned((a),(d))
 
 #define read_port_byte(a)       m_io->read_byte(a)
 #define read_port_word(a)       m_io->read_word_unaligned(a)
@@ -83,8 +83,6 @@ enum BREGS {
 
 #define PUSH(val) { Wreg(SP) -= 2; write_mem_word(((Sreg(SS)<<4)+Wreg(SP)), val); }
 #define POP(var) { Wreg(SP) += 2; var = read_mem_word(((Sreg(SS)<<4) + ((Wreg(SP)-2) & 0xffff))); }
-
-#define BRKXA(xa) { if (m_chip_type == V33_TYPE) { nec_brk(fetch()); m_xa = xa; } else logerror("%06x: %sXA instruction is V33 exclusive\n", PC(), xa ? "BRK" : "RET"); }
 
 #define GetModRM uint32_t ModRM=fetch()
 

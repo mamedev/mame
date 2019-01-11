@@ -11,15 +11,15 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - gcc-5
-    - g++-5
+    - gcc-4.8
+    - g++-4.8
     - clang
 
 before_script:
   git clone https://github.com/bkaradzic/bx ../bx
 
 script:
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make build CXX="g++-5" CC="gcc-5"; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make build CXX="g++-4.8" CC="gcc-4.8"; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make build; fi
 
 branches:
@@ -29,4 +29,4 @@ branches:
 notifications:
   email: false
 
-osx_image: xcode9.3
+osx_image: xcode7.3

@@ -13,7 +13,6 @@
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
 #include "video/atarivad.h"
-#include "emupal.h"
 #include "screen.h"
 
 class batman_state : public driver_device

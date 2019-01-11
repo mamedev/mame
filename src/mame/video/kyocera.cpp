@@ -3,16 +3,17 @@
 #include "emu.h"
 #include "includes/kyocera.h"
 
+#include "rendlay.h"
 #include "screen.h"
 
 
-void kc85_state::kc85_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(kc85_state,kc85)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-void tandy200_state::tandy200_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(tandy200_state,tandy200)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -20,8 +21,16 @@ void tandy200_state::tandy200_palette(palette_device &palette) const
 
 uint32_t kc85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (uint8_t i = 0; i < 10; i++)
-		m_lcdc[i]->screen_update(screen, bitmap, cliprect);
+	m_lcdc0->screen_update(screen, bitmap, cliprect);
+	m_lcdc1->screen_update(screen, bitmap, cliprect);
+	m_lcdc2->screen_update(screen, bitmap, cliprect);
+	m_lcdc3->screen_update(screen, bitmap, cliprect);
+	m_lcdc4->screen_update(screen, bitmap, cliprect);
+	m_lcdc5->screen_update(screen, bitmap, cliprect);
+	m_lcdc6->screen_update(screen, bitmap, cliprect);
+	m_lcdc7->screen_update(screen, bitmap, cliprect);
+	m_lcdc8->screen_update(screen, bitmap, cliprect);
+	m_lcdc9->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -47,18 +56,21 @@ MACHINE_CONFIG_START(kc85_state::kc85_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(kc85_state::kc85_palette), 2);
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	HD44102(config, m_lcdc[0], 0, SCREEN_TAG,   0,  0);
-	HD44102(config, m_lcdc[1], 0, SCREEN_TAG,  50,  0);
-	HD44102(config, m_lcdc[2], 0, SCREEN_TAG, 100,  0);
-	HD44102(config, m_lcdc[3], 0, SCREEN_TAG, 150,  0);
-	HD44102(config, m_lcdc[4], 0, SCREEN_TAG, 200,  0);
-	HD44102(config, m_lcdc[5], 0, SCREEN_TAG,   0, 32);
-	HD44102(config, m_lcdc[6], 0, SCREEN_TAG,  50, 32);
-	HD44102(config, m_lcdc[7], 0, SCREEN_TAG, 100, 32);
-	HD44102(config, m_lcdc[8], 0, SCREEN_TAG, 150, 32);
-	HD44102(config, m_lcdc[9], 0, SCREEN_TAG, 200, 32);
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(kc85_state,kc85)
+
+	MCFG_HD44102_ADD(HD44102_0_TAG, SCREEN_TAG,   0,  0)
+	MCFG_HD44102_ADD(HD44102_1_TAG, SCREEN_TAG,  50,  0)
+	MCFG_HD44102_ADD(HD44102_2_TAG, SCREEN_TAG, 100,  0)
+	MCFG_HD44102_ADD(HD44102_3_TAG, SCREEN_TAG, 150,  0)
+	MCFG_HD44102_ADD(HD44102_4_TAG, SCREEN_TAG, 200,  0)
+	MCFG_HD44102_ADD(HD44102_5_TAG, SCREEN_TAG,   0, 32)
+	MCFG_HD44102_ADD(HD44102_6_TAG, SCREEN_TAG,  50, 32)
+	MCFG_HD44102_ADD(HD44102_7_TAG, SCREEN_TAG, 100, 32)
+	MCFG_HD44102_ADD(HD44102_8_TAG, SCREEN_TAG, 150, 32)
+	MCFG_HD44102_ADD(HD44102_9_TAG, SCREEN_TAG, 200, 32)
 
 //  MCFG_HD44103_MASTER_ADD("m11", SCREEN_TAG, CAP_P(18), RES_K(100), HD44103_FS_HIGH, HD44103_DUTY_1_32)
 //  MCFG_HD44103_SLAVE_ADD( "m12", "m11", SCREEN_TAG, HD44103_FS_HIGH, HD44103_DUTY_1_32)
@@ -72,9 +84,12 @@ MACHINE_CONFIG_START(tandy200_state::tandy200_video)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(tandy200_state::tandy200_palette), 2);
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	HD61830(config, m_lcdc, XTAL(4'915'200)/2/2);
-	m_lcdc->set_addrmap(0, &tandy200_state::tandy200_lcdc);
-	m_lcdc->set_screen(SCREEN_TAG);
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(tandy200_state,tandy200)
+
+	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
+	MCFG_DEVICE_ADDRESS_MAP(0, tandy200_lcdc)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 MACHINE_CONFIG_END

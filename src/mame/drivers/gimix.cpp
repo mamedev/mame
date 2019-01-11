@@ -23,7 +23,6 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "imagedev/floppy.h"
 #include "machine/mm58167.h"
 #include "machine/6840ptm.h"
 #include "machine/6821pia.h"
@@ -31,6 +30,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "machine/wd_fdc.h"
+#include "machine/terminal.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -76,18 +76,28 @@ public:
 		, m_acia2(*this, "acia2")
 		, m_acia3(*this, "acia3")
 		, m_acia4(*this, "acia4")
-		, m_bank(*this, "bank%u", 1U)
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_bank7(*this, "bank7")
+		, m_bank8(*this, "bank8")
+		, m_bank9(*this, "bank9")
+		, m_bank10(*this, "bank10")
+		, m_bank11(*this, "bank11")
+		, m_bank12(*this, "bank12")
+		, m_bank13(*this, "bank13")
+		, m_bank14(*this, "bank14")
+		, m_bank15(*this, "bank15")
+		, m_bank16(*this, "bank16")
 		, m_rombank1(*this, "rombank1")
 		, m_rombank2(*this, "rombank2")
 		, m_fixedrombank(*this, "fixedrombank")
 		, m_dma_dip(*this, "dma_s2")
 	{}
 
-	void gimix(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
-
-private:
 	DECLARE_WRITE8_MEMBER(system_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
@@ -101,12 +111,14 @@ private:
 	DECLARE_READ8_MEMBER(pia_pb_r);
 	DECLARE_WRITE8_MEMBER(pia_pb_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(test_timer_w);
+	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	void gimix(machine_config &config);
 	void gimix_banked_mem(address_map &map);
 	void gimix_mem(address_map &map);
-
+private:
 	uint8_t m_term_data;
 	uint8_t m_dma_status;
 	uint8_t m_dma_ctrl;
@@ -139,7 +151,22 @@ private:
 	required_device<acia6850_device> m_acia3;
 	required_device<acia6850_device> m_acia4;
 
-	required_device_array<address_map_bank_device, 16> m_bank;
+	required_device<address_map_bank_device> m_bank1;
+	required_device<address_map_bank_device> m_bank2;
+	required_device<address_map_bank_device> m_bank3;
+	required_device<address_map_bank_device> m_bank4;
+	required_device<address_map_bank_device> m_bank5;
+	required_device<address_map_bank_device> m_bank6;
+	required_device<address_map_bank_device> m_bank7;
+	required_device<address_map_bank_device> m_bank8;
+	required_device<address_map_bank_device> m_bank9;
+	required_device<address_map_bank_device> m_bank10;
+	required_device<address_map_bank_device> m_bank11;
+	required_device<address_map_bank_device> m_bank12;
+	required_device<address_map_bank_device> m_bank13;
+	required_device<address_map_bank_device> m_bank14;
+	required_device<address_map_bank_device> m_bank15;
+	required_device<address_map_bank_device> m_bank16;
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
 	required_memory_bank m_fixedrombank;
@@ -158,8 +185,8 @@ void gimix_state::gimix_banked_mem(address_map &map)
 	map(0x0e210, 0x0e21f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x0e220, 0x0e23f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 	map(0x0e240, 0x0e3af).ram();
-	map(0x0e3b0, 0x0e3b3).rw(FUNC(gimix_state::dma_r), FUNC(gimix_state::dma_w));  // DMA controller (custom?)
-	map(0x0e3b4, 0x0e3b7).rw(FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC
+	map(0x0e3b0, 0x0e3b3).rw(this, FUNC(gimix_state::dma_r), FUNC(gimix_state::dma_w));  // DMA controller (custom?)
+	map(0x0e3b4, 0x0e3b7).rw(this, FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC
 	map(0x0e400, 0x0e7ff).ram();  // scratchpad RAM
 	map(0x0e800, 0x0efff).ram();
 	map(0x0f000, 0x0f7ff).bankr("rombank2");
@@ -169,11 +196,23 @@ void gimix_state::gimix_banked_mem(address_map &map)
 
 void gimix_state::gimix_mem(address_map &map)
 {
-	for (int bank = 0; bank < 16; bank++)
-	{
-		map(bank << 12, (bank << 12) | 0x0fff).rw(m_bank[bank], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	}
-	map(0xff00, 0xffff).bankr("fixedrombank").w(FUNC(gimix_state::system_w));
+	map(0x0000, 0x0fff).rw(m_bank1, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x1000, 0x1fff).rw(m_bank2, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x2000, 0x2fff).rw(m_bank3, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x3000, 0x3fff).rw(m_bank4, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x4fff).rw(m_bank5, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x5000, 0x5fff).rw(m_bank6, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x6000, 0x6fff).rw(m_bank7, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x7000, 0x7fff).rw(m_bank8, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0x8fff).rw(m_bank9, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x9000, 0x9fff).rw(m_bank10, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xa000, 0xafff).rw(m_bank11, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xb000, 0xbfff).rw(m_bank12, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xcfff).rw(m_bank13, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xd000, 0xdfff).rw(m_bank14, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xe000, 0xefff).rw(m_bank15, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xf000, 0xfeff).rw(m_bank16, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xff00, 0xffff).bankr("fixedrombank").w(this, FUNC(gimix_state::system_w));
 }
 
 static INPUT_PORTS_START( gimix )
@@ -186,9 +225,13 @@ INPUT_PORTS_END
 
 void gimix_state::refresh_memory()
 {
-	for (int bank = 0; bank < 16; bank++)
+	int x;
+	address_map_bank_device* banknum[16] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8,
+			m_bank9, m_bank10, m_bank11, m_bank12, m_bank13, m_bank14, m_bank15, m_bank16};
+
+	for(x=0;x<16;x++) // for each bank
 	{
-		m_bank[bank]->set_bank(m_task_banks[m_task][bank]);
+		banknum[x]->set_bank(m_task_banks[m_task][x]);
 	}
 }
 
@@ -216,7 +259,10 @@ WRITE8_MEMBER( gimix_state::system_w )
 	}
 	if(offset >= 0xf0)  // Dynamic Address Translation RAM (write only)
 	{
-		m_bank[offset-0xf0]->set_bank(data & 0x0f);
+		address_map_bank_device* banknum[16] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8,
+				m_bank9, m_bank10, m_bank11, m_bank12, m_bank13, m_bank14, m_bank15, m_bank16};
+
+		banknum[offset-0xf0]->set_bank(data & 0x0f);
 		m_task_banks[m_task][offset-0xf0] = data & 0x0f;
 		logerror("SYS: Bank %i set to physical bank %02x\n",offset-0xf0,data);
 	}
@@ -325,7 +371,7 @@ READ8_MEMBER(gimix_state::fdc_r)
 		m_floppy1_ready = true;
 		logerror("FDC: Floppy drive 1 motor on\n");
 	}
-	return m_fdc->read(offset);
+	return m_fdc->read(space,offset);
 }
 
 WRITE8_MEMBER(gimix_state::fdc_w)
@@ -335,7 +381,7 @@ WRITE8_MEMBER(gimix_state::fdc_w)
 		m_floppy0->get_device()->mon_w(0);
 	if(m_selected_drive == 2)
 		m_floppy1->get_device()->mon_w(0);
-	m_fdc->write(offset,data);
+	m_fdc->write(space,offset,data);
 }
 
 READ8_MEMBER(gimix_state::pia_pa_r)
@@ -402,9 +448,9 @@ INPUT_CHANGED_MEMBER(gimix_state::drive_size_cb)
 {
 	// set FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
-		m_fdc->set_unscaled_clock(8_MHz_XTAL / 4); // 8 inch (2MHz)
+		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 4); // 8 inch (2MHz)
 	else
-		m_fdc->set_unscaled_clock(8_MHz_XTAL / 8); // 5.25 inch (1MHz)
+		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 8); // 5.25 inch (1MHz)
 }
 
 void gimix_state::machine_reset()
@@ -425,9 +471,9 @@ void gimix_state::machine_reset()
 
 	// initialise FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
-		m_fdc->set_unscaled_clock(8_MHz_XTAL / 4); // 8 inch (2MHz)
+		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 4); // 8 inch (2MHz)
 	else
-		m_fdc->set_unscaled_clock(8_MHz_XTAL / 8); // 5.25 inch (1MHz)
+		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 8); // 5.25 inch (1MHz)
 }
 
 void gimix_state::machine_start()
@@ -442,10 +488,22 @@ void gimix_state::machine_start()
 	// install any extra RAM
 	if(m_ram->size() > 65536)
 	{
-		for (int bank = 0; bank < 16; bank++)
-		{
-			m_bank[bank]->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
-		}
+		m_bank1->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank2->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank3->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank4->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank5->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank6->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank7->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank8->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank9->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank10->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank11->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank12->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank13->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank14->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank15->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+		m_bank16->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
 	}
 	m_floppy0->get_device()->set_rpm(300);
 	m_floppy1->get_device()->set_rpm(300);
@@ -481,83 +539,103 @@ static void gimix_floppies(device_slot_interface &device)
 	device.option_add("8dd", FLOPPY_8_DSDD);
 }
 
+#define MCFG_ADDRESS_BANK(tag) \
+MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \
+MCFG_DEVICE_PROGRAM_MAP(gimix_banked_mem) \
+MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
+MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
+MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+
 MACHINE_CONFIG_START(gimix_state::gimix)
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", MC6809, 8_MHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(gimix_mem)
 
 	/* rtc */
-	mm58167_device &rtc(MM58167(config, "rtc", 32.768_kHz_XTAL));
-	rtc.irq().set(FUNC(gimix_state::irq_w));
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, gimix_state,irq_w))
 
 	/* timer */
-	ptm6840_device &ptm(PTM6840(config, "timer", 2'000'000));  // clock is a guess
-	ptm.irq_callback().set(FUNC(gimix_state::irq_w));  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
+	MCFG_DEVICE_ADD("timer", PTM6840, XTAL(2'000'000))  // clock is a guess
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, gimix_state,irq_w))  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
-	FD1797(config, m_fdc, 8_MHz_XTAL / 4);
-	m_fdc->intrq_wr_callback().set(FUNC(gimix_state::fdc_irq_w));
-	m_fdc->drq_wr_callback().set(FUNC(gimix_state::fdc_drq_w));
-	m_fdc->set_force_ready(true);
+	MCFG_FD1797_ADD("fdc",XTAL(8'000'000) / 4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, gimix_state,fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, gimix_state,fdc_drq_w))
+	MCFG_WD_FDC_FORCE_READY
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", gimix_floppies, "525hd", gimix_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
 
 	/* parallel ports */
-	pia6821_device &pia1(PIA6821(config, "pia1", 2'000'000));
-	pia1.writepa_handler().set(FUNC(gimix_state::pia_pa_w));
-	pia1.writepb_handler().set(FUNC(gimix_state::pia_pb_w));
-	pia1.readpa_handler().set(FUNC(gimix_state::pia_pa_r));
-	pia1.readpb_handler().set(FUNC(gimix_state::pia_pb_r));
-
-	PIA6821(config, "pia2", 2'000'000);
+	MCFG_DEVICE_ADD("pia1",PIA6821,XTAL(2'000'000))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, gimix_state,pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, gimix_state,pia_pb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, gimix_state,pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, gimix_state,pia_pb_r))
+	MCFG_DEVICE_ADD("pia2",PIA6821,XTAL(2'000'000))
 
 	/* serial ports */
-	ACIA6850(config, m_acia1, 2'000'000);
-	m_acia1->txd_handler().set("serial1", FUNC(rs232_port_device::write_txd));
-	m_acia1->rts_handler().set("serial1", FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD("acia1",ACIA6850,XTAL(2'000'000))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial1",rs232_port_device,write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial1",rs232_port_device,write_rts))
 
-	ACIA6850(config, m_acia2, 2'000'000);
-	m_acia2->txd_handler().set("serial2", FUNC(rs232_port_device::write_txd));
-	m_acia2->rts_handler().set("serial2", FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD("acia2",ACIA6850,XTAL(2'000'000))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial2",rs232_port_device,write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial2",rs232_port_device,write_rts))
 
-	ACIA6850(config, m_acia3, 2'000'000);
-	m_acia3->txd_handler().set("serial3", FUNC(rs232_port_device::write_txd));
-	m_acia3->rts_handler().set("serial3", FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD("acia3",ACIA6850,XTAL(2'000'000))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial3",rs232_port_device,write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial3",rs232_port_device,write_rts))
 
-	ACIA6850(config, m_acia4, 2'000'000);
-	m_acia4->txd_handler().set("serial4", FUNC(rs232_port_device::write_txd));
-	m_acia4->rts_handler().set("serial4", FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD("acia4",ACIA6850,XTAL(2'000'000))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("serial4",rs232_port_device,write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("serial4",rs232_port_device,write_rts))
 
-	rs232_port_device &serial1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
-	serial1.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
-	serial1.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
+	MCFG_DEVICE_ADD("serial1",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1",acia6850_device,write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1",acia6850_device,write_cts))
 
-	rs232_port_device &serial2(RS232_PORT(config, "serial2", default_rs232_devices, "terminal"));
-	serial2.rxd_handler().set(m_acia2, FUNC(acia6850_device::write_rxd));
-	serial2.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
+	MCFG_DEVICE_ADD("serial2",RS232_PORT, default_rs232_devices,"terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2",acia6850_device,write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2",acia6850_device,write_cts))
 
-	rs232_port_device &serial3(RS232_PORT(config, "serial3", default_rs232_devices, nullptr));
-	serial3.rxd_handler().set(m_acia3, FUNC(acia6850_device::write_rxd));
-	serial3.cts_handler().set(m_acia3, FUNC(acia6850_device::write_cts));
+	MCFG_DEVICE_ADD("serial3",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia3",acia6850_device,write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia3",acia6850_device,write_cts))
 
-	rs232_port_device &serial4(RS232_PORT(config, "serial4", default_rs232_devices, nullptr));
-	serial4.rxd_handler().set(m_acia4, FUNC(acia6850_device::write_rxd));
-	serial4.cts_handler().set(m_acia4, FUNC(acia6850_device::write_cts));
+	MCFG_DEVICE_ADD("serial4",RS232_PORT, default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia4",acia6850_device,write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia4",acia6850_device,write_cts))
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
-	acia_clock.signal_handler().set(m_acia1, FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia1, FUNC(acia6850_device::write_rxc));
-	acia_clock.signal_handler().append(m_acia2, FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append(m_acia2, FUNC(acia6850_device::write_rxc));
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia1", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia2", acia6850_device, write_rxc))
 
 	/* banking */
-	for (int bank = 0; bank < 16; bank++)
-	{
-		ADDRESS_MAP_BANK(config, m_bank[bank]).set_map(&gimix_state::gimix_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x1000);
-	}
+	MCFG_ADDRESS_BANK("bank1")
+	MCFG_ADDRESS_BANK("bank2")
+	MCFG_ADDRESS_BANK("bank3")
+	MCFG_ADDRESS_BANK("bank4")
+	MCFG_ADDRESS_BANK("bank5")
+	MCFG_ADDRESS_BANK("bank6")
+	MCFG_ADDRESS_BANK("bank7")
+	MCFG_ADDRESS_BANK("bank8")
+	MCFG_ADDRESS_BANK("bank9")
+	MCFG_ADDRESS_BANK("bank10")
+	MCFG_ADDRESS_BANK("bank11")
+	MCFG_ADDRESS_BANK("bank12")
+	MCFG_ADDRESS_BANK("bank13")
+	MCFG_ADDRESS_BANK("bank14")
+	MCFG_ADDRESS_BANK("bank15")
+	MCFG_ADDRESS_BANK("bank16")
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("56K,256K,512K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
+	MCFG_RAM_EXTRA_OPTIONS("56K,256K,512K")
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","gimix")
 

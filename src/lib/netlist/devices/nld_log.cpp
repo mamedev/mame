@@ -89,8 +89,8 @@ namespace netlist
 	#endif
 
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(log)
-	NETLIB_DEVICE_IMPL_DEPRECATED(logD)
+	NETLIB_DEVICE_IMPL(log)
+	NETLIB_DEVICE_IMPL(logD)
 
 	} //namespace devices
 } // namespace netlist

@@ -15,10 +15,10 @@
 // device stuff
 
 #define MCFG_NCR539X_OUT_IRQ_CB(_devcb) \
-	downcast<ncr539x_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+	devcb = &downcast<ncr539x_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_NCR539X_OUT_DRQ_CB(_devcb) \
-	downcast<ncr539x_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
+	devcb = &downcast<ncr539x_device &>(*device).set_out_drq_callback(DEVCB_##_devcb);
 
 class ncr539x_device : public legacy_scsi_host_adapter
 {
@@ -28,8 +28,6 @@ public:
 
 	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_out_drq_callback(Object &&cb) { return m_out_drq_cb.set_callback(std::forward<Object>(cb)); }
-	auto irq_callback() { return m_out_irq_cb.bind(); }
-	auto drq_callback() { return m_out_drq_cb.bind(); }
 
 	// our API
 	DECLARE_READ8_MEMBER(read);

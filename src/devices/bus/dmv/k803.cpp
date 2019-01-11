@@ -75,11 +75,10 @@ void dmv_k803_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void dmv_k803_device::device_add_mconfig(machine_config &config)
-{
-	MM58167(config, m_rtc, XTAL(32'768));
-	m_rtc->irq().set(FUNC(dmv_k803_device::rtc_irq_w));
-}
+MACHINE_CONFIG_START(dmv_k803_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
+	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, dmv_k803_device, rtc_irq_w))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

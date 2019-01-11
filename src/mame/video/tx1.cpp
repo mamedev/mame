@@ -113,8 +113,11 @@ enum
 
 ***************************************************************************/
 
-void tx1_state::tx1_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(tx1_state,tx1)
 {
+	const uint8_t *const color_prom = &m_proms[0];
+	int i;
+
 	static const res_net_info tx1_net_info =
 	{
 		RES_NET_VCC_5V | RES_NET_VIN_TTL_OUT,
@@ -125,12 +128,13 @@ void tx1_state::tx1_palette(palette_device &palette) const
 		}
 	};
 
-	uint8_t const *const color_prom = &m_proms[0];
-	for (int i = 0; i < 256; ++i)
+	for (i = 0; i < 256; ++i)
 	{
-		int const r = compute_res_net(color_prom[i + 0x300] & 0xf, 0, tx1_net_info);
-		int const g = compute_res_net(color_prom[i + 0x400] & 0xf, 1, tx1_net_info);
-		int const b = compute_res_net(color_prom[i + 0x500] & 0xf, 2, tx1_net_info);
+		int r, g, b;
+
+		r = compute_res_net(color_prom[i + 0x300] & 0xf, 0, tx1_net_info);
+		g = compute_res_net(color_prom[i + 0x400] & 0xf, 1, tx1_net_info);
+		b = compute_res_net(color_prom[i + 0x500] & 0xf, 2, tx1_net_info);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -1248,34 +1252,36 @@ uint32_t tx1_state::screen_update_tx1_right(screen_device &screen, bitmap_ind16 
 
 ***************************************************************************/
 
-void tx1_state::buggyboy_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(tx1_state,buggyboy)
 {
-	uint8_t const *const color_prom = &m_proms[0];
+	const uint8_t *const color_prom = &m_proms[0];
+	int i;
 
-	for (int i = 0; i < 0x100; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		int bit0, bit1, bit2, bit3, bit4;
+		int r, g, b;
 
 		bit0 = BIT(color_prom[i + 0x000], 0);
 		bit1 = BIT(color_prom[i + 0x000], 1);
 		bit2 = BIT(color_prom[i + 0x000], 2);
 		bit3 = BIT(color_prom[i + 0x000], 3);
 		bit4 = BIT(color_prom[i + 0x300], 2);
-		int const r = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
+		r = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
 		bit0 = BIT(color_prom[i + 0x100], 0);
 		bit1 = BIT(color_prom[i + 0x100], 1);
 		bit2 = BIT(color_prom[i + 0x100], 2);
 		bit3 = BIT(color_prom[i + 0x100], 3);
 		bit4 = BIT(color_prom[i + 0x300], 1);
-		int const g = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
+		g = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
 		bit0 = BIT(color_prom[i + 0x200], 0);
 		bit1 = BIT(color_prom[i + 0x200], 1);
 		bit2 = BIT(color_prom[i + 0x200], 2);
 		bit3 = BIT(color_prom[i + 0x200], 3);
 		bit4 = BIT(color_prom[i + 0x300], 0);
-		int const b = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
+		b = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

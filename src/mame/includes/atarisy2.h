@@ -15,7 +15,6 @@
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "emupal.h"
 #include "slapstic.h"
 
 class atarisy2_state : public atarigen_state
@@ -36,28 +35,9 @@ public:
 		, m_tms5220(*this, "tms")
 		, m_rombank(*this, "rombank%u", 1U)
 		, m_slapstic(*this, "slapstic")
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void init_ssprint();
-	void init_apb();
-	void init_csprint();
-	void init_paperboy();
-	void init_720();
-
-	void atarisy2(machine_config &config);
-	void apb(machine_config &config);
-	void paperboy(machine_config &config);
-	void ssprint(machine_config &config);
-	void _720(machine_config &config);
-	void csprint(machine_config &config);
-
-protected:
-	virtual void device_post_load() override;
-	virtual void update_interrupts() override;
-	virtual void scanline_update(screen_device &screen, int scanline) override;
-
-private:
 	required_device<t11_device> m_maincpu;
 	required_device<m6502_device> m_audiocpu;
 	required_device<atari_motion_objects_device> m_mob;
@@ -96,8 +76,10 @@ private:
 	int32_t           m_spin_pos;                 /* track fake position of spinner */
 	uint32_t          m_spin_center_count;
 
-	output_finder<2> m_leds;
+	virtual void device_post_load() override;
 
+	virtual void update_interrupts() override;
+	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_WRITE16_MEMBER(int0_ack_w);
 	DECLARE_WRITE16_MEMBER(int1_ack_w);
 	DECLARE_WRITE16_MEMBER(int_enable_w);
@@ -114,7 +96,11 @@ private:
 	DECLARE_WRITE8_MEMBER(tms5220_w);
 	DECLARE_WRITE8_MEMBER(tms5220_strobe_w);
 	DECLARE_WRITE8_MEMBER(coincount_w);
-
+	void init_ssprint();
+	void init_apb();
+	void init_csprint();
+	void init_paperboy();
+	void init_720();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	DECLARE_MACHINE_START(atarisy2);
@@ -129,10 +115,19 @@ private:
 	DECLARE_WRITE16_MEMBER(yscroll_w);
 	DECLARE_WRITE16_MEMBER(xscroll_w);
 	DECLARE_WRITE16_MEMBER(spriteram_w);
-	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
+	DECLARE_PALETTE_DECODER(RRRRGGGGBBBBIIII);
 
 	static const atari_motion_objects_config s_mob_config;
+	void atarisy2(machine_config &config);
+	void apb(machine_config &config);
+	void paperboy(machine_config &config);
+	void ssprint(machine_config &config);
+	void _720(machine_config &config);
+	void csprint(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void vrambank_map(address_map &map);
+
+protected:
+	output_finder<2> m_led;
 };

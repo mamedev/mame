@@ -84,6 +84,42 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_COSMAC_WAIT_CALLBACK(_read) \
+	devcb = &downcast<cosmac_device &>(*device).set_wait_rd_callback(DEVCB_##_read);
+
+#define MCFG_COSMAC_CLEAR_CALLBACK(_read) \
+	devcb = &downcast<cosmac_device &>(*device).set_clear_rd_callback(DEVCB_##_read);
+
+#define MCFG_COSMAC_EF1_CALLBACK(_read) \
+	devcb = &downcast<cosmac_device &>(*device).set_ef1_rd_callback(DEVCB_##_read);
+
+#define MCFG_COSMAC_EF2_CALLBACK(_read) \
+	devcb = &downcast<cosmac_device &>(*device).set_ef2_rd_callback(DEVCB_##_read);
+
+#define MCFG_COSMAC_EF3_CALLBACK(_read) \
+	devcb = &downcast<cosmac_device &>(*device).set_ef3_rd_callback(DEVCB_##_read);
+
+#define MCFG_COSMAC_EF4_CALLBACK(_read) \
+	devcb = &downcast<cosmac_device &>(*device).set_ef4_rd_callback(DEVCB_##_read);
+
+#define MCFG_COSMAC_Q_CALLBACK(_write) \
+	devcb = &downcast<cosmac_device &>(*device).set_q_wr_callback(DEVCB_##_write);
+
+#define MCFG_COSMAC_DMAR_CALLBACK(_read) \
+	devcb = &downcast<cosmac_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
+
+#define MCFG_COSMAC_DMAW_CALLBACK(_write) \
+	devcb = &downcast<cosmac_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
+
+#define MCFG_COSMAC_SC_CALLBACK(_write) \
+	devcb = &downcast<cosmac_device &>(*device).set_sc_wr_callback(DEVCB_##_write);
+
+
+
+//**************************************************************************
 //  ENUMERATIONS
 //**************************************************************************
 
@@ -156,17 +192,17 @@ public:
 		COSMAC_SC
 	};
 
-	auto wait_cb() { return m_read_wait.bind(); }
-	auto clear_cb() { return m_read_clear.bind(); }
-	auto ef1_cb() { return m_read_ef[0].bind(); }
-	auto ef2_cb() { return m_read_ef[1].bind(); }
-	auto ef3_cb() { return m_read_ef[2].bind(); }
-	auto ef4_cb() { return m_read_ef[3].bind(); }
-	auto q_cb() { return m_write_q.bind(); }
-	auto dma_rd_cb() { return m_read_dma.bind(); }
-	auto dma_wr_cb() { return m_write_dma.bind(); }
-	auto sc_cb() { return m_write_sc.bind(); }
-	auto tpb_cb() { return m_write_tpb.bind(); }
+
+	template <class Object> devcb_base &set_wait_rd_callback(Object &&cb) { return m_read_wait.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_clear_rd_callback(Object &&cb) { return m_read_clear.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ef1_rd_callback(Object &&cb) { return m_read_ef1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ef2_rd_callback(Object &&cb) { return m_read_ef2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ef3_rd_callback(Object &&cb) { return m_read_ef3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ef4_rd_callback(Object &&cb) { return m_read_ef4.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_q_wr_callback(Object &&cb) { return m_write_q.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_rd_callback(Object &&cb) { return m_read_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sc_wr_callback(Object &&cb) { return m_write_sc.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	offs_t get_memory_address();
@@ -212,9 +248,9 @@ protected:
 	inline void write_io_byte(offs_t address, uint8_t data);
 
 	// execution logic
-	inline void run_state();
+	inline void run();
 	inline void debug();
-	inline void reset_state();
+	inline void reset();
 	inline void initialize();
 	inline void fetch_instruction();
 	inline void execute_instruction();
@@ -223,10 +259,8 @@ protected:
 	inline void interrupt();
 	inline void sample_wait_clear();
 	inline void sample_ef_lines();
-	virtual void output_state_code();
+	inline void output_state_code();
 	inline void set_q_flag(int state);
-	inline void put_low_reg(int reg, uint8_t data);
-	inline void put_high_reg(int reg, uint8_t data);
 
 	// arithmetic handlers
 	void add(int left, int right);
@@ -340,12 +374,14 @@ protected:
 	// device callbacks
 	devcb_read_line        m_read_wait;
 	devcb_read_line        m_read_clear;
-	devcb_read_line        m_read_ef[4];
+	devcb_read_line        m_read_ef1;
+	devcb_read_line        m_read_ef2;
+	devcb_read_line        m_read_ef3;
+	devcb_read_line        m_read_ef4;
 	devcb_write_line       m_write_q;
 	devcb_read8            m_read_dma;
 	devcb_write8           m_write_dma;
 	devcb_write8           m_write_sc;
-	devcb_write_line       m_write_tpb;
 
 	// control modes
 	enum class cosmac_mode : u8
@@ -360,9 +396,9 @@ protected:
 	enum class cosmac_state : u8
 	{
 		STATE_0_FETCH = 0,
+		STATE_1_RESET,
 		STATE_1_INIT,
 		STATE_1_EXECUTE,
-		STATE_1_EXECUTE_2ND,
 		STATE_2_DMA_IN,
 		STATE_2_DMA_OUT,
 		STATE_3_INT
@@ -381,7 +417,6 @@ protected:
 	int                 m_dmain;            // DMA input request
 	int                 m_dmaout;           // DMA output request
 	int                 m_ef[4];            // external flags
-	int                 m_ef_line[4];       // external flags
 
 	// registers
 	uint8_t               m_d;                // data register (accumulator)
@@ -406,7 +441,7 @@ protected:
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const = 0;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) = 0;
 };
 
 
@@ -422,9 +457,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
-
-	virtual void output_state_code() override;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
 
 	static const ophandler s_opcodetable[256];
 };
@@ -442,7 +475,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
+	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
 
 	static const ophandler s_opcodetable[256];
 };

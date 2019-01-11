@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -448,46 +448,9 @@ namespace bgfx
 		};
 	};
 
-	struct DxbcOperandModifier
-	{
-		enum Enum
-		{
-			None,
-			Neg,
-			Abs,
-			AbsNeg,
-
-			Count
-		};
-	};
-
-	struct DxbcCustomDataClass
-	{
-		enum Enum
-		{
-			Comment,
-			DebugInfo,
-			Opaque,
-			ImmConstantBuffer,
-			ShaderMessage,
-			ClipPlaneConstantMappingsForDx9,
-
-			Count
-		};
-	};
-
 	struct DxbcSubOperand
 	{
-		DxbcSubOperand()
-			: type(DxbcOperandType::Temp)
-			, mode(0)
-			, modeBits(0)
-			, num(0)
-			, numAddrModes(0)
-			, addrMode(0)
-			, regIndex(0)
-		{
-		}
+		DxbcSubOperand() { /* not pod */ }
 
 		DxbcOperandType::Enum type;
 		uint8_t mode;
@@ -500,24 +463,14 @@ namespace bgfx
 
 	struct DxbcOperand
 	{
-		DxbcOperand()
-			: type(DxbcOperandType::Temp)
-			, mode(DxbcOperandMode::Mask)
-			, modeBits(0)
-			, num(0)
-			, modifier(DxbcOperandModifier::None)
-			, numAddrModes(0)
-		{
-			bx::memSet(addrMode, 0, sizeof(addrMode) );
-			bx::memSet(regIndex, 0, sizeof(regIndex) );
-			bx::memSet(un.imm64, 0, sizeof(un.imm64) );
-		}
+		DxbcOperand() { /* not pod */ }
 
 		DxbcOperandType::Enum type;
 		DxbcOperandMode::Enum mode;
 		uint8_t modeBits;
 		uint8_t num;
-		DxbcOperandModifier::Enum modifier;
+		bool extended;
+		uint32_t extBits;
 
 		uint8_t numAddrModes;
 		uint8_t addrMode[3];
@@ -593,9 +546,6 @@ namespace bgfx
 		DxbcResourceReturnType::Enum resourceReturnTypes[4];
 
 		DxbcOperand operand[6];
-
-		DxbcCustomDataClass::Enum customDataClass;
-		stl::vector<uint32_t>     customData;
 	};
 
 	int32_t read(bx::ReaderI* _reader, DxbcInstruction& _instruction, bx::Error* _err);

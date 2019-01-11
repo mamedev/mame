@@ -36,7 +36,6 @@
 #include "emu.h"
 #include "includes/cosmicos.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 #include "cosmicos.lh"
@@ -182,19 +181,19 @@ WRITE8_MEMBER( cosmicos_state::display_w )
 
 void cosmicos_state::cosmicos_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(cosmicos_state::read), FUNC(cosmicos_state::write));
+	map(0x0000, 0xffff).rw(this, FUNC(cosmicos_state::read), FUNC(cosmicos_state::write));
 }
 
 void cosmicos_state::cosmicos_io(address_map &map)
 {
 //  AM_RANGE(0x00, 0x00)
-	map(0x01, 0x01).r(FUNC(cosmicos_state::video_on_r));
-	map(0x02, 0x02).rw(FUNC(cosmicos_state::video_off_r), FUNC(cosmicos_state::audio_latch_w));
+	map(0x01, 0x01).r(this, FUNC(cosmicos_state::video_on_r));
+	map(0x02, 0x02).rw(this, FUNC(cosmicos_state::video_off_r), FUNC(cosmicos_state::audio_latch_w));
 //  AM_RANGE(0x03, 0x03)
 //  AM_RANGE(0x04, 0x04)
-	map(0x05, 0x05).rw(FUNC(cosmicos_state::hex_keyboard_r), FUNC(cosmicos_state::hex_keylatch_w));
-	map(0x06, 0x06).rw(FUNC(cosmicos_state::reset_counter_r), FUNC(cosmicos_state::segment_w));
-	map(0x07, 0x07).rw(FUNC(cosmicos_state::data_r), FUNC(cosmicos_state::display_w));
+	map(0x05, 0x05).rw(this, FUNC(cosmicos_state::hex_keyboard_r), FUNC(cosmicos_state::hex_keylatch_w));
+	map(0x06, 0x06).rw(this, FUNC(cosmicos_state::reset_counter_r), FUNC(cosmicos_state::segment_w));
+	map(0x07, 0x07).rw(this, FUNC(cosmicos_state::data_r), FUNC(cosmicos_state::display_w));
 }
 
 /* Input Ports */
@@ -509,26 +508,27 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	/* basic machine hardware */
-	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cosmicos_state::cosmicos_mem);
-	m_maincpu->set_addrmap(AS_IO, &cosmicos_state::cosmicos_io);
-	m_maincpu->wait_cb().set(FUNC(cosmicos_state::wait_r));
-	m_maincpu->clear_cb().set(FUNC(cosmicos_state::clear_r));
-	m_maincpu->ef1_cb().set(FUNC(cosmicos_state::ef1_r));
-	m_maincpu->ef2_cb().set(FUNC(cosmicos_state::ef2_r));
-	m_maincpu->ef3_cb().set(FUNC(cosmicos_state::ef3_r));
-	m_maincpu->ef4_cb().set(FUNC(cosmicos_state::ef4_r));
-	m_maincpu->q_cb().set(FUNC(cosmicos_state::q_w));
-	m_maincpu->dma_rd_cb().set(FUNC(cosmicos_state::dma_r));
-	m_maincpu->sc_cb().set(FUNC(cosmicos_state::sc_w));
+	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
+	MCFG_DEVICE_PROGRAM_MAP(cosmicos_mem)
+	MCFG_DEVICE_IO_MAP(cosmicos_io)
+	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, cosmicos_state, wait_r))
+	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cosmicos_state, clear_r))
+	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, cosmicos_state, ef1_r))
+	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, cosmicos_state, ef2_r))
+	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, cosmicos_state, ef3_r))
+	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, cosmicos_state, ef4_r))
+	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cosmicos_state, q_w))
+	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, cosmicos_state, dma_r))
+	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, cosmicos_state, sc_w))
 
 	/* video hardware */
-	config.set_default_layout(layout_cosmicos);
-	DM9368(config, m_led, 0);
+	MCFG_DEFAULT_LAYOUT( layout_cosmicos )
+	MCFG_DEVICE_ADD(DM9368_TAG, DM9368, 0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
 
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(1'750'000))
+	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -536,16 +536,9 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
-	m_cti->inlace_cb().set_constant(0);
-	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_cti->dma_out_cb().set(FUNC(cosmicos_state::dmaout_w));
-	m_cti->efx_cb().set(FUNC(cosmicos_state::efx_w));
-	m_cti->rdata_cb().set_constant(1);
-	m_cti->gdata_cb().set_constant(1);
-	m_cti->bdata_cb().set_constant(1);
-	m_cti->set_chrominance(RES_K(2), 0, 0, 0); // R2
-	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(*this, cosmicos_state, dmaout_w), WRITELINE(*this, cosmicos_state, efx_w), NOOP, VCC, VCC, VCC)
+	MCFG_CDP1864_CHROMINANCE(RES_K(2), 0, 0, 0) // R2
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", cosmicos_state, cosmicos, "bin", 0)
@@ -553,7 +546,9 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("256").set_extra_options("4K,48K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256")
+	MCFG_RAM_EXTRA_OPTIONS("4K,48K")
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -561,11 +556,11 @@ MACHINE_CONFIG_END
 ROM_START( cosmicos )
 	ROM_REGION( 0x1000, CDP1802_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "hex", "Hex Monitor" )
-	ROMX_LOAD( "hex.ic6",   0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(0) ) // typed in from manual
-	ROMX_LOAD( "hex.ic7",   0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(0) ) // typed in from manual
+	ROMX_LOAD( "hex.ic6",   0x000, 0x400, BAD_DUMP CRC(d25124bf) SHA1(121215ba3a979e1962327ebe73cbadf784c568d9), ROM_BIOS(1) ) /* typed in from manual */
+	ROMX_LOAD( "hex.ic7",   0x400, 0x400, BAD_DUMP CRC(364ac81b) SHA1(83936ee6a7ed44632eb290889b98fb9a500f15d4), ROM_BIOS(1) ) /* typed in from manual */
 	ROM_SYSTEM_BIOS( 1, "ascii", "ASCII Monitor" )
-	ROMX_LOAD( "ascii.ic6", 0x000, 0x400, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "ascii.ic7", 0x400, 0x400, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "ascii.ic6", 0x000, 0x400, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "ascii.ic7", 0x400, 0x400, NO_DUMP, ROM_BIOS(2) )
 ROM_END
 
 /* System Drivers */

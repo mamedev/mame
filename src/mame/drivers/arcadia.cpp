@@ -127,7 +127,7 @@ anything in hardware. No cartridge has been found which uses them.
 void arcadia_state::arcadia_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).r(m_cart, FUNC(arcadia_cart_slot_device::read_rom));
-	map(0x1800, 0x1aff).rw(FUNC(arcadia_state::video_r), FUNC(arcadia_state::video_w));
+	map(0x1800, 0x1aff).rw(this, FUNC(arcadia_state::video_r), FUNC(arcadia_state::video_w));
 }
 
 /* The Emerson Arcadia 2001 controllers have 2 fire buttons on the side,
@@ -439,7 +439,7 @@ static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
 	7,0, 7,1, 7,2, 7,3, 7,4, 7,5, 7,6, 7,7
 };
 
-void arcadia_state::palette_init(palette_device &palette) const
+PALETTE_INIT_MEMBER(arcadia_state, arcadia)
 {
 	for (int i = 0; i < 8; i++)
 		palette.set_indirect_color(i, arcadia_colors[i]);
@@ -471,38 +471,39 @@ static void arcadia_cart(device_slot_interface &device)
 }
 
 
-void arcadia_state::arcadia(machine_config &config)
-{
+MACHINE_CONFIG_START(arcadia_state::arcadia)
 	/* basic machine hardware */
-	S2650(config, m_maincpu, 3580000/4); /* 0.895 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &arcadia_state::arcadia_mem);
-	m_maincpu->sense_handler().set(FUNC(arcadia_state::vsync_r));
-	m_maincpu->set_periodic_int(FUNC(arcadia_state::video_line), attotime::from_hz(262*60));
-
-	config.m_minimum_quantum = attotime::from_hz(60);
+	MCFG_DEVICE_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(arcadia_mem)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, arcadia_state, vsync_r))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(arcadia_state, video_line,  262*60)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(128+2*XPOS, 262);
-	m_screen->set_visarea(0, 2*XPOS+128-1, 0, 262-1);
-	m_screen->set_screen_update(FUNC(arcadia_state::screen_update_arcadia));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(128+2*XPOS, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 2*XPOS+128-1, 0, 262-1)
+	MCFG_SCREEN_UPDATE_DRIVER(arcadia_state, screen_update_arcadia)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arcadia);
-	PALETTE(config, m_palette, FUNC(arcadia_state::palette_init), ARRAY_LENGTH(arcadia_palette), 8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_arcadia)
+	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(arcadia_palette))
+	MCFG_PALETTE_INDIRECT_ENTRIES(8)
+	MCFG_PALETTE_INIT_OWNER(arcadia_state, arcadia)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ARCADIA_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD("custom", ARCADIA_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
-	EA2001_CART_SLOT(config, "cartslot", arcadia_cart, nullptr);
+	MCFG_ARCADIA_CARTRIDGE_ADD("cartslot", arcadia_cart, nullptr)
 
 	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("arcadia");
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list","arcadia")
+MACHINE_CONFIG_END
 
 
 ROM_START(advsnha)

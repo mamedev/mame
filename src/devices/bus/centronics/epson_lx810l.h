@@ -42,15 +42,15 @@ public:
 	epson_lx810l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* Centronics stuff */
-	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { m_e05a30->centronics_input_strobe(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { m_e05a30->centronics_input_data0(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { m_e05a30->centronics_input_data1(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { m_e05a30->centronics_input_data2(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { m_e05a30->centronics_input_data3(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { m_e05a30->centronics_input_data4(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { m_e05a30->centronics_input_data5(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { m_e05a30->centronics_input_data6(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { m_e05a30->centronics_input_data7(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { if (m_e05a30) m_e05a30->centronics_input_strobe(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (m_e05a30) m_e05a30->centronics_input_data0(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (m_e05a30) m_e05a30->centronics_input_data1(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { if (m_e05a30) m_e05a30->centronics_input_data2(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { if (m_e05a30) m_e05a30->centronics_input_data3(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { if (m_e05a30) m_e05a30->centronics_input_data4(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { if (m_e05a30) m_e05a30->centronics_input_data5(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { if (m_e05a30) m_e05a30->centronics_input_data6(state); }
+	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (m_e05a30) m_e05a30->centronics_input_data7(state); }
 
 	/* Panel buttons */
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);

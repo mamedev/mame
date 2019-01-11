@@ -73,11 +73,11 @@ void battlnts_state::battlnts_map(address_map &map)
 	map(0x2e02, 0x2e02).portr("P1");
 	map(0x2e03, 0x2e03).portr("DSW3");               /* coinsw, testsw, startsw */
 	map(0x2e04, 0x2e04).portr("DSW2");
-	map(0x2e08, 0x2e08).w(FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
-	map(0x2e0c, 0x2e0c).w(FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
+	map(0x2e08, 0x2e08).w(this, FUNC(battlnts_state::battlnts_bankswitch_w));    /* bankswitch control */
+	map(0x2e0c, 0x2e0c).w(this, FUNC(battlnts_state::battlnts_spritebank_w));    /* sprite bank select */
 	map(0x2e10, 0x2e10).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2e14, 0x2e14).w("soundlatch", FUNC(generic_latch_8_device::write)); /* sound code # */
-	map(0x2e18, 0x2e18).w(FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
+	map(0x2e18, 0x2e18).w(this, FUNC(battlnts_state::battlnts_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
 	map(0x4000, 0x7fff).bankr("rombank");              /* banked ROM */
 	map(0x8000, 0xffff).rom();                             /* ROM 777e02.bin */
 }
@@ -240,7 +240,7 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
 	MCFG_DEVICE_PROGRAM_MAP(battlnts_sound_map)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -252,23 +252,24 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, battlnts_state, vblank_irq))
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_battlnts);
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 128);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlnts)
+	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	K007342(config, m_k007342, 0);
-	m_k007342->set_gfxnum(0);
-	m_k007342->set_tile_callback(FUNC(battlnts_state::battlnts_tile_callback), this);
-	m_k007342->set_gfxdecode_tag(m_gfxdecode);
+	MCFG_K007342_ADD("k007342")
+	MCFG_K007342_GFXNUM(0)
+	MCFG_K007342_CALLBACK_OWNER(battlnts_state, battlnts_tile_callback)
+	MCFG_K007342_GFXDECODE("gfxdecode")
 
-	K007420(config, m_k007420, 0);
-	m_k007420->set_bank_limit(0x3ff);
-	m_k007420->set_sprite_callback(FUNC(battlnts_state::battlnts_sprite_callback), this);
-	m_k007420->set_palette_tag("palette");
+	MCFG_K007420_ADD("k007420")
+	MCFG_K007420_BANK_LIMIT(0x3ff)
+	MCFG_K007420_CALLBACK_OWNER(battlnts_state, battlnts_sprite_callback)
+	MCFG_K007420_PALETTE("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("ym1", YM3812, XTAL(24'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

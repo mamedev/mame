@@ -152,8 +152,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/mips/mips1.h"
-#include "emupal.h"
+#include "cpu/mips/r3000.h"
 #include "screen.h"
 
 
@@ -165,15 +164,14 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	void pyson(machine_config &config);
-
-private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void pyson(machine_config &config);
 	void ps2_map(address_map &map);
+protected:
 
 	// devices
-	required_device<mips3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void video_start() override;
@@ -198,22 +196,21 @@ void pyson_state::ps2_map(address_map &map)
 static INPUT_PORTS_START( pyson )
 INPUT_PORTS_END
 
-void pyson_state::pyson(machine_config &config)
-{
-	R5000LE(config, m_maincpu, 294000000); // imported from namcops2.c driver
-	m_maincpu->set_icache_size(16384);
-	m_maincpu->set_dcache_size(16384);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pyson_state::ps2_map);
+MACHINE_CONFIG_START(pyson_state::pyson)
+	MCFG_DEVICE_ADD("maincpu", R5000LE, 294000000) // imported from namcops2.c driver
+	MCFG_MIPS3_ICACHE_SIZE(16384)
+	MCFG_MIPS3_DCACHE_SIZE(16384)
+	MCFG_DEVICE_PROGRAM_MAP(ps2_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_screen_update(FUNC(pyson_state::screen_update));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 639, 0, 479);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DRIVER(pyson_state, screen_update)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	PALETTE(config, "palette").set_entries(65536);
-}
+	MCFG_PALETTE_ADD("palette", 65536)
+MACHINE_CONFIG_END
 
 #define PYSON_BIOS  \
 		ROM_LOAD( "b22a01.u42", 0x000000, 0x080000, CRC(98de405e) SHA1(4bc268a996825c1bdf6ae277d331fe7bdc0cc00c) )

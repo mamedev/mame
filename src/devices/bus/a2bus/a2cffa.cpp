@@ -51,13 +51,12 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void a2bus_cffa2000_device::device_add_mconfig(machine_config &config)
-{
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+MACHINE_CONFIG_START(a2bus_cffa2000_device::device_add_mconfig)
+	MCFG_ATA_INTERFACE_ADD(CFFA2_ATA_TAG, ata_devices, "hdd", nullptr, false)
 
 // not yet, the core explodes
 //  MCFG_SOFTWARE_LIST_ADD("hdd_list", "apple2gs_hdd")
-}
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

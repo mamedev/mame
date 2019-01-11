@@ -161,7 +161,7 @@ READ8_MEMBER( towns_state::towns_gfx_r )
 	uint8_t ret = 0;
 
 	if(m_towns_mainmem_enable != 0)
-		return m_ram->pointer()[offset+0xc0000];
+		return m_messram->pointer()[offset+0xc0000];
 
 	offset = offset << 2;
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER( towns_state::towns_gfx_w )
 {
 	if(m_towns_mainmem_enable != 0)
 	{
-		m_ram->pointer()[offset+0xc0000] = data;
+		m_messram->pointer()[offset+0xc0000] = data;
 		return;
 	}
 	offset = offset << 2;
@@ -350,7 +350,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 READ8_MEMBER( towns_state::towns_video_cff80_mem_r )
 {
 	if(m_towns_mainmem_enable != 0)
-		return m_ram->pointer()[offset+0xcff80];
+		return m_messram->pointer()[offset+0xcff80];
 
 	return towns_video_cff80_r(space,offset);
 }
@@ -359,7 +359,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
 {
 	if(m_towns_mainmem_enable != 0)
 	{
-		m_ram->pointer()[offset+0xcff80] = data;
+		m_messram->pointer()[offset+0xcff80] = data;
 		return;
 	}
 	towns_video_cff80_w(space,offset,data);
@@ -511,10 +511,12 @@ READ8_MEMBER(towns_state::towns_video_5c8_r)
 
 WRITE8_MEMBER(towns_state::towns_video_5c8_w)
 {
+	pic8259_device* dev = m_pic_slave;
+
 	switch(offset)
 	{
 		case 0x02:  // 0x5ca - VSync clear?
-			m_pic_slave->ir3_w(0);
+			dev->ir3_w(0);
 			if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 			//towns_vblank_flag = 0;
 			break;
@@ -660,7 +662,7 @@ READ8_MEMBER(towns_state::towns_video_unknown_r)
  */
 READ8_MEMBER(towns_state::towns_spriteram_low_r)
 {
-	uint8_t* RAM = m_ram->pointer();
+	uint8_t* RAM = m_messram->pointer();
 	uint8_t* ROM = m_user->base();
 
 	if(offset < 0x1000)
@@ -698,7 +700,7 @@ READ8_MEMBER(towns_state::towns_spriteram_low_r)
 
 WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
 {
-	uint8_t* RAM = m_ram->pointer();
+	uint8_t* RAM = m_messram->pointer();
 
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
@@ -1486,17 +1488,19 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_sprite_done)
 TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
-	m_pic_slave->ir3_w(0);  // IRQ11 = VSync
+	device_t* dev = (device_t*)ptr;
+	downcast<pic8259_device *>(dev)->ir3_w(0);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set low\n");
 	m_video.towns_vblank_flag = 0;
 }
 
 INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 {
-	m_pic_slave->ir3_w(1);  // IRQ11 = VSync
+	pic8259_device* dev = m_pic_slave;
+	dev->ir3_w(1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	m_video.towns_vblank_flag = 1;
-	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)m_pic_slave);
+	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)dev);
 	if(m_video.towns_tvram_enable)
 		draw_text_layer();
 	if(m_video.towns_sprite_reg[1] & 0x80)

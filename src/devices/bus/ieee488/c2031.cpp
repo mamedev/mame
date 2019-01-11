@@ -94,7 +94,7 @@ READ8_MEMBER( c2031_device::via0_pa_r )
 
 	*/
 
-	return m_bus->read_dio();
+	return m_bus->dio_r();
 }
 
 WRITE8_MEMBER( c2031_device::via0_pa_w )
@@ -261,7 +261,7 @@ WRITE8_MEMBER( c2031_device::via1_pb_w )
 	m_ga->stp_w(data & 0x03);
 
 	// activity LED
-	m_leds[LED_ACT] = BIT(data, 3);
+	m_led[LED_ACT] = BIT(data, 3);
 
 	// density select
 	m_ga->ds_w((data >> 5) & 0x03);
@@ -281,6 +281,16 @@ WRITE_LINE_MEMBER( c2031_device::byte_w )
 
 
 //-------------------------------------------------
+//  SLOT_INTERFACE( c2031_floppies )
+//-------------------------------------------------
+
+static void c2031_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
+
+
+//-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
@@ -294,37 +304,31 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void c2031_device::device_add_mconfig(machine_config &config)
-{
-	M6502(config, m_maincpu, XTAL(16'000'000)/16);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c2031_device::c2031_mem);
-	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
+MACHINE_CONFIG_START(c2031_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, XTAL(16'000'000)/16)
+	MCFG_DEVICE_PROGRAM_MAP(c2031_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
-	VIA6522(config, m_via0, XTAL(16'000'000)/16);
-	m_via0->readpa_handler().set(FUNC(c2031_device::via0_pa_r));
-	m_via0->readpb_handler().set(FUNC(c2031_device::via0_pb_r));
-	m_via0->writepa_handler().set(FUNC(c2031_device::via0_pa_w));
-	m_via0->writepb_handler().set(FUNC(c2031_device::via0_pb_w));
-	m_via0->irq_handler().set(FUNC(c2031_device::via0_irq_w));
+	MCFG_DEVICE_ADD(M6522_0_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, c2031_device, via0_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c2031_device, via0_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, c2031_device, via0_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c2031_device, via0_pb_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c2031_device, via0_irq_w))
 
-	VIA6522(config, m_via1, XTAL(16'000'000)/16);
-	m_via1->readpa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_r));
-	m_via1->readpb_handler().set(FUNC(c2031_device::via1_pb_r));
-	m_via1->writepa_handler().set(C64H156_TAG, FUNC(c64h156_device::yb_w));
-	m_via1->writepb_handler().set(FUNC(c2031_device::via1_pb_w));
-	m_via1->ca2_handler().set(C64H156_TAG, FUNC(c64h156_device::soe_w));
-	m_via1->cb2_handler().set(C64H156_TAG, FUNC(c64h156_device::oe_w));
-	m_via1->irq_handler().set(FUNC(c2031_device::via1_irq_w));
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, XTAL(16'000'000)/16)
+	MCFG_VIA6522_READPA_HANDLER(READ8(C64H156_TAG, c64h156_device, yb_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, c2031_device, via1_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(C64H156_TAG, c64h156_device, yb_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, c2031_device, via1_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, soe_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(C64H156_TAG, c64h156_device, oe_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, c2031_device, via1_irq_w))
 
-	C64H156(config, m_ga, XTAL(16'000'000));
-	m_ga->byte_callback().set(FUNC(c2031_device::byte_w));
-
-	floppy_connector &connector(FLOPPY_CONNECTOR(config, C64H156_TAG":0", 0));
-	connector.option_add("525ssqd", FLOPPY_525_SSQD);
-	connector.set_default_option("525ssqd");
-	connector.set_fixed(true);
-	connector.set_formats(c2031_device::floppy_formats);
-}
+	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(*this, c2031_device, byte_w))
+	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c2031_floppies, "525ssqd", c2031_device::floppy_formats)
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -394,7 +398,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 	, m_ga(*this, C64H156_TAG)
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
 	, m_address(*this, "ADDRESS")
-	, m_leds(*this, "led%u", 0U)
+	, m_led(*this, "led%u", 0U)
 	, m_nrfd_out(1)
 	, m_ndac_out(1)
 	, m_atna(1)
@@ -411,7 +415,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 
 void c2031_device::device_start()
 {
-	m_leds.resolve();
+	m_led.resolve();
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 

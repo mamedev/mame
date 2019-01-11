@@ -14,16 +14,16 @@
 
 #include "machine/ds2401.h"
 
+#define MCFG_ZS01_ADD( _tag ) \
+	MCFG_DEVICE_ADD( _tag, ZS01, 0 )
+#define MCFG_ZS01_DS2401( ds2401_tag ) \
+	downcast<zs01_device &>(*device).set_ds2401_tag( ds2401_tag );
+
 class zs01_device : public device_t,
 	public device_nvram_interface
 {
 public:
 	// construction/destruction
-	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner)
-		: zs01_device(mconfig, tag, owner, uint32_t(0))
-	{
-	}
-
 	zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	// inline configuration helpers

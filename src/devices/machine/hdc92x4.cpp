@@ -1670,6 +1670,7 @@ void hdc92x4_device::drive_select()
 
 		// Calculate the head load delays
 		head_load_delay = head_load_delay_enable? m_register_w[DATA] * head_load_timer_increment[m_selected_drive_type] : 0;
+		if (fm_mode()) head_load_delay <<= 1;
 
 		LOGMASKED(LOG_SELECT, "DRIVE SELECT command (%02x): head load delay=%d, type=%d, drive=%d, pout=%02x, step_rate=%d\n", current_command(), head_load_delay, m_selected_drive_type, driveparm&3, m_register_w[RETRY_COUNT]&0x0f, pulse_width() + step_time());
 
@@ -1686,12 +1687,6 @@ void hdc92x4_device::drive_select()
 		m_output1 = (m_selected_drive_number != NODRIVE)? (0x10 << m_selected_drive_number) : 0;
 		m_output1 |= (m_register_w[RETRY_COUNT]&0x0f);
 		LOGMASKED(LOG_AUXBUS, "Setting OUTPUT1 to %02x\n", m_output1);
-
-		// We assume a minimum head delay of 4 ms that compensates for the
-		// spin-up of the floppy motor, even when no delay is set
-		if ((m_selected_drive_type == TYPE_FLOPPY5 || m_selected_drive_type == TYPE_FLOPPY8) && (head_load_delay < 4000))
-			head_load_delay = 4000;
-		if (fm_mode()) head_load_delay <<= 1;
 		m_substate = (head_load_delay>0)? HEAD_DELAY : DONE;
 	}
 

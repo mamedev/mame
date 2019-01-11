@@ -2127,21 +2127,6 @@
 		</part>
 	</software>
 
-	<!-- Windows 98 -->
-	<!-- Intel Celeron 266 MHz class minimum / DirectX 7.0 -->
-	<!-- Korean game, published in Japan by Media Kite -->
-	<!-- ID code: MKW-239 -->
-	<software name="jaxis" supported="no">
-		<description>Jaxis (Japan)</description>
-		<year>2002</year>
-		<publisher>Jamie System Development</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jaxis" sha1="749981bb810b64df141c752daf5b47a64ec0acc9" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
 	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
 	<software name="kingsq6e">

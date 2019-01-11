@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Compute
 #define ENGINE_TAG  "engine"
 
 #define MCFG_MCMS_IRQ_CALLBACK(_cb) \
-	downcast<mcms_device &>(*device).set_irq_cb(DEVCB_##_cb);
+	devcb = &downcast<mcms_device &>(*device).set_irq_cb(DEVCB_##_cb);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -277,7 +277,7 @@ void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 				wptr = (m_table[v]<<8) | (m_acc[v]>>8);
 				m_rand = (m_acc[v]>>8) & 0x1f;
 
-				sample = (m_pBusDevice->slot_dma_read(wptr) ^ 0x80);
+				sample = (m_pBusDevice->slot_dma_read_no_space(wptr) ^ 0x80);
 				if (v & 1)
 				{
 					mixL += sample * m_vols[v];

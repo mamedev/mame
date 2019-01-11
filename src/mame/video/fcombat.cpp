@@ -39,50 +39,53 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-void fcombat_state::fcombat_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(fcombat_state, fcombat)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	// create a lookup table for the palette
-	for (int i = 0; i < 0x20; i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2;
+		int r, g, b;
 
-		// red component
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// green component
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// blue component
+		/* blue component */
 		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	// color_prom now points to the beginning of the lookup table
+	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x20;
 
-	// fg chars/sprites
-	for (int i = 0; i < 0x200; i++)
+	/* fg chars/sprites */
+	for (i = 0; i < 0x200; i++)
 	{
-		uint8_t const ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[(i & 0x1c0) | ((i & 3) << 4) | ((i >> 2) & 0x0f)] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	// bg chars (this is not the full story... there are four layers mixed using another PROM
-	for (int i = 0x200; i < 0x300; i++)
+	/* bg chars (this is not the full story... there are four layers mixed */
+	/* using another PROM */
+	for (i = 0x200; i < 0x300; i++)
 	{
-		uint8_t const ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

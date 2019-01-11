@@ -563,7 +563,7 @@ void arm_cpu_device::device_start()
 
 void arm_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	static char const *const s[4] = { "USER", "FIRQ", "IRQ ", "SVC " };
+	static const char *s[4] = { "USER", "FIRQ", "IRQ ", "SVC " };
 
 	switch (entry.index())
 	{

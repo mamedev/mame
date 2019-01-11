@@ -22,65 +22,73 @@
 
 ***************************************************************************/
 
-void appoooh_state::appoooh_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(appoooh_state,appoooh)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2;
+		uint8_t pen;
+		int bit0, bit1, bit2, r, g, b;
 
-		uint8_t const pen = (color_prom[0x20 + i] & 0x0f) | ((i < 0x100) ? 0x00 : 0x10);
+		if (i < 0x100)
+			/* charset #1 */
+			pen = (color_prom[0x020 + (i - 0x000)] & 0x0f) | 0x00;
+		else
+			/* charset #2 */
+			pen = (color_prom[0x120 + (i - 0x100)] & 0x0f) | 0x10;
 
-		// red component
-		bit0 = BIT(color_prom[pen], 0);
-		bit1 = BIT(color_prom[pen], 1);
-		bit2 = BIT(color_prom[pen], 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* red component */
+		bit0 = (color_prom[pen] >> 0) & 0x01;
+		bit1 = (color_prom[pen] >> 1) & 0x01;
+		bit2 = (color_prom[pen] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// green component
-		bit0 = BIT(color_prom[pen], 3);
-		bit1 = BIT(color_prom[pen], 4);
-		bit2 = BIT(color_prom[pen], 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = (color_prom[pen] >> 3) & 0x01;
+		bit1 = (color_prom[pen] >> 4) & 0x01;
+		bit2 = (color_prom[pen] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// blue component
+		/* blue component */
 		bit0 = 0;
-		bit1 = BIT(color_prom[pen], 6);
-		bit2 = BIT(color_prom[pen], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (color_prom[pen] >> 6) & 0x01;
+		bit2 = (color_prom[pen] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-void appoooh_state::robowres_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(appoooh_state,robowres)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2;
+		int bit0, bit1, bit2, r, g, b;
 
-		uint8_t const pen = color_prom[0x20 + i] & 0x0f;
+		uint8_t pen = color_prom[0x020 + i] & 0x0f;
 
-		// red component
-		bit0 = BIT(color_prom[pen], 0);
-		bit1 = BIT(color_prom[pen], 1);
-		bit2 = BIT(color_prom[pen], 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* red component */
+		bit0 = (color_prom[pen] >> 0) & 0x01;
+		bit1 = (color_prom[pen] >> 1) & 0x01;
+		bit2 = (color_prom[pen] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// green component
-		bit0 = BIT(color_prom[pen], 3);
-		bit1 = BIT(color_prom[pen], 4);
-		bit2 = BIT(color_prom[pen], 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = (color_prom[pen] >> 3) & 0x01;
+		bit1 = (color_prom[pen] >> 4) & 0x01;
+		bit2 = (color_prom[pen] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// blue component
+		/* blue component */
 		bit0 = 0;
-		bit1 = BIT(color_prom[pen], 6);
-		bit2 = BIT(color_prom[pen], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (color_prom[pen] >> 6) & 0x01;
+		bit2 = (color_prom[pen] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
 #include "pc_kbdc.h"
 
 //**************************************************************************
@@ -39,7 +38,7 @@ protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
 
 private:
-	required_device<i8051_device> m_cpu;
+	required_device<cpu_device> m_cpu;
 
 	required_ioport_array<8> m_p2_r;
 	required_ioport_array<8> m_p1_r;

@@ -184,17 +184,17 @@ void mcs48_cpu_device::program_12bit(address_map &map)
 
 void mcs48_cpu_device::data_6bit(address_map &map)
 {
-	map(0x00, 0x3f).ram().share("data");
+	map(0x00, 0x3f).ram();
 }
 
 void mcs48_cpu_device::data_7bit(address_map &map)
 {
-	map(0x00, 0x7f).ram().share("data");
+	map(0x00, 0x7f).ram();
 }
 
 void mcs48_cpu_device::data_8bit(address_map &map)
 {
-	map(0x00, 0xff).ram().share("data");
+	map(0x00, 0xff).ram();
 }
 
 
@@ -213,7 +213,6 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	, m_t0_clk_func()
 	, m_prog_out_cb(*this)
 	, m_psw(0)
-	, m_dataptr(*this, "data")
 	, m_feature_mask(feature_mask)
 	, m_int_rom_size(rom_size)
 	, m_opcode_table(opcode_table)
@@ -386,7 +385,7 @@ uint8_t mcs48_cpu_device::argument_fetch()
 
 void mcs48_cpu_device::update_regptr()
 {
-	m_regptr = &m_dataptr[(m_psw & B_FLAG) ? 24 : 0];
+	m_regptr = (uint8_t *)m_data->get_write_ptr((m_psw & B_FLAG) ? 24 : 0);
 }
 
 
@@ -532,25 +531,19 @@ uint8_t mcs48_cpu_device::p2_mask()
 
 void mcs48_cpu_device::expander_operation(expander_op operation, uint8_t port)
 {
-	// put opcode on low 4 bits of P2 (overwriting latch)
+	/* put opcode/data on low 4 bits of P2 */
 	port_w(2, m_p2 = (m_p2 & 0xf0) | (uint8_t(operation) << 2) | (port & 3));
 
-	// generate high-to-low transition on PROG line
+	/* generate high-to-low transition on PROG line */
 	prog_w(0);
 
-	// transfer data on low 4 bits of P2
+	/* put data on low 4 bits of P2 */
 	if (operation != EXPANDER_OP_READ)
 		port_w(2, m_p2 = (m_p2 & 0xf0) | (m_a & 0x0f));
 	else
-	{
-		// place P20-P23 in input mode
-		port_w(2, m_p2 |= 0x0f);
+		m_a = port_r(2) | 0x0f;
 
-		// input data to lower 4 bits of A (upper 4 bits are cleared)
-		m_a = port_r(2) & 0x0f;
-	}
-
-	// generate low-to-high transition on PROG line
+	/* generate low-to-high transition on PROG line */
 	prog_w(1);
 }
 
@@ -1106,7 +1099,7 @@ void mcs48_cpu_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
 		state_add(STATE_GENSP,     "GENSP",     m_psw).mask(0x7).noshow();
-		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%11s");
+		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%10s");
 		state_add(MCS48_A,         "A",         m_a);
 		state_add(MCS48_TC,        "TC",        m_timer);
 		state_add(MCS48_TPRE,      "TPRE",      m_prescaler).mask(0x1f);
@@ -1379,6 +1372,17 @@ TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 WRITE8_MEMBER( upi41_cpu_device::upi41_master_w )
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upi41_cpu_device::master_callback), this), (offset << 8) | data);
+}
+
+
+READ8_MEMBER(mcs48_cpu_device::p1_r)
+{
+	return m_p1;
+}
+
+READ8_MEMBER(mcs48_cpu_device::p2_r)
+{
+	return m_p2;
 }
 
 

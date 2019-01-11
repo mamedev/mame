@@ -25,7 +25,6 @@
 #include "isa.h"
 #include "cga.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 
 enum AGA_MODE  { AGA_OFF, AGA_COLOR, AGA_MONO };
 

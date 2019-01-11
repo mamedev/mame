@@ -1,42 +1,28 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_REALBRK_H
-#define MAME_INCLUDES_REALBRK_H
-
-#pragma once
-
 #include "machine/tmp68301.h"
-#include "emupal.h"
 #include "screen.h"
 
 class realbrk_state : public driver_device
 {
 public:
-	realbrk_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	realbrk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
-		m_vram(*this, "vram_%u", 0U),
+		m_vram_0(*this, "vram_0"),
+		m_vram_1(*this, "vram_1"),
+		m_vram_2(*this, "vram_2"),
 		m_vregs(*this, "vregs"),
 		m_dsw_select(*this, "dsw_select"),
 		m_backup_ram(*this, "backup_ram"),
-		m_vram_ras(*this, "vram_%uras", 0U),
-		m_in_io(*this, "IN%u", 0U),
-		m_dsw_io(*this, "SW%u", 1U),
-		m_paddle_io(*this, "PADDLE%u", 1U),
-		m_player_io(*this, "P%u", 1U)
-	{ }
+		m_vram_0ras(*this, "vram_0ras"),
+		m_vram_1ras(*this, "vram_1ras") { }
 
-	void pkgnsh(machine_config &config);
-	void dai2kaku(machine_config &config);
-	void realbrk(machine_config &config);
-	void pkgnshdx(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tmp68301_device> m_tmp68301;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -44,24 +30,25 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr_array<uint16_t, 3> m_vram;
+	required_shared_ptr<uint16_t> m_vram_0;
+	required_shared_ptr<uint16_t> m_vram_1;
+	required_shared_ptr<uint16_t> m_vram_2;
 	required_shared_ptr<uint16_t> m_vregs;
 	optional_shared_ptr<uint16_t> m_dsw_select;
 	optional_shared_ptr<uint16_t> m_backup_ram;
-	optional_shared_ptr_array<uint16_t, 2> m_vram_ras;
-
-	optional_ioport_array<2> m_in_io;
-	optional_ioport_array<4> m_dsw_io;
-	optional_ioport_array<2> m_paddle_io;
-	optional_ioport_array<2> m_player_io;
+	optional_shared_ptr<uint16_t> m_vram_0ras;
+	optional_shared_ptr<uint16_t> m_vram_1ras;
 
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap1;
 	int m_disable_video;
-	tilemap_t *m_tilemap[3];
+	tilemap_t *m_tilemap_0;
+	tilemap_t *m_tilemap_1;
+	tilemap_t *m_tilemap_2;
 
 	// common
-	template<int Layer> DECLARE_WRITE16_MEMBER(vram_w);
+	DECLARE_WRITE16_MEMBER(vram_0_w);
+	DECLARE_WRITE16_MEMBER(vram_1_w);
 	DECLARE_WRITE16_MEMBER(vram_2_w);
 	DECLARE_WRITE16_MEMBER(vregs_w);
 
@@ -77,21 +64,25 @@ private:
 	DECLARE_READ16_MEMBER(backup_ram_dx_r);
 	DECLARE_WRITE16_MEMBER(backup_ram_w);
 
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dai2kaku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	template <bool Rotatable> void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void pkgnsh(machine_config &config);
+	void dai2kaku(machine_config &config);
+	void realbrk(machine_config &config);
+	void pkgnshdx(machine_config &config);
 	void base_mem(address_map &map);
 	void dai2kaku_mem(address_map &map);
 	void pkgnsh_mem(address_map &map);
 	void pkgnshdx_mem(address_map &map);
 	void realbrk_mem(address_map &map);
 };
-
-#endif // MAME_INCLUDES_REALBRK_H

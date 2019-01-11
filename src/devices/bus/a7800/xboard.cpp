@@ -106,27 +106,26 @@ void a78_xm_device::device_reset()
 }
 
 
-void a78_xboard_device::device_add_mconfig(machine_config &config)
-{
-	A78_CART_SLOT(config, m_xbslot, a7800_cart, nullptr);
+MACHINE_CONFIG_START(a78_xboard_device::device_add_mconfig)
+	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
 
 	SPEAKER(config, "xb_speaker").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8);
-	m_pokey->add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
-}
+	MCFG_DEVICE_ADD("xb_pokey", POKEY, XTAL(14'318'181)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
+MACHINE_CONFIG_END
 
-void a78_xm_device::device_add_mconfig(machine_config &config)
-{
-	A78_CART_SLOT(config, m_xbslot, a7800_cart, nullptr);
+MACHINE_CONFIG_START(a78_xm_device::device_add_mconfig)
+	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
 
 	SPEAKER(config, "xb_speaker").front_center();
 
-	POKEY(config, m_pokey, XTAL(14'318'181)/8);
-	m_pokey->add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
+	MCFG_DEVICE_ADD("xb_pokey", POKEY, XTAL(14'318'181)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
 
-	YM2151(config, m_ym, XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
-}
+	MCFG_DEVICE_ADD("xm_ym2151", YM2151, XTAL(14'318'181)/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
+MACHINE_CONFIG_END
 
 
 /*-------------------------------------------------

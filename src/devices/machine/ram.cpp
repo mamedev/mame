@@ -167,7 +167,7 @@ void ram_device::device_start()
 
 	// register for state saving
 	save_item(NAME(m_size));
-	save_pointer(NAME(m_pointer), m_size);
+	save_pointer(NAME(m_pointer.get()), m_size);
 }
 
 

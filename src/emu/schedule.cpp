@@ -460,12 +460,8 @@ void device_scheduler::timeslice()
 					delta += ATTOSECONDS_PER_SECOND;
 				assert(delta == (target - exec->m_localtime).as_attoseconds());
 
-				if (exec->m_attoseconds_per_cycle == 0)
-				{
-					exec->m_localtime = target;
-				}
 				// if we have enough for at least 1 cycle, do the math
-				else if (delta >= exec->m_attoseconds_per_cycle)
+				if (delta >= exec->m_attoseconds_per_cycle)
 				{
 					// compute how many cycles we want to execute
 					int ran = exec->m_cycles_running = divu_64x32(u64(delta) >> exec->m_divshift, exec->m_divisor);

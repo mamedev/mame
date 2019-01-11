@@ -13,7 +13,6 @@
 #include "screen.h"
 
 #include <ctype.h>
-#include <cstring>
 
 
 //**************************************************************************
@@ -38,10 +37,10 @@ private:
 
 machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	: m_minimum_quantum(attotime::zero)
+	, m_default_layout(nullptr)
 	, m_gamedrv(gamedrv)
 	, m_options(options)
 	, m_root_device()
-	, m_default_layouts([] (char const *a, char const *b) { return 0 > std::strcmp(a, b); })
 	, m_current_device(nullptr)
 {
 	// add the root device
@@ -113,19 +112,6 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 machine_config::~machine_config()
 {
-}
-
-
-//-------------------------------------------------
-//  set_default_layout - set layout for current
-//  device
-//-------------------------------------------------
-
-void machine_config::set_default_layout(internal_layout const &layout)
-{
-	std::pair<default_layout_map::iterator, bool> const ins(m_default_layouts.emplace(current_device().tag(), &layout));
-	if (!ins.second)
-		ins.first->second = &layout;
 }
 
 
@@ -310,21 +296,9 @@ device_t *machine_config::device_find(device_t *owner, const char *tag)
 //  to a device about to be removed from the tree
 //-------------------------------------------------
 
-void machine_config::remove_references(device_t &device)
+void machine_config::remove_references(ATTR_UNUSED device_t &device)
 {
-	// remove default layouts for subdevices
-	char const *const tag(device.tag());
-	std::size_t const taglen(std::strlen(tag));
-	default_layout_map::iterator it(m_default_layouts.lower_bound(tag));
-	while ((m_default_layouts.end() != it) && !std::strncmp(tag, it->first, taglen))
-	{
-		if (!it->first[taglen] || (':' == it->first[taglen]))
-			it = m_default_layouts.erase(it);
-		else
-			++it;
-	}
-
 	// iterate over all devices and remove any references
 	for (device_t &scan : device_iterator(root_device()))
-		scan.subdevices().m_tagmap.clear();
+		scan.subdevices().m_tagmap.clear(); //remove(&device);
 }

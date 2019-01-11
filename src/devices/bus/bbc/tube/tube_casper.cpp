@@ -39,7 +39,7 @@ ROM_START( tube_casper )
 	ROM_LOAD16_BYTE("casper.ic9",  0x0000, 0x2000, CRC(4105cbf4) SHA1(a3efeb6fb144da55b47c718239967ed0af4fff72))
 	ROM_LOAD16_BYTE("casper.ic10", 0x0001, 0x2000, CRC(f25bc320) SHA1(297db56283bb3164c31c21331837213cea426837))
 
-	ROM_REGION(0x8000, "exp_rom", 0)
+	ROM_REGION(0x8000, "host_rom", 0)
 	ROM_LOAD("rom1.rom", 0x0000, 0x4000, CRC(602b6a36) SHA1(7b24746dbcacb8772468532e92832d5c7f6648fd))
 	ROM_LOAD("rom2.rom", 0x4000, 0x4000, CRC(7c9efb43) SHA1(4195ce1ed928178fd645a267872a5b4f325d078a))
 ROM_END
@@ -48,26 +48,25 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void bbc_tube_casper_device::device_add_mconfig(machine_config &config)
-{
-	M68000(config, m_m68000, 4_MHz_XTAL);
-	m_m68000->set_addrmap(AS_PROGRAM, &bbc_tube_casper_device::tube_casper_mem);
+MACHINE_CONFIG_START(bbc_tube_casper_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(m_m68000, M68000, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(tube_casper_mem)
 
-	VIA6522(config, m_via6522_0, 4_MHz_XTAL / 2);
-	m_via6522_0->writepb_handler().set(m_via6522_1, FUNC(via6522_device::write_pa));
-	m_via6522_0->ca2_handler().set(m_via6522_1, FUNC(via6522_device::write_cb1));
-	m_via6522_0->cb2_handler().set(m_via6522_1, FUNC(via6522_device::write_ca1));
-	m_via6522_0->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_tube_slot_device::irq_w));
+	MCFG_DEVICE_ADD(m_via6522_0, VIA6522, XTAL(4'000'000) / 2)
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(m_via6522_1, via6522_device, write_pa))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_via6522_1, via6522_device, write_cb1))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(m_via6522_1, via6522_device, write_ca1))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
 
-	VIA6522(config, m_via6522_1, 4_MHz_XTAL / 2);
-	m_via6522_1->writepb_handler().set(m_via6522_0, FUNC(via6522_device::write_pa));
-	m_via6522_1->ca2_handler().set(m_via6522_0, FUNC(via6522_device::write_cb1));
-	m_via6522_1->cb2_handler().set(m_via6522_0, FUNC(via6522_device::write_ca1));
-	m_via6522_1->irq_handler().set_inputline(m_m68000, M68K_IRQ_1);
+	MCFG_DEVICE_ADD(m_via6522_1, VIA6522, XTAL(4'000'000) / 2)
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(m_via6522_0, via6522_device, write_pa))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(m_via6522_0, via6522_device, write_cb1))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(m_via6522_0, via6522_device, write_ca1))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(m_m68000, M68K_IRQ_1))
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_casper").set_original("bbc_flop_68000");
-}
+	MCFG_SOFTWARE_LIST_ADD("flop_ls_casper", "bbc_flop_68000")
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -92,7 +91,8 @@ bbc_tube_casper_device::bbc_tube_casper_device(const machine_config &mconfig, co
 		m_m68000(*this, "m68000"),
 		m_via6522_0(*this, "via6522_0"),
 		m_via6522_1(*this, "via6522_1"),
-		m_casper_rom(*this, "casper_rom")
+		m_casper_rom(*this, "casper_rom"),
+		m_host_rom(*this, "host_rom")
 {
 }
 
@@ -102,6 +102,17 @@ bbc_tube_casper_device::bbc_tube_casper_device(const machine_config &mconfig, co
 
 void bbc_tube_casper_device::device_start()
 {
+	m_slot = dynamic_cast<bbc_tube_slot_device *>(owner());
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void bbc_tube_casper_device::device_reset()
+{
+	machine().root_device().membank("bank4")->configure_entry(13, memregion("host_rom")->base() + 0x0000);
+	machine().root_device().membank("bank4")->configure_entry(14, memregion("host_rom")->base() + 0x4000);
 }
 
 
@@ -111,10 +122,10 @@ void bbc_tube_casper_device::device_start()
 
 READ8_MEMBER(bbc_tube_casper_device::host_r)
 {
-	return m_via6522_0->read(offset & 0xf);
+	return m_via6522_0->read(space, offset & 0xf);
 }
 
 WRITE8_MEMBER(bbc_tube_casper_device::host_w)
 {
-	m_via6522_0->write(offset & 0xf, data);
+	m_via6522_0->write(space, offset & 0xf, data);
 }

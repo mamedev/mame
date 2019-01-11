@@ -97,7 +97,6 @@ More chips (from eBay auction):
 #include "video/ramdac.h"
 #include "sound/ymz280b.h"
 #include "bus/rs232/rs232.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -114,10 +113,7 @@ public:
 		m_quart1(*this, "quart1")
 	{ }
 
-	void igt_gameking(machine_config &config);
-	void igt_ms72c(machine_config &config);
 
-private:
 	virtual void video_start() override;
 	uint32_t screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -141,10 +137,12 @@ private:
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_READ16_MEMBER(version_r);
 
+	void igt_gameking(machine_config &config);
+	void igt_ms72c(machine_config &config);
 	void igt_gameking_map(address_map &map);
 	void igt_ms72c_map(address_map &map);
 	void ramdac_map(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -249,26 +247,26 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	// 28060000: COLOR SEL
 	// 28070000: OUT SEL
 //  map(0x28010000, 0x2801007f).rw("quart1", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x28010008, 0x2801000b).r(FUNC(igt_gameking_state::uart_status_r));
+	map(0x28010008, 0x2801000b).r(this, FUNC(igt_gameking_state::uart_status_r));
 	map(0x2801001c, 0x2801001f).nopw();
-	map(0x28010030, 0x28010033).r(FUNC(igt_gameking_state::uart_status_r)); // channel D
-	map(0x28010034, 0x28010037).w(FUNC(igt_gameking_state::uart_w));       // channel D
+	map(0x28010030, 0x28010033).r(this, FUNC(igt_gameking_state::uart_status_r)); // channel D
+	map(0x28010034, 0x28010037).w(this, FUNC(igt_gameking_state::uart_w));       // channel D
 	map(0x28020000, 0x280205ff).ram(); // CMOS?
-//  map(0x28020000, 0x2802007f).r(FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
+//  map(0x28020000, 0x2802007f).r(this, FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
 	map(0x28030000, 0x28030003).portr("IN0");
 //  map(0x28040000, 0x2804007f).rw("quart2", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x2804000a, 0x2804000a).w(FUNC(igt_gameking_state::unk_w));
-	map(0x28040008, 0x28040008).rw(FUNC(igt_gameking_state::irq_vector_r), FUNC(igt_gameking_state::irq_enable_w));
+	map(0x2804000a, 0x2804000a).w(this, FUNC(igt_gameking_state::unk_w));
+	map(0x28040008, 0x28040008).rw(this, FUNC(igt_gameking_state::irq_vector_r), FUNC(igt_gameking_state::irq_enable_w));
 	map(0x28040018, 0x2804001b).portr("IN1").nopw();
 	map(0x2804001c, 0x2804001f).portr("IN4").nopw();
 	map(0x28040028, 0x2804002b).nopr();
-	map(0x2804002a, 0x2804002a).w(FUNC(igt_gameking_state::irq_ack_w));
-//  map(0x28040038, 0x2804003b).r(FUNC(igt_gameking_state::timer_r)).umask32(0x00ff0000);
+	map(0x2804002a, 0x2804002a).w(this, FUNC(igt_gameking_state::irq_ack_w));
+//  map(0x28040038, 0x2804003b).r(this, FUNC(igt_gameking_state::timer_r)).umask32(0x00ff0000);
 	map(0x28040038, 0x2804003b).portr("IN2").nopw();
 	map(0x2804003c, 0x2804003f).portr("IN3").nopw();
-	map(0x28040050, 0x28040050).r(FUNC(igt_gameking_state::frame_number_r));
+	map(0x28040050, 0x28040050).r(this, FUNC(igt_gameking_state::frame_number_r));
 	map(0x28040054, 0x28040057).nopw();
-//  map(0x28040054, 0x28040057).w(FUNC(igt_gameking_state::irq_ack_w).umask32(0x000000ff);
+//  map(0x28040054, 0x28040057).w(this, FUNC(igt_gameking_state::irq_ack_w).umask32(0x000000ff);
 
 	map(0x28050000, 0x28050003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x00ff00ff);
 	map(0x28060000, 0x28060000).w("ramdac", FUNC(ramdac_device::index_w));
@@ -295,8 +293,8 @@ READ8_MEMBER(igt_gameking_state::timer_r)
 void igt_gameking_state::igt_ms72c_map(address_map &map)
 {
 	igt_gameking_map(map);
-	map(0x18200000, 0x18200001).r(FUNC(igt_gameking_state::version_r));
-	map(0x2804003a, 0x2804003a).r(FUNC(igt_gameking_state::timer_r));
+	map(0x18200000, 0x18200001).r(this, FUNC(igt_gameking_state::version_r));
+	map(0x2804003a, 0x2804003a).r(this, FUNC(igt_gameking_state::timer_r));
 }
 
 static INPUT_PORTS_START( igt_gameking )
@@ -613,15 +611,15 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_DEVICE_ADD("maincpu", I960, XTAL(24'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(igt_gameking_map)
 
-	MCFG_DEVICE_ADD("quart1", SC28C94, XTAL(24'000'000) / 6)
+	MCFG_SC28C94_ADD("quart1", XTAL(24'000'000) / 6)
 	MCFG_SC28C94_D_TX_CALLBACK(WRITELINE("diag", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("quart2", SC28C94, XTAL(24'000'000) / 6)
+	MCFG_SC28C94_ADD("quart2", XTAL(24'000'000) / 6)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
 
-	rs232_port_device &diag(RS232_PORT(config, "diag", default_rs232_devices, nullptr));
-	diag.rxd_handler().set("quart1", FUNC(sc28c94_device::rx_d_w));
-	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	MCFG_DEVICE_ADD("diag", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("quart1", sc28c94_device, rx_d_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_igt_gameking)
 
@@ -637,8 +635,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
-	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
+	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -646,7 +643,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	MCFG_NVRAM_ADD_1FILL("nvram")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)

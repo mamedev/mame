@@ -49,12 +49,12 @@ TILE_GET_INFO_MEMBER(superqix_state_base::sqix_get_bg_tile_info)
 
 ***************************************************************************/
 
-void hotsmash_state::video_start()
+VIDEO_START_MEMBER(hotsmash_state, pbillian)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hotsmash_state::pb_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8,32,32);
 }
 
-void superqix_state::video_start()
+VIDEO_START_MEMBER(superqix_state_base, superqix)
 {
 	m_fg_bitmap[0] = std::make_unique<bitmap_ind16>(256, 256);
 	m_fg_bitmap[1] = std::make_unique<bitmap_ind16>(256, 256);
@@ -67,12 +67,12 @@ void superqix_state::video_start()
 	save_item(NAME(*m_fg_bitmap[1]));
 }
 
-rgb_t superqix_state_base::BBGGRRII(uint32_t raw)
+PALETTE_DECODER_MEMBER( superqix_state_base, BBGGRRII )
 {
-	uint8_t const i = raw & 3;
-	uint8_t const r = (raw >> 0) & 0x0c;
-	uint8_t const g = (raw >> 2) & 0x0c;
-	uint8_t const b = (raw >> 4) & 0x0c;
+	uint8_t i = raw & 3;
+	uint8_t r = (raw >> 0) & 0x0c;
+	uint8_t g = (raw >> 2) & 0x0c;
+	uint8_t b = (raw >> 4) & 0x0c;
 
 	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
 }

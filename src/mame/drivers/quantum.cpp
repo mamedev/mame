@@ -54,8 +54,8 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 #include "video/avgdvg.h"
 #include "sound/pokey.h"
 #include "sound/discrete.h"
+#include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "machine/x2212.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -67,25 +67,23 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_avg(*this, "avg"),
-		m_nvram(*this, "nvram"),
-		m_leds(*this, "led%u", 0U)
+		m_led(*this, "led%u", 0U)
 	{ }
 
 	void quantum(machine_config &config);
 
-private:
-	virtual void machine_start() override { m_leds.resolve(); }
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
 	DECLARE_READ16_MEMBER(trackball_r);
 	DECLARE_WRITE16_MEMBER(led_w);
-	DECLARE_WRITE16_MEMBER(nvram_recall_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_READ8_MEMBER(input_2_r);
 	void main_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
-	required_device<x2212_device> m_nvram;
-	output_finder<2> m_leds;
+	output_finder<2> m_led;
 };
 
 
@@ -132,24 +130,16 @@ WRITE16_MEMBER(quantum_state::led_w)
 		machine().bookkeeping().coin_counter_w(0, data & 2);
 		machine().bookkeeping().coin_counter_w(1, data & 1);
 
-		m_nvram->store(BIT(data, 2));
-
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		m_leds[0] = BIT(data, 4);
-		m_leds[1] = BIT(data, 5);
+		m_led[0] = BIT(data, 4);
+		m_led[1] = BIT(data, 5);
 
 		/* bits 6 and 7 flip screen */
 		m_avg->set_flip_x (data & 0x40);
 		m_avg->set_flip_y (data & 0x80);
 	}
-}
-
-WRITE16_MEMBER(quantum_state::nvram_recall_w)
-{
-	m_nvram->recall(1);
-	m_nvram->recall(0);
 }
 
 
@@ -167,12 +157,12 @@ void quantum_state::main_map(address_map &map)
 	map(0x800000, 0x801fff).ram().share("vectorram");
 	map(0x840000, 0x84001f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
 	map(0x840020, 0x84003f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
-	map(0x900000, 0x9001ff).rw("nvram", FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
-	map(0x940000, 0x940001).r(FUNC(quantum_state::trackball_r)); /* trackball */
+	map(0x900000, 0x9001ff).ram().share("nvram");
+	map(0x940000, 0x940001).r(this, FUNC(quantum_state::trackball_r)); /* trackball */
 	map(0x948000, 0x948001).portr("SYSTEM");
 	map(0x950000, 0x95001f).writeonly().share("colorram");
-	map(0x958000, 0x958001).w(FUNC(quantum_state::led_w));
-	map(0x960000, 0x960001).w(FUNC(quantum_state::nvram_recall_w));
+	map(0x958000, 0x958001).w(this, FUNC(quantum_state::led_w));
+	map(0x960000, 0x960001).nopw();
 	map(0x968000, 0x968001).w(m_avg, FUNC(avg_quantum_device::reset_word_w));
 	map(0x970000, 0x970001).w(m_avg, FUNC(avg_quantum_device::go_word_w));
 	map(0x978000, 0x978001).nopr().w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -285,57 +275,58 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-void quantum_state::quantum(machine_config &config)
-{
+MACHINE_CONFIG_START(quantum_state::quantum)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, MASTER_CLOCK / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &quantum_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(quantum_state::irq1_line_hold), attotime::from_hz(CLOCK_3KHZ / 12));
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(quantum_state, irq1_line_hold, CLOCK_3KHZ / 12)
 
-	X2212(config, "nvram"); // "137288-001" in parts list and schematic diagram
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(60);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 900, 0, 600);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	MCFG_VECTOR_ADD("vector")
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 900, 0, 600)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
-	AVG_QUANTUM(config, m_avg, 0);
-	m_avg->set_vector_tag("vector");
+	MCFG_DEVICE_ADD("avg", AVG_QUANTUM, 0)
+	MCFG_AVGDVG_VECTOR("vector")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	pokey_device &pokey1(POKEY(config, "pokey1", 600000));
-	pokey1.pot_r<0>().set(FUNC(quantum_state::input_1_r));
-	pokey1.pot_r<1>().set(FUNC(quantum_state::input_1_r));
-	pokey1.pot_r<2>().set(FUNC(quantum_state::input_1_r));
-	pokey1.pot_r<3>().set(FUNC(quantum_state::input_1_r));
-	pokey1.pot_r<4>().set(FUNC(quantum_state::input_1_r));
-	pokey1.pot_r<5>().set(FUNC(quantum_state::input_1_r));
-	pokey1.pot_r<6>().set(FUNC(quantum_state::input_1_r));
-	pokey1.pot_r<7>().set(FUNC(quantum_state::input_1_r));
-	pokey1.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey1.add_route(0, "discrete", 1.0, 0);
+	MCFG_DEVICE_ADD("pokey1", POKEY, 600000)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, quantum_state, input_1_r))
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
-	pokey_device &pokey2(POKEY(config, "pokey2", 600000));
-	pokey2.pot_r<0>().set(FUNC(quantum_state::input_2_r));
-	pokey2.pot_r<1>().set(FUNC(quantum_state::input_2_r));
-	pokey2.pot_r<2>().set(FUNC(quantum_state::input_2_r));
-	pokey2.pot_r<3>().set(FUNC(quantum_state::input_2_r));
-	pokey2.pot_r<4>().set(FUNC(quantum_state::input_2_r));
-	pokey2.pot_r<5>().set(FUNC(quantum_state::input_2_r));
-	pokey2.pot_r<6>().set(FUNC(quantum_state::input_2_r));
-	pokey2.pot_r<7>().set(FUNC(quantum_state::input_2_r));
-	pokey2.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey2.add_route(0, "discrete", 1.0, 1);
+	MCFG_DEVICE_ADD("pokey2", POKEY, 600000)
+	MCFG_POKEY_POT0_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT1_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_POT7_R_CB(READ8(*this, quantum_state, input_2_r))
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), 0.0, 5.0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 1)
 
-	DISCRETE(config, "discrete", quantum_discrete).add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, quantum_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 
 

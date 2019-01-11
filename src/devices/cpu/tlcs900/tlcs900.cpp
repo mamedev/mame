@@ -27,23 +27,23 @@ DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063"
 
 void tmp95c061_device::tmp95c061_mem8(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+	map(0x000000, 0x00007f).rw(this, FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
 }
 
 void tmp95c061_device::tmp95c061_mem16(address_map &map)
 {
-	map(0x000000, 0x00007f).rw(FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
+	map(0x000000, 0x00007f).rw(this, FUNC(tmp95c061_device::internal_r), FUNC(tmp95c061_device::internal_w));
 }
 
 
 void tmp95c063_device::tmp95c063_mem8(address_map &map)
 {
-	map(0x000000, 0x00009f).rw(FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
+	map(0x000000, 0x00009f).rw(this, FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
 }
 
 void tmp95c063_device::tmp95c063_mem16(address_map &map)
 {
-	map(0x000000, 0x00009f).rw(FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
+	map(0x000000, 0x00009f).rw(this, FUNC(tmp95c063_device::internal_r), FUNC(tmp95c063_device::internal_w));
 }
 
 
@@ -123,7 +123,14 @@ tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *ta
 	m_portd_write(*this),
 	m_porte_read(*this),
 	m_porte_write(*this),
-	m_an_read{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
+	m_an0_read(*this),
+	m_an1_read(*this),
+	m_an2_read(*this),
+	m_an3_read(*this),
+	m_an4_read(*this),
+	m_an5_read(*this),
+	m_an6_read(*this),
+	m_an7_read(*this)
 {
 }
 
@@ -1758,42 +1765,42 @@ void tmp95c063_device::tlcs900_handle_ad()
 				switch( m_reg[TMP95C063_ADMOD2] & 0x07 )
 				{
 				case 0x00:  // AN0
-					ad_value = m_an_read[0](0) & 0x3ff;
+					ad_value = m_an0_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
 					break;
 				case 0x01:  // AN1
-					ad_value = m_an_read[1](0) & 0x3ff;
+					ad_value = m_an1_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
 					break;
 				case 0x02:  // AN2
-					ad_value = m_an_read[2](0) & 0x3ff;
+					ad_value = m_an2_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
 					break;
 				case 0x03:  // AN3
-					ad_value = m_an_read[3](0) & 0x3ff;
+					ad_value = m_an3_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
 					break;
 				case 0x04:  // AN4
-					ad_value = m_an_read[4](0) & 0x3ff;
+					ad_value = m_an4_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
 					break;
 				case 0x05:  // AN5
-					ad_value = m_an_read[5](0) & 0x3ff;
+					ad_value = m_an5_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
 					break;
 				case 0x06:  // AN6
-					ad_value = m_an_read[6](0) & 0x3ff;
+					ad_value = m_an6_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
 					break;
 				case 0x07:  // AN7
-					ad_value = m_an_read[7](0) & 0x3ff;
+					ad_value = m_an7_read(0) & 0x3ff;
 					m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
 					m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
 					break;
@@ -1804,78 +1811,78 @@ void tmp95c063_device::tlcs900_handle_ad()
 				switch( m_reg[TMP95C063_ADMOD2] & 0x07 )
 				{
 					case 0x00:      // AN0
-						ad_value = m_an_read[0](0) & 0x3ff;
+						ad_value = m_an0_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
 						break;
 					case 0x01:      // AN0 -> AN1
-						ad_value = m_an_read[0](0) & 0x3ff;
+						ad_value = m_an0_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[1](0) & 0x3ff;
+						ad_value = m_an1_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
 						break;
 					case 0x02:      // AN0 -> AN1 -> AN2
-						ad_value = m_an_read[0](0) & 0x3ff;
+						ad_value = m_an0_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[1](0) & 0x3ff;
+						ad_value = m_an1_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[2](0) & 0x3ff;
+						ad_value = m_an2_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
 						break;
 					case 0x03:      // AN0 -> AN1 -> AN2 -> AN3
-						ad_value = m_an_read[0](0) & 0x3ff;
+						ad_value = m_an0_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[1](0) & 0x3ff;
+						ad_value = m_an1_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[2](0) & 0x3ff;
+						ad_value = m_an2_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[3](0) & 0x3ff;
+						ad_value = m_an3_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
 						break;
 					case 0x04:      // AN4
-						ad_value = m_an_read[4](0) & 0x3ff;
+						ad_value = m_an4_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
 						break;
 					case 0x05:      // AN4 -> AN5
-						ad_value = m_an_read[4](0) & 0x3ff;
+						ad_value = m_an4_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[5](0) & 0x3ff;
+						ad_value = m_an5_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
 						break;
 					case 0x06:      // AN4 -> AN5 -> AN6
-						ad_value = m_an_read[4](0) & 0x3ff;
+						ad_value = m_an4_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[5](0) & 0x3ff;
+						ad_value = m_an5_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[6](0) & 0x3ff;
+						ad_value = m_an6_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
 						break;
 					case 0x07:      // AN4 -> AN5 -> AN6 -> AN7
-						ad_value = m_an_read[4](0) & 0x3ff;
+						ad_value = m_an4_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG04L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG04H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[5](0) & 0x3ff;
+						ad_value = m_an5_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG15L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG15H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[6](0) & 0x3ff;
+						ad_value = m_an6_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG26L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG26H] = (ad_value >> 2) & 0xff;
-						ad_value = m_an_read[7](0) & 0x3ff;
+						ad_value = m_an7_read(0) & 0x3ff;
 						m_reg[TMP95C063_ADREG37L] = (ad_value & 0x3) << 6;
 						m_reg[TMP95C063_ADREG37H] = (ad_value >> 2) & 0xff;
 						break;
@@ -1919,10 +1926,14 @@ void tmp95c063_device::device_start()
 	m_portd_write.resolve_safe();
 	m_porte_read.resolve_safe(0);
 	m_porte_write.resolve_safe();
-	for (int i = 0; i < 8; i++)
-	{
-		m_an_read[i].resolve_safe(0);
-	}
+	m_an0_read.resolve_safe(0);
+	m_an1_read.resolve_safe(0);
+	m_an2_read.resolve_safe(0);
+	m_an3_read.resolve_safe(0);
+	m_an4_read.resolve_safe(0);
+	m_an5_read.resolve_safe(0);
+	m_an6_read.resolve_safe(0);
+	m_an7_read.resolve_safe(0);
 }
 
 void tmp95c063_device::device_reset()

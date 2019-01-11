@@ -48,7 +48,7 @@
 	<software name="aekmon">
 		<description>AEK Monitor ROM</description>
 		<year>1982</year>
-		<publisher>Alan Knowles</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="usage" value="Type LINK #A7C7" />
 		<info name="author" value="Alan Knowles" />
 		<part name="cart" interface="atom_cart">
@@ -61,7 +61,7 @@
 	<software name="aekscrn">
 		<description>AEK Screen ROM</description>
 		<year>1983</year>
-		<publisher>Alan Knowles</publisher>
+		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="usage" value="Type LINK #AFF0" />
 		<info name="author" value="Alan Knowles" />
 		<part name="cart" interface="atom_cart">
@@ -97,7 +97,7 @@
 		<description>Atom Demo</description>
 		<year>1980</year>
 		<publisher>Acornsoft</publisher>
-		<info name="usage" value="Type ?18=#A0&lt;CR&gt;OLD&lt;CR&gt;RUN" />
+		<info name="usage" value="Type RUN" />
 		<part name="cart" interface="atom_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="atomdemo.rom" size="4096" crc="cdf4810f" sha1="36054b1a85341b2131d7c43231a6349a5c984116" offset="0"/>

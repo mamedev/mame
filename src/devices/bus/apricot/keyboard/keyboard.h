@@ -35,6 +35,18 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_APRICOT_KEYBOARD_INTERFACE_ADD(_tag, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, APRICOT_KEYBOARD_INTERFACE, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(apricot_keyboard_devices, _def_slot, false)
+
+#define MCFG_APRICOT_KEYBOARD_IN_HANDLER(_devcb) \
+	devcb = &downcast<apricot_keyboard_bus_device &>(*device).set_in_handler(DEVCB_##_devcb);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -46,20 +58,11 @@ class apricot_keyboard_bus_device : public device_t, public device_slot_interfac
 {
 public:
 	// construction/destruction
-	template <typename T>
-	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: apricot_keyboard_bus_device(mconfig, tag, owner, 0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
 	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apricot_keyboard_bus_device();
 
 	// callbacks
-	auto in_handler() { return m_in_handler.bind(); }
+	template <class Object> devcb_base &set_in_handler(Object &&cb) { return m_in_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from keyboard
 	DECLARE_WRITE_LINE_MEMBER( in_w ) { m_in_handler(state); }

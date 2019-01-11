@@ -15,10 +15,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98644, bus::hp_dio, dio16_98644_device, "dio98644", "HP98644A Asynchronous Serial Interface")
+DEFINE_DEVICE_TYPE(HPDIO_98644, dio16_98644_device, "dio98644", "HP98644A Asynchronous Serial Interface")
 
-namespace bus {
-	namespace hp_dio {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -27,20 +25,20 @@ namespace bus {
 #define RS232_TAG       "rs232"
 #define INS8250_TAG     "ins8250"
 
-void dio16_98644_device::device_add_mconfig(machine_config &config)
-{
-	INS8250(config, m_uart, XTAL(2'457'600));
-	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
-	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+MACHINE_CONFIG_START( dio16_98644_device::device_add_mconfig )
+	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL(2'457'600))
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
-	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
-	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
-	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
-	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
-}
+	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+
+	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, cts_w))
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -88,7 +86,7 @@ static INPUT_PORTS_START(hp98644_port)
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(REG_SWITCHES_MODEM_EN, DEF_STR(On))
 
-	PORT_DIPNAME(REG_SWITCHES_INT_LEVEL_MASK << REG_SWITCHES_INT_LEVEL_SHIFT, 0x02 << REG_SWITCHES_INT_LEVEL_SHIFT, "Interrupt level")
+	PORT_DIPNAME(REG_SWITCHES_INT_LEVEL_MASK << REG_SWITCHES_INT_LEVEL_SHIFT, 0x00, "Interrupt level")
 	PORT_DIPSETTING(0 << REG_SWITCHES_INT_LEVEL_SHIFT, "3")
 	PORT_DIPSETTING(1 << REG_SWITCHES_INT_LEVEL_SHIFT, "4")
 	PORT_DIPSETTING(2 << REG_SWITCHES_INT_LEVEL_SHIFT, "5")
@@ -140,10 +138,8 @@ ioport_constructor dio16_98644_device::device_input_ports() const
 
 void dio16_98644_device::device_start()
 {
-	save_item(NAME(m_installed_io));
-	save_item(NAME(m_control));
-	save_item(NAME(m_loopback));
-	save_item(NAME(m_data));
+	// set_nubus_device makes m_slot valid
+	set_dio_device();
 	m_installed_io = false;
 }
 
@@ -158,7 +154,7 @@ void dio16_98644_device::device_reset()
 
 	if (!m_installed_io)
 	{
-		dio().install_memory(
+		m_dio->install_memory(
 				0x600000 + (code * 0x10000),
 				0x6007ff + (code * 0x10000),
 				read16_delegate(FUNC(dio16_98644_device::io_r), this),
@@ -181,8 +177,7 @@ READ16_MEMBER(dio16_98644_device::io_r)
 		break;
 
 	case 1:
-		ret = m_control | m_control << 8 | \
-		(((m_switches->read() >> REG_SWITCHES_INT_LEVEL_SHIFT) & REG_SWITCHES_INT_LEVEL_MASK) << 4);
+		ret = m_control | m_control << 8;
 		break;
 
 	case 0x08:
@@ -234,6 +229,3 @@ WRITE16_MEMBER(dio16_98644_device::io_w)
 		break;
 	}
 }
-
-} // namespace bus::hp_dio
-} // namespace bus

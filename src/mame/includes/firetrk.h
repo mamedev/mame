@@ -5,15 +5,10 @@
 Atari Fire Truck + Super Bug + Monte Carlo driver
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_FIRETRK_H
-#define MAME_INCLUDES_FIRETRK_H
-
-#pragma once
 
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
-#include "emupal.h"
 #include "screen.h"
 
 #define FIRETRUCK_MOTOR_DATA    NODE_01
@@ -64,24 +59,10 @@ public:
 		, m_bit_6(*this, "BIT_6")
 		, m_bit_7(*this, "BIT_7")
 		, m_dips(*this, {"DIP_0", "DIP_1"})
-		, m_steer(*this, "STEER_%u", 1U)
-		, m_leds(*this, "led%u", 0U)
+		, m_steer(*this, {"STEER_1", "STEER_2"})
+		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void firetrk(machine_config &config);
-	void montecar(machine_config &config);
-	void superbug(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(steer_dir_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(steer_flag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(skid_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(crash_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gear_r);
-	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
-
-private:
 	DECLARE_WRITE8_MEMBER(firetrk_output_w);
 	DECLARE_WRITE8_MEMBER(superbug_output_w);
 	DECLARE_WRITE8_MEMBER(montecar_output_1_w);
@@ -95,16 +76,24 @@ private:
 	DECLARE_WRITE8_MEMBER(montecar_drone_reset_w);
 	DECLARE_WRITE8_MEMBER(steer_reset_w);
 	DECLARE_WRITE8_MEMBER(crash_reset_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(steer_dir_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(steer_flag_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(skid_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(crash_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gear_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_mode_switch_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(firetrk_horn_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(gear_changed);
 	TILE_GET_INFO_MEMBER(firetrk_get_tile_info1);
 	TILE_GET_INFO_MEMBER(superbug_get_tile_info1);
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info1);
 	TILE_GET_INFO_MEMBER(firetrk_get_tile_info2);
 	TILE_GET_INFO_MEMBER(superbug_get_tile_info2);
 	TILE_GET_INFO_MEMBER(montecar_get_tile_info2);
-	void firetrk_palette(palette_device &palette);
+	DECLARE_PALETTE_INIT(firetrk);
 	DECLARE_VIDEO_START(superbug);
 	DECLARE_VIDEO_START(montecar);
-	void montecar_palette(palette_device &palette);
+	DECLARE_PALETTE_INIT(montecar);
 	uint32_t screen_update_firetrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_superbug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_montecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -123,11 +112,15 @@ private:
 	void check_collision(int which);
 	void set_service_mode(int enable);
 	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *alpha_ram, int x, int count, int height);
+	void firetrk(machine_config &config);
+	void montecar(machine_config &config);
+	void superbug(machine_config &config);
 	void firetrk_map(address_map &map);
 	void montecar_map(address_map &map);
 	void superbug_map(address_map &map);
 
-	virtual void machine_start() override { m_leds.resolve(); }
+protected:
+	virtual void machine_start() override { m_led.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -152,7 +145,7 @@ private:
 	optional_ioport m_bit_7;
 	required_ioport_array<2> m_dips;
 	optional_ioport_array<2> m_steer;
-	output_finder<4> m_leds;
+	output_finder<4> m_led;
 
 	uint8_t m_in_service_mode;
 	uint32_t m_dial[2];
@@ -177,5 +170,3 @@ private:
 DISCRETE_SOUND_EXTERN( firetrk_discrete );
 DISCRETE_SOUND_EXTERN( superbug_discrete );
 DISCRETE_SOUND_EXTERN( montecar_discrete );
-
-#endif // MAME_INCLUDES_FIRETRK_H

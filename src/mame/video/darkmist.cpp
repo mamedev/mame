@@ -61,27 +61,39 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 		0);
 }
 
-void darkmist_state::darkmist_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 {
-	//palette.set_indirect_color(0x100, rgb_t::black());
+//  palette.set_indirect_color(0x100, rgb_t::black());
 
-	std::pair<uint8_t const *, uint8_t> const planes[4]{
-			{ &m_bg_clut[0], 0x80 },
-			{ &m_fg_clut[0], 0x00 },
-			{ &m_spr_clut[0], 0x40 },
-			{ &m_tx_clut[0], 0xc0 } };
-
-	for (unsigned plane = 0; ARRAY_LENGTH(planes) > plane; ++plane)
+	for (int i = 0; i < 0x400; i++)
 	{
-		for (unsigned i = 0; 0x100 > i; ++i)
+		int ctabentry;
+		uint8_t clut = 0;
+
+		switch (i & 0x300)
 		{
-			uint8_t const clut = planes[plane].first[i];
-//          if (clut & 0x40) // 0x40 indicates transparent pen
-//              ctabentry = 0x100;
-//          else
-			int const ctabentry = (clut & 0x3f) | planes[plane].second;
-			palette.set_pen_indirect((plane << 8) | i, ctabentry);
+			case 0x000:  clut = m_bg_clut[i&0xff]; break;
+			case 0x100:  clut = m_fg_clut[i&0xff]; break;
+			case 0x200:  clut = m_spr_clut[i&0xff]; break;
+			case 0x300:  clut = m_tx_clut[i&0xff]; break;
 		}
+
+//      if (clut & 0x40) // 0x40 indicates transparent pen
+//          ctabentry = 0x100;
+//      else
+		{
+			ctabentry = (clut & 0x3f);
+
+			switch (i & 0x300)
+			{
+			case 0x000:  ctabentry = ctabentry | 0x80; break;
+			case 0x100:  ctabentry = ctabentry | 0x00; break;
+			case 0x200:  ctabentry = ctabentry | 0x40; break;
+			case 0x300:  ctabentry = ctabentry | 0xc0; break;
+			}
+		}
+
+		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 

@@ -5,22 +5,32 @@
     Slapshot / Operation Wolf 3
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SLAPSHOT_H
-#define MAME_INCLUDES_SLAPSHOT_H
-
-#pragma once
 
 #include "audio/taitosnd.h"
 #include "machine/taitoio.h"
 #include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
-#include "emupal.h"
+
+struct slapshot_tempsprite
+{
+	int gfx;
+	int code,color;
+	int flipx,flipy;
+	int x,y;
+	int zoomx,zoomy;
+	int primask;
+};
 
 class slapshot_state : public driver_device
 {
 public:
-	slapshot_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	enum
+	{
+		TIMER_SLAPSHOT_INTERRUPT6
+	};
+
+	slapshot_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_tc0480scp(*this, "tc0480scp"),
@@ -29,35 +39,19 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this,"spriteram"),
-		m_spriteext(*this,"spriteext")
-	{ }
+		m_spriteext(*this,"spriteext") { }
+
 
 	void opwolf3(machine_config &config);
 	void slapshot(machine_config &config);
-
 	void init_slapshot();
 
 protected:
-	enum
-	{
-		TIMER_SLAPSHOT_INTERRUPT6
-	};
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	struct slapshot_tempsprite
-	{
-		int gfx;
-		int code,color;
-		int flipx,flipy;
-		int x,y;
-		int zoomx,zoomy;
-		int primask;
-	};
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0140syt_device> m_tc0140syt;
@@ -74,7 +68,7 @@ private:
 	std::unique_ptr<uint16_t[]>    m_spriteram_delayed;
 
 	/* video-related */
-	slapshot_tempsprite *m_spritelist;
+	struct      slapshot_tempsprite *m_spritelist;
 	int32_t       m_sprites_disabled;
 	int32_t       m_sprites_active_area;
 	int32_t       m_sprites_master_scrollx;
@@ -104,5 +98,3 @@ private:
 	void opwolf3_z80_sound_map(address_map &map);
 	void slapshot_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_SLAPSHOT_H

@@ -137,13 +137,13 @@ void s100_bus_device::add_card(device_s100_card_interface *card)
 
 READ8_MEMBER( s100_bus_device::smemr_r )
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0;
 
 	device_s100_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		data &= entry->s100_smemr_r(space, offset);
+		data |= entry->s100_smemr_r(space, offset);
 		entry = entry->next();
 	}
 
@@ -173,13 +173,13 @@ WRITE8_MEMBER( s100_bus_device::mwrt_w )
 
 READ8_MEMBER( s100_bus_device::sinp_r )
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0;
 
 	device_s100_card_interface *entry = m_device_list.first();
 
 	while (entry)
 	{
-		data &= entry->s100_sinp_r(space, offset);
+		data |= entry->s100_sinp_r(space, offset);
 		entry = entry->next();
 	}
 

@@ -328,7 +328,6 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/sn76496.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -448,10 +447,10 @@ WRITE8_MEMBER(gatron_state::output_port_1_w)
 void gatron_state::gat_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x63ff).ram().w(FUNC(gatron_state::videoram_w)).share("videoram");
+	map(0x6000, 0x63ff).ram().w(this, FUNC(gatron_state::videoram_w)).share("videoram");
 	map(0x8000, 0x87ff).ram().share("nvram");                          /* battery backed RAM */
-	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::command_w));       /* PSG */
-	map(0xe000, 0xe000).w(FUNC(gatron_state::output_port_0_w));  /* lamps */
+	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::write));       /* PSG */
+	map(0xe000, 0xe000).w(this, FUNC(gatron_state::output_port_0_w));  /* lamps */
 }
 
 void gatron_state::gat_portmap(address_map &map)
@@ -570,12 +569,12 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_DEVICE_PROGRAM_MAP(gat_map)
 	MCFG_DEVICE_IO_MAP(gat_portmap)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	i8255_device &ppi(I8255A(config, "ppi8255"));
-	ppi.in_pa_callback().set_ioport("IN0");
-	ppi.in_pb_callback().set_ioport("IN1");
-	ppi.out_pc_callback().set(FUNC(gatron_state::output_port_1_w));
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gatron_state, output_port_1_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

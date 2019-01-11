@@ -284,105 +284,6 @@ void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry
 
 
 //-------------------------------------------------
-//  select_item
-//-------------------------------------------------
-
-void menu_file_selector::select_item(const file_selector_entry &entry)
-{
-	switch (entry.type)
-	{
-	case SELECTOR_ENTRY_TYPE_EMPTY:
-		// empty slot - unload
-		m_result = result::EMPTY;
-		stack_pop();
-		break;
-
-	case SELECTOR_ENTRY_TYPE_CREATE:
-		// create
-		m_result = result::CREATE;
-		stack_pop();
-		break;
-
-	case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-		m_result = result::SOFTLIST;
-		stack_pop();
-		break;
-
-	case SELECTOR_ENTRY_TYPE_DRIVE:
-	case SELECTOR_ENTRY_TYPE_DIRECTORY:
-		// drive/directory - first check the path
-		{
-			util::zippath_directory::ptr dir;
-			osd_file::error const err = util::zippath_directory::open(entry.fullpath, dir);
-			if (err != osd_file::error::NONE)
-			{
-				// this path is problematic; present the user with an error and bail
-				ui().popup_time(1, _("Error accessing %s"), entry.fullpath);
-				break;
-			}
-		}
-		m_current_directory.assign(entry.fullpath);
-		reset(reset_options::SELECT_FIRST);
-		break;
-
-	case SELECTOR_ENTRY_TYPE_FILE:
-		// file
-		m_current_file.assign(entry.fullpath);
-		m_result = result::FILE;
-		stack_pop();
-		break;
-	}
-}
-
-
-//-------------------------------------------------
-//  type_search_char
-//-------------------------------------------------
-
-void menu_file_selector::type_search_char(char32_t ch)
-{
-	std::string const current(m_filename);
-	if (input_character(m_filename, ch, uchar_is_printable))
-	{
-		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
-
-		file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
-
-		// if it's a perfect match for the current selection, don't move it
-		if (!cur_selected || core_strnicmp(cur_selected->basename.c_str(), m_filename.c_str(), m_filename.size()))
-		{
-			std::string::size_type bestmatch(0);
-			file_selector_entry const *selected_entry(cur_selected);
-			for (auto &entry : m_entrylist)
-			{
-				// TODO: more efficient "common prefix" code
-				std::string::size_type match(0);
-				for (std::string::size_type i = 1; m_filename.size() >= i; ++i)
-				{
-					if (!core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i))
-						match = i;
-					else
-						break;
-				}
-
-				if (match > bestmatch)
-				{
-					bestmatch = match;
-					selected_entry = &entry;
-				}
-			}
-
-			if (selected_entry && (selected_entry != cur_selected))
-			{
-				set_selection((void *)selected_entry);
-				centre_selection();
-			}
-		}
-	}
-}
-
-
-//-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
@@ -474,14 +375,61 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 
 void menu_file_selector::handle()
 {
+	osd_file::error err;
+	const file_selector_entry *selected_entry = nullptr;
+	int bestmatch = 0;
+
 	// process the menu
-	event const *const event = process(0);
-	if (event && event->itemref)
+	const event *event = process(0);
+	if (event != nullptr && event->itemref != nullptr)
 	{
 		// handle selections
 		if (event->iptkey == IPT_UI_SELECT)
 		{
-			select_item(*reinterpret_cast<file_selector_entry const *>(event->itemref));
+			auto entry = (const file_selector_entry *) event->itemref;
+			switch (entry->type)
+			{
+			case SELECTOR_ENTRY_TYPE_EMPTY:
+				// empty slot - unload
+				m_result = result::EMPTY;
+				stack_pop();
+				break;
+
+			case SELECTOR_ENTRY_TYPE_CREATE:
+				// create
+				m_result = result::CREATE;
+				stack_pop();
+				break;
+
+			case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
+				m_result = result::SOFTLIST;
+				stack_pop();
+				break;
+
+			case SELECTOR_ENTRY_TYPE_DRIVE:
+			case SELECTOR_ENTRY_TYPE_DIRECTORY:
+				// drive/directory - first check the path
+				{
+					util::zippath_directory::ptr dir;
+					err = util::zippath_directory::open(entry->fullpath, dir);
+				}
+				if (err != osd_file::error::NONE)
+				{
+					// this path is problematic; present the user with an error and bail
+					ui().popup_time(1, _("Error accessing %s"), entry->fullpath);
+					break;
+				}
+				m_current_directory.assign(entry->fullpath);
+				reset(reset_options::SELECT_FIRST);
+				break;
+
+			case SELECTOR_ENTRY_TYPE_FILE:
+				// file
+				m_current_file.assign(entry->fullpath);
+				m_result = result::FILE;
+				stack_pop();
+				break;
+			}
 
 			// reset the char buffer when pressing IPT_UI_SELECT
 			m_filename.clear();
@@ -489,7 +437,38 @@ void menu_file_selector::handle()
 		else if (event->iptkey == IPT_SPECIAL)
 		{
 			// if it's any other key and we're not maxed out, update
-			type_search_char(event->unichar);
+			if (input_character(m_filename, event->unichar, uchar_is_printable))
+			{
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
+
+				file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
+
+				// check for entries which matches our m_filename_buffer:
+				for (auto &entry : m_entrylist)
+				{
+					if (cur_selected != &entry)
+					{
+						int match = 0;
+						for (int i = 0; i < m_filename.size() + 1; i++)
+						{
+							if (core_strnicmp(entry.basename.c_str(), m_filename.c_str(), i) == 0)
+								match = i;
+						}
+
+						if (match > bestmatch)
+						{
+							bestmatch = match;
+							selected_entry = &entry;
+						}
+					}
+				}
+
+				if (selected_entry != nullptr && selected_entry != cur_selected)
+				{
+					set_selection((void *)selected_entry);
+					centre_selection();
+				}
+			}
 		}
 		else if (event->iptkey == IPT_UI_CANCEL)
 		{

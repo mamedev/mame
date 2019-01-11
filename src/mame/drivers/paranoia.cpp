@@ -44,6 +44,7 @@ HuC6280A (Hudson)
 #include "video/huc6260.h"
 #include "video/huc6270.h"
 #include "cpu/h6280/h6280.h"
+#include "sound/c6280.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,9 +55,6 @@ public:
 	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pce_common_state(mconfig, type, tag) { }
 
-	void paranoia(machine_config &config);
-
-private:
 	DECLARE_WRITE8_MEMBER(i8085_d000_w);
 	DECLARE_READ8_MEMBER(z80_io_01_r);
 	DECLARE_READ8_MEMBER(z80_io_02_r);
@@ -66,6 +64,7 @@ private:
 	DECLARE_WRITE8_MEMBER(i8155_b_w);
 	DECLARE_WRITE8_MEMBER(i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
+	void paranoia(machine_config &config);
 	void paranoia_8085_io_map(address_map &map);
 	void paranoia_8085_map(address_map &map);
 	void paranoia_z80_io_map(address_map &map);
@@ -85,6 +84,10 @@ void paranoia_state::pce_mem(address_map &map)
 	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
 	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
 	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(paranoia_state::pce_joystick_r), FUNC(paranoia_state::pce_joystick_w));
+	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
 }
 
 void paranoia_state::pce_io(address_map &map)
@@ -102,7 +105,7 @@ void paranoia_state::paranoia_8085_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x80ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x8100, 0x8107).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0xd000, 0xd000).w(FUNC(paranoia_state::i8085_d000_w));
+	map(0xd000, 0xd000).w(this, FUNC(paranoia_state::i8085_d000_w));
 	map(0xe000, 0xe1ff).ram();
 }
 
@@ -138,10 +141,10 @@ WRITE8_MEMBER(paranoia_state::z80_io_37_w)
 void paranoia_state::paranoia_z80_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).r(FUNC(paranoia_state::z80_io_01_r));
-	map(0x02, 0x02).r(FUNC(paranoia_state::z80_io_02_r));
-	map(0x17, 0x17).w(FUNC(paranoia_state::z80_io_17_w));
-	map(0x37, 0x37).w(FUNC(paranoia_state::z80_io_37_w));
+	map(0x01, 0x01).r(this, FUNC(paranoia_state::z80_io_01_r));
+	map(0x02, 0x02).r(this, FUNC(paranoia_state::z80_io_02_r));
+	map(0x17, 0x17).w(this, FUNC(paranoia_state::z80_io_17_w));
+	map(0x37, 0x37).w(this, FUNC(paranoia_state::z80_io_37_w));
 }
 
 WRITE8_MEMBER(paranoia_state::i8155_a_w)
@@ -167,14 +170,9 @@ WRITE_LINE_MEMBER(paranoia_state::i8155_timer_out)
 
 MACHINE_CONFIG_START(paranoia_state::paranoia)
 	/* basic machine hardware */
-	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &paranoia_state::pce_mem);
-	m_maincpu->set_addrmap(AS_IO, &paranoia_state::pce_io);
-	m_maincpu->port_in_cb().set(FUNC(paranoia_state::pce_joystick_r));
-	m_maincpu->port_out_cb().set(FUNC(paranoia_state::pce_joystick_w));
-	m_maincpu->add_route(0, "lspeaker", 1.00);
-	m_maincpu->add_route(1, "rspeaker", 1.00);
-
+	MCFG_DEVICE_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(pce_mem)
+	MCFG_DEVICE_IO_MAP(pce_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("sub", I8085A, 18000000/3)
@@ -185,11 +183,11 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 	MCFG_DEVICE_PROGRAM_MAP(paranoia_z80_map)
 	MCFG_DEVICE_IO_MAP(paranoia_z80_io_map)
 
-	i8155_device &i8155(I8155(config, "i8155", 1000000 /*?*/));
-	i8155.out_pa_callback().set(FUNC(paranoia_state::i8155_a_w));
-	i8155.out_pb_callback().set(FUNC(paranoia_state::i8155_b_w));
-	i8155.out_pc_callback().set(FUNC(paranoia_state::i8155_c_w));
-	i8155.out_to_callback().set(FUNC(paranoia_state::i8155_timer_out));
+	MCFG_DEVICE_ADD("i8155", I8155, 1000000 /*?*/)
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, paranoia_state, i8155_a_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, paranoia_state, i8155_b_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, paranoia_state, i8155_c_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(*this, paranoia_state, i8155_timer_out))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -197,18 +195,22 @@ MACHINE_CONFIG_START(paranoia_state::paranoia)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260")
 
-	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
-	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
-	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
-	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
-	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
-
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
-	huc6270.set_vram_size(0x10000);
-	huc6270.irq().set_inputline(m_maincpu, 0);
+	MCFG_DEVICE_ADD( "huc6260", HUC6260, PCE_MAIN_CLOCK )
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
+	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
+	MCFG_HUC6270_VRAM_SIZE(0x10000)
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
+	MCFG_C6280_CPU("maincpu")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+
 MACHINE_CONFIG_END
 
 ROM_START(paranoia)

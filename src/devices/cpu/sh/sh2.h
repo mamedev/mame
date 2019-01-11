@@ -40,8 +40,23 @@
 #define SH2_INT_ABUS    16
 
 #define SH2_DMA_KLUDGE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
+
 #define SH2_DMA_FIFO_DATA_AVAILABLE_CB(name)  int name(uint32_t src, uint32_t dst, uint32_t data, int size)
+
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
+
+#define MCFG_SH2_IS_SLAVE(_slave) \
+	downcast<sh2_device &>(*device).set_is_slave(_slave);
+
+#define MCFG_SH2_DMA_KLUDGE_CB(_class, _method) \
+	downcast<sh2_device &>(*device).set_dma_kludge_callback(sh2_device::dma_kludge_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_SH2_FIFO_DATA_AVAIL_CB(_class, _method) \
+	downcast<sh2_device &>(*device).set_dma_fifo_data_available_callback(sh2_device::dma_fifo_data_available_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_SH2_FTCSR_READ_CB(_class, _method) \
+	downcast<sh2_device &>(*device).set_ftcsr_read_callback(sh2_device::ftcsr_read_delegate(&_class::_method, #_class "::" #_method, this));
+
 
 class sh2_frontend;
 
@@ -59,27 +74,9 @@ public:
 	virtual ~sh2_device() override;
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
-
 	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_dma_kludge_callback(
-		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
-	{
-		set_dma_kludge_callback(dma_kludge_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
 	template <typename Object> void set_dma_fifo_data_available_callback(Object &&cb) { m_dma_fifo_data_available_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_dma_fifo_data_available_callback(
-		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
-	{
-		set_dma_fifo_data_available_callback(dma_fifo_data_available_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
 	template <typename Object> void set_ftcsr_read_callback(Object &&cb) { m_ftcsr_read_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_ftcsr_read_callback(void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_ftcsr_read_callback(ftcsr_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
 
 	DECLARE_WRITE32_MEMBER( sh7604_w );
 	DECLARE_READ32_MEMBER( sh7604_r );

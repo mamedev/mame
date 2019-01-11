@@ -5,18 +5,10 @@
 
 #pragma once
 
-#include "emupal.h"
-
 
 class tc0110pcr_device : public device_t
 {
 public:
-	template <typename T> tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag)
-		: tc0110pcr_device(mconfig, tag, owner, clock)
-	{
-		m_palette.set_tag(std::forward<T>(palette_tag));
-	}
-
 	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ16_MEMBER( word_r );
@@ -27,11 +19,12 @@ public:
 
 	void restore_colors();
 
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_post_load() override;
 
 private:
 	std::unique_ptr<uint16_t[]>     m_ram;
@@ -41,5 +34,10 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TC0110PCR, tc0110pcr_device)
+
+#define MCFG_TC0110PCR_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, TC0110PCR, 0)
+#define MCFG_TC0110PCR_PALETTE(_palette_tag) \
+	downcast<tc0110pcr_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_TC0110PCR_H

@@ -26,7 +26,7 @@ public:
 	void klax(machine_config &config);
 	void klax2bl(machine_config &config);
 
-private:
+protected:
 	virtual void machine_reset() override;
 
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -43,6 +43,7 @@ private:
 	void klax2bl_map(address_map &map);
 	void klax_map(address_map &map);
 
+private:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 

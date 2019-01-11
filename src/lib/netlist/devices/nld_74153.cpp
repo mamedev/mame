@@ -131,8 +131,8 @@ namespace netlist
 		m_2.update_dev();
 	}
 
-	NETLIB_DEVICE_IMPL(74153, "TTL_74153", "+C0,+C1,+C2,+C3,+A,+B,+G")
-	NETLIB_DEVICE_IMPL(74153_dip, "TTL_74153_DIP", "")
+	NETLIB_DEVICE_IMPL(74153)
+	NETLIB_DEVICE_IMPL(74153_dip)
 
 	} //namespace devices
 } // namespace netlist

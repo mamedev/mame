@@ -51,12 +51,9 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	void os214(machine_config &config);
-
 	void init_os214();
-
-private:
 	required_device<cpu_device> m_maincpu;
+	void os214(machine_config &config);
 	void os214_io_map(address_map &map);
 	void os214_prg_map(address_map &map);
 };

@@ -77,8 +77,8 @@ namespace netlist
 			m_O[i].push((o >> i) & 1, delay);
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(82S123)
-	NETLIB_DEVICE_IMPL_DEPRECATED(82S123_dip)
+	NETLIB_DEVICE_IMPL(82S123)
+	NETLIB_DEVICE_IMPL(82S123_dip)
 
 	} //namespace devices
 } // namespace netlist

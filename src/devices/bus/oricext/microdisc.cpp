@@ -23,8 +23,8 @@ static void microdisc_floppies(device_slot_interface &device)
 void microdisc_device::map(address_map &map)
 {
 	map(0x310, 0x313).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x314, 0x314).rw(FUNC(microdisc_device::port_314_r), FUNC(microdisc_device::port_314_w));
-	map(0x318, 0x318).r(FUNC(microdisc_device::port_318_r));
+	map(0x314, 0x314).rw(this, FUNC(microdisc_device::port_314_r), FUNC(microdisc_device::port_314_w));
+	map(0x318, 0x318).r(this, FUNC(microdisc_device::port_318_r));
 }
 
 microdisc_device::microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -68,19 +68,18 @@ const tiny_rom_entry *microdisc_device::device_rom_region() const
 	return ROM_NAME( microdisc );
 }
 
-void microdisc_device::device_add_mconfig(machine_config &config)
-{
-	FD1793(config, fdc, 8_MHz_XTAL / 8);
-	fdc->intrq_wr_callback().set(FUNC(microdisc_device::fdc_irq_w));
-	fdc->drq_wr_callback().set(FUNC(microdisc_device::fdc_drq_w));
-	fdc->hld_wr_callback().set(FUNC(microdisc_device::fdc_hld_w));
-	fdc->set_force_ready(true);
+MACHINE_CONFIG_START(microdisc_device::device_add_mconfig)
+	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, microdisc_device, fdc_hld_w))
+	MCFG_WD_FDC_FORCE_READY
 
-	FLOPPY_CONNECTOR(config, "fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
-}
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
+MACHINE_CONFIG_END
 
 void microdisc_device::remap()
 {

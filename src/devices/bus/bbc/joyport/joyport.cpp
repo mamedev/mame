@@ -32,6 +32,15 @@ device_bbc_joyport_interface::device_bbc_joyport_interface(const machine_config 
 }
 
 
+//-------------------------------------------------
+//  ~device_bbc_joyport_interface - destructor
+//-------------------------------------------------
+
+device_bbc_joyport_interface::~device_bbc_joyport_interface()
+{
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -93,9 +102,8 @@ void bbc_joyport_slot_device::device_reset()
 
 READ8_MEMBER(bbc_joyport_slot_device::pb_r)
 {
-	// TODO: Joyport connected to PB0-PB4 only. PB5-PB7 are expansion port.
 	if (m_device)
-		return 0xe0 | m_device->pb_r(space, 0);
+		return m_device->pb_r(space, 0);
 	else
 		return 0xff;
 }

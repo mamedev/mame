@@ -35,9 +35,6 @@ public:
 			m_analog_x(*this, "ANALOGX"),
 			m_analog_y(*this, "ANALOGY") { }
 
-	void xtheball(machine_config &config);
-
-private:
 	required_device<tms34010_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<tlc34076_device> m_tlc34076;
@@ -60,6 +57,7 @@ private:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+	void xtheball(machine_config &config);
 	void main_map(address_map &map);
 };
 
@@ -197,7 +195,7 @@ void xtheball_state::main_map(address_map &map)
 	map(0x03040000, 0x0304007f).w("latch1", FUNC(hc259_device::write_d0)).umask16(0x00ff);
 	map(0x03040080, 0x0304008f).portr("DSW");
 	map(0x03040080, 0x030400ff).w("latch2", FUNC(hc259_device::write_d0)).umask16(0x00ff);
-	map(0x03040100, 0x0304010f).r(FUNC(xtheball_state::analogx_r));
+	map(0x03040100, 0x0304010f).r(this, FUNC(xtheball_state::analogx_r));
 	map(0x03040110, 0x0304011f).portr("COIN1");
 	map(0x03040130, 0x0304013f).portr("SERVICE2");
 	map(0x03040140, 0x0304014f).portr("COIN3");
@@ -205,8 +203,8 @@ void xtheball_state::main_map(address_map &map)
 	map(0x03040160, 0x0304016f).portr("SERVICE");
 	map(0x03040170, 0x0304017f).portr("SERVICE1");
 	map(0x03040100, 0x0304017f).w("latch3", FUNC(hc259_device::write_d0)).umask16(0x00ff);
-	map(0x03040180, 0x0304018f).r(FUNC(xtheball_state::analogy_watchdog_r)).nopw();
-	map(0x03060000, 0x0306000f).w("dac", FUNC(dac_byte_interface::data_w)).umask16(0xff00);
+	map(0x03040180, 0x0304018f).r(this, FUNC(xtheball_state::analogy_watchdog_r)).nopw();
+	map(0x03060000, 0x0306000f).w("dac", FUNC(dac_byte_interface::write)).umask16(0xff00);
 	map(0x04000000, 0x057fffff).rom().region("user2", 0);
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xfff80000, 0xffffffff).rom().region("user1", 0);
@@ -294,36 +292,36 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(xtheball_state::xtheball)
 
-	TMS34010(config, m_maincpu, 40000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &xtheball_state::main_map);
-	m_maincpu->set_halt_on_reset(false);
-	m_maincpu->set_pixel_clock(10000000);
-	m_maincpu->set_pixels_per_clock(1);
-	m_maincpu->set_scanline_rgb32_callback(FUNC(xtheball_state::scanline_update));
-	m_maincpu->set_shiftreg_in_callback(FUNC(xtheball_state::to_shiftreg));
-	m_maincpu->set_shiftreg_out_callback(FUNC(xtheball_state::from_shiftreg));
-	m_maincpu->set_periodic_int(FUNC(xtheball_state::irq1_line_hold), attotime::from_hz(15000));
+	MCFG_DEVICE_ADD("maincpu", TMS34010, 40000000)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(10000000) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(xtheball_state, scanline_update)     /* scanline updater (rgb32) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(xtheball_state, to_shiftreg)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(xtheball_state, from_shiftreg) /* read from shiftreg function */
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(xtheball_state, irq1_line_hold,  15000)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	hc259_device &latch1(HC259(config, "latch1"));
-	latch1.q_out_cb<7>().set("ticket", FUNC(ticket_dispenser_device::motor_w));
+	MCFG_DEVICE_ADD("latch1", HC259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("ticket", ticket_dispenser_device, motor_w))
 	// Q4 = meter, Q6 = tickets, Q7 = tickets?
 
-	hc259_device &latch2(HC259(config, "latch2"));
-	latch2.q_out_cb<0>().set_output("led0"); // start lamp
+	MCFG_DEVICE_ADD("latch2", HC259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // start lamp
 	// Q1-Q7 = more lamps?
 
-	hc259_device &latch3(HC259(config, "latch3"));
-	latch3.q_out_cb<3>().set(FUNC(xtheball_state::foreground_mode_w));
+	MCFG_DEVICE_ADD("latch3", HC259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, xtheball_state, foreground_mode_w))
 	// Q3 = video foreground control?
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(10000000, 640, 114, 626, 257, 24, 248)

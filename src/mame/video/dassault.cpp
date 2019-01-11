@@ -37,12 +37,12 @@ void dassault_state::mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite
 	uint16_t* srcline;
 	uint32_t* dstline;
 
-	for (y=cliprect.top();y<=cliprect.bottom();y++)
+	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
 		srcline=&sprite_bitmap->pix16(y,0);
 		dstline=&bitmap.pix32(y,0);
 
-		for (x=cliprect.left();x<=cliprect.right();x++)
+		for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
 			uint16_t pix = srcline[x];
 

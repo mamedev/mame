@@ -58,7 +58,6 @@ Notes added 2014-09-10:
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -71,14 +70,13 @@ public:
 	m_subcpu(*this, "subcpu")
 	{ }
 
-	void rcorsair(machine_config &config);
-
-private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void rcorsair(machine_config &config);
 	void rcorsair_main_map(address_map &map);
 	void rcorsair_sub_io_map(address_map &map);
 	void rcorsair_sub_map(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;

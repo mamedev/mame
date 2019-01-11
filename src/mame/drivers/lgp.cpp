@@ -68,7 +68,6 @@ Dumping Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ldv1000.h"
-#include "emupal.h"
 #include "render.h"
 #include "speaker.h"
 
@@ -76,43 +75,34 @@ Dumping Notes:
 class lgp_state : public driver_device
 {
 public:
-	lgp_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_laserdisc(*this, "laserdisc"),
+	lgp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
-
-	void lgp(machine_config &config);
-
-	void init_lgp();
-
-protected:
-	virtual void machine_start() override;
-
-private:
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
-	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
-	void lgp_palette(palette_device &palette) const;
-
-	void main_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_program_map(address_map &map);
+		m_palette(*this, "palette") { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
-
+	DECLARE_READ8_MEMBER(ldp_read);
+	DECLARE_WRITE8_MEMBER(ldp_write);
+	void init_lgp();
+	virtual void machine_start() override;
+	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
+	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
+	DECLARE_PALETTE_INIT(lgp);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void lgp(machine_config &config);
+	void main_io_map(address_map &map);
+	void main_program_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_program_map(address_map &map);
 };
 
 
@@ -176,7 +166,7 @@ void lgp_state::main_program_map(address_map &map)
 	map(0xe400, 0xe7ff).ram().share("tile_ctrl_ram");
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
-	map(0xef80, 0xef80).rw(FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
+	map(0xef80, 0xef80).rw(this, FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
 	map(0xefb8, 0xefb8).nopr(); // watchdog
 	map(0xefc0, 0xefc0).portr("DSWA");    /* Not tested */
 	map(0xefc8, 0xefc8).portr("DSWB");
@@ -380,33 +370,39 @@ WRITE_LINE_MEMBER(lgp_state::ld_command_strobe_cb)
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void lgp_state::lgp_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(lgp_state, lgp)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0; i < 0x20; i++)
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+
+//  for (i = 0; i < palette.entries(); i++)
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0, bit1, bit2;
+		int r,g,b;
+		int bit0,bit1,bit2;
 
-		// red component
-		bit0 = 0; //BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 0);
-		bit2 = BIT(color_prom[i], 1);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* red component */
+		bit0 = 0; //(color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 0) & 0x01;
+		bit2 = (color_prom[i] >> 1) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// green component
-		bit0 = 0; //BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 2);
-		bit2 = BIT(color_prom[i], 3);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = 0; //(color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 2) & 0x01;
+		bit2 = (color_prom[i] >> 3) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// blue component
-		bit0 = 0; //BIT(color_prom[i], 5);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* blue component */
+		bit0 = 0; //(color_prom[i] >> 5) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
+
 }
 
 /* DRIVER */
@@ -431,9 +427,10 @@ MACHINE_CONFIG_START(lgp_state::lgp)
 	/* video hardware */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
-	PALETTE(config, m_palette, FUNC(lgp_state::lgp_palette), 256);
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(lgp_state,lgp)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lgp);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lgp)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

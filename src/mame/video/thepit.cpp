@@ -31,35 +31,36 @@
 
 ***************************************************************************/
 
-void thepit_state::thepit_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(thepit_state, thepit)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 32; i++)
+	for (i = 0; i < 32; i++)
 	{
-		int bit0, bit1, bit2;
+		int bit0, bit1, bit2, r, g, b;
 
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
-	// allocate primary colors for the background and foreground
-	// this is wrong, but I don't know where to pick the colors from
-	for (int i = 0; i < 8; i++)
+	/* allocate primary colors for the background and foreground
+	   this is wrong, but I don't know where to pick the colors from */
+	for (i = 0; i < 8; i++)
 		palette.set_pen_color(i + 32, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
@@ -71,22 +72,23 @@ void thepit_state::thepit_palette(palette_device &palette) const
 
 ***************************************************************************/
 
-void thepit_state::suprmous_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(thepit_state,suprmous)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 32; i++)
+	for (i = 0; i < 32; i++)
 	{
-		uint8_t const b = bitswap<8>(color_prom[i + 0x00], 0, 1, 2, 3, 4, 5, 6, 7);
-		uint8_t const g = bitswap<8>(color_prom[i + 0x20], 0, 1, 2, 3, 4, 5, 6, 7);
-		uint8_t const r = (b>>5&7)<<2 | (g>>6&3);
+		uint8_t b = bitswap<8>(color_prom[i + 0x00], 0, 1, 2, 3, 4, 5, 6, 7);
+		uint8_t g = bitswap<8>(color_prom[i + 0x20], 0, 1, 2, 3, 4, 5, 6, 7);
+		uint8_t r = (b>>5&7)<<2 | (g>>6&3);
 
 		palette.set_pen_color(i, pal5bit(r), pal5bit(g), pal4bit(b));
 	}
 
-	// allocate primary colors for the background and foreground
-	// this is wrong, but I don't know where to pick the colors from
-	for (int i = 0; i < 8; i++)
+	/* allocate primary colors for the background and foreground
+	   this is wrong, but I don't know where to pick the colors from */
+	for (i = 0; i < 8; i++)
 		palette.set_pen_color(i + 32, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 

@@ -49,16 +49,16 @@ ROM_START( plus3 )
 	ROM_DEFAULT_BIOS("adfs100")
 	// ADFS
 	ROM_SYSTEM_BIOS(0, "adfs100", "Acorn ADFS 1.00")
-	ROMX_LOAD("adfs.rom", 0x0000, 0x4000, CRC(3289bdc6) SHA1(e7c7a1094d50a3579751df2007269067c8ff6812), ROM_BIOS(0))
+	ROMX_LOAD("adfs.rom", 0x0000, 0x4000, CRC(3289bdc6) SHA1(e7c7a1094d50a3579751df2007269067c8ff6812), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "adfs113", "PRES ADFS 1.13")
-	ROMX_LOAD("pres_adfs_113.rom", 0x0000, 0x4000, CRC(f06ca04a) SHA1(3c8221d63457c552aa2c9a502db632ce1dea66b4), ROM_BIOS(1))
+	ROMX_LOAD("pres_adfs_113.rom", 0x0000, 0x4000, CRC(f06ca04a) SHA1(3c8221d63457c552aa2c9a502db632ce1dea66b4), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "adfs115", "PRES ADFS 1.15")
-	ROMX_LOAD("pres_adfs_115.rom", 0x0000, 0x4000, CRC(8f81edc3) SHA1(32007425058a7b0f8bd5c17b3c22552aa3a03eca), ROM_BIOS(2))
+	ROMX_LOAD("pres_adfs_115.rom", 0x0000, 0x4000, CRC(8f81edc3) SHA1(32007425058a7b0f8bd5c17b3c22552aa3a03eca), ROM_BIOS(3))
 	// DFS
 	ROM_SYSTEM_BIOS(3, "dfs200", "Advanced 1770 DFS 2.00")
-	ROMX_LOAD("acp_dfs1770_200.rom", 0x0000, 0x4000, CRC(5a3a13c7) SHA1(d5dad7ab5a0237c44d0426cd85a8ec86545747e0), ROM_BIOS(3))
+	ROMX_LOAD("acp_dfs1770_200.rom", 0x0000, 0x4000, CRC(5a3a13c7) SHA1(d5dad7ab5a0237c44d0426cd85a8ec86545747e0), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "dfs210", "Advanced 1770 DFS 2.10")
-	ROMX_LOAD("acp_dfs1770_210.rom", 0x0000, 0x4000, CRC(b0661992) SHA1(c62f1290f689788dad6a2df30ace083eb827cffe), ROM_BIOS(4))
+	ROMX_LOAD("acp_dfs1770_210.rom", 0x0000, 0x4000, CRC(b0661992) SHA1(c62f1290f689788dad6a2df30ace083eb827cffe), ROM_BIOS(5))
 ROM_END
 
 //-------------------------------------------------
@@ -67,9 +67,12 @@ ROM_END
 
 MACHINE_CONFIG_START(electron_plus3_device::device_add_mconfig)
 	/* fdc */
-	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
-	FLOPPY_CONNECTOR(config, m_floppy0, electron_floppies, "35dd", floppy_formats, true).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, electron_floppies, nullptr, floppy_formats).enable_sound(true);
+	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+
 
 	/* pass-through */
 	MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(nullptr)
@@ -127,7 +130,7 @@ uint8_t electron_plus3_device::expbus_r(address_space &space, offs_t offset, uin
 	}
 	else if (offset >= 0xfcc4 && offset < 0xfcc8)
 	{
-		data = m_fdc->read(offset & 0x03);
+		data = m_fdc->read(space, offset & 0x03);
 	}
 
 	data &= m_exp->expbus_r(space, offset, data);
@@ -149,7 +152,7 @@ void electron_plus3_device::expbus_w(address_space &space, offs_t offset, uint8_
 	}
 	else if (offset >= 0xfcc4 && offset < 0xfcc8)
 	{
-		m_fdc->write(offset & 0x03, data);
+		m_fdc->write(space, offset & 0x03, data);
 	}
 	else if (offset == 0xfe05)
 	{

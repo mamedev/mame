@@ -12,6 +12,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "998board.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CRU         (1U<<2)     // CRU logging
@@ -20,7 +21,7 @@
 #define LOG_BANK        (1U<<5)     // Change ROM banks
 #define LOG_KEYBOARD    (1U<<6)   // Keyboard operation
 
-#define VERBOSE ( LOG_WARN )
+#define VERBOSE ( LOG_GENERAL | LOG_WARN )
 
 #include "logmacro.h"
 #include "992board.h"
@@ -356,8 +357,7 @@ io992_device::io992_device(const machine_config &mconfig, device_type type, cons
 		m_key_row(0),
 		m_latch_out(0xd7),
 		m_latch_in(0xd7),
-		m_communication_disable(true),
-		m_response_phase(false)
+		m_communication_disable(true)
 {
 }
 
@@ -479,9 +479,6 @@ READ8_MEMBER(io992_device::cruread)
 			if ((m_latch_in & m_hexbval[i])==0) value &= ~bit;
 			bit <<= 1;
 		}
-		// e80c (bit 6) seems to be a latch for the response phase
-		if (!m_response_phase)
-			value &= ~0x40;
 
 		inp = m_cassette->input();
 		if (inp > 0)
@@ -543,12 +540,8 @@ WRITE8_MEMBER(io992_device::cruwrite)
 		else m_latch_out &= ~m_hexbval[offset & 0x07];
 		LOGMASKED(LOG_HEXBUS, "Hexbus latch out = %02x\n", m_latch_out);
 		break;
-	case 0xe80a:  // BAV
-		// Undocumented, but makes sense according to the ROM
-		if (data==0)
-			m_response_phase = false;
-		// no break
 	case 0xe808:  // HSK
+	case 0xe80a:  // BAV
 		if (data != 0) m_latch_out |= m_hexbval[offset & 0x07];
 		else m_latch_out &= ~m_hexbval[offset & 0x07];
 
@@ -563,7 +556,6 @@ WRITE8_MEMBER(io992_device::cruwrite)
 				LOGMASKED(LOG_HEXBUS, "Enabling Hexbus\n");
 				m_communication_disable = false;
 			}
-			LOGMASKED(LOG_HEXBUS, "Writing to Hexbus: BAV*=%d, HSK*=%d, DATA=%01x\n", (m_latch_out&0x04)!=0, (m_latch_out&0x10)!=0, ((m_latch_out>>4)&0x0c)|(m_latch_out&0x03));
 			hexbus_write(m_latch_out);
 			// Check how the bus has changed. This depends on the states of all
 			// connected peripherals
@@ -606,21 +598,6 @@ void io992_device::hexbus_value_changed(uint8_t data)
 	{
 		LOGMASKED(LOG_HEXBUS, "Hexbus changed and latched: %02x\n", data);
 		m_latch_in = data;
-
-		if ((data & bus::hexbus::HEXBUS_LINE_HSK)==0)
-		{
-			// If HSK* is lowered and we as the host have it up, this indicates
-			// the response phase.
-			if (!m_response_phase && (m_myvalue & bus::hexbus::HEXBUS_LINE_HSK)!=0)
-			{
-				LOGMASKED(LOG_HEXBUS, "Incoming response\n");
-				m_response_phase = true;
-			}
-			// We cannot wait for the CPU explicitly latching HSK*
-			// as designed, because this implies a true parallel execution
-			LOGMASKED(LOG_HEXBUS, "Latching HSK*\n");
-			m_myvalue &= ~bus::hexbus::HEXBUS_LINE_HSK;
-		}
 	}
 	else
 		LOGMASKED(LOG_HEXBUS, "Ignoring Hexbus change (to %02x), latch=%s, BAV*=%d\n", data, m_communication_disable? "inhibit":"enabled", bav_asserted? 0:1);

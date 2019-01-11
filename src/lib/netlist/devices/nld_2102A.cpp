@@ -97,8 +97,8 @@ namespace netlist
 			m_ram[i] = 0;
 	}
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(2102A)
-	NETLIB_DEVICE_IMPL_DEPRECATED(2102A_dip)
+	NETLIB_DEVICE_IMPL(2102A)
+	NETLIB_DEVICE_IMPL(2102A_dip)
 
 	} //namespace devices
 } // namespace netlist

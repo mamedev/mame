@@ -14,7 +14,6 @@
 #include "cpu/z80/z80.h"
 #include "sound/spkrdev.h"
 #include "video/saa5050.h"
-#include "emupal.h"
 
 
 class p2000t_state : public driver_device
@@ -50,10 +49,9 @@ protected:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-
-private:
 	required_ioport_array<10> m_keyboard;
 	uint8_t m_port_101f;
 	uint8_t m_port_202f;
@@ -75,7 +73,7 @@ public:
 
 protected:
 	virtual void video_start() override;
-	void p2000m_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(p2000m);
 	uint32_t screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void p2000m_mem(address_map &map);

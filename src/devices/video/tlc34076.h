@@ -29,12 +29,6 @@ public:
 	};
 
 	// construction/destruction
-	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, tlc34076_bits bits)
-		: tlc34076_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		set_bits(bits);
-	}
-
 	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
@@ -64,6 +58,15 @@ private:
 	uint8_t m_readindex;
 	uint8_t m_dacbits;
 };
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_TLC34076_ADD(tag, bits) \
+	MCFG_DEVICE_ADD((tag), TLC34076, 0) \
+	downcast<tlc34076_device &>(*device).set_bits((tlc34076_device::bits));
 
 
 DECLARE_DEVICE_TYPE(TLC34076, tlc34076_device)

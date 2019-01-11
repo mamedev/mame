@@ -9,28 +9,28 @@
 // device stuff
 
 #define MCFG_DP8390D_IRQ_CB(_devcb) \
-	downcast<dp8390_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	devcb = &downcast<dp8390_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_DP8390D_BREQ_CB(_devcb) \
-	downcast<dp8390_device &>(*device).set_breq_callback(DEVCB_##_devcb);
+	devcb = &downcast<dp8390_device &>(*device).set_breq_callback(DEVCB_##_devcb);
 
 #define MCFG_DP8390D_MEM_READ_CB(_devcb) \
-	downcast<dp8390_device &>(*device).set_mem_read_callback(DEVCB_##_devcb);
+	devcb = &downcast<dp8390_device &>(*device).set_mem_read_callback(DEVCB_##_devcb);
 
 #define MCFG_DP8390D_MEM_WRITE_CB(_devcb) \
-	downcast<dp8390_device &>(*device).set_mem_write_callback(DEVCB_##_devcb);
+	devcb = &downcast<dp8390_device &>(*device).set_mem_write_callback(DEVCB_##_devcb);
 
 #define MCFG_RTL8019A_IRQ_CB(_devcb) \
-	downcast<rtl8019a_device &>(*device).set_irq_callback(DEVCB_##_devcb);
+	devcb = &downcast<rtl8019a_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_RTL8019A_BREQ_CB(_devcb) \
-	downcast<rtl8019a_device &>(*device).set_breq_callback(DEVCB_##_devcb);
+	devcb = &downcast<rtl8019a_device &>(*device).set_breq_callback(DEVCB_##_devcb);
 
 #define MCFG_RTL8019A_MEM_READ_CB(_devcb) \
-	downcast<rtl8019a_device &>(*device).set_mem_read_callback(DEVCB_##_devcb);
+	devcb = &downcast<rtl8019a_device &>(*device).set_mem_read_callback(DEVCB_##_devcb);
 
 #define MCFG_RTL8019A_MEM_WRITE_CB(_devcb) \
-	downcast<rtl8019a_device &>(*device).set_mem_write_callback(DEVCB_##_devcb);
+	devcb = &downcast<rtl8019a_device &>(*device).set_mem_write_callback(DEVCB_##_devcb);
 
 
 class dp8390_device : public device_t, public device_network_interface

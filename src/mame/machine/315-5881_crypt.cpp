@@ -26,21 +26,21 @@ DEFINE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device, "sega315_5881
 //       might be due of high address variables not properly set (@see sega_315_5881_crypt_device::set_addr_high)
 void sega_315_5881_crypt_device::iomap_64be(address_map &map)
 {
-	map(0x0000, 0x0001).r(FUNC(sega_315_5881_crypt_device::ready_r));
+	map(0x0000, 0x0001).r(this, FUNC(sega_315_5881_crypt_device::ready_r));
 //  TODO: it is unknown if the
-	map(0x0010, 0x0011).w(FUNC(sega_315_5881_crypt_device::addrlo_w));
-	map(0x0012, 0x0013).w(FUNC(sega_315_5881_crypt_device::addrhi_w));
-	map(0x0018, 0x0019).w(FUNC(sega_315_5881_crypt_device::subkey_be_w));
-	map(0x001c, 0x001d).r(FUNC(sega_315_5881_crypt_device::decrypt_be_r));
+	map(0x0010, 0x0011).w(this, FUNC(sega_315_5881_crypt_device::addrlo_w));
+	map(0x0012, 0x0013).w(this, FUNC(sega_315_5881_crypt_device::addrhi_w));
+	map(0x0018, 0x0019).w(this, FUNC(sega_315_5881_crypt_device::subkey_be_w));
+	map(0x001c, 0x001d).r(this, FUNC(sega_315_5881_crypt_device::decrypt_be_r));
 }
 
 void sega_315_5881_crypt_device::iomap_le(address_map &map)
 {
-	map(0x0000, 0x0001).r(FUNC(sega_315_5881_crypt_device::ready_r));
-	map(0x0008, 0x0009).w(FUNC(sega_315_5881_crypt_device::addrlo_w));
-	map(0x000a, 0x000b).w(FUNC(sega_315_5881_crypt_device::addrhi_w));
-	map(0x000c, 0x000d).w(FUNC(sega_315_5881_crypt_device::subkey_le_w));
-	map(0x000e, 0x000f).r(FUNC(sega_315_5881_crypt_device::decrypt_le_r));
+	map(0x0000, 0x0001).r(this, FUNC(sega_315_5881_crypt_device::ready_r));
+	map(0x0008, 0x0009).w(this, FUNC(sega_315_5881_crypt_device::addrlo_w));
+	map(0x000a, 0x000b).w(this, FUNC(sega_315_5881_crypt_device::addrhi_w));
+	map(0x000c, 0x000d).w(this, FUNC(sega_315_5881_crypt_device::subkey_le_w));
+	map(0x000e, 0x000f).r(this, FUNC(sega_315_5881_crypt_device::decrypt_le_r));
 }
 
 sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -58,9 +58,9 @@ void sega_315_5881_crypt_device::device_start()
 
 	m_read.bind_relative_to(*owner());
 
-	save_pointer(NAME(buffer), BUFFER_SIZE);
-	save_pointer(NAME(line_buffer), LINE_SIZE);
-	save_pointer(NAME(line_buffer_prev), LINE_SIZE);
+	save_pointer(NAME(buffer.get()), BUFFER_SIZE);
+	save_pointer(NAME(line_buffer.get()), LINE_SIZE);
+	save_pointer(NAME(line_buffer_prev.get()), LINE_SIZE);
 	save_item(NAME(prot_cur_address));
 	save_item(NAME(subkey));
 	save_item(NAME(enc_ready));

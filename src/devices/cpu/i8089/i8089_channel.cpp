@@ -461,7 +461,7 @@ int i8089_channel_device::execute_run()
 			{
 			case 0: nop(); break;
 			case 1: invalid(opc); break;
-			case 2: do_sintr(); break;
+			case 2: sintr(); break;
 			case 3: xfer(); break;
 			default: wid(BIT(brp, 1), BIT(brp, 0));
 			}

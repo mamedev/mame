@@ -68,7 +68,6 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
-#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/wd_fdc.h"
@@ -76,7 +75,6 @@
 #include "machine/pit8253.h"
 #include "video/tms9927.h"
 #include "sound/beep.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "debugger.h"
@@ -270,12 +268,13 @@ void alphatp_12_state::alphatp2_map(address_map &map)
 void alphatp_12_state::alphatp2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
-	map(0x12, 0x12).w(FUNC(alphatp_12_state::beep_w));
-	map(0x50, 0x53).rw(FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
-	map(0x54, 0x54).rw(FUNC(alphatp_12_state::fdc_stat_r), FUNC(alphatp_12_state::fdc_cmd_w));
-	map(0x78, 0x78).w(FUNC(alphatp_12_state::bank_w));
+	map(0x12, 0x12).w(this, FUNC(alphatp_12_state::beep_w));
+	map(0x50, 0x53).rw(this, FUNC(alphatp_12_state::fdc_r), FUNC(alphatp_12_state::fdc_w));
+	map(0x54, 0x54).rw(this, FUNC(alphatp_12_state::fdc_stat_r), FUNC(alphatp_12_state::fdc_cmd_w));
+	map(0x78, 0x78).w(this, FUNC(alphatp_12_state::bank_w));
 }
 
 
@@ -309,34 +308,35 @@ void alphatp_34_state::alphatp3_io(address_map &map)
 {
 	map.unmap_value_high();
 	//AM_RANGE(0x00, 0x00) AM_READ // unknown
-	map(0x04, 0x05).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x08, 0x09).rw(FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
+	map(0x04, 0x04).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x05, 0x05).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x08, 0x09).rw(this, FUNC(alphatp_34_state::comm88_r), FUNC(alphatp_34_state::comm88_w));
 	map(0x10, 0x11).rw(m_kbdmcu, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
-	map(0x12, 0x12).w(FUNC(alphatp_34_state::beep_w));
-	map(0x40, 0x41).r(FUNC(alphatp_34_state::start88_r));
+	map(0x12, 0x12).w(this, FUNC(alphatp_34_state::beep_w));
+	map(0x40, 0x41).r(this, FUNC(alphatp_34_state::start88_r));
 	//AM_RANGE(0x42, 0x42) AM_WRITE // unknown
-	map(0x50, 0x53).rw(FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
-	map(0x54, 0x54).rw(FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
-	map(0x78, 0x78).w(FUNC(alphatp_34_state::bank_w));
+	map(0x50, 0x53).rw(this, FUNC(alphatp_34_state::fdc_r), FUNC(alphatp_34_state::fdc_w));
+	map(0x54, 0x54).rw(this, FUNC(alphatp_34_state::fdc_stat_r), FUNC(alphatp_34_state::fdc_cmd_w));
+	map(0x78, 0x78).w(this, FUNC(alphatp_34_state::bank_w));
 }
 
 void alphatp_34_state::alphatp30_8088_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
-	map(0xe0000, 0xeffff).rw(FUNC(alphatp_34_state::gfxext_r), FUNC(alphatp_34_state::gfxext_w));
+	map(0xe0000, 0xeffff).rw(this, FUNC(alphatp_34_state::gfxext_r), FUNC(alphatp_34_state::gfxext_w));
 	map(0xfe000, 0xfffff).rom().region("16bit", 0);
 }
 
 void alphatp_34_state::alphatp30_8088_io(address_map &map)
 {
 	//AM_RANGE(0x008a, 0x008a) AM_READ // unknown
-	map(0xf800, 0xf800).w(FUNC(alphatp_34_state::gfxext1_w));
-	map(0xf900, 0xf900).w(FUNC(alphatp_34_state::gfxext2_w));
-	map(0xfa00, 0xfa01).w(FUNC(alphatp_34_state::gfxext3_w));
+	map(0xf800, 0xf800).w(this, FUNC(alphatp_34_state::gfxext1_w));
+	map(0xf900, 0xf900).w(this, FUNC(alphatp_34_state::gfxext2_w));
+	map(0xfa00, 0xfa01).w(this, FUNC(alphatp_34_state::gfxext3_w));
 	//AM_RANGE(0xfb00, 0xfb0f) AM_WRITE // unknown possibly gfx ext
 	map(0xffe0, 0xffe1).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xffe4, 0xffe7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xffe9, 0xffea).rw(FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
+	map(0xffe9, 0xffea).rw(this, FUNC(alphatp_34_state::comm85_r), FUNC(alphatp_34_state::comm85_w));
 }
 
 READ8_MEMBER(alphatp_34_state::start88_r)
@@ -1048,12 +1048,12 @@ READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 
 READ8_MEMBER(alphatp_12_state::fdc_r)
 {
-	return m_fdc->read(offset) ^ 0xff;
+	return m_fdc->gen_r(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(alphatp_12_state::fdc_w)
 {
-	m_fdc->write(offset, data ^ 0xff);
+	m_fdc->gen_w(offset, data ^ 0xff);
 }
 
 
@@ -1127,12 +1127,12 @@ READ8_MEMBER(alphatp_34_state::fdc_stat_r)
 
 READ8_MEMBER(alphatp_34_state::fdc_r)
 {
-	return m_fdc->read(offset) ^ 0xff;
+	return m_fdc->gen_r(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER(alphatp_34_state::fdc_w)
 {
-	m_fdc->write(offset, data ^ 0xff);
+	m_fdc->gen_w(offset, data ^ 0xff);
 }
 
 
@@ -1205,32 +1205,37 @@ void alphatp_12_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6_MHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(6'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(alphatp2_mem)
 	MCFG_DEVICE_IO_MAP(alphatp2_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
-	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
-	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_12_state::kbd_matrix_w));
-	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_12_state::kbd_port2_r));
-	m_kbdmcu->p2_out_cb().set(FUNC(alphatp_12_state::kbd_port2_w));
+	MCFG_DEVICE_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, alphatp_12_state, kbd_matrix_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alphatp_12_state, kbd_matrix_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_12_state, kbd_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alphatp_12_state, kbd_port2_w))
 
-	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_12_state::alphatp2_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(alphatp2_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'854'400), 824, 0, 640, 312, 0, 288)
 	MCFG_SCREEN_UPDATE_DRIVER(alphatp_12_state, screen_update)
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	CRT5027(config, m_crtc, 12.8544_MHz_XTAL / 8);
-	m_crtc->set_char_width(8);
-	m_crtc->hsyn_callback().set_inputline("maincpu", I8085_RST55_LINE);
-	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
-	m_crtc->set_screen("screen");
+	MCFG_DEVICE_ADD("crtc", CRT5027, XTAL(12'854'400) / 8)
+	MCFG_TMS9927_CHAR_WIDTH(8)
+	MCFG_TMS9927_HSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
+	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
 
@@ -1240,12 +1245,12 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	// 4.9152_MHz_XTAL serial clock
+	// XTAL(4'915'200) serial clock
 
-	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->intrq_wr_callback().set(FUNC(alphatp_12_state::fdcirq_w));
-	m_fdc->drq_wr_callback().set(FUNC(alphatp_12_state::fdcdrq_w));
-	m_fdc->hld_wr_callback().set(FUNC(alphatp_12_state::fdchld_w));
+	MCFG_FD1791_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcirq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_12_state, fdcdrq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_12_state, fdchld_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
@@ -1282,31 +1287,36 @@ void alphatp_34_state::machine_reset()
 	m_88_da = m_85_da = m_88_started = false;
 }
 MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6_MHz_XTAL)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(6'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(alphatp3_mem)
 	MCFG_DEVICE_IO_MAP(alphatp3_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	I8041(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
-	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
-	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
-	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));
-	m_kbdmcu->p2_out_cb().set(FUNC(alphatp_34_state::kbd_port2_w));
+	MCFG_DEVICE_ADD("kbdmcu", I8041, XTAL(12'854'400)/2)
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, alphatp_34_state, kbd_matrix_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, alphatp_34_state, kbd_matrix_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, alphatp_34_state, kbd_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, alphatp_34_state, kbd_port2_w))
 
-	ADDRESS_MAP_BANK(config, "bankdev").set_map(&alphatp_34_state::alphatp3_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(alphatp3_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'854'400), 824, 0, 640, 312, 0, 288)
 	MCFG_SCREEN_UPDATE_DRIVER(alphatp_34_state, screen_update)
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	CRT5037(config, m_crtc, 12.8544_MHz_XTAL / 8);
-	m_crtc->set_char_width(8);
-	m_crtc->vsyn_callback().set_inputline("maincpu", I8085_RST65_LINE).exor(1);
-	m_crtc->set_screen("screen");
+	MCFG_DEVICE_ADD("crtc", CRT5037, XTAL(12'854'400) / 8)
+	MCFG_TMS9927_CHAR_WIDTH(8)
+	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", I8085_RST65_LINE)) MCFG_DEVCB_XOR(1)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_alphatp3)
 
@@ -1316,35 +1326,34 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	// 4.9152_MHz_XTAL serial clock
+	// XTAL(4'915'200) serial clock
 
-	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
-	m_fdc->intrq_wr_callback().set(FUNC(alphatp_34_state::fdcirq_w));
-	m_fdc->drq_wr_callback().set(FUNC(alphatp_34_state::fdcdrq_w));
-	m_fdc->hld_wr_callback().set(FUNC(alphatp_34_state::fdchld_w));
+	MCFG_FD1791_ADD("fdc", XTAL(4'000'000) / 4)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcirq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, alphatp_34_state, fdcdrq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, alphatp_34_state, fdchld_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
-void alphatp_34_state::alphatp30(machine_config &config)
-{
+MACHINE_CONFIG_START(alphatp_34_state::alphatp30)
 	alphatp3(config);
-	I8088(config, m_i8088, 6000000); // unknown clock
-	m_i8088->set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp30_8088_map);
-	m_i8088->set_addrmap(AS_IO, &alphatp_34_state::alphatp30_8088_io);
-	m_i8088->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
-	m_i8088->set_disable();
+	MCFG_DEVICE_ADD("i8088", I8088, 6000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(alphatp30_8088_map)
+	MCFG_DEVICE_IO_MAP(alphatp30_8088_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_DISABLE()
 
-	PIC8259(config, m_pic, 0);
-	m_pic->out_int_callback().set_inputline(m_i8088, 0);
-	m_pic->in_sp_callback().set_constant(0);
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i8088", 0))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
-	pit.set_clk<0>(100000);  // 15Mhz osc with unknown divisor
-	pit.set_clk<1>(100000);
-	pit.set_clk<2>(100000);
-	pit.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
-}
+	MCFG_DEVICE_ADD("pit", PIT8253, 0)
+	MCFG_PIT8253_CLK0(100000)  // 15Mhz osc with unknown divisor
+	MCFG_PIT8253_CLK1(100000)
+	MCFG_PIT8253_CLK2(100000)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -1371,26 +1380,26 @@ ROM_START( alphatp2 ) // P2 ROM space 0x1800
 	ROM_SYSTEM_BIOS(1, "caap04-06", "caap04-06")
 	ROM_SYSTEM_BIOS(2, "p2_es", "p2_es")
 
-	ROMX_LOAD("caap_96_00_5a.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(0) ) // earlier P2, three 16K RAM boards
-	ROMX_LOAD("caap_05_02_12.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(0) )
-	ROMX_LOAD("caap_94_01_50.bin", 0x1000, 0x0800, CRC(fda8d4a4) SHA1(fa91e6e8504e7f84cf69d86f72826ad5405fd82d), ROM_BIOS(0) )
+	ROMX_LOAD("caap_96_00_5a.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(1) ) // earlier P2, three 16K RAM boards
+	ROMX_LOAD("caap_05_02_12.bin", 0x0800, 0x0800, CRC(14f19693) SHA1(7ecb66818a3e352fede1857a18cd12bf742603a9), ROM_BIOS(1) )
+	ROMX_LOAD("caap_94_01_50.bin", 0x1000, 0x0800, CRC(fda8d4a4) SHA1(fa91e6e8504e7f84cf69d86f72826ad5405fd82d), ROM_BIOS(1) )
 
-	ROMX_LOAD("caap_06_00_17.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(1) ) // later P2, one 48K RAM board
-	ROMX_LOAD("caap_05_01_12.bin", 0x0800, 0x0800, CRC(98c5ec7a) SHA1(b170e9a73b0b64d4111fa1170af6e333793da479), ROM_BIOS(1) )
-	ROMX_LOAD("caap_04_01_03.bin", 0x1000, 0x0800, CRC(f304c3aa) SHA1(92213e77e4e6de12a4eaee25a9c1ec0ab54e93d4), ROM_BIOS(1) )
+	ROMX_LOAD("caap_06_00_17.bin", 0x0000, 0x0800, CRC(cb137796) SHA1(876bd0762faffc7b74093922d8fbf1c72ec70060), ROM_BIOS(2) ) // later P2, one 48K RAM board
+	ROMX_LOAD("caap_05_01_12.bin", 0x0800, 0x0800, CRC(98c5ec7a) SHA1(b170e9a73b0b64d4111fa1170af6e333793da479), ROM_BIOS(2) )
+	ROMX_LOAD("caap_04_01_03.bin", 0x1000, 0x0800, CRC(f304c3aa) SHA1(92213e77e4e6de12a4eaee25a9c1ec0ab54e93d4), ROM_BIOS(2) )
 
-	ROMX_LOAD("caap_p2_es_1.bin", 0x0000, 0x0800, CRC(91b58eb3) SHA1(a4467cf9a14366198ee5f676b9471734e820522d), ROM_BIOS(2) )   // P2 Spain
-	ROMX_LOAD("caap_p2_es_2.bin", 0x0800, 0x0800, CRC(f4dfac82) SHA1(266d1fdaef875515d9c68ae3e67ec88831bb55cb), ROM_BIOS(2) )
-	ROMX_LOAD("caap_p2_es_3.bin", 0x1000, 0x0800, CRC(6f6918ba) SHA1(8dc9f5e337df8abf42e5b55f5f1a1a9d61c42d78), ROM_BIOS(2) )
+	ROMX_LOAD("caap_p2_es_1.bin", 0x0000, 0x0800, CRC(91b58eb3) SHA1(a4467cf9a14366198ee5f676b9471734e820522d), ROM_BIOS(3) )   // P2 Spain
+	ROMX_LOAD("caap_p2_es_2.bin", 0x0800, 0x0800, CRC(f4dfac82) SHA1(266d1fdaef875515d9c68ae3e67ec88831bb55cb), ROM_BIOS(3) )
+	ROMX_LOAD("caap_p2_es_3.bin", 0x1000, 0x0800, CRC(6f6918ba) SHA1(8dc9f5e337df8abf42e5b55f5f1a1a9d61c42d78), ROM_BIOS(3) )
 
 	ROM_REGION(0x400, "kbdmcu", 0)                                                                                          // same across all dumped P2 and P3 machines so far
 	ROM_LOAD("p2_keyboard_ip8041a_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51))   // needs to be checked with P2 sks and Spain
 
 	ROM_REGION(0x800, "gfx", 0)
-	ROMX_LOAD("cajp_97_00_5a.bin", 0x000, 0x800, CRC(aa5eab85) SHA1(2718924f5520e7e9aad635786847e78e3096b285), ROM_BIOS(0)) // came with caap94-96
-	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(1)) // came with caap04-06
-	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(2)) // sks KISS chargen not dumped yet
-	// FIXME: no BIOS option for selecting this ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(3)) // spanish P2 chargen not dumped yet
+	ROMX_LOAD("cajp_97_00_5a.bin", 0x000, 0x800, CRC(aa5eab85) SHA1(2718924f5520e7e9aad635786847e78e3096b285), ROM_BIOS(1)) // came with caap94-96
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(2)) // came with caap04-06
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(3)) // sks KISS chargen not dumped yet
+	ROMX_LOAD("cajp_01_01_28.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(4)) // spanish P2 chargen not dumped yet
 ROM_END
 
 // Alphatronic P2U
@@ -1419,14 +1428,14 @@ ROM_START( alphatp3 )
 	ROM_LOAD("p3_keyboard_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51) )
 
 	ROM_REGION(0x800, "gfx", 0)
-	ROMX_LOAD("cajp08_00_15.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(0) )
-	ROMX_LOAD("cajp08_01_15.bin", 0x000, 0x800, CRC(4ed11dac) SHA1(9db9b8e0edf471faaddbb5521d6223121146bab8), ROM_BIOS(1) )
+	ROMX_LOAD("cajp08_00_15.bin", 0x000, 0x800, CRC(d6248209) SHA1(21689703de7183ecffb410eb8a6d516efe27da9d), ROM_BIOS(1) )
+	ROMX_LOAD("cajp08_01_15.bin", 0x000, 0x800, CRC(4ed11dac) SHA1(9db9b8e0edf471faaddbb5521d6223121146bab8), ROM_BIOS(2) )
 ROM_END
 
 // Alphatronic P30
 ROM_START( alphatp30 ) // P30 add-on card with 8088 needs to be emulated to boot DOS
 	ROM_REGION(0x1800, "boot", 0)
-	ROM_LOAD("hasl17.07.84.bin", 0x0000, 0x1000, CRC(6a91701b) SHA1(8a4f925d0fabab37852a54d04e06deb2aeaa349c))  // ...wait for INT6.5 or INT5.5 with RIM to write char in hsync or hsync GAP-time !!
+	ROM_LOAD("hasl17.07.84.bin", 0x0000, 0x1000, CRC(6A91701B) SHA1(8A4F925D0FABAB37852A54D04E06DEB2AEAA349C))  // ...wait for INT6.5 or INT5.5 with RIM to write char in hsync or hsync GAP-time !!
 
 	ROM_REGION(0x400, "kbdmcu", 0)
 	ROM_LOAD("caju_01_01_01.bin",  0x000, 0x400, CRC(e9b4359f) SHA1(835f4a580b4c108ef2f239039b765324adc7f078))

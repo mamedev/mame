@@ -71,11 +71,11 @@ dump
 
 |  **dump[{d|i}] <filename>,<address>,<length>[,<size>[,<ascii>[,<cpu>]]]**
 |
-| The **dump**/**dumpd**/**dumpi** commands dump memory to the text file specified in the <filename> parameter.
+| The **dump**/**dumpd**/**dumpi** commands dump memory to the text file specified in the <filename> parameter. 
 | 'dump' will dump program space memory, while 'dumpd' will dump data space memory and 'dumpi' will dump I/O space memory.
-| <address> indicates the address of the start of dumping, and <length> indicates how much memory to dump. The range <address> through <address>+<length>-1 inclusive will be output to the file.
+| <address> indicates the address of the start of dumping, and <length> indicates how much memory to dump. The range <address> through <address>+<length>-1 inclusive will be output to the file. 
 | By default, the data will be output in byte format, unless the underlying address space is word/dword/qword-only. You can override this by specifying the <size> parameter, which can be used to group the data in 1, 2, 4 or 8-byte chunks.
-| The optional <ascii> parameter can be used to enable (1) or disable (0) the output of ASCII characters to the right of each line; by default, this is enabled.
+| The optional <ascii> parameter can be used to enable (1) or disable (0) the output of ASCII characters to the right of each line; by default, this is enabled. 
 | Finally, you can dump memory from another CPU by specifying the <cpu> parameter.
 |
 |
@@ -101,7 +101,7 @@ save
 |
 | The **save**/**saved**/**savei** commands save raw memory to the binary file specified in the <filename> parameter.
 | 'save' will save program space memory, while 'saved' will save data space memory and 'savei' will save I/O space memory.
-| <address> indicates the address of the start of saving, and <length> indicates how much memory to save. The range <address> through <address>+<length>-1 inclusive will be output to the file.
+| <address> indicates the address of the start of saving, and <length> indicates how much memory to save. The range <address> through <address>+<length>-1 inclusive will be output to the file. 
 | You can also save memory from another CPU by specifying the <cpu> parameter.
 |
 |
@@ -125,10 +125,10 @@ load
 
 |  **load[{d|i}] <filename>,<address>[,<length>,<cpu>]**
 |
-| The **load**/**loadd**/**loadi** commands load raw memory from the binary file specified in the <filename> parameter.
-| 'load' will load program space memory, while 'loadd' will load data space memory and 'loadi' will load I/O space memory.
-| <address> indicates the address of the start of saving, and <length> indicates how much memory to load. The range <address> through <address>+<length>-1 inclusive will be read in from the file.
-| If you specify <length> = 0 or a length greater than the total length of the file it will load the entire contents of the file and no more.
+| The **load**/**loadd**/**loadi** commands load raw memory from the binary file specified in the <filename> parameter. 
+| 'load' will load program space memory, while 'loadd' will load data space memory and 'loadi' will load I/O space memory. 
+| <address> indicates the address of the start of saving, and <length> indicates how much memory to load. The range <address> through <address>+<length>-1 inclusive will be read in from the file. 
+| If you specify <length> = 0 or a length greater than the total length of the file it will load the entire contents of the file and no more. 
 | You can also load memory from another CPU by specifying the <cpu> parameter.
 |
 | NOTE: This will only actually write memory that is possible to overwrite in the Memory Window
@@ -154,7 +154,7 @@ map
 
 |  **map[{d|i}] <address>**
 |
-| The map/mapd/mapi commands map a logical address in memory to the correct physical address, as well as specifying the bank.
+| The map/mapd/mapi commands map a logical address in memory to the correct physical address, as well as specifying the bank. 
 | 'map' will map program space memory, while 'mapd' will map data space memory and 'mapi' will map I/O space memory.
 |
 | Example:

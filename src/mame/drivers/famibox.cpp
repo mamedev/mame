@@ -75,13 +75,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu") { }
 
-	void famibox(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
@@ -112,6 +106,9 @@ private:
 	DECLARE_READ8_MEMBER(famibox_IN1_r);
 	DECLARE_READ8_MEMBER(famibox_system_r);
 	DECLARE_WRITE8_MEMBER(famibox_system_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
+	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -119,6 +116,7 @@ private:
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
+	void famibox(machine_config &config);
 	void famibox_map(address_map &map);
 };
 
@@ -379,10 +377,10 @@ void famibox_state::famibox_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(FUNC(famibox_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(FUNC(famibox_state::famibox_IN0_r), FUNC(famibox_state::famibox_IN0_w)); /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(FUNC(famibox_state::famibox_IN1_r));     /* IN1 - input port 2 / PSG second control register */
-	map(0x5000, 0x5fff).rw(FUNC(famibox_state::famibox_system_r), FUNC(famibox_state::famibox_system_w));
+	map(0x4014, 0x4014).w(this, FUNC(famibox_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(this, FUNC(famibox_state::famibox_IN0_r), FUNC(famibox_state::famibox_IN0_w)); /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(this, FUNC(famibox_state::famibox_IN1_r));     /* IN1 - input port 2 / PSG second control register */
+	map(0x5000, 0x5fff).rw(this, FUNC(famibox_state::famibox_system_r), FUNC(famibox_state::famibox_system_w));
 	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0xbfff).bankr("cpubank1");
 	map(0xc000, 0xffff).bankr("cpubank2");
@@ -525,26 +523,25 @@ void famibox_state::machine_start()
 	m_coins = 0;
 }
 
-void famibox_state::famibox(machine_config &config)
-{
+MACHINE_CONFIG_START(famibox_state::famibox)
 	/* basic machine hardware */
-	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &famibox_state::famibox_map);
+	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(famibox_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_size(32*8, 262);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(32*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
 
-	PPU_2C02(config, m_ppu);
-	m_ppu->set_cpu_tag(m_maincpu);
-	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_PPU2C02_ADD("ppu")
+	MCFG_PPU2C0X_CPU("maincpu")
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-}
+MACHINE_CONFIG_END
 
 
 ROM_START(famibox)

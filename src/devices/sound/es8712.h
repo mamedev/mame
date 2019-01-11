@@ -11,6 +11,22 @@
 #include "sound/msm5205.h"
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_ES8712_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, ES8712, _clock)
+#define MCFG_ES8712_REPLACE(_tag, _clock) \
+	MCFG_DEVICE_REPLACE(_tag, ES8712, _clock)
+#define MCFG_ES8712_RESET_HANDLER(_devcb) \
+	devcb = &downcast<es8712_device &>(*device).set_reset_handler(DEVCB_##_devcb);
+#define MCFG_ES8712_MSM_WRITE_CALLBACK(_devcb) \
+	devcb = &downcast<es8712_device &>(*device).set_msm_write_callback(DEVCB_##_devcb);
+#define MCFG_ES8712_MSM_TAG(_msmtag) \
+	downcast<es8712_device &>(*device).set_msm_tag(_msmtag);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -24,8 +40,8 @@ public:
 
 	// configuration
 	void set_msm_tag(const char *tag) { m_msm.set_tag(tag); }
-	auto reset_handler() { return m_reset_handler.bind(); }
-	auto msm_write_handler() { return m_msm_write_cb.bind(); }
+	template<class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_handler.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_msm_write_callback(Object &&cb) { return m_msm_write_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);

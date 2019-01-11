@@ -9,7 +9,8 @@
 struct SCSPDSP
 {
 //Config
-	address_space *space;
+	uint16_t *SCSPRAM;
+	uint32_t SCSPRAM_LENGTH;
 	uint32_t RBP; //Ring buf pointer
 	uint32_t RBL; //Delay ram (Ring buffer) size in words
 
@@ -29,7 +30,7 @@ struct SCSPDSP
 //output
 	int16_t EFREG[16];    //EFREG, 16 bit signed
 
-	bool Stopped;
+	int Stopped;
 	int LastStep;
 
 	void Init();

@@ -71,10 +71,6 @@
         This is probably done to be pedantic about coin insertions (might be protection
         related). In fact, currently coin insertions are not consistently recognized.
 
-        We have the schematics for this board and the protection circuit, there
-        are a number of incorrect assumptions in the code which need fixing, especially
-        regarding the two MCU interrupt hookups.
-
 
 ******************************************************************************************/
 
@@ -190,14 +186,14 @@ void bionicc_state::main_map(address_map &map)
 	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
 	map(0xfe0d00, 0xfe3fff).ram();              /* RAM? */
 	map(0xfe4000, 0xfe4001).portr("SYSTEM");
-	map(0xfe4000, 0xfe4001).w(FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
+	map(0xfe4000, 0xfe4001).w(this, FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
 	map(0xfe4002, 0xfe4003).portr("DSW").nopw();
-	map(0xfe8010, 0xfe8017).w(FUNC(bionicc_state::scroll_w));
+	map(0xfe8010, 0xfe8017).w(this, FUNC(bionicc_state::scroll_w));
 	map(0xfe8018, 0xfe8019).nopw(); // vblank irq ack?
-	map(0xfe801a, 0xfe801b).w(FUNC(bionicc_state::mpu_trigger_w)); // based on the code this looks like the MCU trigger if compared to F1 Dream, but 0xfe4002 would match up closer in terms of addresses.  Maybe this is IRQ4 related instead?
-	map(0xfec000, 0xfecfff).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
-	map(0xff0000, 0xff3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
-	map(0xff4000, 0xff7fff).ram().w(FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
+	map(0xfe801a, 0xfe801b).w(this, FUNC(bionicc_state::mpu_trigger_w)); // based on the code this looks like the MCU trigger if compared to F1 Dream, but 0xfe4002 would match up closer in terms of addresses.  Maybe this is IRQ4 related instead?
+	map(0xfec000, 0xfecfff).ram().w(this, FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
+	map(0xff0000, 0xff3fff).ram().w(this, FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
+	map(0xff4000, 0xff7fff).ram().w(this, FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
 	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffc000, 0xffffff).ram().share("ram16");
 }
@@ -213,7 +209,7 @@ void bionicc_state::sound_map(address_map &map)
 
 void bionicc_state::mcu_io(address_map &map)
 {
-	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_shared_r), FUNC(bionicc_state::mcu_shared_w));
+	map(0x000, 0x7ff).rw(this, FUNC(bionicc_state::mcu_shared_r), FUNC(bionicc_state::mcu_shared_w));
 }
 
 /*************************************
@@ -405,10 +401,10 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(bionicc_state, nmi_line_pulse, 4*60)
 
 	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
-	I8751(config, m_mcu, XTAL(24'000'000) / 4);
-	m_mcu->set_addrmap(AS_IO, &bionicc_state::mcu_io);
-	m_mcu->port_out_cb<1>().set(FUNC(bionicc_state::out1_w));
-	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::out3_w));
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(24'000'000) / 4)
+	MCFG_DEVICE_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, bionicc_state, out1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, bionicc_state, out3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -416,21 +412,24 @@ MACHINE_CONFIG_START(bionicc_state::bionicc)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 4, 386, 0, 256, 260, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(bionicc_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bionicc)
 
 	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
 
-	PALETTE(config, m_palette).set_format(2, &bionicc_state::RRRRGGGGBBBBIIII, 1024);
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT_CLASS(2, bionicc_state, RRRRGGGGBBBBIIII)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	YM2151(config, "ymsnd", XTAL(14'318'181) / 4).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181) / 4)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_CONFIG_END
 
 
@@ -568,50 +567,6 @@ ROM_START( bionicc2 ) /* "Not for use outside of USA or Canada" 1st release */
 	ROM_LOAD( "tsu_19.11j",   0x28000, 0x8000, CRC(b5c82722) SHA1(969f9159f7d59e4e4c9ef9ddbdc27cbfa531eabf) )
 	ROM_LOAD( "tsu_22.17j",   0x30000, 0x8000, CRC(5ee1ae6a) SHA1(76ca53d847c940c4176d79ba49b0c10efd6342e8) )
 	ROM_LOAD( "tsu_21.15j",   0x38000, 0x8000, CRC(98777006) SHA1(bcc2058b639e9b71d16af05f63df298bcce91fdc) )
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
-ROM_END
-
-ROM_START( topsecrt2 ) /* "Not for use in any other country but Japan" */
-	ROM_REGION( 0x40000, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_BYTE( "ts_02b.1a",  0x00000, 0x10000, CRC(0b84497f) SHA1(f7e9412d37a1e4b7a437d3f7bc5dc448c8a22079) ) /* 68000 code */
-	ROM_LOAD16_BYTE( "ts_04b.1b",  0x00001, 0x10000, CRC(9ab6de8d) SHA1(04445bc183364ebb6a8833a147b694234b509634) ) /* 68000 code */
-	ROM_LOAD16_BYTE( "ts_03b.2a",  0x20000, 0x10000, CRC(1b3f8a82) SHA1(2f9cad83b7bd10617bbd5172a1d31f41b194d3ac) ) /* 68000 code */
-	ROM_LOAD16_BYTE( "ts_05b.2b",  0x20001, 0x10000, CRC(962a89d8) SHA1(4aa5b0fd68a59ff74716253b0ba4c1933e92855b) ) /* 68000 code */
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
-
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
-
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "ts_08.8l",    0x00000, 0x8000, CRC(96ad379e) SHA1(accd3a560b259c186bc28cdc004ed8de0b12f9d5) )    /* VIDEORAM (text layer) tiles */
-
-	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "ts_07.5l",    0x00000, 0x8000, CRC(25cdf8b2) SHA1(316f6acc46878682dabeab12722e6a64504d23bd) )    /* SCROLL2 Layer Tiles */
-	ROM_LOAD( "ts_06.4l",    0x08000, 0x8000, CRC(314fb12d) SHA1(dab0519a49b64fe7a837b3c6383f6147e1ab6ffd) )
-
-	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "ts_12.17f",    0x00000, 0x8000, CRC(e4b4619e) SHA1(3bec8399ffb28fd50ce6ae88d90b091eadf8bda1) )   /* SCROLL1 Layer Tiles */
-	ROM_LOAD( "ts_11.15f",    0x08000, 0x8000, CRC(ab30237a) SHA1(ea6c07df992ba48f9eca7daa4ea775faa94358d2) )
-	ROM_LOAD( "ts_17.17g",    0x10000, 0x8000, CRC(deb657e4) SHA1(b36b468f9bbb7a4937286230d3f6caa14c61d4dd) )
-	ROM_LOAD( "ts_16.15g",    0x18000, 0x8000, CRC(d363b5f9) SHA1(1dd3991d99db2d6bcbdb12879ba50a01fef95004) )
-	ROM_LOAD( "ts_13.18f",    0x20000, 0x8000, CRC(a8f5a004) SHA1(36ab0cb8ec9ce0519876f7461ccc5020c9c5b597) )
-	ROM_LOAD( "ts_18.18g",    0x28000, 0x8000, CRC(3b36948c) SHA1(d85fcc0265ba1729c587b046cc5a7ba6f25363dd) )
-	ROM_LOAD( "ts_23.18j",    0x30000, 0x8000, CRC(bbfbe58a) SHA1(9b1d5672b6f3c5c0952f8dcd0da71acc68a97a5e) )
-	ROM_LOAD( "ts_24.18k",    0x38000, 0x8000, CRC(f156e564) SHA1(a6cad05bcc6d9ded6294f9b5aa856d05641aed02) )
-
-	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "ts_10.13f",    0x00000, 0x8000, CRC(c3587d05) SHA1(ad0898a5d4cf110783ef092bf8e65b6ef31a8ae0) )   /* Sprites */
-	ROM_LOAD( "ts_09.11f",    0x08000, 0x8000, CRC(6b63eef2) SHA1(5d1580db7f49c5994c2a08a36c2d05f3e246930d) )
-	ROM_LOAD( "ts_15.13g",    0x10000, 0x8000, CRC(db8cebb0) SHA1(1cc9eac14851cde95fb2d69d6f5ffb08bc9c0d93) )
-	ROM_LOAD( "ts_14.11g",    0x18000, 0x8000, CRC(e2e41abf) SHA1(d002d0d8fdbb9ec3e2eac218f6338f733953ca82) )
-	ROM_LOAD( "ts_20.13j",    0x20000, 0x8000, CRC(bfd1a695) SHA1(bf93486b96bfa1a1d5015189043b07e6130e6df1) )
-	ROM_LOAD( "ts_19.11j",    0x28000, 0x8000, CRC(928b669e) SHA1(98ea9d23a46b0700490fd2fa7ab4fb0988dd5ca6) )
-	ROM_LOAD( "ts_22.17j",    0x30000, 0x8000, CRC(3fe05d9a) SHA1(32e28ef03fb82785019d1ae8b3859215b5368c2b) )
-	ROM_LOAD( "ts_21.15j",    0x38000, 0x8000, CRC(27a9bb7c) SHA1(bb60332c0ecde4d7797960dec39c1079498175c3) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "63s141.18f",   0x0000, 0x0100, CRC(b58d0023) SHA1(e8a4a2e2951bf73b3d9eed6957e9ee1e61c9c58a) )    /* priority (not used), Labeled "TSB" */
@@ -756,8 +711,7 @@ GAME( 1987, bionicc,    0,       bionicc, bionicc, bionicc_state, empty_init, RO
 GAME( 1987, bionicc1,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bionicc2,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Bionic Commando (US set 2)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, topsecrt,   bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Top Secret (Japan, old revision)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, topsecrt2,  bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "Capcom",  "Top Secret (Japan, revision B)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bioniccbl,  bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "bootleg", "Bionic Commandos (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bioniccbl2, bionicc, bionicc, bionicc, bionicc_state, empty_init, ROT0, "bootleg", "Bionic Commandos (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
-// there's also an undumped JP new revision on which there are no extra lives after 1 million points, plus other bug-fixes / changes (possibly topsecrt2 set?)
+// there's also an undumped JP new revision on which there are no extra lives after 1 million points, plus other bug-fixes / changes

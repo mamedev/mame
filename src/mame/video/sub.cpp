@@ -11,22 +11,28 @@ Video functions
 #include "emu.h"
 #include "includes/sub.h"
 
-void sub_state::sub_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(sub_state, sub)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0; i < 0x100; i++)
-	{
-		int const r = color_prom[i | 0x000];
-		int const g = color_prom[i | 0x100];
-		int const b = color_prom[i | 0x200];
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+	uint8_t* lookup = memregion("proms2")->base();
 
+	for (i = 0;i < 0x100;i++)
+	{
+		int r,g,b;
+		r = (color_prom[0x000] >> 0);
+		g = (color_prom[0x100] >> 0);
+		b = (color_prom[0x200] >> 0);
+
+		//palette.set_indirect_color(i, rgb_t(r, g, b));
 		palette.set_indirect_color(i, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
+
+		color_prom++;
 	}
 
-	uint8_t const *const lookup = memregion("proms2")->base();
-	for (int i = 0; i < 0x400; i++)
+	for (i = 0;i < 0x400;i++)
 	{
-		uint8_t const ctabentry = lookup[i | 0x400] | (lookup[i | 0x000] << 4);
+		uint8_t ctabentry = lookup[i+0x400] | (lookup[i+0x000] << 4);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -34,7 +40,7 @@ void sub_state::sub_palette(palette_device &palette) const
 TILE_GET_INFO_MEMBER(sub_state::get_tile_info)
 {
 	int code = m_vram[tile_index] | ((m_attr[tile_index]&0xe0)<<3);
-	int color = (m_attr[tile_index]&0x1f)+0x40;
+	int	color = (m_attr[tile_index]&0x1f)+0x40;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -101,10 +107,10 @@ void sub_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		if(dx)
 			x = 0xe0 - x;
-
+		
 
 		gfx->transpen(bitmap,cliprect,spr_offs,col,fx,fy,x,y,0);
-	}
+	}	
 }
 
 

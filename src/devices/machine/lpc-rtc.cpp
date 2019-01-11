@@ -7,14 +7,14 @@ DEFINE_DEVICE_TYPE(LPC_RTC, lpc_rtc_device, "lpc_rpc", "LPC RTC")
 
 void lpc_rtc_device::map(address_map &map)
 {
-	map(0x70, 0x77).rw(FUNC(lpc_rtc_device::index_r), FUNC(lpc_rtc_device::index_w)).umask32(0x00ff00ff);
-	map(0x70, 0x77).rw(FUNC(lpc_rtc_device::target_r), FUNC(lpc_rtc_device::target_w)).umask32(0xff00ff00);
+	map(0x70, 0x77).rw(this, FUNC(lpc_rtc_device::index_r), FUNC(lpc_rtc_device::index_w)).umask32(0x00ff00ff);
+	map(0x70, 0x77).rw(this, FUNC(lpc_rtc_device::target_r), FUNC(lpc_rtc_device::target_w)).umask32(0xff00ff00);
 }
 
 void lpc_rtc_device::extmap(address_map &map)
 {
-	map(0x70, 0x77).rw(FUNC(lpc_rtc_device::extindex_r), FUNC(lpc_rtc_device::extindex_w)).umask32(0x00ff0000);
-	map(0x70, 0x77).rw(FUNC(lpc_rtc_device::exttarget_r), FUNC(lpc_rtc_device::exttarget_w)).umask32(0xff000000);
+	map(0x70, 0x77).rw(this, FUNC(lpc_rtc_device::extindex_r), FUNC(lpc_rtc_device::extindex_w)).umask32(0x00ff0000);
+	map(0x70, 0x77).rw(this, FUNC(lpc_rtc_device::exttarget_r), FUNC(lpc_rtc_device::exttarget_w)).umask32(0xff000000);
 }
 
 lpc_rtc_device::lpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

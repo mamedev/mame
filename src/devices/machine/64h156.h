@@ -67,6 +67,21 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_64H156_ATN_CALLBACK(_write) \
+	devcb = &downcast<c64h156_device &>(*device).set_atn_wr_callback(DEVCB_##_write);
+
+#define MCFG_64H156_SYNC_CALLBACK(_write) \
+	devcb = &downcast<c64h156_device &>(*device).set_sync_wr_callback(DEVCB_##_write);
+
+#define MCFG_64H156_BYTE_CALLBACK(_write) \
+	devcb = &downcast<c64h156_device &>(*device).set_byte_wr_callback(DEVCB_##_write);
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -78,9 +93,9 @@ public:
 	// construction/destruction
 	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto atn_callback() { return m_write_atn.bind(); }
-	auto sync_callback() { return m_write_sync.bind(); }
-	auto byte_callback() { return m_write_byte.bind(); }
+	template <class Object> devcb_base &set_atn_wr_callback(Object &&cb) { return m_write_atn.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sync_wr_callback(Object &&cb) { return m_write_sync.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_byte_wr_callback(Object &&cb) { return m_write_byte.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( yb_r );
 	DECLARE_WRITE8_MEMBER( yb_w );

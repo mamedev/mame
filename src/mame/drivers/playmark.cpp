@@ -266,20 +266,20 @@ void playmark_state::bigtwin_main_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x304000, 0x304001).noprw();             /* watchdog? irq ack? */
 	map(0x440000, 0x4403ff).ram().share("spriteram");
-	map(0x500000, 0x500fff).w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x500000, 0x500fff).w(this, FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
 	map(0x501000, 0x501fff).nopw();    /* unused RAM? */
-	map(0x502000, 0x503fff).w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x502000, 0x503fff).w(this, FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
 	map(0x504000, 0x50ffff).nopw();    /* unused RAM? */
-	map(0x510000, 0x51000b).w(FUNC(playmark_state::bigtwin_scroll_w));
+	map(0x510000, 0x51000b).w(this, FUNC(playmark_state::bigtwin_scroll_w));
 	map(0x51000c, 0x51000d).nopw();    /* always 3? */
 	map(0x600000, 0x67ffff).ram().share("bgvideoram");
 	map(0x700010, 0x700011).portr("SYSTEM");
 	map(0x700012, 0x700013).portr("P1");
 	map(0x700014, 0x700015).portr("P2");
-	map(0x700016, 0x700017).w(FUNC(playmark_state::coinctrl_w));
+	map(0x700016, 0x700017).w(this, FUNC(playmark_state::coinctrl_w));
 	map(0x70001a, 0x70001b).portr("DSW2");
 	map(0x70001c, 0x70001d).portr("DSW1");
-	map(0x70001e, 0x70001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x70001e, 0x70001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
 	map(0x780000, 0x7807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  AM_RANGE(0xe00000, 0xe00001) ?? written on startup
 	map(0xff0000, 0xffffff).ram();
@@ -288,10 +288,10 @@ void playmark_state::bigtwin_main_map(address_map &map)
 void playmark_state::bigtwinb_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
-	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
-	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
-	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x100000, 0x103fff).ram().w(this, FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(this, FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(this, FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(this, FUNC(playmark_state::hrdtimes_scroll_w));
 	map(0x201000, 0x2013ff).ram().share("spriteram");
 	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300010, 0x300011).portr("SYSTEM");
@@ -299,7 +299,7 @@ void playmark_state::bigtwinb_main_map(address_map &map)
 	map(0x300014, 0x300015).portr("P2");
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
-	map(0x30001e, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x30001e, 0x30001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
 	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
 	map(0xff0000, 0xffffff).ram();
 }
@@ -308,21 +308,21 @@ void playmark_state::wbeachvl_main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x440000, 0x440fff).ram().share("spriteram");
-	map(0x500000, 0x501fff).ram().w(FUNC(playmark_state::wbeachvl_bgvideoram_w)).share("videoram3");
-	map(0x504000, 0x505fff).ram().w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
-	map(0x508000, 0x509fff).ram().w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x500000, 0x501fff).ram().w(this, FUNC(playmark_state::wbeachvl_bgvideoram_w)).share("videoram3");
+	map(0x504000, 0x505fff).ram().w(this, FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x508000, 0x509fff).ram().w(this, FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
 	map(0x50f000, 0x50ffff).ram().share("rowscroll");
-	map(0x510000, 0x51000b).w(FUNC(playmark_state::wbeachvl_scroll_w));
+	map(0x510000, 0x51000b).w(this, FUNC(playmark_state::wbeachvl_scroll_w));
 	map(0x51000c, 0x51000d).nopw();    /* 2 and 3 */
 //  AM_RANGE(0x700000, 0x700001) ?? written on startup
 	map(0x710010, 0x710011).portr("SYSTEM");
 	map(0x710012, 0x710013).portr("P1");
 	map(0x710014, 0x710015).portr("P2");
-	map(0x710016, 0x710017).w(FUNC(playmark_state::wbeachvl_coin_eeprom_w));
+	map(0x710016, 0x710017).w(this, FUNC(playmark_state::wbeachvl_coin_eeprom_w));
 	map(0x710018, 0x710019).portr("P3");
 	map(0x71001a, 0x71001b).portr("P4");
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
-	map(0x71001e, 0x71001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x71001e, 0x71001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
 	map(0x780000, 0x780fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
 }
@@ -332,18 +332,18 @@ void playmark_state::excelsr_main_map(address_map &map)
 	map(0x000000, 0x2fffff).rom();
 	map(0x304000, 0x304001).nopw();                /* watchdog? irq ack? */
 	map(0x440000, 0x440cff).ram().share("spriteram");
-	map(0x500000, 0x500fff).ram().w(FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
-	map(0x501000, 0x501fff).ram().w(FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
-	map(0x510000, 0x51000b).w(FUNC(playmark_state::excelsr_scroll_w));
+	map(0x500000, 0x500fff).ram().w(this, FUNC(playmark_state::wbeachvl_fgvideoram_w)).share("videoram2");
+	map(0x501000, 0x501fff).ram().w(this, FUNC(playmark_state::wbeachvl_txvideoram_w)).share("videoram1");
+	map(0x510000, 0x51000b).w(this, FUNC(playmark_state::excelsr_scroll_w));
 	map(0x51000c, 0x51000d).nopw();    /* 2 and 3 */
 	map(0x600000, 0x67ffff).ram().share("bgvideoram");
 	map(0x700010, 0x700011).portr("SYSTEM");
 	map(0x700012, 0x700013).portr("P1");
 	map(0x700014, 0x700015).portr("P2");
-	map(0x700016, 0x700017).w(FUNC(playmark_state::coinctrl_w));
+	map(0x700016, 0x700017).w(this, FUNC(playmark_state::coinctrl_w));
 	map(0x70001a, 0x70001b).portr("DSW2");
 	map(0x70001c, 0x70001d).portr("DSW1");
-	map(0x70001e, 0x70001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x70001e, 0x70001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
 	map(0x780000, 0x7807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
 }
@@ -353,21 +353,21 @@ void playmark_state::hrdtimes_main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x0bffff).ram();
 	map(0x0c0000, 0x0fffff).rom().region("maincpu", 0x0c0000);
-	map(0x100000, 0x1007ff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3"); // 32*32?
+	map(0x100000, 0x1007ff).ram().w(this, FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3"); // 32*32?
 	map(0x100800, 0x103fff).ram();
-	map(0x104000, 0x105fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2"); // 128*32?
+	map(0x104000, 0x105fff).ram().w(this, FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2"); // 128*32?
 	map(0x106000, 0x107fff).ram();
-	map(0x108000, 0x109fff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1"); // 64*64?
+	map(0x108000, 0x109fff).ram().w(this, FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1"); // 64*64?
 	map(0x10a000, 0x10bfff).ram();
 	map(0x10c000, 0x10ffff).ram(); // Unused
-	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x110000, 0x11000d).w(this, FUNC(playmark_state::hrdtimes_scroll_w));
 	map(0x200000, 0x200fff).ram().share("spriteram");
 	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x280800, 0x280fff).ram(); // Unused
 	map(0x300010, 0x300011).portr("SYSTEM");
 	map(0x300012, 0x300013).portr("P1");
 	map(0x300014, 0x300015).portr("P2");
-	map(0x300016, 0x300017).w(FUNC(playmark_state::hrdtimes_coin_w));
+	map(0x300016, 0x300017).w(this, FUNC(playmark_state::hrdtimes_coin_w));
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
 //  AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
@@ -377,18 +377,18 @@ void playmark_state::hrdtimes_main_map(address_map &map)
 void playmark_state::hotmind_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
-	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
-	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
-	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x100000, 0x103fff).ram().w(this, FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(this, FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(this, FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(this, FUNC(playmark_state::hrdtimes_scroll_w));
 	map(0x200000, 0x200fff).ram().share("spriteram");
 	map(0x280000, 0x2807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300010, 0x300011).portr("COINS");
 	map(0x300012, 0x300013).portr("P1");
-	map(0x300014, 0x300015).portr("DISPENSER").w(FUNC(playmark_state::hotmind_coin_eeprom_w));
+	map(0x300014, 0x300015).portr("DISPENSER").w(this, FUNC(playmark_state::hotmind_coin_eeprom_w));
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
-	map(0x30001e, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x30001e, 0x30001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
 	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
 	map(0xff0000, 0xffffff).ram();
 }
@@ -396,17 +396,17 @@ void playmark_state::hotmind_main_map(address_map &map)
 void playmark_state::luckboomh_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x100000, 0x103fff).ram().w(FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
-	map(0x104000, 0x107fff).ram().w(FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
-	map(0x108000, 0x10ffff).ram().w(FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
-	map(0x110000, 0x11000d).w(FUNC(playmark_state::hrdtimes_scroll_w));
+	map(0x100000, 0x103fff).ram().w(this, FUNC(playmark_state::hrdtimes_bgvideoram_w)).share("videoram3");
+	map(0x104000, 0x107fff).ram().w(this, FUNC(playmark_state::hrdtimes_fgvideoram_w)).share("videoram2");
+	map(0x108000, 0x10ffff).ram().w(this, FUNC(playmark_state::hrdtimes_txvideoram_w)).share("videoram1");
+	map(0x110000, 0x11000d).w(this, FUNC(playmark_state::hrdtimes_scroll_w));
 	map(0x200000, 0x200fff).ram().share("spriteram");
 	map(0x280000, 0x2807ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x300010, 0x300011).portr("COINS");
 	map(0x300012, 0x300013).portr("P1");
-	map(0x300014, 0x300015).portr("DISPENSER").w(FUNC(playmark_state::luckboomh_dispenser_w));
+	map(0x300014, 0x300015).portr("DISPENSER").w(this, FUNC(playmark_state::luckboomh_dispenser_w));
 	map(0x30001c, 0x30001d).portr("SERVICE");
-	map(0x30001e, 0x30001f).w(FUNC(playmark_state::playmark_snd_command_w));
+	map(0x30001e, 0x30001f).w(this, FUNC(playmark_state::playmark_snd_command_w));
 	map(0x304000, 0x304001).nopw();        /* watchdog? irq ack? */
 	map(0xff0000, 0xff03ff).ram().share("nvram");
 	map(0xff8000, 0xffffff).ram();
@@ -1048,12 +1048,12 @@ MACHINE_CONFIG_START(playmark_state::bigtwin)
 	MCFG_DEVICE_PROGRAM_MAP(bigtwin_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	PIC16C57(config, m_audiocpu, 12000000);
-	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 12000000)
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1065,10 +1065,11 @@ MACHINE_CONFIG_START(playmark_state::bigtwin)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwin)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigtwin);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigtwin)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwin)
 
@@ -1087,12 +1088,12 @@ MACHINE_CONFIG_START(playmark_state::bigtwinb)
 	MCFG_DEVICE_PROGRAM_MAP(bigtwinb_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);
-	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1104,10 +1105,11 @@ MACHINE_CONFIG_START(playmark_state::bigtwinb)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_bigtwinb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigtwinb);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigtwinb)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,bigtwinb)
 
@@ -1126,15 +1128,16 @@ MACHINE_CONFIG_START(playmark_state::wbeachvl)
 	MCFG_DEVICE_PROGRAM_MAP(wbeachvl_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* 12MHz with internal 4x divisor */
-	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // wrong?
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
-//  m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w)); // probably closer to this, but this only supports 2 sample bank bits
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // wrong?
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
+//  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
 
-	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1146,10 +1149,11 @@ MACHINE_CONFIG_START(playmark_state::wbeachvl)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_wbeachvl)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wbeachvl);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_555, 2048);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wbeachvl)
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,wbeachvl)
 
@@ -1168,12 +1172,12 @@ MACHINE_CONFIG_START(playmark_state::excelsr)
 	MCFG_DEVICE_PROGRAM_MAP(excelsr_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* 12MHz with internal 4x divisor */
-	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* 12MHz with internal 4x divisor */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, playmark_snd_control_w))
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1185,10 +1189,11 @@ MACHINE_CONFIG_START(playmark_state::excelsr)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_excelsr)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_excelsr);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_excelsr)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,excelsr)
 
@@ -1207,13 +1212,13 @@ MACHINE_CONFIG_START(playmark_state::hrdtimes)
 	MCFG_DEVICE_PROGRAM_MAP(hrdtimes_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
-//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
-	m_audiocpu->set_disable();       /* Internal code is not dumped yet */
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
+	MCFG_DEVICE_DISABLE()       /* Internal code is not dumped yet */
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1225,10 +1230,11 @@ MACHINE_CONFIG_START(playmark_state::hrdtimes)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hrdtimes);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hrdtimes)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hrdtimes)
 
@@ -1247,14 +1253,15 @@ MACHINE_CONFIG_START(playmark_state::hotmind)
 	MCFG_DEVICE_PROGRAM_MAP(hotmind_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // irq 2 and 6 point to the same location on hotmind
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
-//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 
-	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1266,10 +1273,11 @@ MACHINE_CONFIG_START(playmark_state::hotmind)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotmind);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hotmind)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hotmind)
 
@@ -1291,14 +1299,14 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 	MCFG_DEVICE_PROGRAM_MAP(luckboomh_main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold)
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    /* verified on pcb */
-//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
+	MCFG_DEVICE_ADD("audiocpu", PIC16C57, XTAL(24'000'000)/2)    /* verified on pcb */
+//  MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, playmark_state, playmark_oki_banking_w)) // Banking data output but not wired. Port C is wired to the OKI banking instead
+	MCFG_PIC16C5x_READ_B_CB(READ8(*this, playmark_state, playmark_snd_command_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, playmark_state, playmark_oki_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(*this, playmark_state, playmark_snd_flag_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, playmark_state, hrdtimes_snd_control_w))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_MACHINE_START_OVERRIDE(playmark_state,playmark)
 	MCFG_MACHINE_RESET_OVERRIDE(playmark_state,playmark)
@@ -1310,10 +1318,11 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playmark_state, screen_update_hrdtimes)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_luckboomh);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_luckboomh)
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,luckboomh)
 
@@ -1790,7 +1799,7 @@ void playmark_state::playmark_decode_pic_hex_dump(void)
 			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			m_audiocpu->set_config(data);
+			m_audiocpu->pic16c5x_set_config(data);
 
 			src_pos = 0x7fff;       /* Force Exit */
 		}

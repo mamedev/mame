@@ -155,68 +155,68 @@ READ8_MEMBER(redalert_state::panther_unk_r)
 void redalert_state::redalert_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).ram().w(FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
+	map(0x2000, 0x3fff).ram().w(this, FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
 	map(0x4000, 0x4fff).ram().share("charram");
 	map(0x5000, 0xbfff).rom();
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("C000").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("C010").nopw();
 	map(0xc020, 0xc020).mirror(0x0f8f).portr("C020").nopw();
-	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
+	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(this, FUNC(redalert_state::redalert_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
-	map(0xc060, 0xc060).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_voice_command_w));
-	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
+	map(0xc060, 0xc060).mirror(0x0f8f).nopr().w(this, FUNC(redalert_state::redalert_voice_command_w));
+	map(0xc070, 0xc070).mirror(0x0f8f).rw(this, FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
 	map(0xf000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
 void redalert_state::ww3_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).ram().w(FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
+	map(0x2000, 0x3fff).ram().w(this, FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
 	map(0x4000, 0x4fff).ram().share("charram");
 	map(0x5000, 0xbfff).rom();
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("C000").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("C010").nopw();
 	map(0xc020, 0xc020).mirror(0x0f8f).portr("C020").nopw();
-	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
+	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(this, FUNC(redalert_state::redalert_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
-	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
+	map(0xc070, 0xc070).mirror(0x0f8f).rw(this, FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
 	map(0xf000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
 void redalert_state::panther_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).ram().w(FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
+	map(0x2000, 0x3fff).ram().w(this, FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
 	map(0x4000, 0x4fff).ram().share("charram");
 	map(0x5000, 0xbfff).rom();
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("C000").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("C010").nopw();
-	map(0xc020, 0xc020).mirror(0x0f8f).r(FUNC(redalert_state::panther_unk_r)); /* vblank? */
-	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::redalert_audio_command_w));
+	map(0xc020, 0xc020).mirror(0x0f8f).r(this, FUNC(redalert_state::panther_unk_r)); /* vblank? */
+	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(this, FUNC(redalert_state::redalert_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
-	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::panther_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
+	map(0xc070, 0xc070).mirror(0x0f8f).rw(this, FUNC(redalert_state::panther_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w));
 	map(0xf000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
 void redalert_state::demoneye_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).ram().w(FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
+	map(0x2000, 0x3fff).ram().w(this, FUNC(redalert_state::redalert_bitmap_videoram_w)).share("bitmap_videoram");
 	map(0x4000, 0x5fff).ram().share("charram");
 	map(0x6000, 0xbfff).rom();
 	map(0xc000, 0xc000).mirror(0x0f8f).portr("C000").nopw();
 	map(0xc010, 0xc010).mirror(0x0f8f).portr("C010").nopw();
 	map(0xc020, 0xc020).mirror(0x0f8f).portr("C020").nopw();
-	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(FUNC(redalert_state::demoneye_audio_command_w));
+	map(0xc030, 0xc030).mirror(0x0f8f).nopr().w(this, FUNC(redalert_state::demoneye_audio_command_w));
 	map(0xc040, 0xc040).mirror(0x0f8f).nopr().writeonly().share("video_control");
 	map(0xc050, 0xc050).mirror(0x0f8f).nopr().writeonly().share("bitmap_color");
 	map(0xc060, 0xc060).mirror(0x0f80).noprw();   /* unknown */
 	map(0xc061, 0xc061).mirror(0x0f80).noprw();   /* unknown */
 	map(0xc062, 0xc062).mirror(0x0f80).noprw();   /* unknown */
-	map(0xc070, 0xc070).mirror(0x0f8f).rw(FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w)); /* probably not correct */
+	map(0xc070, 0xc070).mirror(0x0f8f).rw(this, FUNC(redalert_state::redalert_interrupt_clear_r), FUNC(redalert_state::redalert_interrupt_clear_w)); /* probably not correct */
 	map(0xf000, 0xffff).rom().region("maincpu", 0x8000);
 }
 

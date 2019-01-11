@@ -24,7 +24,7 @@ public:
 	kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 	void set_gfx_region(int gfxregion) { m_gfx_region = gfxregion; }
 	void set_offsets(int x_offset, int y_offset)
 	{
@@ -63,5 +63,19 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(KANEKO_PANDORA, kaneko_pandora_device)
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_KANEKO_PANDORA_GFX_REGION(_region) \
+	downcast<kaneko_pandora_device &>(*device).set_gfx_region(_region);
+
+#define MCFG_KANEKO_PANDORA_OFFSETS(_xoffs, _yoffs) \
+	downcast<kaneko_pandora_device &>(*device).set_offsets(_xoffs, _yoffs);
+
+#define MCFG_KANEKO_PANDORA_GFXDECODE(_gfxtag) \
+	downcast<kaneko_pandora_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_KAN_PAND_H

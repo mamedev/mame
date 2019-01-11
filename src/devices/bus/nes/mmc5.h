@@ -7,9 +7,6 @@
 
 #include "nxrom.h"
 
-#include "sound/nes_apu.h"  // temp hack to pass the additional sound regs to APU...
-#include "video/ppu2c0x.h"  // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
-
 
 // ======================> nes_exrom_device
 
@@ -18,7 +15,6 @@ class nes_exrom_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~nes_exrom_device();
 
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_READ8_MEMBER(read_m) override;
@@ -90,9 +86,6 @@ protected:
 	uint8_t m_ram_hi_banks[4];
 
 	//  int m_nes_vram_sprite[8];
-
-	required_device<ppu2c0x_device> m_ppu;
-	required_device<nesapu_device> m_sound;
 };
 
 

@@ -14,7 +14,6 @@
 #pragma once
 
 #include "a2bus.h"
-#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "formats/imd_dsk.h"
 

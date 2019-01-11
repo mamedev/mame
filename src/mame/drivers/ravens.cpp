@@ -92,10 +92,6 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void ravens(machine_config &config);
-	void ravens2(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_READ8_MEMBER(port17_r);
 	DECLARE_WRITE8_MEMBER(port1b_w);
@@ -108,14 +104,16 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 
+	void ravens(machine_config &config);
+	void ravens2(machine_config &config);
 	void ravens2_io(address_map &map);
 	void ravens_io(address_map &map);
 	void ravens_mem(address_map &map);
-
+private:
 	uint8_t m_term_char;
 	uint8_t m_term_data;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<s2650_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	optional_device<generic_terminal_device> m_terminal;
 	required_device<cassette_image_device> m_cass;
 	output_finder<7> m_digits;
@@ -222,17 +220,17 @@ void ravens_state::ravens_mem(address_map &map)
 void ravens_state::ravens_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x09, 0x09).w(FUNC(ravens_state::leds_w)); // LED output port
-	map(0x10, 0x15).w(FUNC(ravens_state::display_w)); // 6-led display
-	map(0x17, 0x17).r(FUNC(ravens_state::port17_r)); // pushbuttons
+	map(0x09, 0x09).w(this, FUNC(ravens_state::leds_w)); // LED output port
+	map(0x10, 0x15).w(this, FUNC(ravens_state::display_w)); // 6-led display
+	map(0x17, 0x17).r(this, FUNC(ravens_state::port17_r)); // pushbuttons
 }
 
 void ravens_state::ravens2_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x07, 0x07).r(FUNC(ravens_state::port07_r));
-	map(0x1b, 0x1b).w(FUNC(ravens_state::port1b_w));
-	map(0x1c, 0x1c).w(FUNC(ravens_state::port1c_w));
+	map(0x07, 0x07).r(this, FUNC(ravens_state::port07_r));
+	map(0x1b, 0x1b).w(this, FUNC(ravens_state::port1b_w));
+	map(0x1c, 0x1c).w(this, FUNC(ravens_state::port1c_w));
 }
 
 /* Input ports */
@@ -338,60 +336,56 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	return result;
 }
 
-void ravens_state::ravens(machine_config &config)
-{
+MACHINE_CONFIG_START(ravens_state::ravens)
 	/* basic machine hardware */
-	S2650(config, m_maincpu, XTAL(1'000'000)); // frequency is unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &ravens_state::ravens_mem);
-	m_maincpu->set_addrmap(AS_IO, &ravens_state::ravens_io);
-	m_maincpu->sense_handler().set(FUNC(ravens_state::cass_r));
-	m_maincpu->flag_handler().set(FUNC(ravens_state::cass_w));
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
+	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
+	MCFG_DEVICE_IO_MAP(ravens_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	/* video hardware */
-	config.set_default_layout(layout_ravens);
+	MCFG_DEFAULT_LAYOUT(layout_ravens)
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", 1);
+	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
 
 	/* cassette */
-	CASSETTE(config, m_cass);
+	MCFG_CASSETTE_ADD( "cassette" )
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
-}
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+MACHINE_CONFIG_END
 
-void ravens_state::ravens2(machine_config &config)
-{
+MACHINE_CONFIG_START(ravens_state::ravens2)
 	/* basic machine hardware */
-	S2650(config, m_maincpu, XTAL(1'000'000)); // frequency is unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &ravens_state::ravens_mem);
-	m_maincpu->set_addrmap(AS_IO, &ravens_state::ravens2_io);
-	m_maincpu->sense_handler().set(FUNC(ravens_state::cass_r));
-	m_maincpu->flag_handler().set(FUNC(ravens_state::cass_w));
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
+	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
+	MCFG_DEVICE_IO_MAP(ravens2_io)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(ravens_state::kbd_put));
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ravens_state, kbd_put))
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(ravens_state, ravens), this), "pgm", 1);
+	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
 
 	/* cassette */
-	CASSETTE(config, m_cass);
+	MCFG_CASSETTE_ADD( "cassette" )
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
-}
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( ravens )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "v1.0", "V1.0" )
-	ROMX_LOAD( "mon_v1.0.bin", 0x0000, 0x0800, CRC(785eb1ad) SHA1(c316b8ac32ab6aa37746af37b9f81a23367fedd8), ROM_BIOS(0))
+	ROMX_LOAD( "mon_v1.0.bin", 0x0000, 0x0800, CRC(785eb1ad) SHA1(c316b8ac32ab6aa37746af37b9f81a23367fedd8), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v0.9", "V0.9" )
-	ROMX_LOAD( "mon_v0_9.bin", 0x0000, 0x07b5, CRC(2f9b9178) SHA1(ec2ebbc80ee9ff2502c1409ab4f99127032ed724), ROM_BIOS(1))
+	ROMX_LOAD( "mon_v0_9.bin", 0x0000, 0x07b5, CRC(2f9b9178) SHA1(ec2ebbc80ee9ff2502c1409ab4f99127032ed724), ROM_BIOS(2))
 ROM_END
 
 ROM_START( ravens2 )

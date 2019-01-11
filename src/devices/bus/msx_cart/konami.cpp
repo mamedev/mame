@@ -868,7 +868,7 @@ msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_c
 
 void msx_cart_keyboard_master_device::vlm_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(msx_cart_keyboard_master_device::read_vlm));
+	map(0x0000, 0xffff).r(this, FUNC(msx_cart_keyboard_master_device::read_vlm));
 }
 
 

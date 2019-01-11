@@ -345,27 +345,27 @@ uint32_t hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-u8 hd44780_device::read(offs_t offset)
+READ8_MEMBER(hd44780_device::read)
 {
 	switch (offset & 0x01)
 	{
-		case 0: return control_read();
-		case 1: return data_read();
+		case 0: return control_read(space, 0);
+		case 1: return data_read(space, 0);
 	}
 
 	return 0;
 }
 
-void hd44780_device::write(offs_t offset, u8 data)
+WRITE8_MEMBER(hd44780_device::write)
 {
 	switch (offset & 0x01)
 	{
-		case 0: control_write(data);  break;
-		case 1: data_write(data);     break;
+		case 0: control_write(space, 0, data);  break;
+		case 1: data_write(space, 0, data);     break;
 	}
 }
 
-void hd44780_device::control_write(u8 data)
+WRITE8_MEMBER(hd44780_device::control_write)
 {
 	if (m_data_len == 4)
 	{
@@ -485,7 +485,7 @@ void hd44780_device::control_write(u8 data)
 	m_first_cmd = false;
 }
 
-u8 hd44780_device::control_read()
+READ8_MEMBER(hd44780_device::control_read)
 {
 	if (m_data_len == 4)
 	{
@@ -503,7 +503,7 @@ u8 hd44780_device::control_read()
 	}
 }
 
-void hd44780_device::data_write(u8 data)
+WRITE8_MEMBER(hd44780_device::data_write)
 {
 	if (m_busy_flag)
 	{
@@ -543,7 +543,7 @@ void hd44780_device::data_write(u8 data)
 	set_busy_flag(41);
 }
 
-u8 hd44780_device::data_read()
+READ8_MEMBER(hd44780_device::data_read)
 {
 	uint8_t data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
 

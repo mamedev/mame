@@ -53,7 +53,6 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -61,12 +60,11 @@ Thanks to HIGHWAYMAN for providing info on how to get to these epoxies
 class wallc_state : public driver_device
 {
 public:
-	wallc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	wallc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_videoram(*this, "videoram")
-	{ }
+		m_videoram(*this, "videoram") { }
 
 	void sidampkr(machine_config &config);
 	void unkitpkr(machine_config &config);
@@ -105,8 +103,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_sidampkr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void wallc_palette(palette_device &palette) const;
-	void unkitpkr_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(wallc);
+	DECLARE_PALETTE_INIT(unkitpkr);
 	DECLARE_VIDEO_START(unkitpkr);
 	DECLARE_VIDEO_START(sidampkr);
 };
@@ -115,100 +113,102 @@ private:
 
 /***************************************************************************
 
-  Convert the color PROMs into a more usable format.
+  Convert the color PROMs into a more useable format.
 
   Wall Crash has one 32 bytes palette PROM, connected to the RGB output this
   way:
 
-  bit 6 -- 330 Ohm resistor --+-- 330 Ohm pulldown resistor -- RED
-  bit 5 -- 220 Ohm resistor --/
+  bit 6 -- 330 ohm resistor --+-- 330 ohm pulldown resistor -- RED
+  bit 5 -- 220 ohm resistor --/
 
   bit 4 -- NC
 
-  bit 3 -- 330 Ohm resistor --+-- 330 Ohm pulldown resistor -- GREEN
-  bit 2 -- 220 Ohm resistor --/
+  bit 3 -- 330 ohm resistor --+-- 330 ohm pulldown resistor -- GREEN
+  bit 2 -- 220 ohm resistor --/
 
-  bit 1 -- 330 Ohm resistor --+--+-- 330 Ohm pulldown resistor -- BLUE
-  bit 0 -- 220 Ohm resistor --/  |
+  bit 1 -- 330 ohm resistor --+--+-- 330 ohm pulldown resistor -- BLUE
+  bit 0 -- 220 ohm resistor --/  |
                                  |
   bit 7 -+- diode(~655 Ohm)------/
-         \------220 Ohm pullup (+5V) resistor
+         \------220 ohm pullup (+5V) resistor
 
 
 ***************************************************************************/
 
-void wallc_state::wallc_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(wallc_state, wallc)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	static constexpr int resistances_rg[2] = { 330, 220 };
-	static constexpr int resistances_b[3] = { 655, 330, 220 };
-
+	static const int resistances_rg[2] = { 330, 220 };
+	static const int resistances_b[3] = { 655, 330, 220 };
 	double weights_r[2], weights_g[2], weights_b[3];
+
 	compute_resistor_weights(0, 255,    -1.0,
 			2,  resistances_rg, weights_r,  330,    0,
 			2,  resistances_rg, weights_g,  330,    0,
 			3,  resistances_b,  weights_b,  330,    655+220);
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0;i < palette.entries();i++)
 	{
-		int bit0, bit1, bit7;
+		int bit0,bit1,bit7,r,g,b;
 
-		// red component
-		bit0 = BIT(color_prom[i], 5);
-		bit1 = BIT(color_prom[i], 6);
-		int const r = combine_2_weights(weights_r, bit1, bit0);
+		/* red component */
+		bit0 = (color_prom[i] >> 5) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		r = combine_2_weights(weights_r, bit1, bit0);
 
-		// green component
-		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i], 3);
-		int const g = combine_2_weights(weights_g, bit1, bit0);
+		/* green component */
+		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit1 = (color_prom[i] >> 3) & 0x01;
+		g = combine_2_weights(weights_g, bit1, bit0);
 
-		// blue component
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit7 = BIT(color_prom[i], 7);
-		int const b = combine_3_weights(weights_b, bit7, bit1, bit0);
+		/* blue component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit7 = (color_prom[i] >> 7) & 0x01;
+		b = combine_3_weights(weights_b, bit7, bit1, bit0);
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
-void wallc_state::unkitpkr_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(wallc_state, unkitpkr)
 {
-	// this pcb has 470 Ohm resistors instead of the expected 330 Ohms.
-	uint8_t const *const color_prom = memregion("proms")->base();
+//  this pcb has 470 ohms resistors instead of the expected 330 ohms.
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	static constexpr int resistances_rg[2] = { 470, 220 };
-	static constexpr int resistances_b[3] = { 655, 470, 220 };
-
+	static const int resistances_rg[2] = { 470, 220 };
+	static const int resistances_b[3] = { 655, 470, 220 };
 	double weights_r[2], weights_g[2], weights_b[3];
+
 	compute_resistor_weights(0, 255,    -1.0,
 			2,  resistances_rg, weights_r,  470,    0,
 			2,  resistances_rg, weights_g,  470,    0,
 			3,  resistances_b,  weights_b,  470,    655+220);
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0;i < palette.entries();i++)
 	{
-		int bit0, bit1, bit7;
+		int bit0,bit1,bit7,r,g,b;
 
-		// red component
-		bit0 = BIT(color_prom[i], 5);
-		bit1 = BIT(color_prom[i], 6);
-		int const r = combine_2_weights(weights_r, bit1, bit0);
+		/* red component */
+		bit0 = (color_prom[i] >> 5) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		r = combine_2_weights(weights_r, bit1, bit0);
 
-		// green component
-		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i], 3);
-		int const g = combine_2_weights(weights_g, bit1, bit0);
+		/* green component */
+		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit1 = (color_prom[i] >> 3) & 0x01;
+		g = combine_2_weights(weights_g, bit1, bit0);
 
-		// blue component
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit7 = BIT(color_prom[i], 7);
-		int const b = combine_3_weights(weights_b, bit7, bit1, bit0);
+		/* blue component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit7 = (color_prom[i] >> 7) & 0x01;
+		b = combine_3_weights(weights_b, bit7, bit1, bit0);
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -288,7 +288,7 @@ WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
 void wallc_state::wallc_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
+	map(0x8000, 0x83ff).ram().w(this, FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
 	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
 
 	map(0xb000, 0xb000).portr("DSW1");
@@ -297,7 +297,7 @@ void wallc_state::wallc_map(address_map &map)
 	map(0xb600, 0xb600).portr("DSW2");
 
 	map(0xb000, 0xb000).nopw();
-	map(0xb100, 0xb100).w(FUNC(wallc_state::wallc_coin_counter_w));
+	map(0xb100, 0xb100).w(this, FUNC(wallc_state::wallc_coin_counter_w));
 	map(0xb200, 0xb200).nopw();
 	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
 	map(0xb600, 0xb600).w("aysnd", FUNC(ay8912_device::data_w));
@@ -306,7 +306,7 @@ void wallc_state::wallc_map(address_map &map)
 void wallc_state::unkitpkr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
+	map(0x8000, 0x83ff).ram().w(this, FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
 	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
 
 	map(0xb000, 0xb000).portr("DSW1");
@@ -315,11 +315,11 @@ void wallc_state::unkitpkr_map(address_map &map)
 	map(0xb300, 0xb300).portr("IN3");
 	map(0xb500, 0xb5ff).nopr(); // read by memory test routine. left over from some other game
 
-	map(0xb000, 0xb000).w(FUNC(wallc_state::unkitpkr_out0_w));
-	map(0xb100, 0xb100).w(FUNC(wallc_state::unkitpkr_out1_w));
-	map(0xb200, 0xb200).w(FUNC(wallc_state::unkitpkr_out2_w));
+	map(0xb000, 0xb000).w(this, FUNC(wallc_state::unkitpkr_out0_w));
+	map(0xb100, 0xb100).w(this, FUNC(wallc_state::unkitpkr_out1_w));
+	map(0xb200, 0xb200).w(this, FUNC(wallc_state::unkitpkr_out2_w));
 	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
-	map(0xb600, 0xb600).rw("aysnd", FUNC(ay8912_device::data_r), FUNC(ay8910_device::data_w));  // Port A = DSW
+	map(0xb600, 0xb600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));  // Port A = DSW
 }
 
 
@@ -529,12 +529,14 @@ MACHINE_CONFIG_START(wallc_state::wallc)
 	MCFG_SCREEN_UPDATE_DRIVER(wallc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_wallc);
-	PALETTE(config, "palette", FUNC(wallc_state::wallc_palette), 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wallc)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(wallc_state, wallc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	AY8912(config, "aysnd", 12288000 / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
+	MCFG_DEVICE_ADD("aysnd", AY8912, 12288000 / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wallc_state::wallca)
@@ -550,12 +552,13 @@ MACHINE_CONFIG_START(wallc_state::unkitpkr)
 	MCFG_DEVICE_PROGRAM_MAP(unkitpkr_map)
 
 	MCFG_VIDEO_START_OVERRIDE(wallc_state, unkitpkr)
-	subdevice<palette_device>("palette")->set_init(FUNC(wallc_state::unkitpkr_palette));
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(wallc_state, unkitpkr)
 
 	/* sound hardware */
-	subdevice<ay8912_device>("aysnd")->port_a_read_callback().set_ioport("DSW2");
-	subdevice<ay8912_device>("aysnd")->reset_routes();
-	subdevice<ay8912_device>("aysnd")->add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_MODIFY("aysnd")
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wallc_state::sidampkr)

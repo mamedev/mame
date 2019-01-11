@@ -109,17 +109,6 @@ void ymf262_device::device_reset()
 	ymf262_reset_chip(m_chip);
 }
 
-//-------------------------------------------------
-//  device_clock_changed - called if the clock
-//  changes
-//-------------------------------------------------
-
-void ymf262_device::device_clock_changed()
-{
-	int rate = clock()/288;
-	ymf262_clock_changed(m_chip,clock(),rate);
-	m_stream->set_sample_rate(rate);
-}
 
 READ8_MEMBER( ymf262_device::read )
 {

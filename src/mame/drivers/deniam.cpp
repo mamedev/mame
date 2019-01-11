@@ -76,13 +76,13 @@ WRITE16_MEMBER(deniam_state::deniam_irq_ack_w)
 void deniam_state::deniam16b_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(FUNC(deniam_state::deniam_videoram_w)).share("videoram");
-	map(0x410000, 0x410fff).ram().w(FUNC(deniam_state::deniam_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(this, FUNC(deniam_state::deniam_videoram_w)).share("videoram");
+	map(0x410000, 0x410fff).ram().w(this, FUNC(deniam_state::deniam_textram_w)).share("textram");
 	map(0x440000, 0x4407ff).writeonly().share("spriteram");
-	map(0x840000, 0x840fff).w(FUNC(deniam_state::deniam_palette_w)).share("paletteram");
+	map(0x840000, 0x840fff).w(this, FUNC(deniam_state::deniam_palette_w)).share("paletteram");
 	map(0xc40000, 0xc40000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xc40002, 0xc40003).rw(FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
-	map(0xc40004, 0xc40005).w(FUNC(deniam_state::deniam_irq_ack_w));
+	map(0xc40002, 0xc40003).rw(this, FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
+	map(0xc40004, 0xc40005).w(this, FUNC(deniam_state::deniam_irq_ack_w));
 	map(0xc44000, 0xc44001).portr("SYSTEM");
 	map(0xc44002, 0xc44003).portr("P1");
 	map(0xc44004, 0xc44005).portr("P2").nopw();
@@ -103,21 +103,21 @@ void deniam_state::sound_io_map(address_map &map)
 	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x02, 0x03).w("ymsnd", FUNC(ym3812_device::write));
 	map(0x05, 0x05).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x07, 0x07).w(FUNC(deniam_state::deniam16b_oki_rom_bank_w));
+	map(0x07, 0x07).w(this, FUNC(deniam_state::deniam16b_oki_rom_bank_w));
 }
 
 /* identical to 16b, but handles sound directly */
 void deniam_state::deniam16c_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(FUNC(deniam_state::deniam_videoram_w)).share("videoram");
-	map(0x410000, 0x410fff).ram().w(FUNC(deniam_state::deniam_textram_w)).share("textram");
+	map(0x400000, 0x40ffff).ram().w(this, FUNC(deniam_state::deniam_videoram_w)).share("videoram");
+	map(0x410000, 0x410fff).ram().w(this, FUNC(deniam_state::deniam_textram_w)).share("textram");
 	map(0x440000, 0x4407ff).writeonly().share("spriteram");
-	map(0x840000, 0x840fff).w(FUNC(deniam_state::deniam_palette_w)).share("paletteram");
+	map(0x840000, 0x840fff).w(this, FUNC(deniam_state::deniam_palette_w)).share("paletteram");
 	map(0xc40001, 0xc40001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xc40002, 0xc40003).rw(FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
-	map(0xc40004, 0xc40005).w(FUNC(deniam_state::deniam_irq_ack_w));
-	map(0xc40006, 0xc40007).w(FUNC(deniam_state::deniam16c_oki_rom_bank_w));
+	map(0xc40002, 0xc40003).rw(this, FUNC(deniam_state::deniam_coinctrl_r), FUNC(deniam_state::deniam_coinctrl_w));
+	map(0xc40004, 0xc40005).w(this, FUNC(deniam_state::deniam_irq_ack_w));
+	map(0xc40006, 0xc40007).w(this, FUNC(deniam_state::deniam16c_oki_rom_bank_w));
 	map(0xc44000, 0xc44001).portr("SYSTEM");
 	map(0xc44002, 0xc44003).portr("P1");
 	map(0xc44004, 0xc44005).portr("P2");
@@ -250,73 +250,77 @@ void deniam_state::machine_reset()
 	m_oki->set_rom_bank(0);
 }
 
-void deniam_state::deniam16b(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(25'000'000)/2);	/* 12.5Mhz verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &deniam_state::deniam16b_map);
-	m_maincpu->set_vblank_int("screen", FUNC(deniam_state::irq4_line_assert));
+MACHINE_CONFIG_START(deniam_state::deniam16b)
 
-	Z80(config, m_audiocpu, XTAL(25'000'000)/4);	/* 6.25Mhz verified */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &deniam_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &deniam_state::sound_io_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(deniam16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(25'000'000)/4)  /* 6.25Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	//screen.set_visarea(24*8, 64*8-1, 0*8, 28*8-1); // looks better but doesn't match hardware
-	screen.set_visarea(24*8-4, 64*8-5, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(deniam_state::screen_update_deniam));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	//MCFG_SCREEN_VISIBLE_AREA(24*8, 64*8-1, 0*8, 28*8-1) // looks better but doesn't match hardware
+	MCFG_SCREEN_VISIBLE_AREA(24*8-4, 64*8-5, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deniam);
-	PALETTE(config, m_palette).set_entries(2048);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
+	MCFG_PALETTE_ADD("palette", 2048)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(25'000'000)/6)); /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.60);
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	OKIM6295(config, m_oki, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH); /* 1.041620 measured, = 1.0416666Mhz verified */
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void deniam_state::deniam16c(machine_config &config)
-{
+MACHINE_CONFIG_START(deniam_state::deniam16c)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(25'000'000)/2);	/* 12.5Mhz verified */
-	m_maincpu->set_addrmap(AS_PROGRAM, &deniam_state::deniam16c_map);
-	m_maincpu->set_vblank_int("screen", FUNC(deniam_state::irq4_line_assert));
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(deniam16c_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	//screen.set_visarea(24*8, 64*8-1, 0*8, 28*8-1); // looks better but doesn't match hardware
-	screen.set_visarea(24*8-4, 64*8-5, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(deniam_state::screen_update_deniam));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	//MCFG_SCREEN_VISIBLE_AREA(24*8, 64*8-1, 0*8, 28*8-1) // looks better but doesn't match hardware
+	MCFG_SCREEN_VISIBLE_AREA(24*8-4, 64*8-5, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(deniam_state, screen_update_deniam)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_deniam);
-	PALETTE(config, m_palette).set_entries(2048);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_deniam)
+	MCFG_PALETTE_ADD("palette", 2048)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(25'000'000)/6)); /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.60);
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	OKIM6295(config, m_oki, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH);  /* 1.041620 measured, = 1.0416666Mhz verified */
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(25'000'000)/24, okim6295_device::PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 

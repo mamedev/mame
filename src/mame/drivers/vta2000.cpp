@@ -20,13 +20,7 @@ Note: port 0 bit 4 is NOT a speaker bit. See code at 027B.
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/i8251.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "sound/spkrdev.h"
-#include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
 
 
 class vta2000_state : public driver_device
@@ -35,40 +29,22 @@ public:
 	vta2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_mainpit(*this, "mainpit")
-		, m_speaker(*this, "speaker")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 	{ }
 
-	void vta2000(machine_config &config);
-private:
-	DECLARE_WRITE8_MEMBER(output_00);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vta2000_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(vta2000);
 
-	void mem_map(address_map &map);
+	void vta2000(machine_config &config);
 	void io_map(address_map &map);
-
+	void mem_map(address_map &map);
+private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_device<pit8253_device> m_mainpit;
-	required_device<speaker_sound_device> m_speaker;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 };
-
-WRITE8_MEMBER(vta2000_state::output_00)
-{
-	m_mainpit->write_gate0(BIT(data, 4));
-}
-
-WRITE_LINE_MEMBER(vta2000_state::speaker_w)
-{
-	m_speaker->level_w(state);
-}
 
 void vta2000_state::mem_map(address_map &map)
 {
@@ -80,13 +56,8 @@ void vta2000_state::mem_map(address_map &map)
 
 void vta2000_state::io_map(address_map &map)
 {
+	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).w(FUNC(vta2000_state::output_00));
-	map(0x20, 0x21).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xc0, 0xc0).rw("usart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc3, 0xc3).rw("usart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xc8, 0xcb).w("brgpit", FUNC(pit8253_device::write));
-	map(0xe0, 0xe3).rw("mainpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
 /* Input ports */
@@ -181,7 +152,7 @@ static GFXDECODE_START( gfx_vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
-void vta2000_state::vta2000_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
@@ -190,27 +161,9 @@ void vta2000_state::vta2000_palette(palette_device &palette) const
 
 MACHINE_CONFIG_START(vta2000_state::vta2000)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, XTAL(4'000'000) / 4)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(4'000'000) / 4)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
-
-	PIT8253(config, m_mainpit, 0);
-	m_mainpit->set_clk<0>(500'000);
-	m_mainpit->out_handler<0>().set(FUNC(vta2000_state::speaker_w));
-
-	pic8259_device &pic(PIC8259(config, "pic", 0));
-	pic.in_sp_callback().set_constant(0);
-	pic.out_int_callback().set_inputline(m_maincpu, 0);
-
-	i8251_device &usart(I8251(config, "usart", XTAL(4'000'000) / 4));
-	usart.rxrdy_handler().set("pic", FUNC(pic8259_device::ir4_w));
-
-	pit8253_device &brgpit(PIT8253(config, "brgpit", 0));
-	brgpit.set_clk<0>(1'228'800); // maybe
-	brgpit.set_clk<1>(1'228'800);
-	brgpit.out_handler<0>().set("usart", FUNC(i8251_device::write_rxc));
-	brgpit.out_handler<1>().set("usart", FUNC(i8251_device::write_txc)); // or vice versa?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -221,11 +174,9 @@ MACHINE_CONFIG_START(vta2000_state::vta2000)
 	MCFG_SCREEN_UPDATE_DRIVER(vta2000_state, screen_update_vta2000)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(vta2000_state::vta2000_palette), 3);
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(vta2000_state, vta2000)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vta2000)
-
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 
@@ -242,5 +193,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
-COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS */
+COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -222,7 +222,7 @@ void md_boot_state::puckpkmn_map(address_map &map)
 	map(0x700016, 0x700017).portr("DSW1");
 	map(0x700018, 0x700019).portr("DSW2");
 	map(0x700023, 0x700023).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa04000, 0xa04003).rw(FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
+	map(0xa04000, 0xa04003).rw(this, FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
@@ -247,7 +247,7 @@ void md_boot_state::jzth_map(address_map &map)
 	map(0x700016, 0x700017).portr("DSW1");
 	map(0x700018, 0x700019).portr("DSW2");
 	map(0x700023, 0x700023).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa04000, 0xa04003).rw(FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
+	map(0xa04000, 0xa04003).rw(this, FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
@@ -256,7 +256,7 @@ void md_boot_state::jzth_map(address_map &map)
 
 	map(0xA11100, 0xA11101).noprw();
 
-	map(0x710000, 0x710001).rw(FUNC(md_boot_state::bl_710000_r), FUNC(md_boot_state::bl_710000_w)); // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
+	map(0x710000, 0x710001).rw(this, FUNC(md_boot_state::bl_710000_r), FUNC(md_boot_state::bl_710000_w)); // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
 }
 
 READ16_MEMBER(md_boot_state::puckpkmna_70001c_r)
@@ -274,8 +274,8 @@ READ16_MEMBER(md_boot_state::puckpkmna_4b2476_r)
 void md_boot_state::puckpkmna_map(address_map &map)
 {
 	puckpkmn_map(map);
-	map(0x4b2476, 0x4b2477).r(FUNC(md_boot_state::puckpkmna_4b2476_r));
-	map(0x70001c, 0x70001d).r(FUNC(md_boot_state::puckpkmna_70001c_r));
+	map(0x4b2476, 0x4b2477).r(this, FUNC(md_boot_state::puckpkmna_4b2476_r));
+	map(0x70001c, 0x70001d).r(this, FUNC(md_boot_state::puckpkmna_70001c_r));
 }
 
 MACHINE_CONFIG_START(md_boot_state::puckpkmn)

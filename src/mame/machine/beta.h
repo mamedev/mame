@@ -15,7 +15,6 @@
 #pragma once
 
 #include "machine/wd_fdc.h"
-#include "imagedev/floppy.h"
 
 
 #define BETA_DISK_TAG   "beta"
@@ -62,5 +61,11 @@ private:
 
 DECLARE_DEVICE_TYPE(BETA_DISK, beta_disk_device)
 
+
+#define MCFG_BETA_DISK_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, BETA_DISK, 0)
+
+#define MCFG_BETA_DISK_REMOVE(_tag)     \
+	MCFG_DEVICE_REMOVE(_tag)
 
 #endif // MAME_MACHINE_BETA_H

@@ -71,7 +71,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -99,7 +98,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(vvillage_output_w);
 	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	void caswin_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(caswin);
 	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override;
@@ -202,10 +201,10 @@ WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 void caswin_state::vvillage_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xa000, 0xa000).r(FUNC(caswin_state::vvillage_rng_r)); //accessed by caswin only
+	map(0xa000, 0xa000).r(this, FUNC(caswin_state::vvillage_rng_r)); //accessed by caswin only
 	map(0xe000, 0xe7ff).ram().share("nvram");
-	map(0xf000, 0xf3ff).ram().w(FUNC(caswin_state::sc0_vram_w)).share("sc0_vram");
-	map(0xf800, 0xfbff).ram().w(FUNC(caswin_state::sc0_attr_w)).share("sc0_attr");
+	map(0xf000, 0xf3ff).ram().w(this, FUNC(caswin_state::sc0_vram_w)).share("sc0_vram");
+	map(0xf800, 0xfbff).ram().w(this, FUNC(caswin_state::sc0_attr_w)).share("sc0_attr");
 }
 
 void caswin_state::vvillage_io(address_map &map)
@@ -215,10 +214,10 @@ void caswin_state::vvillage_io(address_map &map)
 	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x10, 0x10).portr("IN0");
 	map(0x11, 0x11).portr("IN1");
-	map(0x10, 0x10).w(FUNC(caswin_state::vvillage_scroll_w));
-	map(0x11, 0x11).w(FUNC(caswin_state::vvillage_vregs_w));
-	map(0x12, 0x12).w(FUNC(caswin_state::vvillage_lamps_w));
-	map(0x13, 0x13).w(FUNC(caswin_state::vvillage_output_w));
+	map(0x10, 0x10).w(this, FUNC(caswin_state::vvillage_scroll_w));
+	map(0x11, 0x11).w(this, FUNC(caswin_state::vvillage_vregs_w));
+	map(0x12, 0x12).w(this, FUNC(caswin_state::vvillage_lamps_w));
+	map(0x13, 0x13).w(this, FUNC(caswin_state::vvillage_output_w));
 }
 
 
@@ -307,25 +306,26 @@ static GFXDECODE_START( gfx_vvillage )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-void caswin_state::caswin_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(caswin_state, caswin)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	for (int i = 0; i < 0x40; ++i)
-	{
-		int bit0, bit1, bit2;
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
+	for (i = 0; i < 0x40; ++i)
+	{
 		bit0 = 0;
 		bit1 = (color_prom[0] >> 0) & 0x01;
 		bit2 = (color_prom[0] >> 1) & 0x01;
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = (color_prom[0] >> 2) & 0x01;
 		bit1 = (color_prom[0] >> 3) & 0x01;
 		bit2 = (color_prom[0] >> 4) & 0x01;
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = (color_prom[0] >> 5) & 0x01;
 		bit1 = (color_prom[0] >> 6) & 0x01;
 		bit2 = (color_prom[0] >> 7) & 0x01;
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
@@ -349,17 +349,18 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 	MCFG_SCREEN_UPDATE_DRIVER(caswin_state, screen_update_vvillage)
 	MCFG_SCREEN_PALETTE("palette")
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vvillage)
-	PALETTE(config, "palette", FUNC(caswin_state::caswin_palette), 0x40);
+	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 4000000 / 4));
-	aysnd.port_a_read_callback().set_ioport("DSW1");
-	aysnd.port_b_read_callback().set_ioport("DSW2");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
+	MCFG_DEVICE_ADD("aysnd", AY8910, 4000000 / 4)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 ROM_START( caswin )

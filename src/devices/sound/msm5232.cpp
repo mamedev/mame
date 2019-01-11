@@ -37,6 +37,7 @@ void msm5232_device::device_start()
 	m_stream = machine().sound().stream_alloc(*this, 0, 11, rate);
 
 	/* register with the save state system */
+	machine().save().register_postload(save_prepost_delegate(FUNC(msm5232_device::postload), this));
 	save_item(NAME(m_EN_out16));
 	save_item(NAME(m_EN_out8));
 	save_item(NAME(m_EN_out4));
@@ -708,7 +709,7 @@ void msm5232_device::TG_group_advance(int groupidx)
 
 
 /* MAME Interface */
-void msm5232_device::device_post_load()
+void msm5232_device::postload()
 {
 	init_tables();
 }

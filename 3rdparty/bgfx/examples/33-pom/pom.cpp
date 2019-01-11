@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -125,13 +125,8 @@ public:
 		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -225,10 +220,24 @@ public:
 
 			float time = (float)( (now-m_timeOffset)/freq);
 
-			const bx::Vec3 at  = { 0.0f, 0.0f, 1.0f };
-			const bx::Vec3 eye = { 0.0f, 0.0f, 0.0f };
+			float at[3]  = { 0.0f, 0.0f, 1.0f };
+			float eye[3] = { 0.0f, 0.0f, 0.0f };
 
 			// Set view and projection matrix for view 0.
+			const bgfx::HMD* hmd = bgfx::getHMD();
+			if (NULL != hmd && 0 != (hmd->flags & BGFX_HMD_RENDERING) )
+			{
+				float view[16];
+				bx::mtxQuatTranslationHMD(view, hmd->eye[0].rotation, eye);
+				bgfx::setViewTransform(0, view, hmd->eye[0].projection, BGFX_VIEW_STEREO, hmd->eye[1].projection);
+
+				// Set view 0 default viewport.
+				//
+				// Use HMD's width/height since HMD's internal frame buffer size
+				// might be much larger than window size.
+				bgfx::setViewRect(0, 0, 0, hmd->width, hmd->height);
+			}
+			else
 			{
 				float view[16];
 				bx::mtxLookAt(view, eye, at);
@@ -256,15 +265,12 @@ public:
 
 			ImGui::SetNextWindowPos(
 				  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_width / 5.0f, m_height / 2.0f)
-				, ImGuiCond_FirstUseEver
+				, ImGuiSetCond_FirstUseEver
 				);
 			ImGui::Begin("Settings"
 				, NULL
-				, 0
+				, ImVec2(m_width / 5.0f, m_height / 2.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
 			ImGui::RadioButton("No bump mapping", &m_shading_type, 0);
@@ -336,9 +342,9 @@ public:
 
 			// Set render states.
 			bgfx::setState(0
-					| BGFX_STATE_WRITE_RGB
-					| BGFX_STATE_WRITE_A
-					| BGFX_STATE_WRITE_Z
+					| BGFX_STATE_RGB_WRITE
+					| BGFX_STATE_ALPHA_WRITE
+					| BGFX_STATE_DEPTH_WRITE
 					| BGFX_STATE_DEPTH_TEST_LESS
 					| BGFX_STATE_MSAA
 					);

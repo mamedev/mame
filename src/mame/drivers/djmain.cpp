@@ -301,9 +301,9 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 	{
 		output().set_value("left-ssr",       !!(data & 0x08000000));  // SSR
 		output().set_value("right-ssr",      !!(data & 0x08000000));  // SSR
-		m_leds[0] = BIT(data, 16);            // 1P START
-		m_leds[1] = BIT(data, 17);            // 2P START
-		m_leds[2] = BIT(data, 18);            // EFFECT
+		m_led[0] = BIT(data, 16);            // 1P START
+		m_led[1] = BIT(data, 17);            // 2P START
+		m_led[2] = BIT(data, 18);            // EFFECT
 	}
 }
 
@@ -378,24 +378,24 @@ void djmain_state::maincpu_djmain(address_map &map)
 	map(0x000000, 0x0fffff).rom();                         // PRG ROM
 	map(0x400000, 0x40ffff).ram();                         // WORK RAM
 	map(0x480000, 0x48443f).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");       // COLOR RAM
-	map(0x500000, 0x57ffff).rw(FUNC(djmain_state::sndram_r), FUNC(djmain_state::sndram_w));               // SOUND RAM
+	map(0x500000, 0x57ffff).rw(this, FUNC(djmain_state::sndram_r), FUNC(djmain_state::sndram_w));               // SOUND RAM
 	map(0x580000, 0x58003f).rw(m_k056832, FUNC(k056832_device::long_r), FUNC(k056832_device::long_w));      // VIDEO REG (tilemap)
-	map(0x590000, 0x590007).w(FUNC(djmain_state::unknown590000_w));                  // ??
+	map(0x590000, 0x590007).w(this, FUNC(djmain_state::unknown590000_w));                  // ??
 	map(0x5a0000, 0x5a005f).w(m_k055555, FUNC(k055555_device::K055555_long_w));                  // 055555: priority encoder
 	map(0x5b0000, 0x5b04ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask32(0xff00ff00);
 	map(0x5b0000, 0x5b04ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask32(0x00ff00ff);
-	map(0x5c0000, 0x5c0003).r(FUNC(djmain_state::inp1_r));  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
-	map(0x5c8000, 0x5c8003).r(FUNC(djmain_state::inp2_r));  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
-	map(0x5d0000, 0x5d0003).w(FUNC(djmain_state::light_ctrl_1_w));                   // light/coin blocker control
-	map(0x5d2000, 0x5d2003).w(FUNC(djmain_state::light_ctrl_2_w));                   // light/coin blocker control
-	map(0x5d4000, 0x5d4003).w(FUNC(djmain_state::v_ctrl_w));                     // VIDEO control
-	map(0x5d6000, 0x5d6003).w(FUNC(djmain_state::sndram_bank_w));                    // SOUND RAM bank
-	map(0x5e0000, 0x5e0003).rw(FUNC(djmain_state::turntable_r), FUNC(djmain_state::turntable_select_w));      // input port control (turn tables)
-	map(0x600000, 0x601fff).r(FUNC(djmain_state::v_rom_r));                       // VIDEO ROM readthrough (for POST)
+	map(0x5c0000, 0x5c0003).r(this, FUNC(djmain_state::inp1_r));  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
+	map(0x5c8000, 0x5c8003).r(this, FUNC(djmain_state::inp2_r));  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
+	map(0x5d0000, 0x5d0003).w(this, FUNC(djmain_state::light_ctrl_1_w));                   // light/coin blocker control
+	map(0x5d2000, 0x5d2003).w(this, FUNC(djmain_state::light_ctrl_2_w));                   // light/coin blocker control
+	map(0x5d4000, 0x5d4003).w(this, FUNC(djmain_state::v_ctrl_w));                     // VIDEO control
+	map(0x5d6000, 0x5d6003).w(this, FUNC(djmain_state::sndram_bank_w));                    // SOUND RAM bank
+	map(0x5e0000, 0x5e0003).rw(this, FUNC(djmain_state::turntable_r), FUNC(djmain_state::turntable_select_w));      // input port control (turn tables)
+	map(0x600000, 0x601fff).r(this, FUNC(djmain_state::v_rom_r));                       // VIDEO ROM readthrough (for POST)
 	map(0x801000, 0x8017ff).ram().share("obj_ram");             // OBJECT RAM
-	map(0x802000, 0x802fff).w(FUNC(djmain_state::unknown802000_w));                  // ??
-	map(0x803000, 0x80309f).rw(FUNC(djmain_state::obj_ctrl_r), FUNC(djmain_state::obj_ctrl_w));           // OBJECT REGS
-	map(0x803800, 0x803fff).r(FUNC(djmain_state::obj_rom_r));                     // OBJECT ROM readthrough (for POST)
+	map(0x802000, 0x802fff).w(this, FUNC(djmain_state::unknown802000_w));                  // ??
+	map(0x803000, 0x80309f).rw(this, FUNC(djmain_state::obj_ctrl_r), FUNC(djmain_state::obj_ctrl_w));           // OBJECT REGS
+	map(0x803800, 0x803fff).r(this, FUNC(djmain_state::obj_rom_r));                     // OBJECT ROM readthrough (for POST)
 }
 
 void djmain_state::maincpu_djmainj(address_map &map)
@@ -403,17 +403,17 @@ void djmain_state::maincpu_djmainj(address_map &map)
 	maincpu_djmain(map);
 
 	map(0xc00000, 0xc01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap) (beatmania)
-	map(0xc02000, 0xc02047).w(FUNC(djmain_state::unknownc02000_w));                  // ??
-	map(0xf00000, 0xf0000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)); // IDE control regs (beatmania)
-	map(0xf40000, 0xf4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)); // IDE status control reg (beatmania)
+	map(0xc02000, 0xc02047).w(this, FUNC(djmain_state::unknownc02000_w));                  // ??
+	map(0xf00000, 0xf0000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)); // IDE control regs (beatmania)
+	map(0xf40000, 0xf4000f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)); // IDE status control reg (beatmania)
 }
 
 void djmain_state::maincpu_djmainu(address_map &map)
 {
 	maincpu_djmain(map);
 
-	map(0xd00000, 0xd0000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)); // IDE control regs (hiphopmania)
-	map(0xd40000, 0xd4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)); // IDE status control reg (hiphopmania)
+	map(0xd00000, 0xd0000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)); // IDE control regs (hiphopmania)
+	map(0xd40000, 0xd4000f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)); // IDE status control reg (hiphopmania)
 	map(0xe00000, 0xe01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap) (hiphopmania)
 }
 
@@ -421,8 +421,8 @@ void djmain_state::maincpu_djmaina(address_map &map)
 {
 	maincpu_djmain(map);
 
-	map(0xc00000, 0xc0000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)); // IDE control regs
-	map(0xc40000, 0xc4000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)); // IDE status control reg
+	map(0xc00000, 0xc0000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)); // IDE control regs
+	map(0xc40000, 0xc4000f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)); // IDE status control reg
 	map(0xf00000, 0xf01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap)
 }
 
@@ -1351,7 +1351,7 @@ void djmain_state::machine_start()
 	if (m_ata_user_password != nullptr)
 		hdd->set_user_password(m_ata_user_password);
 
-	m_leds.resolve();
+	m_led.resolve();
 
 	save_item(NAME(m_sndram_bank));
 	save_item(NAME(m_pending_vb_int));
@@ -1366,9 +1366,9 @@ void djmain_state::machine_reset()
 	m_sndram_bank = 0;
 
 	/* reset LEDs */
-	m_leds[0] = 1;
-	m_leds[1] = 1;
-	m_leds[2] = 1;
+	m_led[0] = 1;
+	m_led[1] = 1;
+	m_led[2] = 1;
 }
 
 
@@ -1388,8 +1388,8 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_djmainj)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djmain_state,  vb_interrupt)
 
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
-	m_ata->irq_handler().set(FUNC(djmain_state::ide_interrupt));
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, djmain_state, ide_interrupt))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1399,15 +1399,16 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 	MCFG_SCREEN_VISIBLE_AREA(12, 512-12-1, 0, 384-1)
 	MCFG_SCREEN_UPDATE_DRIVER(djmain_state, screen_update_djmain)
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x4440 / 4);
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djmain);
+	MCFG_PALETTE_ADD("palette", 0x4440/4)
+	MCFG_PALETTE_FORMAT(XBGR)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djmain)
 
-	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(djmain_state::tile_callback), this);
-	m_k056832->set_config("gfx2", K056832_BPP_4dj, 1, 1);
-	m_k056832->set_palette(m_palette);
+	MCFG_DEVICE_ADD("k056832", K056832, 0)
+	MCFG_K056832_CB(djmain_state, tile_callback)
+	MCFG_K056832_CONFIG("gfx2", K056832_BPP_4dj, 1, 1, "none")
+	MCFG_K056832_PALETTE("palette")
 
-	K055555(config, m_k055555, 0);
+	MCFG_K055555_ADD("k055555")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -17,6 +17,34 @@
 #define CRTC_EGA_END_UPDATE(_name)   void _name(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 
+
+#define MCFG_CRTC_EGA_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
+#define MCFG_CRTC_EGA_BEGIN_UPDATE_CB(_class, _method) \
+	downcast<crtc_ega_device &>(*device).set_begin_update_callback(crtc_ega_device::begin_update_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_CRTC_EGA_ROW_UPDATE_CB(_class, _method) \
+	downcast<crtc_ega_device &>(*device).set_row_update_callback(crtc_ega_device::row_update_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_CRTC_EGA_END_UPDATE_CB(_class, _method) \
+	downcast<crtc_ega_device &>(*device).set_end_update_callback(crtc_ega_device::end_update_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_CRTC_EGA_HPIXELS_PER_COLUMN(_pix) \
+	downcast<crtc_ega_device &>(*device).config_set_hpixels_per_column(_pix);
+
+#define MCFG_CRTC_EGA_RES_OUT_DE_CB(_devcb) \
+	devcb = &downcast<crtc_ega_device &>(*device).set_res_out_de_callback(DEVCB_##_devcb);
+
+#define MCFG_CRTC_EGA_RES_OUT_HSYNC_CB(_devcb) \
+	devcb = &downcast<crtc_ega_device &>(*device).set_res_out_hsync_callback(DEVCB_##_devcb);
+
+#define MCFG_CRTC_EGA_RES_OUT_VSYNC_CB(_devcb) \
+	devcb = &downcast<crtc_ega_device &>(*device).set_res_out_vsync_callback(DEVCB_##_devcb);
+
+#define MCFG_CRTC_EGA_RES_OUT_VBLANK_CB(_devcb) \
+	devcb = &downcast<crtc_ega_device &>(*device).set_res_out_vblank_callback(DEVCB_##_devcb);
+
+
 class crtc_ega_device : public device_t,
 						public device_video_interface
 {
@@ -29,14 +57,14 @@ public:
 
 	crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto res_out_de_callback() { return m_res_out_de_cb.bind(); }
-	auto res_out_hsync_callback() { return m_res_out_hsync_cb.bind(); }
-	auto res_out_vsync_callback() { return m_res_out_vsync_cb.bind(); }
-	auto res_out_vblank_callback() { return m_res_out_vblank_cb.bind(); }
+	template <class Object> devcb_base &set_res_out_de_callback(Object &&cb) { return m_res_out_de_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_res_out_hsync_callback(Object &&cb) { return m_res_out_hsync_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_res_out_vsync_callback(Object &&cb) { return m_res_out_vsync_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_res_out_vblank_callback(Object &&cb) { return m_res_out_vblank_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb = begin_update_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_row_update_callback(T &&... args) { m_row_update_cb = row_update_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb = end_update_delegate(std::forward<T>(args)...); }
+	template <typename Object> void set_begin_update_callback(Object &&cb) { m_begin_update_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_row_update_callback(Object &&cb) { m_row_update_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_end_update_callback(Object &&cb) { m_end_update_cb = std::forward<Object>(cb); }
 	void config_set_hpixels_per_column(int hpixels_per_column) { m_hpixels_per_column = hpixels_per_column; }
 
 	/* select one of the registers for reading or writing */

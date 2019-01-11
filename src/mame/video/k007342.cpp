@@ -82,8 +82,8 @@ void k007342_device::device_start()
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 
-	save_pointer(NAME(m_ram), 0x2000);
-	save_pointer(NAME(m_scroll_ram), 0x0200);
+	save_pointer(NAME(m_ram.get()), 0x2000);
+	save_pointer(NAME(m_scroll_ram.get()), 0x0200);
 	save_item(NAME(m_int_enabled));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_scrollx));

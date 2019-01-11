@@ -3,15 +3,15 @@
 #include "emu.h"
 #include "includes/rockrage.h"
 
-void rockrage_state::rockrage_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(rockrage_state, rockrage)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 256*3; i++)
 	{
 		// layer0 uses colors 0x00-0x0f; layer1 uses 0x10-0x1f; sprites use 0x20-0x2f
-		uint8_t const colorbase = (i / 256) * 16;
-		uint8_t const ctabentry = (color_prom[i] & 0x0f) | colorbase;
+		uint8_t colorbase = (i / 256) * 16;
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | colorbase;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

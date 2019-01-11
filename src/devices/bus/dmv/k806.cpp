@@ -100,15 +100,14 @@ void dmv_k806_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void dmv_k806_device::device_add_mconfig(machine_config &config)
-{
-	I8741(config, m_mcu, XTAL(6'000'000));
-	m_mcu->p1_in_cb().set(FUNC(dmv_k806_device::port1_r));
-	m_mcu->p2_out_cb().set(FUNC(dmv_k806_device::port2_w));
-	m_mcu->t1_in_cb().set(FUNC(dmv_k806_device::portt1_r));
+MACHINE_CONFIG_START(dmv_k806_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("mcu", I8741, XTAL(6'000'000))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, dmv_k806_device, port1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, dmv_k806_device, port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, dmv_k806_device, portt1_r))
 
-	TIMER(config, "mouse_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(dmv_k806_device::mouse_timer), this), attotime::from_hz(1000));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", dmv_k806_device, mouse_timer, attotime::from_hz(1000))
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

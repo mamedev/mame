@@ -31,7 +31,6 @@
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
 #include "video/nt7534.h"
-#include "emupal.h"
 #include "screen.h"
 
 class controlidx628_state : public driver_device
@@ -43,43 +42,31 @@ public:
 	{ }
 
 	void controlidx628(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-
 private:
 	DECLARE_WRITE8_MEMBER(p0_w);
-	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_READ8_MEMBER(p3_r);
 	DECLARE_WRITE8_MEMBER(p3_w);
-	void controlidx628_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(controlidx628);
 
 	void io_map(address_map &map);
+	void prog_map(address_map &map);
 
 	required_device<nt7534_device> m_lcdc;
 
-	uint8_t m_p0_data;
-	uint8_t m_p1_data;
-	uint8_t m_p3_data;
+	uint8_t p0_data;
+	uint8_t p1_data;
+	uint8_t p3_data;
 };
 
-
-void controlidx628_state::machine_start()
-{
-	m_p0_data = 0xff;
-	m_p1_data = 0xff;
-	m_p3_data = 0xff;
-
-	save_item(NAME(m_p0_data));
-	save_item(NAME(m_p1_data));
-	save_item(NAME(m_p3_data));
-}
 
 /*************************
 * Memory map information *
 *************************/
+
+void controlidx628_state::prog_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
 void controlidx628_state::io_map(address_map &map)
 {
@@ -87,42 +74,23 @@ void controlidx628_state::io_map(address_map &map)
 }
 
 
-WRITE8_MEMBER(controlidx628_state::p0_w)
+WRITE8_MEMBER( controlidx628_state::p0_w )
 {
-	m_p0_data = data;
+	p0_data = data;
 }
 
-READ8_MEMBER(controlidx628_state::p1_r)
+WRITE8_MEMBER( controlidx628_state::p1_w )
 {
-	// P1.1 is used for serial I/O; P1.4 and P1.5 are also used bidirectionally
-	return 0xcd;
-}
-
-WRITE8_MEMBER(controlidx628_state::p1_w)
-{
-	if ((BIT(m_p1_data, 6) == 0) && (BIT(data, 6) == 1)) // on raising-edge of bit 6
+	if ((BIT(p1_data, 6) == 0) && (BIT(data, 6) == 1)) // on raising-edge of bit 6
 	{
-		m_lcdc->write(space, BIT(data, 7), m_p0_data);
+		m_lcdc->write(space, BIT(data, 7), p0_data);
 	}
-	// P1.0 is also used as a serial I/O clock
-	m_p1_data = data;
+	p1_data = data;
 }
 
-READ8_MEMBER(controlidx628_state::p2_r)
+WRITE8_MEMBER( controlidx628_state::p3_w )
 {
-	// Low nibble used for input
-	return 0xf0;
-}
-
-READ8_MEMBER(controlidx628_state::p3_r)
-{
-	// P3.3 (INT1) and P3.4 (T0) used bidirectionally
-	return 0xff;
-}
-
-WRITE8_MEMBER(controlidx628_state::p3_w)
-{
-	m_p3_data = data;
+	p3_data = data;
 }
 
 /*************************
@@ -132,12 +100,12 @@ WRITE8_MEMBER(controlidx628_state::p3_w)
 //static INPUT_PORTS_START( controlidx628 )
 //INPUT_PORTS_END
 
-void controlidx628_state::controlidx628_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 {
 	// These colors were selected from a photo of the display
 	// using the color-picker in Inkscape:
-	palette.set_pen_color(0, rgb_t(0x06, 0x61, 0xee));
-	palette.set_pen_color(1, rgb_t(0x00, 0x23, 0x84));
+		palette.set_pen_color(0, rgb_t(0x06, 0x61, 0xEE));
+		palette.set_pen_color(1, rgb_t(0x00, 0x23, 0x84));
 }
 
 /*************************
@@ -146,14 +114,12 @@ void controlidx628_state::controlidx628_palette(palette_device &palette) const
 
 MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	// basic machine hardware
-	at89s52_device &maincpu(AT89S52(config, "maincpu", XTAL(11'059'200)));
-	maincpu.set_addrmap(AS_IO, &controlidx628_state::io_map);
-	maincpu.port_out_cb<0>().set(FUNC(controlidx628_state::p0_w));
-	maincpu.port_in_cb<1>().set(FUNC(controlidx628_state::p1_r));
-	maincpu.port_out_cb<1>().set(FUNC(controlidx628_state::p1_w));
-	maincpu.port_in_cb<2>().set(FUNC(controlidx628_state::p2_r));
-	maincpu.port_in_cb<3>().set(FUNC(controlidx628_state::p3_r));
-	maincpu.port_out_cb<3>().set(FUNC(controlidx628_state::p3_w));
+	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(11'059'200)) // Actually the board has an Atmel AT89S52 MCU.
+	MCFG_DEVICE_PROGRAM_MAP(prog_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, controlidx628_state, p0_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, controlidx628_state, p1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, controlidx628_state, p3_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -164,7 +130,8 @@ MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	MCFG_SCREEN_UPDATE_DEVICE("nt7534", nt7534_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(controlidx628_state::controlidx628_palette), 2);
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(controlidx628_state, controlidx628)
 
 	NT7534(config, m_lcdc);
 MACHINE_CONFIG_END

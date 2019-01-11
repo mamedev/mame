@@ -6,8 +6,9 @@
 
 *************************************************************************/
 
-#include "machine/74259.h"
 #include "sound/discrete.h"
+
+
 
 class avalnche_state : public driver_device
 {
@@ -16,13 +17,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_discrete(*this, "discrete"),
-		m_maincpu(*this, "maincpu"),
-		m_latch(*this, "latch") { }
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<uint8_t> m_videoram;
 	optional_device<discrete_device> m_discrete;
-	required_device<cpu_device> m_maincpu;
-	required_device<f9334_device> m_latch;
 
 	uint8_t m_avalance_video_inverted;
 
@@ -37,6 +35,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(catch_aud0_w);
 	DECLARE_WRITE_LINE_MEMBER(catch_aud1_w);
 	DECLARE_WRITE_LINE_MEMBER(catch_aud2_w);
+	required_device<cpu_device> m_maincpu;
 	void avalnche_base(machine_config &config);
 	void acatch(machine_config &config);
 	void acatch_sound(machine_config &config);

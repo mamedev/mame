@@ -5,14 +5,19 @@
 
 #pragma once
 
+#define MCFG_NEXTMO_IRQ_CALLBACK(_write) \
+	devcb = &downcast<nextmo_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+
+#define MCFG_NEXTMO_DRQ_CALLBACK(_write) \
+	devcb = &downcast<nextmo_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
 
 class nextmo_device : public device_t
 {
 public:
 	nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto irq_wr_callback() { return irq_cb.bind(); }
-	auto drq_wr_callback() { return drq_cb.bind(); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
 
 	void map(address_map &map);
 

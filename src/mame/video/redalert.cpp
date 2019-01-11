@@ -166,7 +166,7 @@ VIDEO_START_MEMBER(redalert_state,redalert)
 {
 	m_bitmap_colorram = std::make_unique<uint8_t[]>(0x0400);
 
-	save_pointer(NAME(m_bitmap_colorram), 0x0400);
+	save_pointer(NAME(m_bitmap_colorram.get()), 0x0400);
 
 	m_control_xor = 0x00;
 }

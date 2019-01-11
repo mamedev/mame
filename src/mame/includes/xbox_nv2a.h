@@ -14,13 +14,13 @@
 #include <mutex>
 
 class vertex_program_disassembler {
-	static char const *const srctypes[];
-	static char const *const scaops[];
-	static int const scapar2[];
-	static char const *const vecops[];
-	static int const vecpar2[];
-	static char const *const vecouts[];
-	static char const compchar[];
+	static const char *srctypes[];
+	static const char *scaops[];
+	static const int scapar2[];
+	static const char *vecops[];
+	static const int vecpar2[];
+	static const char *vecouts[];
+	static const char compchar[];
 	int o[6];
 	int state;
 

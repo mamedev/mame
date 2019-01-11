@@ -38,6 +38,7 @@ backup of playfield rom and picture/description of its board
 #include "emu.h"
 #include "includes/ssystem3.h"
 
+#include "cpu/m6502/m6502.h"
 #include "screen.h"
 
 
@@ -281,32 +282,32 @@ static INPUT_PORTS_START( ssystem3 )
 INPUT_PORTS_END
 
 
-void ssystem3_state::ssystem3(machine_config &config)
-{
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 1000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+MACHINE_CONFIG_START(ssystem3_state::ssystem3)
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)
+	MCFG_DEVICE_PROGRAM_MAP(ssystem3_map)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(30);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(728, 437);
-	screen.set_visarea(0, 728-1, 0, 437-1);
-	screen.set_screen_update(FUNC(ssystem3_state::screen_update_ssystem3));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(LCD_FRAMES_PER_SECOND)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(728, 437)
+	MCFG_SCREEN_VISIBLE_AREA(0, 728-1, 0, 437-1)
+	MCFG_SCREEN_UPDATE_DRIVER(ssystem3_state, screen_update_ssystem3)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette, FUNC(ssystem3_state::palette_init), 242 + 32768);
+	MCFG_PALETTE_ADD("palette", 242 + 32768)
+	MCFG_PALETTE_INIT_OWNER(ssystem3_state, ssystem3)
 
 	/* via */
-	VIA6522(config, m_via6522_0, 1000000);
-	m_via6522_0->readpa_handler().set(FUNC(ssystem3_state::ssystem3_via_read_a));
-	m_via6522_0->readpb_handler().set(FUNC(ssystem3_state::ssystem3_via_read_b));
-	m_via6522_0->writepa_handler().set(FUNC(ssystem3_state::ssystem3_via_write_a));
-	m_via6522_0->writepb_handler().set(FUNC(ssystem3_state::ssystem3_via_write_b));
-}
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, ssystem3_state,ssystem3_via_read_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, ssystem3_state,ssystem3_via_read_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, ssystem3_state,ssystem3_via_write_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, ssystem3_state,ssystem3_via_write_b))
+MACHINE_CONFIG_END
 
 
 ROM_START(ssystem3)

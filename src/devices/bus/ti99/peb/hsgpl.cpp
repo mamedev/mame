@@ -121,27 +121,21 @@
 #include "emu.h"
 #include "hsgpl.h"
 
-#define LOG_WARN        (1U<<1)   // Warnings
-#define LOG_CONFIG      (1U<<2)   // Configuration
-#define LOG_PORT        (1U<<3)
-#define LOG_DSR         (1U<<4)
-#define LOG_BANKING     (1U<<5)
-#define LOG_CRU         (1U<<6)
-#define LOG_ADDRESS     (1U<<7)
-#define LOG_READ        (1U<<8)
-#define LOG_WRITE       (1U<<9)
-#define LOG_IGNORE      (1U<<10)
-
-#define VERBOSE ( LOG_CONFIG | LOG_WARN )
-
-#include "logmacro.h"
-
 DEFINE_DEVICE_TYPE_NS(TI99_HSGPL, bus::ti99::peb, snug_high_speed_gpl_device, "ti99_hsgpl", "SNUG High-speed GPL card")
 
 namespace bus { namespace ti99 { namespace peb {
 
 #define CRU_BASE 0x1B00
 #define SUPERCART_BASE 0x0800
+
+#define TRACE_PORT 0
+#define TRACE_DSR 0
+#define TRACE_BANKING 0
+#define TRACE_CRU 0
+#define TRACE_ADDRESS 0
+#define TRACE_READ 0
+#define TRACE_WRITE 0
+#define TRACE_IGNORE 0
 
 #define RAM6_TAG "cartram128k"
 #define GRAM_TAG "gram128k"
@@ -198,7 +192,7 @@ WRITE8_MEMBER(snug_high_speed_gpl_device::cruwrite)
 	{
 		if (data != 0)
 		{
-			LOGMASKED(LOG_CRU, "Supercart cru setting %04x\n", offset);
+			if (TRACE_CRU) logerror("Supercart cru setting %04x\n", offset);
 			m_current_bank = (offset-0x0802)>>2;
 		}
 		return;
@@ -212,15 +206,15 @@ WRITE8_MEMBER(snug_high_speed_gpl_device::cruwrite)
 		{
 		case 0:
 			m_dsr_enabled = (data != 0);
-			LOGMASKED(LOG_CRU, "Set dsr_enabled=%x\n", data);
+			if (TRACE_CRU) logerror("Set dsr_enabled=%x\n", data);
 			break;
 		case 1:
 			m_gram_enabled = (data != 0);
-			LOGMASKED(LOG_CRU, "Set gram_enabled=%x\n", data);
+			if (TRACE_CRU) logerror("Set gram_enabled=%x\n", data);
 			break;
 		case 2:
 			m_bank_inhibit = (data != 0);
-			LOGMASKED(LOG_CRU, "Set bank_inhibit=%x\n", data);
+			if (TRACE_CRU) logerror("Set bank_inhibit=%x\n", data);
 			break;
 		case 3:
 		case 4:
@@ -232,34 +226,34 @@ WRITE8_MEMBER(snug_high_speed_gpl_device::cruwrite)
 				m_dsr_page |= (1 << (bit-3));
 			else
 				m_dsr_page &= ~(1 << (bit-3));
-			LOGMASKED(LOG_CRU, "Set dsr_page=%d\n", m_dsr_page);
+			if (TRACE_CRU) logerror("Set dsr_page=%d\n", m_dsr_page);
 			break;
 		case 9:
 			m_card_enabled = data;
-			LOGMASKED(LOG_CRU, "Set card_enabled=%x\n", data);
+			if (TRACE_CRU) logerror("Set card_enabled=%x\n", data);
 			break;
 		case 10:
 			m_write_enabled = data;
-			LOGMASKED(LOG_CRU, "Set write_enabled=%x\n", data);
+			if (TRACE_CRU) logerror("Set write_enabled=%x\n", data);
 			break;
 		case 11:
 			m_supercart_enabled = data;
 			// CHECK: Do we have to reset the bank?
-			LOGMASKED(LOG_CRU, "Set supercart_enabled=%x\n", data);
+			if (TRACE_CRU) logerror("Set supercart_enabled=%x\n", data);
 			break;
 		case 12:
 			m_led_on = data;
-			LOGMASKED(LOG_CRU, "Set led_on=%x\n", data);
+			if (TRACE_CRU) logerror("Set led_on=%x\n", data);
 			break;
 		case 13:
 			break;
 		case 14:
 			m_mbx_enabled = data;
-			LOGMASKED(LOG_CRU, "Set mbx_enabled=%x\n", data);
+			if (TRACE_CRU) logerror("Set mbx_enabled=%x\n", data);
 			break;
 		case 15:
 			m_ram_enabled = data;
-			LOGMASKED(LOG_CRU, "Set ram_enabled=%x\n", data);
+			if (TRACE_CRU) logerror("Set ram_enabled=%x\n", data);
 			break;
 		}
 	}
@@ -312,7 +306,7 @@ void snug_high_speed_gpl_device::dsrspace_readz(address_space& space, offs_t off
 	if (m_dsr_enabled)
 	{
 		*value = m_dsr_eeprom->read(space, (offset & 0x1fff) | (m_dsr_page<<13), mem_mask);
-		LOGMASKED(LOG_READ, "read dsr %04x[%02x] -> %02x\n", offset, m_dsr_page, *value);
+		if (TRACE_READ) logerror("read dsr %04x[%02x] -> %02x\n", offset, m_dsr_page, *value);
 	}
 }
 
@@ -323,14 +317,14 @@ void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t of
 {
 	if (!m_card_enabled || m_flash_mode)
 	{
-		LOGMASKED(LOG_IGNORE, "cartridge space read ignored (enable=%d, flash_mode=%d)\n", m_card_enabled, m_flash_mode);
+		if (TRACE_IGNORE) logerror("cartridge space read ignored (enable=%d, flash_mode=%d)\n", m_card_enabled, m_flash_mode);
 		return;
 	}
 
 	if (m_module_bank < 16)
 	{
 		*value = m_rom6_eeprom->read(space, (offset & 0x1fff) | (m_current_bank<<13) | (m_current_grom_port<<15), mem_mask);
-		LOGMASKED(LOG_READ, "cartridge space read %04x -> %02x\n", offset, *value);
+		if (TRACE_READ) logerror("cartridge space read %04x -> %02x\n", offset, *value);
 	}
 	else
 	{
@@ -340,7 +334,7 @@ void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t of
 		}
 		else
 		{
-			LOGMASKED(LOG_WARN, "unknown 0x6000 port\n");
+			logerror("unknown 0x6000 port\n");
 		}
 	}
 }
@@ -389,7 +383,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 			{
 				*value = m_gram_memory->pointer()[m_grom_address | (port<<16)];
 				m_module_bank = port + 16;
-				if (bNew) LOGMASKED(LOG_PORT, "GRAM read access at %04x (GRMENA=1) - switch to bank %d\n", offset & 0xffff, m_module_bank);
+				if (TRACE_PORT) if (bNew) logerror("GRAM read access at %04x (GRMENA=1) - switch to bank %d\n", offset & 0xffff, m_module_bank);
 			}
 			else
 			{
@@ -399,7 +393,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 					{
 						*value = m_grom_a_eeprom->read(space, m_grom_address | (port<<16), mem_mask);
 						m_module_bank = port;
-						if (bNew) LOGMASKED(LOG_PORT, "GROM read access at %04x - switch to bank %d\n", offset & 0xffff, m_module_bank);
+						if (TRACE_PORT) if (bNew) logerror("GROM read access at %04x - switch to bank %d\n", offset & 0xffff, m_module_bank);
 					}
 				}
 				else
@@ -408,7 +402,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 					{
 						*value = m_grom_b_eeprom->read(space, m_grom_address | ((port-8)<<16), mem_mask);
 						m_module_bank = port;
-						if (bNew) LOGMASKED(LOG_PORT, "GROM read access at %04x - switch to bank %d\n", offset & 0xffff, m_module_bank);
+						if (TRACE_PORT) if (bNew) logerror("GROM read access at %04x - switch to bank %d\n", offset & 0xffff, m_module_bank);
 					}
 					else
 					{
@@ -418,7 +412,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 							// DSR banks 0-63 (8 KiB per bank, 8 banks per port)
 							*value = m_dsr_eeprom->read(space, m_grom_address | ((port-16)<<16), mem_mask);
 							// Don't change the module port
-							if (bNew) LOGMASKED(LOG_DSR, "read access to DSR bank %d-%d (%04x)\n", (port-16)<<3, ((port-16)<<3)+7, offset);
+							if (TRACE_DSR) if (bNew) logerror("read access to DSR bank %d-%d (%04x)\n", (port-16)<<3, ((port-16)<<3)+7, offset);
 						}
 						else
 						{
@@ -428,7 +422,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 								// Each ROM6 is available as 4 (sub)banks (switchable via 6000, 6002, 6004, 6006)
 								// Accordingly, each port has two complete sets
 								*value = m_rom6_eeprom->read(space, m_grom_address | ((port-24)<<16), mem_mask);
-								if (bNew) LOGMASKED(LOG_PORT, "ROM6 read access for module bank %d-%d (%04x)\n", (port-24)<<1, ((port-24)<<1)+1, offset & 0xffff);
+								if (TRACE_PORT) if (bNew) logerror("ROM6 read access for module bank %d-%d (%04x)\n", (port-24)<<1, ((port-24)<<1)+1, offset & 0xffff);
 							}
 							else
 							{
@@ -437,7 +431,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 								{
 									*value = m_gram_memory->pointer()[m_grom_address | ((port-32)<<16)];
 									m_module_bank = port - 16;
-									if (bNew) LOGMASKED(LOG_PORT, "GRAM read access at %04x  - switch to bank %d\n", offset & 0xffff, m_module_bank);
+									if (TRACE_PORT) if (bNew) logerror("GRAM read access at %04x  - switch to bank %d\n", offset & 0xffff, m_module_bank);
 								}
 								else
 								{
@@ -445,11 +439,11 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 									{
 //                                      *value = m_ram6_memory->pointer()[m_grom_address];
 										*value = m_ram6_memory->pointer()[m_grom_address | ((port-48)<<16)];
-										if (bNew) LOGMASKED(LOG_PORT, "RAM read access at %04x\n", offset & 0xffff);
+										if (TRACE_PORT) if (bNew) logerror("RAM read access at %04x\n", offset & 0xffff);
 									}
 									else
 									{
-										LOGMASKED(LOG_WARN, "Attempt to read from undefined port 0x%0x; ignored.\n", port);
+										logerror("Attempt to read from undefined port 0x%0x; ignored.\n", port);
 									}
 								}
 							}
@@ -460,7 +454,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 		}
 		// The address auto-increment should be done even when the card is
 		// offline
-		LOGMASKED(LOG_ADDRESS, "HSGPL GROM address %04x\n", m_grom_address);
+		if (TRACE_ADDRESS) logerror("HSGPL GROM address %04x\n", m_grom_address);
 		m_grom_address++;
 		m_raddr_LSB = m_waddr_LSB = false;
 	}
@@ -473,19 +467,19 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 {
 	if (!m_card_enabled || m_flash_mode)
 	{
-		LOGMASKED(LOG_IGNORE, "write ignored: card_enabled=%d, flash_mode=%d\n", m_card_enabled, m_flash_mode);
+		if (TRACE_IGNORE) logerror("write ignored: card_enabled=%d, flash_mode=%d\n", m_card_enabled, m_flash_mode);
 		return;
 	}
 
-	LOGMASKED(LOG_WRITE, "cartridge space write %04x <- %02x\n", offset, data);
+	if (TRACE_WRITE) logerror("cartridge space write %04x <- %02x\n", offset, data);
 
 	if (!m_bank_inhibit && (m_module_bank < 16))
 	{
 		if ((offset & 1) == 0)
 		{
-			if ((offset & 0x9ff0)!=0) LOGMASKED(LOG_WARN, "unplausible ROM6 write: %04x <- %02x\n", offset, data);
+			if ((offset & 0x9ff0)!=0) logerror("unplausible ROM6 write: %04x <- %02x\n", offset, data);
 			m_current_bank = (offset>>1) & 3;
-			LOGMASKED(LOG_BANKING, "select bank %d\n", m_current_bank);
+			if (TRACE_BANKING) logerror("select bank %d\n", m_current_bank);
 		}
 		return;     /* right??? */
 	}
@@ -493,7 +487,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 	if ((m_mbx_enabled) && (offset==0x6ffe))
 	{   /* MBX: mapper at 0x6ffe */
 		m_current_bank = data & 0x03;
-		LOGMASKED(LOG_BANKING, "select bank MBX %d\n", m_current_bank);
+		if (TRACE_BANKING) logerror("select bank MBX %d\n", m_current_bank);
 		return;
 	}
 
@@ -511,7 +505,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 			// and !ram_enabled
 			if (m_module_bank < 16)
 			{
-				LOGMASKED(LOG_WARN, "invalid write %04x <- %02x\n", offset, data);
+				logerror("invalid write %04x <- %02x\n", offset, data);
 			// feeprom is normally written to using GPL ports, and I don't know
 			// whether writing through >6000 page is enabled
 /*
@@ -527,7 +521,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 				}
 				else
 				{
-					LOGMASKED(LOG_WARN, "unknown 0x6000 port\n");
+					logerror("unknown 0x6000 port\n");
 				}
 			}
 		}
@@ -577,7 +571,7 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 				{
 					m_gram_memory->pointer()[m_grom_address | (port<<16)] = data;
 					m_module_bank = port + 16;
-					if (bNew) LOGMASKED(LOG_PORT, "GRAM write access at %04x (GRMENA=1) - switch to bank %d\n", offset & 0xffff, port);
+					if (TRACE_PORT) if (bNew) logerror("GRAM write access at %04x (GRMENA=1) - switch to bank %d\n", offset & 0xffff, port);
 				}
 				else
 				{
@@ -585,7 +579,7 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 					{
 						m_grom_a_eeprom->write(space, m_grom_address | (port<<16), data, mem_mask);
 						m_module_bank = port;
-						if (bNew) LOGMASKED(LOG_PORT, "GROM write access at %04x - switch to bank %d\n", offset & 0xffff, port);
+						if (TRACE_PORT) if (bNew) logerror("GROM write access at %04x - switch to bank %d\n", offset & 0xffff, port);
 					}
 					else
 					{
@@ -593,21 +587,21 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 						{
 							m_grom_b_eeprom->write(space, m_grom_address | ((port-8)<<16), data, mem_mask);
 							m_module_bank = port;
-							if (bNew) LOGMASKED(LOG_PORT, "GROM write access at %04x - switch to bank %d\n", offset & 0xffff, port);
+							if (TRACE_PORT) if (bNew) logerror("GROM write access at %04x - switch to bank %d\n", offset & 0xffff, port);
 						}
 						else
 						{
 							if (port < 24)
 							{
 								m_dsr_eeprom->write(space, m_grom_address | ((port-16)<<16), data, mem_mask);
-								if (bNew) LOGMASKED(LOG_DSR, "write access to DSR bank %d-%d (%04x)\n", (port-16)<<3, ((port-16)<<3)+7, offset);
+								if (TRACE_DSR) if (bNew) logerror("write access to DSR bank %d-%d (%04x)\n", (port-16)<<3, ((port-16)<<3)+7, offset);
 							}
 							else
 							{
 								if (port < 32)
 								{
 									m_rom6_eeprom->write(space, m_grom_address | ((port-24)<<16), data, mem_mask);
-									if (bNew) LOGMASKED(LOG_PORT, "ROM6 write access for module bank %d-%d (%04x)\n", (port-24)<<1, ((port-24)<<1)+1,offset & 0xffff);
+									if (TRACE_PORT) if (bNew) logerror("ROM6 write access for module bank %d-%d (%04x)\n", (port-24)<<1, ((port-24)<<1)+1,offset & 0xffff);
 								}
 								else
 								{
@@ -615,7 +609,7 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 									{
 										m_gram_memory->pointer()[m_grom_address | ((port-32)<<16)] = data;
 										m_module_bank = port - 16;
-										if (bNew) LOGMASKED(LOG_PORT, "GRAM write access at %04x - switch to bank %d\n", offset & 0xffff, m_module_bank);
+										if (TRACE_PORT) if (bNew) logerror("GRAM write access at %04x - switch to bank %d\n", offset & 0xffff, m_module_bank);
 									}
 									else
 									{
@@ -623,11 +617,11 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 										{
 //                                          m_ram6_memory->pointer()[m_grom_address] = data;
 											m_ram6_memory->pointer()[m_grom_address | ((port-48)<<16)] = data;
-											if (bNew) LOGMASKED(LOG_PORT, "RAM write access at %04x\n", offset & 0xffff);
+											if (TRACE_PORT) if (bNew) logerror("RAM write access at %04x\n", offset & 0xffff);
 										}
 										else
 										{
-											LOGMASKED(LOG_WARN, "Attempt to write to undefined port; ignored.\n");
+											logerror("Attempt to write to undefined port; ignored.\n");
 										}
 									}
 								}
@@ -668,6 +662,7 @@ void snug_high_speed_gpl_device::device_start()
 
 void snug_high_speed_gpl_device::device_reset()
 {
+	logerror("reset\n");
 	m_dsr_enabled = false;
 	m_gram_enabled = false;
 	m_bank_inhibit = false;
@@ -701,16 +696,18 @@ INPUT_PORTS_START( ti99_hsgpl)
 		PORT_DIPSETTING(    0x01, "Normal" )
 INPUT_PORTS_END
 
-void snug_high_speed_gpl_device::device_add_mconfig(machine_config &config)
-{
-	AT29C040A(config, DSR_EEPROM);
-	AT29C040A(config, GROM_B_EEPROM);
-	AT29C040A(config, GROM_A_EEPROM);
-	AT29C040A(config, ROM6_EEPROM);
-
-	RAM(config, RAM6_TAG).set_default_size("128K").set_default_value(0);
-	RAM(config, GRAM_TAG).set_default_size("128K").set_default_value(0);
-}
+MACHINE_CONFIG_START(snug_high_speed_gpl_device::device_add_mconfig)
+	MCFG_AT29C040A_ADD( DSR_EEPROM )
+	MCFG_AT29C040A_ADD( GROM_B_EEPROM )
+	MCFG_AT29C040A_ADD( GROM_A_EEPROM )
+	MCFG_AT29C040A_ADD( ROM6_EEPROM )
+	MCFG_RAM_ADD(RAM6_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128k")
+	MCFG_RAM_DEFAULT_VALUE(0)
+	MCFG_RAM_ADD(GRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128k")
+	MCFG_RAM_DEFAULT_VALUE(0)
+MACHINE_CONFIG_END
 
 ioport_constructor snug_high_speed_gpl_device::device_input_ports() const
 {

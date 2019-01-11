@@ -32,6 +32,14 @@
 
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_SEGA_SCU_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), SEGA_SCU, (0))
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -54,7 +62,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_req_w);
 	DECLARE_WRITE_LINE_MEMBER(smpc_irq_w);
 
-	template <typename T> void set_hostcpu(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
+	void set_hostcpu(const char *cputag) { m_hostcpu_tag = cputag; }
 
 protected:
 	// device-level overrides
@@ -83,7 +91,8 @@ private:
 	bool m_t1md;
 	bool m_tenb;
 
-	required_device<sh2_device> m_hostcpu;
+	const char *m_hostcpu_tag;
+	sh2_device *m_hostcpu;
 	address_space *m_hostspace;
 	void test_pending_irqs();
 

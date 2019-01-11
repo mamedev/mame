@@ -55,24 +55,24 @@ DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "Texas Instruments TMS
 void tms7000_device::tms7000_mem(address_map &map)
 {
 	map(0x0000, 0x007f).ram(); // 128 bytes internal RAM
-	map(0x0080, 0x00ff).rw(FUNC(tms7000_device::tms7000_unmapped_rf_r), FUNC(tms7000_device::tms7000_unmapped_rf_w));
-	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
+	map(0x0080, 0x00ff).rw(this, FUNC(tms7000_device::tms7000_unmapped_rf_r), FUNC(tms7000_device::tms7000_unmapped_rf_w));
+	map(0x0100, 0x010b).rw(this, FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
 	map(0x0104, 0x0105).nopw(); // no port A write or ddr
 }
 
 void tms7000_device::tms7001_mem(address_map &map)
 {
 	map(0x0000, 0x007f).ram(); // 128 bytes internal RAM
-	map(0x0080, 0x00ff).rw(FUNC(tms7000_device::tms7000_unmapped_rf_r), FUNC(tms7000_device::tms7000_unmapped_rf_w));
-	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
-	map(0x0110, 0x0117).rw(FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
+	map(0x0080, 0x00ff).rw(this, FUNC(tms7000_device::tms7000_unmapped_rf_r), FUNC(tms7000_device::tms7000_unmapped_rf_w));
+	map(0x0100, 0x010b).rw(this, FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
+	map(0x0110, 0x0117).rw(this, FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
 }
 
 void tms7000_device::tms7002_mem(address_map &map)
 {
 	map(0x0000, 0x00ff).ram(); // 256 bytes internal RAM
-	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
-	map(0x0110, 0x0117).rw(FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
+	map(0x0100, 0x010b).rw(this, FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
+	map(0x0110, 0x0117).rw(this, FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
 }
 
 void tms7000_device::tms7020_mem(address_map &map)
@@ -102,11 +102,11 @@ void tms7000_device::tms7042_mem(address_map &map)
 void tms70c46_device::tms70c46_mem(address_map &map)
 {
 	tms7040_mem(map);
-	map(0x010c, 0x010c).rw(FUNC(tms70c46_device::e_bus_data_r), FUNC(tms70c46_device::e_bus_data_w));
+	map(0x010c, 0x010c).rw(this, FUNC(tms70c46_device::e_bus_data_r), FUNC(tms70c46_device::e_bus_data_w));
 	map(0x010d, 0x010d).noprw(); // ? always writes $FF before checking keyboard... maybe INT3 ack?
-	map(0x010e, 0x010e).rw(FUNC(tms70c46_device::dockbus_data_r), FUNC(tms70c46_device::dockbus_data_w));
-	map(0x010f, 0x010f).rw(FUNC(tms70c46_device::dockbus_status_r), FUNC(tms70c46_device::dockbus_status_w));
-	map(0x0118, 0x0118).rw(FUNC(tms70c46_device::control_r), FUNC(tms70c46_device::control_w));
+	map(0x010e, 0x010e).rw(this, FUNC(tms70c46_device::dockbus_data_r), FUNC(tms70c46_device::dockbus_data_w));
+	map(0x010f, 0x010f).rw(this, FUNC(tms70c46_device::dockbus_status_r), FUNC(tms70c46_device::dockbus_status_w));
+	map(0x0118, 0x0118).rw(this, FUNC(tms70c46_device::control_r), FUNC(tms70c46_device::control_w));
 }
 
 

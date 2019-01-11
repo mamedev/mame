@@ -93,22 +93,19 @@
 #include "machine/terminal.h"
 #include "machine/rx01.h"
 
+#define TERMINAL_TAG "terminal"
 
 class pdp11_state : public driver_device
 {
 public:
 	pdp11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
+	{
+	}
 
-	void pdp11ub2(machine_config &config);
-	void pdp11(machine_config &config);
-	void pdp11qb(machine_config &config);
-
-private:
-	required_device<t11_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( teletype_ctrl_r );
 	DECLARE_WRITE16_MEMBER( teletype_ctrl_w );
@@ -119,6 +116,9 @@ private:
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
+	void pdp11ub2(machine_config &config);
+	void pdp11(machine_config &config);
+	void pdp11qb(machine_config &config);
 	void pdp11_mem(address_map &map);
 	void pdp11qb_mem(address_map &map);
 };
@@ -166,7 +166,7 @@ void pdp11_state::pdp11_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).ram();  // RAM
 	map(0xea00, 0xfeff).rom();
-	map(0xff70, 0xff77).rw(FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
+	map(0xff70, 0xff77).rw(this, FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
 
 	map(0xfe78, 0xfe7b).w("rx01", FUNC(rx01_device::write));
 }
@@ -353,19 +353,19 @@ void pdp11_state::kbd_put(u8 data)
 	m_teletype_status |= 0x80;
 }
 
-void pdp11_state::pdp11(machine_config &config)
-{
+MACHINE_CONFIG_START(pdp11_state::pdp11)
 	/* basic machine hardware */
-	T11(config, m_maincpu, XTAL(4'000'000)); // Need proper CPU here
-	m_maincpu->set_initial_mode(6 << 13);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11_mem);
+	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
+	MCFG_T11_INITIAL_MODE(6 << 13)
+	MCFG_DEVICE_PROGRAM_MAP(pdp11_mem)
+
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(pdp11_state::kbd_put));
+	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pdp11_state, kbd_put))
 
-	RX01(config, "rx01", 0);
-}
+	MCFG_RX01_ADD("rx01")
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pdp11_state::pdp11ub2)
 	pdp11(config);
@@ -376,8 +376,9 @@ MACHINE_CONFIG_START(pdp11_state::pdp11qb)
 	pdp11(config);
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
-	m_maincpu->set_initial_mode(0 << 13);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11qb_mem);
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_T11_INITIAL_MODE(0 << 13)
+	MCFG_DEVICE_PROGRAM_MAP(pdp11qb_mem)
 MACHINE_CONFIG_END
 
 /* ROM definition */

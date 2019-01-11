@@ -18,7 +18,6 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/wave.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -31,7 +30,7 @@ void orao_state::orao_mem(address_map &map)
 {
 	map(0x0000, 0x5fff).ram().share("memory");
 	map(0x6000, 0x7fff).ram().share("video_ram"); // video ram
-	map(0x8000, 0x9fff).rw(FUNC(orao_state::orao_io_r), FUNC(orao_state::orao_io_w));
+	map(0x8000, 0x9fff).rw(this, FUNC(orao_state::orao_io_r), FUNC(orao_state::orao_io_w));
 	map(0xa000, 0xafff).ram();  // extension
 	map(0xb000, 0xbfff).ram();  // DOS
 	map(0xc000, 0xdfff).rom();
@@ -185,7 +184,7 @@ MACHINE_CONFIG_START(orao_state::orao)
 	MCFG_SCREEN_UPDATE_DRIVER(orao_state, screen_update_orao)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* audio hardware */

@@ -5,13 +5,11 @@
  * includes/galeb.h
  *
  ****************************************************************************/
+
 #ifndef MAME_INCLUDES_GALEB_H
 #define MAME_INCLUDES_GALEB_H
 
-#pragma once
-
 #include "sound/dac.h"
-#include "emupal.h"
 
 class galeb_state : public driver_device
 {
@@ -28,9 +26,6 @@ public:
 	{
 	}
 
-	void galeb(machine_config &config);
-
-private:
 	required_shared_ptr<uint8_t> m_video_ram;
 	DECLARE_WRITE8_MEMBER(dac_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -45,10 +40,12 @@ private:
 	required_ioport_array<8> m_keyboard;
 	required_device<dac_1bit_device> m_dac;
 
+	void galeb(machine_config &config);
 	void galeb_mem(address_map &map);
-
+protected:
 	virtual void machine_start() override;
 
+private:
 	int m_dac_state;
 };
 

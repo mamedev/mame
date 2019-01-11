@@ -36,11 +36,10 @@ void vp620_device::kb_w(uint8_t data)
 //  MACHINE_CONFIG_START( vp620 )
 //-------------------------------------------------
 
-void vp620_device::device_add_mconfig(machine_config &config)
-{
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
-	keyboard.set_keyboard_callback(FUNC(vp620_device::kb_w));
-}
+MACHINE_CONFIG_START(vp620_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(vp620_device, kb_w))
+MACHINE_CONFIG_END
 
 
 

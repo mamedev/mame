@@ -200,8 +200,8 @@ WRITE8_MEMBER(sidepckt_state::i8751_w)
 void sidepckt_state::sidepckt_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x13ff).mirror(0x400).ram().w(FUNC(sidepckt_state::videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).mirror(0x400).ram().w(FUNC(sidepckt_state::colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).mirror(0x400).ram().w(this, FUNC(sidepckt_state::videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).mirror(0x400).ram().w(this, FUNC(sidepckt_state::colorram_w)).share("colorram");
 	map(0x2000, 0x20ff).ram().share("spriteram");
 	map(0x2100, 0x24ff).nopw(); // ??? (Unused spriteram? The game writes some values at boot, but never read)
 	map(0x3000, 0x3000).portr("P1");
@@ -209,9 +209,9 @@ void sidepckt_state::sidepckt_map(address_map &map)
 	map(0x3002, 0x3002).portr("DSW1");
 	map(0x3003, 0x3003).portr("DSW2");
 	map(0x3004, 0x3004).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x300c, 0x300c).rw(FUNC(sidepckt_state::scroll_y_r), FUNC(sidepckt_state::scroll_y_w));
-	map(0x3014, 0x3014).r(FUNC(sidepckt_state::i8751_r));
-	map(0x3018, 0x3018).w(FUNC(sidepckt_state::i8751_w));
+	map(0x300c, 0x300c).rw(this, FUNC(sidepckt_state::scroll_y_r), FUNC(sidepckt_state::scroll_y_w));
+	map(0x3014, 0x3014).r(this, FUNC(sidepckt_state::i8751_r));
+	map(0x3018, 0x3018).w(this, FUNC(sidepckt_state::i8751_w));
 	map(0x4000, 0xffff).rom();
 }
 
@@ -369,49 +369,50 @@ void sidepckt_state::machine_reset()
 	m_scroll_y      = 0;
 }
 
-void sidepckt_state::sidepckt(machine_config &config)
-{
-	/* basic machine hardware */
-	MC6809E(config, m_maincpu, 2000000); /* MC68B09EP, 2 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sidepckt_map);
+MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 
-	M6502(config, m_audiocpu, 1500000); /* 1.5 MHz */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sound_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000) /* MC68B09EP, 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sidepckt_map)
+
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000) /* 1.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58); /* VERIFY: May be 55 or 56 */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(sidepckt_state::screen_update));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58) /* VERIFY: May be 55 or 56 */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sidepckt);
-	PALETTE(config, m_palette, FUNC(sidepckt_state::sidepckt_palette), 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidepckt)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
-	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
-	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
-	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void sidepckt_state::sidepcktb(machine_config &config)
-{
+MACHINE_CONFIG_START(sidepckt_state::sidepcktb)
 	sidepckt(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sidepcktb_map);
-}
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sidepcktb_map)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

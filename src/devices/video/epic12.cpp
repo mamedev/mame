@@ -61,7 +61,7 @@ void epic12_device::device_start()
 	save_item(NAME(m_gfx_scroll_0_y_shadowcopy));
 	save_item(NAME(m_gfx_scroll_1_x_shadowcopy));
 	save_item(NAME(m_gfx_scroll_1_y_shadowcopy));
-	save_pointer(NAME(m_ram16_copy), m_main_ramsize/2);
+	save_pointer(NAME(m_ram16_copy.get()), m_main_ramsize/2);
 	save_item(NAME(*m_bitmaps));
 }
 

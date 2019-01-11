@@ -158,9 +158,9 @@ const uint16_t lc8670_cpu_device::s_irq_vectors[] =
 
 void lc8670_cpu_device::lc8670_internal_map(address_map &map)
 {
-	map(0x000, 0x0ff).rw(FUNC(lc8670_cpu_device::mram_r), FUNC(lc8670_cpu_device::mram_w));
-	map(0x100, 0x17f).rw(FUNC(lc8670_cpu_device::regs_r), FUNC(lc8670_cpu_device::regs_w));
-	map(0x180, 0x1ff).rw(FUNC(lc8670_cpu_device::xram_r), FUNC(lc8670_cpu_device::xram_w));
+	map(0x000, 0x0ff).rw(this, FUNC(lc8670_cpu_device::mram_r), FUNC(lc8670_cpu_device::mram_w));
+	map(0x100, 0x17f).rw(this, FUNC(lc8670_cpu_device::regs_r), FUNC(lc8670_cpu_device::regs_w));
+	map(0x180, 0x1ff).rw(this, FUNC(lc8670_cpu_device::xram_r), FUNC(lc8670_cpu_device::xram_w));
 }
 
 
@@ -202,7 +202,6 @@ void lc8670_cpu_device::device_start()
 	set_icountptr(m_icount);
 
 	// resolve callbacks
-	m_lcd_update_func.bind_relative_to(*owner());
 	m_bankswitch_func.resolve();
 
 	// setup timers
@@ -560,8 +559,9 @@ void lc8670_cpu_device::execute_set_input(int inputnum, int state)
 
 uint32_t lc8670_cpu_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (!m_lcd_update_func.isnull())
-		return m_lcd_update_func(bitmap, cliprect, m_xram, (REG_MCR & 0x08) && (REG_VCCR & 0x80), REG_STAD);
+	if (m_lcd_update_func)
+		return m_lcd_update_func(*this, bitmap, cliprect, m_xram, (REG_MCR & 0x08) && (REG_VCCR & 0x80), REG_STAD);
+
 	return 0;
 }
 

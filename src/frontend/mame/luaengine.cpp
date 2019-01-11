@@ -24,7 +24,6 @@
 #include "natkeyboard.h"
 #include "uiinput.h"
 #include "pluginopts.h"
-#include "softlist.h"
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -203,11 +202,6 @@ namespace sol
 						typestr = "unmap";
 						break;
 					case AMH_DEVICE_DELEGATE:
-					case AMH_DEVICE_DELEGATE_M:
-					case AMH_DEVICE_DELEGATE_S:
-					case AMH_DEVICE_DELEGATE_SM:
-					case AMH_DEVICE_DELEGATE_MO:
-					case AMH_DEVICE_DELEGATE_SMO:
 						typestr = "delegate";
 						break;
 					case AMH_PORT:
@@ -813,14 +807,13 @@ void lua_engine::initialize()
 			return lua_yield(L, 0);
 		});
 	emu["lang_translate"] = &lang_translate;
-	emu["pid"] = &osd_getpid;
 
 /*
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style with 'rwc' with addtional c for create *and truncate* (be careful)
  *                                     support zipped files on the searchpath
  * file:open(name) - open first file matching name in searchpath, supports read and write sockets as "socket.127.0.0.1:1234"
  * file:open_next() - open next file matching name in searchpath
- * file:read(len) - only reads len bytes, doesn't do lua style formats
+ * file:read(len) - only reads len bytes, doen't do lua style formats
  * file:write(data) - write data to file
  * file:seek(offset, whence) - whence is as C "SEEK_*" int
  * file:seek([opt] whence, [opt] offset) - lua style "set"|"cur"|"end", returns cur offset
@@ -925,7 +918,7 @@ void lua_engine::initialize()
  * thread.result() - get thread result as string
  * thread.busy - check if thread is running
  * thread.yield - check if thread is yielded
- */
+*/
 
 	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
 			"start", [](context &ctx, const char *scr) {
@@ -981,15 +974,6 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
-/*
- * emu.item(item_index)
- * item.size - size of the raw data type
- * item.count - number of entries
- * item:read(offset) - read entry value by index
- * item:read_block(offset, count) - read a block of entry values as a string (byte addressing)
- * item:write(offset, value) - write entry value by index
- */
-
 	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
 					{
@@ -1026,7 +1010,7 @@ void lua_engine::initialize()
 					if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
 						buff->set_len(0);
 					else
-						memcpy(buff->get_ptr(), (uint8_t *)item.base + offset, buff->get_len());
+						memcpy(buff->get_ptr(), item.base, buff->get_len());
 					return buff;
 				},
 			"write", [](save_item &item, int offset, uint64_t value) {
@@ -1302,40 +1286,42 @@ void lua_engine::initialize()
 					return table;
 				},
 			"wpset", [](device_debug &dev, addr_space &sp, const std::string &type, offs_t addr, offs_t len, const char *cond, const char *act) {
-					read_or_write wptype = read_or_write::READ;
+					int wptype = WATCHPOINT_READ;
 					if(type == "w")
-						wptype = read_or_write::WRITE;
+						wptype = WATCHPOINT_WRITE;
 					else if((type == "rw") || (type == "wr"))
-						wptype = read_or_write::READWRITE;
+						wptype = WATCHPOINT_READ | WATCHPOINT_WRITE;
 					return dev.watchpoint_set(sp.space, wptype, addr, len, cond, act);
 				},
 			"wpclr", &device_debug::watchpoint_clear,
 			"wplist", [this](device_debug &dev, addr_space &sp) {
 					sol::table table = sol().create_table();
-					for(auto &wpp : dev.watchpoint_vector(sp.space.spacenum()))
+					device_debug::watchpoint *list = dev.watchpoint_first(sp.space.spacenum());
+					while(list)
 					{
 						sol::table wp = sol().create_table();
-						wp["enabled"] = wpp->enabled();
-						wp["address"] = wpp->address();
-						wp["length"] = wpp->length();
-						switch(wpp->type())
+						wp["enabled"] = list->enabled();
+						wp["address"] = list->address();
+						wp["length"] = list->length();
+						switch(list->type())
 						{
-							case read_or_write::READ:
+							case WATCHPOINT_READ:
 								wp["type"] = "r";
 								break;
-							case read_or_write::WRITE:
+							case WATCHPOINT_WRITE:
 								wp["type"] = "w";
 								break;
-							case read_or_write::READWRITE:
+							case WATCHPOINT_READ | WATCHPOINT_WRITE:
 								wp["type"] = "rw";
 								break;
 							default: // huh?
 								wp["type"] = "";
 								break;
 						}
-						wp["condition"] = wpp->condition();
-						wp["action"] = wpp->action();
-						table[wpp->index()] = wp;
+						wp["condition"] = list->condition();
+						wp["action"] = list->action();
+						table[list->index()] = wp;
+						list = list->next();
 					}
 					return table;
 				});
@@ -1349,7 +1335,7 @@ void lua_engine::initialize()
  * device:debug() - debug interface, cpus only
  * device.spaces[] - device address spaces table
  * device.state[] - device state entries table
- * device.items[] - device save state items table (item name is key, item index is value)
+ * device.items[] - device save state items table
  */
 
 	sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor,
@@ -1711,25 +1697,25 @@ void lua_engine::initialize()
  * render:max_update_rate() -
  * render:ui_target() - target for ui drawing
  * render:ui_container() - container for ui drawing
- * render.targets[] - render_target table
+ * render.target[] - render_target table
  */
 
 	sol().registry().new_usertype<render_manager>("render", "new", sol::no_constructor,
 			"max_update_rate", &render_manager::max_update_rate,
 			"ui_target", &render_manager::ui_target,
 			"ui_container", &render_manager::ui_container,
-			"targets", sol::property([this](render_manager &r) {
+			"targets", [this](render_manager &r) {
 					sol::table target_table = sol().create_table();
 					int tc = 0;
 					for(render_target &curr_rt : r.targets())
 						target_table[tc++] = &curr_rt;
 					return target_table;
-				}));
+				});
 
 /* machine.screens[screen_tag]
- * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol, color is 32bit argb
+ * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol
  * screen:draw_line(x1, y1, x2, y2, linecol) - draw line from (x1, y1)-(x2, y2) colored linecol
- * screen:draw_text(x || justify, y, message, [opt] fgcolor, [opt] bgcolor) - draw message at (x, y) or at line y with left, right, center justification
+ * screen:draw_text(x || justify, y, message, [opt] color) - draw message at (x, y) or at line y with left, right, center justification
  * screen:height() - screen height
  * screen:width() - screen width
  * screen:orientation() - screen angle, flipx, flipy
@@ -1742,8 +1728,6 @@ void lua_engine::initialize()
  * screen:tag() - screen device tag
  * screen:xscale() - screen x scale factor
  * screen:yscale() - screen y scale factor
- * screen:pixel(x, y) - get pixel at (x, y) as packed RGB in a u32
- * screen:pixels() - get whole screen bitmap as string
 */
 
 	sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
@@ -1765,7 +1749,7 @@ void lua_engine::initialize()
 					y2 = std::min(std::max(0.0f, y2), float(sc_height-1)) / float(sc_height);
 					sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 				},
-			"draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color, sol::object bcolor) {
+			"draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color) {
 					int sc_width = sdev.visible_area().width();
 					int sc_height = sdev.visible_area().height();
 					auto justify = ui::text_layout::LEFT;
@@ -1789,18 +1773,17 @@ void lua_engine::initialize()
 						return;
 					}
 					rgb_t textcolor = UI_TEXT_COLOR;
-					rgb_t bgcolor = 0;
+					rgb_t bgcolor = UI_TEXT_BG_COLOR;
 					if(color.is<uint32_t>())
 						textcolor = rgb_t(color.as<uint32_t>());
-					if(bcolor.is<uint32_t>())
-						bgcolor = rgb_t(bcolor.as<uint32_t>());
 					mame_machine_manager::instance()->ui().draw_text_full(sdev.container(), msg, x, y, (1.0f - x),
-										justify, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, textcolor, bgcolor);
+										justify, ui::text_layout::WORD, mame_ui_manager::NORMAL, textcolor,
+										bgcolor, nullptr, nullptr);
 				},
 			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
 			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
 			"orientation", [](screen_device &sdev) {
-					uint32_t flags = sdev.orientation();
+					uint32_t flags = sdev.machine().system().flags & machine_flags::MASK_ORIENTATION;
 					int rotation_angle = 0;
 					switch (flags)
 					{
@@ -1856,21 +1839,7 @@ void lua_engine::initialize()
 			"shortname", &screen_device::shortname,
 			"tag", &screen_device::tag,
 			"xscale", &screen_device::xscale,
-			"yscale", &screen_device::yscale,
-			"pixel", [](screen_device &sdev, float x, float y) {
-					return sdev.pixel((s32)x, (s32)y);
-				},
-			"pixels", [](screen_device &sdev, sol::this_state s) {
-					lua_State *L = s;
-					const rectangle &visarea = sdev.visible_area();
-					luaL_Buffer buff;
-					int size = visarea.height() * visarea.width() * 4;
-					u32 *ptr = (u32 *)luaL_buffinitsize(L, &buff, size);
-					sdev.pixels(ptr);
-					luaL_pushresultsize(&buff, size);
-					return sol::make_reference(L, sol::stack_reference(L, -1));
-				}
-			);
+			"yscale", &screen_device::yscale);
 
 /* mame_manager:ui()
  * ui:is_menu_active() - ui menu state
@@ -2013,7 +1982,6 @@ void lua_engine::initialize()
 			"manufacturer", &device_image_interface::manufacturer,
 			"year", &device_image_interface::year,
 			"software_list_name", &device_image_interface::software_list_name,
-			"software_parent", sol::property([](device_image_interface &di) { const software_info *si = di.software_entry(); return si ? si->parentname() : ""; }),
 			"image_type_name", &device_image_interface::image_type_name,
 			"load", &device_image_interface::load,
 			"unload", &device_image_interface::unload,

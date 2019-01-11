@@ -164,7 +164,7 @@ void hyperstone_device::hyperstone_divsu()
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_xm()
 {
-	const uint32_t next = m_pr16(PC);
+	const uint32_t next = READ_OP(PC);
 	PC += 2;
 
 	const uint8_t sub_type = (next & 0x7000) >> 12;
@@ -172,7 +172,7 @@ void hyperstone_device::hyperstone_xm()
 	uint32_t extra_u = next & 0xfff;
 	if (next & 0x8000)
 	{
-		extra_u = ((extra_u & 0xfff) << 16) | m_pr16(PC);
+		extra_u = ((extra_u & 0xfff) << 16) | READ_OP(PC);
 		PC += 2;
 		m_instruction_length = (3<<19);
 	}
@@ -1536,7 +1536,7 @@ void hyperstone_device::hyperstone_rol()
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_ldxx1()
 {
-	uint16_t next_1 = m_pr16(PC);
+	uint16_t next_1 = READ_OP(PC);
 	PC += 2;
 
 	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
@@ -1544,7 +1544,7 @@ void hyperstone_device::hyperstone_ldxx1()
 	uint32_t extra_s;
 	if (next_1 & 0x8000)
 	{
-		const uint16_t next_2 = m_pr16(PC);
+		const uint16_t next_2 = READ_OP(PC);
 		PC += 2;
 		m_instruction_length = (3<<19);
 
@@ -1655,7 +1655,7 @@ void hyperstone_device::hyperstone_ldxx1()
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_ldxx2()
 {
-	uint16_t next_1 = m_pr16(PC);
+	uint16_t next_1 = READ_OP(PC);
 	PC += 2;
 
 	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
@@ -1663,7 +1663,7 @@ void hyperstone_device::hyperstone_ldxx2()
 	uint32_t extra_s;
 	if (next_1 & 0x8000)
 	{
-		const uint16_t next_2 = m_pr16(PC);
+		const uint16_t next_2 = READ_OP(PC);
 		PC += 2;
 		m_instruction_length = (3<<19);
 
@@ -1800,7 +1800,7 @@ void hyperstone_device::hyperstone_ldxx2()
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_stxx1()
 {
-	uint16_t next_1 = m_pr16(PC);
+	uint16_t next_1 = READ_OP(PC);
 	PC += 2;
 
 	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
@@ -1808,7 +1808,7 @@ void hyperstone_device::hyperstone_stxx1()
 	uint32_t extra_s;
 	if (next_1 & 0x8000)
 	{
-		const uint16_t next_2 = m_pr16(PC);
+		const uint16_t next_2 = READ_OP(PC);
 		PC += 2;
 		m_instruction_length = (3<<19);
 
@@ -1890,7 +1890,7 @@ void hyperstone_device::hyperstone_stxx1()
 template <hyperstone_device::reg_bank DST_GLOBAL, hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_stxx2()
 {
-	uint16_t next_1 = m_pr16(PC);
+	uint16_t next_1 = READ_OP(PC);
 	PC += 2;
 
 	const uint16_t sub_type = (next_1 & 0x3000) >> 12;
@@ -1898,7 +1898,7 @@ void hyperstone_device::hyperstone_stxx2()
 	uint32_t extra_s;
 	if (next_1 & 0x8000)
 	{
-		const uint16_t next_2 = m_pr16(PC);
+		const uint16_t next_2 = READ_OP(PC);
 		PC += 2;
 		m_instruction_length = (3<<19);
 
@@ -2219,7 +2219,7 @@ void hyperstone_device::hyperstone_mul()
 void hyperstone_device::hyperstone_extend()
 {
 	m_instruction_length = (2<<19);
-	const uint32_t func = m_pr16(PC);
+	const uint32_t func = READ_OP(PC);
 	PC += 2;
 	check_delay_PC();
 
@@ -2612,14 +2612,14 @@ void hyperstone_device::hyperstone_frame()
 template <hyperstone_device::reg_bank SRC_GLOBAL>
 void hyperstone_device::hyperstone_call()
 {
-	uint16_t imm_1 = m_pr16(PC);
+	uint16_t imm_1 = READ_OP(PC);
 	PC += 2;
 
 	int32_t extra_s = 0;
 
 	if (imm_1 & 0x8000)
 	{
-		uint16_t imm_2 = m_pr16(PC);
+		uint16_t imm_2 = READ_OP(PC);
 
 		PC += 2;
 		SET_ILC(3<<19);

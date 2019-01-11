@@ -190,13 +190,13 @@ void testcpu_state::ppc_mem(address_map &map)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-void testcpu_state::testcpu(machine_config &config)
-{
+MACHINE_CONFIG_START(testcpu_state::testcpu)
+
 	// CPUs
-	PPC603E(config, m_cpu, 66000000);
-	m_cpu->set_bus_frequency(66000000);  // Multiplier 1, Bus = 66MHz, Core = 66MHz
-	m_cpu->set_addrmap(AS_PROGRAM, &testcpu_state::ppc_mem);
-}
+	MCFG_DEVICE_ADD("maincpu", PPC603E, 66000000)
+	MCFG_PPC_BUS_FREQUENCY(66000000)  // Multiplier 1, Bus = 66MHz, Core = 66MHz
+	MCFG_DEVICE_PROGRAM_MAP(ppc_mem)
+MACHINE_CONFIG_END
 
 
 

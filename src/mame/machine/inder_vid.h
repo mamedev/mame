@@ -14,9 +14,11 @@
 
 #include "video/ramdac.h"
 #include "cpu/tms34010/tms34010.h"
-#include "emupal.h"
 
 DECLARE_DEVICE_TYPE(INDER_VIDEO, inder_vid_device)
+
+#define MCFG_INDER_VIDEO_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INDER_VIDEO, 0)
 
 
 class inder_vid_device : public device_t
@@ -45,6 +47,8 @@ private:
 	required_device<tms34010_device> m_tms;
 
 	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
+
+	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);

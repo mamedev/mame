@@ -28,7 +28,6 @@ public:
 	void write_trr(uint16_t data, uint16_t mem_mask, int which);
 	void write_ter(uint16_t data, uint16_t mem_mask, int which);
 	uint16_t read_tcn(uint16_t mem_mask, int which);
-	bool timer_int_pending(int which) const;
 
 	void init(m68307_cpu_device *device);
 	void reset();

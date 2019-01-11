@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -25,7 +23,7 @@ public:
 	decocomn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
 
 	DECLARE_WRITE16_MEMBER( buffered_palette_w );
 	DECLARE_WRITE16_MEMBER( palette_dma_w );
@@ -48,5 +46,16 @@ private:
 
 DECLARE_DEVICE_TYPE(DECOCOMN, decocomn_device)
 
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_DECOCOMN_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DECOCOMN, 0)
+
+#define MCFG_DECOCOMN_PALETTE(_palette_tag) \
+	downcast<decocomn_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_DECOCOMN_H

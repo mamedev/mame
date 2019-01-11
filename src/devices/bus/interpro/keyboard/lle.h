@@ -17,6 +17,7 @@ namespace bus { namespace interpro { namespace keyboard {
 class lle_device_base
 	: public device_t
 	, public device_interpro_keyboard_port_interface
+	, protected device_matrix_keyboard_interface<5U>
 {
 protected:
 	// constructor/destructor
@@ -26,6 +27,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_matrix_keyboard_interface overrides
+	virtual void key_make(u8 row, u8 column) override {};
+	virtual void key_break(u8 row, u8 column) override {};
 
 	virtual void io_map(address_map &map);
 	virtual void ext_map(address_map &map);
@@ -38,23 +43,17 @@ protected:
 	DECLARE_WRITE8_MEMBER(p2_w);
 	DECLARE_READ8_MEMBER(bus_r);
 	DECLARE_WRITE8_MEMBER(bus_w);
+	DECLARE_READ8_MEMBER(p1_r);
+	DECLARE_READ8_MEMBER(p2_r);
+	DECLARE_WRITE8_MEMBER(latch_w);
 
 private:
-	required_device<i8049_device> m_mcu;
+	required_device<cpu_device> m_mcu;
+	required_device<speaker_sound_device> m_bell;
 	required_device<address_map_bank_device> m_ext;
-	required_ioport_array<15> m_upper;
-	required_ioport_array<11> m_lower;
-	required_device<speaker_sound_device> m_speaker;
-
-	output_finder<8> m_leds;
 
 	u8 m_txd;
-	u8 m_p1;
-	u8 m_p2;
 	u8 m_bus;
-
-	u8 m_row;
-	u8 m_count;
 };
 
 class lle_en_us_device : public lle_device_base

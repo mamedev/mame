@@ -270,7 +270,6 @@
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "softlist.h"
@@ -369,18 +368,18 @@ void dc_cons_state::dc_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().nopw();             // BIOS
 	map(0x00200000, 0x0021ffff).rom().region("dcflash", 0);//AM_READWRITE8(dc_flash_r,dc_flash_w, 0xffffffffffffffffU)
-	map(0x005f6800, 0x005f69ff).rw(FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
+	map(0x005f6800, 0x005f69ff).rw(this, FUNC(dc_cons_state::dc_sysctrl_r), FUNC(dc_cons_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).m(m_maple, FUNC(maple_dc_device::amap));
-	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w)).umask64(0x0000ffff0000ffff);
-	map(0x005f7080, 0x005f709f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)).umask64(0x0000ffff0000ffff);
-	map(0x005f7400, 0x005f74ff).rw(FUNC(dc_cons_state::dc_mess_g1_ctrl_r), FUNC(dc_cons_state::dc_mess_g1_ctrl_w));
-	map(0x005f7800, 0x005f78ff).rw(FUNC(dc_cons_state::dc_g2_ctrl_r), FUNC(dc_cons_state::dc_g2_ctrl_w));
+	map(0x005f7000, 0x005f701f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)).umask64(0x0000ffff0000ffff);
+	map(0x005f7080, 0x005f709f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)).umask64(0x0000ffff0000ffff);
+	map(0x005f7400, 0x005f74ff).rw(this, FUNC(dc_cons_state::dc_mess_g1_ctrl_r), FUNC(dc_cons_state::dc_mess_g1_ctrl_w));
+	map(0x005f7800, 0x005f78ff).rw(this, FUNC(dc_cons_state::dc_g2_ctrl_r), FUNC(dc_cons_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).rw(FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
+	map(0x00600000, 0x006007ff).rw(this, FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
+	map(0x00700000, 0x00707fff).rw(this, FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::sh4_soundram_r), FUNC(dc_cons_state::sh4_soundram_w));
+	map(0x00800000, 0x009fffff).rw(this, FUNC(dc_cons_state::sh4_soundram_r), FUNC(dc_cons_state::sh4_soundram_w));
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
 //  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
@@ -415,14 +414,14 @@ void dc_cons_state::dc_map(address_map &map)
 
 void dc_cons_state::dc_port(address_map &map)
 {
-	map(0x00000000, 0x00000007).rw(FUNC(dc_cons_state::dc_pdtra_r), FUNC(dc_cons_state::dc_pdtra_w));
+	map(0x00000000, 0x00000007).rw(this, FUNC(dc_cons_state::dc_pdtra_r), FUNC(dc_cons_state::dc_pdtra_w));
 }
 
 void dc_cons_state::dc_audio_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x001fffff).ram().share("dc_sound_ram");        /* shared with SH-4 */
-	map(0x00800000, 0x00807fff).rw(FUNC(dc_cons_state::dc_arm_aica_r), FUNC(dc_cons_state::dc_arm_aica_w));
+	map(0x00800000, 0x00807fff).rw(this, FUNC(dc_cons_state::dc_arm_aica_r), FUNC(dc_cons_state::dc_arm_aica_w));
 }
 
 static INPUT_PORTS_START( dc )
@@ -577,25 +576,25 @@ INPUT_PORTS_END
 void dc_cons_state::gdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^aica", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^aica", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
 MACHINE_CONFIG_START(dc_cons_state::dc)
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_md(0, 1);
-	m_maincpu->set_md(1, 0);
-	m_maincpu->set_md(2, 1);
-	m_maincpu->set_md(3, 0);
-	m_maincpu->set_md(4, 0);
-	m_maincpu->set_md(5, 1);
-	m_maincpu->set_md(6, 0);
-	m_maincpu->set_md(7, 1);
-	m_maincpu->set_md(8, 0);
-	m_maincpu->set_sh4_clock(CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
-	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
+	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK)
+	MCFG_SH4_MD0(1)
+	MCFG_SH4_MD1(0)
+	MCFG_SH4_MD2(1)
+	MCFG_SH4_MD3(0)
+	MCFG_SH4_MD4(0)
+	MCFG_SH4_MD5(1)
+	MCFG_SH4_MD6(0)
+	MCFG_SH4_MD7(1)
+	MCFG_SH4_MD8(0)
+	MCFG_SH4_CLOCK(CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(dc_map)
+	MCFG_DEVICE_IO_MAP(dc_port)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
@@ -604,69 +603,34 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
-//  MACRONIX_29LV160TMC(config, "dcflash");
+//  MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
 
-	MAPLE_DC(config, m_maple, 0, m_maincpu);
-	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
-	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
-	dcctrl0.set_port_tag<0>("P1:0");
-	dcctrl0.set_port_tag<1>("P1:1");
-	dcctrl0.set_port_tag<2>("P1:A0");
-	dcctrl0.set_port_tag<3>("P1:A1");
-	dcctrl0.set_port_tag<4>("P1:A2");
-	dcctrl0.set_port_tag<5>("P1:A3");
-	dcctrl0.set_port_tag<6>("P1:A4");
-	dcctrl0.set_port_tag<7>("P1:A5");
-	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
-	dcctrl1.set_port_tag<0>("P2:0");
-	dcctrl1.set_port_tag<1>("P2:1");
-	dcctrl1.set_port_tag<2>("P2:A0");
-	dcctrl1.set_port_tag<3>("P2:A1");
-	dcctrl1.set_port_tag<4>("P2:A2");
-	dcctrl1.set_port_tag<5>("P2:A3");
-	dcctrl1.set_port_tag<6>("P2:A4");
-	dcctrl1.set_port_tag<7>("P2:A5");
-	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
-	dcctrl2.set_port_tag<0>("P3:0");
-	dcctrl2.set_port_tag<1>("P3:1");
-	dcctrl2.set_port_tag<2>("P3:A0");
-	dcctrl2.set_port_tag<3>("P3:A1");
-	dcctrl2.set_port_tag<4>("P3:A2");
-	dcctrl2.set_port_tag<5>("P3:A3");
-	dcctrl2.set_port_tag<6>("P3:A4");
-	dcctrl2.set_port_tag<7>("P3:A5");
-	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
-	dcctrl3.set_port_tag<0>("P4:0");
-	dcctrl3.set_port_tag<1>("P4:1");
-	dcctrl3.set_port_tag<2>("P4:A0");
-	dcctrl3.set_port_tag<3>("P4:A1");
-	dcctrl3.set_port_tag<4>("P4:A2");
-	dcctrl3.set_port_tag<5>("P4:A3");
-	dcctrl3.set_port_tag<6>("P4:A4");
-	dcctrl3.set_port_tag<7>("P4:A5");
+	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
+	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2:0", ":P2:1", ":P2:A0", ":P2:A1", ":P2:A2", ":P2:A3", ":P2:A4", ":P2:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl2", "maple_dc", 2, ":P3:0", ":P3:1", ":P3:A0", ":P3:A1", ":P3:A2", ":P3:A3", ":P3:A4", ":P3:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl3", "maple_dc", 3, ":P4:0", ":P4:1", ":P4:A0", ":P4:A1", ":P4:A2", ":P4:A3", ":P4:A4", ":P4:A5")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(13458568*2, 857, 0, 640, 524, 0, 480) /* TODO: where pclk actually comes? */
 	MCFG_SCREEN_UPDATE_DEVICE("powervr2", powervr2_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x1000)
-	POWERVR2(config, m_powervr2, 0);
-	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
+	MCFG_POWERVR2_ADD("powervr2", WRITE8(*this, dc_state, pvr_irq))
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+	MCFG_DEVICE_ADD("aica", AICA, 0)
+	MCFG_AICA_MASTER
+	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
+	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
-	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	m_aica->set_master(true);
-	m_aica->irq().set(FUNC(dc_state::aica_irq));
-	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
-	m_aica->add_route(0, "lspeaker", 1.0);
-	m_aica->add_route(1, "rspeaker", 1.0);
+	MCFG_AICARTC_ADD("aicartc", XTAL(32'768))
 
-	AICARTC(config, "aicartc", XTAL(32'768));
-
-	ATA_INTERFACE(config, m_ata, 0);
-	m_ata->irq_handler().set(FUNC(dc_cons_state::ata_interrupt));
+	MCFG_DEVICE_ADD("ata", ATA_INTERFACE, 0)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, dc_cons_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:0")
 	MCFG_SLOT_OPTION_ADD("gdrom", GDROM)
@@ -678,7 +642,7 @@ MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1))
 
 // known undumped or private BIOS revisions:
 // "MPR-21068 SEGA JAPAN / 9850 D" from VA0 837-13392-02 (171-7782B) NTSC-J unit

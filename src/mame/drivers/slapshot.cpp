@@ -242,8 +242,8 @@ void slapshot_state::slapshot_map(address_map &map)
 	map(0xa00000, 0xa03fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00); /* nvram (only low bytes used) */
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);  /* priority chip */
 	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
-	map(0xc00020, 0xc0002f).r(FUNC(slapshot_state::service_input_r));  /* service mirror */
-	map(0xd00000, 0xd00003).rw(FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
+	map(0xc00020, 0xc0002f).r(this, FUNC(slapshot_state::service_input_r));  /* service mirror */
+	map(0xd00000, 0xd00003).rw(this, FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
 }
 
 void slapshot_state::opwolf3_map(address_map &map)
@@ -258,8 +258,8 @@ void slapshot_state::opwolf3_map(address_map &map)
 	map(0xa00000, 0xa03fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00); /* nvram (only low bytes used) */
 	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);  /* priority chip */
 	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
-	map(0xc00020, 0xc0002f).r(FUNC(slapshot_state::service_input_r));   /* service mirror */
-	map(0xd00000, 0xd00003).rw(FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
+	map(0xc00020, 0xc0002f).r(this, FUNC(slapshot_state::service_input_r));   /* service mirror */
+	map(0xd00000, 0xd00003).rw(this, FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
 	map(0xe00000, 0xe0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0xff00);
 //  map(0xe80000, 0xe80001) // gun recoil here?
 }
@@ -279,7 +279,7 @@ void slapshot_state::opwolf3_z80_sound_map(address_map &map)
 	map(0xea00, 0xea00).nopr();
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
-	map(0xf200, 0xf200).w(FUNC(slapshot_state::sound_bankswitch_w));
+	map(0xf200, 0xf200).w(this, FUNC(slapshot_state::sound_bankswitch_w));
 }
 
 
@@ -441,135 +441,136 @@ void slapshot_state::machine_start()
 }
 
 
-void slapshot_state::slapshot(machine_config &config)
-{
+MACHINE_CONFIG_START(slapshot_state::slapshot)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14346000);   /* 28.6860 MHz / 2 ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapshot_state::slapshot_map);
-	m_maincpu->set_vblank_int("screen", FUNC(slapshot_state::interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
+	MCFG_DEVICE_PROGRAM_MAP(slapshot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 32000000/8));    /* 4 MHz */
-	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::opwolf3_z80_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_z80_sound_map)
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	TC0640FIO(config, m_tc0640fio, 0);
-	m_tc0640fio->read_1_callback().set_ioport("COINS");
-	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
-	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
-	m_tc0640fio->write_4_callback().set(FUNC(slapshot_state::coin_control_w));
-	m_tc0640fio->read_7_callback().set_ioport("JOY");
+	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
+	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
+	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
+	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, slapshot_state, coin_control_w))
+	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(slapshot_state::screen_update));
-	screen.screen_vblank().set(FUNC(slapshot_state::screen_vblank_taito_no_buffer));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
+	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(XRGB)
 
-	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
-	m_tc0480scp->set_offsets(30 + 3, 9);
-	m_tc0480scp->set_offsets_tx(-1, -1);
-	m_tc0480scp->set_offsets_flip(0, 2);
-	m_tc0480scp->set_col_base(4096);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
+	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
+	MCFG_TC0480SCP_COL_BASE(4096)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
-	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MK48T08(config, "mk48t08", 0);
+	MCFG_MK48T08_ADD( "mk48t08" )
 
-	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
-}
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+MACHINE_CONFIG_END
 
-void slapshot_state::opwolf3(machine_config &config)
-{
+MACHINE_CONFIG_START(slapshot_state::opwolf3)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 14346000);   /* 28.6860 MHz / 2 ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &slapshot_state::opwolf3_map);
-	m_maincpu->set_vblank_int("screen", FUNC(slapshot_state::interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", slapshot_state,  interrupt)
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 32000000/8));    /* 4 MHz */
-	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::opwolf3_z80_sound_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/8)    /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(opwolf3_z80_sound_map)
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
-	adc.eoc_ff_callback().set_inputline("maincpu", 3);
-	adc.in_callback<0>().set_ioport("GUN1X");
-	adc.in_callback<1>().set_ioport("GUN1Y");
-	adc.in_callback<2>().set_ioport("GUN2X");
-	adc.in_callback<3>().set_ioport("GUN2Y");
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
+	MCFG_ADC0808_IN0_CB(IOPORT("GUN1X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("GUN1Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("GUN2X"))
+	MCFG_ADC0808_IN3_CB(IOPORT("GUN2Y"))
 
-	TC0640FIO(config, m_tc0640fio, 0);
-	m_tc0640fio->read_1_callback().set_ioport("COINS");
-	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
-	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
-	m_tc0640fio->write_4_callback().set(FUNC(slapshot_state::coin_control_w));
-	m_tc0640fio->read_7_callback().set_ioport("JOY");
+	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
+	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
+	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
+	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(*this, slapshot_state, coin_control_w))
+	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(slapshot_state::screen_update));
-	screen.screen_vblank().set(FUNC(slapshot_state::screen_vblank_taito_no_buffer));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, slapshot_state, screen_vblank_taito_no_buffer))
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_slapshot)
+	MCFG_PALETTE_ADD("palette", 8192)
+	MCFG_PALETTE_FORMAT(XRGB)
 
-	TC0480SCP(config, m_tc0480scp, 0);
-	m_tc0480scp->set_gfx_region(1);
-	m_tc0480scp->set_tx_region(2);
-	m_tc0480scp->set_offsets(30 + 3, 9);
-	m_tc0480scp->set_offsets_tx(-1, -1);
-	m_tc0480scp->set_offsets_flip(0, 2);
-	m_tc0480scp->set_col_base(4096);
-	m_tc0480scp->set_gfxdecode_tag(m_gfxdecode);
+	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
+	MCFG_TC0480SCP_GFX_REGION(1)
+	MCFG_TC0480SCP_TX_REGION(2)
+	MCFG_TC0480SCP_OFFSETS(30 + 3, 9)
+	MCFG_TC0480SCP_OFFSETS_TX(-1, -1)
+	MCFG_TC0480SCP_OFFSETS_FLIP(0, 2)
+	MCFG_TC0480SCP_COL_BASE(4096)
+	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
-	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MK48T08(config, "mk48t08", 0);
+	MCFG_MK48T08_ADD( "mk48t08" )
 
-	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
-}
-
+	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
+	MCFG_TC0140SYT_MASTER_CPU("maincpu")
+	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+MACHINE_CONFIG_END
 
 /***************************************************************************
                     DRIVERS

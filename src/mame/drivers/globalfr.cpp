@@ -30,9 +30,6 @@ public:
 		m_vfd(*this, "vfd")
 	{ }
 
-	void globalfr(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<s16lf01_device> m_vfd;
 
@@ -40,6 +37,7 @@ private:
 
 	DECLARE_WRITE16_MEMBER(vfd_w);
 
+	void globalfr(machine_config &config);
 	void globalfr_map(address_map &map);
 };
 
@@ -59,7 +57,7 @@ void globalfr_state::globalfr_map(address_map &map)
 	map(0x002000, 0x002fff).ram();
 	map(0x008000, 0x07ffff).rom().region("maincpu", 0x8000);
 	map(0x0a0000, 0x0a01ff).ram();
-	map(0x7e0040, 0x7e0041).w(FUNC(globalfr_state::vfd_w));
+	map(0x7e0040, 0x7e0041).w(this, FUNC(globalfr_state::vfd_w));
 }
 
 static INPUT_PORTS_START( globalfr )
@@ -68,14 +66,13 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-void globalfr_state::globalfr(machine_config &config)
-{
+MACHINE_CONFIG_START(globalfr_state::globalfr)
 	/* basic machine hardware */
-	M37702S1(config, m_maincpu, 4000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &globalfr_state::globalfr_map);
-	S16LF01(config, m_vfd);
-	config.set_default_layout(layout_globalfr);
-}
+	MCFG_DEVICE_ADD("maincpu", M37702S1, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(globalfr_map)
+	MCFG_S16LF01_ADD("vfd",0)
+	MCFG_DEFAULT_LAYOUT(layout_globalfr)
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

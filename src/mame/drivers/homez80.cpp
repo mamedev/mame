@@ -22,7 +22,6 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -34,19 +33,16 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-	{ }
-
-	void homez80(machine_config &config);
-
-private:
+		{ }
 
 	DECLARE_READ8_MEMBER( homez80_keyboard_r );
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void homez80(machine_config &config);
 	void homez80_io(address_map &map);
 	void homez80_mem(address_map &map);
-
+private:
 	bool m_irq;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -67,7 +63,7 @@ void homez80_state::homez80_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom();  // Monitor
 	map(0x2000, 0x23ff).ram().share("videoram"); // Video RAM
-	map(0x7020, 0x702f).r(FUNC(homez80_state::homez80_keyboard_r));
+	map(0x7020, 0x702f).r(this, FUNC(homez80_state::homez80_keyboard_r));
 	map(0x8000, 0xffff).ram();  // 32 K RAM
 }
 
@@ -303,7 +299,7 @@ MACHINE_CONFIG_START(homez80_state::homez80)
 	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homez80)
 MACHINE_CONFIG_END
 

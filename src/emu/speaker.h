@@ -6,20 +6,7 @@
 
     Speaker output sound device.
 
-    Speakers have (x, y, z) coordinates in 3D space:
-    * Observer is at position (0, 0, 0)
-    * Positive x is to the right of the observer
-    * Negative x is to the left of the observer
-    * Positive y is above the observer
-    * Negative y is below the observer
-    * Positive z is in front of the observer
-    * Negative z is behind the observer
-
-    Currently, MAME only considers the sign of the x coordinate (not its
-    magnitude), and completely ignores the y and z coordinates.
-
 ***************************************************************************/
-
 #ifndef MAME_EMU_SPEAKER_H
 #define MAME_EMU_SPEAKER_H
 
@@ -58,10 +45,6 @@ public:
 	speaker_device &front_center() { set_position(0.0, 0.0, 1.0); return *this; }
 	speaker_device &front_left() { set_position(-0.2, 0.0, 1.0); return *this; }
 	speaker_device &front_right() { set_position(0.2, 0.0, 1.0); return *this; }
-	speaker_device &rear_center() { set_position(0.0, 0.0, -0.5); return *this; }
-	speaker_device &rear_left() { set_position(-0.2, 0.0, -0.5); return *this; }
-	speaker_device &rear_right() { set_position(0.2, 0.0, -0.5); return *this; }
-	speaker_device &subwoofer() { set_position(0.0, 0.0, 0.0); return *this; }
 
 	// internally for use by the sound system
 	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);

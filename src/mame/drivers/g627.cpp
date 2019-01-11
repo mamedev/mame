@@ -61,19 +61,17 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void g627(machine_config &config);
-
 	void init_v115();
 	void init_v117();
-
-private:
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
+	void g627(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+private:
 	uint8_t m_seg[6];
 	uint8_t m_portc;
 	uint8_t m_motor;
@@ -96,8 +94,8 @@ void g627_state::mem_map(address_map &map)
 void g627_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x02).w(FUNC(g627_state::disp_w));
-	map(0x03, 0x07).w(FUNC(g627_state::lamp_w));
+	map(0x00, 0x02).w(this, FUNC(g627_state::disp_w));
+	map(0x03, 0x07).w(this, FUNC(g627_state::lamp_w));
 	map(0x10, 0x17).w("astrocade", FUNC(astrocade_io_device::write));
 	map(0x20, 0x27).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 }
@@ -302,13 +300,13 @@ MACHINE_CONFIG_START(g627_state::g627)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IO_MAP(io_map)
 
-	i8156_device &i8156(I8156(config, "i8156", 14138000/8));
-	i8156.in_pa_callback().set(FUNC(g627_state::porta_r));
-	i8156.in_pb_callback().set(FUNC(g627_state::portb_r));
-	i8156.out_pc_callback().set(FUNC(g627_state::portc_w));
-	i8156.out_to_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	MCFG_DEVICE_ADD("i8156", I8156, 14138000/8)
+	MCFG_I8155_IN_PORTA_CB(READ8(*this, g627_state, porta_r))
+	MCFG_I8155_IN_PORTB_CB(READ8(*this, g627_state, portb_r))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, g627_state, portc_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Sound */
 	genpin_audio(config);
@@ -317,7 +315,7 @@ MACHINE_CONFIG_START(g627_state::g627)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Video */
-	config.set_default_layout(layout_g627);
+	MCFG_DEFAULT_LAYOUT(layout_g627)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

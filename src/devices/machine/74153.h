@@ -23,6 +23,19 @@
 
 #pragma once
 
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_TTL153_ZA_CB(_devcb) \
+	devcb = &downcast<ttl153_device &>(*device).set_za_callback(DEVCB_##_devcb);
+
+#define MCFG_TTL153_ZB_CB(_devcb) \
+	devcb = &downcast<ttl153_device &>(*device).set_zb_callback(DEVCB_##_devcb);
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -34,8 +47,8 @@ public:
 	ttl153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	auto za_cb() { return m_za_cb.bind(); }
-	auto zb_cb() { return m_zb_cb.bind(); }
+	template <class Object> devcb_base &set_za_callback(Object &&cb) { return m_za_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_zb_callback(Object &&cb) { return m_zb_cb.set_callback(std::forward<Object>(cb)); }
 
 	// select
 	DECLARE_WRITE_LINE_MEMBER(s0_w);

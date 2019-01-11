@@ -154,7 +154,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 //#include "cpu/m6502/m65c02.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
@@ -177,9 +176,6 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void radicasi(machine_config &config);
-
-private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -189,6 +185,7 @@ private:
 	DECLARE_READ8_MEMBER(radicasi_rombank_lo_r);
 	DECLARE_WRITE8_MEMBER(radicasi_rombank_lo_w);
 	DECLARE_WRITE8_MEMBER(radicasi_rombank_hi_w);
+
 
 	// DMA
 	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_lo_w);
@@ -237,15 +234,18 @@ private:
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
+	void radicasi(machine_config &config);
+
 	void radicasi_bank_map(address_map &map);
 	void radicasi_map(address_map &map);
-
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_vram;
@@ -912,35 +912,35 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 	map(0x4800, 0x49ff).ram().share("palram");
 
 	// 500x system regs?
-	map(0x5003, 0x5003).r(FUNC(radica_eu3a05_state::radicasi_5003_r));
-	map(0x500b, 0x500b).r(FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
-	map(0x500c, 0x500c).w(FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
-	map(0x500d, 0x500d).rw(FUNC(radica_eu3a05_state::radicasi_rombank_lo_r), FUNC(radica_eu3a05_state::radicasi_rombank_lo_w));
+	map(0x5003, 0x5003).r(this, FUNC(radica_eu3a05_state::radicasi_5003_r));
+	map(0x500b, 0x500b).r(this, FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
+	map(0x500c, 0x500c).w(this, FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
+	map(0x500d, 0x500d).rw(this, FUNC(radica_eu3a05_state::radicasi_rombank_lo_r), FUNC(radica_eu3a05_state::radicasi_rombank_lo_w));
 
 	// 501x DMA controller
-	map(0x500F, 0x500F).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_w));
-	map(0x5010, 0x5010).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_md_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_md_w));
-	map(0x5011, 0x5011).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_w));
+	map(0x500F, 0x500F).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_w));
+	map(0x5010, 0x5010).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_md_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_md_w));
+	map(0x5011, 0x5011).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_w));
 
-	map(0x5012, 0x5012).rw(FUNC(radica_eu3a05_state::radicasi_dmadst_lo_r), FUNC(radica_eu3a05_state::radicasi_dmadst_lo_w));
-	map(0x5013, 0x5013).rw(FUNC(radica_eu3a05_state::radicasi_dmadst_hi_r), FUNC(radica_eu3a05_state::radicasi_dmadst_hi_w));
+	map(0x5012, 0x5012).rw(this, FUNC(radica_eu3a05_state::radicasi_dmadst_lo_r), FUNC(radica_eu3a05_state::radicasi_dmadst_lo_w));
+	map(0x5013, 0x5013).rw(this, FUNC(radica_eu3a05_state::radicasi_dmadst_hi_r), FUNC(radica_eu3a05_state::radicasi_dmadst_hi_w));
 
-	map(0x5014, 0x5014).rw(FUNC(radica_eu3a05_state::radicasi_dmasize_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasize_lo_w));
-	map(0x5015, 0x5015).rw(FUNC(radica_eu3a05_state::radicasi_dmasize_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasize_hi_w));
+	map(0x5014, 0x5014).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasize_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasize_lo_w));
+	map(0x5015, 0x5015).rw(this, FUNC(radica_eu3a05_state::radicasi_dmasize_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasize_hi_w));
 
-	map(0x5016, 0x5016).rw(FUNC(radica_eu3a05_state::radicasi_dmatrg_r), FUNC(radica_eu3a05_state::radicasi_dmatrg_w));
+	map(0x5016, 0x5016).rw(this, FUNC(radica_eu3a05_state::radicasi_dmatrg_r), FUNC(radica_eu3a05_state::radicasi_dmatrg_w));
 
 	// 502x - 503x video regs area?
 	map(0x5020, 0x5026).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
-	map(0x5027, 0x5027).w(FUNC(radica_eu3a05_state::radicasi_vidctrl_w));
+	map(0x5027, 0x5027).w(this, FUNC(radica_eu3a05_state::radicasi_vidctrl_w));
 
-	map(0x5029, 0x5029).rw(FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)); // tilebase
-	map(0x502a, 0x502a).rw(FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)); // tilebase
+	map(0x5029, 0x5029).rw(this, FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)); // tilebase
+	map(0x502a, 0x502a).rw(this, FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)); // tilebase
 
-	map(0x502b, 0x502b).rw(FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)); // tilebase (spr?)
-	map(0x502c, 0x502c).rw(FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)); // tilebase (spr?)
+	map(0x502b, 0x502b).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)); // tilebase (spr?)
+	map(0x502c, 0x502c).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)); // tilebase (spr?)
 
-	map(0x5031, 0x5032).rw(FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_r), FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_w));
+	map(0x5031, 0x5032).rw(this, FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_r), FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_w));
 
 
 	// 504x GPIO area?
@@ -958,7 +958,7 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 
 	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
 
-	map(0x50a9, 0x50a9).rw(FUNC(radica_eu3a05_state::radicasi_50a9_r), FUNC(radica_eu3a05_state::radicasi_50a9_w));
+	map(0x50a9, 0x50a9).rw(this, FUNC(radica_eu3a05_state::radicasi_50a9_r), FUNC(radica_eu3a05_state::radicasi_50a9_w));
 
 	//AM_RANGE(0x5000, 0x50ff) AM_RAM
 
@@ -966,8 +966,8 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);
 	// not sure how these work, might be a modified 6502 core instead.
-	map(0xfffa, 0xfffb).r(FUNC(radica_eu3a05_state::radicasi_nmi_vector_r));
-	map(0xfffe, 0xffff).r(FUNC(radica_eu3a05_state::radicasi_irq_vector_r));
+	map(0xfffa, 0xfffb).r(this, FUNC(radica_eu3a05_state::radicasi_nmi_vector_r));
+	map(0xfffe, 0xffff).r(this, FUNC(radica_eu3a05_state::radicasi_irq_vector_r));
 }
 
 
@@ -1153,7 +1153,12 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 	MCFG_DEVICE_PROGRAM_MAP(radicasi_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", radica_eu3a05_state,  interrupt)
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a05_state::radicasi_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(radicasi_bank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1168,14 +1173,14 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_radicasi_fake)
 
-	radica6502_gpio_device &gpio(RADICA6502_GPIO(config, "gpio", 0));
-	gpio.read_0_callback().set_ioport("IN0");
+	MCFG_DEVICE_ADD("gpio", RADICA6502_GPIO, 0)
+	MCFG_RADICA6502_GPIO_READ_PORT0_CB(IOPORT("IN0"))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
-	sound.space_read_callback().set(FUNC(radica_eu3a05_state::read_full_space));
-	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("6ch_sound", RADICA6502_SOUND, 8000)
+	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(*this, radica_eu3a05_state, read_full_space))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -31,24 +31,6 @@ public:
 		fgpa_after_rom_write_addr = 0xffff;
 	}
 
-	void astra_single(machine_config &config);
-	void astra_single_alt(machine_config &config);
-	void astrafr_dual(machine_config &config);
-	void astrafr_dual_alt(machine_config &config);
-	void astrafr_dual_alt_37(machine_config &config);
-	void astra_single_2e(machine_config &config);
-	void astra_single_alt_37(machine_config &config);
-	void astra_single_alt_57(machine_config &config);
-	void astra_single_37(machine_config &config);
-	void astrafr_dual_2e(machine_config &config);
-	void astrafr_dual_37(machine_config &config);
-
-	void init_astradec_sml();
-	void init_astradec();
-	void init_astradec_dual();
-	void init_astradec_sml_dual();
-
-private:
 	uint32_t* m_cpuregion;
 	int  m_cpuregion_size;
 	std::unique_ptr<uint32_t[]> m_mainram;
@@ -128,11 +110,25 @@ private:
 	required_device<m68340_cpu_device> m_maincpu;
 	optional_device<m68340_cpu_device> m_slavecpu;
 
+	void init_astradec_sml();
+	void init_astradec();
+	void init_astradec_dual();
+	void init_astradec_sml_dual();
 	DECLARE_MACHINE_START(astra_common);
 	DECLARE_MACHINE_START(astra_2e);
 	DECLARE_MACHINE_START(astra_37);
 	DECLARE_MACHINE_START(astra_57);
-
+	void astra_single(machine_config &config);
+	void astra_single_alt(machine_config &config);
+	void astrafr_dual(machine_config &config);
+	void astrafr_dual_alt(machine_config &config);
+	void astrafr_dual_alt_37(machine_config &config);
+	void astra_single_2e(machine_config &config);
+	void astra_single_alt_37(machine_config &config);
+	void astra_single_alt_57(machine_config &config);
+	void astra_single_37(machine_config &config);
+	void astrafr_dual_2e(machine_config &config);
+	void astrafr_dual_37(machine_config &config);
 	void astra_map(address_map &map);
 	void astrafr_master_alt_map(address_map &map);
 	void astrafr_master_map(address_map &map);
@@ -253,24 +249,24 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 
 void astrafr_state::astrafr_master_map(address_map &map)
 {
-	map(0x000000, 0xffffffff).rw(FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
 }
 
 
 void astrafr_state::astrafr_master_alt_map(address_map &map)
 {
-	map(0x000000, 0xffffffff).rw(FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
 }
 
 void astrafr_state::astra_map(address_map &map)
 {
-	map(0x000000, 0xffffffff).rw(FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
 }
 
 // probably identical, afaik they're linked units..
 void astrafr_state::astrafr_slave_map(address_map &map)
 {
-	map(0x000000, 0xffffffff).rw(FUNC(astrafr_state::astrafr_slave_mem_r), FUNC(astrafr_state::astrafr_slave_mem_w));
+	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_slave_mem_r), FUNC(astrafr_state::astrafr_slave_mem_w));
 }
 
 
@@ -312,11 +308,11 @@ MACHINE_START_MEMBER(astrafr_state,astra_2e)
 
 
 MACHINE_CONFIG_START(astrafr_state::astrafr_dual)
-	M68340(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_master_map);
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astrafr_master_map)
 
-	M68340(config, m_slavecpu, 16000000);
-	m_slavecpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_slave_map);
+	MCFG_DEVICE_ADD("slavecpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astrafr_slave_map)
 
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
@@ -331,14 +327,13 @@ MACHINE_CONFIG_START(astrafr_state::astrafr_dual_37)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_37 )
 MACHINE_CONFIG_END
 
-void astrafr_state::astrafr_dual_alt(machine_config &config)
-{
-	M68340(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_master_alt_map);
+MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt)
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astrafr_master_alt_map)
 
-	M68340(config, m_slavecpu, 16000000);
-	m_slavecpu->set_addrmap(AS_PROGRAM, &astrafr_state::astrafr_slave_map);
-}
+	MCFG_DEVICE_ADD("slavecpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astrafr_slave_map)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(astrafr_state::astrafr_dual_alt_37)
 	astrafr_dual_alt(config);
@@ -348,8 +343,8 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(astrafr_state::astra_single)
-	M68340(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astra_map);
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astra_map)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 
@@ -373,8 +368,8 @@ MACHINE_START_MEMBER(astrafr_state,astra_57)
 
 
 MACHINE_CONFIG_START(astrafr_state::astra_single_alt)
-	M68340(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrafr_state::astra_map);
+	MCFG_DEVICE_ADD("maincpu", M68340, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(astra_map)
 	MCFG_MACHINE_START_OVERRIDE(astrafr_state, astra_common )
 MACHINE_CONFIG_END
 

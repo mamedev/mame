@@ -5,10 +5,6 @@
     ESD 16 Bit Games
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_ESD16_H
-#define MAME_INCLUDES_ESD16_H
-
-#pragma once
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -17,8 +13,8 @@
 class esd16_state : public driver_device
 {
 public:
-	esd16_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	esd16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
 		m_scroll_0(*this, "scroll_0"),
@@ -33,21 +29,8 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_eeprom(*this, "eeprom"),
 		m_soundlatch(*this, "soundlatch")
-	{ }
+		{}
 
-	void jumppop(machine_config &config);
-	void esd16(machine_config &config);
-	void tangtang(machine_config &config);
-	void mchampdx(machine_config &config);
-	void hedpanio(machine_config &config);
-	void hedpanic(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_vram_0;
 	required_shared_ptr<uint16_t> m_vram_1;
@@ -88,8 +71,17 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_0_16x16);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_1_16x16);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	uint32_t screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECOSPR_PRIORITY_CB_MEMBER(hedpanic_pri_callback);
+	void jumppop(machine_config &config);
+	void esd16(machine_config &config);
+	void tangtang(machine_config &config);
+	void mchampdx(machine_config &config);
+	void hedpanio(machine_config &config);
+	void hedpanic(machine_config &config);
 	void hedpanic_map(address_map &map);
 	void jumppop_map(address_map &map);
 	void mchampdx_map(address_map &map);
@@ -105,5 +97,3 @@ private:
 	void esd16_sprite_area(address_map &map, u32 base);
 	void esd16_vram_area(address_map &map, u32 base);
 };
-
-#endif // MAME_INCLUDES_ESD16_H

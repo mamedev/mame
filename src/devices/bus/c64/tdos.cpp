@@ -153,13 +153,11 @@ DEFINE_DEVICE_TYPE(C64_TDOS, c64_tdos_cartridge_device, "c64_tdos", "C64 TDOS ca
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void c64_tdos_cartridge_device::device_add_mconfig(machine_config &config)
-{
-	MC6852(config, m_ssda, XTAL(6'500'000));
+MACHINE_CONFIG_START(c64_tdos_cartridge_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(MC68A52P_TAG, MC6852, XTAL(6'500'000))
 
-	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
-	m_exp->set_passthrough();
-}
+	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
+MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
@@ -197,7 +195,7 @@ c64_tdos_cartridge_device::c64_tdos_cartridge_device(const machine_config &mconf
 	device_t(mconfig, C64_TDOS, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_ssda(*this, MC68A52P_TAG),
-	m_exp(*this, "exp"),
+	m_exp(*this, C64_EXPANSION_SLOT_TAG),
 	m_sw1(*this, "SW1"), m_enabled(false)
 {
 }

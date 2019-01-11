@@ -161,13 +161,13 @@ DEFINE_DEVICE_TYPE(AW_ROM_BOARD, aw_rom_board, "aw_rom_board", "Sammy Atomiswave
 
 void aw_rom_board::submap(address_map &map)
 {
-	map(0x00, 0x01).w(FUNC(aw_rom_board::epr_offsetl_w));
-	map(0x02, 0x03).w(FUNC(aw_rom_board::epr_offseth_w));
-	map(0x06, 0x07).w(FUNC(aw_rom_board::mpr_record_index_w));
-	map(0x08, 0x09).w(FUNC(aw_rom_board::mpr_first_file_index_w));
-	map(0x0a, 0x0b).w(FUNC(aw_rom_board::mpr_file_offsetl_w));
-	map(0x0c, 0x0d).w(FUNC(aw_rom_board::mpr_file_offseth_w));
-	map(0x40, 0x41).rw(FUNC(aw_rom_board::pio_r), FUNC(aw_rom_board::pio_w));
+	map(0x00, 0x01).w(this, FUNC(aw_rom_board::epr_offsetl_w));
+	map(0x02, 0x03).w(this, FUNC(aw_rom_board::epr_offseth_w));
+	map(0x06, 0x07).w(this, FUNC(aw_rom_board::mpr_record_index_w));
+	map(0x08, 0x09).w(this, FUNC(aw_rom_board::mpr_first_file_index_w));
+	map(0x0a, 0x0b).w(this, FUNC(aw_rom_board::mpr_file_offsetl_w));
+	map(0x0c, 0x0d).w(this, FUNC(aw_rom_board::mpr_file_offseth_w));
+	map(0x40, 0x41).rw(this, FUNC(aw_rom_board::pio_r), FUNC(aw_rom_board::pio_w));
 }
 
 aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -176,6 +176,13 @@ aw_rom_board::aw_rom_board(const machine_config &mconfig, const char *tag, devic
 	, m_keyregion(*this, finder_base::DUMMY_TAG)
 {
 }
+
+void aw_rom_board::static_set_keyregion(device_t &device, const char *keyregion)
+{
+	aw_rom_board &dev = downcast<aw_rom_board &>(device);
+	dev.m_keyregion.set_tag(keyregion);
+}
+
 
 /*
 We are using 20 bits keys with the following subfields' structure:

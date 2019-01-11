@@ -15,13 +15,16 @@
 
 DECLARE_DEVICE_TYPE(PSX_IRQ, psxirq_device)
 
+#define MCFG_PSX_IRQ_HANDLER(_devcb) \
+	devcb = &downcast<psxirq_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+
 class psxirq_device : public device_t
 {
 public:
 	psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto irq() { return m_irq_handler.bind(); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );

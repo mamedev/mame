@@ -43,7 +43,7 @@ void ut88_state::ut88mini_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).rom();  // System ROM
 	map(0xc000, 0xc3ff).ram();  // RAM
-	map(0x9000, 0x9fff).w(FUNC(ut88_state::ut88mini_write_led)); // 7seg LED
+	map(0x9000, 0x9fff).w(this, FUNC(ut88_state::ut88mini_write_led)); // 7seg LED
 }
 
 void ut88_state::ut88_mem(address_map &map)
@@ -58,14 +58,14 @@ void ut88_state::ut88_mem(address_map &map)
 
 void ut88_state::ut88mini_io(address_map &map)
 {
-	map(0xA0, 0xA0).r(FUNC(ut88_state::ut88mini_keyboard_r));
-	map(0xA1, 0xA1).r(FUNC(ut88_state::ut88_tape_r));
+	map(0xA0, 0xA0).r(this, FUNC(ut88_state::ut88mini_keyboard_r));
+	map(0xA1, 0xA1).r(this, FUNC(ut88_state::ut88_tape_r));
 }
 
 void ut88_state::ut88_io(address_map &map)
 {
-	map(0x04, 0x07).rw(FUNC(ut88_state::ut88_keyboard_r), FUNC(ut88_state::ut88_keyboard_w));
-	map(0xA1, 0xA1).rw(FUNC(ut88_state::ut88_tape_r), FUNC(ut88_state::ut88_sound_w));
+	map(0x04, 0x07).rw(this, FUNC(ut88_state::ut88_keyboard_r), FUNC(ut88_state::ut88_keyboard_w));
+	map(0xA1, 0xA1).rw(this, FUNC(ut88_state::ut88_tape_r), FUNC(ut88_state::ut88_sound_w));
 }
 
 /* Input ports */
@@ -202,9 +202,9 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 28*8-1)
 	MCFG_VIDEO_START_OVERRIDE(ut88_state,ut88)
 	MCFG_SCREEN_UPDATE_DRIVER(ut88_state, screen_update_ut88)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ut88)
 
 	/* audio hardware */
@@ -216,10 +216,10 @@ MACHINE_CONFIG_START(ut88_state::ut88)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
-	I8255A(config, m_ppi);
-	m_ppi->out_pa_callback().set(FUNC(ut88_state::ut88_8255_porta_w));
-	m_ppi->in_pb_callback().set(FUNC(ut88_state::ut88_8255_portb_r));
-	m_ppi->in_pc_callback().set(FUNC(ut88_state::ut88_8255_portc_r));
+	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ut88_state, ut88_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ut88_state, ut88_8255_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ut88_state, ut88_8255_portc_r))
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(rku_cassette_formats)
@@ -238,7 +238,7 @@ MACHINE_CONFIG_START(ut88_state::ut88mini)
 	MCFG_MACHINE_RESET_OVERRIDE(ut88_state, ut88mini )
 
 	/* video hardware */
-	config.set_default_layout(layout_ut88mini);
+	MCFG_DEFAULT_LAYOUT(layout_ut88mini)
 
 	/* Cassette */
 	SPEAKER(config, "speaker").front_center();

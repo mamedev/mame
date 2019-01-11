@@ -25,8 +25,7 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
-		m_pf_data(*this, "pf_data"),
-		m_scroll(*this, "scroll") { }
+		m_pf_data(*this, "pf_data") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -41,11 +40,12 @@ public:
 	required_shared_ptr<uint16_t> m_ram;
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_pf_data;
-	required_shared_ptr<uint16_t> m_scroll;
 
 	/* video-related */
-	tilemap_t     *m_bg_tilemap;
+	std::unique_ptr<bitmap_ind16> m_bitmap_f;
 	tilemap_t     *m_fix_tilemap;
+	int         m_flipscreen;
+	uint16_t      m_scroll[2];
 
 	/* misc */
 	uint16_t      m_i8751_return;
@@ -57,27 +57,25 @@ public:
 	int         m_coin_mask;
 	int         m_latch;
 
-	u16 mcu_r();
-	void mcu_w(u16 data);
-	DECLARE_WRITE16_MEMBER(mcu_ack_w);
-	DECLARE_WRITE16_MEMBER(mcu_reset_w);
-	DECLARE_WRITE16_MEMBER(vint_ack_w);
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	void playfield_w(offs_t offset, u16 data, u16 mem_mask);
+	DECLARE_WRITE16_MEMBER(karnov_control_w);
+	DECLARE_READ16_MEMBER(karnov_control_r);
+	DECLARE_WRITE16_MEMBER(karnov_videoram_w);
+	DECLARE_WRITE16_MEMBER(karnov_playfield_swap_w);
 	void init_wndrplnt();
 	void init_karnov();
 	void init_karnovj();
 	void init_chelnovu();
 	void init_chelnovj();
 	void init_chelnov();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vbint_w);
+	void karnov_flipscreen_w( int data );
+	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void karnov_i8751_w( int data );
 	void wndrplnt_i8751_w( int data );
 	void chelnov_i8751_w( int data );

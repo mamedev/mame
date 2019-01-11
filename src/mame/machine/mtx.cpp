@@ -180,7 +180,7 @@ WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
 
 READ8_MEMBER(mtx_state::mtx_sound_strobe_r)
 {
-	m_sn->write(m_sound_latch);
+	m_sn->write(space, 0, m_sound_latch);
 	return 0xff;
 }
 

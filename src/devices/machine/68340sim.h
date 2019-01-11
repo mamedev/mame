@@ -32,7 +32,6 @@ public:
 
 	// Timers and counters
 	uint8_t m_pit_counter;
-	bool m_pit_irq;
 
 	void reset();
 

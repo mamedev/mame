@@ -156,10 +156,10 @@ ioport_constructor sega_sk1100_device::device_input_ports() const
 
 MACHINE_CONFIG_START(sega_sk1100_device::device_add_mconfig)
 	/* devices */
-	I8255(config, m_ppi);
-	m_ppi->in_pa_callback().set(FUNC(sega_sk1100_device::ppi_pa_r));
-	m_ppi->in_pb_callback().set(FUNC(sega_sk1100_device::ppi_pb_r));
-	m_ppi->out_pc_callback().set(FUNC(sega_sk1100_device::ppi_pc_w));
+	MCFG_DEVICE_ADD(UPD9255_0_TAG, I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, sega_sk1100_device, ppi_pa_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, sega_sk1100_device, ppi_pb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sega_sk1100_device, ppi_pc_w))
 
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 
@@ -210,7 +210,7 @@ void sega_sk1100_device::device_start()
 
 READ8_MEMBER(sega_sk1100_device::peripheral_r)
 {
-	return m_ppi->read(offset & 0x03);
+	return m_ppi->read(space, offset & 0x03);
 }
 
 
@@ -220,7 +220,7 @@ READ8_MEMBER(sega_sk1100_device::peripheral_r)
 
 WRITE8_MEMBER(sega_sk1100_device::peripheral_w)
 {
-	m_ppi->write(offset & 0x03, data);
+	m_ppi->write(space, offset & 0x03, data);
 }
 
 

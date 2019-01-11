@@ -122,8 +122,8 @@ void ladybug_state::ladybug_map(address_map &map)
 	map(0x9002, 0x9002).portr("DSW0");
 	map(0x9003, 0x9003).portr("DSW1");
 	map(0xa000, 0xa007).w("videolatch", FUNC(ls259_device::write_d0));
-	map(0xb000, 0xbfff).w("sn1", FUNC(sn76489_device::command_w));
-	map(0xc000, 0xcfff).w("sn2", FUNC(sn76489_device::command_w));
+	map(0xb000, 0xbfff).w("sn1", FUNC(sn76489_device::write));
+	map(0xc000, 0xcfff).w("sn2", FUNC(sn76489_device::write));
 	map(0xd000, 0xd7ff).rw(m_video, FUNC(ladybug_video_device::bg_r), FUNC(ladybug_video_device::bg_w));
 	map(0xe000, 0xe000).portr("IN2");
 }
@@ -140,7 +140,7 @@ void sraider_state::sraider_cpu1_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
 	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w));
-	map(0x8005, 0x8005).r(FUNC(sraider_state::sraider_8005_r));  // protection check?
+	map(0x8005, 0x8005).r(this, FUNC(sraider_state::sraider_8005_r));  // protection check?
 	map(0x8006, 0x8006).writeonly().share("sound_low");
 	map(0x8007, 0x8007).writeonly().share("sound_high");
 	map(0x9000, 0x9000).portr("IN0");
@@ -159,18 +159,18 @@ void sraider_state::sraider_cpu2_map(address_map &map)
 	map(0xa000, 0xa000).readonly().share("sound_high");
 	map(0xc000, 0xc000).nopr(); //some kind of sync
 	map(0xe000, 0xe0ff).writeonly().share("grid_data");
-	map(0xe800, 0xe800).w(FUNC(sraider_state::sraider_io_w));
+	map(0xe800, 0xe800).w(this, FUNC(sraider_state::sraider_io_w));
 }
 
 void sraider_state::sraider_cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::command_w));
-	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::command_w));
-	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::command_w));
-	map(0x28, 0x3f).w(FUNC(sraider_state::sraider_misc_w));  // lots unknown
+	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::write));
+	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::write));
+	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::write));
+	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::write));
+	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::write));
+	map(0x28, 0x3f).w(this, FUNC(sraider_state::sraider_misc_w));  // lots unknown
 }
 
 
@@ -736,19 +736,25 @@ MACHINE_CONFIG_START(ladybug_state::ladybug)
 	MCFG_SCREEN_UPDATE_DRIVER(ladybug_state, screen_update_ladybug)
 	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_ladybug);
-	PALETTE(config, "palette", FUNC(ladybug_state::ladybug_palette), 4*8 + 4*16, 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ladybug)
+	MCFG_PALETTE_ADD("palette", 4*8+4*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
+	MCFG_PALETTE_INIT_OWNER(ladybug_state,ladybug)
 
-	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag("gfxdecode");
+	MCFG_DEVICE_ADD("video", LADYBUG_VIDEO, 4000000)
+	MCFG_LADYBUG_VIDEO_GFXDECODE("gfxdecode")
 
-	ls259_device &videolatch(LS259(config, "videolatch")); // L5 on video board or H3 on single board
-	videolatch.q_out_cb<0>().set(FUNC(ladybug_state::flipscreen_w)); // no other outputs used
+	MCFG_DEVICE_ADD("videolatch", LS259, 0) // L5 on video board or H3 on single board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ladybug_state, flipscreen_w)) // no other outputs used
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("sn1", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("sn2", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dorodon_state::dorodon)
@@ -778,22 +784,35 @@ MACHINE_CONFIG_START(sraider_state::sraider)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sraider_state, screen_update_sraider)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sraider_state, screen_vblank_sraider))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sraider);
-	PALETTE(config, m_palette, FUNC(sraider_state::sraider_palette), 4*8 + 4*16 + 32 + 2, 32 + 32 + 1);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sraider)
+	MCFG_PALETTE_ADD("palette", 4*8+4*16+32+2)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32+32+1)
+	MCFG_PALETTE_INIT_OWNER(sraider_state,sraider)
 
-	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag(m_gfxdecode);
-	ZEROHOUR_STARS(config, m_stars, 0);
+	MCFG_DEVICE_ADD("video", LADYBUG_VIDEO, 4000000)
+	MCFG_LADYBUG_VIDEO_GFXDECODE("gfxdecode")
+
+	MCFG_DEVICE_ADD("stars", ZEROHOUR_STARS, 0)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("sn1", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("sn2", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("sn3", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("sn4", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("sn5", SN76489, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

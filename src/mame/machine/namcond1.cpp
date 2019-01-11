@@ -84,7 +84,7 @@ WRITE16_MEMBER(namcond1_state::cuskey_w)
 			break;
 
 		case (0x0c>>1):
-			m_ygv608->set_gfxbank(data & 0x0003);
+			m_ygv608->set_gfxbank((data & 0x0002) >> 1); // i think
 			// bit 0 used in abcheck during garbage screens, tile/color select of some kind?
 			break;
 

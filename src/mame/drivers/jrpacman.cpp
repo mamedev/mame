@@ -114,15 +114,11 @@ class jrpacman_state : public pacman_state
 public:
 	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
-
-	void jrpacman(machine_config &config);
-
-	void init_jrpacman();
-
-private:
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	void init_jrpacman();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void jrpacman(machine_config &config);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
 };
@@ -149,7 +145,7 @@ WRITE_LINE_MEMBER(jrpacman_state::irq_mask_w)
 void jrpacman_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram().w(FUNC(jrpacman_state::jrpacman_videoram_w)).share("videoram");
+	map(0x4000, 0x47ff).ram().w(this, FUNC(jrpacman_state::jrpacman_videoram_w)).share("videoram");
 	map(0x4800, 0x4fef).ram();
 	map(0x4ff0, 0x4fff).ram().share("spriteram");
 	map(0x5000, 0x503f).portr("P1");
@@ -159,7 +155,7 @@ void jrpacman_state::main_map(address_map &map)
 	map(0x5060, 0x506f).writeonly().share("spriteram2");
 	map(0x5070, 0x5077).w("latch2", FUNC(ls259_device::write_d0));
 	map(0x5080, 0x50bf).portr("DSW");
-	map(0x5080, 0x5080).w(FUNC(jrpacman_state::jrpacman_scroll_w));
+	map(0x5080, 0x5080).w(this, FUNC(jrpacman_state::jrpacman_scroll_w));
 	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x8000, 0xdfff).rom();
 }
@@ -168,7 +164,7 @@ void jrpacman_state::main_map(address_map &map)
 void jrpacman_state::port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0, 0).w(FUNC(jrpacman_state::jrpacman_interrupt_vector_w));
+	map(0, 0).w(this, FUNC(jrpacman_state::jrpacman_interrupt_vector_w));
 }
 
 
@@ -279,50 +275,51 @@ WRITE_LINE_MEMBER(jrpacman_state::vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-void jrpacman_state::jrpacman(machine_config &config)
-{
+MACHINE_CONFIG_START(jrpacman_state::jrpacman)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &jrpacman_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &jrpacman_state::port_map);
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(port_map)
 
-	ls259_device &latch1(LS259(config, "latch1")); // 5P
-	latch1.q_out_cb<0>().set(FUNC(jrpacman_state::irq_mask_w));
-	latch1.q_out_cb<1>().set("namco", FUNC(namco_device::sound_enable_w));
-	latch1.q_out_cb<3>().set(FUNC(jrpacman_state::flipscreen_w));
-	latch1.q_out_cb<7>().set(FUNC(jrpacman_state::coin_counter_w));
+	MCFG_DEVICE_ADD("latch1", LS259, 0) // 5P
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jrpacman_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("namco", namco_device, sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, jrpacman_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, jrpacman_state, coin_counter_w))
 
-	ls259_device &latch2(LS259(config, "latch2")); // 1H
-	latch2.q_out_cb<0>().set(FUNC(jrpacman_state::pengo_palettebank_w));
-	latch2.q_out_cb<1>().set(FUNC(jrpacman_state::pengo_colortablebank_w));
-	latch2.q_out_cb<3>().set(FUNC(jrpacman_state::jrpacman_bgpriority_w));
-	latch2.q_out_cb<4>().set(FUNC(jrpacman_state::jrpacman_charbank_w));
-	latch2.q_out_cb<5>().set(FUNC(jrpacman_state::jrpacman_spritebank_w));
+	MCFG_DEVICE_ADD("latch2", LS259, 0) // 1H
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, jrpacman_state, pengo_palettebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jrpacman_state, pengo_colortablebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, jrpacman_state, jrpacman_bgpriority_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, jrpacman_state, jrpacman_charbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, jrpacman_state, jrpacman_spritebank_w))
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60.606060);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(36*8, 28*8);
-	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(jrpacman_state::screen_update_pacman));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(jrpacman_state::vblank_irq));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.606060)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(jrpacman_state, screen_update_pacman)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, jrpacman_state, vblank_irq))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jrpacman);
-	PALETTE(config, m_palette, FUNC(jrpacman_state::pacman_palette), 128 * 4, 32);
-
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jrpacman)
+	MCFG_PALETTE_ADD("palette", 128*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
+	MCFG_PALETTE_INIT_OWNER(jrpacman_state,pacman)
 	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	NAMCO(config, m_namco_sound, 3072000/32);
-	m_namco_sound->set_voices(3);
-	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("namco", NAMCO, 3072000/32)
+	MCFG_NAMCO_AUDIO_VOICES(3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 
 

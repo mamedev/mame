@@ -497,8 +497,8 @@ void psikyosh_state::ps3v1_map(address_map &map)
 	map(0x03004000, 0x0300ffff).ram().share("bgram"); // video banks 7-0x1f (backgrounds and other effects)
 	map(0x03040000, 0x03044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // palette..
 	map(0x03050000, 0x030501ff).ram().share("zoomram"); // sprite zoom lookup table
-	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
-	map(0x0305ffe0, 0x0305ffff).ram().w(FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); //  video registers
+	map(0x0305ffdc, 0x0305ffdf).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).w(this, FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
+	map(0x0305ffe0, 0x0305ffff).ram().w(this, FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); //  video registers
 	map(0x03060000, 0x0307ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx) (Mirrored?)
@@ -506,7 +506,7 @@ void psikyosh_state::ps3v1_map(address_map &map)
 	map(0x05000000, 0x05000007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // inputs/eeprom
 	map(0x05800000, 0x05800003).portr("INPUTS");
-	map(0x05800004, 0x05800007).rw(FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
+	map(0x05800004, 0x05800007).rw(this, FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
 // ram
 	map(0x06000000, 0x060fffff).ram().share("ram"); // main RAM (1 meg)
 }
@@ -518,7 +518,7 @@ void psikyosh_state::ps5_map(address_map &map)
 	map(0x00000000, 0x000fffff).rom(); // program ROM (1 meg)
 // inputs/eeprom
 	map(0x03000000, 0x03000003).portr("INPUTS");
-	map(0x03000004, 0x03000007).rw(FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
+	map(0x03000004, 0x03000007).rw(this, FUNC(psikyosh_state::psh_eeprom_r), FUNC(psikyosh_state::psh_eeprom_w));
 // sound chip
 	map(0x03100000, 0x03100007).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 // video chip
@@ -526,8 +526,8 @@ void psikyosh_state::ps5_map(address_map &map)
 	map(0x04004000, 0x0400ffff).ram().share("bgram"); // video banks 7-0x1f (backgrounds and other effects)
 	map(0x04040000, 0x04044fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x04050000, 0x040501ff).ram().share("zoomram"); // sprite zoom lookup table
-	map(0x0405ffdc, 0x0405ffdf).nopr().w(FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
-	map(0x0405ffe0, 0x0405ffff).ram().w(FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); // video registers
+	map(0x0405ffdc, 0x0405ffdf).nopr().w(this, FUNC(psikyosh_state::psikyosh_irqctrl_w)); // also writes to this address - might be vblank reads?
+	map(0x0405ffe0, 0x0405ffff).ram().w(this, FUNC(psikyosh_state::psikyosh_vidregs_w)).share("vidregs"); // video registers
 	map(0x04060000, 0x0407ffff).bankr("gfxbank"); // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	map(0x05000000, 0x0507ffff).rom().region("maincpu", 0x100000); // data ROM
@@ -777,54 +777,63 @@ void psikyosh_state::machine_start()
 }
 
 
-void psikyosh_state::psikyo3v1(machine_config &config)
-{
+MACHINE_CONFIG_START(psikyosh_state::psikyo3v1)
+
 	/* basic machine hardware */
-	SH2(config, m_maincpu, MASTER_CLOCK/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps3v1_map);
-	m_maincpu->set_vblank_int("screen", FUNC(psikyosh_state::psikyosh_interrupt));
+	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(ps3v1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", psikyosh_state,  psikyosh_interrupt)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
-	EEPROM_93C56_8BIT(config, m_eeprom).default_value(0);
+	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
 
 	/* video hardware */
-	BUFFERED_SPRITERAM32(config, m_spriteram); /* If using alpha */
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32) /* If using alpha */
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0, 40*8-1, 0, 28*8-1);
-	m_screen->set_screen_update(FUNC(psikyosh_state::screen_update_psikyosh));
-	m_screen->screen_vblank().set("spriteram", FUNC(buffered_spriteram32_device::vblank_copy_rising));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(psikyosh_state, screen_update_psikyosh)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram32_device, vblank_copy_rising))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyosh);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_888, 0x5000 / 4);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_psikyosh)
+	MCFG_PALETTE_ADD("palette", 0x5000/4)
+	MCFG_PALETTE_FORMAT(RGBX)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ymf278b_device &ymf(YMF278B(config, "ymf", MASTER_CLOCK/2));
-	ymf.irq_handler().set_inputline("maincpu", 12);
-	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
+	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void psikyosh_state::psikyo5(machine_config &config)
-{
-	psikyo3v1(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps5_map);
-}
-
-void psikyosh_state::psikyo5_240(machine_config &config)
-{
+MACHINE_CONFIG_START(psikyosh_state::psikyo5)
 	psikyo3v1(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &psikyosh_state::ps5_map);
+	/* basic machine hardware */
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ps5_map)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(psikyosh_state::psikyo5_240)
+	psikyo3v1(config);
+
+	/* basic machine hardware */
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ps5_map)
 
 	/* Measured Hsync 16.165 KHz, Vsync 61.68 Hz */
 	/* Ideally this would be driven off the video register. However, it doesn't changeat runtime and MAME will pick a better screen resolution if it knows upfront */
-	m_screen->set_raw(MASTER_CLOCK/8, 443, 0, 40*8, 262, 0, 30*8);
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 443, 0, 40*8, 262, 0, 30*8)
+MACHINE_CONFIG_END
 
 
 /* PS3 */

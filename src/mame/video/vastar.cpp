@@ -2,7 +2,7 @@
 // copyright-holders:Allard van der Bas
 /***************************************************************************
 
-  vastar.cpp
+  vastar.c
 
   Functions to emulate the video hardware of the machine.
 

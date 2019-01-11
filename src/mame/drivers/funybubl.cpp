@@ -58,47 +58,48 @@ Note: SW2, SW3 & SW4 not populated
 #include "speaker.h"
 
 
-WRITE8_MEMBER(funybubl_state::vidram_bank_w)
+WRITE8_MEMBER(funybubl_state::funybubl_vidram_bank_w)
 {
-	m_vrambank->set_bank(data & 1);
+	membank("bank1")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(funybubl_state::cpurombank_w)
+WRITE8_MEMBER(funybubl_state::funybubl_cpurombank_w)
 {
-	m_mainbank->set_entry(data & 0x3f);   // should we add a check that (data&0x3f) < #banks?
+	membank("bank2")->set_entry(data & 0x3f);   // should we add a check that (data&0x3f) < #banks?
 }
 
-WRITE8_MEMBER(funybubl_state::oki_bank_w)
+
+WRITE8_MEMBER(funybubl_state::funybubl_soundcommand_w)
 {
-	m_okibank->set_entry(data & 1);
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
+WRITE8_MEMBER(funybubl_state::funybubl_oki_bank_sw)
+{
+	m_oki->set_rom_bank(data & 1);
 }
 
 
 void funybubl_state::funybubl_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank"); // banked port 1?
-	map(0xc400, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // palette
-	map(0xd000, 0xdfff).m(m_vrambank, FUNC(address_map_bank_device::amap8)); // banked port 0?
+	map(0x8000, 0xbfff).bankr("bank2"); // banked port 1?
+	map(0xc400, 0xcfff).ram().w(this, FUNC(funybubl_state::funybubl_paldatawrite)).share("paletteram"); // palette
+	map(0xd000, 0xdfff).bankrw("bank1"); // banked port 0?
 	map(0xe000, 0xffff).ram();
 }
 
 void funybubl_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("SYSTEM").w(FUNC(funybubl_state::vidram_bank_w));    // vidram bank
-	map(0x01, 0x01).portr("P1").w(FUNC(funybubl_state::cpurombank_w));     // rom bank?
+	map(0x00, 0x00).portr("SYSTEM").w(this, FUNC(funybubl_state::funybubl_vidram_bank_w));    // vidram bank
+	map(0x01, 0x01).portr("P1").w(this, FUNC(funybubl_state::funybubl_cpurombank_w));     // rom bank?
 	map(0x02, 0x02).portr("P2");
-	map(0x03, 0x03).portr("DSW").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x03, 0x03).portr("DSW").w(this, FUNC(funybubl_state::funybubl_soundcommand_w));
 	map(0x06, 0x06).nopr();     /* Nothing is done with the data read */
 	map(0x06, 0x06).nopw();        /* Written directly after IO port 0 */
 	map(0x07, 0x07).nopw();        /* Reset something on startup - Sound CPU ?? */
-}
-
-void funybubl_state::vrambank_map(address_map &map)
-{
-	map(0x0000, 0x0fff).ram().w(FUNC(funybubl_state::tilemap_w)).share("tilemapram");
-	map(0x1000, 0x1fff).ram().share("spriteram");
 }
 
 /* Sound CPU */
@@ -107,16 +108,11 @@ void funybubl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(FUNC(funybubl_state::oki_bank_w));
+	map(0x9000, 0x9000).w(this, FUNC(funybubl_state::funybubl_oki_bank_sw));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void funybubl_state::oki_map(address_map &map)
-{
-	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x3ffff).bankr("okibank");
-}
 
 
 static INPUT_PORTS_START( funybubl )
@@ -178,42 +174,48 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout layout_8x8x8 =
+static const gfx_layout tiles16x16x8_1_layout =
 {
 	8,8,
 	RGN_FRAC(1,8),
 	8,
-	{ RGN_FRAC(3,8), RGN_FRAC(2,8), RGN_FRAC(1,8), RGN_FRAC(0,8), RGN_FRAC(7,8), RGN_FRAC(6,8), RGN_FRAC(5,8), RGN_FRAC(4,8) },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
+	{ RGN_FRAC(3,8),RGN_FRAC(2,8),RGN_FRAC(1,8),RGN_FRAC(0,8),RGN_FRAC(7,8),RGN_FRAC(6,8),RGN_FRAC(5,8), RGN_FRAC(4,8) },
+	{ 0, 1, 2,  3,  4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
 
-static const gfx_layout layout_16x16x8 =
+static const gfx_layout tiles16x16x8_2_layout =
 {
 	16,16,
 	RGN_FRAC(1,4),
 	8,
 	{ RGN_FRAC(3,4)+4,RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+4, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+4, RGN_FRAC(1,4)+0, RGN_FRAC(0,4)+4, RGN_FRAC(0,4)+0  },
-	{ STEP4(0,1), STEP4(4*2,1), STEP4(16*4*2*2,1), STEP4(16*4*2*2+4*2,1) },
-	{ STEP16(0,4*2*2) },
+	{ 0, 1,2,3, 8,9,10,11, 256,257,258,259, 264,265,266,267},
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+		8*16, 9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
 	32*16
 };
 
 
 static GFXDECODE_START( gfx_funybubl )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,   0x100, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x000, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x8_1_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x8_2_layout, 0, 16 )
 GFXDECODE_END
 
 
 
 void funybubl_state::machine_start()
 {
-	m_mainbank->configure_entries(0, 0x10, memregion("maincpu")->base(), 0x4000);
-	m_okibank->configure_entries(0, 2, memregion("oki")->base() + 0x20000, 0x20000);
+	uint8_t *ROM = memregion("maincpu")->base();
 
-	m_vrambank->set_bank(0);
+
+	save_item(NAME(m_banked_vram));
+
+	membank("bank1")->configure_entries(0, 2, &m_banked_vram[0x0000], 0x1000);
+	membank("bank2")->configure_entries(0, 0x10, ROM, 0x4000);
+
+	membank("bank1")->set_entry(0);
 }
 
 
@@ -228,7 +230,6 @@ MACHINE_CONFIG_START(funybubl_state::funybubl)
 	MCFG_DEVICE_ADD("audiocpu", Z80,8000000/2)      /* 4 MHz?? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
-	ADDRESS_MAP_BANK(config, m_vrambank).set_map(&funybubl_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 13, 0x1000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -237,20 +238,19 @@ MACHINE_CONFIG_START(funybubl_state::funybubl)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, 512-12*8-1, 16, 256-16-1)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(funybubl_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_UPDATE_DRIVER(funybubl_state, screen_update_funybubl)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_funybubl);
-	PALETTE(config, m_palette).set_format(4, &funybubl_state::funybubl_R6B6G6, 0xc00/4);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funybubl)
+	MCFG_PALETTE_ADD("palette", 0x400)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -281,7 +281,9 @@ ROM_START( funybubl )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "b.su12", 0x00000,  0x20000, CRC(a2d780f4) SHA1(bebba3db21ab9ddde8c6f19db3b67c869df582eb) ) /* Same as below, different label */
-	ROM_LOAD( "c.su13", 0x20000,  0x40000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) ) /* Same as below, different label */
+	ROM_RELOAD(         0x40000,  0x20000 )
+	ROM_LOAD( "c.su13", 0x20000,  0x20000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) ) /* Same as below, different label */
+	ROM_CONTINUE(       0x60000,  0x20000 )
 ROM_END
 
 ROM_START( funybublc )
@@ -309,7 +311,9 @@ ROM_START( funybublc )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "3.su12", 0x00000,  0x20000, CRC(a2d780f4) SHA1(bebba3db21ab9ddde8c6f19db3b67c869df582eb) )
-	ROM_LOAD( "4.su13", 0x20000,  0x40000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) )
+	ROM_RELOAD(         0x40000,  0x20000 )
+	ROM_LOAD( "4.su13", 0x20000,  0x20000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) )
+	ROM_CONTINUE(       0x60000,  0x20000 )
 ROM_END
 
 

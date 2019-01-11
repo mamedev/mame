@@ -17,11 +17,12 @@
  *
  *************************************/
 
-void dribling_state::dribling_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(dribling_state, dribling)
 {
-	uint8_t const *const prom = memregion("proms")->base() + 0x400;
+	const uint8_t *prom = memregion("proms")->base() + 0x400;
+	int i;
 
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 	{
 		int r = (~prom[i] >> 0) & 1;    // 220
 		int g = (~prom[i] >> 1) & 3;    // 820 + 560 (332 max)
@@ -31,7 +32,7 @@ void dribling_state::dribling_palette(palette_device &palette) const
 		g *= 0x55;
 		b *= 0xff;
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(r,g,b));
 	}
 }
 

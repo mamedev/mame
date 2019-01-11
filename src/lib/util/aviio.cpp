@@ -284,6 +284,7 @@ public:
 		, m_width(0)
 		, m_height(0)
 		, m_depth(0)
+		, m_interlace(0)
 		, m_huffyuv()
 		, m_channels(0)
 		, m_samplebits(0)
@@ -395,6 +396,7 @@ private:
 	std::uint32_t       m_width;                /* width of video */
 	std::uint32_t       m_height;               /* height of video */
 	std::uint32_t       m_depth;                /* depth of video */
+	std::uint8_t        m_interlace;            /* interlace parameters */
 	std::unique_ptr<huffyuv_data const> m_huffyuv; /* huffyuv decompression data */
 
 	std::uint16_t       m_channels;             /* audio channels */

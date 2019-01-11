@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "cpu/e0c6200/e0c6s46.h"
 #include "sound/spkrdev.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -28,17 +27,17 @@ public:
 		m_out_x(*this, "%u.%u", 0U, 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 	void tama(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
-
-private:
+protected:
 	DECLARE_WRITE8_MEMBER(speaker_w);
-	void tama_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(tama);
 	E0C6S46_PIXEL_UPDATE(pixel_update);
 
 	virtual void machine_start() override;
 
+private:
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	output_finder<16, 40> m_out_x;
@@ -82,7 +81,7 @@ E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 	m_out_x[y][x] = state;
 }
 
-void tamag1_state::tama_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(tamag1_state, tama)
 {
 	palette.set_pen_color(0, rgb_t(0xf1, 0xf0, 0xf9)); // background
 	palette.set_pen_color(1, rgb_t(0x3c, 0x38, 0x38)); // lcd pixel
@@ -135,29 +134,31 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void tamag1_state::tama(machine_config &config)
-{
+MACHINE_CONFIG_START(tamag1_state::tama)
+
 	/* basic machine hardware */
-	E0C6S46(config, m_maincpu, 32.768_kHz_XTAL);
-	m_maincpu->set_pixel_update_cb(FUNC(tamag1_state::pixel_update));
-	m_maincpu->write_r<4>().set(FUNC(tamag1_state::speaker_w));
+	MCFG_DEVICE_ADD("maincpu", E0C6S46, 32.768_kHz_XTAL)
+	MCFG_E0C6S46_PIXEL_UPDATE_CB(tamag1_state, pixel_update)
+	MCFG_E0C6S46_WRITE_R_CB(4, WRITE8(*this, tamag1_state, speaker_w))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(32.768_kHz_XTAL/1024);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40, 16);
-	screen.set_visarea(0, 32-1, 0, 16-1);
-	screen.set_screen_update("maincpu", FUNC(e0c6s46_device::screen_update));
-	screen.set_palette("palette");
-	config.set_default_layout(layout_tama);
+	MCFG_SCREEN_ADD("screen", LCD)
+	MCFG_SCREEN_REFRESH_RATE(32.768_kHz_XTAL/1024)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(40, 16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32-1, 0, 16-1)
+	MCFG_DEFAULT_LAYOUT(layout_tama)
+	MCFG_SCREEN_UPDATE_DEVICE("maincpu", e0c6s46_device, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(tamag1_state::tama_palette), 2);
+	MCFG_PALETTE_ADD("palette", 2)
+	MCFG_PALETTE_INIT_OWNER(tamag1_state, tama)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 

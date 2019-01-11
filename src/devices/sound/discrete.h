@@ -4252,6 +4252,13 @@ public:
 };
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_DISCRETE_INTF(_intf) \
+		downcast<discrete_device &>(*device).set_intf(_intf);
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -4273,14 +4280,14 @@ public:
 	// inline configuration helpers
 	void set_intf(const discrete_block *intf) { m_intf = intf; }
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 	virtual ~discrete_device(void);
 
 	template<int DiscreteInput>
 	DECLARE_WRITE_LINE_MEMBER(write_line)
 	{
-		write(DiscreteInput, state ? 1 : 0);
+		write(machine().dummy_space(), DiscreteInput, state ? 1 : 0);
 	}
 
 	/* --------------------------------- */

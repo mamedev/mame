@@ -27,9 +27,10 @@ typedef void (*output_notifier_func)(const char *outname, s32 value, void *param
 
 class output_manager
 {
-private:
-	template <typename Input, std::make_unsigned_t<Input> DefaultMask> friend class devcb_write;
+	friend class devcb_base;
+	friend class devcb_write_base;
 
+private:
 	class output_notify
 	{
 	public:

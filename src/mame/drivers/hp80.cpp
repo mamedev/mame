@@ -8,7 +8,6 @@
 // This is WIP: lot of things still missing
 
 #include "emu.h"
-#include "emupal.h"
 #include "screen.h"
 #include "cpu/capricorn/capricorn.h"
 #include "speaker.h"
@@ -127,9 +126,6 @@ class hp85_state : public driver_device
 public:
 	hp85_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	void hp85(machine_config &config);
-
-private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -169,9 +165,10 @@ private:
 	DECLARE_WRITE8_MEMBER(irl_w);
 	DECLARE_WRITE8_MEMBER(halt_w);
 
+	void hp85(machine_config &config);
 	void cpu_mem_map(address_map &map);
 	void rombank_mem_map(address_map &map);
-
+protected:
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -1308,20 +1305,20 @@ void hp85_state::cpu_mem_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).m(m_rombank, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0xbfff).ram();
-	map(0xff00, 0xff00).w(FUNC(hp85_state::ginten_w));
-	map(0xff01, 0xff01).w(FUNC(hp85_state::gintdis_w));
-	map(0xff02, 0xff02).rw(FUNC(hp85_state::keysts_r), FUNC(hp85_state::keysts_w));
-	map(0xff03, 0xff03).rw(FUNC(hp85_state::keycod_r), FUNC(hp85_state::keycod_w));
-	map(0xff04, 0xff07).rw(FUNC(hp85_state::crtc_r), FUNC(hp85_state::crtc_w));
+	map(0xff00, 0xff00).w(this, FUNC(hp85_state::ginten_w));
+	map(0xff01, 0xff01).w(this, FUNC(hp85_state::gintdis_w));
+	map(0xff02, 0xff02).rw(this, FUNC(hp85_state::keysts_r), FUNC(hp85_state::keysts_w));
+	map(0xff03, 0xff03).rw(this, FUNC(hp85_state::keycod_r), FUNC(hp85_state::keycod_w));
+	map(0xff04, 0xff07).rw(this, FUNC(hp85_state::crtc_r), FUNC(hp85_state::crtc_w));
 	map(0xff08, 0xff09).rw("tape", FUNC(hp_1ma6_device::reg_r), FUNC(hp_1ma6_device::reg_w));
-	map(0xff0a, 0xff0a).rw(FUNC(hp85_state::clksts_r), FUNC(hp85_state::clksts_w));
-	map(0xff0b, 0xff0b).rw(FUNC(hp85_state::clkdat_r), FUNC(hp85_state::clkdat_w));
-	map(0xff0c, 0xff0c).w(FUNC(hp85_state::prtlen_w));
-	map(0xff0d, 0xff0d).rw(FUNC(hp85_state::prchar_r), FUNC(hp85_state::prchar_w));
-	map(0xff0e, 0xff0e).rw(FUNC(hp85_state::prtsts_r), FUNC(hp85_state::prtctl_w));
-	map(0xff0f, 0xff0f).w(FUNC(hp85_state::prtdat_w));
-	map(0xff18, 0xff18).w(FUNC(hp85_state::rselec_w));
-	map(0xff40, 0xff40).rw(FUNC(hp85_state::intrsc_r), FUNC(hp85_state::intrsc_w));
+	map(0xff0a, 0xff0a).rw(this, FUNC(hp85_state::clksts_r), FUNC(hp85_state::clksts_w));
+	map(0xff0b, 0xff0b).rw(this, FUNC(hp85_state::clkdat_r), FUNC(hp85_state::clkdat_w));
+	map(0xff0c, 0xff0c).w(this, FUNC(hp85_state::prtlen_w));
+	map(0xff0d, 0xff0d).rw(this, FUNC(hp85_state::prchar_r), FUNC(hp85_state::prchar_w));
+	map(0xff0e, 0xff0e).rw(this, FUNC(hp85_state::prtsts_r), FUNC(hp85_state::prtctl_w));
+	map(0xff0f, 0xff0f).w(this, FUNC(hp85_state::prtdat_w));
+	map(0xff18, 0xff18).w(this, FUNC(hp85_state::rselec_w));
+	map(0xff40, 0xff40).rw(this, FUNC(hp85_state::intrsc_r), FUNC(hp85_state::intrsc_w));
 }
 
 void hp85_state::rombank_mem_map(address_map &map)
@@ -1336,13 +1333,18 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
 
-	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp85_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
+	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(rombank_mem_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(HP80_OPTROM_SIZE)
 
 	MCFG_SCREEN_ADD("screen" , RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
 	MCFG_SCREEN_UPDATE_DRIVER(hp85_state , screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp85_state, vblank_w))
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_TIMER_DRIVER_ADD("vm_timer", hp85_state, vm_timer)
 
 	// No idea at all about the actual keyboard scan frequency

@@ -14,6 +14,10 @@
 
 DECLARE_DEVICE_TYPE(CEDAR_MAGNET_SPRITE, cedar_magnet_sprite_device)
 
+#define MCFG_CEDAR_MAGNET_SPRITE_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, CEDAR_MAGNET_SPRITE, 0)
+
+
 class cedar_magnet_sprite_device : public device_t, public cedar_magnet_board_interface
 {
 public:

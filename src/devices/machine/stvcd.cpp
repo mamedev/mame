@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, R. Belmont
 /***************************************************************************
 
-  machine/stvcd.cpp - Sega Saturn and ST-V CD-ROM handling
+  machine/stvcd.c - Sega Saturn and ST-V CD-ROM handling
 
   Another tilt at the windmill in 2011 by R. Belmont.
 
@@ -70,7 +70,6 @@ DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE"
 
 stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
 	, m_cdrom_image(*this, "cdrom")
 	, m_sector_timer(*this, "sector_timer")
 	, m_sh1_timer(*this, "sh1_cmd")
@@ -86,12 +85,18 @@ MACHINE_CONFIG_START(stvcd_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stvcd_device, stv_sh1_sim)
 
 	MCFG_DEVICE_ADD("cdda", CDDA)
-	MCFG_MIXER_ROUTE(0, *this, 1.0, 0)
-	MCFG_MIXER_ROUTE(1, *this, 1.0, 1)
+	// FIXME: these outputs should not be hardcoded
+	MCFG_SOUND_ROUTE(0, ":lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, ":rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 void stvcd_device::device_start()
 {
+}
+
+READ16_MEMBER(stvcd_device::channel_volume_r)
+{
+	return m_cdda->get_channel_volume(offset);
 }
 
 int stvcd_device::get_timing_command(void)

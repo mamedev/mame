@@ -20,6 +20,16 @@
 
 #include "device.h"
 
+/*************************************
+ *
+ *  Device configuration macros
+ *
+ *************************************/
+
+/* Set the read and write group (4-bit; nibble) delegates */
+#define MCFG_R10696_IO(_devcb_rd,_devcb_wr) \
+	downcast<r10696_device &>(*device).set_iord(DEVCB_##_devcb_rd); \
+	downcast<r10696_device &>(*device).set_iowr(DEVCB_##_devcb_wr);
 
 class r10696_device : public device_t
 {
@@ -29,9 +39,8 @@ public:
 	DECLARE_READ8_MEMBER ( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 
-	/* Set the read and write group (4-bit; nibble) delegates */
-	auto iord_cb() { return m_iord.bind(); }
-	auto iowr_cb() { return m_iowr.bind(); }
+	template <class Object> devcb_base &set_iord(Object &&cb) { return m_iord.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_iowr(Object &&cb) { return m_iowr.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

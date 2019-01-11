@@ -123,12 +123,12 @@ void ksayakyu_state::maincpu_map(address_map &map)
 	map(0xa801, 0xa801).portr("P2");
 	map(0xa802, 0xa802).portr("DSW");
 	map(0xa803, 0xa803).nopr(); /* watchdog ? */
-	map(0xa804, 0xa804).w(FUNC(ksayakyu_state::ksayakyu_videoctrl_w));
-	map(0xa805, 0xa805).w(FUNC(ksayakyu_state::latch_w));
-	map(0xa806, 0xa806).r(FUNC(ksayakyu_state::sound_status_r));
-	map(0xa807, 0xa807).r(FUNC(ksayakyu_state::int_ack_r));
-	map(0xa808, 0xa808).w(FUNC(ksayakyu_state::bank_select_w));
-	map(0xb000, 0xb7ff).ram().w(FUNC(ksayakyu_state::ksayakyu_videoram_w)).share("videoram");
+	map(0xa804, 0xa804).w(this, FUNC(ksayakyu_state::ksayakyu_videoctrl_w));
+	map(0xa805, 0xa805).w(this, FUNC(ksayakyu_state::latch_w));
+	map(0xa806, 0xa806).r(this, FUNC(ksayakyu_state::sound_status_r));
+	map(0xa807, 0xa807).r(this, FUNC(ksayakyu_state::int_ack_r));
+	map(0xa808, 0xa808).w(this, FUNC(ksayakyu_state::bank_select_w));
+	map(0xb000, 0xb7ff).ram().w(this, FUNC(ksayakyu_state::ksayakyu_videoram_w)).share("videoram");
 	map(0xb800, 0xbfff).ram().share("spriteram");
 }
 
@@ -139,8 +139,8 @@ void ksayakyu_state::soundcpu_map(address_map &map)
 	map(0xa001, 0xa001).r("ay1", FUNC(ay8910_device::data_r));
 	map(0xa002, 0xa003).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0xa006, 0xa007).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0xa008, 0xa008).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0xa00c, 0xa00c).w(FUNC(ksayakyu_state::tomaincpu_w));
+	map(0xa008, 0xa008).w("dac", FUNC(dac_byte_interface::write));
+	map(0xa00c, 0xa00c).w(this, FUNC(ksayakyu_state::tomaincpu_w));
 	map(0xa010, 0xa010).nopw(); //a timer of some sort?
 }
 
@@ -278,26 +278,27 @@ MACHINE_CONFIG_START(ksayakyu_state::ksayakyu)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ksayakyu_state, screen_update_ksayakyu)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 0))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ksayakyu);
-	PALETTE(config, m_palette, FUNC(ksayakyu_state::ksayakyu_palette), 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ksayakyu)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(ksayakyu_state, ksayakyu)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ay8910_device &ay1(AY8910(config, "ay1", MAIN_CLOCK/16)); //unknown clock
-	ay1.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	ay1.port_b_write_callback().set(FUNC(ksayakyu_state::dummy1_w));
-	ay1.add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/16) //unknown clock
+	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy1_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	ay8910_device &ay2(AY8910(config, "ay2", MAIN_CLOCK/16)); //unknown clock
-	ay2.port_a_write_callback().set(FUNC(ksayakyu_state::dummy2_w));
-	ay2.port_b_write_callback().set(FUNC(ksayakyu_state::dummy3_w));
-	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/16) //unknown clock
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ksayakyu_state, dummy3_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

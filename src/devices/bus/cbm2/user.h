@@ -31,6 +31,37 @@
 
 
 //**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+#define CBM2_USER_PORT_TAG       "user"
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CBM2_USER_PORT_ADD(_tag, _slot_intf, _def_slot) \
+	MCFG_DEVICE_ADD(_tag, CBM2_USER_PORT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
+
+
+#define MCFG_CBM2_USER_PORT_IRQ_CALLBACK(_write) \
+	devcb = &downcast<cbm2_user_port_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+
+#define MCFG_CBM2_USER_PORT_SP_CALLBACK(_write) \
+	devcb = &downcast<cbm2_user_port_device &>(*device).set_sp_wr_callback(DEVCB_##_write);
+
+#define MCFG_CBM2_USER_PORT_CNT_CALLBACK(_write) \
+	devcb = &downcast<cbm2_user_port_device &>(*device).set_cnt_wr_callback(DEVCB_##_write);
+
+#define MCFG_CBM2_USER_PORT_FLAG_CALLBACK(_write) \
+	devcb = &downcast<cbm2_user_port_device &>(*device).set_flag_wr_callback(DEVCB_##_write);
+
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -72,21 +103,12 @@ class cbm2_user_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	template <typename T>
-	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: cbm2_user_port_device(mconfig, tag, owner, 0)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
-	}
 	cbm2_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto irq_callback() { return m_write_irq.bind(); }
-	auto sp_callback() { return m_write_sp.bind(); }
-	auto cnt_callback() { return m_write_cnt.bind(); }
-	auto flag_callback() { return m_write_flag.bind(); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_sp_wr_callback(Object &&cb) { return m_write_sp.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cnt_wr_callback(Object &&cb) { return m_write_cnt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_flag_wr_callback(Object &&cb) { return m_write_flag.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	DECLARE_READ8_MEMBER( d1_r ) { uint8_t data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d1_r(space, offset); return data; }

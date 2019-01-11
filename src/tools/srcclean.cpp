@@ -88,8 +88,6 @@ public:
 		VMS
 	};
 
-	virtual ~cleaner_base() = default;
-
 	template <typename InputIt>
 	void process(InputIt begin, InputIt end);
 	void finalise();
@@ -1790,8 +1788,7 @@ bool is_xml_extension(char const *ext)
 	return
 			!core_stricmp(ext, ".hsi") ||
 			!core_stricmp(ext, ".lay") ||
-			!core_stricmp(ext, ".xml") ||
-			!core_stricmp(ext, ".xslt");
+			!core_stricmp(ext, ".xml");
 }
 
 } // anonymous namespace

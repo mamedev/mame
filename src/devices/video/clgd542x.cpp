@@ -33,7 +33,7 @@
 
 #define IBM8514_LINE_LENGTH (m_vga->offset())
 
-#define VGA_CH_WIDTH ((vga.sequencer.data[1]&1)?8:9)
+#define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
 
 #define TEXT_COLUMNS (vga.crtc.horz_disp_end+1)
 #define TEXT_START_ADDRESS (vga.crtc.start_addr<<3)

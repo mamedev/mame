@@ -85,7 +85,7 @@ ToDo / Notes
 
 Z80 + Sound Bits
 
-Priorities (code in tetrisp2.cpp doesn't use all of the priority ram.. and doesn't work here)
+Priorities (code in tetrisp2.c doesn't use all of the priority ram.. and doesn't work here)
  - some games require completely reversed list processing!
 
 Dip switches/inputs in t2m32 and f1superb
@@ -403,7 +403,7 @@ Notes from Charles MacDonald
  Rotate RAM
  ----------------------------------------------------------------------------
 
- Rotate RAM is 64K, occupying D15-D0 of each word. It is mirrored every
+ Rotate RAM is 64K, occuping D15-D0 of each word. It is mirrored every
  64K-words (128K bytes) in memory.
 
  Remaining data bits return $00FFxxxx or $0000xxxx randomly.
@@ -412,7 +412,7 @@ Notes from Charles MacDonald
  Object RAM
  ----------------------------------------------------------------------------
 
- Object RAM is 128K, occupying D15-D0 of each word. It is mirrored every
+ Object RAM is 128K, occuping D15-D0 of each word. It is mirrored every
  128K-words (256K bytes) in memory.
 
  Remaining data bits return $FFFFxxxx.
@@ -647,41 +647,41 @@ WRITE32_MEMBER(ms32_state::coin_counter_w)
 void ms32_state::ms32_map(address_map &map)
 {
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-	map(0xc0000000, 0xc0007fff).rw(FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);  // nvram is 8-bit wide, 0x2000 in size */
+	map(0xc0000000, 0xc0007fff).rw(this, FUNC(ms32_state::ms32_nvram_r8), FUNC(ms32_state::ms32_nvram_w8)).umask32(0x000000ff).mirror(0x3c1f8000);  // nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
-	map(0xc1180000, 0xc1187fff).rw(FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000).share("priram"); /* priram is 8-bit wide, 0x2000 in size */
+	map(0xc1180000, 0xc1187fff).rw(this, FUNC(ms32_state::ms32_priram_r8), FUNC(ms32_state::ms32_priram_w8)).umask32(0x000000ff).mirror(0x3c038000).share("priram"); /* priram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
-	map(0xc1400000, 0xc143ffff).rw(FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("palram"); /* palram is 16-bit wide, 0x20000 in size */
+	map(0xc1400000, 0xc143ffff).rw(this, FUNC(ms32_state::ms32_palram_r16), FUNC(ms32_state::ms32_palram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("palram"); /* palram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
-	map(0xc2000000, 0xc201ffff).rw(FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("rozram"); /* rozram is 16-bit wide, 0x10000 in size */
+	map(0xc2000000, 0xc201ffff).rw(this, FUNC(ms32_state::ms32_rozram_r16), FUNC(ms32_state::ms32_rozram_w16)).umask32(0x0000ffff).mirror(0x3c1e0000).share("rozram"); /* rozram is 16-bit wide, 0x10000 in size */
 /*  AM_RANGE(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
-	map(0xc2200000, 0xc2201fff).rw(FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000).share("lineram"); /* lineram is 16-bit wide, 0x1000 in size */
+	map(0xc2200000, 0xc2201fff).rw(this, FUNC(ms32_state::ms32_lineram_r16), FUNC(ms32_state::ms32_lineram_w16)).umask32(0x0000ffff).mirror(0x3c1fe000).share("lineram"); /* lineram is 16-bit wide, 0x1000 in size */
 /*  AM_RANGE(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
-	map(0xc2800000, 0xc283ffff).rw(FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("sprram"); /* spriteram is 16-bit wide, 0x20000 in size */
+	map(0xc2800000, 0xc283ffff).rw(this, FUNC(ms32_state::ms32_sprram_r16), FUNC(ms32_state::ms32_sprram_w16)).umask32(0x0000ffff).mirror(0x3c1c0000).share("sprram"); /* spriteram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
-	map(0xc2c00000, 0xc2c07fff).rw(FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram"); /* txram is 16-bit wide, 0x4000 in size */
-	map(0xc2c08000, 0xc2c0ffff).rw(FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("bgram"); /* bgram is 16-bit wide, 0x4000 in size */
+	map(0xc2c00000, 0xc2c07fff).rw(this, FUNC(ms32_state::ms32_txram_r16), FUNC(ms32_state::ms32_txram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("txram"); /* txram is 16-bit wide, 0x4000 in size */
+	map(0xc2c08000, 0xc2c0ffff).rw(this, FUNC(ms32_state::ms32_bgram_r16), FUNC(ms32_state::ms32_bgram_w16)).umask32(0x0000ffff).mirror(0x3c1f0000).share("bgram"); /* bgram is 16-bit wide, 0x4000 in size */
 /*  AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
 	map(0xc2e00000, 0xc2e1ffff).ram().share("mainram").mirror(0x3c0e0000); /* mainram is 32-bit wide, 0x20000 in size */
 	map(0xc3e00000, 0xc3ffffff).rom().region("maincpu", 0).mirror(0x3c000000); // ROM is 32-bit wide, 0x200000 in size */
 
 	/* todo: clean up the mapping of these */
 	map(0xfc800000, 0xfc800003).nopr(); /* sound? */
-	map(0xfc800000, 0xfc800003).w(FUNC(ms32_state::ms32_sound_w)); /* sound? */
+	map(0xfc800000, 0xfc800003).w(this, FUNC(ms32_state::ms32_sound_w)); /* sound? */
 	map(0xfcc00004, 0xfcc00007).portr("INPUTS");
 	map(0xfcc00010, 0xfcc00013).portr("DSW");
 	map(0xfce00034, 0xfce00037).nopw(); // irq ack?
-	map(0xfce00038, 0xfce0003b).w(FUNC(ms32_state::reset_sub_w));
+	map(0xfce00038, 0xfce0003b).w(this, FUNC(ms32_state::reset_sub_w));
 	map(0xfce00050, 0xfce0005f).nopw();    // watchdog? I haven't investigated
 //  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_SHARE("ms32_fce00000") /* registers not ram? */
-	map(0xfce00000, 0xfce00003).w(FUNC(ms32_state::ms32_gfxctrl_w));   /* flip screen + other unknown bits */
-	map(0xfce00280, 0xfce0028f).w(FUNC(ms32_state::ms32_brightness_w));    // global brightness control
+	map(0xfce00000, 0xfce00003).w(this, FUNC(ms32_state::ms32_gfxctrl_w));   /* flip screen + other unknown bits */
+	map(0xfce00280, 0xfce0028f).w(this, FUNC(ms32_state::ms32_brightness_w));    // global brightness control
 /**/map(0xfce00600, 0xfce0065f).ram().share("roz_ctrl");        /* roz control registers */
 /**/map(0xfce00a00, 0xfce00a17).ram().share("tx_scroll");   /* tx layer scroll */
 /**/map(0xfce00a20, 0xfce00a37).ram().share("bg_scroll");   /* bg layer scroll */
-	map(0xfce00a7c, 0xfce00a7f).w(FUNC(ms32_state::pip_w));    // ??? layer related? seems to be always 0
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::coin_counter_w)); //   coin counters + something else
-	map(0xfd000000, 0xfd000003).r(FUNC(ms32_state::ms32_sound_r));
+	map(0xfce00a7c, 0xfce00a7f).w(this, FUNC(ms32_state::pip_w));    // ??? layer related? seems to be always 0
+	map(0xfce00e00, 0xfce00e03).w(this, FUNC(ms32_state::coin_counter_w)); //   coin counters + something else
+	map(0xfd000000, 0xfd000003).r(this, FUNC(ms32_state::ms32_sound_r));
 	map(0xfd1c0000, 0xfd1c0003).writeonly().share("mahjong_select");
 }
 
@@ -715,7 +715,7 @@ void ms32_state::f1superb_map(address_map &map)
 	ms32_map(map);
 
 	map(0xfd0d0000, 0xfd0d0003).portr("DSW2"); // MB-93159
-	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_state::ms32_read_inputs3)).nopw(); // writes 7-led seg at very least
+	map(0xfd0e0000, 0xfd0e0003).r(this, FUNC(ms32_state::ms32_read_inputs3)).nopw(); // writes 7-led seg at very least
 
 	map(0xfce00004, 0xfce00023).ram(); // regs?
 	map(0xfce00200, 0xfce0021f).ram(); // regs?
@@ -723,8 +723,8 @@ void ms32_state::f1superb_map(address_map &map)
 
 	/* these two are almost certainly wrong, they just let you see what
 	   happens if you generate the FPU ints without breaking other games */
-	map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_state::ms32_irq5_guess_w));
-	map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_state::ms32_irq2_guess_w));
+	map(0xfce00e00, 0xfce00e03).w(this, FUNC(ms32_state::ms32_irq5_guess_w));
+	map(0xfd0f0000, 0xfd0f0003).w(this, FUNC(ms32_state::ms32_irq2_guess_w));
 
 	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
 	map(0xfd104000, 0xfd105fff).ram(); // uploads data here
@@ -732,7 +732,7 @@ void ms32_state::f1superb_map(address_map &map)
 	map(0xfd140000, 0xfd143fff).ram(); // used when you start enabling fpu ints
 	map(0xfd144000, 0xfd145fff).ram(); // same data here
 
-	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_state::ms32_extra_r16), FUNC(ms32_state::ms32_extra_w16)).umask32(0x0000ffff).share("f1sb_extraram"); // definitely line ram
+	map(0xfdc00000, 0xfdc1ffff).rw(this, FUNC(ms32_state::ms32_extra_r16), FUNC(ms32_state::ms32_extra_w16)).umask32(0x0000ffff).share("f1sb_extraram"); // definitely line ram
 	map(0xfde00000, 0xfde1ffff).ram(); // scroll info for lineram?
 }
 
@@ -1676,12 +1676,12 @@ void ms32_state::ms32_sound_map(address_map &map)
 {
 	map(0x0000, 0x3eff).rom();
 	map(0x3f00, 0x3f0f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
-	map(0x3f10, 0x3f10).rw(FUNC(ms32_state::latch_r), FUNC(ms32_state::to_main_w));
+	map(0x3f10, 0x3f10).rw(this, FUNC(ms32_state::latch_r), FUNC(ms32_state::to_main_w));
 	map(0x3f20, 0x3f20).nopr(); /* 2nd latch ? */
 	map(0x3f20, 0x3f20).nopw(); /* to_main2_w  ? */
 	map(0x3f40, 0x3f40).nopw();   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
 	map(0x3f70, 0x3f70).nopw();   // watchdog? banking? very noisy
-	map(0x3f80, 0x3f80).w(FUNC(ms32_state::ms32_snd_bank_w));
+	map(0x3f80, 0x3f80).w(this, FUNC(ms32_state::ms32_snd_bank_w));
 	map(0x4000, 0x7fff).ram();
 	map(0x8000, 0xbfff).bankr("z80bank1");
 	map(0xc000, 0xffff).bankr("z80bank2");
@@ -1703,13 +1703,13 @@ void ms32_state::machine_reset()
 MACHINE_CONFIG_START(ms32_state::ms32)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // D70632GD-20 20MHz
+	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // 20MHz
 	MCFG_DEVICE_PROGRAM_MAP(ms32_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // Z0840008PSC, Clock from notes
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
 	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
@@ -1723,16 +1723,16 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ms32_state, screen_update_ms32)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ms32);
-	PALETTE(config, m_palette).set_entries(0x10000);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ms32)
+	MCFG_PALETTE_ADD("palette", 0x10000)
 
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("ymf", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1748,7 +1748,7 @@ MACHINE_CONFIG_START(ms32_state::f1superb)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(f1superb_map)
 
-	m_gfxdecode->set_info(gfx_f1superb);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1superb)
 
 	MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 MACHINE_CONFIG_END
@@ -2200,47 +2200,10 @@ ROM_START( hayaosi3 )
 	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
-	ROM_LOAD( "mb93138_32_ver1.0.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
+	ROM_LOAD( "mb93138_32_ver1.5.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "mb93138.21", 0x000000, 0x040000, CRC(008bc217) SHA1(eec66a86f285ccbc47eba17a4bb83cc1f8a5f425) )
-
-	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
-	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
-	ROM_LOAD( "mr94027.10",  0x200000, 0x200000, CRC(e7cabe41) SHA1(5d903baed690a98856f7581319cf4dbfe1db47bb) )
-
-	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
-	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
-ROM_END
-
-ROM_START( hayaosi3a )
-	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "mb93138_25_ver1.2.25", 0x000003, 0x80000, CRC(71b1f51b) SHA1(bd1c4f75c2949a998ce0f5acaf6def7e7069e40b) ) /* uses MB-93138A EB91022-20078-1 rom board */
-	ROM_LOAD32_BYTE( "mb93138_27_ver1.2.27", 0x000002, 0x80000, CRC(2657e8dc) SHA1(efeafe8c890d447ab4584fd7509538fc86fd555b) )
-	ROM_LOAD32_BYTE( "mb93138_29_ver1.2.29", 0x000001, 0x80000, CRC(8999b41b) SHA1(95b94112105bfa2b708bad44bbbdc33616ad2182) )
-	ROM_LOAD32_BYTE( "mb93138_31_ver1.2.31", 0x000000, 0x80000, CRC(f5d4ef54) SHA1(ed208cb6ed171acac312cb282b2fabc8af70610e) )
-
-	ROM_REGION( 0x1000000, "gfx1", 0 ) /* sprites */
-	ROM_LOAD32_WORD( "mr94027.01",  0x000000, 0x200000, CRC(c72e5c6e) SHA1(b98cd656c48c775953d00b5d8bafd4ffde76d8df) )
-	ROM_LOAD32_WORD( "mr94027.02",  0x000002, 0x200000, CRC(59976568) SHA1(a280c352d612913834c76b8e23d86c937fd21281) )
-	ROM_LOAD32_WORD( "mr94027.03",  0x400000, 0x200000, CRC(3ff68f4f) SHA1(1e367b92560c32c87e27fc0e99be3bdb5eb0510b) )
-	ROM_LOAD32_WORD( "mr94027.04",  0x400002, 0x200000, CRC(6a16d13a) SHA1(65a7751c248c966fd01149418ce6bedba7a0d48a) )
-	ROM_LOAD32_WORD( "mr94027.05",  0x800000, 0x200000, CRC(59545977) SHA1(2e0a83efd7ae210c0b4360e9572dd7eec38cd974) )
-	ROM_LOAD32_WORD( "mr94027.06",  0x800002, 0x200000, CRC(1618785a) SHA1(3f2698d07a52947429313a78ebcedfdae478efd7) )
-	ROM_LOAD32_WORD( "mr94027.07",  0xc00000, 0x200000, CRC(c66099c4) SHA1(5a6edffa39a98f38cc3cffbad9191fb2e794a812) )
-	ROM_LOAD32_WORD( "mr94027.08",  0xc00002, 0x200000, CRC(753b05e0) SHA1(0424e92b32a73c27ecb549e6e9449446ea938e40) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
-	ROM_LOAD( "mr94027.09",  0x000000, 0x200000, CRC(32ead437) SHA1(b94175cf186b4ebcc180a4c092d2ffcdd9ff3b1d) )
-
-	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
-	ROM_LOAD( "mr94027.11",  0x000000, 0x200000, CRC(b65d5096) SHA1(2c4e1e3e9f96be8369cb2de142a82f94506f85c0) )
-
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
-	ROM_LOAD( "mb93138_32_ver1.0.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
-
-	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "mb93138_21_ver1.0.21", 0x000000, 0x040000, CRC(008bc217) SHA1(eec66a86f285ccbc47eba17a4bb83cc1f8a5f425) )
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
@@ -2617,7 +2580,6 @@ void ms32_state::init_bnstars()
 
 GAME( 1994, hayaosi2,  0,        ms32, hayaosi2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, hayaosi3,  0,        ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, hayaosi3a, hayaosi3, ms32, hayaosi3, ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, bbbxing,   0,        ms32, bbbxing,  ms32_state, init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, suchie2,   0,        ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, suchie2o,  suchie2,  ms32, suchie2,  ms32_state, init_suchie2,    ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
@@ -2634,4 +2596,4 @@ GAME( 1997, bnstars,   bnstars1, ms32, suchie2,  ms32_state, init_bnstars,    RO
 GAME( 1996, wpksocv2,  0,        ms32, wpksocv2, ms32_state, init_ss92046_01, ROT0,   "Jaleco",         "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, f1superb, 0,        f1superb, f1superb, ms32_state, init_f1superb, ROT0,   "Jaleco",        "F1 Super Battle", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

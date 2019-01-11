@@ -1,87 +1,87 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_CONFIG_H_HEADER_GUARD
 #define BGFX_CONFIG_H_HEADER_GUARD
 
-#include <bx/bx.h>
+#include <bx/config.h>
 
 #ifndef BGFX_CONFIG_DEBUG
 #	define BGFX_CONFIG_DEBUG 0
 #endif // BGFX_CONFIG_DEBUG
 
-#if !defined(BGFX_CONFIG_RENDERER_DIRECT3D9)  \
- && !defined(BGFX_CONFIG_RENDERER_DIRECT3D11) \
- && !defined(BGFX_CONFIG_RENDERER_DIRECT3D12) \
- && !defined(BGFX_CONFIG_RENDERER_METAL)      \
- && !defined(BGFX_CONFIG_RENDERER_OPENGL)     \
- && !defined(BGFX_CONFIG_RENDERER_OPENGLES)   \
- && !defined(BGFX_CONFIG_RENDERER_VULKAN)     \
- && !defined(BGFX_CONFIG_RENDERER_GNM)
+#if !defined(BGFX_CONFIG_RENDERER_DIRECT3D9) \
+	&& !defined(BGFX_CONFIG_RENDERER_DIRECT3D11) \
+	&& !defined(BGFX_CONFIG_RENDERER_DIRECT3D12) \
+	&& !defined(BGFX_CONFIG_RENDERER_METAL) \
+	&& !defined(BGFX_CONFIG_RENDERER_OPENGL) \
+	&& !defined(BGFX_CONFIG_RENDERER_OPENGLES) \
+	&& !defined(BGFX_CONFIG_RENDERER_VULKAN) \
+	&& !defined(BGFX_CONFIG_RENDERER_GNM)
 
 #	ifndef BGFX_CONFIG_RENDERER_DIRECT3D9
 #		define BGFX_CONFIG_RENDERER_DIRECT3D9 (0 \
-					|| BX_PLATFORM_WINDOWS       \
+					|| BX_PLATFORM_WINDOWS \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_DIRECT3D9
 
 #	ifndef BGFX_CONFIG_RENDERER_DIRECT3D11
 #		define BGFX_CONFIG_RENDERER_DIRECT3D11 (0 \
-					|| BX_PLATFORM_WINDOWS        \
-					|| BX_PLATFORM_WINRT          \
-					|| BX_PLATFORM_XBOXONE        \
+					|| BX_PLATFORM_WINDOWS \
+					|| BX_PLATFORM_WINRT \
+					|| BX_PLATFORM_XBOXONE \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_DIRECT3D11
 
 #	ifndef BGFX_CONFIG_RENDERER_DIRECT3D12
 #		define BGFX_CONFIG_RENDERER_DIRECT3D12 (0 \
-					|| BX_PLATFORM_WINDOWS        \
-					|| BX_PLATFORM_WINRT          \
-					|| BX_PLATFORM_XBOXONE        \
+					|| BX_PLATFORM_WINDOWS \
+					|| BX_PLATFORM_XBOXONE \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_DIRECT3D12
 
 #	ifndef BGFX_CONFIG_RENDERER_METAL
-#		define BGFX_CONFIG_RENDERER_METAL (0           \
+#		define BGFX_CONFIG_RENDERER_METAL (0 \
 					|| (BX_PLATFORM_IOS && BX_CPU_ARM) \
-					|| (BX_PLATFORM_OSX >= 101100)     \
+					|| (BX_PLATFORM_OSX >= 101100) \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_METAL
 
 #	ifndef BGFX_CONFIG_RENDERER_OPENGL
 #		define BGFX_CONFIG_RENDERER_OPENGL (0 \
-					|| BX_PLATFORM_BSD        \
-					|| BX_PLATFORM_LINUX      \
-					|| BX_PLATFORM_OSX        \
-					|| BX_PLATFORM_WINDOWS    \
+					|| BX_PLATFORM_BSD \
+					|| BX_PLATFORM_LINUX \
+					|| BX_PLATFORM_OSX \
+					|| BX_PLATFORM_WINDOWS \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_OPENGL
 
 #	ifndef BGFX_CONFIG_RENDERER_OPENGLES
 #		define BGFX_CONFIG_RENDERER_OPENGLES (0 \
-					|| BX_PLATFORM_ANDROID      \
-					|| BX_PLATFORM_EMSCRIPTEN   \
-					|| BX_PLATFORM_IOS          \
-					|| BX_PLATFORM_RPI          \
-					|| BX_PLATFORM_STEAMLINK    \
-					|| BX_PLATFORM_NX           \
+					|| BX_PLATFORM_ANDROID \
+					|| BX_PLATFORM_EMSCRIPTEN \
+					|| BX_PLATFORM_IOS \
+					|| BX_PLATFORM_QNX \
+					|| BX_PLATFORM_RPI \
+					|| BX_PLATFORM_STEAMLINK \
+					|| BX_PLATFORM_NX \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_OPENGLES
 
 #	ifndef BGFX_CONFIG_RENDERER_VULKAN
 #		define BGFX_CONFIG_RENDERER_VULKAN (0 \
-					|| BX_PLATFORM_ANDROID    \
-					|| BX_PLATFORM_LINUX      \
-					|| BX_PLATFORM_WINDOWS    \
-					|| BX_PLATFORM_NX         \
+					|| BX_PLATFORM_ANDROID \
+					|| BX_PLATFORM_LINUX \
+					|| BX_PLATFORM_WINDOWS \
+					|| BX_PLATFORM_NX \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_VULKAN
 
 #	ifndef BGFX_CONFIG_RENDERER_GNM
 #		define BGFX_CONFIG_RENDERER_GNM (0 \
-					|| BX_PLATFORM_PS4     \
+					|| BX_PLATFORM_PS4 \
 					? 1 : 0)
 #	endif // BGFX_CONFIG_RENDERER_GNM
 
@@ -142,6 +142,11 @@
 #ifndef BGFX_CONFIG_USE_TINYSTL
 #	define BGFX_CONFIG_USE_TINYSTL 1
 #endif // BGFX_CONFIG_USE_TINYSTL
+
+/// Enable OculusVR integration.
+#ifndef BGFX_CONFIG_USE_OVR
+#	define BGFX_CONFIG_USE_OVR 0
+#endif // BGFX_CONFIG_USE_OVR
 
 /// Enable nVidia PerfHUD integration.
 #ifndef BGFX_CONFIG_DEBUG_PERFHUD
@@ -205,14 +210,13 @@
 #	define BGFX_CONFIG_SORT_KEY_NUM_BITS_PROGRAM 9
 #endif // BGFX_CONFIG_SORT_KEY_NUM_BITS_PROGRAM
 
-// Cannot be configured via compiler options.
+// Cannot be configured directly. Must must be power of 2.
 #define BGFX_CONFIG_MAX_PROGRAMS (1<<BGFX_CONFIG_SORT_KEY_NUM_BITS_PROGRAM)
-BX_STATIC_ASSERT(bx::isPowerOf2(BGFX_CONFIG_MAX_PROGRAMS), "BGFX_CONFIG_MAX_PROGRAMS must be power of 2.");
 
 #ifndef BGFX_CONFIG_MAX_VIEWS
+// Do not change. Must be power of 2.
 #	define BGFX_CONFIG_MAX_VIEWS 256
 #endif // BGFX_CONFIG_MAX_VIEWS
-BX_STATIC_ASSERT(bx::isPowerOf2(BGFX_CONFIG_MAX_VIEWS), "BGFX_CONFIG_MAX_VIEWS must be power of 2.");
 
 #define BGFX_CONFIG_MAX_VIEW_NAME_RESERVED 6
 
@@ -322,12 +326,8 @@ BX_STATIC_ASSERT(bx::isPowerOf2(BGFX_CONFIG_MAX_VIEWS), "BGFX_CONFIG_MAX_VIEWS m
 #	define BGFX_CONFIG_MIP_LOD_BIAS 0
 #endif // BGFX_CONFIG_MIP_LOD_BIAS
 
-#ifndef BGFX_CONFIG_DEFAULT_MAX_ENCODERS
-#	define BGFX_CONFIG_DEFAULT_MAX_ENCODERS ( (0 != BGFX_CONFIG_MULTITHREADED) ? 8 : 1)
-#endif // BGFX_CONFIG_DEFAULT_MAX_ENCODERS
-
-#ifndef BGFX_CONFIG_MAX_BACK_BUFFERS
-#	define BGFX_CONFIG_MAX_BACK_BUFFERS 4
-#endif // BGFX_CONFIG_MAX_BACK_BUFFERS
+#ifndef BGFX_CONFIG_MAX_ENCODERS
+#	define BGFX_CONFIG_MAX_ENCODERS ( (0 != BGFX_CONFIG_MULTITHREADED) ? 8 : 1)
+#endif // BGFX_CONFIG_MAX_ENCODERS
 
 #endif // BGFX_CONFIG_H_HEADER_GUARD

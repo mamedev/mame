@@ -49,8 +49,10 @@ public:
 	// construction/destruction
 	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto read_callback() { return m_read.bind(); }
-	auto write_callback() { return m_write.bind(); }
+	template <class Read, class Write> void set_callbacks(Read &&rd, Write &&wr) {
+		m_read.set_callback(std::forward<Read>(rd));
+		m_write.set_callback(std::forward<Write>(wr));
+	}
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

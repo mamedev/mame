@@ -232,6 +232,10 @@ READ8_MEMBER( gamecom_state::gamecom_pio_r )
 
 READ8_MEMBER( gamecom_state::gamecom_internal_r )
 {
+// ToDo: Read from vblank bit
+//  if(SM8521_LCV == offset + 0x20)
+//      popmessage("Read from vblank bit, TODO");
+
 	return m_p_ram[offset + 0x20];
 }
 
@@ -291,23 +295,21 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 		data &= 0x7f;
 		break;
 	case SM8521_TM0D:
-		m_timer[0].upcounter_max = data;
-		data = 0;
-		break;
+		m_timer[0].check_value = data;
+		return;
 	case SM8521_TM0C:
-		m_timer[0].enabled = BIT(data, 7);
-		m_timer[0].prescale_max = gamecom_timer_limit[data & 0x07] >> 1;
-		m_timer[0].prescale_count = 0;
+		m_timer[0].enabled = data & 0x80;
+		m_timer[0].state_limit = gamecom_timer_limit[data & 0x07] >> 1;
+		m_timer[0].state_count = 0;
 		m_p_ram[SM8521_TM0D] = 0;
 		break;
 	case SM8521_TM1D:
-		m_timer[1].upcounter_max = data;
-		data = 0;
-		break;
+		m_timer[1].check_value = data;
+		return;
 	case SM8521_TM1C:
-		m_timer[1].enabled = BIT(data, 7);
-		m_timer[1].prescale_max = gamecom_timer_limit[data & 0x07] >> 1;
-		m_timer[1].prescale_count = 0;
+		m_timer[1].enabled = data & 0x80;
+		m_timer[1].state_limit = gamecom_timer_limit[data & 0x07] >> 1;
+		m_timer[1].state_count = 0;
 		m_p_ram[SM8521_TM1D] = 0;
 		break;
 	case SM8521_CLKT:   /* bit 6-7 */
@@ -317,7 +319,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 			if ( data & 0x40 )
 			{
 				/* timer resolution 1 minute */
-				m_clock_timer->adjust(attotime::from_seconds(60), 0, attotime::from_seconds(60));
+				m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(60));
 			}
 			else
 			{
@@ -397,7 +399,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 		break;
 	case SM8521_SGDA:
 		m_sound.sgda = data;
-		if((m_sound.sgc & 0x8f) == 0x88)
+		if((m_sound.sgc & 0x88) == 0x88)
 			m_dac->write(data);
 		break;
 
@@ -455,40 +457,46 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
 
 
 /* The manual is not conclusive as to which bit of the DMVP register (offset 0x3D) determines
-   which page for source or destination is used.
-   Also, there's nothing about what happens if the block overflows the source or destination. */
+   which page for source or destination is used */
 WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 {
-	u8 dmc = m_p_ram[SM8521_DMC];
-	if (!BIT(dmc, 7))
-		return;
-
-	m_dma.overwrite_mode = BIT(dmc, 0);
+	uint8_t dmc = m_p_ram[SM8521_DMC];
+	m_dma.overwrite_mode = dmc & 0x01;
 	m_dma.transfer_mode = dmc & 0x06;
-	m_dma.adjust_x = BIT(dmc, 3) ? -1 : 1;
-	m_dma.decrement_y = BIT(dmc, 4);
+	m_dma.decrement_x = dmc & 0x08;
+	m_dma.decrement_y = dmc & 0x10;
+	m_dma.enabled = dmc & 0x80;
+	if ( !m_dma.enabled )
+	{
+		return;
+	}
 
-	m_dma.block_width = m_p_ram[SM8521_DMDX];
-	m_dma.block_height = m_p_ram[SM8521_DMDY];
+	m_dma.width_x = m_p_ram[SM8521_DMDX];
+	m_dma.width_x_count = 0;
+	m_dma.width_y = m_p_ram[SM8521_DMDY];
+	m_dma.width_y_count = 0;
 	m_dma.source_x = m_p_ram[SM8521_DMX1];
-	m_dma.source_x_current = m_dma.source_x & 3;
+	m_dma.source_x_current = m_dma.source_x;
 	m_dma.source_y = m_p_ram[SM8521_DMY1];
 	m_dma.source_width = ( m_p_ram[SM8521_LCH] & 0x20 ) ? 50 : 40;
-	m_dma.dest_width = m_dma.source_width;
 	m_dma.dest_x = m_p_ram[SM8521_DMX2];
-	m_dma.dest_x_current = m_dma.dest_x & 3;
+	m_dma.dest_x_current = m_dma.dest_x;
 	m_dma.dest_y = m_p_ram[SM8521_DMY2];
-	m_dma.palette = m_p_ram[SM8521_DMPL];
+	m_dma.dest_width = ( m_p_ram[SM8521_LCH] & 0x20 ) ? 50 : 40;
+	m_dma.palette[0] = m_p_ram[SM8521_DMPL] & 0x03;
+	m_dma.palette[1] = ( m_p_ram[SM8521_DMPL] >> 2 ) & 3;
+	m_dma.palette[2] = ( m_p_ram[SM8521_DMPL] >> 4 ) & 3;
+	m_dma.palette[3] = m_p_ram[SM8521_DMPL] >> 6;
 	m_dma.source_mask = 0x1FFF;
 	m_dma.dest_mask = 0x1FFF;
-	m_dma.source_bank = &m_p_videoram[BIT(m_p_ram[SM8521_DMVP], 0) ? 0x2000 : 0x0000];
-	m_dma.dest_bank   = &m_p_videoram[BIT(m_p_ram[SM8521_DMVP], 1) ? 0x2000 : 0x0000];
-//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", block_width, block_height, m_dma.source_x, m_dma.source_y, m_dma.dest_x, m_dma.dest_y, transfer_mode, m_p_ram[SM8521_DMVP] );
+//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", m_dma.width_x, m_dma.width_y, m_dma.source_x, m_dma.source_y, m_dma.dest_x, m_dma.dest_y, m_dma.transfer_mode, m_p_ram[SM8521_DMVP] );
 //  logerror( "   Palette: %d, %d, %d, %d\n", m_dma.palette[0], m_dma.palette[1], m_dma.palette[2], m_dma.palette[3] );
 	switch( m_dma.transfer_mode )
 	{
 	case 0x00:
 		/* VRAM->VRAM */
+		m_dma.source_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		m_dma.dest_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x02:
 		/* ROM->VRAM */
@@ -500,14 +508,18 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 		else
 		if (m_cart_ptr)
 			m_dma.source_bank = m_cart_ptr + (m_p_ram[SM8521_DMBR] << 14);
+
+		m_dma.dest_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x04:
 		/* Extend RAM->VRAM */
 		m_dma.source_width = 64;
 		m_dma.source_bank = &m_p_nvram[0x0000];
+		m_dma.dest_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
+		m_dma.source_bank = &m_p_videoram[(m_p_ram[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
 		m_dma.dest_width = 64;
 		m_dma.dest_bank = &m_p_nvram[0x0000];
 		break;
@@ -518,48 +530,53 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 	m_dma.dest_current += m_dma.dest_x >> 2;
 	m_dma.source_line = m_dma.source_current;
 	m_dma.dest_line = m_dma.dest_current;
+	m_dma.state_count = 0;
 
-	for( u16 y_count = 0; y_count <= m_dma.block_height; y_count++ )
+	unsigned y_count, x_count;
+
+	for( y_count = 0; y_count <= m_dma.width_y; y_count++ )
 	{
-		for( u16 x_count = 0; x_count <= m_dma.block_width; x_count++ )
+		for( x_count = 0; x_count <= m_dma.width_x; x_count++ )
 		{
-			u16 src_addr = m_dma.source_current & m_dma.source_mask;
-			u16 dst_addr = m_dma.dest_current & m_dma.dest_mask;
-			u8 dst_adj = (m_dma.dest_x_current ^ 3) << 1;
-			u8 src_adj = (m_dma.source_x_current ^ 3) << 1;
+			uint16_t src_addr = m_dma.source_current & m_dma.source_mask;
+			uint16_t dest_addr = m_dma.dest_current & m_dma.dest_mask;
+			uint8_t dest_adj = (3 - (m_dma.dest_x_current & 3)) << 1;
+			uint8_t src_adj = (3 - (m_dma.source_x_current & 3)) << 1;
 
 			/* handle DMA for 1 pixel */
 			// Get new pixel
-			u8 source_pixel = (m_dma.source_bank[src_addr] >> src_adj) & 3;
+			uint8_t source_pixel = (m_dma.source_bank[src_addr] >> src_adj) & 3;
 
 			// If overwrite mode, write new pixel
 			if ( m_dma.overwrite_mode || source_pixel)
 			{
 				// Get 4 pixels and remove the one about to be replaced
-				u8 other_pixels = m_dma.dest_bank[dst_addr] & ~(3 << dst_adj);
+				uint8_t other_pixels = m_dma.dest_bank[dest_addr] & ~(3 << dest_adj);
 				// Get palette of new pixel and place into the hole
-				m_dma.dest_bank[dst_addr] = other_pixels | (((m_dma.palette >> (source_pixel << 1)) & 3) << dst_adj);
+				m_dma.dest_bank[dest_addr] = other_pixels | (m_dma.palette[ source_pixel ] << dest_adj);
 			}
 
 			/* Advance a pixel */
-			m_dma.source_x_current += m_dma.adjust_x;
-			if (BIT(m_dma.source_x_current, 2))
+			if ( m_dma.decrement_x )
 			{
-				m_dma.source_current += m_dma.adjust_x;
-				m_dma.source_x_current &= 3;
+				m_dma.source_x_current--;
+				if ( ( m_dma.source_x_current & 0x03 ) == 0x03 )
+					m_dma.source_current--;
 			}
-
+			else
+			{
+				m_dma.source_x_current++;
+				if ( ( m_dma.source_x_current & 0x03 ) == 0x00 )
+					m_dma.source_current++;
+			}
 			m_dma.dest_x_current++;
-			if (BIT(m_dma.dest_x_current, 2))
-			{
+			if ( ( m_dma.dest_x_current & 0x03 ) == 0x00 )
 				m_dma.dest_current++;
-				m_dma.dest_x_current &= 3;
-			}
 		}
 
 		/* Advance a line */
-		m_dma.source_x_current = m_dma.source_x & 3;
-		m_dma.dest_x_current = m_dma.dest_x & 3;
+		m_dma.source_x_current = m_dma.source_x;
+		m_dma.dest_x_current = m_dma.dest_x;
 		if ( m_dma.decrement_y )
 			m_dma.source_line -= m_dma.source_width;
 		else
@@ -568,8 +585,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 		m_dma.dest_line += m_dma.dest_width;
 		m_dma.dest_current = m_dma.dest_line;
 	}
-
-	m_p_ram[SM8521_DMC] &= 0x7f;  // finished; turn off dma
+	m_dma.enabled = 0;
 	m_maincpu->set_input_line(sm8500_cpu_device::DMA_INT, ASSERT_LINE );
 }
 
@@ -577,33 +593,29 @@ WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 {
 	if ( m_timer[0].enabled )
 	{
-		m_timer[0].prescale_count += data;
-		while ( m_timer[0].prescale_count >= m_timer[0].prescale_max )
+		m_timer[0].state_count += data;
+		while ( m_timer[0].state_count >= m_timer[0].state_limit )
 		{
-			m_timer[0].prescale_count -= m_timer[0].prescale_max;
+			m_timer[0].state_count -= m_timer[0].state_limit;
 			m_p_ram[SM8521_TM0D]++;
-			if ( m_p_ram[SM8521_TM0D] >= m_timer[0].upcounter_max )
+			if ( m_p_ram[SM8521_TM0D] >= m_timer[0].check_value )
 			{
 				m_p_ram[SM8521_TM0D] = 0;
-				// check if irq is enabled before calling,
-				// to stop monopoly choking up the interrupt queue
-				if (BIT(m_p_ram[SM8521_IE0], 6) && BIT(m_p_ram[SM8521_PS1], 0))
-					m_maincpu->set_input_line(sm8500_cpu_device::TIM0_INT, ASSERT_LINE );
+//              m_maincpu->set_input_line(sm8500_cpu_device::TIM0_INT, ASSERT_LINE ); // this causes crazy flickering
 			}
 		}
 	}
 	if ( m_timer[1].enabled )
 	{
-		m_timer[1].prescale_count += data;
-		while ( m_timer[1].prescale_count >= m_timer[1].prescale_max )
+		m_timer[1].state_count += data;
+		while ( m_timer[1].state_count >= m_timer[1].state_limit )
 		{
-			m_timer[1].prescale_count -= m_timer[1].prescale_max;
+			m_timer[1].state_count -= m_timer[1].state_limit;
 			m_p_ram[SM8521_TM1D]++;
-			if ( m_p_ram[SM8521_TM1D] >= m_timer[1].upcounter_max )
+			if ( m_p_ram[SM8521_TM1D] >= m_timer[1].check_value )
 			{
 				m_p_ram[SM8521_TM1D] = 0;
-				if (BIT(m_p_ram[SM8521_IE1], 6) && BIT(m_p_ram[SM8521_PS1], 0) && ((m_p_ram[SM8521_PS0] & 7) < 4))
-					m_maincpu->set_input_line(sm8500_cpu_device::TIM1_INT, ASSERT_LINE );
+				m_maincpu->set_input_line(sm8500_cpu_device::TIM1_INT, ASSERT_LINE );
 			}
 		}
 	}

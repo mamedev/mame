@@ -273,7 +273,7 @@ VIDEO_START_MEMBER(gameplan_state,common)
 	m_via_0_ca1_timer = timer_alloc(TIMER_VIA_0_CAL);
 
 	/* register for save states */
-	save_pointer(NAME(m_videoram), m_videoram_size);
+	save_pointer(NAME(m_videoram.get()), m_videoram_size);
 }
 
 
@@ -315,25 +315,26 @@ VIDEO_RESET_MEMBER(gameplan_state,gameplan)
  *
  *************************************/
 
-void gameplan_state::gameplan_video(machine_config &config)
-{
+MACHINE_CONFIG_START(gameplan_state::gameplan_video)
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,gameplan)
 	MCFG_VIDEO_RESET_OVERRIDE(gameplan_state,gameplan)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(gameplan_state::screen_update_gameplan));
-}
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_gameplan)
+MACHINE_CONFIG_END
 
-void gameplan_state::leprechn_video(machine_config &config)
-{
+
+MACHINE_CONFIG_START(gameplan_state::leprechn_video)
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,leprechn)
-	m_screen->set_screen_update(FUNC(gameplan_state::screen_update_leprechn));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_leprechn)
+MACHINE_CONFIG_END
 
-void gameplan_state::trvquest_video(machine_config &config)
-{
+
+MACHINE_CONFIG_START(gameplan_state::trvquest_video)
 	gameplan_video(config);
 	MCFG_VIDEO_START_OVERRIDE(gameplan_state,trvquest)
-	m_screen->set_screen_update(FUNC(gameplan_state::screen_update_gameplan));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(gameplan_state, screen_update_gameplan)
+MACHINE_CONFIG_END

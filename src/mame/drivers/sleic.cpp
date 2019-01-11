@@ -38,15 +38,15 @@ public:
 
 	void sleic(machine_config &config);
 	void sleic_map(address_map &map);
+protected:
 
-	void init_sleic();
-
-private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
+public:
+	void init_sleic();
 };
 
 

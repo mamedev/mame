@@ -8,8 +8,6 @@
 #ifndef MAME_INCLUDES_SUPRSLAM_H
 #define MAME_INCLUDES_SUPRSLAM_H
 
-#pragma once
-
 #include "video/vsystem_spr.h"
 #include "machine/gen_latch.h"
 #include "video/k053936.h"
@@ -17,8 +15,8 @@
 class suprslam_state : public driver_device
 {
 public:
-	suprslam_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	suprslam_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_screen_videoram(*this, "screen_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
@@ -30,17 +28,8 @@ public:
 		m_spr(*this, "vsystem_spr"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch")
-	{ }
+		m_soundlatch(*this, "soundlatch") { }
 
-	void suprslam(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_screen_videoram;
 	required_shared_ptr<uint16_t> m_bg_videoram;
@@ -72,8 +61,11 @@ private:
 	DECLARE_WRITE8_MEMBER(spr_ctrl_w);
 	TILE_GET_INFO_MEMBER(get_suprslam_tile_info);
 	TILE_GET_INFO_MEMBER(get_suprslam_bg_tile_info);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	uint32_t screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	void suprslam(machine_config &config);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 	void suprslam_map(address_map &map);

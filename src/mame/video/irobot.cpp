@@ -39,20 +39,21 @@
 
 ***************************************************************************/
 
-void irobot_state::irobot_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(irobot_state, irobot)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	// convert the color prom for the text palette
-	for (unsigned i = 0; i < 32; i++)
+	/* convert the color prom for the text palette */
+	for (i = 0; i < 32; i++)
 	{
-		int const intensity = color_prom[i] & 0x03;
+		int intensity = color_prom[i] & 0x03;
 
-		int const r = 28 * ((color_prom[i] >> 6) & 0x03) * intensity;
-		int const g = 28 * ((color_prom[i] >> 4) & 0x03) * intensity;
-		int const b = 28 * ((color_prom[i] >> 2) & 0x03) * intensity;
+		int r = 28 * ((color_prom[i] >> 6) & 0x03) * intensity;
+		int g = 28 * ((color_prom[i] >> 4) & 0x03) * intensity;
+		int b = 28 * ((color_prom[i] >> 2) & 0x03) * intensity;
 
-		int const swapped_i = bitswap<8>(i,7,6,5,4,3,0,1,2);
+		int swapped_i = bitswap<8>(i,7,6,5,4,3,0,1,2);
 
 		palette.set_pen_color(swapped_i + 64, rgb_t(r, g, b));
 	}
@@ -351,7 +352,7 @@ uint32_t irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 
 	int x, y, offs;
 
 	/* copy the polygon bitmap */
-	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], nullptr);
 
 	/* redraw the non-zero characters in the alpha layer */

@@ -22,7 +22,6 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/samples.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -50,6 +49,12 @@ enum
 class astinvad_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INT_OFF,
+		TIMER_INT_GEN
+	};
+
 	astinvad_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -60,23 +65,7 @@ public:
 		, m_samples(*this, "samples")
 		, m_screen(*this, "screen")
 		, m_color_prom(*this, "proms")
-	{ }
-
-	void spcking2(machine_config &config);
-	void spaceint(machine_config &config);
-	void kamikaze(machine_config &config);
-
-	void init_kamikaze();
-	void init_spcking2();
-
-	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
-
-private:
-	enum
-	{
-		TIMER_INT_OFF,
-		TIMER_INT_GEN
-	};
+		{ }
 
 	DECLARE_WRITE8_MEMBER(color_latch_w);
 	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
@@ -84,11 +73,14 @@ private:
 	DECLARE_WRITE8_MEMBER(kamikaze_ppi_w);
 	DECLARE_WRITE8_MEMBER(spaceint_sound1_w);
 	DECLARE_WRITE8_MEMBER(spaceint_sound2_w);
+	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
 	DECLARE_WRITE8_MEMBER(kamikaze_sound1_w);
 	DECLARE_WRITE8_MEMBER(kamikaze_sound2_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound1_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound2_w);
 	DECLARE_WRITE8_MEMBER(spcking2_sound3_w);
+	void init_kamikaze();
+	void init_spcking2();
 	DECLARE_MACHINE_START(kamikaze);
 	DECLARE_MACHINE_RESET(kamikaze);
 	DECLARE_MACHINE_START(spaceint);
@@ -100,11 +92,14 @@ private:
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
 	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
 
+	void spcking2(machine_config &config);
+	void spaceint(machine_config &config);
+	void kamikaze(machine_config &config);
 	void kamikaze_map(address_map &map);
 	void kamikaze_portmap(address_map &map);
 	void spaceint_map(address_map &map);
 	void spaceint_portmap(address_map &map);
-
+private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
 
@@ -140,7 +135,7 @@ VIDEO_START_MEMBER(astinvad_state,spaceint)
 	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes());
 
 	save_item(NAME(m_color_latch));
-	save_pointer(NAME(m_colorram), m_videoram.bytes());
+	save_pointer(NAME(m_colorram.get()), m_videoram.bytes());
 }
 
 
@@ -340,9 +335,9 @@ READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= m_ppi8255_0->read(offset);
+		result &= m_ppi8255_0->read(space, offset);
 	if (!(offset & 8))
-		result &= m_ppi8255_1->read(offset);
+		result &= m_ppi8255_1->read(space, offset);
 	return result;
 }
 
@@ -351,9 +346,9 @@ WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		m_ppi8255_0->write(offset, data);
+		m_ppi8255_0->write(space, offset, data);
 	if (!(offset & 8))
-		m_ppi8255_1->write(offset, data);
+		m_ppi8255_1->write(space, offset, data);
 }
 
 
@@ -493,14 +488,14 @@ void astinvad_state::spaceint_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x4000, 0x5fff).ram().w(FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
+	map(0x4000, 0x5fff).ram().w(this, FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
 }
 
 
 void astinvad_state::kamikaze_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
+	map(0x00, 0xff).rw(this, FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
 }
 
 
@@ -509,9 +504,9 @@ void astinvad_state::spaceint_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).w(FUNC(astinvad_state::spaceint_sound1_w));
-	map(0x03, 0x03).w(FUNC(astinvad_state::color_latch_w));
-	map(0x04, 0x04).w(FUNC(astinvad_state::spaceint_sound2_w));
+	map(0x02, 0x02).w(this, FUNC(astinvad_state::spaceint_sound1_w));
+	map(0x03, 0x03).w(this, FUNC(astinvad_state::color_latch_w));
+	map(0x04, 0x04).w(this, FUNC(astinvad_state::spaceint_sound2_w));
 }
 
 
@@ -668,62 +663,65 @@ static const char *const astinvad_sample_names[] =
  *
  *************************************/
 
-void astinvad_state::kamikaze(machine_config &config)
-{
+MACHINE_CONFIG_START(astinvad_state::kamikaze)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &astinvad_state::kamikaze_map);
-	m_maincpu->set_addrmap(AS_IO, &astinvad_state::kamikaze_portmap);
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(kamikaze_map)
+	MCFG_DEVICE_IO_MAP(kamikaze_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, kamikaze)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, kamikaze)
 
-	I8255A(config, m_ppi8255_0);
-	m_ppi8255_0->in_pa_callback().set_ioport("IN0");
-	m_ppi8255_0->in_pb_callback().set_ioport("IN1");
-	m_ppi8255_0->in_pc_callback().set_ioport("IN2");
+	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	I8255A(config, m_ppi8255_1);
-	m_ppi8255_1->out_pa_callback().set(FUNC(astinvad_state::kamikaze_sound1_w));
-	m_ppi8255_1->out_pb_callback().set(FUNC(astinvad_state::kamikaze_sound2_w));
+	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, astinvad_state, kamikaze_sound1_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, astinvad_state, kamikaze_sound2_w))
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256);
-	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_astinvad));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256)
+	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_astinvad)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(astinvad_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(astinvad_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
-void astinvad_state::spcking2(machine_config &config)
-{
+
+MACHINE_CONFIG_START(astinvad_state::spcking2)
 	kamikaze(config);
 
 	/* basic machine hardware */
-	m_ppi8255_1->out_pa_callback().set(FUNC(astinvad_state::spcking2_sound1_w));
-	m_ppi8255_1->out_pb_callback().set(FUNC(astinvad_state::spcking2_sound2_w));
-	m_ppi8255_1->out_pc_callback().set(FUNC(astinvad_state::spcking2_sound3_w));
+	MCFG_DEVICE_MODIFY("ppi8255_1")
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, astinvad_state, spcking2_sound1_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, astinvad_state, spcking2_sound2_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, astinvad_state, spcking2_sound3_w))
 
 	/* video hardware */
-	m_screen->set_raw(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240);
-	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_spcking2));
-}
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_spcking2)
+MACHINE_CONFIG_END
 
-void astinvad_state::spaceint(machine_config &config)
-{
+
+MACHINE_CONFIG_START(astinvad_state::spaceint)
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK);        /* a guess */
-	m_maincpu->set_addrmap(AS_PROGRAM, &astinvad_state::spaceint_map);
-	m_maincpu->set_addrmap(AS_IO, &astinvad_state::spaceint_portmap);
-	m_maincpu->set_vblank_int("screen", FUNC(astinvad_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
+	MCFG_DEVICE_PROGRAM_MAP(spaceint_map)
+	MCFG_DEVICE_IO_MAP(spaceint_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", astinvad_state, irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(astinvad_state, spaceint)
 	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, spaceint)
@@ -731,22 +729,22 @@ void astinvad_state::spaceint(machine_config &config)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(astinvad_state, spaceint)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_screen_update(FUNC(astinvad_state::screen_update_spaceint));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_spaceint)
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	MCFG_PALETTE_ADD_3BIT_RBG("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(6);
-	m_samples->set_samples_names(astinvad_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(6)
+	MCFG_SAMPLES_NAMES(astinvad_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 
 
@@ -851,8 +849,6 @@ void astinvad_state::init_spcking2()
 {
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;
-
-	save_item(NAME(m_player));
 }
 
 

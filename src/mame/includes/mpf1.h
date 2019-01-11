@@ -38,18 +38,7 @@ public:
 			m_leds(*this, "led%u", 0U)
 	{ }
 
-	void mpf1p(machine_config &config);
-	void mpf1b(machine_config &config);
-	void mpf1(machine_config &config);
-
-	void init_mpf1();
-
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_irq );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
-
-private:
-	required_device<z80_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
@@ -65,6 +54,9 @@ private:
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pb_w );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_irq );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
 
 	int m_break;
 	int m_m1;
@@ -74,8 +66,12 @@ private:
 	emu_timer *m_led_refresh_timer;
 	address_space *m_program;
 
+	void init_mpf1();
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
+	void mpf1p(machine_config &config);
+	void mpf1b(machine_config &config);
+	void mpf1(machine_config &config);
 	void mpf1_io_map(address_map &map);
 	void mpf1_map(address_map &map);
 	void mpf1_step(address_map &map);

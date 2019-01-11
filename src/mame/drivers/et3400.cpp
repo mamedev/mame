@@ -49,13 +49,11 @@ public:
 		, m_digit(*this, "digit%u", 1U)
 	{ }
 
-	void et3400(machine_config &config);
-
 	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
 	DECLARE_WRITE_LINE_MEMBER(segment_test_w);
+	void et3400(machine_config &config);
 
-private:
-
+protected:
 	virtual void machine_start() override;
 
 	DECLARE_READ8_MEMBER(keypad_r);
@@ -68,6 +66,7 @@ private:
 
 	void mem_map(address_map &map);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
 	required_device_array<ls259_device, 6> m_displatch;
@@ -144,8 +143,8 @@ void et3400_state::mem_map(address_map &map)
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1003).mirror(0x03fc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1400, 0x23ff).rom().region("roms", 0);
-	map(0xc000, 0xc0ff).r(FUNC(et3400_state::keypad_r));
-	map(0xc100, 0xc1ff).w(FUNC(et3400_state::display_w));
+	map(0xc000, 0xc0ff).r(this, FUNC(et3400_state::keypad_r));
+	map(0xc100, 0xc1ff).w(this, FUNC(et3400_state::display_w));
 	map(0xfc00, 0xffff).rom().region("roms", 0x1000);
 }
 
@@ -225,27 +224,29 @@ MACHINE_CONFIG_START(et3400_state::et3400)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	config.set_default_layout(layout_et3400);
+	MCFG_DEFAULT_LAYOUT(layout_et3400)
 
 	// Devices
-	PIA6821(config, m_pia, 0);
-	m_pia->writepa_handler().set(FUNC(et3400_state::pia_aw));
-	m_pia->writepb_handler().set(FUNC(et3400_state::pia_bw));
-	m_pia->readpa_handler().set(FUNC(et3400_state::pia_ar));
-	m_pia->readpb_handler().set(FUNC(et3400_state::pia_br));
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, et3400_state, pia_aw))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, et3400_state, pia_bw))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, et3400_state, pia_ar))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, et3400_state, pia_br))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal").set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
-
-	for (std::size_t i = 0; i < 6; i++)
-		LS259(config, m_displatch[i]);
-
-
-	m_displatch[0]->parallel_out_cb().set(FUNC(et3400_state::led_w<1>));
-	m_displatch[1]->parallel_out_cb().set(FUNC(et3400_state::led_w<2>));
-	m_displatch[2]->parallel_out_cb().set(FUNC(et3400_state::led_w<3>));
-	m_displatch[3]->parallel_out_cb().set(FUNC(et3400_state::led_w<4>));
-	m_displatch[4]->parallel_out_cb().set(FUNC(et3400_state::led_w<5>));
-	m_displatch[5]->parallel_out_cb().set(FUNC(et3400_state::led_w<6>));
+	MCFG_DEVICE_ADD("displatch1", LS259, 0) // IC28
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<1>))
+	MCFG_DEVICE_ADD("displatch2", LS259, 0) // IC27
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<2>))
+	MCFG_DEVICE_ADD("displatch3", LS259, 0) // IC26
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<3>))
+	MCFG_DEVICE_ADD("displatch4", LS259, 0) // IC25
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<4>))
+	MCFG_DEVICE_ADD("displatch5", LS259, 0) // IC24
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<5>))
+	MCFG_DEVICE_ADD("displatch6", LS259, 0) // IC23
+	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(*this, et3400_state, led_w<6>))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)

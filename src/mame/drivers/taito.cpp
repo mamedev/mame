@@ -70,16 +70,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void taito2(machine_config &config);
-	void taito6(machine_config &config);
-	void taito(machine_config &config);
-	void shock(machine_config &config);
-	void taito4(machine_config &config);
-	void taito5(machine_config &config);
-
 	void init_taito();
-
-private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
@@ -87,6 +78,12 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(votrax_request);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void taito2(machine_config &config);
+	void taito6(machine_config &config);
+	void taito(machine_config &config);
+	void shock(machine_config &config);
+	void taito4(machine_config &config);
+	void taito5(machine_config &config);
 	void taito_ay_audio(machine_config &config);
 	void shock_map(address_map &map);
 	void shock_sub_map(address_map &map);
@@ -94,7 +91,7 @@ private:
 	void taito_sub_map(address_map &map);
 	void taito_sub_map2(address_map &map);
 	void taito_sub_map5(address_map &map);
-
+private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
 	uint8_t m_votrax_cmd;
@@ -132,7 +129,7 @@ void taito_state::taito_map(address_map &map)
 	map(0x283f, 0x283f).mirror(0x0080).portr("X7");
 	map(0x4000, 0x407f).ram();
 	map(0x4080, 0x408f).ram().share("ram");
-	map(0x4090, 0x409f).rw(FUNC(taito_state::io_r), FUNC(taito_state::io_w));
+	map(0x4090, 0x409f).rw(this, FUNC(taito_state::io_r), FUNC(taito_state::io_w));
 	map(0x40a0, 0x40ff).ram();
 	map(0x4800, 0x48ff).rom().region("roms", 0x2000);
 }
@@ -174,7 +171,7 @@ void taito_state::shock_map(address_map &map)
 	map.global_mask(0x1fff);
 	map(0x0000, 0x0fff).rom().region("roms", 0);
 	map(0x1000, 0x100f).ram().share("ram");
-	map(0x1010, 0x101f).rw(FUNC(taito_state::io_r), FUNC(taito_state::io_w));
+	map(0x1010, 0x101f).rw(this, FUNC(taito_state::io_r), FUNC(taito_state::io_w));
 	map(0x1020, 0x10ff).ram();
 	map(0x1400, 0x1400).portr("X0");
 	map(0x1401, 0x1401).portr("X1");
@@ -352,14 +349,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 
 MACHINE_CONFIG_START(taito_state::taito)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, 19000000/9)
+	MCFG_DEVICE_ADD("maincpu", I8080, 19000000/9)
 	MCFG_DEVICE_PROGRAM_MAP(taito_map)
 
-	MCFG_DEVICE_ADD(m_cpu2, M6802, 1000000) // cpu & clock are a guess
+	MCFG_DEVICE_ADD("audiocpu", M6802, 1000000) // cpu & clock are a guess
 	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map)
 
 	/* Video */
-	config.set_default_layout(layout_taito);
+	MCFG_DEFAULT_LAYOUT(layout_taito)
 
 	/* Sound */
 	genpin_audio(config);
@@ -369,67 +366,67 @@ MACHINE_CONFIG_START(taito_state::taito)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	PIA6821(config, m_pia);
-	//m_pia->readpa_handler().set(FUNC(taito_state::pia_pa_r));
-	m_pia->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
-	m_pia->readpb_handler().set(FUNC(taito_state::pia_pb_r));
-	m_pia->writepb_handler().set(FUNC(taito_state::pia_pb_w));
-	//m_pia->ca2_handler().set(FUNC(taito_state::pia_ca2_w));
-	//m_pia->cb2_handler().set(FUNC(taito_state::pia_cb2_w));
-	m_pia->irqa_handler().set_inputline(m_cpu2, INPUT_LINE_NMI);
-	m_pia->irqb_handler().set_inputline(m_cpu2, M6802_IRQ_LINE);
+	MCFG_DEVICE_ADD("pia", PIA6821, 0)
+	//MCFG_PIA_READPA_HANDLER(READ8(*this, taito_state, pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, taito_state, pia_pb_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, taito_state, pia_pb_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, taito_state, pia_ca2_w))
+	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, taito_state, pia_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", taito_state, timer_a, attotime::from_hz(200))
 MACHINE_CONFIG_END
 
-void taito_state::shock(machine_config &config)
-{
+MACHINE_CONFIG_START(taito_state::shock)
 	taito(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &taito_state::shock_map);
-	m_cpu2->set_addrmap(AS_PROGRAM, &taito_state::shock_sub_map);
-}
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(shock_map)
+	MCFG_DEVICE_MODIFY( "audiocpu" )
+	MCFG_DEVICE_PROGRAM_MAP(shock_sub_map)
+MACHINE_CONFIG_END
 
-void taito_state::taito2(machine_config &config)
-{
+MACHINE_CONFIG_START(taito_state::taito2)
 	taito(config);
-	m_cpu2->set_addrmap(AS_PROGRAM, &taito_state::taito_sub_map2);
-}
+	MCFG_DEVICE_MODIFY( "audiocpu" )
+	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map2)
+MACHINE_CONFIG_END
 
 // add vox
-void taito_state::taito4(machine_config &config)
-{
+MACHINE_CONFIG_START(taito_state::taito4)
 	taito(config);
-
 	SPEAKER(config, "voxsnd").front_center();
-	VOTRAX_SC01(config, m_votrax, 720000); // guess
-	m_votrax->ar_callback().set(FUNC(taito_state::votrax_request));
-	m_votrax->add_route(ALL_OUTPUTS, "voxsnd", 0.15); // todo: fix - it makes noise continuously
+	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) // guess
+	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(*this, taito_state, votrax_request))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "voxsnd", 0.15) // todo: fix - it makes noise continuously
 
-	m_pia->cb2_handler().set(FUNC(taito_state::pia_cb2_w));
-}
+	MCFG_DEVICE_MODIFY("pia")
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, taito_state, pia_cb2_w))
+MACHINE_CONFIG_END
 
-void taito_state::taito_ay_audio(machine_config &config)
-{
-	m_cpu2->set_addrmap(AS_PROGRAM, &taito_state::taito_sub_map5);
+MACHINE_CONFIG_START(taito_state::taito_ay_audio)
+	MCFG_DEVICE_MODIFY( "audiocpu" )
+	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map5)
 
 	SPEAKER(config, "aysnd").front_center();
-	AY8910(config, "aysnd_0", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "aysnd", 0.8); // guess
-	AY8910(config, "aysnd_1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "aysnd", 0.8); // guess
-}
+	MCFG_DEVICE_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
+	MCFG_DEVICE_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
+MACHINE_CONFIG_END
 
 // add ay
-void taito_state::taito5(machine_config &config)
-{
+MACHINE_CONFIG_START(taito_state::taito5)
 	taito(config);
 	taito_ay_audio(config);
-}
+MACHINE_CONFIG_END
 
 // add vox and ay
-void taito_state::taito6(machine_config &config)
-{
+MACHINE_CONFIG_START(taito_state::taito6)
 	taito4(config);
 	taito_ay_audio(config);
-}
+MACHINE_CONFIG_END
 
 
 

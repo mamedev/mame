@@ -74,6 +74,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(I82439TX_LEGACY, i82439tx_device)
+DECLARE_DEVICE_TYPE(I82439TX, i82439tx_device)
 
 #endif // MAME_BUS_LPCI_I82439TX_H

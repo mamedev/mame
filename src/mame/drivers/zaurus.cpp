@@ -1408,7 +1408,6 @@ Note:
 #include "cpu/arm7/arm7core.h"
 #include "machine/pxa255.h"
 #include "machine/timer.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1420,35 +1419,57 @@ class zaurus_state : public driver_device
 public:
 	zaurus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_pxa_periphs(*this, "pxa_periphs")
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, "ram")
 	{ }
 
-	void zaurus(machine_config &config);
-
-private:
 	// devices
-	required_device<pxa255_periphs_device> m_pxa_periphs;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_ram;
 
 	uint8_t m_rtc_tick;
+	DECLARE_READ32_MEMBER(pxa255_ostimer_r);
+	DECLARE_WRITE32_MEMBER(pxa255_ostimer_w);
 	DECLARE_READ32_MEMBER(pxa255_rtc_r);
 	DECLARE_WRITE32_MEMBER(pxa255_rtc_w);
+	DECLARE_READ32_MEMBER(pxa255_intc_r);
+	DECLARE_WRITE32_MEMBER(pxa255_intc_w);
+	PXA255_OSTMR_Regs m_ostimer_regs;
+	PXA255_INTC_Regs m_intc_regs;
+
+	void pxa255_ostimer_irq_check();
+	void pxa255_update_interrupts();
+	void pxa255_set_irq_line(uint32_t line, int irq_state);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_irq_callback);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void zaurus(machine_config &config);
 	void zaurus_map(address_map &map);
-
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
 };
+
+#define VERBOSE_LEVEL ( 5 )
+
+static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char* s_fmt, ... )
+{
+	if( VERBOSE_LEVEL >= n_level )
+	{
+		va_list v;
+		char buf[32768];
+		va_start( v, s_fmt );
+		vsprintf( buf, s_fmt, v );
+		va_end( v );
+		device.logerror( "%s: %s", device.machine().describe_context(), buf );
+		//printf( "%s: %s", device.machine().describe_context().c_str(), buf );
+	}
+}
 
 
 void zaurus_state::video_start()
@@ -1460,6 +1481,223 @@ uint32_t zaurus_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
+void zaurus_state::pxa255_update_interrupts()
+{
+	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
+
+	intc_regs->icfp = (intc_regs->icpr & intc_regs->icmr) & intc_regs->iclr;
+	intc_regs->icip = (intc_regs->icpr & intc_regs->icmr) & (~intc_regs->iclr);
+	m_maincpu->set_input_line(ARM7_FIRQ_LINE, intc_regs->icfp ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(ARM7_IRQ_LINE,  intc_regs->icip ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void zaurus_state::pxa255_set_irq_line(uint32_t line, int irq_state)
+{
+	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
+
+	intc_regs->icpr &= ~line;
+	intc_regs->icpr |= irq_state ? line : 0;
+	//printf( "Setting IRQ line %08x to %d\n", line, irq_state );
+	pxa255_update_interrupts();
+}
+
+void zaurus_state::pxa255_ostimer_irq_check()
+{
+	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
+
+//  logerror("%08x OStimer irq check\n",ostimer_regs->oier);
+
+	pxa255_set_irq_line(PXA255_INT_OSTIMER0, (ostimer_regs->oier & PXA255_OIER_E0) ? ((ostimer_regs->ossr & PXA255_OSSR_M0) ? 1 : 0) : 0);
+	//pxa255_set_irq_line(PXA255_INT_OSTIMER1, (ostimer_regs->oier & PXA255_OIER_E1) ? ((ostimer_regs->ossr & PXA255_OSSR_M1) ? 1 : 0) : 0);
+	//pxa255_set_irq_line(PXA255_INT_OSTIMER2, (ostimer_regs->oier & PXA255_OIER_E2) ? ((ostimer_regs->ossr & PXA255_OSSR_M2) ? 1 : 0) : 0);
+	//pxa255_set_irq_line(PXA255_INT_OSTIMER3, (ostimer_regs->oier & PXA255_OIER_E3) ? ((ostimer_regs->ossr & PXA255_OSSR_M3) ? 1 : 0) : 0);
+}
+
+READ32_MEMBER(zaurus_state::pxa255_ostimer_r)
+{
+	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
+
+	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_OSMR0:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Match Register 0: %08x & %08x\n", ostimer_regs->osmr[0], mem_mask );
+			return ostimer_regs->osmr[0];
+		case PXA255_OSMR1:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Match Register 1: %08x & %08x\n", ostimer_regs->osmr[1], mem_mask );
+			return ostimer_regs->osmr[1];
+		case PXA255_OSMR2:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Match Register 2: %08x & %08x\n", ostimer_regs->osmr[2], mem_mask );
+			return ostimer_regs->osmr[2];
+		case PXA255_OSMR3:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Match Register 3: %08x & %08x\n", ostimer_regs->osmr[3], mem_mask );
+			return ostimer_regs->osmr[3];
+		case PXA255_OSCR:
+			if (0) verboselog(*this, 4, "pxa255_ostimer_r: OS Timer Count Register: %08x & %08x\n", ostimer_regs->oscr, mem_mask );
+			// free-running 3.something MHz counter.  this is a complete hack.
+			ostimer_regs->oscr += 0x300;
+			return ostimer_regs->oscr;
+		case PXA255_OSSR:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Status Register: %08x & %08x\n", ostimer_regs->ossr, mem_mask );
+			return ostimer_regs->ossr;
+		case PXA255_OWER:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Watchdog Match Enable Register: %08x & %08x\n", ostimer_regs->ower, mem_mask );
+			return ostimer_regs->ower;
+		case PXA255_OIER:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_r: OS Timer Interrupt Enable Register: %08x & %08x\n", ostimer_regs->oier, mem_mask );
+			return ostimer_regs->oier;
+		default:
+			if (0) verboselog(*this, 0, "pxa255_ostimer_r: Unknown address: %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2));
+			break;
+	}
+	return 0;
+}
+
+WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
+{
+	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
+
+	switch(PXA255_OSTMR_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_OSMR0:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Match Register 0: %08x & %08x\n", data, mem_mask );
+			ostimer_regs->osmr[0] = data;
+			if(ostimer_regs->oier & PXA255_OIER_E0)
+			{
+				attotime period = attotime::from_hz(3846400) * (ostimer_regs->osmr[0] - ostimer_regs->oscr);
+
+				//printf( "Adjusting one-shot timer to 200MHz * %08x\n", ostimer_regs->osmr[0]);
+				ostimer_regs->timer[0]->adjust(period);
+			}
+			break;
+		case PXA255_OSMR1:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Match Register 1: %08x & %08x\n", data, mem_mask );
+			ostimer_regs->osmr[1] = data;
+			if(ostimer_regs->oier & PXA255_OIER_E1)
+			{
+				attotime period = attotime::from_hz(3846400) * (ostimer_regs->osmr[1] - ostimer_regs->oscr);
+
+				ostimer_regs->timer[1]->adjust(period, 1);
+			}
+			break;
+		case PXA255_OSMR2:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Match Register 2: %08x & %08x\n", data, mem_mask );
+			ostimer_regs->osmr[2] = data;
+			if(ostimer_regs->oier & PXA255_OIER_E2)
+			{
+				attotime period = attotime::from_hz(3846400) * (ostimer_regs->osmr[2] - ostimer_regs->oscr);
+
+				ostimer_regs->timer[2]->adjust(period, 2);
+			}
+			break;
+		case PXA255_OSMR3:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Match Register 3: %08x & %08x\n", data, mem_mask );
+			ostimer_regs->osmr[3] = data;
+			if(ostimer_regs->oier & PXA255_OIER_E3)
+			{
+				//attotime period = attotime::from_hz(3846400) * (ostimer_regs->osmr[3] - ostimer_regs->oscr);
+
+				//ostimer_regs->timer[3]->adjust(period, 3);
+			}
+			break;
+		case PXA255_OSCR:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Count Register: %08x & %08x\n", data, mem_mask );
+			ostimer_regs->oscr = data;
+			break;
+		case PXA255_OSSR:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Status Register: %08x & %08x\n", data, mem_mask );
+			ostimer_regs->ossr &= ~data;
+			pxa255_ostimer_irq_check();
+			break;
+		case PXA255_OWER:
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Watchdog Enable Register: %08x & %08x\n", data, mem_mask );
+			ostimer_regs->ower = data & 0x00000001;
+			break;
+		case PXA255_OIER:
+		{
+			int index = 0;
+			if (0) verboselog(*this, 3, "pxa255_ostimer_w: OS Timer Interrupt Enable Register: %08x & %08x\n", data, mem_mask );
+			ostimer_regs->oier = data & 0x0000000f;
+			for(index = 0; index < 4; index++)
+			{
+				if(ostimer_regs->oier & (1 << index))
+				{
+					//attotime period = attotime::from_hz(200000000) * ostimer_regs->osmr[index];
+
+					//ostimer_regs->timer[index]->adjust(period, index);
+				}
+			}
+
+			break;
+		}
+		default:
+			verboselog(*this, 0, "pxa255_ostimer_w: Unknown address: %08x = %08x & %08x\n", PXA255_OSTMR_BASE_ADDR | (offset << 2), data, mem_mask);
+			break;
+	}
+}
+
+READ32_MEMBER(zaurus_state::pxa255_intc_r)
+{
+	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
+
+	switch(PXA255_INTC_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_ICIP:
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller IRQ Pending Register: %08x & %08x\n", intc_regs->icip, mem_mask );
+			return intc_regs->icip;
+		case PXA255_ICMR:
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller Mask Register: %08x & %08x\n", intc_regs->icmr, mem_mask );
+			return intc_regs->icmr;
+		case PXA255_ICLR:
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller Level Register: %08x & %08x\n", intc_regs->iclr, mem_mask );
+			return intc_regs->iclr;
+		case PXA255_ICFP:
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller FIQ Pending Register: %08x & %08x\n", intc_regs->icfp, mem_mask );
+			return intc_regs->icfp;
+		case PXA255_ICPR:
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller Pending Register: %08x & %08x\n", intc_regs->icpr, mem_mask );
+			return intc_regs->icpr;
+		case PXA255_ICCR:
+			if (0) verboselog(*this, 3, "pxa255_intc_r: Interrupt Controller Control Register: %08x & %08x\n", intc_regs->iccr, mem_mask );
+			return intc_regs->iccr;
+		default:
+			verboselog(*this, 0, "pxa255_intc_r: Unknown address: %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2));
+			break;
+	}
+	return 0;
+}
+
+WRITE32_MEMBER(zaurus_state::pxa255_intc_w)
+{
+	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
+
+	switch(PXA255_INTC_BASE_ADDR | (offset << 2))
+	{
+		case PXA255_ICIP:
+			verboselog(*this, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller IRQ Pending Register: %08x & %08x\n", data, mem_mask );
+			break;
+		case PXA255_ICMR:
+			if (0) verboselog(*this, 3, "pxa255_intc_w: Interrupt Controller Mask Register: %08x & %08x\n", data, mem_mask );
+			intc_regs->icmr = data & 0xfffe7f00;
+			break;
+		case PXA255_ICLR:
+			if (0) verboselog(*this, 3, "pxa255_intc_w: Interrupt Controller Level Register: %08x & %08x\n", data, mem_mask );
+			intc_regs->iclr = data & 0xfffe7f00;
+			break;
+		case PXA255_ICFP:
+			if (0) verboselog(*this, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller FIQ Pending Register: %08x & %08x\n", data, mem_mask );
+			break;
+		case PXA255_ICPR:
+			if (0) verboselog(*this, 3, "pxa255_intc_w: (Invalid Write) Interrupt Controller Pending Register: %08x & %08x\n", data, mem_mask );
+			break;
+		case PXA255_ICCR:
+			if (0) verboselog(*this, 3, "pxa255_intc_w: Interrupt Controller Control Register: %08x & %08x\n", data, mem_mask );
+			intc_regs->iccr = data & 0x00000001;
+			break;
+		default:
+			verboselog(*this, 0, "pxa255_intc_w: Unknown address: %08x = %08x & %08x\n", PXA255_INTC_BASE_ADDR | (offset << 2), data, mem_mask);
+			break;
+	}
+}
 
 READ32_MEMBER(zaurus_state::pxa255_rtc_r)
 {
@@ -1477,13 +1715,9 @@ WRITE32_MEMBER(zaurus_state::pxa255_rtc_w)
 void zaurus_state::zaurus_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().region("firmware", 0);
-	map(0x40900000, 0x4090000f).rw(FUNC(zaurus_state::pxa255_rtc_r), FUNC(zaurus_state::pxa255_rtc_w));
-	map(0x40000000, 0x400002ff).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_dma_r), FUNC(pxa255_periphs_device::pxa255_dma_w));
-	map(0x40400000, 0x40400083).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_i2s_r), FUNC(pxa255_periphs_device::pxa255_i2s_w));
-	map(0x40a00000, 0x40a0001f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_ostimer_r), FUNC(pxa255_periphs_device::pxa255_ostimer_w));
-	map(0x40d00000, 0x40d00017).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_intc_r), FUNC(pxa255_periphs_device::pxa255_intc_w));
-	map(0x40e00000, 0x40e0006b).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_gpio_r), FUNC(pxa255_periphs_device::pxa255_gpio_w));
-	map(0x44000000, 0x4400021f).rw(m_pxa_periphs, FUNC(pxa255_periphs_device::pxa255_lcd_r), FUNC(pxa255_periphs_device::pxa255_lcd_w));
+	map(0x40900000, 0x4090000f).rw(this, FUNC(zaurus_state::pxa255_rtc_r), FUNC(zaurus_state::pxa255_rtc_w));
+	map(0x40a00000, 0x40a0001f).rw(this, FUNC(zaurus_state::pxa255_ostimer_r), FUNC(zaurus_state::pxa255_ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(this, FUNC(zaurus_state::pxa255_intc_r), FUNC(zaurus_state::pxa255_intc_w));
 	map(0xa0000000, 0xa07fffff).ram().share("ram");
 }
 
@@ -1505,7 +1739,7 @@ void zaurus_state::machine_reset()
 /* TODO: Hack */
 TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 {
-#if 0
+	#if 0
 	m_rtc_tick++;
 	m_rtc_tick&=1;
 
@@ -1513,16 +1747,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
 		pxa255_set_irq_line(PXA255_INT_RTC_HZ,1);
 	else
 		pxa255_set_irq_line(PXA255_INT_RTC_HZ,0);
-#else
-	(void)m_rtc_tick;
-#endif
+	#endif
 }
 
 // TODO: main CPU differs greatly between versions!
 MACHINE_CONFIG_START(zaurus_state::zaurus)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,PXA255,MAIN_CLOCK)
+	MCFG_DEVICE_ADD("maincpu",PXA255,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(zaurus_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL(32'768)))
@@ -1539,9 +1771,8 @@ MACHINE_CONFIG_START(zaurus_state::zaurus)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
-
-	PXA255_PERIPHERALS(config, m_pxa_periphs, MAIN_CLOCK, m_maincpu);
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 

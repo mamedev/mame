@@ -394,19 +394,19 @@ void calchase_state::calchase_map(address_map &map)
 	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
 	map(0x000c8000, 0x000cffff).noprw();
 	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
-	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::calchase_iocard1_r));
-	map(0x000d000c, 0x000d000d).r(FUNC(calchase_state::calchase_iocard2_r));
-	map(0x000d0032, 0x000d0033).r(FUNC(calchase_state::calchase_iocard3_r));
-	map(0x000d0030, 0x000d0031).r(FUNC(calchase_state::calchase_iocard4_r));
-	map(0x000d0034, 0x000d0035).r(FUNC(calchase_state::calchase_iocard5_r));
+	map(0x000d0004, 0x000d0005).r(this, FUNC(calchase_state::calchase_iocard1_r));
+	map(0x000d000c, 0x000d000d).r(this, FUNC(calchase_state::calchase_iocard2_r));
+	map(0x000d0032, 0x000d0033).r(this, FUNC(calchase_state::calchase_iocard3_r));
+	map(0x000d0030, 0x000d0031).r(this, FUNC(calchase_state::calchase_iocard4_r));
+	map(0x000d0034, 0x000d0035).r(this, FUNC(calchase_state::calchase_iocard5_r));
 	map(0x000d0008, 0x000d000b).nopw(); // ???
-	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::data_w));
-	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::data_w));
+	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::write));
+	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::write));
 	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
 //  map(0x000d0800, 0x000d0fff).ram();  // GAME_CMOS
 
-	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(calchase_state::bios_ext_ram_w));
-	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(calchase_state::bios_ram_w));
+	map(0x000e0000, 0x000effff).bankr("bios_ext").w(this, FUNC(calchase_state::bios_ext_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(this, FUNC(calchase_state::bios_ram_w));
 	map(0x00100000, 0x03ffffff).ram();  // 64MB
 	map(0x04000000, 0x28ffffff).noprw();
 	//map(0x04000000, 0x040001ff).ram();
@@ -426,7 +426,7 @@ void calchase_state::calchase_io(address_map &map)
 	//map(0x00e8, 0x00eb).noprw();
 	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
 	map(0x0170, 0x0177).noprw(); //To debug
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
 	map(0x0200, 0x021f).noprw(); //To debug
 	map(0x0260, 0x026f).noprw(); //To debug
 	map(0x0278, 0x027b).nopw();//AM_WRITE(pnp_config_w)
@@ -444,7 +444,7 @@ void calchase_state::calchase_io(address_map &map)
 	map(0x0378, 0x037f).noprw(); //To debug
 	// map(0x0300, 0x03af).noprw();
 	// map(0x03b0, 0x03df).noprw();
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
 	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
 	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
@@ -685,8 +685,8 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 
 	pcat_common(config);
 
-	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, calchase_state, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -695,9 +695,10 @@ MACHINE_CONFIG_START(calchase_state::calchase)
 	/* video hardware */
 	pcvideo_trident_vga(config);
 
-	ds12885_device &rtc(DS12885(config.replace(), "rtc"));
-	rtc.irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
-	rtc.set_century_index(0x32);
+	MCFG_DEVICE_REMOVE("rtc")
+	MCFG_DS12885_ADD("rtc")
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir0_w))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -717,8 +718,8 @@ MACHINE_CONFIG_START(calchase_state::hostinv)
 
 	pcat_common(config);
 
-	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "cdrom", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "cdrom", nullptr, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, calchase_state, intel82439tx_pci_r, intel82439tx_pci_w)

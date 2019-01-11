@@ -5,10 +5,9 @@
  * includes/orao.h
  *
  ****************************************************************************/
+
 #ifndef MAME_INCLUDES_ORAO_H
 #define MAME_INCLUDES_ORAO_H
-
-#pragma once
 
 #include "sound/spkrdev.h"
 #include "imagedev/cassette.h"
@@ -16,8 +15,8 @@
 class orao_state : public driver_device
 {
 public:
-	orao_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	orao_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_memory(*this, "memory"),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -27,20 +26,17 @@ public:
 		m_beep(0)
 	{ }
 
-	void orao(machine_config &config);
-
-	void init_orao();
-	void init_orao103();
-
-private:
 	DECLARE_READ8_MEMBER(orao_io_r);
 	DECLARE_WRITE8_MEMBER(orao_io_w);
+	void init_orao();
+	void init_orao103();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void orao(machine_config &config);
 	void orao_mem(address_map &map);
-
+private:
 	required_shared_ptr<uint8_t> m_memory;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<cpu_device> m_maincpu;

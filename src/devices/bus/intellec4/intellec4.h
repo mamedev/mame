@@ -114,6 +114,38 @@ to implement the card in both systems.
 #pragma once
 
 
+#define MCFG_INTELLEC4_UNIV_SLOT_REMOVE(slot_tag) \
+		MCFG_DEVICE_REMOVE(slot_tag)
+
+
+#define MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE(tag, space) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_rom_space(tag, space);
+
+#define MCFG_INTELLEC4_UNIV_BUS_ROM_PORTS_SPACE(tag, space) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_rom_ports_space(tag, space);
+
+#define MCFG_INTELLEC4_UNIV_BUS_MEMORY_SPACE(tag, space) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_memory_space(tag, space);
+
+#define MCFG_INTELLEC4_UNIV_BUS_STATUS_SPACE(tag, space) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_status_space(tag, space);
+
+#define MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE(tag, space) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_ram_ports_space(tag, space);
+
+#define MCFG_INTELLEC4_UNIV_BUS_TEST_CB(obj) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_test_out_cb(DEVCB_##obj);
+
+#define MCFG_INTELLEC4_UNIV_BUS_STOP_CB(obj) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_stop_out_cb(DEVCB_##obj);
+
+#define MCFG_INTELLEC4_UNIV_BUS_RESET_4002_CB(obj) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_reset_4002_out_cb(DEVCB_##obj);
+
+#define MCFG_INTELLEC4_UNIV_BUS_USER_RESET_CB(obj) \
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_user_reset_out_cb(DEVCB_##obj);
+
+
 namespace bus { namespace intellec4 {
 
 class univ_slot_device;
@@ -160,10 +192,10 @@ public:
 	template <typename T> void set_ram_ports_space(T &&tag, int space) { m_ram_ports_device.set_tag(std::forward<T>(tag)); m_ram_ports_space = space; }
 
 	// callback configuration
-	auto stop_out_cb() { return m_stop_out_cb.bind(); }
-	auto test_out_cb() { return m_test_out_cb.bind(); }
-	auto reset_4002_out_cb() { return m_reset_4002_out_cb.bind(); }
-	auto user_reset_out_cb() { return m_user_reset_out_cb.bind(); }
+	template <typename Obj> devcb_base &set_stop_out_cb(Obj &&cb) { return m_stop_out_cb.set_callback(std::forward<Obj>(cb)); }
+	template <typename Obj> devcb_base &set_test_out_cb(Obj &&cb) { return m_test_out_cb.set_callback(std::forward<Obj>(cb)); }
+	template <typename Obj> devcb_base &set_reset_4002_out_cb(Obj &&cb) { return m_reset_4002_out_cb.set_callback(std::forward<Obj>(cb)); }
+	template <typename Obj> devcb_base &set_user_reset_out_cb(Obj &&cb) { return m_user_reset_out_cb.set_callback(std::forward<Obj>(cb)); }
 
 	univ_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 

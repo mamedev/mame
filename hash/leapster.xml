@@ -2,13 +2,12 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but not dumped yet:
+Known games listed by part-no, (*) denotes undumped:
 
 |  PART-NO    |LAN| GAME TITLE                                                | CARTRIDGE-TYPE |
 ================================================================================================
 | 500-10093   |ENG| Learning with Leap                                        | LEAPSTER       |
 | 500-10775-A |ENG| Finding Nemo                                              | LEAPSTER       |
-| 500-10777-A |ENG| Top-Secret Personal Beeswax                               | LEAPSTER       | (*)
 | 500-10825-A |ENG| Spider-Man - The Case of the Sinister Speller             | LEAPSTER       |
 | 500-10829-A |ENG| Reading with Phonics - Mole's Huge Nose                   | LEAPSTER       |
 | 500-10933-A |GER| Spongebob Schwammkopf hat alles im Griff                  | LEAPSTER       |
@@ -28,7 +27,6 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-11496-A |GER| Disney Prinzessinnen - Zauberhaftes Lernen                | LEAPSTER       |
 | 500-11496-B |GER| Disney Prinzessinnen - Zauberhaftes Lernen                | LEAPSTER       | (*)
 | 500-11497-A |GER| Spider-Man - Schachmatt den Schildersaboteuren!           | LEAPSTER       |
-| 500-11529-A |ENG| School House Rock! - America Rock                         | LEAPSTER       | (*)
 | 500-11603-A |GER| DEMO - Herbst 2004 II                                     | LEAPSTER       |
 | 500-11777-A |ENG| Numbers on the Run - Counting on Zero                     | LEAPSTER L-MAX |
 | 500-11779-A |ENG| Letters on the Loose                                      | LEAPSTER L-MAX |
@@ -39,8 +37,6 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-11972-A |GER| Batman - Multipliziere, dividiere und reagiere            | LEAPSTER       |
 | 500-11993-A |ENG| Number Raiders - Arcade-Style Learning                    | LEAPSTER       |
 | 500-11994-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       |
-| 500-11995-A |ENG| Letterpillar                                              | LEAPSTER       | (*)
-| 500-11996-A |ENG| Word Chasers                                              | LEAPSTER       | (*)
 | 500-12098-A |ENG| Cars                                                      | LEAPSTER       |
 | 500-12099-A |ENG| NASCAR                                                    | LEAPSTER L-MAX |
 | 500-12139-A |GER| Buchstabenraupe - Lernen im Arcade-Stil!                  | LEAPSTER       | (*)
@@ -50,37 +46,29 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-12160-A |ENG| Scooby Doo! - Spooky Snacks!                              | LEAPSTER       |
 | 500-12161-A |ENG| Dora the Explorer - Piñata Party - Arcade-Style Learning! | LEAPSTER       |
 | 500-12171-A |GER| Cars                                                      | LEAPSTER       |
-| 500-12202-A |SPA| La Conquista De Los Números                               | LEAPSTER       |
-| 500-12206-A |SPA| Don Lápiz - Aprender A Dibujar Y Escribir                 | LEAPSTER       |
-| 500-12210-A |SPA| Spider-Man - El Caso de Las Letras Revueltas              | LEAPSTER       |
 | 500-12218-A |SPA| Disney Princesa - La Magia De Aprender                    | LEAPSTER       |
 | 500-12223-A |SPA| Cars                                                      | LEAPSTER       |
-| 500-12227-A |SPA| Buscando a Nemo - Leer Bajo el Mar                        | LEAPSTER       |
-| 500-12259-A |SPA| El Laberinto De Las Letras                                | LEAPSTER       |
 | 500-12293-A |ENG| Animal Genius                                             | LEAPSTER       |
 | 500-12296-A |ENG| SonicX                                                    | LEAPSTER       |
-| 500-12339-A |FRA| Dora L'Exploratrice - Au Secours Des Animaux              | LEAPSTER       |
+| 500-12339-A |FRA| Dora L' Exploratrice - Au Secours Des Animaux             | LEAPSTER       |
 | 500-12350-A |ENG| Letterpillar                                              | LEAPSTER       |
-| 500-12352-A |ENG| Cosmic Math - Arcade-Style Learning!                      | LEAPSTER       | (*)
-| 500-12392-A |FRA| Dora L'Exploratrice - Le Pont Casse                       | LEAPSTER       |
-| 500-12393-A |FRA| La Rivière Des Lapins + L'atelier De Peinture             | LEAPSTER       |
+| 500-12392-A |FRA| Dora L' Exploratrice - Le Pont Casse                      | LEAPSTER       |
+| 500-12393-A |FRA| La Riviere Des Lapins + L'atelier De Peinture             | LEAPSTER       |
 | 500-12411-A |FRA| Disney Princesse - La Magie D'Apprendre                   | LEAPSTER       |
-| 500-12413-A |FRA| A La Conquête Des Nombres                                 | LEAPSTER       |
+| 500-12413-A |FRA| A La Conquete Des Nombres                                 | LEAPSTER       |
 | 500-12414-A |FRA| Cars                                                      | LEAPSTER       |
 | 500-12415-A |FRA| Bob Leponge - Heros D'un Jour                             | LEAPSTER       |
-| 500-12416-A |FRA| Spider-Man - L'Affaire Des Mots Mystères                  | LEAPSTER       |
+| 500-12416-A |FRA| Spider-Man - L'Affaire Des Mots Mysteres                  | LEAPSTER       |
 | 500-12466-A |ENG| Clifford - The Big Red Dog - Reading                      | LEAPSTER       |
 | 500-12475-A |FRA| Adibou - A La Recherche De Robitoc                        | LEAPSTER       |
 | 500-12562-B |GER| Dora - Retter der Wildnis                                 | LEAPSTER       |
 | 500-12629-A |FRA| Scooby-Doo! - Et Les Nombres Fous!                        | LEAPSTER       |
 | 500-12654-A |ENG| Ratatouille                                               | LEAPSTER       | (*)
 | 500-12674-A |FRA| Ratatouille                                               | LEAPSTER       |
-| 500-12676-A |ENG| Pet Pals                                                  | LEAPSTER       | (*)
 | 500-12677-A |ENG| Creature Create                                           | LEAPSTER       |
 | 500-12692-A |ENG| Get Puzzled!                                              | LEAPSTER       |
 | 500-12711-A |ENG| Batman - Strength in numbers                              | LEAPSTER       |
 | 500-12712-A |ENG| Cars : Supercharged                                       | LEAPSTER       |
-| 500-12713-A |ENG| Disney World of Enchantment                               | LEAPSTER       | (*)
 | 500-12715-A |ENG| Foster's Home for Imaginary Friends                       | LEAPSTER       |
 | 500-12719-A |ENG| Spongebob Squarepants - Through The Wormhole              | LEAPSTER       |
 | 500-12738-A |GER| Ratatouille                                               | LEAPSTER       |
@@ -119,6 +107,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 | 500-14320-A |ENG| Cars 2                                                    | LEAPSTER       |
 
 -->
+
 
 <!-- Entries are ordered by title of the parent, clones are list after the parent, Leapster L-Max in an own section at the end -->
 
@@ -461,7 +450,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="doraf" cloneof="dora" supported="no">
-		<description>Dora L'Exploratrice - Au Secours Des Animaux (Fra)</description>
+		<description>Dora L' Exploratrice - Au Secours Des Animaux (Fra)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12339-A" />
@@ -473,7 +462,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="dorapont" supported="no">
-		<description>Dora L'Exploratrice - Le Pont Casse (Fra)</description>
+		<description>Dora L' Exploratrice - Le Pont Casse (Fra)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12392-A" />
@@ -504,18 +493,6 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11495-a.bin" size="8388608" crc="6a5e20ba" sha1="984638e1d9b869611de8900d8f5a6a760cd40539" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="findnemos" cloneof="findnemo" supported="no">
-		<description>Buscando a Nemo - Leer Bajo el Mar (Spa)</description>
-		<year>2003</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12227-A" />
-		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="500-12227-A - Buscando a Nemo (Spa).bin" size="8388608" crc="7aa17c75" sha1="798e2bf0d2decc08430ff5d3009b60dffa341aba" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -605,7 +582,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="riviere" supported="no">
-		<description>La Rivière Des Lapins + L'Atelier De Peinture (Fra)</description>
+		<description>La Riviere Des Lapins + L'Atelier De Peinture (Fra)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12393-A" />
@@ -688,18 +665,6 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		</part>
 	</software>
 
-	<software name="mrpencils" cloneof="mrpencil" supported="no">
-		<description>Don Lápiz - Aprender a Dibujar y Escribir (Spa)</description>
-		<year>2003</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12206-A" />
-		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="500-12206-A - Don Lapiz - Aprender a Dibujar y Escribir (Spa).bin" size="8388608" crc="e6e50c84" sha1="9fb971ac661618bad549f37fbad28ffdd3873a30" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="amuspark" supported="no">
 		<description>My Amusement Park (USA)</description>
 		<year>2003</year>
@@ -725,7 +690,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="numraidf" cloneof="numraid" supported="no">
-		<description>A La Conquête Des Nombres - Un Jeu D'Arcade Éducatif! (Fra)</description>
+		<description>A La Conquete Des Nombres - Un Jeu D'Arcade Éducatif! (Fra)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12413-A" />
@@ -744,18 +709,6 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="500-12141-a.bin" size="4194304" crc="334ab5d0" sha1="00eb76e267bfaded25fdf8361e933dc4ec72d059" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="numraids" cloneof="numraid" supported="no">
-		<description>La Conquista de los Números (Spa)</description>
-		<year>2003</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12141-A" />
-		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="500-12202-A - La Conquista de los Numeros (Spa).bin" size="4194304" crc="2fb737c6" sha1="6490a57d98f83ef96b0f4f783632a97c0fa460e4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -990,7 +943,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 	</software>
 
 	<software name="spidermnf" cloneof="spidermn" supported="no">
-		<description>Spider-Man - L'Affaire Des Mots Mystères (Fra)</description>
+		<description>Spider-Man - L'Affaire Des Mots Mysteres (Fra)</description>
 		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12416-A" />
@@ -1009,18 +962,6 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11497-a.bin" size="8388608" crc="9dc2e5f6" sha1="089e6739142edaaa5c0e72ba7faf6f443e1ddc59" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spidermns" cloneof="spidermn" supported="no">
-		<description>Spider-Man - El Caso de Las Letras Revueltas (Spa)</description>
-		<year>2003</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12210-A" />
-		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="500-12210-A - Spider-Man - El Caso de Las Letras Revueltas (Spa).bin" size="8388608" crc="96468ab9" sha1="24fab31e1b0aec1c963867da485d22b97da10660" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1193,8 +1134,7 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 		</part>
 	</software>
 
-	<!-- Word Chasers -->
-	<software name="wrdchsrsg" supported="no">
+	<software name="worter" supported="no">
 		<description>Wörterjäger - Lernen im Arcade-Stil! (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -1205,19 +1145,6 @@ Known games listed by part-no, (*) denotes undumped, (**) denotes acquired but n
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="wrdchsrss" cloneof="wrdchsrsg" supported="no"> <!-- By now, clone of "wrdchsrsg", until the English set is found -->
-		<description>El Laberinto de las Letras (Spa)</description>
-		<year>2003</year>
-		<publisher>LeapFrog</publisher>
-		<info name="serial" value="500-12259-A" />
-		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="500-12259-A - El Laberinto de las Letras (Spa).bin" size="4194304" crc="4a999f60" sha1="91f79a22a8f9f1af6d8ab11f7dc03858b58510d1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 
 	<!-- L-MAX carts, ordered by title -->
 

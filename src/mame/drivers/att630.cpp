@@ -19,13 +19,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void att630(machine_config &config);
-
-private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void att630(machine_config &config);
 	void mem_map(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
 };
 

@@ -38,7 +38,6 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -50,13 +49,11 @@ public:
 	st17xx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	void st17xx(machine_config &config);
-
-private:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void st17xx(machine_config &config);
 	void cpu_map(address_map &map);
 };
 

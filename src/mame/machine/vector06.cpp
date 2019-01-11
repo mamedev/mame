@@ -74,7 +74,7 @@ READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
-		return m_ay->read_data();
+		return m_ay->data_r();
 }
 
 WRITE8_MEMBER(vector06_state::vector06_romdisk_portb_w)

@@ -18,18 +18,18 @@ public:
 		: s11b_state(mconfig, type, tag)
 	{ }
 
-	void s11c(machine_config &config);
-
+	DECLARE_MACHINE_RESET(s11c);
 	void init_s11c();
 
-protected:
-	virtual void machine_reset() override;
-
-private:
-
+	void s11c(machine_config &config);
 	void s11c_main_map(address_map &map);
 	void s11c_audio_map(address_map &map);
 	void s11c_bg_map(address_map &map);
+protected:
+
+private:
+
+
 };
 
 

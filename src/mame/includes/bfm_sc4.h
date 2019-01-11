@@ -137,7 +137,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cpuregion(*this, "maincpu")
 		, m_nvram(*this, "nvram")
-		, m_reel(*this, "reel%u", 1U)
+		, m_reel1(*this, "reel1")
+		, m_reel2(*this, "reel2")
+		, m_reel3(*this, "reel3")
+		, m_reel4(*this, "reel4")
+		, m_reel5(*this, "reel5")
+		, m_reel6(*this, "reel6")
 		, m_io_ports(*this, "IN-%u", 0)
 	{
 		m_chk41addr = -1;
@@ -148,14 +153,25 @@ public:
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;
-	optional_device_array<stepper_device, 6> m_reel;
+	optional_device<stepper_device> m_reel1;
+	optional_device<stepper_device> m_reel2;
+	optional_device<stepper_device> m_reel3;
+	optional_device<stepper_device> m_reel4;
+	optional_device<stepper_device> m_reel5;
+	optional_device<stepper_device> m_reel6;
+
 
 	int m_reel12_latch;
 	int m_reel3_latch;
 	int m_reel4_latch;
 	int m_reel56_latch;
 	int m_optic_pattern;
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	SEC sec;
 
 	int m_meterstatus;

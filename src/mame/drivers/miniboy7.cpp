@@ -138,7 +138,6 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -165,12 +164,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	void miniboy7(machine_config &config);
-
-private:
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 	DECLARE_WRITE8_MEMBER(ay_pb_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
@@ -178,13 +174,16 @@ private:
 
 	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void miniboy7_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(miniboy7);
 
+	void miniboy7(machine_config &config);
 	void miniboy7_map(address_map &map);
 
-	virtual void machine_start() override;
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void machine_reset() override;
 
+private:
 	required_shared_ptr<uint8_t> m_videoram_a;
 	required_shared_ptr<uint8_t> m_colorram_a;
 	required_shared_ptr<uint8_t> m_videoram_b;
@@ -197,7 +196,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	output_finder<5> m_lamps;
+	output_finder<5> m_lamp;
 
 	uint8_t m_ay_pb;
 	int m_gpri;
@@ -256,50 +255,48 @@ MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 	}
 }
 
-void miniboy7_state::miniboy7_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
 {
-	/*
-		prom bits
-		7654 3210
-		---- ---x   red component?.
-		---- --x-   green component?.
-		---- -x--   blue component?.
-		---- x---   intensity?.
-		xxxx ----   unused.
-	*/
+/*
+    prom bits
+    7654 3210
+    ---- ---x   red component?.
+    ---- --x-   green component?.
+    ---- -x--   blue component?.
+    ---- x---   intensity?.
+    xxxx ----   unused.
+*/
+	int i;
 
 	/* 0000IBGR */
-	if (!m_proms)
-		return;
+	if (m_proms == nullptr) return;
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0;i < palette.entries();i++)
 	{
-		int const intenmin = 0xe0;
-//      int const intenmin = 0xc2;
-		int const intenmax = 0xff;
+		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
 
-		// intensity component
-		int const inten = BIT(m_proms[i], 3);
+		intenmin = 0xe0;
+//      intenmin = 0xc2;
+		intenmax = 0xff;
 
-		// red component
-		int const r = BIT(m_proms[i], 0) * (inten ? intenmax : intenmin);
+		/* intensity component */
+		inten = (m_proms[i] >> 3) & 0x01;
 
-		// green component
-		int const g = BIT(m_proms[i], 1) * (inten ? intenmax : intenmin);
+		/* red component */
+		bit0 = (m_proms[i] >> 0) & 0x01;
+		r = (bit0 * intenmin) + (inten * (bit0 * (intenmax - intenmin)));
 
-		// blue component
-		int const b = BIT(m_proms[i], 2) * (inten ? intenmax : intenmin);
+		/* green component */
+		bit1 = (m_proms[i] >> 1) & 0x01;
+		g = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
+
+		/* blue component */
+		bit2 = (m_proms[i] >> 2) & 0x01;
+		b = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
+
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
-}
-
-void miniboy7_state::machine_start()
-{
-	m_lamps.resolve();
-
-	save_item(NAME(m_ay_pb));
-	save_item(NAME(m_gpri));
 }
 
 void miniboy7_state::machine_reset()
@@ -317,11 +314,11 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 
 	data = data ^ 0xff;
 
-//    m_lamps[0] = BIT(data, 0);    // [----x]
-//    m_lamps[1] = BIT(data, 1);    // [---x-]
-//    m_lamps[2] = BIT(data, 2);    // [--x--]
-//    m_lamps[3] = BIT(data, 3);    // [-x---]
-//    m_lamps[4] = BIT(data, 4);    // [x----]
+//    m_lamp[0] = BIT(data, 0);    // [----x]
+//    m_lamp[1] = BIT(data, 1);    // [---x-]
+//    m_lamp[2] = BIT(data, 2);    // [--x--]
+//    m_lamp[3] = BIT(data, 3);    // [-x---]
+//    m_lamp[4] = BIT(data, 4);    // [x----]
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);    // counter
 
@@ -519,14 +516,14 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
 	MCFG_DEVICE_PROGRAM_MAP(miniboy7_map)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	pia6821_device &pia(PIA6821(config, "pia0", 0));
-	pia.readpa_handler().set_ioport("INPUT1");
-	pia.readpb_handler().set(FUNC(miniboy7_state::pia_pb_r));
-	pia.ca2_handler().set(FUNC(miniboy7_state::pia_ca2_w));
-	pia.irqa_handler().set_inputline("maincpu", 0);
-	pia.irqb_handler().set_inputline("maincpu", 0);
+	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_PIA_READPA_HANDLER(IOPORT("INPUT1"))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, miniboy7_state, pia_pb_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, miniboy7_state, pia_ca2_w))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", 0))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", 0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -538,21 +535,21 @@ MACHINE_CONFIG_START(miniboy7_state::miniboy7)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_miniboy7)
 
-	PALETTE(config, m_palette, FUNC(miniboy7_state::miniboy7_palette), 256);
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(miniboy7_state, miniboy7)
 
-	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 12)); /* guess */
-	crtc.set_screen("screen");
-	crtc.set_show_border_area(false);
-	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(miniboy7_state::crtc_update_row), this);
-	crtc.out_vsync_callback().set("pia0", FUNC(pia6821_device::ca1_w));
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 12) /* guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(miniboy7_state, crtc_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("pia0", pia6821_device, ca1_w))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK / 8));    /* guess */
-	ay8910.add_route(ALL_OUTPUTS, "mono", 0.75);
-	ay8910.port_a_write_callback().set(FUNC(miniboy7_state::ay_pa_w));
-	ay8910.port_b_write_callback().set(FUNC(miniboy7_state::ay_pb_w));
+	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK / 8)    /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, miniboy7_state, ay_pb_w))
 
 MACHINE_CONFIG_END
 

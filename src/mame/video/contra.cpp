@@ -21,17 +21,21 @@
 **
 ***************************************************************************/
 
-void contra_state::contra_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(contra_state, contra)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int chip;
 
-	for (int chip = 0; chip < 2; chip++)
+	for (chip = 0; chip < 2; chip++)
 	{
-		for (int pal = 0; pal < 8; pal++)
-		{
-			int const clut = (chip << 1) | (pal & 1);
+		int pal;
 
-			for (int i = 0; i < 0x100; i++)
+		for (pal = 0; pal < 8; pal++)
+		{
+			int i;
+			int clut = (chip << 1) | (pal & 1);
+
+			for (i = 0; i < 0x100; i++)
 			{
 				uint8_t ctabentry;
 
@@ -157,8 +161,8 @@ void contra_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	save_pointer(NAME(m_buffered_spriteram), 0x800);
-	save_pointer(NAME(m_buffered_spriteram_2), 0x800);
+	save_pointer(NAME(m_buffered_spriteram.get()), 0x800);
+	save_pointer(NAME(m_buffered_spriteram_2.get()), 0x800);
 }
 
 
@@ -235,9 +239,9 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(m_buffered_spriteram_2.get(), m_spriteram_2 + 0x800, 0x800);
+			memcpy(m_buffered_spriteram_2.get(), m_spriteram + 0x2800, 0x800);
 		else
-			memcpy(m_buffered_spriteram_2.get(), m_spriteram_2 + 0x000, 0x800);
+			memcpy(m_buffered_spriteram_2.get(), m_spriteram + 0x2000, 0x800);
 	}
 	if (offset == 6)
 	{

@@ -61,7 +61,7 @@ namco_audio_device::namco_audio_device(const machine_config &mconfig, device_typ
 	, m_sample_rate(0)
 	, m_f_fracbits(0)
 	, m_voices(0)
-	, m_stereo(false)
+	, m_stereo(0)
 {
 }
 

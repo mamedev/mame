@@ -4,7 +4,6 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "machine/taito68705interface.h"
-#include "emupal.h"
 
 class lsasquad_state : public driver_device
 {
@@ -24,11 +23,6 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	void lsasquad(machine_config &config);
-	void daikaiju(machine_config &config);
-	void storming(machine_config &config);
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_scrollram;
@@ -63,6 +57,9 @@ private:
 	int draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int  * previd, int type );
 	void drawbg( bitmap_ind16 &bitmap, const rectangle &cliprect, int type );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t priority );
+	void lsasquad(machine_config &config);
+	void daikaiju(machine_config &config);
+	void storming(machine_config &config);
 	void daikaiju_map(address_map &map);
 	void daikaiju_sound_map(address_map &map);
 	void lsasquad_map(address_map &map);

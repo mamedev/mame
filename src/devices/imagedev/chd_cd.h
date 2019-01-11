@@ -27,7 +27,7 @@ class cdrom_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cdrom_image_device();
 
 	void set_interface(const char *interface) { m_interface = interface; }

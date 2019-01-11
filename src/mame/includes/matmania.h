@@ -1,21 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
-#ifndef MAME_INCLUDES_MATMANIA_H
-#define MAME_INCLUDES_MATMANIA_H
-
-#pragma once
 
 #include "machine/taito68705interface.h"
 
 #include "machine/gen_latch.h"
-#include "emupal.h"
 #include "screen.h"
 
 class matmania_state : public driver_device
 {
 public:
-	matmania_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	matmania_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
@@ -35,13 +30,6 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void matmania(machine_config &config);
-	void maniach(machine_config &config);
-
-protected:
-	virtual void video_start() override;
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_videoram2;
@@ -71,13 +59,14 @@ private:
 	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
 	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
 	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
-	void matmania_palette(palette_device &palette) const;
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(matmania);
 	uint32_t screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void matmania(machine_config &config);
+	void maniach(machine_config &config);
 	void maniach_map(address_map &map);
 	void maniach_sound_map(address_map &map);
 	void matmania_map(address_map &map);
 	void matmania_sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_MATMANIA_H

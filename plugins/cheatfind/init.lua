@@ -80,7 +80,7 @@ function cheatfind.startplugin()
 			elseif data.shift < 0 then
 				local s = -data.shift
 				local read = (s == 1) and space.read_u16 or (s == 2) and space.read_u32 or (s == 3) and space.read_u64 or space.read_u8
-				local pack = (s == 1) and "<I2" or (s == 2) and "<I4" or (s == 3) and "<I8" or "B"
+				local pack = (s == 1) and "<H" or (s == 2) and "<L" or (s == 3) and "<J" or "B"
 				for i = start, start + (size >> s) do
 					if j < 65536 then
 						temp[j] = string.pack(pack, read(space, i))
@@ -98,14 +98,11 @@ function cheatfind.startplugin()
 		return data
 	end
 
-	-- compare two data blocks, format is as lua string.unpack, bne and beq val is table of masks, step is address increment value
-	function cheat.comp(newdata, olddata, oper, format, val, bcd, step)
+	-- compare two data blocks, format is as lua string.unpack, bne and beq val is table of masks
+	function cheat.comp(newdata, olddata, oper, format, val, bcd)
 		local ret = {}
 		local ref = {} -- this is a helper for comparing two match lists
 		local bitmask = nil
-		if not step or step <= 0 then
-			step = 1
-		end
 
 		local cfoper = {
 			lt = function(a, b, val) return (a < b and val == 0) or (val > 0 and (a + val) == b) end,
@@ -170,7 +167,7 @@ function cheatfind.startplugin()
 			val = 0
 		end
 
-		for i = 1, olddata.size, step do
+		for i = 1, olddata.size do
 			local oldstat, old = pcall(string.unpack, format, olddata.block, i)
 			local newstat, new = pcall(string.unpack, format, newdata.block, i)
 			if oldstat and newstat then
@@ -214,8 +211,8 @@ function cheatfind.startplugin()
 	end
 
 	-- compare two blocks and filter by table of previous matches
-	function cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd, step)
-		local matches, refs = cheat.comp(newdata, olddata, oper, format, check_val(oper, val, oldmatch), bcd, step)
+	function cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd)
+		local matches, refs = cheat.comp(newdata, olddata, oper, format, check_val(oper, val, oldmatch), bcd)
 		local nonmatch = {}
 		local oldrefs = {}
 		for num, match in pairs(oldmatch) do
@@ -240,15 +237,15 @@ function cheatfind.startplugin()
 
 
 	-- compare a data block to the current state
-	function cheat.compcur(olddata, oper, format, val, bcd, step)
+	function cheat.compcur(olddata, oper, format, val, bcd)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.comp(newdata, olddata, oper, format, val, bcd, step)
+		return cheat.comp(newdata, olddata, oper, format, val, bcd)
 	end
 
 	-- compare a data block to the current state and filter
-	function cheat.compcurnext(olddata, oldmatch, oper, format, val, bcd, step)
+	function cheat.compcurnext(olddata, oldmatch, oper, format, val, bcd)
 		local newdata = cheat.save(olddata.space, olddata.start, olddata.size, olddata.space)
-		return cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd, step)
+		return cheat.compnext(newdata, olddata, oldmatch, oper, format, val, bcd)
 	end
 
 
@@ -257,13 +254,11 @@ function cheatfind.startplugin()
 	local devtable = {}
 	local devsel = 1
 	local devcur = 1
-	local formtable = { " I1", " i1", "<I2", ">I2", "<i2", ">i2", "<I4", ">I4", "<i4", ">i4", "<I8", ">I8", "<i8", ">i8", }-- " <f", " >f", " <d", " >d" }
+	local formtable = { "B", "b", "<H", ">H", "<h", ">h", "<L", ">L", "<l", ">l", "<J", ">J", "<j", ">j" }
 	local formname = { "u8", "s8", "little u16", "big u16", "little s16", "big s16",
-			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64", }
-			   -- "little float", "big float", "little double", "big double" }
+			   "little u32", "big u32", "little s32", "big s32", "little u64", "big u64", "little s64", "big s64" }
 	local width = 1
 	local bcd = 0
-	local align = 0
 	local optable = { "lt", "gt", "eq", "ne", "beq", "bne", "ltv", "gtv", "eqv", "nev" }
 	local opsel = 1
 	local value = 0
@@ -512,23 +507,15 @@ function cheatfind.startplugin()
 				local function f(event)
 					if event == "select" then
 						local count = 0
-						local step = align == 1 and formtable[width]:sub(3, 3) or "1"
-						if step == "f" then
-							step = 4
-						elseif step == "d" then
-							step = 8
-						else
-							step = tonumber(step)
-						end
 						if #matches == 0 then
 							matches[1] = {}
 							for num = 1, #menu_blocks do
 								if leftop == #menu_blocks[1] + 1 then
 									matches[1][num] = cheat.compcur(menu_blocks[num][rightop], optable[opsel],
-									formtable[width], value, bcd == 1, step)
+									formtable[width], value, bcd == 1)
 								else
 									matches[1][num] = cheat.comp(menu_blocks[num][leftop], menu_blocks[num][rightop],
-									optable[opsel], formtable[width], value, bcd == 1, step)
+									optable[opsel], formtable[width], value, bcd == 1)
 								end
 								count = count + #matches[1][num]
 							end
@@ -538,10 +525,10 @@ function cheatfind.startplugin()
 							for num = 1, #menu_blocks do
 								if leftop == #menu_blocks[1] + 1 then
 									matches[#matches][num] = cheat.compcurnext(menu_blocks[num][rightop], lastmatch[num],
-									optable[opsel], formtable[width], value, bcd == 1, step)
+									optable[opsel], formtable[width], value, bcd == 1)
 								else
 									matches[#matches][num] = cheat.compnext(menu_blocks[num][leftop], menu_blocks[num][rightop],
-									lastmatch[num], optable[opsel], formtable[width], value, bcd == 1, step)
+									lastmatch[num], optable[opsel], formtable[width], value, bcd == 1)
 								end
 								count = count + #matches[#matches][num]
 							end
@@ -633,17 +620,6 @@ function cheatfind.startplugin()
 				end
 				return m, function(event) local r bcd, r = incdec(event, bcd, 0, 1) return r end
 			end
-			menu[#menu + 1] = function()
-				if formtable[width]:sub(3, 3) == "1" then
-					return nil
-				end
-				local m = { "Aligned only", _("Off"), 0 }
-				menu_lim(align, 0, 1, m)
-				if align == 1 then
-					m[2] = _("On")
-				end
-				return m, function(event) local r align, r = incdec(event, align, 0, 1) return r end
-			end
 			if #matches ~= 0 then
 				menu[#menu + 1] = function()
 					local function f(event)
@@ -698,15 +674,13 @@ function cheatfind.startplugin()
 					end
 					return mpairs_it, list, 0
 				end
-				local bitwidth = formtable[width]:sub(3, 3)
-				if bitwidth == "2" then
+				local bitwidth = formtable[width]:sub(2, 2):lower()
+				if bitwidth == "h" then
 					bitwidth = " %04x"
-				elseif bitwidth == "4" then
+				elseif bitwidth == "l" then
 					bitwidth = " %08x"
-				elseif bitwidth == "8" then
+				elseif bitwidth == "j" then
 					bitwidth = " %016x"
-				elseif bitwidth == "f" or bitwidth == "d" then
-					bitwidth = " %010f"
 				else
 					bitwidth = " %02x"
 				end
@@ -714,28 +688,20 @@ function cheatfind.startplugin()
 				local function match_exec(match)
 					local dev = devtable[devcur]
 					local cheat = { desc = string.format(_("Test cheat at addr %08X"), match.addr), script = {} }
-					local wid = formtable[width]:sub(3, 3)
+					local wid = formtable[width]:sub(2, 2):lower()
 					local widchar
 					local form
-					if wid == "2" then
+					if wid == "h" then
 						wid = "u16"
 						form = "%08x %04x"
 						widchar = "w"
-					elseif wid == "4" then
+					elseif wid == "l" then
 						wid = "u32"
 						form = "%08x %08x"
-						widchar = "d"
-					elseif wid == "8" then
+						widchart = "d"
+					elseif wid == "j" then
 						wid = "u64"
 						form = "%08x %016x"
-						widchar = "q"
-					elseif wid == "f" then
-						wid = "u32"
-						form = "%08x %f"
-						widchar = "d"
-					elseif wid == "d" then
-						wid = "u64"
-						form = "%08x %f"
 						widchar = "q"
 					else
 						wid = "u8"
@@ -747,9 +713,6 @@ function cheatfind.startplugin()
 					if getmetatable(dev.space).__name:match("device_t") then
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
-					elseif getmetatable(dev.space).__name:match("memory_share") then
-						cheat.share = { share = dev.tag }
-						cheat.script.run = "share:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
 					else
 						cheat.space = { cpu = { tag = dev.tag, type = dev.sname } }
 						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
@@ -784,7 +747,7 @@ function cheatfind.startplugin()
 						local json = require("json")
 						cheat.desc = "%s"
 						cheat_save.json = json.stringify({[1] = cheat}, {indent = true})
-						cheat_save.xml = string.format("<mamecheat version=\"1\">\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
+						cheat_save.xml = string.format("<mamecheat version=1>\n<cheat desc=\"%%s\">\n<script state=\"run\">\n<action>%s.pp%s@%X=%X</action>\n</script>\n</cheat>\n</mamecheat>", dev.tag:sub(2), widchar, match.addr, match.newval)
 						cheat_save.simple = string.format("%s,%s,%X,%s,%X,%%s\n", setname, dev.tag, match.addr, widchar, match.newval)
 						manager:machine():popmessage(string.format(_("Default name is %s"), cheat_save.name))
 						return true

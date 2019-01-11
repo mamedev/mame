@@ -252,10 +252,10 @@ void decocass_state::draw_special_priority(bitmap_ind16 &bitmap, bitmap_ind8 &pr
 	const uint8_t *objdata1 = m_gfxdecode->gfx(3)->get_data(1);
 	assert(m_gfxdecode->gfx(3)->rowbytes() == 64);
 
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const int dy = y - sy;
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			const int dx = x - sx;
 
@@ -308,7 +308,7 @@ void decocass_state::draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect
 	sx = (m_center_h_shift_space >> 2) & 0x3c;
 
 	for (y = 0; y < 4; y++)
-		if ((sy + y) >= cliprect.top() && (sy + y) <= cliprect.bottom())
+		if ((sy + y) >= cliprect.min_y && (sy + y) <= cliprect.max_y)
 		{
 			if (((sy + y) & m_color_center_bot & 3) == (sy & m_color_center_bot & 3))
 				for (x = 0; x < 256; x++)
@@ -588,10 +588,10 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, 
 			sy = 240 - sy + missile_y_adjust_flip_screen;
 		}
 		sy -= missile_y_adjust;
-		if (sy >= cliprect.top() && sy <= cliprect.bottom())
+		if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 			for (x = 0; x < 4; x++)
 			{
-				if (sx >= cliprect.left() && sx <= cliprect.right())
+				if (sx >= cliprect.min_x && sx <= cliprect.max_x)
 				{
 					bitmap.pix16(sy, sx) = (m_color_missiles & 7) | 8;
 					priority.pix8(sy, sx) |= 1 << 2;
@@ -607,10 +607,10 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, 
 			sy = 240 - sy + missile_y_adjust_flip_screen;
 		}
 		sy -= missile_y_adjust;
-		if (sy >= cliprect.top() && sy <= cliprect.bottom())
+		if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 			for (x = 0; x < 4; x++)
 			{
-				if (sx >= cliprect.left() && sx <= cliprect.right())
+				if (sx >= cliprect.min_x && sx <= cliprect.max_x)
 				{
 					bitmap.pix16(sy, sx) = ((m_color_missiles >> 4) & 7) | 8;
 					priority.pix8(sy, sx) |= 1 << 3;
@@ -663,13 +663,13 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 	// technically our y drawing probably shouldn't wrap / mask, but simply draw the 128pixel high 'edge' at the requested position
 	//  see note above this funciton
-	for (y=clip.top(); y<=clip.bottom(); y++)
+	for (y=clip.min_y; y<=clip.max_y;y++)
 	{
 		int srcline = (y + scrolly) & 0x1ff;
 		uint16_t* src = &srcbitmap->pix16(srcline);
 		uint16_t* dst = &bitmap.pix16(y);
 
-		for (x=clip.left(); x<=clip.right(); x++)
+		for (x=clip.min_x; x<=clip.max_x;x++)
 		{
 			int srccol = 0;
 

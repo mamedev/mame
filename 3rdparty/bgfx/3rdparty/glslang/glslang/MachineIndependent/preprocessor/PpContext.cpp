@@ -77,7 +77,6 @@ NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \****************************************************************************/
 
 #include <cstdlib>
-#include <locale>
 
 #include "PpContext.h"
 
@@ -92,8 +91,6 @@ TPpContext::TPpContext(TParseContextBase& pc, const std::string& rootFileName, T
     for (elsetracker = 0; elsetracker < maxIfNesting; elsetracker++)
         elseSeen[elsetracker] = false;
     elsetracker = 0;
-
-    strtodStream.imbue(std::locale::classic());
 }
 
 TPpContext::~TPpContext()

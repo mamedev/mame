@@ -23,13 +23,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(abc_keyboard_devices, _def_slot, false)
 
 #define MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(_devcb) \
-	downcast<abc_keyboard_port_device &>(*device).set_out_rx_handler(DEVCB_##_devcb);
+	devcb = &downcast<abc_keyboard_port_device &>(*device).set_out_rx_handler(DEVCB_##_devcb);
 
 #define MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(_devcb) \
-	downcast<abc_keyboard_port_device &>(*device).set_out_trxc_handler(DEVCB_##_devcb);
+	devcb = &downcast<abc_keyboard_port_device &>(*device).set_out_trxc_handler(DEVCB_##_devcb);
 
 #define MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(_devcb) \
-	downcast<abc_keyboard_port_device &>(*device).set_out_keydown_handler(DEVCB_##_devcb);
+	devcb = &downcast<abc_keyboard_port_device &>(*device).set_out_keydown_handler(DEVCB_##_devcb);
 
 
 

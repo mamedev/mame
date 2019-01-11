@@ -61,18 +61,18 @@ write:
 void dday_state::dday_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4000).w(FUNC(dday_state::dday_sl_control_w));
-	map(0x5000, 0x53ff).ram().w(FUNC(dday_state::dday_textvideoram_w)).share("textvideoram");
-	map(0x5400, 0x57ff).ram().w(FUNC(dday_state::dday_fgvideoram_w)).share("fgvideoram");
-	map(0x5800, 0x5bff).ram().w(FUNC(dday_state::dday_bgvideoram_w)).share("bgvideoram");
-	map(0x5c00, 0x5fff).rw(FUNC(dday_state::dday_colorram_r), FUNC(dday_state::dday_colorram_w)).share("colorram");
+	map(0x4000, 0x4000).w(this, FUNC(dday_state::dday_sl_control_w));
+	map(0x5000, 0x53ff).ram().w(this, FUNC(dday_state::dday_textvideoram_w)).share("textvideoram");
+	map(0x5400, 0x57ff).ram().w(this, FUNC(dday_state::dday_fgvideoram_w)).share("fgvideoram");
+	map(0x5800, 0x5bff).ram().w(this, FUNC(dday_state::dday_bgvideoram_w)).share("bgvideoram");
+	map(0x5c00, 0x5fff).rw(this, FUNC(dday_state::dday_colorram_r), FUNC(dday_state::dday_colorram_w)).share("colorram");
 	map(0x6000, 0x63ff).ram();
 	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8910_device::address_data_w));
 	map(0x6800, 0x6801).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x6c00, 0x6c00).portr("BUTTONS");
 	map(0x7000, 0x7000).portr("DSW0");
 	map(0x7400, 0x7400).portr("DSW1");
-	map(0x7800, 0x7800).rw(FUNC(dday_state::dday_countdown_timer_r), FUNC(dday_state::dday_control_w));
+	map(0x7800, 0x7800).rw(this, FUNC(dday_state::dday_countdown_timer_r), FUNC(dday_state::dday_control_w));
 	map(0x7c00, 0x7c00).portr("PADDLE");
 }
 
@@ -268,17 +268,22 @@ MACHINE_CONFIG_START(dday_state::dday)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dday_state, screen_update_dday)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dday);
-	PALETTE(config, m_palette, FUNC(dday_state::dday_palette), 256).enable_shadows();
-	m_palette->set_indirect_entries(256); // HACK!!!
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dday)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256) /* HACK!!! */
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_INIT_OWNER(dday_state, dday)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay1, 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-	AY8910(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay1", AY8910, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_DEVICE_ADD("ay2", AY8910, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

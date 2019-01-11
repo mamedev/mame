@@ -470,6 +470,7 @@ void arm7_cpu_device::drctg04_00_04(drcuml_block &block, compiler_state &compile
 	uint32_t rs = (op & THUMB_ADDSUB_RS) >> THUMB_ADDSUB_RS_SHIFT;
 	uint32_t rd = (op & THUMB_ADDSUB_RD) >> THUMB_ADDSUB_RD_SHIFT;
 	uml::code_label skip;
+	uml::code_label offsg32;
 	uml::code_label offs32;
 
 	UML_MOV(block, uml::I0, DRC_REG(rd));

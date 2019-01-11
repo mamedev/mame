@@ -133,7 +133,6 @@ public:
 	device_t *get_card_device() const { return m_card_device; }
 	void set_card_device(device_t *dev) { m_card_device = dev; }
 	const char *slot_name() const { return device().tag() + 1; }
-	slot_option &option_set(const char *tag, const device_type &devtype) { m_default_option = tag; m_fixed = true; return option_add_internal(tag, devtype); }
 
 protected:
 	void set_default_clock(u32 clock) { m_default_clock = clock; }

@@ -88,7 +88,7 @@ void wiping_state::main_map(address_map &map)
 	map(0x9000, 0x93ff).ram().share("share1");
 	map(0x9800, 0x9bff).ram().share("share2");
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xa800, 0xa807).r(FUNC(wiping_state::ports_r));
+	map(0xa800, 0xa807).r(this, FUNC(wiping_state::ports_r));
 	map(0xb000, 0xb7ff).ram();
 	map(0xb800, 0xb800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
@@ -296,13 +296,13 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wiping_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
-	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5A
-	mainlatch.q_out_cb<0>().set(FUNC(wiping_state::main_irq_mask_w)); // INT1
-	mainlatch.q_out_cb<1>().set(FUNC(wiping_state::sound_irq_mask_w)); // INT2
-	mainlatch.q_out_cb<2>().set(FUNC(wiping_state::flipscreen_w)); // INV
-	mainlatch.q_out_cb<3>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert(); // CP2RE
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5A
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wiping_state, main_irq_mask_w)) // INT1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wiping_state, sound_irq_mask_w)) // INT2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wiping_state, flipscreen_w)) // INV
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // CP2RE
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -311,15 +311,18 @@ MACHINE_CONFIG_START(wiping_state::wiping)
 	MCFG_SCREEN_SIZE(36*8, 28*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wiping_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wiping);
-	PALETTE(config, m_palette, FUNC(wiping_state::wiping_palette), 64*4+64*4, 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wiping)
+	MCFG_PALETTE_ADD("palette", 64*4+64*4)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
+	MCFG_PALETTE_INIT_OWNER(wiping_state, wiping)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	WIPING_CUSTOM(config, "wiping", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("wiping", WIPING_CUSTOM, 96000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

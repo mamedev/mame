@@ -15,6 +15,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -24,11 +25,11 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_scanline_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::irq)
 {
 	int scanline = param;
 
-	if (scanline == 240 && (m_screen->frame_number() & 1) == 0)
+	if (scanline == 240)
 	{
 		if (*m_interrupt_enable & 4)
 			m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -47,9 +48,9 @@ WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 
 WRITE8_MEMBER(ironhors_state::filter_w)
 {
-	m_disc_ih->write(NODE_11, (data & 0x04) >> 2);
-	m_disc_ih->write(NODE_12, (data & 0x02) >> 1);
-	m_disc_ih->write(NODE_13, (data & 0x01) >> 0);
+	m_disc_ih->write(space, NODE_11, (data & 0x04) >> 2);
+	m_disc_ih->write(space, NODE_12, (data & 0x02) >> 1);
+	m_disc_ih->write(space, NODE_13, (data & 0x01) >> 0);
 }
 
 /*************************************
@@ -61,24 +62,24 @@ WRITE8_MEMBER(ironhors_state::filter_w)
 void ironhors_state::master_map(address_map &map)
 {
 	map(0x0000, 0x0002).ram();
-	map(0x0003, 0x0003).ram().w(FUNC(ironhors_state::charbank_w));
+	map(0x0003, 0x0003).ram().w(this, FUNC(ironhors_state::charbank_w));
 	map(0x0004, 0x0004).ram().share("int_enable");
 	map(0x0005, 0x001f).ram();
 	map(0x0020, 0x003f).ram().share("scroll");
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00df).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900).portr("DSW3").w(FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2").w(FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
+	map(0x0900, 0x0900).portr("DSW3").w(this, FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2").w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
 	map(0x0b01, 0x0b01).portr("P2");
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 	map(0x1800, 0x1800).nopw(); // ???
 	map(0x1a00, 0x1a01).nopw(); // ???
 	map(0x1c00, 0x1dff).nopw(); // ???
-	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x3000, 0x30ff).ram().share("spriteram2");
 	map(0x3100, 0x37ff).ram();
@@ -111,22 +112,22 @@ void ironhors_state::farwest_master_map(address_map &map)
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00ff).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
-	map(0x0b01, 0x0b01).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
+	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(this, FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
+	map(0x0b01, 0x0b01).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 
 
 
-	map(0x1800, 0x1800).w(FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x1800, 0x1800).w(this, FUNC(ironhors_state::sh_irqtrigger_w));
 	map(0x1a00, 0x1a00).ram().share("int_enable");
-	map(0x1a01, 0x1a01).ram().w(FUNC(ironhors_state::charbank_w));
-	map(0x1a02, 0x1a02).w(FUNC(ironhors_state::palettebank_w));
+	map(0x1a01, 0x1a01).ram().w(this, FUNC(ironhors_state::charbank_w));
+	map(0x1a02, 0x1a02).w(this, FUNC(ironhors_state::palettebank_w));
 //  map(0x1c00, 0x1fff).ram();
-	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x1c00, 0x1dff).ram().share("spriteram2");
 	map(0x3000, 0x38ff).ram();
@@ -383,7 +384,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, ironhors_scanline_tick, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(slave_map)
@@ -392,36 +393,37 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(61)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(18432000/4,296,8,256-8,255,16,240) // pixel clock is a guesswork
-
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ironhors);
-	PALETTE(config, m_palette, FUNC(ironhors_state::ironhors_palette), 16*8*16+16*8*16, 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ironhors)
+	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	ym2203_device &ym2203(YM2203(config, "ym2203", 18432000/6));
-	ym2203.port_a_write_callback().set(FUNC(ironhors_state::filter_w));
-	ym2203.add_route(0, "disc_ih", 1.0, 0);
-	ym2203.add_route(1, "disc_ih", 1.0, 1);
-	ym2203.add_route(2, "disc_ih", 1.0, 2);
-	ym2203.add_route(3, "disc_ih", 1.0, 3);
+	MCFG_DEVICE_ADD("ym2203", YM2203, 18432000/6)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ironhors_state, filter_w))
+
+	MCFG_SOUND_ROUTE(0, "disc_ih", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "disc_ih", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "disc_ih", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "disc_ih", 1.0, 3)
 
 	MCFG_DEVICE_ADD("disc_ih", DISCRETE, ironhors_discrete)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
 {
 	int scanline = param;
 
@@ -448,18 +450,20 @@ MACHINE_CONFIG_START(ironhors_state::farwest)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(farwest_master_map)
 	MCFG_DEVICE_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_scanline_tick)
+	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_irq)
 
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(farwest_slave_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	m_gfxdecode->set_info(gfx_farwest);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_farwest)
 	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)
 
-	subdevice<ym2203_device>("ym2203")->port_b_read_callback().set(FUNC(ironhors_state::farwest_soundlatch_r));
+	MCFG_DEVICE_MODIFY("ym2203")
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ironhors_state, farwest_soundlatch_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ironhors_state, filter_w))
 MACHINE_CONFIG_END
 
 

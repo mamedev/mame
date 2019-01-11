@@ -31,6 +31,7 @@ Known to exist but not dumped:
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
+#include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "includes/midvunit.h"
 #include "crusnusa.lh"
@@ -68,6 +69,9 @@ void midvunit_state::machine_reset()
 
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
+
+	m_timer[0] = machine().device<timer_device>("timer0");
+	m_timer[1] = machine().device<timer_device>("timer1");
 }
 
 
@@ -79,7 +83,10 @@ MACHINE_RESET_MEMBER(midvunit_state,midvplus)
 	memcpy(m_ram_base, memregion("user1")->base(), 0x20000*4);
 	m_maincpu->reset();
 
-	m_ata->reset();
+	m_timer[0] = machine().device<timer_device>("timer0");
+	m_timer[1] = machine().device<timer_device>("timer1");
+
+	machine().device("ata")->reset();
 }
 
 
@@ -280,8 +287,8 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 {
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r(space,0) << 15);
-	return in1 | in1 << 16;
+	int status = m_midway_serial_pic->status_r(space,0);
+	return (ioport("991030")->read() & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -342,8 +349,8 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
 
 READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
-	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r(space,0) << 15);
-	return in1 | in1 << 16;
+	int status = m_midway_serial_pic2->status_r(space,0);
+	return (ioport("991030")->read()  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -588,30 +595,30 @@ void midvunit_state::midvunit_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).ram().share("ram_base");
 	map(0x400000, 0x41ffff).ram();
-	map(0x600000, 0x600000).w(FUNC(midvunit_state::midvunit_dma_queue_w));
-	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
+	map(0x600000, 0x600000).w(this, FUNC(midvunit_state::midvunit_dma_queue_w));
+	map(0x808000, 0x80807f).rw(this, FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
 	map(0x809800, 0x809fff).ram();
-	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
-	map(0x980000, 0x980000).r(FUNC(midvunit_state::midvunit_dma_queue_entries_r));
-	map(0x980020, 0x980020).r(FUNC(midvunit_state::midvunit_scanline_r));
-	map(0x980020, 0x98002b).w(FUNC(midvunit_state::midvunit_video_control_w));
-	map(0x980040, 0x980040).rw(FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
+	map(0x900000, 0x97ffff).rw(this, FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
+	map(0x980000, 0x980000).r(this, FUNC(midvunit_state::midvunit_dma_queue_entries_r));
+	map(0x980020, 0x980020).r(this, FUNC(midvunit_state::midvunit_scanline_r));
+	map(0x980020, 0x98002b).w(this, FUNC(midvunit_state::midvunit_video_control_w));
+	map(0x980040, 0x980040).rw(this, FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
 	map(0x980080, 0x980080).noprw();
-	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
+	map(0x980082, 0x980083).r(this, FUNC(midvunit_state::midvunit_dma_trigger_r));
 	map(0x990000, 0x990000).nopr(); // link PAL (low 4 bits must == 4)
-	map(0x991030, 0x991030).lr16("991030", [this]() { return uint16_t(m_in1->read()); });
+	map(0x991030, 0x991030).portr("991030");
 //  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
-	map(0x991060, 0x991060).r(FUNC(midvunit_state::port0_r));
-	map(0x992000, 0x992000).lr16("992000", [this]() { return uint16_t(m_dsw->read()); });
-	map(0x993000, 0x993000).rw(FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));
-	map(0x994000, 0x994000).w(FUNC(midvunit_state::midvunit_control_w));
-	map(0x995000, 0x995000).rw(FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
-	map(0x995020, 0x995020).w(FUNC(midvunit_state::midvunit_cmos_protect_w));
+	map(0x991060, 0x991060).r(this, FUNC(midvunit_state::port0_r));
+	map(0x992000, 0x992000).portr("992000");
+	map(0x993000, 0x993000).rw(this, FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));
+	map(0x994000, 0x994000).w(this, FUNC(midvunit_state::midvunit_control_w));
+	map(0x995000, 0x995000).rw(this, FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
+	map(0x995020, 0x995020).w(this, FUNC(midvunit_state::midvunit_cmos_protect_w));
 	map(0x997000, 0x997000).noprw(); // communications
-	map(0x9a0000, 0x9a0000).w(FUNC(midvunit_state::midvunit_sound_w));
-	map(0x9c0000, 0x9c1fff).rw(FUNC(midvunit_state::midvunit_cmos_r), FUNC(midvunit_state::midvunit_cmos_w)).share("nvram");
-	map(0x9e0000, 0x9e7fff).ram().w(FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
-	map(0xa00000, 0xbfffff).rw(FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
+	map(0x9a0000, 0x9a0000).w(this, FUNC(midvunit_state::midvunit_sound_w));
+	map(0x9c0000, 0x9c1fff).rw(this, FUNC(midvunit_state::midvunit_cmos_r), FUNC(midvunit_state::midvunit_cmos_w)).share("nvram");
+	map(0x9e0000, 0x9e7fff).ram().w(this, FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
+	map(0xa00000, 0xbfffff).rw(this, FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
 	map(0xc00000, 0xffffff).rom().region("user1", 0);
 }
 
@@ -620,23 +627,23 @@ void midvunit_state::midvplus_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).ram().share("ram_base");
 	map(0x400000, 0x41ffff).ram().share("fastram_base");
-	map(0x600000, 0x600000).w(FUNC(midvunit_state::midvunit_dma_queue_w));
-	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
+	map(0x600000, 0x600000).w(this, FUNC(midvunit_state::midvunit_dma_queue_w));
+	map(0x808000, 0x80807f).rw(this, FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
 	map(0x809800, 0x809fff).ram();
-	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
-	map(0x980000, 0x980000).r(FUNC(midvunit_state::midvunit_dma_queue_entries_r));
-	map(0x980020, 0x980020).r(FUNC(midvunit_state::midvunit_scanline_r));
-	map(0x980020, 0x98002b).w(FUNC(midvunit_state::midvunit_video_control_w));
-	map(0x980040, 0x980040).rw(FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
+	map(0x900000, 0x97ffff).rw(this, FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
+	map(0x980000, 0x980000).r(this, FUNC(midvunit_state::midvunit_dma_queue_entries_r));
+	map(0x980020, 0x980020).r(this, FUNC(midvunit_state::midvunit_scanline_r));
+	map(0x980020, 0x98002b).w(this, FUNC(midvunit_state::midvunit_video_control_w));
+	map(0x980040, 0x980040).rw(this, FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
 	map(0x980080, 0x980080).noprw();
-	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
+	map(0x980082, 0x980083).r(this, FUNC(midvunit_state::midvunit_dma_trigger_r));
 	map(0x990000, 0x99000f).rw(m_midway_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
-	map(0x994000, 0x994000).w(FUNC(midvunit_state::midvunit_control_w));
-	map(0x995020, 0x995020).w(FUNC(midvunit_state::midvunit_cmos_protect_w));
-	map(0x9a0000, 0x9a0007).rw("ata", FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w)).umask32(0x0000ffff);
-	map(0x9c0000, 0x9c7fff).ram().w(FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
-	map(0x9d0000, 0x9d000f).rw(FUNC(midvunit_state::midvplus_misc_r), FUNC(midvunit_state::midvplus_misc_w)).share("midvplus_misc");
-	map(0xa00000, 0xbfffff).rw(FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
+	map(0x994000, 0x994000).w(this, FUNC(midvunit_state::midvunit_control_w));
+	map(0x995020, 0x995020).w(this, FUNC(midvunit_state::midvunit_cmos_protect_w));
+	map(0x9a0000, 0x9a0007).rw("ata", FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)).umask32(0x0000ffff);
+	map(0x9c0000, 0x9c7fff).ram().w(this, FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
+	map(0x9d0000, 0x9d000f).rw(this, FUNC(midvunit_state::midvplus_misc_r), FUNC(midvunit_state::midvplus_misc_w)).share("midvplus_misc");
+	map(0xa00000, 0xbfffff).rw(this, FUNC(midvunit_state::midvunit_textureram_r), FUNC(midvunit_state::midvunit_textureram_w)).share("textureram");
 	map(0xc00000, 0xcfffff).ram();
 }
 
@@ -649,6 +656,14 @@ void midvunit_state::midvplus_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( midvunit )
+	PORT_START("991030")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
+
+	PORT_START("992000")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
+
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1058,15 +1073,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(midvunit_state::midvcommon)
 
 	/* basic machine hardware */
-	TMS32031(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvunit_map);
+	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_ADD_NONE("timer0")
 	MCFG_TIMER_ADD_NONE("timer1")
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -1075,62 +1090,62 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 	MCFG_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(midvunit_state, screen_update_midvunit)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_ADC0844_ADD("adc")
+	MCFG_ADC0844_INTR_CB(INPUTLINE("maincpu", 3))
+	MCFG_ADC0844_CH1_CB(IOPORT("WHEEL"))
+	MCFG_ADC0844_CH2_CB(IOPORT("ACCEL"))
+	MCFG_ADC0844_CH3_CB(IOPORT("BRAKE"))
 MACHINE_CONFIG_END
 
 
-void midvunit_state::midvunit(machine_config &config)
-{
+MACHINE_CONFIG_START(midvunit_state::midvunit)
 	midvcommon(config);
 
-	ADC0844(config, m_adc);
-	m_adc->intr_callback().set_inputline("maincpu", 3);
-	m_adc->ch1_callback().set_ioport("WHEEL");
-	m_adc->ch2_callback().set_ioport("ACCEL");
-	m_adc->ch3_callback().set_ioport("BRAKE");
-
 	/* sound hardware */
-	DCS_AUDIO_2K(config, "dcs", 0);
-}
+	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
+MACHINE_CONFIG_END
 
 
-void midvunit_state::crusnwld(machine_config &config)
-{
+MACHINE_CONFIG_START(midvunit_state::crusnwld)
 	midvunit(config);
 	/* valid values are 450 or 460 */
-	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
-	m_midway_serial_pic->set_upper(450);
-}
+	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
+	MCFG_MIDWAY_SERIAL_PIC_UPPER(450)
+MACHINE_CONFIG_END
 
-void midvunit_state::offroadc(machine_config &config)
-{
+MACHINE_CONFIG_START(midvunit_state::offroadc)
 	midvunit(config);
 	/* valid values are 230 or 234 */
-	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
-	m_midway_serial_pic2->set_upper(230);
-	m_midway_serial_pic2->set_yearoffs(94);
-}
+	MCFG_DEVICE_ADD("serial_pic2", MIDWAY_SERIAL_PIC2, 0)
+	MCFG_MIDWAY_SERIAL_PIC2_UPPER(230)
+	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(midvunit_state::midvplus)
 	midvcommon(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvplus_map);
-	m_maincpu->xf1().set(FUNC(midvunit_state::midvplus_xf1_w));
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(midvplus_map)
+	MCFG_TMS3203X_XF1_CB(WRITE8(*this, midvunit_state, midvplus_xf1_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
-	config.device_remove("nvram");
+	MCFG_DEVICE_REMOVE("nvram")
 
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 
-	MIDWAY_IOASIC(config, m_midway_ioasic, 0);
-	m_midway_ioasic->set_shuffle(0);
-	m_midway_ioasic->set_upper(452); /* no alternates */
-	m_midway_ioasic->set_yearoffs(94);
+	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
+	MCFG_MIDWAY_IOASIC_SHUFFLE(0)
+	MCFG_MIDWAY_IOASIC_UPPER(452) /* no alternates */
+	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
+
+	MCFG_DEVICE_REMOVE("adc")
 
 	/* sound hardware */
-	DCS2_AUDIO_2115(config, m_dcs, 0);
-	m_dcs->set_dram_in_mb(2);
-	m_dcs->set_polling_offset(0x3839);
+	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
 MACHINE_CONFIG_END
 
 
@@ -1863,7 +1878,7 @@ void midvunit_state::init_wargods()
 	default_nvram[0x12] = default_nvram[0x32] = 0xaf;
 	default_nvram[0x17] = default_nvram[0x37] = 0xd8;
 	default_nvram[0x18] = default_nvram[0x38] = 0xe7;
-	m_midway_ioasic->set_default_nvram(default_nvram);
+	machine().device<midway_ioasic_device>("ioasic")->set_default_nvram(default_nvram);
 
 	/* speedups */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));

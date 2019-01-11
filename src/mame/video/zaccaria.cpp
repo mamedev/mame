@@ -35,19 +35,21 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 
 
 ***************************************************************************/
-void zaccaria_state::zaccaria_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	static constexpr int resistances_rg[] = { 1200, 1000, 820 };
-	static constexpr int resistances_b[]  = { 1000, 820 };
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i, j, k;
+	static const int resistances_rg[] = { 1200, 1000, 820 };
+	static const int resistances_b[]  = { 1000, 820 };
 
 	double weights_rg[3], weights_b[2];
-	compute_resistor_weights(0, 0xff, -1.0,
-			3, resistances_rg, weights_rg, 390, 0,
-			2, resistances_b,  weights_b,  470, 0,
-			0, nullptr, nullptr, 0, 0);
 
-	for (int i = 0; i < 0x200; i++)
+	compute_resistor_weights(0, 0xff, -1.0,
+								3, resistances_rg, weights_rg, 390, 0,
+								2, resistances_b,  weights_b,  470, 0,
+								0, nullptr, nullptr, 0, 0);
+
+	for (i = 0; i < 0x200; i++)
 	{
 		/*
 		  TODO: I'm not sure, but I think that pen 0 must always be black, otherwise
@@ -57,28 +59,29 @@ void zaccaria_state::zaccaria_palette(palette_device &palette) const
 		  attributesram, but they are always 0 in these games so they would turn out
 		  black anyway.
 		 */
-		if (!(i & 0x038))
+		if (((i % 64) / 8) == 0)
 			palette.set_indirect_color(i, rgb_t::black());
 		else
 		{
 			int bit0, bit1, bit2;
+			int r, g, b;
 
-			// red component
-			bit0 = BIT(color_prom[i + 0x000], 3);
-			bit1 = BIT(color_prom[i + 0x000], 2);
-			bit2 = BIT(color_prom[i + 0x000], 1);
-			int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+			/* red component */
+			bit0 = (color_prom[i + 0x000] >> 3) & 0x01;
+			bit1 = (color_prom[i + 0x000] >> 2) & 0x01;
+			bit2 = (color_prom[i + 0x000] >> 1) & 0x01;
+			r = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-			// green component
-			bit0 = BIT(color_prom[i + 0x000], 0);
-			bit1 = BIT(color_prom[i + 0x200], 3);
-			bit2 = BIT(color_prom[i + 0x200], 2);
-			int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+			/* green component */
+			bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
+			bit1 = (color_prom[i + 0x200] >> 3) & 0x01;
+			bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
+			g = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-			// blue component
-			bit0 = BIT(color_prom[i + 0x200], 1);
-			bit1 = BIT(color_prom[i + 0x200], 0);
-			int const b = combine_2_weights(weights_b, bit0, bit1);
+			/* blue component */
+			bit0 = (color_prom[i + 0x200] >> 1) & 0x01;
+			bit1 = (color_prom[i + 0x200] >> 0) & 0x01;
+			b = combine_2_weights(weights_b, bit0, bit1);
 
 			palette.set_indirect_color(i, rgb_t(r, g, b));
 		}
@@ -88,17 +91,17 @@ void zaccaria_state::zaccaria_palette(palette_device &palette) const
 	/* of 64. In each block, colors are not in the usual sequential order */
 	/* but in interleaved order, like Phoenix. Additionally, colors for */
 	/* background and sprites are interleaved. */
-	for (int i = 0; i < 8; i++)
-		for (int j = 0; j < 4; j++)
-			for (int k = 0; k < 8; k++)
-				// swap j and k to make the colors sequential
-				palette.set_pen_indirect(0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2 * j);
+	for (i = 0;i < 8;i++)
+		for (j = 0;j < 4;j++)
+			for (k = 0;k < 8;k++)
+				/* swap j and k to make the colors sequential */
+				palette.set_pen_indirect(0 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j);
 
-	for (int i = 0; i < 8; i++)
-		for (int j = 0; j < 4; j++)
-			for (int k = 0; k < 8; k++)
-				// swap j and k to make the colors sequential
-				palette.set_pen_indirect(256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2 * j + 1);
+	for (i = 0;i < 8;i++)
+		for (j = 0;j < 4;j++)
+			for (k = 0;k < 8;k++)
+				/* swap j and k to make the colors sequential */
+				palette.set_pen_indirect(256 + 32 * i + 8 * j + k, 64 * i + 8 * k + 2*j+1);
 }
 
 

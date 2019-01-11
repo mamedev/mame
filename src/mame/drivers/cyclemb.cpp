@@ -10,7 +10,7 @@
     driver by Angelo Salese
 
     TODO:
-    - inputs in Cycle Maabou (weird dial/positional input);
+    - inputs in Cycle Maabou;
     - sound (controlled by three i8741);
     - add flipscreen;
     - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
@@ -72,11 +72,11 @@ Dumped by Chack'n
 ****************************************************************************************************/
 
 #include "emu.h"
+#include "machine/tait8741.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -84,8 +84,8 @@ Dumped by Chack'n
 class cyclemb_state : public driver_device
 {
 public:
-	cyclemb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	cyclemb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -95,8 +95,7 @@ public:
 		m_cram(*this, "cram"),
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
-		m_obj3_ram(*this, "obj3_ram"),
-		m_pad(*this, "PAD_P%u", 1U)
+		m_obj3_ram(*this, "obj3_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -110,8 +109,6 @@ public:
 	required_shared_ptr<uint8_t> m_obj1_ram;
 	required_shared_ptr<uint8_t> m_obj2_ram;
 	required_shared_ptr<uint8_t> m_obj3_ram;
-
-	optional_ioport_array<2> m_pad;
 
 	struct
 	{
@@ -134,13 +131,11 @@ public:
 	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(pad_r);
-
 	void init_skydest();
 	void init_cyclemb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void cyclemb_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(cyclemb);
 
 	uint32_t screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -160,29 +155,28 @@ public:
 
 
 
-void cyclemb_state::cyclemb_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(cyclemb_state, cyclemb)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i,r,g,b,val;
+	int bit0,bit1,bit2;
 
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 	{
-		int const val = color_prom[i | 0x100] | (color_prom[i | 0x000] << 4);
-		int bit0, bit1, bit2;
+		val = (color_prom[i+0x100]) | (color_prom[i+0x000]<<4);
 
 		bit0 = 0;
-		bit1 = BIT(val, 6);
-		bit2 = BIT(val, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(val, 3);
-		bit1 = BIT(val, 4);
-		bit2 = BIT(val, 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(val, 0);
-		bit1 = BIT(val, 1);
-		bit2 = BIT(val, 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (val >> 6) & 0x01;
+		bit2 = (val >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 3) & 0x01;
+		bit1 = (val >> 4) & 0x01;
+		bit2 = (val >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 0) & 0x01;
+		bit1 = (val >> 1) & 0x01;
+		bit2 = (val >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -253,7 +247,7 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	0x27 cone (0x13 0x00)
 	*/
 
-	for(i=0;i<0x80;i+=2)
+	for(i=0;i<0x40;i+=2)
 	{
 		y = 0xf1 - m_obj2_ram[i];
 		x = m_obj2_ram[i+1] - 56;
@@ -593,21 +587,21 @@ void cyclemb_state::cyclemb_map(address_map &map)
 void cyclemb_state::cyclemb_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
+	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	map(0xc09e, 0xc09f).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
-	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	map(0xc09e, 0xc09f).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
 void cyclemb_state::skydest_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
+	map(0xc000, 0xc000).w(this, FUNC(cyclemb_state::cyclemb_bankswitch_w));
 	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
-	map(0xc080, 0xc081).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
+	map(0xc080, 0xc081).rw(this, FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	//AM_RANGE(0xc0a0, 0xc0a0) AM_WRITENOP // ?
-	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	map(0xc0bf, 0xc0bf).w(this, FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
@@ -647,7 +641,7 @@ void cyclemb_state::cyclemb_sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x40, 0x41).rw(FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
+	map(0x40, 0x41).rw(this, FUNC(cyclemb_state::skydest_i8741_1_r), FUNC(cyclemb_state::skydest_i8741_1_w));
 }
 
 
@@ -666,12 +660,6 @@ void cyclemb_state::machine_start()
 void cyclemb_state::machine_reset()
 {
 	skydest_i8741_reset();
-}
-
-template <int P>
-CUSTOM_INPUT_MEMBER(cyclemb_state::pad_r)
-{
-	return m_pad[P]->read();
 }
 
 
@@ -708,7 +696,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cyclemb_state, pad_r<0>, nullptr)
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "PAD_P1")
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P1")
@@ -731,7 +719,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cyclemb_state, pad_r<1>, nullptr)
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "PAD_P2")
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P2")
@@ -995,21 +983,23 @@ MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cyclemb_state, screen_update_cyclemb)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cyclemb);
-	PALETTE(config, m_palette, FUNC(cyclemb_state::cyclemb_palette), 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cyclemb)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_INIT_OWNER(cyclemb_state, cyclemb)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, "soundlatch2");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(18'000'000)/12));
-//  ymsnd.irq_handler().set(FUNC(cyclemb_state::ym_irq));
-//  ymsnd.port_b_read_callback().set_ioport("UNK");
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(18'000'000)/12)
+//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, cyclemb_state, ym_irq))
+//  MCFG_AY8910_PORT_B_READ_CB(IOPORT("UNK")) /* port B read */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cyclemb_state::skydest)

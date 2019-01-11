@@ -93,18 +93,17 @@ NETLIB_UPDATE(solver)
 	/* FIXME: Needs a more elegant solution */
 	bool force_solve = (netlist().time() < netlist_time::from_double(2 * m_params.m_max_timestep));
 
-	std::size_t nthreads = std::min(static_cast<std::size_t>(m_parallel()), plib::omp::get_max_threads());
+	std::size_t nthreads = std::min(m_parallel(), plib::omp::get_max_threads());
 	std::size_t t_cnt = 0;
-	std::size_t solv[128];
-	for (std::size_t i = 0; i <  m_mat_solvers.size(); i++)
+	int solv[128];
+	for (int i = 0; i <  m_mat_solvers.size(); i++)
 		if (m_mat_solvers[i]->has_timestep_devices() || force_solve)
 			solv[t_cnt++] = i;
 
 	if (nthreads > 1 && t_cnt > 1)
 	{
 		plib::omp::set_num_threads(nthreads);
-		plib::omp::for_static(static_cast<std::size_t>(0), t_cnt, [this, &solv](std::size_t i)
-			{ ATTR_UNUSED const netlist_time ts = this->m_mat_solvers[solv[i]]->solve(); });
+		plib::omp::for_static(0, t_cnt, [this, &solv](int i) { ATTR_UNUSED const netlist_time ts = this->m_mat_solvers[solv[i]]->solve(); });
 	}
 	else
 		for (auto & solver : m_mat_solvers)
@@ -132,13 +131,13 @@ std::unique_ptr<matrix_solver_t> create_it(netlist_t &nl, pstring name, solver_p
 template <std::size_t m_N, std::size_t storage_N>
 std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
-	if (m_method() == "SOR_MAT")
+	if (pstring("SOR_MAT").equals(m_method()))
 	{
 		return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 		//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
 		//return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
 	}
-	else if (m_method() == "MAT_CR")
+	else if (pstring("MAT_CR").equals(m_method()))
 	{
 		if (size > 0) // GCR always outperforms MAT solver
 		{
@@ -151,29 +150,29 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t 
 			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 		}
 	}
-	else if (m_method() == "MAT")
+	else if (pstring("MAT").equals(m_method()))
 	{
 		typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
 		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 	}
-	else if (m_method() == "SM")
+	else if (pstring("SM").equals(m_method()))
 	{
 		/* Sherman-Morrison Formula */
 		typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
 		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 	}
-	else if (m_method() == "W")
+	else if (pstring("W").equals(m_method()))
 	{
 		/* Woodbury Formula */
 		typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
 		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 	}
-	else if (m_method() == "SOR")
+	else if (pstring("SOR").equals(m_method()))
 	{
 		typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
 		return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
 	}
-	else if (m_method() == "GMRES")
+	else if (pstring("GMRES").equals(m_method()))
 	{
 		typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
 		return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
@@ -269,7 +268,7 @@ void NETLIB_NAME(solver)::post_start()
 	// Override log statistics
 	pstring p = plib::util::environment("NL_STATS", "");
 	if (p != "")
-		m_params.m_log_stats = plib::pstonum<decltype(m_params.m_log_stats)>(p);
+		m_params.m_log_stats = p.as_long();
 	else
 		m_params.m_log_stats = m_log_stats();
 
@@ -418,7 +417,7 @@ void NETLIB_NAME(solver)::create_solver_code(std::map<pstring, pstring> &mp)
 	}
 }
 
-	NETLIB_DEVICE_IMPL_DEPRECATED(solver)
+	NETLIB_DEVICE_IMPL(solver)
 
 	} //namespace devices
 } // namespace netlist

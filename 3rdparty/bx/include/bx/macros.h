@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -7,6 +7,7 @@
 #define BX_MACROS_H_HEADER_GUARD
 
 #include "bx.h"
+#include <type_traits>
 
 ///
 #if BX_COMPILER_MSVC
@@ -18,7 +19,7 @@
 #	define BX_VA_ARGS_PASS(...) (__VA_ARGS__)
 #endif // BX_COMPILER_MSVC
 
-#define BX_VA_ARGS_COUNT(...) BX_VA_ARGS_COUNT_ BX_VA_ARGS_PASS(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define BX_VA_ARGS_COUNT(...) BX_VA_ARGS_COUNT_ BX_VA_ARGS_PASS(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
 #define BX_VA_ARGS_COUNT_(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11, _a12, _a13, _a14, _a15, _a16, _last, ...) _last
 
 ///
@@ -46,7 +47,6 @@
 #define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
 #define BX_ALIGN_4096(_value) BX_ALIGN_MASK(_value, 0xfff)
 
-///
 #define BX_ALIGNOF(_type) __alignof(_type)
 
 #if defined(__has_feature)
@@ -70,27 +70,20 @@
 #	define BX_UNLIKELY(_x) __builtin_expect(!!(_x), 0)
 #	define BX_NO_INLINE   __attribute__( (noinline) )
 #	define BX_NO_RETURN   __attribute__( (noreturn) )
-#	define BX_CONST_FUNC  __attribute__( (const) )
-
 #	if BX_COMPILER_GCC >= 70000
 #		define BX_FALLTHROUGH __attribute__( (fallthrough) )
 #	else
 #		define BX_FALLTHROUGH BX_NOOP()
 #	endif // BX_COMPILER_GCC >= 70000
-
 #	define BX_NO_VTABLE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__( (format(__printf__, _format, _args) ) )
-
 #	if BX_CLANG_HAS_FEATURE(cxx_thread_local)
 #		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_CLANG
-
 #	if (!BX_PLATFORM_OSX && (BX_COMPILER_GCC >= 40200)) || (BX_COMPILER_GCC >= 40500)
 #		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_GCC
-
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
-
 #	if BX_CRT_MSVC
 #		define __stdcall
 #	endif // BX_CRT_MSVC
@@ -103,7 +96,6 @@
 #	define BX_UNLIKELY(_x) (_x)
 #	define BX_NO_INLINE __declspec(noinline)
 #	define BX_NO_RETURN
-#	define BX_CONST_FUNC  __declspec(noalias)
 #	define BX_FALLTHROUGH BX_NOOP()
 #	define BX_NO_VTABLE __declspec(novtable)
 #	define BX_PRINTF_ARGS(_format, _args)
@@ -113,11 +105,6 @@
 #	error "Unknown BX_COMPILER_?"
 #endif
 
-/// The return value of the function is solely a function of the arguments.
-///
-#define BX_CONSTEXPR_FUNC constexpr BX_CONST_FUNC
-
-///
 #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 
 ///
@@ -204,20 +191,26 @@
 #endif // BX_COMPILER_
 
 ///
+#if BX_COMPILER_MSVC
+#	define BX_TYPE_IS_POD(t) (!__is_class(t) || __is_pod(t))
+#else
+#	define BX_TYPE_IS_POD(t) std::is_pod<t>::value
+#endif
+///
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
-	private: _class()
+			private: _class()
 
 #define BX_CLASS_NO_COPY(_class) \
-	private: _class(const _class& _rhs)
+			private: _class(const _class& _rhs)
 
 #define BX_CLASS_NO_ASSIGNMENT(_class) \
-	private: _class& operator=(const _class& _rhs)
+			private: _class& operator=(const _class& _rhs)
 
-#define BX_CLASS_ALLOCATOR(_class)              \
-	public: void* operator new(size_t _size);   \
-	public: void  operator delete(void* _ptr);  \
-	public: void* operator new[](size_t _size); \
-	public: void  operator delete[](void* _ptr)
+#define BX_CLASS_ALLOCATOR(_class) \
+			public: void* operator new(size_t _size); \
+			public: void  operator delete(void* _ptr); \
+			public: void* operator new[](size_t _size); \
+			public: void  operator delete[](void* _ptr)
 
 #define BX_CLASS_1(_class, _a1) BX_CONCATENATE(BX_CLASS_, _a1)(_class)
 #define BX_CLASS_2(_class, _a1, _a2) BX_CLASS_1(_class, _a1); BX_CLASS_1(_class, _a2)

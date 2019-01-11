@@ -4,7 +4,7 @@
 
     m6502d.h
 
-    MOS Technology 6502, original NMOS variant, disassembler
+    Mostek 6502, original NMOS variant, disassembler
 
 ***************************************************************************/
 

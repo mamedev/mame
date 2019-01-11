@@ -17,7 +17,6 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
-#include "emupal.h"
 #include "screen.h"
 
 class cyberbal_base_state : public atarigen_state
@@ -25,8 +24,8 @@ class cyberbal_base_state : public atarigen_state
 protected:
 	cyberbal_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		atarigen_state(mconfig, type, tag),
-		m_playfield(*this, "playfield"),
-		m_alpha(*this, "alpha"),
+		m_playfield_tilemap(*this, "playfield"),
+		m_alpha_tilemap(*this, "alpha"),
 		m_mob(*this, "mob")
 	{ }
 
@@ -40,8 +39,8 @@ protected:
 
 	static const atari_motion_objects_config s_mob_config;
 
-	required_device<tilemap_device> m_playfield;
-	required_device<tilemap_device> m_alpha;
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 
 	uint16_t    m_current_slip[2];
@@ -92,17 +91,15 @@ public:
 		m_ldac(*this, "ldac"),
 		m_soundcomm(*this, "soundcomm"),
 		m_ymsnd(*this, "ymsnd"),
-		m_playfield2(*this, "playfield2"),
-		m_alpha2(*this, "alpha2"),
+		m_playfield2_tilemap(*this, "playfield2"),
+		m_alpha2_tilemap(*this, "alpha2"),
 		m_mob2(*this, "mob2"),
-		m_rpalette(*this, "rpalette"),
 		m_lscreen(*this, "lscreen"),
 		m_rscreen(*this, "rscreen")
 	{ }
 
 	void init_cyberbalt();
 	void cyberbal(machine_config &config);
-	void cyberbal_base(machine_config &config);
 	void cyberbalt(machine_config &config);
 
 protected:
@@ -146,10 +143,9 @@ private:
 	required_device<dac_word_interface> m_ldac;
 	required_device<atari_sound_comm_device> m_soundcomm;
 	required_device<ym2151_device> m_ymsnd;
-	required_device<tilemap_device> m_playfield2;
-	required_device<tilemap_device> m_alpha2;
+	required_device<tilemap_device> m_playfield2_tilemap;
+	required_device<tilemap_device> m_alpha2_tilemap;
 	required_device<atari_motion_objects_device> m_mob2;
-	required_device<palette_device> m_rpalette;
 	required_device<screen_device> m_lscreen;
 	required_device<screen_device> m_rscreen;
 

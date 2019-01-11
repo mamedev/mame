@@ -44,7 +44,7 @@ public:
 	snes_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	auto open_bus_callback() { return m_openbus_cb.bind(); }
+	template <class Object> devcb_base &set_open_bus_callback(Object &&cb) { return m_openbus_cb.set_callback(std::forward<Object>(cb)); }
 
 	void refresh_scanline(bitmap_rgb32 &bitmap, uint16_t curline);
 
@@ -313,5 +313,12 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SNES_PPU, snes_ppu_device)
 
+
+/***************************************************************************
+ INTERFACE CONFIGURATION MACROS
+ ***************************************************************************/
+
+#define MCFG_SNES_PPU_OPENBUS_CB(_read) \
+	devcb = &downcast<snes_ppu_device &>(*device).set_open_bus_callback(DEVCB_##_read);
 
 #endif // MAME_VIDEO_SNES_PPU_H

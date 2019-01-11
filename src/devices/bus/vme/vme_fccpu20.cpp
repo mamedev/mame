@@ -229,8 +229,8 @@ DEFINE_DEVICE_TYPE(VME_FCCPU21YB, vme_fccpu21yb_card_device, "fccpu21yb", "Force
 void vme_fccpu20_device::cpu20_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x00000007).ram().w(FUNC(vme_fccpu20_device::bootvect_w));   /* After first write we act as RAM */
-	map(0x00000000, 0x00000007).rom().r(FUNC(vme_fccpu20_device::bootvect_r));   /* ROM mirror just during reset */
+	map(0x00000000, 0x00000007).ram().w(this, FUNC(vme_fccpu20_device::bootvect_w));   /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(this, FUNC(vme_fccpu20_device::bootvect_r));   /* ROM mirror just during reset */
 	map(0x00000008, 0x0007ffff).ram(); /* Local SRAM */
 	map(0x00080000, 0x000fffff).ram(); /* SRAM-22 installed */
 	map(0xff040000, 0xff04ffff).ram();
@@ -243,31 +243,22 @@ void vme_fccpu20_device::cpu20_mem(address_map &map)
 }
 
 
-static DEVICE_INPUT_DEFAULTS_START( terminal )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
-	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
-DEVICE_INPUT_DEFAULTS_END
-
 MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68020, CLOCK50 / 3) /* Crytstal verified from picture HCI */
+	MCFG_DEVICE_ADD ("maincpu", M68020, CLOCK50 / 3) /* Crytstal verified from picture HCI */
 	MCFG_DEVICE_PROGRAM_MAP (cpu20_mem)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("bim", bim68153_device, iack)
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
-	PIT68230(config, m_pit, CLOCK32 / 4); /* Crystal not verified */
-	m_pit->pa_in_callback().set(FUNC(vme_fccpu20_device::pita_r));
-	m_pit->pb_in_callback().set(FUNC(vme_fccpu20_device::pitb_r));
-	m_pit->pc_in_callback().set(FUNC(vme_fccpu20_device::pitc_r));
-	m_pit->timer_irq_callback().set("bim", FUNC(bim68153_device::int2_w));
+	MCFG_DEVICE_ADD ("pit", PIT68230, CLOCK32 / 4) /* Crystal not verified */
+	MCFG_PIT68230_PA_INPUT_CB(READ8(*this, vme_fccpu20_device, pita_r))
+	MCFG_PIT68230_PB_INPUT_CB(READ8(*this, vme_fccpu20_device, pitb_r))
+	MCFG_PIT68230_PC_INPUT_CB(READ8(*this, vme_fccpu20_device, pitc_r))
+	MCFG_PIT68230_TIMER_IRQ_CB(WRITELINE("bim", bim68153_device, int2_w))
 
 	/* BIM */
-	bim68153_device &bim(MC68153(config, "bim", CLOCK32 / 8));
-	bim.out_int_callback().set(FUNC(vme_fccpu20_device::bim_irq_callback));
+	MCFG_MC68153_ADD("bim", CLOCK32 / 8)
+	MCFG_BIM68153_OUT_INT_CB(WRITELINE(*this, vme_fccpu20_device, bim_irq_callback))
 		/*INT0 - Abort switch */
 		/*INT1 - MPCC@8.064 MHz aswell */
 		/*INT2 - PI/T timer */
@@ -277,41 +268,42 @@ MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
 #define RS232P1_TAG      "rs232p1"
 #define RS232P2_TAG      "rs232p2"
 #define RS232P3_TAG      "rs232p3"
-	mpcc68561_device &mpcc(MPCC68561(config, "mpcc", CLOCK32 / 4, 0, 0));
-	mpcc.out_txd_cb().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
-	mpcc.out_dtr_cb().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
-	mpcc.out_rts_cb().set(RS232P1_TAG, FUNC(rs232_port_device::write_rts));
-	mpcc.out_int_cb().set("bim", FUNC(bim68153_device::int1_w));
+	// MPCC
+	MCFG_MPCC68561_ADD ("mpcc", CLOCK32 / 4, 0, 0)
+	MCFG_MPCC_OUT_TXD_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(WRITELINE(RS232P1_TAG, rs232_port_device, write_rts))
+	MCFG_MPCC_OUT_INT_CB(WRITELINE("bim", bim68153_device, int1_w))
 
 	/* Additional MPCC sits on FLME boards like SRAM-22,
 	   TODO: install MPCC2/MPCC3 in FLME slot device */
-	mpcc68561_device &mpcc2(MPCC68561(config, "mpcc2", CLOCK32 / 4, 0, 0));
-	mpcc2.out_txd_cb().set(RS232P2_TAG, FUNC(rs232_port_device::write_txd));
-	mpcc2.out_dtr_cb().set(RS232P2_TAG, FUNC(rs232_port_device::write_dtr));
-	mpcc2.out_rts_cb().set(RS232P2_TAG, FUNC(rs232_port_device::write_rts));
-	mpcc2.out_int_cb().set("bim", FUNC(bim68153_device::int3_w));
-
-	mpcc68561_device &mpcc3(MPCC68561(config, "mpcc3", CLOCK32 / 4, 0, 0));
-	mpcc3.out_txd_cb().set(RS232P3_TAG, FUNC(rs232_port_device::write_txd));
-	mpcc3.out_dtr_cb().set(RS232P3_TAG, FUNC(rs232_port_device::write_dtr));
-	mpcc3.out_rts_cb().set(RS232P3_TAG, FUNC(rs232_port_device::write_rts));
-	mpcc3.out_int_cb().set("bim", FUNC(bim68153_device::int3_w));
+	// MPCC2
+	MCFG_MPCC68561_ADD ("mpcc2", CLOCK32 / 4, 0, 0)
+	MCFG_MPCC_OUT_TXD_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(WRITELINE(RS232P2_TAG, rs232_port_device, write_rts))
+	MCFG_MPCC_OUT_INT_CB(WRITELINE("bim", bim68153_device, int3_w))
+	// MPCC3
+	MCFG_MPCC68561_ADD ("mpcc3", CLOCK32 / 4, 0, 0)
+	MCFG_MPCC_OUT_TXD_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_txd))
+	MCFG_MPCC_OUT_DTR_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_dtr))
+	MCFG_MPCC_OUT_RTS_CB(WRITELINE(RS232P3_TAG, rs232_port_device, write_rts))
+	MCFG_MPCC_OUT_INT_CB(WRITELINE("bim", bim68153_device, int3_w))
 
 	// MPCC - RS232
-	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
-	rs232p1.rxd_handler().set(m_mpcc, FUNC(mpcc68561_device::write_rx));
-	rs232p1.cts_handler().set(m_mpcc, FUNC(mpcc68561_device::cts_w));
-	rs232p1.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	MCFG_DEVICE_ADD (RS232P1_TAG, RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc", mpcc68561_device, write_rx))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc", mpcc68561_device, cts_w))
 
 	// MPCC2 - RS232
-	rs232_port_device &rs232p2(RS232_PORT(config, RS232P2_TAG, default_rs232_devices, nullptr));
-	rs232p2.rxd_handler().set(m_mpcc2, FUNC(mpcc68561_device::write_rx));
-	rs232p2.cts_handler().set(m_mpcc2, FUNC(mpcc68561_device::cts_w));
+	MCFG_DEVICE_ADD (RS232P2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc2", mpcc68561_device, write_rx))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc2", mpcc68561_device, cts_w))
 
 	// MPCC3 - RS232
-	rs232_port_device &rs232p3(RS232_PORT(config, RS232P3_TAG, default_rs232_devices, nullptr));
-	rs232p3.rxd_handler().set(m_mpcc3, FUNC(mpcc68561_device::write_rx));
-	rs232p3.cts_handler().set(m_mpcc3, FUNC(mpcc68561_device::cts_w));
+	MCFG_DEVICE_ADD (RS232P3_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER (WRITELINE ("mpcc3", mpcc68561_device, write_rx))
+	MCFG_RS232_CTS_HANDLER (WRITELINE ("mpcc3", mpcc68561_device, cts_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vme_fccpu20_card_device::device_add_mconfig)
@@ -323,7 +315,7 @@ MACHINE_CONFIG_START(vme_fccpu21s_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK50 / 4)
+	MCFG_DEVICE_CLOCK( CLOCK50 / 4)
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21 Part No.1 01 001 - 68020 CPU board (CPU-20) + FPU 68881 at 16.7 MHz, 512 KB RAM
@@ -331,7 +323,7 @@ MACHINE_CONFIG_START(vme_fccpu21_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK50 / 3)
+	MCFG_DEVICE_CLOCK( CLOCK50 / 3)
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21A Part No.1 01 011 - 68020 CPU board + FPU 68881 at 20 MHz, 512 KB RAM
@@ -339,7 +331,7 @@ MACHINE_CONFIG_START(vme_fccpu21a_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK40 / 2)
+	MCFG_DEVICE_CLOCK( CLOCK40 / 2)
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21YA Part No.1 01 061 - 68020 CPU board + FPU 68881 at 20 MHz, 2048 KB RAM
@@ -347,7 +339,7 @@ MACHINE_CONFIG_START(vme_fccpu21ya_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK40 / 2)
+	MCFG_DEVICE_CLOCK( CLOCK40 / 2)
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21B Part No.1 01 021 - 68020 CPU board + FPU 68881 at 25 MHz, 512 KB RAM
@@ -355,7 +347,7 @@ MACHINE_CONFIG_START(vme_fccpu21b_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK50 / 2)
+	MCFG_DEVICE_CLOCK( CLOCK50 / 2)
 MACHINE_CONFIG_END
 
 // SYS68K/CPU-21YB Part No.1 01 071 - 68020 CPU board + FPU 68881 at 25 MHz, 2048 KB RAM
@@ -363,7 +355,7 @@ MACHINE_CONFIG_START(vme_fccpu21yb_card_device::device_add_mconfig)
 	vme_fccpu20_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(CLOCK50 / 2)
+	MCFG_DEVICE_CLOCK( CLOCK50 / 2)
 MACHINE_CONFIG_END
 
 

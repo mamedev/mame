@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -15,6 +15,7 @@
 #ifndef BX_CONFIG_SUPPORTS_THREADING
 #	define BX_CONFIG_SUPPORTS_THREADING !(0 \
 			|| BX_PLATFORM_EMSCRIPTEN       \
+			|| BX_CRT_NONE                  \
 			)
 #endif // BX_CONFIG_SUPPORTS_THREADING
 

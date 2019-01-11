@@ -8,9 +8,6 @@
 
 #include "hp_dio.h"
 
-namespace bus {
-	namespace hp_dio {
-
 class dio16_98603b_device :
 		public device_t,
 		public device_dio16_card_interface
@@ -36,9 +33,6 @@ private:
 	uint8_t *m_rom;
 };
 
-} // namespace bus::hp_dio
-} // namespace bus
-
-DECLARE_DEVICE_TYPE_NS(HPDIO_98603B, bus::hp_dio, dio16_98603b_device)
+DECLARE_DEVICE_TYPE(HPDIO_98603B, dio16_98603b_device)
 
 #endif // MAME_BUS_HPDIO_98603B_H

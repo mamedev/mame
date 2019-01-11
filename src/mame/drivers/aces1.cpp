@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
- Ace System One Hardware
+ Ace System 1 Hardware
  Fruit Machines
 
  skeleton driver!
@@ -14,13 +14,9 @@ lots of reads from 0xe000 at the start
 JPM style Reel MCU? Certainly reel data seems to be muxed together in a weird way
 
  Hardware overview
-  - Z80 (Z8400AB1)
-  - 8 MHz XTAL
-  - 3 x TMP8255
-  - 2 x 8 dip-switches banks
+  - Z80
   - 2 timed interrupts (IRQ and NMI) (can be reset)
   - AY8910 for sound
-  - TC5517CPL-20
 
 
  - some of the roms appear to have been merged to larger files, or there are two versions of the board?
@@ -56,7 +52,10 @@ public:
 	aces1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_reel(*this, "reel%u", 0U),
+			m_reel0(*this, "reel0"),
+			m_reel1(*this, "reel1"),
+			m_reel2(*this, "reel2"),
+			m_reel3(*this, "reel3"),
 			m_io_ports(*this, {"IO1", "IO2", "IO3", "IO4", "IO5", "IO6", "IO7", "IO8"}),
 			m_lamps(*this, "lamp%u", 0U),
 			m_digits(*this, "digit%u", 0U)
@@ -78,7 +77,10 @@ private:
 	int m_reel_count[4];
 	int m_optic_pattern;
 
-	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
+	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	DECLARE_READ8_MEMBER( aces1_unk_r )
 	{
@@ -175,10 +177,10 @@ private:
 					m_reel_phase[reel] = ((m_reel_phase[reel] + sense + 8) % 8);
 					switch (reel)
 					{
-					case 0: m_reel[0]->update(phases[m_reel_phase[reel]]); break;
-					case 1: m_reel[1]->update(phases[m_reel_phase[reel]]); break;
-					case 2: m_reel[2]->update(phases[m_reel_phase[reel]]); break;
-					case 3: m_reel[3]->update(phases[m_reel_phase[reel]]); break;
+					case 0: m_reel0->update(phases[m_reel_phase[reel]]); break;
+					case 1: m_reel1->update(phases[m_reel_phase[reel]]); break;
+					case 2: m_reel2->update(phases[m_reel_phase[reel]]); break;
+					case 3: m_reel3->update(phases[m_reel_phase[reel]]); break;
 					}
 					m_reel_clock[reel] = clock;
 					if ( m_reel_phase[reel] % 4 ==0)
@@ -227,7 +229,10 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device_array<stepper_device, 4> m_reel;
+	required_device<stepper_device> m_reel0;
+	required_device<stepper_device> m_reel1;
+	required_device<stepper_device> m_reel2;
+	required_device<stepper_device> m_reel3;
 	required_ioport_array<8> m_io_ports;
 	output_finder<128> m_lamps;
 	output_finder<16> m_digits;
@@ -267,14 +272,6 @@ void aces1_state::machine_start()
 	m_aces1_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_nmi_timer_callback),this), nullptr);
 	m_digits.resolve();
 	m_lamps.resolve();
-
-	save_item(NAME(m_input_strobe));
-	save_item(NAME(m_lamp_strobe));
-	save_item(NAME(m_led_strobe));
-	save_item(NAME(m_reel_clock));
-	save_item(NAME(m_reel_phase));
-	save_item(NAME(m_reel_count));
-	save_item(NAME(m_optic_pattern));
 }
 
 void aces1_state::machine_reset()
@@ -291,14 +288,14 @@ void aces1_state::aces1_map(address_map &map)
 	map(0xafb0, 0xafb3).rw("ic24", FUNC(i8255_device::read), FUNC(i8255_device::write)); // IC24 - lamps, 7segs
 	map(0xafd0, 0xafd3).rw("ic25", FUNC(i8255_device::read), FUNC(i8255_device::write)); // IC25 - lamps, meters, reel comms (writes)
 	map(0xafe0, 0xafe3).rw("ic37", FUNC(i8255_device::read), FUNC(i8255_device::write));//  IC37 - doors, coins, reel optics (reads)
-	map(0xc000, 0xc000).r(FUNC(aces1_state::aces1_unk_r)); // illegal or reset irq?
-	map(0xe000, 0xe000).rw(FUNC(aces1_state::aces1_nmi_counter_reset_r), FUNC(aces1_state::aces1_nmi_counter_reset_w));
+	map(0xc000, 0xc000).r(this, FUNC(aces1_state::aces1_unk_r)); // illegal or reset irq?
+	map(0xe000, 0xe000).rw(this, FUNC(aces1_state::aces1_nmi_counter_reset_r), FUNC(aces1_state::aces1_nmi_counter_reset_w));
 }
 
 
 void aces1_state::aces1_portmap(address_map &map)
 {
-	map(0x00, 0x00).r(FUNC(aces1_state::aces1_unk_port00_r)); // read before enabling interrupts?
+	map(0x00, 0x00).r(this, FUNC(aces1_state::aces1_unk_port00_r)); // read before enabling interrupts?
 }
 
 
@@ -447,51 +444,51 @@ static INPUT_PORTS_START( aces1 )
 INPUT_PORTS_END
 
 
-void aces1_state::aces1(machine_config &config)
-{
-	Z80(config, m_maincpu, XTAL(8'000'000) / 2); /* XTAL verified, divisor not */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aces1_state::aces1_map);
-	m_maincpu->set_addrmap(AS_IO, &aces1_state::aces1_portmap);
+MACHINE_CONFIG_START(aces1_state::aces1)
+
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(aces1_map)
+	MCFG_DEVICE_IO_MAP(aces1_portmap)
 
 	// 0xafb0 IC24 - lamps, 7segs
-	i8255_device &ic24(I8255A(config, "ic24"));
-	ic24.out_pa_callback().set(FUNC(aces1_state::ic24_write_a));  // 7segs
-	ic24.out_pb_callback().set(FUNC(aces1_state::ic24_write_b));  // lamps
-	ic24.out_pc_callback().set(FUNC(aces1_state::ic24_write_c));  // strobe
+	MCFG_DEVICE_ADD("ic24", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, aces1_state, ic24_write_a))  // 7segs
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, aces1_state, ic24_write_b))  // lamps
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, aces1_state, ic24_write_c))  // strobe
 
 	// 0xafd0 IC25 - lamps, meters, reel comms (writes)
-	i8255_device &ic25(I8255A(config, "ic25"));
-	ic25.out_pa_callback().set(FUNC(aces1_state::ic25_write_a));  // extra lamps
-	ic25.out_pb_callback().set(FUNC(aces1_state::ic25_write_b));  // meters, extra lamp select
-	ic25.out_pc_callback().set(FUNC(aces1_state::ic25_write_c));  // reel write, extra lamp strobe
+	MCFG_DEVICE_ADD("ic25", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, aces1_state, ic25_write_a))  // extra lamps
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, aces1_state, ic25_write_b))  // meters, extra lamp select
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, aces1_state, ic25_write_c))  // reel write, extra lamp strobe
 
 	// 0xafe0 IC37 - doors, coins, reel optics (reads)
-	i8255_device &ic37(I8255A(config, "ic37"));
-	ic37.in_pa_callback().set(FUNC(aces1_state::ic37_read_a)); // extra lamps
-	ic37.in_pb_callback().set(FUNC(aces1_state::ic37_read_b)); // meters, extra lamp select
-	ic37.in_pc_callback().set(FUNC(aces1_state::ic37_read_c)); // reel write, extra lamp strobe
+	MCFG_DEVICE_ADD("ic37", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, aces1_state, ic37_read_a)) // extra lamps
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, aces1_state, ic37_read_b)) // meters, extra lamp select
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, aces1_state, ic37_read_c)) // reel write, extra lamp strobe
 
-	config.set_default_layout(layout_aces1);
+	MCFG_DEFAULT_LAYOUT(layout_aces1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// 0xadf0 - Dips, Sound
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(8'000'000) / 8)); /* XTAL verified, divisor not */
-	aysnd.port_a_read_callback().set_ioport("DSWA");
-	aysnd.port_b_read_callback().set_ioport("DSWB");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.00);
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000) /* ?? MHz */
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* steppers */
-	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[0]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<0>));
-	REEL(config, m_reel[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[1]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<1>));
-	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[2]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<2>));
-	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
-	m_reel[3]->optic_handler().set(FUNC(aces1_state::reel_optic_cb<3>));
-}
+	MCFG_STARPOINT_48STEP_ADD("reel0")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel0_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel1")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel1_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel2")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel2_optic_cb))
+	MCFG_STARPOINT_48STEP_ADD("reel3")
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, aces1_state, reel3_optic_cb))
+MACHINE_CONFIG_END
 
 
 ROM_START( ac1clbmn )
@@ -848,7 +845,7 @@ ROM_START( ac1hideha )
 	ROM_LOAD( "hh563p4r", 0x0000, 0x8000, CRC(c82aabb1) SHA1(6a94cbae10edc544117a6bc5849ac8c9ad80a333) )
 ROM_END
 
-ROM_START( ac1unk ) // System One, Race AGO182, (c) Race Electronics 1983
+ROM_START( ac1unk )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "system_one_prom1_2764.bin", 0x0000, 0x2000, CRC(ea532fe4) SHA1(8b77d9e8fad0cd022c8386c509ad2ecbc7032d90) )
 	ROM_LOAD( "system_one_prom2_2764.bin", 0x2000, 0x2000, CRC(729599b7) SHA1(da9aedc50a281cb6626a4c03fc06e5dd62b4edd1) )

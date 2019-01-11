@@ -68,7 +68,6 @@ MACHINES["Z80PIO"] = true
 MACHINES["68681"] = true
 MACHINES["BANKDEV"] = true
 MACHINES["GEN_LATCH"] = true
-MACHINES["INPUT_MERGER"] = true
 MACHINES["OUTPUT_LATCH"] = true
 MACHINES["TICKET"] = true
 MACHINES["WATCHDOG"] = true
@@ -154,8 +153,6 @@ files{
 	MAME_DIR .. "src/mame/includes/wrally.h",
 	MAME_DIR .. "src/mame/machine/wrally.cpp",
 	MAME_DIR .. "src/mame/video/wrally.cpp",
-	MAME_DIR .. "src/mame/video/gaelco_wrally_sprites.cpp",
-	MAME_DIR .. "src/mame/video/gaelco_wrally_sprites.h",
 	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.cpp",
 	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.h",
 	MAME_DIR .. "src/mame/drivers/looping.cpp",

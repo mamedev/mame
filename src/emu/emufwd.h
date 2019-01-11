@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include <type_traits>
-
 
 //----------------------------------
 // 3rdparty
@@ -100,8 +98,8 @@ class symbol_table;
 class debugger_manager;
 
 // declared in devcb.h
-class devcb_base;
-template <typename Input, std::make_unsigned_t<Input> DefaultMask> class devcb_write;
+class devcb_read_base;
+class devcb_write_base;
 
 // declared in devfind.h
 class finder_base;
@@ -149,6 +147,9 @@ class memory_share;
 
 // declared in emuopts.h
 class emu_options;
+
+// declared in emupal.h
+class palette_device;
 
 // declared in gamedrv.h
 class game_driver;

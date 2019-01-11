@@ -13,7 +13,7 @@
 class legacy_scsi_host_adapter : public device_t
 {
 public:
-	template <typename T> void set_scsi_port(T && tag) { m_scsi_port.set_tag(std::forward<T>(tag)); }
+	void set_scsi_port(const char *tag) { m_scsi_port.set_tag(tag); }
 
 protected:
 	legacy_scsi_host_adapter(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

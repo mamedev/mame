@@ -43,6 +43,7 @@
 
 namespace glslang {
 
+    class TAttributeMap;
     class TFunctionDeclarator;
 
     // Should just be the grammar aspect of HLSL.
@@ -52,7 +53,7 @@ namespace glslang {
     public:
         HlslGrammar(HlslScanContext& scanner, HlslParseContext& parseContext)
             : HlslTokenStream(scanner), parseContext(parseContext), intermediate(parseContext.intermediate),
-              typeIdentifiers(false), unitNode(nullptr) { }
+              typeIdentifiers(false) { }
         virtual ~HlslGrammar() { }
 
         bool parse();
@@ -70,8 +71,8 @@ namespace glslang {
         bool acceptControlDeclaration(TIntermNode*& node);
         bool acceptSamplerDeclarationDX9(TType&);
         bool acceptSamplerState();
-        bool acceptFullySpecifiedType(TType&, const TAttributes&);
-        bool acceptFullySpecifiedType(TType&, TIntermNode*& nodeList, const TAttributes&, bool forbidDeclarators = false);
+        bool acceptFullySpecifiedType(TType&);
+        bool acceptFullySpecifiedType(TType&, TIntermNode*& nodeList);
         bool acceptQualifier(TQualifier&);
         bool acceptLayoutQualifierList(TQualifier&);
         bool acceptType(TType&);
@@ -116,10 +117,10 @@ namespace glslang {
         bool acceptScopedCompoundStatement(TIntermNode*&);
         bool acceptStatement(TIntermNode*&);
         bool acceptNestedStatement(TIntermNode*&);
-        void acceptAttributes(TAttributes&);
-        bool acceptSelectionStatement(TIntermNode*&, const TAttributes&);
-        bool acceptSwitchStatement(TIntermNode*&, const TAttributes&);
-        bool acceptIterationStatement(TIntermNode*&, const TAttributes&);
+        void acceptAttributes(TAttributeMap&);
+        bool acceptSelectionStatement(TIntermNode*&, const TAttributeMap&);
+        bool acceptSwitchStatement(TIntermNode*&, const TAttributeMap&);
+        bool acceptIterationStatement(TIntermNode*&, const TAttributeMap&);
         bool acceptJumpStatement(TIntermNode*&);
         bool acceptCaseLabel(TIntermNode*&);
         bool acceptDefaultLabel(TIntermNode*&);
@@ -133,7 +134,6 @@ namespace glslang {
         HlslParseContext& parseContext;  // state of parsing and helper functions for building the intermediate
         TIntermediate& intermediate;     // the final product, the intermediate representation, includes the AST
         bool typeIdentifiers;            // shader uses some types as identifiers
-        TIntermNode* unitNode;
     };
 
 } // end namespace glslang

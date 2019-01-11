@@ -16,6 +16,15 @@
 #define LOG_Move0205    0
 #define LOG_Move0905    0
 
+#define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
+	devcb = &downcast<raiden2cop_device &>(*device).set_m_videoramout_cb(DEVCB_##_devcb);
+
+#define MCFG_RAIDEN2COP_ADD(_tag ) \
+	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0)
+
+#define MCFG_LEGIONNACOP_ADD(_tag ) \
+	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0)
+
 
 class raiden2cop_device : public device_t
 {
@@ -67,9 +76,7 @@ public:
 
 	uint8_t fade_table(int v);
 
-	auto videoramout_cb() { return m_videoramout_cb.bind(); }
-	auto paletteramout_cb() { return m_paletteramout_cb.bind(); }
-	template<class T> void set_host_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
+	template<class Object> devcb_base &set_m_videoramout_cb(Object &&cb) { return m_videoramout_cb.set_callback(std::forward<Object>(cb)); }
 
 	// Number Conversion
 
@@ -201,11 +208,11 @@ protected:
 	virtual void device_start() override;
 
 private:
-	// device callbacks
+	// internal state
 	devcb_write16       m_videoramout_cb;
-	devcb_write16       m_paletteramout_cb;
+	required_device<palette_device> m_palette;
 
-	required_device<cpu_device> m_host_cpu; /**< reference to the host cpu */
+	cpu_device *m_host_cpu;      /**< reference to the host cpu */
 	address_space *m_host_space; /**< reference to the host cpu space */
 	bool m_host_endian;          /**< reference to the host cpu endianness, some commands cares! */
 	uint8_t m_byte_endian_val;     /**< 2 if m_host_endian is big (68k) else 0 */

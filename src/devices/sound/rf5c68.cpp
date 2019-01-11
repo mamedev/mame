@@ -13,7 +13,6 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(RF5C68, rf5c68_device, "rf5c68", "Ricoh RF5C68")
-DEFINE_DEVICE_TYPE(RF5C164, rf5c164_device, "rf5c164", "Ricoh RF5C164")
 
 
 //**************************************************************************
@@ -24,8 +23,8 @@ DEFINE_DEVICE_TYPE(RF5C164, rf5c164_device, "rf5c164", "Ricoh RF5C164")
 //  rf5c68_device - constructor
 //-------------------------------------------------
 
-rf5c68_device::rf5c68_device(const machine_config & mconfig, device_type type, const char * tag, device_t * owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
+rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, RF5C68, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16) // 15 bit Address + 2 Memory select outputs(total 64KB), PSRAM/SRAM/ROM
@@ -33,21 +32,6 @@ rf5c68_device::rf5c68_device(const machine_config & mconfig, device_type type, c
 	, m_cbank(0)
 	, m_wbank(0)
 	, m_enable(0)
-{
-}
-
-rf5c68_device::rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: rf5c68_device(mconfig, RF5C68, tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  rf5c68_device - constructor
-//-------------------------------------------------
-
-rf5c164_device::rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: rf5c68_device(mconfig, RF5C164, tag, owner, clock)
 {
 }
 
@@ -79,15 +63,6 @@ void rf5c68_device::device_start()
 	save_item(NAME(m_cbank));
 	save_item(NAME(m_wbank));
 	save_item(NAME(m_enable));
-}
-
-//-------------------------------------------------
-//  device_clock_changed
-//-------------------------------------------------
-
-void rf5c68_device::device_clock_changed()
-{
-	m_stream->set_sample_rate(clock() / 384);
 }
 
 //-------------------------------------------------

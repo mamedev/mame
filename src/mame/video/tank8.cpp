@@ -10,12 +10,14 @@ Atari Tank 8 video emulation
 #include "includes/tank8.h"
 
 
-void tank8_state::tank8_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(tank8_state, tank8)
 {
+	int i;
+
 	palette.set_indirect_color(8, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(9, rgb_t(0xff, 0xff, 0xff));
 
-	for (int i = 0; i < 8; i++)
+	for (i = 0; i < 8; i++)
 	{
 		palette.set_pen_indirect(2 * i + 0, 8);
 		palette.set_pen_indirect(2 * i + 1, i);
@@ -208,7 +210,7 @@ WRITE_LINE_MEMBER(tank8_state::screen_vblank)
 		draw_sprites(m_helper2, visarea);
 		draw_bullets(m_helper3, visarea);
 
-		for (y = visarea.top(); y <= visarea.bottom(); y++)
+		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
 			int _state = 0;
 
@@ -219,7 +221,7 @@ WRITE_LINE_MEMBER(tank8_state::screen_vblank)
 			if ((m_screen->frame_number() ^ y) & 1)
 				continue; /* video display is interlaced */
 
-			for (x = visarea.left(); x <= visarea.right(); x++)
+			for (x = visarea.min_x; x <= visarea.max_x; x++)
 			{
 				uint8_t index;
 

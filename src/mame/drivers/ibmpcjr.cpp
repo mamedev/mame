@@ -20,10 +20,8 @@
 #include "bus/generic/slot.h"
 #include "bus/isa/fdc.h"
 #include "bus/pc_joy/pc_joy.h"
-#include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/null_modem.h"
-#include "bus/rs232/terminal.h"
+#include "bus/rs232/ser_mouse.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -33,8 +31,8 @@
 class pcjr_state : public driver_device
 {
 public:
-	pcjr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	pcjr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pic8259(*this, "pic8259"),
 		m_pit8253(*this, "pit8253"),
@@ -47,12 +45,6 @@ public:
 		m_keyboard(*this, "pc_keyboard")
 	{ }
 
-	void ibmpcjx(machine_config &config);
-	void ibmpcjr(machine_config &config);
-
-	void init_pcjr();
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
 	required_device<pit8253_device> m_pit8253;
@@ -113,6 +105,9 @@ private:
 	};
 
 	void machine_reset() override;
+	void init_pcjr();
+	void ibmpcjx(machine_config &config);
+	void ibmpcjr(machine_config &config);
 	void ibmpcjr_io(address_map &map);
 	void ibmpcjr_map(address_map &map);
 	void ibmpcjx_io(address_map &map);
@@ -405,7 +400,7 @@ WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 		m_fdc->set_floppy(nullptr);
 
 	if((pdor^m_pcjr_dor) & 0x80)
-		m_fdc->soft_reset();
+		m_fdc->reset();
 
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))
@@ -514,13 +509,8 @@ static void pcjr_floppies(device_slot_interface &device)
 
 static void pcjr_com(device_slot_interface &device)
 {
-	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
-	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
-	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
-	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
-	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
-	device.option_add("terminal",SERIAL_TERMINAL);
-	device.option_add("null_modem",NULL_MODEM);
+	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
+	device.option_add("mousesys_mouse", MSYSTEM_SERIAL_MOUSE);
 }
 
 static const gfx_layout pc_8_charlayout =
@@ -570,9 +560,9 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x00a0, 0x00a0).rw(FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::command_w));
-	map(0x00f2, 0x00f2).w(FUNC(pcjr_state::pcjr_fdc_dor_w));
+	map(0x00a0, 0x00a0).rw(this, FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::write));
+	map(0x00f2, 0x00f2).w(this, FUNC(pcjr_state::pcjr_fdc_dor_w));
 	map(0x00f4, 0x00f5).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x02f8, 0x02ff).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
@@ -594,54 +584,54 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 {
 	map.unmap_value_high();
 	ibmpcjr_io(map);
-	map(0x01ff, 0x01ff).rw(FUNC(pcjr_state::pcjx_port_1ff_r), FUNC(pcjr_state::pcjx_port_1ff_w));
+	map(0x01ff, 0x01ff).rw(this, FUNC(pcjr_state::pcjx_port_1ff_r), FUNC(pcjr_state::pcjx_port_1ff_w));
 }
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 4900000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjr_map);
-	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	MCFG_DEVICE_ADD("maincpu", I8088, 4900000)
+	MCFG_DEVICE_PROGRAM_MAP(ibmpcjr_map)
+	MCFG_DEVICE_IO_MAP(ibmpcjr_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 /*
   On the PC Jr the input for clock 1 seems to be selectable
   based on bit 4(/5?) written to output port A0h. This is not
   supported yet.
  */
-	PIT8253(config, m_pit8253, 0);
-	m_pit8253->set_clk<0>(XTAL(14'318'181)/12);
-	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
-	m_pit8253->set_clk<1>(XTAL(14'318'181)/12);
-	m_pit8253->set_clk<2>(XTAL(14'318'181)/12);
-	m_pit8253->out_handler<2>().set(FUNC(pcjr_state::out2_changed));
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12)
+	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pcjr_state, out2_changed))
 
-	PIC8259(config, m_pic8259, 0);
-	m_pic8259->out_int_callback().set(FUNC(pcjr_state::pic8259_set_int_line));
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, pcjr_state, pic8259_set_int_line))
 
-	i8255_device &ppi(I8255(config, "ppi8255"));
-	ppi.in_pa_callback().set_constant(0xff);
-	ppi.out_pb_callback().set(FUNC(pcjr_state::pcjr_ppi_portb_w));
-	ppi.in_pc_callback().set(FUNC(pcjr_state::pcjr_ppi_portc_r));
+	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pcjr_state, pcjr_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pcjr_state, pcjr_ppi_portc_r))
 
-	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
-	uart.out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
-	uart.out_dtr_callback().set("serport", FUNC(rs232_port_device::write_dtr));
-	uart.out_rts_callback().set("serport", FUNC(rs232_port_device::write_rts));
-	uart.out_int_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
 
-	rs232_port_device &serport(RS232_PORT(config, "serport", pcjr_com, nullptr));
-	serport.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
-	serport.dcd_handler().set("ins8250", FUNC(ins8250_uart_device::dcd_w));
-	serport.dsr_handler().set("ins8250", FUNC(ins8250_uart_device::dsr_w));
-	serport.ri_handler().set("ins8250", FUNC(ins8250_uart_device::ri_w));
-	serport.cts_handler().set("ins8250", FUNC(ins8250_uart_device::cts_w));
+	MCFG_DEVICE_ADD( "serport", RS232_PORT, pcjr_com, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ins8250", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("ins8250", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_uart_device, cts_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)
+	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
 	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
 
-	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr:palette", gfx_pcjr);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_pcjr:palette", gfx_pcjr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -651,16 +641,16 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
-	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
-	lpt0.irq_handler().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w))
 
-	PC_JOY(config, "pc_joy");
+	MCFG_PC_JOY_ADD("pc_joy")
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	MCFG_UPD765A_ADD("fdc", false, false)
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
@@ -677,7 +667,9 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_GENERIC_LOAD(pcjr_state, pcjr_cart2)
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
@@ -692,7 +684,6 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	ibmpcjr(config);
-
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_DEVICE_IO_MAP(ibmpcjx_io)
@@ -703,10 +694,11 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ibmpcjx);
-
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ibmpcjx)
 	/* internal ram */
-	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
 MACHINE_CONFIG_END
 
 
@@ -714,9 +706,9 @@ MACHINE_CONFIG_END
 ROM_START( ibmpcjr )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "default", "Default" )
-	ROMX_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414), ROM_BIOS(0))
+	ROMX_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "quiksilver", "Quicksilver" ) // Alternate bios to boot up faster (Synectics)
-	ROMX_LOAD("quiksilv.rom", 0x0000, 0x10000, CRC(86aaa1c4) SHA1(b3d7e8ce5de17441891e0b71e5261ed01a169dc1), ROM_BIOS(1))
+	ROMX_LOAD("quiksilv.rom", 0x0000, 0x10000, CRC(86aaa1c4) SHA1(b3d7e8ce5de17441891e0b71e5261ed01a169dc1), ROM_BIOS(2))
 
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
@@ -726,10 +718,10 @@ ROM_START( ibmpcjx )
 	ROM_REGION(0x20000,"bios", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("unk")
 	ROM_SYSTEM_BIOS( 0, "5601jda", "5601jda" )
-	ROMX_LOAD("5601jda.bin", 0x10000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(0))
-	ROMX_LOAD("basicjx.rom",   0x08000, 0x08000, NO_DUMP, ROM_BIOS(0)) // boot fails due to this.
+	ROMX_LOAD("5601jda.bin", 0x10000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
+	ROMX_LOAD("basicjx.rom",   0x08000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
 	ROM_SYSTEM_BIOS( 1, "unk", "unk" )
-	ROMX_LOAD("ipljx.rom", 0x00000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(1))
+	ROMX_LOAD("ipljx.rom", 0x00000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
 
 	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card

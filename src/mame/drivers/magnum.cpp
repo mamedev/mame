@@ -12,7 +12,6 @@
 #include "video/hd61830.h"
 #include "video/i8275.h"
 #include "sound/beep.h"
-#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
@@ -267,9 +266,9 @@ void magnum_state::magnum_io(address_map &map)
 	map(0x001a, 0x001b).rw("lcdc2", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x001c, 0x001d).rw("lcdc1", FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x001e, 0x001f).rw("lcdc1", FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
-	map(0x0040, 0x004f).rw(FUNC(magnum_state::sysctl_r), FUNC(magnum_state::sysctl_w));
-	map(0x0050, 0x0051).rw(FUNC(magnum_state::irqstat_r), FUNC(magnum_state::port50_w));
-	map(0x0056, 0x0056).w(FUNC(magnum_state::beep_w));
+	map(0x0040, 0x004f).rw(this, FUNC(magnum_state::sysctl_r), FUNC(magnum_state::sysctl_w));
+	map(0x0050, 0x0051).rw(this, FUNC(magnum_state::irqstat_r), FUNC(magnum_state::port50_w));
+	map(0x0056, 0x0056).w(this, FUNC(magnum_state::beep_w));
 	map(0x0080, 0x008f).rw("rtc", FUNC(cdp1879_device::read), FUNC(cdp1879_device::write)).umask16(0x00ff);
 	//map(0x0100, 0x0107).rw("fdc", FUNC(wd1793_device::read), FUNC(wd1793_device::write)).umask16(0x00ff);
 }
@@ -284,7 +283,8 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 	MCFG_DEVICE_PROGRAM_MAP(magnum_map)
 	MCFG_DEVICE_IO_MAP(magnum_io)
 
-	CDP1879(config, "rtc", XTAL(32'768)).irq_callback().set(FUNC(magnum_state::rtcirq_w));
+	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
+	MCFG_CDP1879_IRQ_CALLBACK(WRITELINE(*this, magnum_state, rtcirq_w))
 
 	MCFG_SCREEN_ADD("screen1", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -300,19 +300,19 @@ MACHINE_CONFIG_START(magnum_state::magnum)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*40-1, 0, 8*16-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	hd61830_device &lcdc1(HD61830(config, "lcdc1", 1000000)); // unknown clock
-	lcdc1.set_addrmap(0, &magnum_state::magnum_lcdc);
-	lcdc1.set_screen("screen1");
+	MCFG_DEVICE_ADD("lcdc1", HD61830, 1000000) // unknown clock
+	MCFG_DEVICE_ADDRESS_MAP(0, magnum_lcdc)
+	MCFG_VIDEO_SET_SCREEN("screen1")
 
-	hd61830_device &lcdc2(HD61830(config, "lcdc2", 1000000)); // unknown clock
-	lcdc2.set_addrmap(0, &magnum_state::magnum_lcdc);
-	lcdc2.set_screen("screen2");
+	MCFG_DEVICE_ADD("lcdc2", HD61830, 1000000) // unknown clock
+	MCFG_DEVICE_ADDRESS_MAP(0, magnum_lcdc)
+	MCFG_VIDEO_SET_SCREEN("screen2")
 
-	//I8275(config, "crtc", 3000000); // unknown clock
+	//MCFG_DEVICE_ADD("crtc", I8275, 3000000) // unknown clock
 
-	//WD1793(config, "fdc", 1000000); // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
+	//MCFG_WD1793_ADD("fdc", 1000000) // nothing known, type or if any disks even exist, port 0x44 is possibly motor control
 
-	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 
 	SPEAKER(config, "speaker").front_center();
 	MCFG_DEVICE_ADD("beep", BEEP, 500) /// frequency is guessed

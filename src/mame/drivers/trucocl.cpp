@@ -7,7 +7,7 @@ Truco Clemente (c) 1991 Miky SRL
 driver by Ernesto Corvi
 
 Notes:
-- Sloppy coin insertion, needs to stay high for 60 Hz wtf?
+- After one game you can't play anymore.
 - Audio is almost there.
 - I think this runs on a heavily modified PacMan type of board.
 
@@ -44,7 +44,6 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "speaker.h"
 
 
-// TODO: doesn't seem suited to neither irq nor nmi
 WRITE8_MEMBER(trucocl_state::irq_enable_w)
 {
 	m_irq_mask = (data & 1) ^ 1;
@@ -96,19 +95,14 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 void trucocl_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).ram().w(FUNC(trucocl_state::trucocl_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).ram().w(FUNC(trucocl_state::trucocl_colorram_w)).share("colorram");
-	map(0x4800, 0x4fff).ram();
-	map(0x5000, 0x5000).w(FUNC(trucocl_state::irq_enable_w));
+	map(0x4000, 0x43ff).ram().w(this, FUNC(trucocl_state::trucocl_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).ram().w(this, FUNC(trucocl_state::trucocl_colorram_w)).share("colorram");
+	map(0x4c00, 0x4fff).ram();
+	map(0x5000, 0x5000).w(this, FUNC(trucocl_state::irq_enable_w));
 	map(0x5000, 0x503f).portr("IN0");
-	map(0x5080, 0x5080).portr("DSW").w(FUNC(trucocl_state::audio_dac_w));
+	map(0x5080, 0x5080).w(this, FUNC(trucocl_state::audio_dac_w));
 	map(0x50c0, 0x50c0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8000, 0xffff).rom();
-}
-
-void trucocl_state::main_io(address_map &map)
-{
-	map(0x0000, 0xffff).nopr(); // read then always discarded?
 }
 
 static INPUT_PORTS_START( trucocl )
@@ -118,36 +112,9 @@ static INPUT_PORTS_START( trucocl )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) //PORT_IMPULSE(60)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(2)
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Enable BGM fanfare" ) // enables extra BGMs on attract mode
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "Nudity" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	// TODO: more are tested ingame
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -165,29 +132,24 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( gfx_trucocl )
-	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout,      0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0,         tilelayout,      0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x10000, tilelayout,      0, 2 )
 GFXDECODE_END
 
-void trucocl_state::machine_reset()
-{
-	// ...
-}
-
 INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
 {
-//  if(m_irq_mask)
+	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
+
 }
 
 MACHINE_CONFIG_START(trucocl_state::trucocl)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", trucocl_state,  trucocl_interrupt)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -198,8 +160,9 @@ MACHINE_CONFIG_START(trucocl_state::trucocl)
 	MCFG_SCREEN_UPDATE_DRIVER(trucocl_state, screen_update_trucocl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_trucocl);
-	PALETTE(config, "palette", FUNC(trucocl_state::trucocl_palette), 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trucocl)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(trucocl_state, trucocl)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

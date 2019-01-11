@@ -68,9 +68,7 @@ apricot_expansion_bus_device::apricot_expansion_bus_device(const machine_config 
 	m_ext1_handler(*this),
 	m_ext2_handler(*this),
 	m_int2_handler(*this),
-	m_int3_handler(*this),
-	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_iop(*this, finder_base::DUMMY_TAG)
+	m_int3_handler(*this), m_cpu_tag(nullptr), m_iop_tag(nullptr)
 {
 }
 
@@ -104,11 +102,13 @@ void apricot_expansion_bus_device::device_start()
 
 void apricot_expansion_bus_device::device_reset()
 {
-	m_program = &m_cpu->space(AS_PROGRAM);
-	m_io = &m_cpu->space(AS_IO);
+	cpu_device *cpu = m_owner->subdevice<cpu_device>(m_cpu_tag);
+	m_program = &cpu->space(AS_PROGRAM);
+	m_io = &cpu->space(AS_IO);
 
-	m_program_iop = &m_iop->space(AS_PROGRAM);
-	m_io_iop = &m_iop->space(AS_IO);
+	cpu_device *iop = m_owner->subdevice<cpu_device>(m_iop_tag);
+	m_program_iop = &iop->space(AS_PROGRAM);
+	m_io_iop = &iop->space(AS_IO);
 }
 
 //-------------------------------------------------

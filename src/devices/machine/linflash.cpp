@@ -61,17 +61,16 @@ linear_flash_pccard_16mb_device::linear_flash_pccard_16mb_device(const machine_c
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_16mb_device::linear_flash_pccard_16mb), this));
 }
 
-void linear_flash_pccard_16mb_device::device_add_mconfig(machine_config &config)
-{
-	FUJITSU_29F016A(config, "1l");
-	FUJITSU_29F016A(config, "1u");
-	FUJITSU_29F016A(config, "2l");
-	FUJITSU_29F016A(config, "2u");
-	FUJITSU_29F016A(config, "3l");
-	FUJITSU_29F016A(config, "3u");
-	FUJITSU_29F016A(config, "4l");
-	FUJITSU_29F016A(config, "4u");
-}
+MACHINE_CONFIG_START(linear_flash_pccard_16mb_device::device_add_mconfig)
+	MCFG_FUJITSU_29F016A_ADD("1l")
+	MCFG_FUJITSU_29F016A_ADD("1u")
+	MCFG_FUJITSU_29F016A_ADD("2l")
+	MCFG_FUJITSU_29F016A_ADD("2u")
+	MCFG_FUJITSU_29F016A_ADD("3l")
+	MCFG_FUJITSU_29F016A_ADD("3u")
+	MCFG_FUJITSU_29F016A_ADD("4l")
+	MCFG_FUJITSU_29F016A_ADD("4u")
+MACHINE_CONFIG_END
 
 
 void linear_flash_pccard_32mb_device::linear_flash_pccard_32mb(address_map &map)
@@ -101,25 +100,24 @@ linear_flash_pccard_32mb_device::linear_flash_pccard_32mb_device(const machine_c
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_32mb_device::linear_flash_pccard_32mb), this));
 }
 
-void linear_flash_pccard_32mb_device::device_add_mconfig(machine_config &config)
-{
-	FUJITSU_29F016A(config, "1l");
-	FUJITSU_29F016A(config, "1u");
-	FUJITSU_29F016A(config, "2l");
-	FUJITSU_29F016A(config, "2u");
-	FUJITSU_29F016A(config, "3l");
-	FUJITSU_29F016A(config, "3u");
-	FUJITSU_29F016A(config, "4l");
-	FUJITSU_29F016A(config, "4u");
-	FUJITSU_29F016A(config, "5l");
-	FUJITSU_29F016A(config, "5u");
-	FUJITSU_29F016A(config, "6l");
-	FUJITSU_29F016A(config, "6u");
-	FUJITSU_29F016A(config, "7l");
-	FUJITSU_29F016A(config, "7u");
-	FUJITSU_29F016A(config, "8l");
-	FUJITSU_29F016A(config, "8u");
-}
+MACHINE_CONFIG_START(linear_flash_pccard_32mb_device::device_add_mconfig)
+	MCFG_FUJITSU_29F016A_ADD("1l")
+	MCFG_FUJITSU_29F016A_ADD("1u")
+	MCFG_FUJITSU_29F016A_ADD("2l")
+	MCFG_FUJITSU_29F016A_ADD("2u")
+	MCFG_FUJITSU_29F016A_ADD("3l")
+	MCFG_FUJITSU_29F016A_ADD("3u")
+	MCFG_FUJITSU_29F016A_ADD("4l")
+	MCFG_FUJITSU_29F016A_ADD("4u")
+	MCFG_FUJITSU_29F016A_ADD("5l")
+	MCFG_FUJITSU_29F016A_ADD("5u")
+	MCFG_FUJITSU_29F016A_ADD("6l")
+	MCFG_FUJITSU_29F016A_ADD("6u")
+	MCFG_FUJITSU_29F016A_ADD("7l")
+	MCFG_FUJITSU_29F016A_ADD("7u")
+	MCFG_FUJITSU_29F016A_ADD("8l")
+	MCFG_FUJITSU_29F016A_ADD("8u")
+MACHINE_CONFIG_END
 
 
 void linear_flash_pccard_64mb_device::linear_flash_pccard_64mb(address_map &map)
@@ -165,38 +163,37 @@ linear_flash_pccard_64mb_device::linear_flash_pccard_64mb_device(const machine_c
 	m_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16,  26, 0, address_map_constructor(FUNC(linear_flash_pccard_64mb_device::linear_flash_pccard_64mb), this));
 }
 
-void linear_flash_pccard_64mb_device::device_add_mconfig(machine_config &config)
-{
-	FUJITSU_29F016A(config, "1l");
-	FUJITSU_29F016A(config, "1u");
-	FUJITSU_29F016A(config, "2l");
-	FUJITSU_29F016A(config, "2u");
-	FUJITSU_29F016A(config, "3l");
-	FUJITSU_29F016A(config, "3u");
-	FUJITSU_29F016A(config, "4l");
-	FUJITSU_29F016A(config, "4u");
-	FUJITSU_29F016A(config, "5l");
-	FUJITSU_29F016A(config, "5u");
-	FUJITSU_29F016A(config, "6l");
-	FUJITSU_29F016A(config, "6u");
-	FUJITSU_29F016A(config, "7l");
-	FUJITSU_29F016A(config, "7u");
-	FUJITSU_29F016A(config, "8l");
-	FUJITSU_29F016A(config, "8u");
-	FUJITSU_29F016A(config, "9l");
-	FUJITSU_29F016A(config, "9u");
-	FUJITSU_29F016A(config, "10l");
-	FUJITSU_29F016A(config, "10u");
-	FUJITSU_29F016A(config, "11l");
-	FUJITSU_29F016A(config, "11u");
-	FUJITSU_29F016A(config, "12l");
-	FUJITSU_29F016A(config, "12u");
-	FUJITSU_29F016A(config, "13l");
-	FUJITSU_29F016A(config, "13u");
-	FUJITSU_29F016A(config, "14l");
-	FUJITSU_29F016A(config, "14u");
-	FUJITSU_29F016A(config, "15l");
-	FUJITSU_29F016A(config, "15u");
-	FUJITSU_29F016A(config, "16l");
-	FUJITSU_29F016A(config, "16u");
-}
+MACHINE_CONFIG_START(linear_flash_pccard_64mb_device::device_add_mconfig)
+	MCFG_FUJITSU_29F016A_ADD("1l")
+	MCFG_FUJITSU_29F016A_ADD("1u")
+	MCFG_FUJITSU_29F016A_ADD("2l")
+	MCFG_FUJITSU_29F016A_ADD("2u")
+	MCFG_FUJITSU_29F016A_ADD("3l")
+	MCFG_FUJITSU_29F016A_ADD("3u")
+	MCFG_FUJITSU_29F016A_ADD("4l")
+	MCFG_FUJITSU_29F016A_ADD("4u")
+	MCFG_FUJITSU_29F016A_ADD("5l")
+	MCFG_FUJITSU_29F016A_ADD("5u")
+	MCFG_FUJITSU_29F016A_ADD("6l")
+	MCFG_FUJITSU_29F016A_ADD("6u")
+	MCFG_FUJITSU_29F016A_ADD("7l")
+	MCFG_FUJITSU_29F016A_ADD("7u")
+	MCFG_FUJITSU_29F016A_ADD("8l")
+	MCFG_FUJITSU_29F016A_ADD("8u")
+	MCFG_FUJITSU_29F016A_ADD("9l")
+	MCFG_FUJITSU_29F016A_ADD("9u")
+	MCFG_FUJITSU_29F016A_ADD("10l")
+	MCFG_FUJITSU_29F016A_ADD("10u")
+	MCFG_FUJITSU_29F016A_ADD("11l")
+	MCFG_FUJITSU_29F016A_ADD("11u")
+	MCFG_FUJITSU_29F016A_ADD("12l")
+	MCFG_FUJITSU_29F016A_ADD("12u")
+	MCFG_FUJITSU_29F016A_ADD("13l")
+	MCFG_FUJITSU_29F016A_ADD("13u")
+	MCFG_FUJITSU_29F016A_ADD("14l")
+	MCFG_FUJITSU_29F016A_ADD("14u")
+	MCFG_FUJITSU_29F016A_ADD("15l")
+	MCFG_FUJITSU_29F016A_ADD("15u")
+	MCFG_FUJITSU_29F016A_ADD("16l")
+	MCFG_FUJITSU_29F016A_ADD("16u")
+MACHINE_CONFIG_END

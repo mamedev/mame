@@ -87,7 +87,7 @@
 
 
 
-char const *const mb86233_disassembler::regnames[0x40] = {
+const char *const mb86233_disassembler::regnames[0x40] = {
 	"b0", "b1", "x0", "x1", "x2", "i0", "i1", "i2", "sp", "pag", "vsm", "dmc", "c0", "c1", "pc", "-",
 	"a", "ah", "al", "b", "bh", "bl", "c", "ch", "cl", "d", "dh", "dl", "p", "ph", "pl", "sft",
 	"rf0", "rf1", "rf2", "rf3", "rf4", "rf5", "rf6", "rf7", "rf8", "rf9", "rfa", "rfb", "rfc", "rfd", "rfe", "rff",
@@ -384,7 +384,7 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "stmh");
 			if(opcode & 0x0001)
 				util::stream_format(stream, " fp");
-			static char const *const round_mode[4] = { "rn", "rp", "rm", "rz" };
+			static const char *const round_mode[4] = { "rn", "rp", "rm", "rz" };
 			util::stream_format(stream, " %s", round_mode[(opcode >> 1) & 3]);
 			break;
 		}
@@ -397,7 +397,7 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	}
 
 	case 0x0e: { // Load 24 bit val
-		static char const *const inst[4] = { "lipl", "lia", "lib", "lid" };
+		static const char *const inst[4] = { "lipl", "lia", "lib", "lid" };
 		util::stream_format(stream, "%s #0x%x", inst[(opcode >> 24) & 0x3], opcode&0xffffff);
 		break;
 	}
@@ -411,7 +411,7 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		switch(sub2) {
 		case 0: {
-			static char const *const rl2[16] = {
+			static const char *rl2[16] = {
 				"?0", "?1", "a", "b", "d", "?5", "?6", "?7", "?8", "?9", "?a", "?b", "?c", "?d", "?e", "?f"
 			};
 			util::stream_format(stream, "clr0");

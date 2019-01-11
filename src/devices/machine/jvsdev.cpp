@@ -2,10 +2,12 @@
 // copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "jvsdev.h"
+#include "jvshost.h"
 
 jvs_device::jvs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock), jvs_outputs(0), host(*this, finder_base::DUMMY_TAG), jvs_address(0), jvs_reset_counter(0)
+	: device_t(mconfig, type, tag, owner, clock), jvs_outputs(0), jvs_address(0), jvs_reset_counter(0)
 {
+	jvs_host_tag = nullptr;
 	next_device = nullptr;
 }
 
@@ -186,6 +188,9 @@ bool jvs_device::get_address_set_line()
 
 void jvs_device::device_start()
 {
+	jvs_host *host = machine().device<jvs_host>(jvs_host_tag);
+	if(!host)
+		fatalerror("JVS device %s could not find JVS host %s\n", tag(), jvs_host_tag);
 	host->add_device(this);
 
 	save_item(NAME(jvs_address));

@@ -415,11 +415,8 @@ DISCRETE_STEP(dsd_555_mstbl)
 	}
 	x_time = 0;
 
-	if (m_trig_discharges_cap && trigger)
-	{
+	if ((trigger_type & DISC_555_TRIGGER_DISCHARGES_CAP) && trigger)
 		m_cap_voltage = 0;
-		v_cap = 0;
-	}
 
 	/* Wait for trigger */
 	if (UNEXPECTED(!flip_flop && trigger))

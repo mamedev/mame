@@ -1,13 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet, R. Belmont
 /*
-    rtc65271.h: include file for rtc65271.cpp
+    rtc65271.h: include file for rtc65271.c
 */
 
 #ifndef MAME_MACHINE_RTC65271_H
 #define MAME_MACHINE_RTC65271_H
 
 #pragma once
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_RTC65271_INTERRUPT_CB(cb) \
+	devcb = &downcast<rtc65271_device &>(*device).set_interrupt_callback(DEVCB_##cb);
 
 
 // ======================> rtc65271_device
@@ -19,7 +27,7 @@ public:
 	// construction/destruction
 	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto interrupt_cb() { return m_interrupt_cb.bind(); }
+	template <class Object> devcb_base &set_interrupt_callback(Object &&cb) { return m_interrupt_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( rtc_r );
 	DECLARE_READ8_MEMBER( xram_r );

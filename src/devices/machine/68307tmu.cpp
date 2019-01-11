@@ -101,10 +101,9 @@ TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer0_callback )
 {
 	m68307_cpu_device* m68k = (m68307_cpu_device *)ptr;
 	single_timer* tptr = &m68k->m_m68307TIMER->singletimer[0];
-	tptr->regs[m68307TIMER_TER] |= 0x2;
+	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
-	if (BIT(tptr->regs[m68307TIMER_TMR], 4))
-		m68k->timer0_interrupt(1);
+	m68k->timer0_interrupt();
 
 	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
 }
@@ -113,10 +112,9 @@ TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer1_callback )
 {
 	m68307_cpu_device* m68k = (m68307_cpu_device *)ptr;
 	single_timer* tptr = &m68k->m_m68307TIMER->singletimer[1];
-	tptr->regs[m68307TIMER_TER] |= 0x2;
+	tptr->regs[m68307TIMER_TMR] |= 0x2;
 
-	if (BIT(tptr->regs[m68307TIMER_TMR], 4))
-		m68k->timer1_interrupt(1);
+	m68k->timer1_interrupt();
 
 	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
 
@@ -154,14 +152,7 @@ void m68307_cpu_device::m68307_timer::write_ter(uint16_t data, uint16_t mem_mask
 {
 	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
 	single_timer* tptr = &singletimer[which];
-	if (data & 0x2)
-	{
-		tptr->regs[m68307TIMER_TER] &= ~0x2;
-		if (which)
-			parent->timer1_interrupt(0);
-		else
-			parent->timer0_interrupt(0);
-	}
+	if (data & 0x2) tptr->regs[m68307TIMER_TMR] &= ~0x2;
 }
 
 void m68307_cpu_device::m68307_timer::write_tmr(uint16_t data, uint16_t mem_mask, int which)
@@ -212,6 +203,7 @@ void m68307_cpu_device::m68307_timer::write_tmr(uint16_t data, uint16_t mem_mask
 	tptr->mametimer->adjust(m68k->cycles_to_attotime(100000));
 
 	m68k->logerror("\n");
+
 }
 
 void m68307_cpu_device::m68307_timer::write_trr(uint16_t data, uint16_t mem_mask, int which)
@@ -243,13 +235,4 @@ void m68307_cpu_device::m68307_timer::reset()
 	}
 
 	wd_mametimer->adjust(attotime::never);
-}
-
-
-bool m68307_cpu_device::m68307_timer::timer_int_pending(int which) const
-{
-	assert(which >= 0 && which < ARRAY_LENGTH(singletimer));
-	const single_timer* tptr = &singletimer[which];
-
-	return BIT(tptr->regs[m68307TIMER_TER], 1) && BIT(tptr->regs[m68307TIMER_TMR], 4);
 }

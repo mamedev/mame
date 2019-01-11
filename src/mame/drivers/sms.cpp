@@ -266,32 +266,32 @@ DC00      - Selection buttons #2, 9-16 (R)
 
 void sms_state::sms1_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).w(FUNC(sms_state::write_cart));
-	map(0x0000, 0x3fff).r(FUNC(sms_state::read_0000));
-	map(0x4000, 0x7fff).r(FUNC(sms_state::read_4000));
-	map(0x8000, 0xbfff).r(FUNC(sms_state::read_8000));
-	map(0xc000, 0xfff7).rw(FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
-	map(0xfff8, 0xfffb).rw(FUNC(sms_state::sms_sscope_r), FUNC(sms_state::sms_sscope_w));       /* 3-D glasses */
-	map(0xfffc, 0xffff).rw(FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
+	map(0x0000, 0xbfff).w(this, FUNC(sms_state::write_cart));
+	map(0x0000, 0x3fff).r(this, FUNC(sms_state::read_0000));
+	map(0x4000, 0x7fff).r(this, FUNC(sms_state::read_4000));
+	map(0x8000, 0xbfff).r(this, FUNC(sms_state::read_8000));
+	map(0xc000, 0xfff7).rw(this, FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
+	map(0xfff8, 0xfffb).rw(this, FUNC(sms_state::sms_sscope_r), FUNC(sms_state::sms_sscope_w));       /* 3-D glasses */
+	map(0xfffc, 0xffff).rw(this, FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
 }
 
 void sms_state::sms_mem(address_map &map)
 {
-	map(0x0000, 0xbfff).w(FUNC(sms_state::write_cart));
-	map(0x0000, 0x3fff).r(FUNC(sms_state::read_0000));
-	map(0x4000, 0x7fff).r(FUNC(sms_state::read_4000));
-	map(0x8000, 0xbfff).r(FUNC(sms_state::read_8000));
-	map(0xc000, 0xfffb).rw(FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
-	map(0xfffc, 0xffff).rw(FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
+	map(0x0000, 0xbfff).w(this, FUNC(sms_state::write_cart));
+	map(0x0000, 0x3fff).r(this, FUNC(sms_state::read_0000));
+	map(0x4000, 0x7fff).r(this, FUNC(sms_state::read_4000));
+	map(0x8000, 0xbfff).r(this, FUNC(sms_state::read_8000));
+	map(0xc000, 0xfffb).rw(this, FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
+	map(0xfffc, 0xffff).rw(this, FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
 }
 
 void smssdisp_state::sms_store_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();                     /* BIOS */
 	map(0x4000, 0x47ff).ram();                     /* RAM */
-	map(0x6000, 0x7fff).r(FUNC(smssdisp_state::store_cart_peek));
-	map(0x8000, 0x8000).portr("DSW").w(FUNC(smssdisp_state::sms_store_control_w)); /* Control */
-	map(0xc000, 0xc000).rw(FUNC(smssdisp_state::sms_store_cart_select_r), FUNC(smssdisp_state::sms_store_cart_select_w)); /* cartridge/card slot selector */
+	map(0x6000, 0x7fff).r(this, FUNC(smssdisp_state::store_cart_peek));
+	map(0x8000, 0x8000).portr("DSW").w(this, FUNC(smssdisp_state::sms_store_control_w)); /* Control */
+	map(0xc000, 0xc000).rw(this, FUNC(smssdisp_state::sms_store_cart_select_r), FUNC(smssdisp_state::sms_store_cart_select_w)); /* cartridge/card slot selector */
 	map(0xd800, 0xd800).portr("GAMESEL1");         /* Game selector port #1 */
 	map(0xdc00, 0xdc00).portr("GAMESEL2");         /* Game selector port #2 */
 }
@@ -301,23 +301,23 @@ void sms_state::sg1000m3_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc7).mirror(0x38).rw(FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc7).mirror(0x38).rw(this, FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
 }
 
 void sms_state::sms_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).mirror(0x3e).w(FUNC(sms_state::sms_mem_control_w));
-	map(0x01, 0x01).mirror(0x3e).w(FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc0).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dd_r));
+	map(0x00, 0x00).mirror(0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
+	map(0x01, 0x01).mirror(0x3e).w(this, FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc0).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dd_r));
 }
 
 
@@ -329,13 +329,13 @@ void sms_state::smskr_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc0).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).mirror(0x3e).r(FUNC(sms_state::sms_input_port_dd_r));
+	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc0).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dd_r));
 }
 
 
@@ -345,18 +345,18 @@ void sms_state::smsj_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc0).r(FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).r(FUNC(sms_state::sms_input_port_dd_r));
-	map(0xdc, 0xdc).r(FUNC(sms_state::sms_input_port_dc_r));
-	map(0xdd, 0xdd).r(FUNC(sms_state::sms_input_port_dd_r));
-	map(0xf0, 0xf0).w(FUNC(sms_state::smsj_ym2413_register_port_w));
-	map(0xf1, 0xf1).w(FUNC(sms_state::smsj_ym2413_data_port_w));
-	map(0xf2, 0xf2).rw(FUNC(sms_state::smsj_audio_control_r), FUNC(sms_state::smsj_audio_control_w));
+	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc0).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xdc, 0xdc).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xdd, 0xdd).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xf0, 0xf0).w(this, FUNC(sms_state::smsj_ym2413_register_port_w));
+	map(0xf1, 0xf1).w(this, FUNC(sms_state::smsj_ym2413_data_port_w));
+	map(0xf2, 0xf2).rw(this, FUNC(sms_state::smsj_audio_control_r), FUNC(sms_state::smsj_audio_control_w));
 }
 
 
@@ -366,18 +366,18 @@ void sms_state::gg_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-	map(0x00, 0x00).r(FUNC(sms_state::gg_input_port_00_r));
-	map(0x01, 0x05).rw(FUNC(sms_state::gg_sio_r), FUNC(sms_state::gg_sio_w));
-	map(0x06, 0x06).w(FUNC(sms_state::gg_psg_stereo_w));
-	map(0x3e, 0x3e).w(FUNC(sms_state::sms_mem_control_w));
-	map(0x3f, 0x3f).w(FUNC(sms_state::sms_io_control_w));
-	map(0x40, 0x7f).rw(FUNC(sms_state::sms_count_r), FUNC(sms_state::gg_psg_w));
-	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
-	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc0).r(FUNC(sms_state::sms_input_port_dc_r));
-	map(0xc1, 0xc1).r(FUNC(sms_state::sms_input_port_dd_r));
-	map(0xdc, 0xdc).r(FUNC(sms_state::sms_input_port_dc_r));
-	map(0xdd, 0xdd).r(FUNC(sms_state::sms_input_port_dd_r));
+	map(0x00, 0x00).r(this, FUNC(sms_state::gg_input_port_00_r));
+	map(0x01, 0x05).rw(this, FUNC(sms_state::gg_sio_r), FUNC(sms_state::gg_sio_w));
+	map(0x06, 0x06).w(this, FUNC(sms_state::gg_psg_stereo_w));
+	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::gg_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc0).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xdc, 0xdc).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xdd, 0xdd).r(this, FUNC(sms_state::sms_input_port_dd_r));
 }
 
 
@@ -578,11 +578,11 @@ MACHINE_CONFIG_START(sms_state::sms2_ntsc)
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	SEGA315_5246(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
+	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(false)
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	m_has_bios_full = true;
 MACHINE_CONFIG_END
@@ -601,24 +601,24 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 
 	MCFG_SCREEN_ADD("left_lcd", LCD)    // This is needed for SegaScope Left LCD
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1_left)
+	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
 	MCFG_SCREEN_ADD("right_lcd", LCD)   // This is needed for SegaScope Right LCD
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1_right)
+	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms1)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	config.set_default_layout(layout_sms1);
+	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	SEGA315_5124(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
+	MCFG_SEGA315_5124_SET_SCREEN("screen")
+	MCFG_SEGA315_5124_IS_PAL(false)
+	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
@@ -631,7 +631,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
 	sms1_ntsc(config);
 
-	m_vdp->irq().set(FUNC(smssdisp_state::sms_store_int_callback));
+	MCFG_DEVICE_MODIFY("sms_vdp")
+	MCFG_SEGA315_5124_INT_CB(WRITELINE(*this, smssdisp_state, sms_store_int_callback))
 
 	MCFG_DEVICE_ADD("control", Z80, XTAL(10'738'635)/3)
 	MCFG_DEVICE_PROGRAM_MAP(sms_store_mem)
@@ -701,11 +702,11 @@ MACHINE_CONFIG_START(sms_state::sms2_pal)
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	SEGA315_5246(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
+	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(true)
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	m_has_bios_full = true;
 MACHINE_CONFIG_END
@@ -731,16 +732,16 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	config.set_default_layout(layout_sms1);
+	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	SEGA315_5124(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
+	MCFG_SEGA315_5124_SET_SCREEN("screen")
+	MCFG_SEGA315_5124_IS_PAL(true)
+	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
@@ -773,11 +774,11 @@ MACHINE_CONFIG_START(sms_state::sms3_paln)
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	SEGA315_5246(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
+	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(true)
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	m_has_bios_full = true;
 MACHINE_CONFIG_END
@@ -803,16 +804,16 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	config.set_default_layout(layout_sms1);
+	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	SEGA315_5124(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(true);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
+	MCFG_SEGA315_5124_SET_SCREEN("screen")
+	MCFG_SEGA315_5124_IS_PAL(true)
+	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Tec Toy Master System III
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
@@ -846,11 +847,11 @@ MACHINE_CONFIG_START(sms_state::sms3_br)
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	SEGA315_5246(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(false); // PAL-M has same line count of NTSC
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
+	MCFG_SEGA315_5246_SET_SCREEN("screen")
+	MCFG_SEGA315_5246_IS_PAL(false) // PAL-M has same line count of NTSC
+	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	m_has_bios_full = true;
 MACHINE_CONFIG_END
@@ -877,16 +878,16 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sms_state, screen_vblank_sms1))
 
-	config.set_default_layout(layout_sms1);
+	MCFG_DEFAULT_LAYOUT(layout_sms1)
 
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	SEGA315_5124(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(false); // PAL-M has same line count of NTSC
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
+	MCFG_SEGA315_5124_SET_SCREEN("screen")
+	MCFG_SEGA315_5124_IS_PAL(false) // PAL-M has same line count of NTSC
+	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	// card and expansion slots, not present in Tec Toy Master System III
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
@@ -926,7 +927,8 @@ MACHINE_CONFIG_START(sms_state::sms1_kr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
-	m_vdp->csync().set(FUNC(sms_state::sms_csync_callback));
+	MCFG_DEVICE_MODIFY("sms_vdp")
+	MCFG_SEGA315_5124_CSYNC_CB(WRITELINE(*this, sms_state, sms_csync_callback))
 
 	m_has_bios_full = false;
 	m_has_bios_2000 = true;
@@ -990,12 +992,11 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	MCFG_VIDEO_START_OVERRIDE(sms_state,gamegear)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,gamegear)
 
-	/* VDP chip of the Gamegear 2 ASIC version */
-	SEGA315_5377(config, m_vdp, 0);
-	m_vdp->set_screen(m_main_scr);
-	m_vdp->set_is_pal(false);
-	m_vdp->irq().set_inputline(m_maincpu, 0);
-	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
+	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5378, 0)
+	MCFG_SEGA315_5378_SET_SCREEN("screen")
+	MCFG_SEGA315_5378_IS_PAL(false)
+	MCFG_SEGA315_5378_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_SEGA315_5378_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1033,17 +1034,17 @@ ROM_START(sms1)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
-	ROMX_LOAD("mpr-10052.rom", 0x0000, 0x2000, CRC(0072ed54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(0))
+	ROMX_LOAD("mpr-10052.rom", 0x0000, 0x2000, CRC(0072ed54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
-	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(1))
+	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "hangon", "US/European BIOS v3.4 with Hang On (1988)" )
-	ROMX_LOAD("mpr-11458.rom", 0x0000, 0x20000, CRC(8edf7ac6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(2))
+	ROMX_LOAD("mpr-11458.rom", 0x0000, 0x20000, CRC(8edf7ac6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(e79bb689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(3))
+	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(e79bb689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 4, "v10", "US Master System BIOS v1.0 (prototype)" )
-	ROMX_LOAD("v1.0.bin", 0x0000, 0x2000, CRC(72bec693) SHA1(29091ff60ef4c22b1ee17aa21e0e75bac6b36474), ROM_BIOS(4))
+	ROMX_LOAD("v1.0.bin", 0x0000, 0x2000, CRC(72bec693) SHA1(29091ff60ef4c22b1ee17aa21e0e75bac6b36474), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 5, "proto", "US Master System Prototype BIOS" )
-	ROMX_LOAD("m404prot.rom", 0x0000, 0x2000, CRC(1a15dfcc) SHA1(4a06c8e66261611dce0305217c42138b71331701), ROM_BIOS(5))
+	ROMX_LOAD("m404prot.rom", 0x0000, 0x2000, CRC(1a15dfcc) SHA1(4a06c8e66261611dce0305217c42138b71331701), ROM_BIOS(6))
 ROM_END
 
 ROM_START(sms)
@@ -1052,7 +1053,7 @@ ROM_START(sms)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(0)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
 ROM_END
 
 ROM_START(smssdisp)
@@ -1072,15 +1073,15 @@ ROM_START(sms1pal)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "bios13", "US/European BIOS v1.3 (1986)" )
-	ROMX_LOAD("mpr-10052.rom", 0x0000, 0x2000, CRC(0072ed54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(0))
+	ROMX_LOAD("mpr-10052.rom", 0x0000, 0x2000, CRC(0072ed54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "bios20", "European BIOS v2.0 (1987?)" ) //Chinese (PAL-D)?
-	ROMX_LOAD("mpr-10883.rom", 0x0000, 0x2000, CRC(b3d854f8) SHA1(fc7eb9141f38c92bf98d9134816f64b45e811112), ROM_BIOS(1))
+	ROMX_LOAD("mpr-10883.rom", 0x0000, 0x2000, CRC(b3d854f8) SHA1(fc7eb9141f38c92bf98d9134816f64b45e811112), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
-	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
+	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "hangon", "Sega Master System - US/European BIOS v3.4 with Hang On (1988)" )
-	ROMX_LOAD("mpr-11458.rom", 0x0000, 0x20000, CRC(8edf7ac6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
+	ROMX_LOAD("mpr-11458.rom", 0x0000, 0x20000, CRC(8edf7ac6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 4, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(e79bb689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
+	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(e79bb689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(5))
 ROM_END
 
 ROM_START(smspal)
@@ -1089,9 +1090,9 @@ ROM_START(smspal)
 
 	ROM_REGION(0x40000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" ) /* PCB Label: SEGA // IC BD M4Jr. PAL" Master System II with 314-5246 (ZIP) VDP and 314-5237 (DIP48) IO */
-	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(0)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1)) /* "SEGA // MPR-12808 W63 // 9114E9004" @ IC2 */
 	ROM_SYSTEM_BIOS( 1, "sonic", "European/Brazilian BIOS with Sonic the Hedgehog (1991)" )
-	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81c3476b) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(1))
+	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81c3476b) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(2))
 ROM_END
 
 ROM_START(sg1000m3)
@@ -1106,7 +1107,7 @@ ROM_START(smsj) /* PCB Label: "SEGA(R) IC BOARD M4J MAIN // 837-6418"; has "YM24
 
 	ROM_REGION(0x4000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "jbios21", "Japanese BIOS v2.1 (1987)" )
-	ROMX_LOAD("mpr-11124.ic2", 0x0000, 0x2000, CRC(48d44a13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(0)) /* "SONY 7J06 // MPR-11124 // JAPAN 021" @ IC2 */
+	ROMX_LOAD("mpr-11124.ic2", 0x0000, 0x2000, CRC(48d44a13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(1)) /* "SONY 7J06 // MPR-11124 // JAPAN 021" @ IC2 */
 ROM_END
 
 ROM_START(smskr)
@@ -1115,7 +1116,7 @@ ROM_START(smskr)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "akbioskr", "Samsung Gam*Boy II with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("akbioskr.rom", 0x000, 0x20000, CRC(9c5bad91) SHA1(2feafd8f1c40fdf1bd5668f8c5c02e5560945b17), ROM_BIOS(0))
+	ROMX_LOAD("akbioskr.rom", 0x000, 0x20000, CRC(9c5bad91) SHA1(2feafd8f1c40fdf1bd5668f8c5c02e5560945b17), ROM_BIOS(1))
 ROM_END
 
 ROM_START(sms1br)
@@ -1124,7 +1125,7 @@ ROM_START(sms1br)
 
 	ROM_REGION(0x20000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
-	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(0))
+	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(1))
 ROM_END
 
 ROM_START(sms2br)
@@ -1133,7 +1134,7 @@ ROM_START(sms2br)
 
 	ROM_REGION(0x40000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(0))
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
 ROM_END
 
 ROM_START(smsbr)
@@ -1142,11 +1143,11 @@ ROM_START(smsbr)
 
 	ROM_REGION(0x40000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(0))
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "sonic", "European/Brazilian BIOS with Sonic the Hedgehog (1991)" )
-	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81c3476b) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(1))
+	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81c3476b) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
-	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
+	ROMX_LOAD("mpr-11459a.rom", 0x0000, 0x20000, CRC(91e93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(3))
 ROM_END
 
 ROM_START(sms2paln)
@@ -1155,9 +1156,9 @@ ROM_START(sms2paln)
 
 	ROM_REGION(0x40000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(0))
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(e79bb689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(1))
+	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(e79bb689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(2))
 ROM_END
 
 ROM_START(smspaln)
@@ -1166,7 +1167,7 @@ ROM_START(smspaln)
 
 	ROM_REGION(0x40000, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
-	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(0))
+	ROMX_LOAD("mpr-12808.ic2", 0x0000, 0x20000, CRC(cf4a09ea) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
 ROM_END
 
 ROM_START(gamegear)
@@ -1176,7 +1177,7 @@ ROM_START(gamegear)
 	ROM_REGION(0x0400, "user1", 0)
 	ROM_SYSTEM_BIOS( 0, "none", "No BIOS" )
 	ROM_SYSTEM_BIOS( 1, "majesco", "Majesco BIOS" )
-	ROMX_LOAD("majbios.rom", 0x0000, 0x0400, CRC(0ebea9d4) SHA1(914aa165e3d879f060be77870d345b60cfeb4ede), ROM_BIOS(1))
+	ROMX_LOAD("majbios.rom", 0x0000, 0x0400, CRC(0ebea9d4) SHA1(914aa165e3d879f060be77870d345b60cfeb4ede), ROM_BIOS(2))
 ROM_END
 
 #define rom_gamegeaj rom_gamegear

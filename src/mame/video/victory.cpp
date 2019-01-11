@@ -52,9 +52,9 @@ void victory_state::video_start()
 
 	/* register for state saving */
 	save_item(NAME(m_paletteram));
-	save_pointer(NAME(m_rram), 0x4000);
-	save_pointer(NAME(m_gram), 0x4000);
-	save_pointer(NAME(m_bram), 0x4000);
+	save_pointer(NAME(m_rram.get()), 0x4000);
+	save_pointer(NAME(m_gram.get()), 0x4000);
+	save_pointer(NAME(m_bram.get()), 0x4000);
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_fgcoll));
 	save_item(NAME(m_fgcollx));

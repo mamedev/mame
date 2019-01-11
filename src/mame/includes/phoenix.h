@@ -6,7 +6,6 @@
 #pragma once
 
 #include "audio/pleiads.h"
-#include "emupal.h"
 
 class phoenix_state : public driver_device
 {
@@ -16,7 +15,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pleiads_custom(*this, "pleiads_custom")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
 		, m_fg_tilemap(nullptr)
 		, m_bg_tilemap(nullptr)
 	{
@@ -36,9 +34,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_RESET(phoenix);
 	DECLARE_VIDEO_START(phoenix);
-	void phoenix_palette(palette_device &palette) const;
-	void survival_palette(palette_device &palette) const;
-	void pleiads_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(phoenix);
+	DECLARE_PALETTE_INIT(survival);
+	DECLARE_PALETTE_INIT(pleiads);
 	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(survival_protection_r);
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
@@ -54,7 +52,6 @@ protected:
 	required_device<cpu_device>             m_maincpu;
 	optional_device<pleiads_sound_device>   m_pleiads_custom;
 	required_device<gfxdecode_device>       m_gfxdecode;
-	required_device<palette_device>         m_palette;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;

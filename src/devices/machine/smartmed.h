@@ -14,6 +14,11 @@
 
 //#define SMARTMEDIA_IMAGE_SAVE
 
+#define MCFG_NAND_TYPE(type) \
+	downcast<nand_device &>(*device).set_nand_type((nand_device::chip::type));
+
+#define MCFG_NAND_RNB_CALLBACK(write) \
+	devcb = &downcast<nand_device &>(*device).set_rnb_wr_callback(DEVCB_##write);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -36,7 +41,7 @@ public:
 	// construction/destruction
 	nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto rnb_wr_callback() { return m_write_rnb.bind(); }
+	template <class Object> devcb_base &set_rnb_wr_callback(Object &&cb) { return m_write_rnb.set_callback(std::forward<Object>(cb)); }
 
 	void set_nand_type(chip type)
 	{

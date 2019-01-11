@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -8,8 +8,7 @@
 #include "packrect.h"
 #include "imgui/imgui.h"
 
-#include <bx/rng.h>
-
+#include <bx/uint32_t.h>
 #include <list>
 
 namespace
@@ -38,7 +37,7 @@ struct PosTexcoordVertex
 
 bgfx::VertexDecl PosTexcoordVertex::ms_decl;
 
-static PosTexcoordVertex s_cubeVertices[] =
+static PosTexcoordVertex s_m_cubeVertices[28] =
 {
 	{-1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f },
 	{ 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f },
@@ -75,9 +74,8 @@ static PosTexcoordVertex s_cubeVertices[] =
 	{-1.0f, -1.0f,  1.0f, -2.0f, -2.0f,  2.0f },
 	{ 1.0f, -1.0f,  1.0f,  2.0f, -2.0f,  2.0f },
 };
-BX_STATIC_ASSERT(BX_COUNTOF(s_cubeVertices) == 28);
 
-static const uint16_t s_cubeIndices[] =
+static const uint16_t s_m_cubeIndices[36] =
 {
 	 0,  1,  2, // 0
 	 1,  3,  2,
@@ -97,20 +95,8 @@ static const uint16_t s_cubeIndices[] =
 	20, 22, 21, // 10
 	21, 22, 23,
 };
-BX_STATIC_ASSERT(BX_COUNTOF(s_cubeIndices) == 36);
 
-static void updateTextureCubeRectBgra8(
-	  bgfx::TextureHandle _handle
-	, uint8_t _side
-	, uint16_t _x
-	, uint16_t _y
-	, uint16_t _width
-	, uint16_t _height
-	, uint8_t _r
-	, uint8_t _g
-	, uint8_t _b
-	, uint8_t _a = 0xff
-	)
+static void updateTextureCubeRectBgra8(bgfx::TextureHandle _handle, uint8_t _side, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height, uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 0xff)
 {
 	bgfx::TextureInfo ti;
 	bgfx::calcTextureSize(ti, _width, _height, 1, false, false, 1, bgfx::TextureFormat::BGRA8);
@@ -129,15 +115,15 @@ static void updateTextureCubeRectBgra8(
 	bgfx::updateTextureCube(_handle, 0, _side, 0, _x, _y, _width, _height, mem);
 }
 
-static const uint16_t kTextureSide   = 512;
-static const uint32_t kTexture2dSize = 256;
+static const uint16_t textureside   = 512;
+static const uint32_t texture2dSize = 256;
 
 class ExampleUpdate : public entry::AppI
 {
 public:
 	ExampleUpdate(const char* _name, const char* _description)
 		: entry::AppI(_name, _description)
-		, m_cube(kTextureSide)
+		, m_cube(textureside)
 	{
 	}
 
@@ -150,13 +136,8 @@ public:
 		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -172,19 +153,15 @@ public:
 		// Create vertex stream declaration.
 		PosTexcoordVertex::init();
 
-		m_textures[ 0] = loadTexture("textures/texture_compression_bc1.ktx", BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
-		m_textures[ 1] = loadTexture("textures/texture_compression_bc2.ktx", BGFX_SAMPLER_U_CLAMP);
-		m_textures[ 2] = loadTexture("textures/texture_compression_bc3.ktx", BGFX_SAMPLER_V_CLAMP);
-		m_textures[ 3] = loadTexture("textures/texture_compression_etc1.ktx", BGFX_SAMPLER_U_BORDER | BGFX_SAMPLER_V_BORDER | BGFX_SAMPLER_BORDER_COLOR(1));
-		m_textures[ 4] = loadTexture("textures/texture_compression_etc2.ktx");
-		m_textures[ 5] = loadTexture("textures/texture_compression_ptc12.pvr");
-		m_textures[ 6] = loadTexture("textures/texture_compression_ptc14.pvr");
-		m_textures[ 7] = loadTexture("textures/texture_compression_ptc22.pvr");
-		m_textures[ 8] = loadTexture("textures/texture_compression_ptc24.pvr");
-		m_textures[ 9] = loadTexture("textures/texture_compression_atc.dds");
-		m_textures[10] = loadTexture("textures/texture_compression_atci.dds");
-		m_textures[11] = loadTexture("textures/texture_compression_atce.dds");
-		BX_STATIC_ASSERT(12 == BX_COUNTOF(m_textures));
+		m_textures[0] = loadTexture("textures/texture_compression_bc1.ktx",  BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP);
+		m_textures[1] = loadTexture("textures/texture_compression_bc2.ktx",  BGFX_TEXTURE_U_CLAMP);
+		m_textures[2] = loadTexture("textures/texture_compression_bc3.ktx",  BGFX_TEXTURE_V_CLAMP);
+		m_textures[3] = loadTexture("textures/texture_compression_etc1.ktx", BGFX_TEXTURE_U_BORDER|BGFX_TEXTURE_V_BORDER|BGFX_TEXTURE_BORDER_COLOR(1) );
+		m_textures[4] = loadTexture("textures/texture_compression_etc2.ktx");
+		m_textures[5] = loadTexture("textures/texture_compression_ptc12.pvr");
+		m_textures[6] = loadTexture("textures/texture_compression_ptc14.pvr");
+		m_textures[7] = loadTexture("textures/texture_compression_ptc22.pvr");
+		m_textures[8] = loadTexture("textures/texture_compression_ptc24.pvr");
 
 		const bgfx::Caps* caps = bgfx::getCaps();
 		m_texture3DSupported = !!(caps->supported & BGFX_CAPS_TEXTURE_3D);
@@ -212,27 +189,27 @@ public:
 				}
 			}
 
-			if (0 != (BGFX_CAPS_FORMAT_TEXTURE_3D & caps->formats[bgfx::TextureFormat::R8]) )
+			if (0 != (BGFX_CAPS_FORMAT_TEXTURE_2D & caps->formats[bgfx::TextureFormat::R8]) )
 			{
-				m_textures3d[m_numTextures3d++] = bgfx::createTexture3D(32, 32, 32, false, bgfx::TextureFormat::R8,   BGFX_SAMPLER_U_CLAMP|BGFX_SAMPLER_V_CLAMP|BGFX_SAMPLER_W_CLAMP, mem8);
+				m_textures3d[m_numTextures3d++] = bgfx::createTexture3D(32, 32, 32, false, bgfx::TextureFormat::R8,   BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP|BGFX_TEXTURE_W_CLAMP, mem8);
 			}
 
-			if (0 != (BGFX_CAPS_FORMAT_TEXTURE_3D & caps->formats[bgfx::TextureFormat::R16F]) )
+			if (0 != (BGFX_CAPS_FORMAT_TEXTURE_2D & caps->formats[bgfx::TextureFormat::R16F]) )
 			{
-				m_textures3d[m_numTextures3d++] = bgfx::createTexture3D(32, 32, 32, false, bgfx::TextureFormat::R16F, BGFX_SAMPLER_U_CLAMP|BGFX_SAMPLER_V_CLAMP|BGFX_SAMPLER_W_CLAMP, mem16f);
+				m_textures3d[m_numTextures3d++] = bgfx::createTexture3D(32, 32, 32, false, bgfx::TextureFormat::R16F, BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP|BGFX_TEXTURE_W_CLAMP, mem16f);
 			}
 
-			if (0 != (BGFX_CAPS_FORMAT_TEXTURE_3D & caps->formats[bgfx::TextureFormat::R32F]) )
+			if (0 != (BGFX_CAPS_FORMAT_TEXTURE_2D & caps->formats[bgfx::TextureFormat::R32F]) )
 			{
-				m_textures3d[m_numTextures3d++] = bgfx::createTexture3D(32, 32, 32, false, bgfx::TextureFormat::R32F, BGFX_SAMPLER_U_CLAMP|BGFX_SAMPLER_V_CLAMP|BGFX_SAMPLER_W_CLAMP, mem32f);
+				m_textures3d[m_numTextures3d++] = bgfx::createTexture3D(32, 32, 32, false, bgfx::TextureFormat::R32F, BGFX_TEXTURE_U_CLAMP|BGFX_TEXTURE_V_CLAMP|BGFX_TEXTURE_W_CLAMP, mem32f);
 			}
 		}
 
 		// Create static vertex buffer.
-		m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices) ), PosTexcoordVertex::ms_decl);
+		m_vbh = bgfx::createVertexBuffer(bgfx::makeRef(s_m_cubeVertices, sizeof(s_m_cubeVertices) ), PosTexcoordVertex::ms_decl);
 
 		// Create static index buffer.
-		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) ) );
+		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(s_m_cubeIndices, sizeof(s_m_cubeIndices) ) );
 
 		// Create programs.
 		m_program    = loadProgram("vs_update", "fs_update");
@@ -262,28 +239,28 @@ public:
 		}
 
 		m_textureCube[0] = bgfx::createTextureCube(
-			  kTextureSide
-			, false
-			, 1
-			, bgfx::TextureFormat::BGRA8
-			, BGFX_SAMPLER_MIN_POINT|BGFX_SAMPLER_MAG_POINT|BGFX_SAMPLER_MIP_POINT
-			);
+				  textureside
+				, false
+				, 1
+				, bgfx::TextureFormat::BGRA8
+				, BGFX_TEXTURE_MIN_POINT|BGFX_TEXTURE_MAG_POINT|BGFX_TEXTURE_MIP_POINT
+				);
 
 		if (m_blitSupported)
 		{
 			m_textureCube[1] = bgfx::createTextureCube(
-				  kTextureSide
-				, false
-				, 1
-				, bgfx::TextureFormat::BGRA8
-				, BGFX_SAMPLER_MIN_POINT|BGFX_SAMPLER_MAG_POINT|BGFX_SAMPLER_MIP_POINT|BGFX_TEXTURE_BLIT_DST
-				);
+					  textureside
+					, false
+					, 1
+					, bgfx::TextureFormat::BGRA8
+					, BGFX_TEXTURE_MIN_POINT|BGFX_TEXTURE_MAG_POINT|BGFX_TEXTURE_MIP_POINT|BGFX_TEXTURE_BLIT_DST
+					);
 		}
 
 		if (m_computeSupported)
 		{
 			m_textureCube[2] = bgfx::createTextureCube(
-				  kTextureSide
+				  textureside
 				, false
 				, 1
 				, bgfx::TextureFormat::RGBA8
@@ -292,19 +269,19 @@ public:
 		}
 
 		m_texture2d = bgfx::createTexture2D(
-			  kTexture2dSize
-			, kTexture2dSize
-			, false
-			, 1
-			, bgfx::TextureFormat::BGRA8
-			, BGFX_SAMPLER_MIN_POINT|BGFX_SAMPLER_MAG_POINT|BGFX_SAMPLER_MIP_POINT
-			);
+				  texture2dSize
+				, texture2dSize
+				, false
+				, 1
+				, bgfx::TextureFormat::BGRA8
+				, BGFX_TEXTURE_MIN_POINT|BGFX_TEXTURE_MAG_POINT|BGFX_TEXTURE_MIP_POINT
+				);
 
-		m_texture2dData = (uint8_t*)malloc(kTexture2dSize*kTexture2dSize*4);
+		m_texture2dData = (uint8_t*)malloc(texture2dSize*texture2dSize*4);
 
-		m_rr = m_rng.gen()%255;
-		m_gg = m_rng.gen()%255;
-		m_bb = m_rng.gen()%255;
+		m_rr = rand()%255;
+		m_gg = rand()%255;
+		m_bb = rand()%255;
 
 		m_hit  = 0;
 		m_miss = 0;
@@ -387,13 +364,7 @@ public:
 
 			imguiEndFrame();
 
-			float borderColor[4] =
-			{
-				float(m_rng.gen()%255)/255.0f,
-				float(m_rng.gen()%255)/255.0f,
-				float(m_rng.gen()%255)/255.0f,
-				float(m_rng.gen()%255)/255.0f,
-			};
+			float borderColor[4] = { float(rand()%255)/255.0f, float(rand()%255)/255.0f, float(rand()%255)/255.0f, float(rand()%255)/255.0f };
 			bgfx::setPaletteColor(1, borderColor);
 
 			// Set view 0 and 1 viewport.
@@ -412,8 +383,8 @@ public:
 			{
 				PackCube face;
 
-				uint16_t bw = bx::max<uint16_t>(1, m_rng.gen()%(kTextureSide/4) );
-				uint16_t bh = bx::max<uint16_t>(1, m_rng.gen()%(kTextureSide/4) );
+				uint16_t bw = bx::uint16_max(1, rand()%(textureside/4) );
+				uint16_t bh = bx::uint16_max(1, rand()%(textureside/4) );
 
 				if (m_cube.find(bw, bh, face) )
 				{
@@ -428,9 +399,9 @@ public:
 						bgfx::blit(0, m_textureCube[1], 0, rect.m_x, rect.m_y, face.m_side, m_textureCube[0], 0, rect.m_x, rect.m_y, face.m_side, rect.m_width, rect.m_height);
 					}
 
-					m_rr = m_rng.gen()%255;
-					m_gg = m_rng.gen()%255;
-					m_bb = m_rng.gen()%255;
+					m_rr = rand()%255;
+					m_gg = rand()%255;
+					m_bb = rand()%255;
 				}
 				else
 				{
@@ -454,14 +425,14 @@ public:
 
 				{
 					// Fill rect.
-					const uint32_t pitch = kTexture2dSize*4;
+					const uint32_t pitch = texture2dSize*4;
 
-					const uint16_t tw = m_rng.gen()% kTexture2dSize;
-					const uint16_t th = m_rng.gen()% kTexture2dSize;
-					const uint16_t tx = m_rng.gen()%(kTexture2dSize-tw);
-					const uint16_t ty = m_rng.gen()%(kTexture2dSize-th);
+					const uint16_t tw = rand()% texture2dSize;
+					const uint16_t th = rand()% texture2dSize;
+					const uint16_t tx = rand()%(texture2dSize-tw);
+					const uint16_t ty = rand()%(texture2dSize-th);
 
-					uint8_t* dst = &m_texture2dData[(ty*kTexture2dSize+tx)*4];
+					uint8_t* dst = &m_texture2dData[(ty*texture2dSize+tx)*4];
 					uint8_t* next = dst + pitch;
 
 					// Using makeRef to pass texture memory without copying.
@@ -484,13 +455,12 @@ public:
 				}
 			}
 
-			const bx::Vec3 at  = { 0.0f, 0.0f,  0.0f };
-			const bx::Vec3 eye = { 0.0f, 0.0f, -5.0f };
+			float at[3] = { 0.0f, 0.0f, 0.0f };
+			float eye[3] = { 0.0f, 0.0f, -5.0f };
 
 			float view[16];
-			bx::mtxLookAt(view, eye, at);
-
 			float proj[16];
+			bx::mtxLookAt(view, eye, at);
 			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
 			// Set view and projection matrix for view 0.
@@ -499,8 +469,8 @@ public:
 			// Update texturecube using compute shader
 			if (bgfx::isValid(m_programCompute) )
 			{
-				bgfx::setImage(0, m_textureCube[2], 0, bgfx::Access::Write);
-				bgfx::dispatch(0, m_programCompute, kTextureSide/16, kTextureSide/16);
+				bgfx::setImage(0, s_texCube, m_textureCube[2], 0, bgfx::Access::Write);
+				bgfx::dispatch(0, m_programCompute, textureside/16, textureside/16);
 			}
 
 			for (uint32_t ii = 0; ii < BX_COUNTOF(m_textureCube); ++ii)
@@ -508,38 +478,35 @@ public:
 				if (bgfx::isValid(m_textureCube[ii]))
 				{
 					float mtx[16];
-					bx::mtxSRT(mtx, 0.7f, 0.7f, 0.7f, time, time*0.37f, 0.0f, -2.0f +ii*2.0f, 0.0f, 0.0f);
+					bx::mtxSRT( mtx, 0.7f, 0.7f, 0.7f, time, time*0.37f, 0.0f, -2.0f +ii*2.0f, 0.0f, 0.0f );
 
 					// Set model matrix for rendering.
-					bgfx::setTransform(mtx);
+					bgfx::setTransform( mtx );
 
 					// Set vertex and index buffer.
-					bgfx::setVertexBuffer(0,  m_vbh);
-					bgfx::setIndexBuffer(m_ibh);
+					bgfx::setVertexBuffer(0,  m_vbh );
+					bgfx::setIndexBuffer( m_ibh );
 
 					// Bind texture.
-					bgfx::setTexture(0, s_texCube, m_textureCube[ii]);
+					bgfx::setTexture( 0, s_texCube, m_textureCube[ii] );
 
 					// Set render states.
-					bgfx::setState(BGFX_STATE_DEFAULT);
+					bgfx::setState( BGFX_STATE_DEFAULT );
 
 					// Submit primitive for rendering to view 0.
-					bgfx::submit(0, m_program);
+					bgfx::submit( 0, m_program );
 				}
 			}
 
 			// Set view and projection matrix for view 1.
 			const float aspectRatio = float(m_height)/float(m_width);
-			const float margin = 0.7f;
-			const float sizeX = 0.5f * BX_COUNTOF(m_textures) * 2.1f + margin;
-			const float sizeY = sizeX * aspectRatio;
-
+			const float size = 11.0f;
 			const bgfx::Caps* caps = bgfx::getCaps();
-			bx::mtxOrtho(proj, -sizeX, sizeX, sizeY, -sizeY, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
+			bx::mtxOrtho(proj, -size, size, size*aspectRatio, -size*aspectRatio, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
 			bgfx::setViewTransform(1, NULL, proj);
 
 			float mtx[16];
-			bx::mtxTranslate(mtx, -sizeX + margin + 1.0f, 1.9f, 0.0f);
+			bx::mtxTranslate(mtx, -size+2.0f - BX_COUNTOF(m_textures)*0.1f*0.5f, 1.9f, 0.0f);
 
 			// Set model matrix for rendering.
 			bgfx::setTransform(mtx);
@@ -557,11 +524,11 @@ public:
 			// Submit primitive for rendering to view 1.
 			bgfx::submit(1, m_programCmp);
 
-			const float xpos = -sizeX + margin + 1.0f;
+			const float xpos = -size+2.0f - BX_COUNTOF(m_textures)*0.1f*0.5f;
 
 			for (uint32_t ii = 0; ii < BX_COUNTOF(m_textures); ++ii)
 			{
-				bx::mtxTranslate(mtx, xpos + ii*2.1f, sizeY - margin - 1.0f, 0.0f);
+				bx::mtxTranslate(mtx, xpos + ii*2.1f, size-6.5f, 0.0f);
 
 				// Set model matrix for rendering.
 				bgfx::setTransform(mtx);
@@ -582,7 +549,7 @@ public:
 
 			for (uint32_t ii = 0; ii < m_numTextures3d; ++ii)
 			{
-				bx::mtxTranslate(mtx, xpos + (ii+(BX_COUNTOF(m_textures) - m_numTextures3d)*0.5f)*2.1f, -sizeY + margin + 1.0f, 0.0f);
+				bx::mtxTranslate(mtx, xpos + ii*2.1f, -size+6.5f, 0.0f);
 
 				// Set model matrix for rendering.
 				bgfx::setTransform(mtx);
@@ -603,7 +570,7 @@ public:
 
 			for (uint32_t ii = 0; ii < 4; ++ii)
 			{
-				bx::mtxTranslate(mtx, sizeX - margin - 1.0f, -sizeY + margin + 1.0f + ii*2.1f, 0.0f);
+				bx::mtxTranslate(mtx, xpos + (size-2.0f)*2.1f, -size+6.5f + ii*2.1f, 0.0f);
 
 				// Set model matrix for rendering.
 				bgfx::setTransform(mtx);
@@ -649,7 +616,6 @@ public:
 	RectPackCubeT<256> m_cube;
 	int64_t m_updateTime;
 	int64_t m_timeOffset;
-	bx::RngMwc m_rng;
 
 	uint32_t m_hit;
 	uint32_t m_miss;
@@ -658,7 +624,7 @@ public:
 	uint8_t m_gg;
 	uint8_t m_bb;
 
-	bgfx::TextureHandle m_textures[12];
+	bgfx::TextureHandle m_textures[9];
 	bgfx::TextureHandle m_textures3d[3];
 	bgfx::TextureHandle m_texture2d;
 	bgfx::TextureHandle m_textureCube[3];

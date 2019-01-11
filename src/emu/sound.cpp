@@ -53,7 +53,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 	: m_device(device),
 		m_next(nullptr),
 		m_sample_rate(sample_rate),
-		m_new_sample_rate(0xffffffff),
+		m_new_sample_rate(0),
 		m_attoseconds_per_sample(0),
 		m_max_samples_per_update(0),
 		m_input(inputs),
@@ -232,11 +232,11 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 
 	// make sure it's a valid input
 	if (index >= m_input.size())
-		fatalerror("stream_set_input attempted to configure nonexistent input %d (%d max)\n", index, int(m_input.size()));
+		fatalerror("stream_set_input attempted to configure non-existant input %d (%d max)\n", index, int(m_input.size()));
 
 	// make sure it's a valid output
 	if (input_stream != nullptr && output_index >= input_stream->m_output.size())
-		fatalerror("stream_set_input attempted to use a nonexistent output %d (%d max)\n", output_index, int(m_output.size()));
+		fatalerror("stream_set_input attempted to use a non-existant output %d (%d max)\n", output_index, int(m_output.size()));
 
 	// if this input is already wired, update the dependent info
 	stream_input &input = m_input[index];
@@ -264,9 +264,6 @@ void sound_stream::set_input(int index, sound_stream *input_stream, int output_i
 
 void sound_stream::update()
 {
-	if (!m_attoseconds_per_sample)
-		return;
-
 	// determine the number of samples since the start of this second
 	attotime time = m_device.machine().time();
 	s32 update_sampindex = s32(time.attoseconds() / m_attoseconds_per_sample);
@@ -430,35 +427,25 @@ void sound_stream::update_with_accounting(bool second_tick)
 void sound_stream::apply_sample_rate_changes()
 {
 	// skip if nothing to do
-	if (m_new_sample_rate == 0xffffffff)
+	if (m_new_sample_rate == 0)
 		return;
 
 	// update to the new rate and remember the old rate
 	u32 old_rate = m_sample_rate;
 	m_sample_rate = m_new_sample_rate;
-	m_new_sample_rate = 0xffffffff;
+	m_new_sample_rate = 0;
 
 	// recompute all the data
 	recompute_sample_rate_data();
 
 	// reset our sample indexes to the current time
-	if (old_rate)
-	{
-		m_output_sampindex = s64(m_output_sampindex) * s64(m_sample_rate) / old_rate;
-		m_output_update_sampindex = s64(m_output_update_sampindex) * s64(m_sample_rate) / old_rate;
-	}
-	else
-	{
-		m_output_sampindex = m_attoseconds_per_sample ? m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample : 0;
-		m_output_update_sampindex = m_output_sampindex;
-	}
-
+	m_output_sampindex = s64(m_output_sampindex) * s64(m_sample_rate) / old_rate;
+	m_output_update_sampindex = s64(m_output_update_sampindex) * s64(m_sample_rate) / old_rate;
 	m_output_base_sampindex = m_output_sampindex - m_max_samples_per_update;
 
 	// clear out the buffer
-	if (m_max_samples_per_update)
-		for (auto & elem : m_output)
-			memset(&elem.m_buffer[0], 0, m_max_samples_per_update * sizeof(elem.m_buffer[0]));
+	for (auto & elem : m_output)
+		memset(&elem.m_buffer[0], 0, m_max_samples_per_update * sizeof(elem.m_buffer[0]));
 }
 
 
@@ -484,22 +471,15 @@ void sound_stream::recompute_sample_rate_data()
 					throw emu_fatalerror("Incompatible sample rates as input of a synchronous stream: %d and %d\n", m_sample_rate, input.m_source->m_stream->m_sample_rate);
 			}
 		}
+		if (!m_sample_rate)
+			m_sample_rate = 1000;
 	}
 
 
 	// recompute the timing parameters
 	attoseconds_t update_attoseconds = m_device.machine().sound().update_attoseconds();
-
-	if (m_sample_rate)
-	{
-		m_attoseconds_per_sample = ATTOSECONDS_PER_SECOND / m_sample_rate;
-		m_max_samples_per_update = (update_attoseconds + m_attoseconds_per_sample - 1) / m_attoseconds_per_sample;
-	}
-	else
-	{
-		m_attoseconds_per_sample = 0;
-		m_max_samples_per_update = 0;
-	}
+	m_attoseconds_per_sample = ATTOSECONDS_PER_SECOND / m_sample_rate;
+	m_max_samples_per_update = (update_attoseconds + m_attoseconds_per_sample - 1) / m_attoseconds_per_sample;
 
 	// update resample and output buffer sizes
 	allocate_resample_buffers();
@@ -510,7 +490,7 @@ void sound_stream::recompute_sample_rate_data()
 	{
 		// if we have a source, see if its sample rate changed
 
-		if (input.m_source != nullptr && input.m_source->m_stream->m_sample_rate)
+		if (input.m_source != nullptr)
 		{
 			// okay, we have a new sample rate; recompute the latency to be the maximum
 			// sample period between us and our input
@@ -531,23 +511,14 @@ void sound_stream::recompute_sample_rate_data()
 			input.m_latency_attoseconds = std::max(input.m_latency_attoseconds, latency);
 			assert(input.m_latency_attoseconds < update_attoseconds);
 		}
-		else
-		{
-			input.m_latency_attoseconds = 0;
-		}
 	}
 
 	// If synchronous, prime the timer
 	if (m_synchronous)
 	{
 		attotime time = m_device.machine().time();
-		if (m_attoseconds_per_sample)
-		{
-			attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds() % m_attoseconds_per_sample);
-			m_sync_timer->adjust(attotime(0, next_edge));
-		}
-		else
-			m_sync_timer->adjust(attotime::never);
+		attoseconds_t next_edge = m_attoseconds_per_sample - (time.attoseconds() % m_attoseconds_per_sample);
+		m_sync_timer->adjust(attotime(0, next_edge));
 	}
 }
 
@@ -616,7 +587,7 @@ void sound_stream::postload()
 		memset(&elem.m_buffer[0], 0, m_output_bufalloc * sizeof(elem.m_buffer[0]));
 
 	// recompute the sample indexes to make sense
-	m_output_sampindex = m_attoseconds_per_sample ? m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample : 0;
+	m_output_sampindex = m_device.machine().sound().last_update().attoseconds() / m_attoseconds_per_sample;
 	m_output_update_sampindex = m_output_sampindex;
 	m_output_base_sampindex = m_output_sampindex - m_max_samples_per_update;
 }
@@ -682,7 +653,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, u32 
 {
 	// if we don't have an output to pull data from, generate silence
 	stream_sample_t *dest = &input.m_resample[0];
-	if (input.m_source == nullptr || input.m_source->m_stream->m_attoseconds_per_sample == 0)
+	if (input.m_source == nullptr)
 	{
 		memset(dest, 0, numsamples * sizeof(*dest));
 		return &input.m_resample[0];

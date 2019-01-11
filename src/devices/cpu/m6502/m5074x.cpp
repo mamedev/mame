@@ -42,8 +42,14 @@ DEFINE_DEVICE_TYPE(M50741, m50741_device, "m50741", "Mitsubishi M50741")
 m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
 	m740_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 13, 0, internal_map),
-	m_read_p{{*this}, {*this}, {*this}, {*this}},
-	m_write_p{{*this}, {*this}, {*this}, {*this}},
+	read_p0(*this),
+	read_p1(*this),
+	read_p2(*this),
+	read_p3(*this),
+	write_p0(*this),
+	write_p1(*this),
+	write_p2(*this),
+	write_p3(*this),
 	m_intctrl(0),
 	m_tmrctrl(0),
 	m_tmr12pre(0),
@@ -64,11 +70,14 @@ m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, co
 
 void m5074x_device::device_start()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_read_p[i].resolve_safe(0);
-		m_write_p[i].resolve_safe();
-	}
+	read_p0.resolve_safe(0);
+	read_p1.resolve_safe(0);
+	read_p2.resolve_safe(0);
+	read_p3.resolve_safe(0);
+	write_p0.resolve_safe();
+	write_p1.resolve_safe();
+	write_p2.resolve_safe();
+	write_p3.resolve_safe();
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
@@ -99,13 +108,6 @@ void m5074x_device::device_start()
 	m_last_all_ints = 0;
 }
 
-
-device_memory_interface::space_config_vector m5074x_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config)
-	};
-}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -280,12 +282,48 @@ void m5074x_device::recalc_timer(int timer)
 
 void m5074x_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 {
-	m_write_p[offset](data);
+	switch (offset)
+	{
+		case 0:
+			write_p0(data);
+			break;
+
+		case 1:
+			write_p1(data);
+			break;
+
+		case 2:
+			write_p2(data);
+			break;
+
+		case 3:
+			write_p3(data);
+			break;
+	}
 }
 
 uint8_t m5074x_device::read_port(uint8_t offset)
 {
-	uint8_t incoming = m_read_p[offset]();
+	uint8_t incoming = 0;
+
+	switch (offset)
+	{
+		case 0:
+			incoming = read_p0();
+			break;
+
+		case 1:
+			incoming = read_p1();
+			break;
+
+		case 2:
+			incoming = read_p2();
+			break;
+
+		case 3:
+			incoming = read_p3();
+			break;
+	}
 
 	// apply data direction registers
 	incoming &= (m_ddrs[offset] ^ 0xff);
@@ -447,8 +485,8 @@ WRITE8_MEMBER(m5074x_device::tmrirq_w)
 void m50740_device::m50740_map(address_map &map)
 {
 	map(0x0000, 0x005f).ram();
-	map(0x00e0, 0x00e9).rw(FUNC(m50740_device::ports_r), FUNC(m50740_device::ports_w));
-	map(0x00f9, 0x00ff).rw(FUNC(m50740_device::tmrirq_r), FUNC(m50740_device::tmrirq_w));
+	map(0x00e0, 0x00e9).rw(this, FUNC(m50740_device::ports_r), FUNC(m50740_device::ports_w));
+	map(0x00f9, 0x00ff).rw(this, FUNC(m50740_device::tmrirq_r), FUNC(m50740_device::tmrirq_w));
 	map(0x1400, 0x1fff).rom().region(M5074X_INTERNAL_ROM_REGION, 0);
 }
 
@@ -466,13 +504,13 @@ m50740_device::m50740_device(const machine_config &mconfig, device_type type, co
 void m50741_device::m50741_map(address_map &map)
 {
 	map(0x0000, 0x005f).ram();
-	map(0x00e0, 0x00e9).rw(FUNC(m50741_device::ports_r), FUNC(m50741_device::ports_w));
-	map(0x00f9, 0x00ff).rw(FUNC(m50741_device::tmrirq_r), FUNC(m50741_device::tmrirq_w));
+	map(0x00e0, 0x00e9).rw(this, FUNC(m50741_device::ports_r), FUNC(m50741_device::ports_w));
+	map(0x00f9, 0x00ff).rw(this, FUNC(m50741_device::tmrirq_r), FUNC(m50741_device::tmrirq_w));
 	map(0x1000, 0x1fff).rom().region("internal", 0);
 }
 
 m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m50741_device(mconfig, M50741, tag, owner, clock)
+	m50741_device(mconfig, M50740, tag, owner, clock)
 {
 }
 

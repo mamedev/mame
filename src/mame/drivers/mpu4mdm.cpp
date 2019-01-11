@@ -360,15 +360,7 @@ ROM_START( m4excam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ex1_4.bin", 0x0000, 0x010000, CRC(34c4aee2) SHA1(c5487c5b0144ca188bc2e3926a0343fd4c9c565a) )
 
-	ROM_REGION( 0x200000, "msm6376", 0 )
-	ROM_LOAD( "mdmexcalibsnd.p1", 0x000000, 0x080000, CRC(8ea73366) SHA1(3ee45ad98e03177eeef97521df7b3d1945242076) )
-	ROM_LOAD( "mdmexcalibsnd.p2", 0x080000, 0x080000, CRC(0fca6ca2) SHA1(2029d15e3b51069f5847ab3846bf6c064f0a3381) )
-	ROM_LOAD( "mdmexcalibsnd.p3", 0x100000, 0x080000, CRC(43be816a) SHA1(a95f702ec1bb20f3e0f18984948963b56769f5ba) )
-	ROM_LOAD( "mdmexcalibsnd.p4", 0x180000, 0x080000, CRC(ef8a718c) SHA1(093a5fff5bab61fc9276a7f9f3c5b728a50603b3) )
-ROM_END
-
-ROM_START( m4excamd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "altrevs", 0 )
 	ROM_LOAD( "ex1_0d.bin", 0x0000, 0x010000, CRC(490c510e) SHA1(21a03d8e2dd4d2c7760acbff5705f925fe9f31be) )
 
 	ROM_REGION( 0x200000, "msm6376", 0 )
@@ -377,6 +369,7 @@ ROM_START( m4excamd )
 	ROM_LOAD( "mdmexcalibsnd.p3", 0x100000, 0x080000, CRC(43be816a) SHA1(a95f702ec1bb20f3e0f18984948963b56769f5ba) )
 	ROM_LOAD( "mdmexcalibsnd.p4", 0x180000, 0x080000, CRC(ef8a718c) SHA1(093a5fff5bab61fc9276a7f9f3c5b728a50603b3) )
 ROM_END
+
 
 ROM_START( m4front )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -456,8 +449,7 @@ GAME(199?, m4smshgba,m4smshgb,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,
 GAME(199?, m4smshgbb,m4smshgb,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 3)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4smshgbc,m4smshgb,  mod4oki, mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Smash 'n' Grab (Mdm) (MPU4, set 4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4snklad, 0,         mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Snakes & Ladders (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4excam, 0,          mod4oki ,mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4, V1.4)",   GAME_FLAGS|MACHINE_NO_SOUND )
-GAME(199?, m4excamd,m4excam,    mod4oki ,mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4, V1.0D)",   GAME_FLAGS|MACHINE_NO_SOUND )
+GAME(199?, m4excam, 0,          mod4oki ,mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Excalibur (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4front, 0,          mod4oki ,mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Final Frontier (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4safar, 0,          mod4oki ,mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Safari Club (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )
 GAME(199?, m4snowbl, 0,         mod2    ,mpu4, mpu4_state, init_m4default, ROT0,   "Mdm","Snowball Bingo (Mdm) (MPU4)",   GAME_FLAGS|MACHINE_NO_SOUND )

@@ -27,7 +27,8 @@
 #define M6502_TAG       "ue10"
 #define M6522_1_TAG     "uab3"
 #define M6522_2_TAG     "uab1"
-#define VIC_TAG         "ub7"
+#define M6560_TAG       "ub7"
+#define M6561_TAG       "ub7"
 #define IEC_TAG         "iec"
 #define SCREEN_TAG      "screen"
 #define CONTROL1_TAG    "joy1"
@@ -41,14 +42,13 @@ public:
 		m_maincpu(*this, M6502_TAG),
 		m_via1(*this, M6522_1_TAG),
 		m_via2(*this, M6522_2_TAG),
-		m_vic(*this, VIC_TAG),
+		m_vic(*this, M6560_TAG),
 		m_iec(*this, CBM_IEC_TAG),
 		m_joy(*this, CONTROL1_TAG),
 		m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
 		m_user(*this, PET_USER_PORT_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		m_ram(*this, RAM_TAG),
-		m_screen(*this, SCREEN_TAG),
 		m_basic(*this, "basic"),
 		m_kernal(*this, "kernal"),
 		m_charom(*this, "charom"),
@@ -58,14 +58,6 @@ public:
 		m_lock(*this, "LOCK")
 	{ }
 
-	void ntsc(machine_config &config);
-	void pal(machine_config &config);
-
-protected:
-	void vic20(machine_config &config, const char* softlist_filter);
-	void add_clocked_devices(machine_config &config, uint32_t clock);
-
-private:
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
@@ -76,7 +68,6 @@ private:
 	required_device<pet_user_port_device> m_user;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<ram_device> m_ram;
-	required_device<screen_device> m_screen;
 	required_region_ptr<uint8_t> m_basic;
 	required_region_ptr<uint8_t> m_kernal;
 	required_region_ptr<uint8_t> m_charom;
@@ -155,7 +146,9 @@ private:
 		IO2 = 6,
 		IO3 = 7
 	};
-
+	void ntsc(machine_config &config);
+	void pal(machine_config &config);
+	void vic20(machine_config &config);
 	void vic20_mem(address_map &map);
 	void vic_colorram_map(address_map &map);
 	void vic_videoram_map(address_map &map);
@@ -216,11 +209,11 @@ READ8_MEMBER( vic20_state::read )
 		case IO0:
 			if (BIT(offset, 4))
 			{
-				data = m_via1->read(offset & 0x0f);
+				data = m_via1->read(space, offset & 0x0f);
 			}
 			else if (BIT(offset, 5))
 			{
-				data = m_via2->read(offset & 0x0f);
+				data = m_via2->read(space, offset & 0x0f);
 			}
 			else if (offset >= 0x9000 && offset < 0x9010)
 			{
@@ -291,11 +284,11 @@ WRITE8_MEMBER( vic20_state::write )
 		case IO0:
 			if (BIT(offset, 4))
 			{
-				m_via1->write(offset & 0x0f, data);
+				m_via1->write(space, offset & 0x0f, data);
 			}
 			else if (BIT(offset, 5))
 			{
-				m_via2->write(offset & 0x0f, data);
+				m_via2->write(space, offset & 0x0f, data);
 			}
 			else if (offset >= 0x9000 && offset < 0x9010)
 			{
@@ -368,7 +361,7 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 
 void vic20_state::vic20_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(vic20_state::read), FUNC(vic20_state::write));
+	map(0x0000, 0xffff).rw(this, FUNC(vic20_state::read), FUNC(vic20_state::write));
 }
 
 
@@ -378,7 +371,7 @@ void vic20_state::vic20_mem(address_map &map)
 
 void vic20_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(FUNC(vic20_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(this, FUNC(vic20_state::vic_videoram_r));
 }
 
 
@@ -563,7 +556,7 @@ READ8_MEMBER( vic20_state::via1_pa_r )
 	data |= m_iec->data_r() << 1;
 
 	// joystick / user port
-	uint8_t joy = m_joy->read_joy();
+	uint8_t joy = m_joy->joy_r();
 
 	data |= (m_user_joy0 && BIT(joy, 0)) << 2;
 	data |= (m_user_joy1 && BIT(joy, 1)) << 3;
@@ -599,7 +592,7 @@ WRITE8_MEMBER( vic20_state::via1_pa_w )
 
 	// serial attention out
 	m_user->write_9(!BIT(data, 7));
-	m_iec->host_atn_w(!BIT(data, 7));
+	m_iec->atn_w(!BIT(data, 7));
 }
 
 WRITE8_MEMBER( vic20_state::via1_pb_w )
@@ -661,7 +654,7 @@ READ8_MEMBER( vic20_state::via2_pb_r )
 	uint8_t data = 0xff;
 
 	// joystick
-	uint8_t joy = m_joy->read_joy();
+	uint8_t joy = m_joy->joy_r();
 
 	data &= BIT(joy, 3) << 7;
 
@@ -695,13 +688,13 @@ WRITE8_MEMBER( vic20_state::via2_pb_w )
 WRITE_LINE_MEMBER( vic20_state::via2_ca2_w )
 {
 	// serial clock out
-	m_iec->host_clk_w(!state);
+	m_iec->clk_w(!state);
 }
 
 WRITE_LINE_MEMBER( vic20_state::via2_cb2_w )
 {
 	// serial data out
-	m_iec->host_data_w(!state);
+	m_iec->data_w(!state);
 }
 
 
@@ -799,120 +792,144 @@ WRITE_LINE_MEMBER(vic20_state::write_user_cassette_switch)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-void vic20_state::vic20(machine_config &config, const char* softlist_filter)
-{
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_screen_update(VIC_TAG, FUNC(mos6560_device::screen_update));
+//-------------------------------------------------
+//  MACHINE_CONFIG( vic20_common )
+//-------------------------------------------------
 
-	m_vic->set_screen(SCREEN_TAG);
-	m_vic->set_addrmap(0, &vic20_state::vic_videoram_map);
-	m_vic->set_addrmap(1, &vic20_state::vic_colorram_map);
+MACHINE_CONFIG_START(vic20_state::vic20)
+	// devices
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", WRITELINE(M6522_2_TAG, via6522_device, write_ca1))
+	MCFG_CBM_IEC_ADD("c1541")
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(WRITELINE(M6522_2_TAG, via6522_device, write_cb1))
 
-	m_vic->potx_rd_callback().set(m_joy, FUNC(vcs_control_port_device::pot_x_r));
-	m_vic->poty_rd_callback().set(m_joy, FUNC(vcs_control_port_device::pot_y_r));
-	m_vic->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy")
+	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(WRITELINE(*this, vic20_state, write_light_pen))
 
-	PET_DATASSETTE_PORT(config, m_cassette, 0);
-	cbm_datassette_devices(*m_cassette);
-	m_cassette->set_default_option("c1530");
-	m_cassette->read_handler().set(m_via2, FUNC(via6522_device::write_ca1));
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, vic20_user_port_cards, nullptr)
+	MCFG_PET_USER_PORT_3_HANDLER(WRITELINE(*this, vic20_state, exp_reset_w))
+	MCFG_PET_USER_PORT_4_HANDLER(WRITELINE(*this, vic20_state, write_user_joy0))
+	MCFG_PET_USER_PORT_5_HANDLER(WRITELINE(*this, vic20_state, write_user_joy1))
+	MCFG_PET_USER_PORT_6_HANDLER(WRITELINE(*this, vic20_state, write_user_joy2))
+	MCFG_PET_USER_PORT_7_HANDLER(WRITELINE(*this, vic20_state, write_user_light_pen))
+	MCFG_PET_USER_PORT_8_HANDLER(WRITELINE(*this, vic20_state, write_user_cassette_switch))
+	MCFG_PET_USER_PORT_B_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_cb1))
+	MCFG_PET_USER_PORT_C_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb0))
+	MCFG_PET_USER_PORT_D_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb1))
+	MCFG_PET_USER_PORT_E_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb2))
+	MCFG_PET_USER_PORT_F_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb3))
+	MCFG_PET_USER_PORT_H_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb4))
+	MCFG_PET_USER_PORT_J_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb5))
+	MCFG_PET_USER_PORT_K_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb6))
+	MCFG_PET_USER_PORT_L_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_pb7))
+	MCFG_PET_USER_PORT_M_HANDLER(WRITELINE(M6522_1_TAG, via6522_device, write_cb2))
 
-	cbm_iec_slot_device::add(config, m_iec, "c1541");
-	m_iec->srq_callback().set(m_via2, FUNC(via6522_device::write_cb1));
+	MCFG_QUICKLOAD_ADD("quickload", vic20_state, cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
-	VCS_CONTROL_PORT(config, m_joy, 0);
-	vcs_control_port_devices(*m_joy);
-	m_joy->set_default_option("joy");
-	m_joy->trigger_wr_callback().set(FUNC(vic20_state::write_light_pen));
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic1001_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "vic1001_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "vic1001_flop")
 
-	PET_USER_PORT(config, m_user, vic20_user_port_cards, nullptr);
-	m_user->p3_handler().set(FUNC(vic20_state::exp_reset_w));
-	m_user->p4_handler().set(FUNC(vic20_state::write_user_joy0));
-	m_user->p5_handler().set(FUNC(vic20_state::write_user_joy1));
-	m_user->p6_handler().set(FUNC(vic20_state::write_user_joy2));
-	m_user->p7_handler().set(FUNC(vic20_state::write_user_light_pen));
-	m_user->p8_handler().set(FUNC(vic20_state::write_user_cassette_switch));
-	m_user->pb_handler().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_user->pc_handler().set(m_via1, FUNC(via6522_device::write_pb0));
-	m_user->pd_handler().set(m_via1, FUNC(via6522_device::write_pb1));
-	m_user->pe_handler().set(m_via1, FUNC(via6522_device::write_pb2));
-	m_user->pf_handler().set(m_via1, FUNC(via6522_device::write_pb3));
-	m_user->ph_handler().set(m_via1, FUNC(via6522_device::write_pb4));
-	m_user->pj_handler().set(m_via1, FUNC(via6522_device::write_pb5));
-	m_user->pk_handler().set(m_via1, FUNC(via6522_device::write_pb6));
-	m_user->pl_handler().set(m_via1, FUNC(via6522_device::write_pb7));
-	m_user->pm_handler().set(m_via1, FUNC(via6522_device::write_cb2));
-
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(vic20_state, cbm_vc20), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
-
-	SOFTWARE_LIST(config, "cart_list").set_type("vic1001_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);
-	SOFTWARE_LIST(config, "cass_list").set_type("vic1001_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);
-	SOFTWARE_LIST(config, "flop_list").set_type("vic1001_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);
-
-	RAM(config, m_ram);
-	m_ram->set_default_size("5K");
-}
+	// internal ram
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("5K")
+MACHINE_CONFIG_END
 
 
-void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
-{
+//-------------------------------------------------
+//  MACHINE_CONFIG( ntsc )
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(vic20_state::ntsc)
+	vic20(config);
 	// basic machine hardware
-	M6502(config, m_maincpu, clock);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vic20_state::vic20_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
-	VIA6522(config, m_via1, clock);
-	m_via1->readpa_handler().set(FUNC(vic20_state::via1_pa_r));
-	m_via1->writepa_handler().set(FUNC(vic20_state::via1_pa_w));
-	m_via1->writepb_handler().set(FUNC(vic20_state::via1_pb_w));
-	m_via1->cb1_handler().set(m_user, FUNC(pet_user_port_device::write_b));
-	m_via1->ca2_handler().set(m_cassette, FUNC(pet_datassette_port_device::motor_w));
-	m_via1->cb2_handler().set(m_user, FUNC(pet_user_port_device::write_m));
-	m_via1->irq_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6560_CLOCK)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, vic20_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic20_state, via1_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
 
-	VIA6522(config, m_via2, clock);
-	m_via2->readpa_handler().set(FUNC(vic20_state::via2_pa_r));
-	m_via2->readpb_handler().set(FUNC(vic20_state::via2_pb_r));
-	m_via2->writepb_handler().set(FUNC(vic20_state::via2_pb_w));
-	m_via2->ca2_handler().set(FUNC(vic20_state::via2_ca2_w));
-	m_via2->cb2_handler().set(FUNC(vic20_state::via2_cb2_w));
-	m_via2->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, MOS6560_CLOCK)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via2_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, vic20_state, via2_pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic20_state, via2_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, vic20_state, via2_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, vic20_state, via2_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
 	SPEAKER(config, "mono").front_center();
+	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6560_POTX_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
+	MCFG_MOS6560_POTY_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	VIC20_EXPANSION_SLOT(config, m_exp, clock, vic20_expansion_cards, nullptr);
-	m_exp->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
-	m_exp->nmi_wr_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
-	m_exp->res_wr_callback().set(FUNC(vic20_state::exp_reset_w));
-}
+	MCFG_DEVICE_ADD(VIC20_EXPANSION_SLOT_TAG, VIC20_EXPANSION_SLOT, MOS6560_CLOCK, vic20_expansion_cards, nullptr)
+	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
+	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
+	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic20_state, exp_reset_w))
+
+	// software lists
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
+MACHINE_CONFIG_END
 
 
-void vic20_state::ntsc(machine_config &config)
-{
-	add_clocked_devices(config, MOS6560_CLOCK);
-	MOS6560(config, m_vic, MOS6560_CLOCK);
-	vic20(config, "NTSC");
+//-------------------------------------------------
+//  MACHINE_CONFIG( pal )
+//-------------------------------------------------
 
-	m_screen->set_refresh_hz(MOS6560_VRETRACERATE);
-	m_screen->set_size((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE);
-	m_screen->set_visarea(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1);
-}
+MACHINE_CONFIG_START(vic20_state::pal)
+	vic20(config);
+	// basic machine hardware
+	MCFG_DEVICE_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(vic20_mem)
+	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
 
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6561_CLOCK)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via1_pa_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, vic20_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic20_state, via1_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
 
-void vic20_state::pal(machine_config &config)
-{
-	add_clocked_devices(config, MOS6561_CLOCK);
-	MOS6561(config, m_vic, MOS6561_CLOCK);
-	vic20(config, "PAL");
+	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, MOS6561_CLOCK)
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, vic20_state, via2_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, vic20_state, via2_pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, vic20_state, via2_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, vic20_state, via2_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, vic20_state, via2_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
-	m_screen->set_refresh_hz(MOS6561_VRETRACERATE);
-	m_screen->set_size((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE);
-	m_screen->set_visarea(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1);
-}
+	// video/sound hardware
+	SPEAKER(config, "mono").front_center();
+	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6560_POTX_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_x_r))
+	MCFG_MOS6560_POTY_CALLBACK(READ8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	// devices
+	MCFG_DEVICE_ADD(VIC20_EXPANSION_SLOT_TAG, VIC20_EXPANSION_SLOT, MOS6561_CLOCK, vic20_expansion_cards, nullptr)
+	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
+	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
+	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(WRITELINE(*this, vic20_state, exp_reset_w))
+
+	// software lists
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
+MACHINE_CONFIG_END
 
 
 
@@ -946,9 +963,9 @@ ROM_START( vic20 )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_SYSTEM_BIOS( 0, "cbm", "Original" )
-	ROMX_LOAD( "901486-06.ue12", 0x0000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19), ROM_BIOS(0) )
+	ROMX_LOAD( "901486-06.ue12", 0x0000, 0x2000, CRC(e5e7c174) SHA1(06de7ec017a5e78bd6746d89c2ecebb646efeb19), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS" )
-	ROMX_LOAD( "jiffydos vic-20 ntsc.ue12", 0x0000, 0x2000, CRC(683a757f) SHA1(83fb83e97b5a840311dbf7e1fe56fe828f41936d), ROM_BIOS(1) )
+	ROMX_LOAD( "jiffydos vic-20 ntsc.ue12", 0x0000, 0x2000, CRC(683a757f) SHA1(83fb83e97b5a840311dbf7e1fe56fe828f41936d), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901460-03.ud7", 0x0000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )
@@ -965,9 +982,9 @@ ROM_START( vic20p )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_SYSTEM_BIOS( 0, "cbm", "Original" )
-	ROMX_LOAD( "901486-07.ue12", 0x0000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e), ROM_BIOS(0) )
+	ROMX_LOAD( "901486-07.ue12", 0x0000, 0x2000, CRC(4be07cb4) SHA1(ce0137ed69f003a299f43538fa9eee27898e621e), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS" )
-	ROMX_LOAD( "jiffydos vic-20 pal.ue12", 0x0000, 0x2000, CRC(705e7810) SHA1(5a03623a4b855531b8bffd756f701306f128be2d), ROM_BIOS(1) )
+	ROMX_LOAD( "jiffydos vic-20 pal.ue12", 0x0000, 0x2000, CRC(705e7810) SHA1(5a03623a4b855531b8bffd756f701306f128be2d), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901460-03.ud7", 0x0000, 0x1000, CRC(83e032a6) SHA1(4fd85ab6647ee2ac7ba40f729323f2472d35b9b4) )

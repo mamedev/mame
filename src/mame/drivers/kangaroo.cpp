@@ -166,7 +166,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        (10_MHz_XTAL)
+#define MASTER_CLOCK        XTAL(10'000'000)
 
 
 
@@ -254,13 +254,13 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_coin_counter_w)
 void kangaroo_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0xbfff).w(FUNC(kangaroo_state::kangaroo_videoram_w));
+	map(0x8000, 0xbfff).w(this, FUNC(kangaroo_state::kangaroo_videoram_w));
 	map(0xc000, 0xdfff).bankr("bank1");
 	map(0xe000, 0xe3ff).ram();
 	map(0xe400, 0xe400).mirror(0x03ff).portr("DSW0");
-	map(0xe800, 0xe80a).mirror(0x03f0).w(FUNC(kangaroo_state::kangaroo_video_control_w)).share("video_control");
+	map(0xe800, 0xe80a).mirror(0x03f0).w(this, FUNC(kangaroo_state::kangaroo_video_control_w)).share("video_control");
 	map(0xec00, 0xec00).mirror(0x00ff).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xed00, 0xed00).mirror(0x00ff).portr("IN1").w(FUNC(kangaroo_state::kangaroo_coin_counter_w));
+	map(0xed00, 0xed00).mirror(0x00ff).portr("IN1").w(this, FUNC(kangaroo_state::kangaroo_coin_counter_w));
 	map(0xee00, 0xee00).mirror(0x00ff).portr("IN2");
 }
 
@@ -273,6 +273,17 @@ void kangaroo_state::main_map(address_map &map)
  *************************************/
 
 void kangaroo_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0c00).ram();
+	map(0x6000, 0x6000).mirror(0x0fff).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x7000, 0x7000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x8000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::address_w));
+}
+
+
+/* yes, this is identical */
+void kangaroo_state::sound_portmap(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x43ff).mirror(0x0c00).ram();
@@ -427,7 +438,7 @@ MACHINE_CONFIG_START(kangaroo_state::nomcu)
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/8)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_map) // yes, this is identical
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
 
 
@@ -437,14 +448,15 @@ MACHINE_CONFIG_START(kangaroo_state::nomcu)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(kangaroo_state, screen_update_kangaroo)
 
-	PALETTE(config, m_palette, palette_device::BGR_3BIT);
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

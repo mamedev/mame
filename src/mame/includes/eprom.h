@@ -14,7 +14,6 @@
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
-#include "emupal.h"
 
 class eprom_state : public atarigen_state
 {
@@ -26,9 +25,7 @@ public:
 		m_mob(*this, "mob"),
 		m_jsa(*this, "jsa"),
 		m_adc(*this, "adc"),
-		m_extra(*this, "extra"),
-		m_palette(*this, "palette"),
-		m_paletteram(*this, "paletteram")
+		m_extra(*this, "extra")
 	{ }
 
 	void guts(machine_config &config);
@@ -67,8 +64,6 @@ private:
 	uint16_t          m_sync_data;
 	optional_device<adc0808_device> m_adc;
 	optional_device<cpu_device> m_extra;
-	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint16_t> m_paletteram;
 	static const atari_motion_objects_config s_mob_config;
 	static const atari_motion_objects_config s_guts_mob_config;
 };

@@ -90,9 +90,9 @@ SEGA 1998
 //////// Model 3 (main CPU @ C00xxxxx) and Hikaru (MMctrl bank 0E) interface
 void m3comm_device::m3_map(address_map &map)
 {
-	map(0x0000000, 0x000ffff).rw(FUNC(m3comm_device::m3_comm_ram_r), FUNC(m3comm_device::m3_comm_ram_w));
-	map(0x0010000, 0x00101ff).rw(FUNC(m3comm_device::m3_ioregs_r), FUNC(m3comm_device::m3_ioregs_w)).umask32(0xffff0000);
-	map(0x0020000, 0x003ffff).rw(FUNC(m3comm_device::m3_m68k_ram_r), FUNC(m3comm_device::m3_m68k_ram_w)).umask32(0xffff0000);
+	map(0x0000000, 0x000ffff).rw(this, FUNC(m3comm_device::m3_comm_ram_r), FUNC(m3comm_device::m3_comm_ram_w));
+	map(0x0010000, 0x00101ff).rw(this, FUNC(m3comm_device::m3_ioregs_r), FUNC(m3comm_device::m3_ioregs_w)).umask32(0xffff0000);
+	map(0x0020000, 0x003ffff).rw(this, FUNC(m3comm_device::m3_m68k_ram_r), FUNC(m3comm_device::m3_m68k_ram_w)).umask32(0xffff0000);
 }
 
 
@@ -102,9 +102,9 @@ void m3comm_device::m3_map(address_map &map)
 void m3comm_device::m3comm_mem(address_map &map)
 {
 	map(0x0000000, 0x000ffff).ram().share("m68k_ram");
-	map(0x0040000, 0x00400ff).rw(FUNC(m3comm_device::ctrl_r), FUNC(m3comm_device::ctrl_w));
+	map(0x0040000, 0x00400ff).rw(this, FUNC(m3comm_device::ctrl_r), FUNC(m3comm_device::ctrl_w));
 	map(0x0080000, 0x008ffff).bankrw("comm_ram");
-	map(0x00C0000, 0x00C00ff).rw(FUNC(m3comm_device::ioregs_r), FUNC(m3comm_device::ioregs_w));
+	map(0x00C0000, 0x00C00ff).rw(this, FUNC(m3comm_device::ioregs_r), FUNC(m3comm_device::ioregs_w));
 }
 
 
@@ -122,7 +122,8 @@ MACHINE_CONFIG_START(m3comm_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(M68K_TAG, M68000, 10000000) // random
 	MCFG_DEVICE_PROGRAM_MAP(m3comm_mem)
 
-	RAM(config, RAM_TAG).set_default_size("128K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
 //**************************************************************************

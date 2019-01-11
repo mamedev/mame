@@ -65,14 +65,14 @@ READ8_MEMBER(ssrj_state::wheel_r)
 void ssrj_state::ssrj_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(FUNC(ssrj_state::vram1_w)).share("vram1");
-	map(0xc800, 0xcfff).ram().w(FUNC(ssrj_state::vram2_w)).share("vram2");
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(ssrj_state::vram1_w)).share("vram1");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(ssrj_state::vram2_w)).share("vram2");
 	map(0xd000, 0xd7ff).ram().share("vram3");
-	map(0xd800, 0xdfff).ram().w(FUNC(ssrj_state::vram4_w)).share("vram4");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(ssrj_state::vram4_w)).share("vram4");
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xefff).ram().share("scrollram");
 	map(0xf000, 0xf000).portr("IN0");
-	map(0xf001, 0xf001).r(FUNC(ssrj_state::wheel_r));
+	map(0xf001, 0xf001).r(this, FUNC(ssrj_state::wheel_r));
 	map(0xf002, 0xf002).portr("IN2");
 	map(0xf003, 0xf003).nopw(); /* unknown */
 	map(0xf401, 0xf401).r("aysnd", FUNC(ay8910_device::data_r));
@@ -155,17 +155,19 @@ MACHINE_CONFIG_START(ssrj_state::ssrj)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 1*8, 31*8-1) // unknown res
 	MCFG_SCREEN_UPDATE_DRIVER(ssrj_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ssrj_state, screen_vblank))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssrj);
-	PALETTE(config, m_palette, FUNC(ssrj_state::ssrj_palette), 128);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssrj)
+	MCFG_PALETTE_ADD("palette", 128)
+	MCFG_PALETTE_INIT_OWNER(ssrj_state, ssrj)
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 8000000/5));
-	aysnd.port_b_read_callback().set_ioport("IN3");
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
+	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/5)
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN3"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /***************************************************************************

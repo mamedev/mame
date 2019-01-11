@@ -5,10 +5,6 @@
     Flak Attack / MX5000
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_FLKATCK_H
-#define MAME_INCLUDES_FLKATCK_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -18,25 +14,19 @@
 class flkatck_state : public driver_device
 {
 public:
-	flkatck_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_vram(*this, "vram"),
-		m_spriteram(*this, "spriteram"),
+	flkatck_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_k007121_ram(*this, "k007121_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121(*this, "k007121"),
 		m_k007232(*this, "k007232"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch")
-	{ }
+		m_soundlatch(*this, "soundlatch") { }
 
-	void flkatck(machine_config &config);
-
-private:
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_vram;
-	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_k007121_ram;
 
 	/* video-related */
 	tilemap_t    *m_k007121_tilemap[2];
@@ -60,7 +50,7 @@ private:
 	DECLARE_WRITE8_MEMBER(flkatck_ls138_w);
 	DECLARE_READ8_MEMBER(multiply_r);
 	DECLARE_WRITE8_MEMBER(multiply_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(flkatck_k007121_w);
 	DECLARE_WRITE8_MEMBER(flkatck_k007121_regs_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_A);
 	TILE_GET_INFO_MEMBER(get_tile_info_B);
@@ -70,8 +60,7 @@ private:
 	uint32_t screen_update_flkatck(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(flkatck_interrupt);
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void flkatck(machine_config &config);
 	void flkatck_map(address_map &map);
 	void flkatck_sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_FLKATCK_H

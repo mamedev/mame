@@ -34,9 +34,8 @@ public:
 	{ }
 
 	void jpmsys7(machine_config &config);
-
-private:
 	void jpmsys7_map(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -59,7 +58,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(jpmsys7_state::jpmsys7)
 	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000)  // seems to be a Coldfire of some kind
 	MCFG_DEVICE_PROGRAM_MAP(jpmsys7_map)
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
+	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

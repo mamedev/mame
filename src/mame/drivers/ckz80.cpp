@@ -281,7 +281,7 @@ void ckz80_state::init_master()
 void ckz80_state::master_map(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x6000).rom().region("maincpu", 0); // _A15
-	map(0xa000, 0xa000).mirror(0x1fff).rw(FUNC(ckz80_state::master_input_r), FUNC(ckz80_state::master_control_w)); // A13
+	map(0xa000, 0xa000).mirror(0x1fff).rw(this, FUNC(ckz80_state::master_input_r), FUNC(ckz80_state::master_control_w)); // A13
 	map(0xc000, 0xc7ff).mirror(0x3800).ram(); // A14
 }
 
@@ -309,7 +309,7 @@ READ8_MEMBER(ckz80_state::master_trampoline_r)
 
 void ckz80_state::master_trampoline(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(ckz80_state::master_trampoline_r), FUNC(ckz80_state::master_trampoline_w));
+	map(0x0000, 0xffff).rw(this, FUNC(ckz80_state::master_trampoline_r), FUNC(ckz80_state::master_trampoline_w));
 }
 
 
@@ -440,10 +440,14 @@ MACHINE_CONFIG_START(ckz80_state::master)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(429) - attotime::from_nsec(22870)) // active for 22.87us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", ckz80_state, irq_off, attotime::from_hz(429))
 
-	ADDRESS_MAP_BANK(config, "master_map").set_map(&ckz80_state::master_map).set_options(ENDIANNESS_LITTLE, 8, 16);
+	MCFG_DEVICE_ADD("master_map", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ckz80_state, display_decay_tick, attotime::from_msec(1))
-	config.set_default_layout(layout_ck_master);
+	MCFG_DEFAULT_LAYOUT(layout_ck_master)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

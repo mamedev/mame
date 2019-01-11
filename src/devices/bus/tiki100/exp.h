@@ -39,19 +39,19 @@
 
 
 #define MCFG_TIKI100_BUS_IRQ_CALLBACK(_write) \
-	downcast<tiki100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_NMI_CALLBACK(_write) \
-	downcast<tiki100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_BUSRQ_CALLBACK(_write) \
-	downcast<tiki100_bus_device &>(*device).set_busrq_wr_callback(DEVCB_##_write);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_busrq_wr_callback(DEVCB_##_write);
 
 #define MCFG_TIKI100_BUS_IN_MREQ_CALLBACK(_read) \
-	downcast<tiki100_bus_device &>(*device).set_mrq_rd_callback(DEVCB_##_read);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_mrq_rd_callback(DEVCB_##_read);
 
 #define MCFG_TIKI100_BUS_OUT_MREQ_CALLBACK(_write) \
-	downcast<tiki100_bus_device &>(*device).set_mrq_wr_callback(DEVCB_##_write);
+	devcb = &downcast<tiki100_bus_device &>(*device).set_mrq_wr_callback(DEVCB_##_write);
 
 
 

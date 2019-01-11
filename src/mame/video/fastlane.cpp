@@ -4,14 +4,18 @@
 #include "includes/fastlane.h"
 
 
-void fastlane_state::fastlane_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(fastlane_state, fastlane)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int pal = 0; pal < 0x10; pal++)
+	const uint8_t *color_prom = memregion("proms")->base();
+	int pal;
+
+	for (pal = 0; pal < 0x10; pal++)
 	{
-		for (int i = 0; i < 0x400; i++)
+		int i;
+
+		for (i = 0; i < 0x400; i++)
 		{
-			uint8_t const ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
+			uint8_t ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
 			palette.set_pen_indirect((pal << 10) | i, ctabentry);
 		}
 	}

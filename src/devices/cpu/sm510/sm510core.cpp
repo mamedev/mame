@@ -59,7 +59,7 @@ void sm510_device::clock_melody()
 {
 	u8 out = 0;
 
-	if (m_r_mask_option == RMASK_DIRECT)
+	if (m_r_mask_option == SM510_R_CONTROL_OUTPUT)
 	{
 		// direct output
 		out = m_r & 3;

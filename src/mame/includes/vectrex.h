@@ -36,15 +36,13 @@ public:
 		TIMER_UPDATE_SIGNAL
 	};
 
-	void vectrex_cart(device_slot_interface &device);
-
 protected:
 	vectrex_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
-		m_via6522_0(*this, "via6522_0"),
 		m_gce_vectorram(*this, "gce_vectorram"),
+		m_via6522_0(*this, "via6522_0"),
 		m_dac(*this, "dac"),
 		m_ay8912(*this, "ay8912"),
 		m_vector(*this, "vector"),
@@ -98,10 +96,7 @@ protected:
 	emu_timer *m_imager_timer;
 	emu_timer *m_lp_t;
 
-	required_device<via6522_device> m_via6522_0;
-
 private:
-
 	struct vectrex_point
 	{
 		int x; int y;
@@ -142,7 +137,8 @@ private:
 	uint8_t m_cb2;
 	void (vectrex_base_state::*vector_add_point_function)(int, int, rgb_t, int);
 
-	required_device<mc1408_device> m_dac;
+	required_device<via6522_device> m_via6522_0;
+	required_device<dac_byte_interface> m_dac;
 	required_device<ay8910_device> m_ay8912;
 	required_device<vector_device> m_vector;
 	optional_ioport_array<4> m_io_contr;

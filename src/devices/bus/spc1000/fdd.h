@@ -7,7 +7,6 @@
 
 #include "exp.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/upd765.h"
 
@@ -40,7 +39,7 @@ private:
 	// internal state
 	required_device<z80_device> m_cpu;
 	required_device<upd765a_device> m_fdc;
-	required_device<i8255_device> m_ppi;
+	required_device<i8255_device> m_pio;
 
 	floppy_image_device *m_fd0;
 	floppy_image_device *m_fd1;

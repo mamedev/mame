@@ -10,7 +10,6 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
-#include "emupal.h"
 
 class simpl156_state : public driver_device
 {
@@ -18,7 +17,7 @@ public:
 	simpl156_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_deco_tilegen(*this, "tilegen"),
+		m_deco_tilegen1(*this, "tilegen1"),
 		m_eeprom(*this, "eeprom"),
 		m_okimusic(*this, "okimusic") ,
 		m_mainram(*this, "mainram"),
@@ -26,23 +25,9 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_palette(*this, "palette") { }
 
-	void joemacr(machine_config &config);
-	void magdrop(machine_config &config);
-	void chainrec(machine_config &config);
-	void mitchell156(machine_config &config);
-	void magdropp(machine_config &config);
-
-	void init_simpl156();
-	void init_joemacr();
-	void init_charlien();
-	void init_prtytime();
-	void init_osman();
-	void init_chainrec();
-
-private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_okimusic;
 	/* memory pointers */
@@ -71,11 +56,20 @@ private:
 	DECLARE_READ32_MEMBER(prtytime_speedup_r);
 	DECLARE_READ32_MEMBER(charlien_speedup_r);
 	DECLARE_READ32_MEMBER(osman_speedup_r);
-
+	void init_simpl156();
+	void init_joemacr();
+	void init_charlien();
+	void init_prtytime();
+	void init_osman();
+	void init_chainrec();
 	virtual void video_start() override;
 	uint32_t screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(simpl156_vbl_interrupt);
-
+	void joemacr(machine_config &config);
+	void magdrop(machine_config &config);
+	void chainrec(machine_config &config);
+	void mitchell156(machine_config &config);
+	void magdropp(machine_config &config);
 	void chainrec_map(address_map &map);
 	void joemacr_map(address_map &map);
 	void magdrop_map(address_map &map);

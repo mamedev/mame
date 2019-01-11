@@ -26,15 +26,15 @@
 // todo, use actual MD map, easier once maps are part of base class.
 void megadriv_radica_state::megadriv_radica_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).r(FUNC(megadriv_radica_state::read)); /* Cartridge Program Rom */
-	map(0xa00000, 0xa01fff).rw(FUNC(megadriv_radica_state::megadriv_68k_read_z80_ram), FUNC(megadriv_radica_state::megadriv_68k_write_z80_ram));
-	map(0xa02000, 0xa03fff).w(FUNC(megadriv_radica_state::megadriv_68k_write_z80_ram));
-	map(0xa04000, 0xa04003).rw(FUNC(megadriv_radica_state::megadriv_68k_YM2612_read), FUNC(megadriv_radica_state::megadriv_68k_YM2612_write));
-	map(0xa06000, 0xa06001).w(FUNC(megadriv_radica_state::megadriv_68k_z80_bank_write));
-	map(0xa10000, 0xa1001f).rw(FUNC(megadriv_radica_state::megadriv_68k_io_read), FUNC(megadriv_radica_state::megadriv_68k_io_write));
-	map(0xa11100, 0xa11101).rw(FUNC(megadriv_radica_state::megadriv_68k_check_z80_bus), FUNC(megadriv_radica_state::megadriv_68k_req_z80_bus));
-	map(0xa11200, 0xa11201).w(FUNC(megadriv_radica_state::megadriv_68k_req_z80_reset));
-	map(0xa13000, 0xa130ff).r(FUNC(megadriv_radica_state::read_a13));
+	map(0x000000, 0x3fffff).r(this, FUNC(megadriv_radica_state::read)); /* Cartridge Program Rom */
+	map(0xa00000, 0xa01fff).rw(this, FUNC(megadriv_radica_state::megadriv_68k_read_z80_ram), FUNC(megadriv_radica_state::megadriv_68k_write_z80_ram));
+	map(0xa02000, 0xa03fff).w(this, FUNC(megadriv_radica_state::megadriv_68k_write_z80_ram));
+	map(0xa04000, 0xa04003).rw(this, FUNC(megadriv_radica_state::megadriv_68k_YM2612_read), FUNC(megadriv_radica_state::megadriv_68k_YM2612_write));
+	map(0xa06000, 0xa06001).w(this, FUNC(megadriv_radica_state::megadriv_68k_z80_bank_write));
+	map(0xa10000, 0xa1001f).rw(this, FUNC(megadriv_radica_state::megadriv_68k_io_read), FUNC(megadriv_radica_state::megadriv_68k_io_write));
+	map(0xa11100, 0xa11101).rw(this, FUNC(megadriv_radica_state::megadriv_68k_check_z80_bus), FUNC(megadriv_radica_state::megadriv_68k_req_z80_bus));
+	map(0xa11200, 0xa11201).w(this, FUNC(megadriv_radica_state::megadriv_68k_req_z80_reset));
+	map(0xa13000, 0xa130ff).r(this, FUNC(megadriv_radica_state::read_a13));
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
 }

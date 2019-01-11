@@ -4,12 +4,10 @@
 #ifndef MAME_INCLUDES_POLYPLAY_H
 #define MAME_INCLUDES_POLYPLAY_H
 
-#include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
-#include "emupal.h"
 
 #define POLYPLAY_MAIN_CLOCK XTAL(9'830'400)
 
@@ -37,16 +35,6 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
-	void polyplay_zre(machine_config &config);
-	void polyplay_zrepp(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
-
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-
-private:
 	INTERRUPT_GEN_MEMBER(nmi_handler);
 
 	/* devices */
@@ -59,18 +47,26 @@ private:
 	DECLARE_READ8_MEMBER(pio_portb_r);
 	DECLARE_WRITE8_MEMBER(pio_portb_w);
 
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
 	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
-	void polyplay_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(polyplay);
 	uint32_t screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void polyplay_zre(machine_config &config);
+	void polyplay_zrepp(machine_config &config);
 	void polyplay_io_zre(address_map &map);
 	void polyplay_io_zrepp(address_map &map);
 	void polyplay_mem_zre(address_map &map);
 	void polyplay_mem_zrepp(address_map &map);
 
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_characterram;
 
-	required_device<z80_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<z80pio_device> m_z80pio;
 	optional_device<z80sio_device> m_z80sio;

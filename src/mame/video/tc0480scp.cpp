@@ -286,6 +286,7 @@ void tc0480scp_device::device_start()
 	save_item(NAME(m_bgscrolly));
 	save_item(NAME(m_pri_reg));
 	save_item(NAME(m_dblwidth));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0480scp_device::postload), this));
 }
 
 //-------------------------------------------------
@@ -964,11 +965,7 @@ READ8_MEMBER( tc0480scp_device::pri_reg_r )
 	return m_pri_reg;
 }
 
-//-------------------------------------------------
-//  device_post_load - device-specific postload
-//-------------------------------------------------
-
-void tc0480scp_device::device_post_load()
+void tc0480scp_device::postload()
 {
 	int reg;
 	int flip = m_ctrl[0xf] & 0x40;

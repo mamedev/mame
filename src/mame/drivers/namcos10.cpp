@@ -40,7 +40,6 @@ Point Blank 3 (GNN2 Ver. A)                        (C) Namco, 2000
 *Ren-ai Quiz High School Angel                     (C) Namco, 2002
 Seishun Quiz Colorful High School (CHS1 Ver.A)     (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)            (C) Namco, 2004
-Shamisen Brothers                                  (C) Kato/Konami, 2003
 Star Trigon (STT1 Ver.A)                           (C) Namco, 2002
 *Taiko No Tatsujin                                 (C) Namco, 2001
 Taiko No Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
@@ -177,7 +176,7 @@ ROM Daughterboard PCBs
 This PCB holds all the ROMs.
 There are three known types of ROM daughterboards used on S10 games (so far).
 All of the PCBs are the same size (approx 5" x 5") containing one custom connector surface-mounted to the underside of
-the PCB, some mask ROMs/flash ROMs, a CPLD (which seems to be the customary 'KEYCUS' chip. On the 2nd type a RAM
+the PCB, some MASKROMs/FlashROMs, a CPLD (which seems to be the customary 'KEYCUS' chip. On the 2nd type a RAM
 chip is also present. The 3rd type has additional hardware to decode MP3 audio and a ROMless Microcontroller.
 
 ********
@@ -209,7 +208,7 @@ System10 MEM(M) PCB 8906961000 (8906970700)
 Notes:
       CY37128VP160: CY37128VP160 Cypress Complex Programmable Logic Device (TQFP160)
       1A - 5A     : Intel Flash DA28F640J5 64MBit Flash EEPROM (SSOP56)
-      1D - 7E     : Samsung Electronics K3N9V1000A-YC 128MBit mask ROM (TSOP48) (see note 3)
+      1D - 7E     : Samsung Electronics K3N9V1000A-YC 128MBit MASK ROM (TSOP48) (see note 3)
       J1          : 6 pin header for programming the CPLD via JTAG
 
 This PCB is used on:
@@ -398,7 +397,6 @@ earlier TK games, so it appears to be optional or is only used by the later TK51
 #include "cpu/psx/psx.h"
 #include "machine/ram.h"
 #include "video/psx.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -409,31 +407,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	void namcos10_base(machine_config &config);
-	void namcos10_memm(machine_config &config);
-	void namcos10_memn(machine_config &config);
-	void ns10_konotako(machine_config &config);
-	void ns10_mrdrilr2(machine_config &config);
-	void ns10_knpuzzle(machine_config &config);
-	void ns10_chocovdr(machine_config &config);
-	void ns10_startrgn(machine_config &config);
-	void ns10_gjspace(machine_config &config);
-	void ns10_nflclsfb(machine_config &config);
-	void ns10_gamshara(machine_config &config);
-
-	void init_knpuzzle();
-	void init_panikuru();
-	void init_mrdrilr2();
-	void init_startrgn();
-	void init_gunbalna();
-	void init_nflclsfb();
-	void init_gjspace();
-	void init_gamshara();
-	void init_mrdrilrg();
-	void init_chocovdr();
-	void init_konotako();
-
-private:
 	// memm variant interface
 	DECLARE_WRITE16_MEMBER(crypto_switch_w);
 	DECLARE_READ16_MEMBER(range_r);
@@ -463,10 +436,20 @@ private:
 	uint8_t *nand_base;
 	void nand_copy( uint32_t *dst, uint32_t address, int len );
 
+	void ns10_konotako(machine_config &config);
+	void ns10_mrdrilr2(machine_config &config);
+	void ns10_knpuzzle(machine_config &config);
+	void ns10_chocovdr(machine_config &config);
+	void ns10_startrgn(machine_config &config);
+	void namcos10_memm(machine_config &config);
+	void namcos10_memn(machine_config &config);
+	void ns10_gjspace(machine_config &config);
+	void ns10_nflclsfb(machine_config &config);
+	void ns10_gamshara(machine_config &config);
 	void namcos10_map(address_map &map);
 	void namcos10_memm_map(address_map &map);
 	void namcos10_memn_map(address_map &map);
-
+private:
 	enum {
 		I2CP_IDLE,
 		I2CP_RECIEVE_BYTE,
@@ -489,10 +472,21 @@ private:
 	uint16_t nand_read2( uint32_t address );
 
 	void i2c_update();
-
+public:
+	void init_knpuzzle();
+	void init_panikuru();
+	void init_mrdrilr2();
+	void init_startrgn();
+	void init_gunbalna();
+	void init_nflclsfb();
+	void init_gjspace();
+	void init_gamshara();
+	void init_mrdrilrg();
+	void init_chocovdr();
+	void init_konotako();
 	DECLARE_MACHINE_RESET(namcos10);
 	void memn_driver_init(  );
-	required_device<psxcpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -502,10 +496,10 @@ void namcos10_state::namcos10_map(address_map &map)
 	map(0x9f500000, 0x9f501fff).ram().share("share3"); /* ram? stores block numbers */
 	map(0xbf500000, 0xbf501fff).ram().share("share3"); /* ram? stores block numbers */
 
-	map(0x1fba0000, 0x1fba000f).rw(FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
-	map(0x1fba0002, 0x1fba0003).rw(FUNC(namcos10_state::sprot_r), FUNC(namcos10_state::sprot_w));
-	map(0x1fba0008, 0x1fba0009).rw(FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
-	map(0x1fba000a, 0x1fba000b).rw(FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
+	map(0x1fba0000, 0x1fba000f).rw(this, FUNC(namcos10_state::control_r), FUNC(namcos10_state::control_w));
+	map(0x1fba0002, 0x1fba0003).rw(this, FUNC(namcos10_state::sprot_r), FUNC(namcos10_state::sprot_w));
+	map(0x1fba0008, 0x1fba0009).rw(this, FUNC(namcos10_state::i2c_clock_r), FUNC(namcos10_state::i2c_clock_w));
+	map(0x1fba000a, 0x1fba000b).rw(this, FUNC(namcos10_state::i2c_data_r), FUNC(namcos10_state::i2c_data_w));
 }
 
 
@@ -550,7 +544,7 @@ READ16_MEMBER(namcos10_state::range_r)
 
 READ16_MEMBER(namcos10_state::control_r)
 {
-	logerror("%s: control_r %d (%x)\n", machine().describe_context(), offset);
+	logerror("control_r %d (%x)\n", offset, m_maincpu->pc());
 	if(offset == 2)
 		return 1^0xffff;
 	return 0;
@@ -558,12 +552,12 @@ READ16_MEMBER(namcos10_state::control_r)
 
 WRITE16_MEMBER(namcos10_state::control_w)
 {
-	logerror("%s: control_w %d, %04x (%x)\n", machine().describe_context(), offset, data);
+	logerror("control_w %d, %04x (%x)\n", offset, data, m_maincpu->pc());
 }
 
 WRITE16_MEMBER(namcos10_state::sprot_w)
 {
-	logerror("%s: sprot_w %04x (%x)\n", machine().describe_context(), data);
+	logerror("sprot_w %04x (%x)\n", data, m_maincpu->pc());
 	sprot_bit = 7;
 	sprot_byte = 0;
 }
@@ -687,9 +681,9 @@ void namcos10_state::namcos10_memm_map(address_map &map)
 {
 	namcos10_map(map);
 
-	map(0x1f300000, 0x1f300001).w(FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f400000, 0x1f5fffff).r(FUNC(namcos10_state::range_r));
-	map(0x1fb40000, 0x1fb4000f).w(FUNC(namcos10_state::bank_w));
+	map(0x1f300000, 0x1f300001).w(this, FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f400000, 0x1f5fffff).r(this, FUNC(namcos10_state::range_r));
+	map(0x1fb40000, 0x1fb4000f).w(this, FUNC(namcos10_state::bank_w));
 }
 
 
@@ -705,26 +699,26 @@ READ16_MEMBER(namcos10_state::nand_status_r )
 
 WRITE8_MEMBER(namcos10_state::nand_address1_w )
 {
-	logerror("%s: nand_a1_w %08x (%08x)\n", machine().describe_context(), data);
+	logerror("nand_a1_w %08x (%08x)\n", data, m_maincpu->pc());
 	//  nand_address = ( nand_address & 0x00ffffff ) | ( data << 24 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address2_w )
 {
-	logerror("%s: nand_a2_w %08x (%08x)\n", machine().describe_context(), data);
+	logerror("nand_a2_w %08x (%08x)\n", data, m_maincpu->pc());
 	nand_address = ( nand_address & 0xffffff00 ) | ( data << 0 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address3_w )
 {
-	logerror("%s: nand_a3_w %08x (%08x)\n", machine().describe_context(), data);
+	logerror("nand_a3_w %08x (%08x)\n", data, m_maincpu->pc());
 	nand_address = ( nand_address & 0xffff00ff ) | ( data <<  8 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address4_w )
 {
 	nand_address = ( nand_address & 0xff00ffff ) | ( data << 16 );
-	logerror("%s: nand_a4_w %08x (%08x) -> %08x\n", machine().describe_context(), data, nand_address*2);
+	logerror("nand_a4_w %08x (%08x) -> %08x\n", data, m_maincpu->pc(), nand_address*2);
 }
 
 uint16_t namcos10_state::nand_read( uint32_t address )
@@ -783,15 +777,15 @@ void namcos10_state::namcos10_memn_map(address_map &map)
 {
 	namcos10_map(map);
 
-	map(0x1f300000, 0x1f300001).w(FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f380000, 0x1f380001).w(FUNC(namcos10_state::crypto_switch_w));
-	map(0x1f400000, 0x1f400001).r(FUNC(namcos10_state::nand_status_r));
-	map(0x1f410000, 0x1f410000).w(FUNC(namcos10_state::nand_address1_w));
-	map(0x1f420000, 0x1f420000).w(FUNC(namcos10_state::nand_address2_w));
-	map(0x1f430000, 0x1f430000).w(FUNC(namcos10_state::nand_address3_w));
-	map(0x1f440000, 0x1f440000).w(FUNC(namcos10_state::nand_address4_w));
-	map(0x1f450000, 0x1f450001).r(FUNC(namcos10_state::nand_data_r));
-	map(0x1fb60000, 0x1fb60001).rw(FUNC(namcos10_state::nand_block_r), FUNC(namcos10_state::nand_block_w));
+	map(0x1f300000, 0x1f300001).w(this, FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f380000, 0x1f380001).w(this, FUNC(namcos10_state::crypto_switch_w));
+	map(0x1f400000, 0x1f400001).r(this, FUNC(namcos10_state::nand_status_r));
+	map(0x1f410000, 0x1f410000).w(this, FUNC(namcos10_state::nand_address1_w));
+	map(0x1f420000, 0x1f420000).w(this, FUNC(namcos10_state::nand_address2_w));
+	map(0x1f430000, 0x1f430000).w(this, FUNC(namcos10_state::nand_address3_w));
+	map(0x1f440000, 0x1f440000).w(this, FUNC(namcos10_state::nand_address4_w));
+	map(0x1f450000, 0x1f450001).r(this, FUNC(namcos10_state::nand_data_r));
+	map(0x1fb60000, 0x1fb60001).rw(this, FUNC(namcos10_state::nand_block_r), FUNC(namcos10_state::nand_block_w));
 }
 
 void namcos10_state::memn_driver_init(  )
@@ -922,96 +916,103 @@ MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 	i2c_bit = 0;
 }
 
-void namcos10_state::namcos10_base(machine_config &config)
-{
+MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 	/* basic machine hardware */
-	CXD8606BQ(config, m_maincpu, XTAL(101'491'200));
-	m_maincpu->set_disable_rom_berr(true);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("16M");
-	// The bios first configures the ROM window as 80000-big, then
+	MCFG_DEVICE_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
+	MCFG_DEVICE_PROGRAM_MAP( namcos10_memm_map )
+
+	// The bios first configures the rom window as 80000-big, then
 	// switches to 400000.  If berr is active, the first configuration
 	// wipes all handlers after 1fc80000, which kills the system
 	// afterwards
 
-	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10)
+	MCFG_PSX_DISABLE_ROM_BERR
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("16M")
+
+	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
 	/* video hardware */
-	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
-
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-}
+MACHINE_CONFIG_END
 
-void namcos10_state::namcos10_memm(machine_config &config)
-{
-	namcos10_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_state::namcos10_memm_map);
-}
+MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
+	MCFG_DEVICE_PROGRAM_MAP( namcos10_memn_map )
 
-void namcos10_state::namcos10_memn(machine_config &config)
-{
-	namcos10_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_state::namcos10_memn_map);
-}
+	// The bios first configures the rom window as 80000-big, then
+	// switches to 400000.  If berr is active, the first configuration
+	// wipes all handlers after 1fc80000, which kills the system
+	// afterwards
 
-void namcos10_state::ns10_mrdrilr2(machine_config &config)
-{
+	MCFG_PSX_DISABLE_ROM_BERR
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("16M")
+
+	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
+
+	/* video hardware */
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
+
+	/* sound hardware */
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(namcos10_state::ns10_mrdrilr2)
 	namcos10_memm(config);
 	/* decrypter device (CPLD in hardware?) */
-	MRDRILR2_DECRYPTER(config, "decrypter", 0);
-}
+	MCFG_DEVICE_ADD("decrypter", MRDRILR2_DECRYPTER, 0)
+MACHINE_CONFIG_END
 
-void namcos10_state::ns10_chocovdr(machine_config &config)
-{
+MACHINE_CONFIG_START(namcos10_state::ns10_chocovdr)
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	CHOCOVDR_DECRYPTER(config, "decrypter", 0);
-}
+	MCFG_DEVICE_ADD("decrypter", CHOCOVDR_DECRYPTER, 0)
+MACHINE_CONFIG_END
 
-void namcos10_state::ns10_gamshara(machine_config &config)
-{
+MACHINE_CONFIG_START(namcos10_state::ns10_gamshara)
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	GAMSHARA_DECRYPTER(config, "decrypter", 0);
-}
+	MCFG_DEVICE_ADD("decrypter", GAMSHARA_DECRYPTER, 0)
+MACHINE_CONFIG_END
 
-void namcos10_state::ns10_gjspace(machine_config &config)
-{
+MACHINE_CONFIG_START(namcos10_state::ns10_gjspace)
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	GJSPACE_DECRYPTER(config, "decrypter", 0);
-}
+	MCFG_DEVICE_ADD("decrypter", GJSPACE_DECRYPTER, 0)
+MACHINE_CONFIG_END
 
-void namcos10_state::ns10_knpuzzle(machine_config &config)
-{
+MACHINE_CONFIG_START(namcos10_state::ns10_knpuzzle)
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	KNPUZZLE_DECRYPTER(config, "decrypter", 0);
-}
+	MCFG_DEVICE_ADD("decrypter", KNPUZZLE_DECRYPTER, 0)
+MACHINE_CONFIG_END
 
-void namcos10_state::ns10_konotako(machine_config &config)
-{
+MACHINE_CONFIG_START(namcos10_state::ns10_konotako)
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	KONOTAKO_DECRYPTER(config, "decrypter", 0);
-}
+	MCFG_DEVICE_ADD("decrypter", KONOTAKO_DECRYPTER, 0)
+MACHINE_CONFIG_END
 
-void namcos10_state::ns10_nflclsfb(machine_config &config)
-{
+MACHINE_CONFIG_START(namcos10_state::ns10_nflclsfb)
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	NFLCLSFB_DECRYPTER(config, "decrypter", 0);
-}
+	MCFG_DEVICE_ADD("decrypter", NFLCLSFB_DECRYPTER, 0)
+MACHINE_CONFIG_END
 
-void namcos10_state::ns10_startrgn(machine_config &config)
-{
+MACHINE_CONFIG_START(namcos10_state::ns10_startrgn)
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	STARTRGN_DECRYPTER(config, "decrypter", 0);
-}
+	MCFG_DEVICE_ADD("decrypter", STARTRGN_DECRYPTER, 0)
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos10 )
 	/* IN 0 */

@@ -23,7 +23,8 @@
 
 // ======================> epson_ex800_device
 
-class epson_ex800_device :  public device_t, public device_centronics_peripheral_interface
+class epson_ex800_device :  public device_t,
+						public device_centronics_peripheral_interface
 {
 public:
 	// construction/destruction

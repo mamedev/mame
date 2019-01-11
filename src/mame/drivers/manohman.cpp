@@ -153,12 +153,13 @@ public:
 
 	void manohman(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	void mem_map(address_map &map);
 
 	IRQ_CALLBACK_MEMBER(iack_handler);
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<pit68230_device> m_pit;
@@ -247,15 +248,15 @@ MACHINE_CONFIG_START(manohman_state::manohman)
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)
 
-	PIT68230(config, m_pit, XTAL(8'000'000)); // MC68230P8
-	m_pit->timer_irq_callback().set_inputline("maincpu", M68K_IRQ_2);
+	MCFG_DEVICE_ADD("pit", PIT68230, XTAL(8'000'000)) // MC68230P8
+	MCFG_PIT68230_TIMER_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_2))
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768)) // M62X42B
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE); // KM6264BL-10 x2 + MAX696CFL + battery
+	MCFG_NVRAM_ADD_NO_FILL("nvram") // KM6264BL-10 x2 + MAX696CFL + battery
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("saa", SAA1099, XTAL(8'000'000) / 2) // clock not verified

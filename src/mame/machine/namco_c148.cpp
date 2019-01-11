@@ -65,48 +65,37 @@ DEFINE_DEVICE_TYPE(NAMCO_C148, namco_c148_device, "namco_c148", "Namco C148 Inte
 //  namco_c148_device - constructor
 //-------------------------------------------------
 
-namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NAMCO_C148, tag, owner, clock),
+namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NAMCO_C148, tag, owner, clock),
 	m_out_ext1_cb(*this),
 	m_out_ext2_cb(*this),
-	m_hostcpu(*this, finder_base::DUMMY_TAG),
-	m_linked_c148(*this, finder_base::DUMMY_TAG)
+	m_hostcpu_tag(nullptr),
+	m_linked_c148_tag(finder_base::DUMMY_TAG)
 {
 }
 
 // (*) denotes master CPU only
 void namco_c148_device::map(address_map &map)
 {
-	map(0x04000, 0x05fff).rw(FUNC(namco_c148_device::bus_ctrl_r), FUNC(namco_c148_device::bus_ctrl_w)).umask16(0x00ff);
-	map(0x06000, 0x07fff).rw(FUNC(namco_c148_device::cpu_irq_level_r), FUNC(namco_c148_device::cpu_irq_level_w)).umask16(0x00ff); // CPUIRQ lv
-	map(0x08000, 0x09fff).rw(FUNC(namco_c148_device::ex_irq_level_r), FUNC(namco_c148_device::ex_irq_level_w)).umask16(0x00ff); // EXIRQ lv
-	map(0x0a000, 0x0bfff).rw(FUNC(namco_c148_device::pos_irq_level_r), FUNC(namco_c148_device::pos_irq_level_w)).umask16(0x00ff); // POSIRQ lv
-	map(0x0c000, 0x0dfff).rw(FUNC(namco_c148_device::sci_irq_level_r), FUNC(namco_c148_device::sci_irq_level_w)).umask16(0x00ff); // SCIRQ lv
-	map(0x0e000, 0x0ffff).rw(FUNC(namco_c148_device::vblank_irq_level_r), FUNC(namco_c148_device::vblank_irq_level_w)).umask16(0x00ff); // VBlank IRQ lv
+	map(0x04000, 0x05fff).rw(this, FUNC(namco_c148_device::bus_ctrl_r), FUNC(namco_c148_device::bus_ctrl_w)).umask16(0x00ff);
+	map(0x06000, 0x07fff).rw(this, FUNC(namco_c148_device::cpu_irq_level_r), FUNC(namco_c148_device::cpu_irq_level_w)).umask16(0x00ff); // CPUIRQ lv
+	map(0x08000, 0x09fff).rw(this, FUNC(namco_c148_device::ex_irq_level_r), FUNC(namco_c148_device::ex_irq_level_w)).umask16(0x00ff); // EXIRQ lv
+	map(0x0a000, 0x0bfff).rw(this, FUNC(namco_c148_device::pos_irq_level_r), FUNC(namco_c148_device::pos_irq_level_w)).umask16(0x00ff); // POSIRQ lv
+	map(0x0c000, 0x0dfff).rw(this, FUNC(namco_c148_device::sci_irq_level_r), FUNC(namco_c148_device::sci_irq_level_w)).umask16(0x00ff); // SCIRQ lv
+	map(0x0e000, 0x0ffff).rw(this, FUNC(namco_c148_device::vblank_irq_level_r), FUNC(namco_c148_device::vblank_irq_level_w)).umask16(0x00ff); // VBlank IRQ lv
 
-	map(0x10000, 0x11fff).w(FUNC(namco_c148_device::cpu_irq_assert_w));
-	map(0x16000, 0x17fff).rw(FUNC(namco_c148_device::cpu_irq_ack_r), FUNC(namco_c148_device::cpu_irq_ack_w)); // CPUIRQ ack
-	map(0x18000, 0x19fff).rw(FUNC(namco_c148_device::ex_irq_ack_r), FUNC(namco_c148_device::ex_irq_ack_w)); // EXIRQ ack
-	map(0x1a000, 0x1bfff).rw(FUNC(namco_c148_device::pos_irq_ack_r), FUNC(namco_c148_device::pos_irq_ack_w)); // POSIRQ ack
-	map(0x1c000, 0x1dfff).rw(FUNC(namco_c148_device::sci_irq_ack_r), FUNC(namco_c148_device::sci_irq_ack_w)); // SCIRQ ack
-	map(0x1e000, 0x1ffff).rw(FUNC(namco_c148_device::vblank_irq_ack_r), FUNC(namco_c148_device::vblank_irq_ack_w)); // VBlank IRQ ack
-	map(0x20000, 0x21fff).r(FUNC(namco_c148_device::ext_r)).umask16(0x00ff); // EEPROM ready status (*)
-	map(0x22000, 0x23fff).nopr().w(FUNC(namco_c148_device::ext1_w)).umask16(0x00ff); // sound CPU reset (*)
-	map(0x24000, 0x25fff).w(FUNC(namco_c148_device::ext2_w)).umask16(0x00ff); // slave & i/o reset (*)
+	map(0x10000, 0x11fff).w(this, FUNC(namco_c148_device::cpu_irq_assert_w));
+	map(0x16000, 0x17fff).rw(this, FUNC(namco_c148_device::cpu_irq_ack_r), FUNC(namco_c148_device::cpu_irq_ack_w)); // CPUIRQ ack
+	map(0x18000, 0x19fff).rw(this, FUNC(namco_c148_device::ex_irq_ack_r), FUNC(namco_c148_device::ex_irq_ack_w)); // EXIRQ ack
+	map(0x1a000, 0x1bfff).rw(this, FUNC(namco_c148_device::pos_irq_ack_r), FUNC(namco_c148_device::pos_irq_ack_w)); // POSIRQ ack
+	map(0x1c000, 0x1dfff).rw(this, FUNC(namco_c148_device::sci_irq_ack_r), FUNC(namco_c148_device::sci_irq_ack_w)); // SCIRQ ack
+	map(0x1e000, 0x1ffff).rw(this, FUNC(namco_c148_device::vblank_irq_ack_r), FUNC(namco_c148_device::vblank_irq_ack_w)); // VBlank IRQ ack
+	map(0x20000, 0x21fff).r(this, FUNC(namco_c148_device::ext_r)).umask16(0x00ff); // EEPROM ready status (*)
+	map(0x22000, 0x23fff).nopr().w(this, FUNC(namco_c148_device::ext1_w)).umask16(0x00ff); // sound CPU reset (*)
+	map(0x24000, 0x25fff).w(this, FUNC(namco_c148_device::ext2_w)).umask16(0x00ff); // slave & i/o reset (*)
 	map(0x26000, 0x27fff).noprw(); // watchdog
 }
 
-
-
-//-------------------------------------------------
-//  device_validity_check - device-specific checks
-//-------------------------------------------------
-
-void namco_c148_device::device_validity_check(validity_checker &valid) const
-{
-	if ((m_linked_c148.finder_tag() != finder_base::DUMMY_TAG) && !m_linked_c148)
-		osd_printf_error("Linked C148 configured but not found.\n");
-}
 
 
 //-------------------------------------------------
@@ -115,6 +104,10 @@ void namco_c148_device::device_validity_check(validity_checker &valid) const
 
 void namco_c148_device::device_start()
 {
+	m_hostcpu = machine().device<cpu_device>(m_hostcpu_tag);
+	m_linked_c148 = machine().device<namco_c148_device>(m_linked_c148_tag);
+	assert(m_hostcpu != nullptr);
+
 	m_out_ext1_cb.resolve_safe();
 	m_out_ext2_cb.resolve_safe();
 
@@ -141,6 +134,25 @@ void namco_c148_device::device_reset()
 	m_irqlevel.sci = 0;
 	m_irqlevel.ex = 0;
 	m_irqlevel.cpu = 0;
+}
+
+//-------------------------------------------------
+//  device_validity_check - device-specific checks
+//-------------------------------------------------
+
+void namco_c148_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const hostcpu = mconfig().root_device().subdevice(m_hostcpu_tag);
+	if (!hostcpu)
+		osd_printf_error("Host CPU device %s not found\n", m_hostcpu_tag ? m_hostcpu_tag : "<nullptr>");
+	else if (!dynamic_cast<cpu_device *>(hostcpu))
+		osd_printf_error("Host CPU device %s is not an instance of cpu_device\n", m_hostcpu_tag ? m_hostcpu_tag : "<nullptr>");
+
+	device_t *const linked_c148 = mconfig().root_device().subdevice(m_linked_c148_tag);
+	if ((finder_base::DUMMY_TAG != m_linked_c148_tag) && !linked_c148)
+		osd_printf_error("Linked C148 device %s not found\n", m_linked_c148_tag ? m_linked_c148_tag : "<nullptr>");
+	else if (linked_c148 && !dynamic_cast<namco_c148_device *>(linked_c148))
+		osd_printf_error("Linked C148 device %s is not an instance of c148_device\n", m_linked_c148_tag ? m_linked_c148_tag : "<nullptr>");
 }
 
 //**************************************************************************

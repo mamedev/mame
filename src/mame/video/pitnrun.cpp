@@ -94,76 +94,65 @@ WRITE_LINE_MEMBER(pitnrun_state::color_select_w)
 
 void pitnrun_state::spotlights()
 {
-	uint8_t const *const ROM = memregion("spot")->base();
-	for (int i=0; i<4; i++)
-	{
-		for (int y=0; y<128; y++)
+	int x,y,i,b,datapix;
+	uint8_t *ROM = memregion("spot")->base();
+	for(i=0;i<4;i++)
+		for(y=0;y<128;y++)
+		for(x=0;x<16;x++)
 		{
-			for (int x=0; x<16; x++)
-			{
-				int datapix = ROM[128*16*i + x + y*16];
-				for(int b=0; b<8; b++)
-				{
-					m_tmp_bitmap[i]->pix16(y, x*8 + (7 - b)) = (datapix & 1);
-					datapix>>=1;
-				}
-			}
+		datapix=ROM[128*16*i+x+y*16];
+		for(b=0;b<8;b++)
+		{
+			m_tmp_bitmap[i]->pix16(y, x*8+(7-b)) = (datapix&1);
+			datapix>>=1;
 		}
-	}
+		}
 }
 
 
-void pitnrun_state::pitnrun_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(pitnrun_state, pitnrun)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-
-	for (int i = 0; i < 32*3; i++)
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
+	int bit0,bit1,bit2,r,g,b;
+	for (i = 0;i < 32*3; i++)
 	{
-		int bit0, bit1, bit2;
-
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 
-	// fake bg palette for lightning effect
-	for (int i = 2*16; i < 2*16 + 16; i++)
+	/* fake bg palette for lightning effect*/
+	for(i=2*16;i<2*16+16;i++)
 	{
-		int bit0, bit1, bit2;
-
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		int r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		r/=3;
+		g/=3;
+		b/=3;
 
-		r /= 3;
-		g /= 3;
-		b /= 3;
-
-		palette.set_pen_color(i + 16, (r > 0xff) ? 0xff : r, (g > 0xff) ? 0xff : g, (b > 0xff) ? 0xff : b);
+		palette.set_pen_color(i+16,(r>0xff)?0xff:r,(g>0xff)?0xff:g,(b>0xff)?0xff:b);
 
 	}
 }

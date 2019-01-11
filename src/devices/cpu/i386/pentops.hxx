@@ -56,17 +56,14 @@ void i386_device::WRITEXMM_HI64(uint32_t ea,i386_device::XMM_REG &r)
 void i386_device::pentium_rdmsr()          // Opcode 0x0f 32
 {
 	uint64_t data;
-	bool valid_msr = false;
+	uint8_t valid_msr = 0;
 
-	// call the model specific implementation
-	data = opcode_rdmsr(valid_msr);
-	if (m_CPL != 0 || valid_msr == false) // if current privilege level isn't 0 or the register isn't recognized ...
-		FAULT(FAULT_GP, 0) // ... throw a general exception fault
-	else
-	{
-		REG32(EDX) = data >> 32;
-		REG32(EAX) = data & 0xffffffff;
-	}
+	data = MSR_READ(REG32(ECX),&valid_msr);
+	REG32(EDX) = data >> 32;
+	REG32(EAX) = data & 0xffffffff;
+
+	if(m_CPL != 0 || valid_msr == 0) // if current privilege level isn't 0 or the register isn't recognized ...
+		FAULT(FAULT_GP,0) // ... throw a general exception fault
 
 	CYCLES(CYCLES_RDMSR);
 }
@@ -74,13 +71,12 @@ void i386_device::pentium_rdmsr()          // Opcode 0x0f 32
 void i386_device::pentium_wrmsr()          // Opcode 0x0f 30
 {
 	uint64_t data;
-	bool valid_msr = false;
+	uint8_t valid_msr = 0;
 
 	data = (uint64_t)REG32(EAX);
 	data |= (uint64_t)(REG32(EDX)) << 32;
 
-	// call the model specific implementation
-	opcode_wrmsr(data, valid_msr);
+	MSR_WRITE(REG32(ECX),data,&valid_msr);
 
 	if(m_CPL != 0 || valid_msr == 0) // if current privilege level isn't 0 or the register isn't recognized
 		FAULT(FAULT_GP,0) // ... throw a general exception fault

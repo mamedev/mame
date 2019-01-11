@@ -41,7 +41,6 @@ if not _OPTIONS["DONT_USE_NETWORK"] then
 	defines {
 		"USE_NETWORK",
 		"OSD_NET_USE_PCAP",
-		"OSD_NET_USE_TAPTUN",
 	}
 end
 

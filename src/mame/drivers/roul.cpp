@@ -67,7 +67,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -82,33 +81,32 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_soundlatch(*this, "soundlatch"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	void roul(machine_config &config);
-
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
-
-private:
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 
-	void roul_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(roul);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void roul(machine_config &config);
 	void roul_cpu_io_map(address_map &map);
 	void roul_map(address_map &map);
 	void sound_cpu_io_map(address_map &map);
 	void sound_map(address_map &map);
 
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
-	output_finder<256> m_lamps;
+	output_finder<256> m_lamp;
 
 	uint8_t m_reg[0x10];
 	std::unique_ptr<uint8_t[]> m_videobuf;
@@ -119,29 +117,29 @@ private:
 #define VIDEOBUF_SIZE 256*256
 
 
-void roul_state::roul_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(roul_state, roul)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0; i < 0x20; ++i)
+	const uint8_t *color_prom = memregion("proms")->base();
+	int bit6, bit7, bit0, bit1, r, g, b;
+	int i;
+
+	for (i = 0; i < 0x20; ++i)
 	{
-		int bit0, bit1;
+		bit7 = (color_prom[0] >> 7) & 0x01;
+		bit6 = (color_prom[0] >> 6) & 0x01;
 
-		int const bit7 = BIT(color_prom[i], 7);
-		int const bit6 = BIT(color_prom[i], 6);
-
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		int const b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
-
-		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i], 3);
-		int const g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
-
-		bit0 = BIT(color_prom[i], 4);
-		bit1 = BIT(color_prom[i], 5);
-		int const r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 2) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 4) & 0x01;
+		bit1 = (color_prom[0] >> 5) & 0x01;
+		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
+		color_prom++;
 	}
 }
 
@@ -208,8 +206,8 @@ WRITE8_MEMBER(roul_state::ball_w)
 {
 	int lamp = data;
 
-	m_lamps[data] = 1;
-	m_lamps[m_lamp_old] = 0;
+	m_lamp[data] = 1;
+	m_lamp[m_lamp_old] = 0;
 	m_lamp_old = lamp;
 }
 
@@ -222,13 +220,13 @@ void roul_state::roul_map(address_map &map)
 void roul_state::roul_cpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf4).w(FUNC(roul_state::blitter_cmd_w));
-	map(0xf5, 0xf5).r(FUNC(roul_state::blitter_status_r));
+	map(0xf0, 0xf4).w(this, FUNC(roul_state::blitter_cmd_w));
+	map(0xf5, 0xf5).r(this, FUNC(roul_state::blitter_status_r));
 	map(0xf8, 0xf8).portr("DSW");
-	map(0xf9, 0xf9).w(FUNC(roul_state::ball_w));
+	map(0xf9, 0xf9).w(this, FUNC(roul_state::ball_w));
 	map(0xfa, 0xfa).portr("IN0");
 	map(0xfd, 0xfd).portr("IN1");
-	map(0xfe, 0xfe).w(FUNC(roul_state::sound_latch_w));
+	map(0xfe, 0xfe).w(this, FUNC(roul_state::sound_latch_w));
 }
 
 void roul_state::sound_map(address_map &map)
@@ -249,7 +247,7 @@ void roul_state::video_start()
 	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
 
 	save_item(NAME(m_reg));
-	save_pointer(NAME(m_videobuf), VIDEOBUF_SIZE);
+	save_pointer(NAME(m_videobuf.get()), VIDEOBUF_SIZE);
 	save_item(NAME(m_lamp_old));
 }
 
@@ -322,7 +320,8 @@ MACHINE_CONFIG_START(roul_state::roul)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -334,13 +333,15 @@ MACHINE_CONFIG_START(roul_state::roul)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	PALETTE(config, "palette", FUNC(roul_state::roul_palette), 0x100);
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(roul_state, roul)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8910(config, "aysnd", 1000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START(roul)

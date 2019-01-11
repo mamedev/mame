@@ -43,6 +43,7 @@ sm500_device::sm500_device(const machine_config &mconfig, const char *tag, devic
 
 sm500_device::sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data)
 	: sm510_base_device(mconfig, type, tag, owner, clock, stack_levels, prgwidth, program, datawidth, data),
+	m_write_o(*this),
 	m_o_pins(o_pins)
 {
 }
@@ -63,6 +64,9 @@ void sm500_device::device_start()
 {
 	// common init (not everything is used though)
 	sm510_base_device::device_start();
+
+	// resolve callbacks
+	m_write_o.resolve_safe();
 
 	// init/zerofill
 	memset(m_ox, 0, sizeof(m_ox));
@@ -118,7 +122,7 @@ void sm500_device::lcd_update()
 		{
 			// 4 segments per group
 			u8 seg = h ? m_ox[o] : m_o[o];
-			m_write_segs(o << 1 | h, m_bp ? seg : 0, 0xffff);
+			m_write_o(o << 1 | h, m_bp ? seg : 0, 0xff);
 		}
 	}
 }
@@ -132,7 +136,7 @@ void sm500_device::lcd_update()
 void sm500_device::clock_melody()
 {
 	// R1 from divider or direct control, R2-R4 generic outputs
-	u8 mask = (m_r_mask_option == RMASK_DIRECT) ? 1 : (m_div >> m_r_mask_option & 1);
+	u8 mask = (m_r_mask_option == SM510_R_CONTROL_OUTPUT) ? 1 : (m_div >> m_r_mask_option & 1);
 	u8 out = (mask & ~m_r) | (~m_r & 0xe);
 
 	// output to R pins

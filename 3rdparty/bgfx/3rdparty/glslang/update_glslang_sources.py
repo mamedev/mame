@@ -28,12 +28,8 @@ import sys
 
 KNOWN_GOOD_FILE = 'known_good.json'
 
-SITE_TO_KNOWN_GOOD_FILE = { 'github' : 'known_good.json',
-                            'gitlab' : 'known_good_khr.json' }
-
 # Maps a site name to its hostname.
-SITE_TO_HOST = { 'github' : 'https://github.com/',
-                 'gitlab' : 'git@gitlab.khronos.org:' }
+SITE_TO_HOST = { 'github' : 'github.com' }
 
 VERBOSE = True
 
@@ -66,7 +62,7 @@ def command_retval(cmd, directory):
     p = subprocess.Popen(cmd,
                          cwd=directory,
                          stdout=subprocess.PIPE)
-    p.communicate()
+    (stdout, _) = p.communicate()
     return p.returncode
 
 
@@ -86,17 +82,20 @@ class GoodCommit(object):
         self.subdir = json['subdir'] if ('subdir' in json) else '.'
         self.commit = json['commit']
 
-    def GetUrl(self):
+    def GetUrl(self, style='https'):
         """Returns the URL for the repository."""
         host = SITE_TO_HOST[self.site]
-        return '{host}{subrepo}'.format(
+        sep = '/' if (style is 'https') else ':'
+        return '{style}://{host}{sep}{subrepo}'.format(
+                    style=style,
                     host=host,
+                    sep=sep,
                     subrepo=self.subrepo)
 
     def AddRemote(self):
         """Add the remote 'known-good' if it does not exist."""
-        remotes = command_output(['git', 'remote'], self.subdir).splitlines()
-        if b'known-good' not in remotes:
+        print('Ignore "fatal" errors for missing known-good remote:')
+        if command_retval(['git', 'remote', 'show', 'known-good'], self.subdir) != 0:
             command_output(['git', 'remote', 'add', 'known-good', self.GetUrl()], self.subdir)
 
     def HasCommit(self):
@@ -121,10 +120,9 @@ class GoodCommit(object):
         command_output(['git', 'checkout', self.commit], self.subdir)
 
 
-def GetGoodCommits(site):
+def GetGoodCommits():
     """Returns the latest list of GoodCommit objects."""
-    known_good_file = SITE_TO_KNOWN_GOOD_FILE[site]
-    with open(known_good_file) as known_good:
+    with open(KNOWN_GOOD_FILE) as known_good:
         return [GoodCommit(c) for c in json.loads(known_good.read())['commits']]
 
 
@@ -132,12 +130,10 @@ def main():
     parser = argparse.ArgumentParser(description='Get Glslang source dependencies at a known-good commit')
     parser.add_argument('--dir', dest='dir', default='.',
                         help="Set target directory for Glslang source root. Default is \'.\'.")
-    parser.add_argument('--site', dest='site', default='github',
-                        help="Set git server site. Default is github.")
 
     args = parser.parse_args()
 
-    commits = GetGoodCommits(args.site)
+    commits = GetGoodCommits()
 
     distutils.dir_util.mkpath(args.dir)
     print('Change directory to {d}'.format(d=args.dir))

@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 class jaleco_blend_device : public device_t
 {
 public:

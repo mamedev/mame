@@ -129,6 +129,9 @@
 /* write word */
 #define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
 
+
+#define READ_OP(addr)          m_pr16(addr)
+
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
 #define MISSIONCRAFT_FLAGS 1
@@ -173,7 +176,6 @@
 #define N_SHIFT                 2
 #define V_SHIFT                 3
 #define S_SHIFT                 18
-#define ILC_SHIFT               19
 
 /* SR flags */
 #define GET_C                   ( SR & C_MASK)          // bit 0 //CARRY

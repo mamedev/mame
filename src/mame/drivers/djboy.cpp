@@ -74,16 +74,16 @@ Notes:
                 BS15.6Y    27C512 EPROM (DIP28)   \ There is an alt. set of labels used for these ROMs with an 'S'
                 BS07.1B    27C512 EPROM (DIP28)   | added to the name (i.e. 'BS15S'), but the actual ROM contents is identical
                 BS19.4B    27C1001 EPROM (DIP32)  / to the regular set (both sets dumped / verified)
-                BS-000.1H  4M mask ROM (DIP32) {sprite}
-                BS-001.1F  4M mask ROM (DIP32) {sprite}
-                BS-002.1D  4M mask ROM (DIP32) {sprite}
-                BS-003.1K  4M mask ROM (DIP32) {sprite}
-                BS-004.1S  4M mask ROM (DIP32) {tile}
-                BS-005.1U  4M mask ROM (DIP32) {tile}
-                BS-100.4D  1M mask ROM (DIP28) {Z80}
-                BS-101.6W  1M mask ROM (DIP28) {Z80 data}
-                BS-200.8C  1M mask ROM (DIP28) {Z80}
-                BS-203.5J  2M mask ROM (DIP32) {OKI-M6295 samples}
+                BS-000.1H  4M MASKROM (DIP32) {sprite}
+                BS-001.1F  4M MASKROM (DIP32) {sprite}
+                BS-002.1D  4M MASKROM (DIP32) {sprite}
+                BS-003.1K  4M MASKROM (DIP32) {sprite}
+                BS-004.1S  4M MASKROM (DIP32) {tile}
+                BS-005.1U  4M MASKROM (DIP32) {tile}
+                BS-100.4D  1M MASKROM (DIP28) {z80}
+                BS-101.6W  1M MASKROM (DIP28) {z80 data}
+                BS-200.8C  1M MASKROM (DIP28) {z80}
+                BS-203.5J  2M MASKROM (DIP32) {oki-m6295 samples}
 
       DIPs    - SW1
                 |--------------------------------------------|
@@ -142,6 +142,7 @@ Notes:
 #include "includes/djboy.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -214,7 +215,7 @@ void djboy_state::mastercpu_am(address_map &map)
 void djboy_state::mastercpu_port_am(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(djboy_state::mastercpu_bankswitch_w));
+	map(0x00, 0x00).w(this, FUNC(djboy_state::mastercpu_bankswitch_w));
 }
 
 /******************************************************************************/
@@ -223,8 +224,8 @@ void djboy_state::slavecpu_am(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("slave_bank");
-	map(0xc000, 0xcfff).ram().w(FUNC(djboy_state::djboy_videoram_w)).share("videoram");
-	map(0xd000, 0xd3ff).ram().w(FUNC(djboy_state::djboy_paletteram_w)).share("paletteram");
+	map(0xc000, 0xcfff).ram().w(this, FUNC(djboy_state::djboy_videoram_w)).share("videoram");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(djboy_state::djboy_paletteram_w)).share("paletteram");
 	map(0xd400, 0xd8ff).ram();
 	map(0xe000, 0xffff).ram().share("share1");
 }
@@ -232,14 +233,14 @@ void djboy_state::slavecpu_am(address_map &map)
 void djboy_state::slavecpu_port_am(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(djboy_state::slavecpu_bankswitch_w));
+	map(0x00, 0x00).w(this, FUNC(djboy_state::slavecpu_bankswitch_w));
 	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x04, 0x04).r(m_slavelatch, FUNC(generic_latch_8_device::read)).w(m_beastlatch, FUNC(generic_latch_8_device::write));
-	map(0x06, 0x06).w(FUNC(djboy_state::djboy_scrolly_w));
-	map(0x08, 0x08).w(FUNC(djboy_state::djboy_scrollx_w));
-	map(0x0a, 0x0a).w(FUNC(djboy_state::trigger_nmi_on_mastercpu));
-	map(0x0c, 0x0c).r(FUNC(djboy_state::beast_status_r));
-	map(0x0e, 0x0e).w(FUNC(djboy_state::coin_count_w));
+	map(0x06, 0x06).w(this, FUNC(djboy_state::djboy_scrolly_w));
+	map(0x08, 0x08).w(this, FUNC(djboy_state::djboy_scrollx_w));
+	map(0x0a, 0x0a).w(this, FUNC(djboy_state::trigger_nmi_on_mastercpu));
+	map(0x0c, 0x0c).r(this, FUNC(djboy_state::beast_status_r));
+	map(0x0e, 0x0e).w(this, FUNC(djboy_state::coin_count_w));
 }
 
 /******************************************************************************/
@@ -254,7 +255,7 @@ void djboy_state::soundcpu_am(address_map &map)
 void djboy_state::soundcpu_port_am(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(djboy_state::soundcpu_bankswitch_w));
+	map(0x00, 0x00).w(this, FUNC(djboy_state::soundcpu_bankswitch_w));
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x06, 0x06).rw("oki_l", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -480,38 +481,38 @@ void djboy_state::machine_reset()
 
 MACHINE_CONFIG_START(djboy_state::djboy)
 
-	MCFG_DEVICE_ADD("mastercpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
+	MCFG_DEVICE_ADD("mastercpu", Z80, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(mastercpu_am)
 	MCFG_DEVICE_IO_MAP(mastercpu_port_am)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", djboy_state, djboy_scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("slavecpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
+	MCFG_DEVICE_ADD("slavecpu", Z80, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(slavecpu_am)
 	MCFG_DEVICE_IO_MAP(slavecpu_port_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
+	MCFG_DEVICE_ADD("soundcpu", Z80, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(soundcpu_am)
 	MCFG_DEVICE_IO_MAP(soundcpu_port_am)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", djboy_state,  irq0_line_hold)
 
-	I80C51(config, m_beast, 12_MHz_XTAL / 2); // 6.000MHz, verified
-	m_beast->port_in_cb<0>().set(FUNC(djboy_state::beast_p0_r));
-	m_beast->port_out_cb<0>().set(FUNC(djboy_state::beast_p0_w));
-	m_beast->port_in_cb<1>().set(FUNC(djboy_state::beast_p1_r));
-	m_beast->port_out_cb<1>().set(FUNC(djboy_state::beast_p1_w));
-	m_beast->port_in_cb<2>().set(FUNC(djboy_state::beast_p2_r));
-	m_beast->port_out_cb<2>().set(FUNC(djboy_state::beast_p2_w));
-	m_beast->port_in_cb<3>().set(FUNC(djboy_state::beast_p3_r));
-	m_beast->port_out_cb<3>().set(FUNC(djboy_state::beast_p3_w));
+	MCFG_DEVICE_ADD("beast", I80C51, 6000000)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, djboy_state, beast_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, djboy_state, beast_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, djboy_state, beast_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, djboy_state, beast_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, djboy_state, beast_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, djboy_state, beast_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, djboy_state, beast_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, djboy_state, beast_p3_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	GENERIC_LATCH_8(config, m_slavelatch);
+	MCFG_GENERIC_LATCH_8_ADD("slavelatch")
 
-	GENERIC_LATCH_8(config, m_beastlatch);
-	m_beastlatch->data_pending_callback().set_inputline(m_beast, INPUT_LINE_IRQ0);
-	m_beastlatch->set_separate_acknowledge(true);
+	MCFG_GENERIC_LATCH_8_ADD("beastlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("beast", INPUT_LINE_IRQ0))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57.5)
@@ -525,24 +526,24 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_djboy)
 	MCFG_PALETTE_ADD("palette", 0x200)
 
-	KANEKO_PANDORA(config, m_pandora, 0);
-	m_pandora->set_gfxdecode_tag(m_gfxdecode);
+	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
+	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL / 4) // 3.000MHz, verified
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MCFG_DEVICE_ADD("oki_l", OKIM6295, 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW) // 1.500MHz, verified
+	MCFG_DEVICE_ADD("oki_l", OKIM6295, 12000000 / 8, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ROM("oki")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("oki_r", OKIM6295, 12_MHz_XTAL / 8, okim6295_device::PIN7_LOW) // 1.500MHz, verified
+	MCFG_DEVICE_ADD("oki_r", OKIM6295, 12000000 / 8, okim6295_device::PIN7_LOW)
 	MCFG_DEVICE_ROM("oki")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -568,7 +569,7 @@ ROM_START( djboy )
 	ROM_LOAD( "bs001.1f", 0x080000, 0x80000, CRC(fdf36e6b) SHA1(a8762458dfd5201304247c113ceb85e96e33d423) )
 	ROM_LOAD( "bs002.1d", 0x100000, 0x80000, CRC(c52fee7f) SHA1(bd33117f7a57899fd4ec0a77413107edd9c44629) )
 	ROM_LOAD( "bs003.1k", 0x180000, 0x80000, CRC(ed89acb4) SHA1(611af362606b73cd2cf501678b463db52dcf69c4) )
-	ROM_LOAD( "bs07s.1b", 0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
+	ROM_LOAD( "bs07.1b",  0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* background */
 	ROM_LOAD( "bs004.1s", 0x000000, 0x80000, CRC(2f1392c3) SHA1(1bc3030b3612766a02133eef0b4d20013c0495a4) )
@@ -598,7 +599,7 @@ ROM_START( djboya )
 	ROM_LOAD( "bs001.1f", 0x080000, 0x80000, CRC(fdf36e6b) SHA1(a8762458dfd5201304247c113ceb85e96e33d423) )
 	ROM_LOAD( "bs002.1d", 0x100000, 0x80000, CRC(c52fee7f) SHA1(bd33117f7a57899fd4ec0a77413107edd9c44629) )
 	ROM_LOAD( "bs003.1k", 0x180000, 0x80000, CRC(ed89acb4) SHA1(611af362606b73cd2cf501678b463db52dcf69c4) )
-	ROM_LOAD( "bs07s.1b", 0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
+	ROM_LOAD( "bs07.1b",  0x1f0000, 0x10000, CRC(d9b7a220) SHA1(ba3b528d50650c209c986268bb29b42ff1276eb2) )  // replaces last 0x200 tiles
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* background */
 	ROM_LOAD( "bs004.1s", 0x000000, 0x80000, CRC(2f1392c3) SHA1(1bc3030b3612766a02133eef0b4d20013c0495a4) )

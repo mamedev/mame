@@ -44,13 +44,14 @@ void ap34_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void electron_ap34_device::device_add_mconfig(machine_config &config)
-{
+MACHINE_CONFIG_START(electron_ap34_device::device_add_mconfig)
 	/* fdc */
-	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
-	FLOPPY_CONNECTOR(config, m_floppy0, ap34_floppies, "525qd", electron_ap34_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, ap34_floppies, nullptr, electron_ap34_device::floppy_formats).enable_sound(true);
-}
+	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ap34_floppies, "525qd", electron_ap34_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ap34_floppies, nullptr, electron_ap34_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -93,7 +94,7 @@ uint8_t electron_ap34_device::read(address_space &space, offs_t offset, int infc
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			data = m_fdc->read(offset & 0x03);
+			data = m_fdc->read(space, offset & 0x03);
 			break;
 		}
 	}
@@ -131,7 +132,7 @@ void electron_ap34_device::write(address_space &space, offs_t offset, uint8_t da
 		case 0xc5:
 		case 0xc6:
 		case 0xc7:
-			m_fdc->write(offset & 0x03, data);
+			m_fdc->write(space, offset & 0x03, data);
 			break;
 		}
 	}

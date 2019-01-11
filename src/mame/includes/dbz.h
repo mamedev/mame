@@ -5,10 +5,6 @@
     Dragon Ball Z
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DBZ_H
-#define MAME_INCLUDES_DBZ_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/k053252.h"
@@ -22,8 +18,8 @@
 class dbz_state : public driver_device
 {
 public:
-	dbz_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	dbz_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_bg1_videoram(*this, "bg1_videoram"),
 		m_bg2_videoram(*this, "bg2_videoram"),
 		m_maincpu(*this, "maincpu"),
@@ -35,17 +31,8 @@ public:
 		m_k053936_1(*this, "k053936_1"),
 		m_k053936_2(*this, "k053936_2"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_soundlatch(*this, "soundlatch"),
-		m_dsw2(*this, "DSW2")
-	{ }
+		m_soundlatch(*this, "soundlatch") { }
 
-	void dbz(machine_config &config);
-
-	void init_dbza();
-	void init_dbz();
-	void init_dbz2();
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_bg1_videoram;
 	required_shared_ptr<uint16_t> m_bg2_videoram;
@@ -72,14 +59,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_ioport m_dsw2;
-
 	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_cause_nmi);
 	DECLARE_WRITE16_MEMBER(dbz_bg2_videoram_w);
 	DECLARE_WRITE16_MEMBER(dbz_bg1_videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(dbz_irq2_ack_w);
+	void init_dbza();
+	void init_dbz();
+	void init_dbz2();
 	TILE_GET_INFO_MEMBER(get_dbz_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_dbz_bg1_tile_info);
 	virtual void machine_start() override;
@@ -89,9 +77,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(dbz_scanline);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
+	void dbz(machine_config &config);
 	void dbz_map(address_map &map);
 	void dbz_sound_io_map(address_map &map);
 	void dbz_sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_DBZ_H

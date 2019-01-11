@@ -97,13 +97,6 @@
 #include "emu.h"
 #include "gkracker.h"
 
-#define LOG_WARN         (1U<<1)   // Warnings
-#define LOG_CHANGE       (1U<<2)   // Cartridge change
-#define LOG_GKRACKER     (1U<<3)   // Gram Kracker operation
-
-#define VERBOSE ( LOG_WARN )
-#include "logmacro.h"
-
 DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_GK, bus::ti99::gromport, ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
 
 namespace bus { namespace ti99 { namespace gromport {
@@ -129,6 +122,8 @@ enum
 #define GKSWITCH4_TAG "GKSWITCH4"
 #define GKSWITCH5_TAG "GKSWITCH5"
 
+#define TRACE_GKRACKER 0
+#define TRACE_CHANGE 0
 #define GKRACKER_NVRAM_TAG "gkracker_nvram"
 #define GKRACKER_ROM_TAG "gkracker_rom"
 
@@ -155,10 +150,10 @@ WRITE_LINE_MEMBER(ti99_gkracker_device::romgq_line)
 /*
     Combined select lines
 */
-void ti99_gkracker_device::set_gromlines(line_state mline, line_state moline, line_state gsq)
+WRITE8_MEMBER(ti99_gkracker_device::set_gromlines)
 {
-	m_grom_selected = (gsq==ASSERT_LINE);
-	if (m_cartridge != nullptr) m_cartridge->set_gromlines(mline, moline, gsq);
+	m_grom_selected = (data != 0);
+	if (m_cartridge != nullptr) m_cartridge->set_gromlines(space, offset, data);
 }
 
 WRITE_LINE_MEMBER(ti99_gkracker_device::gclock_in)
@@ -201,7 +196,7 @@ READ8Z_MEMBER(ti99_gkracker_device::readz)
 
 			// Reset the write address flipflop.
 			m_waddr_LSB = false;
-			LOGMASKED(LOG_GKRACKER, "GROM read -> %02x\n", *value);
+			if (TRACE_GKRACKER) logerror("GROM read -> %02x\n", *value);
 		}
 	}
 
@@ -216,7 +211,7 @@ READ8Z_MEMBER(ti99_gkracker_device::readz)
 		{
 			int base = ((m_gk_switch[4]==GK_BANK1) || ((m_gk_switch[4]==GK_WP) && (m_ram_page==0)))? 0x10000 : 0x12000;
 			*value = m_ram_ptr[offset | base];
-			LOGMASKED(LOG_GKRACKER, "Read %04x -> %02x\n", offset | 0x6000, *value);
+			if (TRACE_GKRACKER) logerror("Read %04x -> %02x\n", offset | 0x6000, *value);
 		}
 	}
 
@@ -228,8 +223,8 @@ READ8Z_MEMBER(ti99_gkracker_device::readz)
 
 		// Read from the guest cartridge.
 		m_cartridge->readz(space, offset, value, mem_mask);
-		if (val1 != *value)
-			LOGMASKED(LOG_GKRACKER, "Read (from guest) %04x -> %02x\n", offset, *value);
+		if (TRACE_GKRACKER)
+			if (val1 != *value) logerror("Read (from guest) %04x -> %02x\n", offset, *value);
 	}
 }
 
@@ -252,7 +247,7 @@ WRITE8_MEMBER(ti99_gkracker_device::write)
 				// Accept low address byte (second write)
 				m_grom_address = (m_grom_address & 0xff00) | data;
 				m_waddr_LSB = false;
-				LOGMASKED(LOG_GKRACKER, "Set GROM address %04x\n", m_grom_address);
+				if (TRACE_GKRACKER) logerror("Set GROM address %04x\n", m_grom_address);
 			}
 			else
 			{
@@ -264,7 +259,7 @@ WRITE8_MEMBER(ti99_gkracker_device::write)
 		else
 		{
 			// Write data byte to GRAM area.
-			LOGMASKED(LOG_GKRACKER, "GROM write %04x(%04x) <- %02x\n", offset, m_grom_address, data);
+			if (TRACE_GKRACKER) logerror("GROM write %04x(%04x) <- %02x\n", offset, m_grom_address, data);
 
 			// According to manual:
 			// Writing to GRAM 0: switch 2 set to GRAM 0 + Write protect switch (4) in 1 or 2 position
@@ -292,7 +287,7 @@ WRITE8_MEMBER(ti99_gkracker_device::write)
 	if (m_romspace_selected)
 	{
 		// Write to the RAM space of the GRAM Kracker
-		LOGMASKED(LOG_GKRACKER, "Write %04x <- %02x\n", offset | 0x6000, data);
+		if (TRACE_GKRACKER) logerror("Write %04x <- %02x\n", offset | 0x6000, data);
 
 		if (m_gk_switch[1] == GK_NORMAL)
 		{
@@ -317,13 +312,13 @@ WRITE8_MEMBER( ti99_gkracker_device::cruwrite )
 
 INPUT_CHANGED_MEMBER( ti99_gkracker_device::gk_changed )
 {
-	LOGMASKED(LOG_GKRACKER, "Input changed %d - %d\n", (int)((uint64_t)param & 0x07), newval);
+	if (TRACE_GKRACKER) logerror("Input changed %d - %d\n", (int)((uint64_t)param & 0x07), newval);
 	m_gk_switch[(uint64_t)param & 0x07] = newval;
 }
 
 void ti99_gkracker_device::insert(int index, ti99_cartridge_device* cart)
 {
-	LOGMASKED(LOG_CHANGE, "Insert cartridge\n");
+	if (TRACE_CHANGE) logerror("Insert cartridge\n");
 	m_cartridge = cart;
 	// Switch 1 has a third location for resetting. We do the reset by default
 	// here. It can be turned off in the configuration.
@@ -332,7 +327,7 @@ void ti99_gkracker_device::insert(int index, ti99_cartridge_device* cart)
 
 void ti99_gkracker_device::remove(int index)
 {
-	LOGMASKED(LOG_CHANGE, "Remove cartridge\n");
+	if (TRACE_CHANGE) logerror("Remove cartridge\n");
 	m_cartridge = nullptr;
 }
 
@@ -355,7 +350,7 @@ void ti99_gkracker_device::gk_install_menu(const char* menutext, int len, int pt
 */
 void ti99_gkracker_device::nvram_default()
 {
-	LOGMASKED(LOG_GKRACKER, "Creating default NVRAM\n");
+	if (TRACE_GKRACKER) logerror("Creating default NVRAM\n");
 	memset(m_ram_ptr, 0, 81920);
 
 	m_ram_ptr[0x6000] = 0xaa;
@@ -379,7 +374,7 @@ void ti99_gkracker_device::nvram_default()
 void ti99_gkracker_device::nvram_read(emu_file &file)
 {
 	int readsize = file.read(m_ram_ptr, 81920);
-	LOGMASKED(LOG_GKRACKER, "Reading NVRAM\n");
+	if (TRACE_GKRACKER) logerror("Reading NVRAM\n");
 	// If we increased the size, fill the remaining parts with 0
 	if (readsize < 81920)
 	{
@@ -389,7 +384,7 @@ void ti99_gkracker_device::nvram_read(emu_file &file)
 
 void ti99_gkracker_device::nvram_write(emu_file &file)
 {
-	LOGMASKED(LOG_GKRACKER, "Writing NVRAM\n");
+	if (TRACE_GKRACKER) logerror("Writing NVRAM\n");
 	file.write(m_ram_ptr, 81920);
 }
 
@@ -433,10 +428,9 @@ const tiny_rom_entry *ti99_gkracker_device::device_rom_region() const
 	return ROM_NAME( gkracker_rom );
 }
 
-void ti99_gkracker_device::device_add_mconfig(machine_config &config)
-{
-	TI99_CART(config, "cartridge", 0);
-}
+MACHINE_CONFIG_START(ti99_gkracker_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("cartridge", TI99_CART, 0)
+MACHINE_CONFIG_END
 
 INPUT_PORTS_START(gkracker)
 	PORT_START( GKSWITCH1_TAG )

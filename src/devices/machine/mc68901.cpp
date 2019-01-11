@@ -530,22 +530,8 @@ void mc68901_device::rcv_complete()
 		m_receive_buffer = get_received_char();
 		m_rsr |= RSR_BUFFER_FULL;
 		LOG("Received Character: %02x\n", m_receive_buffer);
-
-		if (is_receive_framing_error())
-			m_rsr |= RSR_FRAME_ERROR;
-		else
-			m_rsr &= ~RSR_FRAME_ERROR;
-
-		if (is_receive_parity_error())
-			m_rsr |= RSR_PARITY_ERROR;
-		else
-			m_rsr &= ~RSR_PARITY_ERROR;
-
-		if ((m_rsr & (RSR_FRAME_ERROR | RSR_PARITY_ERROR)) && (m_ier & IR_RCV_ERROR))
-			rx_error();
-		else
-			rx_buffer_full();
 	}
+	rx_buffer_full();
 }
 
 

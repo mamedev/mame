@@ -9,17 +9,18 @@
 #include "machine/watchdog.h"
 
 
+#define MCFG_KANEKO_HIT_TYPE(_type) \
+	downcast<kaneko_hit_device &>(*device).set_type(_type);
+
+
 class kaneko_hit_device : public device_t
 {
 public:
-	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: kaneko_hit_device(mconfig, tag, owner, (uint32_t)0)
-	{
-	}
-
 	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_type(int hittype) { m_hittype = hittype; }
+
+	int m_hittype;
 
 	DECLARE_READ16_MEMBER(kaneko_hit_r);
 	DECLARE_WRITE16_MEMBER(kaneko_hit_w);
@@ -59,7 +60,7 @@ private:
 		uint16_t mode;
 	};
 
-	int m_hittype;
+
 
 	required_device<watchdog_timer_device> m_watchdog;
 

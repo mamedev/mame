@@ -5,20 +5,15 @@
     Skyfox
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SKYFOX_H
-#define MAME_INCLUDES_SKYFOX_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
-#include "emupal.h"
 #include "screen.h"
 
 class skyfox_state : public driver_device
 {
 public:
-	skyfox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	skyfox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -28,13 +23,6 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
-	void skyfox(machine_config &config);
-
-	void init_skyfox();
-
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-private:
 	/* devices/memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -48,16 +36,16 @@ private:
 	int m_bg_ctrl;
 
 	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void init_skyfox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void skyfox_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(skyfox);
 	uint32_t screen_update_skyfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skyfox_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	void skyfox(machine_config &config);
 	void skyfox_map(address_map &map);
 	void skyfox_sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_SKYFOX_H

@@ -83,9 +83,9 @@ void deco_ace_device::device_start()
 	m_paletteram_buffered = make_unique_clear<uint32_t[]>(2048);
 	m_ace_ram = make_unique_clear<uint16_t[]>(0x28);
 
-	save_pointer(NAME(m_paletteram), 2048);
-	save_pointer(NAME(m_paletteram_buffered), 2048);
-	save_pointer(NAME(m_ace_ram), 0x28);
+	save_pointer(NAME(m_paletteram.get()), 2048);
+	save_pointer(NAME(m_paletteram_buffered.get()), 2048);
+	save_pointer(NAME(m_ace_ram.get()), 0x28);
 }
 
 //-------------------------------------------------

@@ -40,9 +40,6 @@ public:
 	{
 	}
 
-	void midqslvr(machine_config &config);
-
-private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
@@ -65,6 +62,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void midqslvr(machine_config &config);
 	void midqslvr_io(address_map &map);
 	void midqslvr_map(address_map &map);
 
@@ -368,13 +366,13 @@ void midqslvr_state::midqslvr_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(FUNC(midqslvr_state::isa_ram1_w));
-	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(FUNC(midqslvr_state::isa_ram2_w));
-	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(FUNC(midqslvr_state::bios_ext1_ram_w));
-	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(FUNC(midqslvr_state::bios_ext2_ram_w));
-	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(FUNC(midqslvr_state::bios_ext3_ram_w));
-	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(FUNC(midqslvr_state::bios_ext4_ram_w));
-	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(midqslvr_state::bios_ram_w));
+	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(this, FUNC(midqslvr_state::isa_ram1_w));
+	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(this, FUNC(midqslvr_state::isa_ram2_w));
+	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(this, FUNC(midqslvr_state::bios_ext1_ram_w));
+	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(this, FUNC(midqslvr_state::bios_ext2_ram_w));
+	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(this, FUNC(midqslvr_state::bios_ext3_ram_w));
+	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(this, FUNC(midqslvr_state::bios_ext4_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(this, FUNC(midqslvr_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
 	map(0xfff80000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
@@ -384,11 +382,11 @@ void midqslvr_state::midqslvr_io(address_map &map)
 	pcat32_io_common(map);
 	map(0x00e8, 0x00ef).noprw();
 
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
 	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
@@ -429,8 +427,8 @@ MACHINE_CONFIG_START(midqslvr_state::midqslvr)
 	MCFG_PCI_BUS_LEGACY_DEVICE( 0, DEVICE_SELF, midqslvr_state, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(31, DEVICE_SELF, midqslvr_state, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	/* video hardware */
 	pcvideo_vga(config);

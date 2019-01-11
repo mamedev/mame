@@ -105,11 +105,6 @@ public:
 	{
 	}
 
-	void seibucats(machine_config &config);
-
-	void init_seibucats();
-
-private:
 	// screen updates
 //  uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 //  IRQ_CALLBACK_MEMBER(spi_irq_callback);
@@ -119,15 +114,19 @@ private:
 	DECLARE_WRITE16_MEMBER(input_select_w);
 	DECLARE_WRITE16_MEMBER(output_latch_w);
 	DECLARE_WRITE16_MEMBER(aux_rtc_w);
+	void init_seibucats();
 
+	void seibucats(machine_config &config);
 	void seibucats_map(address_map &map);
-
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 //  virtual void video_start() override;
 
+
+private:
 	uint16_t m_input_select;
 
 //  optional_ioport_array<5> m_key;
@@ -169,25 +168,27 @@ void seibucats_state::seibucats_map(address_map &map)
 	// TODO: map devices
 	map(0x00000000, 0x0003ffff).ram().share("mainram");
 
-	map(0x00000010, 0x00000010).r(FUNC(seibucats_state::spi_status_r));
-	map(0x00000400, 0x00000401).w(FUNC(seibucats_state::input_select_w));
-	map(0x00000404, 0x00000405).w(FUNC(seibucats_state::output_latch_w));
-	map(0x00000484, 0x00000487).w(FUNC(seibucats_state::palette_dma_start_w));
-	map(0x00000490, 0x00000493).w(FUNC(seibucats_state::video_dma_length_w));
-	map(0x00000494, 0x00000497).w(FUNC(seibucats_state::video_dma_address_w));
-	map(0x00000562, 0x00000563).w(FUNC(seibucats_state::sprite_dma_start_w));
+	map(0x00000010, 0x00000010).r(this, FUNC(seibucats_state::spi_status_r));
+	map(0x00000400, 0x00000401).w(this, FUNC(seibucats_state::input_select_w));
+	map(0x00000404, 0x00000405).w(this, FUNC(seibucats_state::output_latch_w));
+	map(0x00000484, 0x00000487).w(this, FUNC(seibucats_state::palette_dma_start_w));
+	map(0x00000490, 0x00000493).w(this, FUNC(seibucats_state::video_dma_length_w));
+	map(0x00000494, 0x00000497).w(this, FUNC(seibucats_state::video_dma_address_w));
+	map(0x00000562, 0x00000563).w(this, FUNC(seibucats_state::sprite_dma_start_w));
 
-	map(0x00000600, 0x00000607).r(FUNC(seibucats_state::input_mux_r)).umask32(0x0000ffff);
+	map(0x00000600, 0x00000607).r(this, FUNC(seibucats_state::input_mux_r)).umask32(0x0000ffff);
 
 	map(0x00200000, 0x003fffff).rom().region("ipl", 0).nopw(); // emjjoshi attempts to write there?
 	// following are likely to be Seibu CATS specific
 	map(0x01200000, 0x01200007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
 	map(0x01200100, 0x01200107).nopw(); // YMF721-S MIDI data
 	map(0x01200104, 0x01200107).nopr(); // YMF721-S MIDI status
-	map(0x01200200, 0x01200207).rw("usart1", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x000000ff);
-	map(0x01200300, 0x01200307).rw("usart2", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x000000ff);
+	map(0x01200200, 0x01200200).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01200204, 0x01200204).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x01200300, 0x01200300).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01200304, 0x01200304).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xa0000000, 0xa1ffffff).noprw(); // NVRAM on ROM board
-	map(0xa2000000, 0xa2000001).w(FUNC(seibucats_state::aux_rtc_w));
+	map(0xa2000000, 0xa2000001).w(this, FUNC(seibucats_state::aux_rtc_w));
 	map(0xffe00000, 0xffffffff).rom().region("ipl", 0);
 }
 
@@ -301,9 +302,9 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state, spi_irq_callback)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	//JRC6355E(config, m_rtc, XTAL(32'768));
+	//MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("usart1", I8251, 0)
 	MCFG_DEVICE_ADD("usart2", I8251, 0)
@@ -316,7 +317,7 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seibucats)
 
-	MCFG_DEVICE_ADD(m_palette, PALETTE, palette_device::BLACK, 8192);
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 8192)
 //  MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	//MCFG_PALETTE_INIT_OWNER(seibucats_state, seibucats)
 

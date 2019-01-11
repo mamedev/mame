@@ -19,7 +19,6 @@
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,13 +37,6 @@ public:
 		, m_mainbank(*this, "mainbank")
 	{ }
 
-	void lastbank(machine_config &config);
-
-	void init_lastbank();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdp;
 	required_device<okim6295_device> m_oki;
@@ -71,6 +63,7 @@ private:
 	DECLARE_READ8_MEMBER(mux_0_r);
 	DECLARE_WRITE8_MEMBER(mux_w);
 	DECLARE_WRITE8_MEMBER(sound_flags_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r);
 
 	DECLARE_READ8_MEMBER(rom_bank_r);
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
@@ -81,7 +74,10 @@ private:
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 
+	void init_lastbank();
+
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
+	void lastbank(machine_config &config);
 	void lastbank_audio_io(address_map &map);
 	void lastbank_audio_map(address_map &map);
 	void lastbank_map(address_map &map);
@@ -235,16 +231,16 @@ void lastbank_state::tc0091lvc_map(address_map &map)
 
 	map(0x8000, 0x9fff).ram().share("nvram");
 
-	map(0xc000, 0xcfff).rw(FUNC(lastbank_state::ram_r<0>), FUNC(lastbank_state::ram_w<0>));
-	map(0xd000, 0xdfff).rw(FUNC(lastbank_state::ram_r<1>), FUNC(lastbank_state::ram_w<1>));
-	map(0xe000, 0xefff).rw(FUNC(lastbank_state::ram_r<2>), FUNC(lastbank_state::ram_w<2>));
-	map(0xf000, 0xfdff).rw(FUNC(lastbank_state::ram_r<3>), FUNC(lastbank_state::ram_w<3>));
+	map(0xc000, 0xcfff).rw(this, FUNC(lastbank_state::ram_r<0>), FUNC(lastbank_state::ram_w<0>));
+	map(0xd000, 0xdfff).rw(this, FUNC(lastbank_state::ram_r<1>), FUNC(lastbank_state::ram_w<1>));
+	map(0xe000, 0xefff).rw(this, FUNC(lastbank_state::ram_r<2>), FUNC(lastbank_state::ram_w<2>));
+	map(0xf000, 0xfdff).rw(this, FUNC(lastbank_state::ram_r<3>), FUNC(lastbank_state::ram_w<3>));
 
 	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
-	map(0xff00, 0xff02).rw(FUNC(lastbank_state::irq_vector_r), FUNC(lastbank_state::irq_vector_w));
-	map(0xff03, 0xff03).rw(FUNC(lastbank_state::irq_enable_r), FUNC(lastbank_state::irq_enable_w));
-	map(0xff04, 0xff07).rw(FUNC(lastbank_state::ram_bank_r), FUNC(lastbank_state::ram_bank_w));
-	map(0xff08, 0xff08).rw(FUNC(lastbank_state::rom_bank_r), FUNC(lastbank_state::rom_bank_w));
+	map(0xff00, 0xff02).rw(this, FUNC(lastbank_state::irq_vector_r), FUNC(lastbank_state::irq_vector_w));
+	map(0xff03, 0xff03).rw(this, FUNC(lastbank_state::irq_enable_r), FUNC(lastbank_state::irq_enable_w));
+	map(0xff04, 0xff07).rw(this, FUNC(lastbank_state::ram_bank_r), FUNC(lastbank_state::ram_bank_w));
+	map(0xff08, 0xff08).rw(this, FUNC(lastbank_state::rom_bank_r), FUNC(lastbank_state::rom_bank_w));
 }
 
 void lastbank_state::lastbank_map(address_map &map)
@@ -252,14 +248,14 @@ void lastbank_state::lastbank_map(address_map &map)
 	tc0091lvc_map(map);
 	map(0xa000, 0xa00d).noprw(); // MSM62X42B or equivalent probably read from here
 	map(0xa800, 0xa800).portr("COINS");
-	map(0xa800, 0xa802).w(FUNC(lastbank_state::output_w));
-	map(0xa803, 0xa803).w(FUNC(lastbank_state::mux_w)); // mux for $a808 / $a80c
+	map(0xa800, 0xa802).w(this, FUNC(lastbank_state::output_w));
+	map(0xa803, 0xa803).w(this, FUNC(lastbank_state::mux_w)); // mux for $a808 / $a80c
 	map(0xa804, 0xa804).portr("SPECIAL");
 	map(0xa805, 0xa805).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xa806, 0xa806).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0xa807, 0xa807).nopw(); // hopper?
-	map(0xa808, 0xa808).r(FUNC(lastbank_state::mux_0_r));
-	map(0xa80c, 0xa80c).r(FUNC(lastbank_state::mux_0_r));
+	map(0xa808, 0xa808).r(this, FUNC(lastbank_state::mux_0_r));
+	map(0xa80c, 0xa80c).r(this, FUNC(lastbank_state::mux_0_r));
 	map(0xa81c, 0xa81c).portr("DSW0");
 	map(0xa81d, 0xa81d).portr("DSW1");
 	map(0xa81e, 0xa81e).portr("DSW2");
@@ -278,7 +274,7 @@ void lastbank_state::lastbank_audio_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x06).rw(m_essnd, FUNC(es8712_device::read), FUNC(es8712_device::write));
 	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x80, 0x80).w(FUNC(lastbank_state::sound_flags_w));
+	map(0x80, 0x80).w(this, FUNC(lastbank_state::sound_flags_w));
 	map(0x80, 0x80).r("soundlatch1", FUNC(generic_latch_8_device::read));
 	map(0xc0, 0xc0).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }
@@ -519,7 +515,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("audiocpu",Z80,MASTER_CLOCK/4)
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_audio_map)
@@ -544,28 +540,28 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lastbank )
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	TC0091LVC(config, m_vdp, 0);
-	m_vdp->set_gfxdecode_tag("gfxdecode");
+	MCFG_DEVICE_ADD("tc0091lvc", TC0091LVC, 0)
+	MCFG_TC0091LVC_GFXDECODE("gfxdecode")
 
 //  MCFG_VIDEO_START_OVERRIDE(lastbank_state,lastbank)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch1");
-	GENERIC_LATCH_8(config, "soundlatch2");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	ES8712(config, m_essnd, 0);
-	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
-	m_essnd->set_msm_tag("msm");
+	MCFG_ES8712_ADD("essnd", 0)
+	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm6585_device, data_w))
+	MCFG_ES8712_MSM_TAG("msm")
 
-	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL)); /* Not verified, It's actually MSM6585? */
-	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
-	msm.set_prescaler_selector(msm6585_device::S40); /* Not verified */
-	msm.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("msm", MSM6585, 640_kHz_XTAL) /* Not verified, It's actually MSM6585? */
+	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
+	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* Not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// A RTC-62421 is present on the Last Bank PCB. However, the code
 	// that tries to read from it is broken and nonfunctional. The RTC

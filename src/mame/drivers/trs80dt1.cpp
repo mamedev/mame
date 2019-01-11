@@ -34,7 +34,6 @@ You can get into the setup menu by pressing Ctrl+Shift+Enter.
 #include "machine/7474.h"
 #include "machine/x2212.h"
 #include "sound/beep.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 //#include "logmacro.h"
@@ -53,11 +52,8 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 		, m_beep(*this, "beeper")
 		, m_7474(*this, "7474")
-	{ }
+		{ }
 
-	void trs80dt1(machine_config &config);
-
-private:
 	DECLARE_READ8_MEMBER(dma_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(store_w);
@@ -65,17 +61,18 @@ private:
 	DECLARE_WRITE8_MEMBER(port3_w);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
+	void trs80dt1(machine_config &config);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
-
+private:
 	bool m_bow;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
-	required_device<i8051_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<i8276_device> m_crtc;
+	required_device<i8275_device> m_crtc;
 	required_device<x2210_device> m_nvram;
 	required_ioport_array<10> m_keyboard;
 	required_device<beep_device> m_beep;
@@ -149,7 +146,7 @@ WRITE8_MEMBER( trs80dt1_state::port3_w )
 void trs80dt1_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x27ff).r(FUNC(trs80dt1_state::dma_r));
+	map(0x2000, 0x27ff).r(this, FUNC(trs80dt1_state::dma_r));
 }
 
 void trs80dt1_state::io_map(address_map &map)
@@ -157,10 +154,10 @@ void trs80dt1_state::io_map(address_map &map)
 	map.global_mask(0xbfff); // A14 not used
 	map(0xa000, 0xa7ff).ram().share("videoram");
 	map(0xa800, 0xa83f).mirror(0x3c0).rw(m_nvram, FUNC(x2210_device::read), FUNC(x2210_device::write)); // X2210
-	map(0xac00, 0xafff).r(FUNC(trs80dt1_state::key_r));
+	map(0xac00, 0xafff).r(this, FUNC(trs80dt1_state::key_r));
 	map(0xb000, 0xb3ff).portr("X9"); // also reads some RS232 inputs
-	map(0xb400, 0xb7ff).w(FUNC(trs80dt1_state::store_w));
-	map(0xbc00, 0xbc01).mirror(0x3fe).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
+	map(0xb400, 0xb7ff).w(this, FUNC(trs80dt1_state::store_w));
+	map(0xbc00, 0xbc01).mirror(0x3fe).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)); // i8276
 }
 
 /* Input ports */
@@ -310,46 +307,43 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 }
 
 
-void trs80dt1_state::trs80dt1(machine_config &config)
-{
+MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	/* basic machine hardware */
-	I8051(config, m_maincpu, 7372800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &trs80dt1_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &trs80dt1_state::io_map);
-	m_maincpu->port_out_cb<1>().set(FUNC(trs80dt1_state::port1_w));
-	m_maincpu->port_out_cb<3>().set(FUNC(trs80dt1_state::port3_w));
+	MCFG_DEVICE_ADD("maincpu", I8051, 7372800)
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, trs80dt1_state, port1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, trs80dt1_state, port3_w))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(40*12, 16*16);
-	screen.set_visarea(0, 40*12-1, 0, 16*16-1);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(40*12, 16*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*12-1, 0, 16*16-1)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_trs80dt1 )
 
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_trs80dt1);
+	MCFG_DEVICE_ADD("crtc", I8275, 12480000 / 8)
+	MCFG_I8275_CHARACTER_WIDTH(8)
+	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(trs80dt1_state, crtc_update_row)
+	MCFG_I8275_DRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT0_LINE)) // BRDY pin goes through inverter to /INT0, so we don't invert
+	MCFG_I8275_IRQ_CALLBACK(WRITELINE("7474", ttl7474_device, clear_w)) // INT pin
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("7474", ttl7474_device, d_w))
+	MCFG_I8275_VRTC_CALLBACK(WRITELINE("7474", ttl7474_device, clock_w))
+	MCFG_VIDEO_SET_SCREEN("screen")
+	MCFG_PALETTE_ADD("palette", 3)
 
-	I8276(config, m_crtc, 12480000 / 8);
-	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(trs80dt1_state::crtc_update_row), this);
-	m_crtc->drq_wr_callback().set_inputline(m_maincpu, MCS51_INT0_LINE); // BRDY pin goes through inverter to /INT0, so we don't invert
-	m_crtc->irq_wr_callback().set(m_7474, FUNC(ttl7474_device::clear_w)); // INT pin
-	m_crtc->irq_wr_callback().append(m_7474, FUNC(ttl7474_device::d_w));
-	m_crtc->vrtc_wr_callback().set(m_7474, FUNC(ttl7474_device::clock_w));
-	m_crtc->set_screen("screen");
+	MCFG_X2210_ADD("nvram")
 
-	PALETTE(config, "palette").set_entries(3);
-
-	X2210(config, "nvram");
-
-	TTL7474(config, m_7474, 0);
-	m_7474->comp_output_cb().set_inputline(m_maincpu, MCS51_INT1_LINE).invert(); // /Q connects directly to /INT1, so we need to invert?
+	MCFG_DEVICE_ADD("7474", TTL7474, 0)
+	MCFG_7474_COMP_OUTPUT_CB(INPUTLINE("maincpu", MCS51_INT1_LINE)) MCFG_DEVCB_INVERT // /Q connects directly to /INT1, so we need to invert?
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 2000);
-	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
+	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
 
 ROM_START( trs80dt1 )
 

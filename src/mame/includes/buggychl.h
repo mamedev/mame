@@ -3,10 +3,6 @@
 /*
     buggychl
 */
-#ifndef MAME_INCLUDES_BUGGYCHL_H
-#define MAME_INCLUDES_BUGGYCHL_H
-
-#pragma once
 
 #include "machine/taito68705interface.h"
 #include "machine/input_merger.h"
@@ -14,14 +10,13 @@
 #include "sound/msm5232.h"
 #include "sound/ta7630.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 
 class buggychl_state : public driver_device
 {
 public:
-	buggychl_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	buggychl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_charram(*this, "charram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
@@ -87,7 +82,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void buggychl_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(buggychl);
 	uint32_t screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_CUSTOM_INPUT_MEMBER( pedal_in_r );
 
@@ -110,5 +105,3 @@ private:
 	bool        m_sound_irq_enable;
 	uint8_t       m_sprite_lookup[0x2000];
 };
-
-#endif // MAME_INCLUDES_BUGGYCHL_H

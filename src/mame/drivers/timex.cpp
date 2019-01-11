@@ -527,11 +527,11 @@ void spectrum_state::ts2068_update_memory()
 
 void spectrum_state::ts2068_io(address_map &map)
 {
-	map(0xf4, 0xf4).rw(FUNC(spectrum_state::ts2068_port_f4_r), FUNC(spectrum_state::ts2068_port_f4_w)).mirror(0xff00);
+	map(0xf4, 0xf4).rw(this, FUNC(spectrum_state::ts2068_port_f4_r), FUNC(spectrum_state::ts2068_port_f4_w)).mirror(0xff00);
 	map(0xf5, 0xf5).w("ay8912", FUNC(ay8910_device::address_w)).mirror(0xff00);
 	map(0xf6, 0xf6).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xff00);
-	map(0xff, 0xff).rw(FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::ts2068_port_ff_w)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xff00);
+	map(0xff, 0xff).rw(this, FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::ts2068_port_ff_w)).mirror(0xff00);
 }
 
 void spectrum_state::ts2068_mem(address_map &map)
@@ -573,20 +573,14 @@ WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
 
 void spectrum_state::tc2048_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0xff, 0xff).rw(FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::tc2048_port_ff_w)).mirror(0xff00);
+	map(0x00, 0x00).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0xff, 0xff).rw(this, FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::tc2048_port_ff_w)).mirror(0xff00);
 }
 
 void spectrum_state::tc2048_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xffff).bankr("bank1").bankw("bank2");
-}
-
-void spectrum_state::init_timex()
-{
-	// setup expansion slot
-	m_exp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 MACHINE_RESET_MEMBER(spectrum_state,tc2048)
@@ -694,7 +688,6 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(spectrum_state::ts2068)
 	spectrum_128(config);
-
 	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ts2068_mem)
 	MCFG_DEVICE_IO_MAP(ts2068_io)
@@ -711,12 +704,13 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
 
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ts2068);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ts2068)
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 
 	/* sound */
-	AY8912(config.replace(), "ay8912", XTAL(14'112'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);        /* From Schematic; 1.764 MHz */
+	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'112'000)/8)        /* From Schematic; 1.764 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("dockslot", generic_plain_slot, "timex_cart")
@@ -727,7 +721,8 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "timex_dock")
 
 	/* internal ram */
-	m_ram->set_default_size("48K");
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("48K")
 MACHINE_CONFIG_END
 
 
@@ -757,7 +752,8 @@ MACHINE_CONFIG_START(spectrum_state::tc2048)
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 
 	/* internal ram */
-	m_ram->set_default_size("48K");
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("48K")
 MACHINE_CONFIG_END
 
 
@@ -786,6 +782,6 @@ ROM_START(uk2086)
 ROM_END
 
 //    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY              FULLNAME             FLAGS
-COMP( 1984, tc2048, spectrum, 0,      tc2048,  spectrum, spectrum_state, init_timex, "Timex of Portugal", "TC-2048" ,          0 )
-COMP( 1983, ts2068, spectrum, 0,      ts2068,  spectrum, spectrum_state, init_timex, "Timex Sinclair",    "TS-2068" ,          0 )
-COMP( 1986, uk2086, spectrum, 0,      uk2086,  spectrum, spectrum_state, init_timex, "Unipolbrit",        "UK-2086 ver. 1.2" , 0 )
+COMP( 1984, tc2048, spectrum, 0,      tc2048,  spectrum, spectrum_state, empty_init, "Timex of Portugal", "TC-2048" ,          0 )
+COMP( 1983, ts2068, spectrum, 0,      ts2068,  spectrum, spectrum_state, empty_init, "Timex Sinclair",    "TS-2068" ,          0 )
+COMP( 1986, uk2086, spectrum, 0,      uk2086,  spectrum, spectrum_state, empty_init, "Unipolbrit",        "UK-2086 ver. 1.2" , 0 )

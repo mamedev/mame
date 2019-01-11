@@ -106,23 +106,7 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 				if (i < minunnamed)
 					goto error; /* Too few unnamed */
 
-				util::option_resolution::entry *entry = resolution->find(name);
-				if (entry->option_type() == util::option_guide::entry::option_type::ENUM_BEGIN)
-				{
-					const util::option_guide::entry *enum_value;
-					for (enum_value = entry->enum_value_begin(); enum_value != entry->enum_value_end(); enum_value++)
-					{
-						if (!strcmp (enum_value->identifier(), value))
-						{
-							entry->set_value(enum_value->parameter());
-							break;
-						}
-					}
-					if (enum_value ==  entry->enum_value_end())
-						goto error;
-				}
-				else
-					entry->set_value(value);
+				resolution->find(name)->set_value(value);
 			}
 		}
 	}

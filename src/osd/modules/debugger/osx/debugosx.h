@@ -9,8 +9,6 @@
 #ifndef __SDL_DEBUGOSX__
 #define __SDL_DEBUGOSX__
 
-#define __ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES 0
-
 // make sure this comes first
 #include <AvailabilityMacros.h>
 

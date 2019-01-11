@@ -13,10 +13,8 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	void glmmc(machine_config &config);
-
-private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void glmmc(machine_config &config);
 };
 
 uint32_t glmmc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

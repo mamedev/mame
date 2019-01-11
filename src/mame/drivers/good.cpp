@@ -35,7 +35,6 @@ voice.rom - VOICE ROM
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -43,8 +42,8 @@ voice.rom - VOICE ROM
 class good_state : public driver_device
 {
 public:
-	good_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	good_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_fg_tilemapram(*this, "fg_tilemapram"),
 		m_bg_tilemapram(*this, "bg_tilemapram"),
 		m_maincpu(*this, "maincpu"),
@@ -52,15 +51,10 @@ public:
 	{
 	}
 
-	void good(machine_config &config);
-
-protected:
-	virtual void video_start() override;
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_tilemapram;
 	required_shared_ptr<uint16_t> m_bg_tilemapram;
+	uint16_t *  m_sprites;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -69,9 +63,11 @@ private:
 	DECLARE_WRITE16_MEMBER(bg_tilemapram_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	virtual void video_start() override;
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void good(machine_config &config);
 	void good_map(address_map &map);
 };
 
@@ -131,8 +127,8 @@ void good_state::good_map(address_map &map)
 
 	map(0x800000, 0x8007ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 
-	map(0x820000, 0x820fff).ram().w(FUNC(good_state::fg_tilemapram_w)).share("fg_tilemapram");
-	map(0x822000, 0x822fff).ram().w(FUNC(good_state::bg_tilemapram_w)).share("bg_tilemapram");
+	map(0x820000, 0x820fff).ram().w(this, FUNC(good_state::fg_tilemapram_w)).share("fg_tilemapram");
+	map(0x822000, 0x822fff).ram().w(this, FUNC(good_state::bg_tilemapram_w)).share("bg_tilemapram");
 
 	map(0xff0000, 0xffefff).ram();
 }
@@ -297,7 +293,7 @@ MACHINE_CONFIG_START(good_state::good)
 	MCFG_DEVICE_PROGRAM_MAP(good_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_good);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_good)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -307,7 +303,9 @@ MACHINE_CONFIG_START(good_state::good)
 	MCFG_SCREEN_UPDATE_DRIVER(good_state, screen_update_good)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x400);
+	MCFG_PALETTE_ADD("palette", 0x400)
+	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

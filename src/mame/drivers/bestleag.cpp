@@ -23,7 +23,6 @@ Dip Locations added according to Service Mode
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -31,8 +30,8 @@ Dip Locations added according to Service Mode
 class bestleag_state : public driver_device
 {
 public:
-	bestleag_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	bestleag_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -41,8 +40,7 @@ public:
 		m_fgram(*this, "fgram"),
 		m_txram(*this, "txram"),
 		m_vregs(*this, "vregs"),
-		m_spriteram(*this, "spriteram")
-	{ }
+		m_spriteram(*this, "spriteram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -256,9 +254,9 @@ void bestleag_state::bestleag_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x0d2000, 0x0d3fff).noprw(); // left over from the original game (only read / written in memory test)
-	map(0x0e0000, 0x0e3fff).ram().w(FUNC(bestleag_state::bgram_w)).share("bgram");
-	map(0x0e8000, 0x0ebfff).ram().w(FUNC(bestleag_state::fgram_w)).share("fgram");
-	map(0x0f0000, 0x0f3fff).ram().w(FUNC(bestleag_state::txram_w)).share("txram");
+	map(0x0e0000, 0x0e3fff).ram().w(this, FUNC(bestleag_state::bgram_w)).share("bgram");
+	map(0x0e8000, 0x0ebfff).ram().w(this, FUNC(bestleag_state::fgram_w)).share("fgram");
+	map(0x0f0000, 0x0f3fff).ram().w(this, FUNC(bestleag_state::txram_w)).share("txram");
 	map(0x0f8000, 0x0f800b).ram().share("vregs");
 	map(0x100000, 0x100fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x200000, 0x200fff).ram().share("spriteram");
@@ -267,7 +265,7 @@ void bestleag_state::bestleag_map(address_map &map)
 	map(0x300014, 0x300015).portr("P2");
 	map(0x300016, 0x300017).portr("DSWA");
 	map(0x300018, 0x300019).portr("DSWB");
-	map(0x30001c, 0x30001d).w(FUNC(bestleag_state::oki_bank_w));
+	map(0x30001c, 0x30001d).w(this, FUNC(bestleag_state::oki_bank_w));
 	map(0x30001f, 0x30001f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x304000, 0x304001).nopw();
 	map(0xfe0000, 0xffffff).ram();
@@ -392,10 +390,11 @@ MACHINE_CONFIG_START(bestleag_state::bestleag)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bestleag_state, screen_update_bestleag)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bestleag);
-	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bestleag)
+	MCFG_PALETTE_ADD("palette", 0x800)
+	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

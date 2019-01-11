@@ -1,18 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo
-#ifndef MAME_INCLUDES_STARCRUS_H
-#define MAME_INCLUDES_STARCRUS_H
-
-#pragma once
-
 #include "sound/samples.h"
-#include "emupal.h"
-
 class starcrus_state : public driver_device
 {
 public:
-	starcrus_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag) ,
+	starcrus_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -22,7 +15,6 @@ public:
 
 	void starcrus(machine_config &config);
 
-private:
 	DECLARE_WRITE8_MEMBER(s1_x_w);
 	DECLARE_WRITE8_MEMBER(s1_y_w);
 	DECLARE_WRITE8_MEMBER(s2_x_w);
@@ -37,9 +29,11 @@ private:
 	DECLARE_WRITE8_MEMBER(proj_parm_2_w);
 	DECLARE_READ8_MEMBER(coll_det_r);
 
+protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -89,5 +83,3 @@ private:
 	void starcrus_io_map(address_map &map);
 	void starcrus_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_STARCRUS_H

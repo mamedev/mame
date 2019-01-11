@@ -7,24 +7,19 @@
                     driver by   Luca Elia (l.elia@tin.it)
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_MEGASYS1_H
-#define MAME_INCLUDES_MEGASYS1_H
-
-#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/ms1_tmap.h"
-#include "emupal.h"
 #include "screen.h"
 
 
 class megasys1_state : public driver_device
 {
 public:
-	megasys1_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	megasys1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_objectram(*this, "objectram"),
 		m_tmap(*this, "scroll%u", 0),
 		m_ram(*this, "ram"),
@@ -38,7 +33,6 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundlatch_z(*this, "soundlatch_z"),
-		m_scantimer(*this, "scantimer"),
 		m_rom_maincpu(*this, "maincpu"),
 		m_io_system(*this, "SYSTEM"),
 		m_io_p1(*this, "P1"),
@@ -46,48 +40,8 @@ public:
 		m_io_dsw(*this, "DSW"),
 		m_io_dsw1(*this, "DSW1"),
 		m_io_dsw2(*this, "DSW2")
-	{ }
+		{ }
 
-	void system_A_soldam(machine_config &config);
-	void system_B_monkelf(machine_config &config);
-	void system_A_iganinju(machine_config &config);
-	void system_A_hachoo(machine_config &config);
-	void kickoffb(machine_config &config);
-	void system_D(machine_config &config);
-	void system_C(machine_config &config);
-	void system_Bbl(machine_config &config);
-	void system_A(machine_config &config);
-	void system_B(machine_config &config);
-	void system_B_hayaosi1(machine_config &config);
-	void system_Z(machine_config &config);
-
-	void init_64street();
-	void init_chimerab();
-	void init_peekaboo();
-	void init_soldam();
-	void init_astyanax();
-	void init_stdragon();
-	void init_hayaosi1();
-	void init_soldamj();
-	void init_phantasm();
-	void init_jitsupro();
-	void init_iganinju();
-	void init_cybattlr();
-	void init_rodlandj();
-	void init_rittam();
-	void init_rodlandjb();
-	void init_avspirit();
-	void init_monkelf();
-	void init_edf();
-	void init_edfp();
-	void init_bigstrik();
-	void init_rodland();
-	void init_edfbl();
-	void init_stdragona();
-	void init_stdragonb();
-	void init_systemz();
-
-private:
 	required_shared_ptr<uint16_t> m_objectram;
 	optional_device_array<megasys1_tilemap_device, 3> m_tmap;
 	required_shared_ptr<uint16_t> m_ram;
@@ -101,7 +55,6 @@ private:
 	optional_device<generic_latch_16_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch2;
 	optional_device<generic_latch_8_device> m_soundlatch_z;
-	optional_device<timer_device> m_scantimer;
 	required_region_ptr<uint16_t> m_rom_maincpu;
 	required_ioport m_io_system;
 	required_ioport m_io_p1;
@@ -174,10 +127,34 @@ private:
 	DECLARE_WRITE16_MEMBER(okim6295_both_2_w);
 	DECLARE_WRITE16_MEMBER(ram_w);
 
-
+	void init_64street();
+	void init_chimerab();
+	void init_peekaboo();
+	void init_soldam();
+	void init_astyanax();
+	void init_stdragon();
+	void init_hayaosi1();
+	void init_soldamj();
+	void init_phantasm();
+	void init_jitsupro();
+	void init_iganinju();
+	void init_cybattlr();
+	void init_rodlandj();
+	void init_rittam();
+	void init_rodlandjb();
+	void init_avspirit();
+	void init_monkelf();
+	void init_edf();
+	void init_edfp();
+	void init_bigstrik();
+	void init_rodland();
+	void init_edfbl();
+	void init_stdragona();
+	void init_stdragonb();
+	void init_systemz();
 	DECLARE_MACHINE_RESET(megasys1);
 	DECLARE_VIDEO_START(megasys1);
-	void megasys1_palette(palette_device &palette);
+	DECLARE_PALETTE_INIT(megasys1);
 	DECLARE_MACHINE_RESET(megasys1_hachoo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -195,6 +172,18 @@ private:
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
+	void system_A_soldam(machine_config &config);
+	void system_B_monkelf(machine_config &config);
+	void system_A_iganinju(machine_config &config);
+	void system_A_hachoo(machine_config &config);
+	void kickoffb(machine_config &config);
+	void system_D(machine_config &config);
+	void system_C(machine_config &config);
+	void system_Bbl(machine_config &config);
+	void system_A(machine_config &config);
+	void system_B(machine_config &config);
+	void system_B_hayaosi1(machine_config &config);
+	void system_Z(machine_config &config);
 	void kickoffb_sound_map(address_map &map);
 	void megasys1A_map(address_map &map);
 	void megasys1A_sound_map(address_map &map);
@@ -209,5 +198,3 @@ private:
 	void z80_sound_io_map(address_map &map);
 	void z80_sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_MEGASYS1_H

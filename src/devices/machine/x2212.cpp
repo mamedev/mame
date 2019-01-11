@@ -10,7 +10,22 @@
 
 #include "emu.h"
 #include "machine/x2212.h"
-#include <algorithm>
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+void x2212_device::x2212_sram_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+}
+
+void x2212_device::x2212_e2prom_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+}
+
 
 
 //**************************************************************************
@@ -25,15 +40,18 @@ DEFINE_DEVICE_TYPE(X2210, x2210_device, "x2210", "Xicor X2210 64x4 NOVRAM")
 //  x2212_device - constructor
 //-------------------------------------------------
 
-x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: x2212_device(mconfig, X2212, tag, owner, clock, 0x100)
 {
 }
 
-x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int size_data)
+x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size_data)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
 	, device_nvram_interface(mconfig, *this)
 	, m_auto_save(false)
+	, m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(x2212_device::x2212_sram_map), this))
+	, m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(x2212_device::x2212_e2prom_map), this))
 	, m_store(false)
 	, m_array_recall(false)
 	, m_size_data(size_data)
@@ -47,14 +65,24 @@ x2212_device::x2212_device(const machine_config &mconfig, device_type type, cons
 
 void x2212_device::device_start()
 {
-	m_sram = std::make_unique<u8[]>(m_size_data);
-	m_e2prom = std::make_unique<u8[]>(m_size_data);
-	std::fill_n(&m_sram[0], m_size_data, 0xff);
-
 	save_item(NAME(m_store));
 	save_item(NAME(m_array_recall));
-	save_pointer(NAME(m_sram), m_size_data);
-	save_pointer(NAME(m_e2prom), m_size_data);
+	m_sram = &space(0);
+	m_e2prom = &space(1);
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector x2212_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_sram_space_config),
+		std::make_pair(1, &m_e2prom_space_config)
+	};
 }
 
 
@@ -66,11 +94,18 @@ void x2212_device::device_start()
 void x2212_device::nvram_default()
 {
 	// default to all-0xff
-	std::fill_n(&m_e2prom[0], m_size_data, 0xff);
+	for (int byte = 0; byte < m_size_data; byte++)
+	{
+		m_sram->write_byte(byte, 0xff);
+		m_e2prom->write_byte(byte, 0xff);
+	}
 
 	// populate from a memory region if present
 	if (m_default_data.found())
-		std::copy_n(&m_default_data[0], m_size_data, &m_e2prom[0]);
+	{
+		for (int byte = 0; byte < m_size_data; byte++)
+			m_e2prom->write_byte(byte, m_default_data[byte]);
+	}
 }
 
 
@@ -81,7 +116,13 @@ void x2212_device::nvram_default()
 
 void x2212_device::nvram_read(emu_file &file)
 {
-	file.read(&m_e2prom[0], m_size_data);
+	auto buffer = std::make_unique<uint8_t[]>(m_size_data);
+	file.read(buffer.get(), m_size_data);
+	for (int byte = 0; byte < m_size_data; byte++)
+	{
+		m_sram->write_byte(byte, 0xff);
+		m_e2prom->write_byte(byte, buffer[byte]);
+	}
 }
 
 
@@ -94,9 +135,12 @@ void x2212_device::nvram_write(emu_file &file)
 {
 	// auto-save causes an implicit store prior to exiting (writing)
 	if (m_auto_save)
-		do_store();
+		store();
 
-	file.write(&m_e2prom[0], m_size_data);
+	uint8_t *buffer = (uint8_t *) alloca(m_size_data);
+	for (int byte = 0; byte < m_size_data; byte++)
+		buffer[byte] = m_e2prom->read_byte(byte);
+	file.write(buffer, m_size_data);
 }
 
 
@@ -106,24 +150,26 @@ void x2212_device::nvram_write(emu_file &file)
 //**************************************************************************
 
 //-------------------------------------------------
-//  do_store - store data from live RAM into the
+//  store - store data from live RAM into the
 //  EEPROM
 //-------------------------------------------------
 
-void x2212_device::do_store()
+void x2212_device::store()
 {
-	std::copy_n(&m_sram[0], m_size_data, &m_e2prom[0]);
+	for (int byte = 0; byte < m_size_data; byte++)
+		m_e2prom->write_byte(byte, m_sram->read_byte(byte));
 }
 
 
 //-------------------------------------------------
-//  do_recall - fetch data from the EEPROM into live
+//  recall - fetch data from the EEPROM into live
 //  RAM
 //-------------------------------------------------
 
-void x2212_device::do_recall()
+void x2212_device::recall()
 {
-	std::copy_n(&m_e2prom[0], m_size_data, &m_sram[0]);
+	for (int byte = 0; byte < m_size_data; byte++)
+		m_sram->write_byte(byte, m_e2prom->read_byte(byte));
 }
 
 
@@ -138,8 +184,7 @@ void x2212_device::do_recall()
 
 WRITE8_MEMBER( x2212_device::write )
 {
-	assert(offset < m_size_data);
-	m_sram[offset] = data & 0x0f;
+	m_sram->write_byte(offset, data & 0x0f);
 }
 
 
@@ -149,8 +194,7 @@ WRITE8_MEMBER( x2212_device::write )
 
 READ8_MEMBER( x2212_device::read )
 {
-	assert(offset < m_size_data);
-	return (m_sram[offset] & 0x0f) | (space.unmap() & 0xf0);
+	return (m_sram->read_byte(offset) & 0x0f) | (space.unmap() & 0xf0);
 }
 
 
@@ -162,7 +206,7 @@ READ8_MEMBER( x2212_device::read )
 WRITE_LINE_MEMBER( x2212_device::store )
 {
 	if (state != 0 && !m_store)
-		do_store();
+		store();
 	m_store = (state != 0);
 }
 
@@ -175,12 +219,12 @@ WRITE_LINE_MEMBER( x2212_device::store )
 WRITE_LINE_MEMBER( x2212_device::recall )
 {
 	if (state != 0 && !m_array_recall)
-		do_recall();
+		recall();
 	m_array_recall = (state != 0);
 }
 
 
-x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: x2212_device(mconfig, X2210, tag, owner, clock, 0x40)
 {
 }

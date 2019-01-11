@@ -18,7 +18,7 @@ Atari Triple Hunt Driver
 
 void triplhnt_state::init_triplhnt()
 {
-	subdevice<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
+	machine().device<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
 }
 
 
@@ -27,6 +27,31 @@ void triplhnt_state::set_collision(int code)
 	m_hit_code = code;
 
 	m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+
+WRITE_LINE_MEMBER(triplhnt_state::ram_2_w)
+{
+	if (state)
+		m_cmos[m_cmos_latch] = m_da_latch;
+}
+
+
+WRITE_LINE_MEMBER(triplhnt_state::sprite_zoom_w)
+{
+	m_sprite_zoom = state;
+}
+
+
+WRITE_LINE_MEMBER(triplhnt_state::sprite_bank_w)
+{
+	m_sprite_bank = state;
+}
+
+
+WRITE_LINE_MEMBER(triplhnt_state::lamp1_w)
+{
+	m_lamp = state ? 1 : 0;
 }
 
 
@@ -108,10 +133,10 @@ void triplhnt_state::triplhnt_map(address_map &map)
 	map(0x0c08, 0x0c08).portr("0C08");
 	map(0x0c09, 0x0c09).portr("0C09");
 	map(0x0c0a, 0x0c0a).portr("0C0A");
-	map(0x0c0b, 0x0c0b).r(FUNC(triplhnt_state::input_port_4_r));
-	map(0x0c10, 0x0c1f).r(FUNC(triplhnt_state::da_latch_r));
-	map(0x0c20, 0x0c2f).r(FUNC(triplhnt_state::cmos_r)).share("nvram");
-	map(0x0c30, 0x0c3f).r(FUNC(triplhnt_state::misc_r)).w(m_latch, FUNC(f9334_device::write_a0));
+	map(0x0c0b, 0x0c0b).r(this, FUNC(triplhnt_state::input_port_4_r));
+	map(0x0c10, 0x0c1f).r(this, FUNC(triplhnt_state::da_latch_r));
+	map(0x0c20, 0x0c2f).r(this, FUNC(triplhnt_state::cmos_r)).share("nvram");
+	map(0x0c30, 0x0c3f).r(this, FUNC(triplhnt_state::misc_r)).w(m_latch, FUNC(f9334_device::write_a0));
 	map(0x0c40, 0x0c40).portr("0C40");
 	map(0x0c48, 0x0c48).portr("0C48");
 	map(0x7000, 0x7fff).rom(); /* program */
@@ -258,64 +283,65 @@ static GFXDECODE_START( gfx_triplhnt )
 GFXDECODE_END
 
 
-void triplhnt_state::triplhnt_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(triplhnt_state, triplhnt)
 {
-	palette.set_pen_color(0, rgb_t(0xaf, 0xaf, 0xaf));  // sprites
+	palette.set_pen_color(0, rgb_t(0xAF, 0xAF, 0xAF));  /* sprites */
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(2, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(2, rgb_t(0xFF, 0xFF, 0xFF));
 	palette.set_pen_color(3, rgb_t(0x50, 0x50, 0x50));
-	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));  // tiles
-	palette.set_pen_color(5, rgb_t(0x3f, 0x3f, 0x3f));
+	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));  /* tiles */
+	palette.set_pen_color(5, rgb_t(0x3F, 0x3F, 0x3F));
 	palette.set_pen_color(6, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(7, rgb_t(0x3f, 0x3f, 0x3f));
+	palette.set_pen_color(7, rgb_t(0x3F, 0x3F, 0x3F));
 }
 
 
-void triplhnt_state::triplhnt(machine_config &config)
-{
-	/* basic machine hardware */
-	M6800(config, m_maincpu, 800000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &triplhnt_state::triplhnt_map);
-	m_maincpu->set_vblank_int("screen", FUNC(triplhnt_state::irq0_line_hold));
+MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // battery-backed 74C89 at J5
+/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M6800, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(triplhnt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", triplhnt_state,  irq0_line_hold)
 
-	F9334(config, m_latch); // J7
-	m_latch->q_out_cb<0>().set_nop(); // unused
-	m_latch->q_out_cb<1>().set([this] (int state) { m_lamp = state ? 1 : 0; });
-	m_latch->q_out_cb<1>().append(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_LAMP_EN>)); // Lamp is used to reset noise
-	m_latch->q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_SCREECH_EN>)); // screech
-	m_latch->q_out_cb<3>().set(FUNC(triplhnt_state::coin_lockout_w));
-	m_latch->q_out_cb<4>().set([this] (int state) { m_sprite_zoom = state; });
-	m_latch->q_out_cb<5>().set([this] (int state) { if (state) m_cmos[m_cmos_latch] = m_da_latch; }); // CMOS write
-	m_latch->q_out_cb<6>().set(FUNC(triplhnt_state::tape_control_w));
-	m_latch->q_out_cb<7>().set([this] (int state) { m_sprite_bank = state; });
-	m_latch->q_out_cb<7>().append(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_BEAR_EN>)); // bear
+	MCFG_NVRAM_ADD_0FILL("nvram") // battery-backed 74C89 at J5
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_DEVICE_ADD("latch", F9334, 0) // J7
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // unused
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, triplhnt_state, lamp1_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_LAMP_EN>)) // Lamp is used to reset noise
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_SCREECH_EN>)) // screech
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, triplhnt_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, triplhnt_state, sprite_zoom_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, triplhnt_state, ram_2_w)) // CMOS write
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, triplhnt_state, tape_control_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, triplhnt_state, sprite_bank_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("discrete", discrete_device, write_line<TRIPLHNT_BEAR_EN>)) // bear
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_size(256, 262);
-	screen.set_visarea(0, 255, 0, 239);
-	screen.set_screen_update(FUNC(triplhnt_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(256, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MCFG_SCREEN_UPDATE_DRIVER(triplhnt_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_triplhnt);
-	PALETTE(config, m_palette, FUNC(triplhnt_state::triplhnt_palette), 8);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triplhnt)
+	MCFG_PALETTE_ADD("palette", 8)
+	MCFG_PALETTE_INIT_OWNER(triplhnt_state, triplhnt)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(2);  /* 2 channels */
-	m_samples->set_samples_names(triplhnt_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.20);
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(2)  /* 2 channels */
+	MCFG_SAMPLES_NAMES(triplhnt_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	DISCRETE(config, m_discrete, triplhnt_discrete);
-	m_discrete->add_route(ALL_OUTPUTS, "mono", 0.90);
-}
+	MCFG_DEVICE_ADD("discrete", DISCRETE, triplhnt_discrete)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+MACHINE_CONFIG_END
 
 
 ROM_START( triplhnt )

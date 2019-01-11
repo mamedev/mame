@@ -82,15 +82,14 @@ Component Side   A   B   Solder Side
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class popobear_state : public driver_device
 {
 public:
-	popobear_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	popobear_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -104,9 +103,6 @@ public:
 		m_tilemap_base[3] = 0xfc000;
 	}
 
-	void popobear(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -135,6 +131,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 
 	void postload();
+	void popobear(machine_config &config);
 	void popobear_mem(address_map &map);
 };
 
@@ -414,7 +411,7 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			uint16_t val = m_vram[scrollbase/2 + line];
 			uint16_t upper = (m_vram[scrollbase2/2 + line]&0xff00)>>8;
 
-			clip.sety(line, line);
+			clip.min_y = clip.max_y = line;
 
 			m_bg_tilemap[1]->set_scrollx(0,(val&0x00ff) | (upper << 8));
 			m_bg_tilemap[1]->set_scrolly(0,((val&0xff00)>>8)-line);
@@ -439,7 +436,7 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			uint16_t val = m_vram[scrollbase/2 + line];
 			uint16_t upper = (m_vram[scrollbase2/2 + line]&0x00ff)>>0;
 
-			clip.sety(line, line);
+			clip.min_y = clip.max_y = line;
 
 			m_bg_tilemap[0]->set_scrollx(0,(val&0x00ff) | (upper << 8));
 			m_bg_tilemap[0]->set_scrolly(0,((val&0xff00)>>8)-line);
@@ -482,7 +479,7 @@ void popobear_state::popobear_mem(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x210000, 0x21ffff).ram();
 	map(0x280000, 0x2fffff).ram().share("spr"); // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
-	map(0x300000, 0x3fffff).ram().w(FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
+	map(0x300000, 0x3fffff).ram().w(this, FUNC(popobear_state::vram_w)).share("vram"); // tile definitions + tilemaps
 
 
 	/* Most if not all of these are vregs */
@@ -492,7 +489,7 @@ void popobear_state::popobear_mem(address_map &map)
 //  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(480020_r) AM_WRITE(480020_w)
 //  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(480028_w)
 //  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(48002c_w)
-	map(0x480031, 0x480031).w(FUNC(popobear_state::irq_ack_w));
+	map(0x480031, 0x480031).w(this, FUNC(popobear_state::irq_ack_w));
 	map(0x480034, 0x480035).ram(); // coin counter or coin lockout
 	map(0x48003a, 0x48003b).ram(); //AM_READ(48003a_r) AM_WRITE(48003a_w)
 
@@ -504,7 +501,7 @@ void popobear_state::popobear_mem(address_map &map)
 	map(0x550000, 0x550003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 
 	map(0x600000, 0x600001).nopw();
-	map(0x620000, 0x620000).r(FUNC(popobear_state::_620000_r));
+	map(0x620000, 0x620000).r(this, FUNC(popobear_state::_620000_r));
 	map(0x620000, 0x620001).nopw();
 	map(0x800000, 0xbfffff).rom();
 }
@@ -654,12 +651,13 @@ MACHINE_CONFIG_START(popobear_state::popobear)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(popobear_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_SCREEN_SIZE(128*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 239)
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256*2);
+	MCFG_PALETTE_ADD("palette", 256*2)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	SPEAKER(config, "mono").front_center();
 

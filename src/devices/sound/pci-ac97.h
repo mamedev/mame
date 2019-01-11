@@ -7,13 +7,11 @@
 
 #include "machine/pci.h"
 
+#define MCFG_AC97_ADD(_tag, _main_id, _revision, _subdevice_id) \
+		MCFG_PCI_DEVICE_ADD(_tag, AC97, _main_id, _revision, 0x040300, _subdevice_id)
+
 class ac97_device : public pci_device {
 public:
-	ac97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision, uint32_t subdevice_id)
-		: ac97_device(mconfig, tag, owner, clock)
-	{
-		set_ids(main_id, revision, 0x040300, subdevice_id);
-	}
 	ac97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:

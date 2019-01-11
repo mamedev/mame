@@ -5,14 +5,12 @@
  * includes/ac1.h
  *
  ****************************************************************************/
+
 #ifndef MAME_INCLUDES_AC1_H
 #define MAME_INCLUDES_AC1_H
 
-#pragma once
-
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
-#include "emupal.h"
 
 class ac1_state : public driver_device
 {

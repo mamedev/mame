@@ -33,13 +33,11 @@ public:
 	{
 	}
 
-	void digijet(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
+	void digijet(machine_config &config);
 	void io_map(address_map &map);
 };
 

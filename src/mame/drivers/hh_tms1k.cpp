@@ -71,7 +71,6 @@
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  *MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
- *MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
@@ -136,6 +135,7 @@
     but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
   - some of the games rely on the fact that faster/longer strobed leds appear brighter,
     eg. tc4/h2hfootb(offense), bankshot(cue ball), f3in1(ball), ...
+  - stopthiep: unable to start a game (may be intentional?)
   - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
   - arrball: shot button is unresponsive sometimes, maybe BTANB? no video of game on Youtube
     ROM is good, PLAs are good, input mux is good
@@ -160,6 +160,7 @@
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
+#include "rendlay.h"
 
 // internal artwork
 #include "7in1ss.lh"
@@ -529,23 +530,23 @@ INPUT_PORTS_END
 
 static const s16 matchnum_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-void matchnum_state::matchnum(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(matchnum_state::read_k));
-	m_maincpu->r().set(FUNC(matchnum_state::write_r));
-	m_maincpu->o().set(FUNC(matchnum_state::write_o));
+MACHINE_CONFIG_START(matchnum_state::matchnum)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_matchnum);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, matchnum_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, matchnum_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, matchnum_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_matchnum)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, matchnum_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(4, matchnum_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -629,23 +630,23 @@ INPUT_PORTS_END
 
 static const s16 arrball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-void arrball_state::arrball(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(arrball_state::read_k));
-	m_maincpu->r().set(FUNC(arrball_state::write_r));
-	m_maincpu->o().set(FUNC(arrball_state::write_o));
+MACHINE_CONFIG_START(arrball_state::arrball)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_arrball);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, arrball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, arrball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, arrball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_arrball)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, arrball_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(4, arrball_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -809,20 +810,20 @@ static const u16 mathmagi_output_pla[0x20] =
 	lA+lF+lE+lD+lC          // G
 };
 
-void mathmagi_state::mathmagi(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 175000); // approximation - RC osc. R=68K, C=82pF
-	m_maincpu->set_output_pla(mathmagi_output_pla);
-	m_maincpu->k().set(FUNC(mathmagi_state::read_k));
-	m_maincpu->r().set(FUNC(mathmagi_state::write_r));
-	m_maincpu->o().set(FUNC(mathmagi_state::write_o));
+MACHINE_CONFIG_START(mathmagi_state::mathmagi)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_mathmagi);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 175000) // approximation - RC osc. R=68K, C=82pF
+	MCFG_TMS1XXX_OUTPUT_PLA(mathmagi_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mathmagi_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mathmagi_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mathmagi_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mathmagi)
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
 
 
@@ -915,18 +916,18 @@ static INPUT_PORTS_START( bcheetah )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 INPUT_PORTS_END
 
-void bcheetah_state::bcheetah(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 100000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(bcheetah_state::read_k));
-	m_maincpu->r().set(FUNC(bcheetah_state::write_r));
-	m_maincpu->o().set(FUNC(bcheetah_state::write_o));
+MACHINE_CONFIG_START(bcheetah_state::bcheetah)
 
-	config.set_default_layout(layout_bcheetah);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 100000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bcheetah_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bcheetah_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bcheetah_state, write_o))
+
+	MCFG_DEFAULT_LAYOUT(layout_bcheetah)
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
 
 
@@ -1042,22 +1043,22 @@ static INPUT_PORTS_START( amaztron )
 	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void amaztron_state::amaztron(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=33K?, C=100pF
-	m_maincpu->k().set(FUNC(amaztron_state::read_k));
-	m_maincpu->r().set(FUNC(amaztron_state::write_r));
-	m_maincpu->o().set(FUNC(amaztron_state::write_o));
+MACHINE_CONFIG_START(amaztron_state::amaztron)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_amaztron);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // approximation - RC osc. R=33K?, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, amaztron_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, amaztron_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, amaztron_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_amaztron)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -1219,23 +1220,23 @@ static const u16 zodiac_output_pla[0x20] =
 	lB+lC+lD+lE+lF          // U
 };
 
-void zodiac_state::zodiac(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 500000); // approximation - RC osc. R=18K, C=100pF
-	m_maincpu->set_output_pla(zodiac_output_pla);
-	m_maincpu->k().set(FUNC(zodiac_state::read_k));
-	m_maincpu->r().set(FUNC(zodiac_state::write_r));
-	m_maincpu->o().set(FUNC(zodiac_state::write_o));
+MACHINE_CONFIG_START(zodiac_state::zodiac)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_zodiac);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 500000) // approximation - RC osc. R=18K, C=100pF
+	MCFG_TMS1XXX_OUTPUT_PLA(zodiac_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, zodiac_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, zodiac_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, zodiac_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_zodiac)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -1335,22 +1336,22 @@ static INPUT_PORTS_START( cqback )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-void cqback_state::cqback(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(cqback_state::read_k));
-	m_maincpu->r().set(FUNC(cqback_state::write_r));
-	m_maincpu->o().set(FUNC(cqback_state::write_o));
+MACHINE_CONFIG_START(cqback_state::cqback)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_cqback);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=33K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cqback_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cqback_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cqback_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cqback)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -1453,22 +1454,22 @@ static INPUT_PORTS_START( h2hfootb )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-void h2hfootb_state::h2hfootb(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 310000); // approximation - RC osc. R=39K, C=100pF
-	m_maincpu->k().set(FUNC(h2hfootb_state::read_k));
-	m_maincpu->r().set(FUNC(h2hfootb_state::write_r));
-	m_maincpu->o().set(FUNC(h2hfootb_state::write_o));
+MACHINE_CONFIG_START(h2hfootb_state::h2hfootb)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_h2hfootb);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 310000) // approximation - RC osc. R=39K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hfootb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hfootb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hfootb_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hfootb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -1594,24 +1595,24 @@ void h2hhockey_state::machine_start()
 	save_item(NAME(m_cap));
 }
 
-void h2hhockey_state::h2hhockey(machine_config &config)
-{
+MACHINE_CONFIG_START(h2hhockey_state::h2hhockey)
+
 	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=100pF
-	m_maincpu->k().set(FUNC(h2hhockey_state::read_k));
-	m_maincpu->r().set(FUNC(h2hhockey_state::write_r));
-	m_maincpu->o().set(FUNC(h2hhockey_state::write_o));
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hhockey_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hhockey_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hhockey_state, write_o))
 
-	TIMER(config, "cap_empty").configure_generic(FUNC(h2hhockey_state::cap_empty_callback));
+	MCFG_TIMER_DRIVER_ADD("cap_empty", h2hhockey_state, cap_empty_callback)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_h2hhockey);
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hhockey)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -1735,22 +1736,22 @@ void h2hbaseb_state::machine_reset()
 	set_clock();
 }
 
-void h2hbaseb_state::h2hbaseb(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1170(config, m_maincpu, 350000); // see set_clock
-	m_maincpu->k().set(FUNC(h2hbaseb_state::read_k));
-	m_maincpu->r().set(FUNC(h2hbaseb_state::write_r));
-	m_maincpu->o().set(FUNC(h2hbaseb_state::write_o));
+MACHINE_CONFIG_START(h2hbaseb_state::h2hbaseb)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_h2hbaseb);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1170, 350000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hbaseb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hbaseb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hbaseb_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hbaseb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -1847,22 +1848,22 @@ static INPUT_PORTS_START( h2hboxing )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Block")
 INPUT_PORTS_END
 
-void h2hboxing_state::h2hboxing(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=39K, C=100pF
-	m_maincpu->k().set(FUNC(h2hboxing_state::read_k));
-	m_maincpu->r().set(FUNC(h2hboxing_state::write_r));
-	m_maincpu->o().set(FUNC(h2hboxing_state::write_o));
+MACHINE_CONFIG_START(h2hboxing_state::h2hboxing)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_h2hboxing);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=39K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, h2hboxing_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, h2hboxing_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, h2hboxing_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_h2hboxing)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -2018,28 +2019,28 @@ void quizwizc_state::machine_start()
 	save_item(NAME(m_pinout));
 }
 
-void quizwizc_state::quizwizc(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 300000); // approximation - RC osc. R=43K, C=100pF
-	m_maincpu->k().set(FUNC(quizwizc_state::read_k));
-	m_maincpu->r().set(FUNC(quizwizc_state::write_r));
-	m_maincpu->o().set(FUNC(quizwizc_state::write_o));
+MACHINE_CONFIG_START(quizwizc_state::quizwizc)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_quizwizc);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, quizwizc_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, quizwizc_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, quizwizc_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_quizwizc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "quizwiz_cart"));
-	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(device_image_load_delegate(&quizwizc_state::device_image_load_cartridge, this));
-	SOFTWARE_LIST(config, "cart_list").set_original("quizwiz");
-}
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "quizwiz_cart")
+	MCFG_GENERIC_MANDATORY
+	MCFG_GENERIC_LOAD(quizwizc_state, cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "quizwiz")
+MACHINE_CONFIG_END
 
 
 
@@ -2194,29 +2195,28 @@ void tc4_state::machine_start()
 	save_item(NAME(m_pinout));
 }
 
-void tc4_state::tc4(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=27.3K, C=100pF
-	m_maincpu->k().set(FUNC(tc4_state::read_k));
-	m_maincpu->r().set(FUNC(tc4_state::write_r));
-	m_maincpu->o().set(FUNC(tc4_state::write_o));
+MACHINE_CONFIG_START(tc4_state::tc4)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_tc4);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=27.3K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tc4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tc4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tc4_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tc4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tc4_cart"));
-	cartslot.set_must_be_loaded(true); // system won't power on without cartridge
-	cartslot.set_device_load(device_image_load_delegate(&tc4_state::device_image_load_cartridge, this));
-
-	SOFTWARE_LIST(config, "cart_list").set_original("tc4");
-}
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tc4_cart")
+	MCFG_GENERIC_MANDATORY // system won't power on without cartridge
+	MCFG_GENERIC_LOAD(tc4_state, cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "tc4")
+MACHINE_CONFIG_END
 
 
 
@@ -2310,22 +2310,22 @@ static INPUT_PORTS_START( cnbaskb )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void cnbaskb_state::cnbaskb(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(cnbaskb_state::read_k));
-	m_maincpu->r().set(FUNC(cnbaskb_state::write_r));
-	m_maincpu->o().set(FUNC(cnbaskb_state::write_o));
+MACHINE_CONFIG_START(cnbaskb_state::cnbaskb)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_cnbaskb);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnbaskb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnbaskb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnbaskb_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cnbaskb)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -2423,22 +2423,22 @@ static INPUT_PORTS_START( cmsport )
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
 
-void cmsport_state::cmsport(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(cmsport_state::read_k));
-	m_maincpu->r().set(FUNC(cmsport_state::write_r));
-	m_maincpu->o().set(FUNC(cmsport_state::write_o));
+MACHINE_CONFIG_START(cmsport_state::cmsport)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_cmsport);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cmsport_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cmsport_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cmsport_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cmsport)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -2549,23 +2549,23 @@ INPUT_PORTS_END
 
 static const s16 cnfball_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-void cnfball_state::cnfball(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(cnfball_state::read_k));
-	m_maincpu->r().set(FUNC(cnfball_state::write_r));
-	m_maincpu->o().set(FUNC(cnfball_state::write_o));
+MACHINE_CONFIG_START(cnfball_state::cnfball)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_cnfball);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnfball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnfball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnfball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cnfball)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, cnfball_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(4, cnfball_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -2675,23 +2675,23 @@ static const u16 cnfball2_output_pla[0x20] =
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void cnfball2_state::cnfball2(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->set_output_pla(cnfball2_output_pla);
-	m_maincpu->k().set(FUNC(cnfball2_state::read_k));
-	m_maincpu->r().set(FUNC(cnfball2_state::write_r));
-	m_maincpu->o().set(FUNC(cnfball2_state::write_o));
+MACHINE_CONFIG_START(cnfball2_state::cnfball2)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_cnfball2);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_OUTPUT_PLA(cnfball2_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnfball2_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnfball2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnfball2_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cnfball2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -2817,22 +2817,22 @@ INPUT_CHANGED_MEMBER(eleciq_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void eleciq_state::eleciq(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=47K, C=50pF
-	m_maincpu->k().set(FUNC(eleciq_state::read_k));
-	m_maincpu->r().set(FUNC(eleciq_state::write_r));
-	m_maincpu->o().set(FUNC(eleciq_state::write_o));
+MACHINE_CONFIG_START(eleciq_state::eleciq)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_eleciq);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=50pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, eleciq_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, eleciq_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, eleciq_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_eleciq)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -2922,22 +2922,22 @@ static INPUT_PORTS_START( esoccer )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-void esoccer_state::esoccer(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=33pF
-	m_maincpu->k().set(FUNC(esoccer_state::read_k));
-	m_maincpu->r().set(FUNC(esoccer_state::write_r));
-	m_maincpu->o().set(FUNC(esoccer_state::write_o));
+MACHINE_CONFIG_START(esoccer_state::esoccer)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_esoccer);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=33pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, esoccer_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, esoccer_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, esoccer_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_esoccer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -3056,22 +3056,22 @@ static INPUT_PORTS_START( ebball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Batter")
 INPUT_PORTS_END
 
-void ebball_state::ebball(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 375000); // approximation - RC osc. R=43K, C=47pF
-	m_maincpu->k().set(FUNC(ebball_state::read_k));
-	m_maincpu->r().set(FUNC(ebball_state::write_r));
-	m_maincpu->o().set(FUNC(ebball_state::write_o));
+MACHINE_CONFIG_START(ebball_state::ebball)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_ebball);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=43K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ebball)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -3179,22 +3179,22 @@ static INPUT_PORTS_START( ebball2 )
 	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void ebball2_state::ebball2(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ebball2_state::read_k));
-	m_maincpu->r().set(FUNC(ebball2_state::write_r));
-	m_maincpu->o().set(FUNC(ebball2_state::write_o));
+MACHINE_CONFIG_START(ebball2_state::ebball2)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_ebball2);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball2_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball2_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ebball2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -3359,22 +3359,22 @@ void ebball3_state::machine_reset()
 	set_clock();
 }
 
-void ebball3_state::ebball3(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 340000); // see set_clock
-	m_maincpu->k().set(FUNC(ebball3_state::read_k));
-	m_maincpu->r().set(FUNC(ebball3_state::write_r));
-	m_maincpu->o().set(FUNC(ebball3_state::write_o));
+MACHINE_CONFIG_START(ebball3_state::ebball3)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_ebball3);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 340000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebball3_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebball3_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebball3_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ebball3)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -3470,22 +3470,22 @@ static INPUT_PORTS_START( esbattle )
 	PORT_CONFSETTING(    0x00, "2" ) // Manual
 INPUT_PORTS_END
 
-void esbattle_state::esbattle(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 425000); // approximation - RC osc. R=47K, C=33pF
-	m_maincpu->k().set(FUNC(esbattle_state::read_k));
-	m_maincpu->r().set(FUNC(esbattle_state::write_r));
-	m_maincpu->o().set(FUNC(esbattle_state::write_o));
+MACHINE_CONFIG_START(esbattle_state::esbattle)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_esbattle);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 425000) // approximation - RC osc. R=47K, C=33pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, esbattle_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, esbattle_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, esbattle_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_esbattle)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -3579,28 +3579,27 @@ void einvader_state::machine_reset()
 	set_clock();
 }
 
-void einvader_state::einvader(machine_config &config)
-{
+MACHINE_CONFIG_START(einvader_state::einvader)
+
 	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 320000); // see set_clock
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(einvader_state::write_r));
-	m_maincpu->o().set(FUNC(einvader_state::write_o));
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 320000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, einvader_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, einvader_state, write_o))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(939, 1080);
-	screen.set_visarea(0, 939-1, 0, 1080-1);
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_einvader);
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(939, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 939-1, 0, 1080-1)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_einvader)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -3700,22 +3699,22 @@ static INPUT_PORTS_START( efootb4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void efootb4_state::efootb4(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1670(config, m_maincpu, 475000); // approximation - RC osc. R=42K, C=47pF
-	m_maincpu->k().set(FUNC(efootb4_state::read_k));
-	m_maincpu->r().set(FUNC(efootb4_state::write_r));
-	m_maincpu->o().set(FUNC(efootb4_state::write_o));
+MACHINE_CONFIG_START(efootb4_state::efootb4)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_efootb4);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1670, 475000) // approximation - RC osc. R=42K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, efootb4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, efootb4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, efootb4_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_efootb4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -3821,22 +3820,22 @@ static INPUT_PORTS_START( ebaskb2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-void ebaskb2_state::ebaskb2(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 360000); // approximation - RC osc. R=33K, C=82pF
-	m_maincpu->k().set(FUNC(ebaskb2_state::read_k));
-	m_maincpu->r().set(FUNC(ebaskb2_state::write_r));
-	m_maincpu->o().set(FUNC(ebaskb2_state::write_o));
+MACHINE_CONFIG_START(ebaskb2_state::ebaskb2)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_ebaskb2);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 360000) // approximation - RC osc. R=33K, C=82pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ebaskb2_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ebaskb2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ebaskb2_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ebaskb2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -3960,22 +3959,22 @@ void raisedvl_state::machine_reset()
 	set_clock();
 }
 
-void raisedvl_state::raisedvl(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 350000); // see set_clock
-	m_maincpu->k().set(FUNC(raisedvl_state::read_k));
-	m_maincpu->r().set(FUNC(raisedvl_state::write_r));
-	m_maincpu->o().set(FUNC(raisedvl_state::write_o));
+MACHINE_CONFIG_START(raisedvl_state::raisedvl)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_raisedvl);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, raisedvl_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, raisedvl_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, raisedvl_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_raisedvl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -4091,22 +4090,22 @@ INPUT_CHANGED_MEMBER(f2pbball_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void f2pbball_state::f2pbball(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=39pF
-	m_maincpu->k().set(FUNC(f2pbball_state::read_k));
-	m_maincpu->r().set(FUNC(f2pbball_state::write_r));
-	m_maincpu->o().set(FUNC(f2pbball_state::write_o));
+MACHINE_CONFIG_START(f2pbball_state::f2pbball)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_f2pbball);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=51K, C=39pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, f2pbball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, f2pbball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, f2pbball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_f2pbball)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -4228,22 +4227,22 @@ void f3in1_state::machine_reset()
 	set_clock();
 }
 
-void f3in1_state::f3in1(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 300000); // see set_clock
-	m_maincpu->k().set(FUNC(f3in1_state::read_k));
-	m_maincpu->r().set(FUNC(f3in1_state::write_r));
-	m_maincpu->o().set(FUNC(f3in1_state::write_o));
+MACHINE_CONFIG_START(f3in1_state::f3in1)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_f3in1);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, f3in1_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, f3in1_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, f3in1_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_f3in1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -4373,22 +4372,22 @@ void gpoker_state::machine_reset()
 	m_beeper->set_state(0);
 }
 
-void gpoker_state::gpoker(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1370(config, m_maincpu, 350000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(gpoker_state::read_k));
-	m_maincpu->r().set(FUNC(gpoker_state::write_r));
-	m_maincpu->o().set(FUNC(gpoker_state::write_o));
+MACHINE_CONFIG_START(gpoker_state::gpoker)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_gpoker);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1370, 350000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, gpoker_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, gpoker_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, gpoker_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_gpoker)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2405); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("beeper", BEEP, 2405) // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -4486,22 +4485,22 @@ static INPUT_PORTS_START( gjackpot )
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void gjackpot_state::gjackpot(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1670(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(gpoker_state::read_k));
-	m_maincpu->r().set(FUNC(gjackpot_state::write_r));
-	m_maincpu->o().set(FUNC(gpoker_state::write_o));
+MACHINE_CONFIG_START(gjackpot_state::gjackpot)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_gjackpot);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1670, 450000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, gpoker_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, gjackpot_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, gpoker_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_gjackpot)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2405); // see gpoker
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("beeper", BEEP, 2405) // see gpoker
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -4591,27 +4590,27 @@ static INPUT_PORTS_START( ginv1000 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
 
-void ginv1000_state::ginv1000(machine_config &config)
-{
+MACHINE_CONFIG_START(ginv1000_state::ginv1000)
+
 	/* basic machine hardware */
-	TMS1370(config, m_maincpu, 340000); // approximation
-	m_maincpu->k().set(FUNC(ginv1000_state::read_k));
-	m_maincpu->r().set(FUNC(ginv1000_state::write_r));
-	m_maincpu->o().set(FUNC(ginv1000_state::write_o));
+	MCFG_DEVICE_ADD("maincpu", TMS1370, 340000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ginv1000_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ginv1000_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ginv1000_state, write_o))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(226, 1080);
-	screen.set_visarea(0, 226-1, 0, 1080-1);
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(226, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 226-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -4721,33 +4720,33 @@ void ginv2000_state::machine_reset()
 	m_expander->write_ms(1); // Vss
 }
 
-void ginv2000_state::ginv2000(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1370(config, m_maincpu, 425000); // approximation - RC osc. R=36K, C=47pF
-	m_maincpu->k().set(FUNC(ginv2000_state::read_k));
-	m_maincpu->r().set(FUNC(ginv2000_state::write_r));
-	m_maincpu->o().set(FUNC(ginv2000_state::write_o));
+MACHINE_CONFIG_START(ginv2000_state::ginv2000)
 
-	TMS1024(config, m_expander);
-	m_expander->write_port4_callback().set(FUNC(ginv2000_state::expander_w));
-	m_expander->write_port5_callback().set(FUNC(ginv2000_state::expander_w));
-	m_expander->write_port6_callback().set(FUNC(ginv2000_state::expander_w));
-	m_expander->write_port7_callback().set(FUNC(ginv2000_state::expander_w));
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1370, 425000) // approximation - RC osc. R=36K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ginv2000_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ginv2000_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ginv2000_state, write_o))
+
+	MCFG_DEVICE_ADD("expander", TMS1024, 0)
+	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, ginv2000_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, ginv2000_state, expander_w))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
-	screen.set_svg_region("svg");
-	screen.set_refresh_hz(50);
-	screen.set_size(364, 1080);
-	screen.set_visarea(0, 364-1, 0, 1080-1);
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(364, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 364-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -4870,22 +4869,22 @@ static INPUT_PORTS_START( fxmcr165 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Address Set")
 INPUT_PORTS_END
 
-void fxmcr165_state::fxmcr165(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 400_kHz_XTAL);
-	m_maincpu->k().set(FUNC(fxmcr165_state::read_k));
-	m_maincpu->r().set(FUNC(fxmcr165_state::write_r));
-	m_maincpu->o().set(FUNC(fxmcr165_state::write_o));
+MACHINE_CONFIG_START(fxmcr165_state::fxmcr165)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_fxmcr165);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 400_kHz_XTAL)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, fxmcr165_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, fxmcr165_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, fxmcr165_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fxmcr165)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -4998,24 +4997,24 @@ INPUT_PORTS_END
 
 static const s16 elecdet_speaker_levels[4] = { 0, 0x3fff, 0x3fff, 0x7fff };
 
-void elecdet_state::elecdet(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS0980(config, m_maincpu, 425000); // approximation
-	m_maincpu->k().set(FUNC(elecdet_state::read_k));
-	m_maincpu->r().set(FUNC(elecdet_state::write_r));
-	m_maincpu->o().set(FUNC(elecdet_state::write_o));
-	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+MACHINE_CONFIG_START(elecdet_state::elecdet)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_elecdet);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS0980, 425000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, elecdet_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, elecdet_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, elecdet_state, write_o))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_elecdet)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, elecdet_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(4, elecdet_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -5126,22 +5125,22 @@ static INPUT_PORTS_START( starwbc )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right")
 INPUT_PORTS_END
 
-void starwbc_state::starwbc(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 325000); // approximation - RC osc. R=51K, C=47pF
-	m_maincpu->k().set(FUNC(starwbc_state::read_k));
-	m_maincpu->r().set(FUNC(starwbc_state::write_r));
-	m_maincpu->o().set(FUNC(starwbc_state::write_o));
+MACHINE_CONFIG_START(starwbc_state::starwbc)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_starwbc);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 325000) // approximation - RC osc. R=51K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, starwbc_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, starwbc_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, starwbc_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_starwbc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -5253,19 +5252,19 @@ static INPUT_PORTS_START( astro )
 	PORT_CONFSETTING(    0x08, "Astro" )
 INPUT_PORTS_END
 
-void astro_state::astro(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1470(config, m_maincpu, 450000); // approximation - RC osc. R=4.7K, C=33pF
-	m_maincpu->k().set(FUNC(astro_state::read_k));
-	m_maincpu->r().set(FUNC(astro_state::write_r));
-	m_maincpu->o().set(FUNC(astro_state::write_o));
+MACHINE_CONFIG_START(astro_state::astro)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_astro);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1470, 450000) // approximation - RC osc. R=4.7K, C=33pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, astro_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, astro_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, astro_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_astro)
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
 
 
@@ -5418,23 +5417,23 @@ static const u16 elecbowl_output_pla[0x20] =
 	0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f
 };
 
-void elecbowl_state::elecbowl(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->set_output_pla(elecbowl_output_pla);
-	m_maincpu->k().set(FUNC(elecbowl_state::read_k));
-	m_maincpu->r().set(FUNC(elecbowl_state::write_r));
-	m_maincpu->o().set(FUNC(elecbowl_state::write_o));
+MACHINE_CONFIG_START(elecbowl_state::elecbowl)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_elecbowl);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pF
+	MCFG_TMS1XXX_OUTPUT_PLA(elecbowl_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, elecbowl_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, elecbowl_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, elecbowl_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_elecbowl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -5575,21 +5574,21 @@ static INPUT_PORTS_START( horseran )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
 INPUT_PORTS_END
 
-void horseran_state::horseran(machine_config &config)
-{
+MACHINE_CONFIG_START(horseran_state::horseran)
+
 	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 300000); // approximation - RC osc. R=56K, C=47pF
-	m_maincpu->k().set(FUNC(horseran_state::read_k));
-	m_maincpu->r().set(FUNC(horseran_state::write_r));
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 300000) // approximation - RC osc. R=56K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, horseran_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, horseran_state, write_r))
 
 	/* video hardware */
-	HLCD0569(config, m_lcd, 1100); // C=0.022uF
-	m_lcd->write_cols().set(FUNC(horseran_state::lcd_output_w));
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_horseran);
+	MCFG_DEVICE_ADD("lcd", HLCD0569, 1100) // C=0.022uF
+	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(*this, horseran_state, lcd_output_w))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_horseran)
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
 
 
@@ -5754,22 +5753,22 @@ static INPUT_PORTS_START( mdndclab )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Dragon Attacks / Dragon Wakes")
 INPUT_PORTS_END
 
-void mdndclab_state::mdndclab(machine_config &config)
-{
+MACHINE_CONFIG_START(mdndclab_state::mdndclab)
+
 	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 475000); // approximation - RC osc. R=27K, C=100pF
-	m_maincpu->k().set(FUNC(mdndclab_state::read_k));
-	m_maincpu->r().set(FUNC(mdndclab_state::write_r));
-	m_maincpu->o().set(FUNC(mdndclab_state::write_o));
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 475000) // approximation - RC osc. R=27K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mdndclab_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mdndclab_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mdndclab_state, write_o))
 
 	/* no visual feedback! */
-	config.set_default_layout(layout_mdndclab); // playing board
+	MCFG_DEFAULT_LAYOUT(layout_mdndclab) // playing board
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -5858,19 +5857,19 @@ static INPUT_PORTS_START( comp4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 INPUT_PORTS_END
 
-void comp4_state::comp4(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(comp4_state::read_k));
-	m_maincpu->r().set(FUNC(comp4_state::write_r));
-	m_maincpu->o().set(FUNC(comp4_state::write_o));
+MACHINE_CONFIG_START(comp4_state::comp4)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_comp4);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS0970, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, comp4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, comp4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, comp4_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_comp4)
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
 
 
@@ -6008,20 +6007,20 @@ static INPUT_PORTS_START( bship )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Clear Last Entry")
 INPUT_PORTS_END
 
-void bship_state::bship(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set(FUNC(bship_state::read_k));
-	m_maincpu->r().set(FUNC(bship_state::write_r));
-	m_maincpu->o().set(FUNC(bship_state::write_o));
+MACHINE_CONFIG_START(bship_state::bship)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_bship);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bship_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bship_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bship_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bship)
 
 	/* sound hardware */
 	// TODO
-}
+MACHINE_CONFIG_END
 
 
 
@@ -6111,35 +6110,35 @@ READ8_MEMBER(bshipb_state::read_k)
 
 // buttons are same as bship set
 
-void bshipb_state::bshipb(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set(FUNC(bshipb_state::read_k));
-	m_maincpu->r().set(FUNC(bshipb_state::write_r));
-	m_maincpu->o().set(FUNC(bshipb_state::write_o));
+MACHINE_CONFIG_START(bshipb_state::bshipb)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_bship);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bshipb_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bshipb_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bshipb_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bship)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SN76477(config, m_sn);
-	m_sn->set_noise_params(RES_K(47), RES_K(100), CAP_P(47));   // R18, R17, C8
-	m_sn->set_decay_res(RES_M(3.3));                            // R16
-	m_sn->set_attack_params(CAP_U(0.47), RES_K(15));            // C7, R20
-	m_sn->set_amp_res(RES_K(100));                              // R19
-	m_sn->set_feedback_res(RES_K(39));                          // R7
-	m_sn->set_vco_params(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270)); // R15/R14, C5, switchable R5/R3/R4
-	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(22), RES_K(750));    // switchable C4, switchable R13/R12
-	m_sn->set_oneshot_params(0, RES_INF);           // NC, switchable R11
-	m_sn->set_vco_mode(0);                          // switchable
-	m_sn->set_mixer_params(0, 0, 0);                // switchable, GND, GND
-	m_sn->set_envelope_params(1, 0);                // Vreg, GND
-	m_sn->set_enable(0);                            // switchable
-	m_sn->add_route(ALL_OUTPUTS, "mono", 0.35);
-}
+	MCFG_DEVICE_ADD("sn76477", SN76477)
+	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(100), CAP_P(47)) // R18, R17, C8
+	MCFG_SN76477_DECAY_RES(RES_M(3.3))                          // R16
+	MCFG_SN76477_ATTACK_PARAMS(CAP_U(0.47), RES_K(15))          // C7, R20
+	MCFG_SN76477_AMP_RES(RES_K(100))                            // R19
+	MCFG_SN76477_FEEDBACK_RES(RES_K(39))                        // R7
+	MCFG_SN76477_VCO_PARAMS(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270)) // R15/R14, C5, switchable R5/R3/R4
+	MCFG_SN76477_PITCH_VOLTAGE(5.0)
+	MCFG_SN76477_SLF_PARAMS(CAP_U(22), RES_K(750))  // switchable C4, switchable R13/R12
+	MCFG_SN76477_ONESHOT_PARAMS(0, RES_INF)         // NC, switchable R11
+	MCFG_SN76477_VCO_MODE(0)                        // switchable
+	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)              // switchable, GND, GND
+	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)              // Vreg, GND
+	MCFG_SN76477_ENABLE(0)                          // switchable
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+MACHINE_CONFIG_END
 
 
 
@@ -6229,21 +6228,21 @@ static INPUT_PORTS_START( simon )
 	PORT_CONFSETTING(    0x01, "4" )
 INPUT_PORTS_END
 
-void simon_state::simon(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(simon_state::read_k));
-	m_maincpu->r().set(FUNC(simon_state::write_r));
+MACHINE_CONFIG_START(simon_state::simon)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_simon);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation - RC osc. R=33K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, simon_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, simon_state, write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_simon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -6370,21 +6369,21 @@ void ssimon_state::machine_reset()
 	set_clock();
 }
 
-void ssimon_state::ssimon(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 275000); // see set_clock
-	m_maincpu->k().set(FUNC(ssimon_state::read_k));
-	m_maincpu->r().set(FUNC(ssimon_state::write_r));
+MACHINE_CONFIG_START(ssimon_state::ssimon)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_ssimon);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 275000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ssimon_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ssimon_state, write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ssimon)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -6550,24 +6549,24 @@ void bigtrak_state::machine_start()
 
 static const s16 bigtrak_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-void bigtrak_state::bigtrak(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=83K, C=100pF
-	m_maincpu->k().set(FUNC(bigtrak_state::read_k));
-	m_maincpu->r().set(FUNC(bigtrak_state::write_r));
-	m_maincpu->o().set(FUNC(bigtrak_state::write_o));
+MACHINE_CONFIG_START(bigtrak_state::bigtrak)
 
-	TIMER(config, "gearbox").configure_periodic(FUNC(bigtrak_state::gearbox_sim_tick), attotime::from_msec(1));
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_bigtrak);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=83K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bigtrak_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bigtrak_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bigtrak_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("gearbox", bigtrak_state, gearbox_sim_tick, attotime::from_msec(1))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bigtrak)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, bigtrak_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(8, bigtrak_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -6783,23 +6782,23 @@ void mbdtower_state::machine_start()
 	save_item(NAME(m_sensor_blind));
 }
 
-void mbdtower_state::mbdtower(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=43K, C=56pF
-	m_maincpu->k().set(FUNC(mbdtower_state::read_k));
-	m_maincpu->r().set(FUNC(mbdtower_state::write_r));
-	m_maincpu->o().set(FUNC(mbdtower_state::write_o));
+MACHINE_CONFIG_START(mbdtower_state::mbdtower)
 
-	TIMER(config, "tower_motor").configure_periodic(FUNC(mbdtower_state::motor_sim_tick), attotime::from_msec(3500/0x80)); // ~3.5sec for a full rotation
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_mbdtower);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=43K, C=56pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mbdtower_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mbdtower_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mbdtower_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("tower_motor", mbdtower_state, motor_sim_tick, attotime::from_msec(3500/0x80)) // ~3.5sec for a full rotation
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mbdtower)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -6894,23 +6893,23 @@ INPUT_PORTS_END
 
 static const s16 arcmania_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-void arcmania_state::arcmania(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=100pF
-	m_maincpu->k().set(FUNC(arcmania_state::read_k));
-	m_maincpu->r().set(FUNC(arcmania_state::write_r));
-	m_maincpu->o().set(FUNC(arcmania_state::write_o));
+MACHINE_CONFIG_START(arcmania_state::arcmania)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_arcmania);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 250000) // approximation - RC osc. R=56K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, arcmania_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, arcmania_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, arcmania_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_arcmania)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, arcmania_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(8, arcmania_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7013,19 +7012,19 @@ static INPUT_PORTS_START( cnsector )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Teach Mode")
 INPUT_PORTS_END
 
-void cnsector_state::cnsector(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS0970(config, m_maincpu, 250000); // approximation
-	m_maincpu->k().set(FUNC(cnsector_state::read_k));
-	m_maincpu->r().set(FUNC(cnsector_state::write_r));
-	m_maincpu->o().set(FUNC(cnsector_state::write_o));
+MACHINE_CONFIG_START(cnsector_state::cnsector)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_cnsector);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS0970, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cnsector_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cnsector_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cnsector_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cnsector)
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
 
 
@@ -7127,23 +7126,23 @@ INPUT_PORTS_END
 
 static const s16 merlin_speaker_levels[8] = { 0, 0x7fff/3, 0x7fff/3, 0x7fff/3*2, 0x7fff/3, 0x7fff/3*2, 0x7fff/3*2, 0x7fff };
 
-void merlin_state::merlin(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 350000); // approximation - RC osc. R=33K, C=100pF
-	m_maincpu->k().set(FUNC(merlin_state::read_k));
-	m_maincpu->r().set(FUNC(merlin_state::write_r));
-	m_maincpu->o().set(FUNC(merlin_state::write_o));
+MACHINE_CONFIG_START(merlin_state::merlin)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_merlin);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 350000) // approximation - RC osc. R=33K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, merlin_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, merlin_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, merlin_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_merlin)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, merlin_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(8, merlin_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7192,23 +7191,23 @@ static INPUT_PORTS_START( mmerlin )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Score") // instead of Hit Me
 INPUT_PORTS_END
 
-void mmerlin_state::mmerlin(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 425000); // approximation - RC osc. R=30K, C=100pF
-	m_maincpu->k().set(FUNC(mmerlin_state::read_k));
-	m_maincpu->r().set(FUNC(mmerlin_state::write_r));
-	m_maincpu->o().set(FUNC(mmerlin_state::write_o));
+MACHINE_CONFIG_START(mmerlin_state::mmerlin)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_mmerlin);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 425000) // approximation - RC osc. R=30K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, mmerlin_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mmerlin_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, mmerlin_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mmerlin)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(8, merlin_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(8, merlin_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7223,7 +7222,6 @@ void mmerlin_state::mmerlin(machine_config &config)
   Stop Thief is actually a board game, the electronic device emulated here
   (called Electronic Crime Scanner) is an accessory. To start a game, press
   the ON button. Otherwise, it is in test-mode where you can hear all sounds.
-  For the patent romset, it needs to be turned off and on to exit test mode.
 
 ***************************************************************************/
 
@@ -7308,24 +7306,24 @@ INPUT_PORTS_END
 
 static const s16 stopthief_speaker_levels[7] = { 0, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff };
 
-void stopthief_state::stopthief(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS0980(config, m_maincpu, 425000); // approximation
-	m_maincpu->k().set(FUNC(stopthief_state::read_k));
-	m_maincpu->r().set(FUNC(stopthief_state::write_r));
-	m_maincpu->o().set(FUNC(stopthief_state::write_o));
-	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+MACHINE_CONFIG_START(stopthief_state::stopthief)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_stopthief);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS0980, 425000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, stopthief_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, stopthief_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, stopthief_state, write_o))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_stopthief)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(7, stopthief_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(7, stopthief_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7422,22 +7420,22 @@ static INPUT_PORTS_START( bankshot )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void bankshot_state::bankshot(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
-	m_maincpu->k().set(FUNC(bankshot_state::read_k));
-	m_maincpu->r().set(FUNC(bankshot_state::write_r));
-	m_maincpu->o().set(FUNC(bankshot_state::write_o));
+MACHINE_CONFIG_START(bankshot_state::bankshot)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_bankshot);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, bankshot_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, bankshot_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, bankshot_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_bankshot)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7539,22 +7537,22 @@ static INPUT_PORTS_START( splitsec )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void splitsec_state::splitsec(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 475000); // approximation - RC osc. R=24K, C=100pF
-	m_maincpu->k().set(FUNC(splitsec_state::read_k));
-	m_maincpu->r().set(FUNC(splitsec_state::write_r));
-	m_maincpu->o().set(FUNC(splitsec_state::write_o));
+MACHINE_CONFIG_START(splitsec_state::splitsec)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_splitsec);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 475000) // approximation - RC osc. R=24K, C=100pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, splitsec_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, splitsec_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, splitsec_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_splitsec)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7657,23 +7655,23 @@ static const s16 lostreas_speaker_levels[16] =
 	0x7fff/8, 0x7fff/7, 0x7fff/6, 0x7fff/5, 0x7fff/4, 0x7fff/3, 0x7fff/2, 0x7fff/1
 };
 
-void lostreas_state::lostreas(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 425000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(lostreas_state::read_k));
-	m_maincpu->r().set(FUNC(lostreas_state::write_r));
-	m_maincpu->o().set(FUNC(lostreas_state::write_o));
+MACHINE_CONFIG_START(lostreas_state::lostreas)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_lostreas);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 425000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, lostreas_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, lostreas_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, lostreas_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_lostreas)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(16, lostreas_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(16, lostreas_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7778,24 +7776,24 @@ static const u16 alphie_output_pla[0x20] =
 	0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
 };
 
-void alphie_state::alphie(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 350000); // approximation
-	m_maincpu->set_output_pla(alphie_output_pla);
-	m_maincpu->k().set(FUNC(alphie_state::read_k));
-	m_maincpu->r().set(FUNC(alphie_state::write_r));
-	m_maincpu->o().set(FUNC(alphie_state::write_o));
+MACHINE_CONFIG_START(alphie_state::alphie)
 
-	TIMER(config, "arm_position").configure_periodic(FUNC(alphie_state::show_arm_position), attotime::from_msec(50));
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_alphie);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 350000) // approximation
+	MCFG_TMS1XXX_OUTPUT_PLA(alphie_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, alphie_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, alphie_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, alphie_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("arm_position", alphie_state, show_arm_position, attotime::from_msec(50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_alphie)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7889,22 +7887,22 @@ static INPUT_PORTS_START( tcfball )
 	PORT_CONFSETTING(    0x08, "2" ) // professional
 INPUT_PORTS_END
 
-void tcfball_state::tcfball(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=56K, C=24pF
-	m_maincpu->k().set(FUNC(tcfball_state::read_k));
-	m_maincpu->r().set(FUNC(tcfball_state::write_r));
-	m_maincpu->o().set(FUNC(tcfball_state::write_o));
+MACHINE_CONFIG_START(tcfball_state::tcfball)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_tcfball);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=56K, C=24pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tcfball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tcfball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tcfball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tcfball)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -7954,23 +7952,23 @@ static const u16 tcfballa_output_pla[0x20] =
 	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-void tcfballa_state::tcfballa(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=50pF
-	m_maincpu->set_output_pla(tcfballa_output_pla);
-	m_maincpu->k().set(FUNC(tcfballa_state::read_k));
-	m_maincpu->r().set(FUNC(tcfballa_state::write_r));
-	m_maincpu->o().set(FUNC(tcfballa_state::write_o));
+MACHINE_CONFIG_START(tcfballa_state::tcfballa)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_tcfballa);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=50pF
+	MCFG_TMS1XXX_OUTPUT_PLA(tcfballa_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tcfballa_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tcfballa_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tcfballa_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tcfballa)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -8118,23 +8116,23 @@ static const u16 tandy12_output_pla[0x20] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-void tandy12_state::tandy12(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->set_output_pla(tandy12_output_pla);
-	m_maincpu->k().set(FUNC(tandy12_state::read_k));
-	m_maincpu->r().set(FUNC(tandy12_state::write_r));
-	m_maincpu->o().set(FUNC(tandy12_state::write_o));
+MACHINE_CONFIG_START(tandy12_state::tandy12)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_tandy12);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 400000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_OUTPUT_PLA(tandy12_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tandy12_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tandy12_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tandy12_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tandy12)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -8227,22 +8225,22 @@ static INPUT_PORTS_START( monkeysee )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 INPUT_PORTS_END
 
-void monkeysee_state::monkeysee(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 250000); // approximation - RC osc. R=68K, C=47pF
-	m_maincpu->k().set(FUNC(monkeysee_state::read_k));
-	m_maincpu->r().set(FUNC(monkeysee_state::write_r));
-	m_maincpu->o().set(FUNC(monkeysee_state::write_o));
+MACHINE_CONFIG_START(monkeysee_state::monkeysee)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_monkeysee);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 250000) // approximation - RC osc. R=68K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, monkeysee_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, monkeysee_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, monkeysee_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_monkeysee)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -8376,22 +8374,22 @@ static INPUT_PORTS_START( speechp )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
-void speechp_state::speechp(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 400000); // approximation - RC osc. R=39K, C=47pF
-	m_maincpu->k().set(FUNC(speechp_state::read_k));
-	m_maincpu->r().set(FUNC(speechp_state::write_r));
-	m_maincpu->o().set(FUNC(speechp_state::write_o));
+MACHINE_CONFIG_START(speechp_state::speechp)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_speechp);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 400000) // approximation - RC osc. R=39K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, speechp_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, speechp_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, speechp_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_speechp)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	S14001A(config, m_speech, 25000); // approximation
-	m_speech->add_route(ALL_OUTPUTS, "mono", 0.75);
-}
+	MCFG_DEVICE_ADD("speech", S14001A, 25000) // approximation
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+MACHINE_CONFIG_END
 
 
 
@@ -8458,19 +8456,19 @@ static INPUT_PORTS_START( timaze )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 INPUT_PORTS_END
 
-void timaze_state::timaze(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 200000); // approximation - RC osc. R=80K, C=27pF
-	m_maincpu->k().set(FUNC(timaze_state::read_k));
-	m_maincpu->r().set(FUNC(timaze_state::write_r));
-	m_maincpu->o().set(FUNC(timaze_state::write_o));
+MACHINE_CONFIG_START(timaze_state::timaze)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_timaze);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 200000) // approximation - RC osc. R=80K, C=27pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, timaze_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, timaze_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, timaze_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_timaze)
 
 	/* no sound! */
-}
+MACHINE_CONFIG_END
 
 
 
@@ -8560,23 +8558,23 @@ INPUT_PORTS_END
 
 static const s16 copycat_speaker_levels[4] = { 0, 0x7fff, -0x8000, 0 };
 
-void copycat_state::copycat(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 320000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(copycat_state::read_k));
-	m_maincpu->r().set(FUNC(copycat_state::write_r));
-	m_maincpu->o().set(FUNC(copycat_state::write_o));
+MACHINE_CONFIG_START(copycat_state::copycat)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_copycat);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 320000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, copycat_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, copycat_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, copycat_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_copycat)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, copycat_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -8636,23 +8634,23 @@ static INPUT_PORTS_START( copycatm2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green Button")
 INPUT_PORTS_END
 
-void copycatm2_state::copycatm2(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(copycatm2_state::write_r));
-	m_maincpu->o().set(FUNC(copycatm2_state::write_o));
+MACHINE_CONFIG_START(copycatm2_state::copycatm2)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_copycatm2);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, copycatm2_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, copycatm2_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_copycatm2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, copycat_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -8707,23 +8705,23 @@ static INPUT_PORTS_START( ditto )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Red Button")
 INPUT_PORTS_END
 
-void ditto_state::ditto(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1730(config, m_maincpu, 275000); // approximation - RC osc. R=100K, C=47pF
-	m_maincpu->k().set_ioport("IN.0");
-	m_maincpu->r().set(FUNC(ditto_state::write_r));
-	m_maincpu->o().set(FUNC(ditto_state::write_o));
+MACHINE_CONFIG_START(ditto_state::ditto)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_ditto);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1730, 275000) // approximation - RC osc. R=100K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(IOPORT("IN.0"))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ditto_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ditto_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ditto)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->set_levels(4, copycat_speaker_levels);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SPEAKER_LEVELS(4, copycat_speaker_levels)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -8823,22 +8821,22 @@ static INPUT_PORTS_START( ss7in1 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void ss7in1_state::ss7in1(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1400(config, m_maincpu, 450000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(ss7in1_state::read_k));
-	m_maincpu->r().set(FUNC(ss7in1_state::write_r));
-	m_maincpu->o().set(FUNC(ss7in1_state::write_o));
+MACHINE_CONFIG_START(ss7in1_state::ss7in1)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_7in1ss);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1400, 450000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ss7in1_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ss7in1_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ss7in1_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_7in1ss)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -8887,7 +8885,7 @@ public:
 		m_expander(*this, "expander")
 	{ }
 
-	required_device<tms1025_device> m_expander;
+	required_device<tms1024_device> m_expander;
 	u8 m_exp_port[7];
 	DECLARE_WRITE8_MEMBER(expander_w);
 
@@ -9016,31 +9014,31 @@ void tbreakup_state::machine_start()
 	save_item(NAME(m_exp_port));
 }
 
-void tbreakup_state::tbreakup(machine_config &config)
-{
+MACHINE_CONFIG_START(tbreakup_state::tbreakup)
+
 	/* basic machine hardware */
-	TMS1040(config, m_maincpu, 325000); // see set_clock
-	m_maincpu->k().set(FUNC(tbreakup_state::read_k));
-	m_maincpu->r().set(FUNC(tbreakup_state::write_r));
-	m_maincpu->o().set(FUNC(tbreakup_state::write_o));
+	MCFG_DEVICE_ADD("maincpu", TMS1040, 325000) // see set_clock
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tbreakup_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tbreakup_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tbreakup_state, write_o))
 
-	TMS1025(config, m_expander);
-	m_expander->write_port1_callback().set(FUNC(tbreakup_state::expander_w));
-	m_expander->write_port2_callback().set(FUNC(tbreakup_state::expander_w));
-	m_expander->write_port3_callback().set(FUNC(tbreakup_state::expander_w));
-	m_expander->write_port4_callback().set(FUNC(tbreakup_state::expander_w));
-	m_expander->write_port5_callback().set(FUNC(tbreakup_state::expander_w));
-	m_expander->write_port6_callback().set(FUNC(tbreakup_state::expander_w));
-	m_expander->write_port7_callback().set(FUNC(tbreakup_state::expander_w));
+	MCFG_DEVICE_ADD("expander", TMS1025, 0)
+	MCFG_TMS1025_WRITE_PORT_CB(PORT1, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT2, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT3, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT4, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT5, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT6, WRITE8(*this, tbreakup_state, expander_w))
+	MCFG_TMS1025_WRITE_PORT_CB(PORT7, WRITE8(*this, tbreakup_state, expander_w))
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_tbreakup);
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_tbreakup)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -9149,22 +9147,22 @@ INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
 	prepare_display();
 }
 
-void phpball_state::phpball(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->k().set(FUNC(phpball_state::read_k));
-	m_maincpu->r().set(FUNC(phpball_state::write_r));
-	m_maincpu->o().set(FUNC(phpball_state::write_o));
+MACHINE_CONFIG_START(phpball_state::phpball)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_hh_tms1k_test);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, phpball_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, phpball_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, phpball_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -9284,23 +9282,23 @@ static const u16 ssports4_output_pla[0x20] =
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x00, 0x40, 0x40, 0x40, 0x40, 0x40
 };
 
-void ssports4_state::ssports4(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1100(config, m_maincpu, 375000); // approximation - RC osc. R=47K, C=47pF
-	m_maincpu->set_output_pla(ssports4_output_pla);
-	m_maincpu->k().set(FUNC(ssports4_state::read_k));
-	m_maincpu->r().set(FUNC(ssports4_state::write_r));
-	m_maincpu->o().set(FUNC(ssports4_state::write_o));
+MACHINE_CONFIG_START(ssports4_state::ssports4)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_ssports4);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1100, 375000) // approximation - RC osc. R=47K, C=47pF
+	MCFG_TMS1XXX_OUTPUT_PLA(ssports4_output_pla)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ssports4_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ssports4_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ssports4_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_ssports4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -9454,22 +9452,22 @@ void xl25_state::machine_reset()
 	update_halt();
 }
 
-void xl25_state::xl25(machine_config &config)
-{
-	/* basic machine hardware */
-	TMS1000C(config, m_maincpu, 300000); // approximation - RC osc. R=5.6K, C=47pF
-	m_maincpu->k().set(FUNC(xl25_state::read_k));
-	m_maincpu->r().set(FUNC(xl25_state::write_r));
-	m_maincpu->o().set(FUNC(xl25_state::write_o));
+MACHINE_CONFIG_START(xl25_state::xl25)
 
-	TIMER(config, "display_decay").configure_periodic(FUNC(hh_tms1k_state::display_decay_tick), attotime::from_msec(1));
-	config.set_default_layout(layout_xl25);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", TMS1000C, 300000) // approximation - RC osc. R=5.6K, C=47pF
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, xl25_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, xl25_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, xl25_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_xl25)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
-}
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
 
 
 
@@ -10084,7 +10082,7 @@ ROM_END
 
 ROM_START( stopthief )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(b9c9d64a) SHA1(481f8653064c142fe5d9314b750bcd73797b92b2) )
+	ROM_LOAD( "mp6101b", 0x0000, 0x1000, CRC(8bde5bb4) SHA1(8c318fcce67acc24c7ae361f575f28ec6f94665a) )
 
 	ROM_REGION( 1246, "maincpu:ipla", 0 )
 	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
@@ -10379,7 +10377,7 @@ CONS( 1983, arcmania,   0,         0, arcmania,  arcmania,  arcmania_state,  emp
 CONS( 1977, cnsector,   0,         0, cnsector,  cnsector,  cnsector_state,  empty_init, "Parker Brothers", "Code Name: Sector", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW ) // ***
 CONS( 1978, merlin,     0,         0, merlin,    merlin,    merlin_state,    empty_init, "Parker Brothers", "Merlin - The Electronic Wizard", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, stopthief,  0,         0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner)", MACHINE_SUPPORTS_SAVE ) // ***
-CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE ) // ***
+CONS( 1979, stopthiefp, stopthief, 0, stopthief, stopthief, stopthief_state, empty_init, "Parker Brothers", "Stop Thief (Electronic Crime Scanner) (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1980, bankshot,   0,         0, bankshot,  bankshot,  bankshot_state,  empty_init, "Parker Brothers", "Bank Shot - Electronic Pool", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, splitsec,   0,         0, splitsec,  splitsec,  splitsec_state,  empty_init, "Parker Brothers", "Split Second", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, mmerlin,    0,         0, mmerlin,   mmerlin,   mmerlin_state,   empty_init, "Parker Brothers", "Master Merlin", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

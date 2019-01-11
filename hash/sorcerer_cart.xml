@@ -26,20 +26,6 @@ Four cartridges were made for this computer one of which was a hardware device, 
 		</part>
 	</software>
 
-	<software name="basic11">
-		<description>Exidy Standard Basic v1.1</description>
-		<year>1980</year>
-		<publisher>Exidy</publisher>
-		<part name="cart" interface="sorcerer_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="basic11a.rom" size="2048" crc="795c6b54" sha1="7984560f202d935af7ea72bfb2129609675caa21" offset="0" />
-				<rom name="basic11b.rom" size="2048" crc="1068a3f8" sha1="6395f2c9829d537d68b75a750acbf27145f1bbad" offset="0x0800" />
-				<rom name="basic11c.rom" size="2048" crc="84a9bfe6" sha1="33132660ea52de7d5b17757a6a1f99508475a069" offset="0x1000" />
-				<rom name="basic11d.rom" size="2048" crc="91446784" sha1="2467f007a8e55b0e37edd026df74ebff7db01089" offset="0x1800" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="devpac">
 		<description>Exidy Z80 Development Pac</description>
 		<year>1979</year>

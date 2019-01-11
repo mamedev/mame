@@ -17,15 +17,17 @@ Taito Super Speed Race driver
 
 
 
-void sspeedr_state::sspeedr_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(sspeedr_state, sspeedr)
 {
-	for (int i = 0; i < 16; i++)
-	{
-		int r = BIT(i, 0) ? 0xb0 : 0x20;
-		int g = BIT(i, 1) ? 0xb0 : 0x20;
-		int b = BIT(i, 2) ? 0xb0 : 0x20;
+	int i;
 
-		if (BIT(i, 3))
+	for (i = 0; i < 16; i++)
+	{
+		int r = (i & 1) ? 0xb0 : 0x20;
+		int g = (i & 2) ? 0xb0 : 0x20;
+		int b = (i & 4) ? 0xb0 : 0x20;
+
+		if (i & 8)
 		{
 			r += 0x4f;
 			g += 0x4f;
@@ -81,7 +83,7 @@ void sspeedr_state::sspeedr_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x21ff).ram();
-	map(0x7f00, 0x7f17).w(FUNC(sspeedr_state::sspeedr_score_w));
+	map(0x7f00, 0x7f17).w(this, FUNC(sspeedr_state::sspeedr_score_w));
 }
 
 
@@ -90,25 +92,25 @@ void sspeedr_state::sspeedr_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
-	map(0x00, 0x01).w(FUNC(sspeedr_state::sspeedr_sound_w));
-	map(0x02, 0x02).w(FUNC(sspeedr_state::sspeedr_lamp_w));
+	map(0x00, 0x01).w(this, FUNC(sspeedr_state::sspeedr_sound_w));
+	map(0x02, 0x02).w(this, FUNC(sspeedr_state::sspeedr_lamp_w));
 	map(0x03, 0x03).portr("DSW");
 	map(0x04, 0x04).portr("IN2");
-	map(0x04, 0x05).w(FUNC(sspeedr_state::sspeedr_time_w));
+	map(0x04, 0x05).w(this, FUNC(sspeedr_state::sspeedr_time_w));
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x10, 0x10).w(FUNC(sspeedr_state::sspeedr_driver_horz_w));
-	map(0x11, 0x11).w(FUNC(sspeedr_state::sspeedr_driver_pic_w));
-	map(0x12, 0x12).w(FUNC(sspeedr_state::sspeedr_driver_horz_2_w));
-	map(0x13, 0x13).w(FUNC(sspeedr_state::sspeedr_drones_horz_w));
-	map(0x14, 0x14).w(FUNC(sspeedr_state::sspeedr_drones_horz_2_w));
-	map(0x15, 0x15).w(FUNC(sspeedr_state::sspeedr_drones_mask_w));
-	map(0x16, 0x16).w(FUNC(sspeedr_state::sspeedr_driver_vert_w));
-	map(0x17, 0x18).w(FUNC(sspeedr_state::sspeedr_track_vert_w));
-	map(0x19, 0x19).w(FUNC(sspeedr_state::sspeedr_track_horz_w));
-	map(0x1a, 0x1a).w(FUNC(sspeedr_state::sspeedr_track_horz_2_w));
-	map(0x1b, 0x1b).w(FUNC(sspeedr_state::sspeedr_track_ice_w));
-	map(0x1c, 0x1e).w(FUNC(sspeedr_state::sspeedr_drones_vert_w));
-	map(0x1f, 0x1f).w(FUNC(sspeedr_state::sspeedr_int_ack_w));
+	map(0x10, 0x10).w(this, FUNC(sspeedr_state::sspeedr_driver_horz_w));
+	map(0x11, 0x11).w(this, FUNC(sspeedr_state::sspeedr_driver_pic_w));
+	map(0x12, 0x12).w(this, FUNC(sspeedr_state::sspeedr_driver_horz_2_w));
+	map(0x13, 0x13).w(this, FUNC(sspeedr_state::sspeedr_drones_horz_w));
+	map(0x14, 0x14).w(this, FUNC(sspeedr_state::sspeedr_drones_horz_2_w));
+	map(0x15, 0x15).w(this, FUNC(sspeedr_state::sspeedr_drones_mask_w));
+	map(0x16, 0x16).w(this, FUNC(sspeedr_state::sspeedr_driver_vert_w));
+	map(0x17, 0x18).w(this, FUNC(sspeedr_state::sspeedr_track_vert_w));
+	map(0x19, 0x19).w(this, FUNC(sspeedr_state::sspeedr_track_horz_w));
+	map(0x1a, 0x1a).w(this, FUNC(sspeedr_state::sspeedr_track_horz_2_w));
+	map(0x1b, 0x1b).w(this, FUNC(sspeedr_state::sspeedr_track_ice_w));
+	map(0x1c, 0x1e).w(this, FUNC(sspeedr_state::sspeedr_drones_vert_w));
+	map(0x1f, 0x1f).w(this, FUNC(sspeedr_state::sspeedr_int_ack_w));
 }
 
 
@@ -196,7 +198,7 @@ MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 	MCFG_DEVICE_IO_MAP(sspeedr_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -206,10 +208,11 @@ MACHINE_CONFIG_START(sspeedr_state::sspeedr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 375, 0, 247)
 	MCFG_SCREEN_UPDATE_DRIVER(sspeedr_state, screen_update_sspeedr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sspeedr_state, screen_vblank_sspeedr))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sspeedr);
-	PALETTE(config, m_palette, FUNC(sspeedr_state::sspeedr_palette), 16);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sspeedr)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(sspeedr_state, sspeedr)
 
 	/* sound hardware */
 MACHINE_CONFIG_END

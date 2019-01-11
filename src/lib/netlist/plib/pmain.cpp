@@ -23,7 +23,7 @@ namespace plib {
 		char *buf = new char[dst_char_count + 1];
 		WideCharToMultiByte(CP_UTF8, 0, w, wlen, buf, dst_char_count, nullptr, nullptr);
 		buf[dst_char_count] = 0;
-		auto ret = pstring(buf);
+		auto ret = pstring(buf, pstring::UTF8);
 		delete [] buf;
 		return ret;
 	}

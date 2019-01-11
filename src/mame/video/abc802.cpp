@@ -179,17 +179,16 @@ WRITE_LINE_MEMBER( abc802_state::vs_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc802_state::abc802_video)
-	mc6845_device &mc6845(MC6845(config, MC6845_TAG, ABC800_CCLK));
-	mc6845.set_screen(SCREEN_TAG);
-	mc6845.set_show_border_area(true);
-	mc6845.set_char_width(ABC800_CHAR_WIDTH);
-	mc6845.set_update_row_callback(FUNC(abc802_state::abc802_update_row), this);
-	mc6845.out_vsync_callback().set(FUNC(abc802_state::vs_w));
-	mc6845.out_vsync_callback().append(m_dart, FUNC(z80dart_device::rib_w)).invert();
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
+	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
+	MCFG_MC6845_UPDATE_ROW_CB(abc802_state, abc802_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, abc802_state, vs_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(Z80DART_TAG, z80dart_device, rib_w)) MCFG_DEVCB_XOR(1)
 
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END

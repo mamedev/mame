@@ -9,29 +9,29 @@
 
 ***************************************************************************/
 
-#ifndef MAME_FRONTEND_MAME_UI_SLIDER_H
-#define MAME_FRONTEND_MAME_UI_SLIDER_H
-
 #pragma once
 
-#include "sliderchangednotifier.h"
+#ifndef __UI_SLIDER__
+#define __UI_SLIDER__
 
 #include <functional>
 
+#include "sliderchangednotifier.h"
+
 #define SLIDER_NOCHANGE     0x12345678
 
-typedef std::function<std::int32_t (running_machine &, void *, int, std::string *, std::int32_t)> slider_update;
+typedef std::function<int32_t(running_machine&, void*, int, std::string*, int32_t)> slider_update;
 
 struct slider_state
 {
-	slider_update   update;             // callback
-	void *          arg;                // argument
-	std::int32_t    minval;             // minimum value
-	std::int32_t    defval;             // default value
-	std::int32_t    maxval;             // maximum value
-	std::int32_t    incval;             // increment value
+	slider_update   update;             /* callback */
+	void *          arg;                /* argument */
+	int32_t           minval;             /* minimum value */
+	int32_t           defval;             /* default value */
+	int32_t           maxval;             /* maximum value */
+	int32_t           incval;             /* increment value */
 	int             id;
-	std::string     description;        // textual description
+	std::string     description;        /* textual description */
 };
 
-#endif // MAME_FRONTEND_MAME_UI_SLIDER_H
+#endif // __UI_SLIDER__

@@ -13,7 +13,6 @@
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
-#include "emupal.h"
 
 class toobin_state : public atarigen_state
 {
@@ -24,15 +23,13 @@ public:
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),
 		m_mob(*this, "mob"),
-		m_palette(*this, "palette"),
-		m_paletteram(*this, "paletteram"),
 		m_interrupt_scan(*this, "interrupt_scan"),
 		m_sound_int_state(0)
 	{ }
 
 	void toobin(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void update_interrupts() override;
@@ -53,13 +50,12 @@ private:
 
 	void main_map(address_map &map);
 
+private:
 	required_device<atari_jsa_i_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
-	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_interrupt_scan;
 
 	double          m_brightness;

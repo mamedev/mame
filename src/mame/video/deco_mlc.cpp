@@ -17,7 +17,7 @@
 
 /******************************************************************************/
 
-void deco_mlc_state::video_start()
+VIDEO_START_MEMBER(deco_mlc_state,mlc)
 {
 	int max_color = (0x800 / m_gfxdecode->gfx(0)->granularity());
 	m_colour_mask=max_color - 1;
@@ -28,13 +28,14 @@ void deco_mlc_state::video_start()
 	m_spriteram_spare = std::make_unique<uint16_t[]>(0x3000/4);
 	m_spriteram = std::make_unique<uint16_t[]>(0x3000/4);
 
-	save_pointer(NAME(m_spriteram), 0x3000/4);
-	save_pointer(NAME(m_spriteram_spare), 0x3000/4);
-	save_pointer(NAME(m_buffered_spriteram), 0x3000/4);
+	save_pointer(NAME(m_spriteram.get()), 0x3000/4);
+	save_pointer(NAME(m_spriteram_spare.get()), 0x3000/4);
+	save_pointer(NAME(m_buffered_spriteram.get()), 0x3000/4);
 }
 
 
-void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_element *gfx,
+static void mlc_drawgfxzoomline(deco_mlc_state *state,
+		uint32_t* dest,const rectangle &clip,gfx_element *gfx,
 		uint32_t code1,uint32_t code2, uint32_t color,int flipx,int sx,
 		int transparent_color,int use8bpp,
 		int scalex, int alpha, int srcline, int shadowMode, int alphaMode  )
@@ -74,22 +75,22 @@ void deco_mlc_state::drawgfxzoomline(uint32_t* dest,const rectangle &clip,gfx_el
 			x_index_base = 0;
 		}
 
-		if( sx < clip.left())
+		if( sx < clip.min_x)
 		{ /* clip left */
-			int pixels = clip.left()-sx;
+			int pixels = clip.min_x-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if( ex > clip.right()+1 )
+		if( ex > clip.max_x+1 )
 		{ /* clip right */
-			int pixels = ex-clip.right()-1;
+			int pixels = ex-clip.max_x-1;
 			ex -= pixels;
 		}
 
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
-			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *code_base1 = gfx->get_data(code1 % gfx->elements());
 			const uint8_t *code_base2 = gfx->get_data(code2 % gfx->elements());
 			const uint8_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
@@ -245,11 +246,16 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 		int min_y = m_clip_ram[(clipper*4)+0];
 		int max_y = m_clip_ram[(clipper*4)+1];
 
-		if ((scanline<min_y) || (scanline>max_y))
+		if (scanline<min_y)
+			continue;
+
+		if (scanline>max_y)
 			continue;
 
 
-		user_clip.setx(m_clip_ram[(clipper*4)+2], m_clip_ram[(clipper*4)+3]);
+		user_clip.min_x=m_clip_ram[(clipper*4)+2];
+		user_clip.max_x=m_clip_ram[(clipper*4)+3];
+
 		user_clip &= cliprect;
 
 		/* Any colours out of range (for the bpp value) trigger 'shadow' mode */
@@ -510,7 +516,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint
 				}
 			}
 
-			drawgfxzoomline(dest,user_clip,m_gfxdecode->gfx(0),
+			mlc_drawgfxzoomline(this,
+							dest,user_clip,m_gfxdecode->gfx(0),
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
 							0,
@@ -543,7 +550,7 @@ uint32_t deco_mlc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 
-	for (int i=cliprect.top();i<=cliprect.bottom();i++)
+	for (int i=cliprect.min_y;i<=cliprect.max_y;i++)
 	{
 		uint32_t *dest = &bitmap.pix32(i);
 

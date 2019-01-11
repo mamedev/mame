@@ -7,7 +7,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
 #include "formats/bw12_dsk.h"
-#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/kb3600.h"
@@ -18,7 +17,6 @@
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 
 #define SCREEN_TAG          "screen"
 #define Z80_TAG             "ic35"
@@ -64,7 +62,7 @@ public:
 	void bankswitch();
 	void floppy_motor_off();
 	void set_floppy_motor_off_timer();
-	void write_ls259(int address, int data);
+	void ls259_w(int address, int data);
 
 	DECLARE_READ8_MEMBER( ls259_r );
 	DECLARE_WRITE8_MEMBER( ls259_w );

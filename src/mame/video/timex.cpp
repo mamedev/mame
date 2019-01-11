@@ -41,8 +41,6 @@ VIDEO_START_MEMBER(spectrum_state,ts2068)
 	m_screen->register_screen_bitmap(m_screen_bitmap);
 
 	m_screen_location = m_video_ram;
-
-	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
 }
 
 WRITE_LINE_MEMBER(spectrum_state::screen_vblank_timex)

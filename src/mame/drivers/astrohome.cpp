@@ -22,10 +22,10 @@
 #include "speaker.h"
 
 
-class astrocde_home_state : public astrocde_state
+class astrocde_mess_state : public astrocde_state
 {
 public:
-	astrocde_home_state(const machine_config &mconfig, device_type type, const char *tag)
+	astrocde_mess_state(const machine_config &mconfig, device_type type, const char *tag)
 		: astrocde_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
 		, m_exp(*this, "exp")
@@ -59,21 +59,21 @@ private:
  *
  *********************************************************************************/
 
-void astrocde_home_state::astrocade_mem(address_map &map)
+void astrocde_mess_state::astrocade_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rom().w(FUNC(astrocde_home_state::astrocade_funcgen_w));
+	map(0x0000, 0x0fff).rom().w(this, FUNC(astrocde_mess_state::astrocade_funcgen_w));
 	map(0x1000, 0x3fff).rom(); /* Star Fortress writes in here?? */
 	map(0x4000, 0x4fff).ram().share("videoram"); /* ASG */
 	//AM_RANGE(0x5000, 0xffff) AM_DEVREADWRITE("exp", astrocade_exp_device, read, write)
 }
 
 
-void astrocde_home_state::astrocade_io(address_map &map)
+void astrocde_mess_state::astrocade_io(address_map &map)
 {
-	map(0x00, 0x0f).select(0xff00).rw(FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
+	map(0x00, 0x0f).select(0xff00).rw(this, FUNC(astrocde_state::video_register_r), FUNC(astrocde_state::video_register_w));
 	map(0x10, 0x1f).select(0xff00).r("astrocade1", FUNC(astrocade_io_device::read));
 	map(0x10, 0x18).select(0xff00).w("astrocade1", FUNC(astrocade_io_device::write));
-	map(0x19, 0x19).mirror(0xff00).w(FUNC(astrocde_state::expand_register_w));
+	map(0x19, 0x19).mirror(0xff00).w(this, FUNC(astrocde_state::expand_register_w));
 }
 
 /*************************************
@@ -99,7 +99,7 @@ void astrocde_home_state::astrocade_io(address_map &map)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_home_state::inputs_r)
+READ8_MEMBER(astrocde_mess_state::inputs_r)
 {
 	if (BIT(offset, 2))
 		return m_keypad[offset & 3]->read();
@@ -214,42 +214,42 @@ static void astrocade_exp(device_slot_interface &device)
 }
 
 
-void astrocde_home_state::astrocde(machine_config &config)
-{
+MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 	/* basic machine hardware */
-	Z80(config, m_maincpu, ASTROCADE_CLOCK/4); /* 1.789 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_home_state::astrocade_mem);
-	m_maincpu->set_addrmap(AS_IO, &astrocde_home_state::astrocade_io);
+	MCFG_DEVICE_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(astrocade_mem)
+	MCFG_DEVICE_IO_MAP(astrocade_io)
 
-	MCFG_MACHINE_START_OVERRIDE(astrocde_home_state, astrocde)
+	MCFG_MACHINE_START_OVERRIDE(astrocde_mess_state, astrocde)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(astrocde_state::screen_update_astrocde));
-	m_screen->set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(astrocde_state, screen_update_astrocde)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(astrocde_home_state::astrocade_palette), 512);
+	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_PALETTE_INIT_OWNER(astrocde_state, astrocde)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ASTROCADE_IO(config, m_astrocade_sound1, ASTROCADE_CLOCK/4);
-	m_astrocade_sound1->si_cb().set(FUNC(astrocde_home_state::inputs_r));
-	m_astrocade_sound1->set_pot_tag<0>("P1_KNOB");
-	m_astrocade_sound1->set_pot_tag<1>("P2_KNOB");
-	m_astrocade_sound1->set_pot_tag<2>("P3_KNOB");
-	m_astrocade_sound1->set_pot_tag<3>("P4_KNOB");
-	m_astrocade_sound1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	MCFG_DEVICE_ADD("astrocade1", ASTROCADE_IO, ASTROCADE_CLOCK/4)
+	MCFG_ASTROCADE_IO_SI_READ_CB(READ8(*this, astrocde_mess_state, inputs_r))
+	MCFG_ASTROCADE_IO_POT0("P1_KNOB")
+	MCFG_ASTROCADE_IO_POT1("P2_KNOB")
+	MCFG_ASTROCADE_IO_POT2("P3_KNOB")
+	MCFG_ASTROCADE_IO_POT3("P4_KNOB")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* expansion port */
-	ASTROCADE_EXP_SLOT(config, m_exp, astrocade_exp, nullptr);
+	MCFG_ASTROCADE_EXPANSION_SLOT_ADD("exp", astrocade_exp, nullptr)
 
 	/* cartridge */
-	ASTROCADE_CART_SLOT(config, m_cart, astrocade_cart, nullptr);
+	MCFG_ASTROCADE_CARTRIDGE_ADD("cartslot", astrocade_cart, nullptr)
 
 	/* Software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("astrocde");
-}
+	MCFG_SOFTWARE_LIST_ADD("cart_list","astrocde")
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -284,7 +284,7 @@ void astrocde_state::init_astrocde()
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
 }
 
-MACHINE_START_MEMBER(astrocde_home_state, astrocde)
+MACHINE_START_MEMBER(astrocde_mess_state, astrocde)
 {
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8_delegate(FUNC(astrocade_cart_slot_device::read_rom),(astrocade_cart_slot_device*)m_cart));
@@ -302,6 +302,6 @@ MACHINE_START_MEMBER(astrocde_home_state, astrocde)
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS                INIT           COMPANY                FULLNAME                       FLAGS */
-CONS( 1978, astrocde, 0,        0,      astrocde, astrocde, astrocde_home_state, init_astrocde, "Bally Manufacturing", "Bally Professional Arcade",   MACHINE_SUPPORTS_SAVE )
-CONS( 1977, astrocdl, astrocde, 0,      astrocde, astrocde, astrocde_home_state, init_astrocde, "Bally Manufacturing", "Bally Home Library Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1977, astrocdw, astrocde, 0,      astrocde, astrocde, astrocde_home_state, init_astrocde, "Bally Manufacturing", "Bally Computer System",       MACHINE_SUPPORTS_SAVE )
+CONS( 1978, astrocde, 0,        0,      astrocde, astrocde, astrocde_mess_state, init_astrocde, "Bally Manufacturing", "Bally Professional Arcade",   MACHINE_SUPPORTS_SAVE )
+CONS( 1977, astrocdl, astrocde, 0,      astrocde, astrocde, astrocde_mess_state, init_astrocde, "Bally Manufacturing", "Bally Home Library Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1977, astrocdw, astrocde, 0,      astrocde, astrocde, astrocde_mess_state, init_astrocde, "Bally Manufacturing", "Bally Computer System",       MACHINE_SUPPORTS_SAVE )

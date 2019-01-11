@@ -17,6 +17,7 @@
 #include "machine/i8251.h"
 #include "includes/b2m.h"
 #include "machine/ram.h"
+#include "imagedev/flopdrv.h"
 
 READ8_MEMBER(b2m_state::b2m_keyboard_r)
 {
@@ -181,12 +182,13 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 	uint8_t drive = ((data >> 1) & 1) ^ 1;
 	uint8_t side  = (data  & 1) ^ 1;
 
+	static const char *names[] = { "fd0", "fd1"};
 	floppy_image_device *floppy = nullptr;
-	if (m_fd[drive].found())
-		floppy = m_fd[drive]->get_device();
+	floppy_connector *con = machine().device<floppy_connector>(names[drive]);
+	if(con)
+		floppy = con->get_device();
 
-	if (floppy != nullptr)
-		floppy->mon_w(0);
+	floppy->mon_w(0);
 	m_fdc->set_floppy(floppy);
 	if (m_b2m_drive!=drive) {
 		m_b2m_drive = drive;
@@ -194,8 +196,7 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 
 	if (m_b2m_side!=side) {
 		m_b2m_side = side;
-		if (floppy != nullptr)
-			floppy->ss_w(side);
+		floppy->ss_w(side);
 	}
 	/*
 	    When bit 5 is set CPU is in HALT state and stay there until

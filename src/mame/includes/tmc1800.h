@@ -38,7 +38,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( tmc1800 );
 
 protected:
-	required_device<cosmac_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_memory_region m_rom;
 	required_ioport m_run;

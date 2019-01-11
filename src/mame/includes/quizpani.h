@@ -1,23 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Pierpaolo Prazzoli
-#ifndef MAME_INCLUDES_QUIZPANI_H
-#define MAME_INCLUDES_QUIZPANI_H
-
-#pragma once
-
 #include "machine/nmk112.h"
 
 class quizpani_state : public driver_device
 {
 public:
-	quizpani_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	quizpani_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_scrollreg(*this, "scrollreg"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_txt_videoram(*this, "txt_videoram")
-	{ }
+		m_txt_videoram(*this, "txt_videoram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -45,5 +39,3 @@ public:
 	void quizpani(machine_config &config);
 	void quizpani_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_QUIZPANI_H

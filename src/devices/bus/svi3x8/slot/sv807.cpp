@@ -99,8 +99,8 @@ void sv807_device::device_start()
 	save_item(NAME(m_bk22));
 	save_item(NAME(m_bk31));
 	save_item(NAME(m_bk32));
-	save_pointer(NAME(m_ram_bank1), 0x8000);
-	save_pointer(NAME(m_ram_bank2), 0x8000);
+	save_pointer(NAME(m_ram_bank1.get()), 0x8000);
+	save_pointer(NAME(m_ram_bank2.get()), 0x8000);
 }
 
 //-------------------------------------------------

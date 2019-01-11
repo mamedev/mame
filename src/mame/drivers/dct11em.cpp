@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -18,21 +17,14 @@ class dct11em_state : public driver_device
 {
 public:
 	dct11em_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-	{ }
-
-	void dct11em(machine_config &config);
-
-private:
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-
-	void dct11em_mem(address_map &map);
-
 	uint32_t screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	required_device<t11_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
+	void dct11em(machine_config &config);
+	void dct11em_mem(address_map &map);
 };
 
 void dct11em_state::dct11em_mem(address_map &map)
@@ -62,24 +54,24 @@ uint32_t dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind1
 }
 
 
-void dct11em_state::dct11em(machine_config &config)
-{
+MACHINE_CONFIG_START(dct11em_state::dct11em)
 	/* basic machine hardware */
-	T11(config, m_maincpu, 7500000); // 7.5MHz XTAL
-	m_maincpu->set_initial_mode(0x1403);  /* according to specs */
-	m_maincpu->set_addrmap(AS_PROGRAM, &dct11em_state::dct11em_mem);
+	MCFG_DEVICE_ADD("maincpu",T11, 7500000) // 7.5MHz XTAL
+	MCFG_T11_INITIAL_MODE(0x1403)  /* according to specs */
+	MCFG_DEVICE_PROGRAM_MAP(dct11em_mem)
+
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(dct11em_state::screen_update_dct11em));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DRIVER(dct11em_state, screen_update_dct11em)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-}
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( dct11em )

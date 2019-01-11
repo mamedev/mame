@@ -66,7 +66,7 @@ const tiny_rom_entry *c64_final_chesscard_device::device_rom_region() const
 
 void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 {
-	map(0x0000, 0x1fff).mirror(0x6000).rw(FUNC(c64_final_chesscard_device::nvram_r), FUNC(c64_final_chesscard_device::nvram_w));
+	map(0x0000, 0x1fff).mirror(0x6000).rw(this, FUNC(c64_final_chesscard_device::nvram_r), FUNC(c64_final_chesscard_device::nvram_w));
 	map(0x8000, 0xffff).rom().region(G65SC02P4_TAG, 0);
 }
 

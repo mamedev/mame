@@ -8,7 +8,6 @@
 #include "isa.h"
 #include "video/upd7220.h"
 #include "machine/bankdev.h"
-#include "emupal.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

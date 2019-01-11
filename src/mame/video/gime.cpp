@@ -86,7 +86,6 @@
 
 
 
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -98,7 +97,6 @@
 #define LOG_INT_MASKING         0
 #define LOG_GIME                0
 #define LOG_TIMER               0
-#define LOG_PALETTE             0
 
 
 
@@ -116,11 +114,9 @@ gime_device::gime_device(const machine_config &mconfig, device_type type, const 
 	, m_write_irq(*this)
 	, m_write_firq(*this)
 	, m_read_floating_bus(*this)
-	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_ram(*this, finder_base::DUMMY_TAG)
-	, m_cart_device(*this, finder_base::DUMMY_TAG)
-	, m_rom(nullptr)
-	, m_rom_region(*this, finder_base::DUMMY_TAG)
+	, m_maincpu_tag(nullptr)
+	, m_ram_tag(nullptr)
+	, m_ext_tag(nullptr)
 {
 }
 
@@ -132,12 +128,18 @@ gime_device::gime_device(const machine_config &mconfig, device_type type, const 
 
 void gime_device::device_start(void)
 {
+	// find the RAM device - make sure that it is started
+	m_ram = machine().device<ram_device>(m_ram_tag);
 	if (!m_ram->started())
 		throw device_missing_dependencies();
 
+	// find the CART device - make sure that it is started
+	m_cart_device = machine().device<cococart_slot_device>(m_ext_tag);
 	if (!m_cart_device->started())
 		throw device_missing_dependencies();
 
+	// find the CPU device - make sure that it is started
+	m_cpu = machine().device<cpu_device>(m_maincpu_tag);
 	if (!m_cpu->started())
 		throw device_missing_dependencies();
 
@@ -170,7 +172,7 @@ void gime_device::device_start(void)
 	m_read_floating_bus.resolve_safe(0);
 
 	// set up ROM/RAM pointers
-	m_rom = m_rom_region->base();
+	m_rom = machine().root_device().memregion(m_maincpu_tag)->base();
 	m_cart_rom = m_cart_device->get_cart_base();
 	m_cart_size = m_cart_device->get_cart_size();
 
@@ -554,14 +556,11 @@ void gime_device::update_memory(int bank)
 		// we're in ROM
 		static const uint8_t rom_map[4][4] =
 		{
-			{ 0, 1, 4, 5 },
-			{ 0, 1, 4, 5 },
+			{ 0, 1, 6, 7 },
+			{ 0, 1, 6, 7 },
 			{ 0, 1, 2, 3 },
-			{ 6, 7, 4, 5 }
+			{ 4, 5, 6, 7 }
 		};
-
-		// Pin ROM page to MMU slot
-		block = (block & 0xfc) | (bank & 0x03);
 
 		// look up the block in the ROM map
 		block = rom_map[m_gime_registers[0] & 3][(block & 0x3F) - 0x3C];
@@ -1009,10 +1008,6 @@ inline void gime_device::write_mmu_register(offs_t offset, uint8_t data)
 inline void gime_device::write_palette_register(offs_t offset, uint8_t data)
 {
 	offset &= 0x0F;
-
-	// perform logging
-	if (LOG_PALETTE)
-		logerror("%s: CoCo3 Palette: $%04x <== $%02x\n", describe_context(), offset + 0xffB0, data);
 
 	/* has this entry changed? */
 	if (m_palette_rotated[m_palette_rotated_position][offset] != data)
@@ -2027,14 +2022,28 @@ const uint8_t gime_device::hires_font[128][12] =
 //  VARIATIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device, "gime_ntsc", "TCC1014 (VC2645QC) GIME (NTSC)")
-DEFINE_DEVICE_TYPE(GIME_PAL,  gime_pal_device,  "gime_pal",  "TCC1014 (VC2645QC) GIME (PAL)")
+namespace
+{
+	class gime_ntsc_device : public gime_device
+	{
+	public:
+		gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: gime_device(mconfig, GIME_NTSC, tag, owner, clock, ntsc_round_fontdata8x12)
+		{
+		}
+	};
 
-gime_ntsc_device::gime_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gime_device(mconfig, GIME_NTSC, tag, owner, clock, ntsc_round_fontdata8x12) { }
+	class gime_pal_device : public gime_device
+	{
+	public:
+		gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: gime_device(mconfig, GIME_PAL, tag, owner, clock, pal_round_fontdata8x12)
+		{
+		}
+	};
+};
 
-gime_pal_device::gime_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gime_device(mconfig, GIME_PAL, tag, owner, clock, pal_round_fontdata8x12) { }
-
+DEFINE_DEVICE_TYPE_PRIVATE(GIME_NTSC, gime_device, gime_ntsc_device, "gime_ntsc", "TCC1014 (VC2645QC) GIME (NTSC)")
+DEFINE_DEVICE_TYPE_PRIVATE(GIME_PAL,  gime_device, gime_pal_device,  "gime_pal",  "TCC1014 (VC2645QC) GIME (PAL)")
 template class device_finder<gime_device, false>;
 template class device_finder<gime_device, true>;

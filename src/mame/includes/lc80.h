@@ -35,13 +35,6 @@ public:
 			m_out_led(*this, "led0")
 	{ }
 
-	void lc80_2(machine_config &config);
-	void lc80(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio2;
 	required_device<cassette_image_device> m_cassette;
@@ -60,12 +53,16 @@ private:
 	DECLARE_READ8_MEMBER( pio1_pb_r );
 	DECLARE_WRITE8_MEMBER( pio1_pb_w );
 	DECLARE_READ8_MEMBER( pio2_pb_r );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	void update_display();
 
 	// display state
 	uint8_t m_digit;
 	uint8_t m_segment;
+	void lc80_2(machine_config &config);
+	void lc80(machine_config &config);
 	void lc80_io(address_map &map);
 	void lc80_mem(address_map &map);
 	void sc80_mem(address_map &map);

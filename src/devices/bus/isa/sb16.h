@@ -92,7 +92,7 @@ private:
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<pc_joy_device> m_joy;
-	required_device<i80c52_device> m_cpu;
+	required_device<cpu_device> m_cpu;
 
 	// internal state
 	bool m_data_in;

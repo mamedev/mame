@@ -8,7 +8,7 @@ ifeq ($(OS),os2)
 EXE := .exe
 endif
 
-ifndef VERBOSE
+ifndef verbose
   SILENT = @
 endif
 CC  = gcc

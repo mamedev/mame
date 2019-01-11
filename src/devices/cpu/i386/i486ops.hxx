@@ -31,13 +31,6 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 				CYCLES(CYCLES_CPUID_EAX1);
 				break;
 			}
-
-			default:
-			{
-				// call the model specific implementation
-				opcode_cpuid();
-				break;
-			}
 		}
 	}
 }
@@ -159,16 +152,14 @@ void i386_device::i486_xadd_rm8_r8()   // Opcode 0x0f c0
 	if( modrm >= 0xc0 ) {
 		uint8_t dst = LOAD_RM8(modrm);
 		uint8_t src = LOAD_REG8(modrm);
-		uint8_t sum = ADD8(dst, src);
 		STORE_REG8(modrm, dst);
-		STORE_RM8(modrm, sum);
+		STORE_RM8(modrm, dst + src);
 		CYCLES(CYCLES_XADD_REG_REG);
 	} else {
 		uint32_t ea = GetEA(modrm,1);
 		uint8_t dst = READ8(ea);
 		uint8_t src = LOAD_REG8(modrm);
-		uint8_t sum = ADD8(dst, src);
-		WRITE8(ea, sum);
+		WRITE8(ea, dst + src);
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_XADD_REG_MEM);
 	}
@@ -180,16 +171,14 @@ void i386_device::i486_xadd_rm16_r16() // Opcode 0x0f c1
 	if( modrm >= 0xc0 ) {
 		uint16_t dst = LOAD_RM16(modrm);
 		uint16_t src = LOAD_REG16(modrm);
-		uint16_t sum = ADD16(dst, src);
 		STORE_REG16(modrm, dst);
-		STORE_RM16(modrm, sum);
+		STORE_RM16(modrm, dst + src);
 		CYCLES(CYCLES_XADD_REG_REG);
 	} else {
 		uint32_t ea = GetEA(modrm,1);
 		uint16_t dst = READ16(ea);
 		uint16_t src = LOAD_REG16(modrm);
-		uint16_t sum = ADD16(dst, src);
-		WRITE16(ea, sum);
+		WRITE16(ea, dst + src);
 		STORE_REG16(modrm, dst);
 		CYCLES(CYCLES_XADD_REG_MEM);
 	}
@@ -201,16 +190,14 @@ void i386_device::i486_xadd_rm32_r32() // Opcode 0x0f c1
 	if( modrm >= 0xc0 ) {
 		uint32_t dst = LOAD_RM32(modrm);
 		uint32_t src = LOAD_REG32(modrm);
-		uint32_t sum = ADD32(dst, src);
 		STORE_REG32(modrm, dst);
-		STORE_RM32(modrm, sum);
+		STORE_RM32(modrm, dst + src);
 		CYCLES(CYCLES_XADD_REG_REG);
 	} else {
 		uint32_t ea = GetEA(modrm,1);
 		uint32_t dst = READ32(ea);
 		uint32_t src = LOAD_REG32(modrm);
-		uint32_t sum = ADD32(dst, src);
-		WRITE32(ea, sum);
+		WRITE32(ea, dst + src);
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_XADD_REG_MEM);
 	}
@@ -233,9 +220,7 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 					ea = GetEA(modrm,1);
 				}
 				WRITE16(ea, m_gdtr.limit);
-				// Win32s requires all 32 bits to be stored here, despite various Intel docs
-				// claiming that the upper 8 bits are either zeroed or undefined in 16-bit mode
-				WRITE32(ea + 2, m_gdtr.base);
+				WRITE32(ea + 2, m_gdtr.base & 0xffffff);
 				CYCLES(CYCLES_SGDT);
 				break;
 			}
@@ -251,7 +236,7 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 					ea = GetEA(modrm,1);
 				}
 				WRITE16(ea, m_idtr.limit);
-				WRITE32(ea + 2, m_idtr.base);
+				WRITE32(ea + 2, m_idtr.base & 0xffffff);
 				CYCLES(CYCLES_SIDT);
 				break;
 			}
@@ -299,9 +284,9 @@ void i386_device::i486_group0F01_16()      // Opcode 0x0f 01
 			}
 		case 6:         /* LMSW */
 			{
+				uint16_t b;
 				if(PROTECTED_MODE && m_CPL)
 					FAULT(FAULT_GP,0)
-				uint16_t b;
 				if( modrm >= 0xc0 ) {
 					b = LOAD_RM16(modrm);
 					CYCLES(CYCLES_LMSW_REG);
@@ -516,8 +501,6 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 			CYCLES(CYCLES_MOV_REG_CR0);
 			if((oldcr ^ m_cr[cr]) & 0x80010000)
 				vtlb_flush_dynamic();
-			if (PROTECTED_MODE != BIT(data, 0))
-				debugger_privilege_hook();
 			break;
 		case 2: CYCLES(CYCLES_MOV_REG_CR2); break;
 		case 3:

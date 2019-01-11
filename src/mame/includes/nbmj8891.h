@@ -2,7 +2,6 @@
 // copyright-holders:Takahiro Nogi
 
 #include "machine/nb1413m3.h"
-#include "emupal.h"
 #include "screen.h"
 
 class nbmj8891_state : public driver_device
@@ -23,50 +22,6 @@ public:
 	{
 	}
 
-	void mjfocusm(machine_config &config);
-	void mjfocus(machine_config &config);
-	void bananadr(machine_config &config);
-	void scandal(machine_config &config);
-	void hanamomo(machine_config &config);
-	void telmahjn(machine_config &config);
-	void pairsten(machine_config &config);
-	void club90s(machine_config &config);
-	void mgion(machine_config &config);
-	void chinmoku(machine_config &config);
-	void msjiken(machine_config &config);
-	void hnageman(machine_config &config);
-	void mjcamerb(machine_config &config);
-	void mjnanpas(machine_config &config);
-	void mmcamera(machine_config &config);
-	void pairsnb(machine_config &config);
-	void taiwanmb(machine_config &config);
-	void hanaoji(machine_config &config);
-	void lovehous(machine_config &config);
-	void hnxmasev(machine_config &config);
-	void mmaiko(machine_config &config);
-	void maiko(machine_config &config);
-	void mladyhtr(machine_config &config);
-	void omotesnd(machine_config &config);
-	void abunai(machine_config &config);
-	void gionbana(machine_config &config);
-	void mgmen89(machine_config &config);
-	void scandalm(machine_config &config);
-
-	void init_pairsten();
-	void init_telmahjn();
-	void init_gionbana();
-	void init_omotesnd();
-	void init_scandal();
-	void init_mgmen89();
-	void init_mjfocusm();
-	void init_mjfocus();
-	void init_pairsnb();
-	void init_mjnanpas();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_outcoin_flag_r);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
 	required_device<screen_device> m_screen;
@@ -119,6 +74,19 @@ private:
 	DECLARE_WRITE8_MEMBER(taiwanmb_gfxflag_w);
 	DECLARE_WRITE8_MEMBER(taiwanmb_mcu_w);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_outcoin_flag_r);
+
+	void init_pairsten();
+	void init_telmahjn();
+	void init_gionbana();
+	void init_omotesnd();
+	void init_scandal();
+	void init_mgmen89();
+	void init_mjfocusm();
+	void init_mjfocus();
+	void init_pairsnb();
+	void init_mjnanpas();
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(_1layer);
 
@@ -131,6 +99,34 @@ private:
 	void common_save_state();
 	void postload();
 
+	void mjfocusm(machine_config &config);
+	void mjfocus(machine_config &config);
+	void bananadr(machine_config &config);
+	void scandal(machine_config &config);
+	void hanamomo(machine_config &config);
+	void telmahjn(machine_config &config);
+	void pairsten(machine_config &config);
+	void club90s(machine_config &config);
+	void mgion(machine_config &config);
+	void chinmoku(machine_config &config);
+	void msjiken(machine_config &config);
+	void hnageman(machine_config &config);
+	void mjcamerb(machine_config &config);
+	void mjnanpas(machine_config &config);
+	void mmcamera(machine_config &config);
+	void pairsnb(machine_config &config);
+	void taiwanmb(machine_config &config);
+	void hanaoji(machine_config &config);
+	void lovehous(machine_config &config);
+	void hnxmasev(machine_config &config);
+	void mmaiko(machine_config &config);
+	void maiko(machine_config &config);
+	void mladyhtr(machine_config &config);
+	void omotesnd(machine_config &config);
+	void abunai(machine_config &config);
+	void gionbana(machine_config &config);
+	void mgmen89(machine_config &config);
+	void scandalm(machine_config &config);
 	void bananadr_io_map(address_map &map);
 	void club90s_map(address_map &map);
 	void gionbana_io_map(address_map &map);
@@ -155,6 +151,6 @@ private:
 	void scandalm_map(address_map &map);
 	void taiwanmb_io_map(address_map &map);
 	void taiwanmb_map(address_map &map);
-
+protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

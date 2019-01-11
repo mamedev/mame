@@ -41,11 +41,11 @@ void higemaru_state::higemaru_map(address_map &map)
 	map(0xc002, 0xc002).portr("SYSTEM");
 	map(0xc003, 0xc003).portr("DSW1");
 	map(0xc004, 0xc004).portr("DSW2");
-	map(0xc800, 0xc800).w(FUNC(higemaru_state::higemaru_c800_w));
+	map(0xc800, 0xc800).w(this, FUNC(higemaru_state::higemaru_c800_w));
 	map(0xc801, 0xc802).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xc803, 0xc804).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0xd000, 0xd3ff).ram().w(FUNC(higemaru_state::higemaru_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(FUNC(higemaru_state::higemaru_colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(higemaru_state::higemaru_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(this, FUNC(higemaru_state::higemaru_colorram_w)).share("colorram");
 	map(0xd880, 0xd9ff).ram().share("spriteram");
 	map(0xe000, 0xefff).ram();
 }
@@ -177,18 +177,22 @@ MACHINE_CONFIG_START(higemaru_state::higemaru)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(higemaru_state, screen_update_higemaru)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_higemaru)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_higemaru)
 
-	PALETTE(config, m_palette, FUNC(higemaru_state::higemaru_palette), 32*4+16*16, 32);
+	MCFG_PALETTE_ADD("palette", 32*4+16*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(32)
+	MCFG_PALETTE_INIT_OWNER(higemaru_state, higemaru)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 /***************************************************************************

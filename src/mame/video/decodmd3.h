@@ -14,17 +14,13 @@
 #include "machine/timer.h"
 #include "video/mc6845.h"
 
+#define MCFG_DECODMD_TYPE3_ADD(_tag, _region) \
+	MCFG_DEVICE_ADD(_tag, DECODMD3, 0) \
+	downcast<decodmd_type3_device &>(*device).set_gfxregion(_region);
 
 class decodmd_type3_device : public device_t
 {
 public:
-	template <typename T>
-	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&gfxregion_tag)
-		: decodmd_type3_device(mconfig, tag, owner, clock)
-	{
-		set_gfxregion(std::forward<T>(gfxregion_tag));
-	}
-
 	decodmd_type3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER(data_w);
@@ -37,7 +33,7 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_register_w);
 	DECLARE_READ16_MEMBER(crtc_status_r);
 
-	template <typename T> void set_gfxregion(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
+	void set_gfxregion(const char *tag) { m_gfxtag = tag; }
 
 	void decodmd3_map(address_map &map);
 protected:
@@ -52,7 +48,7 @@ private:
 	required_memory_bank m_rambank;
 	required_memory_bank m_rombank;
 
-	required_region_ptr<uint8_t> m_rom;
+	memory_region* m_rom;
 
 	uint8_t m_status;
 	uint8_t m_crtc_index;
@@ -61,6 +57,8 @@ private:
 	uint8_t m_ctrl;
 	uint8_t m_busy;
 	uint8_t m_command;
+
+	const char* m_gfxtag;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dmd_irq);
 	MC6845_UPDATE_ROW(crtc_update_row);

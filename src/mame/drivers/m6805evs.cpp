@@ -74,10 +74,8 @@ public:
 	{ }
 
 	void m6805evs(machine_config &config);
-
-private:
 	void mem_map(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 };
@@ -85,6 +83,7 @@ private:
 
 void m6805evs_state::mem_map(address_map &map)
 {
+	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
 	// AM_RANGE(0x0000, 0x001f) I/O registers live here
@@ -105,9 +104,7 @@ void m6805evs_state::machine_reset()
 MACHINE_CONFIG_START(m6805evs_state::m6805evs)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6805, XTAL(4'000'000))
-
-//  Needs a 13-bits address bus wide version of the cpu
-//  MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 
 ROM_START(m6805evs)

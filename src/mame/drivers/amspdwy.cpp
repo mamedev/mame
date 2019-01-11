@@ -75,16 +75,16 @@ void amspdwy_state::amspdwy_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x801f).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).mirror(0x0400).ram().w(this, FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(this, FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
 	map(0x9c00, 0x9fff).ram(); // unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ?
 	map(0xa000, 0xa000).portr("DSW1");
-	map(0xa400, 0xa400).portr("DSW2").w(FUNC(amspdwy_state::amspdwy_flipscreen_w));
-	map(0xa800, 0xa800).r(FUNC(amspdwy_state::amspdwy_wheel_0_r));
-	map(0xac00, 0xac00).r(FUNC(amspdwy_state::amspdwy_wheel_1_r));
+	map(0xa400, 0xa400).portr("DSW2").w(this, FUNC(amspdwy_state::amspdwy_flipscreen_w));
+	map(0xa800, 0xa800).r(this, FUNC(amspdwy_state::amspdwy_wheel_0_r));
+	map(0xac00, 0xac00).r(this, FUNC(amspdwy_state::amspdwy_wheel_1_r));
 	map(0xb000, 0xb000).nopw(); // irq ack?
-	map(0xb400, 0xb400).r(FUNC(amspdwy_state::amspdwy_sound_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xb400, 0xb400).r(this, FUNC(amspdwy_state::amspdwy_sound_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xc000, 0xc0ff).ram().share("spriteram");
 	map(0xe000, 0xe7ff).ram();
 }
@@ -267,22 +267,23 @@ MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_amspdwy);
-	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amspdwy)
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	YM2151(config, m_ym2151, 3000000);
-	m_ym2151->irq_handler().set_inputline(m_audiocpu, 0);
-	m_ym2151->add_route(0, "lspeaker", 1.0);
-	m_ym2151->add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

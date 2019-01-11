@@ -2,7 +2,7 @@
 <!--
 license:CC0
 copyright-holders:Vas Crabb
-Intel INTELLEC® 4/MOD 4 layout
+Intel INTELLEC® 4/MOD 40 layout
 -->
 <mamelayout version="2">
 	<element name="background">
@@ -41,12 +41,18 @@ Intel INTELLEC® 4/MOD 4 layout
 		</rect>
 	</element>
 
-	<repeat count="12">
-		<param name="labelnum" start="0" increment="1" />
-		<element name="label_~labelnum~">
-			<text string="~labelnum~"><color red="1.0" green="1.0" blue="1.0" /></text>
-		</element>
-	</repeat>
+	<element name="label_0"><text string="0"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_1"><text string="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_2"><text string="2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_3"><text string="3"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_4"><text string="4"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_5"><text string="5"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_6"><text string="6"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_7"><text string="7"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_8"><text string="8"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_9"><text string="9"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_10"><text string="10"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="label_11"><text string="11"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 
 	<element name="label_a1"><text string="A1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="label_a2"><text string="A2"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -158,6 +164,21 @@ Intel INTELLEC® 4/MOD 4 layout
 		<cpanel element="background"><bounds left="0" top="0" right="1000" bottom="400" /></cpanel>
 
 		<cpanel element="label_address"><bounds left="72" top="55" right="506" bottom="63" /></cpanel>
+		<cpanel element="label_a3"><bounds left="81" top="63" right="185" bottom="70" /></cpanel>
+		<cpanel element="label_a2"><bounds left="237" top="63" right="341" bottom="70" /></cpanel>
+		<cpanel element="label_a1"><bounds left="393" top="63" right="497" bottom="70" /></cpanel>
+		<cpanel element="label_11"><bounds left="81" top="71" right="92" bottom="78" /></cpanel>
+		<cpanel element="label_10"><bounds left="112" top="71" right="123" bottom="78" /></cpanel>
+		<cpanel element="label_9"><bounds left="143" top="71" right="154" bottom="78" /></cpanel>
+		<cpanel element="label_8"><bounds left="174" top="71" right="185" bottom="78" /></cpanel>
+		<cpanel element="label_7"><bounds left="237" top="71" right="248" bottom="78" /></cpanel>
+		<cpanel element="label_6"><bounds left="268" top="71" right="279" bottom="78" /></cpanel>
+		<cpanel element="label_5"><bounds left="299" top="71" right="310" bottom="78" /></cpanel>
+		<cpanel element="label_4"><bounds left="330" top="71" right="341" bottom="78" /></cpanel>
+		<cpanel element="label_3"><bounds left="393" top="71" right="404" bottom="78" /></cpanel>
+		<cpanel element="label_2"><bounds left="424" top="71" right="435" bottom="78" /></cpanel>
+		<cpanel element="label_1"><bounds left="455" top="71" right="466" bottom="78" /></cpanel>
+		<cpanel element="label_0"><bounds left="486" top="71" right="497" bottom="78" /></cpanel>
 
 		<cpanel element="label_status"><bounds left="540" top="55" right="662" bottom="63" /></cpanel>
 		<cpanel element="label_search"><bounds left="561" top="63" right="610" bottom="70" /></cpanel>
@@ -167,6 +188,16 @@ Intel INTELLEC® 4/MOD 4 layout
 		<cpanel element="label_cpu"><bounds left="611" top="71" right="626" bottom="78" /></cpanel>
 
 		<cpanel element="label_instruction"><bounds left="72" top="104" right="350" bottom="112" /></cpanel>
+		<cpanel element="label_m1"><bounds left="81" top="112" right="185" bottom="119" /></cpanel>
+		<cpanel element="label_m2"><bounds left="237" top="112" right="341" bottom="119" /></cpanel>
+		<cpanel element="label_7"><bounds left="81" top="120" right="92" bottom="127" /></cpanel>
+		<cpanel element="label_6"><bounds left="112" top="120" right="123" bottom="127" /></cpanel>
+		<cpanel element="label_5"><bounds left="143" top="120" right="154" bottom="127" /></cpanel>
+		<cpanel element="label_4"><bounds left="174" top="120" right="185" bottom="127" /></cpanel>
+		<cpanel element="label_3"><bounds left="237" top="120" right="248" bottom="127" /></cpanel>
+		<cpanel element="label_2"><bounds left="268" top="120" right="279" bottom="127" /></cpanel>
+		<cpanel element="label_1"><bounds left="299" top="120" right="310" bottom="127" /></cpanel>
+		<cpanel element="label_0"><bounds left="330" top="120" right="341" bottom="127" /></cpanel>
 
 		<cpanel element="label_active_bank"><bounds left="384" top="104" right="506" bottom="112" /></cpanel>
 		<cpanel element="label_cm_ram"><bounds left="393" top="112" right="497" bottom="119" /></cpanel>
@@ -181,10 +212,42 @@ Intel INTELLEC® 4/MOD 4 layout
 		<cpanel element="label_prom"><bounds left="639" top="120" right="656" bottom="127" /></cpanel>
 
 		<cpanel element="label_execution"><bounds left="72" top="153" right="350" bottom="161" /></cpanel>
+		<cpanel element="label_x2"><bounds left="81" top="161" right="185" bottom="168" /></cpanel>
+		<cpanel element="label_x3"><bounds left="237" top="161" right="341" bottom="168" /></cpanel>
+		<cpanel element="label_3"><bounds left="81" top="169" right="92" bottom="176" /></cpanel>
+		<cpanel element="label_2"><bounds left="112" top="169" right="123" bottom="176" /></cpanel>
+		<cpanel element="label_1"><bounds left="143" top="169" right="154" bottom="176" /></cpanel>
+		<cpanel element="label_0"><bounds left="174" top="169" right="185" bottom="176" /></cpanel>
+		<cpanel element="label_3"><bounds left="237" top="169" right="248" bottom="176" /></cpanel>
+		<cpanel element="label_2"><bounds left="268" top="169" right="279" bottom="176" /></cpanel>
+		<cpanel element="label_1"><bounds left="299" top="169" right="310" bottom="176" /></cpanel>
+		<cpanel element="label_0"><bounds left="330" top="169" right="341" bottom="176" /></cpanel>
 
 		<cpanel element="label_last_ptr"><bounds left="384" top="153" right="662" bottom="161" /></cpanel>
+		<cpanel element="label_x2"><bounds left="393" top="161" right="497" bottom="168" /></cpanel>
+		<cpanel element="label_x3"><bounds left="549" top="161" right="653" bottom="168" /></cpanel>
+		<cpanel element="label_3"><bounds left="393" top="169" right="404" bottom="176" /></cpanel>
+		<cpanel element="label_2"><bounds left="424" top="169" right="435" bottom="176" /></cpanel>
+		<cpanel element="label_1"><bounds left="455" top="169" right="466" bottom="176" /></cpanel>
+		<cpanel element="label_0"><bounds left="486" top="169" right="497" bottom="176" /></cpanel>
+		<cpanel element="label_3"><bounds left="549" top="169" right="560" bottom="176" /></cpanel>
+		<cpanel element="label_2"><bounds left="580" top="169" right="591" bottom="176" /></cpanel>
+		<cpanel element="label_1"><bounds left="611" top="169" right="622" bottom="176" /></cpanel>
+		<cpanel element="label_0"><bounds left="642" top="169" right="653" bottom="176" /></cpanel>
 
 		<cpanel element="label_addr_data"><bounds left="72" top="214" right="506" bottom="222" /></cpanel>
+		<cpanel element="label_11"><bounds left="74" top="230" right="99" bottom="237" /></cpanel>
+		<cpanel element="label_10"><bounds left="105" top="230" right="130" bottom="237" /></cpanel>
+		<cpanel element="label_9"><bounds left="136" top="230" right="161" bottom="237" /></cpanel>
+		<cpanel element="label_8"><bounds left="167" top="230" right="192" bottom="237" /></cpanel>
+		<cpanel element="label_7"><bounds left="230" top="230" right="255" bottom="237" /></cpanel>
+		<cpanel element="label_6"><bounds left="261" top="230" right="286" bottom="237" /></cpanel>
+		<cpanel element="label_5"><bounds left="292" top="230" right="317" bottom="237" /></cpanel>
+		<cpanel element="label_4"><bounds left="323" top="230" right="348" bottom="237" /></cpanel>
+		<cpanel element="label_3"><bounds left="386" top="230" right="411" bottom="237" /></cpanel>
+		<cpanel element="label_2"><bounds left="417" top="230" right="442" bottom="237" /></cpanel>
+		<cpanel element="label_1"><bounds left="448" top="230" right="473" bottom="237" /></cpanel>
+		<cpanel element="label_0"><bounds left="479" top="230" right="504" bottom="237" /></cpanel>
 
 		<cpanel element="label_mode_ctrl"><bounds left="571" top="214" right="662" bottom="222" /></cpanel>
 		<cpanel element="label_mon"><bounds left="573" top="230" right="598" bottom="237" /></cpanel>
@@ -199,6 +262,10 @@ Intel INTELLEC® 4/MOD 4 layout
 
 		<cpanel element="label_pass_counter"><bounds left="72" top="296" right="194" bottom="304" /></cpanel>
 		<cpanel element="label_passes"><bounds left="74" top="304" right="192" bottom="311" /></cpanel>
+		<cpanel element="label_3"><bounds left="74" top="312" right="99" bottom="319" /></cpanel>
+		<cpanel element="label_2"><bounds left="105" top="312" right="130" bottom="319" /></cpanel>
+		<cpanel element="label_1"><bounds left="136" top="312" right="161" bottom="319" /></cpanel>
+		<cpanel element="label_0"><bounds left="167" top="312" right="192" bottom="319" /></cpanel>
 
 		<cpanel element="label_search_ctrl"><bounds left="228" top="296" right="381" bottom="304" /></cpanel>
 		<cpanel element="label_run"><bounds left="230" top="312" right="255" bottom="319" /></cpanel>
@@ -224,35 +291,42 @@ Intel INTELLEC® 4/MOD 4 layout
 		<cpanel element="label_system"><bounds left="727" top="321" right="783" bottom="328" /></cpanel>
 		<cpanel element="label_reset_cpu"><bounds left="727" top="361" right="783" bottom="368" /></cpanel>
 
-		<repeat count="3">
-			<param name="groupnum" start="11" increment="-4" />
-			<param name="ledpos" start="81" increment="156" />
-			<param name="nybble" start="3" increment="-1" />
-			<param name="switchpos" start="74" increment="156" />
-			<param name="groupmask" start="0x0800" rshift="4" />
-			<cpanel element="label_a~nybble~">
-				<bounds x="~ledpos~" y="63" width="104" height="7" />
-			</cpanel>
-			<repeat count="4">
-				<param name="labelnum" start="~groupnum~" increment="-1" />
-				<param name="ledpos" start="~ledpos~" increment="31" />
-				<param name="switchpos" start="~switchpos~" increment="31" />
-				<param name="bit" start="3" increment="-1" />
-				<param name="bitmask" start="~groupmask~" rshift="1" />
-				<cpanel element="label_~labelnum~">
-					<bounds x="~ledpos~" y="71" width="11" height="7" />
-				</cpanel>
-				<cpanel element="label_~labelnum~">
-					<bounds x="~switchpos~" y="230" width="25" height="7" />
-				</cpanel>
-				<cpanel name="led_address_a~nybble~_~bit~" element="led">
-					<bounds x="~ledpos~" y="79" width="11" height="7" />
-				</cpanel>
-				<cpanel element="switch" inputtag="ADDRDAT" inputmask="~bitmask~">
-					<bounds x="~switchpos~" y="240" width="25" height="46" />
-				</cpanel>
-			</repeat>
-		</repeat>
+		<cpanel name="led_address_a3_3" element="led">
+			<bounds left="81" top="79" right="92" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a3_2" element="led">
+			<bounds left="112" top="79" right="123" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a3_1" element="led">
+			<bounds left="143" top="79" right="154" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a3_0" element="led">
+			<bounds left="174" top="79" right="185" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a2_3" element="led">
+			<bounds left="237" top="79" right="248" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a2_2" element="led">
+			<bounds left="268" top="79" right="279" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a2_1" element="led">
+			<bounds left="299" top="79" right="310" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a2_0" element="led">
+			<bounds left="330" top="79" right="341" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a1_3" element="led">
+			<bounds left="393" top="79" right="404" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a1_2" element="led">
+			<bounds left="424" top="79" right="435" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a1_1" element="led">
+			<bounds left="455" top="79" right="466" bottom="86" />
+		</cpanel>
+		<cpanel name="led_address_a1_0" element="led">
+			<bounds left="486" top="79" right="497" bottom="86" />
+		</cpanel>
 
 		<cpanel name="led_status_search" element="led">
 			<bounds left="580" top="79" right="591" bottom="86" />
@@ -262,6 +336,31 @@ Intel INTELLEC® 4/MOD 4 layout
 		</cpanel>
 		<cpanel name="led_status_ptr_valid" element="led">
 			<bounds left="642" top="79" right="653" bottom="86" />
+		</cpanel>
+
+		<cpanel name="led_instruction_m1_3" element="led">
+			<bounds left="81" top="128" right="92" bottom="135" />
+		</cpanel>
+		<cpanel name="led_instruction_m1_2" element="led">
+			<bounds left="112" top="128" right="123" bottom="135" />
+		</cpanel>
+		<cpanel name="led_instruction_m1_1" element="led">
+			<bounds left="143" top="128" right="154" bottom="135" />
+		</cpanel>
+		<cpanel name="led_instruction_m1_0" element="led">
+			<bounds left="174" top="128" right="185" bottom="135" />
+		</cpanel>
+		<cpanel name="led_instruction_m2_3" element="led">
+			<bounds left="237" top="128" right="248" bottom="135" />
+		</cpanel>
+		<cpanel name="led_instruction_m2_2" element="led">
+			<bounds left="268" top="128" right="279" bottom="135" />
+		</cpanel>
+		<cpanel name="led_instruction_m2_1" element="led">
+			<bounds left="299" top="128" right="310" bottom="135" />
+		</cpanel>
+		<cpanel name="led_instruction_m2_0" element="led">
+			<bounds left="330" top="128" right="341" bottom="135" />
 		</cpanel>
 
 		<cpanel name="led_active_bank_3" element="led">
@@ -287,53 +386,92 @@ Intel INTELLEC® 4/MOD 4 layout
 			<bounds left="642" top="128" right="653" bottom="135" />
 		</cpanel>
 
-		<repeat count="2">
-			<param name="groupx" start="81" increment="156" />
-			<param name="mnybble" start="1" increment="1" />
-			<param name="xnybble" start="2" increment="1" />
-			<param name="groupbit" start="7" increment="-4" />
-			<cpanel element="label_m~mnybble~">
-				<bounds x="~groupx~" y="112" width="104" height="7" />
-			</cpanel>
-			<cpanel element="label_x~xnybble~">
-				<bounds x="~groupx~" y="161" width="104" height="7" />
-			</cpanel>
-			<repeat count="4">
-				<param name="xpos" start="~groupx~" increment="31" />
-				<param name="mbit" start="~groupbit~" increment="-1" />
-				<param name="bit" start="3" increment="-1" />
-				<cpanel element="label_~mbit~">
-					<bounds x="~xpos~" y="120" width="11" height="7" />
-				</cpanel>
-				<cpanel element="label_~bit~">
-					<bounds x="~xpos~" y="169" width="11" height="7" />
-				</cpanel>
-				<cpanel name="led_instruction_m~mnybble~_~bit~" element="led">
-					<bounds x="~xpos~" y="128" width="11" height="7" />
-				</cpanel>
-				<cpanel name="led_execution_x~xnybble~_~bit~" element="led">
-					<bounds x="~xpos~" y="177" width="11" height="7" />
-				</cpanel>
-			</repeat>
-		</repeat>
+		<cpanel name="led_execution_x2_3" element="led">
+			<bounds left="81" top="177" right="92" bottom="184" />
+		</cpanel>
+		<cpanel name="led_execution_x2_2" element="led">
+			<bounds left="112" top="177" right="123" bottom="184" />
+		</cpanel>
+		<cpanel name="led_execution_x2_1" element="led">
+			<bounds left="143" top="177" right="154" bottom="184" />
+		</cpanel>
+		<cpanel name="led_execution_x2_0" element="led">
+			<bounds left="174" top="177" right="185" bottom="184" />
+		</cpanel>
+		<cpanel name="led_execution_x3_3" element="led">
+			<bounds left="237" top="177" right="248" bottom="184" />
+		</cpanel>
+		<cpanel name="led_execution_x3_2" element="led">
+			<bounds left="268" top="177" right="279" bottom="184" />
+		</cpanel>
+		<cpanel name="led_execution_x3_1" element="led">
+			<bounds left="299" top="177" right="310" bottom="184" />
+		</cpanel>
+		<cpanel name="led_execution_x3_0" element="led">
+			<bounds left="330" top="177" right="341" bottom="184" />
+		</cpanel>
 
-		<repeat count="2">
-			<param name="groupx" start="393" increment="156" />
-			<param name="nybble" start="2" increment="1" />
-			<cpanel element="label_x~nybble~">
-				<bounds x="~groupx~" y="161" width="104" height="7" />
-			</cpanel>
-			<repeat count="4">
-				<param name="xpos" start="~groupx~" increment="31" />
-				<param name="bit" start="3" increment="-1" />
-				<cpanel element="label_~bit~">
-					<bounds x="~xpos~" y="169" width="11" height="7" />
-				</cpanel>
-				<cpanel name="led_last_ptr_x~nybble~_~bit~" element="led">
-					<bounds x="~xpos~" y="177" width="11" height="7" />
-				</cpanel>
-			</repeat>
-		</repeat>
+		<cpanel name="led_last_ptr_x2_3" element="led">
+			<bounds left="393" top="177" right="404" bottom="184" />
+		</cpanel>
+		<cpanel name="led_last_ptr_x2_2" element="led">
+			<bounds left="424" top="177" right="435" bottom="184" />
+		</cpanel>
+		<cpanel name="led_last_ptr_x2_1" element="led">
+			<bounds left="455" top="177" right="466" bottom="184" />
+		</cpanel>
+		<cpanel name="led_last_ptr_x2_0" element="led">
+			<bounds left="486" top="177" right="497" bottom="184" />
+		</cpanel>
+		<cpanel name="led_last_ptr_x3_3" element="led">
+			<bounds left="549" top="177" right="560" bottom="184" />
+		</cpanel>
+		<cpanel name="led_last_ptr_x3_2" element="led">
+			<bounds left="580" top="177" right="591" bottom="184" />
+		</cpanel>
+		<cpanel name="led_last_ptr_x3_1" element="led">
+			<bounds left="611" top="177" right="622" bottom="184" />
+		</cpanel>
+		<cpanel name="led_last_ptr_x3_0" element="led">
+			<bounds left="642" top="177" right="653" bottom="184" />
+		</cpanel>
+
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0800">
+			<bounds left="74" top="240" right="99" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0400">
+			<bounds left="105" top="240" right="130" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0200">
+			<bounds left="136" top="240" right="161" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0100">
+			<bounds left="167" top="240" right="192" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0080">
+			<bounds left="230" top="240" right="255" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0040">
+			<bounds left="261" top="240" right="286" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0020">
+			<bounds left="292" top="240" right="317" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0010">
+			<bounds left="323" top="240" right="348" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0008">
+			<bounds left="386" top="240" right="411" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0004">
+			<bounds left="417" top="240" right="442" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0002">
+			<bounds left="448" top="240" right="473" bottom="286" />
+		</cpanel>
+		<cpanel element="switch" inputtag="ADDRDAT" inputmask="0x0001">
+			<bounds left="479" top="240" right="504" bottom="286" />
+		</cpanel>
 
 		<cpanel element="switch" inputtag="MODE" inputmask="0x0010">
 			<bounds left="573" top="240" right="598" bottom="286" />
@@ -349,17 +487,18 @@ Intel INTELLEC® 4/MOD 4 layout
 			<bounds left="728" top="240" right="753" bottom="286" />
 		</cpanel>
 
-		<repeat count="4">
-			<param name="xpos" start="74" increment="31" />
-			<param name="mask" start="0x08" rshift="1" />
-			<param name="bit" start="3" increment="-1" />
-			<cpanel element="label_~bit~">
-				<bounds x="~xpos~" y="312" width="25" height="7" />
-			</cpanel>
-			<cpanel element="switch" inputtag="PASSES" inputmask="~mask~">
-				<bounds x="~xpos~" y="322" width="25" height="46" />
-			</cpanel>
-		</repeat>
+		<cpanel element="switch" inputtag="PASSES" inputmask="0x08">
+			<bounds left="74" top="322" right="99" bottom="368" />
+		</cpanel>
+		<cpanel element="switch" inputtag="PASSES" inputmask="0x04">
+			<bounds left="105" top="322" right="130" bottom="368" />
+		</cpanel>
+		<cpanel element="switch" inputtag="PASSES" inputmask="0x02">
+			<bounds left="136" top="322" right="161" bottom="368" />
+		</cpanel>
+		<cpanel element="switch" inputtag="PASSES" inputmask="0x01">
+			<bounds left="167" top="322" right="192" bottom="368" />
+		</cpanel>
 
 		<cpanel element="switch" inputtag="CONTROL" inputmask="0x0001">
 			<bounds left="230" top="322" right="255" bottom="368" />

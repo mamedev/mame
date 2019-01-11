@@ -1,19 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_INCLUDES_TP84
-#define MAME_INCLUDES_TP84
-
-#pragma once
-
-#include "sound/flt_rc.h"
-#include "emupal.h"
 #include "screen.h"
 
 class tp84_state : public driver_device
 {
 public:
-	tp84_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	tp84_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "cpu1"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
@@ -27,14 +20,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_filter(*this, "filter%u", 1U)
-	{ }
+		m_palette(*this, "palette") { }
 
-	void tp84(machine_config &config);
-	void tp84b(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
@@ -49,7 +36,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device_array<filter_rc_device, 3> m_filter;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	bool m_flipscreen_x;
@@ -73,15 +59,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	void tp84_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(tp84);
 	uint32_t screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	void tp84(machine_config &config);
+	void tp84b(machine_config &config);
 	void audio_map(address_map &map);
 	void cpu2_map(address_map &map);
 	void tp84_cpu1_map(address_map &map);
 	void tp84b_cpu1_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_TP84

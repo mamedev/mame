@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -8,17 +8,15 @@
 #include <bx/os.h>
 #include <bx/readerwriter.h>
 
-#if !BX_CRT_NONE
-#	include <stdio.h>  // remove
-#	include <dirent.h> // opendir
+#include <stdio.h>  // remove
+#include <dirent.h> // opendir
 
-#	if BX_CRT_MSVC
-#		include <direct.h>   // _getcwd
-#	else
-#		include <sys/stat.h> // mkdir
-#		include <unistd.h>   // getcwd
-#	endif // BX_CRT_MSVC
-#endif // 0
+#if BX_CRT_MSVC
+#	include <direct.h>   // _getcwd
+#else
+#	include <sys/stat.h> // mkdir
+#	include <unistd.h>   // getcwd
+#endif // BX_CRT_MSVC
 
 #if BX_PLATFORM_WINDOWS
 extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _ptr);
@@ -36,9 +34,8 @@ namespace bx
 
 	static int32_t normalizeFilePath(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
-		// Reference(s):
-		// - Lexical File Names in Plan 9 or Getting Dot-Dot Right
-		//   https://web.archive.org/web/20180629044444/https://9p.io/sys/doc/lexnames.html
+		// Reference: Lexical File Names in Plan 9 or Getting Dot-Dot Right
+		// https://9p.io/sys/doc/lexnames.html
 
 		const int32_t num = strLen(_src, _num);
 
@@ -121,6 +118,7 @@ namespace bx
 
 					break;
 				}
+
 				BX_FALLTHROUGH;
 
 			default:
@@ -154,12 +152,12 @@ namespace bx
 		return size;
 	}
 
-	static bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name, FileInfo::Enum _type)
+	static bool getEnv(const char* _name, FileInfo::Enum _type, char* _out, uint32_t* _inOutSize)
 	{
 		uint32_t len = *_inOutSize;
 		*_out = '\0';
 
-		if (getEnv(_out, &len, _name) )
+		if (getenv(_name, _out, &len) )
 		{
 			FileInfo fi;
 			if (stat(_out, fi)
@@ -177,8 +175,7 @@ namespace bx
 	{
 #if BX_PLATFORM_PS4     \
  || BX_PLATFORM_XBOXONE \
- || BX_PLATFORM_WINRT   \
- || BX_CRT_NONE
+ || BX_PLATFORM_WINRT
 		BX_UNUSED(_buffer, _size);
 		return NULL;
 #elif BX_CRT_MSVC
@@ -191,22 +188,18 @@ namespace bx
 	static bool getCurrentPath(char* _out, uint32_t* _inOutSize)
 	{
 		uint32_t len = *_inOutSize;
-		if (NULL != pwd(_out, len))
-		{
-			*_inOutSize = strLen(_out);
-			return true;
-		}
-
-		return false;
+		pwd(_out, len);
+		*_inOutSize = strLen(_out);
+		return true;
 	}
 
 	static bool getHomePath(char* _out, uint32_t* _inOutSize)
 	{
 		return false
 #if BX_PLATFORM_WINDOWS
-			|| getEnv(_out, _inOutSize, "USERPROFILE", FileInfo::Directory)
+			|| getEnv("USERPROFILE", FileInfo::Directory, _out, _inOutSize)
 #endif // BX_PLATFORM_WINDOWS
-			|| getEnv(_out, _inOutSize, "HOME", FileInfo::Directory)
+			|| getEnv("HOME", FileInfo::Directory, _out, _inOutSize)
 			;
 	}
 
@@ -218,21 +211,21 @@ namespace bx
 		*_inOutSize = len;
 		return result;
 #else
-		static const StringView s_tmp[] =
+		static const char* s_tmp[] =
 		{
 			"TMPDIR",
 			"TMP",
 			"TEMP",
 			"TEMPDIR",
 
-			""
+			NULL
 		};
 
-		for (const StringView* tmp = s_tmp; !tmp->isEmpty(); ++tmp)
+		for (const char** tmp = s_tmp; *tmp != NULL; ++tmp)
 		{
 			uint32_t len = *_inOutSize;
 			*_out = '\0';
-			bool ok = getEnv(_out, &len, *tmp, FileInfo::Directory);
+			bool ok = getEnv(*tmp, FileInfo::Directory, _out, &len);
 
 			if (ok
 			&&  len != 0
@@ -280,14 +273,6 @@ namespace bx
 	{
 		set(_rhs);
 		return *this;
-	}
-
-	void FilePath::clear()
-	{
-		if (!isEmpty() )
-		{
-			set("");
-		}
 	}
 
 	void FilePath::set(Dir::Enum _dir)
@@ -341,37 +326,37 @@ namespace bx
 		return m_filePath;
 	}
 
-	StringView FilePath::getPath() const
+	const StringView FilePath::getPath() const
 	{
-		StringView end = strRFind(m_filePath, '/');
-		if (!end.isEmpty() )
+		const char* end = strRFind(m_filePath, '/');
+		if (NULL != end)
 		{
-			return StringView(m_filePath, end.getPtr()+1);
+			return StringView(m_filePath, end+1);
 		}
 
 		return StringView();
 	}
 
-	StringView FilePath::getFileName() const
+	const StringView FilePath::getFileName() const
 	{
-		StringView fileName = strRFind(m_filePath, '/');
-		if (!fileName.isEmpty() )
+		const char* fileName = strRFind(m_filePath, '/');
+		if (NULL != fileName)
 		{
-			return StringView(fileName.getPtr()+1);
+			return StringView(fileName+1);
 		}
 
 		return get();
 	}
 
-	StringView FilePath::getBaseName() const
+	const StringView FilePath::getBaseName() const
 	{
 		const StringView fileName = getFileName();
 		if (!fileName.isEmpty() )
 		{
-			StringView ext = strFind(fileName, '.');
-			if (!ext.isEmpty() )
+			const char* ext = strFind(fileName, '.');
+			if (ext != NULL)
 			{
-				return StringView(fileName.getPtr(), ext.getPtr() );
+				return StringView(fileName.getPtr(), ext);
 			}
 
 			return fileName;
@@ -380,12 +365,13 @@ namespace bx
 		return StringView();
 	}
 
-	StringView FilePath::getExt() const
+	const StringView FilePath::getExt() const
 	{
 		const StringView fileName = getFileName();
 		if (!fileName.isEmpty() )
 		{
-			return strFind(fileName, '.');
+			const char* ext = strFind(fileName, '.');
+			return StringView(ext);
 		}
 
 		return StringView();
@@ -396,11 +382,6 @@ namespace bx
 		return  '/' == m_filePath[0] // no drive letter
 			|| (':' == m_filePath[1] && '/' == m_filePath[2]) // with drive letter
 			;
-	}
-
-	bool FilePath::isEmpty() const
-	{
-		return 0 == strCmp(m_filePath, ".");
 	}
 
 	bool make(const FilePath& _filePath, Error* _err)
@@ -416,9 +397,6 @@ namespace bx
 		int32_t result = ::_mkdir(_filePath.get() );
 #elif BX_CRT_MINGW
 		int32_t result = ::mkdir(_filePath.get());
-#elif BX_CRT_NONE
-		BX_UNUSED(_filePath);
-		int32_t result = -1;
 #else
 		int32_t result = ::mkdir(_filePath.get(), 0700);
 #endif // BX_CRT_MSVC
@@ -454,13 +432,13 @@ namespace bx
 			return false;
 		}
 
-		const StringView dir   = strRTrim(_filePath.get(), "/");
-		const StringView slash = strRFind(dir, '/');
+		const StringView dir = strRTrim(_filePath.get(), "/");
+		const char* slash = strRFind(dir, '/');
 
-		if (!slash.isEmpty()
-		&&  slash.getPtr() - dir.getPtr() > 1)
+		if (NULL != slash
+		&&  slash - dir.getPtr() > 1)
 		{
-			if (!makeAll(StringView(dir.getPtr(), slash.getPtr() ), _err) )
+			if (!makeAll(StringView(dir.getPtr(), slash), _err) )
 			{
 				return false;
 			}
@@ -493,9 +471,6 @@ namespace bx
 				result = ::remove(_filePath.get() );
 			}
 		}
-#elif BX_CRT_NONE
-		BX_UNUSED(_filePath);
-		int32_t result = -1;
 #else
 		int32_t result = ::remove(_filePath.get() );
 #endif // BX_CRT_MSVC
@@ -534,12 +509,7 @@ namespace bx
 			return false;
 		}
 
-#if BX_CRT_NONE
-		BX_UNUSED(_filePath);
-		return false;
-#elif  BX_PLATFORM_WINDOWS \
-	|| BX_PLATFORM_LINUX   \
-	|| BX_PLATFORM_OSX
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 		DIR* dir = opendir(_filePath.get() );
 		if (NULL == dir)
 		{
@@ -565,7 +535,7 @@ namespace bx
 		}
 
 		closedir(dir);
-#endif // !BX_CRT_NONE
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 
 		return remove(_filePath, _err);
 	}

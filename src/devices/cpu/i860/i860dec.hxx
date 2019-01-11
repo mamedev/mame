@@ -3166,7 +3166,7 @@ void i860_cpu_device::insn_dualop (uint32_t insn)
 	/* Do the add operation, being careful about source and result
 	   precision.  Remember, the R bit indicates source and result precision
 	   here.  */
-	if (src_prec)
+	if (res_prec)
 	{
 		double v1 = get_fval_from_optype_d (insn, A_unit_op1);
 		double v2 = get_fval_from_optype_d (insn, A_unit_op2);

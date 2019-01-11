@@ -75,7 +75,6 @@
 #include "cpu/tms7000/tms7000.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
-#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -92,19 +91,9 @@ public:
 		m_cart(*this, "cartslot"),
 		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	void ti74(machine_config &config);
-	void ti95(machine_config &config);
-
-	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
-
-protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-
-private:
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
@@ -112,12 +101,20 @@ private:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
-	void ti74_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(ti74);
+	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
+	void ti74(machine_config &config);
+	void ti95(machine_config &config);
 	void main_map(address_map &map);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
+private:
 	required_device<tms70c46_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
@@ -126,7 +123,7 @@ private:
 	u8 m_key_select;
 	u8 m_power;
 
-	output_finder<80> m_lamps;
+	output_finder<80> m_lamp;
 };
 
 
@@ -162,11 +159,11 @@ DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
 
 ***************************************************************************/
 
-void ti74_state::ti74_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(ti74_state, ti74)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // LCD pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // LCD pixel off
+	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
 void ti74_state::update_lcd_indicator(u8 y, u8 x, int state)
@@ -183,7 +180,7 @@ void ti74_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// above    | _LOW _ERROR  2nd  INV  ALPHA  LC  INS  DEGRAD  HEX  OCT  I/O
 	// screen-  | _P{70} <{71}                                             RUN{3}
 	//   area   .                                                          SYS{4}
-	m_lamps[y * 10 + x] = state ? 1 : 0;
+	m_lamp[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
@@ -501,7 +498,7 @@ void ti74_state::machine_reset()
 
 void ti74_state::machine_start()
 {
-	m_lamps.resolve();
+	m_lamp.resolve();
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
@@ -521,13 +518,13 @@ void ti74_state::machine_start()
 MACHINE_CONFIG_START(ti74_state::ti74)
 
 	/* basic machine hardware */
-	TMS70C46(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &ti74_state::main_map);
-	m_maincpu->in_porta().set(FUNC(ti74_state::keyboard_r));
-	m_maincpu->out_portb().set(FUNC(ti74_state::bankswitch_w));
-	m_maincpu->out_porte().set(FUNC(ti74_state::keyboard_w));
+	MCFG_DEVICE_ADD("maincpu", TMS70C46, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, ti74_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
+	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
-	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -535,15 +532,16 @@ MACHINE_CONFIG_START(ti74_state::ti74)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(6*31+1, 9*1+1+1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*31, 0, 9*1+1)
-	config.set_default_layout(layout_ti74);
+	MCFG_DEFAULT_LAYOUT(layout_ti74)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(ti74_state, ti74)
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0)); // 270kHz
-	hd44780.set_lcd_size(2, 16); // 2*16 internal
-	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update), this);
+	MCFG_HD44780_ADD("hd44780") // 270kHz
+	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
+	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_state,ti74_pixel_update)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti74_cart")
@@ -556,13 +554,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ti74_state::ti95)
 
 	/* basic machine hardware */
-	TMS70C46(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &ti74_state::main_map);
-	m_maincpu->in_porta().set(FUNC(ti74_state::keyboard_r));
-	m_maincpu->out_portb().set(FUNC(ti74_state::bankswitch_w));
-	m_maincpu->out_porte().set(FUNC(ti74_state::keyboard_w));
+	MCFG_DEVICE_ADD("maincpu", TMS70C46, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, ti74_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
+	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
-	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -570,15 +568,16 @@ MACHINE_CONFIG_START(ti74_state::ti95)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(200, 20)
 	MCFG_SCREEN_VISIBLE_AREA(0, 200-1, 0, 20-1)
-	config.set_default_layout(layout_ti95);
+	MCFG_DEFAULT_LAYOUT(layout_ti95)
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
+	MCFG_PALETTE_ADD("palette", 3)
+	MCFG_PALETTE_INIT_OWNER(ti74_state, ti74)
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
-	hd44780.set_lcd_size(2, 16);
-	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update), this);
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(2, 16)
+	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_state,ti95_pixel_update)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti95_cart")

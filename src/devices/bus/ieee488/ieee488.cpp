@@ -93,13 +93,6 @@ void ieee488_slot_device::device_start()
 }
 
 
-void ieee488_slot_device::add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
-{
-	ieee488_slot_device &slot(IEEE488_SLOT(config, _tag, 0));
-	cbm_ieee488_devices(slot);
-	slot.set_default_option(_def_slot);
-	slot.set_address(_address);
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -430,12 +423,10 @@ void cbm_ieee488_devices(device_slot_interface &device)
 //-------------------------------------------------
 
 // slot devices
-#include "hp9122c.h"
 #include "hp9895.h"
 
 void hp_ieee488_devices(device_slot_interface &device)
 {
-	device.option_add("hp9122c", HP9122C);
 	device.option_add("hp9895", HP9895);
 }
 

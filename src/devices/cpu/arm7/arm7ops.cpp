@@ -1564,12 +1564,7 @@ void arm7_cpu_device::arm9ops_1(uint32_t insn)
 	else if ((insn & 0x00ff00f0) == 0x00010000) /* set endianness (SETEND) */
 	{
 		// unsupported (armv6 onwards only)
-		if (m_archRev < 6) arm9ops_undef(insn);
-		else
-		{
-			uint32_t new_cpsr = GET_CPSR & ~(1 << 9);
-			set_cpsr(new_cpsr | (insn & (1 << 9)));
-		}
+		arm9ops_undef(insn);
 		R15 += 4;
 	}
 	else
@@ -1585,7 +1580,7 @@ void arm7_cpu_device::arm9ops_57(uint32_t insn)
 	if ((insn & 0x0070f000) == 0x0050f000)
 	{
 		// unsupported (armv6 onwards only)
-		if(m_archRev < 6) arm9ops_undef(insn);
+		arm9ops_undef(insn);
 		R15 += 4;
 	}
 	else

@@ -6,8 +6,6 @@
 
 ***************************************************************************/
 
-#include "emupal.h"
-
 class battlane_state : public driver_device
 {
 public:

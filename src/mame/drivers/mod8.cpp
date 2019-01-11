@@ -67,17 +67,15 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void mod8(machine_config &config);
-
-private:
 	DECLARE_WRITE8_MEMBER(out_w);
 	DECLARE_WRITE8_MEMBER(tty_w);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(tty_r);
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
+	void mod8(machine_config &config);
 	void mod8_io(address_map &map);
 	void mod8_mem(address_map &map);
-
+private:
 	uint16_t m_tty_data;
 	uint8_t m_tty_key_data;
 	int m_tty_cnt;
@@ -122,9 +120,10 @@ void mod8_state::mod8_mem(address_map &map)
 void mod8_state::mod8_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).r(FUNC(mod8_state::tty_r));
-	map(0x0a, 0x0a).w(FUNC(mod8_state::out_w));
-	map(0x0b, 0x0b).w(FUNC(mod8_state::tty_w));
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(mod8_state::tty_r));
+	map(0x0a, 0x0a).w(this, FUNC(mod8_state::out_w));
+	map(0x0b, 0x0b).w(this, FUNC(mod8_state::tty_w));
 }
 
 /* Input ports */
@@ -154,8 +153,8 @@ MACHINE_CONFIG_START(mod8_state::mod8)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
 
 	/* video hardware */
-	TELEPRINTER(config, m_teleprinter, 0);
-	m_teleprinter->set_keyboard_callback(FUNC(mod8_state::kbd_put));
+	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)
+	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(mod8_state, kbd_put))
 MACHINE_CONFIG_END
 
 

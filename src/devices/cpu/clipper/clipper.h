@@ -94,15 +94,11 @@ public:
 
 	enum ssw_id : u32
 	{
-		SSW_ID_C1R1 = 0x00000,
-		SSW_ID_C2R1 = 0x00200,
-		SSW_ID_C3R1 = 0x00400,
-		SSW_ID_E1R1 = 0x00600,
-		SSW_ID_C4R0 = 0x00800,
-		SSW_ID_C4R1 = 0x04800,
-		SSW_ID_C4R2 = 0x08800,
-		SSW_ID_C4R3 = 0x0c800,
-		SSW_ID_C4R4 = 0x10800
+		SSW_ID_C400R0 = 0x00800,
+		SSW_ID_C400R1 = 0x04800,
+		SSW_ID_C400R2 = 0x08800,
+		SSW_ID_C400R3 = 0x0c800,
+		SSW_ID_C400R4 = 0x10800
 	};
 
 	// trap source values are shifted into the correct field in the psw
@@ -269,9 +265,6 @@ protected:
 		m_ssw |= SSW_FRD;
 	};
 
-	std::string debug_string(u32 pointer);
-	std::string debug_string_array(u32 array_pointer);
-
 	// emulation state
 	address_space_config m_main_config;
 	address_space_config m_io_config;
@@ -279,12 +272,11 @@ protected:
 
 	enum registers
 	{
-		CLIPPER_UREG = 0,
-		CLIPPER_SREG = 16,
-		CLIPPER_FREG = 32,
-		CLIPPER_PSW  = 48,
-		CLIPPER_SSW  = 49,
-		CLIPPER_PC   = 50,
+		CLIPPER_IREG = 0,
+		CLIPPER_FREG = 16,
+		CLIPPER_PSW  = 32,
+		CLIPPER_SSW  = 33,
+		CLIPPER_PC   = 34,
 	};
 
 	int m_icount;    // instruction cycle count

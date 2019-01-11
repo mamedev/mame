@@ -61,6 +61,14 @@ enum
 
 
 /***************************************************************************
+    CONFIGURATION
+***************************************************************************/
+
+#define MCFG_JAGUAR_IRQ_HANDLER(_devcb) \
+	devcb = &downcast<jaguar_cpu_device &>(*device).set_int_func(DEVCB_##_devcb);
+
+
+/***************************************************************************
     INTERRUPT CONSTANTS
 ***************************************************************************/
 
@@ -88,7 +96,7 @@ public:
 	~jaguar_cpu_device();
 
 	// configuration helpers
-	auto irq() { return m_cpu_interrupt.bind(); }
+	template <class Object> devcb_base &set_int_func(Object &&cb) { return m_cpu_interrupt.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_WRITE32_MEMBER(ctrl_w) = 0;
 	virtual DECLARE_READ32_MEMBER(ctrl_r) = 0;

@@ -135,10 +135,9 @@
         137412-109  Road Blasters (some versions)
         137412-110  Road Blasters
         137412-110  APB
-        137412-111  Pit Fighter (Aug 09, 1990 to Aug 22, 1990)
-        137412-112  Pit Fighter (Aug 22, 1990 to Oct 01, 1990)
-        137412-113  Pit Fighter (Oct 09, 1990 to Oct 12, 1990)
-        137412-114  Pit Fighter (Nov 01, 1990 and later)
+        137412-111  Pit Fighter
+        137412-112  Pit Fighter (Europe)
+        137412-113  Unknown (Europe)
         137412-115  Race Drivin' DSK board
         137412-116  Hydra
         137412-116  Tournament Cyberball 2072
@@ -512,7 +511,7 @@ static const struct slapstic_data slapstic110 =
  *
  *************************************/
 
-/* slapstic 137412-111: Pit Fighter (Aug 09, 1990 to Aug 22, 1990) (confirmed) */
+/* slapstic 137412-111: Pit Fighter (confirmed) */
 static const struct slapstic_data slapstic111 =
 {
 	/* basic banking */
@@ -538,7 +537,7 @@ static const struct slapstic_data slapstic111 =
 };
 
 
-/* slapstic 137412-112: Pit Fighter (Aug 22, 1990 to Oct 01, 1990) (confirmed) */
+/* slapstic 137412-112: Pit Fighter (Japan) (confirmed) */
 static const struct slapstic_data slapstic112 =
 {
 	/* basic banking */
@@ -564,7 +563,7 @@ static const struct slapstic_data slapstic112 =
 };
 
 
-/* slapstic 137412-113: Pit Fighter (Oct 09, 1990 to Oct 12, 1990) (confirmed) */
+/* slapstic 137412-113: Unknown (Europe) (confirmed) */
 static const struct slapstic_data slapstic113 =
 {
 	/* basic banking */
@@ -590,7 +589,7 @@ static const struct slapstic_data slapstic113 =
 };
 
 
-/* slapstic 137412-114: Pit Fighter (Nov 01, 1990 and later) (confirmed) */
+/* slapstic 137412-114: Pit Fighter (rev 9) (confirmed) */
 static const struct slapstic_data slapstic114 =
 {
 	/* basic banking */
@@ -767,6 +766,13 @@ void atari_slapstic_device::device_validity_check(validity_checker &valid) const
 
 void atari_slapstic_device::slapstic_init()
 {
+	if (access_68k == -1)
+	{
+		/* see if we're 68k or 6502/6809 based */
+		device_type cputype = machine().device(":maincpu")->type();
+		access_68k = (cputype == M68000 || cputype == M68010);
+	}
+
 	/* set up the parameters */
 	slapstic = *slapstic_table[m_chipnum - 101];
 

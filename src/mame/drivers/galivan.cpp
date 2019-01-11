@@ -63,7 +63,7 @@ void galivan_state::galivan_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 
 	map(0xc000, 0xdfff).bankr("bank1");
-	map(0xd800, 0xdfff).w(FUNC(galivan_state::galivan_videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).w(this, FUNC(galivan_state::galivan_videoram_w)).share("videoram");
 
 	map(0xe000, 0xe0ff).ram().share("spriteram");
 	map(0xe100, 0xffff).ram();
@@ -74,7 +74,7 @@ void galivan_state::ninjemak_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 
 	map(0xc000, 0xdfff).bankr("bank1");
-	map(0xd800, 0xdfff).w(FUNC(galivan_state::galivan_videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).w(this, FUNC(galivan_state::galivan_videoram_w)).share("videoram");
 
 	map(0xe000, 0xe1ff).ram().share("spriteram");
 	map(0xe200, 0xffff).ram();
@@ -88,13 +88,13 @@ void galivan_state::io_map(address_map &map)
 	map(0x02, 0x02).portr("SYSTEM");
 	map(0x03, 0x03).portr("DSW1");
 	map(0x04, 0x04).portr("DSW2");
-	map(0x40, 0x40).w(FUNC(galivan_state::galivan_gfxbank_w));
-	map(0x41, 0x42).w(FUNC(galivan_state::galivan_scrollx_w));
-	map(0x43, 0x44).w(FUNC(galivan_state::galivan_scrolly_w));
-	map(0x45, 0x45).w(FUNC(galivan_state::galivan_sound_command_w));
+	map(0x40, 0x40).w(this, FUNC(galivan_state::galivan_gfxbank_w));
+	map(0x41, 0x42).w(this, FUNC(galivan_state::galivan_scrollx_w));
+	map(0x43, 0x44).w(this, FUNC(galivan_state::galivan_scrolly_w));
+	map(0x45, 0x45).w(this, FUNC(galivan_state::galivan_sound_command_w));
 //  AM_RANGE(0x46, 0x46) AM_WRITENOP
 //  AM_RANGE(0x47, 0x47) AM_WRITENOP
-	map(0xc0, 0xc0).r(FUNC(galivan_state::IO_port_c0_r)); /* dangar needs to return 0x58 */
+	map(0xc0, 0xc0).r(this, FUNC(galivan_state::IO_port_c0_r)); /* dangar needs to return 0x58 */
 }
 
 void dangarj_state::dangarj_io_map(address_map &map)
@@ -114,13 +114,13 @@ WRITE8_MEMBER(galivan_state::blit_trigger_w)
 void galivan_state::ninjemak_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x80, 0x80).portr("P1").w(FUNC(galivan_state::ninjemak_gfxbank_w));
+	map(0x80, 0x80).portr("P1").w(this, FUNC(galivan_state::ninjemak_gfxbank_w));
 	map(0x81, 0x81).portr("P2");
 	map(0x82, 0x82).portr("SYSTEM");
 	map(0x83, 0x83).portr("SERVICE");
 	map(0x84, 0x84).portr("DSW1");
-	map(0x85, 0x85).portr("DSW2").w(FUNC(galivan_state::galivan_sound_command_w));
-	map(0x86, 0x86).w(FUNC(galivan_state::blit_trigger_w));         // ??
+	map(0x85, 0x85).portr("DSW2").w(this, FUNC(galivan_state::galivan_sound_command_w));
+	map(0x86, 0x86).w(this, FUNC(galivan_state::blit_trigger_w));         // ??
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP         // ??
 }
 
@@ -134,9 +134,9 @@ void galivan_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ymsnd", FUNC(ym3526_device::write));
-	map(0x02, 0x02).w("dac1", FUNC(dac_byte_interface::data_w));
-	map(0x03, 0x03).w("dac2", FUNC(dac_byte_interface::data_w));
-	map(0x04, 0x04).r(FUNC(galivan_state::soundlatch_clear_r));
+	map(0x02, 0x02).w("dac1", FUNC(dac_byte_interface::write));
+	map(0x03, 0x03).w("dac2", FUNC(dac_byte_interface::write));
+	map(0x04, 0x04).r(this, FUNC(galivan_state::soundlatch_clear_r));
 	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -455,17 +455,19 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_galivan)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
-	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galivan)
+	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -482,7 +484,7 @@ MACHINE_CONFIG_START(dangarj_state::dangarj)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(dangarj_io_map)
 
-	NB1412M2(config, m_prot, XTAL(8'000'000)); // divided by 2 maybe
+	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)) // divided by 2 maybe
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galivan_state::ninjemak)
@@ -513,17 +515,19 @@ MACHINE_CONFIG_START(galivan_state::ninjemak)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galivan_state, screen_update_ninjemak)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
-	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galivan)
+	MCFG_PALETTE_ADD("palette", 8*16+16*16+256*16)
+	MCFG_PALETTE_INDIRECT_ENTRIES(256)
+	MCFG_PALETTE_INIT_OWNER(galivan_state, galivan)
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_ADD("ymsnd", YM3526, XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

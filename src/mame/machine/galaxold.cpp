@@ -66,7 +66,8 @@ void galaxold_state::machine_reset_common(int line)
 	m_7474_9m_1->preset_w(0);
 
 	/* start a timer to generate interrupts */
-	subdevice<timer_device>("int_timer")->adjust(m_screen->time_until_pos(0));
+	timer_device *int_timer = machine().device<timer_device>("int_timer");
+	int_timer->adjust(m_screen->time_until_pos(0));
 }
 
 MACHINE_RESET_MEMBER(galaxold_state,galaxold)
@@ -108,7 +109,7 @@ WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_2_w)
 
 WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
 {
-	m_leds[offset] = BIT(data, 0);
+	m_led[offset] = BIT(data, 0);
 }
 
 READ8_MEMBER(galaxold_state::scramblb_protection_1_r)

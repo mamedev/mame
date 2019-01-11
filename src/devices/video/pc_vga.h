@@ -184,7 +184,6 @@ protected:
 	/**/    uint8_t map13;
 	/**/    uint8_t irq_clear;
 	/**/    uint8_t irq_disable;
-			uint8_t no_wrap;
 		} crtc;
 
 		struct

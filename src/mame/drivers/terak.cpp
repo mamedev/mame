@@ -13,7 +13,6 @@ Floppies were 8 inch IBM format.
 
 #include "emu.h"
 #include "cpu/t11/t11.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -23,24 +22,22 @@ public:
 	terak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-	{ }
+		{ }
 
-	void terak(machine_config &config);
-
-private:
 	DECLARE_READ16_MEMBER(terak_fdc_status_r);
 	DECLARE_WRITE16_MEMBER(terak_fdc_command_w);
 	DECLARE_READ16_MEMBER(terak_fdc_data_r);
 	DECLARE_WRITE16_MEMBER(terak_fdc_data_w);
 	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void terak(machine_config &config);
 	void mem_map(address_map &map);
-
+private:
 	uint8_t m_unit;
 	uint8_t m_cmd;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_device<t11_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 };
 
 READ16_MEMBER( terak_state::terak_fdc_status_r )
@@ -79,8 +76,8 @@ void terak_state::mem_map(address_map &map)
 
 	// octal
 	map(0173000, 0173177).rom(); // ROM
-	map(0177000, 0177001).rw(FUNC(terak_state::terak_fdc_status_r), FUNC(terak_state::terak_fdc_command_w));
-	map(0177002, 0177003).rw(FUNC(terak_state::terak_fdc_data_r), FUNC(terak_state::terak_fdc_data_w));
+	map(0177000, 0177001).rw(this, FUNC(terak_state::terak_fdc_status_r), FUNC(terak_state::terak_fdc_command_w));
+	map(0177002, 0177003).rw(this, FUNC(terak_state::terak_fdc_data_r), FUNC(terak_state::terak_fdc_data_w));
 }
 
 /* Input ports */
@@ -102,24 +99,24 @@ uint32_t terak_state::screen_update_terak(screen_device &screen, bitmap_ind16 &b
 }
 
 
-void terak_state::terak(machine_config &config)
-{
+MACHINE_CONFIG_START(terak_state::terak)
 	/* basic machine hardware */
-	T11(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_initial_mode(6 << 13);
-	m_maincpu->set_addrmap(AS_PROGRAM, &terak_state::mem_map);
+	MCFG_DEVICE_ADD("maincpu",T11, XTAL(4'000'000))
+	MCFG_T11_INITIAL_MODE(6 << 13)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(terak_state::screen_update_terak));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_UPDATE_DRIVER(terak_state, screen_update_terak)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-}
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( terak )

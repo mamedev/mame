@@ -61,7 +61,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/wave.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -86,10 +85,9 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// needed by dg680 class
-	required_device<cpu_device> m_maincpu; // S2650 or Z80
+	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 
-	void binbug_base(machine_config &config);
 	void binbug(machine_config &config);
 	void binbug_data(address_map &map);
 	void binbug_mem(address_map &map);
@@ -127,7 +125,7 @@ void binbug_state::binbug_mem(address_map &map)
 void binbug_state::binbug_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(FUNC(binbug_state::binbug_ctrl_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(binbug_state::binbug_ctrl_w));
 }
 
 /* Input ports */
@@ -300,45 +298,38 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-void binbug_state::binbug_base(machine_config &config)
-{
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_color(rgb_t::amber());
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(binbug_state::screen_update));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 511, 0, 255);
-	screen.set_palette("palette");
-
-	GFXDECODE(config, "gfxdecode", "palette", gfx_dg640);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-
-	/* Cassette */
-	CASSETTE(config, m_cass);
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-}
-
-void binbug_state::binbug(machine_config &config)
-{
-	binbug_base(config);
-
+MACHINE_CONFIG_START(binbug_state::binbug)
 	/* basic machine hardware */
-	s2650_device &maincpu(S2650(config, m_maincpu, XTAL(1'000'000)));
-	maincpu.set_addrmap(AS_PROGRAM, &binbug_state::binbug_mem);
-	maincpu.set_addrmap(AS_DATA, &binbug_state::binbug_data);
-	maincpu.sense_handler().set(FUNC(binbug_state::binbug_serial_r));
-	maincpu.flag_handler().set(FUNC(binbug_state::binbug_serial_w));
+	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(binbug_mem)
+	MCFG_DEVICE_DATA_MAP(binbug_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, binbug_state, binbug_serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, binbug_state, binbug_serial_w))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dg640)
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
-	RS232_PORT(config, m_rs232, default_rs232_devices, "keyboard").set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
+	MCFG_DEVICE_ADD("keyboard", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+
+	/* Cassette */
+	MCFG_CASSETTE_ADD( "cassette" )
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(binbug_state, binbug), this), "pgm", 1);
-}
+	MCFG_QUICKLOAD_ADD("quickload", binbug_state, binbug, "pgm", 1)
+MACHINE_CONFIG_END
 
 
 /* ROM definition */
@@ -438,7 +429,6 @@ public:
 	void dg680(machine_config &config);
 	void dg680_io(address_map &map);
 	void dg680_mem(address_map &map);
-
 private:
 	uint8_t m_pio_b;
 	uint8_t m_term_data;
@@ -464,7 +454,7 @@ void dg680_state::dg680_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x04, 0x07).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x08, 0x08).rw(FUNC(dg680_state::port08_r), FUNC(dg680_state::port08_w)); //SWP Control and Status
+	map(0x08, 0x08).rw(this, FUNC(dg680_state::port08_r), FUNC(dg680_state::port08_w)); //SWP Control and Status
 	//AM_RANGE(0x09,0x09) parallel input port
 	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
 	//AM_RANGE(0x0c,0x0d) AM_DEVREADWRITE("am9519", am9519_device, read, write)
@@ -544,35 +534,50 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
 	m_ctc->trg3(0);
 }
 
-void dg680_state::dg680(machine_config &config)
-{
-	binbug_base(config);
-
+MACHINE_CONFIG_START(dg680_state::dg680)
 	/* basic machine hardware */
-	z80_device& maincpu(Z80(config, m_maincpu, XTAL(8'000'000) / 4));
-	maincpu.set_addrmap(AS_PROGRAM, &dg680_state::dg680_mem);
-	maincpu.set_addrmap(AS_IO, &dg680_state::dg680_io);
-	maincpu.set_daisy_config(dg680_daisy_chain);
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(dg680_mem)
+	MCFG_DEVICE_IO_MAP(dg680_io)
+	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dg640)
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Keyboard */
-	generic_keyboard_device &keyb(GENERIC_KEYBOARD(config, "keyb", 0));
-	keyb.set_keyboard_callback(FUNC(dg680_state::kbd_put));
+	MCFG_DEVICE_ADD("keyb", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(dg680_state, kbd_put))
+
+	/* Cassette */
+	MCFG_CASSETTE_ADD( "cassette" )
+	SPEAKER(config, "mono").front_center();
+	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	z80ctc_device& ctc(Z80CTC(config, "z80ctc", XTAL(8'000'000) / 4));
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(8'000'000) / 4)
+	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("z80ctc", z80ctc_device, trg1))
 
-	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(8'000'000) / 4));
-	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio.in_pa_callback().set(FUNC(dg680_state::porta_r));
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(8'000'000) / 4)
+	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, dg680_state, porta_r))
 	// OUT_ARDY - this activates to ask for kbd data but not known if actually used
-	pio.in_pb_callback().set(FUNC(dg680_state::portb_r));
-	pio.out_pb_callback().set(FUNC(dg680_state::portb_w));
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, dg680_state, portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, dg680_state, portb_w))
 
-	TIMER(config, "ctc0").configure_periodic(FUNC(dg680_state::time_tick), attotime::from_hz(200));
-	TIMER(config, "ctc3").configure_periodic(FUNC(dg680_state::uart_tick), attotime::from_hz(4800));
-}
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc0", dg680_state, time_tick, attotime::from_hz(200))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc3", dg680_state, uart_tick, attotime::from_hz(4800))
+MACHINE_CONFIG_END
+
 
 /* ROM definition */
 ROM_START( dg680 )

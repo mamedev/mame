@@ -22,7 +22,6 @@
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -30,8 +29,8 @@
 class jr100_state : public driver_device
 {
 public:
-	jr100_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	jr100_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_pcg(*this, "pcg"),
 		m_vram(*this, "vram"),
@@ -49,12 +48,8 @@ public:
 		m_line6(*this, "LINE6"),
 		m_line7(*this, "LINE7"),
 		m_line8(*this, "LINE8") ,
-		m_maincpu(*this, "maincpu")
-	{ }
+		m_maincpu(*this, "maincpu") { }
 
-	void jr100(machine_config &config);
-
-private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_pcg;
 	required_shared_ptr<uint8_t> m_vram;
@@ -68,7 +63,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(sound_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_tick);
 	DECLARE_READ8_MEMBER(jr100_via_read_b);
 	DECLARE_WRITE8_MEMBER(jr100_via_write_a);
 	DECLARE_WRITE8_MEMBER(jr100_via_write_b);
@@ -77,8 +72,9 @@ private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
 
 
+	void jr100(machine_config &config);
 	void jr100_mem(address_map &map);
-
+protected:
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
@@ -93,10 +89,10 @@ private:
 	required_ioport m_line6;
 	required_ioport m_line7;
 	required_ioport m_line8;
-	required_device<m6802_cpu_device> m_maincpu;
-
-	emu_timer *m_sound_timer;
+	required_device<cpu_device> m_maincpu;
 };
+
+
 
 
 WRITE8_MEMBER(jr100_state::jr100_via_w)
@@ -131,7 +127,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 			m_beeper->set_clock(894886.25 / (double)(m_t1latch) / 2.0);
 		}
 	}
-	m_via->write(offset,data);
+	m_via->write(space,offset,data);
 }
 
 void jr100_state::jr100_mem(address_map &map)
@@ -140,7 +136,7 @@ void jr100_state::jr100_mem(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram");
 	map(0xc000, 0xc0ff).ram().share("pcg");
 	map(0xc100, 0xc3ff).ram().share("vram");
-	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(FUNC(jr100_state::jr100_via_w));
+	map(0xc800, 0xc80f).r(m_via, FUNC(via6522_device::read)).w(this, FUNC(jr100_state::jr100_via_w));
 	map(0xe000, 0xffff).rom();
 }
 
@@ -213,14 +209,10 @@ INPUT_PORTS_END
 
 void jr100_state::machine_start()
 {
-	if (!m_sound_timer)
-		m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr100_state::sound_tick), this));
 }
 
 void jr100_state::machine_reset()
 {
-	attotime timer_period = attotime::from_hz(XTAL(14'318'181) / 16);
-	m_sound_timer->adjust(timer_period, 0, timer_period);
 }
 
 void jr100_state::video_start()
@@ -308,7 +300,7 @@ WRITE_LINE_MEMBER(jr100_state::jr100_via_write_cb2)
 	m_cassette->output(state ? -1.0 : +1.0);
 }
 
-TIMER_CALLBACK_MEMBER(jr100_state::sound_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(jr100_state::sound_tick)
 {
 	m_speaker->level_w(m_speaker_data);
 	m_speaker_data = 0;
@@ -376,42 +368,45 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 	return image_init_result::PASS;
 }
 
-void jr100_state::jr100(machine_config &config)
-{
+MACHINE_CONFIG_START(jr100_state::jr100)
+
 	/* basic machine hardware */
-	M6802(config, m_maincpu, XTAL(14'318'181) / 4); // clock divided internally by 4
-	m_maincpu->set_addrmap(AS_PROGRAM, &jr100_state::jr100_mem);
+	MCFG_DEVICE_ADD("maincpu",M6802, XTAL(14'318'181) / 4) // clock devided internaly by 4
+	MCFG_DEVICE_PROGRAM_MAP(jr100_mem)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(256, 192); /* border size not accurate */
-	screen.set_visarea(0, 256 - 1, 0, 192 - 1);
-	screen.set_screen_update(FUNC(jr100_state::screen_update_jr100));
-	screen.set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(256, 192) /* border size not accurate */
+	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 192 - 1)
+	MCFG_SCREEN_UPDATE_DRIVER(jr100_state, screen_update_jr100)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_jr100);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jr100)
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	VIA6522(config, m_via, XTAL(14'318'181) / 16);
-	m_via->readpb_handler().set(FUNC(jr100_state::jr100_via_read_b));
-	m_via->writepa_handler().set(FUNC(jr100_state::jr100_via_write_a));
-	m_via->writepb_handler().set(FUNC(jr100_state::jr100_via_write_b));
-	m_via->cb2_handler().set(FUNC(jr100_state::jr100_via_write_cb2));
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(14'318'181) / 16)
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, jr100_state,jr100_via_read_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, jr100_state,jr100_via_write_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, jr100_state,jr100_via_write_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, jr100_state, jr100_via_write_cb2))
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	CASSETTE(config, m_cassette, 0);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED));
+	MCFG_DEVICE_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+
+	MCFG_CASSETTE_ADD( "cassette" )
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_tick", jr100_state, sound_tick, attotime::from_hz(XTAL(14'318'181) / 16))
 
 	/* quickload */
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(jr100_state, jr100), this), "prg", 2);
-}
+	MCFG_QUICKLOAD_ADD("quickload", jr100_state, jr100, "prg", 2)
+MACHINE_CONFIG_END
 
 
 /* ROM definition */

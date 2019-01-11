@@ -208,13 +208,9 @@ public:
 		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -302,36 +298,36 @@ public:
 		// Light sphere
 		m_lightSphere = meshLoad("meshes/unit_sphere.bin");
 
-		const uint64_t tsFlags = 0
+		const uint32_t samplerFlags = 0
 			| BGFX_TEXTURE_RT
-			| BGFX_SAMPLER_MIN_POINT
-			| BGFX_SAMPLER_MAG_POINT
-			| BGFX_SAMPLER_MIP_POINT
-			| BGFX_SAMPLER_U_CLAMP
-			| BGFX_SAMPLER_V_CLAMP
+			| BGFX_TEXTURE_MIN_POINT
+			| BGFX_TEXTURE_MAG_POINT
+			| BGFX_TEXTURE_MIP_POINT
+			| BGFX_TEXTURE_U_CLAMP
+			| BGFX_TEXTURE_V_CLAMP
 			;
 
 		// Make gbuffer and related textures
-		m_gbufferTex[GBUFFER_RT_NORMAL] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::BGRA8, tsFlags);
-		m_gbufferTex[GBUFFER_RT_COLOR]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::BGRA8, tsFlags);
-		m_gbufferTex[GBUFFER_RT_DEPTH]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::D24,   tsFlags);
+		m_gbufferTex[GBUFFER_RT_NORMAL] = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+		m_gbufferTex[GBUFFER_RT_COLOR]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
+		m_gbufferTex[GBUFFER_RT_DEPTH]  = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::D24,   samplerFlags);
 		m_gbuffer = bgfx::createFrameBuffer(BX_COUNTOF(m_gbufferTex), m_gbufferTex, true);
 
 		// Make light buffer
-		m_lightBufferTex = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::BGRA8, tsFlags);
+		m_lightBufferTex = bgfx::createTexture2D(bgfx::BackbufferRatio::Equal, false, 1, bgfx::TextureFormat::BGRA8, samplerFlags);
 		bgfx::TextureHandle lightBufferRTs[] =  {
 			m_lightBufferTex
 		};
 		m_lightBuffer = bgfx::createFrameBuffer(BX_COUNTOF(lightBufferRTs), lightBufferRTs, true);
 
 		// Make shadow buffer
-		const uint64_t rsmFlags = 0
+		const uint32_t rsmFlags = 0
 			| BGFX_TEXTURE_RT
-			| BGFX_SAMPLER_MIN_POINT
-			| BGFX_SAMPLER_MAG_POINT
-			| BGFX_SAMPLER_MIP_POINT
-			| BGFX_SAMPLER_U_CLAMP
-			| BGFX_SAMPLER_V_CLAMP
+			| BGFX_TEXTURE_MIN_POINT
+			| BGFX_TEXTURE_MAG_POINT
+			| BGFX_TEXTURE_MIP_POINT
+			| BGFX_TEXTURE_U_CLAMP
+			| BGFX_TEXTURE_V_CLAMP
 			;
 
 		// Reflective shadow map
@@ -340,8 +336,8 @@ public:
 				, SHADOW_MAP_DIM
 				, false
 				, 1
-				, bgfx::TextureFormat::BGRA8
-				, rsmFlags
+				, bgfx::TextureFormat::BGRA8,
+				rsmFlags
 				);
 
 		// Typical shadow map
@@ -350,12 +346,12 @@ public:
 				, SHADOW_MAP_DIM
 				, false
 				, 1
-				, bgfx::TextureFormat::D16
-				, BGFX_TEXTURE_RT /* | BGFX_TEXTURE_COMPARE_LEQUAL*/
+				, bgfx::TextureFormat::D16,
+				BGFX_TEXTURE_RT/* | BGFX_TEXTURE_COMPARE_LEQUAL*/
 				);  // Note I'm not setting BGFX_TEXTURE_COMPARE_LEQUAL.  Why?
-					// Normally a PCF shadow map such as this requires a compare.  However, this sample also
-					// reads from this texture in the lighting pass, and only uses the PCF capabilites in the
-					// combine pass, so the flag is disabled by default.
+		// Normally a PCF shadow map such as this requires a compare.  However, this sample also
+		// reads from this texture in the lighting pass, and only uses the PCF capabilites in the
+		// combine pass, so the flag is disabled by default.
 
 		m_shadowBuffer = bgfx::createFrameBuffer(BX_COUNTOF(m_shadowBufferTex), m_shadowBufferTex, true);
 
@@ -476,7 +472,7 @@ public:
 			lightAt[1] = 0.0f;
 			lightAt[2] = 0.0f;
 
-			bx::mtxLookAt(smView, bx::load(lightEye), bx::load(lightAt) );
+			bx::mtxLookAt(smView, lightEye, lightAt);
 			const float area = 10.0f;
 			const bgfx::Caps* caps = bgfx::getCaps();
 			bx::mtxOrtho(smProj, -area, area, -area, area, -100.0f, 100.0f, 0.0f, caps->homogeneousDepth);
@@ -529,9 +525,9 @@ public:
 					bgfx::setUniform(u_sphereInfo, sphereInfo);
 
 					const uint64_t lightDrawState = 0
-						| BGFX_STATE_WRITE_RGB
+						| BGFX_STATE_RGB_WRITE
 						| BGFX_STATE_BLEND_ADD   // <===  Overlapping lights contribute more
-						| BGFX_STATE_WRITE_A
+						| BGFX_STATE_ALPHA_WRITE
 						| BGFX_STATE_CULL_CW     // <===  If we go into the lights, there will be problems, so we draw the far back face.
 						;
 
@@ -553,7 +549,7 @@ public:
 			bgfx::setTexture(2, s_light,     bgfx::getTexture(m_lightBuffer, 0) );
 			bgfx::setTexture(3, s_depth,     bgfx::getTexture(m_gbuffer, GBUFFER_RT_DEPTH) );
 			bgfx::setTexture(4, s_shadowMap, bgfx::getTexture(m_shadowBuffer, SHADOW_RT_DEPTH)
-				, BGFX_SAMPLER_COMPARE_LEQUAL
+				, BGFX_TEXTURE_COMPARE_LEQUAL
 				);
 
 			// Uniforms for combine pass
@@ -569,8 +565,8 @@ public:
 			// Set up state for combine pass
 			// point of this is to avoid doing depth test, which is in the default state
 			bgfx::setState(0
-				| BGFX_STATE_WRITE_RGB
-				| BGFX_STATE_WRITE_A
+				| BGFX_STATE_RGB_WRITE
+				| BGFX_STATE_ALPHA_WRITE
 				);
 
 			// Set up transform matrix for fullscreen quad
@@ -597,15 +593,12 @@ public:
 
 			ImGui::SetNextWindowPos(
 				  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_width / 5.0f, m_height / 3.0f)
-				, ImGuiCond_FirstUseEver
+				, ImGuiSetCond_FirstUseEver
 				);
 			ImGui::Begin("Settings"
 				, NULL
-				, 0
+				, ImVec2(m_width / 5.0f, m_height / 3.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
 			ImGui::SliderFloat("RSM Amount",      &m_rsmAmount, 0.0f, 0.7f);
@@ -680,9 +673,9 @@ public:
 	{
 		float el = m_lightElevation * (bx::kPi/180.0f);
 		float az = m_lightAzimuth   * (bx::kPi/180.0f);
-		m_lightDir[0] = bx::cos(el)*bx::cos(az);
-		m_lightDir[2] = bx::cos(el)*bx::sin(az);
-		m_lightDir[1] = bx::sin(el);
+		m_lightDir[0] = bx::fcos(el)*bx::fcos(az);
+		m_lightDir[2] = bx::fcos(el)*bx::fsin(az);
+		m_lightDir[1] = bx::fsin(el);
 		m_lightDir[3] = 0.0f;
 	}
 

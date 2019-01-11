@@ -38,7 +38,7 @@ protected:
 	void dack_w(int line, uint8_t data) override;
 
 	required_device<pc_joy_device> m_joy;
-	required_device<i80c31_device> m_cpu;
+	required_device<cpu_device> m_cpu;
 
 private:
 	// internal state

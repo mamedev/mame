@@ -191,19 +191,19 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_DEVICE_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(aim65_mem)
 
-	config.set_default_layout(layout_aim65);
+	MCFG_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
-	DL1416T(config, m_ds[0], u32(0));
-	m_ds[0]->update().set(FUNC(aim65_state::aim65_update_ds<1>));
-	DL1416T(config, m_ds[1], u32(0));
-	m_ds[1]->update().set(FUNC(aim65_state::aim65_update_ds<2>));
-	DL1416T(config, m_ds[2], u32(0));
-	m_ds[2]->update().set(FUNC(aim65_state::aim65_update_ds<3>));
-	DL1416T(config, m_ds[3], u32(0));
-	m_ds[3]->update().set(FUNC(aim65_state::aim65_update_ds<4>));
-	DL1416T(config, m_ds[4], u32(0));
-	m_ds[4]->update().set(FUNC(aim65_state::aim65_update_ds<5>));
+	MCFG_DEVICE_ADD("ds1", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<1>))
+	MCFG_DEVICE_ADD("ds2", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<2>))
+	MCFG_DEVICE_ADD("ds3", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<3>))
+	MCFG_DEVICE_ADD("ds4", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<4>))
+	MCFG_DEVICE_ADD("ds5", DL1416T, u32(0))
+	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();
@@ -215,21 +215,21 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_MOS6530n_IN_PB_CB(READ8(*this, aim65_state, aim65_riot_b_r))
 	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	via6522_device &via0(VIA6522(config, "via6522_0", AIM65_CLOCK));
-	via0.readpb_handler().set(FUNC(aim65_state::aim65_pb_r));
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, AIM65_CLOCK)
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, aim65_state, aim65_pb_r))
 	// in CA1 printer ready?
-	via0.writepb_handler().set(FUNC(aim65_state::aim65_pb_w));
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pb_w))
 	// out CB1 printer start
 	// out CA2 cass control (H=in)
 	// out CB2 turn printer on
-	via0.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	via6522_device &via1(VIA6522(config, "via6522_1", AIM65_CLOCK));
-	via1.irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, AIM65_CLOCK)
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 
-	pia6821_device &pia(PIA6821(config, "pia6821", 0));
-	pia.writepa_handler().set(FUNC(aim65_state::aim65_pia_a_w));
-	pia.writepb_handler().set(FUNC(aim65_state::aim65_pia_b_w));
+	MCFG_DEVICE_ADD("pia6821", PIA6821, 0)
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, aim65_state, aim65_pia_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, aim65_state, aim65_pia_b_w))
 
 	// Deck 1 can play and record
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -269,7 +269,9 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_GENERIC_LOAD(aim65_state, z15_load)
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("4K")
+	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","aim65_cart")
@@ -283,11 +285,11 @@ MACHINE_CONFIG_END
 ROM_START( aim65 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "aim65",  "Rockwell AIM-65")
-	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(0))
-	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(0))
+	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
+	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "dynatem",  "Dynatem AIM-65")
-	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
-	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(1))
+	ROMX_LOAD("dynaim65.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(2))
+	ROMX_LOAD("dynaim65.z22", 0xf000, 0x1000, CRC(83e1c6e7) SHA1(444134043edd83385bd70434cb100269901c4417), ROM_BIOS(2))
 ROM_END
 
 /* Currently dumped and available software:

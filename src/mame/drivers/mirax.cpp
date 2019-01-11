@@ -105,7 +105,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -113,8 +112,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 class mirax_state : public driver_device
 {
 public:
-	mirax_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	mirax_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ay(*this, "ay%u", 1),
@@ -123,17 +122,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_colorram(*this, "colorram")
-	{ }
+		m_colorram(*this, "colorram")  { }
 
-	void mirax(machine_config &config);
-
-	void init_mirax();
-
-protected:
-	virtual void machine_start() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<ay8912_device, 2> m_ay;
@@ -160,44 +150,46 @@ private:
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 
-	void mirax_palette(palette_device &palette) const;
+	void init_mirax();
+	DECLARE_PALETTE_INIT(mirax);
+	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t draw_flag);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	void mirax(machine_config &config);
 	void mirax_main_map(address_map &map);
 	void mirax_sound_map(address_map &map);
 };
 
 
-void mirax_state::mirax_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(mirax_state, mirax)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0;i < palette.entries();i++)
 	{
-		int bit0, bit1, bit2;
+		int bit0,bit1,bit2,r,g,b;
 
-		// red component
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		// green component
-		bit0 = BIT(color_prom[i], 3);
-		bit1 = BIT(color_prom[i], 4);
-		bit2 = BIT(color_prom[i], 5);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		// blue component
-		bit0 = BIT(color_prom[i], 6);
-		bit1 = BIT(color_prom[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -205,24 +197,26 @@ void mirax_state::mirax_palette(palette_device &palette) const
 void mirax_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t draw_flag)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
+	int y,x;
+	int res_x,res_y,wrapy;
 
-	for (int y = 0; y < 32; y++)
+	for (y=0;y<32;y++)
 	{
-		for (int x = 0; x < 32; x++)
+		for (x=0;x<32;x++)
 		{
 			int tile = m_videoram[32*y+x];
 			int color = (m_colorram[x*2]<<8) | (m_colorram[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
 			tile |= ((color & 0xe0)<<3);
 
-			int const res_x = m_flipscreen_x ? (248 - x*8) : (x*8);
-			int const res_y = m_flipscreen_y ? (248 - y*8 + x_scroll) : (y*8 - x_scroll);
-			int const wrapy = m_flipscreen_y ? -256 : 256;
+			res_x = (m_flipscreen_x) ? 248-x*8 : x*8;
+			res_y = (m_flipscreen_y) ? 248-y*8+x_scroll : y*8-x_scroll;
+			wrapy = (m_flipscreen_y) ? -256 : 256;
 
-			if ((x <= 1 || x >= 30) ^ draw_flag)
+			if((x <= 1 || x >= 30) ^ draw_flag)
 			{
 				gfx->opaque(bitmap,cliprect,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y);
-				// wrap-around
+				/* wrap-around */
 				gfx->opaque(bitmap,cliprect,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y+wrapy);
 			}
 		}
@@ -231,21 +225,23 @@ void mirax_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void mirax_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int count = 0; count < 0x200; count += 4)
+	for(int count=0;count<0x200;count+=4)
 	{
-		if (!m_spriteram[count] || !m_spriteram[count + 3])
+		int spr_offs,x,y,color,fx,fy;
+
+		if(m_spriteram[count] == 0x00 || m_spriteram[count+3] == 0x00)
 			continue;
 
-		int spr_offs = m_spriteram[count+1] & 0x3f;
+		spr_offs = (m_spriteram[count+1] & 0x3f);
+		color = m_spriteram[count+2] & 0x7;
+		fx = (m_flipscreen_x) ^ ((m_spriteram[count+1] & 0x40) >> 6); //<- guess
+		fy = (m_flipscreen_y) ^ ((m_spriteram[count+1] & 0x80) >> 7);
+
 		spr_offs += (m_spriteram[count+2] & 0xe0)<<1;
 		spr_offs += (m_spriteram[count+2] & 0x10)<<5;
 
-		int const color = m_spriteram[count+2] & 0x7;
-		int const fx = m_flipscreen_x ^ BIT(m_spriteram[count + 1], 6); //<- guess
-		int const fy = m_flipscreen_y ^ BIT(m_spriteram[count + 1], 7);
-
-		int const y = m_flipscreen_y ? m_spriteram[count] : 0x100 - m_spriteram[count] - 16;
-		int const x = m_flipscreen_x ? 240 - m_spriteram[count+3] : m_spriteram[count+3];
+		y = (m_flipscreen_y) ? m_spriteram[count] : 0x100 - m_spriteram[count] - 16;
+		x = (m_flipscreen_x) ? 240 - m_spriteram[count+3] : m_spriteram[count+3];
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,spr_offs,color,fx,fy,x,y,0);
 	}
@@ -253,9 +249,9 @@ void mirax_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 uint32_t mirax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_tilemap(bitmap, cliprect, 1);
-	draw_sprites(bitmap, cliprect);
-	draw_tilemap(bitmap, cliprect, 0);
+	draw_tilemap(bitmap,cliprect,1);
+	draw_sprites(bitmap,cliprect);
+	draw_tilemap(bitmap,cliprect,0);
 	return 0;
 }
 
@@ -334,7 +330,7 @@ void mirax_state::mirax_main_map(address_map &map)
 	map(0xf300, 0xf300).nopr(); //watchdog? value is always read then discarded
 	map(0xf400, 0xf400).portr("DSW2");
 	map(0xf500, 0xf507).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xf800, 0xf800).w(FUNC(mirax_state::sound_cmd_w));
+	map(0xf800, 0xf800).w(this, FUNC(mirax_state::sound_cmd_w));
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 }
 
@@ -346,13 +342,13 @@ void mirax_state::mirax_sound_map(address_map &map)
 
 	map(0xe000, 0xe000).nopw();
 	map(0xe001, 0xe001).nopw();
-	map(0xe003, 0xe003).w(FUNC(mirax_state::ay1_sel)); //1st ay ?
+	map(0xe003, 0xe003).w(this, FUNC(mirax_state::ay1_sel)); //1st ay ?
 
 	map(0xe400, 0xe400).nopw();
 	map(0xe401, 0xe401).nopw();
-	map(0xe403, 0xe403).w(FUNC(mirax_state::ay2_sel)); //2nd ay ?
+	map(0xe403, 0xe403).w(this, FUNC(mirax_state::ay2_sel)); //2nd ay ?
 
-	map(0xf900, 0xf9ff).w(FUNC(mirax_state::audio_w));
+	map(0xf900, 0xf9ff).w(this, FUNC(mirax_state::audio_w));
 }
 
 
@@ -490,14 +486,14 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_DEVICE_PROGRAM_MAP(mirax_sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mirax_state, irq0_line_hold,  4*60)
 
-	ls259_device &mainlatch(LS259(config, "mainlatch")); // R10
-	mainlatch.q_out_cb<0>().set(FUNC(mirax_state::coin_counter0_w));
-	mainlatch.q_out_cb<1>().set(FUNC(mirax_state::nmi_mask_w));
-	mainlatch.q_out_cb<2>().set(FUNC(mirax_state::coin_counter1_w)); // only used in 'miraxa' - see notes
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // R10
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mirax_state, coin_counter0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mirax_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mirax_state, coin_counter1_w)) // only used in 'miraxa' - see notes
 	// One address flips X, the other flips Y, but I can't tell which is which
 	// Since the value is the same for the 2 addresses, it doesn't really matter
-	mainlatch.q_out_cb<6>().set(FUNC(mirax_state::flip_screen_x_w));
-	mainlatch.q_out_cb<7>().set(FUNC(mirax_state::flip_screen_y_w));
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mirax_state, flip_screen_y_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -506,18 +502,22 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mirax_state, vblank_irq))
 
-	PALETTE(config, m_palette, FUNC(mirax_state::mirax_palette), 0x40);
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mirax);
+	MCFG_PALETTE_ADD("palette", 0x40)
+	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirax)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8912(config, m_ay[0], 12000000/4).add_route(ALL_OUTPUTS, "mono", 0.80);
-	AY8912(config, m_ay[1], 12000000/4).add_route(ALL_OUTPUTS, "mono", 0.80);
+	MCFG_DEVICE_ADD("ay1", AY8912, 12000000/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_DEVICE_ADD("ay2", AY8912, 12000000/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 

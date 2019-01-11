@@ -81,7 +81,7 @@
     Genmod's double switch box is also emulated. There are two switches:
     - Turbo mode: Activates or deactivates the wait state logic on the Geneve
       board. This switch may be changed at any time.
-    - TI mode: Selects between the on-board memory, which is required
+    - TI mode: Selects between the on-board memory, which is obviously required
       for the GPL interpreter, and the external Memex memory. This switch
       triggers a reset when changed.
 
@@ -92,41 +92,27 @@
 
     Logical address space: 64 KiB
 
-    Geneve mode
-    -----------
-    Video:    F100 (port 0, rw),
-              F102 (port 1, rw),
-              F104 (port 2, w),
-              F106 (port 3, w)
-                                  1111 0001 0000 .xx0
-    Mapper:   F110 - F117         1111 0001 0001 0xxx
-    Keyboard: F118                1111 0001 0001 1...
-    Clock:    F130 - F13F         1111 0001 0011 xxxx
-    Sound:    F120                1111 0001 0010 ...0
+    Geneve mode:
 
-    TI mode
-    -------
-    Video:    8800 (port 0, r), 8c00 (port 0, w),
-              8802 (port 1, r), 8c02 (port 0, w),
-                                8c04 (port 2, w),
-                                8c06 (port 3, w)
+    Video:    F100, F102, F104, F106 (mirror: +8)
+    Mapper:   F110 - F117
+    Keyboard: F118
+    Clock:    F130 - F13F
+    Sound:    F120
 
-                                  1000 1w.. .... .xx0
-    Mapper:   8000 - 8007         1000 0000 0000 0xxx
-    Keyboard: 8008 - 800F         1000 0000 0000 1...
-    Clock:    8010 - 801F         1000 0000 0001 xxxx
-    Speech:   9000 / 9400         1001 0w.. .... ...0
-    Grom:     9800 / 9802         1001 1w.. .... ..x0
-              9c00 / 9c02
+    TI mode:
 
-    Physical address space
-    ----------------------
-    Address space size = 2 MiB
+    Video:    8800, 8802, 8804, 8806
+    Mapper:   8000 - 8007
+    Keyboard: 8008 - 800F
+    Clock:    8010 - 801F
+    Speech:   9000 / 9400
+    Grom:     9800 / 9802
 
-    Start    End      Phys.pages
+    Physical address space: 2 MiB
+
+    Start    End      Banks
     000000 - 07FFFF   00-3F   512 KiB DRAM on-board
-       06C000 - 06DFFF   36     Cartridge space first 8K
-       06E000 - 06FFFF   37     Cartridge space second 8K
     080000 - 0FFFFF   40-7F   512 KiB on-board expansion (never used)
     100000 - 16FFFF   80-B7   448 KiB P-Box space (special cards, like MEMEX)
     170000 - 17FFFF   B8-BF    64 KiB P-Box space (current cards)
@@ -134,12 +120,10 @@
     1E0000 - 1FFFFF   F0-FF   128 KiB EPROM space; 16 KiB actually used, 8 mirrors
 
 
-    GenMod modification
-    -------------------
+    GenMod modification:
+
     TI mode
     000000 - 07FFFF   00-3F   512 KiB DRAM on-board
-       06C000 - 06DFFF   36     Cartridge space first 8K
-       06E000 - 06FFFF   37     Cartridge space second 8K
     080000 - 1DFFFF   40-EF  1408 KiB P-Box space
     1E0000 - 1FFFFF   F0-FF   128 KiB EPROM space; 16 KiB actually used, 8 mirrors
 
@@ -163,15 +147,16 @@
     - accesses to the peripheral expansion box: 1 WS
     - accesses to on-board DRAM: 1 WS
     - accesses to video: 15 WS
+    - accesses to sound: ~25 WS
     - accesses to SRAM: 0 WS
 
     Additional waitstates are created when one of the CRU bits is set. In that
     case, all delays are extended to 2 WS (including SRAM).
 
     Sound waitstates are somewhat unpredictable. It seems as if they depend
-    on the clock of the sound chip; the READY line is pulled down until the
-    next clock pulse, which may take some value between 18 CPU cycles and
-    30 CPU cycles.
+    on the clock of the sound chip; the theory is that the READY line is
+    pulled down until the next clock pulse, which may take some value between
+    18 CPU cycles and 30 CPU cycles.
 
     The gate array is able to create wait states for video accesses. However,
     these wait states are effective after the video access has been completed.
@@ -180,8 +165,7 @@
     Without additional wait states, the video access takes the usual 1 or 2 WS.
 
     Waitstate behavior (Nov 2013)
-       Almost perfect. Only video read access from code in DRAM is too fast
-       by one WS
+       Almost perfect. Only video read access from code in DRAM is too fast by one WS
 
     ==========================
     PFM expansion
@@ -220,22 +204,20 @@
 #define LOG_SETTING  (1U<<8)
 #define LOG_VIDEOWS  (1U<<9)
 #define LOG_PFM      (1U<<10)
-#define LOG_DECODE   (1U<<11)
 
 // Minimum log should be settings and warnings
-#define VERBOSE ( LOG_SETTING | LOG_WARN )
+#define VERBOSE (LOG_GENERAL | LOG_SETTING | LOG_WARN)
 
 #include "genboard.h"
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE_NS(GENEVE_KEYBOARD, bus::ti99::internal, geneve_keyboard_device, "geneve_keyboard", "Geneve XT-style keyboard")
 DEFINE_DEVICE_TYPE_NS(GENEVE_MAPPER, bus::ti99::internal, geneve_mapper_device, "geneve_mapper", "Geneve Gate Array")
-DEFINE_DEVICE_TYPE_NS(GENMOD_MAPPER, bus::ti99::internal, genmod_mapper_device, "genmod_mapper", "Geneve Mod Gate Array")
 
 namespace bus { namespace ti99 { namespace internal {
 
-geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock), m_gromwaddr_LSB(false),
+geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GENEVE_MAPPER, tag, owner, clock), m_gromwaddr_LSB(false),
 	m_gromraddr_LSB(false),
 	m_grom_address(0),
 	m_video_waitstates(false),
@@ -249,14 +231,17 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, device
 	m_cartridge_secondpage(false),
 	m_cartridge6_writable(false),
 	m_cartridge7_writable(false),
-	m_boot_rom(0),
+	m_turbo(false),
+	m_genmod(false),
+	m_timode(false),
+	m_pfm_mode(0),
 	m_pfm_bank(0),
 	m_pfm_output_enable(false),
 	m_sram_mask(0),
 	m_sram_val(0),
 	m_ready(*this),
 	m_waitcount(0),
-	m_video_waitcount(0),
+	m_ext_waitcount(0),
 	m_clock(*owner, GENEVE_CLOCK_TAG),
 	m_cpu(*owner, "maincpu"),
 	m_pfm512(*owner, GENEVE_PFM512_TAG),
@@ -268,31 +253,10 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, device
 	m_sram(*this, GENEVE_SRAM_PAR_TAG),
 	m_dram(*this, GENEVE_DRAM_PAR_TAG)
 {
-}
-
-geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: geneve_mapper_device(mconfig, GENEVE_MAPPER, tag, owner, clock)
-{
 	m_eprom = nullptr;
-	m_pbox_prefix = 0x070000;
-}
-
-genmod_mapper_device::genmod_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: geneve_mapper_device(mconfig, GENMOD_MAPPER, tag, owner, clock),
-	m_gm_timode(false),
-	m_turbo(false)
-{
-	m_eprom = nullptr;
-	m_pbox_prefix = 0x170000;
 }
 
 INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
-{
-	// Used when switching the boot ROMs during runtime, especially the PFM
-	m_boot_rom = newval;
-}
-
-INPUT_CHANGED_MEMBER( genmod_mapper_device::setgm_changed )
 {
 	int number = (int)((uint64_t)param&0x03);
 	int value = newval;
@@ -307,12 +271,12 @@ INPUT_CHANGED_MEMBER( genmod_mapper_device::setgm_changed )
 	case 2:
 		// TIMode switch. Causes reset when changed.
 		LOGMASKED(LOG_SETTING, "Setting timode flag to %d\n", value);
-		m_gm_timode = (value!=0);
+		m_timode = (value!=0);
 		machine().schedule_hard_reset();
 		break;
 	case 3:
 		// Used when switching the boot ROMs during runtime, especially the PFM
-		m_boot_rom = value;
+		set_boot_rom(value);
 		break;
 	default:
 		LOGMASKED(LOG_WARN, "Unknown setting %d ignored\n", number);
@@ -352,8 +316,8 @@ READ8_MEMBER( geneve_mapper_device::read_grom )
 	{
 		// GROM data handling
 		// GROMs are stored in pages 38..3f
-		int physpage = 0x38;
-		reply = m_dram->pointer()[(physpage<<13) + m_grom_address];
+		int page = 0x38;
+		reply = m_dram->pointer()[(page<<13) + m_grom_address];
 		m_grom_address = (m_grom_address + 1) & 0xffff;
 		m_gromraddr_LSB = m_gromwaddr_LSB = false;
 	}
@@ -385,8 +349,8 @@ WRITE8_MEMBER( geneve_mapper_device::write_grom )
 	else
 	{   // write GPL data
 		// The Geneve GROM simulator allows for GROM writing (verified with a real system)
-		int physpage = 0x38;
-		m_dram->pointer()[(physpage<<13) + m_grom_address] = data;
+		int page = 0x38;
+		m_dram->pointer()[(page<<13) + m_grom_address] = data;
 
 		m_grom_address = (m_grom_address + 1) & 0xffff;
 		m_gromraddr_LSB = m_gromwaddr_LSB = false;
@@ -395,11 +359,12 @@ WRITE8_MEMBER( geneve_mapper_device::write_grom )
 
 void geneve_mapper_device::set_wait(int min)
 {
+	if (m_debug_no_ws) return;
 	if (m_extra_waitstates && min < 2) min = 2;
 
 	// if we still have video wait states, do not set this counter
 	// (or it will assert READY when expiring)
-	if (m_video_waitcount > min) return;
+	if (m_ext_waitcount > min) return;
 
 	// need one more pass so that READY will be asserted again
 	m_waitcount = min + 1;
@@ -411,10 +376,37 @@ void geneve_mapper_device::set_wait(int min)
 	}
 }
 
-void geneve_mapper_device::set_video_waitcount(int min)
+void geneve_mapper_device::set_ext_wait(int min)
 {
 	if (m_debug_no_ws) return;
-	m_video_waitcount = min;
+	m_ext_waitcount = min;
+}
+
+void geneve_mapper_device::set_boot_rom(int selection)
+{
+	switch (selection)
+	{
+	case GENEVE_098:
+		LOGMASKED(LOG_SETTING, "Using 0.98 boot eprom\n");
+		m_eprom = machine().root_device().memregion("maincpu")->base() + 0x4000;
+		m_pfm_mode = 0;
+		break;
+	case GENEVE_100:
+		LOGMASKED(LOG_SETTING, "Using 1.00 boot eprom\n");
+		m_eprom = machine().root_device().memregion("maincpu")->base();
+		m_pfm_mode = 0;
+		break;
+	case GENEVE_PFM512:
+		LOGMASKED(LOG_SETTING, "Using PFM512 (AT29C040)\n");
+		m_pfm_mode = 1;
+		break;
+	case GENEVE_PFM512A:
+		LOGMASKED(LOG_SETTING, "Using PFM512A (AT29C040A)\n");
+		m_pfm_mode = 2;
+		break;
+	default:
+		LOGMASKED(LOG_WARN, "Unknown boot ROM selection\n");
+	}
 }
 
 void geneve_mapper_device::set_geneve_mode(bool geneve)
@@ -462,6 +454,35 @@ void geneve_mapper_device::set_extra_waitstates(bool wait)
 /************************************************************************
     Called by the address map
 ************************************************************************/
+/*
+    Constants for mapper decoding. Naming scheme:
+    M=mapper
+    L=Logical space; P=Physical space
+    G=Geneve mode;  T=TI mode; GM=GenMod
+*/
+enum
+{
+	MLGVIDEO=1,
+	MLGMAPPER,
+	MLGKEY,
+	MLGCLOCK,
+	MLGSOUND,
+	MLTMAPPER,
+	MLTKEY,
+	MLTCLOCK,
+	MLTVIDEO,
+	MLTSPEECH,
+	MLTGROM,
+	MLTSOUND,
+	MPGDRAM,
+	MPGEXP,
+	MPGEPROM,
+	MPGSRAM,
+	MPGBOX,
+	MPGMDRAM,
+	MPGMEPROM,
+	MPGMBOX
+};
 
 /*
     Read a byte via the data bus. The decoding has already been done in the
@@ -481,19 +502,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if (m_cpu->is_onchip(offset)) return m_cpu->debug_read_onchip_memory(offset&0xff);
 		dec = &debug;
 		m_debug_no_ws = true;
-		dec->offset = offset;
-		decode_logical(true, dec);
-		if (dec->function == MUNDEF)
-		{
-			map_address(m_read_mode, dec);
-			decode_physical(dec);
-			decode_mod(dec);
-		}
-		if (dec->function == MBOX)
-		{
-			m_peribox->memen_in(ASSERT_LINE);
-			m_peribox->setaddress_dbin(space, dec->physaddr, true);
-		}
+		decode(space, offset, true, dec);
 	}
 	else
 	{
@@ -502,49 +511,89 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		m_debug_no_ws = false;
 	}
 
-	// Logical space
-
 	switch (dec->function)
 	{
-	case MLVIDEO:
+	case MLGVIDEO:
 		if (!machine().side_effects_disabled())
 		{
 			value = m_video->read(space, dec->offset>>1);
 			LOGMASKED(LOG_READ, "Read video %04x -> %02x\n", dec->offset, value);
 			// Video wait states are created *after* the access
 			// Accordingly, they have no effect when execution is in onchip RAM
-			if (m_video_waitstates) set_video_waitcount(15);
+			if (m_video_waitstates) set_ext_wait(15);
 		}
 		break;
 
-	case MLMAPPER:
+	case MLGMAPPER:
 		// mapper
-		value = m_map[dec->offset & 0x0007];
-		LOGMASKED(LOG_READ, "Read mapper %04x -> %02x\n", dec->offset, value);
+		value = m_map[dec->offset];
+		LOGMASKED(LOG_READ, "read mapper %04x -> %02x\n", dec->offset, value);
 		break;
 
-	case MLKEY:
+	case MLGKEY:
 		// key
 		if (!machine().side_effects_disabled()) value = m_keyboard->get_recent_key();
 		LOGMASKED(LOG_READ, "Read keyboard -> %02x\n", value);
 		break;
 
-	case MLCLOCK:
+	case MLGCLOCK:
 		// clock
-		// Tests on the real machine showed that the upper nibble is 0xf
-		// (probably because of the location at f130-f13f?)
-		// In TI mode, however, the upper nibble is 1, unless we read 801f,
-		// in which case the nibble is 2. Here the location is 8010-801f.
-		// Needs more investigation. We might as well ignore this,
-		// as the high nibble is obviously undefined and takes some past
-		// value floating around.
-		value = m_clock->read(space, dec->offset & 0x000f);
-		if (m_geneve_mode) value |= 0xf0;
-		else value |= ((dec->offset & 0x000f)==0x000f)? 0x20 : 0x10;
+		// tests on the real machine showed that
+		// upper nibble is 0xf (probably because of the location at 0xf130?)
+		value = m_clock->read(space, dec->offset) | 0xf0;
 		LOGMASKED(LOG_READ, "Read clock %04x -> %02x\n", dec->offset, value);
 		break;
 
-	case MLGROM:
+	case MLTMAPPER:
+		// mapper
+		value = m_map[dec->offset];
+		LOGMASKED(LOG_READ, "Read mapper %04x -> %02x\n", dec->offset, value);
+		break;
+
+	case MLTKEY:
+		// key
+		if (!machine().side_effects_disabled()) value = m_keyboard->get_recent_key();
+		LOGMASKED(LOG_READ, "Read keyboard -> %02x\n", value);
+		break;
+
+	case MLTCLOCK:
+		// clock
+		// upper nibble is 1, only last byte gets a 2
+		// probably because of the location at 8010...8020?
+		// (TI mode used swapped byte order)
+		// unless we use a workspace at >F000, in which case we get 8x values
+		// Obscure, needs more investigation. We might as well ignore this,
+		// as the high nibble is obviously undefined and takes some past
+		// value floating around.
+		value = m_clock->read(space, dec->offset);
+		value |= (dec->offset==0x000f)? 0x20 : 0x10;
+		LOGMASKED(LOG_READ, "Read clock %04x -> %02x\n", dec->offset, value);
+		break;
+
+	case MLTVIDEO:
+		// video
+		// ++++ ++-- ---- ---+
+		// 1000 1000 0000 00x0
+		if (!machine().side_effects_disabled())
+		{
+			value = m_video->read(space, dec->offset>>1);
+			LOGMASKED(LOG_READ, "Read video %04x -> %02x\n", dec->offset, value);
+			// See above
+			if (m_video_waitstates) set_ext_wait(15);
+		}
+		break;
+
+	case MLTSPEECH:
+		// speech
+		// ++++ ++-- ---- ---+
+		// 1001 0000 0000 0000
+		// We need to add the address prefix bits
+		m_peribox->readz(space, dec->offset, &value, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
+		LOGMASKED(LOG_READ, "Read speech -> %02x\n", value);
+		break;
+
+	case MLTGROM:
 		// grom simulation
 		// ++++ ++-- ---- ---+
 		// 1001 1000 0000 00x0
@@ -552,43 +601,49 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		LOGMASKED(LOG_READ, "Read GROM %04x -> %02x\n", dec->offset, value);
 		break;
 
-	case MLSOUND:
+	case MLGSOUND:
+	case MLTSOUND:
 		value = 0;
 		break;
 
-	case MPDRAM:
-		// DRAM. One wait state.
+
+	case MPGDRAM:
+		// DRAM.
 		value = m_dram->pointer()[dec->physaddr];
+//          LOG("dram read physaddr = %06x logaddr = %04x value = %02x\n", dec->physaddr, dec->offset, value);
 		LOGMASKED(LOG_READ, "Read DRAM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
-	case MPEXP:
+	case MPGEXP:
 		// On-board memory expansion for standard Geneve (never used)
-		LOGMASKED(LOG_READ, "Read on-board expansion (not available) %06x -> 00\n", dec->physaddr);
+		LOGMASKED(LOG_READ, "Read unmapped area %06x\n", dec->physaddr);
 		value = 0;
 		break;
 
-	case MPEPROM:
+	case MPGEPROM:
 		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
-		value = boot_rom(space, dec->physaddr, 0xff);
+		if (m_pfm_mode == 0)
+		{
+			value = m_eprom[dec->physaddr & 0x003fff];
+			LOGMASKED(LOG_READ, "Read EPROM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
+		}
+		else value = read_from_pfm(space, dec->physaddr, 0xff);
+
 		break;
 
-	case MPSRAM:
+	case MPGSRAM:
 		if ((dec->physaddr & m_sram_mask)==m_sram_val)
 		{
 			value = m_sram->pointer()[dec->physaddr & ~m_sram_mask];
-			LOGMASKED(LOG_READ, "Read SRAM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		}
-		else
-		{
-			LOGMASKED(LOG_WARN, "Decoded as SRAM read, but no SRAM at %06x\n", dec->physaddr);
-			value = 0;
-		}
+		else value = 0;
 		// Return in any case
+//          LOG("sram read physaddr = %06x logaddr = %04x value = %02x\n", dec->physaddr, dec->offset, value);
+		LOGMASKED(LOG_READ, "Read SRAM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
-	case MBOX:
+	case MPGBOX:
 		// Route everything else to the P-Box
 		//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
 		//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
@@ -598,8 +653,26 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		LOGMASKED(LOG_READ, "Read P-Box %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
-	default:
-		LOGMASKED(LOG_WARN, "Unknown decoding result type: %d\n", dec->function);
+	case MPGMDRAM:
+		// DRAM. One wait state.
+		value = m_dram->pointer()[dec->physaddr];
+		break;
+
+	case MPGMEPROM:
+		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
+		if (m_pfm_mode == 0)
+		{
+			value = m_eprom[dec->physaddr & 0x003fff];
+			LOGMASKED(LOG_READ, "Read EPROM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
+		}
+		else value = read_from_pfm(space, dec->physaddr, 0xff);
+		break;
+
+	case MPGMBOX:
+		// Route everything else to the P-Box
+		m_peribox->readz(space, dec->physaddr, &value, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
 		break;
 	}
 	return value;
@@ -613,271 +686,598 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	// For the debugger, do the decoding here with no wait states
 	if (machine().side_effects_disabled())
 	{
-		// TODO: add debug_write_onchip_memory
 		dec = &debug;
 		m_debug_no_ws = true;
-		dec->offset = offset;
-		decode_logical(false, dec);
-		if (dec->function == MUNDEF)
-		{
-			map_address(m_read_mode, dec);
-			decode_physical(dec);
-			decode_mod(dec);
-		}
-		if (dec->function == MBOX)
-		{
-			m_peribox->memen_in(ASSERT_LINE);
-			m_peribox->setaddress_dbin(space, dec->physaddr, false);
-		}
+		decode(space, offset, false, dec);
 	}
 	else
 	{
 		// Use the values found in the setaddress phase
-		dec = &m_decoded;
 		m_debug_no_ws = false;
+		dec = &m_decoded;
 	}
-
-
-	// Logical space
 
 	switch (dec->function)
 	{
-	case MLVIDEO:
+	case MLGVIDEO:
 		// video
 		// ++++ ++++ ++++ ---+
 		// 1111 0001 0000 .cc0
-		// Initialize waitstate timer
 
 		if (!machine().side_effects_disabled())
 		{
 			m_video->write(space, dec->offset>>1, data);
 			LOGMASKED(LOG_WRITE, "Write video %04x <- %02x\n", offset, data);
 			// See above
-			if (m_video_waitstates) set_video_waitcount(15);
+			if (m_video_waitstates) set_ext_wait(15);
 		}
 		break;
 
-	case MLMAPPER:
+	case MLGMAPPER:
 		// mapper
-		m_map[dec->offset & 0x0007] = data;
+		m_map[dec->offset] = data;
 		LOGMASKED(LOG_WRITE, "Write mapper %04x <- %02x\n", offset, data);
 		break;
 
-	case MLCLOCK:
+	case MLGCLOCK:
 		// clock
 		// ++++ ++++ ++++ ----
-		m_clock->write(space, dec->offset & 0x000f, data);
+		m_clock->write(space, dec->offset, data);
 		LOGMASKED(LOG_WRITE, "Write clock %04x <- %02x\n", offset, data);
 		break;
 
-	case MLSOUND:
+	case MLGSOUND:
 		// sound
 		// ++++ ++++ ++++ ---+
-		m_sound->write(data);
+		m_sound->write(space, 0, data, 0xff);
 		LOGMASKED(LOG_WRITE, "Write sound <- %02x\n", data);
 		break;
 
-	case MLGROM:
-		// The GROM simulator is only available in TI Mode
+	case MLTMAPPER:
+		// mapper
+		m_map[dec->offset] = data;
+		LOGMASKED(LOG_WRITE, "Write mapper %04x <- %02x\n", offset, data);
+		break;
+
+	case MLTCLOCK:
+		// clock
+		m_clock->write(space, dec->offset, data);
+		LOGMASKED(LOG_WRITE, "Write clock %04x <- %02x\n", offset, data);
+		break;
+
+	case MLTVIDEO:
+		// video
+		// ++++ ++-- ---- ---+
+		// 1000 1100 0000 00c0
+		// Initialize waitstate timer
+		if (!machine().side_effects_disabled())
+		{
+			m_video->write(space, dec->offset>>1, data);
+			LOGMASKED(LOG_WRITE, "Write video %04x <- %02x\n", offset, data);
+			// See above
+			if (m_video_waitstates) set_ext_wait(15);
+		}
+		break;
+
+	case MLTSPEECH:
+		// speech
+		// ++++ ++-- ---- ---+
+		// 1001 0100 0000 0000
+		// We need to add the address prefix bits
+		m_peribox->write(space, dec->offset, data, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
+		LOGMASKED(LOG_WRITE, "Write speech <- %02x\n", data);
+		break;
+
+	case MLTGROM:
+		// grom simulation
+		// ++++ ++-- ---- ---+
+		// 1001 1100 0000 00c0
 		write_grom(space, dec->offset, data, 0xff);
 		LOGMASKED(LOG_WRITE, "Write GROM %04x <- %02x\n", offset, data);
 		break;
 
-	// Physical space
-	case MPDRAM:
-		// DRAM write
+	case MLTSOUND:
+		// sound
+		// ++++ ++-- ---- ---+
+		// 1000 0100 0000 0000
+		m_sound->write(space, 0, data, 0xff);
+		LOGMASKED(LOG_WRITE, "Write sound <- %02x\n", data);
+		break;
+
+	case MLTKEY:
+	case MLGKEY:
+		break;
+
+	case MPGDRAM:
+		// DRAM write. One wait state. (only for normal Geneve)
 		m_dram->pointer()[dec->physaddr] = data;
 		LOGMASKED(LOG_WRITE, "Write DRAM %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		break;
 
-	case MPEXP:
-		// On-board memory expansion for standard Geneve
-		// Actually never built, so we show it as unmapped
-		LOGMASKED(LOG_WRITE, "Write on-board expansion (not available) %06x <- %02x\n", dec->physaddr, data);
+	case MPGEXP:
+		// On-board memory expansion for standard Geneve (never used)
+		LOGMASKED(LOG_WRITE, "Write unmapped area %06x\n", dec->physaddr);
 		break;
 
-	case MPEPROM:
+	case MPGEPROM:
 		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
 		// Ignore EPROM write (unless PFM)
-		if (m_boot_rom != GENEVE_EPROM) write_to_pfm(space, dec->physaddr, data, 0xff);
+		if (m_pfm_mode != 0) write_to_pfm(space, dec->physaddr, data, 0xff);
 		else
 			LOGMASKED(LOG_WARN, "Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
 		break;
 
-	case MPSRAM:
+	case MPGSRAM:
 		if ((dec->physaddr & m_sram_mask)==m_sram_val)
 		{
 			m_sram->pointer()[dec->physaddr & ~m_sram_mask] = data;
-			LOGMASKED(LOG_WRITE, "Write SRAM %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		}
-		else
-		{
-			LOGMASKED(LOG_WARN, "Decoded as SRAM write, but no SRAM at %06x\n", dec->physaddr);
-		}
+		LOGMASKED(LOG_WRITE, "Write SRAM %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		break;
 
-	case MBOX:
-		// Route everything else to the P-Box
+	case MPGBOX:
+		dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address
 		LOGMASKED(LOG_WRITE, "Write P-Box %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		m_peribox->write(space, dec->physaddr, data, 0xff);
 		m_peribox->memen_in(CLEAR_LINE);
 		break;
 
-	default:
-		LOGMASKED(LOG_WARN, "Unknown decoding result type: %d\n", dec->function);
+	case MPGMDRAM:
+		// DRAM. One wait state.
+		m_dram->pointer()[dec->physaddr] = data;
+		break;
+
+	case MPGMEPROM:
+		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
+		// Ignore EPROM write
+		if (m_pfm_mode != 0) write_to_pfm(space, dec->physaddr, data, 0xff);
+		else
+			LOGMASKED(LOG_WARN, "Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
+		break;
+
+	case MPGMBOX:
+		// Route everything else to the P-Box
+		m_peribox->write(space, dec->physaddr, data, 0xff);
+		m_peribox->memen_in(CLEAR_LINE);
 		break;
 	}
 }
 
-void geneve_mapper_device::decode_logical(bool reading, geneve_mapper_device::decdata* dec)
+void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read_mode, geneve_mapper_device::decdata* dec)
 {
-	dec->function = MUNDEF;
-	dec->physaddr = m_pbox_prefix | dec->offset;
-	dec->wait = 1;
+	dec->function = 0;
+	dec->offset = offset;
+	dec->physaddr = 0;
 
-	int i = 0;
-	while (i < 7)
+	int page;
+
+	if (read_mode)    // got this from DBIN
 	{
+		// Logical addresses
 		if (m_geneve_mode)
 		{
-			// Skip when genbase is 0
-			if ((m_logmap[i].genbase != 0) && ((dec->offset & ~m_logmap[i].genmask) == m_logmap[i].genbase))
-				break;
+			// TODO: shortcut offset & 0xffc0 = 0xf100
+			if ((offset & 0xfff5)==0xf100)
+			{
+				// video
+				// ++++ ++++ ++++ -+-+
+				// 1111 0001 0000 0000
+				// 1111 0001 0000 0010
+				// 1111 0001 0000 1000
+				// 1111 0001 0000 1010
+
+				dec->function = MLGVIDEO;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfff8)==0xf110)
+			{
+				// mapper
+				dec->function = MLGMAPPER;
+				dec->offset = dec->offset & 0x0007;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfff8) == 0xf118)
+			{
+				// key
+				dec->function = MLGKEY;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfff0)==0xf130)
+			{
+				// clock
+				// tests on the real machine showed that
+				// upper nibble is 0xf (probably because of the location at 0xf130?)
+				dec->function = MLGCLOCK;
+				dec->offset = dec->offset & 0x000f;
+				set_wait(1);
+				return;
+			}
 		}
 		else
 		{
-			if (reading)
+			if ((offset & 0xfff8)==0x8000)
 			{
-				if ((dec->offset & ~m_logmap[i].timask) == m_logmap[i].tibase)
-					break;
+				// mapper
+				dec->function = MLTMAPPER;
+				dec->offset = dec->offset & 0x0007;
+				set_wait(1);
+				return;
 			}
-			else
+			if ((offset & 0xfff8)== 0x8008)
 			{
-				if ((dec->offset & ~m_logmap[i].timask) == (m_logmap[i].tibase | m_logmap[i].writeoff))
-					break;
+				// key
+				dec->function = MLTKEY;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfff0)==0x8010)
+			{
+				// clock
+				dec->function = MLTCLOCK;
+				dec->offset = dec->offset & 0x000f;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfc01)==0x8800)
+			{
+				// video
+				// ++++ ++-- ---- ---+
+				// 1000 1000 0000 00x0
+				// 1 WS is always added; any pending video waitstates are canceled
+				dec->function = MLTVIDEO;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfc01)==0x9000)
+			{
+				// speech
+				// ++++ ++-- ---- ---+
+				// 1001 0000 0000 0000
+				// We need to add the address prefix bits
+				dec->function = MLTSPEECH;
+				dec->offset = offset | ((m_genmod)? 0x170000 : 0x070000);
+				m_peribox->memen_in(ASSERT_LINE);
+				m_peribox->setaddress_dbin(space, dec->offset, read_mode);
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfc01)==0x9800)
+			{
+				// grom simulation
+				// ++++ ++-- ---- ---+
+				// 1001 1000 0000 00x0
+				dec->function = MLTGROM;
+				set_wait(1);
+				return;
 			}
 		}
-		i++;
-	}
-	if (i != 7)
-	{
-		LOGMASKED(LOG_DECODE, "Decoded as %s: %04x\n", m_logmap[i].description, dec->offset);
-		dec->function = m_logmap[i].function;
-	}
-}
+		// still here? Then go via mapping.
+		page = (offset & 0xe000) >> 13;
 
-void geneve_mapper_device::map_address(bool reading, geneve_mapper_device::decdata* dec)
-{
-	int logpage = (dec->offset & 0xe000) >> 13;
-	int physpage = 0;
-
-	// Determine physical address
-	if (m_direct_mode) physpage = 0xf8; // points to boot eprom
-	else
-	{
-		// TI mode, accessing logical addresses 6000-7fff
-		if (!m_geneve_mode && logpage==3)
+		// Determine physical address
+		if (m_direct_mode)
 		{
-			if (reading)
+			dec->physaddr = 0x1f0000; // points to boot eprom (page F8)
+		}
+		else
+		{
+			if (!m_geneve_mode && page==3)
 			{
-				physpage = (m_cartridge_size==0x4000 && m_cartridge_secondpage)? 0x37 : 0x36;
+				if (m_cartridge_size==0x4000 && m_cartridge_secondpage) dec->physaddr = 0x06e000;
+				else dec->physaddr = 0x06c000;
 			}
 			else
 			{
-				// Emulate the cartridge bank switch feature of Extended Basic
-				// TODO: Is this the right place? Or writem()?
+				dec->physaddr = (m_map[page] << 13);
+			}
+		}
+		dec->physaddr |= (offset & 0x1fff);
+
+		if (!m_genmod)      // Standard Geneve
+		{
+			if ((dec->physaddr & 0x180000)==0x000000)
+			{
+				// DRAM.
+				dec->physaddr = dec->physaddr & 0x07ffff;
+				dec->function = MPGDRAM;
+				set_wait(1);
+				return;
+			}
+
+			if ((dec->physaddr & 0x180000)==0x080000)
+			{
+				// On-board memory expansion for standard Geneve (never used)
+				dec->function = MPGEXP;
+				set_wait(1);
+				return;
+			}
+
+			if ((dec->physaddr & 0x1e0000)==0x1e0000)
+			{
+				// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+				// mirrored for f0, f2, f4, ...; f1, f3, f5, ... unless using PFM
+				dec->function = MPGEPROM;
+				set_wait(0);
+				return;
+			}
+
+			if ((dec->physaddr & 0x180000)==0x180000)
+			{
+				dec->function = MPGSRAM;
+				set_wait(0);
+				return;
+			}
+
+			// Route everything else to the P-Box
+			//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
+			//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
+			// Add a wait state
+			set_wait(1);
+			dec->function = MPGBOX;
+
+			dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
+			m_peribox->memen_in(ASSERT_LINE);
+			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
+			return;
+		}
+		else
+		{
+			// GenMod mode
+			if ((m_timode) && ((dec->physaddr & 0x180000)==0x000000))
+			{
+				// DRAM. One wait state.
+				dec->function = MPGMDRAM;
+				dec->physaddr = dec->physaddr & 0x07ffff;
+				if (!m_turbo) set_wait(1);
+				return;
+			}
+
+			if ((dec->physaddr & 0x1e0000)==0x1e0000)
+			{
+				// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
+				// mirrored for f0, f2, f4, ...; f1, f3, f5, ... unless using PFM
+				dec->function = MPGMEPROM;
+				set_wait(0);
+				return;
+			}
+
+			// Route everything else to the P-Box
+			dec->physaddr = (dec->physaddr & 0x001fffff);  // 21 bit address for Genmod
+			dec->function = MPGMBOX;
+
+			if (!m_turbo) set_wait(1);
+			// Check: Are waitstates completely turned off for turbo mode, or
+			// merely the waitstates for DRAM memory access and box access?
+
+			m_peribox->memen_in(ASSERT_LINE);
+			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
+			return;
+		}
+	}
+	else
+	{   // Write access
+		// Logical addresses
+		if (m_geneve_mode)
+		{
+			if ((offset & 0xfff1)==0xf100)
+			{
+				// 1 WS is always added; any pending video waitstates are canceled
+				dec->function = MLGVIDEO;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfff8)==0xf110)
+			{
+				dec->function = MLGMAPPER;
+				dec->offset = dec->offset & 0x0007;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfff1)==0xf120)
+			{
+				// Add 24 waitstates. This is an average value, as the
+				// waitstate generation seems to depend on an external timer of
+				// the sound chip
+				// TODO: do it properly with the use of READY
+				dec->function = MLGSOUND;
+				set_wait(24);
+				return;
+			}
+			if ((offset & 0xfff0)==0xf130)
+			{
+				dec->function = MLGCLOCK;
+				dec->offset = dec->offset & 0x00f;
+				set_wait(1);
+				return;
+			}
+		}
+		else
+		{
+			// TI mode
+			if ((offset & 0xfff8)==0x8000)
+			{
+				dec->function = MLTMAPPER;
+				dec->offset = dec->offset & 0x0007;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfff0)==0x8010)
+			{
+				dec->function = MLTCLOCK;
+				dec->offset = dec->offset & 0x00f;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfc01)==0x9c00)
+			{
+				dec->function = MLTGROM;
+				set_wait(1);
+				return;
+			}
+			if ((offset & 0xfc01)==0x8400)
+			{
+				// Add 24 waitstates. This is an approximation, as the
+				// waitstate generation seems to depend on an external timer of
+				// the sound chip
+				// TODO: do it properly with the use of READY-
+				dec->function = MLTSOUND;
+				set_wait(24);
+				return;
+			}
+			if ((offset & 0xfc01)==0x8c00)
+			{
+				// 1 WS is always added; any pending video waitstates are canceled
+				dec->function = MLTVIDEO;
+				set_wait(1);
+				return;
+			}
+
+			if ((offset & 0xfc01)==0x9400)
+			{
+				dec->function = MLTSPEECH;
+				dec->offset = dec->offset | ((m_genmod)? 0x170000 : 0x070000);
+				m_peribox->memen_in(ASSERT_LINE);
+				m_peribox->setaddress_dbin(space, dec->offset, read_mode);
+				set_wait(1);
+				return;
+			}
+		}
+
+		// Determine physical address
+		page = (dec->offset & 0xe000) >> 13;
+
+		if (m_direct_mode)
+		{
+			dec->physaddr = 0x1e0000; // points to boot eprom
+		}
+		else
+		{
+			if (!m_geneve_mode && page==3)
+			{
 				if (m_cartridge_size==0x4000)
 				{
 					m_cartridge_secondpage = ((dec->offset & 0x0002)!=0);
 					LOGMASKED(LOG_WRITE, "Set cartridge page %02x\n", m_cartridge_secondpage);
+					set_wait(1);
+					return;
 				}
 				else
 				{
-					// writing into cartridge rom space (no bank switching)
+					// writing into cartridge rom space (no bankswitching)
 					if ((((dec->offset & 0x1000)==0x0000) && !m_cartridge6_writable)
 						|| (((dec->offset & 0x1000)==0x1000) && !m_cartridge7_writable))
 					{
 						LOGMASKED(LOG_WARN, "Writing to protected cartridge space %04x ignored\n", dec->offset);
+						return;
 					}
 					else
 						// TODO: Check whether secondpage is really ignored
-						physpage = 0x36;
+					dec->physaddr = 0x06c000;
 				}
 			}
+			else
+				dec->physaddr = (m_map[page] << 13);
+		}
+
+		dec->physaddr |= dec->offset & 0x1fff;
+
+		if (!m_genmod)
+		{
+			if ((dec->physaddr & 0x180000)==0x000000)
+			{
+				dec->function = MPGDRAM;
+				dec->physaddr = dec->physaddr & 0x07ffff;
+				set_wait(1);
+				return;
+			}
+			if ((dec->physaddr & 0x180000)==0x080000)
+			{
+				dec->function = MPGEXP;
+				set_wait(1);
+				return;
+			}
+
+			if ((dec->physaddr & 0x1e0000)==0x1e0000)
+			{
+				dec->function = MPGEPROM;
+				set_wait(0); // EPROM
+				return;
+			}
+			if ((dec->physaddr & 0x180000)==0x180000)
+			{
+				dec->function = MPGSRAM;
+				set_wait(0); // SRAM
+				return;
+			}
+
+			// Route everything else to the P-Box
+			// Add a wait state
+
+			// only AMA, AMB, AMC are used; AMD and AME are not used
+			dec->function = MPGBOX;
+			dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address
+			m_peribox->memen_in(ASSERT_LINE);
+			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
+			set_wait(1);
 		}
 		else
-			physpage = m_map[logpage];
-	}
-	dec->physaddr = ((physpage << 13) | (dec->offset & 0x1fff)) & 0x1fffff;
-}
+		{
+			// GenMod mode
+			if ((dec->physaddr & 0x1e0000)==0x1e0000)
+			{   // EPROM, ignore (unless PFM)
+				dec->function = MPGMEPROM;
+				set_wait(0);
+				return;
+			}
 
-void geneve_mapper_device::decode_physical(geneve_mapper_device::decdata* dec)
-{
-	dec->function = MUNDEF;
+			if (m_timode && ((dec->physaddr & 0x180000)==0x000000))
+			{
+				dec->function = MPGMDRAM;
+				dec->physaddr = dec->physaddr & 0x07ffff;
+				if (!m_turbo) set_wait(1);
+				return;
+			}
 
-	int i = 0;
-	while (i < 4)
-	{
-		if ((dec->physaddr & ~m_physmap[i].mask) == m_physmap[i].base)
-			break;
-		i++;
+			// Route everything else to the P-Box
+			dec->function = MPGMBOX;
+			dec->physaddr = (dec->physaddr & 0x001fffff);  // 21 bit address for Genmod
+			m_peribox->memen_in(ASSERT_LINE);
+			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
+			if (!m_turbo) set_wait(1);
+		}
 	}
-	if (i != 4)
-	{
-		LOGMASKED(LOG_DECODE, "Decoded as %s: %06x\n", m_physmap[i].description, dec->physaddr);
-		dec->function = m_physmap[i].function;
-		dec->wait = m_physmap[i].wait;
-	}
-	else
-	{
-		// Route everything else to the P-Box
-		dec->function = MBOX;
-		dec->wait = 1;
-	}
-}
-
-void genmod_mapper_device::decode_mod(geneve_mapper_device::decdata* dec)
-{
-	// GenMod mode
-	// The TI Mode switch activates the DRAM on the board (1 WS)
-	// for the first 512K (000000-07ffff)
-	if (((dec->function == MPDRAM) && !m_gm_timode) || dec->function==MPSRAM || dec->function==MPEXP)
-	{
-		dec->function = MBOX;
-	}
-
-	if ((dec->function != MPDRAM) && m_turbo)
-		dec->wait = 0;
 }
 
 /*
-    Boot ROM handling, from EPROM or PFM.
+    Read from PFM.
 */
-READ8_MEMBER( geneve_mapper_device::boot_rom )
+READ8_MEMBER( geneve_mapper_device::read_from_pfm )
 {
 	uint8_t value;
-	int pfmaddress = (offset & 0x01ffff) | (m_pfm_bank<<17);
+	if (!m_pfm_output_enable) return 0;
 
-	switch (m_boot_rom)
+	int address = (offset & 0x01ffff) | (m_pfm_bank<<17);
+
+	switch (m_pfm_mode)
 	{
-	case GENEVE_EPROM:
-		value = m_eprom[offset & 0x003fff];
-		LOGMASKED(LOG_READ, "Read EPROM %04x -> %02x\n", offset & 0x003fff, value);
-		return value;
-	case GENEVE_PFM512:
-		value = m_pfm512->read(space, pfmaddress, mem_mask);
+	case 1:
+		value = m_pfm512->read(space, address, mem_mask);
 		break;
-	case GENEVE_PFM512A:
-		value = m_pfm512a->read(space, pfmaddress, mem_mask);
+	case 2:
+		value = m_pfm512a->read(space, address, mem_mask);
 		break;
 	default:
-		LOGMASKED(LOG_WARN, "Illegal mode for reading boot ROM: %d\n", m_boot_rom);
-		value = 0;
+		LOGMASKED(LOG_WARN, "Illegal mode for reading PFM: %d\n", m_pfm_mode);
+		return 0;
 	}
 
-	if (!m_pfm_output_enable) value = 0;
-	LOGMASKED(LOG_PFM, "Reading from PFM at address %05x -> %02x\n", pfmaddress, value);
+	LOGMASKED(LOG_PFM, "Reading from PFM at address %05x -> %02x\n", address, value);
 	return value;
 }
 
@@ -888,16 +1288,16 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
 	int address = (offset & 0x01ffff) | (m_pfm_bank<<17);
 	LOGMASKED(LOG_PFM, "Writing to PFM at address %05x <- %02x\n", address, data);
 
-	switch (m_boot_rom)
+	switch (m_pfm_mode)
 	{
-	case GENEVE_PFM512:
+	case 1:
 		m_pfm512->write(space, address, data, mem_mask);
 		break;
-	case GENEVE_PFM512A:
+	case 2:
 		m_pfm512a->write(space, address, data, mem_mask);
 		break;
 	default:
-		LOGMASKED(LOG_WARN, "Illegal mode for writing to PFM: %d\n", m_boot_rom);
+		LOGMASKED(LOG_WARN, "Illegal mode for writing to PFM: %d\n", m_pfm_mode);
 	}
 }
 
@@ -907,28 +1307,11 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
     This decoding will later be used in the READ/WRITE member functions. Also,
     we initiate wait state creation here.
 */
-READ8_MEMBER( geneve_mapper_device::setoffset )
+SETOFFSET_MEMBER( geneve_mapper_device::setoffset )
 {
 	LOGMASKED(LOG_DETAIL, "setoffset = %04x\n", offset);
 	m_debug_no_ws = false;
-	m_decoded.offset = offset;
-
-	decode_logical(m_read_mode, &m_decoded);
-	if (m_decoded.function == MUNDEF)
-	{
-		map_address(m_read_mode, &m_decoded);
-		decode_physical(&m_decoded);
-		decode_mod(&m_decoded);
-	}
-
-	set_wait(m_decoded.wait);
-
-	if (m_decoded.function == MBOX)
-	{
-		m_peribox->memen_in(ASSERT_LINE);
-		m_peribox->setaddress_dbin(space, m_decoded.physaddr, m_read_mode);
-	}
-	return 0;
+	decode(space, offset, m_read_mode, &m_decoded);
 }
 
 /*
@@ -966,10 +1349,10 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 			}
 			else
 			{
-				if (m_video_waitcount > 0)
+				if (m_ext_waitcount > 0)
 				{
-					m_video_waitcount--;
-					if (m_video_waitcount == 0)
+					m_ext_waitcount--;
+					if (m_ext_waitcount == 0)
 					{
 						LOGMASKED(LOG_CLOCK, "clock, READY asserted after video\n");
 						m_ready(ASSERT_LINE);
@@ -977,7 +1360,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 					}
 					else
 					{
-						LOGMASKED(LOG_CLOCK, "vclock, ew=%d\n", m_video_waitcount);
+						LOGMASKED(LOG_CLOCK, "vclock, ew=%d\n", m_ext_waitcount);
 					}
 				}
 			}
@@ -987,7 +1370,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 	{
 		// Falling edge
 		// Do we have video wait states? In that case, clear the line again
-		if ((m_waitcount == 0) && (m_video_waitcount > 0) && m_ready_asserted)
+		if ((m_waitcount == 0) && (m_ext_waitcount > 0) && m_ready_asserted)
 		{
 			LOGMASKED(LOG_CLOCK, "clock, READY cleared for video\n");
 			m_ready(CLEAR_LINE);
@@ -1059,22 +1442,25 @@ void geneve_mapper_device::device_start()
 	save_item(NAME(m_decoded.function));
 	save_item(NAME(m_decoded.offset));
 	save_item(NAME(m_decoded.physaddr));
-	save_item(NAME(m_boot_rom));
+	save_item(NAME(m_turbo));
+	save_item(NAME(m_genmod));
+	save_item(NAME(m_timode));
+	save_item(NAME(m_pfm_mode));
 	save_item(NAME(m_pfm_bank));
 	save_item(NAME(m_pfm_output_enable));
 	save_item(NAME(m_sram_mask));
 	save_item(NAME(m_sram_val));
 	save_item(NAME(m_waitcount));
-	save_item(NAME(m_video_waitcount));
+	save_item(NAME(m_ext_waitcount));
 }
 
-void geneve_mapper_device::common_reset()
+void geneve_mapper_device::device_reset()
 {
 	m_extra_waitstates = false;
 	m_video_waitstates = true;
 	m_read_mode = false;
 	m_waitcount = 0;
-	m_video_waitcount = 0;
+	m_ext_waitcount = 0;
 	m_ready_asserted = true;
 
 	m_geneve_mode =false;
@@ -1090,22 +1476,25 @@ void geneve_mapper_device::common_reset()
 	// Clear map
 	for (auto & elem : m_map) elem = 0;
 
+	m_genmod = false;
+
 	// Check which boot EPROM we are using (or PFM)
-	m_boot_rom = machine().root_device().ioport("BOOTROM")->read();
-	m_eprom = machine().root_device().memregion("maincpu")->base();
+	set_boot_rom(machine().root_device().ioport("BOOTROM")->read());
 
-	// Allow for configuring the VRAM size
-	uint32_t videoram = (machine().root_device().ioport("VRAM")->read()!=0)? 0x30000 : 0x20000;
-	downcast<v99x8_device &>(*m_video.target()).set_vram_size(videoram);
-	LOGMASKED(LOG_SETTING, "Video RAM set to %d KiB\n", videoram / 1024);
-}
+	// Check for GenMod. We assume that GenMod can be combined with PFM.
+	if (machine().root_device().ioport("MODE")->read()!=0)
+	{
+		LOGMASKED(LOG_SETTING, "Using GenMod modification\n");
+		m_eprom = machine().root_device().memregion("maincpu")->base() + 0x8000;
+		if (m_eprom[0] != 0xf0)
+		{
+			fatalerror("genboard: GenMod boot ROM missing\n");
+		}
+		m_genmod = true;
+		m_turbo = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TURBO)!=0);
+		m_timode = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TIM)!=0);
+	}
 
-void geneve_mapper_device::device_reset()
-{
-	common_reset();
-
-	// SRAM is only separately handled for the standard Geneve; Genmod uses
-	// the Memex instead
 	switch (machine().root_device().ioport("SRAM")->read())
 	{
 /*  1 100. .... .... .... .... on-board sram (128K) -+
@@ -1127,35 +1516,15 @@ void geneve_mapper_device::device_reset()
 		m_sram_val =    0x180000;
 		break;
 	}
-}
 
-void genmod_mapper_device::device_reset()
-{
-	common_reset();
-	LOGMASKED(LOG_SETTING, "Using GenMod modification\n");
-	m_turbo = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TURBO)!=0);
-	m_gm_timode = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TIM)!=0);
+	// Allow for configuring the VRAM size
+	uint32_t videoram = (machine().root_device().ioport("VRAM")->read()!=0)? 0x30000 : 0x20000;
+	downcast<v99x8_device &>(*m_video.target()).set_vram_size(videoram);
+	LOGMASKED(LOG_SETTING, "Video RAM set to %d KiB\n", videoram / 1024);
 }
 
 /****************************************************************************
     Keyboard support
-
-    The XT keyboard interface is described in various places on the internet,
-    like (http://www-2.cs.cmu.edu/afs/cs/usr/jmcm/www/info/key2.txt).  It is a
-    synchronous unidirectional serial interface: the data line is driven by the
-    keyboard to send data to the CPU; the CTS/clock line has a pull up resistor
-    and can be driven low by both keyboard and CPU.  To send data to the CPU,
-    the keyboard pulses the clock line low 9 times, and the Geneve samples all
-    8 bits of data (plus one start bit) on each falling edge of the clock.
-    When the key code buffer is full, the Geneve gate array asserts the kbdint*
-    line (connected to 9901 int8_t*).  The Geneve gate array will hold the
-    CTS/clock line low as long as the keyboard buffer is full or CRU bit @>F78
-    is 0.  Writing a 0 to >F79 will clear the Geneve keyboard buffer, and
-    writing a 1 will resume normal operation: you need to write a 0 to >F78
-    before clearing >F79, or the keyboard will be enabled to send data the gate
-    array when >F79 is is set to 0, and any such incoming data from the
-    keyboard will be cleared as soon as it is buffered by the gate array.
-
 ****************************************************************************/
 
 static const uint8_t MF1_CODE[0xe] =

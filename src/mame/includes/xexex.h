@@ -5,10 +5,6 @@
     Xexex
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_XEXEX_H
-#define MAME_INCLUDES_XEXEX_H
-
-#pragma once
 
 #include "video/k053250.h"
 #include "sound/flt_vol.h"
@@ -21,7 +17,6 @@
 #include "video/konami_helper.h"
 #include "machine/k054321.h"
 #include "machine/timer.h"
-#include "emupal.h"
 #include "screen.h"
 
 class xexex_state : public driver_device
@@ -49,11 +44,6 @@ public:
 	{
 	}
 
-	void xexex(machine_config &config);
-
-	void init_xexex();
-
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_workram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -98,7 +88,7 @@ private:
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-
+	void init_xexex();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -106,14 +96,12 @@ private:
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
 	void xexex_postload();
-	void xexex_objdma(int limiter);
-	void parse_control2();
+	void xexex_objdma( int limiter );
+	void parse_control2(  );
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	K054539_CB_MEMBER(ym_set_mixing);
-
+	void xexex(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_XEXEX_H

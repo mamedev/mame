@@ -285,7 +285,6 @@ uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
 	if(mode == 0)
 	{
-		// FIXME: this should perform a 16-bit big-endian word read
 		return m_io->read_byte((uint16_t)(addr)) +
 			(m_io->read_byte((uint16_t)(addr+1)) << 8);
 	}
@@ -326,7 +325,6 @@ void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
 	if(mode == 0)
 	{
-		// FIXME: this should perform a 16-bit big-endian word write
 		m_io->write_byte((uint16_t)(addr),value & 0xff);
 		m_io->write_byte((uint16_t)(addr+1),(value >> 8) & 0xff);
 	}

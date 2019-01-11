@@ -16,7 +16,6 @@
 #include "cpu/nec/nec.h"
 #include "machine/cxd1095.h"
 //#include "sound/ay8910.h"
-#include "emupal.h"
 
 #define MAIN_CLOCK XTAL(16'000'000) // Unknown clock
 
@@ -191,7 +190,8 @@ MACHINE_CONFIG_START(korgm1_state::korgm1)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  AY8910(config, "aysnd", MAIN_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.30);
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 

@@ -30,26 +30,23 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_digits(*this, "digit%u", 0U),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	void mw18w(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
-
-private:
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
 	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
 	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
 	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
+	void mw18w(machine_config &config);
 	void mw18w_map(address_map &map);
 	void mw18w_portmap(address_map &map);
-
-	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
+private:
+	virtual void machine_start() override { m_digits.resolve(); m_lamp.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	output_finder<10> m_digits;
-	output_finder<81> m_lamps;
+	output_finder<81> m_lamp;
 };
 
 
@@ -77,7 +74,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
 	// d6: bell sound
 	// d7: backdrop lamp dim control
 
-	m_lamps[80] = BIT(data, 7);
+	m_lamp[80] = BIT(data, 7);
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
@@ -90,7 +87,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 
 	// refresh lamp status
 	for (int i = 0; i < 5; i++)
-		m_lamps[col * 10 + i] = BIT(rows, i);
+		m_lamp[col * 10 + i] = BIT(rows, i);
 
 	/* lamps info:
 
@@ -181,13 +178,13 @@ void mw18w_state::mw18w_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(FUNC(mw18w_state::mw18w_sound0_w));
-	map(0x01, 0x01).portr("IN1").w(FUNC(mw18w_state::mw18w_sound1_w));
-	map(0x02, 0x02).portr("IN2").w(FUNC(mw18w_state::mw18w_lamps_w));
-	map(0x03, 0x03).portr("DSW").w(FUNC(mw18w_state::mw18w_led_display_w));
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(mw18w_state::mw18w_sound0_w));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(mw18w_state::mw18w_sound1_w));
+	map(0x02, 0x02).portr("IN2").w(this, FUNC(mw18w_state::mw18w_lamps_w));
+	map(0x03, 0x03).portr("DSW").w(this, FUNC(mw18w_state::mw18w_led_display_w));
 	map(0x04, 0x04).portr("IN4");
 	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).w(FUNC(mw18w_state::mw18w_irq0_clear_w));
+	map(0x07, 0x07).w(this, FUNC(mw18w_state::mw18w_irq0_clear_w));
 }
 
 
@@ -287,7 +284,7 @@ MACHINE_CONFIG_START(mw18w_state::mw18w)
 	MCFG_DEVICE_PROGRAM_MAP(mw18w_map)
 	MCFG_DEVICE_IO_MAP(mw18w_portmap)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* no video! */
 

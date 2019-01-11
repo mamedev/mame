@@ -4,24 +4,34 @@
 
 #include "includes/labyrunr.h"
 
-void labyrunr_state::labyrunr_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int pal;
 
-	for (int pal = 0; pal < 8; pal++)
+	for (pal = 0; pal < 8; pal++)
 	{
+		/* chars, no lookup table */
 		if (pal & 1)
 		{
-			// chars, no lookup table
-			for (int i = 0; i < 0x100; i++)
+			int i;
+
+			for (i = 0; i < 0x100; i++)
 				palette.set_pen_indirect((pal << 8) | i, (pal << 4) | (i & 0x0f));
 		}
+		/* sprites */
 		else
 		{
-			// sprites
-			for (int i = 0; i < 0x100; i++)
+			int i;
+
+			for (i = 0; i < 0x100; i++)
 			{
-				uint8_t const ctabentry = !color_prom[i] ? 0 : ((pal << 4) | (color_prom[i] & 0x0f));
+				uint8_t ctabentry;
+
+				if (color_prom[i] == 0)
+					ctabentry = 0;
+				else
+					ctabentry = (pal << 4) | (color_prom[i] & 0x0f);
 
 				palette.set_pen_indirect((pal << 8) | i, ctabentry);
 			}

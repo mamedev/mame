@@ -75,7 +75,7 @@ void menu_video_options::handle()
 	const event *menu_event = process(0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((intptr_t)menu_event->itemref)
+		switch ((uintptr_t)menu_event->itemref)
 		{
 			/* rotate adds rotation depending on the direction */
 			case VIDEO_ITEM_ROTATE:

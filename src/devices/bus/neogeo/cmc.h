@@ -8,7 +8,6 @@
 #include "slot.h"
 #include "rom.h"
 #include "prot_cmc.h"
-#include "machine/nvram.h"
 
 // ======================> neogeo_cmc_cart_device
 
@@ -219,13 +218,10 @@ public:
 
 protected:
 	virtual void device_start() override;
-
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override;
 
 private:
-	std::unique_ptr<uint16_t[]> m_ram;
-
-	required_device<nvram_device> m_nvram;
+	uint16_t m_ram[0x1000];
 };
 
 DECLARE_DEVICE_TYPE(NEOGEO_CMC_JOCKEYGP_CART, neogeo_cmc_jockeygp_cart_device)

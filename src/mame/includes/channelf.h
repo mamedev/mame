@@ -5,10 +5,9 @@
  * includes/channelf.h
  *
  ****************************************************************************/
+
 #ifndef MAME_INCLUDES_CHANNELF_H
 #define MAME_INCLUDES_CHANNELF_H
-
-#pragma once
 
 #include "cpu/f8/f8.h"
 #include "audio/channelf.h"
@@ -16,17 +15,15 @@
 #include "bus/chanf/slot.h"
 #include "bus/chanf/rom.h"
 
-#include "emupal.h"
-
 
 class channelf_state : public driver_device
 {
 public:
 	channelf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_custom(*this,"custom")
-		, m_cart(*this, "cartslot")
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_custom(*this,"custom"),
+			m_cart(*this, "cartslot")
 	{ }
 
 	DECLARE_READ8_MEMBER(port_0_r);
@@ -45,7 +42,7 @@ public:
 	uint8_t port_read_with_latch(uint8_t ext, uint8_t latch_state);
 	virtual void video_start() override;
 	virtual void machine_start() override;
-	void channelf_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(channelf);
 	uint32_t screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<channelf_sound_device> m_custom;

@@ -5,10 +5,9 @@
  * includes/vector06.h
  *
  ****************************************************************************/
+
 #ifndef MAME_INCLUDES_VECTOR06_H
 #define MAME_INCLUDES_VECTOR06_H
-
-#pragma once
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -16,24 +15,23 @@
 #include "cpu/i8085/i8085.h"
 
 #include "imagedev/cassette.h"
-#include "imagedev/floppy.h"
+#include "imagedev/flopdrv.h"
 
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
 
 #include "sound/ay8910.h"
 #include "sound/spkrdev.h"
 
-#include "emupal.h"
 #include "screen.h"
 
 class vector06_state : public driver_device
 {
 public:
-	vector06_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	vector06_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
@@ -56,9 +54,6 @@ public:
 		m_reset(*this, "RESET")
 	{ }
 
-	void vector06(machine_config &config);
-
-private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_READ8_MEMBER(vector06_8255_portb_r);
@@ -78,15 +73,17 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(vector06);
 	uint32_t screen_update_vector06(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vector06_interrupt);
 	TIMER_CALLBACK_MEMBER(reset_check_callback);
 	IRQ_CALLBACK_MEMBER(vector06_irq_callback);
 
+	void vector06(machine_config &config);
 	void vector06_io(address_map &map);
 	void vector06_mem(address_map &map);
-
-	required_device<i8080_cpu_device> m_maincpu;
+private:
+	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<generic_slot_device> m_cart;

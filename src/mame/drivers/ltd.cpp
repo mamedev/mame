@@ -61,17 +61,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void ltd4(machine_config &config);
-	void ltd3(machine_config &config);
-
 	void init_atla_ltd();
 	void init_bhol_ltd();
 	void init_zephy();
 	void init_ltd();
-
-	DECLARE_INPUT_CHANGED_MEMBER(ficha);
-
-private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(port1_r);
@@ -79,10 +72,14 @@ private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE8_MEMBER(count_reset_w);
+	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
+	void ltd4(machine_config &config);
+	void ltd3(machine_config &config);
 	void ltd3_map(address_map &map);
+	void ltd4_io(address_map &map);
 	void ltd4_map(address_map &map);
-
+private:
 	bool m_timer_r;
 	bool m_clear;
 	uint8_t m_counter;
@@ -101,8 +98,8 @@ private:
 void ltd_state::ltd3_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram().share("nvram"); // internal to the cpu
-	map(0x0080, 0x0087).mirror(0x78).r(FUNC(ltd_state::io_r));
-	map(0x0800, 0x2fff).w(FUNC(ltd_state::io_w));
+	map(0x0080, 0x0087).mirror(0x78).r(this, FUNC(ltd_state::io_r));
+	map(0x0800, 0x2fff).w(this, FUNC(ltd_state::io_w));
 	map(0xc000, 0xcfff).rom().mirror(0x3000).region("roms", 0);
 }
 
@@ -111,7 +108,7 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x0000, 0x001f).ram(); // internal to the cpu
 	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x01ff).ram().share("nvram");
-	map(0x0800, 0x0800).w(FUNC(ltd_state::count_reset_w));
+	map(0x0800, 0x0800).w(this, FUNC(ltd_state::count_reset_w));
 	map(0x0c00, 0x0c00).w("aysnd_1", FUNC(ay8910_device::reset_w));
 	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
 	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
@@ -120,6 +117,12 @@ void ltd_state::ltd4_map(address_map &map)
 	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
 	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
 	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);
+}
+
+void ltd_state::ltd4_io(address_map &map)
+{
+	map(0x0100, 0x0100).rw(this, FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
+	map(0x0101, 0x0101).rw(this, FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
 }
 
 // bits 6,7 not connected to data bus
@@ -528,10 +531,10 @@ MACHINE_CONFIG_START(ltd_state::ltd3)
 	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(ltd3_map)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	config.set_default_layout(layout_ltd);
+	MCFG_DEFAULT_LAYOUT(layout_ltd)
 
 	/* Sound */
 	genpin_audio(config);
@@ -541,24 +544,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ltd_state::ltd4)
 	/* basic machine hardware */
-	m6803_cpu_device &maincpu(M6803(config, "maincpu", XTAL(3'579'545))); // guess, no details available
-	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd4_map);
-	maincpu.in_p1_cb().set(FUNC(ltd_state::port1_r));
-	maincpu.out_p1_cb().set(FUNC(ltd_state::port1_w));
-	maincpu.in_p2_cb().set(FUNC(ltd_state::port2_r));
-	maincpu.out_p2_cb().set(FUNC(ltd_state::port2_w));
+	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545)) // guess, no details available
+	MCFG_DEVICE_PROGRAM_MAP(ltd4_map)
+	MCFG_DEVICE_IO_MAP(ltd4_io)
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
-	config.set_default_layout(layout_ltd);
+	MCFG_DEFAULT_LAYOUT(layout_ltd)
 
 	/* Sound */
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, "aysnd_0", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
-	AY8910(config, "aysnd_1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.3); /* guess */
+	MCFG_DEVICE_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
+	MCFG_DEVICE_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

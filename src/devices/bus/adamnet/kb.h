@@ -42,11 +42,12 @@ protected:
 	virtual void adamnet_reset_w(int state) override;
 
 private:
-	required_device<m6801_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_ioport_array<13> m_y;
 
 	uint16_t m_key_y;
 
+	// not really public
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
@@ -55,6 +56,7 @@ private:
 	DECLARE_READ8_MEMBER( p4_r );
 	DECLARE_WRITE8_MEMBER( p4_w );
 
+	void adam_kb_io(address_map &map);
 	void adam_kb_mem(address_map &map);
 };
 

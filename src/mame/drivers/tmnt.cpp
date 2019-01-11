@@ -475,16 +475,16 @@ void tmnt_state::cuebrick_main_map(address_map &map)
 	map(0x040000, 0x043fff).ram(); /* main RAM */
 	map(0x060000, 0x063fff).ram(); /* main RAM */
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0000, 0x0a0001).portr("COINS").w(this, FUNC(tmnt_state::tmnt_0a0000_w));
 	map(0x0a0002, 0x0a0003).portr("P1");
 	map(0x0a0004, 0x0a0005).portr("P2");
 	map(0x0a0010, 0x0a0011).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0a0012, 0x0a0013).portr("DSW1");
 	map(0x0a0018, 0x0a0019).portr("DSW3");
 	map(0x0b0000, 0x0b03ff).bankrw("nvrambank");
-	map(0x0b0400, 0x0b0400).w(FUNC(tmnt_state::cuebrick_nvbank_w));
+	map(0x0b0400, 0x0b0400).w(this, FUNC(tmnt_state::cuebrick_nvbank_w));
 	map(0x0c0000, 0x0c0003).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0xff00);
-	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x100000, 0x107fff).rw(this, FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
 	map(0x140400, 0x1407ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
 }
@@ -496,7 +496,7 @@ void tmnt_state::mia_main_map(address_map &map)
 	map(0x040000, 0x043fff).ram(); /* main RAM */
 	map(0x060000, 0x063fff).ram(); /* main RAM */
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0000, 0x0a0001).portr("COINS").w(this, FUNC(tmnt_state::tmnt_0a0000_w));
 	map(0x0a0002, 0x0a0003).portr("P1");
 	map(0x0a0004, 0x0a0005).portr("P2");
 	map(0x0a0009, 0x0a0009).w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -504,9 +504,9 @@ void tmnt_state::mia_main_map(address_map &map)
 	map(0x0a0012, 0x0a0013).portr("DSW2");
 	map(0x0a0018, 0x0a0019).portr("DSW3");
 #if 0
-	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::tmnt_priority_w));
+	map(0x0c0000, 0x0c0001).w(this, FUNC(tmnt_state::tmnt_priority_w));
 #endif
-	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x100000, 0x107fff).rw(this, FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
 	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
 	map(0x140400, 0x1407ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
@@ -518,7 +518,7 @@ void tmnt_state::tmnt_main_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0x060000, 0x063fff).ram(); /* main RAM */
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0000, 0x0a0001).portr("COINS").w(this, FUNC(tmnt_state::tmnt_0a0000_w));
 	map(0x0a0002, 0x0a0003).portr("P1");
 	map(0x0a0004, 0x0a0005).portr("P2");
 	map(0x0a0006, 0x0a0007).portr("P3");
@@ -527,8 +527,8 @@ void tmnt_state::tmnt_main_map(address_map &map)
 	map(0x0a0012, 0x0a0013).portr("DSW2");
 	map(0x0a0014, 0x0a0015).portr("P4");
 	map(0x0a0018, 0x0a0019).portr("DSW3");
-	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::tmnt_priority_w));
-	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x0c0000, 0x0c0001).w(this, FUNC(tmnt_state::tmnt_priority_w));
+	map(0x100000, 0x107fff).rw(this, FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
 	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
 	map(0x140400, 0x1407ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
@@ -544,14 +544,14 @@ void tmnt_state::punkshot_main_map(address_map &map)
 	map(0x0a0002, 0x0a0003).portr("COINS/DSW3");
 	map(0x0a0004, 0x0a0005).portr("P3/P4");
 	map(0x0a0006, 0x0a0007).portr("P1/P2");
-	map(0x0a0020, 0x0a0021).w(FUNC(tmnt_state::punkshot_0a0020_w));
+	map(0x0a0020, 0x0a0021).w(this, FUNC(tmnt_state::punkshot_0a0020_w));
 	map(0x0a0040, 0x0a0043).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x0a0060, 0x0a007f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x0a0080, 0x0a0081).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::punkshot_k052109_word_noA12_w));
+	map(0x100000, 0x107fff).rw(this, FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::punkshot_k052109_word_noA12_w));
 	map(0x110000, 0x110007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
 	map(0x110400, 0x1107ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
-	map(0xfffffc, 0xffffff).r(FUNC(tmnt_state::punkshot_kludge_r));
+	map(0xfffffc, 0xffffff).r(this, FUNC(tmnt_state::punkshot_kludge_r));
 }
 
 void tmnt_state::lgtnfght_main_map(address_map &map)
@@ -565,13 +565,13 @@ void tmnt_state::lgtnfght_main_map(address_map &map)
 	map(0x0a0006, 0x0a0007).portr("DSW1");
 	map(0x0a0008, 0x0a0009).portr("DSW2");
 	map(0x0a0010, 0x0a0011).portr("DSW3");
-	map(0x0a0018, 0x0a0019).w(FUNC(tmnt_state::lgtnfght_0a0018_w));
+	map(0x0a0018, 0x0a0019).w(this, FUNC(tmnt_state::lgtnfght_0a0018_w));
 	map(0x0a0020, 0x0a0023).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x0a0028, 0x0a0029).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x0b0000, 0x0b3fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
-	map(0x0c0000, 0x0c001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x0b0000, 0x0b3fff).rw(this, FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x0c0000, 0x0c001f).rw(this, FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x0e0000, 0x0e001f).w(m_k053251, FUNC(k053251_device::lsb_w));
-	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x100000, 0x107fff).rw(this, FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 }
 
 WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
@@ -585,19 +585,19 @@ void tmnt_state::blswhstl_main_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x180000, 0x183fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 	map(0x204000, 0x207fff).ram(); /* main RAM */
-	map(0x300000, 0x303fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x300000, 0x303fff).rw(this, FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
-	map(0x680000, 0x68001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x680000, 0x68001f).rw(this, FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x700000, 0x700001).portr("P1");
 	map(0x700002, 0x700003).portr("P2");
-	map(0x700004, 0x700005).r(FUNC(tmnt_state::blswhstl_coin_r));
+	map(0x700004, 0x700005).r(this, FUNC(tmnt_state::blswhstl_coin_r));
 	map(0x700006, 0x700007).portr("EEPROM");
-	map(0x700200, 0x700201).w(FUNC(tmnt_state::blswhstl_eeprom_w));
-	map(0x700300, 0x700301).w(FUNC(tmnt_state::blswhstl_700300_w));
+	map(0x700200, 0x700201).w(this, FUNC(tmnt_state::blswhstl_eeprom_w));
+	map(0x700300, 0x700301).w(this, FUNC(tmnt_state::blswhstl_700300_w));
 	map(0x700400, 0x700401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0x780600, 0x780603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x780604, 0x780605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
+	map(0x780604, 0x780605).w(this, FUNC(tmnt_state::ssriders_soundkludge_w));
 	map(0x780700, 0x78071f).w(m_k053251, FUNC(k053251_device::lsb_w));
 }
 
@@ -626,10 +626,10 @@ void tmnt_state::glfgreat_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram(); /* main RAM */
-	map(0x104000, 0x107fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x104000, 0x107fff).rw(this, FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));  /* 053936? */
-	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
+	map(0x110000, 0x11001f).w(this, FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
 	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
@@ -637,22 +637,22 @@ void tmnt_state::glfgreat_main_map(address_map &map)
 	map(0x120002, 0x120003).portr("P3/P4");
 	map(0x120004, 0x120005).portr("COINS/DSW3");
 	map(0x120006, 0x120007).portr("DSW1/DSW2");
-	map(0x121000, 0x121001).r(FUNC(tmnt_state::glfgreat_ball_r));   /* returns the color of the center pixel of the roz layer */
-	map(0x122000, 0x122001).w(FUNC(tmnt_state::glfgreat_122000_w));
+	map(0x121000, 0x121001).r(this, FUNC(tmnt_state::glfgreat_ball_r));   /* returns the color of the center pixel of the roz layer */
+	map(0x122000, 0x122001).w(this, FUNC(tmnt_state::glfgreat_122000_w));
 	map(0x124000, 0x124001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x125000, 0x125003).r(m_k053260, FUNC(k053260_device::main_read)).umask16(0xff00).w(FUNC(tmnt_state::glfgreat_sound_w)).umask16(0xff00);
-	map(0x200000, 0x207fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
-	map(0x300000, 0x3fffff).r(FUNC(tmnt_state::glfgreat_rom_r));
+	map(0x125000, 0x125003).r(m_k053260, FUNC(k053260_device::main_read)).umask16(0xff00).w(this, FUNC(tmnt_state::glfgreat_sound_w)).umask16(0xff00);
+	map(0x200000, 0x207fff).rw(this, FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x300000, 0x3fffff).r(this, FUNC(tmnt_state::glfgreat_rom_r));
 }
 
 void tmnt_state::prmrsocr_main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram(); /* main RAM */
-	map(0x104000, 0x107fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x104000, 0x107fff).rw(this, FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x108000, 0x108fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x10c000, 0x10cfff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));
-	map(0x110000, 0x11001f).w(FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
+	map(0x110000, 0x11001f).w(this, FUNC(tmnt_state::k053244_word_noA1_w));              /* duplicate! */
 	map(0x114000, 0x11401f).rw(m_k053245, FUNC(k05324x_device::k053244_lsb_r), FUNC(k05324x_device::k053244_lsb_w));    /* duplicate! */
 	map(0x118000, 0x11801f).w(m_k053936, FUNC(k053936_device::ctrl_w));
 	map(0x11c000, 0x11c01f).w(m_k053251, FUNC(k053251_device::msb_w));
@@ -661,11 +661,11 @@ void tmnt_state::prmrsocr_main_map(address_map &map)
 	map(0x12100d, 0x12100d).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x12100f, 0x12100f).w("soundlatch2", FUNC(generic_latch_8_device::write));
 	map(0x121015, 0x121015).r("soundlatch3", FUNC(generic_latch_8_device::read));
-	map(0x122000, 0x122001).w(FUNC(tmnt_state::prmrsocr_eeprom_w));    /* EEPROM + video control */
-	map(0x123000, 0x123001).w(FUNC(tmnt_state::prmrsocr_sound_irq_w));
-	map(0x200000, 0x207fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x122000, 0x122001).w(this, FUNC(tmnt_state::prmrsocr_eeprom_w));    /* EEPROM + video control */
+	map(0x123000, 0x123001).w(this, FUNC(tmnt_state::prmrsocr_sound_irq_w));
+	map(0x200000, 0x207fff).rw(this, FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 	map(0x280000, 0x280001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x300000, 0x33ffff).r(FUNC(tmnt_state::prmrsocr_rom_r));
+	map(0x300000, 0x33ffff).r(this, FUNC(tmnt_state::prmrsocr_rom_r));
 }
 
 
@@ -910,22 +910,22 @@ void tmnt_state::tmnt2_main_map(address_map &map)
 	map(0x000000, 0x0fffff).rom().share("tmnt2_rom");
 	map(0x104000, 0x107fff).ram().share("sunset_104000");   /* main RAM */
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x180000, 0x183fff).ram().w(FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");   // k053245_scattered_word_r
+	map(0x180000, 0x183fff).ram().w(this, FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");   // k053245_scattered_word_r
 	map(0x1c0000, 0x1c0001).portr("P1");
 	map(0x1c0002, 0x1c0003).portr("P2");
 	map(0x1c0004, 0x1c0005).portr("P3");
 	map(0x1c0006, 0x1c0007).portr("P4");
 	map(0x1c0100, 0x1c0101).portr("COINS");
-	map(0x1c0102, 0x1c0103).r(FUNC(tmnt_state::ssriders_eeprom_r));
-	map(0x1c0200, 0x1c0201).w(FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
-	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
+	map(0x1c0102, 0x1c0103).r(this, FUNC(tmnt_state::ssriders_eeprom_r));
+	map(0x1c0200, 0x1c0201).w(this, FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
+	map(0x1c0300, 0x1c0301).w(this, FUNC(tmnt_state::ssriders_1c0300_w));
 	map(0x1c0400, 0x1c0401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0x1c0500, 0x1c057f).ram(); /* TMNT2 only (1J) unknown, mostly MCU blit offsets */
 //  AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r) /* protection device */
-	map(0x1c0800, 0x1c081f).w(FUNC(tmnt_state::tmnt2_1c0800_w)).share("tmnt2_1c0800");  /* protection device */
-	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x1c0800, 0x1c081f).w(this, FUNC(tmnt_state::tmnt2_1c0800_w)).share("tmnt2_1c0800");  /* protection device */
+	map(0x5a0000, 0x5a001f).rw(this, FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
+	map(0x5c0604, 0x5c0605).w(this, FUNC(tmnt_state::ssriders_soundkludge_w));
 	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 }
@@ -935,22 +935,22 @@ void tmnt_state::ssriders_main_map(address_map &map)
 	map(0x000000, 0x0bffff).rom();
 	map(0x104000, 0x107fff).ram(); /* main RAM */
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x180000, 0x183fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x180000, 0x183fff).rw(this, FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x1c0000, 0x1c0001).portr("P1");
 	map(0x1c0002, 0x1c0003).portr("P2");
 	map(0x1c0004, 0x1c0005).portr("P3");
 	map(0x1c0006, 0x1c0007).portr("P4");
 	map(0x1c0100, 0x1c0101).portr("COINS");
-	map(0x1c0102, 0x1c0103).r(FUNC(tmnt_state::ssriders_eeprom_r));
-	map(0x1c0200, 0x1c0201).w(FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
-	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
+	map(0x1c0102, 0x1c0103).r(this, FUNC(tmnt_state::ssriders_eeprom_r));
+	map(0x1c0200, 0x1c0201).w(this, FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
+	map(0x1c0300, 0x1c0301).w(this, FUNC(tmnt_state::ssriders_1c0300_w));
 	map(0x1c0400, 0x1c0401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
 	map(0x1c0500, 0x1c057f).ram(); /* TMNT2 only (1J) unknown */
-	map(0x1c0800, 0x1c0801).r(FUNC(tmnt_state::ssriders_protection_r));
-	map(0x1c0800, 0x1c0803).w(FUNC(tmnt_state::ssriders_protection_w));
-	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x1c0800, 0x1c0801).r(this, FUNC(tmnt_state::ssriders_protection_r));
+	map(0x1c0800, 0x1c0803).w(this, FUNC(tmnt_state::ssriders_protection_w));
+	map(0x5a0000, 0x5a001f).rw(this, FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x5c0604, 0x5c0605).w(FUNC(tmnt_state::ssriders_soundkludge_w));
+	map(0x5c0604, 0x5c0605).w(this, FUNC(tmnt_state::ssriders_soundkludge_w));
 	map(0x5c0700, 0x5c071f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 }
@@ -961,11 +961,11 @@ void tmnt_state::sunsetbl_main_map(address_map &map)
 	map(0x104000, 0x107fff).ram(); /* main RAM */
 	map(0x14c000, 0x14cfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x14e700, 0x14e71f).w(m_k053251, FUNC(k053251_device::lsb_w));
-	map(0x180000, 0x183fff).rw(FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
+	map(0x180000, 0x183fff).rw(this, FUNC(tmnt_state::k053245_scattered_word_r), FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");
 	map(0x184000, 0x18ffff).ram();
-	map(0x1c0300, 0x1c0301).w(FUNC(tmnt_state::ssriders_1c0300_w));
+	map(0x1c0300, 0x1c0301).w(this, FUNC(tmnt_state::ssriders_1c0300_w));
 	map(0x1c0400, 0x1c0401).nopw();
-	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
+	map(0x5a0000, 0x5a001f).rw(this, FUNC(tmnt_state::k053244_word_noA1_r), FUNC(tmnt_state::k053244_word_noA1_w));
 	map(0x600000, 0x603fff).rw(m_k052109, FUNC(k052109_device::word_r), FUNC(k052109_device::word_w));
 	map(0x604020, 0x60402f).nopw();    /* written every frame */
 	map(0x604200, 0x604201).nopw();    /* watchdog */
@@ -974,9 +974,9 @@ void tmnt_state::sunsetbl_main_map(address_map &map)
 	map(0xc00002, 0xc00003).portr("P2");
 	map(0xc00004, 0xc00005).portr("P3");
 	map(0xc00006, 0xc00007).portr("P4");
-	map(0xc00200, 0xc00201).w(FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
+	map(0xc00200, 0xc00201).w(this, FUNC(tmnt_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
 	map(0xc00404, 0xc00405).portr("COINS");
-	map(0xc00406, 0xc00407).r(FUNC(tmnt_state::sunsetbl_eeprom_r));
+	map(0xc00406, 0xc00407).r(this, FUNC(tmnt_state::sunsetbl_eeprom_r));
 	map(0xc00601, 0xc00601).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x75d288, 0x75d289).nopr(); // read repeatedly in some test menus (PC=181f2)
 }
@@ -990,11 +990,11 @@ void tmnt_state::thndrx2_main_map(address_map &map)
 	map(0x300000, 0x30001f).w(m_k053251, FUNC(k053251_device::lsb_w));
 	map(0x400000, 0x400003).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x500000, 0x50003f).rw(m_k054000, FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
-	map(0x500100, 0x500101).w(FUNC(tmnt_state::thndrx2_eeprom_w));
+	map(0x500100, 0x500101).w(this, FUNC(tmnt_state::thndrx2_eeprom_w));
 	map(0x500200, 0x500201).portr("P1/COINS");
-	map(0x500202, 0x500203).r(FUNC(tmnt_state::thndrx2_eeprom_r));
+	map(0x500202, 0x500203).r(this, FUNC(tmnt_state::thndrx2_eeprom_r));
 	map(0x500300, 0x500301).nopw();    /* watchdog reset? irq enable? */
-	map(0x600000, 0x607fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
+	map(0x600000, 0x607fff).rw(this, FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 	map(0x700000, 0x700007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
 	map(0x700400, 0x7007ff).rw(m_k051960, FUNC(k051960_device::k051960_r), FUNC(k051960_device::k051960_w));
 }
@@ -1014,13 +1014,13 @@ void tmnt_state::tmnt_audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).rw(FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
+	map(0x9000, 0x9000).rw(this, FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xd000, 0xd000).w(m_upd7759, FUNC(upd7759_device::port_w));
-	map(0xe000, 0xe000).w(FUNC(tmnt_state::tmnt_upd_start_w));
-	map(0xf000, 0xf000).r(FUNC(tmnt_state::tmnt_upd_busy_r));
+	map(0xe000, 0xe000).w(this, FUNC(tmnt_state::tmnt_upd_start_w));
+	map(0xf000, 0xf000).r(this, FUNC(tmnt_state::tmnt_upd_busy_r));
 }
 
 
@@ -1029,7 +1029,7 @@ void tmnt_state::punkshot_audio_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfa00, 0xfa00).w(FUNC(tmnt_state::sound_arm_nmi_w));
+	map(0xfa00, 0xfa00).w(this, FUNC(tmnt_state::sound_arm_nmi_w));
 	map(0xfc00, 0xfc2f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
 }
 
@@ -1048,7 +1048,7 @@ void tmnt_state::glfgreat_audio_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf82f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
-	map(0xfa00, 0xfa00).w(FUNC(tmnt_state::sound_arm_nmi_w));
+	map(0xfa00, 0xfa00).w(this, FUNC(tmnt_state::sound_arm_nmi_w));
 }
 
 
@@ -1058,7 +1058,7 @@ void tmnt_state::ssriders_audio_map(address_map &map)
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xfa00, 0xfa2f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
-	map(0xfc00, 0xfc00).w(FUNC(tmnt_state::sound_arm_nmi_w));
+	map(0xfc00, 0xfc00).w(this, FUNC(tmnt_state::sound_arm_nmi_w));
 }
 
 
@@ -1067,7 +1067,7 @@ void tmnt_state::thndrx2_audio_map(address_map &map)
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf801).mirror(0x0010).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfa00, 0xfa00).w(FUNC(tmnt_state::sound_arm_nmi_w));
+	map(0xfa00, 0xfa00).w(this, FUNC(tmnt_state::sound_arm_nmi_w));
 	map(0xfc00, 0xfc2f).rw(m_k053260, FUNC(k053260_device::read), FUNC(k053260_device::write));
 }
 
@@ -1088,11 +1088,11 @@ void tmnt_state::prmrsocr_audio_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe0ff).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
-	map(0xe100, 0xe12f).rw(FUNC(tmnt_state::k054539_ctrl_r), FUNC(tmnt_state::k054539_ctrl_w));
+	map(0xe100, 0xe12f).rw(this, FUNC(tmnt_state::k054539_ctrl_r), FUNC(tmnt_state::k054539_ctrl_w));
 	map(0xf000, 0xf000).w("soundlatch3", FUNC(generic_latch_8_device::write));
 	map(0xf002, 0xf002).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xf003, 0xf003).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0xf800, 0xf800).w(FUNC(tmnt_state::prmrsocr_audio_bankswitch_w));
+	map(0xf800, 0xf800).w(this, FUNC(tmnt_state::prmrsocr_audio_bankswitch_w));
 }
 
 
@@ -1625,19 +1625,8 @@ static INPUT_PORTS_START( glfgreat )
 	KONAMI16_MSB( 4, IPT_BUTTON3, IPT_BUTTON4 ) PORT_PLAYER(4)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( glfgreatu )
-	PORT_INCLUDE( glfgreat )
-
-	PORT_MODIFY("DSW1/DSW2")
-	PORT_DIPNAME( 0x1800, 0x1000, "Initial/Maximum Credit" ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(      0x1800, "2/2" )
-	PORT_DIPSETTING(      0x1000, "2/3" )
-	PORT_DIPSETTING(      0x0800, "2/4" )
-	PORT_DIPSETTING(      0x0000, "2/5" )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( glfgreatj )
-	PORT_INCLUDE( glfgreatu )
+	PORT_INCLUDE( glfgreat )
 
 	PORT_MODIFY("DSW1/DSW2")
 	PORT_DIPNAME( 0x0300, 0x0100, "Players/Controllers" ) PORT_DIPLOCATION("SW2:1,2")
@@ -1645,6 +1634,11 @@ static INPUT_PORTS_START( glfgreatj )
 	PORT_DIPSETTING(      0x0200, "2/2" ) // Upright
 	PORT_DIPSETTING(      0x0100, "4/2" ) // Cocktail (P1&P3 <-> P2&P4)
 	PORT_DIPSETTING(      0x0000, "4/4" ) // Cocktail (P1&P2 <-> P3&P4)
+	PORT_DIPNAME( 0x1800, 0x1000, "Initial/Maximum Credit" ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(      0x1800, "2/2" )
+	PORT_DIPSETTING(      0x1000, "2/3" )
+	PORT_DIPSETTING(      0x0800, "2/4" )
+	PORT_DIPSETTING(      0x0000, "2/5" )
 
 	PORT_MODIFY("P1/P2")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_NAME("Spare (P1 Left)")
@@ -1682,6 +1676,7 @@ static INPUT_PORTS_START( glfgreatj )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(4) PORT_NAME("P4 Club Select")
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_BUTTON4        ) PORT_PLAYER(4) PORT_NAME("Spare (P4 Button 4)")
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( ssriders )
 	PORT_START("COINS")
@@ -1914,109 +1909,116 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 	m_irq5_mask = 0;
 }
 
-void tmnt_state::cuebrick(machine_config &config)
-{
+
+MACHINE_CONFIG_START(tmnt_state::cuebrick)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);    /* 8 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::cuebrick_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::tmnt_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cuebrick_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_mia));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_mia)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
-	m_palette->set_membits(8);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_MEMBITS(8)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,cuebrick)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::cuebrick_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, cuebrick_tile_callback)
 
-	K051960(config, m_k051960, 0);
-	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
-	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(tmnt_state, mia_sprite_callback)
+	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
-	ymsnd.irq_handler().set_inputline(m_maincpu, M68K_IRQ_6);
-	ymsnd.add_route(0, "mono", 1.0);
-	ymsnd.add_route(1, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_6))
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+MACHINE_CONFIG_END
 
-void tmnt_state::mia(machine_config &config)
-{
+
+MACHINE_CONFIG_START(tmnt_state::mia)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::mia_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::tmnt_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(mia_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::mia_audio_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(mia_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_mia));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_mia)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
-	m_palette->set_membits(8);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_MEMBITS(8)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,mia)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::mia_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, mia_tile_callback)
 
-	K051960(config, m_k051960, 0);
-	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback), this);
-	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(tmnt_state, mia_sprite_callback)
+	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	K007232(config, m_k007232, XTAL(3'579'545));
-	m_k007232->port_write().set(FUNC(tmnt_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.20);
-	m_k007232->add_route(1, "mono", 0.20);
-}
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, tmnt_state, volume_callback))
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+MACHINE_CONFIG_END
+
 
 MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 {
@@ -2025,227 +2027,244 @@ MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 	m_upd7759->reset_w(1);
 }
 
-void tmnt_state::tmnt(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::tmnt_interrupt));
+MACHINE_CONFIG_START(tmnt_state::tmnt)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt_audio_map);
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/3)
+	MCFG_DEVICE_PROGRAM_MAP(tmnt_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, tmnt_interrupt)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(tmnt_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,tmnt)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1 );
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	// verified against real hardware
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt)
+	MCFG_SCREEN_PALETTE("palette")
 
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt));
-	screen.set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
-	m_palette->set_membits(8);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_MEMBITS(8)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,tmnt)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
 
-	K051960(config, m_k051960, 0);
-	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(tmnt_state::tmnt_sprite_callback), this);
-	m_k051960->set_plane_order(K051960_PLANEORDER_MIA);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, "soundlatch");
-
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);
-
-	K007232(config, m_k007232, XTAL(3'579'545));
-	m_k007232->port_write().set(FUNC(tmnt_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.33);
-	m_k007232->add_route(1, "mono", 0.33);
-
-	UPD7759(config, "upd", XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.60);
-
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1); /* 1 channel for the title music */
-	m_samples->set_samples_start_callback(FUNC(tmnt_state::tmnt_decode_sample));
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-void tmnt_state::punkshot(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::punkshot_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
-
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::punkshot_audio_map);
-	/* NMIs are generated by the 053260 */
-
-	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
-
-	WATCHDOG_TIMER(config, "watchdog");
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_punkshot));
-	screen.set_palette(m_palette);
-
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
-
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
-
-	K051960(config, m_k051960, 0);
-	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(tmnt_state::punkshot_sprite_callback), this);
-
-	K053251(config, m_k053251, 0);
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(tmnt_state, tmnt_sprite_callback)
+	MCFG_K051960_PLANEORDER(K051960_PLANEORDER_MIA)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(ALL_OUTPUTS, "mono", 0.70);
-}
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-void tmnt_state::lgtnfght(machine_config &config)
-{
+	MCFG_DEVICE_ADD("k007232", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, tmnt_state, volume_callback))
+	MCFG_SOUND_ROUTE(0, "mono", 0.33)
+	MCFG_SOUND_ROUTE(1, "mono", 0.33)
+
+	MCFG_DEVICE_ADD("upd", UPD7759, XTAL(640'000))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(1) /* 1 channel for the title music */
+	MCFG_SAMPLES_START_CB(tmnt_state, tmnt_decode_sample)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(tmnt_state::punkshot)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::lgtnfght_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::lgtnfght_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(punkshot_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::lgtnfght_audio_map);
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(punkshot_audio_map)
+								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_lgtnfght));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_punkshot)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
+
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
+
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(tmnt_state, punkshot_sprite_callback)
+
+	MCFG_K053251_ADD("k053251")
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(tmnt_state::lgtnfght)
+
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(lgtnfght_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(lgtnfght_audio_map)
+
+	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
 
-	K053245(config, m_k053245, 0);
-	m_k053245->set_palette(m_palette);
-	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
+	MCFG_DEVICE_ADD("k053245", K053245, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "lspeaker", 0.70);
-	m_k053260->add_route(1, "rspeaker", 0.70);
-}
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
+MACHINE_CONFIG_END
 
-void tmnt_state::blswhstl(machine_config &config)
-{
+
+MACHINE_CONFIG_START(tmnt_state::blswhstl)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);       /* Confirmed */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::blswhstl_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(blswhstl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_audio_map);
-	/* NMIs are generated by the 053260 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
+								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_lgtnfght));
-	screen.screen_vblank().set(FUNC(tmnt_state::screen_vblank_blswhstl));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tmnt_state, screen_vblank_blswhstl))
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_VIDEO_START_OVERRIDE(tmnt_state, blswhstl)
+	MCFG_VIDEO_START_OVERRIDE(tmnt_state, blswhstl )
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::blswhstl_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, blswhstl_tile_callback)
 
-	K053245(config, m_k053245, 0);
-	m_k053245->set_palette(m_palette);
-	m_k053245->set_sprite_callback(FUNC(tmnt_state::blswhstl_sprite_callback), this);
+	MCFG_DEVICE_ADD("k053245", K053245, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_CB(tmnt_state, blswhstl_sprite_callback)
 
-	K053251(config, m_k053251, 0);
-	K054000(config, m_k054000, 0);
+	MCFG_K053251_ADD("k053251")
+	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.70).add_route(1, "rspeaker", 0.70);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 
-	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "rspeaker", 0.50);   /* fixed inverted stereo channels */
-	m_k053260->add_route(1, "lspeaker", 0.50);
-}
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)   /* fixed inverted stereo channels */
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
+MACHINE_CONFIG_END
 
 
 
@@ -2265,62 +2284,65 @@ static GFXDECODE_START( gfx_glfgreat )
 	GFXDECODE_ENTRY( "zoom", 0, zoomlayout, 0x400, 16 )
 GFXDECODE_END
 
-void tmnt_state::glfgreat(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);       /* Confirmed */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::glfgreat_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::lgtnfght_interrupt));
+MACHINE_CONFIG_START(tmnt_state::glfgreat)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::glfgreat_audio_map);
-	/* NMIs are generated by the 053260 */
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(glfgreat_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(glfgreat_audio_map)
+								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_glfgreat));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glfgreat);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glfgreat)
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,glfgreat)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
 
-	K053245(config, m_k053245, 0);
-	m_k053245->set_palette(m_palette);
-	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
+	MCFG_DEVICE_ADD("k053245", K053245, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	K053936(config, m_k053936, 0);
-	m_k053936->set_wrap(1);
-	m_k053936->set_offsets(85, 0);
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_WRAP(1)
+	MCFG_K053936_OFFSETS(85, 0)
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "lspeaker", 1.0);
-	m_k053260->add_route(1, "rspeaker", 1.0);
-}
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
 
 MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 {
@@ -2329,279 +2351,298 @@ MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-void tmnt_state::prmrsocr(machine_config &config)
-{
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);       /* Confirmed */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::prmrsocr_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::lgtnfght_interrupt));
+MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 
-	Z80(config, m_audiocpu, 8000000);  /* ? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::prmrsocr_audio_map);
-	/* NMIs are generated by the 054539 */
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)       /* Confirmed */
+	MCFG_DEVICE_PROGRAM_MAP(prmrsocr_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, lgtnfght_interrupt)
+
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(prmrsocr_audio_map)
+								/* NMIs are generated by the 054539 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,prmrsocr)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_glfgreat));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_glfgreat)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_glfgreat);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_glfgreat)
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,prmrsocr)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
 
-	K053245(config, m_k053245, 0);
-	m_k053245->set_palette(m_palette);
-	m_k053245->set_sprite_callback(FUNC(tmnt_state::prmrsocr_sprite_callback), this);
+	MCFG_DEVICE_ADD("k053245", K053245, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_CB(tmnt_state, prmrsocr_sprite_callback)
 
-	K053936(config, m_k053936, 0);
-	m_k053936->set_offsets(85, 1);
+	MCFG_DEVICE_ADD("k053936", K053936, 0)
+	MCFG_K053936_OFFSETS(85, 1)
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2");
-	GENERIC_LATCH_8(config, "soundlatch3");
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	K054539(config, m_k054539, XTAL(18'432'000));
-	m_k054539->timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
-	m_k054539->add_route(0, "lspeaker", 1.0);
-	m_k054539->add_route(1, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
+	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
-void tmnt_state::tmnt2(machine_config &config)
-{
+
+MACHINE_CONFIG_START(tmnt_state::tmnt2)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt2_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(tmnt2_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	Z80(config, m_audiocpu, 8000000);
-	/* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM access. */
-	/* Access speed of ROM/RAM used on the machine is 150ns, without the wait, they cannot run on 8MHz. */
-	/* We are not emulating the wait state, so the ROM test ends at 02 instead of 00. */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_audio_map);
-	/* NMIs are generated by the 053260 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)  /* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
+						/* access. Access speed of ROM/RAM used on the machine is 150ns, */
+						/* without the wait, they cannot run on 8MHz.                    */
+						/* We are not emulating the wait state, so the ROM test ends at  */
+						/* 02 instead of 00. */
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
+								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
 
-	K053245(config, m_k053245, 0);
-	m_k053245->set_palette(m_palette);
-	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
+	MCFG_DEVICE_ADD("k053245", K053245, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "lspeaker", 0.75);
-	m_k053260->add_route(1, "rspeaker", 0.75);
-}
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+MACHINE_CONFIG_END
 
-void tmnt_state::ssriders(machine_config &config)
-{
+
+MACHINE_CONFIG_START(tmnt_state::ssriders)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	Z80(config, m_audiocpu, 8000000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::ssriders_audio_map);
-	/* NMIs are generated by the 053260 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ssriders_audio_map)
+								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
 
-	K053245(config, m_k053245, 0);
-	m_k053245->set_palette(m_palette);
-	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
+	MCFG_DEVICE_ADD("k053245", K053245, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "lspeaker", 0.70);
-	m_k053260->add_route(1, "rspeaker", 0.70);
-}
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
+MACHINE_CONFIG_END
 
-void tmnt_state::sunsetbl(machine_config &config)
-{
+
+MACHINE_CONFIG_START(tmnt_state::sunsetbl)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::sunsetbl_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::irq4_line_hold));
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sunsetbl_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state,  irq4_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_tmnt2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::ssbl_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, ssbl_tile_callback)
 
-	K053245(config, m_k053245, 0);
-	m_k053245->set_palette(m_palette);
-	m_k053245->set_sprite_callback(FUNC(tmnt_state::lgtnfght_sprite_callback), this);
+	MCFG_DEVICE_ADD("k053245", K053245, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K05324X_OFFSETS(0, 0)
+	MCFG_K05324X_CB(tmnt_state, lgtnfght_sprite_callback)
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-}
+	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+MACHINE_CONFIG_END
 
-void tmnt_state::thndrx2(machine_config &config)
-{
+MACHINE_CONFIG_START(tmnt_state::thndrx2)
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::thndrx2_main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(tmnt_state::punkshot_interrupt));
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(thndrx2_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tmnt_state, punkshot_interrupt)
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::thndrx2_audio_map);
-	/* NMIs are generated by the 053260 */
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(thndrx2_audio_map)
+								/* NMIs are generated by the 053260 */
 
 	MCFG_MACHINE_START_OVERRIDE(tmnt_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,common)
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(tmnt_state::screen_update_thndrx2));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_thndrx2)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	MCFG_PALETTE_ENABLE_SHADOWS()
+	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	K052109(config, m_k052109, 0);
-	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback), this);
+	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K052109_CB(tmnt_state, tmnt_tile_callback)
 
-	K051960(config, m_k051960, 0);
-	m_k051960->set_palette(m_palette);
-	m_k051960->set_screen_tag("screen");
-	m_k051960->set_sprite_callback(FUNC(tmnt_state::thndrx2_sprite_callback), this);
+	MCFG_DEVICE_ADD("k051960", K051960, 0)
+	MCFG_GFX_PALETTE("palette")
+	MCFG_K051960_SCREEN_TAG("screen")
+	MCFG_K051960_CB(tmnt_state, thndrx2_sprite_callback)
 
-	K053251(config, m_k053251, 0);
+	MCFG_K053251_ADD("k053251")
 
-	K054000(config, m_k054000, 0);
+	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	K053260(config, m_k053260, XTAL(3'579'545));
-	m_k053260->add_route(0, "lspeaker", 0.75);
-	m_k053260->add_route(1, "rspeaker", 0.75);
-}
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+MACHINE_CONFIG_END
 
 
 
@@ -3340,38 +3381,6 @@ ROM_START( glfgreat )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "061l02.1h",   0x000000, 0x20000, CRC(ac7399f4) SHA1(27f95bd41cb550ea0395a93138066896b834551e) )
 	ROM_LOAD16_BYTE( "061l03.4h",   0x000001, 0x20000, CRC(77b0ff5c) SHA1(e47701402a9a6f69cfbc72de0fee4cbdd79fbc6e) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "061f01.4e",    0x0000, 0x8000, CRC(ab9a2a57) SHA1(c92738b4d3754c2378cd1e6ae786faa0c5a65808) )
-
-	// the tile and sprite ROMs are actually 16-bit ROMs on a 32-bit bus, but the data lines are
-	// swapped so that D0-D7 and D16-D23 come from one ROM and D8-D15 and D24-D31 from the other
-	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
-	ROM_LOAD16_BYTE( "061d14.12l", 0x000000, 0x080000, CRC(b9440924) SHA1(d12763f1c999cfa4f2d6f685a73c8c20204f9cbb) )
-	ROM_LOAD16_BYTE( "061d13.12k", 0x000001, 0x080000, CRC(9f999f0b) SHA1(f83e3e9e44d7d5ba4c72f72db1ab9f98a0e80fe2) )
-
-	ROM_REGION( 0x200000, "k053245", 0 )    /* sprites */
-	ROM_LOAD16_BYTE( "061d11.3k", 0x000000, 0x100000, CRC(c45b66a3) SHA1(bfb7f9a39d195857893d3f04c28d5c89442c3ac7) )
-	ROM_LOAD16_BYTE( "061d12.8k", 0x000001, 0x100000, CRC(d305ecd1) SHA1(28cba6b5eb56b6f5c01e9da341a5c0e2ed3cb407) )
-
-	ROM_REGION( 0x180000, "zoom", 0 )   /* 053936 tiles */
-	ROM_LOAD( "061b08.14g",   0x000000, 0x080000, CRC(6ab739c3) SHA1(37ed6c9b224189c183895517d6a72738fe92ecc4) )
-	ROM_LOAD( "061b09.15g",   0x080000, 0x080000, CRC(42c7a603) SHA1(e98e484ca817ed65c7fb80a87d732e70d120676f) )
-	ROM_LOAD( "061b10.17g",   0x100000, 0x080000, CRC(10f89ce7) SHA1(cf6a16ed0174db640780da4d11076efeb48a6119) )
-
-	ROM_REGION( 0x120000, "user1", 0 )  /* 053936 tilemaps */
-	ROM_LOAD( "061b07.18d",   0x000000, 0x080000, CRC(517887e2) SHA1(ff7aa0df2cda3c745a195879c71727352696ef3a) )
-	ROM_LOAD( "061b06.16d",   0x080000, 0x080000, CRC(41ada2ad) SHA1(7b200e44e040e3d79f2603a02c9991b4655407d4) )
-	ROM_LOAD( "061b05.15d",   0x100000, 0x020000, CRC(2456fb11) SHA1(e1bdb9f5983751d28addad6977a44df3d9899a14) )
-
-	ROM_REGION( 0x100000, "k053260", 0 )    /* samples for the 053260 */
-	ROM_LOAD( "061e04.1d",    0x0000, 0x100000, CRC(7921d8df) SHA1(19ca4850ec489cca245e90a41bfc22493cd52263) )
-ROM_END
-
-ROM_START( glfgreatu )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "061k02.1h",   0x000000, 0x20000, CRC(7d7a4d43) SHA1(e942b256ccb155f86253888884f79db819e501da) )
-	ROM_LOAD16_BYTE( "061k03.4h",   0x000001, 0x20000, CRC(3647999a) SHA1(3edd0aaa017800b5cd436399f12dc2f23882a8ce) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "061f01.4e",    0x0000, 0x8000, CRC(ab9a2a57) SHA1(c92738b4d3754c2378cd1e6ae786faa0c5a65808) )
@@ -4212,7 +4221,7 @@ void tmnt_state::init_cuebrick()
 {
 	membank("nvrambank")->configure_entries(0, 0x20, m_cuebrick_nvram, 0x400);
 
-	subdevice<nvram_device>("nvram")->set_base(m_cuebrick_nvram, sizeof(m_cuebrick_nvram));
+	machine().device<nvram_device>("nvram")->set_base(m_cuebrick_nvram, sizeof(m_cuebrick_nvram));
 
 	save_item(NAME(m_cuebrick_nvram));
 }
@@ -4250,9 +4259,8 @@ GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, empty_init, 
 GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, empty_init,  ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats (World, version L)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatu,   glfgreat, glfgreat, glfgreatu, tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats (US, version K)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats (Japan, version J)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, tmnt_state, empty_init,  ROT0,   "Konami",  "Golfing Greats (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
@@ -4260,7 +4268,7 @@ GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init, 
 GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt_state, empty_init,  ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, empty_init,  ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA1 Type H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, empty_init,  ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, ssriders,    0,        ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver EAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ssriderseaa, ssriders, ssriders, ssridr4p,  tmnt_state, empty_init,  ROT0,   "Konami",  "Sunset Riders (4 Players ver EAA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

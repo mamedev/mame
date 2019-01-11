@@ -40,6 +40,41 @@
 #include "machine/rescap.h"
 #include "video/resnet.h"
 
+#include "screen.h"
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define CDP1864_CLOCK   XTAL(1'750'000)
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CDP1864_ADD(_tag, _screen_tag, _clock, _inlace, _irq, _dma_out, _efx, _hsync, _rdata, _bdata, _gdata) \
+		MCFG_DEVICE_ADD(_tag, CDP1864, _clock) \
+		MCFG_VIDEO_SET_SCREEN(_screen_tag) \
+		downcast<cdp1864_device *>(device)->set_inlace_callback(DEVCB_##_inlace); \
+		downcast<cdp1864_device *>(device)->set_irq_callback(DEVCB_##_irq); \
+		downcast<cdp1864_device *>(device)->set_dma_out_callback(DEVCB_##_dma_out); \
+		downcast<cdp1864_device *>(device)->set_efx_callback(DEVCB_##_efx); \
+		downcast<cdp1864_device *>(device)->set_hsync_callback(DEVCB_##_hsync); \
+		downcast<cdp1864_device *>(device)->set_rdata_callback(DEVCB_##_rdata); \
+		downcast<cdp1864_device *>(device)->set_bdata_callback(DEVCB_##_bdata); \
+		downcast<cdp1864_device *>(device)->set_gdata_callback(DEVCB_##_gdata);
+
+#define MCFG_CDP1864_CHROMINANCE(_r, _b, _g, _bkg) \
+		downcast<cdp1864_device *>(device)->set_chrominance_resistors(_r, _b, _g, _bkg);
+
+#define MCFG_CDP1864_SCREEN_ADD(_tag, _clock) \
+		MCFG_SCREEN_ADD(_tag, RASTER) \
+		MCFG_SCREEN_RAW_PARAMS(_clock, cdp1864_device::SCREEN_WIDTH, cdp1864_device::HBLANK_END, cdp1864_device::HBLANK_START, cdp1864_device::TOTAL_SCANLINES, cdp1864_device::SCANLINE_VBLANK_END, cdp1864_device::SCANLINE_VBLANK_START)
+
 
 
 //**************************************************************************
@@ -82,16 +117,15 @@ public:
 	// construction/destruction
 	cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto inlace_cb() { return m_read_inlace.bind(); }
-	auto int_cb() { return m_write_int.bind(); }
-	auto dma_out_cb() { return m_write_dma_out.bind(); }
-	auto efx_cb() { return m_write_efx.bind(); }
-	auto hsync_cb() { return m_write_hsync.bind(); }
-	auto rdata_cb() { return m_read_rdata.bind(); }
-	auto bdata_cb() { return m_read_bdata.bind(); }
-	auto gdata_cb() { return m_read_gdata.bind(); }
-
-	void set_chrominance(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }
+	template <class Object> void set_inlace_callback(Object &&inlace) { m_read_inlace.set_callback(std::forward<Object>(inlace)); }
+	template <class Object> void set_irq_callback(Object &&irq) { m_write_irq.set_callback(std::forward<Object>(irq)); }
+	template <class Object> void set_dma_out_callback(Object &&dma_out) { m_write_dma_out.set_callback(std::forward<Object>(dma_out)); }
+	template <class Object> void set_efx_callback(Object &&efx) { m_write_efx.set_callback(std::forward<Object>(efx)); }
+	template <class Object> void set_hsync_callback(Object &&hsync) { m_write_hsync.set_callback(std::forward<Object>(hsync)); }
+	template <class Object> void set_rdata_callback(Object &&rdata) { m_read_rdata.set_callback(std::forward<Object>(rdata)); }
+	template <class Object> void set_bdata_callback(Object &&bdata) { m_read_bdata.set_callback(std::forward<Object>(bdata)); }
+	template <class Object> void set_gdata_callback(Object &&gdata) { m_read_gdata.set_callback(std::forward<Object>(gdata)); }
+	void set_chrominance_resistors(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }
 
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_READ8_MEMBER( dispoff_r );
@@ -109,7 +143,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -134,7 +167,7 @@ private:
 	devcb_read_line        m_read_rdata;
 	devcb_read_line        m_read_bdata;
 	devcb_read_line        m_read_gdata;
-	devcb_write_line       m_write_int;
+	devcb_write_line       m_write_irq;
 	devcb_write_line       m_write_dma_out;
 	devcb_write_line       m_write_efx;
 	devcb_write_line       m_write_hsync;

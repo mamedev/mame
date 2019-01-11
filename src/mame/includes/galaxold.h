@@ -5,20 +5,18 @@
   Galaxian hardware family (old)
 
   This include file is used by the following drivers:
-    - dambustr.cpp
-    - galaxold.cpp
-    - scramble.cpp
-    - scobra.cpp
+    - dambustr.c
+    - galaxold.c
+    - scramble.c
+    - scobra.c
 
 ***************************************************************************/
+
 #ifndef MAME_INCLUDES_GALAXOLD_H
 #define MAME_INCLUDES_GALAXOLD_H
 
-#pragma once
-
 #include "machine/7474.h"
 #include "machine/timer.h"
-#include "emupal.h"
 #include "screen.h"
 
 /* star circuit */
@@ -47,7 +45,7 @@ public:
 		, m_bulletsram(*this,"bulletsram")
 		, m_rockclim_videoram(*this,"rockclim_vram")
 		, m_racknrol_tiles_bank(*this,"racknrol_tbank")
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led%u", 0U)
 		, m_leftclip(2)
 	{ }
 
@@ -68,7 +66,7 @@ public:
 	optional_shared_ptr<uint8_t> m_bulletsram;
 	optional_shared_ptr<uint8_t> m_rockclim_videoram;
 	optional_shared_ptr<uint8_t> m_racknrol_tiles_bank;
-	output_finder<2> m_leds;
+	output_finder<2> m_led;
 
 	int m_irq_line;
 	uint8_t m__4in1_bank;
@@ -177,16 +175,16 @@ public:
 	DECLARE_MACHINE_RESET(devilfsg);
 	DECLARE_MACHINE_RESET(hunchbkg);
 
-	void galaxold_palette(palette_device &palette);
-	void rockclim_palette(palette_device &palette) const;
-	void scrambold_palette(palette_device &palette);
-	void stratgyx_palette(palette_device &palette);
-	void darkplnt_palette(palette_device &palette) const;
-	void minefld_palette(palette_device &palette);
-	void rescue_palette(palette_device &palette);
-	void mariner_palette(palette_device &palette);
-	void dambustr_palette(palette_device &palette);
-	void turtles_palette(palette_device &palette);
+	DECLARE_PALETTE_INIT(galaxold);
+	DECLARE_PALETTE_INIT(rockclim);
+	DECLARE_PALETTE_INIT(scrambold);
+	DECLARE_PALETTE_INIT(stratgyx);
+	DECLARE_PALETTE_INIT(darkplnt);
+	DECLARE_PALETTE_INIT(minefld);
+	DECLARE_PALETTE_INIT(rescue);
+	DECLARE_PALETTE_INIT(mariner);
+	DECLARE_PALETTE_INIT(dambustr);
+	DECLARE_PALETTE_INIT(turtles);
 
 	DECLARE_VIDEO_START(galaxold);
 	DECLARE_VIDEO_START(drivfrcg);
@@ -291,7 +289,6 @@ public:
 	void scramblb(machine_config &config);
 	void porter(machine_config &config);
 	void scramb2(machine_config &config);
-	void scramb3(machine_config &config);
 	void ozon1(machine_config &config);
 	void mooncrst(machine_config &config);
 	void guttang(machine_config &config);
@@ -307,7 +304,7 @@ public:
 	void ckongmc_map(address_map &map);
 	void dkongjrm_map(address_map &map);
 	void dkongjrmc_map(address_map &map);
-	void drivfrcg_program(address_map &map);
+	void drivfrcg(address_map &map);
 	void drivfrcg_io(address_map &map);
 	void galaxold_map(address_map &map);
 	void guttang_map(address_map &map);
@@ -319,19 +316,17 @@ public:
 	void mooncrst_map(address_map &map);
 	void ozon1_io_map(address_map &map);
 	void ozon1_map(address_map &map);
-	void racknrol_map(address_map &map);
+	void racknrol(address_map &map);
 	void racknrol_io(address_map &map);
 	void rockclim_map(address_map &map);
-	void scramb_common_map(address_map &map);
 	void scramb2_map(address_map &map);
-	void scramb3_map(address_map &map);
 	void scramblb_map(address_map &map);
 	void scrambler_map(address_map &map);
 	void spcwarp(address_map &map);
 	void tazzmang(address_map &map);
 
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_start() override { m_led.resolve(); }
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

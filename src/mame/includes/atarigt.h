@@ -10,7 +10,6 @@
 #include "machine/adc0808.h"
 #include "machine/atarigen.h"
 #include "video/atarirle.h"
-#include "emupal.h"
 
 #define CRAM_ENTRIES        0x4000
 #define TRAM_ENTRIES        0x4000
@@ -21,23 +20,17 @@
 class atarigt_state : public atarigen_state
 {
 public:
-	atarigt_state(const machine_config &mconfig, device_type type, const char *tag) :
-		atarigen_state(mconfig, type, tag),
-		m_palette(*this, "palette"),
-		m_colorram(*this, "colorram", 32),
-		m_adc(*this, "adc"),
-		m_playfield_tilemap(*this, "playfield"),
-		m_alpha_tilemap(*this, "alpha"),
-		m_rle(*this, "rle"),
-		m_service_io(*this, "SERVICE"),
-		m_coin_io(*this, "COIN"),
-		m_fake_io(*this, "FAKE"),
-		m_mo_command(*this, "mo_command"),
-		m_cage(*this, "cage")
-	{ }
+	atarigt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarigen_state(mconfig, type, tag),
+			m_colorram(*this, "colorram", 32),
+			m_adc(*this, "adc"),
+			m_playfield_tilemap(*this, "playfield"),
+			m_alpha_tilemap(*this, "alpha"),
+			m_rle(*this, "rle"),
+			m_mo_command(*this, "mo_command"),
+			m_cage(*this, "cage") { }
 
-	bool           m_is_primrage;
-	required_device<palette_device> m_palette;
+	uint8_t           m_is_primrage;
 	required_shared_ptr<uint16_t> m_colorram;
 
 	optional_device<adc0808_device> m_adc;
@@ -45,10 +38,6 @@ public:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_device<atari_rle_objects_device> m_rle;
-
-	optional_ioport m_service_io;
-	optional_ioport m_coin_io;
-	optional_ioport m_fake_io;
 
 	bitmap_ind16    m_pf_bitmap;
 	bitmap_ind16    m_an_bitmap;
@@ -60,6 +49,8 @@ public:
 
 	uint32_t          m_tram_checksum;
 
+	uint32_t          m_expanded_mram[MRAM_ENTRIES * 3];
+
 	required_shared_ptr<uint32_t> m_mo_command;
 	optional_device<atari_cage_device> m_cage;
 
@@ -70,10 +61,9 @@ public:
 	offs_t          m_protaddr[ADDRSEQ_COUNT];
 	uint8_t           m_protmode;
 	uint16_t          m_protresult;
-	std::unique_ptr<uint8_t[]> m_protdata;
+	uint8_t           m_protdata[0x800];
 
 	virtual void update_interrupts() override;
-	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ32_MEMBER(special_port2_r);
 	DECLARE_READ32_MEMBER(special_port3_r);

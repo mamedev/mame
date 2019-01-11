@@ -23,7 +23,6 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/spkrdev.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -31,17 +30,14 @@ TODO:
 class horse_state : public driver_device
 {
 public:
-	horse_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	horse_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
 		m_inp_matrix(*this, "IN.%u", 0),
 		m_vram(*this, "vram")
 	{ }
 
-	void horse(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inp_matrix;
@@ -57,6 +53,7 @@ private:
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void horse(machine_config &config);
 	void horse_io_map(address_map &map);
 	void horse_map(address_map &map);
 };
@@ -64,7 +61,7 @@ private:
 void horse_state::machine_start()
 {
 	m_colorram = std::make_unique<uint8_t []>(0x200);
-	save_pointer(NAME(m_colorram), 0x200);
+	save_pointer(NAME(m_colorram.get()), 0x200);
 	save_item(NAME(m_output));
 }
 
@@ -106,7 +103,7 @@ void horse_state::horse_map(address_map &map)
 	map(0x0000, 0x37ff).rom();
 	map(0x4000, 0x40ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x6000, 0x7fff).ram().share("vram");
-	map(0x8000, 0x87ff).mirror(0x0800).rw(FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
+	map(0x8000, 0x87ff).mirror(0x0800).rw(this, FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
 }
 
 void horse_state::horse_io_map(address_map &map)
@@ -199,10 +196,10 @@ MACHINE_CONFIG_START(horse_state::horse)
 	MCFG_DEVICE_PROGRAM_MAP(horse_map)
 	MCFG_DEVICE_IO_MAP(horse_io_map)
 
-	i8155_device &i8155(I8155(config, "i8155", XTAL(12'000'000) / 4)); // port A input, B output, C output but unused
-	i8155.in_pa_callback().set(FUNC(horse_state::input_r));
-	i8155.out_pb_callback().set(FUNC(horse_state::output_w));
-	i8155.out_to_callback().set("speaker", FUNC(speaker_sound_device::level_w));
+	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 4) // port A input, B output, C output but unused
+	MCFG_I8155_IN_PORTA_CB(READ8(*this, horse_state, input_r))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, horse_state, output_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -213,7 +210,7 @@ MACHINE_CONFIG_START(horse_state::horse)
 	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 	MCFG_SCREEN_PALETTE("palette")
-	PALETTE(config, "palette", palette_device::BGR_3BIT);
+	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

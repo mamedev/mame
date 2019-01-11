@@ -7,6 +7,9 @@
 
 #include "lpc.h"
 
+#define MCFG_LPC_ACPI_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, LPC_ACPI, 0)
+
 class lpc_acpi_device : public lpc_device {
 public:
 	lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

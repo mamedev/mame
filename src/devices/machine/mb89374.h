@@ -37,6 +37,25 @@ Data Link Controller
 
 #include "osdcore.h"
 
+//**************************************************************************
+//  DEVICE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_MB89374_IRQ_CB(_devcb) \
+	devcb = &downcast<mb89374_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
+
+#define MCFG_MB89374_PO0_CB(_devcb) \
+	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<0>(DEVCB_##_devcb);
+
+#define MCFG_MB89374_PO1_CB(_devcb) \
+	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<1>(DEVCB_##_devcb);
+
+#define MCFG_MB89374_PO2_CB(_devcb) \
+	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<2>(DEVCB_##_devcb);
+
+#define MCFG_MB89374_PO3_CB(_devcb) \
+	devcb = &downcast<mb89374_device &>(*device).set_out_po_callback<3>(DEVCB_##_devcb);
+
 
 class mb89374_device : public device_t,
 					   public device_execute_interface
@@ -45,8 +64,8 @@ public:
 	// construction/destruction
 	mb89374_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto out_irq_callback() { return m_out_irq_cb.bind(); }
-	template <unsigned N> auto out_po_callback() { return m_out_po_cb[N].bind(); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_out_po_callback(Object &&cb) { return m_out_po_cb[N].set_callback(std::forward<Object>(cb)); }
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );

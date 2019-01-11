@@ -14,7 +14,7 @@ void volfied_state::video_start()
 	m_video_ctrl = 0;
 	m_video_mask = 0;
 
-	save_pointer(NAME(m_video_ram), 0x40000);
+	save_pointer(NAME(m_video_ram.get()), 0x40000);
 	save_item(NAME(m_video_ctrl));
 	save_item(NAME(m_video_mask));
 }

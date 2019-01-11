@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -34,6 +34,7 @@
 		|| BX_PLATFORM_IOS              \
 		|| BX_PLATFORM_LINUX            \
 		|| BX_PLATFORM_OSX              \
+		|| BX_PLATFORM_QNX              \
 		|| BX_PLATFORM_RPI              \
 		|| BX_PLATFORM_STEAMLINK        \
 		|| BX_PLATFORM_WINDOWS          \
@@ -56,44 +57,37 @@
 
 #if BGFX_PLATFORM_SUPPORTS_DX9BC
 #	undef  BGFX_EMBEDDED_SHADER_DX9BC
-#	define BGFX_EMBEDDED_SHADER_DX9BC(_renderer, _name) \
-		{ _renderer, BX_CONCATENATE(_name, _dx9 ), BX_COUNTOF(BX_CONCATENATE(_name, _dx9 ) ) },
+#	define BGFX_EMBEDDED_SHADER_DX9BC(_renderer, _name) { _renderer, BX_CONCATENATE(_name, _dx9 ), sizeof(BX_CONCATENATE(_name, _dx9 ) ) },
 #endif // BGFX_PLATFORM_SUPPORTS_DX9BC
 
 #if BGFX_PLATFORM_SUPPORTS_DXBC
 #	undef  BGFX_EMBEDDED_SHADER_DXBC
-#	define BGFX_EMBEDDED_SHADER_DXBC(_renderer, _name) \
-		{ _renderer, BX_CONCATENATE(_name, _dx11), BX_COUNTOF(BX_CONCATENATE(_name, _dx11) ) },
+#	define BGFX_EMBEDDED_SHADER_DXBC(_renderer, _name)  { _renderer, BX_CONCATENATE(_name, _dx11), sizeof(BX_CONCATENATE(_name, _dx11) ) },
 #endif // BGFX_PLATFORM_SUPPORTS_DXBC
 
 #if BGFX_PLATFORM_SUPPORTS_PSSL
 #	undef  BGFX_EMBEDDED_SHADER_PSSL
-#	define BGFX_EMBEDDED_SHADER_PSSL(_renderer, _name) \
-		{ _renderer, BX_CONCATENATE(_name, _pssl), BX_CONCATENATE(_name, _pssl_size) },
+#	define BGFX_EMBEDDED_SHADER_PSSL(_renderer, _name)  { _renderer, BX_CONCATENATE(_name, _pssl), BX_CONCATENATE(_name, _pssl_size) },
 #endif // BGFX_PLATFORM_SUPPORTS_PSSL
 
 #if BGFX_PLATFORM_SUPPORTS_ESSL
 #	undef  BGFX_EMBEDDED_SHADER_ESSL
-#	define BGFX_EMBEDDED_SHADER_ESSL(_renderer, _name) \
-		{ _renderer, BX_CONCATENATE(_name, _glsl), BX_COUNTOF(BX_CONCATENATE(_name, _glsl) ) },
+#	define BGFX_EMBEDDED_SHADER_ESSL(_renderer, _name)  { _renderer, BX_CONCATENATE(_name, _glsl), sizeof(BX_CONCATENATE(_name, _glsl) ) },
 #endif // BGFX_PLATFORM_SUPPORTS_ESSL
 
 #if BGFX_PLATFORM_SUPPORTS_GLSL
 #	undef  BGFX_EMBEDDED_SHADER_GLSL
-#	define BGFX_EMBEDDED_SHADER_GLSL(_renderer, _name) \
-		{ _renderer, BX_CONCATENATE(_name, _glsl), BX_COUNTOF(BX_CONCATENATE(_name, _glsl) ) },
+#	define BGFX_EMBEDDED_SHADER_GLSL(_renderer, _name)  { _renderer, BX_CONCATENATE(_name, _glsl), sizeof(BX_CONCATENATE(_name, _glsl) ) },
 #endif // BGFX_PLATFORM_SUPPORTS_GLSL
 
 #if BGFX_PLATFORM_SUPPORTS_SPIRV
 #	undef  BGFX_EMBEDDED_SHADER_SPIRV
-#	define BGFX_EMBEDDED_SHADER_SPIRV(_renderer, _name) \
-		{ _renderer, BX_CONCATENATE(_name, _spv), BX_COUNTOF(BX_CONCATENATE(_name, _spv) ) },
+#	define BGFX_EMBEDDED_SHADER_SPIRV(_renderer, _name)  { _renderer, BX_CONCATENATE(_name, _spv), sizeof(BX_CONCATENATE(_name, _spv) ) },
 #endif // BGFX_PLATFORM_SUPPORTS_SPIRV
 
 #if BGFX_PLATFORM_SUPPORTS_METAL
 #	undef  BGFX_EMBEDDED_SHADER_METAL
-#	define BGFX_EMBEDDED_SHADER_METAL(_renderer, _name) \
-		{ _renderer, BX_CONCATENATE(_name, _mtl), BX_COUNTOF(BX_CONCATENATE(_name, _mtl) ) },
+#	define BGFX_EMBEDDED_SHADER_METAL(_renderer, _name)  { _renderer, BX_CONCATENATE(_name, _mtl), sizeof(BX_CONCATENATE(_name, _mtl) ) },
 #endif // BGFX_PLATFORM_SUPPORTS_METAL
 
 #define BGFX_EMBEDDED_SHADER(_name)                                                                \

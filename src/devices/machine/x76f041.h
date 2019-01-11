@@ -13,12 +13,15 @@
 #pragma once
 
 
+#define MCFG_X76F041_ADD( _tag ) \
+	MCFG_DEVICE_ADD( _tag, X76F041, 0 )
+
 class x76f041_device : public device_t,
 	public device_nvram_interface
 {
 public:
 	// construction/destruction
-	x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	x76f041_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	DECLARE_WRITE_LINE_MEMBER( write_cs );
 	DECLARE_WRITE_LINE_MEMBER( write_rst );

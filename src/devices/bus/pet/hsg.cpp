@@ -97,14 +97,14 @@ MACHINE_CONFIG_START(cbm8000_hsg_a_device::device_add_mconfig)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
 	MCFG_SCREEN_REFRESH_RATE(25)
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	EF9365(config, m_gdc, 1750000);
-	m_gdc->set_screen(SCREEN_TAG);
-	m_gdc->set_addrmap(0, &cbm8000_hsg_a_device::hsg_a_map);
-	m_gdc->set_palette_tag("palette");
-	m_gdc->set_nb_bitplanes(1);
-	m_gdc->set_display_mode(ef9365_device::DISPLAY_MODE_512x512);
+	MCFG_DEVICE_ADD(EF9365_TAG, EF9365, 1750000)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_DEVICE_ADDRESS_MAP(0, hsg_a_map)
+	MCFG_EF936X_PALETTE("palette")
+	MCFG_EF936X_BITPLANES_CNT(1);
+	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x512);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cbm8000_hsg_b_device::device_add_mconfig)
@@ -113,14 +113,14 @@ MACHINE_CONFIG_START(cbm8000_hsg_b_device::device_add_mconfig)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	EF9365(config, m_gdc, 1750000); //EF9366
-	m_gdc->set_screen(SCREEN_TAG);
-	m_gdc->set_addrmap(0, &cbm8000_hsg_b_device::hsg_b_map);
-	m_gdc->set_palette_tag("palette");
-	m_gdc->set_nb_bitplanes(1);
-	m_gdc->set_display_mode(ef9365_device::DISPLAY_MODE_512x256);
+	MCFG_DEVICE_ADD(EF9366_TAG, EF9365, 1750000)
+	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MCFG_DEVICE_ADDRESS_MAP(0, hsg_b_map)
+	MCFG_EF936X_PALETTE("palette")
+	MCFG_EF936X_BITPLANES_CNT(1);
+	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x256);
 MACHINE_CONFIG_END
 
 

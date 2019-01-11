@@ -54,6 +54,7 @@ protected:
 
 #define O(o) void o ## _full(); void o ## _partial()
 
+	u32 inst_state_base;        /* Current instruction bank */
 	virtual u32 get_state_base() const override;
 
 	uint8_t do_clb(uint8_t in, uint8_t bit);

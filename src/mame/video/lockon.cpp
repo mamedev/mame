@@ -98,15 +98,16 @@ static const res_net_info lockon_pd_net_info =
 	}
 };
 
-void lockon_state::lockon_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(lockon_state, lockon)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 1024; ++i)
+	for (i = 0; i < 1024; ++i)
 	{
 		uint8_t r, g, b;
-		uint8_t const p1 = color_prom[i];
-		uint8_t const p2 = color_prom[i + 0x400];
+		uint8_t p1 = color_prom[i];
+		uint8_t p2 = color_prom[i + 0x400];
 
 		if (p2 & 0x80)
 		{
@@ -905,7 +906,7 @@ void lockon_state::video_start()
 
 	save_item(NAME(*m_back_buffer));
 	save_item(NAME(*m_front_buffer));
-	save_pointer(NAME(m_obj_pal_ram), 2048);
+	save_pointer(NAME(m_obj_pal_ram.get()), 2048);
 }
 
 uint32_t lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
@@ -15,7 +15,6 @@ project "bx"
 		path.join(BX_DIR, "include/**.h"),
 		path.join(BX_DIR, "include/**.inl"),
 		path.join(BX_DIR, "src/**.cpp"),
-		path.join(BX_DIR, "scripts/**.natvis"),
 	}
 
 	configuration { "Debug" }

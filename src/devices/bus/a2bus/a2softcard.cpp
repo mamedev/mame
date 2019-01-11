@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(A2BUS_SOFTCARD, a2bus_softcard_device, "a2softcard", "Microso
 
 void a2bus_softcard_device::z80_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(a2bus_softcard_device::dma_r), FUNC(a2bus_softcard_device::dma_w));
+	map(0x0000, 0xffff).rw(this, FUNC(a2bus_softcard_device::dma_r), FUNC(a2bus_softcard_device::dma_w));
 }
 
 /***************************************************************************
@@ -37,11 +37,10 @@ void a2bus_softcard_device::z80_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void a2bus_softcard_device::device_add_mconfig(machine_config &config)
-{
-	Z80(config, m_z80, 1021800*2);   // Z80 runs on double the Apple II's clock
-	m_z80->set_addrmap(AS_PROGRAM, &a2bus_softcard_device::z80_mem);
-}
+MACHINE_CONFIG_START(a2bus_softcard_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, 1021800*2)   // Z80 runs on double the Apple II's clock
+	MCFG_DEVICE_PROGRAM_MAP(z80_mem)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -106,27 +105,27 @@ READ8_MEMBER( a2bus_softcard_device::dma_r )
 	{
 		if (offset <= 0xafff)
 		{
-			return slot_dma_read(offset+0x1000);
+			return slot_dma_read(space, offset+0x1000);
 		}
 		else if (offset <= 0xbfff)  // LC bank 2 d000-dfff
 		{
-			return slot_dma_read((offset&0xfff) + 0xd000);
+			return slot_dma_read(space, (offset&0xfff) + 0xd000);
 		}
 		else if (offset <= 0xcfff)  // LC e000-efff
 		{
-			return slot_dma_read((offset&0xfff) + 0xe000);
+			return slot_dma_read(space, (offset&0xfff) + 0xe000);
 		}
 		else if (offset <= 0xdfff)  // LC f000-ffff (or ROM?)
 		{
-			return slot_dma_read((offset&0xfff) + 0xf000);
+			return slot_dma_read(space, (offset&0xfff) + 0xf000);
 		}
 		else if (offset <= 0xefff)  // I/O space c000-cfff
 		{
-			return slot_dma_read((offset&0xfff) + 0xc000);
+			return slot_dma_read(space, (offset&0xfff) + 0xc000);
 		}
 		else    // zero page
 		{
-			return slot_dma_read(offset&0xfff);
+			return slot_dma_read(space, offset&0xfff);
 		}
 	}
 
@@ -144,27 +143,27 @@ WRITE8_MEMBER( a2bus_softcard_device::dma_w )
 	{
 		if (offset <= 0xafff)
 		{
-			slot_dma_write(offset+0x1000, data);
+			slot_dma_write(space, offset+0x1000, data);
 		}
 		else if (offset <= 0xbfff)  // LC bank 2 d000-dfff
 		{
-			slot_dma_write((offset&0xfff) + 0xd000, data);
+			slot_dma_write(space, (offset&0xfff) + 0xd000, data);
 		}
 		else if (offset <= 0xcfff)  // LC e000-efff
 		{
-			slot_dma_write((offset&0xfff) + 0xe000, data);
+			slot_dma_write(space, (offset&0xfff) + 0xe000, data);
 		}
 		else if (offset <= 0xdfff)  // LC f000-ffff (or ROM?)
 		{
-			slot_dma_write((offset&0xfff) + 0xf000, data);
+			slot_dma_write(space, (offset&0xfff) + 0xf000, data);
 		}
 		else if (offset <= 0xefff)  // I/O space c000-cfff
 		{
-			slot_dma_write((offset&0xfff) + 0xc000, data);
+			slot_dma_write(space, (offset&0xfff) + 0xc000, data);
 		}
 		else    // zero page
 		{
-			slot_dma_write(offset&0xfff, data);
+			slot_dma_write(space, offset&0xfff, data);
 		}
 	}
 }

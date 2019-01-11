@@ -7,7 +7,6 @@
 
 #include "isa.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -41,7 +40,6 @@ public:
 protected:
 	isa8_cga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<mc6845_device> m_crtc;
 	required_ioport m_cga_config;
 
 	// device-level overrides

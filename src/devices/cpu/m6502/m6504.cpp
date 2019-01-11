@@ -4,7 +4,7 @@
 
     m6504.c
 
-    MOS Technology 6502, NMOS variant with reduced address bus
+    Mostek 6502, NMOS variant with reduced address bus
 
 ***************************************************************************/
 

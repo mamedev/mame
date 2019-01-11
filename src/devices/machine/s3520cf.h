@@ -12,6 +12,14 @@ Seiko/Epson S-3520CF
 #pragma once
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_S3520CF_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), S3520CF, XTAL(32'768))
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -22,7 +30,7 @@ class s3520cf_device :  public device_t
 {
 public:
 	// construction/destruction
-	s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_READ_LINE_MEMBER( read_bit );

@@ -1148,7 +1148,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 		case 0x274: // DSA
 			if (!is_602_class())
 				return false;
-			desc.flags |= OPFLAG_CAN_CHANGE_MODES | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_END_SEQUENCE;
+			desc.flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION;
 			return true;
 	}
 

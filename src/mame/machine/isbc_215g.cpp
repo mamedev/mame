@@ -13,7 +13,6 @@ DEFINE_DEVICE_TYPE(ISBC_215G, isbc_215g_device, "isbc_215g", "ISBC 215G Winchest
 
 isbc_215g_device::isbc_215g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISBC_215G, tag, owner, clock),
-	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_dmac(*this, "u84"),
 	m_hdd0(*this, "drive0"),
 	m_hdd1(*this, "drive1"),
@@ -319,14 +318,14 @@ WRITE16_MEMBER(isbc_215g_device::mem_w)
 
 void isbc_215g_device::isbc_215g_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(isbc_215g_device::mem_r), FUNC(isbc_215g_device::mem_w));
+	map(0x00000, 0xfffff).rw(this, FUNC(isbc_215g_device::mem_r), FUNC(isbc_215g_device::mem_w));
 }
 
 void isbc_215g_device::isbc_215g_io(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("i8089", 0);
 	map(0x4000, 0x47ff).mirror(0x3800).ram();
-	map(0x8000, 0x8039).mirror(0x3fc0).rw(FUNC(isbc_215g_device::io_r), FUNC(isbc_215g_device::io_w));
+	map(0x8000, 0x8039).mirror(0x3fc0).rw(this, FUNC(isbc_215g_device::io_r), FUNC(isbc_215g_device::io_w));
 	map(0xc070, 0xc08f).rw("sbx1", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
 	map(0xc0b0, 0xc0bf).rw("sbx1", FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
 	map(0xc0d0, 0xc0df).rw("sbx2", FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
@@ -353,23 +352,22 @@ WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
 	m_isbx_irq[3] = state ? true : false;
 }
 
-void isbc_215g_device::device_add_mconfig(machine_config &config)
-{
-	I8089(config, m_dmac, XTAL(15'000'000) / 3);
-	m_dmac->set_addrmap(AS_PROGRAM, &isbc_215g_device::isbc_215g_mem);
-	m_dmac->set_addrmap(AS_IO, &isbc_215g_device::isbc_215g_io);
-	m_dmac->set_data_width(16);
+MACHINE_CONFIG_START(isbc_215g_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("u84", I8089, XTAL(15'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(isbc_215g_mem)
+	MCFG_DEVICE_IO_MAP(isbc_215g_io)
+	MCFG_I8089_DATA_WIDTH(16)
 
-	HARDDISK(config, "drive0", 0);
-	HARDDISK(config, "drive1", 0);
+	MCFG_HARDDISK_ADD("drive0")
+	MCFG_HARDDISK_ADD("drive1")
 
-	ISBX_SLOT(config, m_sbx1, 0, isbx_cards, nullptr);
-	m_sbx1->mintr0().set(FUNC(isbc_215g_device::isbx_irq_00_w));
-	m_sbx1->mintr1().set(FUNC(isbc_215g_device::isbx_irq_01_w));
-	ISBX_SLOT(config, m_sbx2, 0, isbx_cards, "fdc_218a");
-	m_sbx2->mintr0().set(FUNC(isbc_215g_device::isbx_irq_10_w));
-	m_sbx2->mintr1().set(FUNC(isbc_215g_device::isbx_irq_11_w));
-}
+	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_00_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_01_w))
+	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, "fdc_218a")
+	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_10_w))
+	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_11_w))
+MACHINE_CONFIG_END
 
 
 ROM_START( isbc_215g )
@@ -401,7 +399,7 @@ void isbc_215g_device::device_reset()
 
 void isbc_215g_device::device_start()
 {
-	m_maincpu_mem = &m_maincpu->space(AS_PROGRAM);
+	m_maincpu_mem = &machine().device<cpu_device>(m_maincpu_tag)->space(AS_PROGRAM);
 	m_cyl[0] = m_cyl[1] = 0;
 	m_lba[0] = m_lba[1] = 0;
 	m_idcompare[0] = m_idcompare[1] = m_idcompare[2] = m_idcompare[3] = 0;

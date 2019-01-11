@@ -244,14 +244,14 @@ void liberate_state::prosport_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x2000).ram();
 	map(0x0200, 0x021f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x0400, 0x07ff).ram().w(FUNC(liberate_state::prosport_bg_vram_w)).share("bg_vram");
-	map(0x0800, 0x1fff).rw(FUNC(liberate_state::prosport_charram_r), FUNC(liberate_state::prosport_charram_w)); //0x1e00-0x1fff isn't charram!
+	map(0x0400, 0x07ff).ram().w(this, FUNC(liberate_state::prosport_bg_vram_w)).share("bg_vram");
+	map(0x0800, 0x1fff).rw(this, FUNC(liberate_state::prosport_charram_r), FUNC(liberate_state::prosport_charram_w)); //0x1e00-0x1fff isn't charram!
 	map(0x2400, 0x2fff).ram();
-	map(0x3000, 0x33ff).ram().w(FUNC(liberate_state::liberate_colorram_w)).share("colorram");
-	map(0x3400, 0x37ff).ram().w(FUNC(liberate_state::liberate_videoram_w)).share("videoram");
+	map(0x3000, 0x33ff).ram().w(this, FUNC(liberate_state::liberate_colorram_w)).share("colorram");
+	map(0x3400, 0x37ff).ram().w(this, FUNC(liberate_state::liberate_videoram_w)).share("videoram");
 	map(0x3800, 0x3fff).ram().share("spriteram");
 	map(0x4000, 0xffff).rom();
-	map(0x8000, 0x800f).w(FUNC(liberate_state::prosport_io_w));
+	map(0x8000, 0x800f).w(this, FUNC(liberate_state::prosport_io_w));
 	map(0x8000, 0x800f).bankr("bank1");
 }
 
@@ -259,13 +259,13 @@ void liberate_state::liberate_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x3fff).rom(); /* Mirror of main rom */
-	map(0x4000, 0x7fff).r(FUNC(liberate_state::deco16_bank_r));
-	map(0x4000, 0x43ff).w(FUNC(liberate_state::liberate_colorram_w)).share("colorram");
-	map(0x4400, 0x47ff).w(FUNC(liberate_state::liberate_videoram_w)).share("videoram");
+	map(0x4000, 0x7fff).r(this, FUNC(liberate_state::deco16_bank_r));
+	map(0x4000, 0x43ff).w(this, FUNC(liberate_state::liberate_colorram_w)).share("colorram");
+	map(0x4400, 0x47ff).w(this, FUNC(liberate_state::liberate_videoram_w)).share("videoram");
 	map(0x4800, 0x4fff).writeonly().share("spriteram");
 	map(0x6200, 0x67ff).writeonly().share("scratchram");
 	map(0x8000, 0xffff).rom();
-	map(0x8000, 0x800f).w(FUNC(liberate_state::deco16_io_w));
+	map(0x8000, 0x800f).w(this, FUNC(liberate_state::deco16_io_w));
 	map(0x8000, 0x800f).bankr("bank1");
 }
 
@@ -278,25 +278,25 @@ void liberate_state::prosoccr_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x3fff).rom(); /* Mirror of main rom */
-	map(0x4000, 0x7fff).r(FUNC(liberate_state::prosoccr_bank_r));
-	map(0x4000, 0x43ff).mirror(0x800).w(FUNC(liberate_state::liberate_colorram_w)).share("colorram");
-	map(0x4400, 0x47ff).w(FUNC(liberate_state::liberate_videoram_w)).share("videoram");
+	map(0x4000, 0x7fff).r(this, FUNC(liberate_state::prosoccr_bank_r));
+	map(0x4000, 0x43ff).mirror(0x800).w(this, FUNC(liberate_state::liberate_colorram_w)).share("colorram");
+	map(0x4400, 0x47ff).w(this, FUNC(liberate_state::liberate_videoram_w)).share("videoram");
 	map(0x4c00, 0x4fff).writeonly().share("spriteram");
 	map(0x6200, 0x67ff).writeonly().share("scratchram");
-	map(0x8000, 0x97ff).rw(FUNC(liberate_state::prosoccr_charram_r), FUNC(liberate_state::prosoccr_charram_w));
-	map(0x9800, 0x9800).w(FUNC(liberate_state::prosoccr_char_bank_w));
+	map(0x8000, 0x97ff).rw(this, FUNC(liberate_state::prosoccr_charram_r), FUNC(liberate_state::prosoccr_charram_w));
+	map(0x9800, 0x9800).w(this, FUNC(liberate_state::prosoccr_char_bank_w));
 	map(0xa000, 0xffff).rom();
 }
 
 void liberate_state::deco16_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0").w(FUNC(liberate_state::deco16_bank_w));
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(liberate_state::deco16_bank_w));
 	map(0x01, 0x01).portr("TILT");
 }
 
 void liberate_state::prosoccr_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0").w(FUNC(liberate_state::prosoccr_io_bank_w));
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(liberate_state::prosoccr_io_bank_w));
 	//AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
 }
 
@@ -305,13 +305,13 @@ void liberate_state::liberatb_map(address_map &map)
 	map(0x0000, 0x0fff).ram();
 	map(0x00fe, 0x00fe).portr("IN0");
 	map(0x1000, 0x3fff).rom(); /* Mirror of main rom */
-	map(0x4000, 0x7fff).r(FUNC(liberate_state::deco16_bank_r));
-	map(0x4000, 0x43ff).w(FUNC(liberate_state::liberate_colorram_w)).share("colorram");
-	map(0x4400, 0x47ff).w(FUNC(liberate_state::liberate_videoram_w)).share("videoram");
+	map(0x4000, 0x7fff).r(this, FUNC(liberate_state::deco16_bank_r));
+	map(0x4000, 0x43ff).w(this, FUNC(liberate_state::liberate_colorram_w)).share("colorram");
+	map(0x4400, 0x47ff).w(this, FUNC(liberate_state::liberate_videoram_w)).share("videoram");
 	map(0x4800, 0x4fff).writeonly().share("spriteram");
 	map(0x6200, 0x67ff).writeonly().share("scratchram");
 	map(0x8000, 0xffff).rom();
-	map(0xf000, 0xf00f).w(FUNC(liberate_state::deco16_io_w));
+	map(0xf000, 0xf00f).w(this, FUNC(liberate_state::deco16_io_w));
 	map(0xf000, 0xf000).portr("IN1");
 	map(0xf001, 0xf001).portr("IN2");
 	map(0xf002, 0xf002).portr("IN3");
@@ -764,22 +764,25 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_liberate);
-	PALETTE(config, m_palette, FUNC(liberate_state::liberate_palette), 33);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_liberate)
+	MCFG_PALETTE_ADD("palette", 33)
+	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,liberate)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8912(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	AY8912(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::liberate)
@@ -823,7 +826,7 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosoccr)
 
-	m_gfxdecode->set_info(gfx_prosoccr);
+	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_prosoccr)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
@@ -851,22 +854,25 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prosport);
-	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 256);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prosport)
+	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	AY8912(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	AY8912(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

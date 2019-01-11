@@ -530,7 +530,7 @@ WRITE_LINE_MEMBER(taito_f3_state::screen_vblank_f3)
 	}
 }
 
-void taito_f3_state::video_start()
+VIDEO_START_MEMBER(taito_f3_state,f3)
 {
 	const struct F3config *pCFG=&f3_config_table[0];
 	int i;
@@ -656,12 +656,12 @@ void taito_f3_state::video_start()
 	memset(m_spriteram16_buffered.get(),0,0x10000);
 	memset(m_spriteram.get(),0,0x10000);
 
-	save_pointer(NAME(m_videoram), 0x2000/2);
-	save_pointer(NAME(m_spriteram), 0x10000/2);
-	save_pointer(NAME(m_f3_vram), 0x2000/2);
-	save_pointer(NAME(m_f3_pf_data), 0xc000/2);
-	save_pointer(NAME(m_f3_line_ram), 0x10000/2);
-	save_pointer(NAME(m_f3_pivot_ram), 0x10000/2);
+	save_pointer(NAME(m_videoram.get()), 0x2000/2);
+	save_pointer(NAME(m_spriteram.get()), 0x10000/2);
+	save_pointer(NAME(m_f3_vram.get()), 0x2000/2);
+	save_pointer(NAME(m_f3_pf_data.get()), 0xc000/2);
+	save_pointer(NAME(m_f3_line_ram.get()), 0x10000/2);
+	save_pointer(NAME(m_f3_pivot_ram.get()), 0x10000/2);
 
 	save_item(NAME(m_f3_control_0));
 	save_item(NAME(m_f3_control_1));

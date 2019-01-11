@@ -24,6 +24,7 @@ Atari Orbit Driver
 
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
+#include "sound/discrete.h"
 #include "speaker.h"
 
 
@@ -49,10 +50,10 @@ TIMER_CALLBACK_MEMBER(orbit_state::irq_off)
 }
 
 
-INTERRUPT_GEN_MEMBER(orbit_state::interrupt)
+INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
 {
-	m_maincpu->set_input_line(0, ASSERT_LINE);
-	m_irq_off_timer->adjust(m_screen->time_until_vblank_end());
+	device.execute().set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(orbit_state::irq_off),this));
 }
 
 
@@ -78,7 +79,7 @@ WRITE_LINE_MEMBER(orbit_state::coin_lockout_w)
  *
  *************************************/
 
-void orbit_state::main_map(address_map &map)
+void orbit_state::orbit_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).mirror(0x0700).ram();
@@ -87,13 +88,13 @@ void orbit_state::main_map(address_map &map)
 	map(0x1800, 0x1800).mirror(0x07ff).portr("DSW1");
 	map(0x2000, 0x2000).mirror(0x07ff).portr("DSW2");
 	map(0x2800, 0x2800).mirror(0x07ff).portr("BUTTONS");
-	map(0x3000, 0x33bf).mirror(0x0400).ram().w(FUNC(orbit_state::playfield_w)).share(m_playfield_ram);
-	map(0x33c0, 0x33ff).mirror(0x0400).ram().share(m_sprite_ram);
-	map(0x3800, 0x3800).mirror(0x00ff).w(FUNC(orbit_state::note_w));
-	map(0x3900, 0x3900).mirror(0x00ff).w(FUNC(orbit_state::noise_amp_w));
-	map(0x3a00, 0x3a00).mirror(0x00ff).w(FUNC(orbit_state::note_amp_w));
+	map(0x3000, 0x33bf).mirror(0x0400).ram().w(this, FUNC(orbit_state::orbit_playfield_w)).share("playfield_ram");
+	map(0x33c0, 0x33ff).mirror(0x0400).ram().share("sprite_ram");
+	map(0x3800, 0x3800).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_note_w));
+	map(0x3900, 0x3900).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_noise_amp_w));
+	map(0x3a00, 0x3a00).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_note_amp_w));
 	map(0x3c00, 0x3c0f).mirror(0x00f0).w(m_latch, FUNC(f9334_device::write_a0));
-	map(0x3e00, 0x3e00).mirror(0x00ff).w(FUNC(orbit_state::noise_rst_w));
+	map(0x3e00, 0x3e00).mirror(0x00ff).w(this, FUNC(orbit_state::orbit_noise_rst_w));
 	map(0x3f00, 0x3f00).mirror(0x00ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x6000, 0x7fff).rom();
 }
@@ -248,8 +249,6 @@ GFXDECODE_END
 
 void orbit_state::machine_start()
 {
-	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(orbit_state::irq_off), this));
-
 	save_item(NAME(m_flip_screen));
 }
 
@@ -268,13 +267,13 @@ void orbit_state::machine_reset()
 MACHINE_CONFIG_START(orbit_state::orbit)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M6800, MASTER_CLOCK / 16)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orbit_state, interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLOCK / 16)
+	MCFG_DEVICE_PROGRAM_MAP(orbit_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orbit_state,  orbit_interrupt)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
 
-	F9334(config, m_latch); // M6
+	MCFG_DEVICE_ADD("latch", F9334, 0) // M6
 	/* BIT0 => UNUSED       */
 	/* BIT1 => LOCKOUT      */
 	/* BIT2 => NMI ENABLE   */
@@ -283,28 +282,28 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	/* BIT5 => PANEL STROBE */
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
-	m_latch->q_out_cb<1>().set(FUNC(orbit_state::coin_lockout_w));
-	m_latch->q_out_cb<3>().set_output("led0");
-	m_latch->q_out_cb<6>().set_output("led1");
-	m_latch->q_out_cb<7>().set(m_discrete, FUNC(discrete_device::write_line<ORBIT_WARNING_EN>));
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, orbit_state, coin_lockout_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1"))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ORBIT_WARNING_EN>))
 
-	WATCHDOG_TIMER(config, "watchdog");
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2)
-	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update_orbit)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_orbit)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbit)
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_discrete, DISCRETE, orbit_discrete)
+	MCFG_DEVICE_ADD("discrete", DISCRETE, orbit_discrete)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

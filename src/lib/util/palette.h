@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef MAME_UTIL_PALETTE_H
-#define MAME_UTIL_PALETTE_H
-
 #pragma once
+
+#ifndef __PALETTE_H__
+#define __PALETTE_H__
 
 #include "osdcore.h"
 #include "coretmpl.h"
@@ -278,4 +278,5 @@ inline rgb_t pal555(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshif
 inline rgb_t pal565(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<5,6,5>(data, rshift, gshift, bshift); }
 inline rgb_t pal888(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift) { return rgbexpand<8,8,8>(data, rshift, gshift, bshift); }
 
-#endif // MAME_UTIL_PALETTE_H
+
+#endif  // __PALETTE_H__

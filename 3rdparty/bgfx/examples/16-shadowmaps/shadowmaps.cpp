@@ -213,12 +213,12 @@ void mtxYawPitchRoll(float* __restrict _result
 		            , float _roll
 		            )
 {
-	float sroll  = bx::sin(_roll);
-	float croll  = bx::cos(_roll);
-	float spitch = bx::sin(_pitch);
-	float cpitch = bx::cos(_pitch);
-	float syaw   = bx::sin(_yaw);
-	float cyaw   = bx::cos(_yaw);
+	float sroll  = bx::fsin(_roll);
+	float croll  = bx::fcos(_roll);
+	float spitch = bx::fsin(_pitch);
+	float cpitch = bx::fcos(_pitch);
+	float syaw   = bx::fsin(_yaw);
+	float cyaw   = bx::fcos(_yaw);
 
 	_result[ 0] = sroll * spitch * syaw + croll * cyaw;
 	_result[ 1] = sroll * cpitch;
@@ -647,10 +647,10 @@ static RenderState s_renderStates[RenderState::Count] =
 {
 	{ // Default
 		0
-		| BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_A
+		| BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_ALPHA_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
-		| BGFX_STATE_WRITE_Z
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_CULL_CCW
 		| BGFX_STATE_MSAA
 		, UINT32_MAX
@@ -659,9 +659,9 @@ static RenderState s_renderStates[RenderState::Count] =
 	},
 	{ // ShadowMap_PackDepth
 		0
-		| BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_A
-		| BGFX_STATE_WRITE_Z
+		| BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_ALPHA_WRITE
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_CULL_CCW
 		| BGFX_STATE_MSAA
@@ -671,9 +671,9 @@ static RenderState s_renderStates[RenderState::Count] =
 	},
 	{ // ShadowMap_PackDepthHoriz
 		0
-		| BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_A
-		| BGFX_STATE_WRITE_Z
+		| BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_ALPHA_WRITE
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_CULL_CCW
 		| BGFX_STATE_MSAA
@@ -688,9 +688,9 @@ static RenderState s_renderStates[RenderState::Count] =
 	},
 	{ // ShadowMap_PackDepthVert
 		0
-		| BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_A
-		| BGFX_STATE_WRITE_Z
+		| BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_ALPHA_WRITE
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_CULL_CCW
 		| BGFX_STATE_MSAA
@@ -704,9 +704,9 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // Custom_BlendLightTexture
-		BGFX_STATE_WRITE_RGB
-		| BGFX_STATE_WRITE_A
-		| BGFX_STATE_WRITE_Z
+		BGFX_STATE_RGB_WRITE
+		| BGFX_STATE_ALPHA_WRITE
+		| BGFX_STATE_DEPTH_WRITE
 		| BGFX_STATE_DEPTH_TEST_LESS
 		| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_COLOR, BGFX_STATE_BLEND_INV_SRC_COLOR)
 		| BGFX_STATE_CULL_CCW
@@ -716,7 +716,7 @@ static RenderState s_renderStates[RenderState::Count] =
 		, BGFX_STENCIL_NONE
 	},
 	{ // Custom_DrawPlaneBottom
-		BGFX_STATE_WRITE_RGB
+		BGFX_STATE_RGB_WRITE
 		| BGFX_STATE_CULL_CW
 		| BGFX_STATE_MSAA
 		, UINT32_MAX
@@ -1114,7 +1114,7 @@ void splitFrustum(float* _splits, uint8_t _numSplits, float _near, float _far, f
 	{
 		float si = float(int8_t(ff) ) / numSlicesf;
 
-		const float nearp = l*(_near*bx::pow(ratio, si) ) + (1 - l)*(_near + (_far - _near)*si);
+		const float nearp = l*(_near*bx::fpow(ratio, si) ) + (1 - l)*(_near + (_far - _near)*si);
 		_splits[nn] = nearp;          //near
 		_splits[ff] = nearp * 1.005f; //far from previous split
 	}
@@ -1301,13 +1301,8 @@ public:
 		m_viewState = ViewState(uint16_t(m_width), uint16_t(m_height));
 		m_clearValues = ClearValues(0x00000000, 1.0f, 0);
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_viewState.m_width;
-		init.resolution.height = m_viewState.m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_viewState.m_width, m_viewState.m_height, m_reset);
 
 		// Enable debug text.
 		bgfx::setDebug(m_debug);
@@ -1962,7 +1957,7 @@ public:
 			const float camAspect  = float(int32_t(m_viewState.m_width) ) / float(int32_t(m_viewState.m_height) );
 			const float camNear    = 0.1f;
 			const float camFar     = 2000.0f;
-			const float projHeight = bx::tan(bx::toRad(camFovy)*0.5f);
+			const float projHeight = 1.0f/bx::ftan(bx::toRad(camFovy)*0.5f);
 			const float projWidth  = projHeight * camAspect;
 			bx::mtxProj(m_viewState.m_proj, camFovy, camAspect, camNear, camFar, caps->homogeneousDepth);
 			cameraGetViewMtx(m_viewState.m_view);
@@ -1989,15 +1984,12 @@ public:
 
 			ImGui::SetNextWindowPos(
 				  ImVec2(m_viewState.m_width - m_viewState.m_width / 5.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_viewState.m_width / 5.0f, m_viewState.m_height - 20.0f)
-				, ImGuiCond_FirstUseEver
+				, ImGuiSetCond_FirstUseEver
 				);
 			ImGui::Begin("Settings"
 				, NULL
-				, 0
+				, ImVec2(m_viewState.m_width / 5.0f, m_viewState.m_height - 20.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
 #define IMGUI_FLOAT_SLIDER(_name, _val) \
@@ -2094,15 +2086,12 @@ public:
 
 			ImGui::SetNextWindowPos(
 				  ImVec2(10.0f, 260.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_viewState.m_width / 5.0f, 350.0f)
-				, ImGuiCond_FirstUseEver
+				, ImGuiSetCond_FirstUseEver
 				);
 			ImGui::Begin("Light"
 				, NULL
-				, 0
+				, ImVec2(m_viewState.m_width / 5.0f, 350.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 			ImGui::PushItemWidth(185.0f);
 
@@ -2209,16 +2198,16 @@ public:
 			if (m_settings.m_updateScene)  { m_timeAccumulatorScene += deltaTime; }
 
 			// Setup lights.
-			m_pointLight.m_position.m_x = bx::cos(m_timeAccumulatorLight) * 20.0f;
+			m_pointLight.m_position.m_x = bx::fcos(m_timeAccumulatorLight) * 20.0f;
 			m_pointLight.m_position.m_y = 26.0f;
-			m_pointLight.m_position.m_z = bx::sin(m_timeAccumulatorLight) * 20.0f;
+			m_pointLight.m_position.m_z = bx::fsin(m_timeAccumulatorLight) * 20.0f;
 			m_pointLight.m_spotDirectionInner.m_x = -m_pointLight.m_position.m_x;
 			m_pointLight.m_spotDirectionInner.m_y = -m_pointLight.m_position.m_y;
 			m_pointLight.m_spotDirectionInner.m_z = -m_pointLight.m_position.m_z;
 
-			m_directionalLight.m_position.m_x = -bx::cos(m_timeAccumulatorLight);
+			m_directionalLight.m_position.m_x = -bx::fcos(m_timeAccumulatorLight);
 			m_directionalLight.m_position.m_y = -1.0f;
-			m_directionalLight.m_position.m_z = -bx::sin(m_timeAccumulatorLight);
+			m_directionalLight.m_position.m_z = -bx::fsin(m_timeAccumulatorLight);
 
 			// Setup instance matrices.
 			float mtxFloor[16];
@@ -2285,9 +2274,9 @@ public:
 						   , 0.0f
 						   , float(ii)
 						   , 0.0f
-						   , bx::sin(float(ii)*2.0f*bx::kPi/float(numTrees) ) * 60.0f
+						   , bx::fsin(float(ii)*2.0f*bx::kPi/float(numTrees) ) * 60.0f
 						   , 0.0f
-						   , bx::cos(float(ii)*2.0f*bx::kPi/float(numTrees) ) * 60.0f
+						   , bx::fcos(float(ii)*2.0f*bx::kPi/float(numTrees) ) * 60.0f
 						   );
 			}
 
@@ -2335,7 +2324,7 @@ public:
 
 				float at[3];
 				bx::vec3Add(at, m_pointLight.m_position.m_v, m_pointLight.m_spotDirectionInner.m_v);
-				bx::mtxLookAt(lightView[TetrahedronFaces::Green], bx::load(m_pointLight.m_position.m_v), bx::load(at) );
+				bx::mtxLookAt(lightView[TetrahedronFaces::Green], m_pointLight.m_position.m_v, at);
 			}
 			else if (LightType::PointLight == m_settings.m_lightType)
 			{
@@ -2352,7 +2341,7 @@ public:
 				{
 					const float fovx = 143.98570868f + 3.51f + m_settings.m_fovXAdjust;
 					const float fovy = 125.26438968f + 9.85f + m_settings.m_fovYAdjust;
-					const float aspect = bx::tan(bx::toRad(fovx*0.5f) )/bx::tan(bx::toRad(fovy*0.5f) );
+					const float aspect = bx::ftan(bx::toRad(fovx*0.5f) )/bx::ftan(bx::toRad(fovy*0.5f) );
 
 					bx::mtxProj(
 						  lightProj[ProjType::Vertical]
@@ -2378,7 +2367,7 @@ public:
 
 				const float fovx = 143.98570868f + 7.8f + m_settings.m_fovXAdjust;
 				const float fovy = 125.26438968f + 3.0f + m_settings.m_fovYAdjust;
-				const float aspect = bx::tan(bx::toRad(fovx*0.5f) )/bx::tan(bx::toRad(fovy*0.5f) );
+				const float aspect = bx::ftan(bx::toRad(fovx*0.5f) )/bx::ftan(bx::toRad(fovy*0.5f) );
 
 				bx::mtxProj(
 							lightProj[ProjType::Horizontal]
@@ -2421,13 +2410,13 @@ public:
 			else // LightType::DirectionalLight == settings.m_lightType
 			{
 				// Setup light view mtx.
-				const bx::Vec3 at = { 0.0f, 0.0f, 0.0f };
-				const bx::Vec3 eye =
+				float eye[3] =
 				{
-					-m_directionalLight.m_position.m_x,
-					-m_directionalLight.m_position.m_y,
-					-m_directionalLight.m_position.m_z,
+					-m_directionalLight.m_position.m_x
+					, -m_directionalLight.m_position.m_y
+					, -m_directionalLight.m_position.m_z
 				};
+				float at[3] = { 0.0f, 0.0f, 0.0f };
 				bx::mtxLookAt(lightView[0], eye, at);
 
 				// Compute camera inverse view mtx.
@@ -2483,12 +2472,12 @@ public:
 						bx::vec3MulMtx(lightSpaceFrustumCorner, frustumCorners[ii][jj], lightView[0]);
 
 						// Update bounding box.
-						min[0] = bx::min(min[0], lightSpaceFrustumCorner[0]);
-						max[0] = bx::max(max[0], lightSpaceFrustumCorner[0]);
-						min[1] = bx::min(min[1], lightSpaceFrustumCorner[1]);
-						max[1] = bx::max(max[1], lightSpaceFrustumCorner[1]);
-						min[2] = bx::min(min[2], lightSpaceFrustumCorner[2]);
-						max[2] = bx::max(max[2], lightSpaceFrustumCorner[2]);
+						min[0] = bx::fmin(min[0], lightSpaceFrustumCorner[0]);
+						max[0] = bx::fmax(max[0], lightSpaceFrustumCorner[0]);
+						min[1] = bx::fmin(min[1], lightSpaceFrustumCorner[1]);
+						max[1] = bx::fmax(max[1], lightSpaceFrustumCorner[1]);
+						min[2] = bx::fmin(min[2], lightSpaceFrustumCorner[2]);
+						max[2] = bx::fmax(max[2], lightSpaceFrustumCorner[2]);
 					}
 
 					float minproj[3];
@@ -2505,8 +2494,8 @@ public:
 					if (m_settings.m_stabilize)
 					{
 						const float quantizer = 64.0f;
-						scalex = quantizer / bx::ceil(quantizer / scalex);
-						scaley = quantizer / bx::ceil(quantizer / scaley);
+						scalex = quantizer / bx::fceil(quantizer / scalex);
+						scaley = quantizer / bx::fceil(quantizer / scaley);
 					}
 
 					offsetx = 0.5f * (maxproj[0] + minproj[0]) * scalex;
@@ -2515,8 +2504,8 @@ public:
 					if (m_settings.m_stabilize)
 					{
 						const float halfSize = currentShadowMapSizef * 0.5f;
-						offsetx = bx::ceil(offsetx * halfSize) / halfSize;
-						offsety = bx::ceil(offsety * halfSize) / halfSize;
+						offsetx = bx::fceil(offsetx * halfSize) / halfSize;
+						offsety = bx::fceil(offsety * halfSize) / halfSize;
 					}
 
 					float mtxCrop[16];
@@ -2899,12 +2888,12 @@ public:
 				&&  currentSmSettings->m_doBlur)
 			{
 				bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtShadowMap[0]) );
-				bgfx::setState(BGFX_STATE_WRITE_RGB|BGFX_STATE_WRITE_A);
+				bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 				screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 				bgfx::submit(RENDERVIEW_VBLUR_0_ID, s_programs.m_vBlur[depthType]);
 
 				bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtBlur) );
-				bgfx::setState(BGFX_STATE_WRITE_RGB|BGFX_STATE_WRITE_A);
+				bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 				screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 				bgfx::submit(RENDERVIEW_HBLUR_0_ID, s_programs.m_hBlur[depthType]);
 
@@ -2915,12 +2904,12 @@ public:
 						const uint8_t viewId = RENDERVIEW_VBLUR_0_ID + jj;
 
 						bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtShadowMap[ii]) );
-						bgfx::setState(BGFX_STATE_WRITE_RGB|BGFX_STATE_WRITE_A);
+						bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 						screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 						bgfx::submit(viewId, s_programs.m_vBlur[depthType]);
 
 						bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtBlur) );
-						bgfx::setState(BGFX_STATE_WRITE_RGB|BGFX_STATE_WRITE_A);
+						bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 						screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 						bgfx::submit(viewId+1, s_programs.m_hBlur[depthType]);
 					}
@@ -3155,7 +3144,7 @@ public:
 			if (m_settings.m_drawDepthBuffer)
 			{
 				bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtShadowMap[0]) );
-				bgfx::setState(BGFX_STATE_WRITE_RGB|BGFX_STATE_WRITE_A);
+				bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 				screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 				bgfx::submit(RENDERVIEW_DRAWDEPTH_0_ID, s_programs.m_drawDepth[depthType]);
 
@@ -3164,7 +3153,7 @@ public:
 					for (uint8_t ii = 1; ii < m_settings.m_numSplits; ++ii)
 					{
 						bgfx::setTexture(4, s_shadowMap[0], bgfx::getTexture(s_rtShadowMap[ii]) );
-						bgfx::setState(BGFX_STATE_WRITE_RGB|BGFX_STATE_WRITE_A);
+						bgfx::setState(BGFX_STATE_RGB_WRITE|BGFX_STATE_ALPHA_WRITE);
 						screenSpaceQuad(currentShadowMapSizef, currentShadowMapSizef, s_flipV);
 						bgfx::submit(RENDERVIEW_DRAWDEPTH_0_ID+ii, s_programs.m_drawDepth[depthType]);
 					}

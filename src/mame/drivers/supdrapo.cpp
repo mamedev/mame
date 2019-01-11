@@ -62,7 +62,6 @@
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -74,20 +73,16 @@
 class supdrapo_state : public driver_device
 {
 public:
-	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_col_line(*this, "col_line"),
 		m_videoram(*this, "videoram"),
-		m_char_bank(*this, "char_bank")
-	{ }
+		m_char_bank(*this, "char_bank") { }
 
-	void supdrapo(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -111,9 +106,10 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void supdrapo_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(supdrapo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void supdrapo(machine_config &config);
 	void sdpoker_mem(address_map &map);
 };
 
@@ -129,14 +125,19 @@ void supdrapo_state::video_start()
 
 uint32_t supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int count = 0;
-	for (int y = 0; y < 32; y++)
+	int x, y;
+	int count;
+	int color;
+
+	count = 0;
+
+	for(y = 0; y < 32; y++)
 	{
-		for (int x = 0; x < 32; x++)
+		for(x = 0; x < 32; x++)
 		{
-			int const tile = m_videoram[count] + m_char_bank[count] * 0x100;
-			// Global Column Coloring, GUESS!
-			int const color = m_col_line[(x*2) + 1] ? (m_col_line[(x*2) + 1] - 1) & 7 : 0;
+			int tile = m_videoram[count] + m_char_bank[count] * 0x100;
+			/* Global Column Coloring, GUESS! */
+			color = m_col_line[(x*2) + 1] ? (m_col_line[(x*2) + 1] - 1) & 7 : 0;
 
 			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, tile,color, 0, 0, x*8, y*8);
 
@@ -148,29 +149,29 @@ uint32_t supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// Maybe bit 2 & 3 of the second color prom are intensity bits?
-void supdrapo_state::supdrapo_palette(palette_device &palette) const
+/*Maybe bit 2 & 3 of the second color prom are intensity bits? */
+PALETTE_INIT_MEMBER(supdrapo_state, supdrapo)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int bit0, bit1, bit2 , r, g, b;
+	int i;
 
-	for (int i = 0; i < 0x100; ++i)
+	for (i = 0; i < 0x100; ++i)
 	{
-		int bit0, bit1, bit2;
+		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 0) & 0x01;
+		bit2 = (color_prom[0] >> 1) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = 0; // BIT(color_prom[0], 0);
-		bit1 = BIT(color_prom[0], 0);
-		bit2 = BIT(color_prom[0], 1);
-		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;//(color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 2) & 0x01;
+		bit2 = (color_prom[0] >> 3) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		bit0 = 0; // BIT(color_prom[0], 3);
-		bit1 = BIT(color_prom[0], 2);
-		bit2 = BIT(color_prom[0], 3);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		bit0 = 0; // BIT(color_prom[0], 0);
-		bit1 = BIT(color_prom[0x100], 0);
-		bit2 = BIT(color_prom[0x100], 1);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0x100] >> 0) & 0x01;
+		bit2 = (color_prom[0x100] >> 1) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
@@ -286,16 +287,16 @@ void supdrapo_state::sdpoker_mem(address_map &map)
 	map(0x6800, 0x6bff).ram().share("videoram");
 	map(0x6c00, 0x6fff).ram().share("char_bank");
 	map(0x7000, 0x7bff).ram(); //$7600 seems watchdog
-	map(0x7c00, 0x7c00).w(FUNC(supdrapo_state::debug7c00_w));
-	map(0x8000, 0x8000).portr("IN4").w(FUNC(supdrapo_state::wdog8000_w));
+	map(0x7c00, 0x7c00).w(this, FUNC(supdrapo_state::debug7c00_w));
+	map(0x8000, 0x8000).portr("IN4").w(this, FUNC(supdrapo_state::wdog8000_w));
 	map(0x8001, 0x8001).portr("IN0");
-	map(0x8002, 0x8002).portr("IN1").w(FUNC(supdrapo_state::payout_w));
-	map(0x8003, 0x8003).portr("IN2").w(FUNC(supdrapo_state::coinin_w));
-	map(0x8004, 0x8004).portr("IN3").w(FUNC(supdrapo_state::debug8004_w));
+	map(0x8002, 0x8002).portr("IN1").w(this, FUNC(supdrapo_state::payout_w));
+	map(0x8003, 0x8003).portr("IN2").w(this, FUNC(supdrapo_state::coinin_w));
+	map(0x8004, 0x8004).portr("IN3").w(this, FUNC(supdrapo_state::debug8004_w));
 	map(0x8005, 0x8005).portr("SW1");
 	map(0x8006, 0x8006).portr("SW2");
 	map(0x9000, 0x90ff).ram().share("nvram");
-	map(0x9400, 0x9400).r(FUNC(supdrapo_state::rng_r));
+	map(0x9400, 0x9400).r(this, FUNC(supdrapo_state::rng_r));
 	map(0x9800, 0x9801).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 
@@ -457,9 +458,9 @@ MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 	MCFG_DEVICE_PROGRAM_MAP(sdpoker_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	MCFG_WATCHDOG_ADD("watchdog")
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -468,17 +469,18 @@ MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(supdrapo_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supdrapo);
-	PALETTE(config, m_palette, FUNC(supdrapo_state::supdrapo_palette), 0x100);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_supdrapo)
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_PALETTE_INIT_OWNER(supdrapo_state, supdrapo)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));  /* guess */
-	aysnd.port_a_write_callback().set(FUNC(supdrapo_state::ay8910_outputa_w));
-	aysnd.port_b_write_callback().set(FUNC(supdrapo_state::ay8910_outputb_w));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK)  /* guess */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supdrapo_state, ay8910_outputa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, supdrapo_state, ay8910_outputb_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

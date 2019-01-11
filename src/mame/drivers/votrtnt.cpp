@@ -26,6 +26,7 @@
 *  ToDo:
 *  - Votrax device needs considerable improvement in sound quality.
 *
+*
 ******************************************************************************/
 
 /* Core includes */
@@ -50,13 +51,11 @@ public:
 		, m_clock(*this, "acia_clock")
 	{ }
 
+	DECLARE_MACHINE_RESET(votrtnt);
+
 	void votrtnt(machine_config &config);
-
-private:
-	virtual void machine_reset() override;
-
 	void _6802_mem(address_map &map);
-
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
 	required_device<clock_device> m_clock;
@@ -113,7 +112,7 @@ static INPUT_PORTS_START(votrtnt)
 	PORT_DIPSETTING(    0x80, "9600" )
 INPUT_PORTS_END
 
-void votrtnt_state::machine_reset()
+MACHINE_RESET_MEMBER( votrtnt_state, votrtnt )
 {
 	// Read the dips, whichever one is found to be on first is accepted
 	u8 dips = ioport("DSW1")->read();
@@ -136,34 +135,35 @@ void votrtnt_state::machine_reset()
  Machine Drivers
 ******************************************************************************/
 
-void votrtnt_state::votrtnt(machine_config &config)
-{
+MACHINE_CONFIG_START(votrtnt_state::votrtnt)
 	/* basic machine hardware */
-	M6802(config, m_maincpu, 2.4576_MHz_XTAL);  // 2.4576MHz XTAL, verified; divided by 4 inside the MC6802
-	m_maincpu->set_addrmap(AS_PROGRAM, &votrtnt_state::_6802_mem);
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(2'457'600))  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
+	MCFG_DEVICE_PROGRAM_MAP(_6802_mem)
+
+	MCFG_MACHINE_RESET_OVERRIDE(votrtnt_state, votrtnt)
 
 	/* video hardware */
-	//config.set_default_layout(layout_votrtnt);
+	//MCFG_DEFAULT_LAYOUT(layout_votrtnt)
 
 	/* serial hardware */
-	acia6850_device &acia(ACIA6850(config, "acia"));
-	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
-	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
-	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
-	CLOCK(config, m_clock, 153600);
-	m_clock->signal_handler().set("acia", FUNC(acia6850_device::write_txc));
-	m_clock->signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	VOTRAX_SC01(config, m_votrax, 720000); // 720kHz? needs verify
-	m_votrax->ar_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_votrax->add_route(ALL_OUTPUTS, "mono", 1.00);
-}
+	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) /* 720kHz? needs verify */
+	MCFG_VOTRAX_SC01_REQUEST_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_CONFIG_END
 
 
 

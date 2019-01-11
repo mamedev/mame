@@ -32,7 +32,6 @@ f5
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -40,16 +39,11 @@ f5
 class mosaicf2_state : public driver_device
 {
 public:
-	mosaicf2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	mosaicf2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") ,
-		m_videoram(*this, "videoram")
-	{ }
+		m_videoram(*this, "videoram"){ }
 
-	void mosaicf2(machine_config &config);
-	void royalpk2(machine_config &config);
-
-private:
 	/* devices */
 	required_device<hyperstone_device>  m_maincpu;
 
@@ -58,6 +52,8 @@ private:
 
 	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mosaicf2(machine_config &config);
+	void royalpk2(machine_config &config);
 	void common_map(address_map &map);
 	void mosaicf2_io(address_map &map);
 	void royalpk2_io(address_map &map);
@@ -111,7 +107,7 @@ void mosaicf2_state::mosaicf2_io(address_map &map)
 	map(0x4003, 0x4003).r("oki", FUNC(okim6295_device::read));
 	map(0x4813, 0x4813).r("ymsnd", FUNC(ym2151_device::status_r));
 	map(0x5000, 0x5003).portr("P1");
-	map(0x5200, 0x5203).r(FUNC(mosaicf2_state::f32_input_port_1_r));
+	map(0x5200, 0x5203).r(this, FUNC(mosaicf2_state::f32_input_port_1_r));
 	map(0x5400, 0x5403).portr("EEPROMIN");
 	map(0x6003, 0x6003).w("oki", FUNC(okim6295_device::write));
 	map(0x6803, 0x6803).w("ymsnd", FUNC(ym2151_device::data_w));
@@ -176,9 +172,9 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	MCFG_DEVICE_IO_MAP(mosaicf2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq0_line_hold)
 
-	EEPROM_93C46_16BIT(config, "eeprom")
-		.erase_time(attotime::from_usec(1))
-		.write_time(attotime::from_usec(1));
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -189,15 +185,15 @@ MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaicf2_state, screen_update_mosaicf2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::RGB_555);
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545 MHz */
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -255,9 +251,9 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	MCFG_DEVICE_IO_MAP(royalpk2_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mosaicf2_state,  irq1_line_hold)
 
-	EEPROM_93C46_16BIT(config, "eeprom")
-		.erase_time(attotime::from_usec(1))
-		.write_time(attotime::from_usec(1));
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_ERASE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -268,15 +264,15 @@ MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaicf2_state, screen_update_mosaicf2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, "palette", palette_device::RGB_555);
+	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-//  ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545 MHz */
-//  ymsnd.add_route(0, "lspeaker", 1.0);
-//  ymsnd.add_route(1, "rspeaker", 1.0);
+//  MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* 3.579545 MHz */
+//  MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

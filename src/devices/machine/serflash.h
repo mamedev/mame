@@ -7,6 +7,15 @@
 
 #pragma once
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_SERFLASH_ADD(_tag) \
+		MCFG_DEVICE_ADD(_tag, SERFLASH, 0)
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -20,11 +29,9 @@ public:
 	// custom initialization for default state
 	typedef device_delegate<void (serflash_device &, void *, size_t)> init_delegate;
 
+
 	// construction/destruction
 	serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// configuration
-	void set_flash_page_size(uint16_t size) { m_flash_page_size = size; }
 
 	DECLARE_READ8_MEMBER( flash_ready_r );
 	DECLARE_READ8_MEMBER( flash_io_r );
@@ -39,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(n3d_flash_addr_w);
 
 protected:
+	static constexpr unsigned FLASH_PAGE_SIZE = 2048+64;
+
 	enum class flash_state_t : u8 { IDLE = 0, READ, READ_ID, READ_STATUS, BLOCK_ERASE, PAGE_PROGRAM };
 
 	// device-level overrides
@@ -56,8 +65,6 @@ protected:
 	size_t                      m_length;
 	uint8_t* m_region;
 
-	uint32_t                    m_row_num;
-	uint16_t                    m_flash_page_size;
 
 	flash_state_t m_flash_state;
 
@@ -69,10 +76,9 @@ protected:
 	uint8_t m_flash_addr_seq;
 	uint8_t m_flash_read_seq;
 
-	uint32_t m_flash_row;
-	uint16_t m_flash_col;
+	uint16_t m_flash_row, m_flash_col;
 	int m_flash_page_addr;
-	uint32_t m_flash_page_index;
+	uint16_t m_flash_page_index;
 
 
 	std::vector<uint8_t> m_flashwritemap;
@@ -81,7 +87,7 @@ protected:
 
 	uint32_t m_flash_addr;
 
-	std::vector<uint8_t> m_flash_page_data;
+	uint8_t m_flash_page_data[FLASH_PAGE_SIZE];
 };
 
 

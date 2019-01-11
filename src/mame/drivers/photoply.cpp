@@ -41,9 +41,6 @@ public:
 	{
 	}
 
-	void photoply(machine_config &config);
-
-private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	required_region_ptr<uint8_t> m_main_bios;
@@ -57,10 +54,11 @@ private:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	uint16_t m_pci_shadow_reg;
+	void photoply(machine_config &config);
 
 	void photoply_io(address_map &map);
 	void photoply_map(address_map &map);
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -198,7 +196,7 @@ void photoply_state::photoply_map(address_map &map)
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(cirrus_gd5446_device::mem_r), FUNC(cirrus_gd5446_device::mem_w));
 //  AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 //  AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("ex_bios", 0)
-	map(0x000c0000, 0x000fffff).rw(FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
+	map(0x000c0000, 0x000fffff).rw(this, FUNC(photoply_state::bios_r), FUNC(photoply_state::bios_w));
 	map(0x00100000, 0x07ffffff).ram(); // 64MB RAM, guess!
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
@@ -210,17 +208,17 @@ void photoply_state::photoply_io(address_map &map)
 	pcat32_io_common(map);
 	map(0x00e8, 0x00eb).noprw();
 
-	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x0202, 0x0202).w(FUNC(photoply_state::eeprom_w));
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
+	map(0x0202, 0x0202).w(this, FUNC(photoply_state::eeprom_w));
 //  AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
-	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
 //  AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5446_device::port_03b0_r), FUNC(cirrus_gd5446_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5446_device::port_03c0_r), FUNC(cirrus_gd5446_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5446_device::port_03d0_r), FUNC(cirrus_gd5446_device::port_03d0_w));
 
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 
@@ -311,11 +309,11 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "vga", gfx_photoply)
 
-	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
 
-	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
-	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
+	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir7_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(5, DEVICE_SELF, photoply_state, sis_pcm_r, sis_pcm_w)
@@ -327,9 +325,9 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	EEPROM_93C46_16BIT(config, "eeprom")
-		.write_time(attotime::from_usec(1))
-		.erase_all_time(attotime::from_usec(10));
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_ERASE_ALL_TIME(attotime::from_usec(10))
 MACHINE_CONFIG_END
 
 

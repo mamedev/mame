@@ -44,6 +44,8 @@ DECLARE_DEVICE_TYPE(TMP95C061, tmp95c061_device)
 DECLARE_DEVICE_TYPE(TMP95C063, tmp95c063_device)
 
 
+#define MCFG_TLCS900H_AM8_16( am8_16 ) downcast<tlcs900h_device &>(*device).set_am8_16(am8_16 );
+
 class tlcs900h_device : public cpu_device
 {
 public:
@@ -610,6 +612,39 @@ protected:
 	void op_F0();
 };
 
+#define MCFG_TMP95C061_PORT1_READ( _port_read ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port1_read(DEVCB_##_port_read);
+#define MCFG_TMP95C061_PORT1_WRITE( _port_write ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port1_write(DEVCB_##_port_write);
+#define MCFG_TMP95C061_PORT2_WRITE( _port_write ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port2_write(DEVCB_##_port_write);
+#define MCFG_TMP95C061_PORT5_READ( _port_read ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port5_read(DEVCB_##_port_read);
+#define MCFG_TMP95C061_PORT5_WRITE( _port_write ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port5_write(DEVCB_##_port_write);
+#define MCFG_TMP95C061_PORT6_READ( _port_read ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port6_read(DEVCB_##_port_read);
+#define MCFG_TMP95C061_PORT6_WRITE( _port_write ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port6_write(DEVCB_##_port_write);
+#define MCFG_TMP95C061_PORT7_READ( _port_read ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port7_read(DEVCB_##_port_read);
+#define MCFG_TMP95C061_PORT7_WRITE( _port_write ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port7_write(DEVCB_##_port_write);
+#define MCFG_TMP95C061_PORT8_READ( _port_read ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port8_read(DEVCB_##_port_read);
+#define MCFG_TMP95C061_PORT8_WRITE( _port_write ) \
+	devcb = &downcast<mp95c061_device &>(*device).set_port8_write(DEVCB_##_port_write);
+#define MCFG_TMP95C061_PORT9_READ( _port_read ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_port9_read(DEVCB_##_port_read);
+#define MCFG_TMP95C061_PORTA_READ( _port_read ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_porta_read(DEVCB_##_port_read);
+#define MCFG_TMP95C061_PORTA_WRITE( _port_write ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_porta_write(DEVCB_##_port_write);
+#define MCFG_TMP95C061_PORTB_READ( _port_read ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_portb_read(DEVCB_##_port_read);
+#define MCFG_TMP95C061_PORTB_WRITE( _port_write ) \
+	devcb = &downcast<tmp95c061_device &>(*device).set_portb_write(DEVCB_##_port_write);
+
 class tmp95c061_device : public tlcs900h_device
 {
 public:
@@ -617,21 +652,21 @@ public:
 	tmp95c061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto port1_read()  { return m_port1_read.bind(); }
-	auto port1_write() { return m_port1_write.bind(); }
-	auto port2_write() { return m_port2_write.bind(); }
-	auto port5_read()  { return m_port5_read.bind(); }
-	auto port5_write() { return m_port5_write.bind(); }
-	auto port6_write() { return m_port6_write.bind(); }
-	auto port7_read()  { return m_port7_read.bind(); }
-	auto port7_write() { return m_port7_write.bind(); }
-	auto port8_read()  { return m_port8_read.bind(); }
-	auto port8_write() { return m_port8_write.bind(); }
-	auto port9_read()  { return m_port9_read.bind(); }
-	auto porta_read()  { return m_porta_read.bind(); }
-	auto porta_write() { return m_porta_write.bind(); }
-	auto portb_read()  { return m_portb_read.bind(); }
-	auto portb_write() { return m_portb_write.bind(); }
+	template <class Object> devcb_base &set_port1_read(Object &&cb) { return m_port1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port1_write(Object &&cb) { return m_port1_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port2_write(Object &&cb) { return m_port2_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port5_read(Object &&cb) { return m_port5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port5_write(Object &&cb) { return m_port5_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port6_write(Object &&cb) { return m_port6_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port7_read(Object &&cb) { return m_port7_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port7_write(Object &&cb) { return m_port7_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port8_read(Object &&cb) { return m_port8_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port8_write(Object &&cb) { return m_port8_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port9_read(Object &&cb) { return m_port9_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_read(Object &&cb) { return m_porta_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_write(Object &&cb) { return m_porta_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_read(Object &&cb) { return m_portb_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_write(Object &&cb) { return m_portb_write.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( internal_r );
 	DECLARE_WRITE8_MEMBER( internal_w );
@@ -693,6 +728,45 @@ private:
 };
 
 
+#define MCFG_TMP95C063_PORT0_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port0_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT0_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port0_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT1_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port1_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT1_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port1_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT2_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port2_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT2_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port2_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT3_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port3_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT3_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port3_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT4_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port4_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT4_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port4_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT5_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port5_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT5_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port5_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT6_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port6_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT6_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port6_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT7_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port7_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT7_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port7_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT8_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port8_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT8_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port8_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORT9_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_port9_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORT9_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_port9_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTA_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_porta_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTA_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_porta_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTB_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portb_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTB_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portb_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTC_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portc_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTC_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portc_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTD_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_portd_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTD_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_portd_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_PORTE_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_porte_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_PORTE_WRITE( _port_write ) devcb = &downcast<tmp95c063_device &>(*device).set_porte_write(DEVCB_##_port_write);
+#define MCFG_TMP95C063_AN0_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an0_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN1_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an1_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN2_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an2_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN3_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an3_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN4_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an4_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN5_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an5_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN6_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an6_read(DEVCB_##_port_read);
+#define MCFG_TMP95C063_AN7_READ( _port_read ) devcb = &downcast<tmp95c063_device &>(*device).set_an7_read(DEVCB_##_port_read);
+
 class tmp95c063_device : public tlcs900h_device
 {
 public:
@@ -703,29 +777,36 @@ public:
 	DECLARE_WRITE8_MEMBER( internal_w );
 
 	// configuration helpers
-	auto port1_read()  { return m_port1_read.bind(); }
-	auto port1_write() { return m_port1_write.bind(); }
-	auto port2_write() { return m_port2_write.bind(); }
-	auto port5_read()  { return m_port5_read.bind(); }
-	auto port5_write() { return m_port5_write.bind(); }
-	auto port6_read()  { return m_port6_read.bind(); }
-	auto port6_write() { return m_port6_write.bind(); }
-	auto port7_read()  { return m_port7_read.bind(); }
-	auto port7_write() { return m_port7_write.bind(); }
-	auto port8_read()  { return m_port8_read.bind(); }
-	auto port8_write() { return m_port8_write.bind(); }
-	auto port9_read()  { return m_port9_read.bind(); }
-	auto port9_write() { return m_port9_write.bind(); }
-	auto porta_read()  { return m_porta_read.bind(); }
-	auto porta_write() { return m_porta_write.bind(); }
-	auto portb_read()  { return m_portb_read.bind(); }
-	auto portb_write() { return m_portb_write.bind(); }
-	auto portc_read()  { return m_portc_read.bind(); }
-	auto portd_read()  { return m_portd_read.bind(); }
-	auto portd_write() { return m_portd_write.bind(); }
-	auto porte_read()  { return m_porte_read.bind(); }
-	auto porte_write() { return m_porte_write.bind(); }
-	template <size_t Bit> auto an_read() { return m_an_read[Bit].bind(); }
+	template <class Object> devcb_base &set_port1_read(Object &&cb) { return m_port1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port1_write(Object &&cb) { return m_port1_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port2_write(Object &&cb) { return m_port2_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port5_read(Object &&cb) { return m_port5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port5_write(Object &&cb) { return m_port5_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port6_read(Object &&cb) { return m_port6_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port6_write(Object &&cb) { return m_port6_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port7_read(Object &&cb) { return m_port7_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port7_write(Object &&cb) { return m_port7_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port8_read(Object &&cb) { return m_port8_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port8_write(Object &&cb) { return m_port8_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port9_read(Object &&cb) { return m_port9_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port9_write(Object &&cb) { return m_port9_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_read(Object &&cb) { return m_porta_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_write(Object &&cb) { return m_porta_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_read(Object &&cb) { return m_portb_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_write(Object &&cb) { return m_portb_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portc_read(Object &&cb) { return m_portc_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portd_read(Object &&cb) { return m_portd_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portd_write(Object &&cb) { return m_portd_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porte_read(Object &&cb) { return m_porte_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porte_write(Object &&cb) { return m_porte_write.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an0_read(Object &&cb) { return m_an0_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an1_read(Object &&cb) { return m_an1_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an2_read(Object &&cb) { return m_an2_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an3_read(Object &&cb) { return m_an3_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an4_read(Object &&cb) { return m_an4_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an5_read(Object &&cb) { return m_an5_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an6_read(Object &&cb) { return m_an6_read.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_an7_read(Object &&cb) { return m_an7_read.set_callback(std::forward<Object>(cb)); }
 
 	void tmp95c063_mem16(address_map &map);
 	void tmp95c063_mem8(address_map &map);
@@ -788,7 +869,14 @@ private:
 	devcb_write8   m_porte_write;
 
 	// analogue inputs, sampled at 10 bits
-	devcb_read16   m_an_read[8];
+	devcb_read16       m_an0_read;
+	devcb_read16       m_an1_read;
+	devcb_read16       m_an2_read;
+	devcb_read16       m_an3_read;
+	devcb_read16       m_an4_read;
+	devcb_read16       m_an5_read;
+	devcb_read16       m_an6_read;
+	devcb_read16       m_an7_read;
 };
 
 #endif // MAME_CPU_TLCS900_TLCS900_H

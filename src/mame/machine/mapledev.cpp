@@ -2,16 +2,18 @@
 // copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "mapledev.h"
+#include "maple-dc.h"
 
 maple_device::maple_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : device_t(mconfig, type, tag, owner, clock)
-, host(*this, finder_base::DUMMY_TAG)
 {
+	host_tag = nullptr;
 	host_port = 0;
 }
 
 
 void maple_device::device_start()
 {
+	host = machine().device<maple_dc_device>(host_tag);
 	host->register_port(host_port, this);
 
 	timer = timer_alloc(TIMER_ID);

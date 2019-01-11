@@ -135,10 +135,8 @@ public:
 	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// inline configuration helpers
-	software_list_device &set_type(const char *list, softlist_type list_type) { m_list_name.assign(list); m_list_type = list_type; return *this; }
-	software_list_device &set_original(const char *list) { return set_type(list, SOFTWARE_LIST_ORIGINAL_SYSTEM); }
-	software_list_device &set_compatible(const char *list) { return set_type(list, SOFTWARE_LIST_COMPATIBLE_SYSTEM); }
-	software_list_device &set_filter(const char *filter) { m_filter = filter; return *this; }
+	void set_type(const char *list, softlist_type list_type) { m_list_name.assign(list); m_list_type = list_type; }
+	void set_filter(const char *filter) { m_filter = filter; }
 
 	// getters
 	const std::string &list_name() const { return m_list_name; }

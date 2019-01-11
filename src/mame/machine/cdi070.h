@@ -123,6 +123,15 @@ TODO:
 #define CCR_IPL         0x07
 
 //**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CDI68070_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MACHINE_CDI68070, 0)
+#define MCFG_CDI68070_REPLACE(_tag) \
+	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDI68070, 0)
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -131,15 +140,7 @@ TODO:
 class cdi68070_device : public device_t
 {
 public:
-	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
-
 	// construction/destruction
-	template <typename T> cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
-		: cdi68070_device(mconfig, tag, owner, clock)
-	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-	}
-
 	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// external callbacks
@@ -269,7 +270,6 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
 
 	void uart_rx_check();
 	void uart_tx_check();
@@ -299,6 +299,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(CDI_68070, cdi68070_device)
+DECLARE_DEVICE_TYPE(MACHINE_CDI68070, cdi68070_device)
 
 #endif // MAME_MACHINE_CDI070_H

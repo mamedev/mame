@@ -5,11 +5,6 @@
     The Main Event / Devastators
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MAINEVT_H
-#define MAME_INCLUDES_MAINEVT_H
-
-#pragma once
-
 #include "sound/upd7759.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
@@ -29,13 +24,9 @@ public:
 		, m_k052109(*this, "k052109")
 		, m_k051960(*this, "k051960")
 		, m_rombank(*this, "rombank")
-		, m_leds(*this, "led%u", 0U)
+		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void devstors(machine_config &config);
-	void mainevt(machine_config &config);
-
-private:
 	DECLARE_WRITE8_MEMBER(dv_nmienable_w);
 	DECLARE_WRITE8_MEMBER(mainevt_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mainevt_coin_w);
@@ -58,11 +49,14 @@ private:
 	K052109_CB_MEMBER(dv_tile_callback);
 	K051960_CB_MEMBER(mainevt_sprite_callback);
 	K051960_CB_MEMBER(dv_sprite_callback);
+	void devstors(machine_config &config);
+	void mainevt(machine_config &config);
 	void devstors_map(address_map &map);
 	void devstors_sound_map(address_map &map);
 	void mainevt_map(address_map &map);
 	void mainevt_sound_map(address_map &map);
 
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -79,7 +73,5 @@ private:
 	required_device<k051960_device> m_k051960;
 
 	required_memory_bank m_rombank;
-	output_finder<4> m_leds;
+	output_finder<4> m_led;
 };
-
-#endif // MAME_INCLUDES_MAINEVT_H

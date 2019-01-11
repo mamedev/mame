@@ -264,8 +264,6 @@ void tms9902_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	// reaches 0.
 	case DECTIMER:
 		m_TIMERR = m_TIMELP;
-		m_TIMELP = true;
-		field_interrupts();
 		break;
 
 	//  Callback for the autonomous operations of the chip. This is normally
@@ -867,48 +865,6 @@ void tms9902_device::device_start()
 	m_dectimer = timer_alloc(DECTIMER);
 	m_recvtimer = timer_alloc(RECVTIMER);
 	m_sendtimer = timer_alloc(SENDTIMER);
-
-	save_item(NAME(m_LDCTRL));
-	save_item(NAME(m_LDIR));
-	save_item(NAME(m_LRDR));
-	save_item(NAME(m_LXDR));
-	save_item(NAME(m_TSTMD));
-	save_item(NAME(m_RTSON));
-	save_item(NAME(m_BRKON));
-	save_item(NAME(m_BRKout));
-	save_item(NAME(m_XBR));
-	save_item(NAME(m_XSR));
-	save_item(NAME(m_RBR));
-	save_item(NAME(m_DSCENB));
-	save_item(NAME(m_RIENB));
-	save_item(NAME(m_XBIENB));
-	save_item(NAME(m_TIMENB));
-	save_item(NAME(m_RDR));
-	save_item(NAME(m_RDV8));
-	save_item(NAME(m_XDR));
-	save_item(NAME(m_XDV8));
-	save_item(NAME(m_INT));
-	save_item(NAME(m_DSCH));
-	save_item(NAME(m_CTSin));
-	save_item(NAME(m_DSRin));
-	save_item(NAME(m_RTSout));
-	save_item(NAME(m_TIMELP));
-	save_item(NAME(m_TIMERR));
-	save_item(NAME(m_XSRE));
-	save_item(NAME(m_XBRE));
-	save_item(NAME(m_RBRL));
-	save_item(NAME(m_RIN));
-	save_item(NAME(m_RSBD));
-	save_item(NAME(m_RFBD));
-	save_item(NAME(m_RFER));
-	save_item(NAME(m_ROVER));
-	save_item(NAME(m_RPER));
-	save_item(NAME(m_RCL));
-	save_item(NAME(m_ODDP));
-	save_item(NAME(m_PENB));
-	save_item(NAME(m_STOPB));
-	save_item(NAME(m_CLK4M));
-	save_item(NAME(m_TMR));
 }
 
 DEFINE_DEVICE_TYPE(TMS9902, tms9902_device, "tms9902", "TMS9902 ACC")

@@ -16,6 +16,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
+#include "imagedev/flopdrv.h"
 #include "formats/pk8020_dsk.h"
 #include "machine/ram.h"
 #include "screen.h"
@@ -179,19 +180,19 @@ static void pk8020_floppies(device_slot_interface &device)
 /*
  * interrupts
  *
- * 0    external devices
- * 1    uart rx ready
- * 2    uart tx ready
- * 3    lan
- * 4    vblank
- * 5    timer ch2
- * 6    printer
- * 7    floppy
+ * 0	external devices
+ * 1	uart rx ready
+ * 2	uart tx ready
+ * 3	lan
+ * 4	vblank
+ * 5	timer ch2
+ * 6	printer
+ * 7	floppy
  */
 /* Machine driver */
 MACHINE_CONFIG_START(pk8020_state::pk8020)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 20_MHz_XTAL / 8)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(20'000'000) / 8)
 	MCFG_DEVICE_PROGRAM_MAP(pk8020_mem)
 	MCFG_DEVICE_IO_MAP(pk8020_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pk8020_state,  pk8020_interrupt)
@@ -204,47 +205,48 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8020_state, screen_update_pk8020)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_pk8020)
-	PALETTE(config, m_palette, FUNC(pk8020_state::pk8020_palette), 16);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pk8020)
+	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_INIT_OWNER(pk8020_state, pk8020)
 
-	I8255(config, m_ppi8255_1);
-	m_ppi8255_1->in_pa_callback().set(FUNC(pk8020_state::pk8020_porta_r));
-	m_ppi8255_1->out_pb_callback().set(FUNC(pk8020_state::pk8020_portb_w));
-	m_ppi8255_1->in_pc_callback().set(FUNC(pk8020_state::pk8020_portc_r));
-	m_ppi8255_1->out_pc_callback().set(FUNC(pk8020_state::pk8020_portc_w));
+	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8020_state, pk8020_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pk8020_state, pk8020_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pk8020_state, pk8020_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8020_state, pk8020_portc_w))
 
-	I8255(config, m_ppi8255_2);
-	m_ppi8255_2->out_pc_callback().set(FUNC(pk8020_state::pk8020_2_portc_w));
+	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8020_state, pk8020_2_portc_w))
 
-	I8255(config, m_ppi8255_3);
+	MCFG_DEVICE_ADD("ppi8255_3", I8255, 0)
 
-	PIT8253(config, m_pit8253, 0);
-	m_pit8253->set_clk<0>(20_MHz_XTAL / 10);
-	m_pit8253->out_handler<0>().set(FUNC(pk8020_state::pk8020_pit_out0));
-	m_pit8253->set_clk<1>(20_MHz_XTAL / 10);
-	m_pit8253->out_handler<1>().set(FUNC(pk8020_state::pk8020_pit_out1));
-	m_pit8253->set_clk<2>((20_MHz_XTAL / 8) / 164);
-	m_pit8253->out_handler<2>().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
+	MCFG_PIT8253_CLK0(XTAL(20'000'000) / 10)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out0))
+	MCFG_PIT8253_CLK1(XTAL(20'000'000) / 10)
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pk8020_state,pk8020_pit_out1))
+	MCFG_PIT8253_CLK2((XTAL(20'000'000) / 8) / 164)
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259", pic8259_device, ir5_w))
 
-	PIC8259(config, m_pic8259, 0);
-	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
-	I8251(config, m_rs232, 0);
-	m_rs232->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_rs232->rxrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir1_w));
-	m_rs232->txrdy_handler().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	MCFG_DEVICE_ADD("i8251line", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir1_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
 
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_rs232, FUNC(i8251_device::write_rxd));
-	rs232.cts_handler().set(m_rs232, FUNC(i8251_device::write_cts));
-	rs232.dsr_handler().set(m_rs232, FUNC(i8251_device::write_dsr));
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251line", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("i8251line", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("i8251line", i8251_device, write_dsr))
 
-	I8251(config, m_lan, 0);
+	MCFG_DEVICE_ADD("i8251lan", I8251, 0)
 
-	FD1793(config, m_wd1793, 20_MHz_XTAL / 20);
-	m_wd1793->intrq_wr_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+	MCFG_FD1793_ADD("wd1793", XTAL(20'000'000) / 20)
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", pk8020_floppies, "qd", pk8020_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", pk8020_floppies, "qd", pk8020_state::floppy_formats)
@@ -262,7 +264,9 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0x00); // 64 + 4*48 + 2 = 258
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("258K")   //64 + 4*48 + 2
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -271,11 +275,11 @@ ROM_START( korvet )
 	ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("v11")
 	ROM_SYSTEM_BIOS(0, "v11", "v1.1")
-	ROMX_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81bdc2af) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9), ROM_BIOS(0))
+	ROMX_LOAD( "korvet11.rom", 0x10000, 0x6000, CRC(81bdc2af) SHA1(c3484c3f1f3d252475979283c073286b8661d2b9), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v20", "v2.0")
-	ROMX_LOAD( "korvet20.rom", 0x10000, 0x6000, CRC(d6c36a45) SHA1(dba67e63457251814ad5c0fe6bb6d584eea5c7d2), ROM_BIOS(1))
+	ROMX_LOAD( "korvet20.rom", 0x10000, 0x6000, CRC(d6c36a45) SHA1(dba67e63457251814ad5c0fe6bb6d584eea5c7d2), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "cpm", "cpm")
-	ROMX_LOAD( "cpm.rom",      0x10000, 0x4000, CRC(7a38d7f6) SHA1(fec6623291a38990b003e818683cd5edfb494c36), ROM_BIOS(2))
+	ROMX_LOAD( "cpm.rom",      0x10000, 0x4000, CRC(7a38d7f6) SHA1(fec6623291a38990b003e818683cd5edfb494c36), ROM_BIOS(3))
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "korvet2.fnt", 0x0000, 0x2000, CRC(fb1cd3d4) SHA1(58f1d6e393253b1e8b497ce0880b6eff6d85b42a))
 ROM_END
@@ -292,9 +296,9 @@ ROM_END
 ROM_START( kontur )
 	ROM_REGION( 0x16000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v1", "v1")
-	ROMX_LOAD( "kontur.rom",  0x10000, 0x2000, CRC(92cd441e) SHA1(9a0f9079256cefc6169ae4ba2114841d1f380480), ROM_BIOS(0))
+	ROMX_LOAD( "kontur.rom",  0x10000, 0x2000, CRC(92cd441e) SHA1(9a0f9079256cefc6169ae4ba2114841d1f380480), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v2", "v2")
-	ROMX_LOAD( "kontur2.rom", 0x10000, 0x2000, CRC(5256d101) SHA1(22022a3c6882dbc5ea28d7815f00c182bbaef9e1), ROM_BIOS(1))
+	ROMX_LOAD( "kontur2.rom", 0x10000, 0x2000, CRC(5256d101) SHA1(22022a3c6882dbc5ea28d7815f00c182bbaef9e1), ROM_BIOS(2))
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "kontur.fnt", 0x0000, 0x2000, CRC(14d33790) SHA1(6d5fcb214805c5fc44ef98a97219158ff7826ac0))
 ROM_END

@@ -2251,7 +2251,7 @@ uint8_t saturn_state::stv_vdp2_is_rotation_applied(void)
 			RP.dx == _FIXED_1 &&
 			RP.dy == _FIXED_0 &&
 			RP.kx == _FIXED_1 &&
-			RP.ky == _FIXED_1 &&
+			RP.ky == _FIXED_1 && 
 			STV_VDP2_RPMD < 2) // disable optimizations if roz mode is 2 or 3
 	{
 		return 0;
@@ -2502,27 +2502,27 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 				y_index = 0;
 			}
 
-			if( sx < myclip.left())
+			if( sx < myclip.min_x)
 			{ /* clip left */
-				int pixels = myclip.left()-sx;
+				int pixels = myclip.min_x-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
-			if( sy < myclip.top() )
+			if( sy < myclip.min_y )
 			{ /* clip top */
-				int pixels = myclip.top()-sy;
+				int pixels = myclip.min_y-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
 			/* NS 980211 - fixed incorrect clipping */
-			if( ex > myclip.right()+1 )
+			if( ex > myclip.max_x+1 )
 			{ /* clip right */
-				int pixels = ex-myclip.right()-1;
+				int pixels = ex-myclip.max_x-1;
 				ex -= pixels;
 			}
-			if( ey > myclip.bottom()+1 )
+			if( ey > myclip.max_y+1 )
 			{ /* clip bottom */
-				int pixels = ey-myclip.bottom()-1;
+				int pixels = ey-myclip.max_y-1;
 				ey -= pixels;
 			}
 
@@ -2703,27 +2703,27 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 				y_index = 0;
 			}
 
-			if( sx < myclip.left())
+			if( sx < myclip.min_x)
 			{ /* clip left */
-				int pixels = myclip.left()-sx;
+				int pixels = myclip.min_x-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
-			if( sy < myclip.top() )
+			if( sy < myclip.min_y )
 			{ /* clip top */
-				int pixels = myclip.top()-sy;
+				int pixels = myclip.min_y-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
 			/* NS 980211 - fixed incorrect clipping */
-			if( ex > myclip.right()+1 )
+			if( ex > myclip.max_x+1 )
 			{ /* clip right */
-				int pixels = ex-myclip.right()-1;
+				int pixels = ex-myclip.max_x-1;
 				ex -= pixels;
 			}
-			if( ey > myclip.bottom()+1 )
+			if( ey > myclip.max_y+1 )
 			{ /* clip bottom */
-				int pixels = ey-myclip.bottom()-1;
+				int pixels = ey-myclip.max_y-1;
 				ey -= pixels;
 			}
 
@@ -2893,27 +2893,27 @@ void saturn_state::stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectan
 			y_index = 0;
 		}
 
-		if( sx < myclip.left())
+		if( sx < myclip.min_x)
 		{ /* clip left */
-			int pixels = myclip.left()-sx;
+			int pixels = myclip.min_x-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
-		if( sy < myclip.top() )
+		if( sy < myclip.min_y )
 		{ /* clip top */
-			int pixels = myclip.top()-sy;
+			int pixels = myclip.min_y-sy;
 			sy += pixels;
 			y_index += pixels*dy;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if( ex > myclip.right()+1 )
+		if( ex > myclip.max_x+1 )
 		{ /* clip right */
-			int pixels = ex-myclip.right()-1;
+			int pixels = ex-myclip.max_x-1;
 			ex -= pixels;
 		}
-		if( ey > myclip.bottom()+1 )
+		if( ey > myclip.max_y+1 )
 		{ /* clip bottom */
-			int pixels = ey-myclip.bottom()-1;
+			int pixels = ey-myclip.max_y-1;
 			ey -= pixels;
 		}
 
@@ -3006,27 +3006,27 @@ void saturn_state::stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectan
 			y_index = 0;
 		}
 
-		if( sx < myclip.left())
+		if( sx < myclip.min_x)
 		{ /* clip left */
-			int pixels = myclip.left()-sx;
+			int pixels = myclip.min_x-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
-		if( sy < myclip.top() )
+		if( sy < myclip.min_y )
 		{ /* clip top */
-			int pixels = myclip.top()-sy;
+			int pixels = myclip.min_y-sy;
 			sy += pixels;
 			y_index += pixels*dy;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if( ex > myclip.right()+1 )
+		if( ex > myclip.max_x+1 )
 		{ /* clip right */
-			int pixels = ex-myclip.right()-1;
+			int pixels = ex-myclip.max_x-1;
 			ex -= pixels;
 		}
-		if( ey > myclip.bottom()+1 )
+		if( ey > myclip.max_y+1 )
 		{ /* clip bottom */
-			int pixels = ey-myclip.bottom()-1;
+			int pixels = ey-myclip.max_y-1;
 			ey -= pixels;
 		}
 
@@ -3096,29 +3096,29 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 	ey = sy + gfx->height();
 
 	/* clip left */
-	if (sx < clip.left())
+	if (sx < clip.min_x)
 	{
-		int pixels = clip.left()-sx;
+		int pixels = clip.min_x-sx;
 		sx += pixels;
 		x_index_base += xinc*pixels;
 	}
 
 	/* clip top */
-	if (sy < clip.top())
-	{   int pixels = clip.top()-sy;
+	if (sy < clip.min_y)
+	{   int pixels = clip.min_y-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
 
 	/* clip right */
-	if (ex > clip.right()+1)
+	if (ex > clip.max_x+1)
 	{
-		ex = clip.right()+1;
+		ex = clip.max_x+1;
 	}
 	/* clip bottom */
-	if (ey > clip.bottom()+1)
+	if (ey > clip.max_y+1)
 	{
-		ey = clip.bottom()+1;
+		ey = clip.max_y+1;
 	}
 
 	/* skip if inner loop doesn't draw anything */
@@ -3173,29 +3173,29 @@ void saturn_state::stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectan
 	ey = sy + gfx->height();
 
 	/* clip left */
-	if (sx < clip.left())
+	if (sx < clip.min_x)
 	{
-		int pixels = clip.left()-sx;
+		int pixels = clip.min_x-sx;
 		sx += pixels;
 		x_index_base += xinc*pixels;
 	}
 
 	/* clip top */
-	if (sy < clip.top())
-	{   int pixels = clip.top()-sy;
+	if (sy < clip.min_y)
+	{   int pixels = clip.min_y-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
 
 	/* clip right */
-	if (ex > clip.right()+1)
+	if (ex > clip.max_x+1)
 	{
-		ex = clip.right()+1;
+		ex = clip.max_x+1;
 	}
 	/* clip bottom */
-	if (ey > clip.bottom()+1)
+	if (ey > clip.max_y+1)
 	{
-		ey = clip.bottom()+1;
+		ey = clip.max_y+1;
 	}
 
 	/* skip if inner loop doesn't draw anything */
@@ -3251,9 +3251,9 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	if(stv2_current_tilemap.fade_control & 1)
 		pal_bank += ((stv2_current_tilemap.fade_control & 2) ? (2*2048) : (2048));
 
-	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
+	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
-		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
+		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3308,9 +3308,9 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	if(stv2_current_tilemap.fade_control & 1)
 		pal_bank += ((stv2_current_tilemap.fade_control & 2) ? (2*2048) : (2048));
 
-	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
+	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
-		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
+		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3364,9 +3364,9 @@ void saturn_state::draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	if(stv2_current_tilemap.fade_control & 1)
 		pal_bank = ((stv2_current_tilemap.fade_control & 2) ? (2*2048) : (2048));
 
-	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
+	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
-		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
+		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3418,9 +3418,9 @@ void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
 	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
 
-	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
+	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
-		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
+		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3476,9 +3476,9 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
 	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
 
-	for(ydst=cliprect.top();ydst<=cliprect.bottom();ydst++)
+	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
-		for(xdst=cliprect.left();xdst<=cliprect.right();xdst++)
+		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
 		{
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
@@ -3958,7 +3958,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		{
 			int drawyposinc = tilesizey*(stv2_current_tilemap.tile_size ? 2 : 1);
 			drawypos = -(stv2_current_tilemap.scrolly*scaley);
-			while( ((drawypos + drawyposinc) >> 16) < cliprect.top() )
+			while( ((drawypos + drawyposinc) >> 16) < cliprect.min_y )
 			{
 				drawypos += drawyposinc;
 				y++;
@@ -3969,7 +3969,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		{
 			drawypos += tilesizey*(stv2_current_tilemap.tile_size ? 2 : 1);
 		}
-		if ((drawypos >> 16) > cliprect.bottom()) break;
+		if ((drawypos >> 16) > cliprect.max_y) break;
 
 		ypageoffs = y & (pgtiles_y-1);
 
@@ -3981,7 +3981,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 			{
 				int drawxposinc = tilesizex*(stv2_current_tilemap.tile_size ? 2 : 1);
 				drawxpos = -(stv2_current_tilemap.scrollx*scalex);
-				while( ((drawxpos + drawxposinc) >> 16) < cliprect.left() )
+				while( ((drawxpos + drawxposinc) >> 16) < cliprect.min_x )
 				{
 					drawxpos += drawxposinc;
 					x++;
@@ -3992,7 +3992,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 			{
 				drawxpos+=tilesizex*(stv2_current_tilemap.tile_size ? 2 : 1);
 			}
-			if ( (drawxpos >> 16) > cliprect.right() ) break;
+			if ( (drawxpos >> 16) > cliprect.max_x ) break;
 
 			xpageoffs = x & (pgtiles_x-1);
 
@@ -4190,7 +4190,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 
 		if ( LOG_VDP2 )
 		{
-			logerror( "Layer RBG%d, size %d x %d\n", stv2_current_tilemap.layer_name & 0x7f, cliprect.right() + 1, cliprect.bottom() + 1 );
+			logerror( "Layer RBG%d, size %d x %d\n", stv2_current_tilemap.layer_name & 0x7f, cliprect.max_x + 1, cliprect.max_y + 1 );
 			logerror( "Tiles: min %08X, max %08X\n", tilecodemin, tilecodemax );
 			logerror( "MAP size in dwords %08X\n", mpsize_dwords );
 			for (i = 0; i < stv2_current_tilemap.map_count; i++)
@@ -4240,7 +4240,7 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rectangle mycliprect;
-	int cur_line = cliprect.top();
+	int cur_line = cliprect.min_y;
 	int address;
 	int active_functions = 0;
 	int32_t scroll_values[3], prev_scroll_values[3];
@@ -4278,7 +4278,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 	if ( linezoom_enable ) active_functions++;
 
 	// address of data table
-	address = stv2_current_tilemap.linescroll_table_address + active_functions*4*cliprect.top();
+	address = stv2_current_tilemap.linescroll_table_address + active_functions*4*cliprect.min_y;
 
 	// get the first scroll values
 	for ( i = 0; i < active_functions; i++ )
@@ -4294,7 +4294,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 		}
 	}
 
-	while( cur_line <= cliprect.bottom() )
+	while( cur_line <= cliprect.max_y )
 	{
 		lines = 0;
 		do
@@ -4325,11 +4325,12 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 			{
 				scroll_values_equal &= (scroll_values[i] == prev_scroll_values[i]);
 			}
-		} while( scroll_values_equal && ((cur_line + lines) <= cliprect.bottom()) );
+		} while( scroll_values_equal && ((cur_line + lines) <= cliprect.max_y) );
 
 		// determined how many lines can be drawn
 		// prepare clipping rectangle
-		mycliprect.sety(cur_line, cur_line + lines - 1);
+		mycliprect.min_y = cur_line;
+		mycliprect.max_y = cur_line + lines - 1;
 
 		// prepare scroll values
 		i = 0;
@@ -4357,7 +4358,7 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 			i++;
 		}
 
-//      if ( LOG_VDP2 ) logerror( "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.top(), mycliprect.bottom(), stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0 );
+//      if ( LOG_VDP2 ) logerror( "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.min_y, mycliprect.max_y, stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0 );
 		// render current tilemap portion
 		if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 		{
@@ -4388,14 +4389,14 @@ void saturn_state::stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cli
 	{
 		base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 
-		for(y=cliprect.top();y<=cliprect.bottom();y++)
+		for(y=cliprect.min_y;y<=cliprect.max_y;y++)
 		{
 			base_offs = (STV_VDP2_LCTA & base_mask) << 1;
 
 			if(STV_VDP2_LCCLMD)
 				base_offs += (y / interlace) << 1;
 
-			for(x=cliprect.left();x<=cliprect.right();x++)
+			for(x=cliprect.min_x;x<=cliprect.max_x;x++)
 			{
 				uint16_t pen;
 
@@ -4426,9 +4427,9 @@ void saturn_state::stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &c
 	if(STV_VDP2_LSMD == 3)
 		v_size <<= 1;
 
-	for(y=cliprect.top();y<=cliprect.bottom();y+=v_size)
+	for(y=cliprect.min_y;y<=cliprect.max_y;y+=v_size)
 	{
-		for(x=cliprect.left();x<=cliprect.right();x+=h_size)
+		for(x=cliprect.min_x;x<=cliprect.max_x;x+=h_size)
 		{
 			pix = bitmap.pix32(y, x);
 
@@ -4448,7 +4449,7 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 
 	if ( stv2_current_tilemap.linescroll_enable ||
 			stv2_current_tilemap.vertical_linescroll_enable ||
-			stv2_current_tilemap.linezoom_enable ||
+			stv2_current_tilemap.linezoom_enable || 
 			stv2_current_tilemap.vertical_cell_scroll_enable)
 	{
 		// check for vertical cell scroll enable (Sonic Jam)
@@ -4461,11 +4462,11 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 			int16_t base_scrollx, base_scrolly;
 			//uint32_t base_incx, base_incy;
 			int cur_char = 0;
-
+			
 			base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 			vcsc_address = (((STV_VDP2_VCSTAU << 16) | STV_VDP2_VCSTAL) & base_mask) * 2;
 			vcsc_address >>= 2;
-
+			
 			base_offset = 0;
 			base_multiplier = 1;
 			// offset for both enabled
@@ -4474,25 +4475,26 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 				// NBG1
 				if(stv2_current_tilemap.layer_name & 1)
 					base_offset = 1;
-
+				
 				base_multiplier = 2;
 			}
-
+			
 			base_scrollx = stv2_current_tilemap.scrollx;
 			base_scrolly = stv2_current_tilemap.scrolly;
 			//base_incx = stv2_current_tilemap.incx;
 			//base_incy = stv2_current_tilemap.incy;
-
-			while(cur_char <= cliprect.right())
+			
+			while(cur_char <= cliprect.max_x)
 			{
-				mycliprect.setx(cur_char, cur_char + 8 - 1);
-
+				mycliprect.min_x = cur_char;
+				mycliprect.max_x = cur_char + 8 - 1;
+				
 				uint32_t cur_address;
 				int16_t char_scroll;
-
+				
 				cur_address = vcsc_address;
 				cur_address += ((cur_char >> 3) * base_multiplier) + base_offset;
-
+				
 				char_scroll = m_vdp2_vram[ cur_address ] >> 16;
 				char_scroll &= 0x07ff;
 				if ( char_scroll & 0x0400 ) char_scroll |= 0xf800;
@@ -4502,7 +4504,7 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 				//stv2_current_tilemap.incy = base_incy;
 
 				stv_vdp2_check_tilemap_with_linescroll(bitmap, mycliprect);
-
+			
 				// TODO: + 16 for tilemap and char size = 16?
 				cur_char += 8;
 
@@ -4510,10 +4512,10 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		}
 		else
 			stv_vdp2_check_tilemap_with_linescroll(bitmap, cliprect);
-
+		
 		return;
 	}
-
+	
 	if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 	{
 		stv_vdp2_draw_basic_bitmap(bitmap, mycliprect);
@@ -4753,7 +4755,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	xp = mul_fixed32( RP.A, RP.px - RP.cx ) + mul_fixed32( RP.B, RP.py - RP.cy ) + mul_fixed32( RP.C, RP.pz - RP.cz ) + RP.cx + RP.mx;
 	yp = mul_fixed32( RP.D, RP.px - RP.cx ) + mul_fixed32( RP.E, RP.py - RP.cy ) + mul_fixed32( RP.F, RP.pz - RP.cz ) + RP.cy + RP.my;
 
-	for (vcnt = cliprect.top(); vcnt <= cliprect.bottom(); vcnt++ )
+	for (vcnt = cliprect.min_y; vcnt <= cliprect.max_y; vcnt++ )
 	{
 		/*xsp = RP.A * ( ( RP.xst + RP.dxst * (vcnt << 16) ) - RP.px ) +
 		      RP.B * ( ( RP.yst + RP.dyst * (vcnt << 16) ) - RP.py ) +
@@ -4845,7 +4847,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 			dxs = mul_fixed32( kx, mul_fixed32( dx, 1 << (16-hcnt_shift)));
 			dys = mul_fixed32( ky, mul_fixed32( dy, 1 << (16-hcnt_shift)));
 
-			for (hcnt = cliprect.left(); hcnt <= cliprect.right(); xs+=dxs, ys+=dys, hcnt++ )
+			for (hcnt = cliprect.min_x; hcnt <= cliprect.max_x; xs+=dxs, ys+=dys, hcnt++ )
 			{
 				x = xs >> 16;
 				y = ys >> 16;
@@ -4902,7 +4904,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 		}
 		else
 		{
-			for (hcnt = cliprect.left(); hcnt <= cliprect.right(); hcnt++ )
+			for (hcnt = cliprect.min_x; hcnt <= cliprect.max_x; hcnt++ )
 			{
 				switch( coeff_table_size )
 				{
@@ -5045,7 +5047,7 @@ inline bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parame
 	uint8_t w1_enable = STV_VDP2_RPW1E;
 	uint8_t w0_area = STV_VDP2_RPW0A;
 	uint8_t w1_area = STV_VDP2_RPW1A;
-
+	
 	if (w0_enable == 0 &&
 		w1_enable == 0)
 		return rot_parameter ^ 1;
@@ -5828,13 +5830,13 @@ void saturn_state::stv_vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cli
 	{
 		base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
 
-		for(y=cliprect.top();y<=cliprect.bottom();y++)
+		for(y=cliprect.min_y;y<=cliprect.max_y;y++)
 		{
 			base_offs = ((STV_VDP2_BKTA ) & base_mask) << 1;
 			if(STV_VDP2_BKCLMD)
 				base_offs += ((y / interlace) << 1);
 
-			for(x=cliprect.left();x<=cliprect.right();x++)
+			for(x=cliprect.min_x;x<=cliprect.max_x;x++)
 			{
 				int r,g,b;
 				uint16_t dot;
@@ -6180,7 +6182,7 @@ uint8_t saturn_state::get_hblank( void )
 	const rectangle &visarea = m_screen->visible_area();
 	int cur_h = m_screen->hpos();
 
-	if (cur_h > visarea.right()) //TODO
+	if (cur_h > visarea.max_x) //TODO
 		return 1;
 
 	return 0;
@@ -6348,9 +6350,9 @@ int saturn_state::stv_vdp2_start ( void )
 	stv_rbg_cache_data.is_cache_dirty = 3;
 	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
 
-	save_pointer(NAME(m_vdp2_regs), 0x040000/2);
-	save_pointer(NAME(m_vdp2_vram), 0x100000/4);
-	save_pointer(NAME(m_vdp2_cram), 0x080000/4);
+	save_pointer(NAME(m_vdp2_regs.get()), 0x040000/2);
+	save_pointer(NAME(m_vdp2_vram.get()), 0x100000/4);
+	save_pointer(NAME(m_vdp2_cram.get()), 0x080000/4);
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_state::stv_vdp2_state_save_postload), this));
 
 	return 0;
@@ -6506,7 +6508,7 @@ void saturn_state::stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y
 		// double density makes the line window to fetch data every two lines
 		uint8_t interlace = (STV_VDP2_LSMD == 3);
 		uint32_t vram_data = m_vdp2_vram[(address >> 2)+(y >> interlace)];
-
+		
 		*s_x = (vram_data >> 16) & 0x3ff;
 		*e_x = (vram_data & 0x3ff);
 	}
@@ -6566,7 +6568,7 @@ void saturn_state::stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y
 		// double density makes the line window to fetch data every two lines
 		uint8_t interlace = (STV_VDP2_LSMD == 3);
 		uint32_t vram_data = m_vdp2_vram[(address >> 2)+(y >> interlace)];
-
+		
 		*s_x = (vram_data >> 16) & 0x3ff;
 		*e_x = (vram_data & 0x3ff);
 	}
@@ -6789,7 +6791,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	{
 		if ( alpha_enabled == 0 )
 		{
-			for ( y = cliprect.top(); y <= cliprect.bottom(); y++ )
+			for ( y = cliprect.min_y; y <= cliprect.max_y; y++ )
 			{
 				if ( stv_sprite_priorities_usage_valid )
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6798,7 +6800,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
 				bitmap_line = &bitmap.pix32(y);
 
-				for ( x = cliprect.left(); x <= cliprect.right(); x++ )
+				for ( x = cliprect.min_x; x <= cliprect.max_x; x++ )
 				{
 					if(!stv_vdp2_window_process(x,y))
 						continue;
@@ -6863,7 +6865,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 								pix &= 0x7ff;
 								pix += color_offset_pal;
 								bitmap_line[x] = m_palette->pen( pix );
-
+								
 							}
 						}
 
@@ -6882,7 +6884,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		}
 		else //alpha_enabled == 1
 		{
-			for ( y = cliprect.top(); y <= cliprect.bottom(); y++ )
+			for ( y = cliprect.min_y; y <= cliprect.max_y; y++ )
 			{
 				if ( stv_sprite_priorities_usage_valid )
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6891,7 +6893,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
 				bitmap_line = &bitmap.pix32(y);
 
-				for ( x = cliprect.left(); x <= cliprect.right(); x++ )
+				for ( x = cliprect.min_x; x <= cliprect.max_x; x++ )
 				{
 					if(!stv_vdp2_window_process(x,y))
 						continue;
@@ -6991,7 +6993,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	}
 	else
 	{
-		for ( y = cliprect.top(); y <= cliprect.bottom() / (interlace_framebuffer+1); y++ )
+		for ( y = cliprect.min_y; y <= cliprect.max_y / (interlace_framebuffer+1); y++ )
 		{
 			if ( stv_sprite_priorities_usage_valid )
 				if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -7008,7 +7010,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				bitmap_line2 = &bitmap.pix32(2*y + 1);
 			}
 
-			for ( x = cliprect.left(); x <= cliprect.right() /(double_x+1) ; x++ )
+			for ( x = cliprect.min_x; x <= cliprect.max_x /(double_x+1) ; x++ )
 			{
 				if(!stv_vdp2_window_process(x,y))
 					continue;

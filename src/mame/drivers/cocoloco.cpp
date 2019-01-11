@@ -182,7 +182,6 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/netlist.h"
 #include "sound/ay8910.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -197,20 +196,11 @@
 class cocoloco_state : public driver_device
 {
 public:
-	cocoloco_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	cocoloco_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette") { }
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-	void cocoloco(machine_config &config);
-
-protected:
-	virtual void video_start() override;
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
@@ -223,9 +213,13 @@ private:
 	DECLARE_WRITE8_MEMBER(vram_clear_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 
-	void cocoloco_palette(palette_device &palette) const;
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+	virtual void video_start() override;
+	DECLARE_PALETTE_INIT(cocoloco);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cocoloco(machine_config &config);
 	void cocoloco_map(address_map &map);
 };
 
@@ -280,13 +274,15 @@ NETLIST_END()
 *          Video Hardware          *
 ***********************************/
 
-void cocoloco_state::cocoloco_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
 {
-	for (int i = 0; i < 0x10; i += 2)
+	for(int i = 0; i < 0x10; i += 2)
 	{
-		int const r = pal2bit(i & 3);
-		int const g = pal2bit((i >> 1) & 3);
-		int const b = pal2bit((i >> 2) & 3);
+		int r,g,b;
+
+		r = pal2bit(i & 3);
+		g = pal2bit((i >> 1) & 3);
+		b = pal2bit((i >> 2) & 3);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -307,21 +303,23 @@ void cocoloco_state::video_start()
 {
 	m_videoram = std::make_unique<uint8_t[]>(0x2000 * 8);
 
-	save_pointer(NAME(m_videoram), 0x2000 * 8);
+	save_pointer(NAME(m_videoram.get()), 0x2000 * 8);
 	save_item(NAME(m_videobank));
 }
 
 uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	int x, y, count, xi;
+
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	int count = 0;
+	count = 0;
 
-	for (int x = 0; x < 256; x += 8)
+	for(x = 0; x < 256; x += 8)
 	{
-		for (int y = 0; y < 256; y++)
+		for(y = 0; y < 256; y++)
 		{
-			for (int xi = 0; xi < 8; xi++)
+			for (xi = 0; xi < 8; xi++)
 			{
 				int color;
 				color  =  (m_videoram[count|0x0000] >> (xi)) & 1;
@@ -329,7 +327,7 @@ uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				color |= ((m_videoram[count|0x4000] >> (xi)) & 1) << 2;
 				color |= ((m_videoram[count|0x6000] >> (xi)) & 1) << 3;
 
-				if (cliprect.contains(x + xi, 256 - y))
+				if(cliprect.contains(x + xi, 256 - y))
 					bitmap.pix16(256 - y, x + xi) = m_palette->pen(color & 0x0f);
 			}
 
@@ -391,14 +389,14 @@ WRITE8_MEMBER( cocoloco_state::coincounter_w )
 void cocoloco_state::cocoloco_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).rw(FUNC(cocoloco_state::vram_r), FUNC(cocoloco_state::vram_w));     // 256 x 256 x 1
+	map(0x2000, 0x3fff).rw(this, FUNC(cocoloco_state::vram_r), FUNC(cocoloco_state::vram_w));     // 256 x 256 x 1
 	map(0x6001, 0x6001).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x6002, 0x6002).w("ay8910", FUNC(ay8910_device::data_w));
 	map(0x6003, 0x6003).w("ay8910", FUNC(ay8910_device::address_w));
-	map(0x8003, 0x8003).w(FUNC(cocoloco_state::vbank_w));
-	map(0x8005, 0x8005).w(FUNC(cocoloco_state::coincounter_w));
+	map(0x8003, 0x8003).w(this, FUNC(cocoloco_state::vbank_w));
+	map(0x8005, 0x8005).w(this, FUNC(cocoloco_state::coincounter_w));
 	map(0xa000, 0xa000).portr("IN0");
-	map(0xa005, 0xa005).w(FUNC(cocoloco_state::vram_clear_w));
+	map(0xa005, 0xa005).w(this, FUNC(cocoloco_state::vram_clear_w));
 	map(0xd000, 0xffff).rom();
 }
 
@@ -521,19 +519,20 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256)  // TODO: not accurate, ~50 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	MCFG_SCREEN_PALETTE("palette")
 
-	PALETTE(config, m_palette, FUNC(cocoloco_state::cocoloco_palette), 0x10);
+	MCFG_PALETTE_ADD("palette", 0x10)
+	MCFG_PALETTE_INIT_OWNER(cocoloco_state, cocoloco)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay8910(AY8910(config, "ay8910", SND_CLOCK));
-	ay8910.port_a_read_callback().set_ioport("DSW1");
-	ay8910.port_b_read_callback().set_ioport("DSW2");
-	ay8910.set_flags(AY8910_RESISTOR_OUTPUT);
-	ay8910.add_route(0, "snd_nl", 1.0, 0);
-	ay8910.add_route(1, "snd_nl", 1.0, 1);
-	ay8910.add_route(2, "snd_nl", 1.0, 2);
+	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 

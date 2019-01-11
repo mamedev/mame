@@ -2,8 +2,8 @@
 // copyright-holders:Ryan Holtz
 #pragma once
 
-#ifndef RENDER_BGFX
-#define RENDER_BGFX
+#ifndef __RENDER_BGFX__
+#define __RENDER_BGFX__
 
 #include <bgfx/bgfx.h>
 
@@ -80,7 +80,7 @@ public:
 		return &win->target()->get_primitives();
 	}
 
-	static char const *const WINDOW_PREFIX;
+	static const char* WINDOW_PREFIX;
 
 private:
 	void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
@@ -162,4 +162,4 @@ private:
 	static uint32_t s_current_view;
 };
 
-#endif // RENDER_BGFX
+#endif

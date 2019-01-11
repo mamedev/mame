@@ -13,9 +13,9 @@ namespace netlist
 	namespace devices
 	{
 
-	static constexpr const netlist_time out_delay = NLTIME_FROM_NS(18);
-	static constexpr const netlist_time out_delay2 = NLTIME_FROM_NS(36);
-	static constexpr const netlist_time out_delay3 = NLTIME_FROM_NS(54);
+	static constexpr netlist_time out_delay = NLTIME_FROM_NS(18);
+	static constexpr netlist_time out_delay2 = NLTIME_FROM_NS(36);
+	static constexpr netlist_time out_delay3 = NLTIME_FROM_NS(54);
 
 	NETLIB_OBJECT(7493)
 	{
@@ -40,7 +40,7 @@ namespace netlist
 
 		NETLIB_HANDLERI(updA)
 		{
-			//if (m_reset)
+			if (m_reset)
 			{
 				m_a ^= 1;
 				m_QA.push(m_a, out_delay);
@@ -49,13 +49,12 @@ namespace netlist
 
 		NETLIB_HANDLERI(updB)
 		{
-			//if (m_reset)
+			if (m_reset)
 			{
-				//++m_bcd &= 0x07;
-				auto cnt = (++m_bcd &= 0x07);
-				m_QD.push((cnt >> 2) & 1, out_delay3);
-				m_QC.push((cnt >> 1) & 1, out_delay2);
-				m_QB.push(cnt & 1, out_delay);
+				++m_bcd &= static_cast<std::uint8_t>(0x07);
+				m_QD.push((m_bcd >> 2) & 1, out_delay3);
+				m_QC.push((m_bcd >> 1) & 1, out_delay2);
+				m_QB.push(m_bcd & 1, out_delay);
 			}
 		}
 
@@ -64,7 +63,7 @@ namespace netlist
 
 		state_var_sig m_reset;
 		state_var_sig m_a;
-		state_var_u8  m_bcd;
+		state_var_sig m_bcd;
 
 		logic_input_t m_CLKA;
 		logic_input_t m_CLKB;
@@ -127,8 +126,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(7493,		"TTL_7493", "+CLKA,+CLKB,+R1,+R2")
-	NETLIB_DEVICE_IMPL(7493_dip,    "TTL_7493_DIP", "")
+	NETLIB_DEVICE_IMPL(7493)
+	NETLIB_DEVICE_IMPL(7493_dip)
 
 	} //namespace devices
 } // namespace netlist

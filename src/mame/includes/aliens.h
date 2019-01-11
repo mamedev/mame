@@ -5,23 +5,18 @@
     Aliens
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ALIENS_H
-#define MAME_INCLUDES_ALIENS_H
 
-#pragma once
-
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/k007232.h"
-#include "video/k051960.h"
 #include "video/k052109.h"
+#include "video/k051960.h"
 
 class aliens_state : public driver_device
 {
 public:
-	aliens_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	aliens_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank0000(*this, "bank0000"),
@@ -29,11 +24,10 @@ public:
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
 		m_soundlatch(*this, "soundlatch"),
-		m_rombank(*this, "rombank")
-	{ }
+		m_rombank(*this, "rombank") { }
 
 	/* devices */
-	required_device<konami_cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<k007232_device> m_k007232;
@@ -59,5 +53,3 @@ public:
 	void aliens_sound_map(address_map &map);
 	void bank0000_map(address_map &map);
 };
-
-#endif // MAME_INCLUDES_ALIENS_H

@@ -12,9 +12,11 @@ Atari Fire Truck + Super Bug + Monte Carlo video emulation
 static const rectangle playfield_window(0x02a, 0x115, 0x000, 0x0ff);
 
 
-void firetrk_state::firetrk_palette(palette_device &palette)
+PALETTE_INIT_MEMBER(firetrk_state, firetrk)
 {
-	static constexpr uint8_t colortable_source[] =
+	int i;
+
+	static const uint8_t colortable_source[] =
 	{
 		0, 0, 1, 0,
 		2, 0, 3, 0,
@@ -24,7 +26,7 @@ void firetrk_state::firetrk_palette(palette_device &palette)
 		2, 0, 0, 3,
 		3, 0, 0, 3
 	};
-	static constexpr rgb_t palette_source[] =
+	static const rgb_t palette_source[] =
 	{
 		rgb_t::black(),
 		rgb_t(0x5b, 0x5b, 0x5b),
@@ -34,7 +36,7 @@ void firetrk_state::firetrk_palette(palette_device &palette)
 
 	m_color1_mask = m_color2_mask = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 	{
 		uint8_t color = colortable_source[i];
 
@@ -54,11 +56,12 @@ void firetrk_state::prom_to_palette(int number, uint8_t val)
 }
 
 
-void firetrk_state::montecar_palette(palette_device &palette)
+PALETTE_INIT_MEMBER(firetrk_state,montecar)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	static constexpr uint8_t colortable_source[] =
+	static const uint8_t colortable_source[] =
 	{
 		0x00, 0x00, 0x00, 0x01,
 		0x00, 0x02, 0x00, 0x03,
@@ -93,7 +96,7 @@ void firetrk_state::montecar_palette(palette_device &palette)
 
 	m_color1_mask = m_color2_mask = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 	{
 		uint8_t color = colortable_source[i];
 
@@ -320,8 +323,8 @@ void firetrk_state::check_collision(int which)
 {
 	int y, x;
 
-	for (y = playfield_window.top(); y <= playfield_window.bottom(); y++)
-		for (x = playfield_window.left(); x <= playfield_window.right(); x++)
+	for (y = playfield_window.min_y; y <= playfield_window.max_y; y++)
+		for (x = playfield_window.min_x; x <= playfield_window.max_x; x++)
 		{
 			pen_t a = m_helper1.pix16(y, x);
 			pen_t b = m_helper2.pix16(y, x);
@@ -350,7 +353,7 @@ uint32_t firetrk_state::screen_update_firetrk(screen_device &screen, bitmap_ind1
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
-	if (cliprect.bottom() == screen.visible_area().bottom())
+	if (cliprect.max_y == screen.visible_area().max_y)
 	{
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
@@ -383,7 +386,7 @@ uint32_t firetrk_state::screen_update_superbug(screen_device &screen, bitmap_ind
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 296, 0x10, 0x10);
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
-	if (cliprect.bottom() == screen.visible_area().bottom())
+	if (cliprect.max_y == screen.visible_area().max_y)
 	{
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 
@@ -413,7 +416,7 @@ uint32_t firetrk_state::screen_update_montecar(screen_device &screen, bitmap_ind
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x00, 24, 0x20, 0x08);
 	draw_text(bitmap, cliprect, m_alpha_num_ram + 0x20, 16, 0x20, 0x08);
 
-	if (cliprect.bottom() == screen.visible_area().bottom())
+	if (cliprect.max_y == screen.visible_area().max_y)
 	{
 		m_tilemap2->draw(screen, m_helper1, playfield_window, 0, 0);
 

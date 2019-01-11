@@ -609,12 +609,6 @@ void mpcc_device::rcv_complete()
 	data = get_received_char();
 	LOGRX("%s %02x [%c]\n", FUNCNAME, isascii(data) ? data : ' ', data);
 
-	uint8_t errors = 0;
-	if (is_receive_parity_error())
-		errors |= REG_RSR_CPERR;
-	if (is_receive_framing_error())
-		errors |= REG_RSR_FRERR;
-
 	//  receive_data(data);
 	if (m_rx_data_fifo.full())
 	{
@@ -628,12 +622,7 @@ void mpcc_device::rcv_complete()
 	}
 	else
 	{
-		if (m_rx_data_fifo.empty())
-		{
-			m_rsr |= errors;
-			update_interrupts(INT_RX);
-		}
-		m_rx_data_fifo.enqueue(data | errors << 8);
+		m_rx_data_fifo.enqueue(data);
 		m_rsr |= REG_RSR_RDA;
 		// interrupt if rx data availble is enabled
 		if (m_rier & REG_RIER_RDA)
@@ -758,14 +747,13 @@ void mpcc_device::update_interrupts(int source)
 
 	switch(source)
 	{
-	case INT_TX:
 	case INT_TX_TDRA:
 	case INT_TX_TFC:
 	case INT_TX_TUNRN:
 	case INT_TX_TFERR:
-		if (m_tsr & m_tier & (REG_TSR_TDRA | REG_TSR_TFC | REG_TSR_TUNRN | REG_TSR_TFERR))
+		if ( m_tsr & (REG_TSR_TDRA | REG_TSR_TFC | REG_TSR_TUNRN | REG_TSR_TFERR) )
 		{
-			LOGINT(" - Found unserved TX interrupt %02x\n", m_tsr & m_tier);
+			LOGINT(" - Found unserved TX interrupt %02x\n", m_tsr);
 			m_int_state[TX_INT_PRIO] = INT_REQ; // Still TX interrupts to serve
 		}
 		else
@@ -773,16 +761,15 @@ void mpcc_device::update_interrupts(int source)
 			m_int_state[TX_INT_PRIO] = INT_NONE; // No more TX interrupts to serve
 		}
 		break;
-	case INT_RX:
 	case INT_RX_RDA:
 	case INT_RX_EOF:
 	case INT_RX_CPERR:
 	case INT_RX_FRERR:
 	case INT_RX_ROVRN:
 	case INT_RX_RAB:
-		if (m_rsr & m_rier & (REG_RSR_RDA | REG_RSR_EOF | REG_RSR_CPERR | REG_RSR_FRERR | REG_RSR_ROVRN | REG_RSR_RAB))
+		if ( m_rsr & (REG_RSR_RDA | REG_RSR_EOF | REG_RSR_CPERR | REG_RSR_FRERR | REG_RSR_ROVRN | REG_RSR_RAB))
 		{
-			LOGINT(" - Found unserved RX interrupt %02x\n", m_rsr & m_rier);
+			LOGINT(" - Found unserved RX interrupt %02x\n", m_rsr);
 			m_int_state[RX_INT_PRIO] = INT_REQ; // Still RX interrupts to serve
 		}
 		else
@@ -790,13 +777,12 @@ void mpcc_device::update_interrupts(int source)
 			m_int_state[RX_INT_PRIO] = INT_NONE; // No more RX interrupts to serve
 		}
 		break;
-	case INT_SR:
 	case INT_SR_CTS:
 	case INT_SR_DSR:
 	case INT_SR_DCD:
-		if (m_sisr & m_sier & (REG_SISR_CTST | REG_SISR_DSRT | REG_SISR_DCDT))
+		if ( m_sisr & (REG_SISR_CTST | REG_SISR_DSRT | REG_SISR_DCDT ) )
 		{
-			LOGINT(" - Found unserved SR interrupt %02x\n", m_sisr & m_sier);
+			LOGINT(" - Found unserved SR interrupt %02x\n", m_sisr);
 			m_int_state[SR_INT_PRIO] = INT_REQ; // Still SR interrupts to serve
 		}
 		else
@@ -879,15 +865,12 @@ WRITE8_MEMBER( mpcc_device::write )
 	}
 }
 
+// TODO: Sync clear of error bits with readout from fifo
 // TODO: implement Idle bit
 void mpcc_device::do_rsr(uint8_t data)
 {
 	LOG("%s -> %02x\n", FUNCNAME, data);
-	// writing 1 resets status bits except for RDA which is read-only
-	m_rsr &= ~data | REG_RSR_RDA;
-	// status belonging to data at the head of the FIFO cannot be cleared
-	if (!m_rx_data_fifo.empty())
-		m_rsr |= m_rx_data_fifo.peek() >> 8;
+	m_rsr = data;
 	update_interrupts(INT_RX);
 }
 
@@ -926,18 +909,13 @@ uint8_t mpcc_device::do_rdr()
 	if (!m_rx_data_fifo.empty())
 	{
 		// load data from the FIFO
-		data = m_rx_data_fifo.dequeue() & 0xff;
+		data = m_rx_data_fifo.dequeue();
 
 		// Check if this was the last data and reset the interrupt and status register accordingly
 		if (m_rx_data_fifo.empty())
 		{
 			m_rsr &= ~REG_RSR_RDA;
 			update_interrupts(INT_RX_RDA);
-		}
-		else
-		{
-			m_rsr |= m_rx_data_fifo.peek() >> 8;
-			update_interrupts(INT_RX);
 		}
 	}
 	else
@@ -974,7 +952,6 @@ void mpcc_device::do_rier(uint8_t data)
 	LOGSETUP(" - Rx INT on Frame error          : %s\n", (m_rier & REG_RIER_FRERR) ? "enabled" : "disabled");
 	LOGSETUP(" - Rx INT on Receiver overrun     : %s\n", (m_rier & REG_RIER_ROVRN) ? "enabled" : "disabled");
 	LOGSETUP(" - Rx INT on Abort/Break          : %s\n", (m_rier & REG_RIER_RAB)   ? "enabled" : "disabled");
-	update_interrupts(INT_RX);
 }
 
 uint8_t mpcc_device::do_rier()
@@ -1027,8 +1004,7 @@ void mpcc_device::do_tdr(uint8_t data)
 void mpcc_device::do_tsr(uint8_t data)
 {
 	LOGINT("%s -> %02x\n", FUNCNAME, data);
-	// writing 1 resets status bits except for TDRA which is read-only
-	m_tsr &= ~data | REG_TSR_TDRA;
+	m_tsr = data;
 	update_interrupts(INT_TX);
 }
 
@@ -1084,7 +1060,6 @@ void mpcc_device::do_tier(uint8_t data)
 	LOGSETUP(" - Tx INT on Frame complete       : %s\n", (m_tier & REG_TIER_TFC ) ? "enabled" : "disabled");
 	LOGSETUP(" - Tx INT on Underrun             : %s\n", (m_tier & REG_TIER_TUNRN) ? "enabled" : "disabled");
 	LOGSETUP(" - Tx INT on Frame error          : %s\n", (m_tier & REG_TIER_TFERR) ? "enabled" : "disabled");
-	update_interrupts(INT_TX);
 }
 
 uint8_t mpcc_device::do_tier()
@@ -1156,7 +1131,6 @@ void mpcc_device::do_sier(uint8_t data)
 	LOGSETUP(" - Serial interface INT on CTS: %s\n", (m_sier & REG_SIER_CTS) ? "enabled" : "disabled");
 	LOGSETUP(" - Serial interface INT on DSR: %s\n", (m_sier & REG_SIER_DSR) ? "enabled" : "disabled");
 	LOGSETUP(" - Serial interface INT on DCD: %s\n", (m_sier & REG_SIER_DCD) ? "enabled" : "disabled");
-	update_interrupts(INT_SR);
 }
 
 uint8_t mpcc_device::do_sier()

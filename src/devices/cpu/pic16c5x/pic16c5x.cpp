@@ -91,29 +91,29 @@ DEFINE_DEVICE_TYPE(PIC1655,  pic1655_device,  "pic1655",  "Microchip PIC1655")
  *  Internal Memory Maps
  ****************************************************************************/
 
-void pic16c5x_device::rom_9(address_map &map)
+void pic16c5x_device::pic16c5x_rom_9(address_map &map)
 {
 	map(0x000, 0x1ff).rom();
 }
 
-void pic16c5x_device::ram_5(address_map &map)
+void pic16c5x_device::pic16c5x_ram_5(address_map &map)
 {
 	map(0x00, 0x07).ram();
 	map(0x08, 0x0f).ram();
 	map(0x10, 0x1f).ram();
 }
 
-void pic16c5x_device::rom_10(address_map &map)
+void pic16c5x_device::pic16c5x_rom_10(address_map &map)
 {
 	map(0x000, 0x3ff).rom();
 }
 
-void pic16c5x_device::rom_11(address_map &map)
+void pic16c5x_device::pic16c5x_rom_11(address_map &map)
 {
 	map(0x000, 0x7ff).rom();
 }
 
-void pic16c5x_device::ram_7(address_map &map)
+void pic16c5x_device::pic16c5x_ram_7(address_map &map)
 {
 	map(0x00, 0x07).ram().mirror(0x60);
 	map(0x08, 0x0f).ram().mirror(0x60);
@@ -127,9 +127,9 @@ void pic16c5x_device::ram_7(address_map &map)
 pic16c5x_device::pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, program_width, -1
-					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_9), this): ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c5x_device::rom_10), this) : address_map_constructor(FUNC(pic16c5x_device::rom_11), this) )))
+					   , ( ( program_width == 9 ) ? address_map_constructor(FUNC(pic16c5x_device::pic16c5x_rom_9), this): ( ( program_width == 10 ) ? address_map_constructor(FUNC(pic16c5x_device::pic16c5x_rom_10), this) : address_map_constructor(FUNC(pic16c5x_device::pic16c5x_rom_11), this) )))
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_width, 0
-					, ( ( data_width == 5 ) ? address_map_constructor(FUNC(pic16c5x_device::ram_5), this) : address_map_constructor(FUNC(pic16c5x_device::ram_7), this) ) )
+					, ( ( data_width == 5 ) ? address_map_constructor(FUNC(pic16c5x_device::pic16c5x_ram_5), this) : address_map_constructor(FUNC(pic16c5x_device::pic16c5x_ram_7), this) ) )
 	, m_reset_vector((program_width == 9) ? 0x1ff : ((program_width == 10) ? 0x3ff : 0x7ff))
 	, m_picmodel(picmodel)
 	, m_temp_config(0)
@@ -1064,7 +1064,7 @@ void pic16c5x_device::pic16c5x_soft_reset()
 	pic16c5x_reset_regs();
 }
 
-void pic16c5x_device::set_config(uint16_t data)
+void pic16c5x_device::pic16c5x_set_config(uint16_t data)
 {
 	logerror("Writing %04x to the PIC16C5x config register\n",data);
 	m_temp_config = data;

@@ -16,6 +16,18 @@ typedef device_delegate<void (int *code, int *color, int *priority_mask)> k05324
 #define K053246_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
 #define K055673_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
 
+#define MCFG_K053246_CB(_class, _method) \
+	downcast<k053247_device &>(*device).set_k053247_callback(k053247_cb_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_K053246_CONFIG(_gfx_reg, _order, _dx, _dy) \
+	downcast<k053247_device &>(*device).set_config(_gfx_reg, _order, _dx, _dy);
+
+#define MCFG_K055673_CB(_class, _method) \
+	downcast<k053247_device &>(*device).set_k053247_callback(k053247_cb_delegate(&_class::_method, #_class "::" #_method, this));
+
+#define MCFG_K055673_CONFIG(_gfx_reg, _order, _dx, _dy) \
+	downcast<k053247_device &>(*device).set_config(_gfx_reg, _order, _dx, _dy);
+
 
 /**  Konami 053246 / 053247 / 055673  **/
 #define K055673_LAYOUT_GX  5
@@ -56,10 +68,9 @@ public:
 
 	// configuration
 	void set_k053247_callback(k053247_cb_delegate callback) { m_k053247_cb = callback; }
-	template <typename... T> void set_sprite_callback(T &&... args) { m_k053247_cb = k053247_cb_delegate(std::forward<T>(args)...); }
-	template <typename T> void set_config(T &&tag, int bpp, int dx, int dy)
+	void set_config(const char *gfx_reg, int bpp, int dx, int dy)
 	{
-		m_gfxrom.set_tag(tag);
+		m_memory_region = gfx_reg;
 		m_bpp = bpp;
 		m_dx = dx;
 		m_dy = dy;
@@ -108,7 +119,7 @@ public:
 
 	k053247_cb_delegate m_k053247_cb;
 
-	required_region_ptr<uint8_t> m_gfxrom;
+	const char *m_memory_region;
 	int m_gfx_num;
 	int m_bpp;
 
@@ -476,5 +487,16 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K055673, k055673_device)
+
+
+#define MCFG_K053246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
+#define MCFG_K053246_PALETTE MCFG_GFX_PALETTE
+
+
+#define MCFG_K055673_SET_SCREEN MCFG_VIDEO_SET_SCREEN
+
+#define MCFG_K055673_PALETTE MCFG_GFX_PALETTE
+
 
 #endif // MAME_INCLUDES_K053246_K053247_K055673_H

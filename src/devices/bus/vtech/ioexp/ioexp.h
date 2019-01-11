@@ -29,8 +29,16 @@
 
 #pragma once
 
-// include here so drivers don't need to
-#include "carts.h"
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_IOEXP_SLOT_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, VTECH_IOEXP_SLOT, 0) \
+	MCFG_DEVICE_SLOT_INTERFACE(vtech_ioexp_slot_carts, nullptr, false)
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,14 +51,6 @@ class vtech_ioexp_slot_device : public device_t, public device_slot_interface
 	friend class device_vtech_ioexp_interface;
 public:
 	// construction/destruction
-	vtech_ioexp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: vtech_ioexp_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		vtech_ioexp_slot_carts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
 	vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vtech_ioexp_slot_device();
 
@@ -83,5 +83,8 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(VTECH_IOEXP_SLOT, vtech_ioexp_slot_device)
+
+// include here so drivers don't need to
+#include "carts.h"
 
 #endif // MAME_BUS_VTECH_IOEXP_IOEXP_H

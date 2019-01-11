@@ -4,9 +4,12 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="org.mamedev.mame"
-      android:versionCode="205"
-      android:versionName="0.205"
+      android:versionCode="197"
+      android:versionName="0.197"
       android:installLocation="auto">
+
+    <!-- Android 5.0 -->
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="21" />
 
     <!-- OpenGL ES 2.0 -->
     <uses-feature android:glEsVersion="0x00020000" />

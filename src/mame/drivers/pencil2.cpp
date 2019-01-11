@@ -106,12 +106,6 @@ public:
 		, m_cart(*this, "cartslot")
 	{}
 
-	void pencil2(machine_config &config);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
-
-private:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
@@ -119,9 +113,12 @@ private:
 	DECLARE_READ8_MEMBER(porte2_r);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
+	void pencil2(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-
+private:
 	virtual void machine_start() override;
 	int m_centronics_busy;
 	int m_centronics_ack;
@@ -145,17 +142,17 @@ void pencil2_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
-	map(0x10, 0x1f).w(FUNC(pencil2_state::port10_w));
-	map(0x30, 0x3f).w(FUNC(pencil2_state::port30_w));
-	map(0x80, 0x9f).w(FUNC(pencil2_state::port80_w));
-	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0xc0, 0xdf).w(FUNC(pencil2_state::portc0_w));
-	map(0xe0, 0xff).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0x00, 0x0f).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x10, 0x1f).w(this, FUNC(pencil2_state::port10_w));
+	map(0x30, 0x3f).w(this, FUNC(pencil2_state::port30_w));
+	map(0x80, 0x9f).w(this, FUNC(pencil2_state::port80_w));
+	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0xc0, 0xdf).w(this, FUNC(pencil2_state::portc0_w));
+	map(0xe0, 0xff).w("sn76489a", FUNC(sn76489a_device::write));
 	map(0xe0, 0xe0).portr("E0");
 	map(0xe1, 0xe1).portr("E1");
-	map(0xe2, 0xe2).r(FUNC(pencil2_state::porte2_r));
+	map(0xe2, 0xe2).r(this, FUNC(pencil2_state::porte2_r));
 	map(0xe3, 0xe3).portr("E3");
 	map(0xe4, 0xe4).portr("E4");
 	map(0xe6, 0xe6).portr("E6");
@@ -318,10 +315,10 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
-	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
-	vdp.set_screen("screen");
-	vdp.set_vram_size(0x4000);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -337,7 +334,7 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")
 
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pencil2_state, write_centronics_ack))
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pencil2_state, write_centronics_busy))
 

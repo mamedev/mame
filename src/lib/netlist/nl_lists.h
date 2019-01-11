@@ -101,7 +101,7 @@ namespace netlist
 
 #if !USE_HEAP
 	/* Use TS = true for a threadsafe queue */
-	template <class T, bool TS, bool KEEPSTAT, class QueueOp = typename T::QueueOp>
+	template <class T, bool TS, class QueueOp = typename T::QueueOp>
 	class timed_queue : plib::nocopyassignmove
 	{
 	public:
@@ -201,8 +201,8 @@ namespace netlist
 
 	public:
 		// profiling
-		nperfcount_t<KEEPSTAT> m_prof_sortmove;
-		nperfcount_t<KEEPSTAT> m_prof_call;
+		nperfcount_t m_prof_sortmove;
+		nperfcount_t m_prof_call;
 	};
 #else
 	template <class T, bool TS, class QueueOp = typename T::QueueOp>
@@ -296,8 +296,8 @@ namespace netlist
 
 	public:
 		// profiling
-		nperfcount_t<NL_KEEP_STATISTICS> m_prof_sortmove;
-		nperfcount_t<NL_KEEP_STATISTICS> m_prof_call;
+		nperfcount_t m_prof_sortmove;
+		nperfcount_t m_prof_call;
 	};
 #endif
 }

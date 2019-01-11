@@ -175,7 +175,7 @@ void wswan_state::common_start()
 
 	register_save();
 
-	subdevice<nvram_device>("nvram")->set_base(m_internal_eeprom, INTERNAL_EEPROM_SIZE);
+	machine().device<nvram_device>("nvram")->set_base(m_internal_eeprom, INTERNAL_EEPROM_SIZE);
 
 	if (m_cart->exists())
 	{

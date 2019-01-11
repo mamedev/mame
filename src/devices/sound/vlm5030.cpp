@@ -235,6 +235,7 @@ void vlm5030_device::device_start()
 	save_item(NAME(m_target_pitch));
 	save_item(NAME(m_target_k));
 	save_item(NAME(m_x));
+	machine().save().register_postload(save_prepost_delegate(FUNC(vlm5030_device::restore_state), this));
 }
 
 //-------------------------------------------------
@@ -260,11 +261,6 @@ void vlm5030_device::device_reset()
 	memset(m_x, 0, sizeof(m_x));
 	/* reset parameters */
 	setup_parameter( 0x00);
-}
-
-void vlm5030_device::device_post_load()
-{
-	restore_state();
 }
 
 void vlm5030_device::rom_bank_updated()

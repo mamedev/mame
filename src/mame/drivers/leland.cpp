@@ -83,37 +83,37 @@
 void leland_state::master_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x9fff).bankr(m_master_bankslot[0]);
-	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(FUNC(leland_state::leland_battery_ram_w)).share("battery");
-	map(0xe000, 0xefff).ram().share(m_mainram);
-	map(0xf000, 0xf3ff).rw(FUNC(leland_state::leland_gated_paletteram_r), FUNC(leland_state::leland_gated_paletteram_w)).share("palette");
-	map(0xf800, 0xf801).w(FUNC(leland_state::leland_master_video_addr_w));
+	map(0x2000, 0x9fff).bankr("masterbank_0");
+	map(0xa000, 0xdfff).bankr("masterbank_1").w(this, FUNC(leland_state::leland_battery_ram_w)).share("battery");
+	map(0xe000, 0xefff).ram().share("mainram");
+	map(0xf000, 0xf3ff).rw(this, FUNC(leland_state::leland_gated_paletteram_r), FUNC(leland_state::leland_gated_paletteram_w)).share("palette");
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_master_video_addr_w));
 }
 
 void leland_state::master_map_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(leland_state::leland_master_alt_bankswitch_w));
-	map(0xfd, 0xff).rw(FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
+	map(0xf0, 0xf0).w(this, FUNC(leland_state::leland_master_alt_bankswitch_w));
+	map(0xfd, 0xff).rw(this, FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
 }
 
-void redline_state::master_redline_map_io(address_map &map)
+void leland_state::master_redline_map_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xf0, 0xf0).w(FUNC(redline_state::redline_master_alt_bankswitch_w));
+	map(0xf0, 0xf0).w(this, FUNC(leland_state::leland_master_alt_bankswitch_w));
 	map(0xf2, 0xf2).rw(m_sound, FUNC(leland_80186_sound_device::leland_80186_response_r), FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
 	map(0xf4, 0xf4).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
-	map(0xfd, 0xff).rw(FUNC(redline_state::leland_master_analog_key_r), FUNC(redline_state::leland_master_analog_key_w));
+	map(0xfd, 0xff).rw(this, FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
 }
 
 
 void ataxx_state::master_map_program_2(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x9fff).bankr(m_master_bankslot[0]);
-	map(0xa000, 0xdfff).bankr(m_master_bankslot[1]).w(FUNC(ataxx_state::ataxx_battery_ram_w)).share("battery");
-	map(0xe000, 0xf7ff).ram().share(m_mainram);
-	map(0xf800, 0xffff).rw(FUNC(ataxx_state::ataxx_paletteram_and_misc_r), FUNC(ataxx_state::ataxx_paletteram_and_misc_w)).share("palette");
+	map(0x2000, 0x9fff).bankr("masterbank_0");
+	map(0xa000, 0xdfff).bankr("masterbank_1").w(this, FUNC(ataxx_state::ataxx_battery_ram_w)).share("battery");
+	map(0xe000, 0xf7ff).ram().share("mainram");
+	map(0xf800, 0xffff).rw(this, FUNC(ataxx_state::ataxx_paletteram_and_misc_r), FUNC(ataxx_state::ataxx_paletteram_and_misc_w)).share("palette");
 }
 
 
@@ -124,9 +124,9 @@ void ataxx_state::master_map_io_2(address_map &map)
 	map(0x05, 0x05).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
 	map(0x06, 0x06).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
 	map(0x0c, 0x0c).w(m_sound, FUNC(leland_80186_sound_device::ataxx_80186_control_w));
-	map(0x20, 0x20).rw(FUNC(ataxx_state::ataxx_eeprom_r), FUNC(ataxx_state::ataxx_eeprom_w));
-	map(0xd0, 0xef).rw(FUNC(ataxx_state::ataxx_mvram_port_r), FUNC(ataxx_state::ataxx_mvram_port_w));
-	map(0xf0, 0xff).rw(FUNC(ataxx_state::ataxx_master_input_r), FUNC(ataxx_state::ataxx_master_output_w));
+	map(0x20, 0x20).rw(this, FUNC(ataxx_state::ataxx_eeprom_r), FUNC(ataxx_state::ataxx_eeprom_w));
+	map(0xd0, 0xef).rw(this, FUNC(ataxx_state::ataxx_mvram_port_r), FUNC(ataxx_state::ataxx_mvram_port_w));
+	map(0xf0, 0xff).rw(this, FUNC(ataxx_state::ataxx_master_input_r), FUNC(ataxx_state::ataxx_master_output_w));
 }
 
 
@@ -140,49 +140,49 @@ void ataxx_state::master_map_io_2(address_map &map)
 void leland_state::slave_small_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0xdfff).bankr(m_slave_bankslot);
+	map(0x2000, 0xdfff).bankr("slavebank");
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf801).w(FUNC(leland_state::leland_slave_video_addr_w));
-	map(0xf802, 0xf802).r(FUNC(leland_state::leland_raster_r));
-	map(0xf803, 0xf803).w(FUNC(leland_state::leland_slave_small_banksw_w));
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
+	map(0xf803, 0xf803).w(this, FUNC(leland_state::leland_slave_small_banksw_w));
 }
 
 
-void redline_state::slave_large_map_program(address_map &map)
+void leland_state::slave_large_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x4000, 0xbfff).bankr(m_slave_bankslot);
-	map(0xc000, 0xc000).w(FUNC(leland_state::leland_slave_large_banksw_w));
+	map(0x4000, 0xbfff).bankr("slavebank");
+	map(0xc000, 0xc000).w(this, FUNC(leland_state::leland_slave_large_banksw_w));
 	map(0xe000, 0xefff).ram();
-	map(0xf800, 0xf801).w(FUNC(leland_state::leland_slave_video_addr_w));
-	map(0xf802, 0xf802).r(FUNC(leland_state::leland_raster_r));
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
 }
 
 
 void leland_state::slave_map_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x1f).rw(FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
-	map(0x40, 0x5f).rw(FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
+	map(0x00, 0x1f).rw(this, FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
+	map(0x40, 0x5f).rw(this, FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
 }
 
 
 void leland_state::slave_map_program(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x9fff).bankr(m_slave_bankslot);
+	map(0x2000, 0x9fff).bankr("slavebank");
 	map(0xa000, 0xdfff).rom();
 	map(0xe000, 0xefff).ram();
-	map(0xfffc, 0xfffd).w(FUNC(leland_state::leland_slave_video_addr_w));
-	map(0xfffe, 0xfffe).r(FUNC(leland_state::leland_raster_r));
-	map(0xffff, 0xffff).w(FUNC(leland_state::ataxx_slave_banksw_w));
+	map(0xfffc, 0xfffd).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xfffe, 0xfffe).r(this, FUNC(leland_state::leland_raster_r));
+	map(0xffff, 0xffff).w(this, FUNC(leland_state::ataxx_slave_banksw_w));
 }
 
 
 void ataxx_state::slave_map_io_2(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x60, 0x7f).rw(FUNC(ataxx_state::ataxx_svram_port_r), FUNC(ataxx_state::ataxx_svram_port_w));
+	map(0x60, 0x7f).rw(this, FUNC(ataxx_state::ataxx_svram_port_r), FUNC(ataxx_state::ataxx_svram_port_w));
 }
 
 /*************************************
@@ -981,17 +981,17 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(leland_state::leland)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_master, Z80, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("master", Z80, MASTER_CLOCK/2)
 	MCFG_DEVICE_PROGRAM_MAP(master_map_program)
 	MCFG_DEVICE_IO_MAP(master_map_io)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", leland_state,  leland_master_interrupt)
 
-	MCFG_DEVICE_ADD(m_slave, Z80, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("slave", Z80, MASTER_CLOCK/2)
 	MCFG_DEVICE_PROGRAM_MAP(slave_small_map_program)
 	MCFG_DEVICE_IO_MAP(slave_map_io)
 
-	EEPROM_93C46_16BIT(config, m_eeprom);
-	NVRAM(config, "battery", nvram_device::DEFAULT_ALL_0);
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
 	leland_video(config);
@@ -999,29 +999,29 @@ MACHINE_CONFIG_START(leland_state::leland)
 	SPEAKER(config, "speaker").front_center();
 
 	// only one of the AY sockets is populated
-	AY8910(config, m_ay8910, 10000000/6);
-	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
-	m_ay8910->set_resistors_load(1000, 0, 0);
-	m_ay8910->port_a_read_callback().set(FUNC(leland_state::leland_sound_port_r));
-	m_ay8910->port_a_write_callback().set(FUNC(leland_state::leland_sound_port_w));
-	m_ay8910->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	MCFG_DEVICE_ADD("ay8910", AY8910, 10000000/6)
+	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	MCFG_AY8910_RES_LOADS(1000, 0, 0)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, leland_state, leland_sound_port_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, leland_state, leland_sound_port_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-//  AY8912(config, m_ay8912, 10000000/6);
-//  m_ay8912->set_flags(AY8910_SINGLE_OUTPUT);
-//  m_ay8912->set_resistors_load(1000, 0, 0);
-//  m_ay8912->port_a_read_callback().set(FUNC(leland_state::leland_sound_port_r));
-//  m_ay8912->port_a_write_callback().set(FUNC(leland_state::leland_sound_port_w));
-//  m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.25);
+//  MCFG_DEVICE_ADD("ay8912", AY8912, 10000000/6)
+//  MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+//  MCFG_AY8910_RES_LOADS(1000, 0, 0)
+//  MCFG_AY8910_PORT_A_READ_CB(READ8(*this, leland_state, leland_sound_port_r))
+//  MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, leland_state, leland_sound_port_w))
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DEVICE_ADD(m_dac[0], DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
-	MCFG_DEVICE_ADD(m_dac[1], DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	MCFG_DEVICE_ADD("dac0", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u79 + r17-r23 (24k,12k,6.2k,3k,1.5k,750,390,180)
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.0625) // ls374.u88 + r27-r34 (24k,12k,6.2k,3k,1.5k,750,390,180)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(redline_state::redline)
+MACHINE_CONFIG_START(leland_state::redline)
 	leland(config);
 
 	/* basic machine hardware */
@@ -1029,19 +1029,19 @@ MACHINE_CONFIG_START(redline_state::redline)
 	MCFG_DEVICE_IO_MAP(master_redline_map_io)
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_sound, REDLINE_80186, 0)
+	MCFG_DEVICE_ADD("custom", REDLINE_80186, 0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(redline_state::quarterb)
+MACHINE_CONFIG_START(leland_state::quarterb)
 	redline(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE(m_sound, LELAND_80186, 0)
+	MCFG_DEVICE_REPLACE("custom", LELAND_80186, 0)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(redline_state::lelandi)
+MACHINE_CONFIG_START(leland_state::lelandi)
 	quarterb(config);
 
 	/* basic machine hardware */
@@ -1053,30 +1053,32 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ataxx_state::ataxx)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_master, Z80, 6000000)
+	MCFG_DEVICE_ADD("master", Z80, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(master_map_program_2)
 	MCFG_DEVICE_IO_MAP(master_map_io_2)
 
-	MCFG_DEVICE_ADD(m_slave, Z80, 6000000)
+	MCFG_DEVICE_ADD("slave", Z80, 6000000)
 	MCFG_DEVICE_PROGRAM_MAP(slave_map_program)
 	MCFG_DEVICE_IO_MAP(slave_map_io_2)
 
-	EEPROM_93C56_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
+	MCFG_EEPROM_SERIAL_ENABLE_STREAMING()
 
-	NVRAM(config, "battery", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
 	ataxx_video(config);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_sound, ATAXX_80186, 0)
+	MCFG_DEVICE_ADD("custom", ATAXX_80186, 0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ataxx_state::wsf)
 	ataxx(config);
 
-	MCFG_DEVICE_REPLACE(m_sound, WSF_80186, 0)
+	MCFG_DEVICE_REMOVE("custom")
+	MCFG_DEVICE_ADD("custom", WSF_80186, 0)
 MACHINE_CONFIG_END
 
 
@@ -2197,7 +2199,7 @@ ROM_START( offroad )
 	ROM_LOAD( "03-22119-02.u56t",   0x30000, 0x10000, CRC(38642f22) SHA1(9167bbc7ed8a8a0b913ead3b8b5a7749a29f15cb) )
 
 	ROM_REGION( 0x80000, "slave", 0 )
-	ROM_LOAD( "03-22100-02.u2t",  0x00000, 0x02000, CRC(08c96a4b) SHA1(7d93dd918a5733c190b2668811d161f5f6339cf0) ) /* Also known to labeled as revision 01 */
+	ROM_LOAD( "03-22100-01.u2t",  0x00000, 0x02000, CRC(08c96a4b) SHA1(7d93dd918a5733c190b2668811d161f5f6339cf0) )
 	ROM_LOAD( "03-22108-02.u4t",  0x30000, 0x10000, CRC(0d72780a) SHA1(634b87e7afff4ac2e8e3b98554364c5f3c4d9176) )
 	ROM_LOAD( "03-22109-02.u5t",  0x40000, 0x10000, CRC(5429ce2c) SHA1(73e543796629ac719928f4fe48442f1975db5092) )
 	ROM_LOAD( "03-22110-02.u6t",  0x50000, 0x10000, CRC(f97bad5c) SHA1(c68f8022c86bfc5c0480e5ce426fe2f985dc255f) )
@@ -2213,7 +2215,7 @@ ROM_START( offroad )
 	ROM_LOAD16_BYTE( "03-22115-03.u15t", 0x0e0000, 0x10000, CRC(c8439a7a) SHA1(9a8bb1fca8d3414dcfd4839bc0c4289e4d810943) )
 
 	ROM_REGION( 0x18000, "bg_gfx", 0 )
-	ROM_LOAD( "03-22105-02.u93", 0x00000, 0x08000, CRC(4426e367) SHA1(298203112d724feb9a75a7bfc34b3dbb4d7fffe7) ) /* Also known to labeled as revision 01 */
+	ROM_LOAD( "03-22105-01.u93", 0x00000, 0x08000, CRC(4426e367) SHA1(298203112d724feb9a75a7bfc34b3dbb4d7fffe7) )
 	ROM_LOAD( "03-22106-02.u94", 0x08000, 0x08000, CRC(687dc1fc) SHA1(876c72561d942ebc5f3a148d3d3efdceb39c9e2e) )
 	ROM_LOAD( "03-22107-02.u95", 0x10000, 0x08000, CRC(cee6ee5f) SHA1(3f1c6e8d9eb9de207cabca7c9d6d8d633bd69681) )
 
@@ -2224,7 +2226,7 @@ ROM_START( offroad )
 	/* 91 = empty */
 	/* 68 = empty */
 	ROM_LOAD( "03-22103-02.u90",  0x14000, 0x4000, CRC(2266757a) SHA1(22aaf4b14f11198ffd14c9830c7997fd47ee14b6) )
-	ROM_LOAD( "03-22101-02.u67",  0x18000, 0x4000, CRC(ecab0527) SHA1(6bbf8243d9b2ea775897719592212b51998f1b01) ) /* Also known to labeled as revision 01 */
+	ROM_LOAD( "03-22101-01.u67",  0x18000, 0x4000, CRC(ecab0527) SHA1(6bbf8243d9b2ea775897719592212b51998f1b01) )
 	/* 89 = empty */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -2263,7 +2265,7 @@ ROM_START( offroad3 )
 	ROM_LOAD16_BYTE( "03-22115-03.u15t", 0x0e0000, 0x10000, CRC(c8439a7a) SHA1(9a8bb1fca8d3414dcfd4839bc0c4289e4d810943) )
 
 	ROM_REGION( 0x18000, "bg_gfx", 0 )
-	ROM_LOAD( "03-22105-02.u93", 0x00000, 0x08000, CRC(4426e367) SHA1(298203112d724feb9a75a7bfc34b3dbb4d7fffe7) ) /* Also known to labeled as revision 01 */
+	ROM_LOAD( "03-22105-01.u93", 0x00000, 0x08000, CRC(4426e367) SHA1(298203112d724feb9a75a7bfc34b3dbb4d7fffe7) )
 	ROM_LOAD( "03-22106-02.u94", 0x08000, 0x08000, CRC(687dc1fc) SHA1(876c72561d942ebc5f3a148d3d3efdceb39c9e2e) )
 	ROM_LOAD( "03-22107-02.u95", 0x10000, 0x08000, CRC(cee6ee5f) SHA1(3f1c6e8d9eb9de207cabca7c9d6d8d633bd69681) )
 
@@ -2274,7 +2276,7 @@ ROM_START( offroad3 )
 	/* 91 = empty */
 	/* 68 = empty */
 	ROM_LOAD( "03-22103-02.u90",  0x14000, 0x4000, CRC(2266757a) SHA1(22aaf4b14f11198ffd14c9830c7997fd47ee14b6) )
-	ROM_LOAD( "03-22101-02.u67",  0x18000, 0x4000, CRC(ecab0527) SHA1(6bbf8243d9b2ea775897719592212b51998f1b01) ) /* Also known to labeled as revision 01 */
+	ROM_LOAD( "03-22101-01.u67",  0x18000, 0x4000, CRC(ecab0527) SHA1(6bbf8243d9b2ea775897719592212b51998f1b01) )
 	/* 89 = empty */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
@@ -2676,68 +2678,25 @@ ROM_END
 For World Soccer Finals, the label format is:
 ------------------------
 |(C)1990 Leland Corp.  | -> Copyright & Manufacturer
-|P/N E-302-30022-04    | -> Part number with revision
+|P/N E-302-30022-03    | -> Part number with revision
 |WORLD SOCCER     U64  | -> Game name & ROM PCB location
 ------------------------
 */
 ROM_START( wsf )
-	ROM_REGION( 0x50000, "master", 0 )
-	ROM_LOAD( "e-302-30022-04.u64",  0x00000, 0x20000, CRC(533cc90f) SHA1(44cec1093819dc1eb5c4ed48ac8a666d9601a870) )
-	ROM_RELOAD(                      0x10000, 0x20000 )
-	ROM_LOAD( "e-302-30023-04.u65",  0x30000, 0x20000, CRC(763c6c1b) SHA1(4f0ef31b7ec4b060dac28ebb1dc663f9328c9f97) )
-
-	ROM_REGION( 0x100000, "slave", 0 )
-	ROM_LOAD( "e-302-30001-01.u151",  0x00000, 0x20000, CRC(31c63af5) SHA1(268093ade200241339b6f60a00123bbf73325e38) )
-	ROM_LOAD( "e-302-30002-01.u152",  0x20000, 0x20000, CRC(a53e88a6) SHA1(0b7748b70d6dd9fcc1a22646e8af20f3baa4aa40) )
-	ROM_LOAD( "e-302-30003-01.u153",  0x40000, 0x20000, CRC(12afad1d) SHA1(848549db714b46497176e42d6f2088ba3d6ab2f4) )
-	ROM_LOAD( "e-302-30004-01.u154",  0x60000, 0x20000, CRC(b8b3d59c) SHA1(9ba6e25bb5132c556557a0395ce1d982c0853426) )
-	ROM_LOAD( "e-302-30005-01.u155",  0x80000, 0x20000, CRC(505724b9) SHA1(f8a29e3e7f0a146f2daf67883de12533b2ed7341) )
-	ROM_LOAD( "e-302-30006-01.u156",  0xa0000, 0x20000, CRC(c86b5c4d) SHA1(f04d8fc1e8f872f406fcad69ff71ed695f42797a) )
-	ROM_LOAD( "e-302-30007-01.u157",  0xc0000, 0x20000, CRC(451321ae) SHA1(da82f0bba4341b087136afa17767b64389a0f8f4) )
-	ROM_LOAD( "e-302-30008-01.u158",  0xe0000, 0x20000, CRC(4d23836f) SHA1(7b5b9419774e7537e69017c4c44a0601b6e93714) )
-
-	ROM_REGION( 0x100000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "e-302-30017-02.u3",  0x20001, 0x20000, CRC(b1d578e1) SHA1(861d597c403b5b385395383dc70eac7a8496c11e) )
-	ROM_LOAD16_BYTE( "e-302-30020-02.u6",  0x20000, 0x20000, CRC(919a62ee) SHA1(ec8110e77d5bd88c39582dc3804fa6982306ed40) )
-	ROM_LOAD16_BYTE( "e-302-30018-02.u4",  0x60001, 0x20000, CRC(d24947ee) SHA1(e40913d4b16d49357e6b9a306b4cfd5091a15ded) )
-	ROM_RELOAD(                            0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "e-302-30019-02.u5",  0x60000, 0x20000, CRC(d846f292) SHA1(97ede713aada8f9b7d4afd0a7f7b71a98c4fd15d) )
-	ROM_RELOAD(                            0xc0000, 0x20000 )
-
-	ROM_REGION( 0x60000, "bg_gfx", 0 )
-	ROM_LOAD( "e-302-30011-03.u145",  0x00000, 0x10000, CRC(6d1c1f19) SHA1(8291a09efab00af2b24cd03f413c152e5e191a5d) )
-	ROM_LOAD( "e-302-30012-03.u146",  0x10000, 0x10000, CRC(6b69bc9e) SHA1(0cc72edd40c997b583b3300136b6d5c7f774ae0a) )
-	ROM_LOAD( "e-302-30013-03.u147",  0x20000, 0x10000, CRC(e1b1e36f) SHA1(4c4040b4dd36a81a6d2affb1e0e07f8d13477205) )
-	ROM_LOAD( "e-302-30014-02.u148",  0x30000, 0x10000, CRC(4a5e7d2b) SHA1(c2d0f60dd1923ea0672a145f72159d71d86e1440) )
-	ROM_LOAD( "e-302-30015-02.u149",  0x40000, 0x10000, CRC(b30c4ff3) SHA1(8bd709bd277584fc32983424873097300eb791c6) )
-	ROM_LOAD( "e-302-30016-02.u150",  0x50000, 0x10000, CRC(3bc8efac) SHA1(78451b935fba519603db0de2e2d06e83b3d4353a) )
-
-	ROM_REGION( 0x20000, "xrom", 0 ) /* X-ROM (data used by main processor) */
-	ROM_LOAD( "e-302-30009-01.u68",  0x00000, 0x10000, CRC(f2fbfc15) SHA1(712cfa7b11135b1f568f38cc478ef5a3330d0608) )
-	ROM_LOAD( "e-302-30010-01.u69",  0x10000, 0x10000, CRC(b4ed2d3b) SHA1(61c9d86b63cf000187a105c6eed967fecb2f3c1c) )
-
-	ROM_REGION( 0x20000, "dac", 0 ) /* externally clocked DAC data */
-	ROM_LOAD( "e-302-30021-02.u8",   0x00000, 0x20000, CRC(a8f97be4) SHA1(738a2ec96a923ef3b3c62425365d4455ba200119) )
-
-	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-wsf.bin", 0x0000, 0x0100, CRC(5bd0633d) SHA1(4917a0b0be82dc1bd4cfdb5bfb509f0472f1014f) )
-ROM_END
-
-ROM_START( wsf3 )
 	ROM_REGION( 0x50000, "master", 0 )
 	ROM_LOAD( "e-302-30022-03.u64",  0x00000, 0x20000, CRC(2e7faa96) SHA1(d43915a433133eca650fabece61a4a65642b39f6) )
 	ROM_RELOAD(                      0x10000, 0x20000 )
 	ROM_LOAD( "e-302-30023-03.u65",  0x30000, 0x20000, CRC(7146328f) SHA1(390b98a2cd54a981eb4fafba700ff2fa1e379a32) )
 
 	ROM_REGION( 0x100000, "slave", 0 )
-	ROM_LOAD( "e-302-30001-01.u151",  0x00000, 0x20000, CRC(31c63af5) SHA1(268093ade200241339b6f60a00123bbf73325e38) )
-	ROM_LOAD( "e-302-30002-01.u152",  0x20000, 0x20000, CRC(a53e88a6) SHA1(0b7748b70d6dd9fcc1a22646e8af20f3baa4aa40) )
-	ROM_LOAD( "e-302-30003-01.u153",  0x40000, 0x20000, CRC(12afad1d) SHA1(848549db714b46497176e42d6f2088ba3d6ab2f4) )
-	ROM_LOAD( "e-302-30004-01.u154",  0x60000, 0x20000, CRC(b8b3d59c) SHA1(9ba6e25bb5132c556557a0395ce1d982c0853426) )
-	ROM_LOAD( "e-302-30005-01.u155",  0x80000, 0x20000, CRC(505724b9) SHA1(f8a29e3e7f0a146f2daf67883de12533b2ed7341) )
-	ROM_LOAD( "e-302-30006-01.u156",  0xa0000, 0x20000, CRC(c86b5c4d) SHA1(f04d8fc1e8f872f406fcad69ff71ed695f42797a) )
-	ROM_LOAD( "e-302-30007-01.u157",  0xc0000, 0x20000, CRC(451321ae) SHA1(da82f0bba4341b087136afa17767b64389a0f8f4) )
-	ROM_LOAD( "e-302-30008-01.u158",  0xe0000, 0x20000, CRC(4d23836f) SHA1(7b5b9419774e7537e69017c4c44a0601b6e93714) )
+	ROM_LOAD( "e-302-30001-01.151",  0x00000, 0x20000, CRC(31c63af5) SHA1(268093ade200241339b6f60a00123bbf73325e38) )
+	ROM_LOAD( "e-302-30002-01.152",  0x20000, 0x20000, CRC(a53e88a6) SHA1(0b7748b70d6dd9fcc1a22646e8af20f3baa4aa40) )
+	ROM_LOAD( "e-302-30003-01.153",  0x40000, 0x20000, CRC(12afad1d) SHA1(848549db714b46497176e42d6f2088ba3d6ab2f4) )
+	ROM_LOAD( "e-302-30004-01.154",  0x60000, 0x20000, CRC(b8b3d59c) SHA1(9ba6e25bb5132c556557a0395ce1d982c0853426) )
+	ROM_LOAD( "e-302-30005-01.155",  0x80000, 0x20000, CRC(505724b9) SHA1(f8a29e3e7f0a146f2daf67883de12533b2ed7341) )
+	ROM_LOAD( "e-302-30006-01.156",  0xa0000, 0x20000, CRC(c86b5c4d) SHA1(f04d8fc1e8f872f406fcad69ff71ed695f42797a) )
+	ROM_LOAD( "e-302-30007-01.157",  0xc0000, 0x20000, CRC(451321ae) SHA1(da82f0bba4341b087136afa17767b64389a0f8f4) )
+	ROM_LOAD( "e-302-30008-01.158",  0xe0000, 0x20000, CRC(4d23836f) SHA1(7b5b9419774e7537e69017c4c44a0601b6e93714) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )
 	ROM_LOAD16_BYTE( "e-302-30017-01.u3",  0x20001, 0x20000, CRC(39ec13c1) SHA1(4067da05cbaf205ab7cc14a3370220ad98b394cd) )
@@ -2748,12 +2707,12 @@ ROM_START( wsf3 )
 	ROM_RELOAD(                            0xc0000, 0x20000 )
 
 	ROM_REGION( 0x60000, "bg_gfx", 0 )
-	ROM_LOAD( "e-302-30011-02.u145",  0x00000, 0x10000, CRC(6153569b) SHA1(b6a106c8b87a9a3f01eff3854d0c1f2c4a64fd94) )
-	ROM_LOAD( "e-302-30012-02.u146",  0x10000, 0x10000, CRC(52d65e21) SHA1(25f63aa29dc7e7673043e1f43e357a5232a1be9e) )
-	ROM_LOAD( "e-302-30013-02.u147",  0x20000, 0x10000, CRC(b3afda12) SHA1(52bf780c642f0092114aeb994e6571c034f198a0) )
-	ROM_LOAD( "e-302-30014-01.u148",  0x30000, 0x10000, CRC(624e6c64) SHA1(02240adcf4433543c8f7ad8904c34400f25409cc) )
-	ROM_LOAD( "e-302-30015-01.u149",  0x40000, 0x10000, CRC(5d9064f2) SHA1(7a68a379aa6a6cd0518e8a4107b2e646f5700c2b) )
-	ROM_LOAD( "e-302-30016-01.u150",  0x50000, 0x10000, CRC(d76389cd) SHA1(2b7e6cd662ffde177b110ad0ed2e42fe4ccf811f) )
+	ROM_LOAD( "e-302-30011-02.145",  0x00000, 0x10000, CRC(6153569b) SHA1(b6a106c8b87a9a3f01eff3854d0c1f2c4a64fd94) )
+	ROM_LOAD( "e-302-30012-02.146",  0x10000, 0x10000, CRC(52d65e21) SHA1(25f63aa29dc7e7673043e1f43e357a5232a1be9e) )
+	ROM_LOAD( "e-302-30013-02.147",  0x20000, 0x10000, CRC(b3afda12) SHA1(52bf780c642f0092114aeb994e6571c034f198a0) )
+	ROM_LOAD( "e-302-30014-02.148",  0x30000, 0x10000, CRC(624e6c64) SHA1(02240adcf4433543c8f7ad8904c34400f25409cc) )
+	ROM_LOAD( "e-302-30015-01.149",  0x40000, 0x10000, CRC(5d9064f2) SHA1(7a68a379aa6a6cd0518e8a4107b2e646f5700c2b) )
+	ROM_LOAD( "e-302-30016-01.150",  0x50000, 0x10000, CRC(d76389cd) SHA1(2b7e6cd662ffde177b110ad0ed2e42fe4ccf811f) )
 
 	ROM_REGION( 0x20000, "xrom", 0 ) /* X-ROM (data used by main processor) */
 	ROM_LOAD( "e-302-30009-01.u68",  0x00000, 0x10000, CRC(f2fbfc15) SHA1(712cfa7b11135b1f568f38cc478ef5a3330d0608) )
@@ -3073,7 +3032,7 @@ void leland_state::init_strkzone()
 }
 
 
-void redline_state::init_redlin2p()
+void leland_state::init_redlin2p()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::redline_bankswitch;
@@ -3084,14 +3043,14 @@ void redline_state::init_redlin2p()
 	init_master_ports(0x00, 0xc0);
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xc0, 0xc0, read8_delegate(FUNC(redline_state::redline_pedal_1_r),this));
-	m_master->space(AS_IO).install_read_handler(0xd0, 0xd0, read8_delegate(FUNC(redline_state::redline_pedal_2_r),this));
-	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(redline_state::redline_wheel_2_r),this));
-	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(redline_state::redline_wheel_1_r),this));
+	m_master->space(AS_IO).install_read_handler(0xc0, 0xc0, read8_delegate(FUNC(leland_state::redline_pedal_1_r),this));
+	m_master->space(AS_IO).install_read_handler(0xd0, 0xd0, read8_delegate(FUNC(leland_state::redline_pedal_2_r),this));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::redline_wheel_2_r),this));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(leland_state::redline_wheel_1_r),this));
 }
 
 
-void redline_state::init_quarterb()
+void leland_state::init_quarterb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3103,7 +3062,7 @@ void redline_state::init_quarterb()
 }
 
 
-void redline_state::init_viper()
+void leland_state::init_viper()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3116,16 +3075,16 @@ void redline_state::init_viper()
 	init_master_ports(0x00, 0xc0);
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xa4, 0xa4, read8_delegate(FUNC(redline_state::dangerz_input_upper_r),this));
-	m_master->space(AS_IO).install_read_handler(0xb8, 0xb8, read8_delegate(FUNC(redline_state::dangerz_input_y_r),this));
-	m_master->space(AS_IO).install_read_handler(0xbc, 0xbc, read8_delegate(FUNC(redline_state::dangerz_input_x_r),this));
+	m_master->space(AS_IO).install_read_handler(0xa4, 0xa4, read8_delegate(FUNC(leland_state::dangerz_input_upper_r),this));
+	m_master->space(AS_IO).install_read_handler(0xb8, 0xb8, read8_delegate(FUNC(leland_state::dangerz_input_y_r),this));
+	m_master->space(AS_IO).install_read_handler(0xbc, 0xbc, read8_delegate(FUNC(leland_state::dangerz_input_x_r),this));
 
 	save_item(NAME(m_dangerz_x));
 	save_item(NAME(m_dangerz_y));
 }
 
 
-void redline_state::init_teamqb()
+void leland_state::init_teamqb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3143,7 +3102,7 @@ void redline_state::init_teamqb()
 }
 
 
-void redline_state::init_aafb()
+void leland_state::init_aafb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3161,7 +3120,7 @@ void redline_state::init_aafb()
 }
 
 
-void redline_state::init_aafbb()
+void leland_state::init_aafbb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3179,7 +3138,7 @@ void redline_state::init_aafbb()
 }
 
 
-void redline_state::init_aafbd2p()
+void leland_state::init_aafbd2p()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3197,7 +3156,7 @@ void redline_state::init_aafbd2p()
 }
 
 
-void redline_state::init_offroad()
+void leland_state::init_offroad()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3211,13 +3170,13 @@ void redline_state::init_offroad()
 	init_master_ports(0x40, 0x80);   /* yes, this is intentional */
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(redline_state::offroad_wheel_3_r),this));
-	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8_delegate(FUNC(redline_state::offroad_wheel_1_r),this));
-	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(redline_state::offroad_wheel_2_r),this));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::offroad_wheel_3_r),this));
+	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8_delegate(FUNC(leland_state::offroad_wheel_1_r),this));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(leland_state::offroad_wheel_2_r),this));
 }
 
 
-void redline_state::init_offroadt()
+void leland_state::init_offroadt()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3230,13 +3189,13 @@ void redline_state::init_offroadt()
 	init_master_ports(0x80, 0x40);
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(redline_state::offroad_wheel_3_r),this));
-	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8_delegate(FUNC(redline_state::offroad_wheel_1_r),this));
-	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(redline_state::offroad_wheel_2_r),this));
+	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::offroad_wheel_3_r),this));
+	m_master->space(AS_IO).install_read_handler(0xf9, 0xf9, read8_delegate(FUNC(leland_state::offroad_wheel_1_r),this));
+	m_master->space(AS_IO).install_read_handler(0xfb, 0xfb, read8_delegate(FUNC(leland_state::offroad_wheel_2_r),this));
 }
 
 
-void redline_state::init_pigout()
+void leland_state::init_pigout()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3291,7 +3250,7 @@ void ataxx_state::init_indyheat()
 	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
-	m_master->space(AS_IO).install_read_handler(0x00, 0x02, read8_delegate(FUNC(ataxx_state::ataxx_trackball_r),this));
+	m_master->space(AS_IO).install_read_handler(0x00, 0x02, read8_delegate(FUNC(ataxx_state::indyheat_wheel_r),this));
 	m_master->space(AS_IO).install_read_handler(0x08, 0x0b, read8_delegate(FUNC(ataxx_state::indyheat_analog_r),this));
 	m_master->space(AS_IO).install_read_port(0x0d, 0x0d, "P1");
 	m_master->space(AS_IO).install_read_port(0x0e, 0x0e, "P2");
@@ -3354,35 +3313,34 @@ GAME( 1987, dblplay,    0,        leland,   basebal2,   leland_state, init_dblpl
 GAME( 1988, strkzone,   0,        leland,   basebal2,   leland_state, init_strkzone, ROT0,   "Leland Corporation", "Strike Zone Baseball", 0 )
 
 /* large master banks, small slave banks, 80186 sound */
-GAME( 1987, redlin2p,   0,        redline,  redline,    redline_state, init_redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
-GAME( 1987, quarterb,   0,        quarterb, quarterb,   redline_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 5)", 0 )
-GAME( 1987, quarterba,  quarterb, quarterb, quarterb,   redline_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 2)", 0 )
-GAME( 1987, quarterbc,  quarterb, quarterb, quarterb,   redline_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 1, cocktail)", 0 )
+GAME( 1987, redlin2p,   0,        redline,  redline,    leland_state, init_redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
+GAME( 1987, quarterb,   0,        quarterb, quarterb,   leland_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 5)", 0 )
+GAME( 1987, quarterba,  quarterb, quarterb, quarterb,   leland_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 2)", 0 )
+GAME( 1987, quarterbc,  quarterb, quarterb, quarterb,   leland_state, init_quarterb, ROT270, "Leland Corporation", "Quarterback (rev 1, cocktail)", 0 )
 
 /* large master banks, large slave banks, 80186 sound */
-GAME( 1988, viper,      0,        lelandi,  dangerz,    redline_state, init_viper,    ROT0,   "Leland Corporation", "Viper (rev 3)", 0 )
-GAME( 1988, teamqb,     0,        lelandi,  teamqb,     redline_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 3)", 0 )
-GAME( 1988, teamqb2,    teamqb,   lelandi,  teamqb,     redline_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 2)", 0 )
-GAME( 1989, aafb,       0,        lelandi,  teamqb,     redline_state, init_aafb,     ROT270, "Leland Corporation", "All American Football (rev E)", 0 )
-GAME( 1989, aafbd2p,    aafb,     lelandi,  aafb2p,     redline_state, init_aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 Players)", 0 )
-GAME( 1989, aafbc,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev C)", 0 )
-GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     redline_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev B)", MACHINE_NOT_WORKING )
+GAME( 1988, viper,      0,        lelandi,  dangerz,    leland_state, init_viper,    ROT0,   "Leland Corporation", "Viper (rev 3)", 0 )
+GAME( 1988, teamqb,     0,        lelandi,  teamqb,     leland_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 3)", 0 )
+GAME( 1988, teamqb2,    teamqb,   lelandi,  teamqb,     leland_state, init_teamqb,   ROT270, "Leland Corporation", "John Elway's Team Quarterback (rev 2)", 0 )
+GAME( 1989, aafb,       0,        lelandi,  teamqb,     leland_state, init_aafb,     ROT270, "Leland Corporation", "All American Football (rev E)", 0 )
+GAME( 1989, aafbd2p,    aafb,     lelandi,  aafb2p,     leland_state, init_aafbd2p,  ROT270, "Leland Corporation", "All American Football (rev D, 2 Players)", 0 )
+GAME( 1989, aafbc,      aafb,     lelandi,  teamqb,     leland_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev C)", 0 )
+GAME( 1989, aafbb,      aafb,     lelandi,  teamqb,     leland_state, init_aafbb,    ROT270, "Leland Corporation", "All American Football (rev B)", MACHINE_NOT_WORKING )
 
 /* huge master banks, large slave banks, 80186 sound */
-GAME( 1989, offroad,    0,        lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )
-GAME( 1989, offroad3,   offroad,  lelandi,  offroad,    redline_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
-GAME( 1989, offroadt,   0,        lelandi,  offroad,    redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
-GAME( 1989, offroadt2p, offroadt, lelandi,  offroadt2p, redline_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 Players)", 0 )
-GAME( 1990, pigout,     0,        lelandi,  pigout,     redline_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 2?)", 0 ) /* need to verify revision */
-GAME( 1990, pigouta,    pigout,   lelandi,  pigout,     redline_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
+GAME( 1989, offroad,    0,        lelandi,  offroad,    leland_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 4)", 0 )
+GAME( 1989, offroad3,   offroad,  lelandi,  offroad,    leland_state, init_offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
+GAME( 1989, offroadt,   0,        lelandi,  offroad,    leland_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
+GAME( 1989, offroadt2p, offroadt, lelandi,  offroadt2p, leland_state, init_offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 Players)", 0 )
+GAME( 1990, pigout,     0,        lelandi,  pigout,     leland_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 2?)", 0 ) /* need to verify revision */
+GAME( 1990, pigouta,    pigout,   lelandi,  pigout,     leland_state, init_pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
 
 /* Ataxx-era PCB, 80186 sound */
-GAME( 1990, ataxx,      0,        ataxx,    ataxx,      ataxx_state,   init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 5)", 0 )
-GAME( 1990, ataxxa,     ataxx,    ataxx,    ataxx,      ataxx_state,   init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
-GAME( 1990, ataxxe,     ataxx,    ataxx,    ataxx,      ataxx_state,   init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
-GAME( 1990, ataxxj,     ataxx,    ataxx,    ataxx,      ataxx_state,   init_ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
-GAME( 1990, wsf,        0,        wsf,      wsf,        ataxx_state,   init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 4)", 0 )
-GAME( 1990, wsf3,       wsf,      wsf,      wsf,        ataxx_state,   init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
-GAME( 1991, indyheat,   0,        wsf,      indyheat,   ataxx_state,   init_indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat (rev 1)", 0 )
-GAME( 1991, brutforc,   0,        wsf,      brutforc,   ataxx_state,   init_brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
-GAME( 1991, asylum,     0,        wsf,      brutforc,   ataxx_state,   init_asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )
+GAME( 1990, ataxx,      0,        ataxx,    ataxx,      ataxx_state,  init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 5)", 0 )
+GAME( 1990, ataxxa,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
+GAME( 1990, ataxxe,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
+GAME( 1990, ataxxj,     ataxx,    ataxx,    ataxx,      ataxx_state,  init_ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
+GAME( 1990, wsf,        0,        wsf,      wsf,        ataxx_state,  init_wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )
+GAME( 1991, indyheat,   0,        wsf,      indyheat,   ataxx_state,  init_indyheat, ROT0,   "Leland Corporation", "Danny Sullivan's Indy Heat (rev 1)", 0 )
+GAME( 1991, brutforc,   0,        wsf,      brutforc,   ataxx_state,  init_brutforc, ROT0,   "Leland Corporation", "Brute Force", 0 )
+GAME( 1991, asylum,     0,        wsf,      brutforc,   ataxx_state,  init_asylum,   ROT270, "Leland Corporation", "Asylum (prototype)", 0 )

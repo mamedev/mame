@@ -10,10 +10,8 @@ public:
 	sam_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	void sam(machine_config &config);
-
-private:
-	void sam_map(address_map &map);
+		void sam(machine_config &config);
+		void sam_map(address_map &map);
 };
 
 void sam_state::sam_map(address_map &map)

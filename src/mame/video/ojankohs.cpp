@@ -19,33 +19,32 @@
 
 ******************************************************************************/
 
-void ojankohs_state::ojankoy_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(ojankohs_state,ojankoy)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2, bit3, bit4;
+	int i;
+	int bit0, bit1, bit2, bit3, bit4, r, g, b;
 
-	for (int i = 0; i < palette.entries(); i++)
+	for (i = 0; i < palette.entries(); i++)
 	{
 		bit0 = BIT(color_prom[0], 2);
 		bit1 = BIT(color_prom[0], 3);
 		bit2 = BIT(color_prom[0], 4);
 		bit3 = BIT(color_prom[0], 5);
 		bit4 = BIT(color_prom[0], 6);
-		int const r = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
-
+		r = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
 		bit0 = BIT(color_prom[palette.entries()], 5);
 		bit1 = BIT(color_prom[palette.entries()], 6);
 		bit2 = BIT(color_prom[palette.entries()], 7);
 		bit3 = BIT(color_prom[0], 0);
 		bit4 = BIT(color_prom[0], 1);
-		int const g = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
-
+		g = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
 		bit0 = BIT(color_prom[palette.entries()], 0);
 		bit1 = BIT(color_prom[palette.entries()], 1);
 		bit2 = BIT(color_prom[palette.entries()], 2);
 		bit3 = BIT(color_prom[palette.entries()], 3);
 		bit4 = BIT(color_prom[palette.entries()], 4);
-		int const b = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
+		b = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
@@ -54,47 +53,53 @@ void ojankohs_state::ojankoy_palette(palette_device &palette) const
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_palette_w)
 {
+	int r, g, b;
+
 	m_paletteram[offset] = data;
 
 	offset &= 0x7fe;
 
-	int const r = (m_paletteram[offset + 0] & 0x7c) >> 2;
-	int const g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
-	int const b = (m_paletteram[offset + 1] & 0x1f) >> 0;
+	r = (m_paletteram[offset + 0] & 0x7c) >> 2;
+	g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
+	b = (m_paletteram[offset + 1] & 0x1f) >> 0;
 
 	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_MEMBER(ojankohs_state::ccasino_palette_w)
 {
+	int r, g, b;
+
 	offset = bitswap<11>(offset, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
 
 	m_paletteram[offset] = data;
 
 	offset &= 0x7fe;
 
-	int const r = (m_paletteram[offset + 0] & 0x7c) >> 2;
-	int const g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
-	int const b = (m_paletteram[offset + 1] & 0x1f) >> 0;
+	r = (m_paletteram[offset + 0] & 0x7c) >> 2;
+	g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
+	b = (m_paletteram[offset + 1] & 0x1f) >> 0;
 
 	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankoc_palette_w)
 {
-	if (m_paletteram[offset] != data)
-	{
-		m_paletteram[offset] = data;
-		m_screen_refresh = 1;
+	int r, g, b, color;
 
-		int const color = (m_paletteram[offset & 0x1e] << 8) | m_paletteram[offset | 0x01];
+	if (m_paletteram[offset] == data)
+		return;
 
-		int const r = (color >> 10) & 0x1f;
-		int const g = (color >>  5) & 0x1f;
-		int const b = (color >>  0) & 0x1f;
+	m_paletteram[offset] = data;
+	m_screen_refresh = 1;
 
-		m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
-	}
+	color = (m_paletteram[offset & 0x1e] << 8) | m_paletteram[offset | 0x01];
+
+	r = (color >> 10) & 0x1f;
+	g = (color >>  5) & 0x1f;
+	b = (color >>  0) & 0x1f;
+
+	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 

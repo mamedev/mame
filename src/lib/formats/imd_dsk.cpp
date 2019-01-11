@@ -433,9 +433,6 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	if(pos >= size)
 		return false;
 
-	int tracks, heads;
-	image->get_maximal_geometry(tracks, heads);
-
 	while(pos < size) {
 		uint8_t mode = img[pos++];
 		uint8_t track = img[pos++];
@@ -443,23 +440,8 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 		uint8_t sector_count = img[pos++];
 		uint8_t ssize = img[pos++];
 
-		if(track >= tracks)
-		{
-			osd_printf_error("imd_format: Track %d exceeds maximum of %d\n", track, tracks);
-			return false;
-		}
-
-		if((head & 0x3f) >= heads)
-		{
-			osd_printf_error("imd_format: Head %d exceeds maximum of %d\n", head & 0x3f, heads);
-			return false;
-		}
-
 		if(ssize == 0xff)
-		{
-			osd_printf_error("imd_format: Unsupported variable sector size on track %d head %d", track, head & 0x3f);
-			return false;
-		}
+			throw emu_fatalerror("imd_format: Unsupported variable sector size on track %d head %d", track, head);
 
 		uint32_t actual_size = ssize < 7 ? 128 << ssize : 8192;
 

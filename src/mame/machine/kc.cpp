@@ -384,7 +384,7 @@ void kc_state::update_0x08000()
 		/* IRM enabled */
 		LOG(("IRM enabled\n"));
 
-		membank("bank3")->set_base(&m_video_ram[0]);
+		membank("bank3")->set_base(m_video_ram);
 		space.install_readwrite_bank(0x8000, 0xbfff, "bank3");
 	}
 	else
@@ -485,12 +485,12 @@ void kc85_4_state::update_0x08000()
 		/* IRM enabled - has priority over RAM8 enabled */
 		LOG(("IRM enabled\n"));
 
-		uint8_t* ram_page = &m_video_ram[(BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14)];
+		uint8_t* ram_page = m_video_ram + ((BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14));
 
 		membank("bank3")->set_base(ram_page);
 		space.install_readwrite_bank(0x8000, 0xa7ff, "bank3");
 
-		membank("bank6")->set_base(&m_video_ram[0x2800]);
+		membank("bank6")->set_base(m_video_ram + 0x2800);
 		space.install_readwrite_bank(0xa800, 0xbfff, "bank6");
 	}
 	else if (m_pio_data[1] & (1<<5))

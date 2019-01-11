@@ -110,10 +110,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(_devcb) \
-	downcast<electron_cartslot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
+	devcb = &downcast<electron_cartslot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(_devcb) \
-	downcast<electron_cartslot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
+	devcb = &downcast<electron_cartslot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************

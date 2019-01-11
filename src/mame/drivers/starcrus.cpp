@@ -32,18 +32,18 @@ void starcrus_state::starcrus_map(address_map &map)
 
 void starcrus_state::starcrus_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("P1").w(FUNC(starcrus_state::s1_x_w));
-	map(0x01, 0x01).portr("P2").w(FUNC(starcrus_state::s1_y_w));
-	map(0x02, 0x02).rw(FUNC(starcrus_state::coll_det_r), FUNC(starcrus_state::s2_x_w));
-	map(0x03, 0x03).portr("DSW").w(FUNC(starcrus_state::s2_y_w));
-	map(0x04, 0x04).w(FUNC(starcrus_state::p1_x_w));
-	map(0x05, 0x05).w(FUNC(starcrus_state::p1_y_w));
-	map(0x06, 0x06).w(FUNC(starcrus_state::p2_x_w));
-	map(0x07, 0x07).w(FUNC(starcrus_state::p2_y_w));
-	map(0x08, 0x08).w(FUNC(starcrus_state::ship_parm_1_w));
-	map(0x09, 0x09).w(FUNC(starcrus_state::ship_parm_2_w));
-	map(0x0a, 0x0a).w(FUNC(starcrus_state::proj_parm_1_w));
-	map(0x0b, 0x0b).w(FUNC(starcrus_state::proj_parm_2_w));
+	map(0x00, 0x00).portr("P1").w(this, FUNC(starcrus_state::s1_x_w));
+	map(0x01, 0x01).portr("P2").w(this, FUNC(starcrus_state::s1_y_w));
+	map(0x02, 0x02).rw(this, FUNC(starcrus_state::coll_det_r), FUNC(starcrus_state::s2_x_w));
+	map(0x03, 0x03).portr("DSW").w(this, FUNC(starcrus_state::s2_y_w));
+	map(0x04, 0x04).w(this, FUNC(starcrus_state::p1_x_w));
+	map(0x05, 0x05).w(this, FUNC(starcrus_state::p1_y_w));
+	map(0x06, 0x06).w(this, FUNC(starcrus_state::p2_x_w));
+	map(0x07, 0x07).w(this, FUNC(starcrus_state::p2_y_w));
+	map(0x08, 0x08).w(this, FUNC(starcrus_state::ship_parm_1_w));
+	map(0x09, 0x09).w(this, FUNC(starcrus_state::ship_parm_2_w));
+	map(0x0a, 0x0a).w(this, FUNC(starcrus_state::proj_parm_1_w));
+	map(0x0b, 0x0b).w(this, FUNC(starcrus_state::proj_parm_2_w));
 }
 
 
@@ -140,34 +140,35 @@ static const char *const starcrus_sample_names[] =
 };
 
 
-void starcrus_state::starcrus(machine_config &config)
-{
+MACHINE_CONFIG_START(starcrus_state::starcrus)
+
 	/* basic machine hardware */
-	I8080(config, m_maincpu, 9750000/9);  /* 8224 chip is a divide by 9 */
-	m_maincpu->set_addrmap(AS_PROGRAM, &starcrus_state::starcrus_map);
-	m_maincpu->set_addrmap(AS_IO, &starcrus_state::starcrus_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(starcrus_state::irq0_line_hold));
+	MCFG_DEVICE_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
+	MCFG_DEVICE_PROGRAM_MAP(starcrus_map)
+	MCFG_DEVICE_IO_MAP(starcrus_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", starcrus_state,  irq0_line_hold)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(starcrus_state::screen_update));
-	screen.set_palette(m_palette);
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(starcrus_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_starcrus);
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_starcrus)
+
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(4);
-	m_samples->set_samples_names(starcrus_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("samples", SAMPLES)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(starcrus_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

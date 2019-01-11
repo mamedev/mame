@@ -48,7 +48,7 @@ WRITE_LINE_MEMBER(mjkjidai_state::adpcm_int)
 	else
 	{
 		uint8_t const data = m_adpcmrom[m_adpcm_pos / 2];
-		m_msm->write_data(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
+		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
 		m_adpcm_pos++;
 	}
 }
@@ -86,7 +86,7 @@ void mjkjidai_state::mjkjidai_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("nvram");   // cleared and initialized on startup if bit 6 of port 00 is 0
-	map(0xe000, 0xf7ff).ram().w(FUNC(mjkjidai_state::mjkjidai_videoram_w)).share("videoram");
+	map(0xe000, 0xf7ff).ram().w(this, FUNC(mjkjidai_state::mjkjidai_videoram_w)).share("videoram");
 }
 
 void mjkjidai_state::mjkjidai_io_map(address_map &map)
@@ -94,9 +94,9 @@ void mjkjidai_state::mjkjidai_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x13).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x40, 0x40).w(FUNC(mjkjidai_state::adpcm_w));
+	map(0x20, 0x20).w("sn1", FUNC(sn76489_device::write));
+	map(0x30, 0x30).w("sn2", FUNC(sn76489_device::write));
+	map(0x40, 0x40).w(this, FUNC(mjkjidai_state::adpcm_w));
 }
 
 
@@ -299,47 +299,52 @@ void mjkjidai_state::machine_reset()
 MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 10000000/2); /* 5 MHz ??? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &mjkjidai_state::mjkjidai_map);
-	m_maincpu->set_addrmap(AS_IO, &mjkjidai_state::mjkjidai_io_map);
+	MCFG_DEVICE_ADD("maincpu", Z80,10000000/2) /* 5 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(mjkjidai_map)
+	MCFG_DEVICE_IO_MAP(mjkjidai_io_map)
 
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
-	i8255_device &ppi1(I8255A(config, "ppi1"));
-	ppi1.in_pa_callback().set_ioport("KEYBOARD");
-	ppi1.out_pb_callback().set(FUNC(mjkjidai_state::keyboard_select_lo_w));
-	ppi1.out_pc_callback().set(FUNC(mjkjidai_state::keyboard_select_hi_w));
-	ppi1.in_pc_callback().set_ioport("IN2");
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("KEYBOARD"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mjkjidai_state, keyboard_select_lo_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mjkjidai_state, keyboard_select_hi_w))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
-	i8255_device &ppi2(I8255A(config, "ppi2"));
-	ppi2.out_pa_callback().set(FUNC(mjkjidai_state::mjkjidai_ctrl_w));  // rom bank, coin counter, flip screen etc
-	ppi2.in_pb_callback().set_ioport("DSW1");
-	ppi2.in_pc_callback().set_ioport("DSW2");
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0)
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mjkjidai_state, mjkjidai_ctrl_w))  // rom bank, coin counter, flip screen etc
+	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(3*8, 61*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(mjkjidai_state::screen_update_mjkjidai));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(mjkjidai_state::vblank_irq));
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(3*8, 61*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(mjkjidai_state, screen_update_mjkjidai)
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mjkjidai_state, vblank_irq))
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mjkjidai);
-	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x100);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mjkjidai)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76489(config, "sn2", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(mjkjidai_state::adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S64_4B);	/* 6kHz */
-	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
+	MCFG_DEVICE_ADD("sn2", SN76489, 10000000/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mjkjidai_state, adpcm_int))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6kHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
 
 /***************************************************************************
 

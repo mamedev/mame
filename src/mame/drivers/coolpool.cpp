@@ -17,8 +17,6 @@
     The second CPU in Cool Pool and 9 Ball Shootout is a TMS320C26; the code
     is the same in the two games.
 
-    The audio DAC is a Micro Power Systems MP1210HN.
-
     Cool Pool:
     - The checksum test routine is wrong, e.g. when it says to be testing
       4U/8U it is actually reading 4U/8U/3U/7U, when testing 3U/7U it
@@ -166,7 +164,8 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
 	if (!memcmp(nvram_unlock_seq, m_nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
 		m_nvram_write_enable = 1;
-		m_nvram_timer->adjust(attotime::from_msec(1000));
+		timer_device *nvram_timer = machine().device<timer_device>("nvram_timer");
+		nvram_timer->adjust(attotime::from_msec(1000));
 	}
 }
 
@@ -525,9 +524,9 @@ READ16_MEMBER(coolpool_state::coolpool_input_r)
 void coolpool_state::amerdart_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share("vram_base");
-	map(0x04000000, 0x0400000f).w(FUNC(coolpool_state::amerdart_misc_w));
+	map(0x04000000, 0x0400000f).w(this, FUNC(coolpool_state::amerdart_misc_w));
 	map(0x05000000, 0x0500000f).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
-	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0x06000000, 0x06007fff).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffb00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -538,9 +537,9 @@ void coolpool_state::coolpool_map(address_map &map)
 	map(0x00000000, 0x001fffff).ram().share("vram_base");
 	map(0x01000000, 0x010000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
 	map(0x02000000, 0x020000ff).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
-	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
+	map(0x03000000, 0x0300000f).w(this, FUNC(coolpool_state::coolpool_misc_w));
 	map(0x03000000, 0x03ffffff).rom().region("gfx1", 0);
-	map(0x06000000, 0x06007fff).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0x06000000, 0x06007fff).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -550,9 +549,9 @@ void coolpool_state::nballsht_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram_base");
 	map(0x02000000, 0x020000ff).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
-	map(0x03000000, 0x0300000f).w(FUNC(coolpool_state::coolpool_misc_w));
+	map(0x03000000, 0x0300000f).w(this, FUNC(coolpool_state::coolpool_misc_w));
 	map(0x04000000, 0x040000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
-	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
+	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff000000, 0xff7fffff).rom().region("gfx1", 0);
 	map(0xffc00000, 0xffffffff).rom().region("maincpu", 0);
@@ -575,12 +574,12 @@ void coolpool_state::amerdart_dsp_pgm_map(address_map &map)
 
 void coolpool_state::amerdart_dsp_io_map(address_map &map)
 {
-	map(0x00, 0x01).w(FUNC(coolpool_state::dsp_romaddr_w));
+	map(0x00, 0x01).w(this, FUNC(coolpool_state::dsp_romaddr_w));
 	map(0x02, 0x02).w(m_dsp2main, FUNC(generic_latch_16_device::write));
-	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::data_w));
-	map(0x04, 0x04).r(FUNC(coolpool_state::dsp_rom_r));
+	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::write));
+	map(0x04, 0x04).r(this, FUNC(coolpool_state::dsp_rom_r));
 	map(0x05, 0x05).portr("IN0");
-	map(0x06, 0x06).r(FUNC(coolpool_state::amerdart_trackball_r));
+	map(0x06, 0x06).r(this, FUNC(coolpool_state::amerdart_trackball_r));
 	map(0x07, 0x07).r(m_main2dsp, FUNC(generic_latch_16_device::read));
 }
 
@@ -593,10 +592,10 @@ void coolpool_state::coolpool_dsp_pgm_map(address_map &map)
 
 void coolpool_state::coolpool_dsp_io_base_map(address_map &map)
 {
-	map(0x00, 0x01).w(FUNC(coolpool_state::dsp_romaddr_w));
+	map(0x00, 0x01).w(this, FUNC(coolpool_state::dsp_romaddr_w));
 	map(0x02, 0x02).r(m_main2dsp, FUNC(generic_latch_16_device::read)).w(m_dsp2main, FUNC(generic_latch_16_device::write));
-	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::data_w));
-	map(0x04, 0x04).r(FUNC(coolpool_state::dsp_rom_r));
+	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::write));
+	map(0x04, 0x04).r(this, FUNC(coolpool_state::dsp_rom_r));
 	map(0x05, 0x05).portr("IN0");
 }
 
@@ -604,7 +603,7 @@ void coolpool_state::coolpool_dsp_io_base_map(address_map &map)
 void coolpool_state::coolpool_dsp_io_map(address_map &map)
 {
 	coolpool_dsp_io_base_map(map);
-	map(0x07, 0x07).r(FUNC(coolpool_state::coolpool_input_r));
+	map(0x07, 0x07).r(this, FUNC(coolpool_state::coolpool_input_r));
 }
 
 
@@ -716,31 +715,30 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(coolpool_state::amerdart)
 
 	/* basic machine hardware */
-	TMS34010(config, m_maincpu, XTAL(40'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::amerdart_map);
-	m_maincpu->set_halt_on_reset(false);
-	m_maincpu->set_pixel_clock(XTAL(40'000'000)/12);
-	m_maincpu->set_pixels_per_clock(2);
-	m_maincpu->set_scanline_rgb32_callback(FUNC(coolpool_state::amerdart_scanline));
-	m_maincpu->set_shiftreg_in_callback(FUNC(coolpool_state::to_shiftreg));
-	m_maincpu->set_shiftreg_out_callback(FUNC(coolpool_state::from_shiftreg));
+	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(amerdart_map)
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/12) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, amerdart_scanline) /* scanline callback (rgb32) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
 
-	tms32015_device &dsp(TMS32015(config, m_dsp, XTAL(40'000'000)/2));
-	dsp.set_addrmap(AS_PROGRAM, &coolpool_state::amerdart_dsp_pgm_map);
+	MCFG_DEVICE_ADD("dsp", TMS32015, XTAL(40'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(amerdart_dsp_pgm_map)
 	/* Data Map is internal to the CPU */
-	dsp.set_addrmap(AS_IO, &coolpool_state::amerdart_dsp_io_map);
-	dsp.bio().set(FUNC(coolpool_state::amerdart_dsp_bio_line_r));
-
+	MCFG_DEVICE_IO_MAP(amerdart_dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, coolpool_state, amerdart_dsp_bio_line_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
 
-	GENERIC_LATCH_16(config, m_main2dsp);
-	GENERIC_LATCH_16(config, m_dsp2main);
-	m_dsp2main->data_pending_callback().set_inputline(m_maincpu, 1);
+	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
+	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
+	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -749,7 +747,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -758,37 +756,37 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(coolpool_state::coolpool)
 
 	/* basic machine hardware */
-	TMS34010(config, m_maincpu, XTAL(40'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_map);
-	m_maincpu->set_halt_on_reset(false);
-	m_maincpu->set_pixel_clock(XTAL(40'000'000)/6);
-	m_maincpu->set_pixels_per_clock(1);
-	m_maincpu->set_scanline_rgb32_callback(FUNC(coolpool_state::coolpool_scanline));
-	m_maincpu->set_shiftreg_in_callback(FUNC(coolpool_state::to_shiftreg));
-	m_maincpu->set_shiftreg_out_callback(FUNC(coolpool_state::from_shiftreg));
+	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(coolpool_map)
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
+	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/6) /* pixel clock */
+	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
+	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, coolpool_scanline) /* scanline callback (rgb32) */
+	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
+	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
 
-	tms32026_device& dsp(TMS32026(config, m_dsp, XTAL(40'000'000)));
-	dsp.set_addrmap(AS_PROGRAM, &coolpool_state::coolpool_dsp_pgm_map);
-	dsp.set_addrmap(AS_IO, &coolpool_state::coolpool_dsp_io_map);
-	dsp.bio_in_cb().set(FUNC(coolpool_state::dsp_bio_line_r));
-	dsp.hold_in_cb().set(FUNC(coolpool_state::dsp_hold_line_r));
-//  dsp.hold_ack_out_cb().set(FUNC(coolpool_state::dsp_HOLDA_signal_w));
+	MCFG_DEVICE_ADD("dsp", TMS32026,XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(coolpool_dsp_pgm_map)
+	MCFG_DEVICE_IO_MAP(coolpool_dsp_io_map)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, coolpool_state, dsp_bio_line_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, coolpool_state, dsp_hold_line_r))
+//  MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, coolpool_state, dsp_HOLDA_signal_w))
 
-	GENERIC_LATCH_16(config, m_main2dsp);
-	m_main2dsp->data_pending_callback().set_inputline(m_dsp, 0); /* ???  I have no idea who should generate this! */
+	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("dsp", 0)) /* ???  I have no idea who should generate this! */
 															/* the DSP polls the status bit so it isn't strictly */
 															/* necessary to also have an IRQ */
 
-	GENERIC_LATCH_16(config, m_dsp2main);
-	m_dsp2main->data_pending_callback().set_inputline(m_maincpu, 1);
+	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
+	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240)
@@ -796,18 +794,21 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", MP1210, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-void coolpool_state::_9ballsht(machine_config &config)
-{
+MACHINE_CONFIG_START(coolpool_state::_9ballsht)
 	coolpool(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &coolpool_state::nballsht_map);
-	m_dsp->set_addrmap(AS_IO, &coolpool_state::nballsht_dsp_io_map);
-}
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nballsht_map)
+
+	MCFG_DEVICE_MODIFY("dsp")
+	MCFG_DEVICE_IO_MAP(nballsht_dsp_io_map)
+MACHINE_CONFIG_END
 
 
 

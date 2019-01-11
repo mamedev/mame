@@ -5,12 +5,28 @@
 
 #pragma once
 
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+/* TODO: frequency */
+#define MCFG_M6M80011AP_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, M6M80011AP, XTAL(32'768))
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> m6m80011ap_device
+
 class m6m80011ap_device :   public device_t,
 							public device_nvram_interface
 {
 public:
 	// construction/destruction
-	m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768); /* TODO: frequency */
+	m6m80011ap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_READ_LINE_MEMBER( read_bit );
@@ -52,6 +68,8 @@ private:
 	uint16_t m_eeprom_data[0x80];
 };
 
+
+// device type definition
 DECLARE_DEVICE_TYPE(M6M80011AP, m6m80011ap_device)
 
 #endif // MAME_MACHINE_M6M80011AP_H

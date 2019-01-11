@@ -16,13 +16,10 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 #include "machine/8042kbdc.h"
 // floppy disk controller
 #include "machine/upd765.h"
-#include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 // parallel port
 #include "machine/pc_lpt.h"
-// serial port
-#include "machine/ins8250.h"
 
 // make sure that pckeybrd.cpp 8042kbdc.cpp are present in project
 
@@ -31,22 +28,16 @@ class fdc37c93x_device : public device_t, public device_isa16_card_interface
 public:
 	fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~fdc37c93x_device() {}
+	static void static_set_sysopt_pin(device_t &device, int value) { dynamic_cast<fdc37c93x_device &>(device).sysopt_pin = value; }
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	void set_sysopt_pin(int value) { sysopt_pin = value; }
-	auto gp20_reset() { return m_gp20_reset_callback.bind(); }
-	auto gp25_gatea20() { return m_gp25_gatea20_callback.bind(); }
-	auto irq1() { return m_irq1_callback.bind(); }
-	auto irq8() { return m_irq8_callback.bind(); }
-	auto irq9() { return m_irq9_callback.bind(); }
-	auto txd1() { return m_txd1_callback.bind(); }
-	auto ndtr1() { return m_ndtr1_callback.bind(); }
-	auto nrts1() { return m_nrts1_callback.bind(); }
-	auto txd2() { return m_txd2_callback.bind(); }
-	auto ndtr2() { return m_ndtr2_callback.bind(); }
-	auto nrts2() { return m_nrts2_callback.bind(); }
+	template <class Object> devcb_base &set_gp20_reset_callback(Object &&cb) { return m_gp20_reset_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_gp25_gatea20_callback(Object &&cb) { return m_gp25_gatea20_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq1_callback(Object &&cb) { return m_irq1_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq8_callback(Object &&cb) { return m_irq8_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq9_callback(Object &&cb) { return m_irq9_callback.set_callback(std::forward<Object>(cb)); }
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
@@ -58,26 +49,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq_floppy_w);
 	// for the internal parallel port
 	DECLARE_WRITE_LINE_MEMBER(irq_parallel_w);
-	// for the internal uarts
-	DECLARE_WRITE_LINE_MEMBER(irq_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial1_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(txd_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(dtr_serial2_w);
-	DECLARE_WRITE_LINE_MEMBER(rts_serial2_w);
-	// chip pins for uarts
-	DECLARE_WRITE_LINE_MEMBER(rxd1_w);
-	DECLARE_WRITE_LINE_MEMBER(ndcd1_w);
-	DECLARE_WRITE_LINE_MEMBER(ndsr1_w);
-	DECLARE_WRITE_LINE_MEMBER(nri1_w);
-	DECLARE_WRITE_LINE_MEMBER(ncts1_w);
-	DECLARE_WRITE_LINE_MEMBER(rxd2_w);
-	DECLARE_WRITE_LINE_MEMBER(ndcd2_w);
-	DECLARE_WRITE_LINE_MEMBER(ndsr2_w);
-	DECLARE_WRITE_LINE_MEMBER(nri2_w);
-	DECLARE_WRITE_LINE_MEMBER(ncts2_w);
 	// rtc
 	DECLARE_WRITE_LINE_MEMBER(irq_rtc_w);
 	// keyboard
@@ -87,9 +58,9 @@ public:
 
 	void unmap_fdc(address_map &map);
 	void map_lpt(address_map &map);
-	void map_serial1(address_map &map);
-	void map_serial2(address_map &map);
+	void unmap_lpt(address_map &map);
 	void map_rtc(address_map &map);
+	void unmap_rtc(address_map &map);
 	void map_keyboard(address_map &map);
 	void unmap_keyboard(address_map &map);
 
@@ -97,10 +68,6 @@ public:
 	DECLARE_WRITE8_MEMBER(disabled_write);
 	DECLARE_READ8_MEMBER(lpt_read);
 	DECLARE_WRITE8_MEMBER(lpt_write);
-	DECLARE_READ8_MEMBER(serial1_read);
-	DECLARE_WRITE8_MEMBER(serial1_write);
-	DECLARE_READ8_MEMBER(serial2_read);
-	DECLARE_WRITE8_MEMBER(serial2_write);
 	DECLARE_READ8_MEMBER(rtc_read);
 	DECLARE_WRITE8_MEMBER(rtc_write);
 	DECLARE_READ8_MEMBER(at_keybc_r);
@@ -149,16 +116,8 @@ private:
 	devcb_write_line m_irq1_callback;
 	devcb_write_line m_irq8_callback;
 	devcb_write_line m_irq9_callback;
-	devcb_write_line m_txd1_callback;
-	devcb_write_line m_ndtr1_callback;
-	devcb_write_line m_nrts1_callback;
-	devcb_write_line m_txd2_callback;
-	devcb_write_line m_ndtr2_callback;
-	devcb_write_line m_nrts2_callback;
 	required_device<pc_fdc_interface> floppy_controller_fdcdev;
 	required_device<pc_lpt_device> pc_lpt_lptdev;
-	required_device<ns16450_device> pc_serial1_comdev;
-	required_device<ns16450_device> pc_serial2_comdev;
 	required_device<ds12885_device> ds12885_rtcdev;
 	required_device<kbdc8042_device> m_kbdc;
 	int sysopt_pin;
@@ -172,10 +131,6 @@ private:
 	void unmap_fdc_addresses();
 	void map_lpt_addresses();
 	void unmap_lpt_addresses();
-	void map_serial1_addresses();
-	void unmap_serial1_addresses();
-	void map_serial2_addresses();
-	void unmap_serial2_addresses();
 	void map_rtc_addresses();
 	void unmap_rtc_addresses();
 	void map_keyboard_addresses();
@@ -186,8 +141,8 @@ private:
 	void write_ide1_configuration_register(int index, int data) {}
 	void write_ide2_configuration_register(int index, int data) {}
 	void write_parallel_configuration_register(int index, int data);
-	void write_serial1_configuration_register(int index, int data);
-	void write_serial2_configuration_register(int index, int data);
+	void write_serial1_configuration_register(int index, int data) {}
+	void write_serial2_configuration_register(int index, int data) {}
 	void write_rtc_configuration_register(int index, int data);
 	void write_keyboard_configuration_register(int index, int data);
 	void write_auxio_configuration_register(int index, int data);
@@ -205,5 +160,26 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device);
+
+#define MCFG_FDC37C93X_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, FDC37C93X, 0)
+
+#define MCFG_FDC37C93X_SYSOPT(_pinvalue) \
+	fdc37c93x_device::static_set_sysopt_pin(*device, _pinvalue);
+
+#define MCFG_FDC37C93X_GP20_RESET_CB(_devcb) \
+	devcb = &downcast<fdc37c93x_device &>(*device).set_gp20_reset_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_GP25_GATEA20_CB(_devcb) \
+	devcb = &downcast<fdc37c93x_device &>(*device).set_gp25_gatea20_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_IRQ1_CB(_devcb) \
+	devcb = &downcast<fdc37c93x_device &>(*device).set_irq1_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_IRQ8_CB(_devcb) \
+	devcb = &downcast<fdc37c93x_device &>(*device).set_irq8_callback(DEVCB_##_devcb);
+
+#define MCFG_FDC37C93X_IRQ9_CB(_devcb) \
+	devcb = &downcast<fdc37c93x_device &>(*device).set_irq9_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_FDC37C93X_H

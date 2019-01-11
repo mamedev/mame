@@ -5,15 +5,10 @@
     Sigma Spiders hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_SPIDERS_H
-#define MAME_INCLUDES_SPIDERS_H
-
-#pragma once
 
 #include "machine/6821pia.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"
-#include "emupal.h"
 
 class spiders_state : public driver_device
 {
@@ -61,5 +56,3 @@ private:
 	uint8_t m_gfx_rom_ctrl_latch;
 	uint8_t m_gfx_rom_ctrl_data;
 };
-
-#endif // MAME_INCLUDES_SPIDERS_H

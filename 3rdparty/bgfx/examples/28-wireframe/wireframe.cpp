@@ -49,7 +49,7 @@ struct Camera
 
 	void mtxLookAt(float* _outViewMtx)
 	{
-		bx::mtxLookAt(_outViewMtx, bx::load(m_pos.curr), bx::load(m_target.curr) );
+		bx::mtxLookAt(_outViewMtx, m_pos.curr, m_target.curr);
 	}
 
 	void orbit(float _dx, float _dy)
@@ -116,7 +116,7 @@ struct Camera
 		bx::vec3ToLatLong(&ll[0], &ll[1], toPosNorm);
 		ll[0] += consume[0];
 		ll[1] -= consume[1];
-		ll[1]  = bx::clamp(ll[1], 0.02f, 0.98f);
+		ll[1]  = bx::fclamp(ll[1], 0.02f, 0.98f);
 
 		float tmp[3];
 		bx::vec3FromLatLong(tmp, ll[0], ll[1]);
@@ -136,16 +136,16 @@ struct Camera
 
 	void update(float _dt)
 	{
-		const float amount = bx::min(_dt/0.12f, 1.0f);
+		const float amount = bx::fmin(_dt/0.12f, 1.0f);
 
 		consumeOrbit(amount);
 
-		m_target.curr[0] = bx::lerp(m_target.curr[0], m_target.dest[0], amount);
-		m_target.curr[1] = bx::lerp(m_target.curr[1], m_target.dest[1], amount);
-		m_target.curr[2] = bx::lerp(m_target.curr[2], m_target.dest[2], amount);
-		m_pos.curr[0]    = bx::lerp(m_pos.curr[0], m_pos.dest[0], amount);
-		m_pos.curr[1]    = bx::lerp(m_pos.curr[1], m_pos.dest[1], amount);
-		m_pos.curr[2]    = bx::lerp(m_pos.curr[2], m_pos.dest[2], amount);
+		m_target.curr[0] = bx::flerp(m_target.curr[0], m_target.dest[0], amount);
+		m_target.curr[1] = bx::flerp(m_target.curr[1], m_target.dest[1], amount);
+		m_target.curr[2] = bx::flerp(m_target.curr[2], m_target.dest[2], amount);
+		m_pos.curr[0] = bx::flerp(m_pos.curr[0], m_pos.dest[0], amount);
+		m_pos.curr[1] = bx::flerp(m_pos.curr[1], m_pos.dest[1], amount);
+		m_pos.curr[2] = bx::flerp(m_pos.curr[2], m_pos.dest[2], amount);
 	}
 
 	struct Interp3f
@@ -303,13 +303,8 @@ public:
 			| BGFX_RESET_MSAA_X16
 			;
 
-		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.resolution.width  = m_width;
-		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
-		bgfx::init(init);
+		bgfx::init(args.m_type, args.m_pciId);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable m_debug text.
 		bgfx::setDebug(m_debug);
@@ -390,15 +385,12 @@ public:
 
 			ImGui::SetNextWindowPos(
 				  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
-				, ImGuiCond_FirstUseEver
-				);
-			ImGui::SetNextWindowSize(
-				  ImVec2(m_width / 5.0f, m_height * 0.75f)
-				, ImGuiCond_FirstUseEver
+				, ImGuiSetCond_FirstUseEver
 				);
 			ImGui::Begin("Settings"
 				, NULL
-				, 0
+				, ImVec2(m_width / 5.0f, m_height * 0.75f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
 			ImGui::Separator();
@@ -480,9 +472,9 @@ public:
 			if (DrawMode::Wireframe == m_drawMode)
 			{
 				uint64_t state = 0
-					| BGFX_STATE_WRITE_RGB
-					| BGFX_STATE_WRITE_A
-					| BGFX_STATE_WRITE_Z
+					| BGFX_STATE_RGB_WRITE
+					| BGFX_STATE_ALPHA_WRITE
+					| BGFX_STATE_DEPTH_WRITE
 					| BGFX_STATE_CULL_CCW
 					| BGFX_STATE_MSAA
 					| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
@@ -492,10 +484,10 @@ public:
 			else
 			{
 				uint64_t state = 0
-					| BGFX_STATE_WRITE_RGB
-					| BGFX_STATE_WRITE_A
+					| BGFX_STATE_RGB_WRITE
+					| BGFX_STATE_ALPHA_WRITE
 					| BGFX_STATE_DEPTH_TEST_LESS
-					| BGFX_STATE_WRITE_Z
+					| BGFX_STATE_DEPTH_WRITE
 					| BGFX_STATE_CULL_CCW
 					| BGFX_STATE_MSAA
 					;

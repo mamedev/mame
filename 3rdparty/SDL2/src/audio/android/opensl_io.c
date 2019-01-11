@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <limits.h>
-#include <string.h>
 #include "opensl_io.h"
 #define CONV16BIT 32768 
 #define CONVMYFLT (1./32768.)

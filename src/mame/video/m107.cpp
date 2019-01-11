@@ -122,7 +122,9 @@ WRITE16_MEMBER(m107_state::control_w)
 
 void m107_state::video_start()
 {
-	for (int laynum = 0; laynum < 4; laynum++)
+	int laynum;
+
+	for (laynum = 0; laynum < 4; laynum++)
 	{
 		pf_layer_info *layer = &m_pf_layer[laynum];
 
@@ -141,9 +143,12 @@ void m107_state::video_start()
 			layer->tmap->set_transparent_pen(0);
 	}
 
+	m_buffered_spriteram = make_unique_clear<uint16_t[]>(0x1000/2);
+
 	save_item(NAME(m_sprite_display));
 	save_item(NAME(m_raster_irq_position));
 	save_item(NAME(m_control));
+	save_pointer(NAME(m_buffered_spriteram.get()), 0x1000/2);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -155,9 +160,9 @@ void m107_state::video_start()
 
 void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint16_t *spriteram = m_spriteram->buffer();
+	uint16_t *spriteram = m_buffered_spriteram.get();
 	int offs;
-	const uint8_t *rom = m_sprtable_rom;
+	uint8_t *rom = m_user1_ptr;
 
 	for (offs = 0;offs < 0x800;offs += 4)
 	{
@@ -218,7 +223,7 @@ void m107_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const
 
 			if (rom[rom_offs+1] || rom[rom_offs+3] || rom[rom_offs+5] || rom[rom_offs+7])
 			{
-				while (rom_offs < m_sprtable_rom.length())  /* safety check */
+				while (rom_offs < 0x40000)  /* safety check */
 				{
 					/*
 					[1]
@@ -380,7 +385,7 @@ WRITE16_MEMBER(m107_state::spritebuffer_w)
 //      logerror("%s: buffered spriteram\n",m_maincpu->pc());
 		m_sprite_display    = (!(data & 0x1000));
 
-		m_spriteram->copy();
+		memcpy(m_buffered_spriteram.get(), m_spriteram, 0x1000);
 	}
 }
 

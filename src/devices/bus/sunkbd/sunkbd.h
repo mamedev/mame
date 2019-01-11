@@ -8,6 +8,10 @@
 #include "diserial.h"
 
 
+#define MCFG_SUNKBD_RXD_HANDLER(cb) \
+	devcb = &downcast<sun_keyboard_port_device &>(*device).set_rxd_handler(DEVCB_##cb);
+
+
 class device_sun_keyboard_port_interface;
 
 
@@ -28,8 +32,8 @@ public:
 	sun_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sun_keyboard_port_device();
 
-	// configuration helpers
-	auto rxd_handler() { return m_rxd_handler.bind(); }
+	// static configuration helpers
+	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 
@@ -38,10 +42,9 @@ public:
 protected:
 	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_config_complete() override;
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
+	virtual void device_config_complete() override;
 
 	int m_rxd;
 
@@ -59,12 +62,12 @@ class device_sun_keyboard_port_interface : public device_slot_card_interface
 public:
 	virtual ~device_sun_keyboard_port_interface() override;
 
-protected:
-	device_sun_keyboard_port_interface(machine_config const &mconfig, device_t &device);
-
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
 
 	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
+
+protected:
+	device_sun_keyboard_port_interface(machine_config const &mconfig, device_t &device);
 
 	sun_keyboard_port_device *m_port;
 

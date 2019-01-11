@@ -44,17 +44,14 @@ For BIOS CRC confirmation
 class pv2000_state : public driver_device
 {
 public:
-	pv2000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	pv2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
 		m_cart(*this, "cartslot"),
 		m_last_state(0)
-	{ }
+		{ }
 
-	void pv2000(machine_config &config);
-
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
@@ -73,6 +70,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
+	void pv2000(machine_config &config);
 	void pv2000_io_map(address_map &map);
 	void pv2000_map(address_map &map);
 };
@@ -184,8 +182,8 @@ void pv2000_state::pv2000_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 
-	map(0x4000, 0x4000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x4001, 0x4001).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x4000, 0x4000).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0x4001, 0x4001).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
 
 	map(0x7000, 0x7fff).ram();
 	//AM_RANGE(0x8000, 0xbfff) ext ram?
@@ -198,17 +196,17 @@ void pv2000_state::pv2000_io_map(address_map &map)
 	map.global_mask(0xff);
 
 	//theres also printer and tape I/O (TODO)
-	map(0x00, 0x00).w(FUNC(pv2000_state::cass_conf_w));
+	map(0x00, 0x00).w(this, FUNC(pv2000_state::cass_conf_w));
 
 	//keyboard/joystick
-	map(0x10, 0x10).r(FUNC(pv2000_state::keys_hi_r));
-	map(0x20, 0x20).rw(FUNC(pv2000_state::keys_lo_r), FUNC(pv2000_state::keys_w));
+	map(0x10, 0x10).r(this, FUNC(pv2000_state::keys_hi_r));
+	map(0x20, 0x20).rw(this, FUNC(pv2000_state::keys_lo_r), FUNC(pv2000_state::keys_w));
 
 	//sn76489a
-	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0x40, 0x40).r(this, FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::write));
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
-	map(0x60, 0x60).rw(FUNC(pv2000_state::cass_in), FUNC(pv2000_state::cass_out));
+	map(0x60, 0x60).rw(this, FUNC(pv2000_state::cass_in), FUNC(pv2000_state::cass_out));
 }
 
 
@@ -394,11 +392,11 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	MCFG_DEVICE_IO_MAP(pv2000_io_map)
 
 	// video hardware
-	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
-	vdp.set_screen("screen");
-	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(pv2000_state::pv2000_vdp_interrupt));
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
+	MCFG_TMS9928A_VRAM_SIZE(0x4000)
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, pv2000_state, pv2000_vdp_interrupt))
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

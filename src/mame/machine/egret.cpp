@@ -68,14 +68,14 @@ ROM_END
 
 void egret_device::egret_map(address_map &map)
 {
-	map(0x0000, 0x0002).rw(FUNC(egret_device::ports_r), FUNC(egret_device::ports_w));
-	map(0x0004, 0x0006).rw(FUNC(egret_device::ddr_r), FUNC(egret_device::ddr_w));
-	map(0x0007, 0x0007).rw(FUNC(egret_device::pll_r), FUNC(egret_device::pll_w));
-	map(0x0008, 0x0008).rw(FUNC(egret_device::timer_ctrl_r), FUNC(egret_device::timer_ctrl_w));
-	map(0x0009, 0x0009).rw(FUNC(egret_device::timer_counter_r), FUNC(egret_device::timer_counter_w));
-	map(0x0012, 0x0012).rw(FUNC(egret_device::onesec_r), FUNC(egret_device::onesec_w));
+	map(0x0000, 0x0002).rw(this, FUNC(egret_device::ports_r), FUNC(egret_device::ports_w));
+	map(0x0004, 0x0006).rw(this, FUNC(egret_device::ddr_r), FUNC(egret_device::ddr_w));
+	map(0x0007, 0x0007).rw(this, FUNC(egret_device::pll_r), FUNC(egret_device::pll_w));
+	map(0x0008, 0x0008).rw(this, FUNC(egret_device::timer_ctrl_r), FUNC(egret_device::timer_ctrl_w));
+	map(0x0009, 0x0009).rw(this, FUNC(egret_device::timer_counter_r), FUNC(egret_device::timer_counter_w));
+	map(0x0012, 0x0012).rw(this, FUNC(egret_device::onesec_r), FUNC(egret_device::onesec_w));
 	map(0x0090, 0x00ff).ram();                         // work RAM and stack
-	map(0x0100, 0x01ff).rw(FUNC(egret_device::pram_r), FUNC(egret_device::pram_w));
+	map(0x0100, 0x01ff).rw(this, FUNC(egret_device::pram_r), FUNC(egret_device::pram_w));
 	map(0x0f00, 0x1fff).rom().region(EGRET_CPU_TAG, 0);
 }
 

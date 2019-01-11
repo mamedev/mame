@@ -79,7 +79,6 @@
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "cpu/adsp2100/adsp2100.h"
-#include "emupal.h"
 #include "screen.h"
 
 
@@ -94,25 +93,25 @@ class wms_state : public driver_device
 {
 public:
 	wms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+	: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu")
 	{ }
 
-	void wms(machine_config &config);
-
 	void init_wms();
-
-private:
 	DECLARE_READ8_MEMBER(test_r);
-	uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+		uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void adsp_data_map(address_map &map);
-	void adsp_program_map(address_map &map);
-	void wms_io(address_map &map);
-	void wms_map(address_map &map);
+		void wms(machine_config &config);
+		void adsp_data_map(address_map &map);
+		void adsp_program_map(address_map &map);
+		void wms_io(address_map &map);
+		void wms_map(address_map &map);
+protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+
+private:
 };
 
 uint32_t wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -137,7 +136,7 @@ READ8_MEMBER(wms_state::test_r)
 
 void wms_state::wms_io(address_map &map)
 {
-	map(0x1207, 0x1207).r(FUNC(wms_state::test_r));
+	map(0x1207, 0x1207).r(this, FUNC(wms_state::test_r));
 }
 
 

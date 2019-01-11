@@ -5,18 +5,12 @@
     Kyugo hardware games
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_KYUGO_H
-#define MAME_INCLUDES_KYUGO_H
-
-#pragma once
-
-#include "emupal.h"
 
 class kyugo_state : public driver_device
 {
 public:
-	kyugo_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+	kyugo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_bgattribram(*this, "bgattribram"),
@@ -26,19 +20,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_palette(*this, "palette")  { }
 
-	void kyugo_base(machine_config &config);
-	void repulse(machine_config &config);
-	void flashgala(machine_config &config);
-	void srdmissn(machine_config &config);
-	void legend(machine_config &config);
-	void gyrodine(machine_config &config);
-
-	void init_srdmissn();
-
-private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
@@ -50,9 +33,17 @@ private:
 	DECLARE_WRITE8_MEMBER(scroll_y_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
+	void init_srdmissn();
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
+	void kyugo_base(machine_config &config);
+	void repulse(machine_config &config);
+	void flashgala(machine_config &config);
+	void srdmissn(machine_config &config);
+	void legend(machine_config &config);
+	void gyrodine(machine_config &config);
 	void flashgala_sub_map(address_map &map);
 	void flashgala_sub_portmap(address_map &map);
 	void gyrodine_main_map(address_map &map);
@@ -65,11 +56,12 @@ private:
 	void repulse_sub_portmap(address_map &map);
 	void srdmissn_sub_map(address_map &map);
 	void srdmissn_sub_portmap(address_map &map);
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fgvideoram;
 	required_shared_ptr<uint8_t> m_bgvideoram;
@@ -100,5 +92,3 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-#endif // MAME_INCLUDES_KYUGO_H

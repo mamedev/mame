@@ -30,37 +30,37 @@
 
 ***************************************************************************/
 
-void docastle_state::docastle_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(docastle_state, docastle)
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
+	int i;
 
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2;
+		int bit0, bit1, bit2, r, g, b;
 
-		// red component
-		bit0 = BIT(color_prom[i], 5);
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const r = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
-
-		// green component
-		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i], 3);
-		bit2 = BIT(color_prom[i], 4);
-		int const g = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
-
-		// blue component
+		/* red component */
+		bit0 = (*color_prom >> 5) & 0x01;
+		bit1 = (*color_prom >> 6) & 0x01;
+		bit2 = (*color_prom >> 7) & 0x01;
+		r = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
+		/* green component */
+		bit0 = (*color_prom >> 2) & 0x01;
+		bit1 = (*color_prom >> 3) & 0x01;
+		bit2 = (*color_prom >> 4) & 0x01;
+		g = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
+		/* blue component */
 		bit0 = 0;
-		bit1 = BIT(color_prom[i], 0);
-		bit2 = BIT(color_prom[i], 1);
-		int const b = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
+		bit1 = (*color_prom >> 0) & 0x01;
+		bit2 = (*color_prom >> 1) & 0x01;
+		b = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
 
 		/* because the graphics are decoded as 4bpp with the top bit used for transparency
 		   or priority, we create matching 3bpp sets of palette entries, which effectively
 		   ignores the value of the top bit */
-		palette.set_pen_color(((i & 0xf8) << 1) | 0x00 | (i & 0x07), rgb_t(r, g, b));
-		palette.set_pen_color(((i & 0xf8) << 1) | 0x08 | (i & 0x07), rgb_t(r, g, b));
+		palette.set_pen_color(((i & 0xf8) << 1) | 0x00 | (i & 0x07), rgb_t(r,g,b));
+		palette.set_pen_color(((i & 0xf8) << 1) | 0x08 | (i & 0x07), rgb_t(r,g,b));
+		color_prom++;
 	}
 }
 

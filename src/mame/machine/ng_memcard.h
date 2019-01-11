@@ -13,9 +13,21 @@
 #pragma once
 
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_NEOGEO_MEMCARD_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, NG_MEMCARD, 0)
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
 // ======================> ng_memcard_device
 
-class ng_memcard_device : public device_t, public device_image_interface
+class ng_memcard_device :  public device_t,
+							public device_image_interface
 {
 public:
 	// construction/destruction
@@ -23,7 +35,6 @@ public:
 
 	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
 
-	// device_image_interface implementation
 	virtual bool is_readable()  const override { return true; }
 	virtual bool is_writeable() const override { return true; }
 	virtual bool is_creatable() const override { return true; }
@@ -35,16 +46,14 @@ public:
 	virtual void call_unload() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
-	// bus interface
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-
-	bool present() { return is_loaded(); }
-
-protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
+
+	/* returns the index of the current memory card, or -1 if none */
+	int present() { return is_loaded() ? 0 : -1; }
 private:
 	uint8_t m_memcard_data[0x800];
 };

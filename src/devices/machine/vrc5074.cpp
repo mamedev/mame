@@ -100,7 +100,7 @@
 #define NINT_PCIS           (14)
 #define NINT_PCIE           (15)
 
-#define TIMER_PERIOD        attotime::from_hz(clock())
+#define TIMER_PERIOD        attotime::from_hz(SYSTEM_CLOCK)
 
 #define PCI_BUS_CLOCK        33000000
 // Number of dma words to transfer at a time, real hardware bursts 8
@@ -123,51 +123,48 @@ DEFINE_DEVICE_TYPE(VRC5074, vrc5074_device, "vrc5074", "NEC VRC5074 System Contr
 void vrc5074_device::config_map(address_map &map)
 {
 	pci_bridge_device::config_map(map);
-	map(0x00000018, 0x00000027).rw(FUNC(vrc5074_device::sdram_addr_r), FUNC(vrc5074_device::sdram_addr_w));
+	map(0x00000018, 0x00000027).rw(this, FUNC(vrc5074_device::sdram_addr_r), FUNC(vrc5074_device::sdram_addr_w));
 }
 
 // cpu i/f map
 void vrc5074_device::cpu_map(address_map &map)
 {
-	map(0x00000000, 0x000001ff).rw(FUNC(vrc5074_device::cpu_reg_r), FUNC(vrc5074_device::cpu_reg_w));
+	map(0x00000000, 0x000001ff).rw(this, FUNC(vrc5074_device::cpu_reg_r), FUNC(vrc5074_device::cpu_reg_w));
 }
 
 void vrc5074_device::serial_map(address_map &map)
 {
-	map(0x00000000, 0x0000003f).rw(FUNC(vrc5074_device::serial_r), FUNC(vrc5074_device::serial_w));
+	map(0x00000000, 0x0000003f).rw(this, FUNC(vrc5074_device::serial_r), FUNC(vrc5074_device::serial_w));
 }
 
 // Target Window 1 map
 void vrc5074_device::target1_map(address_map &map)
 {
-	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc5074_device::target1_r), FUNC(vrc5074_device::target1_w));
+	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc5074_device::target1_r), FUNC(vrc5074_device::target1_w));
 }
 
-void vrc5074_device::device_add_mconfig(machine_config &config)
-{
-	NS16550(config, m_uart, DERIVED_CLOCK(1, 12));
-	m_uart->out_int_callback().set(FUNC(vrc5074_device::uart_irq_callback));
-	m_uart->out_tx_callback().set("ttys00", FUNC(rs232_port_device::write_txd));
-	m_uart->out_dtr_callback().set("ttys00", FUNC(rs232_port_device::write_dtr));
-	m_uart->out_rts_callback().set("ttys00", FUNC(rs232_port_device::write_rts));
+MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)
+	MCFG_DEVICE_ADD("uart", NS16550, SYSTEM_CLOCK / 12)
+	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, vrc5074_device, uart_irq_callback))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys00", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys00", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys00", rs232_port_device, write_rts))
 
-	rs232_port_device &ttys00(RS232_PORT(config, "ttys00", default_rs232_devices, nullptr));
-	ttys00.rxd_handler().set(m_uart, FUNC(ns16550_device::rx_w));
-	ttys00.dcd_handler().set(m_uart, FUNC(ns16550_device::dcd_w));
-	ttys00.cts_handler().set(m_uart, FUNC(ns16550_device::cts_w));
-}
+	MCFG_DEVICE_ADD("ttys00", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", ns16550_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("uart", ns16550_device, dcd_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", ns16550_device, cts_w))
+MACHINE_CONFIG_END
 
-vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pci_host_device(mconfig, VRC5074, tag, owner, clock),
+vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, VRC5074, tag, owner, clock),
 	m_uart(*this, "uart"),
-	m_cpu_space(nullptr), m_cpu(*this, finder_base::DUMMY_TAG),
+	m_cpu_space(nullptr), m_cpu(nullptr), cpu_tag(nullptr),
 	m_mem_config("memory_space", ENDIANNESS_LITTLE, 32, 32),
 	m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32),
 	m_romRegion(*this, "rom"),
 	m_updateRegion(*this, "update")
 {
-	set_ids_host(0x1033005a, 0x04, 0x00000000);
-
 	for (int i = 0; i < 2; i++)
 		m_sdram_size[i] = 0x0;
 
@@ -195,6 +192,7 @@ device_memory_interface::space_config_vector vrc5074_device::memory_space_config
 void vrc5074_device::device_start()
 {
 	pci_host_device::device_start();
+	m_cpu = machine().device<mips3_device>(cpu_tag);
 	m_cpu_space = &m_cpu->space(AS_PROGRAM);
 	memory_space = &space(AS_DATA);
 	io_space = &space(AS_IO);
@@ -382,6 +380,13 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 void vrc5074_device::reset_all_mappings()
 {
 	pci_device::reset_all_mappings();
+}
+
+void vrc5074_device::set_cpu_tag(const char *_cpu_tag)
+{
+	if (LOG_NILE)
+		logerror("%s: set_cpu_tag\n", tag());
+	cpu_tag = _cpu_tag;
 }
 
 READ32_MEMBER(vrc5074_device::sdram_addr_r)
@@ -834,7 +839,7 @@ READ32_MEMBER(vrc5074_device::cpu_reg_r)
 		if (m_cpu_regs[offset - 1] & 1)
 		{
 			// Should check for cascaded timer
-			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_double() * clock();
+			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
 		}
 
 		if (LOG_TIMERS) logerror("%s NILE READ: timer %d counter(%03X) = %08X\n", machine().describe_context(), which, offset * 4, result);
@@ -955,24 +960,24 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		which = (offset - NREG_T0CTRL) / 4;
 		if (LOG_NILE | LOG_TIMERS) logerror("%s NILE WRITE: timer %d control(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
 		logit = 0;
-		m_timer_period[which] = (uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1) * attotime::from_hz(clock()).as_double();
+		m_timer_period[which] = (uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1) * attotime::from_hz(SYSTEM_CLOCK).as_double();
 		if (m_cpu_regs[offset] & 2) {
 			// Cascade timer
 			uint32_t scaleSrc = (m_cpu_regs[offset] >> 2) & 0x3;
-			m_timer_period[which] += (uint64_t(m_cpu_regs[NREG_T0CTRL + scaleSrc * 4]) + 1) * attotime::from_hz(clock()).as_double();
+			m_timer_period[which] += (uint64_t(m_cpu_regs[NREG_T0CTRL + scaleSrc * 4]) + 1) * attotime::from_hz(SYSTEM_CLOCK).as_double();
 			logerror("Timer scale: timer %d is scaled by %08X\n", which, m_cpu_regs[NREG_T0CTRL + which * 4]);
 		}
 		/* timer just enabled? */
 		if (!(olddata & 1) && (m_cpu_regs[offset] & 1))
 		{
-			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
-			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, attotime::from_double(m_timer_period[which]).as_hz());
+			m_timer[which]->adjust(attotime::from_hz(SYSTEM_CLOCK) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
+			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, ATTOSECONDS_TO_HZ(attotime::from_double(m_timer_period[which]).as_attoseconds()));
 		}
 
 		/* timer disabled? */
 		else if ((olddata & 1) && !(m_cpu_regs[offset] & 1))
 		{
-			m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_double() * clock();
+			m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
 			m_timer[which]->adjust(attotime::never, which);
 		}
 		break;
@@ -987,7 +992,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 
 		if (m_cpu_regs[offset - 1] & 1)
 		{
-			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[offset], which);
+			m_timer[which]->adjust(attotime::from_hz(SYSTEM_CLOCK) * m_cpu_regs[offset], which);
 		}
 		break;
 	}

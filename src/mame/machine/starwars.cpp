@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "includes/starwars.h"
+#include "machine/x2212.h"
 
 
 /* Constants for matrix processor operations */
@@ -44,14 +45,14 @@ TIMER_CALLBACK_MEMBER(starwars_state::math_run_clear)
 
 WRITE8_MEMBER(starwars_state::starwars_nstore_w)
 {
-	m_novram->store(0);
-	m_novram->store(1);
-	m_novram->store(0);
+	machine().device<x2212_device>("x2212")->store(0);
+	machine().device<x2212_device>("x2212")->store(1);
+	machine().device<x2212_device>("x2212")->store(0);
 }
 
 WRITE_LINE_MEMBER(starwars_state::recall_w)
 {
-	m_novram->recall(!state);
+	machine().device<x2212_device>("x2212")->recall(!state);
 }
 
 /*************************************

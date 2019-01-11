@@ -364,7 +364,7 @@ bool z180_device::get_tend1()
 
 #define Z180_CNTR_RESET         0x07
 #define Z180_CNTR_RMASK         0xff
-#define Z180_CNTR_WMASK         0x4f        /* Original: 0x7f - Modified: 0x4f - Inhibits setting up TI & RI flags due to the lack of CSIO implementation */
+#define Z180_CNTR_WMASK         0x7f
 
 /* 0b CSI/O transmit/receive register */
 #define Z180_TRDR_RESET         0x00
@@ -857,6 +857,7 @@ uint8_t z180_device::z180_readcontrol(offs_t port)
 
 	case Z180_CNTR:
 		data = IO_CNTR & Z180_CNTR_RMASK;
+		data &= ~0x10; // Super Famicom Box sets the TE bit then wants it to be toggled after 8 bits transmitted
 		LOG("Z180 CNTR   rd $%02x ($%02x)\n", data, m_io[port & 0x3f]);
 		break;
 
@@ -2441,7 +2442,6 @@ again:
 				if (!m_HALT)
 				{
 					m_R++;
-					IO_FRC++;   /* Added FRC counting, not implemented yet */
 					m_extra_cycles = 0;
 					curcycles = exec_op(ROP());
 					curcycles += m_extra_cycles;
@@ -2500,7 +2500,6 @@ again:
 			if (!m_HALT)
 			{
 				m_R++;
-				IO_FRC++;   /* Added FRC counting, not implemented yet */
 				m_extra_cycles = 0;
 				curcycles = exec_op(ROP());
 				curcycles += m_extra_cycles;

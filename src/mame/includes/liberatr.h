@@ -38,7 +38,7 @@ public:
 	void liberat2(machine_config &config);
 	void liberatr(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -54,6 +54,8 @@ private:
 	DECLARE_READ8_MEMBER( bitmap_xy_r );
 	DECLARE_WRITE8_MEMBER( bitmap_xy_w );
 
+	DECLARE_WRITE_LINE_MEMBER(planet_select_w);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// early raster EAROM interface
@@ -64,6 +66,7 @@ private:
 	void liberat2_map(address_map &map);
 	void liberatr_map(address_map &map);
 
+protected:
 	// The following structure describes the (up to 32) line segments
 	// that make up one horizontal line (latitude) for one display frame of the planet.
 	// Note: this and the following structure is only used to collect the

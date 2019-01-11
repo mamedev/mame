@@ -29,7 +29,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<z80_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport m_row0;

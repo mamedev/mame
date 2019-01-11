@@ -19,7 +19,6 @@ TODO:
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "quizshow.lh"
@@ -46,9 +45,8 @@ public:
 		m_dac(*this, "dac"),
 		m_main_ram(*this, "main_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamp(*this, "lamp%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
@@ -56,8 +54,8 @@ public:
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
-private:
-	virtual void machine_start() override { m_lamps.resolve(); }
+protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void mem_map(address_map &map);
@@ -73,17 +71,17 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flag_output_w);
 	DECLARE_WRITE8_MEMBER(main_ram_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void quizshow_palette(palette_device &palette) const;
+	DECLARE_PALETTE_INIT(quizshow);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
 
-	required_device<s2650_device> m_maincpu;
+private:
+	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_shared_ptr<uint8_t> m_main_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	output_finder<11> m_lamps;
+	output_finder<11> m_lamp;
 
 	tilemap_t *m_tilemap;
 	uint32_t m_clocks;
@@ -99,13 +97,13 @@ private:
 
 ***************************************************************************/
 
-void quizshow_state::quizshow_palette(palette_device &palette) const
+PALETTE_INIT_MEMBER(quizshow_state, quizshow)
 {
 	palette.set_indirect_color(0, rgb_t::black());
 	palette.set_indirect_color(1, rgb_t::white());
 
 	// normal, blink/off, invert, blink+invert
-	constexpr int lut_pal[16] = {
+	const int lut_pal[16] = {
 		0, 0, 1, 0,
 		0, 0, 0, 0,
 		1, 0, 0, 0,
@@ -118,10 +116,10 @@ void quizshow_state::quizshow_palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
 {
-	uint8_t const code = m_main_ram[tile_index];
+	uint8_t code = m_main_ram[tile_index];
 
 	// d6: blink, d7: invert
-	uint8_t const color = (code & (m_blink_state | 0x80)) >> 6;
+	uint8_t color = (code & (m_blink_state | 0x80)) >> 6;
 
 	SET_TILE_INFO_MEMBER(0, code & 0x3f, color, 0);
 }
@@ -148,7 +146,7 @@ WRITE8_MEMBER(quizshow_state::lamps1_w)
 {
 	// d0-d3: P1 answer button lamps
 	for (int i = 0; i < 4; i++)
-		m_lamps[i] = BIT(data, i);
+		m_lamp[i] = BIT(data, i);
 
 	// d4-d7: N/C
 }
@@ -157,7 +155,7 @@ WRITE8_MEMBER(quizshow_state::lamps2_w)
 {
 	// d0-d3: P2 answer button lamps
 	for (int i = 0; i < 4; i++)
-		m_lamps[i + 4] = BIT(data, i);
+		m_lamp[i + 4] = BIT(data, i);
 
 	// d4-d7: N/C
 }
@@ -165,8 +163,8 @@ WRITE8_MEMBER(quizshow_state::lamps2_w)
 WRITE8_MEMBER(quizshow_state::lamps3_w)
 {
 	// d0-d1: start button lamps
-	m_lamps[8] = BIT(data, 0);
-	m_lamps[9] = BIT(data, 1);
+	m_lamp[8] = BIT(data, 0);
+	m_lamp[9] = BIT(data, 1);
 
 	// d2-d3: unused? (chip is shared with tape_control_w)
 	// d4-d7: N/C
@@ -175,7 +173,7 @@ WRITE8_MEMBER(quizshow_state::lamps3_w)
 WRITE8_MEMBER(quizshow_state::tape_control_w)
 {
 	// d2: enable user category select (changes tape head position)
-	m_lamps[10] = BIT(data, 2);
+	m_lamp[10] = BIT(data, 2);
 	m_category_enable = (data & 0xc) == 0xc;
 
 	// d3: tape motor
@@ -241,18 +239,18 @@ void quizshow_state::mem_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x0bff).rom();
-	map(0x1802, 0x1802).w(FUNC(quizshow_state::audio_w));
-	map(0x1804, 0x1804).w(FUNC(quizshow_state::lamps1_w));
-	map(0x1808, 0x1808).w(FUNC(quizshow_state::lamps2_w));
-	map(0x1810, 0x1810).w(FUNC(quizshow_state::lamps3_w));
-	map(0x1820, 0x1820).w(FUNC(quizshow_state::tape_control_w));
-	map(0x1840, 0x1840).w(FUNC(quizshow_state::video_disable_w));
+	map(0x1802, 0x1802).w(this, FUNC(quizshow_state::audio_w));
+	map(0x1804, 0x1804).w(this, FUNC(quizshow_state::lamps1_w));
+	map(0x1808, 0x1808).w(this, FUNC(quizshow_state::lamps2_w));
+	map(0x1810, 0x1810).w(this, FUNC(quizshow_state::lamps3_w));
+	map(0x1820, 0x1820).w(this, FUNC(quizshow_state::tape_control_w));
+	map(0x1840, 0x1840).w(this, FUNC(quizshow_state::video_disable_w));
 	map(0x1881, 0x1881).portr("IN0");
 	map(0x1882, 0x1882).portr("IN1");
 	map(0x1884, 0x1884).portr("IN2");
 	map(0x1888, 0x1888).portr("IN3");
-	map(0x1900, 0x1900).r(FUNC(quizshow_state::timing_r));
-	map(0x1e00, 0x1fff).ram().w(FUNC(quizshow_state::main_ram_w)).share("main_ram");
+	map(0x1900, 0x1900).r(this, FUNC(quizshow_state::timing_r));
+	map(0x1e00, 0x1fff).ram().w(this, FUNC(quizshow_state::main_ram_w)).share("main_ram");
 }
 
 
@@ -390,33 +388,34 @@ void quizshow_state::machine_reset()
 	m_tape_head_pos = 0;
 }
 
-void quizshow_state::quizshow(machine_config &config)
-{
-	/* basic machine hardware */
-	S2650(config, m_maincpu, MASTER_CLOCK / 16); // divider guessed
-	m_maincpu->set_addrmap(AS_PROGRAM, &quizshow_state::mem_map);
-	m_maincpu->sense_handler().set(FUNC(quizshow_state::tape_signal_r));
-	m_maincpu->flag_handler().set(FUNC(quizshow_state::flag_output_w));
+MACHINE_CONFIG_START(quizshow_state::quizshow)
 
-	TIMER(config, "clock_timer").configure_periodic(FUNC(quizshow_state::clock_timer_cb), attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))); // 8V
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK / 16) // divider guessed
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, quizshow_state, tape_signal_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, quizshow_state, flag_output_w))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("clock_timer", quizshow_state, clock_timer_cb, attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))) // 8V
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(quizshow_state::screen_update));
-	m_screen->set_palette("palette");
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizshow);
-	PALETTE(config, m_palette, FUNC(quizshow_state::quizshow_palette), 8*2, 2);
+	MCFG_SCREEN_UPDATE_DRIVER(quizshow_state, screen_update)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_quizshow)
+	MCFG_PALETTE_ADD("palette", 8*2)
+	MCFG_PALETTE_INDIRECT_ENTRIES(2)
+	MCFG_PALETTE_INIT_OWNER(quizshow_state, quizshow)
 
 	/* sound hardware (discrete) */
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
-	vref.set_output(5.0);
-	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
-}
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -437,7 +436,7 @@ ROM_START( quizshow )
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x0200, "user1", 0 ) // gfx1
-	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) )
+	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, BAD_DUMP CRC(03017820) SHA1(fd118aa706bdc6976e527ed63388fad01e66270e) ) // from Atari's source archive, may have some bad bits
 	ROM_LOAD_NIB_LOW ( "005466-02.n2", 0x0000, 0x0200, CRC(cd554367) SHA1(04da83eb6e2f86f88a3495072b98fbdaca485ae8) )
 
 	ROM_REGION( 0x0200, "proms", 0 )

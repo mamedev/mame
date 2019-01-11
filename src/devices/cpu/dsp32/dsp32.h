@@ -30,6 +30,9 @@ const int DSP32_OUTPUT_PDF  = 0x02;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+#define MCFG_DSP32C_OUTPUT_CALLBACK(_write) \
+	devcb = &downcast<dsp32c_device &>(*device).set_output_pins_callback(DEVCB_##_write);
+
 // ======================> dsp32c_device
 
 class dsp32c_device : public cpu_device
@@ -38,7 +41,8 @@ public:
 	// construction/destruction
 	dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto out_cb() { return m_output_pins_changed.bind(); }
+	template <class Object> devcb_base &set_output_pins_callback(Object &&cb) { return m_output_pins_changed.set_callback(std::forward<Object>(cb)); }
+
 
 	// public interfaces
 	void pio_w(int reg, int data);

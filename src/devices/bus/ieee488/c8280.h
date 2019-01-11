@@ -14,7 +14,6 @@
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/c8280_dsk.h"
-#include "imagedev/floppy.h"
 #include "machine/mos6530n.h"
 #include "machine/wd_fdc.h"
 
@@ -72,7 +71,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_ioport m_address;
 	floppy_image_device *m_floppy;
-	output_finder<4> m_leds;
+	output_finder<4> m_led;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

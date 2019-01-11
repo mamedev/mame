@@ -779,8 +779,7 @@ void ymz280b_device::write_to_register(int data)
 				break;
 
 			default:
-				if (data != 0)
-					logerror("YMZ280B: unknown register write %02X = %02X\n", m_current_register, data);
+				logerror("YMZ280B: unknown register write %02X = %02X\n", m_current_register, data);
 				break;
 		}
 	}
@@ -851,8 +850,7 @@ void ymz280b_device::write_to_register(int data)
 				break;
 
 			default:
-				if (data != 0)
-					logerror("YMZ280B: unknown register write %02X = %02X\n", m_current_register, data);
+				logerror("YMZ280B: unknown register write %02X = %02X\n", m_current_register, data);
 				break;
 		}
 	}

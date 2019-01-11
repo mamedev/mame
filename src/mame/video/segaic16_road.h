@@ -67,4 +67,7 @@ private:
 
 DECLARE_DEVICE_TYPE(SEGAIC16_ROAD, segaic16_road_device)
 
+#define MCFG_SEGAIC16_ROAD_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGAIC16_ROAD, 0)
+
 #endif // MAME_VIDEO_SEGAIC16_ROAD_H

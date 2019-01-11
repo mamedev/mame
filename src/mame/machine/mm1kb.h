@@ -14,6 +14,16 @@
 #include "sound/samples.h"
 
 
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_MM1_KEYBOARD_KBST_CALLBACK(_write) \
+	devcb = &downcast<mm1_keyboard_device &>(*device).set_kbst_wr_callback(DEVCB_##_write);
+
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -26,7 +36,7 @@ public:
 	// construction/destruction
 	mm1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto kbst_wr_callback() { return m_write_kbst.bind(); }
+	template <class Object> devcb_base &set_kbst_wr_callback(Object &&cb) { return m_write_kbst.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read ) { return m_data; }
 
