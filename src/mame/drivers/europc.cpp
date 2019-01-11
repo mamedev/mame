@@ -620,12 +620,18 @@ ROM_START( europc )
 	ROMX_LOAD("bios_v2.04.bin", 0x8000, 0x8000, CRC(e623967c) SHA1(5196b14018da1f3198e2950af0e6eab41425f556), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS( 7, "v2.05", "EuroPC v2.05" )
 	ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(7)) // v2.04 and v2.05 don't work yet, , see comment section
- ROM_END
+
+	ROM_REGION(0x1000, "kbdctrl", 0)
+	ROM_LOAD("zc86115p-mc6805u2.bin", 0x0000, 0x1000, CRC(d90c1fab) SHA1(ddb7060abddee7294723833c303090de35c1e79c))
+ROM_END
 
 ROM_START( europc2 )
 	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
 	ROM_LOAD("europcii_bios_v3.01_500145.bin", 0x8000, 0x8000, CRC(ecca89c8) SHA1(802b89babdf0ab0a0a9c21d1234e529c8386d6fb))
+
+	ROM_REGION(0x1000, "kbdctrl", 0)
+	ROM_LOAD("zc86115p-mc6805u2.bin", 0x0000, 0x1000, CRC(d90c1fab) SHA1(ddb7060abddee7294723833c303090de35c1e79c))
 ROM_END
 
 ROM_START( euroxt )
