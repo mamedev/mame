@@ -96,7 +96,7 @@ namespace netlist
 			m_sub.m_IP.activate_hl();
 	}
 
-	inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
+	NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
 	{
 		/* static */ const netlist_time out_delayQn[14] = {
 				NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),

@@ -63,8 +63,7 @@ namespace netlist
 		state_var_u8 m_abcd;
 
 	private:
-		//inline void update_outputs_all(const unsigned &cnt, const netlist_time &out_delay) noexcept
-		inline void update_outputs_all(const unsigned &cnt, const netlist_time &out_delay) noexcept
+		void update_outputs_all(const unsigned &cnt, const netlist_time &out_delay) noexcept
 		{
 			m_Q[0].push((cnt >> 0) & 1, out_delay);
 			m_Q[1].push((cnt >> 1) & 1, out_delay);

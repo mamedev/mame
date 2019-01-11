@@ -137,9 +137,9 @@ public:
 	//NETLIB_RESETI();
 	NETLIB_UPDATEI();
 
-	inline q_type qtype() const { return m_qtype; }
-	inline bool is_qtype(q_type atype) const { return m_qtype == atype; }
-	inline void set_qtype(q_type atype) { m_qtype = atype; }
+	q_type qtype() const { return m_qtype; }
+	bool is_qtype(q_type atype) const { return m_qtype == atype; }
+	void set_qtype(q_type atype) { m_qtype = atype; }
 protected:
 
 	bjt_model_t m_model;

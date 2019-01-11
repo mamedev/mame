@@ -778,10 +778,10 @@ namespace netlist
 		logic_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t();
 
-		inline const netlist_sig_t & Q() const NL_NOEXCEPT { return m_cur_Q; }
+		const netlist_sig_t & Q() const NL_NOEXCEPT { return m_cur_Q; }
 		void initial(const netlist_sig_t val) NL_NOEXCEPT { m_cur_Q = m_new_Q = val; }
 
-		inline void set_Q_and_push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q )
 			{
@@ -789,7 +789,7 @@ namespace netlist
 				push_to_queue(delay);
 			}
 		}
-		inline void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q || is_queued())
 			{
@@ -798,7 +798,7 @@ namespace netlist
 			}
 		}
 
-		inline void set_Q_time(const netlist_sig_t newQ, const netlist_time &at) NL_NOEXCEPT
+		void set_Q_time(const netlist_sig_t newQ, const netlist_time &at) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q)
 			{
@@ -1382,7 +1382,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	template <typename ST, std::size_t AW, std::size_t DW>
-	inline param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring &name)
+	param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring &name)
 	: param_data_t(device, name)
 	{
 		auto f = stream();

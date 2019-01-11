@@ -98,8 +98,17 @@ namespace netlist
 		state_var<bool> m_last_out;
 		state_var<bool> m_ff;
 
-		inline nl_double clamp(const nl_double v, const nl_double a, const nl_double b);
+		nl_double clamp(const nl_double v, const nl_double a, const nl_double b)
+		{
+			nl_double ret = v;
+			nl_double vcc = m_R1.m_P();
 
+			if (ret >  vcc - a)
+				ret = vcc - a;
+			if (ret < b)
+				ret = b;
+			return ret;
+		}
 	};
 
 	NETLIB_OBJECT_DERIVED(NE555_dip, NE555)
@@ -116,18 +125,6 @@ namespace netlist
 			register_subalias("8",  m_R1.m_P);      // Pin 8
 		}
 	};
-
-	inline nl_double NETLIB_NAME(NE555)::clamp(const nl_double v, const nl_double a, const nl_double b)
-	{
-		nl_double ret = v;
-		nl_double vcc = m_R1.m_P();
-
-		if (ret >  vcc - a)
-			ret = vcc - a;
-		if (ret < b)
-			ret = b;
-		return ret;
-	}
 
 	NETLIB_RESET(NE555)
 	{

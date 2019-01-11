@@ -105,7 +105,7 @@ namespace netlist
 		NETLIB_NAME(7483)::update();
 	}
 
-	inline NETLIB_UPDATE(7483)
+	NETLIB_UPDATE(7483)
 	{
 		uint8_t r = static_cast<uint8_t>(m_a + m_b + m_C0());
 
