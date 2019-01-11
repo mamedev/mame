@@ -147,7 +147,7 @@ const logic_family_desc_t *family_CD4XXX()
 // ----------------------------------------------------------------------------------------
 
 detail::queue_t::queue_t(netlist_t &nl)
-	: timed_queue<pqentry_t<net_t *, netlist_time>, false>(512)
+	: timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>(512)
 	, netlist_ref(nl)
 	, plib::state_manager_t::callback_t()
 	, m_qsize(0)
@@ -585,7 +585,7 @@ void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 
 void netlist_t::print_stats() const
 {
-	if (nperftime_t::enabled)
+	if (nperftime_t<NL_KEEP_STATISTICS>::enabled)
 	{
 		std::vector<size_t> index;
 		for (size_t i=0; i<m_devices.size(); i++)
@@ -594,7 +594,7 @@ void netlist_t::print_stats() const
 		std::sort(index.begin(), index.end(),
 				[&](size_t i1, size_t i2) { return m_devices[i1]->m_stat_total_time.total() < m_devices[i2]->m_stat_total_time.total(); });
 
-		nperftime_t::type total_time(0);
+		nperftime_t<NL_KEEP_STATISTICS>::type total_time(0);
 		uint_least64_t total_count(0);
 
 		for (auto & j : index)
@@ -607,8 +607,8 @@ void netlist_t::print_stats() const
 			total_count += entry->m_stat_total_time.count();
 		}
 
-		nperftime_t overhead;
-		nperftime_t test;
+		nperftime_t<NL_KEEP_STATISTICS> overhead;
+		nperftime_t<NL_KEEP_STATISTICS> test;
 		overhead.start();
 		for (int j=0; j<100000;j++)
 		{
@@ -617,9 +617,9 @@ void netlist_t::print_stats() const
 		}
 		overhead.stop();
 
-		nperftime_t::type total_overhead = overhead()
-				* static_cast<nperftime_t::type>(total_count)
-				/ static_cast<nperftime_t::type>(200000);
+		nperftime_t<NL_KEEP_STATISTICS>::type total_overhead = overhead()
+				* static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(total_count)
+				/ static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(200000);
 
 		log().verbose("Queue Pushes   {1:15}", queue().m_prof_call());
 		log().verbose("Queue Moves    {1:15}", queue().m_prof_sortmove());
@@ -631,8 +631,8 @@ void netlist_t::print_stats() const
 		log().verbose("");
 		log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
 		log().verbose("Total overhead {1:15}", total_overhead);
-		nperftime_t::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
-				/ static_cast<nperftime_t::type>(queue().m_prof_call());
+		nperftime_t<NL_KEEP_STATISTICS>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
+				/ static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(queue().m_prof_call());
 		log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
 		log().verbose("");
 		for (auto &entry : m_devices)

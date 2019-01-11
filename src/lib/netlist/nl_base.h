@@ -1097,9 +1097,9 @@ namespace netlist
 		void set_default_delegate(detail::core_terminal_t &term);
 
 		/* stats */
-		nperftime_t  m_stat_total_time;
-		nperfcount_t m_stat_call_count;
-		nperfcount_t m_stat_inc_active;
+		nperftime_t<NL_KEEP_STATISTICS>  m_stat_total_time;
+		nperfcount_t<NL_KEEP_STATISTICS> m_stat_call_count;
+		nperfcount_t<NL_KEEP_STATISTICS> m_stat_inc_active;
 
 
 	protected:
@@ -1193,7 +1193,7 @@ namespace netlist
 	 * solvers will update inputs after parallel processing.
 	 */
 	class detail::queue_t :
-			public timed_queue<pqentry_t<net_t *, netlist_time>, false>,
+			public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
 			public detail::netlist_ref,
 			public plib::state_manager_t::callback_t
 	{
@@ -1351,8 +1351,8 @@ namespace netlist
 		plib::state_manager_t               m_state;
 
 		// performance
-		nperftime_t     m_stat_mainloop;
-		nperfcount_t    m_perf_out_processed;
+		nperftime_t<NL_KEEP_STATISTICS>     m_stat_mainloop;
+		nperfcount_t<NL_KEEP_STATISTICS>    m_perf_out_processed;
 
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
 };
