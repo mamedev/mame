@@ -309,7 +309,7 @@ WRITE16_MEMBER(md_boot_state::aladmdb_w )
 	  - aladmdb_w : 1b2d18 - data = aa00 (only once on reset)
 	  - aladmdb_w : 1b2d42 - data = 0000 (only once on reset)
 	*/
-	//logerror("aladmdb_w : %06x - data = %04x\n",m_maincpu->pc(),data);
+	logerror("aladmdb_w : %06x - data = %04x\n",m_maincpu->pc(),data);
 }
 
 READ16_MEMBER(md_boot_state::aladmdb_r )
@@ -351,7 +351,9 @@ READ16_MEMBER(md_boot_state::twinktmb_r )
 {
 	if (m_maincpu->pc()==0x02f81e)
 	{
-		return machine().rand() & 0xffff; // TODO: obviously wrong, rand() gets in game
+		uint16_t ret = machine().rand() & 0xffff;
+		logerror("%04x\n", ret);
+		return ret; // TODO: obviously wrong, rand() gets in game
 	}
 
 	if (m_maincpu->pc()==0x02f84e) return 0x0000; // what's this?
@@ -1065,6 +1067,7 @@ void md_boot_state::init_twinktmb()
 	rom[0x06] = 0xcc;
 
 	init_sonic2mb();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(md_boot_state::twinktmb_r),this));
 }
 
 /*************************************
