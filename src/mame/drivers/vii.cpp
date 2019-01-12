@@ -583,7 +583,7 @@ static INPUT_PORTS_START( mattelcs ) // there is a 'secret test mode' that previ
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_NAME("Sound") // toggles between sound+music, sound only, and no sound
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_NAME("Hike / Pitch")  
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_NAME("Shoot / Run")  
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_NAME("Hkick / Hit")  
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_NAME("Kick / Hit")  
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED ) 
 
 	PORT_START("P3")
