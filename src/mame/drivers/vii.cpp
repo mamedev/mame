@@ -14,10 +14,10 @@
 		Dora the Explorer
 		Mattel Classic Sports 
 
-		"SunPlus PA7801" ( known as Sunplus SPG110? )
-			
-		Classic Arcade Pinball
+		"SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead 
 
+		"SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
+	
     Status:
 
         Mostly working
@@ -56,6 +56,11 @@
 
 	TODO:
 		Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
+
+    Also on this hardware:
+
+        name                        PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
+        Dream Life                  ?           x16         48          not dumped      no              Sunplus
 
 *******************************************************************************/
 
