@@ -119,7 +119,7 @@ private:
 		XMIT_STATE_CTS        = 2
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<unsp_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<spg2xx_device> m_spg;
 	required_device<generic_slot_device> m_cart;
@@ -320,6 +320,7 @@ WRITE8_MEMBER(vsmile_state::chip_sel_w)
 			m_bankdev->set_bank(2 + cart_offset);
 			break;
 	}
+	m_maincpu->invalidate_cache();
 }
 
 void vsmile_state::machine_start()

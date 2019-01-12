@@ -107,7 +107,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
 	DECLARE_READ16_MEMBER(wireless60_porta_r);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<unsp_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<spg2xx_device> m_spg;
 	optional_memory_bank m_bank;
@@ -201,6 +201,7 @@ void spg2xx_game_state::switch_bank(uint32_t bank)
 	{
 		m_current_bank = bank;
 		m_bank->set_entry(bank);
+		m_maincpu->invalidate_cache();
 	}
 }
 
@@ -262,7 +263,6 @@ void vii_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 
 WRITE16_MEMBER(vii_state::vii_portb_w)
 {
-	if (data == 0x7c) machine().debug_break();
 	switch_bank(((data & 0x80) >> 7) | ((data & 0x20) >> 4));
 }
 
