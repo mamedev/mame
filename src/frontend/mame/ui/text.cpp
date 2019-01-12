@@ -136,7 +136,7 @@ void text_layout::add_text(const char *text, const char_style &style)
 		{
 			// get the current character
 			char32_t schar;
-			int const scharcount = uchar_from_utf8(&schar, &text[position], text_length - position);
+			int const scharcount = uchar_from_utf8(schar, &text[position], text_length - position);
 			if (scharcount < 0)
 				break;
 
@@ -154,7 +154,7 @@ void text_layout::add_text(const char *text, const char_style &style)
 
 		// get the current character
 		char32_t ch;
-		int const scharcount = uchar_from_utf8(&ch, &text[position], text_length - position);
+		int const scharcount = uchar_from_utf8(ch, &text[position], text_length - position);
 		if (scharcount < 0)
 			break;
 		position += unsigned(scharcount);

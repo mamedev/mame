@@ -164,7 +164,7 @@ public:
 					while (len)
 					{
 						char32_t ch;
-						auto chlen = uchar_from_utf8(&ch, ptr, len);
+						auto chlen = uchar_from_utf8(ch, ptr, len);
 						if (0 > chlen)
 						{
 							ch = 0x0fffd;

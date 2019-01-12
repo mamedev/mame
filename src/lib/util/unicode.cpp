@@ -64,7 +64,7 @@ bool uchar_is_digit(char32_t uchar)
 //  into a unicode character
 //-----------------------------------------------
 
-int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count)
+int uchar_from_utf8(char32_t &uchar, const char *utf8char, size_t count)
 {
 	char32_t c, minchar;
 	int auxlen, i;
@@ -149,7 +149,7 @@ int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count)
 	if (c < minchar)
 		return -1;
 
-	*uchar = c;
+	uchar = c;
 	return auxlen + 1;
 }
 
@@ -159,7 +159,7 @@ int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count)
 //  into a unicode character
 //-------------------------------------------------
 
-int uchar_from_utf16(char32_t *uchar, const char16_t *utf16char, size_t count)
+int uchar_from_utf16(char32_t &uchar, const char16_t *utf16char, size_t count)
 {
 	int rc = -1;
 
@@ -173,14 +173,14 @@ int uchar_from_utf16(char32_t *uchar, const char16_t *utf16char, size_t count)
 		// handle the two-byte case
 		if (count > 1 && utf16char[1] >= 0xdc00 && utf16char[1] <= 0xdfff)
 		{
-			*uchar = 0x10000 + ((utf16char[0] & 0x3ff) * 0x400) + (utf16char[1] & 0x3ff);
+			uchar = 0x10000 + ((utf16char[0] & 0x3ff) * 0x400) + (utf16char[1] & 0x3ff);
 			rc = 2;
 		}
 	}
 	else if (utf16char[0] < 0xdc00 || utf16char[0] > 0xdfff)
 	{
 		// handle the one-byte case
-		*uchar = utf16char[0];
+		uchar = utf16char[0];
 		rc = 1;
 	}
 
@@ -194,7 +194,7 @@ int uchar_from_utf16(char32_t *uchar, const char16_t *utf16char, size_t count)
 //  byte order
 //-------------------------------------------------
 
-int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count)
+int uchar_from_utf16f(char32_t &uchar, const char16_t *utf16char, size_t count)
 {
 	char16_t buf[2] = {0};
 	if (count > 0)
@@ -539,7 +539,7 @@ bool utf8_is_valid_string(const char *utf8string)
 		int charlen;
 
 		// extract the current character and verify it
-		charlen = uchar_from_utf8(&uchar, utf8string, remaining_length);
+		charlen = uchar_from_utf8(uchar, utf8string, remaining_length);
 		if (charlen <= 0 || uchar == 0 || !uchar_isvalid(uchar))
 			return false;
 
