@@ -965,15 +965,15 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 }
 
 
-bool setup_t::parse_stream(plib::putf8_reader &istrm, const pstring &name)
+bool setup_t::parse_stream(plib::putf8_reader &&istrm, const pstring &name)
 {
 	plib::pomemstream ostrm;
-	plib::putf8_writer owrt(ostrm);
+	plib::putf8_writer owrt(&ostrm);
 
 	plib::ppreprocessor(&m_defines).process(istrm, owrt);
-	plib::pimemstream istrm2(ostrm);
-	plib::putf8_reader reader2(istrm2);
-	return parser_t(reader2, *this).parse(name);
+	plib::putf8_reader reader2 = plib::putf8_reader(plib::pimemstream(ostrm));
+
+	return parser_t(std::move(reader2), *this).parse(name);
 }
 
 void setup_t::register_define(const pstring &defstr)
@@ -996,8 +996,8 @@ bool source_t::parse(const pstring &name)
 	else
 	{
 		auto rstream = stream(name);
-		plib::putf8_reader reader(*rstream);
-		return m_setup.parse_stream(reader, name);
+		plib::putf8_reader reader(rstream.get());
+		return m_setup.parse_stream(std::move(reader), name);
 	}
 }
 

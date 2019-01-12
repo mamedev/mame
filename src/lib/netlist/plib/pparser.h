@@ -19,7 +19,7 @@ namespace plib {
 class ptokenizer : nocopyassignmove
 {
 public:
-	explicit ptokenizer(plib::putf8_reader &strm);
+	ptokenizer(plib::putf8_reader &&strm);
 
 	virtual ~ptokenizer();
 
@@ -123,7 +123,7 @@ private:
 
 	bool eof() { return m_strm.eof(); }
 
-	putf8_reader &m_strm;
+	putf8_reader m_strm;
 
 	int m_lineno;
 	pstring m_cur_line;

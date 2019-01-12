@@ -37,8 +37,8 @@ namespace plib {
 	: options()
 	, pout_strm()
 	, perr_strm()
-	, pout(pout_strm)
-	, perr(perr_strm)
+	, pout(&pout_strm)
+	, perr(&perr_strm)
 	{
 
 	}

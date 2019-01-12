@@ -298,7 +298,7 @@ template <std::size_t m_N, std::size_t storage_N>
 pstring matrix_solver_GCR_t<m_N, storage_N>::static_compile_name()
 {
 	plib::postringstream t;
-	plib::putf8_fmt_writer w(t);
+	plib::putf8_fmt_writer w(&t);
 	csc_private(w);
 	std::hash<pstring> h;
 
@@ -309,7 +309,7 @@ template <std::size_t m_N, std::size_t storage_N>
 std::pair<pstring, pstring> matrix_solver_GCR_t<m_N, storage_N>::create_solver_code()
 {
 	plib::postringstream t;
-	plib::putf8_fmt_writer strm(t);
+	plib::putf8_fmt_writer strm(&t);
 	pstring name = static_compile_name();
 
 	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS, double * __restrict V)\n")(name));

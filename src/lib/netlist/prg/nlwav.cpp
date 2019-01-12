@@ -51,38 +51,45 @@ private:
  * and data chunk length to the file.
  */
 /* http://de.wikipedia.org/wiki/RIFF_WAVE */
+
 class wav_t
 {
 public:
 	wav_t(plib::postream &strm, unsigned sr) : m_f(strm)
 	{
 		initialize(sr);
-		m_f.write(&m_fh, sizeof(m_fh));
-		m_f.write(&m_fmt, sizeof(m_fmt));
-		m_f.write(&m_data, sizeof(m_data));
+		write(m_fh);
+		write(m_fmt);
+		write(m_data);
 	}
 	~wav_t()
 	{
 		if (m_f.seekable())
 		{
 			m_fh.filelen = m_data.len + sizeof(m_data) + sizeof(m_fh) + sizeof(m_fmt) - 8;
-			m_f.seek(0);
-			m_f.write(&m_fh, sizeof(m_fh));
-			m_f.write(&m_fmt, sizeof(m_fmt));
+			m_f.seekp(0);
+			write(m_fh);
+			write(m_fmt);
 
 			//data.len = fmt.block_align * n;
-			m_f.write(&m_data, sizeof(m_data));
+			write(m_data);
 		}
 	}
 
 	unsigned channels() { return m_fmt.channels; }
 	unsigned sample_rate() { return m_fmt.sample_rate; }
 
+	template <typename T>
+	void write(const T &val)
+	{
+		m_f.write(reinterpret_cast<const char *>(&val), sizeof(T));
+	}
+
 	void write_sample(int sample)
 	{
 		m_data.len += m_fmt.block_align;
 		int16_t ps = static_cast<int16_t>(sample); /* 16 bit sample, FIXME: Endianess? */
-		m_f.write(&ps, sizeof(ps));
+		write(ps);
 	}
 
 private:
@@ -150,7 +157,7 @@ public:
 
 	void process()
 	{
-		plib::putf8_reader reader(m_is);
+		plib::putf8_reader reader(&m_is);
 		pstring line;
 
 		while(reader.readline(line))
@@ -248,7 +255,7 @@ void nlwav_app::convert(long sample_rate)
 {
 	plib::postream *fo = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
 	plib::pistream *fin = (opt_inp() == "-" ? &pin_strm : plib::palloc<plib::pifilestream>(opt_inp()));
-	plib::putf8_reader reader(*fin);
+	plib::putf8_reader reader(fin);
 	wav_t *wo = plib::palloc<wav_t>(*fo, static_cast<unsigned>(sample_rate));
 
 	double dt = 1.0 / static_cast<double>(wo->sample_rate());

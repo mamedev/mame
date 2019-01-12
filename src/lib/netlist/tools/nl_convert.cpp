@@ -42,8 +42,7 @@ using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
 
 static lib_map_t read_lib_map(const pstring &lm)
 {
-	plib::pistringstream istrm(lm);
-	plib::putf8_reader reader(istrm);
+	auto reader = plib::putf8_reader(plib::pistringstream(lm));
 	lib_map_t m;
 	pstring line;
 	while (reader.readline(line))
@@ -59,7 +58,7 @@ static lib_map_t read_lib_map(const pstring &lm)
 -------------------------------------------------*/
 
 nl_convert_base_t::nl_convert_base_t()
-	: out(m_buf)
+	: out(&m_buf)
 	, m_numberchars("0123456789-+e.")
 {
 }
@@ -401,8 +400,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
     Eagle converter
 -------------------------------------------------*/
 
-nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &strm)
-	: plib::ptokenizer(strm)
+nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &&strm)
+	: plib::ptokenizer(std::move(strm))
 	, m_convert(convert)
 {
 	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
@@ -429,9 +428,8 @@ void nl_convert_eagle_t::tokenizer::verror(const pstring &msg, int line_num, con
 //FIXME: should accept a stream as well
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
-	plib::pistringstream istrm(contents);
-	plib::putf8_reader reader(istrm);
-	tokenizer tok(*this, reader);
+
+	tokenizer tok(*this, plib::putf8_reader(plib::pistringstream(contents)));
 
 	out("NETLIST_START(dummy)\n");
 	add_term("GND", "GND");
@@ -539,8 +537,8 @@ void nl_convert_eagle_t::convert(const pstring &contents)
     RINF converter
 -------------------------------------------------*/
 
-nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &strm)
-	: plib::ptokenizer(strm)
+nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &&strm)
+	: plib::ptokenizer(std::move(strm))
 	, m_convert(convert)
 {
 	set_identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-");
@@ -579,9 +577,7 @@ void nl_convert_rinf_t::tokenizer::verror(const pstring &msg, int line_num, cons
 
 void nl_convert_rinf_t::convert(const pstring &contents)
 {
-	plib::pistringstream istrm(contents);
-	plib::putf8_reader reader(istrm);
-	tokenizer tok(*this, reader);
+	tokenizer tok(*this, plib::putf8_reader(plib::pistringstream(contents)));
 	auto lm = read_lib_map(s_lib_map);
 
 	out("NETLIST_START(dummy)\n");

@@ -19,8 +19,8 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(log)
 		, m_I(*this, "I")
-		, m_strm(plib::pfmt("{1}.log")(this->name()))
-		, m_writer(m_strm)
+		, m_strm(pstring(plib::pfmt("{1}.log")(this->name())))
+		, m_writer(&m_strm)
 		{
 		}
 

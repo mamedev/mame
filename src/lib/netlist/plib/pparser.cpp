@@ -16,8 +16,8 @@ namespace plib {
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
 
-ptokenizer::ptokenizer(plib::putf8_reader &strm)
-: m_strm(strm), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
+ptokenizer::ptokenizer(plib::putf8_reader &&strm)
+: m_strm(std::move(strm)), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
 {
 }
 

@@ -292,8 +292,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fn
 	std::vector<input_t> ret;
 	if (fname != "")
 	{
-		plib::pifilestream f(fname);
-		plib::putf8_reader r(f);
+		plib::putf8_reader r = plib::putf8_reader(plib::pifilestream(fname));
 		pstring l;
 		while (r.readline(l))
 		{
@@ -402,7 +401,7 @@ void tool_app_t::static_compile()
 			opt_logs(),
 			opt_defines(), opt_rfolders());
 
-	plib::putf8_writer w(pout_strm);
+	plib::putf8_writer w(&pout_strm);
 	std::map<pstring, pstring> mp;
 
 	nt.solver()->create_solver_code(mp);
@@ -724,12 +723,12 @@ int tool_app_t::execute()
 			if (opt_file() == "-")
 			{
 				plib::pstdin f;
-				ostrm.write(f);
+				plib::copystream(ostrm, f);
 			}
 			else
 			{
 				plib::pifilestream f(opt_file());
-				ostrm.write(f);
+				plib::copystream(ostrm, f);
 			}
 			contents = ostrm.str();
 
