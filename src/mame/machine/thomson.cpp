@@ -1713,14 +1713,14 @@ void thomson_state::to9_set_video_mode( uint8_t data, int style )
 			thom_set_video_mode( THOM_VMODE_TO9 );
 		break;
 
-		// undocumented, but tested on a real TO8D
-        case 0x20: thom_set_video_mode( THOM_VMODE_MO5_ALT );     break;
+	// undocumented, but tested on a real TO8D
+	case 0x20: thom_set_video_mode( THOM_VMODE_MO5_ALT );     break;
 
 	case 0x21: thom_set_video_mode( THOM_VMODE_BITMAP4 );     break;
 
 	case 0x41: thom_set_video_mode( THOM_VMODE_BITMAP4_ALT ); break;
 
-		// also undocumented but tested
+	// also undocumented but tested
 	case 0x59: thom_set_video_mode( THOM_VMODE_BITMAP4_ALT_HALF ); break;
 
 	case 0x2a:
@@ -1743,9 +1743,9 @@ void thomson_state::to9_set_video_mode( uint8_t data, int style )
 
 	case 0x3f: thom_set_video_mode( THOM_VMODE_OVERLAY3 );    break;
 
-                // undocumented variant enconding for bitmap16
-        case 0x5b: thom_set_video_mode( THOM_VMODE_BITMAP16_ALT ); break;
-          
+	// undocumented variant enconding for bitmap16
+	case 0x5b: thom_set_video_mode( THOM_VMODE_BITMAP16_ALT ); break;
+
 	default:
 		logerror( "to9_set_video_mode: unknown mode $%02X tr=%i phi=%i mod=%i\n", data, (data >> 5) & 3, (data >> 3) & 2, data & 7 );
 	}
