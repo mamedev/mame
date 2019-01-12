@@ -183,9 +183,9 @@ void print_summary(
 //-------------------------------------------------
 
 cli_frontend::cli_frontend(emu_options &options, osd_interface &osd)
-	: m_options(options),
-		m_osd(osd),
-		m_result(EMU_ERR_NONE)
+	: m_options(options)
+	, m_osd(osd)
+	, m_result(EMU_ERR_NONE)
 {
 	m_options.add_entries(cli_option_entries);
 }
@@ -211,6 +211,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	try
 	{
 		m_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
+		m_osd.set_verbose(m_options.verbose());
 	}
 	catch (options_exception &ex)
 	{
@@ -234,7 +235,10 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 
 	// read INI's, if appropriate
 	if (m_options.read_config())
+	{
 		mame_options::parse_standard_inis(m_options, option_errors);
+		m_osd.set_verbose(m_options.verbose());
+	}
 
 	// otherwise, check for a valid system
 	load_translation(m_options);
