@@ -572,7 +572,7 @@ public:
 	}
 
 	// mainboard configurations
-	void cartslot_config(machine_config &config, int no);
+	void cartslot_config(machine_config &config, unsigned count);
 	void cartslot_fixed(machine_config &config, char const *dflt);
 	void mv1fz(machine_config &config);
 
@@ -1991,12 +1991,10 @@ void ngarcade_base_state::neogeo_mono(machine_config &config)
 }
 
 // configurable slot
-void mvs_state::cartslot_config(machine_config &config, int no)
+void mvs_state::cartslot_config(machine_config &config, unsigned count)
 {
-	for (int i = 0; i < no; i++)
-	{
+	for (unsigned i = 0; i < count; i++)
 		NEOGEO_CART_SLOT(config, m_slots[i], neogeo_cart, nullptr);
-	}
 }
 
 void mvs_led_state::mv1(machine_config &config)
@@ -2739,15 +2737,13 @@ void mvs_led_state::neogeo_mj(machine_config &config)
 	mv1_fixed(config);
 	set_default_bios_tag("japan");
 
-	//no joystick panel
-	config.device_remove("edge");
-	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "", false);
+	// no joystick panel
+	m_edge->set_default_option("");
+	m_edge->set_fixed(false);
 
-	//P1 mahjong controller
-	config.device_remove("ctrl1");
-	config.device_remove("ctrl2");
-	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "mahjong", false);
-	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", true);
+	// P1 mahjong controller
+	m_ctrl1->set_default_option("mahjong");
+	m_ctrl1->set_fixed(false);
 
 	cartslot_fixed(config, "rom");
 }
@@ -2785,8 +2781,8 @@ void mvs_led_state::pnyaa(machine_config &config)
 void mvs_led_state::popbounc(machine_config &config)
 {
 	mv1_fixed(config);
-	config.device_remove("edge");
-	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge_fixed, "dial", true);
+
+	NEOGEO_CTRL_EDGE_CONNECTOR(config.replace(), m_edge, neogeo_arc_edge_fixed, "dial", true);
 
 	cartslot_fixed(config, "rom");
 }
@@ -2842,6 +2838,7 @@ void mvs_led_state::jockeygp(machine_config &config)
 void mvs_led_state::vliner(machine_config &config)
 {
 	mv1_fixed(config);
+
 	// input handlers are installed at DRIVER_INIT...
 	config.device_remove("edge");
 	config.device_remove("ctrl1");
