@@ -595,7 +595,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
-	UTS_KEYBOARD(config, m_keyboard, uts_keyboards, "extw");
+	UTS_KEYBOARD(config, m_keyboard, uts20_keyboards, "extw");
 	m_keyboard->rxd_callback().set(FUNC(univac_state::aux_rxd_w));
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
@@ -614,6 +614,9 @@ MACHINE_CONFIG_START(univac_state::uts10)
 	config.device_remove("latch_40");
 	subdevice<ls259_device>("latch_c0")->q_out_cb<6>().set_nop();
 	subdevice<ls259_device>("latch_e0")->q_out_cb<7>().set(FUNC(univac_state::sio_loopback_w)).invert();
+
+	UTS_KEYBOARD(config.replace(), m_keyboard, uts10_keyboards, "extw");
+	m_keyboard->rxd_callback().set(FUNC(univac_state::aux_rxd_w));
 MACHINE_CONFIG_END
 
 

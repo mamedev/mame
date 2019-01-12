@@ -3236,6 +3236,8 @@ end
 
 if (BUSES["UTS_KBD"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/uts_kbd/400kbd.cpp",
+		MAME_DIR .. "src/devices/bus/uts_kbd/400kbd.h",
 		MAME_DIR .. "src/devices/bus/uts_kbd/extw.cpp",
 		MAME_DIR .. "src/devices/bus/uts_kbd/extw.h",
 		MAME_DIR .. "src/devices/bus/uts_kbd/uts_kbd.cpp",
