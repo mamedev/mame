@@ -434,31 +434,31 @@ protected:
 		RowScrollOn = true
 	};
 
+	enum flipx_t : bool
+	{
+		FlipXOff = false,
+		FlipXOn = true
+	};
+
 	void apply_saturation(const rectangle &cliprect);
 	void apply_fade(const rectangle &cliprect);
 
-	template<blend_enable_t Blend, rowscroll_enable_t RowScroll>
+	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
 	void blit(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
 	void blit_page(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t bitmap_addr, uint16_t *regs);
 	void blit_sprite(const rectangle &cliprect, uint32_t scanline, int depth, uint32_t base_addr);
 	void blit_sprites(const rectangle &cliprect, uint32_t scanline, int depth);
 
-	uint8_t expand_rgb5_to_rgb8(uint8_t val);
 	uint8_t mix_channel(uint8_t a, uint8_t b);
-	void mix_pixel(uint32_t offset, uint16_t rgb);
-	void set_pixel(uint32_t offset, uint16_t rgb);
 
 	void stop_channel(const uint32_t channel);
 	bool advance_channel(address_space &space, const uint32_t channel);
 	bool fetch_sample(address_space &space, const uint32_t channel);
 	void loop_channel(const uint32_t channel);
 
-	struct rgbtriad_t
-	{
-		uint8_t r, g, b;
-	};
-
-	rgbtriad_t m_screenbuf[320 * 240];
+	uint32_t m_screenbuf[320 * 240];
+	uint8_t m_rgb5_to_rgb8[32];
+	uint32_t m_rgb555_to_rgb888[0x8000];
 
 	bool m_hide_page0;
 	bool m_hide_page1;

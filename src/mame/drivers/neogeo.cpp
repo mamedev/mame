@@ -572,6 +572,8 @@ public:
 	}
 
 	// mainboard configurations
+	void cartslot_config(machine_config &config, unsigned count);
+	void cartslot_fixed(machine_config &config, char const *dflt);
 	void mv1fz(machine_config &config);
 
 	// fixed software configurations
@@ -1591,7 +1593,6 @@ void mvs_state::machine_start()
 	ngarcade_base_state::machine_start();
 
 	m_sprgen->m_fixed_layer_bank_type = 0;
-	m_sprgen->set_screen(m_screen);
 
 	m_curr_slot = -1;
 	set_slot_idx(0);
@@ -1907,8 +1908,8 @@ INPUT_CHANGED_MEMBER(aes_base_state::aes_jp1)
  *
  *************************************/
 
-MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
-
+void neogeo_base_state::neogeo_base(machine_config &config)
+{
 	/* basic machine hardware */
 	M68000(config, m_maincpu, NEOGEO_MAIN_CPU_CLOCK);
 
@@ -1927,14 +1928,14 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	/* video hardware */
 	config.set_default_layout(layout_neogeo);
 
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(neogeo_base_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
+	m_screen->set_screen_update(FUNC(neogeo_base_state::screen_update));
 
 	/* 4096 colors * two banks * normal and shadow */
-	MCFG_DEVICE_ADD(m_palette, PALETTE, palette_device::BLACK, 4096*2*2)
+	PALETTE(config, m_palette, palette_device::BLACK, 4096*2*2);
 
-	MCFG_DEVICE_ADD(m_sprgen, NEOGEO_SPRITE_OPTIMZIED, 0)
+	NEOGEO_SPRITE_OPTIMZIED(config, m_sprgen, 0).set_screen(m_screen);
 
 	/* audio hardware */
 	INPUT_MERGER_ALL_HIGH(config, m_audionmi);
@@ -1948,10 +1949,11 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 
 	YM2610(config, m_ym, NEOGEO_YM2610_CLOCK);
 	m_ym->irq_handler().set_inputline(m_audiocpu, 0);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(neogeo_base_state::neogeo_stereo)
+void neogeo_base_state::neogeo_stereo(machine_config &config)
+{
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -1959,7 +1961,7 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_stereo)
 	m_ym->add_route(0, "rspeaker", 0.28);
 	m_ym->add_route(1, "lspeaker", 0.98);
 	m_ym->add_route(2, "rspeaker", 0.98);
-MACHINE_CONFIG_END
+}
 
 
 void ngarcade_base_state::neogeo_arcade(machine_config &config)
@@ -1979,134 +1981,129 @@ void ngarcade_base_state::neogeo_arcade(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(ngarcade_base_state::neogeo_mono)
+void ngarcade_base_state::neogeo_mono(machine_config &config)
+{
 	SPEAKER(config, "speaker").front_center();
 
 	m_ym->add_route(0, "speaker", 0.28);
 	m_ym->add_route(1, "speaker", 0.49);
 	m_ym->add_route(2, "speaker", 0.49);
-MACHINE_CONFIG_END
-
+}
 
 // configurable slot
-#define NEOGEO_CONFIG_CARTSLOT(_tag)    \
-	MCFG_NEOGEO_CARTRIDGE_ADD(_tag, neogeo_cart, nullptr)
+void mvs_state::cartslot_config(machine_config &config, unsigned count)
+{
+	for (unsigned i = 0; i < count; i++)
+		NEOGEO_CART_SLOT(config, m_slots[i], neogeo_cart, nullptr);
+}
 
-// non-configurable slot (to be used for non-softlist sets, until we introduce some 'template' concept)
-// a single cart in slot 1, with pre-defined cart type
-#define NEOGEO_CONFIG_ONE_FIXED_CARTSLOT(_default)    \
-	MCFG_NEOGEO_CARTRIDGE_ADD("cslot1", neogeo_cart, _default)    \
-	MCFG_SET_IMAGE_LOADABLE(false)
-
-MACHINE_CONFIG_START(mvs_led_state::mv1)
+void mvs_led_state::mv1(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
 	NG_MEMCARD(config, m_memcard, 0);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
 
-	NEOGEO_CONFIG_CARTSLOT("cslot1")
+	cartslot_config(config, 1);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "neogeo")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mv1f)
+void mvs_led_state::mv1f(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
 
-	NEOGEO_CONFIG_CARTSLOT("cslot1")
+	cartslot_config(config, 1);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "neogeo")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(mvs_state::mv1fz)
+void mvs_state::mv1fz(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_mono(config);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	NEOGEO_CONFIG_CARTSLOT("cslot1")
+	cartslot_config(config, 1);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "neogeo")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(mvs_led_el_state::mv2f)
+void mvs_led_el_state::mv2f(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
 	NG_MEMCARD(config, m_memcard, 0);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
 
-	NEOGEO_CONFIG_CARTSLOT("cslot1")
-	NEOGEO_CONFIG_CARTSLOT("cslot2")
+	cartslot_config(config, 2);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "neogeo")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(mvs_led_el_state::mv4f)
+void mvs_led_el_state::mv4f(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
 	NG_MEMCARD(config, m_memcard, 0);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
 
-	NEOGEO_CONFIG_CARTSLOT("cslot1")
-	NEOGEO_CONFIG_CARTSLOT("cslot2")
-	NEOGEO_CONFIG_CARTSLOT("cslot3")
-	NEOGEO_CONFIG_CARTSLOT("cslot4")
+	cartslot_config(config, 4);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "neogeo")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(mvs_led_el_state::mv6f)
+void mvs_led_el_state::mv6f(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
 	NG_MEMCARD(config, m_memcard, 0);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", false)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
 
-	NEOGEO_CONFIG_CARTSLOT("cslot1")
-	NEOGEO_CONFIG_CARTSLOT("cslot2")
-	NEOGEO_CONFIG_CARTSLOT("cslot3")
-	NEOGEO_CONFIG_CARTSLOT("cslot4")
-	NEOGEO_CONFIG_CARTSLOT("cslot5")
-	NEOGEO_CONFIG_CARTSLOT("cslot6")
+	cartslot_config(config, 6);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "neogeo")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mv1_fixed)
+void mvs_led_state::mv1_fixed(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_stereo(config);
 
 	NG_MEMCARD(config, m_memcard, 0);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", true)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", true);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "", true)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
-MACHINE_CONFIG_END
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", true);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", true);
+}
 
 
 
@@ -2115,7 +2112,6 @@ void aes_base_state::machine_start()
 	neogeo_base_state::machine_start();
 
 	m_sprgen->m_fixed_layer_bank_type = 0;
-	m_sprgen->set_screen(m_screen);
 }
 
 void aes_state::machine_start()
@@ -2138,7 +2134,8 @@ void aes_state::device_post_load()
 }
 
 
-MACHINE_CONFIG_START(aes_state::aes)
+void aes_state::aes(machine_config &config)
+{
 	neogeo_base(config);
 	neogeo_stereo(config);
 
@@ -2146,14 +2143,13 @@ MACHINE_CONFIG_START(aes_state::aes)
 
 	NG_MEMCARD(config, m_memcard, 0);
 
-	MCFG_NEOGEO_CARTRIDGE_ADD("cslot1", neogeo_cart, nullptr)
+	NEOGEO_CART_SLOT(config, m_slots[0], neogeo_cart, nullptr);
 
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_controls, "joy", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list","AES")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_type("neogeo", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter("AES");
+}
 
 
 
@@ -2353,7 +2349,7 @@ MACHINE_CONFIG_END
 	ROM_Y_ZOOM
 
 #define ROM_Y_ZOOM \
-	ROM_REGION( 0x20000, "zoomy", 0 ) \
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 ) \
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 
 
@@ -2400,7 +2396,7 @@ ROM_START( aes )
 
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
@@ -2424,373 +2420,438 @@ CONS( 1990, aes,      0,       0,      aes,     aes,         aes_state,        e
 
 // non-configurable slot (to be used for non-softlist sets, until we introduce some 'template' concept)
 // a single cart in slot 1, with pre-defined cart type
-#define NEOGEO_CONFIG_ONE_FIXED_CARTSLOT(_default)    \
-	MCFG_NEOGEO_CARTRIDGE_ADD("cslot1", neogeo_cart, _default)    \
-	MCFG_SET_IMAGE_LOADABLE(false)
-
+void mvs_state::cartslot_fixed(machine_config &config, char const *dflt)
+{
+	NEOGEO_CART_SLOT(config, m_slots[0], neogeo_cart, dflt).set_user_loadable(false);
+}
 
 // machine config for one-game fixed config, loaded without using softlists
 
-MACHINE_CONFIG_START(mvs_led_state::neobase)
+void mvs_led_state::neobase(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "rom");
+}
 
 // used by fatfury2 & ssideki
-MACHINE_CONFIG_START(mvs_led_state::fatfur2)
+void mvs_led_state::fatfur2(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom_fatfur2")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "rom_fatfur2");
+}
 
-MACHINE_CONFIG_START(mvs_state::kizuna4p)
+void mvs_state::kizuna4p(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_mono(config);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "kiz4p", true)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge_fixed, "kiz4p", true);
 
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "rom");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof97oro)
+void mvs_led_state::kof97oro(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kof97oro")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kof97oro");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kog)
+void mvs_led_state::kog(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kog")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kog");
+}
 
-MACHINE_CONFIG_START(mvs_state::irrmaze)
+void mvs_state::irrmaze(machine_config &config)
+{
 	neogeo_arcade(config);
 	neogeo_mono(config);
 
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "irrmaze", true)
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge_fixed, "irrmaze", true);
 
 	config.set_default_layout(layout_irrmaze);
 
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "rom");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof98)
+void mvs_led_state::kof98(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom_kof98")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "rom_kof98");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mslugx)
+void mvs_led_state::mslugx(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom_mslugx")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "rom_mslugx");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof99)
+void mvs_led_state::kof99(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("sma_kof99")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "sma_kof99");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof99k)
+void mvs_led_state::kof99k(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_kof99k")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_kof99k");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::garou)
+void mvs_led_state::garou(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("sma_garou")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "sma_garou");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::garouh)
+void mvs_led_state::garouh(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("sma_garouh")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "sma_garouh");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::garoubl)
+void mvs_led_state::garoubl(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_garoubl")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_garoubl");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mslug3)
+void mvs_led_state::mslug3(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("sma_mslug3")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "sma_mslug3");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mslug3a)
+void mvs_led_state::mslug3a(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("sma_mslug3a")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "sma_mslug3a");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mslug3h)
+void mvs_led_state::mslug3h(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_mslug3h")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_mslug3h");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mslug3b6)
+void mvs_led_state::mslug3b6(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_mslug3b6")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_mslug3b6");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof2000)
+void mvs_led_state::kof2000(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("sma_kof2k")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "sma_kof2k");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof2000n)
+void mvs_led_state::kof2000n(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc50_kof2000n")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc50_kof2000n");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::zupapa)
+void mvs_led_state::zupapa(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_zupapa")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_zupapa");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::sengoku3)
+void mvs_led_state::sengoku3(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_sengoku3")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_sengoku3");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof2001)
+void mvs_led_state::kof2001(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc50_kof2001")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc50_kof2001");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::cthd2k3)
+void mvs_led_state::cthd2k3(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_cthd2k3")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_cthd2k3");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::ct2k3sp)
+void mvs_led_state::ct2k3sp(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_ct2k3sp")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_ct2k3sp");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::ct2k3sa)
+void mvs_led_state::ct2k3sa(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_ct2k3sa")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_ct2k3sa");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof2002)
+void mvs_led_state::kof2002(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("k2k2_kof2k2")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "k2k2_kof2k2");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof2002b)
+void mvs_led_state::kof2002b(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf2k2b")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf2k2b");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kf2k2pls)
+void mvs_led_state::kf2k2pls(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("k2k2_kf2k2p")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "k2k2_kf2k2p");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kf2k2mp)
+void mvs_led_state::kf2k2mp(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf2k2mp")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf2k2mp");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kf2k2mp2)
+void mvs_led_state::kf2k2mp2(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf2k2mp2")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf2k2mp2");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof10th)
+void mvs_led_state::kof10th(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf10th")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf10th");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kf10thep)
+void mvs_led_state::kf10thep(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf10thep")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf10thep");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kf2k5uni)
+void mvs_led_state::kf2k5uni(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf2k5uni")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf2k5uni");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof2k4se)
+void mvs_led_state::kof2k4se(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf2k4se")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf2k4se");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mslug5)
+void mvs_led_state::mslug5(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("pvc_mslug5")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "pvc_mslug5");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::ms5plus)
+void mvs_led_state::ms5plus(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_ms5plus")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_ms5plus");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::svc)
+void mvs_led_state::svc(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("pvc_svc")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "pvc_svc");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::svcboot)
+void mvs_led_state::svcboot(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_svcboot")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_svcboot");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::svcplus)
+void mvs_led_state::svcplus(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_svcplus")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_svcplus");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::svcplusa)
+void mvs_led_state::svcplusa(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_svcplusa")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_svcplusa");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::svcsplus)
+void mvs_led_state::svcsplus(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_svcsplus")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_svcsplus");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::samsho5)
+void mvs_led_state::samsho5(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("k2k2_samsh5")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "k2k2_samsh5");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::samsho5b)
+void mvs_led_state::samsho5b(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_samsho5b")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_samsho5b");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof2003)
+void mvs_led_state::kof2003(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("pvc_kf2k3")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "pvc_kf2k3");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kof2003h)
+void mvs_led_state::kof2003h(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("pvc_kf2k3h")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "pvc_kf2k3h");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kf2k3bl)
+void mvs_led_state::kf2k3bl(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf2k3bl")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf2k3bl");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kf2k3pl)
+void mvs_led_state::kf2k3pl(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf2k3pl")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf2k3pl");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::kf2k3upl)
+void mvs_led_state::kf2k3upl(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kf2k3upl")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_kf2k3upl");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::samsh5sp)
+void mvs_led_state::samsh5sp(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("k2k2_sams5s")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "k2k2_sams5s");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::neogeo_mj)
+void mvs_led_state::neogeo_mj(machine_config &config)
+{
 	mv1_fixed(config);
 	set_default_bios_tag("japan");
 
-	//no joystick panel
-	MCFG_DEVICE_REMOVE("edge")
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "", false)
+	// no joystick panel
+	m_edge->set_default_option("");
+	m_edge->set_fixed(false);
 
-	//P1 mahjong controller
-	MCFG_DEVICE_REMOVE("ctrl1")
-	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "mahjong", false)
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
+	// P1 mahjong controller
+	m_ctrl1->set_default_option("mahjong");
+	m_ctrl1->set_fixed(false);
 
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "rom");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::preisle2)
+void mvs_led_state::preisle2(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_preisle2")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_preisle2");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::nitd)
+void mvs_led_state::nitd(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_nitd")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_nitd");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::s1945p)
+void mvs_led_state::s1945p(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_s1945p")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_s1945p");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::lans2004)
+void mvs_led_state::lans2004(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_lans2004")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_lans2004");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::pnyaa)
+void mvs_led_state::pnyaa(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("pcm2_pnyaa")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "pcm2_pnyaa");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::popbounc)
+void mvs_led_state::popbounc(machine_config &config)
+{
 	mv1_fixed(config);
-	MCFG_DEVICE_REMOVE("edge")
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "dial", true)
 
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
-MACHINE_CONFIG_END
+	NEOGEO_CTRL_EDGE_CONNECTOR(config.replace(), m_edge, neogeo_arc_edge_fixed, "dial", true);
 
-MACHINE_CONFIG_START(mvs_led_state::ganryu)
+	cartslot_fixed(config, "rom");
+}
+
+void mvs_led_state::ganryu(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_ganryu")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_ganryu");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::bangbead)
+void mvs_led_state::bangbead(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc42_bangbead")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc42_bangbead");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::mslug4)
+void mvs_led_state::mslug4(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("pcm2_mslug4")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "pcm2_mslug4");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::ms4plus)
+void mvs_led_state::ms4plus(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("pcm2_ms4p")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "pcm2_ms4p");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::rotd)
+void mvs_led_state::rotd(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("pcm2_rotd")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "pcm2_rotd");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::matrim)
+void mvs_led_state::matrim(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("k2k2_matrim")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "k2k2_matrim");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::matrimbl)
+void mvs_led_state::matrimbl(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_matrimbl")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_matrimbl");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::jockeygp)
+void mvs_led_state::jockeygp(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("cmc50_jockeygp")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "cmc50_jockeygp");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::vliner)
+void mvs_led_state::vliner(machine_config &config)
+{
 	mv1_fixed(config);
+
 	// input handlers are installed at DRIVER_INIT...
-	MCFG_DEVICE_REMOVE("edge")
-	MCFG_DEVICE_REMOVE("ctrl1")
-	MCFG_DEVICE_REMOVE("ctrl2")
+	config.device_remove("edge");
+	config.device_remove("ctrl1");
+	config.device_remove("ctrl2");
 
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom_vliner")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "rom_vliner");
+}
 
-MACHINE_CONFIG_START(mvs_led_state::sbp)
+void mvs_led_state::sbp(machine_config &config)
+{
 	mv1_fixed(config);
-	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_sbp")
-MACHINE_CONFIG_END
+	cartslot_fixed(config, "boot_sbp");
+}
 
 
 
@@ -11740,7 +11801,7 @@ GAME( 1999, garoubl,    garou,    garoubl,   neogeo,    mvs_led_state, empty_ini
 GAME( 2000, mslug3,     neogeo,   mslug3,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 2000, mslug3a,    mslug3,   mslug3a,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560, earlier)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX - revision Mar/17/2000 1:36 (from SMA rom) */
 GAME( 2000, mslug3h,    mslug3,   mslug3h,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGH-2560)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2000, mslug3b6,   mslug3,   mslug3b6,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 6 (Metal Slug 3 bootleg)", MACHINE_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see naomi.c ;-) */
+GAME( 2000, mslug3b6,   mslug3,   mslug3b6,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 6 (Metal Slug 3 bootleg)", MACHINE_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see naomi.cpp ;-) */
 GAME( 2000, kof2000,    neogeo,   kof2000,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (NGM-2570 ~ NGH-2570)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 2000, kof2000n,   kof2000,  kof2000n,  neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2001, zupapa,     neogeo,   zupapa,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Zupapa!" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */

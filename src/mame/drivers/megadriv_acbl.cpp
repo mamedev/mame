@@ -334,13 +334,10 @@ READ16_MEMBER(md_boot_state::aladmdb_r )
 READ16_MEMBER(md_boot_state::sonic2mb_r )
 {
 	if (m_maincpu->pc()==0x00010a)
-	{
-		m_aladmdb_mcu_port = ioport("MCU")->read();
-
 		return ioport("COIN")->read() & 0x03;
-	}
 	
-	if (m_maincpu->pc()==0x000318) { return ((m_aladmdb_mcu_port) << 8); } // DSW
+	if (m_maincpu->pc()==0x000318)
+		return ioport("MCU")->read() << 8; // DSW
 
 	//logerror("sonic2mb_r : %06x\n",m_maincpu->pc());
 
@@ -350,13 +347,9 @@ READ16_MEMBER(md_boot_state::sonic2mb_r )
 READ16_MEMBER(md_boot_state::twinktmb_r )
 {
 	if (m_maincpu->pc()==0x02f81e)
-	{
-		uint16_t ret = machine().rand() & 0xffff;
-		logerror("%04x\n", ret);
-		return ret; // TODO: obviously wrong, rand() gets in game
-	}
+		return ioport("COIN")->read(); // TODO: coins don't respond well
 
-	if (m_maincpu->pc()==0x02f84e) return 0x0000; // what's this?
+	if (m_maincpu->pc()==0x02f84e) return 0x0000; // what's this? dips?
 
 	//logerror("twinktmb_r : %06x\n",m_maincpu->pc());
 
@@ -644,15 +637,18 @@ INPUT_PORTS_START( sonic2mb )
 
 	/* As I don't know how it is on real hardware, this is more a guess than anything */
 	PORT_MODIFY("MCU")
-	PORT_DIPNAME(          0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2") // recognized only after soft reset?
+	PORT_DIPNAME(          0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(       0x00, "1" )
 	PORT_DIPSETTING(       0x01, "2" )
 	PORT_DIPSETTING(       0x02, "3" )
 	PORT_DIPSETTING(       0x03, "4" )
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPNAME(          0x30, 0x20, "Timer Speed" ) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(       0x30, "Slowest" )
+	PORT_DIPSETTING(       0x20, "Normal" )
+	PORT_DIPSETTING(       0x10, "Fast" )
+	PORT_DIPSETTING(       0x00, "Fastest" )
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
 	PORT_DIPUNUSED( 0x100, IP_ACTIVE_HIGH )
@@ -676,6 +672,17 @@ INPUT_PORTS_START( twinktmb )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_START("COIN")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* verified from M68000 code */
@@ -1081,6 +1088,6 @@ GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_state, init_mk3mdb,   R
 GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_state, init_ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
 GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)
-GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", MACHINE_UNEMULATED_PROTECTION ) // simulation incomplete, needs PIC decap
+GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)", 0 ) // flying wires going through the empty PIC space aren't completely understood
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)", 0 )
 GAME( 1993, twinktmb, 0, md_bootleg,   twinktmb, md_boot_state, init_twinktmb, ROT0, "bootleg / Sega",   "Twinkle Tale (bootleg of Megadrive version)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // needs PIC decap or simulation
