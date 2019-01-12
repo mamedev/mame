@@ -3511,6 +3511,8 @@ if (BUSES["HP9845_IO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp9845_io/98034.h",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98035.cpp",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98035.h",
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9885.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9885.h",
 	}
 end
 
