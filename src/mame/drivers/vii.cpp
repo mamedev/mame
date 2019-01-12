@@ -1017,12 +1017,6 @@ ROM_START( vii )
 	ROM_LOAD16_WORD_SWAP( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
 ROM_END
 
-ROM_START( jak_capb )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "classicarcadepinball.bin", 0x000000, 0x200000, CRC(b643dab0) SHA1(f57d546758ba442e28b5f0f48b3819b2fc2eb7f7) )
-ROM_END
-
-
 ROM_START( jak_batm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
@@ -1249,9 +1243,6 @@ CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2008, jak_wall, 0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Wall-E (JAKKS Pacific TV Game)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-CONS( 2005, jak_capb, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc", "Classic Arcade Pinball (JAKKS Pacific TV Game)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
 
 // 'Game-Key-Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)
 CONS( 2005, jak_wwe,  0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "WWE (JAKKS Pacific TV Game)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
