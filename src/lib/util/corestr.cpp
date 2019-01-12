@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    corestr.c
+    corestr.cpp
 
     Core string functions used throughout MAME.
 
@@ -10,6 +10,8 @@
 
 #include "corestr.h"
 #include "osdcore.h"
+#include "unicode.h"
+
 #include <ctype.h>
 #include <stdlib.h>
 
@@ -189,10 +191,49 @@ std::string &strtrimrightspace(std::string& str)
 	return internal_strtrimspace(str, true);
 }
 
+static std::string &strtransform_uchar(std::string& str, char32_t(*callback)(char32_t ch))
+{
+	size_t i = 0;
+	while (i < str.size())
+	{
+		size_t advance;
+		char32_t old_character;
+		int rc = uchar_from_utf8(&old_character, &str[i], str.size() - i);
+
+		if (rc > 0)
+		{
+			char32_t new_character = callback(old_character);
+			if (old_character != new_character)
+			{
+				// if the character has changed, replace it
+				char new_character_utf8_buffer[UTF8_CHAR_MAX];
+				int new_character_utf8_length = utf8_from_uchar(new_character_utf8_buffer, ARRAY_LENGTH(new_character_utf8_buffer), new_character);
+				assert(new_character_utf8_length > 0);
+				str.replace(i, rc, new_character_utf8_buffer, new_character_utf8_length);
+				advance = new_character_utf8_length;
+			}
+			else
+			{
+				// if the character has not changed, just advance
+				advance = (size_t)rc;
+			}
+		}
+		else
+		{
+			// degenerate scenario; skip over this character
+			advance = 1;
+		}
+
+		// advance our progress, and be defensive with the assert
+		assert(advance > 0);
+		i += advance;
+	}
+	return str;
+}
+
 std::string &strmakeupper(std::string& str)
 {
-	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
-	return str;
+	return strtransform_uchar(str, uchar_toupper);
 }
 
 /**
@@ -207,8 +248,7 @@ std::string &strmakeupper(std::string& str)
 
 std::string &strmakelower(std::string& str)
 {
-	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-	return str;
+	return strtransform_uchar(str, uchar_tolower);
 }
 
 /**
