@@ -410,7 +410,7 @@ void rx2030_state::rx2030_map(address_map &map)
 							case 19: // keyboard
 								LOGMASKED(LOG_IOCB, "iocb %s command 0x%04x data 0x%02x (%s)\n",
 									iop_commands[iocb], iop_cmd,
-									m_ram->read(0x1000 + iocb_cmdparam + 6),
+									m_ram->read(0x1000 + iocb_cmdparam + 7),
 									machine().describe_context());
 								break;
 
@@ -548,33 +548,24 @@ void rx2030_state::rx2030(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
 
 	// scsi bus and devices
-	NSCSI_BUS(config, m_scsibus, 0);
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", mips_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mips_scsi_devices, nullptr);
 
-	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
-	mips_scsi_devices(harddisk);
-	harddisk.set_default_option("harddisk");
+	// scsi host adapter (clock assumed)
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("aic6250", AIC6250).clock(10_MHz_XTAL).machine_config(
+		[this](device_t *device)
+		{
+			aic6250_device &adapter = downcast<aic6250_device &>(*device);
 
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:4", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
-
-	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("aic6250", AIC6250);
-	adapter.set_default_option("aic6250");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("aic6250", [this](device_t *device)
-	{
-		aic6250_device &adapter = downcast<aic6250_device &>(*device);
-
-		adapter.set_clock(10_MHz_XTAL); // clock assumed
-
-		adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7).invert();
-		adapter.breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
-	});
+			adapter.int_cb().set_inputline(m_iop, INPUT_LINE_IRQ7).invert();
+			adapter.breq_cb().set(m_iop, FUNC(v50_device::dreq_w<1>));
+		});
 
 	// ethernet
 	AM7990(config, m_net);
@@ -757,8 +748,7 @@ void rx3230_state::rx3230(machine_config &config)
 {
 	R3000A(config, m_cpu, 50_MHz_XTAL / 2, 32768, 32768);
 	m_cpu->set_addrmap(AS_PROGRAM, &rx3230_state::rx3230_map);
-	// TODO: FPU disabled until properly emulated
-	//m_cpu->set_fpurev(mips1_device_base::MIPS_R3010A);
+	m_cpu->set_fpurev(mips1_device_base::MIPS_R3010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
 	// 32 SIMM slots, 8-128MB memory, banks of 8 1MB or 4MB SIMMs
@@ -773,37 +763,29 @@ void rx3230_state::rx3230(machine_config &config)
 	m_rambo->parity_out().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 	//m_rambo->buzzer_out().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_rambo->set_ram(m_ram);
-	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma_r));
-	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma_w));
+	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_r));
+	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_w));
 
 	// scsi bus and devices
-	NSCSI_BUS(config, m_scsibus, 0);
-
-	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, "scsi:0", 0));
-	mips_scsi_devices(harddisk);
-	harddisk.set_default_option("harddisk");
-
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:1", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:2", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:3", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:4", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:5", 0));
-	mips_scsi_devices(NSCSI_CONNECTOR(config, "scsi:6", 0));
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", mips_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mips_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mips_scsi_devices, nullptr);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("ncr53c94", NCR53C94);
-	adapter.set_default_option("ncr53c94");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("ncr53c94", [this](device_t *device)
-	{
-		ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c94", NCR53C94).clock(24_MHz_XTAL).machine_config(
+		[this](device_t *device)
+		{
+			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
 
-		adapter.set_clock(24_MHz_XTAL);
-
-		adapter.irq_handler_cb().set(*this, FUNC(rx3230_state::irq_w<INT_SCSI>)).invert();
-		adapter.drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
-	});
+			adapter.set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
+			adapter.irq_handler_cb().set(*this, FUNC(rx3230_state::irq_w<INT_SCSI>)).invert();
+			adapter.drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
+		});
 
 	// ethernet
 	AM7990(config, m_net);

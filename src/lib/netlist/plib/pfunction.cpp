@@ -17,7 +17,7 @@ namespace plib {
 
 void pfunction::compile(const std::vector<pstring> &inputs, const pstring &expr)
 {
-	if (expr.startsWith("rpn:"))
+	if (plib::startsWith(expr, "rpn:"))
 		compile_postfix(inputs, expr.substr(4));
 	else
 		compile_infix(inputs, expr);
@@ -68,9 +68,9 @@ void pfunction::compile_postfix(const std::vector<pstring> &inputs,
 			}
 			if (rc.m_cmd != PUSH_INPUT)
 			{
-				bool err = false;
 				rc.m_cmd = PUSH_CONST;
-				rc.m_param = cmd.as_double(&err);
+				bool err;
+				rc.m_param = plib::pstonum_ne<decltype(rc.m_param)>(cmd, err);
 				if (err)
 					throw plib::pexception(plib::pfmt("nld_function: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 				stk += 1;
@@ -88,7 +88,7 @@ static int get_prio(pstring v)
 {
 	if (v == "(" || v == ")")
 		return 1;
-	else if (v.left(1) >= "a" && v.left(1) <= "z")
+	else if (plib::left(v, 1) >= "a" && plib::left(v, 1) <= "z")
 		return 0;
 	else if (v == "*" || v == "/")
 		return 20;
@@ -113,7 +113,7 @@ void pfunction::compile_infix(const std::vector<pstring> &inputs, const pstring 
 {
 	// Shunting-yard infix parsing
 	std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};
-	std::vector<pstring> sexpr(plib::psplit(expr.replace_all(" ",""), sep));
+	std::vector<pstring> sexpr(plib::psplit(plib::replace_all(expr, pstring(" "), pstring("")), sep));
 	std::stack<pstring> opstk;
 	std::vector<pstring> postfix;
 
@@ -199,8 +199,8 @@ double pfunction::evaluate(const std::vector<double> &values)
 			OP(SUB,  1, ST2 - ST1)
 			OP(DIV,  1, ST2 / ST1)
 			OP(POW,  1, std::pow(ST2, ST1))
-			OP(SIN,  0, std::sin(ST2));
-			OP(COS,  0, std::cos(ST2));
+			OP(SIN,  0, std::sin(ST2))
+			OP(COS,  0, std::cos(ST2))
 			case RAND:
 				stack[ptr++] = lfsr_random();
 				break;

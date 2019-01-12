@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- It is unclear how to calculate the checksum that's stored as ASCII at the start of some of these, however there is a secondary checksum in a footer area at the end that works out correctly, so the ROMs should be good -->
+
+<softwarelist name="clickstart_cart" description="LeapFrog ClickStart cartridges">
+
+	<software name="aniart" supported="no">
+		<description>Animal Art Studio</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="clickstart_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12780-a - animal art studio (uk).bin" size="0x400000" crc="f1390fea" sha1="3ace0c1b1ffe883e2dda8976c24f47729df53191" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aniarts" cloneof="aniart" supported="no">
+		<description>Estudio de Arte Animal</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="clickstart_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12887-a - estudio de arte animal (sp).bin" size="0x400000" crc="11920f3a" sha1="c6c1f153a6e17a31da1a079f2c8e0e57947d2ac9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nemo" supported="no">
+		<description>Finding Nemo</description>
+		<year>2007</year>
+		<publisher>LeapFrog / Disney / Pixar</publisher>
+		<part name="cart" interface="clickstart_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12727-a - finding nemo (uk).bin" size="0x400000" crc="33e02256" sha1="caac98a66b714aa9addef42d31cd139fe138ea58" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor" supported="no">
+		<description>Toy Story (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog / Disney / Pixar</publisher>
+		<part name="cart" interface="clickstart_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12728-a - toy story (uk).bin" size="0x400000" crc="9021fa2e" sha1="841be50a7f0eb4f633469b04928d3085874866dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="toystors" cloneof="toystor" supported="no">
+		<description>Toy Story (SP)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="clickstart_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12894-a - toy story (sp).bin" size="0x400000" crc="91a748f6" sha1="05da46b6ded3fee24bc1167395f8139647368b68" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="bobbuild" supported="no">
+		<description>Bob the Builder (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="clickstart_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-13084-a - bob the builder (uk).bin" size="0x400000" crc="387920df" sha1="ac071987f5389604f368ea0a59962a0c28f73a80" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="thomas" supported="no">
+		<description>Thomas &amp; Friends (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="clickstart_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12781-a - thomas and friends (uk).bin" size="0x400000" crc="8485c99a" sha1="2a4899868f383b8a6e8cdc0e65dfed86222ff697" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="dora" supported="no">
+		<description>Dora the Explorer (UK)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="clickstart_cart">
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12729-a - dora the explorer (uk).bin" size="0x400000" crc="e93bd91a" sha1="e4c9649becd6370d555c6475cb491ba78c54ad17" offset="0" />
+			</dataarea>
+		</part>
+	</software>	
+</softwarelist>
+

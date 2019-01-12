@@ -266,7 +266,6 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 		break;
 	case 0x1004/4:
 		LOGMASKED(LOG_SCSI, "%s: HPC3 SCSI0 DMA Control Write: %08x\n", machine().describe_context(), data);
-		printf("HPC3 SCSI0 DMA Control Write: %08x\n", data);
 		m_scsi_dma[0].m_ctrl = data;
 		m_scsi_dma[0].m_to_device = (m_scsi_dma[0].m_ctrl & HPC3_DMACTRL_DIR);
 		m_scsi_dma[0].m_big_endian = (m_scsi_dma[0].m_ctrl & HPC3_DMACTRL_ENDIAN);
@@ -683,7 +682,7 @@ void hpc3_device::scsi_drq(bool state, int channel)
 void hpc3_device::do_scsi_dma(int channel)
 {
     scsi_dma_t &dma = m_scsi_dma[channel];
-    
+
     if (dma.m_to_device)
 		m_wd33c93->dma_w(m_cpu_space->read_byte(dma.m_big_endian ? BYTE4_XOR_BE(dma.m_addr) : BYTE4_XOR_LE(dma.m_addr)));
 	else

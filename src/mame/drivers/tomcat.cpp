@@ -360,7 +360,7 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 
 	MCFG_DEVICE_ADD("m48t02", M48T02, 0)
 
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, "vector", 0);
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(40)
 	//MCFG_SCREEN_REFRESH_RATE((double)XTAL(12'000'000) / 16 / 16 / 16 / 12  / 5 )

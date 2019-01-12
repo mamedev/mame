@@ -44,4 +44,22 @@ private:
 
 DECLARE_DEVICE_TYPE(CRUSH11, crush11_host_device)
 
+// device connected to SMBus
+
+class smbus_logger_device : public device_t, public smbus_interface
+{
+public:
+	smbus_logger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual int execute_command(int command, int rw, int data) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	uint8_t buffer[0xff];
+};
+
+DECLARE_DEVICE_TYPE(SMBUS_LOGGER, smbus_logger_device)
+
 #endif

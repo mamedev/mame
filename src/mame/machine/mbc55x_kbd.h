@@ -7,8 +7,8 @@
 
 *******************************************************************************/
 
-#ifndef MAME_MACHINE_MBC55X_KBD
-#define MAME_MACHINE_MBC55X_KBD 1
+#ifndef MAME_MACHINE_MBC55X_KBD_H
+#define MAME_MACHINE_MBC55X_KBD_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MBC55X_KEYBOARD, mbc55x_keyboard_device)
 
-#endif // MAME_MACHINE_MBC55X_KBD
+#endif // MAME_MACHINE_MBC55X_KBD_H

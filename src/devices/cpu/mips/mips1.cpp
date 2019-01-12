@@ -318,98 +318,105 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 			"mount",        "hdwconf",      "exportfs",     "nfsfh_open",   "libattach",    "libdetach"
 		};
 
+		static char const *const msg_syscalls[] = { "msgget", "msgctl", "msgrcv", "msgsnd" };
+		static char const *const shm_syscalls[] = { "shmat", "shmctl", "shmdt", "shmget" };
+		static char const *const sem_syscalls[] = { "semctl", "semget", "semop" };
+		static char const *const mips_syscalls[] = { "mipskopt", "mipshwconf", "mipsgetrusage", "mipswait", "mipscacheflush", "mipscachectl" };
+
 		int const asid = (m_cpr[0][COP0_EntryHi] & EH_ASID) >> 6;
 		switch (m_r[2])
 		{
 		case 1000: // indirect
 			switch (m_r[4])
 			{
-			case 2151: // sysmips
+			case 1049: // msgsys
+				LOGMASKED(LOG_RISCOS, "asid %d syscall msgsys:%s() (%s)\n",
+					asid, (m_r[5] < ARRAY_LENGTH(msg_syscalls)) ? msg_syscalls[m_r[5]] : "unknown", machine().describe_context());
+				break;
+
+			case 1052: // shmsys
+				LOGMASKED(LOG_RISCOS, "asid %d syscall shmsys:%s() (%s)\n",
+					asid, (m_r[5] < ARRAY_LENGTH(shm_syscalls)) ? shm_syscalls[m_r[5]] : "unknown", machine().describe_context());
+				break;
+
+			case 1053: // semsys
+				LOGMASKED(LOG_RISCOS, "asid %d syscall semsys:%s() (%s)\n",
+					asid, (m_r[5] < ARRAY_LENGTH(sem_syscalls)) ? sem_syscalls[m_r[5]] : "unknown", machine().describe_context());
+				break;
+
+			case 2151: // bsd_sysmips
 				switch (m_r[5])
 				{
 				case 0x100: // mipskopt
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:sysmips:mipskopt(\"%s\") (%s)\n",
+					LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:mipskopt(\"%s\") (%s)\n",
 						asid, debug_string(m_r[6]), machine().describe_context());
 					break;
 
-				case 0x101: // mipshwconf
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:sysmips:mipshwconf() (%s)\n",
-						asid, machine().describe_context());
-					break;
-
-				case 0x102: // mipsgetrusage
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:sysmips:mipsgetrusage() (%s)\n",
-						asid, machine().describe_context());
-					break;
-
-				case 0x103: // mipswait
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:sysmips:mipswait() (%s)\n",
-						asid, machine().describe_context());
-					break;
-
-				case 0x104: // mipscacheflush
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:sysmips:mipscacheflush() (%s)\n",
-						asid, machine().describe_context());
-					break;
-
-				case 0x105: // mipscachectl
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:sysmips:mipscachectl() (%s)\n",
-						asid, machine().describe_context());
-					break;
-
 				default:
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:sysmips:unknown 0x%x (%s)\n",
-						asid, m_r[5], machine().describe_context());
+					if ((m_r[5] > 0x100) && (m_r[5] - 0x100) < ARRAY_LENGTH(mips_syscalls))
+						LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:%s() (%s)\n",
+							asid, mips_syscalls[m_r[5] - 0x100], machine().describe_context());
+					else
+						LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:unknown %d (%s)\n",
+							asid, m_r[5], machine().describe_context());
 					break;
 				}
 				break;
 
 			default:
 				if ((m_r[4] > 2000) && (m_r[4] - 2000 < ARRAY_LENGTH(bsd_syscalls)) && bsd_syscalls[m_r[4] - 2000])
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:%s() (%s)\n",
+					LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_%s() (%s)\n",
 						asid, bsd_syscalls[m_r[4] - 2000], machine().describe_context());
 				else
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:unknown 0x%x (%s)\n",
+					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:unknown %d (%s)\n",
 						asid, m_r[4], machine().describe_context());
 				break;
 			}
 			break;
 
+		case 1003: // read
+		case 1006: // close
+		case 1054: // ioctl
+		case 1169: // fcntl
+			LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d) (%s)\n",
+				asid, sysv_syscalls[m_r[2] - 1000], m_r[4], machine().describe_context());
+			break;
+
+		case 1004: // write
+			if (m_r[4] == 1 || m_r[4] == 2)
+				LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d, \"%s\") (%s)\n",
+					asid, sysv_syscalls[m_r[2] - 1000], m_r[4], debug_string(m_r[5], m_r[6]), machine().describe_context());
+			else
+				LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d) (%s)\n",
+					asid, sysv_syscalls[m_r[2] - 1000], m_r[4], machine().describe_context());
+			break;
+
 		case 1005: // open
-			LOGMASKED(LOG_RISCOS, "asid %d syscall open(\"%s\") (%s)\n",
-				asid, debug_string(m_r[4]), machine().describe_context());
-			break;
-
+		case 1008: // creat
 		case 1009: // link
-			LOGMASKED(LOG_RISCOS, "asid %d syscall link(\"%s\", \"%s\") (%s)\n",
-				asid, debug_string(m_r[4]), debug_string(m_r[5]), machine().describe_context());
-			break;
-
 		case 1010: // unlink
-			LOGMASKED(LOG_RISCOS, "asid %d syscall unlink(\"%s\") (%s)\n",
-				asid, debug_string(m_r[4]), machine().describe_context());
-			break;
-
+		case 1012: // chdir
 		case 1018: // stat
-			LOGMASKED(LOG_RISCOS, "asid %d syscall stat(\"%s\") (%s)\n",
-				asid, debug_string(m_r[4]), machine().describe_context());
+		case 1033: // access
+			LOGMASKED(LOG_RISCOS, "asid %d syscall %s(\"%s\") (%s)\n",
+				asid, sysv_syscalls[m_r[2] - 1000], debug_string(m_r[4]), machine().describe_context());
 			break;
 
 		case 1059: // execve
-			LOGMASKED(LOG_RISCOS, "asid %d syscall execve(\"%s\", [ %s ]) (%s)\n",
-				asid, debug_string(m_r[4]), debug_string_array(m_r[5]), machine().describe_context());
+			LOGMASKED(LOG_RISCOS, "asid %d syscall execve(\"%s\", [ %s ], [ %s ]) (%s)\n",
+				asid, debug_string(m_r[4]), debug_string_array(m_r[5]), debug_string_array(m_r[6]), machine().describe_context());
 			break;
 
 		case 1060: // umask
-			LOGMASKED(LOG_RISCOS, "asid %d syscall umask(0%o) (%s)\n",
-				asid, m_r[4], machine().describe_context());
+			LOGMASKED(LOG_RISCOS, "asid %d syscall umask(%#o) (%s)\n",
+				asid, m_r[4] & 0777, machine().describe_context());
 			break;
 
 		default:
 			if ((m_r[2] > 1000) && (m_r[2] - 1000 < ARRAY_LENGTH(sysv_syscalls)) && sysv_syscalls[m_r[2] - 1000])
 				LOGMASKED(LOG_RISCOS, "asid %d syscall %s() (%s)\n", asid, sysv_syscalls[m_r[2] - 1000], machine().describe_context());
 			else
-				LOGMASKED(LOG_RISCOS, "asid %d syscall unknown 0x%x (%s)\n", asid, m_r[2], machine().describe_context());
+				LOGMASKED(LOG_RISCOS, "asid %d syscall unknown %d (%s)\n", asid, m_r[2], machine().describe_context());
 			break;
 		}
 	}
@@ -429,7 +436,7 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 	m_branch_state = EXCEPTION;
 
 	// shift the exception bits
-	SR = (SR & ~SR_KUIE) | ((SR << 2) & (SR_KUo | SR_IEo | SR_KUp | SR_IEp));
+	SR = (SR & ~SR_KUIE) | ((SR << 2) & SR_KUIEop);
 
 	if (refill)
 		m_pc = (SR & SR_BEV) ? 0xbfc00100 : 0x80000000;
@@ -441,16 +448,16 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 
 void mips1core_device_base::check_irqs()
 {
-	if ((CAUSE & SR & 0xff00) && (SR & SR_IEc))
+	if ((CAUSE & SR & SR_IM) && (SR & SR_IEc))
 		generate_exception(EXCEPTION_INTERRUPT);
 }
 
 void mips1core_device_base::set_irq_line(int irqline, int state)
 {
 	if (state != CLEAR_LINE)
-		CAUSE |= 0x400 << irqline;
+		CAUSE |= CAUSE_IPEX0 << irqline;
 	else
-		CAUSE &= ~(0x400 << irqline);
+		CAUSE &= ~(CAUSE_IPEX0 << irqline);
 
 	check_irqs();
 }
@@ -473,7 +480,7 @@ void mips1core_device_base::set_cop0_reg(int const index, u32 const data)
 {
 	if (index == COP0_Cause)
 	{
-		CAUSE = (CAUSE & 0xfc00) | (data & ~0xfc00);
+		CAUSE = (CAUSE & CAUSE_IPEX) | (data & ~CAUSE_IPEX);
 
 		// update interrupts -- software ints can occur this way
 		check_irqs();
@@ -534,7 +541,7 @@ void mips1core_device_base::handle_cop0(u32 const op)
 				case 0x02:  /* TLBWI */                                              break;
 				case 0x06:  /* TLBWR */                                              break;
 				case 0x08:  /* TLBP */                                               break;
-				case 0x10:  /* RFE */   SR = (SR & 0xfffffff0) | ((SR >> 2) & 0x0f); break;
+				case 0x10:  /* RFE */   SR = (SR & ~SR_KUIEpc) | ((SR >> 2) & SR_KUIEpc); break;
 				case 0x18:  /* ERET */  generate_exception(EXCEPTION_INVALIDOP);     break;
 				default:    generate_exception(EXCEPTION_INVALIDOP);                 break;
 			}
@@ -1172,7 +1179,7 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 		return true;
 	}
 
-	if (!machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && !(intention & TRANSLATE_DEBUG_MASK))
 	{
 		if (VERBOSE & LOG_TLB)
 		{
@@ -1195,25 +1202,31 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 	return false;
 }
 
-std::string mips1core_device_base::debug_string(u32 string_pointer)
+std::string mips1core_device_base::debug_string(u32 string_pointer, int const limit)
 {
 	auto const suppressor(machine().disable_side_effects());
 
 	bool done = false;
+	bool mapped = false;
 	std::string result("");
 
 	while (!done)
 	{
 		done = true;
-		load<u8>(string_pointer++, [&done, &result](u8 byte)
+		load<u8>(string_pointer++, [limit, &done, &mapped, &result](u8 byte)
 		{
+			mapped = true;
 			if (byte != 0)
 			{
 				result += byte;
-				done = false;
+
+				done = result.length() == limit;
 			}
 		});
 	}
+
+	if (!mapped)
+		result.assign("[unmapped]");
 
 	return result;
 }

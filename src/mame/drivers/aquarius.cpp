@@ -366,7 +366,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarius);
-	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
+	TEA1002(config, m_tea1002, XTAL(8'867'238));
 	PALETTE(config, m_palette, FUNC(aquarius_state::aquarius_palette), 512, 16);
 
 	/* sound hardware */

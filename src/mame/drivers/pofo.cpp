@@ -1033,10 +1033,10 @@ MACHINE_CONFIG_START(portfolio_state::portfolio)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_portfolio);
 
-	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, XTAL(4'915'200)/2/2)
-	MCFG_DEVICE_ADDRESS_MAP(0, portfolio_lcdc)
-	MCFG_HD61830_RD_CALLBACK(READ8(*this, portfolio_state, hd61830_rd_r))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	HD61830(config, m_lcdc, XTAL(4'915'200)/2/2);
+	m_lcdc->set_addrmap(0, &portfolio_state::portfolio_lcdc);
+	m_lcdc->rd_rd_callback().set(FUNC(portfolio_state::hd61830_rd_r));
+	m_lcdc->set_screen(SCREEN_TAG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -65,7 +65,7 @@ public:
 	void sfiii3(machine_config &config);
 	void sfiii(machine_config &config);
 	void jojoba(machine_config &config);
-	void simm_config(machine_config &config, int slot, int maxchip);
+	void simm_config(machine_config &config, int slot, int chipno);
 	void simm1_64mbit(machine_config &config);
 	void simm2_64mbit(machine_config &config);
 	void simm3_128mbit(machine_config &config);
@@ -80,7 +80,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
+	void copy_from_nvram();
+	u32 m_current_table_address;
 	required_device<sh2_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -103,6 +104,7 @@ private:
 	optional_memory_region      m_user4_region;
 	optional_memory_region      m_user5_region;
 
+private:
 	u32 m_cram_gfxflash_bank;
 	std::unique_ptr<u32[]> m_char_ram;
 	std::unique_ptr<u32[]> m_eeprom;
@@ -127,7 +129,6 @@ private:
 	u32 m_paldma_length;
 	u32 m_chardma_source;
 	u32 m_chardma_other;
-	u32 m_current_table_address;
 	int m_rle_length;
 	int m_last_normal_byte;
 	u16 m_lastb;
@@ -181,7 +182,6 @@ private:
 	u32 ProcessByte8(u8 b,u32 dst_offset);
 	void do_alt_char_dma( u32 src, u32 real_dest, u32 real_length );
 	void process_character_dma(u32 address);
-	void copy_from_nvram();
 	inline void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
 		int transparency, int transparent_color,

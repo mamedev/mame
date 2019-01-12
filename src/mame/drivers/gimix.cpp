@@ -487,8 +487,8 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	MCFG_DEVICE_PROGRAM_MAP(gimix_mem)
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, gimix_state,irq_w))
+	mm58167_device &rtc(MM58167(config, "rtc", 32.768_kHz_XTAL));
+	rtc.irq().set(FUNC(gimix_state::irq_w));
 
 	/* timer */
 	ptm6840_device &ptm(PTM6840(config, "timer", 2'000'000));  // clock is a guess

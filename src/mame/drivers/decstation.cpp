@@ -103,6 +103,7 @@ public:
 protected:
 	DECLARE_READ_LINE_MEMBER(brcond0_r) { return ASSERT_LINE; }
 	DECLARE_WRITE_LINE_MEMBER(ioga_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(dz_irq_w);
 
 	DECLARE_READ32_MEMBER(cfb_r);
 	DECLARE_WRITE32_MEMBER(cfb_w);
@@ -238,9 +239,9 @@ READ32_MEMBER(decstation_state::cfb_r)
 {
 	uint32_t addr = offset << 2;
 
-//  logerror("cfb_r: reading at %x\n", addr);
+	//logerror("cfb_r: reading at %x\n", addr);
 
-	if (addr < 0x800000)
+	if (addr < 0x80000)
 	{
 		return m_vrom_ptr[addr>>2] & 0xff;
 	}
@@ -551,6 +552,11 @@ WRITE_LINE_MEMBER(decstation_state::ioga_irq_w)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);
 }
 
+WRITE_LINE_MEMBER(decstation_state::dz_irq_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ2, state);
+}
+
 void decstation_state::machine_start()
 {
 	if (m_vrom)
@@ -562,6 +568,8 @@ void decstation_state::machine_start()
 
 void decstation_state::machine_reset()
 {
+	m_ioga->set_dma_space(&m_maincpu->space(AS_PROGRAM));
+
 	m_copy_src = 1;
 	m_entry = 0;
 	m_stage = 0;
@@ -662,6 +670,8 @@ MACHINE_CONFIG_START(decstation_state::kn01)
 	m_scantimer->configure_scanline(FUNC(decstation_state::scanline_timer), "screen", 0, 1);
 
 	DC7085(config, m_dz, 0);
+	m_dz->int_cb().set(FUNC(decstation_state::dz_irq_w));
+	m_dz->ch1_tx_cb().set("dc7085:ch1", FUNC(dc7085_channel::rx_w));
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
 
@@ -684,6 +694,8 @@ MACHINE_CONFIG_START(decstation_state::kn02ba)
 
 	AM79C90(config, m_lance, XTAL(12'500'000));
 	m_lance->intr_out().set("ioga", FUNC(dec_ioga_device::lance_irq_w));
+	m_lance->dma_in().set("ioga", FUNC(dec_ioga_device::lance_dma_r));
+	m_lance->dma_out().set("ioga", FUNC(dec_ioga_device::lance_dma_w));
 
 	DECSTATION_IOGA(config, m_ioga, XTAL(12'500'000));
 	m_ioga->irq_out().set(FUNC(decstation_state::ioga_irq_w));

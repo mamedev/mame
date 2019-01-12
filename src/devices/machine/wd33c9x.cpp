@@ -29,7 +29,7 @@
 #define LOG_REGS        (LOG_READS | LOG_WRITES)
 #define LOG_ALL         (LOG_REGS | LOG_COMMANDS | LOG_ERRORS | LOG_MISC | LOG_LINES | LOG_STATE | LOG_STEP)
 
-#define VERBOSE         (LOG_COMMANDS | LOG_ERRORS | LOG_STATE | LOG_REGS | LOG_STEP)
+#define VERBOSE         (LOG_COMMANDS | LOG_ERRORS)
 #include "logmacro.h"
 
 enum register_addresses_e : uint8_t {
@@ -362,6 +362,7 @@ wd33c9x_base_device::wd33c9x_base_device(const machine_config &mconfig, device_t
 	, m_addr{ 0 }
 	, m_regs{ 0 }
 	, m_command_length{ 0 }
+	, m_last_message{ 0 }
 	, m_scsi_state{ IDLE }
 	, m_mode{ MODE_D }
 	, m_xfr_phase{ 0 }
@@ -392,6 +393,7 @@ void wd33c9x_base_device::device_start()
 	save_item(NAME(m_addr));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_command_length));
+	save_item(NAME(m_last_message));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_scsi_state));
 	save_item(NAME(m_xfr_phase));
@@ -420,6 +422,7 @@ void wd33c9x_base_device::device_reset()
 		m_regs[reg] = (QUEUE_TAG <= reg && reg <= INVALID_1E) ? 0xff : 0;
 	}
 	m_command_length = 0;
+	m_last_message = 0;
 	set_scsi_state(IDLE);
 	m_mode = MODE_D;
 	m_xfr_phase = 0;
@@ -510,7 +513,6 @@ READ8_MEMBER(wd33c9x_base_device::indir_r)
 
 WRITE8_MEMBER(wd33c9x_base_device::indir_w)
 {
-	logerror("REG %d %02x\n", offset, data);
 	switch (offset) {
 	case 0:
 		indir_addr_w(space, 0, data, mem_mask);
@@ -563,7 +565,7 @@ READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
 
 	uint8_t ret;
 	switch (m_addr) {
-	case DATA:
+	case DATA: {
 		if (!(m_regs[AUXILIARY_STATUS] & AUXILIARY_STATUS_DBR)) {
 			// The processor, except in one case, should only
 			// access the Data Register when the DBR bit in the
@@ -574,10 +576,14 @@ READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
 			// Data Register.
 			fatalerror("%s: The host should never access the data register without DBR set.\n", shortname());
 		}
+		bool was_full = data_fifo_full();
 		ret = data_fifo_pop();
-		logerror("data = %02x\n", ret);
-		m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_DBR;
+		if (data_fifo_empty())
+			m_regs[AUXILIARY_STATUS] &= ~AUXILIARY_STATUS_DBR;
+		if (was_full)
+			step(false);
 		break;
+	}
 
 	default:
 		if (m_addr == OWN_ID) {
@@ -592,12 +598,6 @@ READ8_MEMBER(wd33c9x_base_device::indir_reg_r)
 			update_irq();
 		}
 
-		logerror("reg %02x = %02x\n", m_addr, ret);
-
-		if(m_addr == 1) {
-			ret |= 8;
-			machine().debug_break();
-		}
 		// No address increment on accesses to Command, Data, and Auxiliary Status Registers
 		if (m_addr != COMMAND && m_addr != AUXILIARY_STATUS) {
 			m_addr = (m_addr + 1) & REGS_MASK;
@@ -666,8 +666,6 @@ WRITE8_MEMBER(wd33c9x_base_device::indir_reg_w)
 		else {
 			m_regs[m_addr] = data;
 		}
-		if(m_addr == 1)
-			machine().debug_break();
 		m_addr = (m_addr + 1) & REGS_MASK;
 		break;
 	}
@@ -908,6 +906,9 @@ void wd33c9x_base_device::step(bool timeout)
 					if (m_regs[CONTROL] & CONTROL_EDI) {
 						set_scsi_state(FINISHED);
 						irq_fifo_push(SCSI_STATUS_SELECT_TRANSFER_SUCCESS);
+					} else {
+						// Makes very little sense, but the previous code did it and warzard seems to need it - XXX
+						m_regs[CONTROL] |= CONTROL_EDI;
 					}
 					break;
 					
@@ -915,8 +916,7 @@ void wd33c9x_base_device::step(bool timeout)
 					fatalerror("%s: Unhandled command phase during Select-and-Transfer disconnect.\n", shortname());
 					break;
 				}
-			}
-			else {
+			} else {
 				set_scsi_state(FINISHED);
 				irq_fifo_push(SCSI_STATUS_DISCONNECT);
 			}
@@ -1103,8 +1103,7 @@ void wd33c9x_base_device::step(bool timeout)
 					break;
 
 				case S_PHASE_MSG_IN:
-					logerror("Got msg %02x\n", data);
-					data_fifo_push(data);
+					m_last_message = data;
 					break;
 
 				default:
@@ -1142,8 +1141,18 @@ void wd33c9x_base_device::step(bool timeout)
 				irq_fifo_push(SCSI_STATUS_REQ | m_xfr_phase);
 			}
 		} else {
+			if(cc == COMMAND_CC_SELECT_TRANSFER) {
+				m_regs[COMMAND_PHASE] = COMMAND_PHASE_CP_BYTES_0;
+				std::string cmd;
+				for (uint8_t i = 0; i < m_command_length; ++i) {
+					const uint8_t command_byte = m_regs[CDB_1 + i];
+					cmd += util::string_format(" %02x", command_byte);
+					data_fifo_push(command_byte);
+				}
+				LOGMASKED(LOG_COMMANDS, "Sending command:%s (%d)\n", cmd, m_transfer_count);
+			} else
+				m_regs[COMMAND_PHASE] = COMMAND_PHASE_SELECTED;
 			set_scsi_state(INIT_XFR);
-			m_regs[COMMAND_PHASE] = COMMAND_PHASE_SELECTED;
 		}
 		step(false);
 		break;
@@ -1207,8 +1216,7 @@ void wd33c9x_base_device::step(bool timeout)
 					//state = (m_xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)) ? INIT_XFR_RECV_BYTE_NACK : INIT_XFR_RECV_BYTE_ACK;
 					scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 					set_scsi_state((RECV_WAIT_REQ_1 << SUB_SHIFT) | INIT_XFR_RECV_BYTE_ACK);
-					if (ctrl & S_REQ)
-						step(false);
+					step(false);
 				}
 				break;
 
@@ -1334,9 +1342,8 @@ void wd33c9x_base_device::step(bool timeout)
 
 	case INIT_XFR_RECV_BYTE_ACK:
 		if (sat && m_xfr_phase == S_PHASE_MSG_IN) {
-			const uint8_t msg = data_fifo_pop();
 			if (m_regs[COMMAND_PHASE] <= COMMAND_PHASE_CP_BYTES_C) {
-				switch (msg) {
+				switch (m_last_message) {
 				case SM_SAVE_DATA_PTR:
 					set_scsi_state(FINISHED);
 					irq_fifo_push(SCSI_STATUS_SAVE_DATA_POINTERS);
@@ -1348,18 +1355,18 @@ void wd33c9x_base_device::step(bool timeout)
 					break;
 
 				default:
-					fatalerror("%s: Unhandled MSG_IN.\n", shortname());
+					fatalerror("%s: Unhandled MSG_IN %02x.\n", shortname(), m_last_message);
 					break;
 				}
 			} else if (m_regs[COMMAND_PHASE] < COMMAND_PHASE_COMMAND_COMPLETE) {
-				switch (msg) {
+				switch (m_last_message) {
 				case SM_COMMAND_COMPLETE:
 					set_scsi_state(FINISHED);
 					irq_fifo_push(SCSI_STATUS_SELECT_TRANSFER_SUCCESS);
 					m_regs[COMMAND_PHASE] = COMMAND_PHASE_COMMAND_COMPLETE;
 					break;
 				default:
-					fatalerror("%s: Unhandled MSG_IN.\n", shortname());
+					fatalerror("%s: Unhandled MSG_IN %02x.\n", shortname(), m_last_message);
 					break;
 				}
 			}
@@ -1686,15 +1693,13 @@ bool wd33c9x_base_device::set_command_length(const uint8_t cc)
 	if (eaf && (cc == COMMAND_CC_SELECT_TRANSFER || cc == COMMAND_CC_SELECT_ATN_TRANSFER)) {
 		m_command_length &= OWN_ID_CDB_SIZE;
 		ret = true;
-	}
-	else if (eaf && cc == COMMAND_CC_WAIT_SELECT_RECEIVE_DATA) {
+	} else if (eaf && cc == COMMAND_CC_WAIT_SELECT_RECEIVE_DATA) {
 		m_command_length = 6;
 		m_regs[COMMAND_PHASE] = COMMAND_PHASE_CP_BYTES_1;
 		irq_fifo_push(SCSI_STATUS_NEED_COMMAND_SIZE);
 		update_irq();
 		ret = false;
-	}
-	else {
+	} else {
 		switch (m_regs[CDB_1] >> 5) {
 		default:
 		case 0: m_command_length = 6;  break;

@@ -22,13 +22,11 @@ namespace netlist
 	//  Performance tracking
 	//============================================================
 
-#if NL_KEEP_STATISTICS
-	using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, true>;
-	using nperfcount_t = plib::chrono::counter<true>;
-#else
-	using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, false>;
-	using nperfcount_t = plib::chrono::counter<false>;
-#endif
+	template<bool enabled_>
+	using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, enabled_>;
+
+	template<bool enabled_>
+	using nperfcount_t = plib::chrono::counter<enabled_>;
 
 	//============================================================
 	//  Types needed by various includes

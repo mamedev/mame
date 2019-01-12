@@ -844,7 +844,7 @@ MACHINE_CONFIG_START(snk6502_state::satansat)
 	MCFG_DEVICE_PROGRAM_MAP(satansat_map)
 
 	// video hardware
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_satansat)
+	m_gfxdecode->set_info(gfx_satansat);
 
 	// sound hardware
 	MCFG_DEVICE_REPLACE("snk6502", SATANSAT_SOUND, 0)

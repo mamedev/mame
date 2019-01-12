@@ -50,17 +50,23 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_bankdev(*this, "bank")
 		, m_system_region(*this, "maincpu")
-		, m_io_p1(*this, "P1")
-		, m_io_p2(*this, "P2")
+		, m_io_joy(*this, "JOY")
+		, m_io_colors(*this, "COLORS")
+		, m_io_buttons(*this, "BUTTONS")
+		, m_io_power(*this, "POWER")
 		, m_cart_region(nullptr)
+		, m_uart_tx_timer(nullptr)
 		, m_pad_timer(nullptr)
-		, m_pad_counter(0)
 		, m_portb_data(0)
 		, m_portc_data(0)
 	{ }
 
 	void vsmile(machine_config &config);
 	void vsmilep(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(pad_joy_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(pad_color_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(pad_button_changed);
 
 private:
 	virtual void machine_start() override;
@@ -82,7 +88,9 @@ private:
 
 	DECLARE_WRITE8_MEMBER(chip_sel_w);
 
-	DECLARE_WRITE8_MEMBER(uart_tx);
+	DECLARE_WRITE8_MEMBER(uart_rx);
+	void uart_tx_fifo_push(uint8_t data);
+	void handle_uart_tx();
 
 	DECLARE_READ16_MEMBER(bank0_r);
 	DECLARE_READ16_MEMBER(bank1_r);
@@ -104,7 +112,11 @@ private:
 		VSMILE_PORTC_LOGO =     0x10,
 		VSMILE_PORTC_TEST =     0x20,
 		VSMILE_PORTC_AMP =      0x40,
-		VSMILE_PORTC_SYSRESET = 0x80
+		VSMILE_PORTC_SYSRESET = 0x80,
+
+		XMIT_STATE_IDLE       = 0,
+		XMIT_STATE_RTS        = 1,
+		XMIT_STATE_CTS        = 2
 	};
 
 	required_device<cpu_device> m_maincpu;
@@ -113,30 +125,77 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_device<address_map_bank_device> m_bankdev;
 	required_memory_region m_system_region;
-	required_ioport m_io_p1;
-	required_ioport m_io_p2;
+	required_ioport m_io_joy;
+	required_ioport m_io_colors;
+	required_ioport m_io_buttons;
+	required_ioport m_io_power;
 	memory_region *m_cart_region;
 
+	bool m_ctrl_cts[2];
+	bool m_ctrl_rts[2];
+	uint8_t m_ctrl_probe_history[2];
+	uint8_t m_ctrl_probe_count;
+	uint8_t m_uart_tx_fifo[32]; // arbitrary size
+	uint8_t m_uart_tx_fifo_start;
+	uint8_t m_uart_tx_fifo_end;
+	uint8_t m_uart_tx_fifo_count;
+	emu_timer *m_uart_tx_timer;
+	int m_uart_tx_state;
+
 	emu_timer *m_pad_timer;
-	uint8_t m_pad_counter;
 
 	uint16_t m_portb_data;
 	uint16_t m_portc_data;
 };
+
+void vsmile_state::uart_tx_fifo_push(uint8_t data)
+{
+	if (m_uart_tx_fifo_count == ARRAY_LENGTH(m_uart_tx_fifo))
+	{
+		logerror("Warning: Trying to push more than %d bytes onto the controller Tx FIFO, data will be lost\n", ARRAY_LENGTH(m_uart_tx_fifo));
+	}
+
+	m_uart_tx_fifo[m_uart_tx_fifo_end] = data;
+	m_uart_tx_fifo_count++;
+	//printf("Pushing %02x into FIFO at %d, count now %d\n", data, m_uart_tx_fifo_end, m_uart_tx_fifo_count);
+	m_uart_tx_fifo_end = (m_uart_tx_fifo_end + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
+}
+
+void vsmile_state::handle_uart_tx()
+{
+	if (m_uart_tx_fifo_count == 0)
+		return;
+
+	if (m_uart_tx_state == XMIT_STATE_IDLE)
+	{
+		m_uart_tx_state = XMIT_STATE_RTS;
+		m_ctrl_rts[0] = true;
+		m_spg->extint_w(0, true);
+		return;
+	}
+
+	//printf("Transmitting: %02x\n", m_uart_tx_fifo[m_uart_tx_fifo_start]);
+	m_spg->uart_rx(m_uart_tx_fifo[m_uart_tx_fifo_start]);
+	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
+	m_uart_tx_fifo_count--;
+	if (m_uart_tx_fifo_count == 0)
+	{
+		m_uart_tx_state = XMIT_STATE_IDLE;
+		m_ctrl_rts[0] = false;
+		m_spg->extint_w(0, false);
+		//m_uart_tx_timer->adjust(attotime::never);
+	}
+}
 
 void vsmile_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
 	case TIMER_UART_TX:
+		handle_uart_tx();
 		break;
 	case TIMER_PAD:
-		m_pad_counter++;
-		if (m_pad_counter >= 100)
-		{
-			m_pad_counter = 0;
-			//m_spg->uart_rx(0x55);
-		}
+		uart_tx_fifo_push(0x55);
 		break;
 	default:
 		logerror("Unknown timer ID: %d\n", id);
@@ -166,43 +225,83 @@ READ16_MEMBER(vsmile_state::bank3_r)
 
 READ16_MEMBER(vsmile_state::portb_r)
 {
-	//const uint8_t inputs = m_io_p2->read();
-	//const uint16_t input_bits = BIT(inputs, 0) ? VSMILE_PORTB_ON_SW : 0;
-	//const uint16_t data = VSMILE_PORTB_ON_SW | VSMILE_PORTB_OFF_SW | (m_cart && m_cart->exists() ? VSMILE_PORTB_CART : 0);
-	//logerror("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
-	//printf("V.Smile Port B read  %04x, mask %04x\n", data, mem_mask);
-	return m_portb_data;// | data;
+	const uint8_t power = m_io_power->read();
+	uint16_t data = m_portb_data;
+
+	if (BIT(power, 0))
+		data |= VSMILE_PORTB_ON_SW;
+	else
+		data &= ~VSMILE_PORTB_ON_SW;
+
+	if (BIT(power, 1))
+		data |= VSMILE_PORTB_OFF_SW;
+	else
+		data &= ~VSMILE_PORTB_OFF_SW;
+
+	if (BIT(power, 2))
+		data |= VSMILE_PORTB_OFF;
+	else
+		data &= ~VSMILE_PORTB_OFF;
+
+	return data;
 }
 
 READ16_MEMBER(vsmile_state::portc_r)
 {
-	uint16_t data = 0x0004;
-	if (m_portc_data & 0x0100)
-		data |= 0x0400;
-	if (m_portc_data & 0x0200)
-		data |= 0x1000;
-	//logerror("V.Smile Port C read  %04x, mask %04x\n", data, mem_mask);
-	return (m_portc_data & ~0x000f) | data;
+	uint16_t data = 0x0014;
+	data |= m_ctrl_rts[0] ? 0 : 0x0400;
+	data |= m_ctrl_rts[1] ? 0 : 0x1000;
+	data |= 0x2000;
+	return data;
 }
 
 WRITE16_MEMBER(vsmile_state::portb_w)
 {
-	m_portb_data = data;//(m_portb_data &~ mem_mask) | (data & mem_mask);
+	m_portb_data = data;
 	//logerror("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
-	//printf("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
 }
 
 WRITE16_MEMBER(vsmile_state::portc_w)
 {
-	m_portc_data = data;//(m_portc_data &~ mem_mask) | (data & mem_mask);
+	m_portc_data = data & mem_mask;
 	//logerror("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
-	//printf("V.Smile Port C write %04x, mask %04x\n", m_portc_data, mem_mask);
-	//printf("%02x ", data >> 8);
+	if (BIT(mem_mask, 8))
+	{
+		m_ctrl_cts[0] = BIT(data, 8);
+		if (m_uart_tx_state == XMIT_STATE_RTS)
+			m_uart_tx_state = XMIT_STATE_CTS;
+	}
+	if (BIT(mem_mask, 9))
+	{
+		m_ctrl_cts[1] = BIT(data, 9);
+	}
 }
 
-WRITE8_MEMBER(vsmile_state::uart_tx)
+WRITE8_MEMBER(vsmile_state::uart_rx)
 {
-	logerror("UART Tx: %02x\n", data);
+	//printf("Receiving: %02x\n", data);
+	if ((data >> 4) == 7)
+	{
+		if (m_ctrl_probe_count >= 1)
+		{
+			if (m_ctrl_probe_count == 2)
+			{
+				m_ctrl_probe_history[0] = m_ctrl_probe_history[1];
+			}
+			else
+			{
+				m_ctrl_probe_count++;
+			}
+			m_ctrl_probe_history[1] = data;
+			const uint8_t response = ((m_ctrl_probe_history[0] + m_ctrl_probe_history[1] + 0x0f) & 0x0f) ^ 0x05;
+			uart_tx_fifo_push(0xb0 | response);
+		}
+		else
+		{
+			m_ctrl_probe_history[0] = data;
+			m_ctrl_probe_count++;
+		}
+	}
 }
 
 WRITE8_MEMBER(vsmile_state::chip_sel_w)
@@ -236,6 +335,20 @@ void vsmile_state::machine_start()
 
 	m_pad_timer = timer_alloc(TIMER_PAD);
 	m_pad_timer->adjust(attotime::never);
+
+	m_uart_tx_timer = timer_alloc(TIMER_UART_TX);
+	m_uart_tx_timer->adjust(attotime::never);
+
+	save_item(NAME(m_portb_data));
+	save_item(NAME(m_portc_data));
+	save_item(NAME(m_ctrl_cts));
+	save_item(NAME(m_ctrl_rts));
+	save_item(NAME(m_ctrl_probe_history));
+	save_item(NAME(m_ctrl_probe_count));
+	save_item(NAME(m_uart_tx_fifo));
+	save_item(NAME(m_uart_tx_fifo_start));
+	save_item(NAME(m_uart_tx_fifo_end));
+	save_item(NAME(m_uart_tx_fifo_count));
 }
 
 void vsmile_state::machine_reset()
@@ -243,8 +356,51 @@ void vsmile_state::machine_reset()
 	m_portb_data = 0;
 	m_portc_data = 0;
 
-	m_pad_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
-	m_pad_counter = 0;
+	m_pad_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
+	m_uart_tx_timer->adjust(attotime::from_hz(9600/10), 0, attotime::from_hz(9600/10));
+
+	memset(m_ctrl_cts, 0, sizeof(bool) * 2);
+	memset(m_ctrl_rts, 0, sizeof(bool) * 2);
+	memset(m_ctrl_probe_history, 0, 2);
+	m_ctrl_probe_count = 0;
+	memset(m_uart_tx_fifo, 0, 32);
+	m_uart_tx_fifo_start = 0;
+	m_uart_tx_fifo_end = 0;
+	m_uart_tx_fifo_count = 0;
+	m_uart_tx_state = XMIT_STATE_IDLE;
+}
+
+INPUT_CHANGED_MEMBER(vsmile_state::pad_joy_changed)
+{
+	const uint8_t value = m_io_joy->read();
+
+	if (BIT(value, 2))
+		uart_tx_fifo_push(0xcf);
+	else if (BIT(value, 3))
+		uart_tx_fifo_push(0xc7);
+	else
+		uart_tx_fifo_push(0xc0);
+
+	if (BIT(value, 0))
+		uart_tx_fifo_push(0x87);
+	else if (BIT(value, 1))
+		uart_tx_fifo_push(0x8f);
+	else
+		uart_tx_fifo_push(0x80);
+}
+
+INPUT_CHANGED_MEMBER(vsmile_state::pad_color_changed)
+{
+	uart_tx_fifo_push(0x90 | m_io_colors->read());
+}
+
+INPUT_CHANGED_MEMBER(vsmile_state::pad_button_changed)
+{
+	const uint8_t value = m_io_buttons->read();
+	if (BIT(value, newval))
+		uart_tx_fifo_push(0xa1 + newval);
+	else
+		uart_tx_fifo_push(0xa0);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(vsmile_state, cart)
@@ -292,23 +448,32 @@ void vsmile_state::mem_map(address_map &map)
 }
 
 static INPUT_PORTS_START( vsmile )
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
+	PORT_START("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_joy_changed, 0) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_joy_changed, 0) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_joy_changed, 0) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_joy_changed, 0) PORT_NAME("Joypad Right")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("P2")
-	PORT_DIPNAME( 0x0001, 0x0001, "POWER ON" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "POWER OFF" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("COLORS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_color_changed, 0) PORT_NAME("Green")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_color_changed, 0) PORT_NAME("Blue")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_color_changed, 0) PORT_NAME("Yellow")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_color_changed, 0) PORT_NAME("Red")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_button_changed, 0) PORT_NAME("OK")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_button_changed, 1) PORT_NAME("Quit")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_button_changed, 2) PORT_NAME("Help")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_button_changed, 3) PORT_NAME("ABC")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("POWER")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Power On")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Power Off")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Soft Off")
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void vsmile_state::vsmile(machine_config &config)
@@ -332,7 +497,7 @@ void vsmile_state::vsmile(machine_config &config)
 	m_spg->portb_out().set(FUNC(vsmile_state::portb_w));
 	m_spg->portc_out().set(FUNC(vsmile_state::portc_w));
 	m_spg->chip_select().set(FUNC(vsmile_state::chip_sel_w));
-	m_spg->uart_tx().set(FUNC(vsmile_state::uart_tx));
+	m_spg->uart_tx().set(FUNC(vsmile_state::uart_rx));
 	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 

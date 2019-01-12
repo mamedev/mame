@@ -110,7 +110,7 @@ public:
 	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
 
 	ATTR_HOT inline const netlist::netlist_time last_time_update() { return m_old; }
-	ATTR_HOT void update_time_x();
+	ATTR_HOT void update_icount();
 	ATTR_HOT void check_mame_abort_slice();
 
 	static void register_memregion_source(netlist::setup_t &setup, const char *name);
@@ -231,13 +231,9 @@ protected:
 	virtual void device_start() override;
 
 private:
-	static constexpr int MAX_OUT = 10;
-	nld_sound_out *m_out[MAX_OUT];
+	std::map<int, nld_sound_out *> m_out;
 	nld_sound_in *m_in;
 	sound_stream *m_stream;
-	int m_num_inputs;
-	int m_num_outputs;
-
 };
 
 // ----------------------------------------------------------------------------------------
@@ -260,9 +256,11 @@ public:
 
 	inline netlist_mame_device &nl_owner() const { return *m_owner; }
 
-	inline bool is_sound_device() const { return bool(m_sound); }
-
-	inline void update_to_current_time() { m_sound->get_stream()->update(); }
+	inline void update_to_current_time()
+	{
+		if (m_sound != nullptr)
+			m_sound->get_stream()->update();
+	}
 
 	void set_mult_offset(const double mult, const double offset);
 
@@ -306,11 +304,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	netlist::param_double_t *m_param;
 	bool   m_auto_port;
 	const char *m_param_name;
+	double m_value_for_device_timer;
 };
 
 // ----------------------------------------------------------------------------------------

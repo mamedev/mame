@@ -326,15 +326,15 @@ MACHINE_CONFIG_START(pce_state::pce_common)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260")
 
-	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
+	HUC6260(config, m_huc6260, MAIN_CLOCK);
+	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
+	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
+	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
+	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
+	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270.set_vram_size(0x10000);
+	huc6270.irq().set_inputline(m_maincpu, 0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -380,30 +380,33 @@ MACHINE_CONFIG_START(pce_state::sgx)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260")
 
-	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6202", huc6202_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6202", huc6202_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6202", huc6202_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6202", huc6202_device, hsync_changed))
-	MCFG_DEVICE_ADD( "huc6270_0", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
-	MCFG_DEVICE_ADD( "huc6270_1", HUC6270, 0 )
-	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
-	MCFG_DEVICE_ADD( "huc6202", HUC6202, 0 )
-	MCFG_HUC6202_NEXT_PIXEL_0_CB(READ16("huc6270_0", huc6270_device, next_pixel))
-	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(READ16("huc6270_0", huc6270_device, time_until_next_event))
-	MCFG_HUC6202_VSYNC_CHANGED_0_CB(WRITELINE("huc6270_0", huc6270_device, vsync_changed))
-	MCFG_HUC6202_HSYNC_CHANGED_0_CB(WRITELINE("huc6270_0", huc6270_device, hsync_changed))
-	MCFG_HUC6202_READ_0_CB(READ8("huc6270_0", huc6270_device, read))
-	MCFG_HUC6202_WRITE_0_CB(WRITE8("huc6270_0", huc6270_device, write))
-	MCFG_HUC6202_NEXT_PIXEL_1_CB(READ16("huc6270_1", huc6270_device, next_pixel))
-	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_1_CB(READ16("huc6270_1", huc6270_device, time_until_next_event))
-	MCFG_HUC6202_VSYNC_CHANGED_1_CB(WRITELINE("huc6270_1", huc6270_device, vsync_changed))
-	MCFG_HUC6202_HSYNC_CHANGED_1_CB(WRITELINE("huc6270_1", huc6270_device, hsync_changed))
-	MCFG_HUC6202_READ_1_CB(READ8("huc6270_1", huc6270_device, read))
-	MCFG_HUC6202_WRITE_1_CB(WRITE8("huc6270_1", huc6270_device, write))
+	HUC6260(config, m_huc6260, MAIN_CLOCK);
+	m_huc6260->next_pixel_data().set("huc6202", FUNC(huc6202_device::next_pixel));
+	m_huc6260->time_til_next_event().set("huc6202", FUNC(huc6202_device::time_until_next_event));
+	m_huc6260->vsync_changed().set("huc6202", FUNC(huc6202_device::vsync_changed));
+	m_huc6260->hsync_changed().set("huc6202", FUNC(huc6202_device::hsync_changed));
+
+	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", 0));
+	huc6270_0.set_vram_size(0x10000);
+	huc6270_0.irq().set_inputline(m_maincpu, 0);
+
+	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", 0));
+	huc6270_1.set_vram_size(0x10000);
+	huc6270_1.irq().set_inputline(m_maincpu, 0);
+
+	huc6202_device &huc6202(HUC6202(config, "huc6202", 0 ));
+	huc6202.next_pixel_0_callback().set("huc6270_0", FUNC(huc6270_device::next_pixel));
+	huc6202.time_til_next_event_0_callback().set("huc6270_0", FUNC(huc6270_device::time_until_next_event));
+	huc6202.vsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::vsync_changed));
+	huc6202.hsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::hsync_changed));
+	huc6202.read_0_callback().set("huc6270_0", FUNC(huc6270_device::read));
+	huc6202.write_0_callback().set("huc6270_0", FUNC(huc6270_device::write));
+	huc6202.next_pixel_1_callback().set("huc6270_1", FUNC(huc6270_device::next_pixel));
+	huc6202.time_til_next_event_1_callback().set("huc6270_1", FUNC(huc6270_device::time_until_next_event));
+	huc6202.vsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::vsync_changed));
+	huc6202.hsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::hsync_changed));
+	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read));
+	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

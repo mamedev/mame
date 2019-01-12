@@ -556,8 +556,8 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 	MCFG_PALETTE_ADD("palette", 8)
 
-	MCFG_DEVICE_ADD("ef9345", EF9345, 0)
-	MCFG_EF9345_PALETTE("palette")
+	EF9345(config, m_ef9345, 0);
+	m_ef9345->set_palette_tag("palette");
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
 
 	/* sound hardware */

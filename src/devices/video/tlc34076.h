@@ -66,15 +66,6 @@ private:
 };
 
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_TLC34076_ADD(tag, bits) \
-	MCFG_DEVICE_ADD((tag), TLC34076, 0) \
-	downcast<tlc34076_device &>(*device).set_bits((tlc34076_device::bits));
-
-
 DECLARE_DEVICE_TYPE(TLC34076, tlc34076_device)
 
 #endif // MAME_VIDEO_TLC34076_H

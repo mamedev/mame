@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(trs80_state::ht1080z)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_ht1080z)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ht1080z)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ht1080z);
 
 	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
 	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(trs80_state::lnw80)
 
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnw80)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_lnw80);
 
 	subdevice<palette_device>("palette")->set_entries(8).set_init(FUNC(trs80_state::lnw80_palette));
 	MCFG_SCREEN_MODIFY("screen")
@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(trs80_state::radionic)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, 768, 0, 512, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_radionic)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_radionic)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_radionic);
 
 	// Interface to external circuits
 	I8255(config, m_ppi);

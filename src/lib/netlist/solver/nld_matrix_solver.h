@@ -43,14 +43,14 @@ public:
 
 	void add(terminal_t *term, int net_other, bool sorted);
 
-	inline std::size_t count() const { return m_terms.size(); }
+	std::size_t count() const { return m_terms.size(); }
 
-	inline terminal_t **terms() { return m_terms.data(); }
-	inline int *connected_net_idx() { return m_connected_net_idx.data(); }
-	inline nl_double *gt() { return m_gt.data(); }
-	inline nl_double *go() { return m_go.data(); }
-	inline nl_double *Idr() { return m_Idr.data(); }
-	inline nl_double * const *connected_net_V() const { return m_connected_net_V.data(); }
+	terminal_t **terms() { return m_terms.data(); }
+	int *connected_net_idx() { return m_connected_net_idx.data(); }
+	nl_double *gt() { return m_gt.data(); }
+	nl_double *go() { return m_go.data(); }
+	nl_double *Idr() { return m_Idr.data(); }
+	nl_double * const *connected_net_V() const { return m_connected_net_V.data(); }
 
 	void set_pointers();
 
@@ -116,8 +116,8 @@ public:
 	const netlist_time solve();
 	void update_inputs();
 
-	inline bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
-	inline bool has_timestep_devices() const { return m_step_devices.size() > 0; }
+	bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
+	bool has_timestep_devices() const { return m_step_devices.size() > 0; }
 
 	void update_forced();
 	void update_after(const netlist_time &after)
@@ -232,7 +232,7 @@ void matrix_solver_t::build_LE_A()
 	for (std::size_t k = 0; k < iN; k++)
 	{
 		terms_for_net_t *terms = m_terms[k].get();
-		nl_double * Ak = &child.A(k, 0);
+		nl_double * Ak = &child.A(k, 0ul);
 
 		for (std::size_t i=0; i < iN; i++)
 			Ak[i] = 0.0;

@@ -856,7 +856,7 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs009_state, vblank_irq))
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_jingbell)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jingbell);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */
@@ -875,7 +875,7 @@ MACHINE_CONFIG_START(igs009_state::gp98)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(gp98_portmap)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gp98)
+	m_gfxdecode->set_info(gfx_gp98);
 
 	MCFG_VIDEO_START_OVERRIDE(igs009_state,gp98)
 MACHINE_CONFIG_END

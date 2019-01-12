@@ -1549,7 +1549,7 @@ MACHINE_CONFIG_START(pc6001mk2_state::pc6001mk2)
 	m_palette->set_entries(16+16);
 	m_palette->set_init(FUNC(pc6001mk2_state::pc6001mk2_palette));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pc6001m2)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pc6001m2);
 
 	MCFG_DEVICE_ADD("upd7752", UPD7752, PC6001_MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

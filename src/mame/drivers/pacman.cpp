@@ -3787,7 +3787,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	m_mainlatch->q_out_cb<6>().set_nop();
 	m_mainlatch->q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_s2650games)
+	m_gfxdecode->set_info(gfx_s2650games);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -3869,16 +3869,17 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superabc)
+	m_gfxdecode->set_info(gfx_superabc);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(pacman_state::crush4)
+void pacman_state::crush4(machine_config &config)
+{
 	mschamp(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_crush4)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_crush4);
+}
 
 MACHINE_CONFIG_START(pacman_state::crushs)
 	pacman(config);

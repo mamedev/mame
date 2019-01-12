@@ -801,7 +801,7 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_JANGOU_BLITTER_ADD("blitter", MASTER_CLOCK/4)
+	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

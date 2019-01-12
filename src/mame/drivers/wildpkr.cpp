@@ -482,7 +482,7 @@ MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 	MCFG_SCREEN_UPDATE_DEVICE("acrtc", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_HD63484_ADD("acrtc", 0, hd63484_map)
+	HD63484(config, "acrtc", 0).set_addrmap(0, &wildpkr_state::hd63484_map);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_HD63484_ADD("acrtc", 0, hd63484_map)
+	HD63484(config, "acrtc", 0).set_addrmap(0, &wildpkr_state::hd63484_map);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);

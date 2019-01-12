@@ -94,7 +94,10 @@ After entering the characters, press FCTN and CTRL PAGE keys again to save the s
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
+#include "bus/uts_kbd/uts_kbd.h"
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/z80daisy.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
@@ -108,11 +111,13 @@ After entering the characters, press FCTN and CTRL PAGE keys again to save the s
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_PARITY  (1U << 1)
+#define LOG_NVRAM   (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_PARITY)
+//#define VERBOSE (LOG_GENERAL | LOG_PARITY | LOG_NVRAM)
 #include "logmacro.h"
 
 #define LOGPARITY(...)  LOGMASKED(LOG_PARITY, __VA_ARGS__)
+#define LOGNVRAM(...)   LOGMASKED(LOG_NVRAM, __VA_ARGS__)
 
 
 class univac_state : public driver_device
@@ -123,60 +128,99 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "nvram")
 		, m_ctc(*this, "ctc")
-		, m_uart(*this, "uart")
+		, m_keybclk(*this, "keybclk")
+		, m_sio(*this, "sio")
 		, m_beep(*this, "beeper")
+		, m_screen(*this, "screen")
+		, m_keyboard(*this, "keyboard")
+		, m_printer(*this, "printer")
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_p_nvram(*this, "nvram")
 		, m_bank_mask(0)
-		, m_parity_check(0)
-		, m_parity_poison(0)
+		, m_parity_poison(false)
+		, m_display_enable(false)
 		, m_framecnt(0)
+		, m_nvram_protect(false)
+		, m_loopback_control(false)
+		, m_comm_rxd(true)
+		, m_sio_txda(true)
+		, m_aux_rxd(true)
+		, m_sio_txdb(true)
+		, m_sio_rtsb(true)
+		, m_aux_dsr(true)
+		, m_sio_wrdyb(true)
 	{ }
 
 	void uts10(machine_config &config);
 	void uts20(machine_config &config);
 
 private:
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(nvram_w);
+	u8 ram_r(offs_t offset);
+	u8 bank_r(offs_t offset);
+	void ram_w(offs_t offset, u8 data);
+	void bank_w(offs_t offset, u8 data);
+	void nvram_w(offs_t offset, u8 data);
 
-	DECLARE_WRITE8_MEMBER(port43_w);
-	DECLARE_WRITE8_MEMBER(portc4_w);
-	DECLARE_WRITE8_MEMBER(porte6_w);
+	DECLARE_WRITE_LINE_MEMBER(nvram_protect_w);
+	DECLARE_WRITE_LINE_MEMBER(select_disp_w);
+	DECLARE_WRITE_LINE_MEMBER(ram_control_w);
+	DECLARE_WRITE_LINE_MEMBER(parity_poison_w);
+	DECLARE_WRITE_LINE_MEMBER(display_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(sio_loopback_w);
+	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
+	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
+	DECLARE_WRITE_LINE_MEMBER(aux_rxd_w);
+	DECLARE_WRITE_LINE_MEMBER(sio_rtsb_w);
+	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
+	DECLARE_WRITE_LINE_MEMBER(aux_dsr_w);
+	DECLARE_WRITE_LINE_MEMBER(loopback_rxcb_w);
+	DECLARE_WRITE_LINE_MEMBER(porte6_w);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+	void uts10_io_map(address_map &map);
 	void uts10_map(address_map &map);
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_post_load() override;
 
 	required_device<z80_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
 	required_device<z80ctc_device>  m_ctc;
-	required_device<z80sio_device>  m_uart;
+	optional_device<clock_device>   m_keybclk;
+	required_device<z80sio_device>  m_sio;
 	required_device<beep_device>    m_beep;
+	required_device<screen_device>  m_screen;
+
+	required_device<uts_keyboard_port_device> m_keyboard;
+	required_device<rs232_port_device> m_printer;
 
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
 	required_shared_ptr<u8> m_p_nvram;
 	std::unique_ptr<u8 []>  m_p_parity;
 
+	u16 m_disp_mask;
 	u16 m_bank_mask;
-	u8  m_parity_check;
-	u8  m_parity_poison;
+	bool m_parity_poison;
+	bool m_display_enable;
 	u8  m_framecnt;
+	bool m_nvram_protect;
+
+	bool m_loopback_control;
+	bool m_comm_rxd;
+	bool m_sio_txda;
+	bool m_aux_rxd;
+	bool m_sio_txdb;
+	bool m_sio_rtsb;
+	bool m_aux_dsr;
+	bool m_sio_wrdyb;
 };
 
 
 
-READ8_MEMBER( univac_state::ram_r )
+u8 univac_state::ram_r(offs_t offset)
 {
 	if (BIT(m_p_parity[offset >> 3], offset & 0x07) && !machine().side_effects_disabled())
 	{
@@ -186,12 +230,12 @@ READ8_MEMBER( univac_state::ram_r )
 	return m_p_videoram[offset];
 }
 
-READ8_MEMBER( univac_state::bank_r )
+u8 univac_state::bank_r(offs_t offset)
 {
-	return space.read_byte((0xc000 | offset) ^ m_bank_mask);
+	return ram_r(offset ^ m_bank_mask);
 }
 
-WRITE8_MEMBER( univac_state::ram_w )
+void univac_state::ram_w(offs_t offset, u8 data)
 {
 	if (m_parity_poison)
 	{
@@ -205,48 +249,145 @@ WRITE8_MEMBER( univac_state::ram_w )
 	m_p_videoram[offset] = data;
 }
 
-WRITE8_MEMBER( univac_state::bank_w )
+void univac_state::bank_w(offs_t offset, u8 data)
 {
-	space.write_byte((0xc000 | offset) ^ m_bank_mask, data);
+	ram_w(offset ^ m_bank_mask, data);
 }
 
-WRITE8_MEMBER( univac_state::nvram_w )
+void univac_state::nvram_w(offs_t offset, u8 data)
 {
 	// NVRAM is four bits wide, accessed in the low nybble
 	// It's simplest to hack it when writing to make the upper bits read back high on the open bus
-	m_p_nvram[offset] = data | 0xf0;
+	// (But is it all open bus? Bit 4 is specifically tested in a few places...)
+	if (m_nvram_protect)
+		LOGNVRAM("%s: NVRAM write suppressed (address %02X, data %02X)\n", machine().describe_context(), offset + 0x80, data);
+	else
+		m_p_nvram[offset] = data | 0xf0;
 }
 
-WRITE8_MEMBER( univac_state::port43_w )
+WRITE_LINE_MEMBER(univac_state::nvram_protect_w)
 {
-	m_bank_mask = BIT(data, 0) ? 0x2000 : 0x0000;
+	// There seems to be some timing-based write protection related to the CTC's TRG0 input.
+	// The present implementation is a crude approximation of a wild guess.
+	if (state)
+		m_nvram_protect = m_screen->vpos() < 10;
 }
 
-WRITE8_MEMBER( univac_state::portc4_w )
+WRITE_LINE_MEMBER(univac_state::select_disp_w)
 {
-	m_parity_poison = BIT(data, 0);
-	u8 const check = BIT(data, 1);
-	if (check != m_parity_check)
+	m_disp_mask = state ? 0x2000 : 0x0000;
+}
+
+WRITE_LINE_MEMBER(univac_state::ram_control_w)
+{
+	m_bank_mask = state ? 0x2000 : 0x0000;
+}
+
+WRITE_LINE_MEMBER(univac_state::parity_poison_w)
+{
+	m_parity_poison = state;
+}
+
+WRITE_LINE_MEMBER(univac_state::display_enable_w)
+{
+	m_display_enable = state;
+}
+
+WRITE_LINE_MEMBER(univac_state::sio_loopback_w)
+{
+	if (state)
 	{
-		m_parity_check = check;
-		address_space &space(m_maincpu->space(AS_PROGRAM));
-		space.unmap_read(0xc000, 0xffff);
-		if (check)
-		{
-			LOGPARITY("parity check enabled\n");
-			space.install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(univac_state::ram_r), this));
-		}
-		else
-		{
-			LOGPARITY("parity check disabled\n");
-			space.install_rom(0xc000, 0xffff, &m_p_videoram[0]);
-		}
+		m_sio->rxa_w(m_sio_txda);
+		m_sio->rxb_w(m_sio_txdb);
+		m_sio->dcdb_w(m_sio_wrdyb);
+		m_sio->ctsb_w(m_sio_wrdyb);
+		m_sio->syncb_w(!m_sio_rtsb);
+		m_printer->write_txd(1);
+		m_printer->write_rts(1);
+		m_keyboard->ready_w(0);
+		if (m_keybclk.found())
+			m_keybclk->set_clock_scale(0.0);
+	}
+	else
+	{
+		m_sio->rxa_w(m_comm_rxd);
+		m_sio->rxb_w(m_aux_rxd);
+		m_sio->dcdb_w(m_aux_dsr);
+		m_sio->ctsb_w(m_aux_dsr); // likely ignored
+		m_sio->syncb_w(1);
+		m_printer->write_txd(m_sio_txdb);
+		m_printer->write_rts(m_sio_rtsb);
+		m_keyboard->ready_w(m_sio_wrdyb);
+		if (m_keybclk.found())
+			m_keybclk->set_clock_scale(1.0);
+	}
+
+	m_loopback_control = state;
+}
+
+WRITE_LINE_MEMBER(univac_state::sio_txda_w)
+{
+	m_sio_txda = state;
+	if (m_loopback_control)
+		m_sio->rxa_w(state);
+}
+
+WRITE_LINE_MEMBER(univac_state::sio_txdb_w)
+{
+	m_sio_txdb = state;
+	if (m_loopback_control)
+		m_sio->rxb_w(state);
+	else
+		m_printer->write_txd(state);
+}
+
+WRITE_LINE_MEMBER(univac_state::aux_rxd_w)
+{
+	m_aux_rxd = state;
+	if (!m_loopback_control)
+		m_sio->rxb_w(state);
+}
+
+WRITE_LINE_MEMBER(univac_state::sio_rtsb_w)
+{
+	m_sio_rtsb = state;
+	if (m_loopback_control)
+		m_sio->syncb_w(!state);
+	else
+		m_printer->write_rts(state);
+}
+
+WRITE_LINE_MEMBER(univac_state::sio_wrdyb_w)
+{
+	m_sio_wrdyb = state;
+	if (m_loopback_control)
+	{
+		m_sio->dcdb_w(state);
+		m_sio->ctsb_w(state);
+	}
+	else
+		m_keyboard->ready_w(state);
+}
+
+WRITE_LINE_MEMBER(univac_state::aux_dsr_w)
+{
+	m_aux_dsr = state;
+	if (!m_loopback_control)
+	{
+		m_sio->dcdb_w(state);
+		m_sio->ctsb_w(state);
 	}
 }
 
-WRITE8_MEMBER( univac_state::porte6_w )
+WRITE_LINE_MEMBER(univac_state::loopback_rxcb_w)
 {
-	//m_beep->set_state(BIT(data, 0)); // not sure what belongs here, but it isn't the beeper
+	if (m_loopback_control)
+		m_sio->rxcb_w(state);
+}
+
+WRITE_LINE_MEMBER(univac_state::porte6_w)
+{
+	//m_beep->set_state(state); // not sure what belongs here, but it isn't the beeper
 }
 
 
@@ -255,7 +396,7 @@ void univac_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x4fff).rom().region("roms", 0);
 	map(0x8000, 0xbfff).rw(FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
-	map(0xc000, 0xffff).ram().w(FUNC(univac_state::ram_w)).share("videoram");
+	map(0xc000, 0xffff).rw(FUNC(univac_state::ram_r), FUNC(univac_state::ram_w)).share("videoram");
 }
 
 void univac_state::uts10_map(address_map &map)
@@ -263,19 +404,26 @@ void univac_state::uts10_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x4fff).rom().region("roms", 0);
 	map(0x8000, 0x9fff).mirror(0x2000).rw(FUNC(univac_state::bank_r), FUNC(univac_state::bank_w));
-	map(0xc000, 0xffff).ram().w(FUNC(univac_state::ram_w)).share("videoram");
+	map(0xc000, 0xffff).rw(FUNC(univac_state::ram_r), FUNC(univac_state::ram_w)).share("videoram");
+}
+
+void univac_state::uts10_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw(m_sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x20, 0x23).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x60, 0x60).nopw(); // values written here may or may not matter
+	map(0x80, 0xbf).ram().w(FUNC(univac_state::nvram_w)).share("nvram");
+	map(0xc0, 0xc7).w("latch_c0", FUNC(ls259_device::write_d0));
+	map(0xe0, 0xe7).w("latch_e0", FUNC(ls259_device::write_d0));
 }
 
 void univac_state::io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map.unmap_value_high();
-	map(0x00, 0x03).rw(m_uart, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
-	map(0x20, 0x23).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x43, 0x43).w(FUNC(univac_state::port43_w));
-	map(0x80, 0xbf).ram().w(FUNC(univac_state::nvram_w)).share("nvram");
-	map(0xc4, 0xc4).w(FUNC(univac_state::portc4_w));
-	map(0xe6, 0xe6).w(FUNC(univac_state::porte6_w));
+	uts10_io_map(map);
+	map(0x40, 0x40).nopr(); // read only once, during self-test; result is discarded
+	map(0x40, 0x47).w("latch_40", FUNC(ls259_device::write_d0));
 }
 
 /* Input ports */
@@ -293,34 +441,29 @@ void univac_state::machine_start()
 
 	save_pointer(NAME(m_p_parity), parity_bytes);
 	save_item(NAME(m_bank_mask));
-	save_item(NAME(m_parity_check));
 	save_item(NAME(m_parity_poison));
+	save_item(NAME(m_display_enable));
 	save_item(NAME(m_framecnt));
-}
-
-void univac_state::machine_reset()
-{
-	m_beep->set_state(0);
-
-	m_bank_mask = 0x0000;
-	m_parity_check = 0;
-	m_parity_poison = 0;
-}
-
-void univac_state::device_post_load()
-{
-	if (m_parity_check)
-	{
-		address_space &space(m_maincpu->space(AS_PROGRAM));
-		space.unmap_read(0xc000, 0xffff);
-		space.install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(univac_state::ram_r), this));
-	}
+	save_item(NAME(m_loopback_control));
+	save_item(NAME(m_comm_rxd));
+	save_item(NAME(m_sio_txda));
+	save_item(NAME(m_aux_rxd));
+	save_item(NAME(m_sio_txdb));
+	save_item(NAME(m_sio_rtsb));
+	save_item(NAME(m_aux_dsr));
+	save_item(NAME(m_sio_wrdyb));
 }
 
 uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,ra,chr;
-	uint16_t sy=0,x,ma=0,gfx; //m_bank_mask; (it isn't port43 that selects the screen)
+	if (!m_display_enable)
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
+	u8 y,ra,chr;
+	uint16_t sy=0,x,ma=0,gfx;
 
 	m_framecnt++;
 
@@ -332,7 +475,7 @@ uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 			for (x = ma; x < ma + 80; x++)
 			{
-				chr = m_p_videoram[x];    // bit 7 = rv attribute (or dim, depending on control-page setting)
+				chr = ram_r(x ^ m_disp_mask);    // bit 7 = rv attribute (or dim, depending on control-page setting)
 
 				gfx = m_p_chargen[((chr & 0x7f)<<4) | ra];
 
@@ -386,7 +529,7 @@ GFXDECODE_END
 
 static const z80_daisy_config daisy_chain[] =
 {
-	{ "uart" },
+	{ "sio" },
 	{ "ctc" },
 	{ nullptr }
 };
@@ -398,6 +541,20 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	m_maincpu->set_addrmap(AS_PROGRAM, &univac_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &univac_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
+
+	ls259_device &latch_40(LS259(config, "latch_40")); // actual type and location unknown
+	latch_40.q_out_cb<1>().set(FUNC(univac_state::select_disp_w));
+	latch_40.q_out_cb<3>().set(FUNC(univac_state::ram_control_w));
+
+	ls259_device &latch_c0(LS259(config, "latch_c0")); // actual type and location unknown
+	latch_c0.q_out_cb<3>().set(FUNC(univac_state::display_enable_w));
+	latch_c0.q_out_cb<4>().set(FUNC(univac_state::parity_poison_w));
+	latch_c0.q_out_cb<6>().set(FUNC(univac_state::sio_loopback_w));
+
+	ls259_device &latch_e0(LS259(config, "latch_e0")); // actual type and location unknown
+	//latch_e0.q_out_cb<2>().set(FUNC(univac_state::reverse_video_w));
+	latch_e0.q_out_cb<5>().set("crtc", FUNC(dp835x_device::refresh_control)).invert();
+	latch_e0.q_out_cb<6>().set(FUNC(univac_state::porte6_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -417,27 +574,46 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->set_clk<1>(18.432_MHz_XTAL / 12);
 	m_ctc->set_clk<2>(18.432_MHz_XTAL / 12);
-	m_ctc->zc_callback<1>().set(m_uart, FUNC(z80sio_device::txca_w));
-	m_ctc->zc_callback<1>().append(m_uart, FUNC(z80sio_device::rxca_w));
-	m_ctc->zc_callback<2>().set(m_uart, FUNC(z80sio_device::rxtxcb_w));
+	m_ctc->zc_callback<0>().set(FUNC(univac_state::nvram_protect_w));
+	m_ctc->zc_callback<1>().set(m_sio, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().append(m_sio, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<2>().set(m_sio, FUNC(z80sio_device::txcb_w));
+	m_ctc->zc_callback<2>().append(FUNC(univac_state::loopback_rxcb_w));
 
-	Z80SIO(config, m_uart, 18.432_MHz_XTAL / 6);
-	m_uart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_uart->out_txda_callback().set(m_uart, FUNC(z80sio_device::rxa_w)); // FIXME: hacked in permanent loopback to pass test
-	m_uart->out_txdb_callback().set(m_uart, FUNC(z80sio_device::rxb_w)); // FIXME: hacked in permanent loopback to pass test
-	m_uart->out_wrdyb_callback().set(m_uart, FUNC(z80sio_device::dcdb_w)); // FIXME: hacked in permanent loopback to pass test
-	m_uart->out_wrdyb_callback().append(m_uart, FUNC(z80sio_device::ctsb_w)); // FIXME: hacked in permanent loopback to pass test
+	CLOCK(config, m_keybclk, 18.432_MHz_XTAL / 60);
+	m_keybclk->signal_handler().set(m_sio, FUNC(z80sio_device::rxcb_w));
+
+	Z80SIO(config, m_sio, 18.432_MHz_XTAL / 6);
+	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio->out_txda_callback().set(FUNC(univac_state::sio_txda_w));
+	m_sio->out_txdb_callback().set(FUNC(univac_state::sio_txdb_w));
+	m_sio->out_rtsb_callback().set(FUNC(univac_state::sio_rtsb_w));
+	m_sio->out_wrdyb_callback().set(FUNC(univac_state::sio_wrdyb_w));
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+
+	UTS_KEYBOARD(config, m_keyboard, uts_keyboards, "extw");
+	m_keyboard->rxd_callback().set(FUNC(univac_state::aux_rxd_w));
+
+	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
+	m_printer->dcd_handler().set(FUNC(univac_state::aux_dsr_w));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(univac_state::uts10)
 	uts20(config);
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_DEVICE_PROGRAM_MAP(uts10_map)
+	MCFG_DEVICE_IO_MAP(uts10_io_map)
+
+	config.device_remove("keybclk");
+	m_ctc->zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
+
+	config.device_remove("latch_40");
+	subdevice<ls259_device>("latch_c0")->q_out_cb<6>().set_nop();
+	subdevice<ls259_device>("latch_e0")->q_out_cb<7>().set(FUNC(univac_state::sio_loopback_w)).invert();
 MACHINE_CONFIG_END
 
 
@@ -453,9 +629,6 @@ ROM_START( uts10 )
 
 	ROM_REGION( 0x0800, "chargen", 0 ) // possibly some bitrot, see h,m,n in F4 displayer
 	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
-
-	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "2716264.bin",  0x0000, 0x0800, CRC(75e188aa) SHA1(a6486576525f7eec617fd7f9db469063f8c357fc) )
 ROM_END
 
 ROM_START( uts20 )
@@ -469,14 +642,10 @@ ROM_START( uts20 )
 	// character generator not dumped, using the one from 'UTS10' for now
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, BAD_DUMP CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
-
-	// keyboard not dumped, using the one from 'UTS10' for now. The keyboard looks the same, and is most likely identical.
-	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "2716264.bin",  0x0000, 0x0800, BAD_DUMP CRC(75e188aa) SHA1(a6486576525f7eec617fd7f9db469063f8c357fc) )
 ROM_END
 
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY          FULLNAME  FLAGS
-COMP( 1979?, uts10, uts20,  0,      uts10,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, uts10, uts20,  0,      uts10,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-10", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, uts20, 0,      0,      uts20,   uts20, univac_state, empty_init, "Sperry Univac", "UTS-20", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

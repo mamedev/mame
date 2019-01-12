@@ -1513,7 +1513,7 @@ void mappy_state::mappy_common(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mappy);
-	PALETTE(config, m_palette, FUNC(mappy_state::mappy_palette), 64*4+16*4, 32);
+	PALETTE(config, m_palette, FUNC(mappy_state::mappy_palette), 64*4+16*16, 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);

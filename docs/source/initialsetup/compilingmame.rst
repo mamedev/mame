@@ -36,15 +36,79 @@ Rebuilding MAME on a dual-core (e.g. i3 or laptop i5) machine:
 Microsoft Windows
 -----------------
 
-Here are specific notes about compiling MAME for Microsoft Windows.
+MAME for Windows is built using the MSYS2 environment.  You will need Windows 7
+or later and a reasonably up-to-date MSYS2 installation.  We strongly recommend
+building MAME on a 64-bit system.  Instructions may need to be adjusted for
+32-bit systems.
 
-* Refer to `the MAME tools site <http://mamedev.org/tools/>`_ for the latest toolkit for getting MAME compiled on Windows.
+* A pre-packaged MSYS2 installation including the prerequisites for building
+  MAME can be downloaded from the `MAME Build Tools
+  <http://mamedev.org/tools/>`_ page.
+* After initial installation, you can update the MSYS2 environment using the
+  **pacman** (Arch package manage) command.
+* By default, MAME will be built using native Windows OS interfaces for
+  window management, audio/video output, font rendering, etc.  If you want to
+  use the portable SDL (Simple DirectMedia Layer) interfaces instead, you can
+  add **OSD=sdl** to the make options.  The main emulator binary will have an
+  ``sdl`` prefix prepended (e.g. ``sdlmame64.exe`` or ``sdlmame.exe``).  You
+  will need to install the MSYS2 packages for SDL 2 version 2.0.3 or later.
+* By default, MAME will include the native Windows debugger.  To also inculde
+  the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You
+  will need to install the MSYS2 packages for Qt 5.
 
-* You will need to download the toolset from that link to begin. Periodically, these tools are updated and newer versions of MAME from that point on will **require** updated tools to compile.
+Using a standard MSYS2 installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* You can do compilation on Visual Studio 2017 (if installed on your PC) by using **make vs2017**. This will always regenerate the settings, so **REGENIE=1** is *not* needed.
+You may also build MAME using a standard MSYS2 installation and adding the tools
+needed for building MAME.  These instructions assume you have some familiarity
+with MSYS2 and the **pacman** package manager.
 
-* Make sure you get SDL 2 2.0.3 or 2.0.4 as earlier versions are buggy.
+* Install the MSYS2 environment from  the `MSYS2 homepage
+  <https://www.msys2.org/>`_.
+* Download the latest version of the ``mame-essentials`` package from the
+  `MAME package repository <https://repo.mamedev.org/x86_64/>`_ and install it
+  using the **pacman** command.
+* Add the ``mame`` repository to ``/etc/pacman.conf`` using
+  ``/etc/pacman.d/mirrorlist.mame`` for locations.
+* Install packages necessary to build MAME.  At the very least, you'll need
+  ``bash``, ``git``, ``make``.
+* For 64-bit builds you'll need ``mingw-w64-i686-gcc`` and
+  ``mingw-w64-x86_64-python2``.
+* For 32-bit builds you'll need ``mingw-w64-x86_64-gcc`` and
+  ``mingw-w64-i686-python2``.
+* For debugging you may want to install ``gdb``.
+* To build against the portable SDL interfaces, you'll need
+  ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf`` for 64-bit builds,
+  or ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf`` for 32-bit builds.
+* To build the Qt debugger, you'll need ``mingw-w64-x86_64-qt5`` for 64-bit
+  builds, or ``mingw-w64-i686-qt5`` for 32-bit builds.
+* To generate API documentation from source, you'll need ``doxygen``.
+* For 64-bit builds, open **MSYS2 MinGW 64-bit** from the start menu, and set
+  up the environment variables ``MINGW64`` to ``/mingw64`` and ``MINGW32`` to an
+  empty string (e.g. using the command **export MINGW64=/mingw64 MINGW32=** in
+  the Bash shell).
+* For 32-bit builds, open **MSYS2 MinGW 32-bit** from the start menu, and set
+  up the environment variables ``MINGW32`` to ``/mingw32`` and ``MINGW64`` to an
+  empty string (e.g. using the command **export MINGW32=/mingw32 MINGW64=** in
+  the Bash shell).
+
+Building with Microsoft Visual Studio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* You can generate Visual Studio 2017 projects using **make vs2017**.  The
+  solution and project files will be created in
+  ``build/projects/windows/mame/vs2017`` by default (the name of the ``build``
+  folder can be changed using the ``BUILDDIR`` option).  This will always
+  regenerate the settings, so **REGENIE=1** is *not* needed.
+* Adding **MSBUILD=1** to the make options will build build the solution using
+  the Microsoft Build Engine after generating the project files.  Note that this
+  requires paths and environment variables to be configured so the correct
+  Visual Studio tools can be located.
+* MAME can only be compiled with the Visual Studio 15.7.6 tools.  Bugs in newer
+  versions of the Microsoft Visual C/C++ compiler prevent it from compiling
+  MAME.
+* The MSYS2 environment is still required to generate the project files, convert
+  built-in layouts, compile UI translations, etc.
 
 
 .. _compiling-fedora:

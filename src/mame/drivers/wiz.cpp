@@ -833,7 +833,7 @@ MACHINE_CONFIG_START(wiz_state::wiz)
 	MCFG_DEVICE_PROGRAM_MAP(wiz_main_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wiz)
+	m_gfxdecode->set_info(gfx_wiz);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(wiz_state, screen_update_wiz)
 MACHINE_CONFIG_END

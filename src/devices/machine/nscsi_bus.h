@@ -176,7 +176,9 @@ protected:
 
 	// SCSI addtional sense code qualifiers
 	enum {
-		SK_ASC_MEDIUM_NOT_PRESENT       = 0x3a
+		SK_ASC_INVALID_FIELD_IN_CDB       = 0x24,
+		SK_ASC_LOGICAL_UNIT_NOT_SUPPORTED = 0x25,
+		SK_ASC_MEDIUM_NOT_PRESENT         = 0x3a
 	};
 
 	// SCSI commands

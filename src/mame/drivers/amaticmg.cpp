@@ -911,7 +911,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 
 	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
+	m_gfxdecode->set_info(gfx_amaticmg2);
 	m_palette->set_init(FUNC(amaticmg_state::amaticmg2_palette));
 	m_palette->set_entries(0x10000);
 MACHINE_CONFIG_END
@@ -930,7 +930,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 
 	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
+	m_gfxdecode->set_info(gfx_amaticmg2);
 	m_palette->set_init(FUNC(amaticmg_state::amaticmg2_palette));
 	m_palette->set_entries(0x10000);
 MACHINE_CONFIG_END

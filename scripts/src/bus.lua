@@ -3231,6 +3231,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/uts_kbd/uts_kbd.h,BUSES["UTS_KBD"] = true
+---------------------------------------------------
+
+if (BUSES["UTS_KBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/uts_kbd/extw.cpp",
+		MAME_DIR .. "src/devices/bus/uts_kbd/extw.h",
+		MAME_DIR .. "src/devices/bus/uts_kbd/uts_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/uts_kbd/uts_kbd.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/vtech/memexp/memexp.h,BUSES["VTECH_MEMEXP"] = true
 ---------------------------------------------------
 

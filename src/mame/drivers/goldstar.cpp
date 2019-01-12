@@ -8513,15 +8513,17 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(goldstar_state::moonlght)
+void goldstar_state::moonlght(machine_config &config)
+{
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ml)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_ml);
+}
 
-MACHINE_CONFIG_START(goldstar_state::goldfrui)
+void goldstar_state::goldfrui(machine_config &config)
+{
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_goldfrui)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_goldfrui);
+}
 
 
 MACHINE_CONFIG_START(sanghopm_state::star100)
@@ -8693,30 +8695,35 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cb3_state::cb3c)
+void cb3_state::cb3c(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cb3c)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cb3c);
+}
 
-MACHINE_CONFIG_START(cb3_state::cb3e)
+void cb3_state::cb3e(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cb3e)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cb3e);
+}
 
-MACHINE_CONFIG_START(cb3_state::chrygld)
+void cb3_state::chrygld(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chry10)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_chry10);
+}
 
-MACHINE_CONFIG_START(cb3_state::cherrys)
+void cb3_state::cherrys(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cherrys)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cherrys);
+}
 
-MACHINE_CONFIG_START(cb3_state::cm97)
+void cb3_state::cm97(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cm97)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cm97);
+}
 
 
 MACHINE_CONFIG_START(goldstar_state::wcherry)
@@ -8808,10 +8815,11 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cmaster_state::cmasterc)
+void cmaster_state::cmasterc(machine_config &config)
+{
 	cm(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cmasterc)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cmasterc);
+}
 
 
 MACHINE_CONFIG_START(goldstar_state::cmast91)
@@ -8969,10 +8977,11 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(wingco_state::bingownga)
+void wingco_state::bingownga(machine_config &config)
+{
 	bingowng(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bingownga)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_bingownga);
+}
 
 
 MACHINE_CONFIG_START(wingco_state::flam7_w4)
@@ -8992,7 +9001,7 @@ MACHINE_CONFIG_START(wingco_state::flaming7)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_flaming7)
+	m_gfxdecode->set_info(gfx_flaming7);
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
@@ -9006,7 +9015,7 @@ MACHINE_CONFIG_START(wingco_state::flam7_tw)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_flam7_tw)
+	m_gfxdecode->set_info(gfx_flam7_tw);
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
@@ -9337,7 +9346,7 @@ MACHINE_CONFIG_START(cmaster_state::nfm)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(nfm_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_nfm)
+	m_gfxdecode->set_info(gfx_nfm);
 MACHINE_CONFIG_END
 
 

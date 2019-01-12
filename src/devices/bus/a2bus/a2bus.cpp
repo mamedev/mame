@@ -244,22 +244,12 @@ void a2bus_device::set_maincpu_halt(int state)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 }
 
-uint8_t a2bus_device::dma_r(address_space &space, uint16_t offset)
+uint8_t a2bus_device::dma_r(uint16_t offset)
 {
 	return m_maincpu_space->read_byte(offset);
 }
 
-void a2bus_device::dma_w(address_space &space, uint16_t offset, uint8_t data)
-{
-	m_maincpu_space->write_byte(offset, data);
-}
-
-uint8_t a2bus_device::dma_nospace_r(uint16_t offset)
-{
-	return m_maincpu_space->read_byte(offset);
-}
-
-void a2bus_device::dma_nospace_w(uint16_t offset, uint8_t data)
+void a2bus_device::dma_w(uint16_t offset, uint8_t data)
 {
 	m_maincpu_space->write_byte(offset, data);
 }

@@ -2465,7 +2465,7 @@ MACHINE_CONFIG_START(staraudi_state::staraudi)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
 	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_seta2)
+	m_gfxdecode->set_info(gfx_seta2);
 MACHINE_CONFIG_END
 
 
@@ -2525,7 +2525,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 	MCFG_DEVICE_PROGRAM_MAP(funcube_sub_map)
 	MCFG_DEVICE_IO_MAP(funcube_sub_io)
 
-	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(":sub:sci1", FUNC(h8_sci_device::rx_w));
 

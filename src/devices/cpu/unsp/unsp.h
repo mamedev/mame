@@ -68,6 +68,8 @@ public:
 
 	void set_timer_interval(int timer, uint32_t interval);
 
+	uint8_t get_csb();
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

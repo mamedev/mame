@@ -688,7 +688,7 @@ MACHINE_CONFIG_START(esd16_state::jumppop)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_DEVICE_CLOCK( XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_jumppop)
+	m_gfxdecode->set_info(gfx_jumppop);
 
 	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

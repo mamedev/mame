@@ -581,9 +581,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
 	}
 }
 
-MACHINE_CONFIG_START(md6802_state::md6802)
-	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(md6802_map)
+void md6802_state::md6802(machine_config &config)
+{
+	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &md6802_state::md6802_map);
 	config.set_default_layout(layout_md6802);
 
 	/* Devices */
@@ -610,16 +611,17 @@ MACHINE_CONFIG_START(md6802_state::md6802)
 	m_pia2->readpb_handler().set(FUNC(md6802_state::pia2_kbB_r));
 	m_pia2->ca2_handler().set(FUNC(md6802_state::pia2_ca2_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", md6802_state, scan_artwork, attotime::from_hz(10))
+	TIMER(config, "artwork_timer").configure_periodic(FUNC(md6802_state::scan_artwork), attotime::from_hz(10));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mp68a_state::mp68a)
+void mp68a_state::mp68a(machine_config &config)
+{
 	// Clock source is based on a N9602N Dual Retriggerable Resettable Monostable Multivibrator oscillator at aprox 505KHz.
 	// Trimpot seems broken/stuck at 5K Ohm thu. ROM code 1Ms delay loops suggest 1MHz+
-	MCFG_DEVICE_ADD("maincpu", M6800, 505000)
-	MCFG_DEVICE_PROGRAM_MAP(mp68a_map)
+	M6800(config, m_maincpu, 505000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mp68a_state::mp68a_map);
 	config.set_default_layout(layout_mp68a);
 
 	/* Devices */
@@ -660,21 +662,15 @@ MACHINE_CONFIG_START(mp68a_state::mp68a)
 	/* 0x086B 0x600 (Port A)    = 0x70 */
 	/* 0x086B 0x600 (Port A)    = 0x50 */
 	/* 0x086B 0x600 (Port A)    = 0x70 */
-	MCFG_DEVICE_ADD("digit0", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<0>))
-	MCFG_DEVICE_ADD("digit1", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<1>))
-	MCFG_DEVICE_ADD("digit2", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<2>))
-	MCFG_DEVICE_ADD("digit3", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<3>))
-	MCFG_DEVICE_ADD("digit4", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<4>))
-	MCFG_DEVICE_ADD("digit5", DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, mp68a_state, digit_w<5>))
+	DM9368(config, m_digits[0], 0).update_cb().set(FUNC(mp68a_state::digit_w<0>));
+	DM9368(config, m_digits[1], 0).update_cb().set(FUNC(mp68a_state::digit_w<1>));
+	DM9368(config, m_digits[2], 0).update_cb().set(FUNC(mp68a_state::digit_w<2>));
+	DM9368(config, m_digits[3], 0).update_cb().set(FUNC(mp68a_state::digit_w<3>));
+	DM9368(config, m_digits[4], 0).update_cb().set(FUNC(mp68a_state::digit_w<4>));
+	DM9368(config, m_digits[5], 0).update_cb().set(FUNC(mp68a_state::digit_w<5>));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", mp68a_state, scan_artwork, attotime::from_hz(10))
-MACHINE_CONFIG_END
+	TIMER(config, "artwork_timer").configure_periodic(FUNC(mp68a_state::scan_artwork), attotime::from_hz(10));
+}
 
 // TODO split ROM image into proper ROM set
 ROM_START( md6802 ) // ROM image from http://elektronikforumet.com/forum/viewtopic.php?f=2&t=79576&start=135#p1203640

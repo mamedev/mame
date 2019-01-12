@@ -71,6 +71,10 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_an_in(*this, "AN%u", 0U),
+		m_mouse0x(*this, "MOUSE0X"),
+		m_mouse0y(*this, "MOUSE0Y"),
+		m_mouse1x(*this, "MOUSE1X"),
+		m_mouse1y(*this, "MOUSE1Y"),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
@@ -102,6 +106,7 @@ public:
 	void xavixp(machine_config &config);
 	void xavix2000(machine_config &config);
 	void xavix_nv(machine_config &config);
+	void xavix2000_nv(machine_config &config);
 
 	void init_xavix();
 
@@ -169,6 +174,10 @@ protected:
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport_array<8> m_an_in;
+	optional_ioport m_mouse0x;
+	optional_ioport m_mouse0y;
+	optional_ioport m_mouse1x;
+	optional_ioport m_mouse1y;
 	required_device<xavix_device> m_maincpu;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
@@ -258,7 +267,16 @@ private:
 	uint8_t m_ioevent_active;
 	void process_ioevent(uint8_t bits);
 
-	DECLARE_WRITE8_MEMBER(adc_7b00_w);
+	DECLARE_READ8_MEMBER(mouse_7b00_r);
+	DECLARE_READ8_MEMBER(mouse_7b01_r);
+	DECLARE_READ8_MEMBER(mouse_7b10_r);
+	DECLARE_READ8_MEMBER(mouse_7b11_r);
+
+	DECLARE_WRITE8_MEMBER(mouse_7b00_w);
+	DECLARE_WRITE8_MEMBER(mouse_7b01_w);
+	DECLARE_WRITE8_MEMBER(mouse_7b10_w);
+	DECLARE_WRITE8_MEMBER(mouse_7b11_w);
+	
 	DECLARE_READ8_MEMBER(adc_7b80_r);
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);
 	DECLARE_READ8_MEMBER(adc_7b81_r);
@@ -444,6 +462,12 @@ private:
 	DECLARE_WRITE8_MEMBER(mult_w);
 	DECLARE_READ8_MEMBER(mult_param_r);
 	DECLARE_WRITE8_MEMBER(mult_param_w);
+
+	uint8_t m_barrel_params[2];
+
+	DECLARE_READ8_MEMBER(barrel_r);
+	DECLARE_WRITE8_MEMBER(barrel_w);
+
 
 	void update_irqs();
 	uint8_t m_irqsource;

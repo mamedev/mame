@@ -268,12 +268,21 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int xscroll = m_scrollregs[0] | (m_scrollregs[1] << 8);
 	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
 
-	int size = 16;
-	// or 0x10?
+	int size;
+	// or 0x80?
 	if (m_tilecfg[0] & 0x10)
 	{
 		size = 8;
+		m_pagewidth = 32;
+		m_pageheight = 28;
 	}
+	else
+	{
+		size = 16;
+		m_pagewidth = 16;
+		m_pageheight = 14;
+	}
+
 
 	// normal
 	draw_page(screen, bitmap, cliprect, 0, 0 - xscroll,                            0 - yscroll,                             size);
@@ -965,8 +974,6 @@ void radica_eu3a14_state::init_rad_gtg()
 	// must be registers to control this
 	m_tilerambase = 0x0a00 - 0x200;
 	m_spriterambase = 0x0220 - 0x200;
-	m_pagewidth = 16;
-	m_pageheight = 14;
 }
 
 void radica_eu3a14_state::init_rad_foot()
@@ -974,9 +981,6 @@ void radica_eu3a14_state::init_rad_foot()
 	// must be registers to control this
 	m_tilerambase = 0x0200 - 0x200;
 	m_spriterambase = 0x2800 - 0x200;
-	// this is ok for the game, but secret test mode also uses a weird 8x8 mode with different tile addressing
-	m_pagewidth = 16;
-	m_pageheight = 14;
 }
 
 
@@ -985,9 +989,6 @@ void radica_eu3a14_state::init_rad_hnt3()
 	// must be registers to control this
 	m_tilerambase = 0x0200 - 0x200;
 	m_spriterambase = 0x1800 - 0x200;
-	// uses an 8x8 mode, could depend on that, but other 8x8 use case above is different
-	m_pagewidth = 32;
-	m_pageheight = 28;
 }
 
 

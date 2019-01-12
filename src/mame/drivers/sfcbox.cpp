@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 	MCFG_DEVICE_PROGRAM_MAP(sfcbox_map)
 	MCFG_DEVICE_IO_MAP(sfcbox_io)
 
-	MCFG_MB90082_ADD("mb90082",XTAL(12'000'000) / 2) /* TODO: correct clock */
+	MB90082(config, m_mb90082, XTAL(12'000'000) / 2); /* TODO: correct clock */
 	S3520CF(config, m_s3520cf); /* RTC */
 
 	/* sound hardware */

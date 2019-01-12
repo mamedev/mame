@@ -131,15 +131,28 @@ protected:
 		SR_COP2  = 0x40000000, // coprocessor 2 usable
 		SR_COP3  = 0x80000000, // coprocessor 3 usable
 
-		SR_KUIE  = 0x0000003f, // all interrupt enable and user mode bits
+		SR_KUIE   = 0x0000003f, // all interrupt enable and user mode bits
+		SR_KUIEpc = 0x0000000f, // previous and current interrupt enable and user mode bits
+		SR_KUIEop = 0x0000003c, // old and previous interrupt enable and user mode bits
+		SR_IM     = 0x0000ff00, // all interrupt mask bits
 	};
 
 	enum cause_mask : u32
 	{
 		CAUSE_EXCCODE = 0x0000007c, // exception code
+		CAUSE_IPSW0   = 0x00000100, // software interrupt 0 pending
+		CAUSE_IPSW1   = 0x00000200, // software interrupt 1 pending
+		CAUSE_IPEX0   = 0x00000400, // external interrupt 0 pending
+		CAUSE_IPEX1   = 0x00000800, // external interrupt 1 pending
+		CAUSE_IPEX2   = 0x00001000, // external interrupt 2 pending
+		CAUSE_IPEX3   = 0x00002000, // external interrupt 3 pending
+		CAUSE_IPEX4   = 0x00004000, // external interrupt 4 pending
+		CAUSE_IPEX5   = 0x00008000, // external interrupt 5 pending
 		CAUSE_IP      = 0x0000ff00, // interrupt pending
 		CAUSE_CE      = 0x30000000, // co-processor error
 		CAUSE_BD      = 0x80000000, // branch delay
+
+		CAUSE_IPEX    = 0x0000fc00, // external interrupt pending
 	};
 
 	enum entryhi_mask : u32
@@ -216,7 +229,7 @@ protected:
 	bool fetch(u32 program_address, std::function<void(u32)> &&apply);
 
 	// debug helpers
-	std::string debug_string(u32 string_pointer);
+	std::string debug_string(u32 string_pointer, int const limit = 0);
 	std::string debug_string_array(u32 array_pointer);
 
 	// address spaces

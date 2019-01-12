@@ -66,14 +66,14 @@ NETLIB_OBJECT(twoterm)
 	NETLIB_UPDATEI();
 
 public:
-	/* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
+	void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
 		m_P.set( G,  G, (  V) * G - I);
 		m_N.set( G,  G, ( -V) * G + I);
 	}
 
-	/* inline */ nl_double deltaV() const
+	nl_double deltaV() const
 	{
 		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
@@ -107,7 +107,7 @@ NETLIB_OBJECT_DERIVED(R_base, twoterm)
 	}
 
 public:
-	inline void set_R(const nl_double R)
+	void set_R(const nl_double R)
 	{
 		const nl_double G = NL_FCONST(1.0) / R;
 		set_mat( G, -G, 0.0,

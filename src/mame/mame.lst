@@ -1837,13 +1837,14 @@ luigibal                        // (c) 2007
 lucky88                         // (c) 2007
 magforst                        // (c) 2005
 magmerm                         // (c) 2003
+mchilli                         // (c) 2008
+mchilliq                        // (c) 2010
 metestrm                        // (c) 2007
 milkin                          // (c) 2007
 mskitty                         // (c) 2005
 mnytree                         // (c) 2000
+moonfire                        // (c) 2004
 moonwalt                        // (c) 2007
-mchilli                         // (c) 2008
-mchilliq                        // (c) 2010
 mrwoo                           // (c) 200?
 mystarr                         // (c) 2002
 mysteycm                        // (c) 2001
@@ -1939,6 +1940,7 @@ whalecshua                      // (c) 2005
 wheregld                        // (c) 2004
 wheregldsp                      // (c) 2004
 wheregldm                       // (c) 2004
+wheregldq                       // (c) 2005
 whtwater                        // (c) 2003
 wikwin2                         // (c) 2006
 wldafr                          // (c) 2002
@@ -8823,6 +8825,7 @@ bionicc2                        // 3/1987 (c) 1987 (US)
 bioniccbl                       // bootleg
 bioniccbl2                      // bootleg
 topsecrt                        // 3/1987 (c) 1987 (Japan)
+topsecrt2                       // 3/1987 (c) 1987 (Japan)
 
 @source:bishi.cpp
 bishi                           // GX575 (c) 1996 (Japan)
@@ -9871,6 +9874,9 @@ clayshoo                        // [1979 Allied Leisure]
 
 @source:clcd.cpp
 clcd                            // Commodore LCD
+
+@source:clickstart.cpp
+clikstrt                        // (c) 2007 LeapFrog Enterprises
 
 @source:cliffhgr.cpp
 cliffhgr                        // (c) 1983
@@ -15012,6 +15018,7 @@ gnw_dkong                       // Nintendo
 gnw_dkong2                      // Nintendo
 gnw_egg                         // Nintendo
 gnw_ghouse                      // Nintendo
+gnw_lboat                       // Nintendo
 gnw_manhole                     // Nintendo
 gnw_mario                       // Nintendo
 gnw_mariocm                     // Nintendo
@@ -20905,12 +20912,13 @@ dcat16                          //
 
 @source:megadriv_acbl.cpp
 aladmdb                         // MegaDrive-based hack
+barek3mb                        // MegaDrive-based hack
 mk3mdb                          // MegaDrive-based hack
 sonic2mb                        // MegaDrive-based hack
 srmdb                           // MegaDrive-based hack
 ssf2mdb                         // MegaDrive-based hack
 topshoot                        // (c) 1995 Sun Mixing
-barek3mb                        // MegaDrive-based hack
+twinktmb                        // MegaDrive-based hack
 
 @source:megadriv_rad.cpp
 rad_sf                          // (c)2004 Radica
@@ -29644,6 +29652,7 @@ rumblefp                        // 2004.02 The Rumble Fish (prototype)
 rumblf2p                        // 2005.01 The Rumble Fish 2 (prototype)
 salmankt                        // 2004.06 Salary Man Kintarou Net Select
 samba                           // 1999.12 Samba de Amigo (Rev B)
+sambaa                          // 1999.?? Samba de Amigo (Rev A)
 samba2k                         // 2000.12 Samba de Amigo Ver.2000
 sambap                          // 1999.?? Samba de Amigo (prototype)
 samsptk                         // 2005.09 Samurai Spirits Tenkaichi Kenkakuden
@@ -38539,9 +38548,13 @@ vigilantg                       // (c) 1988 (US Rev G)
 vigilanto                       // (c) 1988 (US)
 
 @source:vii.cpp
-batmantv                        // The Batman, 2004
+jak_batm                        // The Batman, 2004
+jak_wall                        //
+jak_wwe                         //
+jak_fan4                        //
+jak_just                        //
+jak_dora                        //
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
-walle                           //
 wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
 wlsair60                        // Wireless Air 60
@@ -38552,6 +38565,7 @@ rad_skatp                       //
 rad_sktv                        //
 rad_crik                        //
 rad_fb2                         //
+mattelcs                        //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -39696,11 +39710,14 @@ rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
 epo_efdx                        //
+epo_sdb                         //
+epo_guru                        //
 rad_rh                          //
 has_wamg                        //
 ekara                           //
 ekaraa                          //
 ekaraj                          //
+ekaraphs                        //
 ddrfammt                        //
 popira                          //
 taikodp                         //
@@ -40109,6 +40126,10 @@ ts1500                          // Timex Sinclair 1500
 zx80                            // 1980 Sinclair ZX-80
 zx81                            // 1981 Sinclair ZX-81
 zx97                            //
+
+@source:testpat.cpp
+tp1983
+tp1985
 
 @source:vgmplay.cpp
 vgmplay

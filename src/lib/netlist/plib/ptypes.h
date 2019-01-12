@@ -25,14 +25,14 @@ namespace plib
 	template<> struct is_integral<INT128> { static constexpr bool value = true; };
 	template<> struct numeric_limits<UINT128>
 	{
-		static inline constexpr UINT128 max()
+		static constexpr UINT128 max()
 		{
 			return ~((UINT128)0);
 		}
 	};
 	template<> struct numeric_limits<INT128>
 	{
-		static inline constexpr INT128 max()
+		static constexpr INT128 max()
 		{
 			return (~((UINT128)0)) >> 1;
 		}

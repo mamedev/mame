@@ -108,9 +108,6 @@ protected:
 
 	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(maincpu_interrupt);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(ohci_usb_interrupt_changed);
 	DECLARE_WRITE_LINE_MEMBER(smbus_interrupt_changed);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_changed);

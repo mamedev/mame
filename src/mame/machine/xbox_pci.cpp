@@ -21,7 +21,7 @@ nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *ta
 	pci_host_device(mconfig, NV2A_HOST, tag, owner, clock),
 	cpu(*this, finder_base::DUMMY_TAG)
 {
-	set_ids(0x10de01b0, 0, 0, 0);
+	set_ids_host(0x10de02a5, 0, 0);
 }
 
 void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -94,6 +94,7 @@ void mcpx_isalpc_device::internal_io_map(address_map &map)
 	map(0x0020, 0x0023).rw("pic8259_1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0070, 0x0073).rw("rtc", FUNC(ds12885ext_device::read), FUNC(ds12885ext_device::write));
+	map(0x0080, 0x0080).w(FUNC(mcpx_isalpc_device::boot_state_w));
 	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
 
@@ -103,20 +104,27 @@ void mcpx_isalpc_device::map_extra(uint64_t memory_window_start, uint64_t memory
 	io_space->install_device(0, 0xffff, *this, &mcpx_isalpc_device::internal_io_map);
 }
 
+mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
+	: mcpx_isalpc_device(mconfig, tag, owner, clock)
+{
+	set_ids(0x10de01b2, 0xb4, 0, subsystem_id); // revision id must be at least 0xb4, otherwise usb will require a hub
+}
+
 mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_ISALPC, tag, owner, clock),
 	m_interrupt_output(*this),
+	m_boot_state_hook(*this),
 	pic8259_1(*this, "pic8259_1"),
 	pic8259_2(*this, "pic8259_2"),
 	pit8254(*this, "pit8254")
 {
-	set_ids(0x10de01b2, 0xb4, 0, 0); // revision id must be at least 0xb4, otherwise usb will require a hub
 }
 
 void mcpx_isalpc_device::device_start()
 {
 	pci_device::device_start();
 	m_interrupt_output.resolve_safe();
+	m_boot_state_hook.resolve_safe();
 	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
 	bank_infos[0].adr = 0x8000;
 }
@@ -161,6 +169,12 @@ READ32_MEMBER(mcpx_isalpc_device::lpc_r)
 
 WRITE32_MEMBER(mcpx_isalpc_device::lpc_w)
 {
+}
+
+WRITE8_MEMBER(mcpx_isalpc_device::boot_state_w)
+{
+	if (m_boot_state_hook)
+		m_boot_state_hook((offs_t)0, data);
 }
 
 WRITE_LINE_MEMBER(mcpx_isalpc_device::interrupt_ouptut_changed)

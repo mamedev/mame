@@ -387,9 +387,9 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470)/2, 568, 0, 40*8, 312, 0, 25*8)
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz700)
 	MCFG_SCREEN_PALETTE(m_palette)
-	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz700)
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz700);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -441,7 +441,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	ADDRESS_MAP_BANK(config, "bankf").set_map(&mz_state::mz800_bankf).set_options(ENDIANNESS_LITTLE, 8, 16, 0x2000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mz_state, mz800)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mz800)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_mz800);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)

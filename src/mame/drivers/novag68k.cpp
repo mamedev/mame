@@ -259,9 +259,9 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_SCREEN_PALETTE("palette")
 	PALETTE(config, "palette", FUNC(novag68k_state::novag_lcd_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(novag68k_state, novag_lcd_pixel_update)
+	HD44780(config, m_lcd, 0);
+	m_lcd->set_lcd_size(2, 8);
+	m_lcd->set_pixel_update_cb(FUNC(novag68k_state::novag_lcd_pixel_update), this);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag68k_state, display_decay_tick, attotime::from_msec(1))
 	config.set_default_layout(layout_novag_diablo68k);

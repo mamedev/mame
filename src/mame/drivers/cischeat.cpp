@@ -1981,7 +1981,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigrun)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigrun);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x4000/2);
 	m_palette->enable_shadows();
 
@@ -2033,7 +2033,7 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cischeat)
+	m_gfxdecode->set_info(gfx_cischeat);
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
 
 	m_tmap[0]->set_colorbase(0x1c00/2);
@@ -2067,7 +2067,7 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gpstar)
+	m_gfxdecode->set_info(gfx_f1gpstar);
 	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
 
 	m_tmap[0]->set_colorbase(0x1e00/2);
@@ -2147,7 +2147,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
 	m_palette->enable_shadows();
 
@@ -2238,7 +2238,7 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
 	m_palette->enable_shadows();
 

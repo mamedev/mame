@@ -609,9 +609,9 @@ MACHINE_CONFIG_START(cc40_state::cc40)
 
 	PALETTE(config, "palette", FUNC(cc40_state::cc40_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
-	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_state, cc40_pixel_update)
+	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780.set_lcd_size(2, 16); // 2*16 internal
+	hd44780.set_pixel_update_cb(FUNC(cc40_state::cc40_pixel_update), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

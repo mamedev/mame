@@ -2183,12 +2183,12 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_PROGRAM_MAP(cmi07cpu_map)
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("dp1", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, cmi_state, cmi_iix_update_dp<0>))
-	MCFG_DEVICE_ADD("dp2", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, cmi_state, cmi_iix_update_dp<1>))
-	MCFG_DEVICE_ADD("dp3", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, cmi_state, cmi_iix_update_dp<2>))
+	DL1416T(config, m_dp1, u32(0));
+	m_dp1->update().set(FUNC(cmi_state::cmi_iix_update_dp<0>));
+	DL1416T(config, m_dp2, u32(0));
+	m_dp2->update().set(FUNC(cmi_state::cmi_iix_update_dp<1>));
+	DL1416T(config, m_dp3, u32(0));
+	m_dp3->update().set(FUNC(cmi_state::cmi_iix_update_dp<2>));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

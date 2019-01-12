@@ -225,7 +225,8 @@ base_sns_cart_slot_device::~base_sns_cart_slot_device()
 void base_sns_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_sns_cart_interface *>(get_card_device());
-	m_cart->m_slot = this;
+	if (m_cart != nullptr)
+		m_cart->m_slot = this;
 
 	m_irq_callback.resolve_safe();
 }
