@@ -2407,12 +2407,10 @@ SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 	return data;
 }
 
-void cps3_state::simm_config(machine_config &config, int slot, int chipno)
+void cps3_state::simm_config(machine_config &config, unsigned slot, unsigned count)
 {
-	for (int i = 0; i < chipno; i++)
-	{
+	for (unsigned i = 0; i < count; i++)
 		FUJITSU_29F016A(config, m_simm[slot][i]);
-	}
 }
 
 void cps3_state::simm1_64mbit(machine_config &config)

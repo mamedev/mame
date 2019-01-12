@@ -65,7 +65,7 @@ public:
 	void sfiii3(machine_config &config);
 	void sfiii(machine_config &config);
 	void jojoba(machine_config &config);
-	void simm_config(machine_config &config, int slot, int chipno);
+	void simm_config(machine_config &config, unsigned slot, unsigned count);
 	void simm1_64mbit(machine_config &config);
 	void simm2_64mbit(machine_config &config);
 	void simm3_128mbit(machine_config &config);
