@@ -74,7 +74,12 @@ namespace netlist
 		param_double_t m_freq;
 		netlist_time m_inc;
 
-		inline static void mc_update(logic_net_t &net);
+		static void mc_update(logic_net_t &net)
+		{
+			net.toggle_new_Q();
+			net.update_devs();
+		}
+
 	};
 
 	// -----------------------------------------------------------------------------

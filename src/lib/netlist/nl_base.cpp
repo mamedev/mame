@@ -836,12 +836,12 @@ void detail::net_t::rebuild_list()
 		}
 }
 
-void detail::net_t::process(const unsigned &mask)
+void detail::net_t::process(const std::uint_fast8_t mask)
 {
 	for (auto & p : m_list_active)
 	{
 		p.device().m_stat_call_count.inc();
-		if ((p.state() & mask) != 0)
+		if ((p.state() & mask))
 		{
 			p.device().m_stat_total_time.start();
 			p.m_delegate();
@@ -972,24 +972,6 @@ detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &anam
 
 detail::core_terminal_t::~core_terminal_t()
 {
-}
-
-void detail::core_terminal_t::reset()
-{
-	if (is_type(OUTPUT))
-		set_state(STATE_OUT);
-	else
-		set_state(STATE_INP_ACTIVE);
-}
-
-void detail::core_terminal_t::set_net(net_t *anet)
-{
-	m_net = anet;
-}
-
-void detail::core_terminal_t::clear_net()
-{
-	m_net = nullptr;
 }
 
 analog_t::analog_t(core_device_t &dev, const pstring &aname, const state_e state)
@@ -1256,21 +1238,6 @@ std::unique_ptr<plib::pistream> param_data_t::stream()
 {
 	return device().netlist().setup().get_data_stream(Value());
 }
-
-	namespace devices
-	{
-	// ----------------------------------------------------------------------------------------
-	// mainclock
-	// ----------------------------------------------------------------------------------------
-
-	void NETLIB_NAME(mainclock)::mc_update(logic_net_t &net)
-	{
-		net.toggle_new_Q();
-		net.update_devs();
-	}
-
-
-	} //namespace devices
 
 	bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT
 	{

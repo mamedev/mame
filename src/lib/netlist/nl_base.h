@@ -522,9 +522,10 @@ namespace netlist
 		 */
 		bool is_type(const terminal_type atype) const { return (type() == atype); }
 
-		void set_net(net_t *anet);
-		void clear_net();
+		void set_net(net_t *anet) { m_net = anet; }
+		void clear_net() { m_net = nullptr; }
 		bool has_net() const NL_NOEXCEPT { return (m_net != nullptr); }
+
 
 		const net_t & net() const NL_NOEXCEPT { return *m_net;}
 		net_t & net() NL_NOEXCEPT { return *m_net;}
@@ -532,11 +533,11 @@ namespace netlist
 		bool is_logic() const NL_NOEXCEPT;
 		bool is_analog() const NL_NOEXCEPT;
 
-		bool is_state(const state_e &astate) const NL_NOEXCEPT { return (m_state == astate); }
+		bool is_state(const state_e astate) const NL_NOEXCEPT { return (m_state == astate); }
 		const state_e &state() const NL_NOEXCEPT { return m_state; }
-		void set_state(const state_e &astate) NL_NOEXCEPT { m_state = astate; }
+		void set_state(const state_e astate) NL_NOEXCEPT { m_state = astate; }
 
-		void reset();
+		void reset() { set_state(is_type(OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
 
 		nldelegate m_delegate;
 
@@ -768,7 +769,7 @@ namespace netlist
 		plib::linkedlist_t<core_terminal_t> m_list_active;
 		core_terminal_t * m_railterminal;
 
-		void process(const unsigned &mask);
+		void process(const std::uint_fast8_t mask);
 	};
 
 	class logic_net_t : public detail::net_t
