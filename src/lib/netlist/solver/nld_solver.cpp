@@ -82,6 +82,10 @@ void NETLIB_NAME(solver)::stop()
 
 NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 {
+	for (auto &s : m_mat_solvers)
+	{
+		plib::pfree(s);
+	}
 }
 
 NETLIB_UPDATE(solver)
@@ -94,32 +98,27 @@ NETLIB_UPDATE(solver)
 	bool force_solve = (netlist().time() < netlist_time::from_double(2 * m_params.m_max_timestep));
 
 	std::size_t nthreads = std::min(static_cast<std::size_t>(m_parallel()), plib::omp::get_max_threads());
-	std::size_t t_cnt = 0;
-	std::size_t solv[128];
-	for (std::size_t i = 0; i <  m_mat_solvers.size(); i++)
-		if (m_mat_solvers[i]->has_timestep_devices() || force_solve)
-			solv[t_cnt++] = i;
 
-	//if (nthreads > 1 && t_cnt > 1)
+	std::vector<matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers : m_mat_solvers_timestepping);
+
+	if (nthreads > 1 && solvers.size() > 1)
 	{
 		plib::omp::set_num_threads(nthreads);
-		plib::omp::for_static(static_cast<std::size_t>(0), t_cnt, [this, &solv](std::size_t i)
+		plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(), [this, &solvers](std::size_t i)
 			{
-				const netlist_time ts = this->m_mat_solvers[solv[i]]->solve();
+				const netlist_time ts = solvers[i]->solve();
 				plib::unused_var(ts);
 			});
 	}
-//	else
-//		for (auto & solver : m_mat_solvers)
-//			if (solver->has_timestep_devices() || force_solve)
-//			{
-//				const netlist_time ts = solver->solve();
-//				plib::unused_var(ts);
-//			}
+	else
+		for (auto & solver : solvers)
+		{
+			const netlist_time ts = solver->solve();
+			plib::unused_var(ts);
+		}
 
-	for (auto & solver : m_mat_solvers)
-		if (solver->has_timestep_devices() || force_solve)
-			solver->update_inputs();
+	for (auto & solver : solvers)
+		solver->update_inputs();
 
 	/* step circuit */
 	if (!m_Q_step.net().is_queued())
@@ -129,14 +128,13 @@ NETLIB_UPDATE(solver)
 }
 
 template <class C>
-std::unique_ptr<matrix_solver_t> create_it(netlist_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
+matrix_solver_t * create_it(netlist_t &nl, pstring name, solver_parameters_t &params, std::size_t size)
 {
-	typedef C solver;
-	return plib::make_unique<solver>(nl, name, &params, size);
+	return plib::palloc<C>(nl, name, &params, size);
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
+matrix_solver_t * NETLIB_NAME(solver)::create_solver(std::size_t size, const pstring &solvername)
 {
 	if (m_method() == "SOR_MAT")
 	{
@@ -148,41 +146,34 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t 
 	{
 		if (size > 0) // GCR always outperforms MAT solver
 		{
-			typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
-			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+			return create_it<matrix_solver_GCR_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 		}
 		else
 		{
-			typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
-			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+			return create_it<matrix_solver_direct_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 		}
 	}
 	else if (m_method() == "MAT")
 	{
-		typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
-		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+		return create_it<matrix_solver_direct_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 	}
 	else if (m_method() == "SM")
 	{
 		/* Sherman-Morrison Formula */
-		typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
-		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+		return create_it<matrix_solver_sm_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 	}
 	else if (m_method() == "W")
 	{
 		/* Woodbury Formula */
-		typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
-		return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
+		return create_it<matrix_solver_w_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 	}
 	else if (m_method() == "SOR")
 	{
-		typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
-		return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
+		return create_it<matrix_solver_SOR_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 	}
 	else if (m_method() == "GMRES")
 	{
-		typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
-		return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
+		return create_it<matrix_solver_GMRES_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 	}
 	else
 	{
@@ -247,6 +238,7 @@ struct net_splitter
 void NETLIB_NAME(solver)::post_start()
 {
 	const bool use_specific = true;
+	plib::unused_var(use_specific);
 
 	m_params.m_pivot = m_pivot();
 	m_params.m_accuracy = m_accuracy();
@@ -290,7 +282,7 @@ void NETLIB_NAME(solver)::post_start()
 	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), netlist().m_nets.size());
 	for (auto & grp : splitter.groups)
 	{
-		std::unique_ptr<matrix_solver_t> ms;
+		matrix_solver_t *ms;
 		std::size_t net_count = grp.size();
 		pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
@@ -299,17 +291,17 @@ void NETLIB_NAME(solver)::post_start()
 #if 1
 			case 1:
 				if (use_specific)
-					ms = plib::make_unique<matrix_solver_direct1_t>(netlist(), sname, &m_params);
+					ms = plib::palloc<matrix_solver_direct1_t>(netlist(), sname, &m_params);
 				else
 					ms = create_solver<1,1>(1, sname);
 				break;
 			case 2:
 				if (use_specific)
-					ms =  plib::make_unique<matrix_solver_direct2_t>(netlist(), sname, &m_params);
+					ms =  plib::palloc<matrix_solver_direct2_t>(netlist(), sname, &m_params);
 				else
 					ms = create_solver<2,2>(2, sname);
 				break;
-#if 0
+#if 1
 			case 3:
 				ms = create_solver<3,3>(3, sname);
 				break;
@@ -411,7 +403,9 @@ void NETLIB_NAME(solver)::post_start()
 			}
 		}
 
-		m_mat_solvers.push_back(std::move(ms));
+		m_mat_solvers.push_back(ms);
+		if (ms->has_timestep_devices())
+			m_mat_solvers_timestepping.push_back(ms);
 	}
 }
 
