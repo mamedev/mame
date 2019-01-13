@@ -14,6 +14,7 @@
 #endif
 
 #include "netlist_types.h"
+#include "nl_errstr.h"
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "plib/palloc.h" // owned_ptr
@@ -906,6 +907,8 @@ namespace netlist
 
 		void update_param();
 
+		pstring get_initial(const device_t &dev, bool *found);
+
 		template<typename C>
 		void set(C &p, const C v)
 		{
@@ -918,6 +921,30 @@ namespace netlist
 
 	};
 
+	// -----------------------------------------------------------------------------
+	// numeric parameter template
+	// -----------------------------------------------------------------------------
+
+	template <typename T>
+	class param_num_t final: public param_t
+	{
+	public:
+		param_num_t(device_t &device, const pstring &name, const T val);
+		const T &operator()() const NL_NOEXCEPT { return m_param; }
+		void setTo(const T &param) { set(m_param, param); }
+	private:
+		T m_param;
+	};
+
+	/* FIXME: these should go as well */
+	typedef param_num_t<bool> param_logic_t;
+	typedef param_num_t<int> param_int_t;
+	typedef param_num_t<double> param_double_t;
+
+	// -----------------------------------------------------------------------------
+	// pointer parameter
+	// -----------------------------------------------------------------------------
+
 	class param_ptr_t final: public param_t
 	{
 	public:
@@ -928,35 +955,9 @@ namespace netlist
 		std::uint8_t* m_param;
 	};
 
-	class param_logic_t final: public param_t
-	{
-	public:
-		param_logic_t(device_t &device, const pstring &name, const bool val);
-		const bool &operator()() const NL_NOEXCEPT { return m_param; }
-		void setTo(const bool &param) { set(m_param, param); }
-	private:
-		bool m_param;
-	};
-
-	class param_int_t final: public param_t
-	{
-	public:
-		param_int_t(device_t &device, const pstring &name, const int val);
-		const int &operator()() const NL_NOEXCEPT { return m_param; }
-		void setTo(const int &param) { set(m_param, param); }
-	private:
-		int m_param;
-	};
-
-	class param_double_t final: public param_t
-	{
-	public:
-		param_double_t(device_t &device, const pstring &name, const double val);
-		const double &operator()() const NL_NOEXCEPT { return m_param; }
-		void setTo(const double &param) { set(m_param, param); }
-	private:
-		double m_param;
-	};
+	// -----------------------------------------------------------------------------
+	// string parameter
+	// -----------------------------------------------------------------------------
 
 	class param_str_t : public param_t
 	{
@@ -980,6 +981,10 @@ namespace netlist
 	private:
 		pstring m_param;
 	};
+
+	// -----------------------------------------------------------------------------
+	// model parameter
+	// -----------------------------------------------------------------------------
 
 	class param_model_t : public param_str_t
 	{
@@ -1014,15 +1019,21 @@ namespace netlist
 		detail::model_map_t m_map;
 };
 
+	// -----------------------------------------------------------------------------
+	// data parameter
+	// -----------------------------------------------------------------------------
 
 	class param_data_t : public param_str_t
 	{
 	public:
-		param_data_t(device_t &device, const pstring &name);
+		param_data_t(device_t &device, const pstring &name)
+		: param_str_t(device, name, "")
+		{
+		}
 
 		std::unique_ptr<plib::pistream> stream();
 	protected:
-		virtual void changed() override;
+		virtual void changed() override { }
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1135,6 +1146,8 @@ namespace netlist
 		virtual ~device_t() override;
 
 		setup_t &setup();
+		const setup_t &setup() const;
+
 
 		template<class C, typename... Args>
 		void register_sub(const pstring &name, std::unique_ptr<C> &dev, const Args&... args)
@@ -1241,6 +1254,7 @@ namespace netlist
 		/* netlist build functions */
 
 		setup_t &setup() NL_NOEXCEPT { return *m_setup; }
+		const setup_t &setup() const NL_NOEXCEPT { return *m_setup; }
 
 		void register_dev(plib::owned_ptr<core_device_t> dev);
 		void remove_dev(core_device_t *dev);
@@ -1365,6 +1379,27 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
+
+	template <typename T>
+	param_num_t<T>::param_num_t(device_t &device, const pstring &name, const T val)
+	: param_t(device, name)
+	{
+		//m_param = device.setup().get_initial_param_val(this->name(),val);
+		bool found = false;
+		pstring p = this->get_initial(device, &found);
+		if (found)
+		{
+			bool err = false;
+			T vald = plib::pstonum_ne<T>(p, err);
+			if (err)
+				netlist().log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, p);
+			m_param = vald;
+		}
+		else
+			m_param = val;
+
+		netlist().save(*this, m_param, "m_param");
+	}
 
 	template <typename ST, std::size_t AW, std::size_t DW>
 	param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring &name)

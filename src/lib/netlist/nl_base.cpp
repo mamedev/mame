@@ -720,6 +720,11 @@ setup_t &device_t::setup()
 	return netlist().setup();
 }
 
+const setup_t &device_t::setup() const
+{
+	return netlist().setup();
+}
+
 void device_t::register_subalias(const pstring &name, detail::core_terminal_t &term)
 {
 	pstring alias = this->name() + "." + name;
@@ -1153,6 +1158,14 @@ void param_t::update_param()
 		device().update_dev();
 }
 
+pstring param_t::get_initial(const device_t &dev, bool *found)
+{
+	pstring res = dev.setup().get_initial_param_val(this->name(), "");
+	*found = (res != "");
+	return res;
+}
+
+
 const pstring param_model_t::model_type()
 {
 	if (m_map.size() == 0)
@@ -1172,27 +1185,6 @@ param_str_t::~param_str_t()
 
 void param_str_t::changed()
 {
-}
-
-param_double_t::param_double_t(device_t &device, const pstring &name, const double val)
-: param_t(device, name)
-{
-	m_param = device.setup().get_initial_param_val(this->name(),val);
-	netlist().save(*this, m_param, "m_param");
-}
-
-param_int_t::param_int_t(device_t &device, const pstring &name, const int val)
-: param_t(device, name)
-{
-	m_param = device.setup().get_initial_param_val(this->name(),val);
-	netlist().save(*this, m_param, "m_param");
-}
-
-param_logic_t::param_logic_t(device_t &device, const pstring &name, const bool val)
-: param_t(device, name)
-{
-	m_param = device.setup().get_initial_param_val(this->name(),val);
-	netlist().save(*this, m_param, "m_param");
 }
 
 param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
@@ -1222,14 +1214,6 @@ nl_double param_model_t::model_value(const pstring &entity)
 	return netlist().setup().model_value(m_map, entity);
 }
 
-param_data_t::param_data_t(device_t &device, const pstring &name)
-: param_str_t(device, name, "")
-{
-}
-
-void param_data_t::changed()
-{
-}
 
 std::unique_ptr<plib::pistream> param_data_t::stream()
 {

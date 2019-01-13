@@ -18,9 +18,8 @@ class nld_sound_in;
 
 namespace netlist {
 	class setup_t;
-	class param_double_t;
-	class param_int_t;
-	class param_logic_t;
+	template <typename T>
+	class param_num_t;
 	class param_ptr_t;
 }
 
@@ -308,7 +307,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	netlist::param_double_t *m_param;
+	netlist::param_num_t<double> *m_param;
 	bool   m_auto_port;
 	const char *m_param_name;
 	double m_value_for_device_timer;
@@ -403,7 +402,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	netlist::param_int_t *m_param;
+	netlist::param_num_t<int> *m_param;
 	uint32_t m_mask;
 	uint32_t m_shift;
 	const char *m_param_name;
@@ -442,7 +441,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	netlist::param_logic_t *m_param;
+	netlist::param_num_t<bool> *m_param;
 	uint32_t m_shift;
 	const char *m_param_name;
 };
