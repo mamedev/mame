@@ -104,12 +104,18 @@ NETLIB_UPDATE(solver)
 	{
 		plib::omp::set_num_threads(nthreads);
 		plib::omp::for_static(static_cast<std::size_t>(0), t_cnt, [this, &solv](std::size_t i)
-			{ ATTR_UNUSED const netlist_time ts = this->m_mat_solvers[solv[i]]->solve(); });
+			{
+				const netlist_time ts = this->m_mat_solvers[solv[i]]->solve();
+				plib::unused_var(ts);
+			});
 	}
 	else
 		for (auto & solver : m_mat_solvers)
 			if (solver->has_timestep_devices() || force_solve)
-				ATTR_UNUSED const netlist_time ts = solver->solve();
+			{
+				const netlist_time ts = solver->solve();
+				plib::unused_var(ts);
+			};
 
 	for (auto & solver : m_mat_solvers)
 		if (solver->has_timestep_devices() || force_solve)

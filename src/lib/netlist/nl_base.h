@@ -181,6 +181,11 @@ class NETLIB_NAME(name) : public device_t
 
 namespace netlist
 {
+	/*! Delegate type for device notification.
+	 *
+	 */
+	typedef plib::pmfp<void> nldelegate;
+
 	// -----------------------------------------------------------------------------
 	// forward definitions
 	// -----------------------------------------------------------------------------
@@ -473,11 +478,6 @@ namespace netlist
 	private:
 		core_device_t & m_device;
 };
-
-	/*! Delegate type for device notification.
-	 *
-	 */
-	typedef plib::pmfp<void> nldelegate;
 
 	// -----------------------------------------------------------------------------
 	// core_terminal_t
@@ -1118,7 +1118,7 @@ namespace netlist
 		plib::plog_base<netlist_t, NL_DEBUG> &log();
 
 	public:
-		virtual void timestep(ATTR_UNUSED const nl_double st) { }
+		virtual void timestep(const nl_double st) { plib::unused_var(st); }
 		virtual void update_terminals() { }
 
 		virtual void update_param() {}

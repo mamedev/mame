@@ -390,7 +390,9 @@ void matrix_solver_t::update() NL_NOEXCEPT
 
 void matrix_solver_t::update_forced()
 {
-	ATTR_UNUSED const netlist_time new_timestep = solve();
+	const netlist_time new_timestep = solve();
+	plib::unused_var(new_timestep);
+
 	update_inputs();
 
 	if (m_params.m_dynamic_ts && has_timestep_devices())

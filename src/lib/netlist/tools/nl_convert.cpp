@@ -306,7 +306,8 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				pstring model;
 				pstring pins ="CBE";
 				bool err;
-				ATTR_UNUSED long nval = plib::pstonum_ne<long>(tt[4], err);
+				long nval = plib::pstonum_ne<long>(tt[4], err);
+				plib::unused_var(nval);
 
 				if ((err || plib::startsWith(tt[4], "N")) && tt.size() > 5)
 					model = tt[5];
