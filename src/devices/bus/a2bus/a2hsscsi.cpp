@@ -87,9 +87,9 @@ void a2bus_hsscsi_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", hsscsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:5", hsscsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", hsscsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsibus:7", hsscsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [](device_t *device) {
+	NSCSI_CONNECTOR(config, "scsibus:7", hsscsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", [this](device_t *device) {
 		device->set_clock(10000000);
-		downcast<ncr5380n_device &>(*device).drq_handler().set("^^", FUNC(a2bus_hsscsi_device::drq_w));
+		downcast<ncr5380n_device &>(*device).drq_handler().set(*this, FUNC(a2bus_hsscsi_device::drq_w));
 	});
 }
 
