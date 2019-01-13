@@ -97,7 +97,7 @@
     The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
     The remaining 4 bits are connected to other hardware, read via the VIA.
 
-    The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
+    The AY8910 named ay1 has writes on PORT B to the ZN434 DA converter.
     The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
 
 
@@ -1511,10 +1511,10 @@ static INPUT_PORTS_START(cgold2)
 	PORT_MODIFY("500e")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_W)
 
-	PORT_MODIFY("via_port_b")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP ) PORT_NAME("Test1") PORT_CODE(KEYCODE_2) // coin optic 1?
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) PORT_NAME("Test2") PORT_CODE(KEYCODE_3) // coin optic 2?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) PORT_NAME("Test3") PORT_CODE(KEYCODE_4) // coin to cashbox?
+	PORT_MODIFY("5201")
+	PORT_DIPNAME( 0x10, 0x10, "5201-5") // Must be "on" otherwise the game will not respond
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5201:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(fhunter)
@@ -1770,7 +1770,7 @@ void aristmk4_state::power_fail()
 	To enter the robot test
 
 	1. Open the main door
-	2. Trigger powerfail / NMI by presing L for at least 1 second, the game will freeze.
+	2. Trigger powerfail / NMI by pressing ',' for at least 1 second, the game will freeze.
 	3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
 
 	Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
