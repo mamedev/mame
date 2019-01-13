@@ -285,7 +285,7 @@ WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
 	{
 		// not at all sure about this, it seems to write 0 too often
 		uint8_t bank = (data & 0x00ff0000) >> 16;
-		if (bank < 4)
+		if (bank < 5)
 			m_okibank->set_entry(bank);
 	}
 
