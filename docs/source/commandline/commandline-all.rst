@@ -925,6 +925,7 @@ Core State/Playback Options
 **-[no]snapbilinear**
 
     Specify if the snapshot or movie should have bilinear filtering applied.
+    Shutting this off can improve performance while recording video to a file.
 
     The default is ON (**-snapbilinear**).
 
@@ -1313,8 +1314,7 @@ Core Video Options
     rendered at its original resolution before being scaled.  At higher
     settings, the screen is expanded in both axes by a factor of *<amount>*
     using nearest-neighbor sampling before applying filters or shaders.  With
-    **-video d3d**, this produces a less blurry image at the expense of a
-    little (on nearly all modern architectures) speed.
+    **-video d3d**, this produces a less blurry image at the expense of speed.
 
     The default is ``1``.
 
@@ -1373,7 +1373,8 @@ Core Per-Window Options
 
 .. _mame-commandline-screen:
 
-NOTE:  **Multiple Screens may fail to work correctly on some Mac machines as of right now.**
+NOTE:  **Multiple Screens may fail to work correctly on some Mac machines as of
+right now.**
 
 **-screen** *<display>*
 
@@ -1991,9 +1992,9 @@ Core Input Options
     To specify the map for this parameter, you can specify a string of rows
     separated by a '.' (which indicates the end of a row), like so:
 
-    +-------------------------------------------------------------------------------------------+
-    | 777888999.777888999.777888999.444555666.444555666.444555666.111222333.111222333.111222333 |
-    +-------------------------------------------------------------------------------------------+
+    +-------------------------------------------------------------------------------------------------------+
+    | **-joymap 777888999.777888999.777888999.444555666.444555666.444555666.111222333.111222333.111222333** |
+    +-------------------------------------------------------------------------------------------------------+
 
     However, this can be reduced using several shorthands supported by the <map>
     parameter.  If information about a row is missing, then it is assumed that
@@ -2003,7 +2004,8 @@ Core Input Options
     up/down symmetry is assumed.
 
     By using these shorthands, the 81 character map can be simply specified by
-    this 11 character string: 7778...4445
+    this 11 character string: 7778...4445 (which means we then use
+    **-joymap 7778...4445**)
 
     Looking at the first row, 7778 is only 4 characters long.  The 5th entry
     can't use symmetry, so it is assumed to be equal to the previous character
