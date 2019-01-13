@@ -270,11 +270,14 @@ WRITE_LINE_MEMBER(fs3216_state::fdc_drq_w)
 	{
 		m_floppy_status |= 0x01;
 		if (BIT(m_floppy_control, 3) && !m_fdc_dma_timer->enabled())
+		{
 			m_fdc_dma_timer->adjust(attotime::from_hz(16_MHz_XTAL / 64));
+			m_floppy_status |= 0x04;
+		}
 	}
 	else
 	{
-		m_floppy_status &= 0xfe;
+		m_floppy_status &= 0xfa;
 		m_fdc_dma_timer->adjust(attotime::never);
 	}
 }
