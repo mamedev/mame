@@ -72,6 +72,7 @@ private:
 	void floppy_select_w(offs_t offset, u16 data);
 	void floppy_control_w(u8 data);
 	u8 floppy_status_r();
+	TIMER_CALLBACK_MEMBER(fdc_dma);
 	u8 fdc_ram_r(offs_t offset);
 	void fdc_ram_w(offs_t offset, u8 data);
 
@@ -99,6 +100,7 @@ private:
 	u8 m_floppy_select;
 	u8 m_fdc_select;
 	u16 m_fdc_dma_count;
+	emu_timer *m_fdc_dma_timer;
 	std::unique_ptr<u8[]> m_fdc_ram;
 };
 
@@ -110,11 +112,13 @@ void fs3216_state::machine_start()
 
 	std::fill(std::begin(m_mmu_reg), std::end(m_mmu_reg), 0);
 
-	m_floppy_status = 0;
+	m_floppy_status = 0x80;
 	m_floppy_control = 0;
 	m_floppy_select = 0;
 	m_fdc_select = 0;
 	m_fdc_dma_count = 0;
+
+	m_fdc_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fs3216_state::fdc_dma), this));
 
 	save_item(NAME(m_mmu_reg));
 	save_item(NAME(m_from_reset));
@@ -263,9 +267,16 @@ WRITE_LINE_MEMBER(fs3216_state::fdc_int_w)
 WRITE_LINE_MEMBER(fs3216_state::fdc_drq_w)
 {
 	if (state)
+	{
 		m_floppy_status |= 0x01;
+		if (BIT(m_floppy_control, 3) && !m_fdc_dma_timer->enabled())
+			m_fdc_dma_timer->adjust(attotime::from_hz(16_MHz_XTAL / 64));
+	}
 	else
+	{
 		m_floppy_status &= 0xfe;
+		m_fdc_dma_timer->adjust(attotime::never);
+	}
 }
 
 WRITE_LINE_MEMBER(fs3216_state::fdc_hdl_w)
@@ -338,12 +349,39 @@ void fs3216_state::floppy_control_w(u8 data)
 		m_fdc->tc_w(0);
 	}
 
+	if (BIT(data, 3) && BIT(m_floppy_status, 0))
+	{
+		if (!m_fdc_dma_timer->enabled())
+		{
+			m_fdc_dma_timer->adjust(attotime::from_hz(16_MHz_XTAL / 64));
+			m_floppy_status |= 0x04;
+		}
+	}
+	else
+	{
+		m_fdc_dma_timer->adjust(attotime::never);
+		m_floppy_status &= 0xfb;
+	}
+
 	m_fdc->set_unscaled_clock(16_MHz_XTAL / (BIT(data, 0) ? 4 : 2));
 }
 
 u8 fs3216_state::floppy_status_r()
 {
 	return m_floppy_status;
+}
+
+TIMER_CALLBACK_MEMBER(fs3216_state::fdc_dma)
+{
+	if (BIT(m_floppy_control, 4))
+		m_fdc_ram[m_fdc_dma_count & 0x7ff] = m_fdc->dma_r();
+	else
+		m_fdc->dma_w(m_fdc_ram[m_fdc_dma_count & 0x7ff]);
+	m_floppy_status &= 0xfb;
+
+	++m_fdc_dma_count;
+	if (BIT(m_fdc_dma_count, 11))
+		m_fdc->tc_w(1);
 }
 
 u8 fs3216_state::fdc_ram_r(offs_t offset)
