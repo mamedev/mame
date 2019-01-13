@@ -83,7 +83,32 @@ void trkfldch_state::machine_start()
 
 void trkfldch_state::machine_reset()
 {
-	m_maincpu->set_state_int(1, 0xa2ed); // possible irq vector pointer at 0x0f,0x0e, THIS IS NOT THE BOOT CODE!
+	uint8_t *rom = memregion("maincpu")->base();
+
+	int vector = 0xe;
+
+	/* what appears to be a table of vectors apepars at the START of ROM, maybe this gets copied to RAM, maybe used directly?
+	0: (invalid)
+	1: (invalid)
+	2: 0xA2C6
+	3: 0xA334
+	4: 0xA300
+	5: 0xA2E0
+	6: 0xA2B9
+	7: 0xA2ED   // possible irq vector pointer, THIS IS NOT THE BOOT CODE!
+	8: 0xA2D3
+	9: 0xA327
+	a: 0xA30D
+	b: 0x6000
+	c: 0xA31A
+	d: 0xA2AC
+	e: 0xA341
+	f: (invalid)
+	*/
+
+	uint16_t addr = (rom[vector * 2 + 1] << 8) | (rom[vector * 2]);
+
+	m_maincpu->set_state_int(1, addr);
 }
 
 MACHINE_CONFIG_START(trkfldch_state::trkfldch)
