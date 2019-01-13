@@ -163,7 +163,13 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 
 	// special case for configure inputs
 	if ((uintptr_t)driver == 1)
-		menu::stack_push<menu_game_options>(ui(), container());
+	{
+		menu::stack_push<menu_simple_game_options>(
+				ui(),
+				container(),
+				[this] () { reset(reset_options::SELECT_FIRST); });
+	}
+
 	// anything else is a driver
 	else
 	{

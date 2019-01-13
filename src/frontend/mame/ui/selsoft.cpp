@@ -91,8 +91,7 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 	load_sw_custom_filters();
 	m_filter_highlight = m_filter_type;
 
-	ui_globals::curimage_view = SNAPSHOT_VIEW;
-	ui_globals::switch_image = true;
+	set_switch_image();
 	ui_globals::cur_sw_dats_view = 0;
 	ui_globals::cur_sw_dats_total = 1;
 }
@@ -103,8 +102,6 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 
 menu_select_software::~menu_select_software()
 {
-	ui_globals::curimage_view = CABINETS_VIEW;
-	ui_globals::switch_image = true;
 }
 
 //-------------------------------------------------
@@ -135,12 +132,10 @@ void menu_select_software::handle()
 			break;
 
 		case IPT_UI_LEFT:
-			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
+			if (ui_globals::rpanel == RP_IMAGES)
 			{
 				// Images
-				ui_globals::curimage_view--;
-				ui_globals::switch_image = true;
-				ui_globals::default_image = false;
+				previous_image_view();
 			}
 			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
 			{
@@ -151,12 +146,10 @@ void menu_select_software::handle()
 			break;
 
 		case IPT_UI_RIGHT:
-			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
+			if (ui_globals::rpanel == RP_IMAGES)
 			{
 				// Images
-				ui_globals::curimage_view++;
-				ui_globals::switch_image = true;
-				ui_globals::default_image = false;
+				next_image_view();
 			}
 			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 			{
@@ -205,16 +198,16 @@ void menu_select_software::handle()
 					if ((uintptr_t)swinfo > 2)
 					{
 						favorite_manager &mfav = mame_machine_manager::instance()->favorite();
-						if (!mfav.isgame_favorite(*swinfo))
+						if (!mfav.is_favorite_system_software(*swinfo))
 						{
-							mfav.add_favorite_game(*swinfo);
+							mfav.add_favorite_software(*swinfo);
 							machine().popmessage(_("%s\n added to favorites list."), swinfo->longname.c_str());
 						}
 
 						else
 						{
 							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
-							mfav.remove_favorite_game();
+							mfav.remove_favorite_software(*swinfo);
 						}
 					}
 				}

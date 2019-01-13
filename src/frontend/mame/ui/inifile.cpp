@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/inifile.cpp
@@ -16,13 +16,24 @@
 #include "drivenum.h"
 #include "softlist_dev.h"
 
+#include <algorithm>
+#include <cstring>
+#include <iterator>
+
+
+namespace {
+
+char const FAVORITE_FILENAME[] = "favorites.ini";
+
+} // anonymous namespace
+
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
-inifile_manager::inifile_manager(running_machine &machine, ui_options &moptions)
-	: m_options(moptions)
+inifile_manager::inifile_manager(ui_options &options)
+	: m_options(options)
 	, m_ini_index()
 {
 	// scan directories and create index
@@ -108,204 +119,103 @@ void inifile_manager::init_category(std::string &&filename, emu_file &file)
     FAVORITE MANAGER
 **************************************************************************/
 
-//-------------------------------------------------
-//  ctor
-//-------------------------------------------------
-
-favorite_manager::favorite_manager(running_machine &machine, ui_options &moptions)
-	: m_machine(machine)
-	, m_options(moptions)
+bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs, ui_software_info const &rhs) const
 {
-	parse_favorite();
-}
+	assert(lhs.driver);
+	assert(rhs.driver);
 
-//-------------------------------------------------
-//  add a game
-//-------------------------------------------------
-
-void favorite_manager::add_favorite_game(const game_driver *driver)
-{
-	m_list.emplace(driver->type.fullname(), *driver);
-	save_favorite_games();
-}
-
-//-------------------------------------------------
-//  add a system
-//-------------------------------------------------
-
-void favorite_manager::add_favorite_game(ui_software_info &swinfo)
-{
-	m_list.emplace(swinfo.longname, swinfo);
-	save_favorite_games();
-}
-
-//-------------------------------------------------
-//  add a game / system
-//-------------------------------------------------
-
-void favorite_manager::add_favorite_game()
-{
-	if ((machine().system().flags & machine_flags::MASK_TYPE) == machine_flags::TYPE_ARCADE)
+	if (!lhs.startempty)
 	{
-		add_favorite_game(&machine().system());
-		return;
-	}
-
-	auto software_avail = false;
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
-	{
-		if (image.exists() && image.loaded_through_softlist())
-		{
-			const software_info *swinfo = image.software_entry();
-			const software_part *part = image.part_entry();
-			ui_software_info tmpmatches;
-			tmpmatches.shortname = swinfo->shortname();
-			tmpmatches.longname = image.longname();
-			tmpmatches.parentname = swinfo->parentname();
-			tmpmatches.year = image.year();
-			tmpmatches.publisher = image.manufacturer();
-			tmpmatches.supported = image.supported();
-			tmpmatches.part = part->name();
-			tmpmatches.driver = &machine().system();
-			tmpmatches.listname = strensure(image.software_list_name());
-			tmpmatches.interface = part->interface();
-			tmpmatches.instance = image.instance_name();
-			tmpmatches.startempty = 0;
-			tmpmatches.parentlongname.clear();
-			if (!swinfo->parentname().empty())
-			{
-				auto swlist = software_list_device::find_by_name(machine().config(), image.software_list_name());
-				for (const software_info &c_swinfo : swlist->get_info())
-				{
-					std::string c_parent(c_swinfo.parentname());
-					if (!c_parent.empty() && c_parent == swinfo->shortname())
-						{
-							tmpmatches.parentlongname = c_swinfo.longname();
-							break;
-						}
-				}
-			}
-
-			tmpmatches.usage.clear();
-			for (const feature_list_item &flist : swinfo->other_info())
-				if (!strcmp(flist.name().c_str(), "usage"))
-					tmpmatches.usage = flist.value();
-
-			tmpmatches.devicetype = strensure(image.image_type_name());
-			tmpmatches.available = true;
-			software_avail = true;
-			m_list.emplace(tmpmatches.longname, tmpmatches);
-			save_favorite_games();
-		}
-	}
-
-	if (!software_avail)
-		add_favorite_game(&machine().system());
-}
-
-//-------------------------------------------------
-//  remove a favorite from list
-//-------------------------------------------------
-
-void favorite_manager::remove_favorite_game(ui_software_info const &swinfo)
-{
-	for (auto e = m_list.begin(); e != m_list.end(); ++e)
-		if (e->second == swinfo)
-		{
-			m_list.erase(e);
-			break;
-		}
-	m_current = m_list.begin();
-	save_favorite_games();
-}
-
-//-------------------------------------------------
-//  remove a favorite from list
-//-------------------------------------------------
-
-void favorite_manager::remove_favorite_game()
-{
-	m_list.erase(m_current);
-	m_current = m_list.begin();
-	save_favorite_games();
-}
-
-//-------------------------------------------------
-//  check if game is already in favorite list
-//-------------------------------------------------
-
-bool favorite_manager::isgame_favorite()
-{
-	if ((machine().system().flags & machine_flags::MASK_TYPE) == machine_flags::TYPE_ARCADE)
-		return isgame_favorite(&machine().system());
-
-	auto image_loaded = false;
-
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
-	{
-		const software_info *swinfo = image.software_entry();
-		if (image.exists() && swinfo != nullptr)
-		{
-			image_loaded = true;
-			for (auto current = m_list.begin(); current != m_list.end(); ++current)
-				if (current->second.shortname == swinfo->shortname() &&
-					current->second.listname == image.software_list_name())
-				{
-					m_current = current;
-					return true;
-				}
-		}
-	}
-
-	if (!image_loaded)
-		return isgame_favorite(&machine().system());
-
-	m_current = m_list.begin();
-	return false;
-}
-
-//-------------------------------------------------
-//  check if game is already in favorite list
-//-------------------------------------------------
-
-bool favorite_manager::isgame_favorite(const game_driver *driver)
-{
-	for (auto current = m_list.begin(); current != m_list.end(); ++current)
-		if (current->second.driver == driver && current->second.shortname == driver->name)
-		{
-			m_current = current;
+		if (rhs.startempty)
+			return false;
+		else if (lhs.listname < rhs.listname)
 			return true;
-		}
-
-	m_current = m_list.begin();
-	return false;
-}
-
-//-------------------------------------------------
-//  check if game is already in favorite list
-//-------------------------------------------------
-
-bool favorite_manager::isgame_favorite(ui_software_info const &swinfo)
-{
-	for (auto current = m_list.begin(); current != m_list.end(); ++current)
-		if (current->second == swinfo)
-		{
-			m_current = current;
+		else if (lhs.listname > rhs.listname)
+			return false;
+		else if (lhs.shortname < rhs.shortname)
 			return true;
-		}
+		else if (lhs.shortname > rhs.shortname)
+			return false;
+	}
+	else if (!rhs.startempty)
+	{
+		return true;
+	}
 
-	m_current = m_list.begin();
-	return false;
+	return 0 > std::strncmp(lhs.driver->name, rhs.driver->name, ARRAY_LENGTH(lhs.driver->name));
 }
 
+bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs, game_driver const &rhs) const
+{
+	assert(lhs.driver);
+
+	if (!lhs.startempty)
+		return false;
+	else
+		return 0 > std::strncmp(lhs.driver->name, rhs.name, ARRAY_LENGTH(rhs.name));
+}
+
+bool favorite_manager::favorite_compare::operator()(game_driver const &lhs, ui_software_info const &rhs) const
+{
+	assert(rhs.driver);
+
+	if (!rhs.startempty)
+		return true;
+	else
+		return 0 > std::strncmp(lhs.name, rhs.driver->name, ARRAY_LENGTH(lhs.name));
+}
+
+bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs, running_software_key const &rhs) const
+{
+	assert(lhs.driver);
+	assert(std::get<1>(rhs));
+
+	if (lhs.startempty)
+		return true;
+	else if (lhs.listname < std::get<1>(rhs))
+		return true;
+	else if (lhs.listname > std::get<1>(rhs))
+		return false;
+	else if (lhs.shortname < std::get<2>(rhs))
+		return true;
+	else if (lhs.shortname > std::get<2>(rhs))
+		return false;
+	else
+		return 0 > std::strncmp(lhs.driver->name, std::get<0>(rhs).name, ARRAY_LENGTH(lhs.driver->name));
+}
+
+bool favorite_manager::favorite_compare::operator()(running_software_key const &lhs, ui_software_info const &rhs) const
+{
+	assert(std::get<1>(lhs));
+	assert(rhs.driver);
+
+	if (rhs.startempty)
+		return false;
+	else if (std::get<1>(lhs) < rhs.listname)
+		return true;
+	else if (std::get<1>(lhs) > rhs.listname)
+		return false;
+	else if (std::get<2>(lhs) < rhs.shortname)
+		return true;
+	else if (std::get<2>(lhs) > rhs.shortname)
+		return false;
+	else
+		return 0 > std::strncmp(std::get<0>(lhs).name, rhs.driver->name, ARRAY_LENGTH(rhs.driver->name));
+}
+
+
 //-------------------------------------------------
-//  parse favorite file
+//  construction/destruction
 //-------------------------------------------------
 
-void favorite_manager::parse_favorite()
+favorite_manager::favorite_manager(ui_options &options)
+	: m_options(options)
+	, m_favorites()
+	, m_sorted()
+	, m_need_sort(true)
 {
 	emu_file file(m_options.ui_path(), OPEN_FLAG_READ);
-	if (file.open(favorite_filename) == osd_file::error::NONE)
+	if (file.open(FAVORITE_FILENAME) == osd_file::error::NONE)
 	{
 		char readbuf[1024];
 		file.gets(readbuf, 1024);
@@ -332,7 +242,8 @@ void favorite_manager::parse_favorite()
 			file.gets(readbuf, 1024);
 			chartrimcarriage(readbuf);
 			auto dx = driver_list::find(readbuf);
-			if (dx == -1) continue;
+			if (0 > dx)
+				continue;
 			tmpmatches.driver = &driver_list::driver(dx);
 			file.gets(readbuf, 1024);
 			tmpmatches.listname = chartrimcarriage(readbuf);
@@ -350,53 +261,258 @@ void favorite_manager::parse_favorite()
 			tmpmatches.devicetype = chartrimcarriage(readbuf);
 			file.gets(readbuf, 1024);
 			tmpmatches.available = atoi(readbuf);
-			m_list.emplace(tmpmatches.longname, tmpmatches);
+			m_favorites.emplace(std::move(tmpmatches));
 		}
 		file.close();
 	}
 }
 
+
 //-------------------------------------------------
-//  save favorite
+//  add
 //-------------------------------------------------
 
-void favorite_manager::save_favorite_games()
+void favorite_manager::add_favorite_system(game_driver const &driver)
+{
+	add_impl(driver);
+}
+
+void favorite_manager::add_favorite_software(ui_software_info const &swinfo)
+{
+	add_impl(swinfo);
+}
+
+void favorite_manager::add_favorite(running_machine &machine)
+{
+#if 0
+	apply_running_machine(
+			machine,
+			[this] (auto &&key, bool &done)
+			{
+				add_impl(std::forward<decltype(key)>(key));
+				done = true;
+			});
+#endif
+}
+
+template <typename T> void favorite_manager::add_impl(T &&key)
+{
+	auto const ins(m_favorites.emplace(std::forward<T>(key)));
+	if (ins.second)
+	{
+		if (!m_sorted.empty())
+			m_sorted.emplace_back(std::ref(*ins.first));
+		m_need_sort = true;
+		save_favorites();
+	}
+}
+
+
+//-------------------------------------------------
+//  check
+//-------------------------------------------------
+
+bool favorite_manager::is_favorite_system(game_driver const &driver) const
+{
+	return check_impl(driver);
+}
+
+bool favorite_manager::is_favorite_software(ui_software_info const &swinfo) const
+{
+	auto found(m_favorites.lower_bound(swinfo));
+	if ((m_favorites.end() != found) && (found->listname == swinfo.listname) && (found->shortname == swinfo.shortname))
+		return true;
+	else if (m_favorites.begin() == found)
+		return false;
+
+	// need to back up and check for matching software with lexically earlier driver
+	--found;
+	return (found->listname == swinfo.listname) && (found->shortname == swinfo.shortname);
+}
+
+bool favorite_manager::is_favorite(running_machine &machine) const
+{
+	bool result(false);
+	apply_running_machine(
+			machine,
+			[this, &result] (auto const &key, bool &done)
+			{
+				assert(!result);
+				result = check_impl(key);
+				done = done || result;
+			});
+	return result;
+}
+
+bool favorite_manager::is_favorite_system_software(ui_software_info const &swinfo) const
+{
+	return check_impl(swinfo);
+}
+
+template <typename T> bool favorite_manager::check_impl(T const &key) const
+{
+	return m_favorites.find(key) != m_favorites.end();
+}
+
+
+//-------------------------------------------------
+//  remove
+//-------------------------------------------------
+
+void favorite_manager::remove_favorite_system(game_driver const &driver)
+{
+	remove_impl(driver);
+}
+
+void favorite_manager::remove_favorite_software(ui_software_info const &swinfo)
+{
+	remove_impl(swinfo);
+}
+
+void favorite_manager::remove_favorite(running_machine &machine)
+{
+	apply_running_machine(machine, [this] (auto const &key, bool &done) { done = remove_impl(key); });
+}
+
+template <typename T> bool favorite_manager::remove_impl(T const &key)
+{
+	auto const found(m_favorites.find(key));
+	if (m_favorites.end() != found)
+	{
+		m_favorites.erase(found);
+		m_sorted.clear();
+		m_need_sort = true;
+		save_favorites();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+//-------------------------------------------------
+//  implementation
+//-------------------------------------------------
+
+template <typename T>
+void favorite_manager::apply_running_machine(running_machine &machine, T &&action)
+{
+	bool done(false);
+
+	// TODO: this should be changed - it interacts poorly with slotted arcade systems
+	if ((machine.system().flags & machine_flags::MASK_TYPE) == machine_flags::TYPE_ARCADE)
+	{
+		action(machine.system(), done);
+	}
+	else
+	{
+		bool have_software(false);
+		for (device_image_interface &image_dev : image_interface_iterator(machine.root_device()))
+		{
+			software_info const *const sw(image_dev.software_entry());
+			if (image_dev.exists() && image_dev.loaded_through_softlist() && sw)
+			{
+				assert(image_dev.software_list_name());
+
+				have_software = true;
+				action(running_software_key(machine.system(), image_dev.software_list_name(), sw->shortname()), done);
+				if (done)
+					return;
+			}
+		}
+
+		if (!have_software)
+			action(machine.system(), done);
+	}
+}
+
+void favorite_manager::update_sorted()
+{
+	if (m_need_sort)
+	{
+		if (m_sorted.empty())
+			std::copy(m_favorites.begin(), m_favorites.end(), std::back_inserter(m_sorted));
+
+		assert(m_favorites.size() == m_sorted.size());
+		std::stable_sort(
+				m_sorted.begin(),
+				m_sorted.end(),
+				[] (ui_software_info const &lhs, ui_software_info const &rhs) -> bool
+				{
+					assert(lhs.driver);
+					assert(rhs.driver);
+
+					int cmp;
+
+					cmp = core_stricmp(lhs.longname.c_str(), rhs.longname.c_str());
+					if (0 > cmp)
+						return true;
+					else if (0 < cmp)
+						return false;
+
+					cmp = core_stricmp(lhs.driver->type.fullname(), rhs.driver->type.fullname());
+					if (0 > cmp)
+						return true;
+					else if (0 < cmp)
+						return false;
+
+					cmp = std::strcmp(lhs.listname.c_str(), rhs.listname.c_str());
+					if (0 > cmp)
+						return true;
+					else if (0 < cmp)
+						return false;
+
+					return false;
+				});
+
+		m_need_sort = false;
+	}
+}
+
+void favorite_manager::save_favorites()
 {
 	// attempt to open the output file
 	emu_file file(m_options.ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	if (file.open(favorite_filename) == osd_file::error::NONE)
+	if (file.open(FAVORITE_FILENAME) == osd_file::error::NONE)
 	{
-		if (m_list.empty())
+		if (m_favorites.empty())
 		{
+			// delete it if there are no favorites
 			file.remove_on_close();
-			file.close();
-			return;
 		}
-
-		// generate the favorite INI
-		std::ostringstream text;
-		text << "[ROOT_FOLDER]\n[Favorite]\n\n";
-		for (auto & e : m_list)
+		else
 		{
-			auto elem = e.second;
-			text << elem.shortname << '\n';
-			text << elem.longname << '\n';
-			text << elem.parentname << '\n';
-			text << elem.year << '\n';
-			text << elem.publisher << '\n';
-			util::stream_format(text, "%d\n", elem.supported);
-			text << elem.part << '\n';
-			util::stream_format(text, "%s\n", elem.driver->name);
-			text << elem.listname << '\n';
-			text << elem.interface << '\n';
-			text << elem.instance << '\n';
-			util::stream_format(text, "%d\n", elem.startempty);
-			text << elem.parentlongname << '\n';
-			text << elem.usage << '\n';
-			text << elem.devicetype << '\n';
-			util::stream_format(text, "%d\n", elem.available);
+			// generate the favorite INI
+			file.puts("[ROOT_FOLDER]\n[Favorite]\n\n");
+			util::ovectorstream buf;
+			for (ui_software_info const &info : m_favorites)
+			{
+				buf.clear();
+				buf.rdbuf()->clear();
+
+				buf << info.shortname << '\n';
+				buf << info.longname << '\n';
+				buf << info.parentname << '\n';
+				buf << info.year << '\n';
+				buf << info.publisher << '\n';
+				util::stream_format(buf, "%d\n", info.supported);
+				buf << info.part << '\n';
+				util::stream_format(buf, "%s\n", info.driver->name);
+				buf << info.listname << '\n';
+				buf << info.interface << '\n';
+				buf << info.instance << '\n';
+				util::stream_format(buf, "%d\n", info.startempty);
+				buf << info.parentlongname << '\n';
+				buf << info.usage << '\n';
+				buf << info.devicetype << '\n';
+				util::stream_format(buf, "%d\n", info.available);
+
+				buf.put('\0');
+				file.puts(&buf.vec()[0]);
+			}
 		}
-		file.puts(text.str().c_str());
 		file.close();
 	}
 }

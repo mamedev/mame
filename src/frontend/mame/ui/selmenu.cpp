@@ -12,7 +12,6 @@
 #include "ui/selmenu.h"
 
 #include "ui/datmenu.h"
-#include "ui/icorender.h"
 #include "ui/info.h"
 #include "ui/inifile.h"
 
@@ -44,6 +43,28 @@
 namespace ui {
 
 namespace {
+
+enum
+{
+	FIRST_VIEW = 0,
+	SNAPSHOT_VIEW = FIRST_VIEW,
+	CABINETS_VIEW,
+	CPANELS_VIEW,
+	PCBS_VIEW,
+	FLYERS_VIEW,
+	TITLES_VIEW,
+	ENDS_VIEW,
+	ARTPREV_VIEW,
+	BOSSES_VIEW,
+	LOGOS_VIEW,
+	VERSUS_VIEW,
+	GAMEOVER_VIEW,
+	HOWTO_VIEW,
+	SCORES_VIEW,
+	SELECT_VIEW,
+	MARQUEES_VIEW,
+	LAST_VIEW = MARQUEES_VIEW
+};
 
 std::pair<char const *, char const *> const arts_info[] =
 {
@@ -437,8 +458,11 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_pressed(false)
 	, m_repeat(0)
 	, m_right_visible_lines(0)
+	, m_redraw_icon(false)
+	, m_switch_image(false)
+	, m_default_image(true)
+	, m_image_view(FIRST_VIEW)
 	, m_flags(256)
-	, m_icons(MAX_ICONS_RENDER)
 {
 	// set up persistent cache for machine run
 	{
@@ -455,6 +479,28 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 			s_caches.emplace(&machine(), m_cache);
 			add_cleanup_callback(&menu_select_launch::exit);
 		}
+	}
+}
+
+
+void menu_select_launch::next_image_view()
+{
+	if (LAST_VIEW > m_image_view)
+	{
+		++m_image_view;
+		set_switch_image();
+		m_default_image = false;
+	}
+}
+
+
+void menu_select_launch::previous_image_view()
+{
+	if (FIRST_VIEW < m_image_view)
+	{
+		--m_image_view;
+		set_switch_image();
+		m_default_image = false;
 	}
 }
 
@@ -562,7 +608,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	rgb_t color = UI_BACKGROUND_COLOR;
 	if (swinfo && ((swinfo->startempty != 1) || !driver))
 	{
-		isstar = mame_machine_manager::instance()->favorite().isgame_favorite(*swinfo);
+		isstar = mame_machine_manager::instance()->favorite().is_favorite_system_software(*swinfo);
 
 		// first line is long name or system
 		tempbuf[0] = make_software_description(*swinfo);
@@ -598,7 +644,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	}
 	else if (driver)
 	{
-		isstar = mame_machine_manager::instance()->favorite().isgame_favorite(driver);
+		isstar = mame_machine_manager::instance()->favorite().is_favorite_system(*driver);
 
 		// first line is game description/game name
 		tempbuf[0] = make_driver_description(*driver);
@@ -1051,122 +1097,8 @@ void menu_select_launch::set_pressed()
 
 float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, float y0)
 {
-	if (!ui_globals::has_icons || m_is_swlist)
-		return 0.0f;
-
-	float ud_arrow_width = ui().get_line_height() * container().manager().ui_aspect(&container());
-	const game_driver *driver = nullptr;
-
-	if (item[0].flags & FLAG_UI_FAVORITE)
-	{
-		ui_software_info *soft = (ui_software_info *)selectedref;
-		if (soft->startempty == 1)
-			driver = soft->driver;
-	}
-	else
-		driver = (const game_driver *)selectedref;
-
-	auto x1 = x0 + ud_arrow_width;
-	auto y1 = y0 + ui().get_line_height();
-
-	icon_cache::iterator icon(m_icons.find(driver));
-	if ((m_icons.end() == icon) || ui_globals::redraw_icon)
-	{
-		if (m_icons.end() == icon)
-		{
-			texture_ptr texture(machine().render().texture_alloc(), [&render = machine().render()] (render_texture *texture) { render.texture_free(texture); });
-			icon = m_icons.emplace(
-					std::piecewise_construct,
-					std::forward_as_tuple(driver),
-					std::forward_as_tuple(std::piecewise_construct, std::forward_as_tuple(std::move(texture)), std::tuple<>())).first;
-		}
-
-		// set clone status
-		bool cloneof = strcmp(driver->parent, "0");
-		if (cloneof)
-		{
-			auto cx = driver_list::find(driver->parent);
-			if ((cx >= 0) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
-				cloneof = false;
-		}
-
-		// get search path
-		path_iterator path(ui().options().icons_directory());
-		std::string curpath;
-		std::string searchstr(ui().options().icons_directory());
-
-		// iterate over path and add path for zipped formats
-		while (path.next(curpath))
-			searchstr.append(";").append(curpath.c_str()).append(PATH_SEPARATOR).append("icons");
-
-		bitmap_argb32 tmp;
-		emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-		std::string fullname = std::string(driver->name).append(".ico");
-		render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
-
-		if (!tmp.valid() && cloneof)
-		{
-			fullname.assign(driver->parent).append(".ico");
-			render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
-		}
-
-		bitmap_argb32 &bitmap(icon->second.second);
-		if (tmp.valid())
-		{
-			float panel_width = x1 - x0;
-			float panel_height = y1 - y0;
-			auto screen_width = machine().render().ui_target().width();
-			auto screen_height = machine().render().ui_target().height();
-
-			if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
-				std::swap(screen_height, screen_width);
-
-			int panel_width_pixel = panel_width * screen_width;
-			int panel_height_pixel = panel_height * screen_height;
-
-			// Calculate resize ratios for resizing
-			auto ratioW = (float)panel_width_pixel / tmp.width();
-			auto ratioH = (float)panel_height_pixel / tmp.height();
-			auto dest_xPixel = tmp.width();
-			auto dest_yPixel = tmp.height();
-
-			if (ratioW < 1 || ratioH < 1)
-			{
-				// smaller ratio will ensure that the image fits in the view
-				float ratio = std::min(ratioW, ratioH);
-				dest_xPixel = tmp.width() * ratio;
-				dest_yPixel = tmp.height() * ratio;
-			}
-
-			bitmap_argb32 dest_bitmap;
-
-			// resample if necessary
-			if (dest_xPixel != tmp.width() || dest_yPixel != tmp.height())
-			{
-				dest_bitmap.allocate(dest_xPixel, dest_yPixel);
-				render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-				render_resample_argb_bitmap_hq(dest_bitmap, tmp, color, true);
-			}
-			else
-				dest_bitmap = std::move(tmp);
-
-			bitmap.allocate(panel_width_pixel, panel_height_pixel);
-			for (int x = 0; x < dest_xPixel; x++)
-				for (int y = 0; y < dest_yPixel; y++)
-					bitmap.pix32(y, x) = dest_bitmap.pix32(y, x);
-
-			icon->second.first->set_bitmap(bitmap, bitmap.cliprect(), TEXFORMAT_ARGB32);
-		}
-		else
-		{
-			bitmap.reset();
-		}
-	}
-
-	if (icon->second.second.valid())
-		container().add_quad(x0, y0, x1, y1, rgb_t::white(), icon->second.first.get(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-	return ud_arrow_width * 1.5f;
+	// derived class must implement this
+	return 0.0f;
 }
 
 
@@ -1177,21 +1109,21 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 void menu_select_launch::get_title_search(std::string &snaptext, std::string &searchstr)
 {
 	// get arts title text
-	snaptext.assign(_(arts_info[ui_globals::curimage_view].first));
+	snaptext.assign(_(arts_info[m_image_view].first));
 
 	// get search path
 	std::string addpath;
-	if (ui_globals::curimage_view == SNAPSHOT_VIEW)
+	if (m_image_view == SNAPSHOT_VIEW)
 	{
 		emu_options moptions;
-		searchstr = machine().options().value(arts_info[ui_globals::curimage_view].second);
-		addpath = moptions.value(arts_info[ui_globals::curimage_view].second);
+		searchstr = machine().options().value(arts_info[m_image_view].second);
+		addpath = moptions.value(arts_info[m_image_view].second);
 	}
 	else
 	{
 		ui_options moptions;
-		searchstr = ui().options().value(arts_info[ui_globals::curimage_view].second);
-		addpath = moptions.value(arts_info[ui_globals::curimage_view].second);
+		searchstr = ui().options().value(arts_info[m_image_view].second);
+		addpath = moptions.value(arts_info[m_image_view].second);
 	}
 
 	std::string tmp(searchstr);
@@ -1901,7 +1833,7 @@ void menu_select_launch::draw(uint32_t flags)
 	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
 
 	// reset redraw icon stage
-	if (!m_is_swlist) ui_globals::redraw_icon = false;
+	m_redraw_icon = false;
 
 	// noinput
 	if (noinput)
@@ -2044,14 +1976,14 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 	{
 		m_cache->set_snapx_driver(nullptr);
 
-		if (ui_globals::default_image)
-			ui_globals::curimage_view = (software->startempty == 0) ? SNAPSHOT_VIEW : CABINETS_VIEW;
+		if (m_default_image)
+			m_image_view = (software->startempty == 0) ? SNAPSHOT_VIEW : CABINETS_VIEW;
 
 		// arts title and searchpath
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (!m_cache->snapx_software_is(software) || !snapx_valid() || ui_globals::switch_image)
+		if (!m_cache->snapx_software_is(software) || !snapx_valid() || m_switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			bitmap_argb32 tmp_bitmap;
@@ -2097,7 +2029,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 			}
 
 			m_cache->set_snapx_software(software);
-			ui_globals::switch_image = false;
+			m_switch_image = false;
 			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
 
@@ -2108,13 +2040,13 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 	{
 		m_cache->set_snapx_software(nullptr);
 
-		if (ui_globals::default_image)
-			ui_globals::curimage_view = ((driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
+		if (m_default_image)
+			m_image_view = ((driver->flags & machine_flags::MASK_TYPE) != machine_flags::TYPE_ARCADE) ? CABINETS_VIEW : SNAPSHOT_VIEW;
 
 		std::string const searchstr = arts_render_common(origx1, origy1, origx2, origy2);
 
 		// loads the image if necessary
-		if (!m_cache->snapx_driver_is(driver) || !snapx_valid() || ui_globals::switch_image)
+		if (!m_cache->snapx_driver_is(driver) || !snapx_valid() || m_switch_image)
 		{
 			emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
 			snapfile.set_restrict_to_mediapath(true);
@@ -2166,7 +2098,7 @@ void menu_select_launch::arts_render(float origx1, float origy1, float origx2, f
 			}
 
 			m_cache->set_snapx_driver(driver);
-			ui_globals::switch_image = false;
+			m_switch_image = false;
 			arts_render_images(std::move(tmp_bitmap), origx1, origy1, origx2, origy2);
 		}
 
@@ -2224,7 +2156,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
 			nullptr, nullptr, tmp_size);
 
-	draw_common_arrow(origx1, origy1 + UI_BOX_TB_BORDER, origx2, origy2, ui_globals::curimage_view, FIRST_VIEW, LAST_VIEW, title_size);
+	draw_common_arrow(origx1, origy1 + UI_BOX_TB_BORDER, origx2, origy2, m_image_view, FIRST_VIEW, LAST_VIEW, title_size);
 
 	return searchstr;
 }
@@ -2274,7 +2206,7 @@ void menu_select_launch::arts_render_images(bitmap_argb32 &&tmp_bitmap, float or
 		auto dest_yPixel = tmp_bitmap.height();
 
 		// force 4:3 ratio min
-		if (ui().options().forced_4x3_snapshot() && ratioI < 0.75f && ui_globals::curimage_view == SNAPSHOT_VIEW)
+		if (ui().options().forced_4x3_snapshot() && ratioI < 0.75f && m_image_view == SNAPSHOT_VIEW)
 		{
 			// smaller ratio will ensure that the image fits in the view
 			dest_yPixel = tmp_bitmap.width() * 0.75f;

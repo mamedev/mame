@@ -39,14 +39,19 @@ private:
 		CONF_PLUGINS,
 	};
 
+	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_argb32> >;
+
 	class persistent_data;
 
+	persistent_data &m_persistent_data;
+	icon_cache m_icons;
+	bool m_has_icons;
 	std::vector<std::reference_wrapper<ui_system_info const> > m_displaylist;
 
-	static persistent_data s_persistent_data;
-	static bool s_first_start;
-
 	std::vector<std::pair<double, std::reference_wrapper<ui_system_info const> > > m_searchlist;
+	unsigned m_searched_fields;
+
+	static bool s_first_start;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
@@ -83,6 +88,9 @@ private:
 
 	// General info
 	virtual void general_info(const game_driver *driver, std::string &buffer) override;
+
+	// drawing
+	virtual float draw_icon(int linenum, void *selectedref, float x1, float y1) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);

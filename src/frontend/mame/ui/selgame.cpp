@@ -39,6 +39,8 @@
 #include <mutex>
 #include <thread>
 
+#include "ui/icorender.h" // this is inline code
+
 
 extern const char UI_VERSION_TAG[];
 
@@ -49,20 +51,14 @@ class menu_select_game::persistent_data
 public:
 	enum available : unsigned
 	{
-		AVAIL_NONE              = 0,
-		AVAIL_SORTED_LIST       = 1 << 0,
-		AVAIL_BIOS_COUNT        = 1 << 1,
-		AVAIL_UCS_SHORTNAME     = 1 << 2,
-		AVAIL_UCS_DESCRIPTION   = 1 << 3,
-		AVAIL_UCS_MANUF_DESC    = 1 << 4
+		AVAIL_NONE              = 0U,
+		AVAIL_SORTED_LIST       = 1U << 0,
+		AVAIL_BIOS_COUNT        = 1U << 1,
+		AVAIL_UCS_SHORTNAME     = 1U << 2,
+		AVAIL_UCS_DESCRIPTION   = 1U << 3,
+		AVAIL_UCS_MANUF_DESC    = 1U << 4,
+		AVAIL_FILTER_DATA       = 1U << 5
 	};
-
-	persistent_data()
-		: m_started(false)
-		, m_available(AVAIL_NONE)
-		, m_bios_count(0)
-	{
-	}
 
 	~persistent_data()
 	{
@@ -109,7 +105,26 @@ public:
 		return std::find_if(m_sorted_list.begin(), m_sorted_list.end(), [] (ui_system_info const &info) { return !info.available; }) != m_sorted_list.end();
 	}
 
+	machine_filter_data &filter_data()
+	{
+		wait_available(AVAIL_FILTER_DATA);
+		return m_filter_data;
+	}
+
+	static persistent_data &instance()
+	{
+		static persistent_data data;
+		return data;
+	}
+
 private:
+	persistent_data()
+		: m_started(false)
+		, m_available(AVAIL_NONE)
+		, m_bios_count(0)
+	{
+	}
+
 	void notify_available(available value)
 	{
 		std::unique_lock<std::mutex> lock(m_mutex);
@@ -140,8 +155,8 @@ private:
 					++m_bios_count;
 
 				m_sorted_list.emplace_back(driver, x, false);
-				c_mnfct::add(driver.manufacturer);
-				c_year::add(driver.year);
+				m_filter_data.add_manufacturer(driver.manufacturer);
+				m_filter_data.add_year(driver.year);
 			}
 		}
 
@@ -154,6 +169,10 @@ private:
 				m_sorted_list.end(),
 				[] (ui_system_info const &lhs, ui_system_info const &rhs) { return sorted_game_list(lhs.driver, rhs.driver); });
 		notify_available(AVAIL_SORTED_LIST);
+
+		// sort manufacturers and years
+		m_filter_data.finalise();
+		notify_available(AVAIL_FILTER_DATA);
 
 		// convert shortnames to UCS-4
 		for (ui_system_info &info : m_sorted_list)
@@ -175,22 +194,21 @@ private:
 			info.ucs_manufacturer_description = ustr_from_utf8(normalize_unicode(buf, unicode_normalization_form::D, true));
 		}
 		notify_available(AVAIL_UCS_MANUF_DESC);
-
-		// sort manufacturers and years
-		c_mnfct::finalise();
-		c_year::finalise();
 	}
 
-	std::mutex m_mutex;
-	std::condition_variable m_condition;
-	std::unique_ptr<std::thread> m_thread;
-	std::atomic<bool> m_started;
-	std::atomic<unsigned> m_available;
-	std::vector<ui_system_info> m_sorted_list;
-	int m_bios_count;
+	// synchronisation
+	std::mutex                      m_mutex;
+	std::condition_variable         m_condition;
+	std::unique_ptr<std::thread>    m_thread;
+	std::atomic<bool>               m_started;
+	std::atomic<unsigned>           m_available;
+
+	// data
+	std::vector<ui_system_info>     m_sorted_list;
+	machine_filter_data             m_filter_data;
+	int                             m_bios_count;
 };
 
-menu_select_game::persistent_data menu_select_game::s_persistent_data;
 bool menu_select_game::s_first_start = true;
 
 
@@ -200,15 +218,20 @@ bool menu_select_game::s_first_start = true;
 
 menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename)
 	: menu_select_launch(mui, container, false)
+	, m_persistent_data(persistent_data::instance())
+	, m_icons(MAX_ICONS_RENDER)
+	, m_has_icons(false)
+	, m_displaylist()
+	, m_searchlist()
+	, m_searched_fields(persistent_data::AVAIL_NONE)
 {
 	std::string error_string, last_filter, sub_filter;
 	ui_options &moptions = mui.options();
 
 	// load drivers cache
-	s_persistent_data.cache_data();
+	m_persistent_data.cache_data();
 
 	// check if there are available icons
-	ui_globals::has_icons = false;
 	file_enumerator path(moptions.icons_directory());
 	const osd::directory::entry *dir;
 	while ((dir = path.next()) != nullptr)
@@ -216,7 +239,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 		std::string src(dir->name);
 		if (src.find(".ico") != std::string::npos || src.find("icons") != std::string::npos)
 		{
-			ui_globals::has_icons = true;
+			m_has_icons = true;
 			break;
 		}
 	}
@@ -248,29 +271,21 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 		emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
 		if (file.open_ram(fake_ini.c_str(), fake_ini.size()) == osd_file::error::NONE)
 		{
-			machine_filter::ptr flt(machine_filter::create(file));
-			if (flt)
-			{
-				main_filters::actual = flt->get_type();
-				main_filters::filters.emplace(main_filters::actual, std::move(flt));
-			}
+			m_persistent_data.filter_data().load_ini(file);
 			file.close();
 		}
 	}
 
 	// do this after processing the last used filter setting so it overwrites the placeholder
 	load_custom_filters();
-	m_filter_highlight = main_filters::actual;
+	m_filter_highlight = m_persistent_data.filter_data().get_current_filter_type();
 
 	if (!moptions.remember_last())
 		reselect_last::reset();
 
 	mui.machine().options().set_value(OPTION_SNAPNAME, "%g/%i", OPTION_PRIORITY_CMDLINE);
 
-	ui_globals::curimage_view = FIRST_VIEW;
 	ui_globals::curdats_view = 0;
-	ui_globals::switch_image = false;
-	ui_globals::default_image = true;
 	ui_globals::panels_status = moptions.hide_panels();
 	ui_globals::curdats_total = 1;
 }
@@ -291,17 +306,7 @@ menu_select_game::~menu_select_game()
 	if (driver)
 		last_driver = driver->name;
 
-	std::string filter;
-	auto const active_filter(main_filters::filters.find(main_filters::actual));
-	if (main_filters::filters.end() != active_filter)
-	{
-		char const *val(active_filter->second->filter_text());
-		filter = val ? util::string_format("%s,%s", active_filter->second->config_name(), val) : active_filter->second->config_name();
-	}
-	else
-	{
-		filter = machine_filter::config_name(main_filters::actual);
-	}
+	std::string const filter(m_persistent_data.filter_data().get_config_string());
 
 	ui_options &mopt = ui().options();
 	mopt.set_value(OPTION_LAST_RIGHT_PANEL, ui_globals::rpanel, OPTION_PRIORITY_CMDLINE);
@@ -405,7 +410,8 @@ void menu_select_game::handle()
 					{
 						menu::stack_push<menu_machine_configure>(
 								ui(), container(),
-								reinterpret_cast<const game_driver *>(m_prev_selected),
+								*reinterpret_cast<const game_driver *>(m_prev_selected),
+								nullptr,
 								menu_event->mouse.x0, menu_event->mouse.y0);
 					}
 					else
@@ -413,18 +419,21 @@ void menu_select_game::handle()
 						ui_software_info *sw = reinterpret_cast<ui_software_info *>(m_prev_selected);
 						menu::stack_push<menu_machine_configure>(
 								ui(), container(),
-								(const game_driver *)sw->driver,
+								*sw->driver,
+								[this, empty = sw->startempty] (bool fav, bool changed)
+								{
+									if (changed)
+										reset(empty ? reset_options::SELECT_FIRST : reset_options::REMEMBER_REF);
+								},
 								menu_event->mouse.x0, menu_event->mouse.y0);
 					}
 					break;
 
 				case IPT_UI_LEFT:
-					if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
+					if (ui_globals::rpanel == RP_IMAGES)
 					{
 						// Images
-						ui_globals::curimage_view--;
-						ui_globals::switch_image = true;
-						ui_globals::default_image = false;
+						previous_image_view();
 					}
 					else if (ui_globals::rpanel == RP_INFOS)
 					{
@@ -434,12 +443,10 @@ void menu_select_game::handle()
 					break;
 
 				case IPT_UI_RIGHT:
-					if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
+					if (ui_globals::rpanel == RP_IMAGES)
 					{
 						// Images
-						ui_globals::curimage_view++;
-						ui_globals::switch_image = true;
-						ui_globals::default_image = false;
+						next_image_view();
 					}
 					else if (ui_globals::rpanel == RP_INFOS)
 					{
@@ -455,14 +462,14 @@ void menu_select_game::handle()
 						if (!isfavorite())
 						{
 							game_driver const *const driver(reinterpret_cast<game_driver const *>(menu_event->itemref));
-							if (!mfav.isgame_favorite(driver))
+							if (!mfav.is_favorite_system(*driver))
 							{
-								mfav.add_favorite_game(driver);
+								mfav.add_favorite_system(*driver);
 								machine().popmessage(_("%s\n added to favorites list."), driver->type.fullname());
 							}
 							else
 							{
-								mfav.remove_favorite_game();
+								mfav.remove_favorite_system(*driver);
 								machine().popmessage(_("%s\n removed from favorites list."), driver->type.fullname());
 							}
 						}
@@ -470,19 +477,19 @@ void menu_select_game::handle()
 						{
 							ui_software_info const *const swinfo(reinterpret_cast<ui_software_info const *>(menu_event->itemref));
 							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname);
-							mfav.remove_favorite_game(*swinfo);
+							mfav.remove_favorite_software(*swinfo);
 							reset(reset_options::SELECT_FIRST);
 						}
 					}
 					break;
 
 				case IPT_UI_AUDIT_FAST:
-					if (s_persistent_data.unavailable_systems())
-						menu::stack_push<menu_audit>(ui(), container(), s_persistent_data.sorted_list(), menu_audit::mode::FAST);
+					if (m_persistent_data.unavailable_systems())
+						menu::stack_push<menu_audit>(ui(), container(), m_persistent_data.sorted_list(), menu_audit::mode::FAST);
 					break;
 
 				case IPT_UI_AUDIT_ALL:
-					menu::stack_push<menu_audit>(ui(), container(), s_persistent_data.sorted_list(), menu_audit::mode::ALL);
+					menu::stack_push<menu_audit>(ui(), container(), m_persistent_data.sorted_list(), menu_audit::mode::ALL);
 					break;
 				}
 			}
@@ -499,10 +506,10 @@ void menu_select_game::handle()
 
 void menu_select_game::populate(float &customtop, float &custombottom)
 {
-	ui_globals::redraw_icon = true;
-	ui_globals::switch_image = true;
+	set_redraw_icon();
+	set_switch_image();
 	int old_item_selected = -1;
-	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	constexpr uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 
 	if (!isfavorite())
 	{
@@ -518,12 +525,12 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 			m_displaylist.clear();
 
 			// if filter is set on category, build category list
-			auto const it(main_filters::filters.find(main_filters::actual));
-			std::vector<ui_system_info> const &sorted(s_persistent_data.sorted_list());
-			if (main_filters::filters.end() == it)
+			machine_filter const *const flt(m_persistent_data.filter_data().get_current_filter());
+			std::vector<ui_system_info> const &sorted(m_persistent_data.sorted_list());
+			if (!flt)
 				std::copy(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
 			else
-				it->second->apply(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
+				flt->apply(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
 
 			// iterate over entries
 			int curitem = 0;
@@ -549,36 +556,34 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	{
 		// populate favorites list
 		m_search.clear();
-		int curitem = 0;
-
-		// iterate over entries
-		for (auto &favmap : mame_machine_manager::instance()->favorite().m_list)
-		{
-			auto flags = flags_ui | FLAG_UI_FAVORITE;
-			if (favmap.second.startempty == 1)
-			{
-				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver())
-					old_item_selected = curitem;
-
-				bool cloneof = strcmp(favmap.second.driver->parent, "0");
-				if (cloneof)
+		mame_machine_manager::instance()->favorite().apply_sorted(
+				[this, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
 				{
-					int cx = driver_list::find(favmap.second.driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
-						cloneof = false;
-				}
+					auto flags = flags_ui | FLAG_UI_FAVORITE;
+					if (info.startempty == 1)
+					{
+						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
+							old_item_selected = curitem;
 
-				item_append(favmap.second.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&favmap.second);
-			}
-			else
-			{
-				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver())
-					old_item_selected = curitem;
-				item_append(favmap.second.longname, favmap.second.devicetype,
-							favmap.second.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&favmap.second);
-			}
-			curitem++;
-		}
+						bool cloneof = strcmp(info.driver->parent, "0");
+						if (cloneof)
+						{
+							int cx = driver_list::find(info.driver->parent);
+							if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
+								cloneof = false;
+						}
+
+						item_append(info.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&info);
+					}
+					else
+					{
+						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
+							old_item_selected = curitem;
+						item_append(info.longname, info.devicetype,
+									info.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&info);
+					}
+					curitem++;
+				});
 	}
 
 	item_append(menu_item_type::SEPARATOR, flags_ui);
@@ -639,11 +644,11 @@ void menu_select_game::build_available_list()
 
 		// build a name for it
 		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; ++src)
-			*dst++ = tolower((uint8_t) * src);
+			*dst++ = tolower(uint8_t(*src));
 
 		*dst = 0;
-		int drivnum = driver_list::find(drivername);
-		if (drivnum != -1 && !included[drivnum])
+		int const drivnum = driver_list::find(drivername);
+		if (0 <= drivnum)
 			included[drivnum] = true;
 	}
 
@@ -715,7 +720,7 @@ void menu_select_game::build_available_list()
 	}
 
 	// copy into the persistent sorted list
-	for (ui_system_info &info : s_persistent_data.sorted_list())
+	for (ui_system_info &info : m_persistent_data.sorted_list())
 		info.available = included[info.index];
 }
 
@@ -752,13 +757,17 @@ void menu_select_game::inkey_select(const event *menu_event)
 	if ((uintptr_t)driver == CONF_OPTS)
 	{
 		// special case for configure options
-		menu::stack_push<menu_game_options>(ui(), container());
+		menu::stack_push<menu_game_options>(
+				ui(),
+				container(),
+				m_persistent_data.filter_data(),
+				[this] () { reset(reset_options::SELECT_FIRST); });
 	}
 	else if (uintptr_t(driver) == CONF_MACHINE)
 	{
 		// special case for configure machine
 		if (m_prev_selected)
-			menu::stack_push<menu_machine_configure>(ui(), container(), reinterpret_cast<const game_driver *>(m_prev_selected));
+			menu::stack_push<menu_machine_configure>(ui(), container(), *reinterpret_cast<const game_driver *>(m_prev_selected));
 		return;
 	}
 	else if ((uintptr_t)driver == CONF_PLUGINS)
@@ -810,7 +819,11 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	if ((uintptr_t)ui_swinfo == CONF_OPTS)
 	{
 		// special case for configure options
-		menu::stack_push<menu_game_options>(ui(), container());
+		menu::stack_push<menu_game_options>(
+				ui(),
+				container(),
+				m_persistent_data.filter_data(),
+				[this] () { reset(reset_options::SELECT_FIRST); });
 	}
 	else if ((uintptr_t)ui_swinfo == CONF_MACHINE)
 	{
@@ -818,7 +831,15 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		if (m_prev_selected)
 		{
 			ui_software_info *swinfo = reinterpret_cast<ui_software_info *>(m_prev_selected);
-			menu::stack_push<menu_machine_configure>(ui(), container(), (const game_driver *)swinfo->driver);
+			menu::stack_push<menu_machine_configure>(
+					ui(),
+					container(),
+					*swinfo->driver,
+					[this, empty = swinfo->startempty] (bool fav, bool changed)
+					{
+						if (changed)
+							reset(empty ? reset_options::SELECT_FIRST : reset_options::REMEMBER_REF);
+					});
 		}
 		return;
 	}
@@ -889,7 +910,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 
 bool menu_select_game::isfavorite() const
 {
-	return machine_filter::FAVORITE == main_filters::actual;
+	return machine_filter::FAVORITE == m_persistent_data.filter_data().get_current_filter_type();
 }
 
 
@@ -937,7 +958,7 @@ void menu_select_game::populate_search()
 	// ensure search list is populated
 	if (m_searchlist.empty())
 	{
-		std::vector<ui_system_info> const &sorted(s_persistent_data.sorted_list());
+		std::vector<ui_system_info> const &sorted(m_persistent_data.sorted_list());
 		m_searchlist.reserve(sorted.size());
 		for (ui_system_info const &info : sorted)
 			m_searchlist.emplace_back(1.0, std::ref(info));
@@ -945,20 +966,19 @@ void menu_select_game::populate_search()
 
 	// keep track of what we matched against
 	const std::u32string ucs_search(ustr_from_utf8(normalize_unicode(m_search, unicode_normalization_form::D, true)));
-	unsigned matched(0);
 
 	// match shortnames
-	if (s_persistent_data.is_available(persistent_data::AVAIL_UCS_SHORTNAME))
+	if (m_persistent_data.is_available(persistent_data::AVAIL_UCS_SHORTNAME))
 	{
-		matched |= persistent_data::AVAIL_UCS_SHORTNAME;
+		m_searched_fields |= persistent_data::AVAIL_UCS_SHORTNAME;
 		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
 			info.first = util::edit_distance(ucs_search, info.second.get().ucs_shortname);
 	}
 
 	// match descriptions
-	if (s_persistent_data.is_available(persistent_data::AVAIL_UCS_DESCRIPTION))
+	if (m_persistent_data.is_available(persistent_data::AVAIL_UCS_DESCRIPTION))
 	{
-		matched |= persistent_data::AVAIL_UCS_DESCRIPTION;
+		m_searched_fields |= persistent_data::AVAIL_UCS_DESCRIPTION;
 		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
 		{
 			if (info.first)
@@ -970,9 +990,9 @@ void menu_select_game::populate_search()
 	}
 
 	// match "<manufacturer> <description>"
-	if (s_persistent_data.is_available(persistent_data::AVAIL_UCS_MANUF_DESC))
+	if (m_persistent_data.is_available(persistent_data::AVAIL_UCS_MANUF_DESC))
 	{
-		matched |= persistent_data::AVAIL_UCS_MANUF_DESC;
+		m_searched_fields |= persistent_data::AVAIL_UCS_MANUF_DESC;
 		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
 		{
 			if (info.first)
@@ -1154,6 +1174,132 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	buffer = str.str();
 }
 
+
+//-------------------------------------------------
+//  draw icons
+//-------------------------------------------------
+
+float menu_select_game::draw_icon(int linenum, void *selectedref, float x0, float y0)
+{
+	if (!m_has_icons)
+		return 0.0f;
+
+	float ud_arrow_width = ui().get_line_height() * container().manager().ui_aspect(&container());
+	const game_driver *driver = nullptr;
+
+	if (item[0].flags & FLAG_UI_FAVORITE)
+	{
+		ui_software_info *soft = (ui_software_info *)selectedref;
+		if (soft->startempty == 1)
+			driver = soft->driver;
+	}
+	else
+		driver = (const game_driver *)selectedref;
+
+	auto x1 = x0 + ud_arrow_width;
+	auto y1 = y0 + ui().get_line_height();
+
+	icon_cache::iterator icon(m_icons.find(driver));
+	if ((m_icons.end() == icon) || redraw_icon())
+	{
+		if (m_icons.end() == icon)
+		{
+			texture_ptr texture(machine().render().texture_alloc(), [&render = machine().render()] (render_texture *texture) { render.texture_free(texture); });
+			icon = m_icons.emplace(
+					std::piecewise_construct,
+					std::forward_as_tuple(driver),
+					std::forward_as_tuple(std::piecewise_construct, std::forward_as_tuple(std::move(texture)), std::tuple<>())).first;
+		}
+
+		// set clone status
+		bool cloneof = strcmp(driver->parent, "0");
+		if (cloneof)
+		{
+			auto cx = driver_list::find(driver->parent);
+			if ((cx >= 0) && (driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT))
+				cloneof = false;
+		}
+
+		// get search path
+		path_iterator path(ui().options().icons_directory());
+		std::string curpath;
+		std::string searchstr(ui().options().icons_directory());
+
+		// iterate over path and add path for zipped formats
+		while (path.next(curpath))
+			searchstr.append(";").append(curpath.c_str()).append(PATH_SEPARATOR).append("icons");
+
+		bitmap_argb32 tmp;
+		emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
+		std::string fullname = std::string(driver->name).append(".ico");
+		render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
+
+		if (!tmp.valid() && cloneof)
+		{
+			fullname.assign(driver->parent).append(".ico");
+			render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
+		}
+
+		bitmap_argb32 &bitmap(icon->second.second);
+		if (tmp.valid())
+		{
+			float panel_width = x1 - x0;
+			float panel_height = y1 - y0;
+			auto screen_width = machine().render().ui_target().width();
+			auto screen_height = machine().render().ui_target().height();
+
+			if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
+				std::swap(screen_height, screen_width);
+
+			int panel_width_pixel = panel_width * screen_width;
+			int panel_height_pixel = panel_height * screen_height;
+
+			// Calculate resize ratios for resizing
+			auto ratioW = (float)panel_width_pixel / tmp.width();
+			auto ratioH = (float)panel_height_pixel / tmp.height();
+			auto dest_xPixel = tmp.width();
+			auto dest_yPixel = tmp.height();
+
+			if (ratioW < 1 || ratioH < 1)
+			{
+				// smaller ratio will ensure that the image fits in the view
+				float ratio = std::min(ratioW, ratioH);
+				dest_xPixel = tmp.width() * ratio;
+				dest_yPixel = tmp.height() * ratio;
+			}
+
+			bitmap_argb32 dest_bitmap;
+
+			// resample if necessary
+			if (dest_xPixel != tmp.width() || dest_yPixel != tmp.height())
+			{
+				dest_bitmap.allocate(dest_xPixel, dest_yPixel);
+				render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
+				render_resample_argb_bitmap_hq(dest_bitmap, tmp, color, true);
+			}
+			else
+				dest_bitmap = std::move(tmp);
+
+			bitmap.allocate(panel_width_pixel, panel_height_pixel);
+			for (int x = 0; x < dest_xPixel; x++)
+				for (int y = 0; y < dest_yPixel; y++)
+					bitmap.pix32(y, x) = dest_bitmap.pix32(y, x);
+
+			icon->second.first->set_bitmap(bitmap, bitmap.cliprect(), TEXFORMAT_ARGB32);
+		}
+		else
+		{
+			bitmap.reset();
+		}
+	}
+
+	if (icon->second.second.valid())
+		container().add_quad(x0, y0, x1, y1, rgb_t::white(), icon->second.first.get(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	return ud_arrow_width * 1.5f;
+}
+
+
 void menu_select_game::inkey_export()
 {
 	std::vector<game_driver const *> list;
@@ -1167,13 +1313,13 @@ void menu_select_game::inkey_export()
 		if (isfavorite())
 		{
 			// iterate over favorites
-			for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
-			{
-				if (favmap.second.startempty == 1)
-					list.push_back(favmap.second.driver);
-				else
-					return;
-			}
+			mame_machine_manager::instance()->favorite().apply(
+					[&list] (ui_software_info const &info)
+					{
+						assert(info.driver);
+						if (info.startempty)
+							list.push_back(info.driver);
+					});
 		}
 		else
 		{
@@ -1228,7 +1374,7 @@ bool menu_select_game::load_available_machines()
 	file.close();
 
 	// turn it into the sorted system list we all love
-	for (ui_system_info &info : s_persistent_data.sorted_list())
+	for (ui_system_info &info : m_persistent_data.sorted_list())
 	{
 		std::unordered_set<std::string>::iterator const it(available.find(&info.driver->name[0]));
 		bool const found(available.end() != it);
@@ -1249,9 +1395,9 @@ void menu_select_game::load_custom_filters()
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
 	if (file.open("custom_", emulator_info::get_configname(), "_filter.ini") == osd_file::error::NONE)
 	{
-		machine_filter::ptr flt(machine_filter::create(file));
+		machine_filter::ptr flt(machine_filter::create(file, m_persistent_data.filter_data()));
 		if (flt)
-			main_filters::filters[flt->get_type()] = std::move(flt); // not emplace/insert - could replace bogus filter from ui.ini line
+			m_persistent_data.filter_data().set_filter(std::move(flt)); // not emplace/insert - could replace bogus filter from ui.ini line
 		file.close();
 	}
 
@@ -1264,7 +1410,8 @@ void menu_select_game::load_custom_filters()
 
 float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 {
-	return menu_select_launch::draw_left_panel<machine_filter>(main_filters::actual, main_filters::filters, x1, y1, x2, y2);
+	machine_filter_data &filter_data(m_persistent_data.filter_data());
+	return menu_select_launch::draw_left_panel<machine_filter>(filter_data.get_current_filter_type(), filter_data.get_filters(), x1, y1, x2, y2);
 }
 
 
@@ -1293,7 +1440,7 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 			bare_build_version,
 			visible_items,
 			(driver_list::total() - 1),
-			s_persistent_data.bios_count());
+			m_persistent_data.bios_count());
 
 	if (isfavorite())
 	{
@@ -1301,10 +1448,10 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 	}
 	else
 	{
-		auto const it(main_filters::filters.find(main_filters::actual));
-		char const *const filter((main_filters::filters.end() != it) ? it->second->filter_text() : nullptr);
+		machine_filter const *const it(m_persistent_data.filter_data().get_current_filter());
+		char const *const filter(it ? it->filter_text() : nullptr);
 		if (filter)
-			line1 = string_format(_("%1$s: %2$s - Search: %3$s_"), it->second->display_name(), filter, m_search);
+			line1 = string_format(_("%1$s: %2$s - Search: %3$s_"), it->display_name(), filter, m_search);
 		else
 			line1 = string_format(_("Search: %1$s_"), m_search);
 	}
@@ -1331,15 +1478,12 @@ void menu_select_game::filter_selected()
 {
 	if ((machine_filter::FIRST <= m_filter_highlight) && (machine_filter::LAST >= m_filter_highlight))
 	{
-		m_search.clear();
-		auto it(main_filters::filters.find(machine_filter::type(m_filter_highlight)));
-		if (main_filters::filters.end() == it)
-			it = main_filters::filters.emplace(machine_filter::type(m_filter_highlight), machine_filter::create(machine_filter::type(m_filter_highlight))).first;
-		it->second->show_ui(
+		m_persistent_data.filter_data().get_filter(machine_filter::type(m_filter_highlight)).show_ui(
 				ui(),
 				container(),
 				[this] (machine_filter &filter)
 				{
+					set_switch_image();
 					machine_filter::type const new_type(filter.get_type());
 					if (machine_filter::CUSTOM == new_type)
 					{
@@ -1350,7 +1494,7 @@ void menu_select_game::filter_selected()
 							file.close();
 						}
 					}
-					main_filters::actual = new_type;
+					m_persistent_data.filter_data().set_current_filter_type(new_type);
 					reset(reset_options::SELECT_FIRST);
 				});
 	}

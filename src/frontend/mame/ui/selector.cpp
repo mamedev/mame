@@ -60,7 +60,6 @@ void menu_selector::handle()
 
 			m_handler(selection);
 
-			ui_globals::switch_image = true;
 			stack_pop();
 		}
 		else if (menu_event->iptkey == IPT_SPECIAL)

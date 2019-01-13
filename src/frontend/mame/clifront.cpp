@@ -300,16 +300,19 @@ int cli_frontend::execute(std::vector<std::string> &args)
 			// work out how wide the titles need to be
 			int titlelen(0);
 			for (int match : matches)
-				titlelen = std::max(titlelen, int(strlen(drivlist.driver(match).type.fullname())));
+				if (0 <= match)
+					titlelen = (std::max)(titlelen, int(strlen(drivlist.driver(match).type.fullname())));
 
 			// print them out
 			osd_printf_error("\n\"%s\" approximately matches the following\n"
 					"supported machines (best match first):\n\n", m_options.attempted_system_name().c_str());
 			for (int match : matches)
 			{
-				game_driver const &drv(drivlist.driver(match));
-				if (match != -1)
+				if (0 <= match)
+				{
+					game_driver const &drv(drivlist.driver(match));
 					osd_printf_error("%s", util::string_format("%-18s%-*s(%s, %s)\n", drv.name, titlelen + 2, drv.type.fullname(), drv.manufacturer, drv.year).c_str());
+				}
 			}
 		}
 	}
