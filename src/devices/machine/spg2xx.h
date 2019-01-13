@@ -27,12 +27,6 @@
         ND - unknown - Wireless Air 60
         ND - Likely many more
 
-    Also on this hardware:
-
-        name                        PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
-        Radica Play TV Football 2   L7278       x16         48          not dumped      no              Sunplus
-        Dream Life                  ?           x16         48          not dumped      no              Sunplus
-
 **********************************************************************/
 
 #ifndef MAME_MACHINE_SPG2XX_H

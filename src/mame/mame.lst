@@ -38550,6 +38550,9 @@ vigilantd                       // (c) 1988 (Japan Rev D)
 vigilantg                       // (c) 1988 (US Rev G)
 vigilanto                       // (c) 1988 (US)
 
+@source:spg110.cpp
+jak_capb                        //
+
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
 jak_wall                        //
