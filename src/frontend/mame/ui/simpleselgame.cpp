@@ -250,7 +250,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	// otherwise, rebuild the match list
 	assert(m_drivlist != nullptr);
 	if (!m_search.empty() || m_matchlist[0] == -1 || m_rerandomize)
-		m_drivlist->find_approximate_matches(m_search.c_str(), matchcount, m_matchlist);
+		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
 	m_rerandomize = false;
 
 	// iterate over entries

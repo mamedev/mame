@@ -22,7 +22,9 @@
 #include "romload.h"
 #include "softlist.h"
 
+#include <atomic>
 #include <bitset>
+#include <condition_variable>
 #include <cstdlib>
 #include <cstring>
 #include <iterator>
@@ -94,6 +96,26 @@ constexpr char const *SOFTWARE_FILTER_NAMES[software_filter::COUNT] = {
 		__("Software List"),
 		__("Custom Filter") };
 
+
+
+//-------------------------------------------------
+//  static filter data
+//-------------------------------------------------
+
+std::mutex f_filter_data_mutex;
+std::condition_variable f_filter_data_condition;
+std::atomic<bool> f_mnfct_finalised(false), f_year_finalised(false);
+std::vector<std::string> f_mnfct_ui, f_year_ui;
+std::unordered_set<std::string> f_mnfct_tmp, f_year_tmp;
+
+std::string trim_manufacturer(std::string const &mfg)
+{
+	size_t const found(mfg.find('('));
+	if ((found != std::string::npos) && (found > 0))
+		return mfg.substr(0, found - 1);
+	else
+		return mfg;
+}
 
 
 //-------------------------------------------------
@@ -740,7 +762,7 @@ class manufacturer_machine_filter : public choice_filter_impl_base<machine_filte
 {
 public:
 	manufacturer_machine_filter(char const *value, emu_file *file, unsigned indent)
-		: choice_filter_impl_base<machine_filter, machine_filter::MANUFACTURER>(c_mnfct::ui, value)
+		: choice_filter_impl_base<machine_filter, machine_filter::MANUFACTURER>(c_mnfct::ui(), value)
 	{
 	}
 
@@ -751,7 +773,7 @@ public:
 		else if (!selection_valid())
 			return false;
 
-		std::string const name(c_mnfct::getname(system.driver->manufacturer));
+		std::string const name(trim_manufacturer(system.driver->manufacturer));
 		return !name.empty() && (selection_text() == name);
 	}
 };
@@ -761,7 +783,7 @@ class year_machine_filter : public choice_filter_impl_base<machine_filter, machi
 {
 public:
 	year_machine_filter(char const *value, emu_file *file, unsigned indent)
-		: choice_filter_impl_base<machine_filter, machine_filter::YEAR>(c_year::ui, value)
+		: choice_filter_impl_base<machine_filter, machine_filter::YEAR>(c_year::ui(), value)
 	{
 	}
 
@@ -1709,17 +1731,95 @@ software_filter::ptr software_filter::create(emu_file &file, software_filter_dat
 	return nullptr;
 }
 
+
+//-------------------------------------------------
+//  set manufacturers
+//-------------------------------------------------
+
+void c_mnfct::add(std::string &&mfg)
+{
+	assert(!f_mnfct_finalised.load(std::memory_order_acquire));
+
+	size_t const found(mfg.find('('));
+	if ((found != std::string::npos) && (found > 0))
+		mfg.resize(found - 1);
+
+	f_mnfct_tmp.emplace(std::move(mfg));
+}
+
+void c_mnfct::finalise()
+{
+	assert(!f_mnfct_finalised.load(std::memory_order_acquire));
+
+	f_mnfct_ui.reserve(f_mnfct_tmp.size());
+	for (auto it = f_mnfct_tmp.begin(); f_mnfct_tmp.end() != it; it = f_mnfct_tmp.erase(it))
+		f_mnfct_ui.emplace_back(*it);
+	std::sort(
+			f_mnfct_ui.begin(),
+			f_mnfct_ui.end(),
+			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
+
+	std::unique_lock<std::mutex> lock(f_filter_data_mutex);
+	f_mnfct_finalised.store(true, std::memory_order_release);
+	f_filter_data_condition.notify_all();
+}
+
+std::vector<std::string> const &c_mnfct::ui()
+{
+	if (!f_mnfct_finalised.load(std::memory_order_acquire))
+	{
+		std::unique_lock<std::mutex> lock(f_filter_data_mutex);
+		f_filter_data_condition.wait(lock, [] () { return f_mnfct_finalised.load(std::memory_order_acquire); });
+	}
+
+	return f_mnfct_ui;
+}
+
+
+//-------------------------------------------------
+//  set years
+//-------------------------------------------------
+
+void c_year::add(std::string &&year)
+{
+	assert(!f_year_finalised.load(std::memory_order_acquire));
+
+	f_year_tmp.emplace(std::move(year));
+}
+
+void c_year::finalise()
+{
+	assert(!f_year_finalised.load(std::memory_order_acquire));
+
+	f_year_ui.reserve(f_year_tmp.size());
+	for (auto it = f_year_tmp.begin(); f_year_tmp.end() != it; it = f_year_tmp.erase(it))
+		f_year_ui.emplace_back(*it);
+	std::sort(
+			f_year_ui.begin(),
+			f_year_ui.end(),
+			[] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
+
+	std::unique_lock<std::mutex> lock(f_filter_data_mutex);
+	f_year_finalised.store(true, std::memory_order_release);
+	f_filter_data_condition.notify_all();
+}
+
+std::vector<std::string> const &c_year::ui()
+{
+	if (!f_year_finalised.load(std::memory_order_acquire))
+	{
+		std::unique_lock<std::mutex> lock(f_filter_data_mutex);
+		f_filter_data_condition.wait(lock, [] () { return f_year_finalised.load(std::memory_order_acquire); });
+	}
+
+	return f_year_ui;
+}
+
 } // namesapce ui
 
 
 extern const char UI_VERSION_TAG[];
 const char UI_VERSION_TAG[] = "# UI INFO ";
-
-// Years index
-std::vector<std::string> c_year::ui;
-
-// Manufacturers index
-std::vector<std::string> c_mnfct::ui;
 
 // Main filters
 ui::machine_filter::type main_filters::actual = ui::machine_filter::ALL;
@@ -1780,72 +1880,6 @@ std::vector<std::string> tokenize(const std::string &text, char sep)
 	std::string temp = text.substr(start);
 	if (!temp.empty()) tokens.push_back(temp);
 	return tokens;
-}
-
-//-------------------------------------------------
-//  search a substring with even partial matching
-//-------------------------------------------------
-
-int fuzzy_substring(std::string s_needle, std::string s_haystack)
-{
-	if (s_needle.empty())
-		return s_haystack.size();
-	if (s_haystack.empty())
-		return s_needle.size();
-
-	strmakelower(s_needle);
-	strmakelower(s_haystack);
-
-	if (s_needle == s_haystack)
-		return 0;
-	if (s_haystack.find(s_needle) != std::string::npos)
-		return 0;
-
-	auto *row1 = global_alloc_array_clear<int>(s_haystack.size() + 2);
-	auto *row2 = global_alloc_array_clear<int>(s_haystack.size() + 2);
-
-	for (int i = 0; i < s_needle.size(); ++i)
-	{
-		row2[0] = i + 1;
-		for (int j = 0; j < s_haystack.size(); ++j)
-		{
-			int cost = (s_needle[i] == s_haystack[j]) ? 0 : 1;
-			row2[j + 1] = std::min(row1[j + 1] + 1, std::min(row2[j] + 1, row1[j] + cost));
-		}
-
-		int *tmp = row1;
-		row1 = row2;
-		row2 = tmp;
-	}
-
-	int *first, *smallest;
-	first = smallest = row1;
-	int *last = row1 + s_haystack.size();
-
-	while (++first != last)
-		if (*first < *smallest)
-			smallest = first;
-
-	int rv = *smallest;
-	global_free_array(row1);
-	global_free_array(row2);
-
-	return rv;
-}
-
-//-------------------------------------------------
-//  set manufacturers
-//-------------------------------------------------
-
-std::string c_mnfct::getname(const char *str)
-{
-	std::string name(str);
-	size_t found = name.find("(");
-
-	if (found != std::string::npos)
-		return (name.substr(0, found - 1));
-	else
-		return name;
 }
 
 

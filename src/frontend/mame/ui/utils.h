@@ -31,10 +31,15 @@ class render_container;
 struct ui_system_info
 {
 	ui_system_info() { }
-	ui_system_info(game_driver const &d, bool a) : driver(&d), available(a) { }
+	ui_system_info(game_driver const &d, int index, bool a) : driver(&d), available(a) { }
 
 	game_driver const *driver = nullptr;
+	int index;
 	bool available = false;
+
+	std::u32string ucs_shortname;
+	std::u32string ucs_description;
+	std::u32string ucs_manufacturer_description;
 };
 
 struct ui_software_info
@@ -259,6 +264,24 @@ protected:
 
 DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
 
+// Manufacturers
+struct c_mnfct
+{
+	static void add(std::string &&mfg);
+	static void finalise();
+
+	static std::vector<std::string> const &ui();
+};
+
+// Years
+struct c_year
+{
+	static void add(std::string &&year);
+	static void finalise();
+
+	static std::vector<std::string> const &ui();
+};
+
 } // namespace ui
 
 #define MAX_CHAR_INFO            256
@@ -326,24 +349,11 @@ enum
 // GLOBAL CLASS
 struct ui_globals
 {
-	static uint8_t        curimage_view, curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
+	static uint8_t      curimage_view, curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
 	static bool         switch_image, redraw_icon, default_image, reset;
 	static int          visible_main_lines, visible_sw_lines;
-	static uint16_t       panels_status;
+	static uint16_t     panels_status;
 	static bool         has_icons;
-};
-
-// Manufacturers
-struct c_mnfct
-{
-	static std::string getname(const char *str);
-	static std::vector<std::string> ui;
-};
-
-// Years
-struct c_year
-{
-	static std::vector<std::string> ui;
 };
 
 struct main_filters
@@ -353,7 +363,6 @@ struct main_filters
 };
 
 // GLOBAL FUNCTIONS
-int fuzzy_substring(std::string needle, std::string haystack);
 char* chartrimcarriage(char str[]);
 const char* strensure(const char* s);
 int getprecisionchr(const char* s);

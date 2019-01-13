@@ -31,17 +31,168 @@
 #include "uiinput.h"
 #include "luaengine.h"
 
+#include <atomic>
+#include <condition_variable>
 #include <cstring>
 #include <iterator>
+#include <memory>
+#include <mutex>
+#include <thread>
 
 
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
 
-bool menu_select_game::first_start = true;
-std::vector<const game_driver *> menu_select_game::m_sortedlist;
-int menu_select_game::m_isabios = 0;
+class menu_select_game::persistent_data
+{
+public:
+	enum available : unsigned
+	{
+		AVAIL_NONE              = 0,
+		AVAIL_SORTED_LIST       = 1 << 0,
+		AVAIL_BIOS_COUNT        = 1 << 1,
+		AVAIL_UCS_SHORTNAME     = 1 << 2,
+		AVAIL_UCS_DESCRIPTION   = 1 << 3,
+		AVAIL_UCS_MANUF_DESC    = 1 << 4
+	};
+
+	persistent_data()
+		: m_started(false)
+		, m_available(AVAIL_NONE)
+		, m_bios_count(0)
+	{
+	}
+
+	~persistent_data()
+	{
+		if (m_thread)
+			m_thread->join();
+	}
+
+	void cache_data()
+	{
+		std::unique_lock<std::mutex> lock(m_mutex);
+		do_start_caching();
+	}
+
+	bool is_available(available desired)
+	{
+		return (m_available.load(std::memory_order_acquire) & desired) == desired;
+	}
+
+	void wait_available(available desired)
+	{
+		if (!is_available(desired))
+		{
+			std::unique_lock<std::mutex> lock(m_mutex);
+			do_start_caching();
+			m_condition.wait(lock, [this, desired] () { return is_available(desired); });
+		}
+	}
+
+	std::vector<ui_system_info> &sorted_list()
+	{
+		wait_available(AVAIL_SORTED_LIST);
+		return m_sorted_list;
+	}
+
+	int bios_count()
+	{
+		wait_available(AVAIL_BIOS_COUNT);
+		return m_bios_count;
+	}
+
+	bool unavailable_systems()
+	{
+		wait_available(AVAIL_SORTED_LIST);
+		return std::find_if(m_sorted_list.begin(), m_sorted_list.end(), [] (ui_system_info const &info) { return !info.available; }) != m_sorted_list.end();
+	}
+
+private:
+	void notify_available(available value)
+	{
+		std::unique_lock<std::mutex> lock(m_mutex);
+		m_available.fetch_or(value, std::memory_order_release);
+		m_condition.notify_all();
+	}
+
+	void do_start_caching()
+	{
+		if (!m_started)
+		{
+			m_started = true;
+			m_thread = std::make_unique<std::thread>([this] { do_cache_data(); });
+		}
+	}
+
+	void do_cache_data()
+	{
+		// generate full list
+		m_sorted_list.reserve(driver_list::total());
+		std::unordered_set<std::string> manufacturers, years;
+		for (int x = 0; x < driver_list::total(); ++x)
+		{
+			game_driver const &driver(driver_list::driver(x));
+			if (&driver != &GAME_NAME(___empty))
+			{
+				if (driver.flags & machine_flags::IS_BIOS_ROOT)
+					++m_bios_count;
+
+				m_sorted_list.emplace_back(driver, x, false);
+				c_mnfct::add(driver.manufacturer);
+				c_year::add(driver.year);
+			}
+		}
+
+		// notify that BIOS count is valie
+		notify_available(AVAIL_BIOS_COUNT);
+
+		// sort drivers and notify
+		std::stable_sort(
+				m_sorted_list.begin(),
+				m_sorted_list.end(),
+				[] (ui_system_info const &lhs, ui_system_info const &rhs) { return sorted_game_list(lhs.driver, rhs.driver); });
+		notify_available(AVAIL_SORTED_LIST);
+
+		// convert shortnames to UCS-4
+		for (ui_system_info &info : m_sorted_list)
+			info.ucs_shortname = ustr_from_utf8(normalize_unicode(info.driver->name, unicode_normalization_form::D, true));
+		notify_available(AVAIL_UCS_SHORTNAME);
+
+		// convert descriptions to UCS-4
+		for (ui_system_info &info : m_sorted_list)
+			info.ucs_description = ustr_from_utf8(normalize_unicode(info.driver->type.fullname(), unicode_normalization_form::D, true));
+		notify_available(AVAIL_UCS_DESCRIPTION);
+
+		// convert "<manufacturer> <description>" to UCS-4
+		std::string buf;
+		for (ui_system_info &info : m_sorted_list)
+		{
+			buf.assign(info.driver->manufacturer);
+			buf.append(1, ' ');
+			buf.append(info.driver->type.fullname());
+			info.ucs_manufacturer_description = ustr_from_utf8(normalize_unicode(buf, unicode_normalization_form::D, true));
+		}
+		notify_available(AVAIL_UCS_MANUF_DESC);
+
+		// sort manufacturers and years
+		c_mnfct::finalise();
+		c_year::finalise();
+	}
+
+	std::mutex m_mutex;
+	std::condition_variable m_condition;
+	std::unique_ptr<std::thread> m_thread;
+	std::atomic<bool> m_started;
+	std::atomic<unsigned> m_available;
+	std::vector<ui_system_info> m_sorted_list;
+	int m_bios_count;
+};
+
+menu_select_game::persistent_data menu_select_game::s_persistent_data;
+bool menu_select_game::s_first_start = true;
+
 
 //-------------------------------------------------
 //  ctor
@@ -54,7 +205,7 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	ui_options &moptions = mui.options();
 
 	// load drivers cache
-	init_sorted_list();
+	s_persistent_data.cache_data();
 
 	// check if there are available icons
 	ui_globals::has_icons = false;
@@ -74,8 +225,9 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	if (!load_available_machines())
 		build_available_list();
 
-	if (first_start)
+	if (s_first_start)
 	{
+		//s_first_start = false; TODO: why wansn't it ever clearing the first start flag?
 		reselect_last::set_driver(moptions.last_used_machine());
 		ui_globals::rpanel = std::min<int>(std::max<int>(moptions.last_right_panel(), RP_FIRST), RP_LAST);
 
@@ -121,7 +273,6 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	ui_globals::default_image = true;
 	ui_globals::panels_status = moptions.hide_panels();
 	ui_globals::curdats_total = 1;
-	m_searchlist[0] = nullptr;
 }
 
 //-------------------------------------------------
@@ -326,12 +477,12 @@ void menu_select_game::handle()
 					break;
 
 				case IPT_UI_AUDIT_FAST:
-					if (std::find_if(m_availsortedlist.begin(), m_availsortedlist.end(), [] (ui_system_info const &info) { return !info.available; }) != m_availsortedlist.end())
-						menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, menu_audit::mode::FAST);
+					if (s_persistent_data.unavailable_systems())
+						menu::stack_push<menu_audit>(ui(), container(), s_persistent_data.sorted_list(), menu_audit::mode::FAST);
 					break;
 
 				case IPT_UI_AUDIT_ALL:
-					menu::stack_push<menu_audit>(ui(), container(), m_availsortedlist, menu_audit::mode::ALL);
+					menu::stack_push<menu_audit>(ui(), container(), s_persistent_data.sorted_list(), menu_audit::mode::ALL);
 					break;
 				}
 			}
@@ -368,10 +519,11 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 
 			// if filter is set on category, build category list
 			auto const it(main_filters::filters.find(main_filters::actual));
+			std::vector<ui_system_info> const &sorted(s_persistent_data.sorted_list());
 			if (main_filters::filters.end() == it)
-				m_displaylist = m_availsortedlist;
+				std::copy(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
 			else
-				it->second->apply(m_availsortedlist.begin(), m_availsortedlist.end(), std::back_inserter(m_displaylist));
+				it->second->apply(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
 
 			// iterate over entries
 			int curitem = 0;
@@ -400,7 +552,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		int curitem = 0;
 
 		// iterate over entries
-		for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
+		for (auto &favmap : mame_machine_manager::instance()->favorite().m_list)
 		{
 			auto flags = flags_ui | FLAG_UI_FAVORITE;
 			if (favmap.second.startempty == 1)
@@ -562,18 +714,9 @@ void menu_select_game::build_available_list()
 		}
 	}
 
-	// sort
-	m_availsortedlist.reserve(total);
-	for (std::size_t x = 0; total > x; ++x)
-	{
-		game_driver const &driver(driver_list::driver(x));
-		if (&driver != &GAME_NAME(___empty))
-			m_availsortedlist.emplace_back(driver, included[x]);
-	}
-	std::stable_sort(
-			m_availsortedlist.begin(),
-			m_availsortedlist.end(),
-			[] (ui_system_info const &a, ui_system_info const &b) { return sorted_game_list(a.driver, b.driver); });
+	// copy into the persistent sorted list
+	for (ui_system_info &info : s_persistent_data.sorted_list())
+		info.available = included[info.index];
 }
 
 
@@ -791,48 +934,72 @@ void menu_select_game::change_info_pane(int delta)
 
 void menu_select_game::populate_search()
 {
-	// allocate memory to track the penalty value
-	std::vector<int> penalty(VISIBLE_GAMES_IN_SEARCH, 9999);
-	int index = 0;
-	for (; index < m_displaylist.size(); ++index)
+	// ensure search list is populated
+	if (m_searchlist.empty())
 	{
-		// pick the best match between driver name and description
-		int curpenalty = fuzzy_substring(m_search, m_displaylist[index].driver->type.fullname());
-		int tmp = fuzzy_substring(m_search, m_displaylist[index].driver->name);
-		curpenalty = std::min(curpenalty, tmp);
+		std::vector<ui_system_info> const &sorted(s_persistent_data.sorted_list());
+		m_searchlist.reserve(sorted.size());
+		for (ui_system_info const &info : sorted)
+			m_searchlist.emplace_back(1.0, std::ref(info));
+	}
 
-		// insert into the sorted table of matches
-		for (int matchnum = VISIBLE_GAMES_IN_SEARCH - 1; matchnum >= 0; --matchnum)
+	// keep track of what we matched against
+	const std::u32string ucs_search(ustr_from_utf8(normalize_unicode(m_search, unicode_normalization_form::D, true)));
+	unsigned matched(0);
+
+	// match shortnames
+	if (s_persistent_data.is_available(persistent_data::AVAIL_UCS_SHORTNAME))
+	{
+		matched |= persistent_data::AVAIL_UCS_SHORTNAME;
+		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
+			info.first = util::edit_distance(ucs_search, info.second.get().ucs_shortname);
+	}
+
+	// match descriptions
+	if (s_persistent_data.is_available(persistent_data::AVAIL_UCS_DESCRIPTION))
+	{
+		matched |= persistent_data::AVAIL_UCS_DESCRIPTION;
+		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
 		{
-			// stop if we're worse than the current entry
-			if (curpenalty >= penalty[matchnum])
-				break;
-
-			// as long as this isn't the last entry, bump this one down
-			if (matchnum < VISIBLE_GAMES_IN_SEARCH - 1)
+			if (info.first)
 			{
-				penalty[matchnum + 1] = penalty[matchnum];
-				m_searchlist[matchnum + 1] = m_searchlist[matchnum];
+				double const penalty(util::edit_distance(ucs_search, info.second.get().ucs_description));
+				info.first = (std::min)(penalty, info.first);
 			}
-
-			m_searchlist[matchnum] = m_displaylist[index].driver;
-			penalty[matchnum] = curpenalty;
 		}
 	}
 
-	(index < VISIBLE_GAMES_IN_SEARCH) ? m_searchlist[index] = nullptr : m_searchlist[VISIBLE_GAMES_IN_SEARCH] = nullptr;
-	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
-	for (int curitem = 0; m_searchlist[curitem]; ++curitem)
+	// match "<manufacturer> <description>"
+	if (s_persistent_data.is_available(persistent_data::AVAIL_UCS_MANUF_DESC))
 	{
-		bool cloneof = strcmp(m_searchlist[curitem]->parent, "0");
+		matched |= persistent_data::AVAIL_UCS_MANUF_DESC;
+		for (std::pair<double, std::reference_wrapper<ui_system_info const> > &info : m_searchlist)
+		{
+			if (info.first)
+			{
+				double const penalty(util::edit_distance(ucs_search, info.second.get().ucs_manufacturer_description));
+				info.first = (std::min)(penalty, info.first);
+			}
+		}
+	}
+
+	// sort according to edit distance and put up to 200 in the menu
+	std::stable_sort(
+			m_searchlist.begin(),
+			m_searchlist.end(),
+			[] (auto const &lhs, auto const &rhs) { return lhs.first < rhs.first; });
+	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	for (int curitem = 0; (std::min)(m_searchlist.size(), std::size_t(200)) > curitem; ++curitem)
+	{
+		game_driver const &drv(*m_searchlist[curitem].second.get().driver);
+		bool cloneof = strcmp(drv.parent, "0") != 0;
 		if (cloneof)
 		{
-			int cx = driver_list::find(m_searchlist[curitem]->parent);
+			int const cx = driver_list::find(drv.parent);
 			if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 				cloneof = false;
 		}
-		item_append(m_searchlist[curitem]->type.fullname(), "", (!cloneof) ? flags_ui : (FLAG_INVERT | flags_ui),
-			(void *)m_searchlist[curitem]);
+		item_append(drv.type.fullname(), "", !cloneof ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&drv);
 	}
 }
 
@@ -992,8 +1159,8 @@ void menu_select_game::inkey_export()
 	std::vector<game_driver const *> list;
 	if (!m_search.empty())
 	{
-		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
-			list.push_back(m_searchlist[curitem]);
+		for (int curitem = 0; (std::min)(m_searchlist.size(), std::size_t(200)); ++curitem)
+			list.push_back(m_searchlist[curitem].second.get().driver);
 	}
 	else
 	{
@@ -1017,41 +1184,6 @@ void menu_select_game::inkey_export()
 	}
 
 	menu::stack_push<menu_export>(ui(), container(), std::move(list));
-}
-
-//-------------------------------------------------
-//  save drivers infos to file
-//-------------------------------------------------
-
-void menu_select_game::init_sorted_list()
-{
-	if (!m_sortedlist.empty())
-		return;
-
-	// generate full list
-	std::unordered_set<std::string> manufacturers, years;
-	for (int x = 0; x < driver_list::total(); ++x)
-	{
-		game_driver const &driver(driver_list::driver(x));
-		if (&driver != &GAME_NAME(___empty))
-		{
-			if (driver.flags & machine_flags::IS_BIOS_ROOT)
-				m_isabios++;
-
-			m_sortedlist.push_back(&driver);
-			manufacturers.emplace(c_mnfct::getname(driver.manufacturer));
-			years.emplace(driver.year);
-		}
-	}
-
-	// sort manufacturers - years and driver
-	for (auto it = manufacturers.begin(); manufacturers.end() != it; it = manufacturers.erase(it))
-		c_mnfct::ui.emplace_back(*it);
-	std::sort(c_mnfct::ui.begin(), c_mnfct::ui.end(), [] (std::string const &x, std::string const &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
-	for (auto it = years.begin(); years.end() != it; it = years.erase(it))
-		c_year::ui.emplace_back(*it);
-	std::stable_sort(c_year::ui.begin(), c_year::ui.end());
-	std::stable_sort(m_sortedlist.begin(), m_sortedlist.end(), sorted_game_list);
 }
 
 //-------------------------------------------------
@@ -1093,27 +1225,18 @@ bool menu_select_game::load_available_machines()
 		else
 			available.emplace(std::move(readbuf));
 	}
+	file.close();
 
 	// turn it into the sorted system list we all love
-	m_availsortedlist.reserve(driver_list::total());
-	for (std::size_t x = 0; driver_list::total() > x; ++x)
+	for (ui_system_info &info : s_persistent_data.sorted_list())
 	{
-		game_driver const &driver(driver_list::driver(x));
-		if (&driver != &GAME_NAME(___empty))
-		{
-			std::unordered_set<std::string>::iterator const it(available.find(&driver.name[0]));
-			bool const found(available.end() != it);
-			m_availsortedlist.emplace_back(driver, found);
-			if (found)
-				available.erase(it);
-		}
+		std::unordered_set<std::string>::iterator const it(available.find(&info.driver->name[0]));
+		bool const found(available.end() != it);
+		info.available = found;
+		if (found)
+			available.erase(it);
 	}
-	std::stable_sort(
-			m_availsortedlist.begin(),
-			m_availsortedlist.end(),
-			[] (ui_system_info const &a, ui_system_info const &b) { return sorted_game_list(a.driver, b.driver); });
 
-	file.close();
 	return true;
 }
 
@@ -1170,7 +1293,7 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 			bare_build_version,
 			visible_items,
 			(driver_list::total() - 1),
-			m_isabios);
+			s_persistent_data.bios_count());
 
 	if (isfavorite())
 	{

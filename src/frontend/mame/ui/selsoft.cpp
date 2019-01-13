@@ -490,15 +490,20 @@ void menu_select_software::load_sw_custom_filters()
 void menu_select_software::find_matches(const char *str, int count)
 {
 	// allocate memory to track the penalty value
-	std::vector<int> penalty(count, 9999);
-	int index = 0;
+	std::vector<double> penalty(count, 1.0);
+	std::u32string const search(ustr_from_utf8(normalize_unicode(str, unicode_normalization_form::D, true)));
 
-	for (; index < m_displaylist.size(); ++index)
+	int index = 0;
+	for ( ; index < m_displaylist.size(); ++index)
 	{
-		// pick the best match between driver name and description
-		int curpenalty = fuzzy_substring(str, m_displaylist[index]->longname);
-		int tmp = fuzzy_substring(str, m_displaylist[index]->shortname);
-		curpenalty = std::min(curpenalty, tmp);
+		// pick the best match between shortname and longname
+		// TODO: search alternate title as well
+		double curpenalty(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index]->shortname, unicode_normalization_form::D, true))));
+		if (curpenalty)
+		{
+			double const tmp(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index]->longname, unicode_normalization_form::D, true))));
+			curpenalty = (std::min)(curpenalty, tmp);
+		}
 
 		// insert into the sorted table of matches
 		for (int matchnum = count - 1; matchnum >= 0; --matchnum)
