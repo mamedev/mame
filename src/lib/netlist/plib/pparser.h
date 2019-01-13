@@ -164,7 +164,7 @@ public:
 	void process(putf8_reader &istrm, putf8_writer &ostrm);
 
 protected:
-	double expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
+	int expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
 	define_t *get_define(const pstring &name);
 	pstring replace_macros(const pstring &line);
 	virtual void error(const pstring &err);

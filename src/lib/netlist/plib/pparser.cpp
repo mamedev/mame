@@ -283,6 +283,8 @@ ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
 	m_expr_sep.push_back("-");
 	m_expr_sep.push_back("*");
 	m_expr_sep.push_back("/");
+	m_expr_sep.push_back("&&");
+	m_expr_sep.push_back("||");
 	m_expr_sep.push_back("==");
 	m_expr_sep.push_back(" ");
 	m_expr_sep.push_back("\t");
@@ -302,34 +304,28 @@ void ppreprocessor::error(const pstring &err)
 	throw pexception("PREPRO ERROR: " + err);
 }
 
+#define CHECKTOK2(p_op, p_prio) \
+	else if (tok == # p_op)							\
+	{ 												\
+		if (prio < p_prio) 							\
+			return val; 							\
+		start++; 									\
+		const auto v2 = expr(sexpr, start, p_prio);	\
+		val = (val p_op v2);						\
+	} 												\
 
+// Operator precedence see https://en.cppreference.com/w/cpp/language/operator_precedence
 
-double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
+int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
 {
-	double val;
+	int val;
 	pstring tok=sexpr[start];
 	if (tok == "(")
 	{
 		start++;
-		val = expr(sexpr, start, /*prio*/ 0);
+		val = expr(sexpr, start, /*prio*/ 255);
 		if (sexpr[start] != ")")
 			error("parsing error!");
-		start++;
-	}
-	else if (tok == "!")
-	{
-		start++;
-		val = expr(sexpr, start, 90);
-		if (val != 0)
-			val = 0;
-		else
-			val = 1;
-	}
-	else
-	{
-		tok=sexpr[start];
-		// FIXME: error handling
-		val = plib::pstonum<decltype(val)>(tok);
 		start++;
 	}
 	while (start < sexpr.size())
@@ -340,36 +336,25 @@ double ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start
 			// FIXME: catch error
 			return val;
 		}
-		else if (tok == "+")
+		else if (tok == "!")
 		{
-			if (prio > 10)
+			if (prio < 3)
 				return val;
 			start++;
-			val = val + expr(sexpr, start, 10);
+			val = !expr(sexpr, start, 3);
 		}
-		else if (tok == "-")
+		CHECKTOK2(*,  5)
+		CHECKTOK2(/,  5)
+		CHECKTOK2(+,  6)
+		CHECKTOK2(-,  6)
+		CHECKTOK2(==, 10)
+		CHECKTOK2(&&, 14)
+		CHECKTOK2(||, 15)
+		else
 		{
-			if (prio > 10)
-				return val;
+			// FIXME: error handling
+			val = plib::pstonum<decltype(val)>(tok);
 			start++;
-			val = val - expr(sexpr, start, 10);
-		}
-		else if (tok == "*")
-		{
-			start++;
-			val = val * expr(sexpr, start, 20);
-		}
-		else if (tok == "/")
-		{
-			start++;
-			val = val / expr(sexpr, start, 20);
-		}
-		else if (tok == "==")
-		{
-			if (prio > 5)
-				return val;
-			start++;
-			val = (val == expr(sexpr, start, 5)) ? 1.0 : 0.0;
 		}
 	}
 	return val;
@@ -418,7 +403,7 @@ pstring  ppreprocessor::process_line(const pstring &line)
 			std::size_t start = 0;
 			lt = replace_macros(lt);
 			std::vector<pstring> t(psplit(replace_all(lt.substr(3), pstring(" "), pstring("")), m_expr_sep));
-			int val = static_cast<int>(expr(t, start, 0));
+			int val = static_cast<int>(expr(t, start, 255));
 			if (val == 0)
 				m_ifflag |= (1 << m_level);
 		}
