@@ -288,8 +288,8 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 		vec_set(mr+1, NL_FCONST(0.0), m_g);
 		m_g[0] = rho;
 
-		for (std::size_t i = 0; i < mr; i++)
-			vec_set(mr + 1, NL_FCONST(0.0), m_ht[i]);
+		for (std::size_t i = 0; i < mr + 1; i++)
+			vec_set(mr, NL_FCONST(0.0), m_ht[i]);
 
 		vec_mult_scalar(n, residual, NL_FCONST(1.0) / rho, m_v[0]);
 
