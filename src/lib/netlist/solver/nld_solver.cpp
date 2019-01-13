@@ -100,7 +100,7 @@ NETLIB_UPDATE(solver)
 		if (m_mat_solvers[i]->has_timestep_devices() || force_solve)
 			solv[t_cnt++] = i;
 
-	if (nthreads > 1 && t_cnt > 1)
+	//if (nthreads > 1 && t_cnt > 1)
 	{
 		plib::omp::set_num_threads(nthreads);
 		plib::omp::for_static(static_cast<std::size_t>(0), t_cnt, [this, &solv](std::size_t i)
@@ -109,13 +109,13 @@ NETLIB_UPDATE(solver)
 				plib::unused_var(ts);
 			});
 	}
-	else
-		for (auto & solver : m_mat_solvers)
-			if (solver->has_timestep_devices() || force_solve)
-			{
-				const netlist_time ts = solver->solve();
-				plib::unused_var(ts);
-			};
+//	else
+//		for (auto & solver : m_mat_solvers)
+//			if (solver->has_timestep_devices() || force_solve)
+//			{
+//				const netlist_time ts = solver->solve();
+//				plib::unused_var(ts);
+//			}
 
 	for (auto & solver : m_mat_solvers)
 		if (solver->has_timestep_devices() || force_solve)
