@@ -107,19 +107,19 @@ CUSTOM_INPUT_MEMBER(psikyo_state::mcu_status_r)
 	return ret;
 }
 
-static const uint8_t s1945_table[256] = {
+static const u8 s1945_table[256] = {
 	0x00, 0x00, 0x64, 0xae, 0x00, 0x00, 0x26, 0x2c, 0x00, 0x00, 0x2c, 0xda, 0x00, 0x00, 0x2c, 0xbc,
 	0x00, 0x00, 0x2c, 0x9e, 0x00, 0x00, 0x2f, 0x0e, 0x00, 0x00, 0x31, 0x10, 0x00, 0x00, 0xc5, 0x1e,
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x5c, 0x00, 0x00, 0x2b, 0xc0
 };
 
-static const uint8_t s1945a_table[256] = {
+static const u8 s1945a_table[256] = {
 	0x00, 0x00, 0x64, 0xbe, 0x00, 0x00, 0x26, 0x2c, 0x00, 0x00, 0x2c, 0xda, 0x00, 0x00, 0x2c, 0xbc,
 	0x00, 0x00, 0x2c, 0x9e, 0x00, 0x00, 0x2f, 0x0e, 0x00, 0x00, 0x31, 0x10, 0x00, 0x00, 0xc7, 0x2a,
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xad, 0x4c, 0x00, 0x00, 0x2b, 0xc0
 };
 
-static const uint8_t s1945j_table[256] = {
+static const u8 s1945j_table[256] = {
 	0x00, 0x00, 0x64, 0xb6, 0x00, 0x00, 0x26, 0x2c, 0x00, 0x00, 0x2c, 0xda, 0x00, 0x00, 0x2c, 0xbc,
 	0x00, 0x00, 0x2c, 0x9e, 0x00, 0x00, 0x2f, 0x0e, 0x00, 0x00, 0x31, 0x10, 0x00, 0x00, 0xc5, 0x92,
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x64, 0x00, 0x00, 0x2b, 0xc0
@@ -148,8 +148,8 @@ WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
 		m_s1945_mcu_direction = data;
 		break;
 	case 0x07:
-		psikyo_switch_banks(1, (data >> 6) & 3);
-		psikyo_switch_banks(0, (data >> 4) & 3);
+		switch_bgbanks(1, (data >> 6) & 3);
+		switch_bgbanks(0, (data >> 4) & 3);
 		m_s1945_mcu_bctrl = data;
 		break;
 	case 0x0b:
@@ -201,7 +201,7 @@ READ32_MEMBER(psikyo_state::s1945_mcu_r)
 	{
 	case 0:
 		{
-		uint32_t res;
+		u32 res;
 		if (m_s1945_mcu_control & 16)
 		{
 			res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
@@ -250,16 +250,16 @@ WRITE32_MEMBER(psikyo_state::vram_w)
 
 void psikyo_state::psikyo_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                     // ROM (not all used)
+	map(0x000000, 0x0fffff).rom();                                                                 // ROM (not all used)
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).ram().w(FUNC(psikyo_state::vram_w<0>)).share("vram_0");       // Layer 0
-	map(0x802000, 0x803fff).ram().w(FUNC(psikyo_state::vram_w<1>)).share("vram_1");       // Layer 1
-	map(0x804000, 0x807fff).ram().share("vregs");                           // RAM + Vregs
-//  AM_RANGE(0xc00000, 0xc0000b) AM_READ(psikyo_input_r)                                    // Depends on board
-//  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404
-//  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board
-	map(0xfe0000, 0xffffff).ram();                                                     // RAM
+	map(0x800000, 0x801fff).ram().w(FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
+	map(0x802000, 0x803fff).ram().w(FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
+//  map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::input_r));                                        // Depends on board
+//  map(0xc00004, 0xc0000b).w(FUNC(psikyo_state::s1945_mcu_w));                                    // MCU on sh404
+//  map(0xc00010, 0xc00013).w(m_soundlatch, FUNC(generic_latch_8_device::write));                  // Depends on board
+	map(0xfe0000, 0xffffff).ram();                                                                 // RAM
 }
 
 template<int Shift>
@@ -268,32 +268,11 @@ WRITE8_MEMBER(psikyo_state::sound_bankswitch_w)
 	m_audiobank->set_entry((data >> Shift) & 0x03);
 }
 
-READ32_MEMBER(psikyo_state::s1945bl_oki_r)
+WRITE8_MEMBER(psikyo_state::s1945bl_okibank_w)
 {
-	uint8_t dat = m_oki->read(space, 0);
-	return dat << 24;
-}
-
-WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		m_oki->write(space, 0, data >> 24);
-	}
-
-	if (ACCESSING_BITS_16_23)
-	{
-		// not at all sure about this, it seems to write 0 too often
-		uint8_t bank = (data & 0x00ff0000) >> 16;
-		if (bank < 4)
-			m_okibank->set_entry(bank);
-	}
-
-	if (ACCESSING_BITS_8_15)
-		printf("ACCESSING_BITS_8_15 ?? %08x %08x\n", data & 0x0000ff00, mem_mask);
-
-	if (ACCESSING_BITS_0_7)
-		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x000000ff, mem_mask);
+	// not at all sure about this, it seems to write 0 too often
+	if (data < 5)
+		m_okibank->set_entry(data);
 }
 
 void psikyo_state::s1945bl_oki_map(address_map &map)
@@ -304,19 +283,20 @@ void psikyo_state::s1945bl_oki_map(address_map &map)
 
 void psikyo_state::psikyo_bootleg_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                     // ROM (not all used)
+	map(0x000000, 0x0fffff).rom();                                                                 // ROM (not all used)
 	map(0x200000, 0x200fff).ram().share("boot_spritebuf");              // RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
 	map(0x400000, 0x401fff).ram().share("spriteram");       // Sprites, buffered by two frames (list buffered + fb buffered)
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");    // Palette
-	map(0x800000, 0x801fff).ram().w(FUNC(psikyo_state::vram_w<0>)).share("vram_0");       // Layer 0
-	map(0x802000, 0x803fff).ram().w(FUNC(psikyo_state::vram_w<1>)).share("vram_1");       // Layer 1
-	map(0x804000, 0x807fff).ram().share("vregs");                               // RAM + Vregs
-	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));                               // input ports
+	map(0x800000, 0x801fff).ram().w(FUNC(psikyo_state::vram_w<0>)).share("vram_0");                // Layer 0
+	map(0x802000, 0x803fff).ram().w(FUNC(psikyo_state::vram_w<1>)).share("vram_1");                // Layer 1
+	map(0x804000, 0x807fff).ram().share("vregs");                                                  // RAM + Vregs
+	map(0xc00000, 0xc0000b).r(FUNC(psikyo_state::gunbird_input_r));                                // input ports
 
-	map(0xc00018, 0xc0001b).rw(FUNC(psikyo_state::s1945bl_oki_r), FUNC(psikyo_state::s1945bl_oki_w));
+	map(0xc00018, 0xc00018).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00019, 0xc00019).w(FUNC(psikyo_state::s1945bl_okibank_w));
 
-	map(0xfe0000, 0xffffff).ram();                                                     // RAM
+	map(0xfe0000, 0xffffff).ram();                                                                 // RAM
 
 }
 
@@ -1065,13 +1045,14 @@ void psikyo_state::sngkace(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
-	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_psikyo));
-	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_psikyo));
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
+	BUFFERED_SPRITERAM32(config, m_spriteram);
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,sngkace)
 
 	/* sound hardware */
@@ -1110,13 +1091,14 @@ void psikyo_state::gunbird(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
-	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_psikyo));
-	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_psikyo));
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
+	BUFFERED_SPRITERAM32(config, m_spriteram);
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
@@ -1150,13 +1132,14 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
-	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_psikyo_bootleg));
-	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_psikyo));
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_bootleg));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_bootleg));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
+	BUFFERED_SPRITERAM32(config, m_spriteram);
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
@@ -1192,13 +1175,14 @@ void psikyo_state::s1945(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */  // we're using PORT_VBLANK
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
-	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_psikyo));
-	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank_psikyo));
+	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(psikyo_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_psikyo);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
 
+	BUFFERED_SPRITERAM32(config, m_spriteram);
 	MCFG_VIDEO_START_OVERRIDE(psikyo_state,psikyo)
 
 	/* sound hardware */
@@ -1847,7 +1831,7 @@ ROM_END
 void psikyo_state::init_sngkace()
 {
 	{
-		uint8_t *RAM = memregion("ymsnd")->base();
+		u8 *RAM = memregion("ymsnd")->base();
 		int len = memregion("ymsnd")->bytes();
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
@@ -1858,7 +1842,7 @@ void psikyo_state::init_sngkace()
 		}
 	}
 
-	m_ka302c_banking = 0; // SH201B doesn't have any gfx banking
+	m_ka302c_banking = false; // SH201B doesn't have any gfx banking
 
 	/* setup audiocpu banks */
 	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
@@ -1867,7 +1851,7 @@ void psikyo_state::init_sngkace()
 #if 0
 	if (!strcmp(machine().system().name,"sngkace"))
 	{
-		uint8_t *ROM  =   memregion("maincpu")->base();
+		u8 *ROM  =   memregion("maincpu")->base();
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;
@@ -1877,7 +1861,7 @@ void psikyo_state::init_sngkace()
 #endif
 }
 
-void psikyo_state::s1945_mcu_init(  )
+void psikyo_state::s1945_mcu_init()
 {
 	m_s1945_mcu_direction = 0x00;
 	m_s1945_mcu_inlatch = 0xff;
@@ -1905,7 +1889,7 @@ void psikyo_state::init_tengai()
 	s1945_mcu_init();
 	m_s1945_mcu_table = nullptr;
 
-	m_ka302c_banking = 0; // Banking is controlled by mcu
+	m_ka302c_banking = false; // Banking is controlled by mcu
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
@@ -1914,7 +1898,7 @@ void psikyo_state::init_tengai()
 
 void psikyo_state::init_gunbird()
 {
-	m_ka302c_banking = 1;
+	m_ka302c_banking = true;
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
@@ -1927,7 +1911,7 @@ void psikyo_state::init_s1945()
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945_table;
 
-	m_ka302c_banking = 0; // Banking is controlled by mcu
+	m_ka302c_banking = false; // Banking is controlled by mcu
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
@@ -1939,7 +1923,7 @@ void psikyo_state::init_s1945a()
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945a_table;
 
-	m_ka302c_banking = 0; // Banking is controlled by mcu
+	m_ka302c_banking = false; // Banking is controlled by mcu
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
@@ -1951,7 +1935,7 @@ void psikyo_state::init_s1945j()
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945j_table;
 
-	m_ka302c_banking = 0; // Banking is controlled by mcu
+	m_ka302c_banking = false; // Banking is controlled by mcu
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
@@ -1960,9 +1944,9 @@ void psikyo_state::init_s1945j()
 
 void psikyo_state::init_s1945bl()
 {
-	m_ka302c_banking = 1;
+	m_ka302c_banking = true;
 
-	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x30000, 0x10000);
+	m_okibank->configure_entries(0, 5, memregion("oki")->base() + 0x30000, 0x10000);
 	m_okibank->set_entry(0);
 }
 
