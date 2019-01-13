@@ -391,6 +391,9 @@ void psikyo_state::get_sprites_bootleg()
 void psikyo_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	struct sprite_t *sprite_ptr = m_sprite_ptr_pre;
+	u32 transmask = 0;
+	if (m_sprite_ctrl & 4) transmask |= (1 << 0);
+	if (m_sprite_ctrl & 8) transmask |= (1 << 15);
 
 	while (sprite_ptr != m_spritelist.get())
 	{
@@ -398,22 +401,22 @@ void psikyo_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, con
 
 		if (sprite_ptr->zoomx == 0x10000 && sprite_ptr->zoomy == 0x10000)
 		{
-			m_gfxdecode->gfx(sprite_ptr->gfx)->prio_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(sprite_ptr->gfx)->prio_transmask(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
-				screen.priority(),sprite_ptr->primask,(m_sprite_ctrl & 4 ? 0 : 15));
+				screen.priority(),sprite_ptr->primask,transmask);
 		}
 		else
 		{
-			m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(sprite_ptr->gfx)->prio_zoom_transmask(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				screen.priority(),sprite_ptr->primask,(m_sprite_ctrl & 4 ? 0 : 15));
+				screen.priority(),sprite_ptr->primask,transmask);
 		}
 	}
 }
