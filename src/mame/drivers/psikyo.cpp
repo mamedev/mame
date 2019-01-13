@@ -1962,7 +1962,7 @@ void psikyo_state::init_s1945bl()
 {
 	m_ka302c_banking = 1;
 
-	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x30000, 0x10000);
+	m_okibank->configure_entries(0, 5, memregion("oki")->base() + 0x30000, 0x10000);
 	m_okibank->set_entry(0);
 }
 
