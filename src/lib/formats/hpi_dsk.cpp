@@ -72,6 +72,8 @@ constexpr unsigned HPI_RED_IMAGE_SIZE = HPI_RED_TRACKS * HPI_HEADS * HPI_SECTORS
 
 hpi_format::hpi_format()
 {
+	(void)HPI_IMAGE_SIZE;
+	(void)HPI_RED_IMAGE_SIZE;
 }
 
 int hpi_format::identify(io_generic *io, uint32_t form_factor)
