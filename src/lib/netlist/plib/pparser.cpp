@@ -318,7 +318,7 @@ void ppreprocessor::error(const pstring &err)
 
 int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
 {
-	int val;
+	int val = 0;
 	pstring tok=sexpr[start];
 	if (tok == "(")
 	{

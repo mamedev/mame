@@ -9,6 +9,11 @@
 #ifndef NLBASE_H_
 #define NLBASE_H_
 
+#ifdef NL_PROHIBIT_BASEH_INCLUDE
+#error "nl_base.h included. Please correct."
+#endif
+
+#include "netlist_types.h"
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "plib/palloc.h" // owned_ptr
@@ -19,21 +24,6 @@
 #include "plib/ppmf.h"
 
 #include <unordered_map>
-
-#ifdef NL_PROHIBIT_BASEH_INCLUDE
-#error "nl_base.h included. Please correct."
-#endif
-
-// ----------------------------------------------------------------------------------------
-// Type definitions
-// ----------------------------------------------------------------------------------------
-
-/*! @brief netlist_sig_t is the type used for logic signals.
- *
- *  This may be any of bool, uint8_t, uint16_t, uin32_t and uint64_t.
- *  The choice has little to no impact on performance.
- */
-using netlist_sig_t = std::uint32_t;
 
 //============================================================
 //  MACROS / New Syntax
@@ -221,6 +211,7 @@ namespace netlist
 	class netlist_t;
 	class core_device_t;
 	class device_t;
+	class callbacks_t;
 
 	//============================================================
 	//  Exceptions
@@ -1115,7 +1106,7 @@ namespace netlist
 			update();
 		}
 
-		plib::plog_base<netlist_t, NL_DEBUG> &log();
+		log_type & log();
 
 	public:
 		virtual void timestep(const nl_double st) { plib::unused_var(st); }
@@ -1178,6 +1169,7 @@ namespace netlist
 
 	// -----------------------------------------------------------------------------
 	// nld_base_dummy : basis for dummy devices
+	// FIXME: this is not the right place to define this
 	// -----------------------------------------------------------------------------
 
 	NETLIB_OBJECT(base_dummy)
@@ -1223,16 +1215,8 @@ namespace netlist
 	{
 	public:
 
-		explicit netlist_t(const pstring &aname);
-		virtual ~netlist_t();
-
-		/**
-		 * @brief Load base libraries for diodes, transistors ...
-		 *
-		 * This must be called after netlist_t is created.
-		 *
-		 */
-		void load_base_libraries();
+		explicit netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
+		~netlist_t();
 
 		/* run functions */
 
@@ -1292,8 +1276,9 @@ namespace netlist
 		/* logging and name */
 
 		pstring name() const { return m_name; }
-		plib::plog_base<netlist_t, NL_DEBUG> &log() { return m_log; }
-		const plib::plog_base<netlist_t, NL_DEBUG> &log() const { return m_log; }
+
+		log_type & log() { return m_log; }
+		const log_type &log() const { return m_log; }
 
 		/* state related */
 
@@ -1319,9 +1304,6 @@ namespace netlist
 		// FIXME: sort rebuild_lists out
 		void rebuild_lists(); /* must be called after post_load ! */
 
-		/* logging callback */
-		virtual void vlog(const plib::plog_level &l, const pstring &ls) const = 0;
-
 	protected:
 
 		void print_stats() const;
@@ -1345,8 +1327,6 @@ namespace netlist
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
 		pstring                             m_name;
-		std::unique_ptr<setup_t>            m_setup;
-		plib::plog_base<netlist_t, NL_DEBUG>           m_log;
 		std::unique_ptr<plib::dynlib>       m_lib; // external lib needs to be loaded as long as netlist exists
 
 		plib::state_manager_t               m_state;
@@ -1356,6 +1336,10 @@ namespace netlist
 		nperfcount_t<NL_KEEP_STATISTICS>    m_perf_out_processed;
 
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
+
+		std::unique_ptr<callbacks_t> m_callbacks;
+		log_type							 m_log;
+		std::unique_ptr<setup_t>             m_setup;
 };
 
 	// -----------------------------------------------------------------------------

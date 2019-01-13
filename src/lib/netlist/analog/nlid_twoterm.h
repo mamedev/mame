@@ -48,6 +48,20 @@ namespace netlist
 // nld_twoterm
 // -----------------------------------------------------------------------------
 
+		template <class C>
+		inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+		{
+			core_device_t *h = dynamic_cast<core_device_t *>(&d1);
+			return b ? *h : d2;
+		}
+		template<>
+		inline core_device_t &bselect(bool b, netlist_t &d1, core_device_t &d2)
+		{
+			if (b)
+				throw nl_exception("bselect with netlist and b==true");
+			return d2;
+		}
+
 NETLIB_OBJECT(twoterm)
 {
 	NETLIB_CONSTRUCTOR_EX(twoterm, bool terminals_owned = false)
@@ -87,12 +101,6 @@ public:
 	}
 
 private:
-	template <class C>
-	static core_device_t &bselect(bool b, C &d1, core_device_t &d2)
-	{
-		core_device_t *h = dynamic_cast<core_device_t *>(&d1);
-		return b ? *h : d2;
-	}
 };
 
 

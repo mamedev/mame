@@ -132,22 +132,35 @@ std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &fil
 	return std::unique_ptr<plib::pistream>(nullptr);
 }
 
+class netlist_tool_callbacks_t : public netlist::callbacks_t
+{
+public:
+	netlist_tool_callbacks_t(tool_app_t &app)
+	: netlist::callbacks_t()
+	, m_app(app)
+	{ }
+
+	void vlog(const plib::plog_level &l, const pstring &ls) const override;
+
+private:
+	tool_app_t &m_app;
+};
+
 class netlist_tool_t : public netlist::netlist_t
 {
 public:
 
 	netlist_tool_t(tool_app_t &app, const pstring &aname)
-	: netlist::netlist_t(aname), m_app(app)
+	: netlist::netlist_t(aname, plib::make_unique<netlist_tool_callbacks_t>(app))
 	{
 	}
 
-	virtual ~netlist_tool_t() override
+	~netlist_tool_t()
 	{
 	}
 
 	void init()
 	{
-		load_base_libraries();
 	}
 
 	void read_netlist(const pstring &filename, const pstring &name,
@@ -234,13 +247,10 @@ public:
 
 protected:
 
-	void vlog(const plib::plog_level &l, const pstring &ls) const override;
-
 private:
-	tool_app_t &m_app;
 };
 
-void netlist_tool_t::vlog(const plib::plog_level &l, const pstring &ls) const
+void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls) const
 {
 	pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
 	// FIXME: ...

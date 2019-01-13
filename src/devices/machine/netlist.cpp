@@ -49,20 +49,15 @@ DEFINE_DEVICE_TYPE(NETLIST_STREAM_OUTPUT, netlist_mame_stream_output_device, "nl
 // Special netlist extension devices  ....
 // ----------------------------------------------------------------------------------------
 
-class netlist_mame_device::netlist_mame_t : public netlist::netlist_t
+class netlist_mame_device::netlist_mame_callbacks_t : public netlist::callbacks_t
 {
 public:
 
-	netlist_mame_t(netlist_mame_device &parent, const pstring &aname)
-		: netlist::netlist_t(aname)
+	netlist_mame_callbacks_t(netlist_mame_device &parent)
+		: netlist::callbacks_t()
 		, m_parent(parent)
 	{
 	}
-
-	running_machine &machine() { return m_parent.machine(); }
-
-
-	netlist_mame_device &parent() { return m_parent; }
 
 protected:
 	void vlog(const plib::plog_level &l, const pstring &ls) const override
@@ -89,6 +84,24 @@ protected:
 			throw error;
 		}
 	}
+
+private:
+	netlist_mame_device &m_parent;
+};
+
+
+class netlist_mame_device::netlist_mame_t : public netlist::netlist_t
+{
+public:
+
+	netlist_mame_t(netlist_mame_device &parent, const pstring &aname)
+		: netlist::netlist_t(aname, plib::make_unique<netlist_mame_device::netlist_mame_callbacks_t>(parent))
+		, m_parent(parent)
+	{
+	}
+
+	running_machine &machine() { return m_parent.machine(); }
+	netlist_mame_device &parent() { return m_parent; }
 
 private:
 	netlist_mame_device &m_parent;
@@ -173,7 +186,7 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		netlist_sig_t cur = m_in();
+		netlist::netlist_sig_t cur = m_in();
 
 		// FIXME: make this a parameter
 		// avoid calls due to noise
@@ -190,7 +203,7 @@ private:
 	netlist::logic_input_t m_in;
 	netlist_mame_logic_output_device::output_delegate m_callback;
 	netlist_mame_cpu_device *m_cpu_device;
-	netlist::state_var<netlist_sig_t> m_last;
+	netlist::state_var<netlist::netlist_sig_t> m_last;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -505,7 +518,7 @@ void netlist_mame_cpu_device::state_string_export(const device_state_entry &entr
 		if (entry.index() & 1)
 			str = string_format("%10.6f", *((double *)entry.dataptr()));
 		else
-			str = string_format("%d", *((netlist_sig_t *)entry.dataptr()));
+			str = string_format("%d", *((netlist::netlist_sig_t *)entry.dataptr()));
 	}
 }
 
@@ -836,8 +849,6 @@ void netlist_mame_device::device_start()
 	//printf("clock is %d\n", clock());
 
 	m_netlist = global_alloc(netlist_mame_t(*this, "netlist"));
-
-	m_netlist->load_base_libraries();
 
 	// register additional devices
 

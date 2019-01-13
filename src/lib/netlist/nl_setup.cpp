@@ -768,11 +768,11 @@ void setup_t::start_devices()
 	}
 }
 
-plib::plog_base<netlist_t, NL_DEBUG> &setup_t::log()
+log_type &setup_t::log()
 {
 	return netlist().log();
 }
-const plib::plog_base<netlist_t, NL_DEBUG> &setup_t::log() const
+const log_type &setup_t::log() const
 {
 	return netlist().log();
 }

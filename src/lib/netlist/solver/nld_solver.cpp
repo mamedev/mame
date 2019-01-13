@@ -104,7 +104,7 @@ NETLIB_UPDATE(solver)
 	if (nthreads > 1 && solvers.size() > 1)
 	{
 		plib::omp::set_num_threads(nthreads);
-		plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(), [this, &solvers](std::size_t i)
+		plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(), [&solvers](std::size_t i)
 			{
 				const netlist_time ts = solvers[i]->solve();
 				plib::unused_var(ts);

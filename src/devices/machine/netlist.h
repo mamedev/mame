@@ -99,6 +99,7 @@ class netlist_mame_device : public device_t
 {
 public:
 	class netlist_mame_t;
+	class netlist_mame_callbacks_t;
 
 	// construction/destruction
 	netlist_mame_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

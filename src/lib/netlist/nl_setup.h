@@ -288,8 +288,8 @@ namespace netlist
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
 
-		plib::plog_base<netlist_t, NL_DEBUG> &log();
-		const plib::plog_base<netlist_t, NL_DEBUG> &log() const;
+		log_type &log();
+		const log_type &log() const;
 
 		//std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 		std::unordered_map<pstring, factory::element_t *> m_device_factory;

@@ -239,31 +239,28 @@ detail::terminal_type detail::core_terminal_t::type() const
 // netlist_t
 // ----------------------------------------------------------------------------------------
 
-netlist_t::netlist_t(const pstring &aname)
+netlist_t::netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks)
 	: m_time(netlist_time::zero())
 	, m_queue(*this)
 	, m_mainclock(nullptr)
 	, m_solver(nullptr)
 	, m_params(nullptr)
 	, m_name(aname)
-	, m_log(*this)
 	, m_lib(nullptr)
 	, m_state()
+	, m_callbacks(std::move(callbacks))	// Order is important here
+	, m_log(*m_callbacks)
 {
 	state().save_item(this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "m_queue");
 	state().save_item(this, m_time, "m_time");
 	m_setup = plib::make_unique<setup_t>(*this);
+	NETLIST_NAME(base)(*m_setup);
 }
 
 netlist_t::~netlist_t()
 {
 	m_nets.clear();
 	m_devices.clear();
-}
-
-void netlist_t::load_base_libraries()
-{
-	NETLIST_NAME(base)(*m_setup);
 }
 
 nl_double netlist_t::gmin() const NL_NOEXCEPT
@@ -694,7 +691,7 @@ void core_device_t::set_default_delegate(detail::core_terminal_t &term)
 		term.m_delegate.set(&core_device_t::update, this);
 }
 
-plib::plog_base<netlist_t, NL_DEBUG> &core_device_t::log()
+log_type & core_device_t::log()
 {
 	return netlist().log();
 }
