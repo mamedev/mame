@@ -5,11 +5,13 @@
 Track & Field Challenge TV Game
 https://www.youtube.com/watch?v=wjn1lLylqog
 
-HELP!  what architecture is this?  CPU type doesn't seem obvious
+HELP!  what type of CPU / SoC is this? seems to be G65816 derived?
 
 */
 
 #include "emu.h"
+
+#include "cpu/g65816/g65816.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -20,6 +22,8 @@ class trkfldch_state : public driver_device
 public:
 	trkfldch_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
@@ -32,6 +36,8 @@ protected:
 
 private:
 
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -49,7 +55,7 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 
 void trkfldch_state::trkfldch_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x0000);
 }
 
 static INPUT_PORTS_START( trkfldch )
@@ -77,22 +83,24 @@ void trkfldch_state::machine_start()
 
 void trkfldch_state::machine_reset()
 {
+	m_maincpu->set_state_int(1, 0xa2ed); // possible irq vector pointer at 0x0f,0x0e, THIS IS NOT THE BOOT CODE!
 }
 
 MACHINE_CONFIG_START(trkfldch_state::trkfldch)
 	/* basic machine hardware */
-//	MCFG_DEVICE_ADD("maincpu", Z80,8000000)
-//	MCFG_DEVICE_PROGRAM_MAP(trkfldch_map)
-//	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", trkfldch_state,  irq0_line_hold)
+	G65816(config, m_maincpu, 20000000);
+	//m_maincpu->set_addrmap(AS_DATA, &tv965_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trkfldch_state::trkfldch_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(trkfldch_state, screen_update_trkfldch)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(trkfldch_state::screen_update_trkfldch));
+	m_screen->set_palette("palette");
+
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_trkfldch); // dummy
 	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG); // dummy
