@@ -1738,9 +1738,11 @@ void model1_state::vf(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vf_outputs_w));
 }
 
-void model1_state::vr(machine_config &config)
-{
+MACHINE_CONFIG_START(model1_state::vr)
 	model1(config);
+
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model1_comm_mem)
 
 	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
 	ioboard.an_callback<0>().set_ioport("WHEEL");
@@ -1749,11 +1751,13 @@ void model1_state::vr(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
-}
+MACHINE_CONFIG_END
 
-void model1_state::vformula(machine_config &config)
-{
+MACHINE_CONFIG_START(model1_state::vformula)
 	model1(config);
+	
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model1_comm_mem)
 
 	model1io_device &ioboard(*subdevice<model1io_device>("ioboard"));
 	ioboard.an_callback<0>().set_ioport("WHEEL");
@@ -1762,7 +1766,7 @@ void model1_state::vformula(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
-}
+MACHINE_CONFIG_END
 
 void model1_state::swa(machine_config &config)
 {
