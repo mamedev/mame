@@ -3622,6 +3622,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/inteladv.cpp",
 	MAME_DIR .. "src/mame/drivers/vsmile.cpp",
 	MAME_DIR .. "src/mame/drivers/clickstart.cpp",
+	MAME_DIR .. "src/mame/drivers/storio.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "wang")
