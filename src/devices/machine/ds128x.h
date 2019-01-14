@@ -5,11 +5,6 @@
 
 #include "mc146818.h"
 
-#define MCFG_DS12885_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DS12885, XTAL(32'768))
-
-#define MCFG_DS12885EXT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DS12885EXT, XTAL(32'768))
 
 // ======================> ds12885_device
 

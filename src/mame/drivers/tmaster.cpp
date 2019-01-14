@@ -401,10 +401,11 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tmaster_state::tmds1204)
+void tmaster_state::tmds1204(machine_config &config)
+{
 	tm(config);
-	MCFG_DS1204_ADD("ds1204")
-MACHINE_CONFIG_END
+	DS1204(config, "ds1204", 0);
+}
 
 /***************************************************************************
 

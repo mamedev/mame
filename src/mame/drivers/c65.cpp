@@ -691,19 +691,19 @@ MACHINE_CONFIG_START(c65_state::c65)
 	MCFG_DEVICE_PROGRAM_MAP(c65_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
 
-	MCFG_DEVICE_ADD("cia_0", MOS6526, MAIN_CLOCK)
-	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c65_state, cia0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c65_state, cia0_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c65_state, cia0_porta_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c65_state, cia0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c65_state, cia0_portb_w))
+	MOS6526(config, m_cia0, MAIN_CLOCK);
+	m_cia0->set_tod_clock(60);
+	m_cia0->irq_wr_callback().set(FUNC(c65_state::cia0_irq));
+	m_cia0->pa_rd_callback().set(FUNC(c65_state::cia0_porta_r));
+	m_cia0->pa_wr_callback().set(FUNC(c65_state::cia0_porta_w));
+	m_cia0->pb_rd_callback().set(FUNC(c65_state::cia0_portb_r));
+	m_cia0->pb_wr_callback().set(FUNC(c65_state::cia0_portb_w));
 
-	MCFG_DEVICE_ADD("cia_1", MOS6526, MAIN_CLOCK)
-	MCFG_MOS6526_TOD(60)
-//  MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c65_state, c65_cia1_interrupt))
-//  MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c65_state, c65_cia1_port_a_r))
-//  MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c65_state, c65_cia1_port_a_w))
+	MOS6526(config, m_cia1, MAIN_CLOCK);
+	m_cia1->set_tod_clock(60);
+//  m_cia1->irq_wr_callback().set(FUNC(c65_state::c65_cia1_interrupt));
+//  m_cia1->pa_rd_callback().set(FUNC(c65_state::c65_cia1_port_a_r));
+//  m_cia1->pa_wr_callback().set(FUNC(c65_state::c65_cia1_port_a_w));
 
 
 	/* video hardware */

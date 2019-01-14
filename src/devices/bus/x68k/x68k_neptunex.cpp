@@ -17,12 +17,13 @@
 DEFINE_DEVICE_TYPE(X68K_NEPTUNEX, x68k_neptune_device, "x68k_neptunex", "Neptune-X")
 
 // device machine config
-MACHINE_CONFIG_START(x68k_neptune_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
-	MCFG_DP8390D_IRQ_CB(WRITELINE(*this, x68k_neptune_device, x68k_neptune_irq_w))
-	MCFG_DP8390D_MEM_READ_CB(READ8(*this, x68k_neptune_device, x68k_neptune_mem_read))
-	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(*this, x68k_neptune_device, x68k_neptune_mem_write))
-MACHINE_CONFIG_END
+void x68k_neptune_device::device_add_mconfig(machine_config &config)
+{
+	DP8390D(config, m_dp8390, 0);
+	m_dp8390->irq_callback().set(FUNC(x68k_neptune_device::x68k_neptune_irq_w));
+	m_dp8390->mem_read_callback().set(FUNC(x68k_neptune_device::x68k_neptune_mem_read));
+	m_dp8390->mem_write_callback().set(FUNC(x68k_neptune_device::x68k_neptune_mem_write));
+}
 
 x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X68K_NEPTUNEX, tag, owner, clock)

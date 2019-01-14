@@ -295,9 +295,10 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	M24_KEYBOARD(config, m_keyboard, 0);
 	m_keyboard->out_data_handler().set(FUNC(m24_state::kbcin_w));
 
-	MCFG_DEVICE_ADD("mm58174an", MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // ?
-	MCFG_MM58274C_DAY1(1)   // ?
+	mm58274c_device &mm58174an(MM58274C(config, "mm58174an", 0));
+	// this is all guess
+	mm58174an.set_mode24(1); // ?
+	mm58174an.set_day1(1);   // ?
 
 	M24_Z8000(config, m_z8000_apb, 0);
 	m_z8000_apb->halt_callback().set(FUNC(m24_state::halt_i86_w));
