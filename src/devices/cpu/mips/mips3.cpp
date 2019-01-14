@@ -166,6 +166,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_dword_xor(data_bits == 64 ? (m_bigendian ? DWORD_XOR_BE(0) : DWORD_XOR_LE(0)) : 0)
 	, c_icache_size(0)
 	, c_dcache_size(0)
+	, c_secondary_cache_line_size(0)
 	, m_fastram_select(0)
 	, m_debugger_temp(0)
 	, m_drc_cache(DRC_CACHE_SIZE + sizeof(internal_mips3_state) + 0x800000)
