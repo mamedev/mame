@@ -49,7 +49,7 @@
 	<software name="scoobysp" supported="no">
 		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain)</description>
 		<year>200?</year>
-		<publisher>VTect</publisher>
+		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-280422 - scooby-doo-scooby-doo y la momia (sp).bin" size="0x4200000" crc="cd1ee924" sha1="83e561af5910dc547829d54c84fbef60350f4f54" offset="0" />
