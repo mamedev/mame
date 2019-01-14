@@ -1046,7 +1046,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	case 0x31: // UART Status
-		LOGMASKED(LOG_UART, "io_r: UART Status = %04x\n", val);
+		LOGMASKED(LOG_UART, "%s: io_r: UART Status = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x36: // UART RX Data
@@ -1089,7 +1089,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 	case 0x37: // UART Rx FIFO Control
 		val &= ~0x0070;
 		val |= (m_uart_rx_available ? 7 : 0) << 4;
-		LOGMASKED(LOG_UART, "io_r: UART Rx FIFO Control = %04x\n", val);
+		LOGMASKED(LOG_UART, "io_r: UART Rx FIFO Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x51: // unknown, polled by ClickStart cartridges ( clikstrt )
@@ -1180,7 +1180,7 @@ WRITE16_MEMBER(spg28x_device::io_w)
 	{
 		m_io_regs[offset] = data;
 		m_uart_baud_rate = 27000000 / (0x10000 - m_io_regs[0x33]);
-		LOGMASKED(LOG_UART, "io_w: UART Baud Rate scaler = %04x (%d baud)\n", data, m_uart_baud_rate);
+		LOGMASKED(LOG_UART, "%s: io_w: UART Baud Rate scaler = %04x (%d baud)\n", machine().describe_context(), data, m_uart_baud_rate);
 	}
 	else
 	{
@@ -1435,8 +1435,9 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	case 0x30: // UART Control
 	{
 		static const char* const s_9th_bit[4] = { "0", "1", "Odd", "Even" };
-		LOGMASKED(LOG_UART, "io_w: UART Control = %04x (TxEn:%d, RxEn:%d, Bits:%d, MultiProc:%d, 9thBit:%s, TxIntEn:%d, RxIntEn:%d\n", data
-			, BIT(data, 7), BIT(data, 6), BIT(data, 5) ? 9 : 8, BIT(data, 4), s_9th_bit[(data >> 2) & 3], BIT(data, 1), BIT(data, 0));
+		LOGMASKED(LOG_UART, "%s: io_w: UART Control = %04x (TxEn:%d, RxEn:%d, Bits:%d, MultiProc:%d, 9thBit:%s, TxIntEn:%d, RxIntEn:%d\n",
+			machine().describe_context(), data, BIT(data, 7), BIT(data, 6), BIT(data, 5) ? 9 : 8, BIT(data, 4), s_9th_bit[(data >> 2) & 3],
+			BIT(data, 1), BIT(data, 0));
 		const uint16_t changed = m_io_regs[offset] ^ data;
 		m_io_regs[offset] = data;
 		if (!BIT(data, 6))
@@ -1460,7 +1461,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	}
 
 	case 0x31: // UART Status
-		LOGMASKED(LOG_UART, "io_w: UART Status = %04x\n", data);
+		LOGMASKED(LOG_UART, "%s: io_w: UART Status = %04x\n", machine().describe_context(), data);
 		if (BIT(data, 0))
 		{
 			m_io_regs[0x31] &= ~1;
@@ -1485,13 +1486,13 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	{
 		m_io_regs[offset] = data;
 		const uint32_t divisor = 16 * (0x10000 - ((m_io_regs[0x34] << 8) | m_io_regs[0x33]));
-		LOGMASKED(LOG_UART, "io_w: UART Baud Rate (%s byte): Baud rate = %d\n", offset == 0x33 ? "low" : "high", 27000000 / divisor);
+		LOGMASKED(LOG_UART, "%s: io_w: UART Baud Rate (%s byte): Baud rate = %d\n", offset == 0x33 ? "low" : "high", machine().describe_context(), 27000000 / divisor);
 		m_uart_baud_rate = 27000000 / divisor;
 		break;
 	}
 
 	case 0x35: // UART TX Data
-		LOGMASKED(LOG_UART, "io_w: UART Tx Data = %02x\n", data & 0x00ff);
+		LOGMASKED(LOG_UART, "%s: io_w: UART Tx Data = %02x\n", machine().describe_context(), data & 0x00ff);
 		m_io_regs[offset] = data;
 		if (BIT(m_io_regs[0x30], 7))
 		{
@@ -1503,12 +1504,12 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		break;
 
 	case 0x36: // UART RX Data
-		LOGMASKED(LOG_UART, "io_w: UART Rx Data (read-only) = %04x\n", data);
+		LOGMASKED(LOG_UART, "%s: io_w: UART Rx Data (read-only) = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x37: // UART Rx FIFO Control
-		LOGMASKED(LOG_UART, "io_w: UART Rx FIFO Control = %04x (Reset:%d, Overrun:%d, Underrun:%d, Count:%d, Threshold:%d)\n", data
-			, BIT(data, 15), BIT(data, 14), BIT(data, 13), (data >> 4) & 7, data & 7);
+		LOGMASKED(LOG_UART, "%s: io_w: UART Rx FIFO Control = %04x (Reset:%d, Overrun:%d, Underrun:%d, Count:%d, Threshold:%d)\n",
+			machine().describe_context(), data, BIT(data, 15), BIT(data, 14), BIT(data, 13), (data >> 4) & 7, data & 7);
 		if (data & 0x8000)
 		{
 			m_uart_rx_available = false;

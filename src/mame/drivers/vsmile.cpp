@@ -157,7 +157,6 @@ void vsmile_state::uart_tx_fifo_push(uint8_t data)
 
 	m_uart_tx_fifo[m_uart_tx_fifo_end] = data;
 	m_uart_tx_fifo_count++;
-	//printf("Pushing %02x into FIFO at %d, count now %d\n", data, m_uart_tx_fifo_end, m_uart_tx_fifo_count);
 	m_uart_tx_fifo_end = (m_uart_tx_fifo_end + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
 }
 
@@ -174,7 +173,6 @@ void vsmile_state::handle_uart_tx()
 		return;
 	}
 
-	//printf("Transmitting: %02x\n", m_uart_tx_fifo[m_uart_tx_fifo_start]);
 	m_spg->uart_rx(m_uart_tx_fifo[m_uart_tx_fifo_start]);
 	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
 	m_uart_tx_fifo_count--;
@@ -279,28 +277,12 @@ WRITE16_MEMBER(vsmile_state::portc_w)
 
 WRITE8_MEMBER(vsmile_state::uart_rx)
 {
-	//printf("Receiving: %02x\n", data);
-	if ((data >> 4) == 7)
+	if ((data >> 4) == 7 || (data >> 4) == 11)
 	{
-		if (m_ctrl_probe_count >= 1)
-		{
-			if (m_ctrl_probe_count == 2)
-			{
-				m_ctrl_probe_history[0] = m_ctrl_probe_history[1];
-			}
-			else
-			{
-				m_ctrl_probe_count++;
-			}
-			m_ctrl_probe_history[1] = data;
-			const uint8_t response = ((m_ctrl_probe_history[0] + m_ctrl_probe_history[1] + 0x0f) & 0x0f) ^ 0x05;
-			uart_tx_fifo_push(0xb0 | response);
-		}
-		else
-		{
-			m_ctrl_probe_history[0] = data;
-			m_ctrl_probe_count++;
-		}
+		m_ctrl_probe_history[0] = m_ctrl_probe_history[1];
+		m_ctrl_probe_history[1] = data;
+		const uint8_t response = ((m_ctrl_probe_history[0] + m_ctrl_probe_history[1] + 0x0f) & 0x0f) ^ 0x05;
+		uart_tx_fifo_push(0xb0 | response);
 	}
 }
 
@@ -398,10 +380,15 @@ INPUT_CHANGED_MEMBER(vsmile_state::pad_color_changed)
 INPUT_CHANGED_MEMBER(vsmile_state::pad_button_changed)
 {
 	const uint8_t value = m_io_buttons->read();
-	if (BIT(value, newval))
-		uart_tx_fifo_push(0xa1 + newval);
+	const size_t bit = reinterpret_cast<size_t>(param);
+	if (BIT(value, bit))
+	{
+		uart_tx_fifo_push(0xa1 + (uint8_t)bit);
+	}
 	else
+	{
 		uart_tx_fifo_push(0xa0);
+	}
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(vsmile_state, cart)
