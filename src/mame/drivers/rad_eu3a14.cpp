@@ -11,15 +11,15 @@
     Known to be on this hardware
 
     name                          PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
-    Golden Tee Golf Home Edition                                                                      ELAN EU3A14   (developed by FarSight Studios)
-    Connectv Football                                                                                 ELAN EU3A14   (developed by Medialink)
-    Play TV Basketball            75029       x16         48          4MB             no              ELAN EU3A14
+    Golden Tee Golf Home Edition  ?           x16         48          4MB             no              ELAN EU3A14   (developed by FarSight Studios)
+    Connectv Football             ?           x16         48          4MB             no              ELAN EU3A14   (developed by Medialink)
     Baseball 3                    ?           x16         48          4MB             no              ELAN EU3A14   (developed by FarSight Studios)
     Huntin’3                      ?           x16         48          4MB             no              Elan ?
     --------------
 	Also on this hardware
     --------------
 	Real Swing Golf               74037       x16         48          not dumped      no              ELAN EU3A14
+    Play TV Basketball            75029       x16         48          not dumped      no              ELAN EU3A14
 
     In many ways this is similar to the rad_eu3a05.cpp hardware
     but the video system has changed, here the sprites are more traditional non-tile based, rather
@@ -71,6 +71,7 @@ public:
 	radica_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainregion(*this, "maincpu"),
 		m_palram(*this, "palram"),
 		m_scrollregs(*this, "scrollregs"),
 		m_tilecfg(*this, "tilecfg"),
@@ -134,6 +135,7 @@ private:
 	double hue2rgb(double p, double q, double t);
 
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<uint8_t> m_mainregion;
 	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_scrollregs;
 	required_shared_ptr<uint8_t> m_tilecfg;
@@ -153,6 +155,7 @@ private:
 	int m_pagewidth;
 	int m_pageheight;
 
+	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxno, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size);
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -213,51 +216,109 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
+void radica_eu3a14_state::draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxno, int tileno, int base, int palette, int flipx, int flipy, int xpos, int ypos, int transpen, int size)
+{
+	int bppdiv = 1;
+	int baseaddr = base * 256;
+
+	switch (gfxno)
+	{
+	case 0x03: bppdiv = 1; baseaddr += tileno * 256; break; // 16x16 8bpp
+	case 0x04: bppdiv = 2; baseaddr += tileno * 128; break; // 16x16 4bpp
+	case 0x05: bppdiv = 1; baseaddr += tileno * 64;  break; // 8x8 8bpp
+	case 0x06: bppdiv = 2; baseaddr += tileno * 64;  break; // 8x8 4bpp
+	default: break;
+	}
+	const uint8_t *gfxdata = &m_mainregion[baseaddr & 0x3fffff];
+
+	int xstride = size / bppdiv;
+
+	int count = 0;
+	for (int y = 0; y < size; y++)
+	{
+		int realy = ypos + y;
+		uint16_t* dst = &bitmap.pix16(ypos + y);
+
+		for (int x = 0; x < xstride; x++)
+		{
+			int pix = gfxdata[count];
+
+			if (realy >= cliprect.min_y && realy <= cliprect.max_y)
+			{
+				if (bppdiv == 1) // 8bpp
+				{
+					int realx = x + xpos;
+					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+					{
+						if (pix)
+							dst[realx] = pix;
+					}
+				}
+				else if (bppdiv == 2) // 4bpp
+				{
+					int realx = (x * 2) + xpos;
+					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+					{
+						if (pix & 0xf0)
+							dst[realx] = (pix & 0xf0) >> 4;
+					}
+
+					realx++;
+
+					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+					{
+						if (pix & 0x0f)
+							dst[realx] = pix & 0x0f;
+					}
+				}
+			}
+			count++;
+		}
+	}
+}
+
 void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size)
 {
-	gfx_element *gfx;
+	int gfxno = 0;
 
 	int pagesize = m_pagewidth * m_pageheight * 2;
 
 	int base = (m_tilebase[1] << 8) | m_tilebase[0];
 	if (m_tilecfg[2] & 0x04) // 4bpp selection
 	{
-		gfx = m_gfxdecode->gfx(4); // 16x16 4bpp
-		base <<= 1;
+		gfxno = 4; // 16x16 4bpp
 
 		if (size == 8)
 		{
-			gfx = m_gfxdecode->gfx(6); // 8x8 4bpp
-			base <<= 2;
+			gfxno = 6; // 8x8 4bpp
 		}
 	}
 	else // 8bpp selection
 	{
-		gfx = m_gfxdecode->gfx(3); // 16x16 8bpp
+		gfxno = 3; // 16x16 8bpp
 
 		if (size == 8)
 		{
-			gfx = m_gfxdecode->gfx(5); // 8x8 8bpp
-			base <<= 2;
+			gfxno = 5; // 8x8 8bpp
 		}
-
 	}
 
 	int xdraw = xbase;
 	int ydraw = ybase;
 	int count = 0;
 
-	for (int i = m_tilerambase+pagesize*which; i < m_tilerambase+pagesize*(which+1); i+=2)
+	for (int i = m_tilerambase + pagesize * which; i < m_tilerambase + pagesize * (which + 1); i += 2)
 	{
-		int tile = m_mainram[i+0] | (m_mainram[i+1] << 8);
+		int tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);
 
-		gfx->transpen(bitmap, cliprect, tile+base, 0, 0, 0, xdraw, ydraw, 0);
-		xdraw+=size;
+		draw_tile(bitmap, cliprect, gfxno, tile, base, 0, 0, 0, xdraw, ydraw, 0, size);
+
+		xdraw += size;
 
 		count++;
 		if (((count % m_pagewidth) == 0))
 		{
-			xdraw -= size*m_pagewidth;
+			xdraw -= size * m_pagewidth;
 			ydraw += size;
 		}
 	}
