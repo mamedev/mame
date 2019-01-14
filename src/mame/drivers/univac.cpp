@@ -311,7 +311,10 @@ WRITE_LINE_MEMBER(univac_state::alarm_enable_w)
 {
 	m_alarm_enable = state;
 	if (!state)
+	{
+		m_alarm_toggle = false;
 		m_alarm->level_w(0);
+	}
 }
 
 WRITE_LINE_MEMBER(univac_state::sio_loopback_w)
