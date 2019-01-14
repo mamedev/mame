@@ -188,7 +188,6 @@ uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				*p++ = bg;
 			}
 		}
-		ma += 160;
 	}
 	return 0;
 }

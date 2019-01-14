@@ -132,14 +132,6 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 		else
 			return 0;
 	}
-
-	if (retVal == 0)
-	{
-		m_prev_key = 0;
-		m_count_key = 0;
-	}
-
-	return retVal;
 }
 
 WRITE8_MEMBER(bob85_state::bob85_7seg_w)
