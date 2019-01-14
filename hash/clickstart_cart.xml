@@ -118,7 +118,7 @@
 	</software>
 
 	<software name="nihaokailan" supported="no">
-		<description>Nickelodeon ni hao, lai-lan (UK)</description>
+		<description>Nickelodeon Ni Hao, Kai-Lan (UK)</description>
 		<year>2009</year>
 		<publisher>LeapFrog / VIACOM</publisher>
 		<part name="cart" interface="clickstart_cart">
