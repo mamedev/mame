@@ -15,6 +15,8 @@
 #include "ui/selmenu.h"
 #include "ui/utils.h"
 
+#include <functional>
+
 
 class media_auditor;
 
@@ -37,15 +39,14 @@ private:
 		CONF_PLUGINS,
 	};
 
-	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	static bool first_start;
-	static int m_isabios;
+	class persistent_data;
 
-	static std::vector<const game_driver *> m_sortedlist;
-	std::vector<ui_system_info> m_availsortedlist;
-	std::vector<ui_system_info> m_displaylist;
+	std::vector<std::reference_wrapper<ui_system_info const> > m_displaylist;
 
-	const game_driver *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	static persistent_data s_persistent_data;
+	static bool s_first_start;
+
+	std::vector<std::pair<double, std::reference_wrapper<ui_system_info const> > > m_searchlist;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
@@ -75,7 +76,6 @@ private:
 
 	bool isfavorite() const;
 	void populate_search();
-	void init_sorted_list();
 	bool load_available_machines();
 	void load_custom_filters();
 

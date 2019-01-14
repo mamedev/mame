@@ -9,6 +9,12 @@
 #ifndef NLBASE_H_
 #define NLBASE_H_
 
+#ifdef NL_PROHIBIT_BASEH_INCLUDE
+#error "nl_base.h included. Please correct."
+#endif
+
+#include "netlist_types.h"
+#include "nl_errstr.h"
 #include "nl_lists.h"
 #include "nl_time.h"
 #include "plib/palloc.h" // owned_ptr
@@ -19,21 +25,6 @@
 #include "plib/ppmf.h"
 
 #include <unordered_map>
-
-#ifdef NL_PROHIBIT_BASEH_INCLUDE
-#error "nl_base.h included. Please correct."
-#endif
-
-// ----------------------------------------------------------------------------------------
-// Type definitions
-// ----------------------------------------------------------------------------------------
-
-/*! @brief netlist_sig_t is the type used for logic signals.
- *
- *  This may be any of bool, uint8_t, uint16_t, uin32_t and uint64_t.
- *  The choice has little to no impact on performance.
- */
-using netlist_sig_t = std::uint32_t;
 
 //============================================================
 //  MACROS / New Syntax
@@ -221,6 +212,7 @@ namespace netlist
 	class netlist_t;
 	class core_device_t;
 	class device_t;
+	class callbacks_t;
 
 	//============================================================
 	//  Exceptions
@@ -915,6 +907,8 @@ namespace netlist
 
 		void update_param();
 
+		pstring get_initial(const device_t &dev, bool *found);
+
 		template<typename C>
 		void set(C &p, const C v)
 		{
@@ -927,6 +921,30 @@ namespace netlist
 
 	};
 
+	// -----------------------------------------------------------------------------
+	// numeric parameter template
+	// -----------------------------------------------------------------------------
+
+	template <typename T>
+	class param_num_t final: public param_t
+	{
+	public:
+		param_num_t(device_t &device, const pstring &name, const T val);
+		const T &operator()() const NL_NOEXCEPT { return m_param; }
+		void setTo(const T &param) { set(m_param, param); }
+	private:
+		T m_param;
+	};
+
+	/* FIXME: these should go as well */
+	typedef param_num_t<bool> param_logic_t;
+	typedef param_num_t<int> param_int_t;
+	typedef param_num_t<double> param_double_t;
+
+	// -----------------------------------------------------------------------------
+	// pointer parameter
+	// -----------------------------------------------------------------------------
+
 	class param_ptr_t final: public param_t
 	{
 	public:
@@ -937,35 +955,9 @@ namespace netlist
 		std::uint8_t* m_param;
 	};
 
-	class param_logic_t final: public param_t
-	{
-	public:
-		param_logic_t(device_t &device, const pstring &name, const bool val);
-		const bool &operator()() const NL_NOEXCEPT { return m_param; }
-		void setTo(const bool &param) { set(m_param, param); }
-	private:
-		bool m_param;
-	};
-
-	class param_int_t final: public param_t
-	{
-	public:
-		param_int_t(device_t &device, const pstring &name, const int val);
-		const int &operator()() const NL_NOEXCEPT { return m_param; }
-		void setTo(const int &param) { set(m_param, param); }
-	private:
-		int m_param;
-	};
-
-	class param_double_t final: public param_t
-	{
-	public:
-		param_double_t(device_t &device, const pstring &name, const double val);
-		const double &operator()() const NL_NOEXCEPT { return m_param; }
-		void setTo(const double &param) { set(m_param, param); }
-	private:
-		double m_param;
-	};
+	// -----------------------------------------------------------------------------
+	// string parameter
+	// -----------------------------------------------------------------------------
 
 	class param_str_t : public param_t
 	{
@@ -989,6 +981,10 @@ namespace netlist
 	private:
 		pstring m_param;
 	};
+
+	// -----------------------------------------------------------------------------
+	// model parameter
+	// -----------------------------------------------------------------------------
 
 	class param_model_t : public param_str_t
 	{
@@ -1023,15 +1019,21 @@ namespace netlist
 		detail::model_map_t m_map;
 };
 
+	// -----------------------------------------------------------------------------
+	// data parameter
+	// -----------------------------------------------------------------------------
 
 	class param_data_t : public param_str_t
 	{
 	public:
-		param_data_t(device_t &device, const pstring &name);
+		param_data_t(device_t &device, const pstring &name)
+		: param_str_t(device, name, "")
+		{
+		}
 
 		std::unique_ptr<plib::pistream> stream();
 	protected:
-		virtual void changed() override;
+		virtual void changed() override { }
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1115,7 +1117,7 @@ namespace netlist
 			update();
 		}
 
-		plib::plog_base<netlist_t, NL_DEBUG> &log();
+		log_type & log();
 
 	public:
 		virtual void timestep(const nl_double st) { plib::unused_var(st); }
@@ -1144,6 +1146,8 @@ namespace netlist
 		virtual ~device_t() override;
 
 		setup_t &setup();
+		const setup_t &setup() const;
+
 
 		template<class C, typename... Args>
 		void register_sub(const pstring &name, std::unique_ptr<C> &dev, const Args&... args)
@@ -1178,6 +1182,7 @@ namespace netlist
 
 	// -----------------------------------------------------------------------------
 	// nld_base_dummy : basis for dummy devices
+	// FIXME: this is not the right place to define this
 	// -----------------------------------------------------------------------------
 
 	NETLIB_OBJECT(base_dummy)
@@ -1223,16 +1228,8 @@ namespace netlist
 	{
 	public:
 
-		explicit netlist_t(const pstring &aname);
+		explicit netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
 		virtual ~netlist_t();
-
-		/**
-		 * @brief Load base libraries for diodes, transistors ...
-		 *
-		 * This must be called after netlist_t is created.
-		 *
-		 */
-		void load_base_libraries();
 
 		/* run functions */
 
@@ -1257,6 +1254,7 @@ namespace netlist
 		/* netlist build functions */
 
 		setup_t &setup() NL_NOEXCEPT { return *m_setup; }
+		const setup_t &setup() const NL_NOEXCEPT { return *m_setup; }
 
 		void register_dev(plib::owned_ptr<core_device_t> dev);
 		void remove_dev(core_device_t *dev);
@@ -1292,8 +1290,9 @@ namespace netlist
 		/* logging and name */
 
 		pstring name() const { return m_name; }
-		plib::plog_base<netlist_t, NL_DEBUG> &log() { return m_log; }
-		const plib::plog_base<netlist_t, NL_DEBUG> &log() const { return m_log; }
+
+		log_type & log() { return m_log; }
+		const log_type &log() const { return m_log; }
 
 		/* state related */
 
@@ -1319,9 +1318,6 @@ namespace netlist
 		// FIXME: sort rebuild_lists out
 		void rebuild_lists(); /* must be called after post_load ! */
 
-		/* logging callback */
-		virtual void vlog(const plib::plog_level &l, const pstring &ls) const = 0;
-
 	protected:
 
 		void print_stats() const;
@@ -1345,8 +1341,6 @@ namespace netlist
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
 		pstring                             m_name;
-		std::unique_ptr<setup_t>            m_setup;
-		plib::plog_base<netlist_t, NL_DEBUG>           m_log;
 		std::unique_ptr<plib::dynlib>       m_lib; // external lib needs to be loaded as long as netlist exists
 
 		plib::state_manager_t               m_state;
@@ -1356,6 +1350,10 @@ namespace netlist
 		nperfcount_t<NL_KEEP_STATISTICS>    m_perf_out_processed;
 
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
+
+		std::unique_ptr<callbacks_t> m_callbacks;
+		log_type							 m_log;
+		std::unique_ptr<setup_t>             m_setup;
 };
 
 	// -----------------------------------------------------------------------------
@@ -1381,6 +1379,27 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
+
+	template <typename T>
+	param_num_t<T>::param_num_t(device_t &device, const pstring &name, const T val)
+	: param_t(device, name)
+	{
+		//m_param = device.setup().get_initial_param_val(this->name(),val);
+		bool found = false;
+		pstring p = this->get_initial(device, &found);
+		if (found)
+		{
+			bool err = false;
+			T vald = plib::pstonum_ne<T>(p, err);
+			if (err)
+				netlist().log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, p);
+			m_param = vald;
+		}
+		else
+			m_param = val;
+
+		netlist().save(*this, m_param, "m_param");
+	}
 
 	template <typename ST, std::size_t AW, std::size_t DW>
 	param_rom_t<ST, AW, DW>::param_rom_t(device_t &device, const pstring &name)

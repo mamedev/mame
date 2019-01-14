@@ -72,9 +72,9 @@ with MSYS2 and the **pacman** package manager.
   ``/etc/pacman.d/mirrorlist.mame`` for locations.
 * Install packages necessary to build MAME.  At the very least, you'll need
   ``bash``, ``git``, ``make``.
-* For 64-bit builds you'll need ``mingw-w64-i686-gcc`` and
+* For 64-bit builds you'll need ``mingw-w64-x86_64-gcc`` and
   ``mingw-w64-x86_64-python2``.
-* For 32-bit builds you'll need ``mingw-w64-x86_64-gcc`` and
+* For 32-bit builds you'll need ``mingw-w64-i686-gcc`` and
   ``mingw-w64-i686-python2``.
 * For debugging you may want to install ``gdb``.
 * To build against the portable SDL interfaces, you'll need

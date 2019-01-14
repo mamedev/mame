@@ -16,6 +16,7 @@
 #include "nl_factory.h"
 #include "nl_config.h"
 #include "netlist_types.h"
+#include "nl_errstr.h"
 
 #include <stack>
 #include <vector>
@@ -212,9 +213,8 @@ namespace netlist
 		pstring build_fqn(const pstring &obj_name) const;
 
 		void register_param(const pstring &name, param_t &param);
-		pstring get_initial_param_val(const pstring &name, const pstring &def);
-		double get_initial_param_val(const pstring &name, const double def);
-		int get_initial_param_val(const pstring &name, const int def);
+
+		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &obj);
 
@@ -288,8 +288,8 @@ namespace netlist
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
 
-		plib::plog_base<netlist_t, NL_DEBUG> &log();
-		const plib::plog_base<netlist_t, NL_DEBUG> &log() const;
+		log_type &log();
+		const log_type &log() const;
 
 		//std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 		std::unordered_map<pstring, factory::element_t *> m_device_factory;
@@ -331,12 +331,11 @@ namespace netlist
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;
-};
+	};
 
 	// ----------------------------------------------------------------------------------------
 	// base sources
 	// ----------------------------------------------------------------------------------------
-
 
 	class source_string_t : public source_t
 	{
@@ -399,6 +398,10 @@ namespace netlist
 		void (*m_setup_func)(setup_t &);
 		pstring m_setup_func_name;
 	};
+
+	// -----------------------------------------------------------------------------
+	// inline implementations
+	// -----------------------------------------------------------------------------
 
 }
 

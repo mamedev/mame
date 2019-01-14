@@ -113,14 +113,15 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 		return;
 
 	// initialize everyone's states
-	std::vector<int> penalty(matches);
+	std::vector<double> penalty(matches);
 	for (int matchnum = 0; matchnum < matches; matchnum++)
 	{
-		penalty[matchnum] = 9999;
+		penalty[matchnum] = 1.0;
 		list[matchnum] = nullptr;
 	}
 
 	// iterate over our info (will cause a parse if needed)
+	std::u32string const search(ustr_from_utf8(normalize_unicode(name, unicode_normalization_form::D, true)));
 	for (const software_info &swinfo : get_info())
 	{
 		for (const software_part &swpart : swinfo.parts())
@@ -128,9 +129,9 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 			if ((interface == nullptr || swpart.matches_interface(interface)) && is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
 			{
 				// pick the best match between driver name and description
-				int longpenalty = driver_list::penalty_compare(name.c_str(), swinfo.longname().c_str());
-				int shortpenalty = driver_list::penalty_compare(name.c_str(), swinfo.shortname().c_str());
-				int curpenalty = std::min(longpenalty, shortpenalty);
+				double const longpenalty = util::edit_distance(search, ustr_from_utf8(normalize_unicode(swinfo.longname(), unicode_normalization_form::D, true)));
+				double const shortpenalty = util::edit_distance(search, ustr_from_utf8(normalize_unicode(swinfo.shortname(), unicode_normalization_form::D, true)));
+				double const curpenalty = std::min(longpenalty, shortpenalty);
 
 				// make sure it isn't already in the table
 				bool skip = false;

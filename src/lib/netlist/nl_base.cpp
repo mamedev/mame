@@ -239,31 +239,28 @@ detail::terminal_type detail::core_terminal_t::type() const
 // netlist_t
 // ----------------------------------------------------------------------------------------
 
-netlist_t::netlist_t(const pstring &aname)
+netlist_t::netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks)
 	: m_time(netlist_time::zero())
 	, m_queue(*this)
 	, m_mainclock(nullptr)
 	, m_solver(nullptr)
 	, m_params(nullptr)
 	, m_name(aname)
-	, m_log(*this)
 	, m_lib(nullptr)
 	, m_state()
+	, m_callbacks(std::move(callbacks))	// Order is important here
+	, m_log(*m_callbacks)
 {
 	state().save_item(this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "m_queue");
 	state().save_item(this, m_time, "m_time");
 	m_setup = plib::make_unique<setup_t>(*this);
+	NETLIST_NAME(base)(*m_setup);
 }
 
 netlist_t::~netlist_t()
 {
 	m_nets.clear();
 	m_devices.clear();
-}
-
-void netlist_t::load_base_libraries()
-{
-	NETLIST_NAME(base)(*m_setup);
 }
 
 nl_double netlist_t::gmin() const NL_NOEXCEPT
@@ -694,7 +691,7 @@ void core_device_t::set_default_delegate(detail::core_terminal_t &term)
 		term.m_delegate.set(&core_device_t::update, this);
 }
 
-plib::plog_base<netlist_t, NL_DEBUG> &core_device_t::log()
+log_type & core_device_t::log()
 {
 	return netlist().log();
 }
@@ -719,6 +716,11 @@ device_t::~device_t()
 }
 
 setup_t &device_t::setup()
+{
+	return netlist().setup();
+}
+
+const setup_t &device_t::setup() const
 {
 	return netlist().setup();
 }
@@ -1156,6 +1158,14 @@ void param_t::update_param()
 		device().update_dev();
 }
 
+pstring param_t::get_initial(const device_t &dev, bool *found)
+{
+	pstring res = dev.setup().get_initial_param_val(this->name(), "");
+	*found = (res != "");
+	return res;
+}
+
+
 const pstring param_model_t::model_type()
 {
 	if (m_map.size() == 0)
@@ -1175,27 +1185,6 @@ param_str_t::~param_str_t()
 
 void param_str_t::changed()
 {
-}
-
-param_double_t::param_double_t(device_t &device, const pstring &name, const double val)
-: param_t(device, name)
-{
-	m_param = device.setup().get_initial_param_val(this->name(),val);
-	netlist().save(*this, m_param, "m_param");
-}
-
-param_int_t::param_int_t(device_t &device, const pstring &name, const int val)
-: param_t(device, name)
-{
-	m_param = device.setup().get_initial_param_val(this->name(),val);
-	netlist().save(*this, m_param, "m_param");
-}
-
-param_logic_t::param_logic_t(device_t &device, const pstring &name, const bool val)
-: param_t(device, name)
-{
-	m_param = device.setup().get_initial_param_val(this->name(),val);
-	netlist().save(*this, m_param, "m_param");
 }
 
 param_ptr_t::param_ptr_t(device_t &device, const pstring &name, uint8_t * val)
@@ -1225,14 +1214,6 @@ nl_double param_model_t::model_value(const pstring &entity)
 	return netlist().setup().model_value(m_map, entity);
 }
 
-param_data_t::param_data_t(device_t &device, const pstring &name)
-: param_str_t(device, name, "")
-{
-}
-
-void param_data_t::changed()
-{
-}
 
 std::unique_ptr<plib::pistream> param_data_t::stream()
 {

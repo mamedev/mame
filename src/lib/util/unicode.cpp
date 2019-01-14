@@ -21,6 +21,67 @@
 #include <locale>
 
 
+namespace {
+
+//-------------------------------------------------
+//  internal_normalize_unicode - uses utf8proc to
+//  normalize unicode
+//-------------------------------------------------
+
+std::string internal_normalize_unicode(
+		char const *s,
+		size_t length,
+		unicode_normalization_form normalization_form,
+		bool fold_case,
+		bool null_terminated)
+{
+	// convert the normalization form
+	int options;
+	switch (normalization_form)
+	{
+	case unicode_normalization_form::C:
+		options = UTF8PROC_STABLE | UTF8PROC_COMPOSE;
+		break;
+	case unicode_normalization_form::D:
+		options = UTF8PROC_STABLE | UTF8PROC_DECOMPOSE;
+		break;
+	case unicode_normalization_form::KC:
+		options = UTF8PROC_STABLE | UTF8PROC_COMPOSE | UTF8PROC_COMPAT;
+		break;
+	case unicode_normalization_form::KD:
+		options = UTF8PROC_STABLE | UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT;
+		break;
+	default:
+		throw false;
+	}
+
+	// perform case folding?
+	if (fold_case)
+		options |= UTF8PROC_CASEFOLD;
+
+	// use NUL terminator to determine length?
+	if (null_terminated)
+		options |= UTF8PROC_NULLTERM;
+
+	// invoke utf8proc
+	utf8proc_uint8_t *utf8proc_result(nullptr);
+	utf8proc_ssize_t const utf8proc_result_length(utf8proc_map(reinterpret_cast<utf8proc_uint8_t const *>(s), length, &utf8proc_result, utf8proc_option_t(options)));
+
+	// conver the result
+	std::string result;
+	if (utf8proc_result)
+	{
+		if (utf8proc_result_length > 0)
+			result.assign(reinterpret_cast<char const *>(utf8proc_result), utf8proc_result_length);
+		free(utf8proc_result);
+	}
+
+	return result;
+}
+
+} // anonymous namespace
+
+
 //-------------------------------------------------
 //  uchar_isvalid - return true if a given
 //  character is a legitimate unicode character
@@ -66,56 +127,53 @@ bool uchar_is_digit(char32_t uchar)
 
 int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count)
 {
-	char32_t c, minchar;
-	int auxlen, i;
-	char auxchar;
-
 	// validate parameters
-	if (utf8char == nullptr || count == 0)
+	if (!utf8char || !count)
 		return 0;
 
 	// start with the first byte
-	c = (unsigned char) *utf8char;
+	char32_t c = (unsigned char)*utf8char;
 	count--;
 	utf8char++;
 
 	// based on that, determine how many additional bytes we need
-	if (c < 0x80)
+	char32_t minchar;
+	int auxlen;
+	if ((c & 0x80) == 0x00)
 	{
 		// unicode char 0x00000000 - 0x0000007F
-		c &= 0x7f;
 		auxlen = 0;
 		minchar = 0x00000000;
 	}
-	else if (c >= 0xc0 && c < 0xe0)
+	else if ((c & 0xe0) == 0xc0)
 	{
 		// unicode char 0x00000080 - 0x000007FF
 		c &= 0x1f;
 		auxlen = 1;
 		minchar = 0x00000080;
 	}
-	else if (c >= 0xe0 && c < 0xf0)
+	else if ((c & 0xf0) == 0xe0)
 	{
 		// unicode char 0x00000800 - 0x0000FFFF
 		c &= 0x0f;
 		auxlen = 2;
 		minchar = 0x00000800;
 	}
-	else if (c >= 0xf0 && c < 0xf8)
+	else if ((c & 0xf8) == 0xf0)
 	{
 		// unicode char 0x00010000 - 0x001FFFFF
 		c &= 0x07;
 		auxlen = 3;
 		minchar = 0x00010000;
 	}
-	else if (c >= 0xf8 && c < 0xfc)
+	else if ((c & 0xfc) == 0xf8)
 	{
 		// unicode char 0x00200000 - 0x03FFFFFF
 		c &= 0x03;
 		auxlen = 4;
 		minchar = 0x00200000;
 	}
-	else if (c >= 0xfc && c < 0xfe)
+	else if ((c & 0xfe) == 0xfc)
 	{
 		// unicode char 0x04000000 - 0x7FFFFFFF
 		c &= 0x01;
@@ -133,9 +191,9 @@ int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count)
 		return -1;
 
 	// we now know how long the char is, now compute it
-	for (i = 0; i < auxlen; i++)
+	for (int i = 0; i < auxlen; i++)
 	{
-		auxchar = utf8char[i];
+		char32_t const auxchar = (unsigned char)utf8char[i];
 
 		// all auxillary chars must be between 0x80-0xbf
 		if ((auxchar & 0xc0) != 0x80)
@@ -202,6 +260,28 @@ int uchar_from_utf16f(char32_t *uchar, const char16_t *utf16char, size_t count)
 	if (count > 1)
 		buf[1] = swapendian_int16(utf16char[1]);
 	return uchar_from_utf16(uchar, buf, count);
+}
+
+
+//-------------------------------------------------
+//  ustr_from_utf8 - convert a UTF-8 sequence into
+//  into a Unicode string
+//-------------------------------------------------
+
+std::u32string ustr_from_utf8(const std::string &utf8str)
+{
+	std::u32string result;
+	char const *utf8char(utf8str.c_str());
+	size_t remaining(utf8str.length());
+	while (remaining)
+	{
+		char32_t ch;
+		int const consumed(uchar_from_utf8(&ch, utf8char, remaining));
+		result.append(1, (consumed > 0) ? ch : char32_t(0x00fffdU));
+		utf8char += (consumed > 0) ? consumed : 1;
+		remaining -= (consumed > 0) ? consumed : 1;
+	}
+	return result;
 }
 
 
@@ -388,50 +468,13 @@ std::string utf8_from_wstring(const std::wstring &string)
 
 
 //-------------------------------------------------
-//  internal_normalize_unicode - uses utf8proc to
-//  normalize unicode
+//  normalize_unicode - uses utf8proc to normalize
+//  unicode
 //-------------------------------------------------
 
-static std::string internal_normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form, bool null_terminated)
+std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form, bool fold_case)
 {
-	// convert the normalization form
-	int options;
-	switch (normalization_form)
-	{
-	case unicode_normalization_form::C:
-		options = UTF8PROC_STABLE | UTF8PROC_COMPOSE;
-		break;
-	case unicode_normalization_form::D:
-		options = UTF8PROC_STABLE | UTF8PROC_DECOMPOSE;
-		break;
-	case unicode_normalization_form::KC:
-		options = UTF8PROC_STABLE | UTF8PROC_COMPOSE | UTF8PROC_COMPAT;
-		break;
-	case unicode_normalization_form::KD:
-		options = UTF8PROC_STABLE | UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT;
-		break;
-	default:
-		throw false;
-	}
-
-	// was this null terminated?
-	if (null_terminated)
-		options |= UTF8PROC_NULLTERM;
-
-	// invoke utf8proc
-	utf8proc_uint8_t *utf8proc_result;
-	utf8proc_ssize_t utf8proc_result_length = utf8proc_map((utf8proc_uint8_t *) s, length, &utf8proc_result, (utf8proc_option_t)options);
-
-	// conver the result
-	std::string result;
-	if (utf8proc_result)
-	{
-		if (utf8proc_result_length > 0)
-			result = std::string((const char *)utf8proc_result, utf8proc_result_length);
-		free(utf8proc_result);
-	}
-
-	return result;
+	return internal_normalize_unicode(s.c_str(), s.length(), normalization_form, fold_case, false);
 }
 
 
@@ -440,9 +483,9 @@ static std::string internal_normalize_unicode(const char *s, size_t length, unic
 //  unicode
 //-------------------------------------------------
 
-std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form)
+std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form, bool fold_case)
 {
-	return internal_normalize_unicode(s.c_str(), s.length(), normalization_form, false);
+	return internal_normalize_unicode(s, 0, normalization_form, fold_case, true);
 }
 
 
@@ -451,20 +494,9 @@ std::string normalize_unicode(const std::string &s, unicode_normalization_form n
 //  unicode
 //-------------------------------------------------
 
-std::string normalize_unicode(const char *s, unicode_normalization_form normalization_form)
+std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form, bool fold_case)
 {
-	return internal_normalize_unicode(s, 0, normalization_form, true);
-}
-
-
-//-------------------------------------------------
-//  normalize_unicode - uses utf8proc to normalize
-//  unicode
-//-------------------------------------------------
-
-std::string normalize_unicode(const char *s, size_t length, unicode_normalization_form normalization_form)
-{
-	return internal_normalize_unicode(s, length, normalization_form, false);
+	return internal_normalize_unicode(s, length, normalization_form, fold_case, false);
 }
 
 

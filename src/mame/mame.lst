@@ -37939,6 +37939,9 @@ vs4j                            // 2004.10 Virtua Striker 4 (Japan) (Rev E)
 @source:triplhnt.cpp
 triplhnt                        // 008422-008791    1977/04 [6800]
 
+@source:trkfldch.cpp
+trkfldch                        // (c) 2007 Konami
+
 @source:trs80.cpp
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
@@ -38546,6 +38549,9 @@ vigilantc                       // (c) 1988 (World Rev C)
 vigilantd                       // (c) 1988 (Japan Rev D)
 vigilantg                       // (c) 1988 (US Rev G)
 vigilanto                       // (c) 1988 (US)
+
+@source:spg110.cpp
+jak_capb                        //
 
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
@@ -39703,6 +39709,7 @@ rad_boxp                        //
 rad_crdn                        //
 rad_crdnp                       //
 rad_opus                        //
+rad_hnt                         //
 rad_bass                        //
 rad_bassp                       //
 rad_snow                        //

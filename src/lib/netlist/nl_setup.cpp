@@ -145,44 +145,11 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 	return pstring("Error");
 }
 
-pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def)
+pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 		return i->second;
-	else
-		return def;
-}
-
-double setup_t::get_initial_param_val(const pstring &name, const double def)
-{
-	auto i = m_param_values.find(name);
-	if (i != m_param_values.end())
-	{
-		bool err = false;
-		double vald = plib::pstonum_ne<double>(i->second, err);
-		if (err)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-		return vald;
-	}
-	else
-		return def;
-}
-
-int setup_t::get_initial_param_val(const pstring &name, const int def)
-{
-	auto i = m_param_values.find(name);
-	if (i != m_param_values.end())
-	{
-		bool err;
-		double vald = plib::pstonum_ne<double>(i->second, err);
-		if (err)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-		if (vald - std::floor(vald) != 0.0)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-
-		return static_cast<int>(vald);
-	}
 	else
 		return def;
 }
@@ -278,7 +245,10 @@ void setup_t::register_frontier(const pstring &attach, const double r_IN, const 
 
 void setup_t::register_param(const pstring &param, const double value)
 {
-	register_param(param, plib::pfmt("{1:.9}").e(value));
+	if (std::abs(value - std::floor(value)) > 1e-30 || std::abs(value) > 1e9)
+		register_param(param, plib::pfmt("{1:.9}").e(value));
+	else
+		register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
 }
 
 void setup_t::register_param(const pstring &param, const pstring &value)
@@ -768,11 +738,11 @@ void setup_t::start_devices()
 	}
 }
 
-plib::plog_base<netlist_t, NL_DEBUG> &setup_t::log()
+log_type &setup_t::log()
 {
 	return netlist().log();
 }
-const plib::plog_base<netlist_t, NL_DEBUG> &setup_t::log() const
+const log_type &setup_t::log() const
 {
 	return netlist().log();
 }
