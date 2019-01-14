@@ -1229,7 +1229,7 @@ namespace netlist
 	public:
 
 		explicit netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
-		~netlist_t();
+		virtual ~netlist_t();
 
 		/* run functions */
 
