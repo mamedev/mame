@@ -245,7 +245,7 @@ namespace netlist
 
 		param_t *find_param(const pstring &param_in, bool required = true) const;
 
-		void start_devices();
+		void register_dynamic_log_devices();
 		void resolve_inputs();
 
 		/* handle namespace */

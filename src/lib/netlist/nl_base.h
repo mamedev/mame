@@ -80,14 +80,15 @@ class NETLIB_NAME(name) : public device_t
 		: device_t(owner, name)
 
 	/*! Add this to a device definition to mark the device as dynamic.
-	*  If NETLIB_IS_DYNAMIC(true) is added to the device definition the device
-	*  is treated as an analog dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI
-	*  is called on a each step of the Newton-Raphson step
-	*  of solving the linear equations.
-	*
-	*  You may also use e.g. NETLIB_IS_DYNAMIC(m_func() != "") to only make the
-	*  device a dynamic device if parameter m_func is set.
-	*/
+	 *
+	 *  If NETLIB_IS_DYNAMIC(true) is added to the device definition the device
+	 *  is treated as an analog dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI
+	 *  is called on a each step of the Newton-Raphson step
+	 *  of solving the linear equations.
+	 *
+	 *  You may also use e.g. NETLIB_IS_DYNAMIC(m_func() != "") to only make the
+	 *  device a dynamic device if parameter m_func is set.
+	 */
 #define NETLIB_IS_DYNAMIC(expr)                                                \
 	public: virtual bool is_dynamic() const override { return expr; }
 
@@ -1228,8 +1229,10 @@ namespace netlist
 	{
 	public:
 
+		using nets_collection_type = std::vector<plib::owned_ptr<detail::net_t>>;
+
 		explicit netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
-		virtual ~netlist_t();
+		~netlist_t();
 
 		/* run functions */
 
@@ -1242,14 +1245,24 @@ namespace netlist
 		void process_queue(const netlist_time &delta) NL_NOEXCEPT;
 		void abort_current_queue_slice() NL_NOEXCEPT { m_queue.retime(detail::queue_t::entry_t(m_time, nullptr)); }
 
+		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
+		detail::queue_t &queue() NL_NOEXCEPT { return m_queue; }
+
+		/* setup functions - not needed by execute interface */
+
 		/* Control functions */
 
-		void start();
 		void stop();
 		void reset();
 
-		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
-		detail::queue_t &queue() NL_NOEXCEPT { return m_queue; }
+		// ========================================================
+		// configuration section
+		// ========================================================
+
+		void prepare_to_run();
+
+		// FIXME: sort rebuild_lists out
+		void rebuild_lists(); /* must be called after post_load ! */
 
 		/* netlist build functions */
 
@@ -1300,33 +1313,47 @@ namespace netlist
 
 		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
 		{
-			this->state().save_item(static_cast<void *>(&owner), state, from_utf8(owner.name()) + pstring(".") + stname);
+			this->state().save_item(static_cast<void *>(&owner), state, owner.name() + pstring(".") + stname);
 		}
 		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
-			this->state().save_state_ptr(static_cast<void *>(&owner), from_utf8(owner.name()) + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->state().save_state_ptr(static_cast<void *>(&owner), owner.name() + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
 
 		plib::dynlib &lib() { return *m_lib; }
 
-		// FIXME: find something better
-		/* sole use is to manage lifetime of net objects */
-		std::vector<plib::owned_ptr<detail::net_t>> m_nets;
+		const nets_collection_type &nets() { return m_nets; }
+
+		template <typename T>
+		void register_net(plib::owned_ptr<T> &&net)
+		{
+			m_nets.push_back(std::move(net));
+		}
+
+		void delete_empty_nets()
+		{
+			m_nets.erase(
+				std::remove_if(m_nets.begin(), m_nets.end(),
+					[](plib::owned_ptr<detail::net_t> &x)
+					{
+						if (x->num_cons() == 0)
+						{
+							x->netlist().log().verbose("Deleting net {1} ...", x->name());
+							return true;
+						}
+						else
+							return false;
+					}), m_nets.end());
+		}
+
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
-
-		// FIXME: sort rebuild_lists out
-		void rebuild_lists(); /* must be called after post_load ! */
 
 	protected:
 
 		void print_stats() const;
 
 	private:
-
-		/* helper for save above */
-		static pstring from_utf8(const char *c) { return pstring(c); }
-		static pstring from_utf8(const pstring &c) { return c; }
 
 		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
 
@@ -1349,7 +1376,9 @@ namespace netlist
 		nperftime_t<NL_KEEP_STATISTICS>     m_stat_mainloop;
 		nperfcount_t<NL_KEEP_STATISTICS>    m_perf_out_processed;
 
+		/* sole use is to manage lifetime of net objects */
 		std::vector<plib::owned_ptr<core_device_t>> m_devices;
+		nets_collection_type m_nets;
 
 		std::unique_ptr<callbacks_t> m_callbacks;
 		log_type							 m_log;

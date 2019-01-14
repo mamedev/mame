@@ -182,7 +182,7 @@ public:
 		log_setup(logs);
 
 		// start devices
-		this->start();
+		this->prepare_to_run();
 		// reset
 		this->reset();
 	}
@@ -595,7 +595,7 @@ void tool_app_t::listdevices()
 	nt.setup().include("dummy");
 
 
-	nt.start();
+	nt.prepare_to_run();
 
 	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
 

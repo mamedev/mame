@@ -183,7 +183,7 @@ void detail::queue_t::on_post_load()
 	netlist().log().debug("current time {1} qsize {2}\n", netlist().time().as_double(), m_qsize);
 	for (std::size_t i = 0; i < m_qsize; i++ )
 	{
-		detail::net_t *n = netlist().m_nets[m_net_ids[i]].get();
+		detail::net_t *n = netlist().nets()[m_net_ids[i]].get();
 		this->push(queue_t::entry_t(netlist_time::from_raw(m_times[i]),n));
 	}
 }
@@ -290,9 +290,9 @@ void netlist_t::remove_dev(core_device_t *dev)
 		);
 }
 
-void netlist_t::start()
+void netlist_t::prepare_to_run()
 {
-	setup().start_devices();
+	setup().register_dynamic_log_devices();
 
 	/* load the library ... */
 
@@ -616,8 +616,8 @@ void netlist_t::print_stats() const
 				* static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(total_count)
 				/ static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(200000);
 
-		log().verbose("Queue Pushes   {1:15}", queue().m_prof_call());
-		log().verbose("Queue Moves    {1:15}", queue().m_prof_sortmove());
+		log().verbose("Queue Pushes   {1:15}", m_queue.m_prof_call());
+		log().verbose("Queue Moves    {1:15}", m_queue.m_prof_sortmove());
 
 		log().verbose("Total loop     {1:15}", m_stat_mainloop());
 		/* Only one serialization should be counted in total time */
@@ -627,7 +627,7 @@ void netlist_t::print_stats() const
 		log().verbose("Take the next lines with a grain of salt. They depend on the measurement implementation.");
 		log().verbose("Total overhead {1:15}", total_overhead);
 		nperftime_t<NL_KEEP_STATISTICS>::type overhead_per_pop = (m_stat_mainloop()-2*total_overhead - (total_time - total_overhead))
-				/ static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(queue().m_prof_call());
+				/ static_cast<nperftime_t<NL_KEEP_STATISTICS>::type>(m_queue.m_prof_call());
 		log().verbose("Overhead per pop  {1:11}", overhead_per_pop );
 		log().verbose("");
 		for (auto &entry : m_devices)
@@ -1048,7 +1048,7 @@ logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
-	netlist().m_nets.push_back(plib::owned_ptr<logic_net_t>(&m_my_net, false));
+	netlist().register_net(plib::owned_ptr<logic_net_t>(&m_my_net, false));
 	set_logic_family(dev.logic_family());
 	netlist().setup().register_term(*this);
 }
@@ -1085,7 +1085,7 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	: analog_t(dev, aname, STATE_OUT)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
-	netlist().m_nets.push_back(plib::owned_ptr<analog_net_t>(&m_my_net, false));
+	netlist().register_net(plib::owned_ptr<analog_net_t>(&m_my_net, false));
 	this->set_net(&m_my_net);
 
 	//net().m_cur_Analog = NL_FCONST(0.0);

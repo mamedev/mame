@@ -544,7 +544,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
 		auto anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
-		netlist().m_nets.push_back(plib::owned_ptr<analog_net_t>(anet, true));
+		netlist().register_net(plib::owned_ptr<analog_net_t>(anet, true));
 		t1.set_net(anet);
 		anet->add_terminal(t2);
 		anet->add_terminal(t1);
@@ -687,18 +687,7 @@ void setup_t::resolve_inputs()
 
 	// delete empty nets
 
-	netlist().m_nets.erase(
-			std::remove_if(netlist().m_nets.begin(), netlist().m_nets.end(),
-					[](plib::owned_ptr<detail::net_t> &x)
-					{
-						if (x->num_cons() == 0)
-						{
-							x->netlist().log().verbose("Deleting net {1} ...", x->name());
-							return true;
-						}
-						else
-							return false;
-					}), netlist().m_nets.end());
+	netlist().delete_empty_nets();
 
 	pstring errstr("");
 
@@ -719,7 +708,7 @@ void setup_t::resolve_inputs()
 
 }
 
-void setup_t::start_devices()
+void setup_t::register_dynamic_log_devices()
 {
 	pstring env = plib::util::environment("NL_LOGS", "");
 

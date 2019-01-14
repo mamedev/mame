@@ -123,7 +123,7 @@ public:
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
 	{
-		m_cpu_device = downcast<netlist_mame_cpu_device *>(&downcast<netlist_mame_device::netlist_mame_t &>(netlist()).parent());
+		m_cpu_device = downcast<netlist_mame_cpu_device *>(&static_cast<netlist_mame_device::netlist_mame_t &>(netlist()).parent());
 	}
 
 	ATTR_COLD void reset() override
@@ -171,7 +171,7 @@ public:
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
 	{
-		m_cpu_device = downcast<netlist_mame_cpu_device *>(&downcast<netlist_mame_device::netlist_mame_t &>(netlist()).parent());
+		m_cpu_device = downcast<netlist_mame_cpu_device *>(&static_cast<netlist_mame_device::netlist_mame_t &>(netlist()).parent());
 	}
 
 	ATTR_COLD void reset() override
@@ -238,7 +238,7 @@ public:
 
 std::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
 {
-	memory_region *mem = downcast<netlist_mame_device::netlist_mame_t &>(setup().netlist()).machine().root_device().memregion(m_name.c_str());
+	memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().netlist()).machine().root_device().memregion(m_name.c_str());
 	return plib::make_unique_base<plib::pistream, plib::pimemstream>(mem->base(), mem->bytes());
 }
 
@@ -249,8 +249,7 @@ netlist_data_memregions_t::netlist_data_memregions_t(netlist::setup_t &setup)
 
 std::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring &name)
 {
-	memory_region *mem = downcast<netlist_mame_device::netlist_mame_t &>(setup().netlist()).parent().memregion(name.c_str());
-	//memory_region *mem = downcast<netlist_mame_t &>(setup().netlist()).machine().root_device().memregion(name.c_str());
+	memory_region *mem = static_cast<netlist_mame_device::netlist_mame_t &>(setup().netlist()).parent().memregion(name.c_str());
 	if (mem != nullptr)
 	{
 		return plib::make_unique_base<plib::pistream, plib::pimemstream>(mem->base(), mem->bytes());
@@ -881,7 +880,7 @@ void netlist_mame_device::device_start()
 		}
 	}
 
-	netlist().start();
+	netlist().prepare_to_run();
 
 	netlist().save(*this, m_rem, "m_rem");
 	netlist().save(*this, m_div, "m_div");
@@ -1016,7 +1015,7 @@ void netlist_mame_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_genPC).noshow();
 
 	int index = 0;
-	for (auto &n : netlist().m_nets)
+	for (auto &n : netlist().nets())
 	{
 		if (n->is_logic())
 		{

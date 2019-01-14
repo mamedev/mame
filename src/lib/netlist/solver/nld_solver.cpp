@@ -215,7 +215,7 @@ struct net_splitter
 
 	void run(netlist_t &netlist)
 	{
-		for (auto & net : netlist.m_nets)
+		for (auto & net : netlist.nets())
 		{
 			netlist.log().debug("processing {1}\n", net->name());
 			if (!net->isRailNet() && net->num_cons() > 0)
@@ -279,7 +279,7 @@ void NETLIB_NAME(solver)::post_start()
 	splitter.run(netlist());
 
 	// setup the solvers
-	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), netlist().m_nets.size());
+	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), netlist().nets().size());
 	for (auto & grp : splitter.groups)
 	{
 		matrix_solver_t *ms;
