@@ -688,7 +688,14 @@ void spg2xx_device::do_sprite_dma(uint32_t len)
 	}
 
 	m_video_regs[0x72] = 0;
-	VIDEO_IRQ_STATUS |= 4;
+	if (VIDEO_IRQ_ENABLE & 4)
+	{
+		const uint16_t old = VIDEO_IRQ_STATUS;
+		VIDEO_IRQ_STATUS |= 4;
+		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
+		if (changed)
+			check_video_irq();
+	}
 }
 
 READ16_MEMBER(spg2xx_device::video_r)
