@@ -24,7 +24,7 @@
 DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "SunPlus u'nSP")
 
 /* size of the execution code cache */
-#define CACHE_SIZE                      (32 * 1024 * 1024)
+#define CACHE_SIZE                      (64 * 1024 * 1024)
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, UNSP, tag, owner, clock)
@@ -32,13 +32,13 @@ unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_
 	, m_program(nullptr)
 	, m_core(nullptr)
 	, m_debugger_temp(0)
-#if UNSP_LOG_OPCODES
+#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	, m_log_ops(0)
 #endif
 	, m_cache(CACHE_SIZE + sizeof(unsp_device))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
-	, m_drcoptions(UNSP_STRICT_VERIFY)
+	, m_drcoptions(0)
 	, m_cache_dirty(0)
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
@@ -78,6 +78,9 @@ uint16_t unsp_device::read16(uint32_t address)
 
 void unsp_device::write16(uint32_t address, uint16_t data)
 {
+#if UNSP_LOG_REGS
+	log_write(address, data);
+#endif
 	m_program->write_word(address, data);
 }
 
@@ -148,7 +151,7 @@ void unsp_device::device_start()
 	state_add(UNSP_IRQ,    "IRQ", m_core->m_irq).formatstr("%1u");
 	state_add(UNSP_FIQ,    "FIQ", m_core->m_fiq).formatstr("%1u");
 	state_add(UNSP_SB,     "SB", m_core->m_sb).formatstr("%1u");
-#if UNSP_LOG_OPCODES
+#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	state_add(UNSP_LOG_OPS,"LOG", m_log_ops).formatstr("%1u");
 #endif
 
@@ -197,10 +200,20 @@ void unsp_device::device_stop()
 #if UNSP_LOG_REGS
 void unsp_device::log_regs()
 {
+	if (m_log_ops == 0)
+		return;
 	fwrite(m_core->m_r, sizeof(uint32_t), 8, m_log_file);
 	fwrite(&m_core->m_sb, sizeof(uint32_t), 1, m_log_file);
-	fflush(m_log_file);
+	fwrite(&m_core->m_icount, sizeof(uint32_t), 1, m_log_file);
 }
+
+void unsp_device::log_write(uint32_t addr, uint32_t data)
+{
+	addr |= 0x80000000;
+	fwrite(&addr, sizeof(uint32_t), 1, m_log_file);
+	fwrite(&data, sizeof(uint32_t), 1, m_log_file);
+}
+
 #endif
 
 void unsp_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -948,10 +961,14 @@ void unsp_device::execute_run()
 	unsp_disassembler dasm;
 #endif
 
-	while (m_core->m_icount > 0)
+	while (m_core->m_icount >= 0)
 	{
 		debugger_instruction_hook(UNSP_LPC);
 		const uint32_t op = read16(UNSP_LPC);
+
+#if UNSP_LOG_REGS
+		log_regs();
+#endif
 
 #if UNSP_LOG_OPCODES
 		if (m_log_ops)
@@ -960,10 +977,6 @@ void unsp_device::execute_run()
 			dasm.disassemble(strbuffer, UNSP_LPC, op, read16(UNSP_LPC+1));
 			logerror("%x: %s\n", UNSP_LPC, strbuffer.str().c_str());
 		}
-#endif
-
-#if UNSP_LOG_REGS
-		log_regs();
 #endif
 
 		add_lpc(1);
@@ -977,16 +990,26 @@ void unsp_device::execute_run()
 
 /*****************************************************************************/
 
-void unsp_device::execute_set_input(int irqline, int state)
+void unsp_device::execute_set_input(int inputnum, int state)
 {
-	m_core->m_sirq &= ~(1 << irqline);
+	set_state_unsynced(inputnum, state);
+}
+
+uint8_t unsp_device::get_csb()
+{
+	return 1 << ((UNSP_LPC >> 20) & 3);
+}
+
+void unsp_device::set_state_unsynced(int inputnum, int state)
+{
+	m_core->m_sirq &= ~(1 << inputnum);
 
 	if(!state)
 	{
 		return;
 	}
 
-	switch (irqline)
+	switch (inputnum)
 	{
 		case UNSP_IRQ0_LINE:
 		case UNSP_IRQ1_LINE:
@@ -997,14 +1020,20 @@ void unsp_device::execute_set_input(int irqline, int state)
 		case UNSP_IRQ6_LINE:
 		case UNSP_IRQ7_LINE:
 		case UNSP_FIQ_LINE:
-			m_core->m_sirq |= (1 << irqline);
+			m_core->m_sirq |= (1 << inputnum);
 			break;
 		case UNSP_BRK_LINE:
 			break;
 	}
 }
 
-uint8_t unsp_device::get_csb()
+uint16_t unsp_device::get_ds()
 {
-	return 1 << ((UNSP_LPC >> 20) & 3);
+	return (m_core->m_r[REG_SR] >> 10) & 0x3f;
+}
+
+void unsp_device::set_ds(uint16_t ds)
+{
+	m_core->m_r[REG_SR] &= 0x03ff;
+	m_core->m_r[REG_SR] |= (ds & 0x3f) << 10;
 }

@@ -945,7 +945,7 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 
 void spg2xx_device::check_video_irq()
 {
-	m_cpu->set_input_line(UNSP_IRQ0_LINE, (VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
+	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, (VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1041,7 +1041,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	case 0x2f: // Data Segment
-		val = m_cpu->state_int(UNSP_SR) >> 10;
+		val = m_cpu->get_ds();
 		LOGMASKED(LOG_SEGMENT, "io_r: Data Segment = %04x\n", val);
 		break;
 
@@ -1428,12 +1428,9 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	}
 
 	case 0x2f: // Data Segment
-	{
-		uint16_t ds = m_cpu->state_int(UNSP_SR);
-		m_cpu->set_state_int(UNSP_SR, (ds & 0x03ff) | ((data & 0x3f) << 10));
+		m_cpu->set_ds(data & 0x3f);
 		LOGMASKED(LOG_SEGMENT, "io_w: Data Segment = %04x\n", data);
 		break;
-	}
 
 	case 0x30: // UART Control
 	{
@@ -1762,19 +1759,19 @@ void spg2xx_device::extint_w(int channel, bool state)
 void spg2xx_device::check_irqs(const uint16_t changed)
 {
 	//  {
-	//      m_cpu->set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
+	//      m_cpu->set_state_unsynced(UNSP_IRQ1_LINE, ASSERT_LINE);
 	//  }
 
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 	{
 		LOGMASKED(LOG_IRQS, "%ssserting IRQ2 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00));
-		m_cpu->set_input_line(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
+		m_cpu->set_state_unsynced(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x2100) // UART, ADC IRQ
 	{
 		LOGMASKED(LOG_UART, "%ssserting IRQ3 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100));
-		m_cpu->set_input_line(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
+		m_cpu->set_state_unsynced(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) // Beat IRQ
@@ -1782,31 +1779,31 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 		if ((m_audio_regs[AUDIO_BEAT_COUNT] & (AUDIO_BIS_MASK | AUDIO_BIE_MASK)) == (AUDIO_BIS_MASK | AUDIO_BIE_MASK))
 		{
 			LOGMASKED(LOG_BEAT, "Asserting beat IRQ\n");
-			m_cpu->set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
+			m_cpu->set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
 		}
 		else
 		{
 			LOGMASKED(LOG_BEAT, "Clearing beat IRQ\n");
-			m_cpu->set_input_line(UNSP_IRQ4_LINE, CLEAR_LINE);
+			m_cpu->set_state_unsynced(UNSP_IRQ4_LINE, CLEAR_LINE);
 		}
 	}
 
 	if (changed & 0x1200) // External IRQ
 	{
 		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200));
-		m_cpu->set_input_line(UNSP_IRQ5_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
+		m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
 	{
 		LOGMASKED(LOG_IRQS, "%ssserting IRQ6 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070));
-		m_cpu->set_input_line(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
+		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x008b) // TMB1, TMB2, 4Hz, key change IRQ
 	{
 		LOGMASKED(LOG_IRQS, "%ssserting IRQ7 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
-		m_cpu->set_input_line(UNSP_IRQ7_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
+		m_cpu->set_state_unsynced(UNSP_IRQ7_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

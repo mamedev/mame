@@ -29,8 +29,6 @@
 #define MAPVAR_PC				M0
 #define MAPVAR_CYCLES			M1
 
-#define UNSP_STRICT_VERIFY		0x0001          /* verify all instructions */
-
 #define SINGLE_INSTRUCTION_MODE	(0)
 
 #define ENABLE_UNSP_DRC			(1)
@@ -63,7 +61,7 @@ enum
 	UNSP_FIQ_EN,
 	UNSP_IRQ,
 	UNSP_FIQ,
-#if UNSP_LOG_OPCODES
+#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	UNSP_SB,
 	UNSP_LOG_OPS
 #else
@@ -95,12 +93,25 @@ public:
 	// construction/destruction
 	unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// HACK: IRQ line state can only be modified directly by hardware on-board the SPG SoC itself.
+	// Therefore, to avoid an unnecessary scheduler sync when the external spg2xx_device sets or
+	// clears an interrupt line, we provide this direct accessor.
+	// A more correct but longer-term solution will be to move spg2xx_device to be internal to
+	// a subclass of unsp_device rather than its own standalone device.
+	void set_state_unsynced(int inputnum, int state);
+
 	uint8_t get_csb();
+
+	void set_ds(uint16_t ds);
+	uint16_t get_ds();
 
 	inline void ccfunc_unimplemented();
 	void invalidate_cache();
+
 #if UNSP_LOG_REGS
 	void log_regs();
+	void log_write(uint32_t addr, uint32_t data);
+	void cfunc_log_write();
 #endif
 
 protected:
@@ -176,7 +187,6 @@ private:
 
 		uint32_t m_arg0;
 		uint32_t m_arg1;
-		uint32_t m_arg2;
 		uint32_t m_jmpdest;
 
 		int m_icount;
@@ -191,7 +201,7 @@ private:
 	internal_unsp_state *m_core;
 
 	uint32_t m_debugger_temp;
-#if UNSP_LOG_OPCODES
+#if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	uint32_t m_log_ops;
 #endif
 
@@ -251,11 +261,9 @@ private:
 	void static_generate_memory_accessor(bool iswrite, const char *name, uml::code_handle *&handleptr);
 
 	void generate_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param);
+	void generate_check_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param);
 	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
-	void generate_push(drcuml_block &block, uint32_t sp);
-	void generate_pop(drcuml_block &block, uint32_t sp);
 	void generate_add_lpc(drcuml_block &block, int32_t offset);
 	void generate_update_nzsc(drcuml_block &block);
 	void generate_update_nz(drcuml_block &block);
