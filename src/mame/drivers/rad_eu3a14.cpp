@@ -159,6 +159,7 @@ private:
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int xpos, int ypos, int gfxno);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -371,6 +372,14 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 }
 
+void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int count, int pal, int flipx, int xpos, int ypos, int gfxno)
+{
+	int tileno = offset + count;
+	gfx_element *gfx = m_gfxdecode->gfx(gfxno);
+	gfx->transpen(bitmap, cliprect, tileno, pal, flipx, 0, xpos, ypos, 0);
+}
+
+
 void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
@@ -433,8 +442,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 		int offset = ((m_mainram[i + 5] << 8) + (m_mainram[i + 4] << 0));
 		int extra = m_mainram[i + 6];
-		gfx_element *gfx;
-		gfx = m_gfxdecode->gfx(1);
+		int gfxno = 1;
 
 		int spritebase = (m_spritebase[1] << 8) | m_spritebase[0];
 
@@ -447,16 +455,17 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 		case 0x00: // 8bpp
 		case 0x07: // 8bpp
 			offset >>= 1;
-			gfx = m_gfxdecode->gfx(2);
+			gfxno = 2;
 			break;
 
 		case 0x02: // 2bpp
 			offset <<= 1;
-			gfx = m_gfxdecode->gfx(0);
+			gfxno = 0;
 			pal = 0;
 			break;
 
 		case 0x04: // 4bpp
+			gfxno = 1;
 			break;
 
 		case 0x01: // unknowns
@@ -476,7 +485,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 			{
 				for (int xx = 0; xx < width; xx++)
 				{
-					gfx->transpen(bitmap, cliprect, offset + count, pal, flipx, 0, x + xx * 8, y + yy, 0);
+					draw_sprite_line(screen, bitmap, cliprect, offset, count, pal, flipx, x + xx * 8, y + yy, gfxno);
 					count++;
 				}
 			}
