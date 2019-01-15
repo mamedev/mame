@@ -965,12 +965,12 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 	}
 #endif
 
-	const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
-	VIDEO_IRQ_STATUS |= 1;
-	LOGMASKED(LOG_IRQS, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
-	const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
-	if (changed)
+	if (VIDEO_IRQ_ENABLE & 1)
+	{
+		VIDEO_IRQ_STATUS |= 1;
+		LOGMASKED(LOG_IRQS, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
 		check_video_irq();
+	}
 }
 
 void spg2xx_device::check_video_irq()
@@ -1869,11 +1869,9 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		case TIMER_SCREENPOS:
 		{
-			const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
-			VIDEO_IRQ_STATUS |= 2;
-			const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
-			if (changed)
+			if (VIDEO_IRQ_ENABLE & 2)
 			{
+				VIDEO_IRQ_STATUS |= 2;
 				check_video_irq();
 			}
 			m_screen->update_partial(m_screen->vpos());
