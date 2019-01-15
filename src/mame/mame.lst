@@ -33057,6 +33057,8 @@ rabbitjt                        // (c) 1996 Electronic Arts
 
 @source:rad_eu3a14.cpp
 rad_gtg
+rad_rsg
+rad_rsgp
 rad_foot
 rad_bb3
 rad_bb3p
