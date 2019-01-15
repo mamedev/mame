@@ -54,6 +54,7 @@ public:
 		, m_io_colors(*this, "COLORS")
 		, m_io_buttons(*this, "BUTTONS")
 		, m_cart_region(nullptr)
+		, m_cart_addr_mask(0)
 		, m_uart_tx_timer(nullptr)
 		, m_pad_timer(nullptr)
 		, m_portb_data(0)
@@ -129,6 +130,8 @@ private:
 	required_ioport m_io_buttons;
 	memory_region *m_cart_region;
 
+	uint32_t m_cart_addr_mask;
+
 	bool m_ctrl_cts[2];
 	bool m_ctrl_rts[2];
 	uint8_t m_ctrl_probe_history[2];
@@ -201,22 +204,21 @@ void vsmile_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 READ16_MEMBER(vsmile_state::bank0_r)
 {
-	return ((uint16_t*)m_cart_region->base())[offset];
+	return ((uint16_t*)m_cart_region->base())[offset & m_cart_addr_mask];
 }
 
 READ16_MEMBER(vsmile_state::bank1_r)
 {
-	return ((uint16_t*)m_cart_region->base())[offset + 0x100000];
+	return ((uint16_t*)m_cart_region->base())[(offset + 0x100000) & m_cart_addr_mask];
 }
 
 READ16_MEMBER(vsmile_state::bank2_r)
 {
-	return ((uint16_t*)m_cart_region->base())[offset + 0x200000];
+	return ((uint16_t*)m_cart_region->base())[(offset + 0x200000) & m_cart_addr_mask];
 }
 
 READ16_MEMBER(vsmile_state::bank3_r)
 {
-	//return ((uint16_t*)m_cart_region->base())[offset + 0x300000];
 	return ((uint16_t*)m_system_region->base())[offset];
 }
 
@@ -294,6 +296,7 @@ void vsmile_state::machine_start()
 	{
 		std::string region_tag;
 		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_addr_mask = (m_cart_region->bytes() >> 1) - 1;
 	}
 
 	m_bankdev->set_bank(m_cart && m_cart->exists() ? 4 : 0);
