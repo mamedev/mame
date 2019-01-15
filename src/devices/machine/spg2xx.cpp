@@ -148,9 +148,25 @@ void spg2xx_device::device_start()
 	m_4khz_timer = timer_alloc(TIMER_4KHZ);
 	m_4khz_timer->adjust(attotime::never);
 
+	m_timer_src_a = timer_alloc(TIMER_SRC_A);
+	m_timer_src_a->adjust(attotime::never);
+
+	m_timer_src_b = timer_alloc(TIMER_SRC_B);
+	m_timer_src_b->adjust(attotime::never);
+
+	m_timer_src_c = timer_alloc(TIMER_SRC_C);
+	m_timer_src_c->adjust(attotime::never);
+
 	m_stream = stream_alloc(0, 2, 44100);
 
 	m_channel_debug = -1;
+
+	save_item(NAME(m_timer_a_preload));
+	save_item(NAME(m_timer_b_preload));
+
+	save_item(NAME(m_timer_a_state));
+	save_item(NAME(m_timer_b_state));
+	save_item(NAME(m_timer_c_state));
 
 	save_item(NAME(m_hide_page0));
 	save_item(NAME(m_hide_page1));
@@ -215,6 +231,13 @@ void spg2xx_device::device_reset()
 
 	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
 	memset(m_io_regs, 0, 0x200 * sizeof(uint16_t));
+
+	m_timer_a_preload = 0;
+	m_timer_b_preload = 0;
+
+	m_timer_a_state = 0;
+	m_timer_b_state = 0;
+	m_timer_c_state = 0;
 
 	m_io_regs[0x23] = 0x0028;
 	m_uart_rx_available = false;
@@ -983,7 +1006,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 	switch (offset)
 	{
 	case 0x01: case 0x06: case 0x0b: // GPIO Data Port A/B/C
-		do_gpio(offset);
+		do_gpio(offset, false);
 		LOGMASKED(LOG_GPIO, "io_r: %s %c = %04x\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset]);
 		val = m_io_regs[offset];
 		break;
@@ -996,6 +1019,10 @@ READ16_MEMBER(spg2xx_device::io_r)
 
 	case 0x10: // Timebase Control
 		LOGMASKED(LOG_IO_READS, "io_r: Timebase Control = %04x\n", val);
+		break;
+
+	case 0x12: // Timer A Data
+		LOGMASKED(LOG_IO_WRITES, "io_r: Timer A Data = %04x\n", val);
 		break;
 
 	case 0x1c: // Video line counter
@@ -1025,8 +1052,8 @@ READ16_MEMBER(spg2xx_device::io_r)
 
 	case 0x27: // ADC Data
 		m_io_regs[0x27] = 0;
-		IO_IRQ_STATUS &= ~0x4000;
-		check_irqs(0x4000);
+		IO_IRQ_STATUS &= ~0x2000;
+		check_irqs(0x2000);
 		LOGMASKED(LOG_IO_READS, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
 		break;
 
@@ -1181,6 +1208,82 @@ void spg2xx_device::update_portb_special_modes()
 	}
 }
 
+void spg2xx_device::update_timer_b_rate()
+{
+	switch (m_io_regs[0x17] & 7)
+	{
+		case 0:
+		case 1:
+		case 6:
+		case 7:
+			m_timer_src_c->adjust(attotime::never);
+			m_timer_c_state = 0;
+			break;
+		case 2:
+			m_timer_src_c->adjust(attotime::from_hz(32768), 0, attotime::from_hz(32768));
+			break;
+		case 3:
+			m_timer_src_c->adjust(attotime::from_hz(8192), 0, attotime::from_hz(8192));
+			break;
+		case 4:
+			m_timer_src_c->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+			break;
+		case 5:
+			m_timer_src_c->adjust(attotime::never);
+			m_timer_c_state = 1;
+			break;
+	}
+}
+
+void spg2xx_device::update_timer_a_src()
+{
+	m_timer_a_state ^= 1;
+	if (m_timer_a_state && m_timer_b_state)
+	{
+		increment_timer_a();
+	}
+}
+
+void spg2xx_device::update_timer_b_src()
+{
+	m_timer_b_state ^= 1;
+	if (m_timer_a_state && m_timer_b_state)
+	{
+		increment_timer_a();
+	}
+}
+
+void spg2xx_device::increment_timer_a()
+{
+	m_io_regs[0x12]++;
+	if (m_io_regs[0x12] == 0)
+	{
+		m_io_regs[0x12] = m_timer_a_preload;
+		const uint16_t old = IO_IRQ_STATUS;
+		IO_IRQ_STATUS |= 0x0800;
+		if (IO_IRQ_STATUS != old)
+			check_irqs(0x0800);
+	}
+}
+
+void spg2xx_device::update_timer_c_src()
+{
+	m_timer_c_state ^= 1;
+	if (m_timer_c_state)
+	{
+		m_io_regs[0x16]++;
+		if (m_io_regs[0x16] == 0)
+		{
+			m_io_regs[0x16] = m_timer_b_preload;
+			const uint16_t old = IO_IRQ_STATUS;
+			IO_IRQ_STATUS |= 0x0400;
+			if (IO_IRQ_STATUS != old)
+				check_irqs(0x0400);
+		}
+	}
+}
+
+
 WRITE16_MEMBER(spg28x_device::io_w)
 {
 	if (offset == 0x33)
@@ -1225,21 +1328,21 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
 		LOGMASKED(LOG_GPIO, "io_w: %s %c = %04x\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data);
 		m_io_regs[offset] = data;
-		do_gpio(offset);
+		do_gpio(offset, true);
 		break;
 
 	case 0x03: // Port A Direction
 		LOGMASKED(LOG_GPIO, "io_w: GPIO Direction Port A = %04x\n", data);
 		m_io_regs[offset] = data;
 		update_porta_special_modes();
-		do_gpio(offset);
+		do_gpio(offset, true);
 		break;
 
 	case 0x08: // Port B Direction
 		LOGMASKED(LOG_GPIO, "io_w: GPIO Direction Port B = %04x\n", data);
 		m_io_regs[offset] = data;
 		update_portb_special_modes();
-		do_gpio(offset);
+		do_gpio(offset, true);
 		break;
 
 	case 0x05: // Port A Special
@@ -1301,6 +1404,126 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	case 0x11: // Timebase Clear
 		LOGMASKED(LOG_IO_WRITES, "io_w: Timebase Clear = %04x\n", data);
 		break;
+
+	case 0x12: // Timer A Data
+		LOGMASKED(LOG_IO_WRITES, "io_w: Timer A Data = %04x\n", data);
+		m_io_regs[offset] = data;
+		m_timer_a_preload = data;
+		break;
+
+	case 0x13: // Timer A Control
+	{
+		static const char* const s_source_a[8] = { "0", "0", "32768Hz", "8192Hz", "4096Hz", "1", "0", "ExtClk1" };
+		static const char* const s_source_b[8] = { "2048Hz", "1024Hz", "256Hz", "TMB1", "4Hz", "2Hz", "1", "ExtClk2" };
+		LOGMASKED(LOG_IO_WRITES, "io_w: Timer A Control = %04x (Source A:%s, Source B:%s)\n", data,
+			s_source_a[data & 7], s_source_b[(data >> 3) & 7]);
+		m_io_regs[offset] = data;
+		switch (data & 7)
+		{
+			case 0:
+			case 1:
+			case 6:
+			case 7:
+				m_timer_src_a->adjust(attotime::never);
+				m_timer_a_state = 0;
+				break;
+			case 2:
+				m_timer_src_a->adjust(attotime::from_hz(32768), 0, attotime::from_hz(32768));
+				break;
+			case 3:
+				m_timer_src_a->adjust(attotime::from_hz(8192), 0, attotime::from_hz(8192));
+				break;
+			case 4:
+				m_timer_src_a->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+				break;
+			case 5:
+				m_timer_src_a->adjust(attotime::never);
+				m_timer_a_state = 1;
+				break;
+		}
+		switch ((data >> 3) & 7)
+		{
+			case 0:
+				m_timer_src_b->adjust(attotime::from_hz(2048), 0, attotime::from_hz(2048));
+				break;
+			case 1:
+				m_timer_src_b->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
+				break;
+			case 2:
+				m_timer_src_b->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+				break;
+			case 3:
+				m_timer_src_b->adjust(attotime::never);
+				break;
+			case 4:
+				m_timer_src_b->adjust(attotime::from_hz(4), 0, attotime::from_hz(4));
+				break;
+			case 5:
+				m_timer_src_b->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+				break;
+			case 6:
+				m_timer_src_b->adjust(attotime::never);
+				m_timer_b_state = 1;
+				break;
+			case 7:
+				m_timer_src_b->adjust(attotime::never);
+				break;
+		}
+		break;
+	}
+
+	case 0x15: // Timer A IRQ Clear
+	{
+		LOGMASKED(LOG_IO_WRITES, "io_w: Timer A IRQ Clear\n");
+		const uint16_t old = IO_IRQ_STATUS;
+		IO_IRQ_STATUS &= ~0x0800;
+		if (IO_IRQ_STATUS != old)
+			check_irqs(0x0800);
+		break;
+	}
+
+	case 0x16: // Timer B Data
+		LOGMASKED(LOG_IO_WRITES, "io_w: Timer B Data = %04x\n", data);
+		m_io_regs[offset] = data;
+		m_timer_b_preload = data;
+		break;
+
+	case 0x17: // Timer B Control
+	{
+		static const char* const s_source_c[8] = { "0", "0", "32768Hz", "8192Hz", "4096Hz", "1", "0", "ExtClk1" };
+		LOGMASKED(LOG_IO_WRITES, "io_w: Timer B Control = %04x (Source C:%s)\n", data, s_source_c[data & 7]);
+		m_io_regs[offset] = data;
+		if (m_io_regs[0x18] == 1)
+		{
+			update_timer_b_rate();
+		}
+		break;
+	}
+
+	case 0x18: // Timer B Enable
+	{
+		LOGMASKED(LOG_IO_WRITES, "io_w: Timer B Enable = %04x\n", data);
+		m_io_regs[offset] = data & 1;
+		if (data & 1)
+		{
+			update_timer_b_rate();
+		}
+		else
+		{
+			m_timer_src_c->adjust(attotime::never);
+		}
+		break;
+	}
+
+	case 0x19: // Timer B IRQ Clear
+	{
+		LOGMASKED(LOG_IO_WRITES, "io_w: Timer B IRQ Clear\n");
+		const uint16_t old = IO_IRQ_STATUS;
+		IO_IRQ_STATUS &= ~0x0400;
+		if (IO_IRQ_STATUS != old)
+			check_irqs(0x0400);
+		break;
+	}
 
 	case 0x20: // System Control
 	{
@@ -1383,7 +1606,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		{
 			m_io_regs[0x27] = 0x8000 | (m_adc_in() & 0x7fff);
 			const uint16_t old = IO_IRQ_STATUS;
-			IO_IRQ_STATUS |= 0x4000;
+			IO_IRQ_STATUS |= 0x2000;
 			const uint16_t changed = IO_IRQ_STATUS ^ old;
 			if (changed)
 			{
@@ -1672,6 +1895,18 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		case TIMER_4KHZ:
 			system_timer_tick();
 			break;
+
+		case TIMER_SRC_A:
+			update_timer_a_src();
+			break;
+
+		case TIMER_SRC_B:
+			update_timer_b_src();
+			break;
+
+		case TIMER_SRC_C:
+			update_timer_c_src();
+			break;
 	}
 }
 
@@ -1840,7 +2075,7 @@ uint16_t spg2xx_device::do_special_gpio(uint32_t index, uint16_t mask)
 	return data;
 }
 
-void spg2xx_device::do_gpio(uint32_t offset)
+void spg2xx_device::do_gpio(uint32_t offset, bool write)
 {
 	uint32_t index = (offset - 1) / 5;
 	uint16_t buffer = m_io_regs[5 * index + 2];
@@ -1857,16 +2092,25 @@ void spg2xx_device::do_gpio(uint32_t offset)
 	switch (index)
 	{
 		case 0:
-			m_porta_out(0, what, push &~ special);
-			what = (what & ~pull) | (m_porta_in(0, pull &~ special) & pull);
+			if (write)
+				m_porta_out(0, what, push &~ special);
+			what = (what & ~pull);
+			if (!write)
+				what |= m_porta_in(0, pull &~ special) & pull;
 			break;
 		case 1:
-			m_portb_out(0, what, push &~ special);
-			what = (what & ~pull) | (m_portb_in(0, pull &~ special) & pull);
+			if (write)
+				m_portb_out(0, what, push &~ special);
+			what = (what & ~pull);
+			if (!write)
+				what |= m_portb_in(0, pull &~ special) & pull;
 			break;
 		case 2:
-			m_portc_out(0, what, push &~ special);
-			what = (what & ~pull) | (m_portc_in(0, pull &~ special) & pull);
+			if (write)
+				m_portc_out(0, what, push &~ special);
+			what = (what & ~pull);
+			if (!write)
+				what |= m_portc_in(0, pull &~ special) & pull;
 			break;
 	}
 

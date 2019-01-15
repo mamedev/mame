@@ -396,6 +396,9 @@ protected:
 	static const device_timer_id TIMER_UART_TX = 4;
 	static const device_timer_id TIMER_UART_RX = 5;
 	static const device_timer_id TIMER_4KHZ = 6;
+	static const device_timer_id TIMER_SRC_A = 7;
+	static const device_timer_id TIMER_SRC_B = 8;
+	static const device_timer_id TIMER_SRC_C = 9;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -403,8 +406,14 @@ protected:
 
 	void update_porta_special_modes();
 	void update_portb_special_modes();
-	void do_gpio(uint32_t offset);
+	void do_gpio(uint32_t offset, bool write);
 	uint16_t do_special_gpio(uint32_t index, uint16_t mask);
+
+	void update_timer_b_rate();
+	void update_timer_a_src();
+	void update_timer_b_src();
+	void update_timer_c_src();
+	void increment_timer_a();
 
 	void uart_transmit_tick();
 	void uart_receive_tick();
@@ -507,8 +516,18 @@ protected:
 
 	devcb_write8 m_chip_sel;
 
+	uint16_t m_timer_a_preload;
+	uint16_t m_timer_b_preload;
+
+	int m_timer_a_state;
+	int m_timer_b_state;
+	int m_timer_c_state;
+
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
+	emu_timer *m_timer_src_a;
+	emu_timer *m_timer_src_b;
+	emu_timer *m_timer_src_c;
 	emu_timer *m_screenpos_timer;
 	emu_timer *m_audio_beat;
 

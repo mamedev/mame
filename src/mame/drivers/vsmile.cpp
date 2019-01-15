@@ -53,7 +53,6 @@ public:
 		, m_io_joy(*this, "JOY")
 		, m_io_colors(*this, "COLORS")
 		, m_io_buttons(*this, "BUTTONS")
-		, m_io_power(*this, "POWER")
 		, m_cart_region(nullptr)
 		, m_uart_tx_timer(nullptr)
 		, m_pad_timer(nullptr)
@@ -128,7 +127,6 @@ private:
 	required_ioport m_io_joy;
 	required_ioport m_io_colors;
 	required_ioport m_io_buttons;
-	required_ioport m_io_power;
 	memory_region *m_cart_region;
 
 	bool m_ctrl_cts[2];
@@ -218,29 +216,14 @@ READ16_MEMBER(vsmile_state::bank2_r)
 
 READ16_MEMBER(vsmile_state::bank3_r)
 {
+	//return ((uint16_t*)m_cart_region->base())[offset + 0x300000];
 	return ((uint16_t*)m_system_region->base())[offset];
 }
 
 READ16_MEMBER(vsmile_state::portb_r)
 {
-	const uint8_t power = m_io_power->read();
-	uint16_t data = m_portb_data;
-
-	if (BIT(power, 0))
-		data |= VSMILE_PORTB_ON_SW;
-	else
-		data &= ~VSMILE_PORTB_ON_SW;
-
-	if (BIT(power, 1))
-		data |= VSMILE_PORTB_OFF_SW;
-	else
-		data &= ~VSMILE_PORTB_OFF_SW;
-
-	if (BIT(power, 2))
-		data |= VSMILE_PORTB_OFF;
-	else
-		data &= ~VSMILE_PORTB_OFF;
-
+	uint8_t data = m_portb_data;
+	m_portb_data = VSMILE_PORTB_OFF_SW | VSMILE_PORTB_ON_SW | VSMILE_PORTB_RESET;
 	return data;
 }
 
@@ -250,13 +233,12 @@ READ16_MEMBER(vsmile_state::portc_r)
 	data |= m_ctrl_rts[0] ? 0 : 0x0400;
 	data |= m_ctrl_rts[1] ? 0 : 0x1000;
 	data |= 0x2000;
+	//data = machine().rand() & 0xffff;
 	return data;
 }
 
 WRITE16_MEMBER(vsmile_state::portb_w)
 {
-	m_portb_data = data;
-	//logerror("V.Smile Port B write %04x, mask %04x\n", m_portb_data, mem_mask);
 }
 
 WRITE16_MEMBER(vsmile_state::portc_w)
@@ -425,7 +407,7 @@ void vsmile_state::banked_map(address_map &map)
 
 	map(0x1800000, 0x18fffff).r(FUNC(vsmile_state::bank0_r));
 	map(0x1900000, 0x19fffff).r(FUNC(vsmile_state::bank1_r));
-	map(0x1a00000, 0x1afffff).nopr();
+	map(0x1a00000, 0x1afffff).r(FUNC(vsmile_state::bank2_r));
 	map(0x1b00000, 0x1bfffff).r(FUNC(vsmile_state::bank3_r));
 }
 
@@ -456,12 +438,6 @@ static INPUT_PORTS_START( vsmile )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_button_changed, 2) PORT_NAME("Help")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_button_changed, 3) PORT_NAME("ABC")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("POWER")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Power On")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Power Off")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Soft Off")
-	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void vsmile_state::vsmile(machine_config &config)
