@@ -1076,7 +1076,8 @@ void md_boot_state::init_twinktmb()
 	rom[0x07] = 0x46;
 	rom[0x06] = 0xcc;
 
-	init_sonic2mb();
+	init_megadrij();
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(md_boot_state::twinktmb_r),this));
 }
 
