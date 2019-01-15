@@ -1264,6 +1264,7 @@ kccomp                          // VEB KC compact
 @source:amusco.cpp
 amusco                          // 1987, Amusco.
 draw88pkr                       // 1988, BTE, Inc.
+freeway
 
 @source:amust.cpp
 amust                           //
@@ -36233,6 +36234,7 @@ humlan                          // (c) 2001 Subsino & Truemax
 mtrain                          // (c) 1996 Subsino
 new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
+queenbee                        // (c) 2001 Subsino
 saklove                         // (c) 1998 Subsino
 squeenb                         // (c) 2002 Subsino
 wtrnymph                        // (c) 1996 Subsino

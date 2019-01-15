@@ -22,6 +22,7 @@ Year  Game                CPU         Sound            Custom                   
 1999  Bishou Jan          H8/3044**   SS9904           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 1999  X-Train/P-Train     AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 2000  New 2001            H8/3044**   SS9904           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
+2001  Queen Bee           H8/3044**   SS9804           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 2001  Humlan's Lyckohjul  H8/3044**   SS9804           SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
 2002  Super Queen Bee     H8/3044**   ?                ?                                 ?
 2006  X-Plan              AM188-EM    M6295            SS9601, SS9802, SS9803            HM86171 RAMDAC, Battery
@@ -114,6 +115,7 @@ public:
 
 	void init_bishjan();
 	void init_new2001();
+	void init_queenbee();
 	void init_humlan();
 	void init_squeenb();
 	void init_xtrain();
@@ -2700,6 +2702,44 @@ void subsino2_state::init_new2001()
 
 /***************************************************************************
 
+Queen Bee
+(c) 2001 Subsino
+
+no ROM labels available
+
+***************************************************************************/
+
+ROM_START( queenbee )
+	ROM_REGION( 0x80000, "maincpu", 0 )    // H8/3044
+	ROM_LOAD( "u21", 0x00000, 0x40000, CRC(23e0ad8f) SHA1(d913ebd249c471ab36aabe515a8b36bb3590c1ca) )
+	ROM_FILL(                            0x40000, 0x40000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 ) // this PCB has a single surface mounted ROM, which hasn't been dumped.
+	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+	// following ROMs are taken from humlan for testing, it doesn't seem to be a case of just differently split ROMs.
+	// ROM_LOAD32_BYTE( "hlj__truemax_3_v402.u25", 0x000000, 0x80000, CRC(dfc8d795) SHA1(93e0fe271c7390596f73092720befe11d8354838) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_4_v402.u26", 0x000001, 0x80000, CRC(31c774d6) SHA1(13fcdb42f5fd7d0cadd3fd7030037c21b7585f0f) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000002, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
+	// ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
+
+	ROM_REGION( 0x40000, "samples", 0 )
+	ROM_LOAD( "u9", 0x000000, 0x40000, NO_DUMP )
+ROM_END
+
+void subsino2_state::init_queenbee()
+{
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
+
+	// patch serial protection test (ERROR 093099 otherwise)
+	rom[0x1826/2] = 0x4066;
+
+	// rts -> rte
+	rom[0x3902/2] = 0x5670; // IRQ 8
+	rom[0x3a56/2] = 0x5670; // IRQ 0
+}
+
+/***************************************************************************
+
 Humlan's Lyckohjul (Sweden, V402)
 (c) 2001 Subsino & Truemax
 
@@ -3224,5 +3264,6 @@ GAME( 1999, ptrain,   0,        xtrain,   xtrain,   subsino2_state, init_ptrain,
 GAME( 1999, bishjan,  0,        bishjan,  bishjan,  subsino2_state, init_bishjan,  ROT0, "Subsino",                   "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
 GAME( 2000, new2001,  0,        new2001,  new2001,  subsino2_state, init_new2001,  ROT0, "Subsino",                   "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
 GAME( 2006, xplan,    0,        xplan,    xplan,    subsino2_state, init_xplan,    ROT0, "Subsino",                   "X-Plan (Ver. 101)",                     0 )
-GAME( 2001, humlan,   0,        humlan,   humlan,   subsino2_state, init_humlan,   ROT0, "Subsino (Truemax license)", "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2002, squeenb,  0,        humlan,   humlan,   subsino2_state, init_squeenb,  ROT0, "Subsino",                   "Super Queen Bee (Ver. 101)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, queenbee, 0,        humlan,   humlan,   subsino2_state, init_queenbee, ROT0, "Subsino",                   "Queen Bee (Brazil, Ver. 202)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues, only program ROM available
+GAME( 2001, humlan,   queenbee, humlan,   humlan,   subsino2_state, init_humlan,   ROT0, "Subsino (Truemax license)", "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
+GAME( 2002, squeenb,  0,        humlan,   humlan,   subsino2_state, init_squeenb,  ROT0, "Subsino",                   "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // severe timing issues
