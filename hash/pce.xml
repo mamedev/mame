@@ -761,7 +761,7 @@
 	<software name="deadmoon">
 		<description>Dead Moon - Tsuki Sekai no Akumu</description>
 		<year>1990</year>
-		<publisher>B.S.S.</publisher>
+		<publisher>T.S.S.</publisher>
 		<info name="serial" value="TS91001"/>
 		<info name="release" value="19910222"/>
 		<info name="alt_title" value="デッドムーン 月世界の悪夢"/>
@@ -3466,7 +3466,7 @@
 	</software>
 
 	<software name="sidearms">
-		<description>Sidearms - Hyper Dyne</description>
+		<description>Side Arms - Hyper Dyne</description>
 		<year>1989</year>
 		<publisher>NEC</publisher>
 		<info name="serial" value="H54G-1004"/>
