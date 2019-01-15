@@ -842,6 +842,8 @@ void jakks_gkr_state::jakks_gkr_nk(machine_config &config)
 	jakks_gkr(config);
 
 	SOFTWARE_LIST(config, "jakks_gamekey_nk").set_original("jakks_gamekey_nk");
+
+	SOFTWARE_LIST(config, "jakks_gamekey_dy").set_original("jakks_gamekey_dy"); // doesn't belong here, but there are no DY base games dumped yet so just ensure it isn't orphaned
 }
 
 

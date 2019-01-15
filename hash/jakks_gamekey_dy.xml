@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="jakks_gamekey_dy" description="JAKKS Pacific 'DY' Game Keys">
+	
+	<!-- This list is for the 'DY' coded Game Keys, for Disney base systems (not Disney Princess) -->
+	
+	<!--  One of them doesn't use the /OE signal from the game, and has 16 10K resistors tying the data lines high.
+	   Silkscreened onto both PCBs is the text A1 A2 A3 A4 with 2 boxes next to each with H and L.  Both PCBs are marked A1 H A3 L. -->
+	
+	<software name="sbwlgoof" supported="no"> <!-- AT24C04 SEEPROM -->
+		<description>Sports Bowling &amp; Goofy's Underwater Adventure</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<dataarea name="rom" size="0x200000">
+				<rom name="dy_disneygkbowlinggoofy.bin" size="0x200000" crc="d2147aa4" sha1="0db986aac68868a2ff4936e93178da8c592ac81d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stenfchs" supported="no"> <!-- AT24C04 SEEPROM -->
+		<description>Sports Tennis &amp; Face Chase</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<dataarea name="rom" size="0x200000">
+				<rom name="dy_disneygktennisfacechase.bin" size="0x200000" crc="ba37ccf2" sha1="c7204a0499b6949f3f70f0f5c042d353435406fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- There is another key with "Sports Tennis" "Face Chase" and "The Riches of Agrabah" which was sold as part of a 2-key + unit bundle -->
+
+</softwarelist>
