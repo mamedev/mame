@@ -36,8 +36,8 @@ class matrix_solver_direct_t: public matrix_solver_t
 	friend class matrix_solver_t;
 public:
 
-	matrix_solver_direct_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
-	matrix_solver_direct_t(netlist_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
 
 	virtual ~matrix_solver_direct_t() override;
 
@@ -253,7 +253,7 @@ unsigned matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool n
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetlist, const pstring &name,
+matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, ASCENDING, params)
 , m_dim(size)
@@ -269,7 +269,7 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetli
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetlist, const pstring &name,
+matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name,
 		const eSortType sort, const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, sort, params)
 , m_dim(size)

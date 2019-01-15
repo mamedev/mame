@@ -65,7 +65,7 @@ namespace netlist
 			logic_net_t &net = m_Q.net();
 			// this is only called during setup ...
 			net.toggle_new_Q();
-			net.set_time(netlist().time() + m_inc);
+			net.set_time(exec().time() + m_inc);
 		}
 
 	public:

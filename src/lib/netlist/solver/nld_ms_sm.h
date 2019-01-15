@@ -54,7 +54,7 @@ class matrix_solver_sm_t: public matrix_solver_t
 
 public:
 
-	matrix_solver_sm_t(netlist_t &anetlist, const pstring &name,
+	matrix_solver_sm_t(netlist_base_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size);
 
 	virtual ~matrix_solver_sm_t() override;
@@ -307,7 +307,7 @@ unsigned matrix_solver_sm_t<m_N, storage_N>::vsolve_non_dynamic(const bool newto
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_sm_t<m_N, storage_N>::matrix_solver_sm_t(netlist_t &anetlist, const pstring &name,
+matrix_solver_sm_t<m_N, storage_N>::matrix_solver_sm_t(netlist_base_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, NOSORT, params)
 , m_dim(size)

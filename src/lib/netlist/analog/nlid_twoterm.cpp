@@ -100,7 +100,7 @@ NETLIB_UPDATE(twoterm)
 NETLIB_RESET(R_base)
 {
 	NETLIB_NAME(twoterm)::reset();
-	set_R(1.0 / netlist().gmin());
+	set_R(1.0 / exec().gmin());
 }
 
 NETLIB_UPDATE(R_base)
@@ -115,13 +115,13 @@ NETLIB_UPDATE(R_base)
 NETLIB_UPDATE_PARAM(R)
 {
 	update_dev();
-	set_R(std::max(m_R(), netlist().gmin()));
+	set_R(std::max(m_R(), exec().gmin()));
 }
 
 NETLIB_RESET(R)
 {
 	NETLIB_NAME(twoterm)::reset();
-	set_R(std::max(m_R(), netlist().gmin()));
+	set_R(std::max(m_R(), exec().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -134,8 +134,8 @@ NETLIB_RESET(POT)
 	if (m_DialIsLog())
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
-	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
-	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), netlist().gmin()));
+	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
+	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), exec().gmin()));
 }
 
 NETLIB_UPDATE_PARAM(POT)
@@ -147,8 +147,8 @@ NETLIB_UPDATE_PARAM(POT)
 	if (m_DialIsLog())
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
-	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
-	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), netlist().gmin()));
+	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
+	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), exec().gmin()));
 
 }
 
@@ -164,7 +164,7 @@ NETLIB_RESET(POT2)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 	if (m_Reverse())
 		v = 1.0 - v;
-	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
+	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 }
 
 
@@ -178,7 +178,7 @@ NETLIB_UPDATE_PARAM(POT2)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 	if (m_Reverse())
 		v = 1.0 - v;
-	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
+	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -188,13 +188,13 @@ NETLIB_UPDATE_PARAM(POT2)
 NETLIB_RESET(C)
 {
 	// FIXME: Startup conditions
-	set(netlist().gmin(), 0.0, -5.0 / netlist().gmin());
-	//set(netlist().gmin(), 0.0, 0.0);
+	set(exec().gmin(), 0.0, -5.0 / exec().gmin());
+	//set(exec().gmin(), 0.0, 0.0);
 }
 
 NETLIB_UPDATE_PARAM(C)
 {
-	m_GParallel = netlist().gmin();
+	m_GParallel = exec().gmin();
 }
 
 NETLIB_UPDATE(C)
@@ -218,7 +218,7 @@ NETLIB_TIMESTEP(C)
 
 NETLIB_RESET(L)
 {
-	m_GParallel = netlist().gmin();
+	m_GParallel = exec().gmin();
 	m_I = 0.0;
 	m_G = m_GParallel;
 	set_mat( m_G, -m_G, -m_I,
@@ -254,7 +254,7 @@ NETLIB_RESET(D)
 	nl_double Is = m_model.m_IS;
 	nl_double n = m_model.m_N;
 
-	m_D.set_param(Is, n, netlist().gmin());
+	m_D.set_param(Is, n, exec().gmin());
 	set(m_D.G(), 0.0, m_D.Ieq());
 }
 
@@ -263,7 +263,7 @@ NETLIB_UPDATE_PARAM(D)
 	nl_double Is = m_model.m_IS;
 	nl_double n = m_model.m_N;
 
-	m_D.set_param(Is, n, netlist().gmin());
+	m_D.set_param(Is, n, exec().gmin());
 }
 
 NETLIB_UPDATE(D)
@@ -299,7 +299,7 @@ NETLIB_UPDATE(VS)
 NETLIB_TIMESTEP(VS)
 {
 	this->set(1.0 / m_R(),
-			m_compiled.evaluate(std::vector<double>({netlist().time().as_double()})),
+			m_compiled.evaluate(std::vector<double>({exec().time().as_double()})),
 			0.0);
 }
 
@@ -324,7 +324,7 @@ NETLIB_UPDATE(CS)
 
 NETLIB_TIMESTEP(CS)
 {
-	const double I = m_compiled.evaluate(std::vector<double>({netlist().time().as_double()}));
+	const double I = m_compiled.evaluate(std::vector<double>({exec().time().as_double()}));
 	set_mat(0.0, 0.0, -I,
 			0.0, 0.0,  I);
 }

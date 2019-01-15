@@ -117,7 +117,7 @@ namespace {
 class NETLIB_NAME(analog_callback) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(analog_callback)(netlist::netlist_t &anetlist, const pstring &name)
+	NETLIB_NAME(analog_callback)(netlist::netlist_base_t &anetlist, const pstring &name)
 		: device_t(anetlist, name)
 		, m_in(*this, "IN")
 		, m_cpu_device(nullptr)
@@ -165,7 +165,7 @@ private:
 class NETLIB_NAME(logic_callback) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(logic_callback)(netlist::netlist_t &anetlist, const pstring &name)
+	NETLIB_NAME(logic_callback)(netlist::netlist_base_t &anetlist, const pstring &name)
 		: device_t(anetlist, name)
 		, m_in(*this, "IN")
 		, m_cpu_device(nullptr)
@@ -273,7 +273,7 @@ std::unique_ptr<plib::pistream> netlist_data_memregions_t::stream(const pstring 
 class NETLIB_NAME(sound_out) : public netlist::device_t
 {
 public:
-	NETLIB_NAME(sound_out)(netlist::netlist_t &anetlist, const pstring &name)
+	NETLIB_NAME(sound_out)(netlist::netlist_base_t &anetlist, const pstring &name)
 		: netlist::device_t(anetlist, name)
 		, m_channel(*this, "CHAN", 0)
 		, m_mult(*this, "MULT", 1000.0)
@@ -311,7 +311,7 @@ public:
 	NETLIB_UPDATEI()
 	{
 		nl_double val = m_in() * m_mult() + m_offset();
-		sound_update(netlist().time());
+		sound_update(exec().time());
 		/* ignore spikes */
 		if (std::abs(val) < 32767.0)
 			m_cur = val;
@@ -355,7 +355,7 @@ public:
 
 	static const int MAX_INPUT_CHANNELS = 16;
 
-	NETLIB_NAME(sound_in)(netlist::netlist_t &anetlist, const pstring &name)
+	NETLIB_NAME(sound_in)(netlist::netlist_base_t &anetlist, const pstring &name)
 	: netlist::device_t(anetlist, name)
 	, m_inc(netlist::netlist_time::from_nsec(1))
 	, m_feedback(*this, "FB") // clock part

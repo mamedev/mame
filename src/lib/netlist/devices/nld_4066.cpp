@@ -5,9 +5,11 @@
  *
  */
 
-#include "nlid_cmos.h"
-#include "../analog/nlid_twoterm.h"
 #include "nld_4066.h"
+
+#include "nlid_cmos.h"
+#include "netlist/analog/nlid_twoterm.h"
+#include "netlist/solver/nld_solver.h"
 
 namespace netlist
 {
@@ -39,7 +41,7 @@ namespace netlist
 	{
 		// Start in off condition
 		// FIXME: is ROFF correct?
-		m_R.set_R(NL_FCONST(1.0) / netlist().gmin());
+		m_R.set_R(NL_FCONST(1.0) / exec().gmin());
 
 	}
 
@@ -54,7 +56,7 @@ namespace netlist
 
 		if (in < low)
 		{
-			R = NL_FCONST(1.0) / netlist().gmin();
+			R = NL_FCONST(1.0) / exec().gmin();
 		}
 		else if (in > high)
 		{

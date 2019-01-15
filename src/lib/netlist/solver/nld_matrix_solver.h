@@ -144,7 +144,7 @@ public:
 
 protected:
 
-	matrix_solver_t(netlist_t &anetlist, const pstring &name,
+	matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
 			const eSortType sort, const solver_parameters_t *params);
 
 	void setup_base(analog_net_t::list_t &nets);

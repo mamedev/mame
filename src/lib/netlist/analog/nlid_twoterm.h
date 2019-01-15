@@ -55,7 +55,7 @@ namespace netlist
 			return b ? *h : d2;
 		}
 		template<>
-		inline core_device_t &bselect(bool b, netlist_t &d1, core_device_t &d2)
+		inline core_device_t &bselect(bool b, netlist_base_t &d1, core_device_t &d2)
 		{
 			if (b)
 				throw nl_exception("bselect with netlist and b==true");

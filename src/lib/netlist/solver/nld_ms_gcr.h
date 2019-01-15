@@ -28,7 +28,7 @@ class matrix_solver_GCR_t: public matrix_solver_t
 {
 public:
 
-	matrix_solver_GCR_t(netlist_t &anetlist, const pstring &name,
+	matrix_solver_GCR_t(netlist_base_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_t(anetlist, name, matrix_solver_t::ASCENDING, params)
 		, m_dim(size)

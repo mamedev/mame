@@ -68,7 +68,7 @@ NETLIB_OBJECT(solver)
 	void post_start();
 	void stop();
 
-	nl_double gmin() { return m_gmin(); }
+	nl_double gmin() const { return m_gmin(); }
 
 	void create_solver_code(std::map<pstring, pstring> &mp);
 
