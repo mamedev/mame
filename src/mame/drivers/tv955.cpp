@@ -104,7 +104,13 @@ void tv955_state::control_latch_w(u8 data)
 
 WRITE_LINE_MEMBER(tv955_state::system_reset_w)
 {
-	// TODO
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	if (!state)
+	{
+		m_keybuart->reset();
+		m_printuart->reset();
+		m_hostuart->reset();
+	}
 }
 
 void tv955_state::mem_map(address_map &map)
@@ -213,4 +219,4 @@ ROM_START( tv955 )
 	ROM_LOAD( "t180002-26b.u45",     0x0000, 0x1000, CRC(69c9ebc7) SHA1(32282c816ec597a7c45e939acb7a4155d35ea584) )
 ROM_END
 
-COMP( 1985, tv955, 0, 0, tv955, tv955, tv955_state, empty_init, "TeleVideo Systems", "TeleVideo 955", MACHINE_IS_SKELETON )
+COMP( 1985, tv955, 0, 0, tv955, tv955, tv955_state, empty_init, "TeleVideo Systems", "TeleVideo 955", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
