@@ -25,13 +25,12 @@
 
 namespace netlist
 {
-setup_t::setup_t(netlist_base_t &netlist)
+setup_t::setup_t(netlist_t &netlist)
 	: m_netlist(netlist)
 	, m_factory(*this)
 	, m_proxy_cnt(0)
 	, m_frontier_cnt(0)
 {
-	devices::initialize_factory(m_factory);
 }
 
 setup_t::~setup_t()
@@ -44,6 +43,16 @@ setup_t::~setup_t()
 
 	m_sources.clear();
 }
+
+netlist_state_t &setup_t::netlist()
+{
+	return m_netlist.nlstate();
+}
+const netlist_state_t &setup_t::netlist() const
+{
+	return m_netlist.nlstate();
+}
+
 
 pstring setup_t::build_fqn(const pstring &obj_name) const
 {
@@ -381,7 +390,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 
 		proxy = new_proxy.get();
 
-		netlist().register_dev(std::move(new_proxy));
+		m_netlist.nlstate().add_dev(std::move(new_proxy));
 	}
 	return proxy;
 }
@@ -420,7 +429,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 			inp.net().m_core_terms.clear(); // clear the list
 		}
 		ret->out().net().add_terminal(inp);
-		netlist().register_dev(std::move(new_proxy));
+		m_netlist.nlstate().add_dev(std::move(new_proxy));
 		return ret;
 	}
 }
@@ -687,7 +696,7 @@ void setup_t::resolve_inputs()
 
 	// delete empty nets
 
-	netlist().delete_empty_nets();
+	delete_empty_nets();
 
 	pstring errstr("");
 
@@ -722,7 +731,7 @@ void setup_t::register_dynamic_log_devices()
 			auto nc = factory().factory_by_name("LOG")->Create(netlist(), name);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
-			netlist().register_dev(std::move(nc));
+			m_netlist.nlstate().add_dev(std::move(nc));
 		}
 	}
 }
@@ -942,6 +951,123 @@ void setup_t::register_define(const pstring &defstr)
 		register_define(plib::left(defstr, p), defstr.substr(p+1));
 	else
 		register_define(defstr, "1");
+}
+
+// ----------------------------------------------------------------------------------------
+// Device handling
+// ----------------------------------------------------------------------------------------
+
+void setup_t::delete_empty_nets()
+{
+	netlist().nets().erase(
+		std::remove_if(netlist().nets().begin(), netlist().nets().end(),
+			[](plib::owned_ptr<detail::net_t> &x)
+			{
+				if (x->num_cons() == 0)
+				{
+					x->state().log().verbose("Deleting net {1} ...", x->name());
+					return true;
+				}
+				else
+					return false;
+			}), netlist().nets().end());
+}
+
+// ----------------------------------------------------------------------------------------
+// Run preparation
+// ----------------------------------------------------------------------------------------
+
+void setup_t::prepare_to_run()
+{
+	register_dynamic_log_devices();
+
+	/* load the library ... */
+
+	/* make sure the solver and parameters are started first! */
+
+	for (auto & e : m_device_factory)
+	{
+		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
+				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
+		{
+			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
+			m_netlist.nlstate().add_dev(std::move(dev));
+		}
+	}
+
+	log().debug("Searching for solver and parameters ...\n");
+
+	auto solver = netlist().get_single_device<devices::NETLIB_NAME(solver)>("solver");
+	netlist().m_params = netlist().get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
+
+	/* create devices */
+
+	log().debug("Creating devices ...\n");
+	for (auto & e : m_device_factory)
+	{
+		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
+				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
+		{
+			auto dev = plib::owned_ptr<device_t>(e.second->Create(netlist(), e.first));
+			m_netlist.nlstate().add_dev(std::move(dev));
+		}
+	}
+
+	bool use_deactivate = (netlist().m_params->m_use_deactivate() ? true : false);
+
+	for (auto &d : netlist().devices())
+	{
+		if (use_deactivate)
+		{
+			auto p = m_param_values.find(d->name() + ".HINT_NO_DEACTIVATE");
+			if (p != m_param_values.end())
+			{
+				//FIXME: check for errors ...
+				double v = plib::pstonum<double>(p->second);
+				if (std::abs(v - std::floor(v)) > 1e-6 )
+					log().fatal(MF_1_HND_VAL_NOT_SUPPORTED, p->second);
+				d->set_hint_deactivate(v == 0.0);
+			}
+		}
+		else
+			d->set_hint_deactivate(false);
+	}
+
+	/* resolve inputs */
+	resolve_inputs();
+
+	log().verbose("looking for two terms connected to rail nets ...");
+	for (auto & t : m_netlist.nlstate().get_device_list<analog::NETLIB_NAME(twoterm)>())
+	{
+		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
+		{
+			log().warning(MW_3_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3,
+				t->name(), t->m_N.net().name(), t->m_P.net().name());
+			t->m_N.net().remove_terminal(t->m_N);
+			t->m_P.net().remove_terminal(t->m_P);
+			m_netlist.nlstate().remove_dev(t);
+		}
+	}
+
+	log().verbose("initialize solver ...\n");
+
+	if (solver == nullptr)
+	{
+		for (auto &p : netlist().nets())
+			if (p->is_analog())
+				log().fatal(MF_0_NO_SOLVER);
+	}
+	else
+		solver->post_start();
+
+	for (auto &n : netlist().nets())
+		for (auto & term : n->m_core_terms)
+		{
+			//core_device_t *dev = reinterpret_cast<core_device_t *>(term->m_delegate.object());
+			core_device_t *dev = &term->device();
+			dev->set_default_delegate(*term);
+		}
+
 }
 
 // ----------------------------------------------------------------------------------------

@@ -39,7 +39,7 @@ namespace netlist
 		void net_truthtable_start(const pstring &nlname);
 
 		/* for debugging messages */
-		netlist_base_t &netlist() { return m_setup.netlist(); }
+		netlist_state_t &netlist() { return m_setup.netlist(); }
 
 		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
 	private:

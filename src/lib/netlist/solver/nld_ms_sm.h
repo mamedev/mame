@@ -122,10 +122,10 @@ void matrix_solver_sm_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_t::setup_base(nets);
 
-	netlist().save(*this, m_last_RHS, "m_last_RHS");
+	state().save(*this, m_last_RHS, "m_last_RHS");
 
 	for (unsigned k = 0; k < N(); k++)
-		netlist().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
+		state().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
 }
 
 

@@ -111,9 +111,9 @@ namespace netlist
 		for (int i = 0; i < 3; i++)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp = netlist().setup().find_terminal(devname + "." + power_syms[i][0],
+			auto tp = setup().find_terminal(devname + "." + power_syms[i][0],
 					detail::terminal_type::INPUT, false);
-			auto tn = netlist().setup().find_terminal(devname + "." + power_syms[i][1],
+			auto tn = setup().find_terminal(devname + "." + power_syms[i][1],
 					detail::terminal_type::INPUT, false);
 			if (tp != nullptr && tn != nullptr)
 			{

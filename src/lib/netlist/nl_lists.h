@@ -62,10 +62,10 @@ namespace netlist
 	struct pqentry_t final
 	{
 		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
-		constexpr pqentry_t(const Time &t, const Element &o) noexcept : m_exec_time(t), m_object(o) { }
+		constexpr pqentry_t(const Time t, const Element o) noexcept : m_exec_time(t), m_object(o) { }
 		~pqentry_t() = default;
 		constexpr pqentry_t(const pqentry_t &e) noexcept = default;
-		constexpr pqentry_t(pqentry_t &&e) = default;
+		constexpr pqentry_t(pqentry_t &&e) noexcept = default;
 		pqentry_t& operator=(pqentry_t && other) noexcept = default;
 		pqentry_t& operator=(const pqentry_t &other) noexcept = default;
 
@@ -131,7 +131,7 @@ namespace netlist
 		}
 
 		void pop() noexcept              { --m_end; }
-		const T &top() const noexcept { return *(m_end-1); }
+		const T top() const noexcept { return *(m_end-1); }
 
 		template <class R>
 		void remove(const R &elem) noexcept

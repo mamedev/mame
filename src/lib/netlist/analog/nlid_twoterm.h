@@ -33,7 +33,8 @@
 #ifndef NLID_TWOTERM_H_
 #define NLID_TWOTERM_H_
 
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
 #include "../plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
@@ -400,7 +401,7 @@ public:
 	, m_R(*this, "R", 0.1)
 	, m_V(*this, "V", 0.0)
 	, m_func(*this,"FUNC", "")
-	, m_compiled(this->name() + ".FUNCC", this, this->netlist().state())
+	, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
 	{
 		register_subalias("P", m_P);
 		register_subalias("N", m_N);
@@ -431,7 +432,7 @@ public:
 	NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
 	, m_I(*this, "I", 1.0)
 	, m_func(*this,"FUNC", "")
-	, m_compiled(this->name() + ".FUNCC", this, this->netlist().state())
+	, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
 	{
 		register_subalias("P", m_P);
 		register_subalias("N", m_N);

@@ -151,7 +151,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	// FIXME: Move me
 
-	if (netlist().lib().isLoaded())
+	if (state().lib().isLoaded())
 	{
 		pstring symname = static_compile_name();
 #if 0
@@ -161,7 +161,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		else
 			this->log().warning("External static solver {1} not found ...", symname);
 #else
-		m_proc.load(this->netlist().lib(), symname);
+		m_proc.load(this->state().lib(), symname);
 		if (m_proc.resolved())
 			this->log().warning("External static solver {1} found ...", symname);
 		else

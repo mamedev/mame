@@ -317,7 +317,7 @@ namespace netlist
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
 		, m_Q(*this, "Q")
-		, m_compiled(this->name() + ".FUNCC", this, this->netlist().state())
+		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
 		{
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)

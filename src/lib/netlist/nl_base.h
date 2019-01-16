@@ -211,7 +211,8 @@ namespace netlist
 	class net_t;
 	class setup_t;
 	class netlist_t;
-	class netlist_base_t;
+	class netlist_state_t;
+	typedef netlist_state_t netlist_base_t;
 	class core_device_t;
 	class device_t;
 	class callbacks_t;
@@ -425,19 +426,22 @@ namespace netlist
 
 	struct detail::netlist_ref
 	{
-		explicit constexpr netlist_ref(netlist_base_t &nl) : m_netlist(nl) { }
+		explicit netlist_ref(netlist_state_t &nl);
 
-		C14CONSTEXPR netlist_base_t & netlist() NL_NOEXCEPT { return m_netlist; }
-		constexpr const netlist_base_t & netlist() const NL_NOEXCEPT { return m_netlist; }
+		netlist_state_t & state();
+		const netlist_state_t & state() const;
 
-		netlist_t & exec() NL_NOEXCEPT { return *reinterpret_cast<netlist_t *>(&m_netlist); }
-		const netlist_t & exec() const NL_NOEXCEPT { return *reinterpret_cast<const netlist_t *>(&m_netlist); }
+		setup_t & setup();
+		const setup_t & setup() const;
+
+		C14CONSTEXPR netlist_t & exec() NL_NOEXCEPT { return m_netlist; }
+		constexpr const netlist_t & exec() const NL_NOEXCEPT { return m_netlist; }
 
 	protected:
 		~netlist_ref() = default; // prohibit polymorphic destruction
 
 	private:
-		netlist_base_t & m_netlist;
+		netlist_t & m_netlist;
 
 	};
 
@@ -469,8 +473,8 @@ namespace netlist
 		/*! The netlist owning the owner of this object.
 		 * \returns reference to netlist object.
 		 */
-		netlist_base_t &netlist() NL_NOEXCEPT;
-		const netlist_base_t &netlist() const NL_NOEXCEPT;
+		netlist_base_t &state() NL_NOEXCEPT;
+		const netlist_base_t &state() const NL_NOEXCEPT;
 
 		netlist_t &exec() NL_NOEXCEPT;
 		const netlist_t &exec() const NL_NOEXCEPT;
@@ -534,7 +538,7 @@ namespace netlist
 		bool is_analog() const NL_NOEXCEPT;
 
 		bool is_state(const state_e astate) const NL_NOEXCEPT { return (m_state == astate); }
-		const state_e &state() const NL_NOEXCEPT { return m_state; }
+		const state_e &terminal_state() const NL_NOEXCEPT { return m_state; }
 		void set_state(const state_e astate) NL_NOEXCEPT { m_state = astate; }
 
 		void reset() { set_state(is_type(OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
@@ -1156,7 +1160,6 @@ namespace netlist
 		setup_t &setup();
 		const setup_t &setup() const;
 
-
 		template<class C, typename... Args>
 		void register_sub(const pstring &name, std::unique_ptr<C> &dev, const Args&... args)
 		{
@@ -1213,7 +1216,7 @@ namespace netlist
 	{
 	public:
 		typedef pqentry_t<net_t *, netlist_time> entry_t;
-		explicit queue_t(netlist_t &nl);
+		explicit queue_t(netlist_state_t &nl);
 
 	protected:
 
@@ -1228,55 +1231,21 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// netlist_t
+	// netlist_state__t
 	// -----------------------------------------------------------------------------
 
-	class netlist_base_t : private plib::nocopyassignmove
+	class netlist_state_t : private plib::nocopyassignmove
 	{
 	public:
-
 		using nets_collection_type = std::vector<plib::owned_ptr<detail::net_t>>;
+		using devices_collection_type = std::vector<plib::owned_ptr<core_device_t>>;
+		netlist_state_t(const pstring &aname,
+			std::unique_ptr<callbacks_t> &&callbacks,
+			std::unique_ptr<setup_t> &&setup);
 
-		explicit netlist_base_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
-		~netlist_base_t();
+		~netlist_state_t();
 
-		/* Control functions */
-
-		void stop();
-		void reset();
-
-		// ========================================================
-		// configuration section
-		// ========================================================
-
-		void prepare_to_run();
-
-		// FIXME: sort rebuild_lists out
-		void rebuild_lists(); /* must be called after post_load ! */
-
-		/* netlist build functions */
-
-		setup_t &setup() NL_NOEXCEPT { return *m_setup; }
-		const setup_t &setup() const NL_NOEXCEPT { return *m_setup; }
-
-		void register_dev(plib::owned_ptr<core_device_t> dev);
-		void remove_dev(core_device_t *dev);
-
-		detail::net_t *find_net(const pstring &name) const;
-		std::size_t find_net_id(const detail::net_t *net) const;
-
-		template<class device_class>
-		std::vector<device_class *> get_device_list() const
-		{
-			std::vector<device_class *> tmp;
-			for (auto &d : m_devices)
-			{
-				device_class *dev = dynamic_cast<device_class *>(d.get());
-				if (dev != nullptr)
-					tmp.push_back(dev);
-			}
-			return tmp;
-		}
+		friend class netlist_t; // allow access to private members
 
 		template<class C>
 		static bool check_class(core_device_t *p)
@@ -1297,65 +1266,102 @@ namespace netlist
 		log_type & log() { return m_log; }
 		const log_type &log() const { return m_log; }
 
-		/* state related */
+		plib::dynlib &lib() { return *m_lib; }
 
-		plib::state_manager_t &state() { return m_state; }
+		/* state handling */
+
+		plib::state_manager_t &run_state_manager() { return m_state; }
 
 		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
 		{
-			this->state().save_item(static_cast<void *>(&owner), state, owner.name() + pstring(".") + stname);
+			this->run_state_manager().save_item(static_cast<void *>(&owner), state, owner.name() + pstring(".") + stname);
 		}
 		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
-			this->state().save_state_ptr(static_cast<void *>(&owner), owner.name() + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->run_state_manager().save_state_ptr(static_cast<void *>(&owner), owner.name() + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
 
-		plib::dynlib &lib() { return *m_lib; }
+		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
 
-		const nets_collection_type &nets() { return m_nets; }
+		detail::net_t *find_net(const pstring &name) const;
+		std::size_t find_net_id(const detail::net_t *net) const;
 
 		template <typename T>
-		void register_net(plib::owned_ptr<T> &&net)
+		void register_net(plib::owned_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
+
+		devices::NETLIB_NAME(netlistparams) *m_params;
+
+		template<class device_class>
+		inline std::vector<device_class *> get_device_list()
 		{
-			m_nets.push_back(std::move(net));
+			std::vector<device_class *> tmp;
+			for (auto &d : m_devices)
+			{
+				device_class *dev = dynamic_cast<device_class *>(d.get());
+				if (dev != nullptr)
+					tmp.push_back(dev);
+			}
+			return tmp;
 		}
 
-		void delete_empty_nets();
+		void add_dev(plib::owned_ptr<core_device_t> dev)
+		{
+			for (auto & d : m_devices)
+				if (d->name() == dev->name())
+					log().fatal(MF_1_DUPLICATE_NAME_DEVICE_LIST, d->name());
+			m_devices.push_back(std::move(dev));
+		}
+
+		void remove_dev(core_device_t *dev)
+		{
+			m_devices.erase(
+				std::remove_if(
+					m_devices.begin(),
+					m_devices.end(),
+					[&] (plib::owned_ptr<core_device_t> const& p)
+					{
+						return p.get() == dev;
+					}),
+					m_devices.end()
+				);
+		}
 
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 
-	protected:
+		setup_t &setup() NL_NOEXCEPT { return *m_setup; }
+		const setup_t &setup() const NL_NOEXCEPT { return *m_setup; }
 
-		/* sole use is to manage lifetime of net objects */
-		std::vector<plib::owned_ptr<core_device_t>> m_devices;
-		nets_collection_type m_nets;
+		nets_collection_type & nets() { return m_nets; }
+		devices_collection_type & devices() { return m_devices; }
+
+		// FIXME: make a postload member and include code there
+		void rebuild_lists(); /* must be called after post_load ! */
 
 	private:
 
-		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
-
-		/* mostly ro */
-
-		devices::NETLIB_NAME(netlistparams) *m_params;
+		void reset();
 
 		pstring                             m_name;
 		std::unique_ptr<plib::dynlib>       m_lib; // external lib needs to be loaded as long as netlist exists
-
 		plib::state_manager_t               m_state;
-
-
 		std::unique_ptr<callbacks_t> 		m_callbacks;
-		log_type							 m_log;
-		std::unique_ptr<setup_t>             m_setup;
+		log_type							m_log;
+		std::unique_ptr<setup_t>            m_setup;
+
+		nets_collection_type 			    m_nets;
+		/* sole use is to manage lifetime of net objects */
+		devices_collection_type 		    m_devices;
+
 	};
 
+	// -----------------------------------------------------------------------------
+	// netlist_t
+	// -----------------------------------------------------------------------------
 
-	class netlist_t : public netlist_base_t
+	class netlist_t
 	{
 	public:
-
-		using nets_collection_type = std::vector<plib::owned_ptr<detail::net_t>>;
 
 		explicit netlist_t(const pstring &aname, std::unique_ptr<callbacks_t> callbacks);
 		~netlist_t();
@@ -1375,6 +1381,10 @@ namespace netlist
 		void stop();
 		void reset();
 
+		/* state handling */
+
+		plib::state_manager_t &run_state_manager() { return m_state->run_state_manager(); }
+
 		/* only used by nltool to create static c-code */
 		devices::NETLIB_NAME(solver) *solver() const NL_NOEXCEPT { return m_solver; }
 
@@ -1385,11 +1395,17 @@ namespace netlist
 			return static_cast<X *>(m_solver)->gmin();
 		}
 
-	protected:
+		netlist_state_t &nlstate() NL_NOEXCEPT { return *m_state; }
+		const netlist_state_t &nlstate() const { return *m_state; }
+
+		log_type & log() { return m_state->log(); }
+		const log_type &log() const { return m_state->log(); }
 
 		void print_stats() const;
 
 	private:
+		std::unique_ptr<netlist_state_t>	m_state;
+
 		/* mostly rw */
 		netlist_time                        m_time;
 		devices::NETLIB_NAME(mainclock) *   m_mainclock;
@@ -1426,6 +1442,26 @@ namespace netlist
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
+	inline netlist_state_t & detail::netlist_ref::state()
+	{
+		return m_netlist.nlstate();
+	}
+
+	inline const netlist_state_t & detail::netlist_ref::state() const
+	{
+		return m_netlist.nlstate();
+	}
+
+	inline setup_t & detail::netlist_ref::setup()
+	{
+		return m_netlist.nlstate().setup();
+	}
+
+	inline const setup_t & detail::netlist_ref::setup() const
+	{
+		return m_netlist.nlstate().setup();
+	}
+
 	template <typename T>
 	param_num_t<T>::param_num_t(device_t &device, const pstring &name, const T val)
 	: param_t(device, name)
@@ -1438,13 +1474,13 @@ namespace netlist
 			bool err = false;
 			T vald = plib::pstonum_ne<T>(p, err);
 			if (err)
-				netlist().log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, p);
+				device.state().log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, p);
 			m_param = vald;
 		}
 		else
 			m_param = val;
 
-		netlist().save(*this, m_param, "m_param");
+		device.state().save(*this, m_param, "m_param");
 	}
 
 	template <typename ST, std::size_t AW, std::size_t DW>
@@ -1455,7 +1491,7 @@ namespace netlist
 		if (f != nullptr)
 			f->read(&m_data[0],1<<AW);
 		else
-			device.netlist().log().warning("Rom {1} not found", Value());
+			device.state().log().warning("Rom {1} not found", Value());
 	}
 
 	inline void logic_input_t::inactivate() NL_NOEXCEPT
@@ -1531,7 +1567,7 @@ namespace netlist
 
 	inline const netlist_sig_t & logic_input_t::Q() const NL_NOEXCEPT
 	{
-		nl_assert(state() != STATE_INP_PASSIVE);
+		nl_assert(terminal_state() != STATE_INP_PASSIVE);
 		return net().Q();
 	}
 
@@ -1549,14 +1585,14 @@ namespace netlist
 		}
 	}
 
-	inline netlist_base_t &detail::device_object_t::netlist() NL_NOEXCEPT
+	inline netlist_base_t &detail::device_object_t::state() NL_NOEXCEPT
 	{
-		return m_device.netlist();
+		return m_device.state();
 	}
 
-	inline const netlist_base_t &detail::device_object_t::netlist() const NL_NOEXCEPT
+	inline const netlist_base_t &detail::device_object_t::state() const NL_NOEXCEPT
 	{
-		return m_device.netlist();
+		return m_device.state();
 	}
 
 	inline netlist_t &detail::device_object_t::exec() NL_NOEXCEPT
@@ -1574,14 +1610,14 @@ namespace netlist
 	state_var<T>::state_var(O &owner, const pstring &name, const T &value)
 	: m_value(value)
 	{
-		owner.netlist().save(owner, m_value, name);
+		owner.state().save(owner, m_value, name);
 	}
 
 	template <typename T, std::size_t N>
 	template <typename O>
 	state_var<T[N]>::state_var(O &owner, const pstring &name, const T & value)
 	{
-		owner.netlist().save(owner, m_value, name);
+		owner.state().save(owner, m_value, name);
 		for (std::size_t i=0; i<N; i++)
 			m_value[i] = value;
 	}

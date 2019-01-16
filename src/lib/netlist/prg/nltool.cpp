@@ -163,6 +163,8 @@ public:
 	{
 	}
 
+	netlist::setup_t &setup() { return nlstate().setup(); }
+
 	void read_netlist(const pstring &filename, const pstring &name,
 			const std::vector<pstring> &logs,
 			const std::vector<pstring> &defines,
@@ -179,15 +181,15 @@ public:
 		setup().register_source(plib::make_unique_base<netlist::source_t,
 				netlist::source_file_t>(setup(), filename));
 		setup().include(name);
-		log_setup(logs);
+		create_dynamic_logs(logs);
 
 		// start devices
-		this->prepare_to_run();
+		setup().prepare_to_run();
 		// reset
 		this->reset();
 	}
 
-	void log_setup(const std::vector<pstring> &logs)
+	void create_dynamic_logs(const std::vector<pstring> &logs)
 	{
 		log().debug("Creating dynamic logs ...\n");
 		for (auto & log : logs)
@@ -200,15 +202,15 @@ public:
 
 	std::vector<char> save_state()
 	{
-		state().pre_save();
+		run_state_manager().pre_save();
 		std::size_t size = 0;
-		for (auto const & s : state().save_list())
+		for (auto const & s : run_state_manager().save_list())
 			size += s->m_dt.size * s->m_count;
 
 		std::vector<char> buf(size);
 		char *p = buf.data();
 
-		for (auto const & s : state().save_list())
+		for (auto const & s : run_state_manager().save_list())
 		{
 			std::size_t sz = s->m_dt.size * s->m_count;
 			if (s->m_dt.is_float || s->m_dt.is_integral)
@@ -224,7 +226,7 @@ public:
 	void load_state(std::vector<char> &buf)
 	{
 		std::size_t size = 0;
-		for (auto const & s : state().save_list())
+		for (auto const & s : run_state_manager().save_list())
 			size += s->m_dt.size * s->m_count;
 
 		if (buf.size() != size)
@@ -232,7 +234,7 @@ public:
 
 		char *p = buf.data();
 
-		for (auto const & s : state().save_list())
+		for (auto const & s : run_state_manager().save_list())
 		{
 			std::size_t sz = s->m_dt.size * s->m_count;
 			if (s->m_dt.is_float || s->m_dt.is_integral)
@@ -241,8 +243,8 @@ public:
 				log().fatal("found unsupported save element {1}\n", s->m_name);
 			p += sz;
 		}
-		state().post_load();
-		rebuild_lists();
+		run_state_manager().post_load();
+		nlstate().rebuild_lists();
 	}
 
 protected:
@@ -595,7 +597,7 @@ void tool_app_t::listdevices()
 	nt.setup().include("dummy");
 
 
-	nt.prepare_to_run();
+	nt.setup().prepare_to_run();
 
 	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
 

@@ -12,6 +12,7 @@
 #include "plib/putil.h"
 #include "plib/pstream.h"
 #include "plib/pparser.h"
+#include "plib/pstate.h"
 
 #include "nl_factory.h"
 #include "nl_config.h"
@@ -127,7 +128,8 @@ namespace netlist
 	class core_device_t;
 	class param_t;
 	class setup_t;
-	class netlist_base_t;
+	class netlist_state_t;
+	class netlist_t;
 	class logic_family_desc_t;
 	class terminal_t;
 
@@ -204,11 +206,15 @@ namespace netlist
 
 		using link_t = std::pair<pstring, pstring>;
 
-		explicit setup_t(netlist_base_t &netlist);
+		explicit setup_t(netlist_t &netlist);
 		~setup_t();
 
-		netlist_base_t &netlist() { return m_netlist; }
-		const netlist_base_t &netlist() const { return m_netlist; }
+
+		netlist_state_t &netlist();
+		const netlist_state_t &netlist() const;
+
+		netlist_t &exec() { return m_netlist; }
+		const netlist_t &exec() const { return m_netlist; }
 
 		pstring build_fqn(const pstring &obj_name) const;
 
@@ -301,6 +307,14 @@ namespace netlist
 		/* needed by proxy */
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true);
 
+		/* core net handling */
+
+		void delete_empty_nets();
+
+		/* run preparation */
+
+		void prepare_to_run();
+
 	private:
 
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
@@ -319,7 +333,7 @@ namespace netlist
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 
-		netlist_base_t                              &m_netlist;
+		netlist_t		                            &m_netlist;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 		std::vector<link_t>                         m_links;
 		factory::list_t                             m_factory;

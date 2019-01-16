@@ -138,42 +138,42 @@ matrix_solver_t * NETLIB_NAME(solver)::create_solver(std::size_t size, const pst
 {
 	if (m_method() == "SOR_MAT")
 	{
-		return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+		return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(state(), solvername, m_params, size);
 		//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
-		//return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
+		//return plib::make_unique<solver_sor_mat>(state(), solvername, &m_params, size);
 	}
 	else if (m_method() == "MAT_CR")
 	{
 		if (size > 0) // GCR always outperforms MAT solver
 		{
-			return create_it<matrix_solver_GCR_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+			return create_it<matrix_solver_GCR_t<m_N, storage_N>>(state(), solvername, m_params, size);
 		}
 		else
 		{
-			return create_it<matrix_solver_direct_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+			return create_it<matrix_solver_direct_t<m_N, storage_N>>(state(), solvername, m_params, size);
 		}
 	}
 	else if (m_method() == "MAT")
 	{
-		return create_it<matrix_solver_direct_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+		return create_it<matrix_solver_direct_t<m_N, storage_N>>(state(), solvername, m_params, size);
 	}
 	else if (m_method() == "SM")
 	{
 		/* Sherman-Morrison Formula */
-		return create_it<matrix_solver_sm_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+		return create_it<matrix_solver_sm_t<m_N, storage_N>>(state(), solvername, m_params, size);
 	}
 	else if (m_method() == "W")
 	{
 		/* Woodbury Formula */
-		return create_it<matrix_solver_w_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+		return create_it<matrix_solver_w_t<m_N, storage_N>>(state(), solvername, m_params, size);
 	}
 	else if (m_method() == "SOR")
 	{
-		return create_it<matrix_solver_SOR_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+		return create_it<matrix_solver_SOR_t<m_N, storage_N>>(state(), solvername, m_params, size);
 	}
 	else if (m_method() == "GMRES")
 	{
-		return create_it<matrix_solver_GMRES_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
+		return create_it<matrix_solver_GMRES_t<m_N, storage_N>>(state(), solvername, m_params, size);
 	}
 	else
 	{
@@ -276,10 +276,10 @@ void NETLIB_NAME(solver)::post_start()
 
 	net_splitter splitter;
 
-	splitter.run(netlist());
+	splitter.run(state());
 
 	// setup the solvers
-	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), netlist().nets().size());
+	log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 	for (auto & grp : splitter.groups)
 	{
 		matrix_solver_t *ms;
@@ -291,13 +291,13 @@ void NETLIB_NAME(solver)::post_start()
 #if 1
 			case 1:
 				if (use_specific)
-					ms = plib::palloc<matrix_solver_direct1_t>(netlist(), sname, &m_params);
+					ms = plib::palloc<matrix_solver_direct1_t>(state(), sname, &m_params);
 				else
 					ms = create_solver<1,1>(1, sname);
 				break;
 			case 2:
 				if (use_specific)
-					ms =  plib::palloc<matrix_solver_direct2_t>(netlist(), sname, &m_params);
+					ms =  plib::palloc<matrix_solver_direct2_t>(state(), sname, &m_params);
 				else
 					ms = create_solver<2,2>(2, sname);
 				break;

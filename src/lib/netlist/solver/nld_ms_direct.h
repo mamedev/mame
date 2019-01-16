@@ -107,10 +107,10 @@ void matrix_solver_direct_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 			t->m_nzrd.push_back(static_cast<unsigned>(N()));
 	}
 
-	netlist().save(*this, m_last_RHS, "m_last_RHS");
+	state().save(*this, m_last_RHS, "m_last_RHS");
 
 	for (std::size_t k = 0; k < N(); k++)
-		netlist().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
+		state().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
 }
 
 
