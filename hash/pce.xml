@@ -33,9 +33,9 @@
 		<description>Adventure Island</description>
 		<year>1991</year>
 		<publisher>Hudson</publisher>
-		<info name="serial" value="アドベンチャーアイランド"/>
+		<info name="serial" value="HC91035"/>
 		<info name="release" value="19910419"/>
-		<info name="alt_title" value="HC91035"/>
+		<info name="alt_title" value="アドベンチャーアイランド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="adventure island (japan).pce" size="262144" crc="8e71d4f3" sha1="01ad5bbd7316740409e01917c19494cb26173ff5" offset="000000" />
@@ -2221,7 +2221,7 @@
 	<software name="mizubaku">
 		<description>Mizubaku Dai Bouken</description>
 		<year>1992</year>
-		<publisher>Namcot</publisher>
+		<publisher>Taito</publisher>
 		<info name="serial" value="TP03020"/>
 		<info name="release" value="19920117"/>
 		<info name="alt_title" value="ミズバク大冒険"/>
