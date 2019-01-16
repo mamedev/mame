@@ -365,6 +365,29 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/rom/slot.h,BUSES["BBC_ROM"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_ROM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/rom/slot.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/slot.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/rom.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/rom.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/ram.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/ram.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/pal.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/pal.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/rtc.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/rtc.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/tube/tube.h,BUSES["BBC_TUBE"] = true
 ---------------------------------------------------
 
