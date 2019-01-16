@@ -600,6 +600,7 @@ void vsmile_state::vsmile(machine_config &config)
 	m_bankdev->set_addrmap(AS_PROGRAM, &vsmile_state::banked_map);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
+	SOFTWARE_LIST(config, "cart_list2").set_original("vsmilem_cart");
 }
 
 void vsmile_state::vsmilep(machine_config &config)
