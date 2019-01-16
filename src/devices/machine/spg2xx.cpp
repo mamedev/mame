@@ -1007,14 +1007,14 @@ READ16_MEMBER(spg2xx_device::io_r)
 	{
 	case 0x01: case 0x06: case 0x0b: // GPIO Data Port A/B/C
 		do_gpio(offset, false);
-		LOGMASKED(LOG_GPIO, "io_r: %s %c = %04x\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset]);
+		LOGMASKED(LOG_GPIO, "%s: io_r: %s %c = %04x\n", machine().describe_context(), gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset]);
 		val = m_io_regs[offset];
 		break;
 
 	case 0x02: case 0x03: case 0x04: case 0x05:
 	case 0x07: case 0x08: case 0x09: case 0x0a:
 	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Other GPIO regs
-		LOGMASKED(LOG_GPIO, "io_r: %s %c = %04x\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset]);
+		LOGMASKED(LOG_GPIO, "%s: io_r: %s %c = %04x\n", machine().describe_context(), gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset]);
 		break;
 
 	case 0x10: // Timebase Control
@@ -1035,15 +1035,15 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	case 0x21: // IRQ Control
-		LOGMASKED(LOG_IRQS, "io_r: I/O IRQ Control = %04x\n", val);
+		LOGMASKED(LOG_IRQS, "%s: io_r: I/O IRQ Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x22: // IRQ Status
-		LOGMASKED(LOG_IRQS, "io_r: I/O IRQ Status = %04x\n", val);
+		LOGMASKED(LOG_IRQS, "%s: io_r: I/O IRQ Status = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x23: // External Memory Control
-		LOGMASKED(LOG_IO_READS, "io_r: Ext. Memory Control = %04x\n", val);
+		LOGMASKED(LOG_IO_READS, "%s: io_r: Ext. Memory Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x25: // ADC Control
@@ -1307,7 +1307,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	{
 	case 0x00: // GPIO special function select
 	{
-		LOGMASKED(LOG_GPIO, "io_w: GPIO Configuration = %04x (IOBWake:%d, IOAWake:%d, IOBSpecSel:%d, IOASpecSel:%d)\n", data
+		LOGMASKED(LOG_GPIO, "%s: io_w: GPIO Configuration = %04x (IOBWake:%d, IOAWake:%d, IOBSpecSel:%d, IOASpecSel:%d)\n", machine().describe_context(), data
 			, BIT(data, 4), BIT(data, 3), BIT(data, 1), BIT(data, 0));
 		const uint16_t old = m_io_regs[offset];
 		m_io_regs[offset] = data;
@@ -1326,33 +1326,33 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	case 0x02: case 0x04: // Port A
 	case 0x07: case 0x09: // Port B
 	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
-		LOGMASKED(LOG_GPIO, "io_w: %s %c = %04x\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data);
+		LOGMASKED(LOG_GPIO, "%s: io_w: %s %c = %04x\n", machine().describe_context(), gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data);
 		m_io_regs[offset] = data;
 		do_gpio(offset, true);
 		break;
 
 	case 0x03: // Port A Direction
-		LOGMASKED(LOG_GPIO, "io_w: GPIO Direction Port A = %04x\n", data);
+		LOGMASKED(LOG_GPIO, "%s: io_w: GPIO Direction Port A = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		update_porta_special_modes();
 		do_gpio(offset, true);
 		break;
 
 	case 0x08: // Port B Direction
-		LOGMASKED(LOG_GPIO, "io_w: GPIO Direction Port B = %04x\n", data);
+		LOGMASKED(LOG_GPIO, "%s: io_w: GPIO Direction Port B = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		update_portb_special_modes();
 		do_gpio(offset, true);
 		break;
 
 	case 0x05: // Port A Special
-		LOGMASKED(LOG_GPIO, "io_w: Port A Special Function Select: %04x\n", data);
+		LOGMASKED(LOG_GPIO, "%s: io_w: Port A Special Function Select: %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		update_porta_special_modes();
 		break;
 
 	case 0x0a: // Port B Special
-		LOGMASKED(LOG_GPIO, "io_w: Port B Special Function Select: %04x\n", data);
+		LOGMASKED(LOG_GPIO, "%s: io_w: Port B Special Function Select: %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		update_portb_special_modes();
 		break;

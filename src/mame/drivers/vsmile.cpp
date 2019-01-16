@@ -2,26 +2,18 @@
 // copyright-holders:Ryan Holtz
 /******************************************************************************
 
-    V-Tech V.Smile console emulat
+    V-Tech V.Smile console emulation
+    V-Tech V.Smile Baby console emulation
 
-    Status:
+    Similar Systems:
 
-        Most games boot but lack controls
-
-    To-Do:
-
-        Proper UART support (SPG2xx) for controller
-
-    Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
-
-        V.Smile by VTech, a system designed for children under the age of 10
-        V.Smile Pocket (2 versions)
+        V.Smile Pocket
         V.Smile Cyber Pocket
         V.Smile PC Pal
         V-Motion Active Learning System
-        Leapster
-        V.Smile Baby Infant Development System
         V.Flash
+        V.Baby
+        Leapfrog Leapster
 
 *******************************************************************************/
 
@@ -44,15 +36,16 @@ class vsmile_state : public driver_device
 public:
 	vsmile_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_spg(*this, "spg")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_spg(*this, "spg")
 		, m_cart(*this, "cartslot")
 		, m_bankdev(*this, "bank")
 		, m_system_region(*this, "maincpu")
 		, m_io_joy(*this, "JOY")
 		, m_io_colors(*this, "COLORS")
 		, m_io_buttons(*this, "BUTTONS")
+		, m_dsw_region(*this, "REGION")
 		, m_cart_region(nullptr)
 		, m_cart_addr_mask(0)
 		, m_uart_tx_timer(nullptr)
@@ -67,6 +60,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(pad_joy_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(pad_color_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(pad_button_changed);
+
+protected:
+	required_device<spg2xx_device> m_spg;
 
 private:
 	virtual void machine_start() override;
@@ -121,13 +117,13 @@ private:
 
 	required_device<unsp_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<spg2xx_device> m_spg;
 	required_device<generic_slot_device> m_cart;
 	required_device<address_map_bank_device> m_bankdev;
 	required_memory_region m_system_region;
 	required_ioport m_io_joy;
 	required_ioport m_io_colors;
 	required_ioport m_io_buttons;
+	required_ioport m_dsw_region;
 	memory_region *m_cart_region;
 
 	uint32_t m_cart_addr_mask;
@@ -148,6 +144,27 @@ private:
 	uint16_t m_portb_data;
 	uint16_t m_portc_data;
 };
+
+class vsmileb_state : public vsmile_state
+{
+public:
+	vsmileb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: vsmile_state(mconfig, type, tag)
+	{ }
+
+	void vsmileb(machine_config &config);
+
+private:
+	DECLARE_READ16_MEMBER(porta_r);
+};
+
+READ16_MEMBER(vsmileb_state::porta_r)
+{
+	static uint16_t return_data = 0x0101;
+	uint16_t data = return_data;
+	return_data ^= 0x0201;
+	return data;
+}
 
 void vsmile_state::uart_tx_fifo_push(uint8_t data)
 {
@@ -231,7 +248,7 @@ READ16_MEMBER(vsmile_state::portb_r)
 
 READ16_MEMBER(vsmile_state::portc_r)
 {
-	uint16_t data = 0x0014;
+	uint16_t data = m_dsw_region->read();
 	data |= m_ctrl_rts[0] ? 0 : 0x0400;
 	data |= m_ctrl_rts[1] ? 0 : 0x1000;
 	data |= 0x2000;
@@ -406,7 +423,7 @@ void vsmile_state::banked_map(address_map &map)
 	map(0x1000000, 0x13fffff).r(FUNC(vsmile_state::bank0_r));
 
 	map(0x1400000, 0x15fffff).r(FUNC(vsmile_state::bank0_r));
-	map(0x1600000, 0x17fffff).r(FUNC(vsmile_state::bank1_r));
+	map(0x1600000, 0x17fffff).r(FUNC(vsmile_state::bank2_r));
 
 	map(0x1800000, 0x18fffff).r(FUNC(vsmile_state::bank0_r));
 	map(0x1900000, 0x19fffff).r(FUNC(vsmile_state::bank1_r));
@@ -441,6 +458,20 @@ static INPUT_PORTS_START( vsmile )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_button_changed, 2) PORT_NAME("Help")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_state, pad_button_changed, 3) PORT_NAME("ABC")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("REGION")
+	PORT_DIPNAME( 0x0f, 0x04, "BIOS Region" )
+	PORT_DIPSETTING(    0x04, "UK/US" )
+	PORT_DIPSETTING(    0x07, "China" )
+	PORT_DIPSETTING(    0x08, "Mexico" )
+	PORT_DIPSETTING(    0x0a, "Italy" )
+	PORT_DIPSETTING(    0x0b, "Germany" )
+	PORT_DIPSETTING(    0x0c, "Spain" )
+	PORT_DIPSETTING(    0x0d, "France" )
+	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
+	PORT_DIPSETTING(    0x00, "No" )
+	PORT_DIPSETTING(    0x10, "Yes" )
+	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 void vsmile_state::vsmile(machine_config &config)
@@ -489,6 +520,13 @@ void vsmile_state::vsmilep(machine_config &config)
 	m_spg->set_pal(true);
 }
 
+void vsmileb_state::vsmileb(machine_config &config)
+{
+	vsmile(config);
+	m_spg->porta_in().set(FUNC(vsmileb_state::porta_r));
+	SOFTWARE_LIST(config, "cart_list2").set_original("vsmileb_cart");
+}
+
 ROM_START( vsmile )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
@@ -509,8 +547,8 @@ ROM_START( vsmileb )
 	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
 ROM_END
 
-// year, name, parent, compat, machine, input, class, init, company, fullname, flags
-CONS( 2005, vsmile,  0,      0, vsmile,  vsmile, vsmile_state, empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmileg, vsmile, 0, vsmilep, vsmile, vsmile_state, empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmilef, vsmile, 0, vsmilep, vsmile, vsmile_state, empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmileb, 0,      0, vsmile,  vsmile, vsmile_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+//    year, name,    parent, compat, machine, input,  class,         init,       company, fullname,            flags
+CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile, vsmile_state,  empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmileg, vsmile, 0,      vsmilep, vsmile, vsmile_state,  empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilef, vsmile, 0,      vsmilep, vsmile, vsmile_state,  empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmileb, 0,      0,      vsmileb, vsmile, vsmileb_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
