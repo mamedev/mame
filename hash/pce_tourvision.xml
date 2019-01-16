@@ -11,6 +11,9 @@ The Game ID is added as a feature on each game of the softwarelist (0xFF is used
 
 Unless noted, all games match the corresponding PCE HuCard dump.
 
+All TourVisión carts are dumped as 1MB, the 384KB ROM is constructed concatenating the first 256KB of the first 512KB half with the first 128KB of the second 512KB half.
+For 512, 256 or 128KB ROMs, just a simple split is needed.
+
     Games with unknown ID
 
 Armed-F
@@ -73,14 +76,7 @@ Zipang
 
 Parasol Stars
 
-    Bad dumps?
-
-Most 384KBytes HuCards do not match with their corresponding TourVisión dumps. On those TourVisión dumps, the first 512KBytes are different
-from the second 512KBytes half (but then, each 512KBytes chunk have two identical 256KBytes halves.
-
 -->
-
-<!-- 0x40000 matches PCE tnzs -->
 
 	<software name="1943kai">
 		<description>1943 Kai (TourVision PCE bootleg)</description>
@@ -141,9 +137,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="不思議の夢のアリス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x3d"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="alice_in_wonderland.bin" size="1048576" crc="d1e941ef" sha1="7ca02fee191a270df29764e3eca1f93bd996622b" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="fushigi no yume no alice (japan).pce" size="393216" crc="12c4e6fd" sha1="c266b05dd367b2973399b8daff7c4dc33bebedd9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -207,9 +202,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="バットマン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1e"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="batman.tv" size="1048576" crc="e282f730" sha1="599a7a13cbc2f8d6726407ef3e261cca5d66511f" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="batman (japan).pce" size="393216" crc="106bb7b2" sha1="87e93e23c0c3ef960e9a226fc10a5fc9625d43a7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -223,7 +217,7 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 			<feature name="id" value="0x5d"/>
 			<dataarea name="rom" size="262144">
 		<!-- NOT identical to the set in the PCE list, byte at 0xBCD is changed from 0x05 (PCE) to 0x02 (TV)-->
-				<rom name="tourv_be_ball_alt.pce" size="262144" crc="261f1013" sha1="55d8815a4a432e587fc7483b63b73114fe40e710" offset="000000" />
+				<rom name="be ball (japan) [a].pce" size="262144" crc="261f1013" sha1="55d8815a4a432e587fc7483b63b73114fe40e710" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -287,9 +281,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="バーニングエンジェル"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x31"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="burning_angels.tv" size="1048576" crc="a776ff9d" sha1="ea0dd87090f8e4eceac59df8495fcc10f325afe5" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="burning angels (japan).pce" size="393216" crc="d233c05a" sha1="d34f38058ac1d8276e145a47fc4fdc1310f49a60" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -301,9 +294,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="カダッシュ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xcb"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="cadash.tv" size="1048576" crc="3611c4cf" sha1="68dab560b0c8123ec334df4e7db4af64dd92ff60" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="cadash (japan).pce" size="393216" crc="8dc0d85f" sha1="3755cb2b883bc106e58019e1cd82708a63394f35" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -368,9 +360,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="サイバーコア"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0d"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="cyber_core.bin" size="1048576" crc="e1bfac8f" sha1="8c346edf8251710a3dcddf4bd1f870de0661e5c9" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="cyber core (japan).pce" size="393216" crc="a98d276a" sha1="75bbd695e55a01a423a6c2404335d75f5bb65437" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -697,10 +688,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="はにい・おんざ・ろおど"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x53"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, the first 512Kbytes are different
-		from the second 512KB half (but then, each 512KBytes chunk have two identical 256Kbytes halves. -->
-				<rom name="hanii_on_the_road.tv" size="1048576" crc="f21c0c39" sha1="bc31811a3b1fe84e8f1c0cb1b4cf98d1af911040" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="hanii on the road (japan).pce" size="393216" crc="9897fa86" sha1="67e7fd05e40c08a7e353501e1940ef1ec5ae8b05" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -712,9 +701,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="ヒット ジ アイス"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x61"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="hit_the_ice.tv" size="1048576" crc="a0929d2b" sha1="26607a76cade818bd0d1daf2d0bfddfecd18f187" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="hit the ice - vhl the official video hockey league (japan).pce" size="393216" crc="7acb60c8" sha1="1452d2161d1da401f05c36a0a50492a6df9dc010" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -902,19 +890,19 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		</part>
 	</software>
 
-	<software name="outrun">
-		<description>Out Run (TourVision PCE bootleg)</description>
+	<software name="outruna">
+		<description>Out Run (alt) (TourVision PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (TourVision) / NEC Avenue</publisher>
 		<info name="alt_title" value="アウトラン"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x26"/>
-			<dataarea name="rom" size="1048576">
+			<dataarea name="rom" size="524288">
 		<!-- NOT identical to the set in the PCE list
 		50000-5000F: FF 10 10 00 1C F9 0F F8 0F 87 FF 3F 0F 4F 00 2E - PCE Dump
 		50000-5000F: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 - Tourvision
 		otherwise 0x80000 identical -->
-				<rom name="outrun.bin" size="1048576" crc="ef866d6e" sha1="f414d8fcacb6f055f2b3fd9eb1723921d98d11cc" offset="000000" />
+				<rom name="out run (japan) [a].pce" size="524288" crc="92b654a7" sha1="7d669e78978ebb2a3169f4428a664c81a8888b6e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -959,15 +947,14 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 	</software>
 
 	<software name="pcgenj">
-		<description>PC Genjin - Pithecanthropus Computerurus (TourVision PCE bootleg)</description>
+		<description>PC Genjin - Pithecanthropus Computerurus (Alt) (TourVision PCE bootleg)</description>
 		<year>1989</year>
 		<publisher>bootleg (TourVision) / Hudson</publisher>
 		<info name="alt_title" value="PC原人"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x08"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="pc_genjin.bin" size="1048576" crc="eecd176f" sha1="b24e7501e0aa9e8ba8759f9bb32452f42d7688cd" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="pc genjin - pithecanthropus computerurus (japan) [a].pce" size="393216" crc="67b35e6e" sha1="2c36256e77e74d5528366d35f0a55c45bc37d5a5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1149,9 +1136,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="天聖龍"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x24"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="saint_dragon.bin" size="1048576" crc="492231a9" sha1="b8bfd18bde2398b07a693c86d21a14cd9627f0c8" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="tenseiryuu - saint dragon (japan).pce" size="393216" crc="2e278ccb" sha1="a9637a5efeb555426a44ae1cc86ed25a9520759d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1358,9 +1344,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="ニュージーランドストーリー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0b"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="the_newzealand_story.bin" size="1048576" crc="53b25bf6" sha1="5f04cdbd37df84d20692d05f72fb4e28f0d3f79d" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="new zealand story, the (japan).pce" size="393216" crc="8e4d75a8" sha1="cda9acea9cae4899af35b6c49b9ed449c240af16" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1412,9 +1397,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="虎への道"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x0a"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="tiger_road.bin" size="1048576" crc="5e55f35c" sha1="942c8e9e8923acf7ef2ba8878879251621e48408" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="tora e no michi (japan).pce" size="393216" crc="82ae3b16" sha1="ea66f8c1be62e853b72f93a3a1e3b597356ae62f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1478,9 +1462,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="ビジランテ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x08"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="vigilante.bin" size="1048576" crc="00eaafcc" sha1="a082ef8ba1ffb9abc8296eadba1e9e70ba7b6812" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="vigilante (japan).pce" size="393216" crc="e4124fe0" sha1="a43ddb6b9d70c7597788abd363b5df719b70bc46" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1492,9 +1475,8 @@ from the second 512KBytes half (but then, each 512KBytes chunk have two identica
 		<info name="alt_title" value="バイオレント・ソルジャー"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xff"/>
-			<dataarea name="rom" size="1048576">
-		<!-- NOT identical to the set in the PCE list, left unsplitted for reference -->
-				<rom name="violent_soldier.bin" size="1048576" crc="66bbea83" sha1="b60d507eb5d5069f0e8a52308a35459b44ee5b9e" offset="000000" />
+			<dataarea name="rom" size="393216">
+				<rom name="violent soldier (japan).pce" size="393216" crc="1bc36b36" sha1="76581fe7acb707b1e5bab2ac27cd27e3ed06078a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
