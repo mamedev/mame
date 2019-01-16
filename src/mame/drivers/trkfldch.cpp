@@ -5,7 +5,23 @@
 Track & Field Challenge TV Game
 https://www.youtube.com/watch?v=wjn1lLylqog
 
-HELP!  what type of CPU / SoC is this? seems to be G65816 derived?
+HELP!  what type of CPU / SoC is this? seems to be G65816 derived with custom vectors?
+
+currently dies after call at
+
+00:AE85: LDA $0b
+00:AE87: TAX
+00:AE88: LDA $0d
+00:AE8A: JSL $00a044
+
+00:A044: SEP #$20
+00:A046: PHA
+00:A047: REP #$20
+00:A049: DEX
+00:A04A: PHX
+00:A04B: RTL
+
+which pushes some values onto the stack, then RTLs to them (but the values at $0b and $0d at both 00, so it jumps to 0 and dies)
 
 */
 
@@ -42,6 +58,9 @@ private:
 
 	uint32_t screen_update_trkfldch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trkfldch_map(address_map &map);
+
+	DECLARE_READ8_MEMBER(unk_7804_read);
+	DECLARE_READ8_MEMBER(unk_7805_read);
 };
 
 void trkfldch_state::video_start()
@@ -53,9 +72,30 @@ uint32_t trkfldch_state::screen_update_trkfldch(screen_device &screen, bitmap_in
 	return 0;
 }
 
+
+READ8_MEMBER(trkfldch_state::unk_7804_read)
+{
+	return 0xff;
+}
+
+READ8_MEMBER(trkfldch_state::unk_7805_read)
+{
+	return 0xff;
+}
+
 void trkfldch_state::trkfldch_map(address_map &map)
 {
-	map(0x8000, 0xbfff).rom().region("maincpu", 0x0000);
+	map(0x000000, 0x003fff).ram();
+
+	map(0x006800, 0x006cff).ram();
+
+	map(0x007000, 0x0072ff).ram();
+
+	// 7800 - 78xx look like registers?
+	map(0x007804, 0x007804).r(FUNC(trkfldch_state::unk_7804_read));
+	map(0x007805, 0x007805).r(FUNC(trkfldch_state::unk_7805_read));
+
+	map(0x008000, 0x3fffff).rom().region("maincpu", 0x000000); // good for code mapped at 008000 and 050000 at least
 }
 
 static INPUT_PORTS_START( trkfldch )
