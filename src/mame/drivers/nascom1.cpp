@@ -718,10 +718,10 @@ void nascom_state::nascom(machine_config &config)
 
 	// devices
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
-	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", 0, ATTOSECONDS_IN_MSEC(500));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", 0.5);
 	snapshot.set_interface("nascom_snap");
 	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar", 0));
-	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", 0, ATTOSECONDS_IN_MSEC(500));
+	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", 0.5);
 	snapchar.set_interface("nascom_char");
 }
 
