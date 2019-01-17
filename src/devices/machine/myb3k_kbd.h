@@ -14,9 +14,6 @@
     is responsible for storing the byte into the serial/parallell converter
     (that can be read through IN from port 0x04) and then trigger an interrupt.
 
-    MCFG_DEVICE_ADD("myb3k_keyboard", MYB3K_KEYBOARD, 0)
-    MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
-
 **********************************************************************/
 
 #ifndef MAME_MACHINE_MYB3K_KBD_H
