@@ -895,7 +895,8 @@ WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
 	// Must tie back to inputs somehow!
 }
 
-MACHINE_CONFIG_START(sc4_state::sc4_common)
+void sc4_state::sc4_common(machine_config &config)
+{
 	M68307(config, m_maincpu, 16000000);    // 68307! (EC000 core)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc4_state::sc4_map);
 	m_maincpu->serial_a_tx_callback().set(FUNC(sc4_state::m68307_duart_txa));
@@ -907,20 +908,20 @@ MACHINE_CONFIG_START(sc4_state::sc4_common)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, sc4_state, bfm_sc4_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, sc4_state, bfm_sc4_duart_txa))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, sc4_state, bfm_sc4_duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, sc4_state, bfm_sc4_duart_output_w))
+	MC68681(config, m_duart, 16000000/4); // ?? Mhz
+	m_duart->set_clocks(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8);
+	m_duart->irq_cb().set(FUNC(sc4_state::bfm_sc4_duart_irq_handler));
+	m_duart->a_tx_cb().set(FUNC(sc4_state::bfm_sc4_duart_txa));
+	m_duart->inport_cb().set(FUNC(sc4_state::bfm_sc4_duart_input_r));;
+	m_duart->outport_cb().set(FUNC(sc4_state::bfm_sc4_duart_output_w));;
 
 	BFM_BDA(config, m_vfd0, 60, 0);
 
 //  config.set_default_layout(layout_bfm_sc4);
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
+	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 //Standard 6 reels all connected
 void sc4_state::sc4(machine_config &config)

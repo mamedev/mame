@@ -603,20 +603,20 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 
 	AY8912(config, "aysnd", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("duart18", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MC68681(config, m_duart[0],  XTAL(3'686'400));  // UARTA = Modem 1200Baud
+	m_duart[0]->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_duart[0]->inport_cb().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("duart39", MC68681, XTAL(3'686'400))  // UARTA = Printer
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_3))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW2"))
+	MC68681(config, m_duart[1],  XTAL(3'686'400));  // UARTA = Printer
+	m_duart[1]->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
+	m_duart[1]->inport_cb().set_ioport("DSW2");
 
-	MCFG_DEVICE_ADD("duart40", MC68681, XTAL(3'686'400))  // UARTA = Touch , UARTB = Bill Acceptor
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_5))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
+	MC68681(config, m_duart[2],  XTAL(3'686'400));  // UARTA = Touch , UARTB = Bill Acceptor
+	m_duart[2]->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5);
+	m_duart[2]->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
+	m_duart[2]->inport_cb().set_ioport("DSW3");
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart40", mc68681_device, rx_a_w) )
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart[1], FUNC(mc68681_device::rx_a_w));
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))

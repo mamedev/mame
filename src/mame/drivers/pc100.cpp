@@ -671,11 +671,11 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	m_fdc->intrq_wr_callback().set(FUNC(pc100_state::irqnmi_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc100_state::drqnmi_w));
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL(32'768))
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, pc100_state, rtc_portc_3_w))
+	MSM58321(config, m_rtc, XTAL(32'768));
+	m_rtc->d0_handler().set(FUNC(pc100_state::rtc_portc_0_w));
+	m_rtc->d1_handler().set(FUNC(pc100_state::rtc_portc_1_w));
+	m_rtc->d2_handler().set(FUNC(pc100_state::rtc_portc_2_w));
+	m_rtc->d3_handler().set(FUNC(pc100_state::rtc_portc_3_w));
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525dd", floppy_image_device::default_floppy_formats)

@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 	MCFG_DEVICE_PROGRAM_MAP(wildpkr_map)
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // guess
 
-	MCFG_DEVICE_ADD("duart", MC68681, SEC_CLOCK)
+	MC68681(config, m_duart, SEC_CLOCK);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -505,8 +505,8 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // DS1220Y
 
-	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
-	MCFG_MC68681_IRQ_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_2))
+	MC68681(config, m_duart, 3686400);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
 	MCFG_DEVICE_ADD("id", DS2401, 0)
 

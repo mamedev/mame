@@ -250,13 +250,13 @@ MACHINE_CONFIG_START(kim1_state::kim1)
 	config.set_default_layout(layout_kim1);
 
 	// devices
-	MCFG_DEVICE_ADD("miot_u2", MOS6530, 1000000)
-	MCFG_MOS6530_IN_PA_CB(READ8(*this, kim1_state, kim1_u2_read_a))
-	MCFG_MOS6530_OUT_PA_CB(WRITE8(*this, kim1_state, kim1_u2_write_a))
-	MCFG_MOS6530_IN_PB_CB(READ8(*this, kim1_state, kim1_u2_read_b))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, kim1_state, kim1_u2_write_b))
+	MOS6530(config, m_riot2, 1000000);
+	m_riot2->in_pa_callback().set(FUNC(kim1_state::kim1_u2_read_a));
+	m_riot2->out_pa_callback().set(FUNC(kim1_state::kim1_u2_write_a));
+	m_riot2->in_pb_callback().set(FUNC(kim1_state::kim1_u2_read_b));
+	m_riot2->out_pb_callback().set(FUNC(kim1_state::kim1_u2_write_b));
 
-	MCFG_DEVICE_ADD("miot_u3", MOS6530, 1000000)
+	MOS6530(config, "miot_u3", 1000000);
 
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_FORMATS(kim1_cassette_formats)

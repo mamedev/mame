@@ -250,8 +250,8 @@ MACHINE_CONFIG_START(manohman_state::manohman)
 	PIT68230(config, m_pit, XTAL(8'000'000)); // MC68230P8
 	m_pit->timer_irq_callback().set_inputline("maincpu", M68K_IRQ_2);
 
-	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
+	MC68681(config, m_duart, XTAL(3'686'400));
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768)) // M62X42B
 

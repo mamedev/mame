@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(pcat_nit_state::pcat_nit)
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE(uart, ins8250_uart_device, rx_w) ) // rate?
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w)); // rate?
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END
@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(pcat_nit_state::bonanza)
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE(uart, ins8250_uart_device, rx_w) ) // rate?
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w)); // rate?
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

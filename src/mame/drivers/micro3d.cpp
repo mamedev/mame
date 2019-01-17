@@ -331,12 +331,12 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	m_audiocpu->serial_tx_cb().set(FUNC(micro3d_state::data_from_i8031));
 	m_audiocpu->serial_rx_cb().set(FUNC(micro3d_state::data_to_i8031));
 
-	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, micro3d_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("monitor_host", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, micro3d_state, duart_txb))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, micro3d_state, duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, micro3d_state, duart_output_w))
+	MC68681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
+	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
+	m_duart->outport_cb().set(FUNC(micro3d_state::duart_output_w));
 
 	mc68901_device &mfp(MC68901(config, "mfp", 4000000));
 	mfp.set_timer_clock(4000000);

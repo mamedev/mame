@@ -235,12 +235,13 @@ MACHINE_CONFIG_START(junior_state::junior)
 	config.set_default_layout(layout_junior);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, junior_state, junior_riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, junior_state, junior_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, junior_state, junior_riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, junior_state, junior_riot_b_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MOS6532_NEW(config, m_riot, 1_MHz_XTAL);
+	m_riot->pa_rd_callback().set(FUNC(junior_state::junior_riot_a_r));
+	m_riot->pa_wr_callback().set(FUNC(junior_state::junior_riot_a_w));
+	m_riot->pb_rd_callback().set(FUNC(junior_state::junior_riot_b_r));
+	m_riot->pb_wr_callback().set(FUNC(junior_state::junior_riot_b_w));
+	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
+
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
 MACHINE_CONFIG_END

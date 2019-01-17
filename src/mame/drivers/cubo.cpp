@@ -1082,7 +1082,7 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	MOS8520(config, m_cia_1, amiga_state::CLK_E_PAL);
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE(*this, cubo_state, rs232_rx_w))
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(FUNC(cubo_state::rs232_rx_w));
 
 	MCFG_CDROM_ADD("cd32_cdrom")
 	MCFG_CDROM_INTERFACE("cd32_cdrom")

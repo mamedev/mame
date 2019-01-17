@@ -1045,12 +1045,12 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	I8214(config, m_pic, 16_MHz_XTAL/4);
 	m_pic->int_wr_callback().set(FUNC(v1050_state::pic_int_w));
 
-	MCFG_DEVICE_ADD(MSM58321RS_TAG, MSM58321, 32.768_kHz_XTAL)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pc_3_w))
+	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->d0_handler().set(FUNC(v1050_state::rtc_ppi_pa_0_w));
+	m_rtc->d1_handler().set(FUNC(v1050_state::rtc_ppi_pa_1_w));
+	m_rtc->d2_handler().set(FUNC(v1050_state::rtc_ppi_pa_2_w));
+	m_rtc->d3_handler().set(FUNC(v1050_state::rtc_ppi_pa_3_w));
+	m_rtc->busy_handler().set(FUNC(v1050_state::rtc_ppi_pc_3_w));
 
 	I8255A(config, m_ppi_disp);
 	m_ppi_disp->in_pa_callback().set(I8255A_M6502_TAG, FUNC(i8255_device::pb_r));

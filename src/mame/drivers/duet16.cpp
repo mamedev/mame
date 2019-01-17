@@ -430,14 +430,14 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, 32768_Hz_XTAL)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, duet16_state, rtc_d0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, duet16_state, rtc_d1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, duet16_state, rtc_d2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, duet16_state, rtc_d3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, duet16_state, rtc_busy_w))
-	MCFG_MSM58321_YEAR0(1980)
-	MCFG_MSM58321_DEFAULT_24H(true)
+	MSM58321(config, m_rtc, 32768_Hz_XTAL);
+	m_rtc->d0_handler().set(FUNC(duet16_state::rtc_d0_w));
+	m_rtc->d1_handler().set(FUNC(duet16_state::rtc_d1_w));
+	m_rtc->d2_handler().set(FUNC(duet16_state::rtc_d2_w));
+	m_rtc->d3_handler().set(FUNC(duet16_state::rtc_d3_w));
+	m_rtc->busy_handler().set(FUNC(duet16_state::rtc_busy_w));
+	m_rtc->set_year0(1980);
+	m_rtc->set_default_24h(true);
 MACHINE_CONFIG_END
 
 ROM_START(duet16)

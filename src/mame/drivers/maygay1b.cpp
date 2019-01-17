@@ -775,9 +775,9 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	m_mcu->port_out_cb<2>().set(FUNC(maygay1b_state::mcu_port2_w));
 	m_mcu->port_out_cb<3>().set(FUNC(maygay1b_state::mcu_port3_w));
 
-	MCFG_DEVICE_ADD("duart68681", MC68681, M1_DUART_CLOCK)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygay1b_state, duart_irq_handler))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, maygay1b_state, m1_duart_r))
+	MC68681(config, m_duart68681, M1_DUART_CLOCK);
+	m_duart68681->irq_cb().set(FUNC(maygay1b_state::duart_irq_handler));
+	m_duart68681->inport_cb().set(FUNC(maygay1b_state::m1_duart_r));;
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set(FUNC(maygay1b_state::m1_pia_porta_w));
