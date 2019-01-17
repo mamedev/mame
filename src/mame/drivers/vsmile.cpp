@@ -19,6 +19,8 @@
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "bus/vsmile/vsmile_slot.h"
 #include "bus/vsmile/rom.h"
 
@@ -39,7 +41,6 @@ public:
 		, m_spg(*this, "spg")
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_cart(*this, "cartslot")
 		, m_bankdev(*this, "bank")
 		, m_system_region(*this, "maincpu")
 	{ }
@@ -52,7 +53,6 @@ protected:
 	required_device<spg2xx_device> m_spg;
 	required_device<unsp_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<vsmile_cart_slot_device> m_cart;
 	required_device<address_map_bank_device> m_bankdev;
 	required_memory_region m_system_region;
 };
@@ -62,6 +62,7 @@ class vsmile_state : public vsmile_base_state
 public:
 	vsmile_state(const machine_config &mconfig, device_type type, const char *tag)
 		: vsmile_base_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
 		, m_io_joy(*this, "JOY")
 		, m_io_colors(*this, "COLORS")
 		, m_io_buttons(*this, "BUTTONS")
@@ -121,6 +122,7 @@ private:
 		XMIT_STATE_CTS        = 2
 	};
 
+	required_device<vsmile_cart_slot_device> m_cart;
 	required_ioport m_io_joy;
 	required_ioport m_io_colors;
 	required_ioport m_io_buttons;
@@ -145,6 +147,9 @@ class vsmileb_state : public vsmile_base_state
 public:
 	vsmileb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: vsmile_base_state(mconfig, type, tag)
+		, m_cart(*this, "cartslot")
+		, m_cart_region(nullptr)
+		, m_cart_addr_mask(0)
 	{ }
 
 	void vsmileb(machine_config &config);
@@ -154,6 +159,8 @@ private:
 
 	void banked_map(address_map &map);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
 	DECLARE_READ16_MEMBER(portc_r);
@@ -161,6 +168,11 @@ private:
 	DECLARE_WRITE16_MEMBER(portb_w);
 	DECLARE_WRITE16_MEMBER(portc_w);
 	DECLARE_WRITE8_MEMBER(chip_sel_w);
+
+	required_device<generic_slot_device> m_cart;
+
+	memory_region *m_cart_region;
+	uint32_t m_cart_addr_mask;
 };
 
 /************************************
@@ -412,7 +424,24 @@ void vsmileb_state::machine_start()
 {
 	vsmile_base_state::machine_start();
 
+	if (m_cart && m_cart->exists())
+	{
+		std::string region_tag;
+		m_cart_region = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_cart_addr_mask = (m_cart_region->bytes() >> 1) - 1;
+	}
+
 	m_bankdev->set_bank(0);
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(vsmileb_state, cart)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
 }
 
 READ16_MEMBER(vsmileb_state::porta_r)
@@ -438,17 +467,17 @@ READ16_MEMBER(vsmileb_state::portc_r)
 
 WRITE16_MEMBER(vsmileb_state::porta_w)
 {
-	logerror("%s: GPIO Port A Write: %04x\n", machine().describe_context(), data);
+	logerror("%s: GPIO Port A Write: %04x & %04x = %04x\n", machine().describe_context(), data, mem_mask, data & mem_mask);
 }
 
 WRITE16_MEMBER(vsmileb_state::portb_w)
 {
-	logerror("%s: GPIO Port B Write: %04x\n", machine().describe_context(), data);
+	logerror("%s: GPIO Port B Write: %04x & %04x = %04x\n", machine().describe_context(), data, mem_mask, data & mem_mask);
 }
 
 WRITE16_MEMBER(vsmileb_state::portc_w)
 {
-	logerror("%s: GPIO Port C Write: %04x\n", machine().describe_context(), data);
+	logerror("%s: GPIO Port C Write: %04x & %04x = %04x\n", machine().describe_context(), data, mem_mask, data & mem_mask);
 }
 
 WRITE8_MEMBER(vsmileb_state::chip_sel_w)
@@ -550,8 +579,6 @@ void vsmile_base_state::vsmile_base(machine_config &config)
 	m_bankdev->set_data_width(16);
 	m_bankdev->set_shift(-1);
 	m_bankdev->set_stride(0x400000);
-
-	VSMILE_CART_SLOT(config, m_cart, vsmile_cart, nullptr);
 }
 
 void vsmile_state::vsmile(machine_config &config)
@@ -565,6 +592,8 @@ void vsmile_state::vsmile(machine_config &config)
 	m_spg->uart_tx().set(FUNC(vsmile_state::uart_rx));
 
 	m_bankdev->set_addrmap(AS_PROGRAM, &vsmile_state::banked_map);
+
+	VSMILE_CART_SLOT(config, m_cart, vsmile_cart, nullptr);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
 	SOFTWARE_LIST(config, "cart_list2").set_original("vsmilem_cart");
@@ -589,6 +618,10 @@ void vsmileb_state::vsmileb(machine_config &config)
 	m_spg->chip_select().set(FUNC(vsmileb_state::chip_sel_w));
 
 	m_bankdev->set_addrmap(AS_PROGRAM, &vsmileb_state::banked_map);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vsmile_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(device_image_load_delegate(&vsmileb_state::device_image_load_cart, this));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmileb_cart");
 }
