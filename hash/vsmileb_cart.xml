@@ -143,6 +143,9 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099024(GE)" />
 		<part name="cart" interface="vsmileb_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="poohhawag.bin" size="8388608" status="nodump" offset="0" />
+			</dataarea>
 			<feature name="pcb" value="707155" />
 			<feature name="pcb_model" value="707155-2" />
 		</part>
@@ -169,6 +172,9 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099014(SE)" />
 		<part name="cart" interface="vsmileb_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="lupptack.bin" size="8388608" status="nodump" offset="0" />
+			</dataarea>
 			<feature name="pcb" value="707155" />
 			<feature name="pcb_model" value="707155-2" />
 		</part>
