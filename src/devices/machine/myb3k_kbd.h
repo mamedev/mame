@@ -24,11 +24,6 @@
 
 #pragma once
 
-#define MYB3K_KBD_CB_PUT(cls, fnc)          myb3k_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, ((cls *)nullptr))
-#define MYB3K_KBD_CB_DEVPUT(tag, cls, fnc)  myb3k_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), (tag), ((cls *)nullptr))
-
-#define MCFG_MYB3K_KEYBOARD_CB(cb)          downcast<myb3k_keyboard_device &>(*device).set_keyboard_callback((MYB3K_KBD_CB_##cb));
-
 DECLARE_DEVICE_TYPE(MYB3K_KEYBOARD, myb3k_keyboard_device)
 DECLARE_DEVICE_TYPE(JB3000_KEYBOARD, jb3000_keyboard_device)
 DECLARE_DEVICE_TYPE(STEPONE_KEYBOARD, stepone_keyboard_device)
@@ -51,7 +46,18 @@ public:
 		TIMER_ID_SECOND_BYTE
 	};
 
-	template <class Object> void set_keyboard_callback(Object &&cb) { m_keyboard_cb = std::forward<Object>(cb); }
+	template <class FunctionClass>
+	void set_keyboard_callback(void (FunctionClass::*callback)(u8 character), const char *name)
+	{
+		set_keyboard_callback(output_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
+	// FIXME: this should be aware of current device for resolving the tag
+	template <class FunctionClass>
+	void set_keyboard_callback(const char *devname, void (FunctionClass::*callback)(u8 character), const char *name)
+	{
+		set_keyboard_callback(output_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	void set_keyboard_callback(output_delegate callback) { m_keyboard_cb = callback; }
 
 protected:
 	myb3k_keyboard_device(
