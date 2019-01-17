@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="apple2_flop_orig.xml" description="Apple II 5.25 Original disks">
+<softwarelist name="apple2_flop_orig" description="Apple II 5.25 Original disks">
 
   <software name="agusawoz">
     <description>Agent USA</description>
