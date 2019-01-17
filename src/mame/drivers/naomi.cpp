@@ -11264,20 +11264,26 @@ ROM_END
 /* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile",      "Noukone Puzzle Takoron (Japan) (GDL-0042)", GAME_FLAGS )
 
 /* CDP-xxxxx and CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
+// CDP-10001?- World Club Champion Football Serie A 2001-2002 (Sega, 2002)
+// CDP-10001?- World Club Champion Football Serie A 2001-2002 Ver.1.2 (Sega, 2002)
 /* CDP-10001C*/ GAME( 2003, wccf116,  naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 Ver.2 (Japan) (CDP-10001C)", GAME_FLAGS )
 /* CDP-10003 */ GAME( 2002, wccf1dup, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2001-2002 DIMM FIRM Ver.3.03 (CDP-10003)", GAME_FLAGS )
-/* CDV-10002 */ GAME( 2004, wccf212e, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2002-2003 Ver.2.12 (Export) (CDV-10002)", GAME_FLAGS )
+// CDV-10001 - World Club Champion Football Serie A 2001-2002 Ver.2.11 (Japan) (Sega, 2002)
+/* CDV-10002 */ GAME( 2004, wccf212e, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2002-2003 Ver.2.12 (Italy) (CDV-10002)", GAME_FLAGS )
+// CDV-10003 - World Club Champion Football Serie A 2002-2003 Ver.2 (Japan) (Sega, 2004)
+// CDV-10004 - World Club Champion Football Serie A 2002-2003 Ver.2 (Korea) (Sega, 2004)
 /* CDV-10007 */ GAME( 2004, wccf2chk, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2002-2003 Drive Checker (CDV-10007)", GAME_FLAGS )  // actually just disc ejector
 /* CDV-10008 */ GAME( 2004, wccf234j, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Hitmaker / Sega", "World Club Champion Football Serie A 2002-2003 Ver.2.34 (Japan) (CDV-10008)", GAME_FLAGS )
-/* CDV-10013 */ GAME( 2005, wccf310j, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 (Japan) (CDV-10013)", GAME_FLAGS )
+// CDV-10011 - World Club Champion Football European Clubs 2004-2005 (Sega, 2005)
+// CDV-10011P- World Club Champion Football European Clubs 2004-2005 (Sega, 2005)
+/* CDV-10013 */ GAME( 2005, wccf310j, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 (Asia) (CDV-10013)", GAME_FLAGS )
 /* CDV-10015 */ GAME( 2005, wccf331e, wccf322e,naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 Ver.1.1 (Export) (CDV-10015)", GAME_FLAGS )
 /* CDV-10015P*/ GAME( 2005, wccf322e, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2004-2005 Ver.3.22 (Export) (CDV-10015P)", GAME_FLAGS )
+// CDV-10020 - World Club Champion Football European Clubs 2004-2005 Ver.1.1 (Sega, 2005)
+// CDV-10021 - World Club Champion Football European Clubs 2004-2005 Ver.1.2 (Sega, 2005)
+// CDV-10025 - World Club Champion Football European Clubs 2005-2006 (Sega, 2006)
+// CDV-10025A- World Club Champion Football European Clubs 2005-2006 (Sega, 2006)
 /* CDV-10027 */ GAME( 2006, wccf420e, naomigd, naomigd, naomi, naomi_state, init_naomigd, ROT0, "Sega",            "World Club Champion Football European Clubs 2005-2006 (Export) (CDV-10027)", GAME_FLAGS )
-// CD?-????? - World Club Champion Football Serie A 2001-2002 (Sega, 2002)
-// CD?-????? - World Club Champion Football Serie A 2001-2002 Ver.1.2 (Sega, 2002)
-// CD?-????? - World Club Champion Football Serie A 2002-2003 Ver.2 (Sega, 2004)
-// CD?-????? - World Club Champion Football European Clubs 2004-2005 Ver.1.2 (Sega, 2005)
-// CD?-????? - World Club Champion Football European Clubs 2005-2006 bugfix (Sega, 2006)
 
 /* MDA-Gxxxx (Compact Flash replacement of Naomi 2 GD-ROM releases) */
 // 0001 - Club Kart Cycraft Edition (GDS-0029)

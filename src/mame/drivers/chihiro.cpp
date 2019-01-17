@@ -64,7 +64,7 @@ Games on this system include....
 | | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  |              |
 |*| 2007     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  | ?            |
 | | 200?     | Sega Network Taisen Mahjong MJ 3 Evo Test Ver      | Sega                     | GDROM  | GDX-0022   |              |
-| | 200?     | Firmware Update For M J3 Evo                       | Sega                     | GDROM  | GDX-0023   |              |
+| | 200?     | Firmware Update For MJ 3 Evo                       | Sega                     | GDROM  | GDX-0023   |              |
 | | 2009     | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
 |*| 2009     | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
 |*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C | 317-0376-JPN |
