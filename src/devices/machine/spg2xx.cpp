@@ -43,6 +43,8 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_UNKNOWN_PPU     (1U << 24)
 #define LOG_FIQ				(1U << 25)
 #define LOG_SIO             (1U << 26)
+#define LOG_EXT_MEM			(1U << 27)
+#define LOG_EXTINT			(1U << 28)
 #define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_UNKNOWN_IO)
 #define LOG_CHANNELS        (LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
 #define LOG_SPU             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
@@ -1087,10 +1089,10 @@ READ16_MEMBER(spg2xx_device::io_r)
 		if (m_uart_rx_available)
 		{
 			m_io_regs[0x31] &= ~0x0081;
-			logerror("UART Rx data is available, clearing bits\n");
+			LOGMASKED(LOG_UART, "UART Rx data is available, clearing bits\n");
 			if (m_uart_rx_fifo_count)
 			{
-				logerror("Remaining count %d, value %02x\n", m_uart_rx_fifo_count, m_uart_rx_fifo[m_uart_rx_fifo_start]);
+				LOGMASKED(LOG_UART, "Remaining count %d, value %02x\n", m_uart_rx_fifo_count, m_uart_rx_fifo[m_uart_rx_fifo_start]);
 				m_io_regs[0x36] = m_uart_rx_fifo[m_uart_rx_fifo_start];
 				val = m_io_regs[0x36];
 				m_uart_rx_fifo_start = (m_uart_rx_fifo_start + 1) % ARRAY_LENGTH(m_uart_rx_fifo);
@@ -1102,7 +1104,7 @@ READ16_MEMBER(spg2xx_device::io_r)
 				}
 				else
 				{
-					logerror("Remaining count %d, setting up timer\n", m_uart_rx_fifo_count);
+					LOGMASKED(LOG_UART, "Remaining count %d, setting up timer\n", m_uart_rx_fifo_count);
 					//uart_receive_tick();
 					if (m_uart_rx_timer->remaining() == attotime::never)
 						m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[0x30], 5) ? 11 : 10, m_uart_baud_rate));
@@ -1585,10 +1587,10 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 			"256KW, 3c0000-3fffff\n",
 			"512KW, 380000-3fffff\n"
 		};
-		LOGMASKED(LOG_IO_WRITES, "io_w: Ext. Memory Control (not yet implemented) = %04x:\n", data);
-		LOGMASKED(LOG_IO_WRITES, "      WaitStates:%d, BusArbPrio:%s\n", (data >> 1) & 3, s_bus_arb[(data >> 3) & 7]);
-		LOGMASKED(LOG_IO_WRITES, "      ROMAddrDecode:%s\n", s_addr_decode[(data >> 6) & 3]);
-		LOGMASKED(LOG_IO_WRITES, "      RAMAddrDecode:%s\n", s_ram_decode[(data >> 8) & 15]);
+		LOGMASKED(LOG_EXT_MEM, "io_w: Ext. Memory Control (not yet implemented) = %04x:\n", data);
+		LOGMASKED(LOG_EXT_MEM, "      WaitStates:%d, BusArbPrio:%s\n", (data >> 1) & 3, s_bus_arb[(data >> 3) & 7]);
+		LOGMASKED(LOG_EXT_MEM, "      ROMAddrDecode:%s\n", s_addr_decode[(data >> 6) & 3]);
+		LOGMASKED(LOG_EXT_MEM, "      RAMAddrDecode:%s\n", s_ram_decode[(data >> 8) & 15]);
 		m_chip_sel((data >> 6) & 3);
 		m_io_regs[offset] = data;
 		break;
@@ -1976,12 +1978,12 @@ void spg2xx_device::uart_receive_tick()
 
 void spg2xx_device::extint_w(int channel, bool state)
 {
-	logerror("Setting extint channel %d to %s\n", channel, state ? "true" : "false");
+	LOGMASKED(LOG_EXTINT, "Setting extint channel %d to %s\n", channel, state ? "true" : "false");
 	bool old = m_extint[channel];
 	m_extint[channel] = state;
 	if (old != state)
 	{
-		logerror("extint state changed, so %sing interrupt\n", state ? "rais" : "lower");
+		LOGMASKED(LOG_EXTINT, "extint state changed, so %sing interrupt\n", state ? "rais" : "lower");
 		const uint16_t mask = (channel == 0) ? 0x0200 : 0x1000;
 		const uint16_t old_irq = IO_IRQ_STATUS;
 		if (state)
@@ -1991,7 +1993,7 @@ void spg2xx_device::extint_w(int channel, bool state)
 
 		if (old_irq != IO_IRQ_STATUS)
 		{
-			logerror("extint IRQ changed, so checking interrupts\n");
+			LOGMASKED(LOG_EXTINT, "extint IRQ changed, so checking interrupts\n");
 			check_irqs(mask);
 		}
 	}

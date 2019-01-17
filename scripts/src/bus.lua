@@ -3270,6 +3270,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/vsmile/vsmile_slot.h,BUSES["VSMILE"] = true
+---------------------------------------------------
+
+if (BUSES["VSMILE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/vsmile/vsmile_slot.cpp",
+		MAME_DIR .. "src/devices/bus/vsmile/vsmile_slot.h",
+		MAME_DIR .. "src/devices/bus/vsmile/rom.cpp",
+		MAME_DIR .. "src/devices/bus/vsmile/rom.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/vtech/memexp/memexp.h,BUSES["VTECH_MEMEXP"] = true
 ---------------------------------------------------
 

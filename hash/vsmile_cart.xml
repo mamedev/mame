@@ -111,7 +111,7 @@ Game cartridges
 +========+===================+============================================================================+
 |        | 80-090260(US)     | Disney Fairies: Tinker Bell                                                |
 |        |          (DK)     | Disney Fairies: Tingeling                                                  |
-|        | 80-090274(SE)     | Disney Fairies: Tingeling                                                  |
+|   XX   | 80-090274(SE)     | Disney Fairies: Tingeling                                                  |
 |        | 80-090275(NO)     | Disney Fairies: Tingeling                                                  |
 |        |          (FI)     | Disney Fairies: Helinä-keiju                                               |
 +========+===================+============================================================================+
@@ -170,7 +170,7 @@ Game cartridges
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)     |
 |        | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey                                      |
 |        |          (DK)     | Mickey                                                                     |
-|        | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                        |
+|   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                        |
 |        |          (NO)     | Mickey                                                                     |
 |        |          (FI)     | Mickey                                                                     |
 +========+===================+============================================================================+
@@ -521,6 +521,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092204(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -537,6 +538,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092024(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -553,6 +555,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092000(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
@@ -569,6 +572,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092004(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
@@ -585,6 +589,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092005(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
@@ -601,6 +606,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092124(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
@@ -617,6 +623,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092124(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
@@ -633,6 +640,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092125(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -649,6 +657,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092133(DK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
@@ -665,6 +674,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092134(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
@@ -680,6 +690,7 @@ Game cartridges
 		<year>2005</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="La Sirenetta - Ariel e la Crociera Magica (Italy).bin" size="8388608" crc="280b335b" sha1="256ea4f5725dcfd51be08ea6c135ad71701cc296" offset="0" />
 			</dataarea>
@@ -692,6 +703,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092384(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="7061238A" />
 			<feature name="pcb_model" value="7061238A-3" />
 			<feature name="cart_type" value="lilac" />
@@ -709,6 +721,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092300(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="7061238A" />
 			<feature name="pcb_model" value="7061238A-3" />
 			<feature name="cart_type" value="lilac" />
@@ -725,6 +738,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092304(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -741,6 +755,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092313(DK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
@@ -757,6 +772,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092314(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
@@ -774,6 +790,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092660(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -790,6 +807,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092664(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -806,6 +824,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092665(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -822,6 +841,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092673(DK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -839,6 +859,7 @@ Game cartridges
 		<info name="serial" value="80-092674(SE)" />
 		<info name="alt_title" value="Biler - Kör ikapp i Kylarköping (Misprinted cart)"/>
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="cart_type" value="lilac" />
@@ -855,6 +876,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092240(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -871,6 +893,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092240(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="52-92240(us).bin" size="8388608" crc="0a89723c" sha1="15082b565f6f71a0f993c2734cb807f37611eb17" offset="0" />
 			</dataarea>
@@ -883,6 +906,7 @@ Game cartridges
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="52-92251 (Ita)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Cenerentola - I Desideri Magici di Cenerentola (Italy).bin" size="8388608" crc="cb28ac0d" sha1="e938504a40a4f47cd4b09489f515c0a6545a1800" offset="0" />
 			</dataarea>
@@ -895,6 +919,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092245(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -911,6 +936,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092253(DK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -927,6 +953,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092244-104(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -943,6 +970,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092244(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -959,6 +987,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092254(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -975,6 +1004,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092080(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="52-092080(us).bin" size="8388608" crc="997a8a07" sha1="cd70c7249e25a37aeb3a3b85f56bd2b39dbf3d73" offset="0" />
 			</dataarea>
@@ -988,6 +1018,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092280(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1004,6 +1035,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092285(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="7061238A" />
 			<feature name="pcb_model" value="7061238A-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1020,6 +1052,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092284-104(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -1036,6 +1069,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092264(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1052,6 +1086,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092265(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1068,6 +1103,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092824(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1084,6 +1120,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092420(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1100,6 +1137,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092422(NL)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1116,6 +1154,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092044(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
@@ -1132,6 +1171,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092045(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-A" />
 			<feature name="cart_type" value="lilac" />
@@ -1148,6 +1188,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092984(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-6" />
 			<feature name="cart_type" value="lilac" />
@@ -1164,6 +1205,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092100(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1180,6 +1222,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092104(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1196,6 +1239,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092105(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1212,6 +1256,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092113(DK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
@@ -1228,6 +1273,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092114(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
@@ -1244,6 +1290,7 @@ Game cartridges
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<info name="serial" value="80-092113(DK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Re Leone, Il - La Grande Avventura di Simba (Italy).bin" size="8388608" crc="6f807218" sha1="2783734d1596021f0aadf1b20d7398d2f73abb04" offset="0" />
 			</dataarea>
@@ -1256,6 +1303,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="52-092963(UK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Kung Fu Panda - Path of the Panda (Europe).bin" size="8388608" crc="0a56ba7b" sha1="04afc9bb216154c91fa3ef92b6bbcc88a9a2a43e" offset="0" />
 			</dataarea>
@@ -1268,6 +1316,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="52-092964(GER)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -1284,6 +1333,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090024(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -1300,6 +1350,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092585(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1316,6 +1367,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092084(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1332,6 +1384,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092094(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1348,6 +1401,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092944(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -1364,6 +1418,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092942(NL)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1380,6 +1435,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092954(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="cart_type" value="lilac" />
@@ -1396,6 +1452,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090164(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -1412,6 +1469,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090144(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -1428,6 +1486,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090154(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-6" />
 			<feature name="cart_type" value="lilac" />
@@ -1444,6 +1503,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092544-104(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -1460,6 +1520,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092545(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1476,6 +1537,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090004-004(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -1492,6 +1554,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090003-003(UK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Up (Europe).bin" size="8388608" crc="739a10a0" sha1="1d88241675f304ad50b756af49b33062b7de05dc" offset="0" />
 			</dataarea>
@@ -1504,6 +1567,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092920(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1520,6 +1584,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092884(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1535,6 +1600,7 @@ Game cartridges
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Ratatouille - Le Nuove Ricette di Remy (Italy).bin" size="8388608" crc="438550fb" sha1="1edc845aecac91eb640185895d3f7a3cdf462159" offset="0" />
 			</dataarea>
@@ -1547,6 +1613,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092160(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1563,6 +1630,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092165(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1579,6 +1647,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092164(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-E" />
 			<feature name="cart_type" value="lilac" />
@@ -1595,6 +1664,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092173(DK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1611,6 +1681,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092174(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1626,6 +1697,7 @@ Game cartridges
 		<year>200?</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Scooby-Doo! - Avventura a Funland (Italy).bin" size="8388608" crc="a2bd7a0c" sha1="e8d4863616b1fdf83ed3c33327d6e17ac63b1443" offset="0" />
 			</dataarea>
@@ -1638,6 +1710,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092464(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1654,6 +1727,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092860(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1670,6 +1744,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092864(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1686,6 +1761,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092862(NL)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1702,6 +1778,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092604(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1718,6 +1795,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092605(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1734,6 +1812,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092145(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1750,6 +1829,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092524(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1766,6 +1846,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092440(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1782,6 +1863,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092444(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1798,6 +1880,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092444(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1814,6 +1897,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092644(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1830,6 +1914,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092644(NL)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1846,6 +1931,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092645(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1862,6 +1948,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092344-104(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1878,6 +1965,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092344(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1894,6 +1982,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092345(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1910,6 +1999,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092354(SE)" /> <!-- 494096(SE) on cart -->
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
@@ -1926,6 +2016,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-090274(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="cart_type" value="lilac" />
@@ -1942,6 +2033,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092220(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="52-92220(us).bin" size="8388608" crc="6335b0e1" sha1="ddb4bcc5f9b155041bf4ffce236f57cfae3fdec2" offset="0" />
 			</dataarea>
@@ -1954,6 +2046,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092224(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -1970,6 +2063,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092234(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="lilac" />
@@ -1986,6 +2080,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092844(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -2002,6 +2097,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092854(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708106" />
 			<feature name="pcb_model" value="708106-1" />
 			<feature name="cart_type" value="lilac" />
@@ -2018,6 +2114,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092064(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -2034,6 +2131,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092064-104(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="lilac" />
@@ -2050,6 +2148,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092065(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708894" />
 			<feature name="pcb_model" value="708894-1" />
 			<feature name="cart_type" value="lilac" />
@@ -2066,6 +2165,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092065-2(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -2082,6 +2182,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092073(DK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -2098,6 +2199,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092074(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-1" />
 			<feature name="cart_type" value="lilac" />
@@ -2115,6 +2217,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091324(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-2" />
 			<feature name="cart_type" value="yellow" />
@@ -2131,6 +2234,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067004(GER)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_ram" />
 			<feature name="pcb" value="67000C" />
 			<feature name="pcb_model" value="67000C-5" />
 			<feature name="cart_type" value="yellow" />
@@ -2150,6 +2254,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067021(SE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="67000C" />
 			<feature name="pcb_model" value="67000C-2" />
 			<feature name="cart_type" value="yellow" />
@@ -2169,6 +2274,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092360(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="52-92360(us).bin" size="8388608" crc="76ff9718" sha1="be783c1abe96f785564f5b5b6b4ea089b799c1d4" offset="0" />
 			</dataarea>
@@ -2181,6 +2287,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092360-101(US)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="cart_type" value="lilac" />
@@ -2197,6 +2304,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092364(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -2213,6 +2321,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092363-103(UK)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Zayzoo - An Earth Adventure (UK).bin" size="8388608" crc="4e94fce2" sha1="b65a446199d390d6b25046fb66fb7e7f329e84c5" offset="0" />
 			</dataarea>
@@ -2225,6 +2334,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092365(FR)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="706714" />
 			<feature name="pcb_model" value="706714-1" />
 			<feature name="cart_type" value="lilac" />
@@ -2241,6 +2351,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091444(GE)" />
 		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
 			<feature name="pcb_model" value="707180-3" />
 			<feature name="cart_type" value="yellow" />
