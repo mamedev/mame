@@ -1438,6 +1438,7 @@ MACHINE_CONFIG_START(apple2_state::apple2_common)
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig");
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
 	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)

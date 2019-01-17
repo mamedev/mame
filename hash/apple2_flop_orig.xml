@@ -1,0 +1,2451 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="apple2_flop_orig.xml" description="Apple II 5.25 Original disks">
+
+  <software name="agusawoz">
+    <description>Agent USA</description>
+    <year>1984</year>
+    <publisher>Scholastic</publisher>
+    <info name="release" value="2018-11-15"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="80443">
+        <rom name="agent usa.woz" size="80443" crc="c998fa8f" sha1="964336e9f3f6e778232ed6174864e12b337ffa67" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="arhrtwoz">
+    <description>Airheart</description>
+    <year>1986</year>
+    <publisher>Broderbund Software</publisher>
+    <info name="release" value="2018-10-12"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240141">
+        <rom name="airheart.woz" size="240141" crc="2685473f" sha1="a20a23a55639154bc2f6bab4cf27895187413b6b" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="aambhwoz">
+    <description>Alien Ambush</description>
+    <year>1981</year>
+    <publisher>Micro Distributors</publisher>
+    <info name="release" value="2018-09-17"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233482">
+        <rom name="alien ambush.woz" size="233482" crc="447173e3" sha1="fcef1a08c2d0d4a25c15fba65ba4713b55c33fc2" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ankhwoz">
+    <description>Ankh</description>
+    <year>1983</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-08-28"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233471">
+        <rom name="ankh.woz" size="233471" crc="f1957348" sha1="5f7aab7aa138de668e0f1bac97e58b1cb1128fc0" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="apcspwoz">
+    <description>Apple Cider Spider</description>
+    <year>1983</year>
+    <publisher>Sierra On-Line</publisher>
+    <info name="release" value="2018-09-01"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233532">
+        <rom name="apple cider spider.woz" size="233532" crc="ce310438" sha1="e54afce309fb62eeca8cc0dea0efbf10777249dd" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="agalxwoz">
+    <description>Apple Galaxian</description>
+    <year>1980</year>
+    <publisher>Broderbund Software</publisher>
+    <info name="release" value="2018-10-10"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="106991">
+        <rom name="apple galaxian.woz" size="106991" crc="298683ba" sha1="47a7e2459803a80d60744c295fa44ac69c815a9c" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="aquatwoz">
+    <description>Aquatron</description>
+    <year>1983</year>
+    <publisher>Sierra On-Line</publisher>
+    <info name="release" value="2018-07-29"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="246792">
+        <rom name="aquatron.woz" size="246792" crc="050A69FF" sha1="9BB84494A65B673D3444EDD044206F9A1A148A4A" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="archnwoz">
+    <description>Archon: The Light and The Dark</description>
+    <year>1984</year>
+    <publisher>Electronic Arts</publisher>
+    <info name="release" value="2018-09-03"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226901">
+        <rom name="archon.woz" size="226901" crc="259acee7" sha1="96f118b0b49cba85fb79ee1d36c1bfe88f69d9fe" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ardyawoz">
+    <description>Ardy the Aardvark</description>
+    <year>1983</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-09-23"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233476">
+        <rom name="ardy the aardvark.woz" size="233476" crc="5ba2f2a0" sha1="0358ac0d0788ca03c5fed151c44a86676aa554e3" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="autobwoz">
+    <description>Autobahn</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-05"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="53760">
+        <rom name="autobahn.woz" size="53760" crc="d2636d1e" sha1="f2c280a63bc4bf1d3eb010731d122e960daed3fa" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="axisawoz">
+    <description>Axis Assassin</description>
+    <year>1982</year>
+    <publisher>Electronic Arts</publisher>
+    <info name="release" value="2018-08-10"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226823">
+        <rom name="axis assassin.woz" size="226823" crc="332a66bc" sha1="c940a0f83dcb27039cfa7bd08e7fa11163cadbed" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="aztecwoz">
+    <description>Aztec</description>
+    <year>1982</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2019-01-03"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233469">
+        <rom name="aztec.woz" size="233469" crc="9a7e5a77" sha1="37ad95a2e87a0a63c76eb8a0da0a0114d9bd6559" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="bdudewoz">
+    <description>Bad Dudes</description>
+    <year>1988</year>
+    <publisher>Data East USA</publisher>
+    <info name="release" value="2019-01-03"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233460">
+        <rom name="bad dudes side a.woz" size="233460" crc="e37063ea" sha1="870aeb56c9b7002c54500ce7f6da2bf291ef6b0e" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233460">
+        <rom name="bad dudes side b.woz" size="233460" crc="2febca6b" sha1="84392cbbf7ffeaa8280d7bf354f6b507acd6afca" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="blblzwoz">
+    <description>Ballblazer</description>
+    <year>1985</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-08-11"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240138">
+        <rom name="ballblazer.woz" size="240138" crc="ce1f6dbf" sha1="02b24b12a45cd437dd53be25f73c51da99e8be98" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="batmnwoz">
+    <description>Batman: The Caped Crusader</description>
+    <year>1985</year>
+    <publisher>Data East USA</publisher>
+    <info name="release" value="2018-08-11"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233469">
+        <rom name="batman side a.woz" size="233469" crc="5b55225f" sha1="6ff40d0a5347af16b656d8aa490c99dbd0acc225" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233469">
+        <rom name="batman side b.woz" size="233469" crc="2b6a6d08" sha1="1d1603bf50527d15a2a4c76391de2fded2cd859f" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="bcqftwoz">
+    <description>BC's Quest for Tires</description>
+    <year>1983</year>
+    <publisher>Sierra On-Line</publisher>
+    <info name="release" value="2018-08-11"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="253454">
+        <rom name="bc's quest for tires.woz" size="253454" crc="ce25b417" sha1="2a85e860f86748b14a913c3cb7a94762fa1d5de4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="bellhpwz">
+    <description>Bellhop</description>
+    <year>1982</year>
+    <publisher>Hayden Book Company</publisher>
+    <info name="release" value="2018-07-31"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240180">
+        <rom name="bellhop.woz" size="240180" crc="14F96DE9" sha1="8B864BDFEB11F029295BD1B7E7337CC857510BC7" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="belrtwoz">
+    <description>Below the Root</description>
+    <year>1984</year>
+    <publisher>Hayden Book Company</publisher>
+    <info name="release" value="2018-07-31"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233490">
+        <rom name="below the root side a.woz" size="233490" crc="9129bb1c" sha1="a51a653e2886a00f636a7bc3a192745dcb06327b" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233515">
+        <rom name="below the root side b.woz" size="233515" crc="f3f181f8" sha1="2451c2c2f441c9b17ea82619e57e22e865c926d1" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tbilewoz">
+    <description>The Bilestoad</description>
+    <year>1983</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-09-24"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233458">
+        <rom name="the bilestoad.woz" size="233458" crc="f87abe3c" sha1="68153b3444a2e0cc1090ee20dd3cd34edd1dc53a" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="bgbatwoz">
+    <description>Bug Battle</description>
+    <year>1982</year>
+    <publisher>United Software of America</publisher>
+    <info name="release" value="2018-09-05"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="67088">
+        <rom name="bug battle.woz" size="67088" crc="667e02c5" sha1="b4c859da09fffbb2a1fc5fc35920d6695c0c73cb" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cbbltwoz">
+    <description>Cannonball Blitz</description>
+    <year>1982</year>
+    <publisher>On-Line Systems</publisher>
+    <info name="release" value="2018-12-26"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233483">
+        <rom name="cannonball blitz.woz" size="233483" crc="e2d1793b" sha1="fd216f318ee12ce05f4c47ba3f7555b8ebf83c2f" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cavocwoz">
+    <description>Caverns of Callisto</description>
+    <year>1983</year>
+    <publisher>Origin Systems</publisher>
+    <info name="release" value="2018-10-23"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="220149">
+        <rom name="caverns of callisto.woz" size="220149" crc="a2849124" sha1="6c91fb79711d99c7c5415f84de50b11282420d3c" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="czerowoz">
+    <description>Ceiling Zero</description>
+    <year>1981</year>
+    <publisher>Turnkey Software</publisher>
+    <info name="release" value="2018-09-18"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="120335">
+        <rom name="ceiling zero.woz" size="120335" crc="b070fb17" sha1="9367e7c0345420bc836a1ff92149bca7d70ebf33" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="centiwoz">
+    <description>Centipede</description>
+    <year>1983</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2019-01-14"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233448">
+        <rom name="centipede.woz" size="233448" crc="df23de50" sha1="e38c229a930866842b5581b89ad15cc620333342" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="comndowz">
+    <description>Commando</description>
+    <year>1987</year>
+    <publisher>Data East USA</publisher>
+    <info name="release" value="2018-08-02"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233478">
+        <rom name="commando.woz" size="233478" crc="B28E4E2B" sha1="4D41326BE376D529D4172D75365BF8E8162A944E" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cbongwoz">
+    <description>Congo Bongo</description>
+    <year>1987</year>
+    <publisher>SEGA Enterprises</publisher>
+    <info name="release" value="2018-08-02"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="220129">
+        <rom name="congo bongo.woz" size="220129" crc="f18eb492" sha1="6c28985fa747e578e87f5cecfd521eef678f4c81" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="conqwwoz">
+    <description>Conquering Worlds</description>
+    <year>1983</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2019-01-06"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="220176">
+        <rom name="conquering worlds.woz" size="220176" crc="df06a833" sha1="fc12c66f0d60f7253f5ebded9f89d92e89ccab59" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="coptswoz">
+    <description>Copts and Robbers</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-09-20"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="107016">
+        <rom name="copts and robbers.woz" size="107016" crc="9b473847" sha1="f98ee46f570c66e15f9c34814b202b8bd40b3b6e" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cfairwoz">
+    <description>County Fair</description>
+    <year>1981</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-12-31"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="126960">
+        <rom name="county fair.woz" size="126960" crc="fb43f35a" sha1="9bc1ab7ea98e4b89497c5a1d8d3a719597deffe4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cmazewoz">
+    <description>Crazy Mazey</description>
+    <year>1982</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2019-01-05"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233475">
+        <rom name="crazy mazey.woz" size="233475" crc="c54f399b" sha1="0c0abd2a5c03bc5235d7d28cb3ef60d18d0d3240" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="crismwoz">
+    <description>Crisis Mountain</description>
+    <year>1982</year>
+    <publisher>Micro Fun</publisher>
+    <info name="release" value="2018-09-06"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233483">
+        <rom name="crisis mountain.woz" size="233483" crc="8ba3e03e" sha1="da43ab36ab26a7672df5132ca02fecbf0ae0f1c2" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="crosfwoz">
+    <description>Crossfire</description>
+    <year>1981</year>
+    <publisher>On-Line Systems</publisher>
+    <info name="release" value="2019-01-12"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233477">
+        <rom name="crossfire.woz" size="233477" crc="410930b0" sha1="db4ad9256846ac08e432c2dbb36671fb4b55a143" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cubitwoz">
+    <description>Cubit</description>
+    <year>1983</year>
+    <publisher>Micromax</publisher>
+    <info name="release" value="2018-08-22"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233465">
+        <rom name="cubit.woz" size="233465" crc="6f91e366" sha1="9fa85d622f6df78da4e6bf47287b32452382c051" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="cstrkwoz">
+    <description>Cyber Strike</description>
+    <year>1980</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-11-18"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="140265">
+        <rom name="cyber strike.woz" size="140265" crc="33f9d8ab" sha1="70fd4c89436bb839b153498d19b1bc769d8852dd" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tdambwoz">
+    <description>The Dam Busters</description>
+    <year>1985</year>
+    <publisher>Accolade</publisher>
+    <info name="release" value="2018-12-29"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233497">
+        <rom name="the dam busters.woz" size="233497" crc="d5fdd6ec" sha1="4e00f53dd93605a209691f4ceac9a72b92556db9" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="dswrdwoz">
+    <description>Death Sword</description>
+    <year>1987</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-11-30"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233486">
+        <rom name="death sword.woz" size="233486" crc="31c95650" sha1="b94418ae85f887f857dc683221e24ab8172eb191" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="dstrywoz">
+    <description>Destroyer</description>
+    <year>1986</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-07"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233484">
+        <rom name="destroyer.woz" size="233484" crc="bb402221" sha1="40cba620460fde69dda879230128237ee68c830f" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="deggswoz">
+    <description>Dino Eggs</description>
+    <year>1983</year>
+    <publisher>Micro Fun</publisher>
+    <info name="release" value="2018-08-07"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233477">
+        <rom name="dino eggs.woz" size="233477" crc="70d8d65d" sha1="84cbacaa8d639087b9b510839f0b2fe5bb40abd4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="dbombwoz">
+    <description>Dive Bomber</description>
+    <year>1988</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-08"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233475">
+        <rom name="dive bomber.woz" size="233475" crc="f56ccceb" sha1="481f1cadcae87a599f116ce402a2113c22a654cc" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="dkongwoz">
+    <description>Donkey Kong</description>
+    <year>1983</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2019-01-08"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233450">
+        <rom name="donkey kong.woz" size="233450" crc="77ea741f" sha1="8a3195bd8aa21f4890fae30c417295b6bf5662ea" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="drolwoz">
+    <description>Drol</description>
+    <year>1983</year>
+    <publisher>Broderbund Software</publisher>
+    <info name="release" value="2018-10-13"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233473">
+        <rom name="drol.woz" size="233473" crc="6f8efd51" sha1="d6bc91908869701e952d037540fb79b87686415f" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="dbeetwoz">
+    <description>Dung Beetles</description>
+    <year>1982</year>
+    <publisher>Datasoft</publisher>
+    <info name="release" value="2018-10-14"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233450">
+        <rom name="dung beetles.woz" size="233450" crc="be1f0710" sha1="7dd2fc29eb40976f3db5ca54a85d1e094937e3b9" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="teidowoz">
+    <description>The Eidolon</description>
+    <year>1985</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-05"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233469">
+        <rom name="the eidolon.woz" size="233469" crc="d63f1ca5" sha1="c072f163c24455949964b175b6e05354cc9d0f72" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="epochwoz">
+    <description>Epoch</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-07"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="107009">
+        <rom name="epoch.woz" size="107009" crc="41f6900e" sha1="69021434f212c461ce66a98d04be036b8dc60a07" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="flcnswoz">
+    <description>Falcons</description>
+    <year>1981</year>
+    <publisher>Piccadilly Software</publisher>
+    <info name="release" value="2018-09-19"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="146916">
+        <rom name="falcons.woz" size="146916" crc="cc93f644" sha1="7766debe7d678380aae96def6f14cedd6ff1683a" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <software name="fnghtwoz">
+    <description>Fight Night</description>
+    <year>1985</year>
+    <publisher>Accolade</publisher>
+    <info name="release" value="2018-09-04"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233490">
+        <rom name="fight night.woz" size="233490" crc="a3f76367" sha1="125d508202a60ff6515a7b80dddd4313b123421e" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="fs2v20wz">
+    <description>Flight Simulator II (v2.0)</description>
+    <year>1985</year>
+    <publisher>Accolade</publisher>
+
+    <info name="release" value="2018-09-04"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233510">
+        <rom name="flight simulator ii v2.0.woz" size="233510" crc="e73d8996" sha1="88359b00974e857e14d0a104fae7b191d1f52662" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="floutwoz">
+    <description>Flip Out</description>
+    <year>1982</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-08"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240132">
+        <rom name="flip out.woz" size="240132" crc="c8a6d56c" sha1="27e388adc7358390824163a33a31efb8c7449d7a" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="frce7woz">
+    <description>Force 7</description>
+    <year>1987</year>
+    <publisher>Datasoft</publisher>
+
+    <info name="release" value="2018-12-20"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="193522">
+        <rom name="force 7.woz" size="193522" crc="01d48369" sha1="c248796aa3ef777c00447a4e3049dbd074a16a18" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="f1rcrwoz">
+    <description>Formula 1 Racer</description>
+    <year>1983</year>
+    <publisher>Gentry Software</publisher>
+    <info name="release" value="2018-12-22"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="87054">
+        <rom name="formula 1 racer.woz" size="87054" crc="c245af6f" sha1="05cdd1a23417dd772d59324e24052ed04bfc51db" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ffallwoz">
+    <description>Free Fall</description>
+    <year>1982</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-11-16"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233488">
+        <rom name="free fall.woz" size="233488" crc="ec0b4ba1" sha1="9f8597e2659b7b94eca5c97c8f096fd2a3ac575a" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="frogrwoz">
+    <description>Frogger</description>
+    <year>1981</year>
+    <publisher>Sierra On-Line</publisher>
+    <info name="release" value="2018-09-13"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="260154">
+        <rom name="frogger.woz" size="260154" crc="a6529172" sha1="583e0cccc428fec0ddfba2f781c1fa42804323f8" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="frog2woz">
+    <description>Frogger II</description>
+    <year>1984</year>
+    <publisher>SEGA Enterprises</publisher>
+    <info name="release" value="2018-12-21"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233464">
+        <rom name="frogger ii.woz" size="233464" crc="3cbf713e" sha1="cc4507249236e2674d3d7ecd1799460d0b7e7fbc" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="gijoewoz">
+    <description>G.I. Joe</description>
+    <year>1985</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-09-13"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233527">
+        <rom name="g. i. joe side a.woz" size="233527" crc="a7feb3c1" sha1="74ffc0d32ff1d294b91b7ffb24216b64a3eef6e8" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233527">
+        <rom name="g. i. joe side b.woz" size="233527" crc="7e547fa1" sha1="12f251af41708fa349c1d022c4007fac54dd610a" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tgsewoz">
+    <description>The Games - Summer Edition</description>
+    <year>1988</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-05"/>
+
+    <!-- Disk A -->
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233937">
+        <rom name="the games - summer edition - disk 1, side a.woz" size="233937" crc="0dc7efa5" sha1="954e0259c9cd8f9318cc84a03038070fe5a1a8af" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233937">
+        <rom name="the games - summer edition - disk 1, side b.woz" size="233937" crc="a972a6ae" sha1="b6db0be1652fb79717cd6103051f3af685edf658" offset="0x0000" />
+      </dataarea>
+    </part>
+    <!-- Disk B -->
+    <part name="flop3" interface="floppy_5_25">
+      <dataarea name="flop" size="233937">
+        <rom name="the games - summer edition - disk 2, side a.woz" size="233937" crc="8d53f85e" sha1="52c04578fb5bb2c2a65ce9f9fcc344fa46192e6a" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop4" interface="floppy_5_25">
+      <dataarea name="flop" size="233937">
+        <rom name="the games - summer edition - disk 2, side b.woz" size="233937" crc="ccc6e8bd" sha1="6bf9d6d245f7de1991ded76e5b0f4cbf212d192d" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="gatowoz">
+    <description>GATO</description>
+    <year>1985</year>
+    <publisher>Spectrum Holobyte</publisher>
+    <info name="release" value="2018-08-14"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233524">
+        <rom name="gato.woz" size="233524" crc="919ce758" sha1="6df688cbcfe4bd5d7c6cbc3a730ed4fb19b047b1" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="gdrftwoz">
+    <description>Genetic Drift</description>
+    <year>1981</year>
+    <publisher>Broderbund Software</publisher>
+    <info name="release" value="2018-10-27"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="120320">
+        <rom name="genetic drift.woz" size="120320" crc="4b3c4403" sha1="c03c14268f780dc10200913958c566c0d0745e4d" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="gbblrwoz">
+    <description>Gobbler</description>
+    <year>1981</year>
+    <publisher>On-Line Systems</publisher>
+    <info name="release" value="2018-12-25"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="253442">
+        <rom name="gobbler.woz" size="253442" crc="f9a9a3ed" sha1="8cb6dfa9db96d1270ae0ace9a1dd9ac7438c7fbb" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="gooniewz">
+    <description>The Goonies</description>
+    <year>1985</year>
+    <publisher>Datasoft</publisher>
+    <info name="release" value="2018-08-04"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226840">
+        <rom name="the goonies.woz" size="226840" crc="A365005F" sha1="08FAB759030728CFA95C4DC8FA017AA3C32F9E9F" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="gumblwoz">
+    <description>Gumball</description>
+    <year>1983</year>
+    <publisher>Broderbund Software</publisher>
+    <info name="release" value="2018-10-11"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233497">
+        <rom name="gumball.woz" size="233497" crc="f49249e5" sha1="a13b691bdba9ce006aabb46e799009d44a9591cc" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="heistwoz">
+    <description>The Heist</description>
+    <year>1983</year>
+    <publisher>Micro Fun</publisher>
+    <info name="release" value="2018-12-28"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233483">
+        <rom name="the heist.woz" size="233483" crc="c39a1905" sha1="a9895f8ab454bf3dfdf5ac979274681d3ea42056" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="herowoz">
+    <description>HERO - Helicopter Emergency Rescue Operation</description>
+    <year>1983</year>
+    <publisher>Activision</publisher>
+    <info name="release" value="2018-10-11"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233525">
+        <rom name="h.e.r.o. - helicopter emergency rescue operation.woz" size="233525" crc="facd3a5b" sha1="ef705f7605cdb94ecab13ded673887592918e52c" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="hadrnwoz">
+    <description>Hadron</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-11-20"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="133638">
+        <rom name="hadron.woz" size="133638" crc="9d678164" sha1="69f982b60a91ad66dab671d2ccf44b5d0c44cf72" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="hhmackwz">
+    <description>Hard Hat Mack</description>
+    <year>1983</year>
+    <publisher>Electronic Arts</publisher>
+    <info name="release" value="2018-07-25"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226887">
+        <rom name="hard hat mack.woz" size="226887" crc="82A26A65" sha1="7FE8FA5F6C0A303221F6F6C4FD542FEAEC2C84E3" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="hrdblwoz">
+    <description>Hardball</description>
+    <year>1985</year>
+    <publisher>Accolade</publisher>
+    <info name="release" value="2019-01-11"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226850">
+        <rom name="hardball.woz" size="226850" crc="7592a75d" sha1="555a5602e8f7205331499040b74c652ec680b5c1" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="hedonwoz">
+    <description>Head On</description>
+    <year>1980</year>
+    <publisher>California Pacific Computers</publisher>
+    <info name="release" value="2018-08-09"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="40463">
+        <rom name="head on.woz" size="40463" crc="674e109f" sha1="7a2ec7e63e254591555be0408c5e98e481f7925e" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="hghrswoz">
+    <description>High Rise</description>
+    <year>1983</year>
+    <publisher>Micro Fun</publisher>
+    <info name="release" value="2018-09-29"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="133632">
+        <rom name="high rise.woz" size="133632" crc="20539152" sha1="5bfec6ed2ce708428dcf47baa693c1985d744a3d" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ikariwoz">
+    <description>Ikari Warriors</description>
+    <year>1983</year>
+    <publisher>Data East USA</publisher>
+    <info name="release" value="2018-09-29"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233486">
+        <rom name="ikari warriors side a.woz" size="233486" crc="e8b44cd5" sha1="05836f6f7dca26005f7759a972d1979f965cdde0" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233486">
+        <rom name="ikari warriors side b.woz" size="233486" crc="ff41f744" sha1="0754b5c86d12f3f8d58d58f3c4e89ad1a0f37cf4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="igrprwoz">
+    <description>International Gran Prix</description>
+    <year>1982</year>
+    <publisher>MUSE Software</publisher>
+    <info name="release" value="2018-09-21"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="140311">
+        <rom name="international gran prix.woz" size="140311" crc="e0ac088a" sha1="dedf2276a824b4dd454b915a20c1cf3d96518f24" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="jwbrkwoz">
+    <description>Jawbreaker</description>
+    <year>1981</year>
+    <publisher>On-Line Systems</publisher>
+    <info name="release" value="2018-09-25"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240117">
+        <rom name="jawbreaker.woz" size="240117" crc="79cd1db7" sha1="3050b0a351516d63254010ea3ae8137d37f7dbed" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="jwbk2woz">
+    <description>Jawbreaker ][</description>
+    <year>1982</year>
+    <publisher>Sierra On-Line</publisher>
+    <info name="release" value="2018-09-21"/>
+    <!-- It requires a 48K Apple ][ or ][+.
+    Due to compatibility issues caused by the copy protection, it will not run
+    on any later models. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="459782">
+        <rom name="jawbreaker ][.woz" size="459782" crc="564b9530" sha1="9e8ff4220a0203ace18fafe300b119558d6e3fdc" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tjetwoz">
+    <description>The Jet</description>
+    <year>1986</year>
+    <publisher>subLOGIC</publisher>
+    <info name="release" value="2018-10-24"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="140293">
+        <rom name="the jet.woz" size="140293" crc="b6b0b193" sha1="df4f4a46039053835cdd449ed91bb524a678d317" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="joustwoz">
+    <description>Joust</description>
+    <year>1983</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2018-10-28"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233444">
+        <rom name="joust.woz" size="233444" crc="4111f092" sha1="04e1493c87efd5a1e13141b46164bde876e90fd0" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <software name="jhuntwoz">
+    <description>Jungle Hunt</description>
+    <year>1984</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2018-08-12"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233456">
+        <rom name="jungle hunt.woz" size="233456" crc="4138c797" sha1="a920bb6b70a738c7d37fc292efa3c369211385c9" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="kchmpwoz">
+    <description>Karate Champ</description>
+    <year>1985</year>
+    <publisher>Data East</publisher>
+    <info name="release" value="2018-08-31"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233486">
+        <rom name="karate champ.woz" size="233486" crc="d579695d" sha1="9587fcf42e9aea5ec95c5ece7a28f3fae49d53b0" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="krtkawoz">
+    <description>Karateka</description>
+    <year>1984</year>
+    <publisher>Broderbund Software</publisher>
+    <info name="release" value="2018-10-19"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233451">
+        <rom name="karateka.woz" size="233451" crc="579992fd" sha1="426b10497d927ad8704f252b1f948aa259d1f608" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233451">
+        <rom name="karateka side b.woz" size="233451" crc="6be5c7db" sha1="58c3cf8c66c48eac9d0602a3a5437b03577edbe9" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="kdnkiwoz">
+    <description>Kid Niki</description>
+    <year>1987</year>
+    <publisher>Data East</publisher>
+    <info name="release" value="2018-10-19"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233499">
+        <rom name="kid niki side a.woz" size="233499" crc="c2fcb172" sha1="2001d447a04a03c6c51b698091ef32e1fc149b83" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233499">
+        <rom name="kid niki side b.woz" size="233499" crc="8ca573fb" sha1="892f4e3daf765cc33fb7230f97cabed8f52763a5" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="kngfmwoz">
+    <description>Kung Fu Master</description>
+    <year>1985</year>
+    <publisher>Data East</publisher>
+    <info name="release" value="2018-08-20"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233482">
+        <rom name="kung fu master.woz" size="233482" crc="ac6f78b9" sha1="3d7b1973331a0e51ede04d101bb060ca40c2ab92" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="lacrkwoz">
+    <description>L.A. Crackdown</description>
+    <year>1988</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-08-20"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233484">
+        <rom name="l. a. crackdown side a.woz" size="233484" crc="2470ff12" sha1="9e095637f0e4f3bf6f18318f68c3a8946a333394" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233484">
+        <rom name="l. a. crackdown side b.woz" size="233484" crc="f90f1341" sha1="ab3bf18944f6482f574a054c916c84d2fbc4f49b" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="lsttwoz">
+    <description>Lost Tomb</description>
+    <year>1984</year>
+    <publisher>Datasoft</publisher>
+    <info name="release" value="2018-09-22"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="206813">
+        <rom name="lost tomb.woz" size="206813" crc="3e169830" sha1="5d116f6c8accd7a0f04f4b50ab20781fcdf19285" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="maradwoz">
+    <description>Marauder</description>
+    <year>1982</year>
+    <publisher>On-Line Systems</publisher>
+    <info name="release" value="2018-10-21"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233470">
+        <rom name="marauder.woz" size="233470" crc="59a89e2c" sha1="cd279b38ee6a072aa2974a66804e1f75ff34111d" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mmadnwoz">
+    <description>Marble Madness</description>
+    <year>1986</year>
+    <publisher>Electronic Arts</publisher>
+    <info name="release" value="2018-10-21"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226821">
+        <rom name="marble madness side a.woz" size="226821" crc="d4c96731" sha1="3e3fd0be2b4de291e0c137a3a2cfac0fdd56fdd0" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233477">
+        <rom name="marble madness side b.woz" size="233477" crc="29a0ea5d" sha1="b3c12458557e931b718f168013cffaec6f16a862" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mrscswoz">
+    <description>Mars Cars</description>
+    <year>1982</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2019-01-01"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233471">
+        <rom name="mars cars.woz" size="233471" crc="46d2bce9" sha1="277aa084470604e7643ff125f5a499228b356258" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="matznwoz">
+    <description>Mating Zone</description>
+    <year>1982</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-08-13"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="140285">
+        <rom name="mating zone.woz" size="140285" crc="b8de1b81" sha1="dfd93436426b002a0f63a780f03ac8a19b9f750f" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mgabtwoz">
+    <description>Megabots</description>
+    <year>1986</year>
+    <publisher>Neosoft</publisher>
+    <info name="release" value="2018-09-08"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="220133">
+        <rom name="megabots.woz" size="220133" crc="ba1beb84" sha1="3ef769a242fc82e36da98cbc524507e905485940" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mamgcwoz">
+    <description>Might_and_Magic_-_Disk_A</description>
+    <year>1986</year>
+    <publisher>New World Computing</publisher>
+    <info name="release" value="2018-09-08"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233539">
+        <rom name="might and magic - disk a.woz" size="233539" crc="1d32a568" sha1="11c13cee62c44c80d77c0f04905dd6f7e34cb69d" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233539">
+        <rom name="might and magic - disk b.woz" size="233539" crc="25174e82" sha1="5da6b88c342dbe8f5716266433958728fea13f72" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop3" interface="floppy_5_25">
+      <dataarea name="flop" size="233539">
+        <rom name="might and magic - disk c.woz" size="233539" crc="ad3dd0e3" sha1="ac89cf4281680194c8984621f00f8642610d6286" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop4" interface="floppy_5_25">
+      <dataarea name="flop" size="233539">
+        <rom name="might and magic - disk d.woz" size="233539" crc="771cb886" sha1="c718cdde8298e38f7a25eb91fdf348b5e2131b51" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="m2049woz">
+    <description>Miner 2049er</description>
+    <year>1982</year>
+    <publisher>Micro Fun</publisher>
+    <info name="release" value="2018-08-19"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233469">
+        <rom name="miner 2049er.woz" size="233469" crc="472481cb" sha1="56bf80d1cad8f54503134cf0a1acd207d8f0b01d" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="minitwoz">
+    <description>Minit Man</description>
+    <year>1983</year>
+    <publisher>Penguin Software</publisher>
+    <info name="release" value="2018-12-27"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233479">
+        <rom name="minit man.woz" size="233479" crc="1a8738dc" sha1="f67c0c46423d3d1b7cab9cb4487749e4079e5a1b" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mimp2woz">
+    <description>Mission Impossible II</description>
+    <year>1988</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-27"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233525">
+        <rom name="mission impossible ii side a.woz" size="233525" crc="fb26d565" sha1="20303f1f17ce5975df6c5c32d98fb5afdfb18f36" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233525">
+        <rom name="mission impossible ii side b.woz" size="233525" crc="0797da53" sha1="f9512f2f6cc7cc54081433bb97a21fceb159942f" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mnmunwoz">
+    <description>Money Muncher</description>
+    <year>1982</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2019-01-02"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233478">
+        <rom name="money munchers.woz" size="233478" crc="5f157c32" sha1="3dddc118174558495a7bc44591d769c747dc25ba" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mnstswoz">
+    <description>Monster Smash</description>
+    <year>1983</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2019-01-04"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233476">
+        <rom name="monster smash.woz" size="233476" crc="a2a01373" sha1="a0aeea2f9b66a1ff725fa5e49a3c5398a3be1273" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="montrwoz">
+    <description>Montezumas Revenge</description>
+    <year>1984</year>
+    <publisher>Parker Brothers</publisher>
+    <info name="release" value="2019-01-04"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233489">
+        <rom name="montezuma's revenge.woz" size="233489" crc="ec080432" sha1="c9c0a71e155f8f9df0d5019f2d4edbc4544bb526" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <software name="mpatrwoz">
+    <description>Moon Patrol</description>
+    <year>1983</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2018-08-26"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="346602">
+        <rom name="moon patrol.woz" size="346602" crc="8b46d4fc" sha1="df0d7aee0cd9810cb254f4f28dad3b96792a26a3" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="movimwoz">
+    <description>The Movie Monster Game</description>
+    <year>1986</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-10-24"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233451">
+        <rom name="the movie monster game side a.woz" size="233451" crc="7318e456" sha1="0bf74c85da08fd5c4bebb587c38769eb8aefb953" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233451">
+        <rom name="the movie monster game side b.woz" size="233451" crc="338a8ad1" sha1="b1a996b703cf00c509e15639c53019ce812341c8" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mrrobtwz">
+    <description>Mr. Robot and his Robot Factory</description>
+    <year>1984</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-07-30"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233512">
+        <rom name="mr. robot and his robot factory.woz" size="233512" crc="A90E0A85" sha1="ABE595D42A5DF89441B418C4606786DEF433A84A" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="mspcmwoz">
+    <description>Ms. Pac-Man</description>
+    <year>1983</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2018-07-30"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="53744">
+        <rom name="ms. pac-man.woz" size="53744" crc="4abe0f76" sha1="29d49e4ab496d095691cef66936f2fe7b95b2d4e" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="nmpinwoz">
+    <description>Night Mission Pinball</description>
+    <year>1982</year>
+    <publisher>subLOGIC</publisher>
+    <info name="release" value="2018-09-12"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="146969">
+        <rom name="night mission pinball.woz" size="146969" crc="e5ce27ec" sha1="5c5cc2f66195ae0c7ac1b0e561b5db7066f6b357" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="nstlkwoz">
+    <description>Night Stalker</description>
+    <year>1982</year>
+    <publisher>Mattel Electronics</publisher>
+    <info name="release" value="2018-08-06"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233461">
+        <rom name="night stalker.woz" size="233461" crc="f2dabc02" sha1="231094b414105700cfb288425db32d067cdf69b9" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="1on1woz">
+    <description>Julius Erving and Larry Bird Go One on One</description>
+    <year>1983</year>
+    <publisher>Electronic Arts</publisher>
+    <info name="release" value="2018-08-24"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226826">
+        <rom name="one on one.woz" size="226826" crc="4b4be4d2" sha1="bf565dafb896dfc1ca7e1a4685656f1fe0241624" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="orbtnwoz">
+    <description>Orbitron</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-29"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="106991">
+        <rom name="orbitron.woz" size="106991" crc="f05cd1ed" sha1="88d09ad4e388e84ed9ed13c53be9d9fa3536d4bb" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ormsnewoz">
+    <description>O'Riley's Mine</description>
+    <year>1981</year>
+    <publisher>Datasoft</publisher>
+    <info name="release" value="2018-10-29"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="87031">
+        <rom name="o'riley's mine.woz" size="87031" crc="0e9f6bf0" sha1="2175c413e3c134ded2c2a9771bb09cfa61c71fc7" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="opstwoz">
+    <description>Outpost</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-09-16"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="73733">
+        <rom name="outpost.woz" size="73733" crc="7785efb0" sha1="0d6753232c65b2f3accc292c0bd86cc334280987" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="pprboywz">
+    <description>Paperboy</description>
+    <year>1988</year>
+    <publisher>Mindscape</publisher>
+    <info name="release" value="2018-07-26"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233449">
+        <rom name="paperboy.woz" size="233449" crc="CF0FEDF6" sha1="AA3F286DF6D929C44175270B389EF043930CF77F" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ppatrwoz">
+    <description>Pest Patrol</description>
+    <year>1982</year>
+    <publisher>Sierra On-Line</publisher>
+    <info name="release" value="2018-10-25"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="253404">
+        <rom name="pest patrol.woz" size="253404" crc="75bf4512" sha1="18e92e52c25e1777daf774e2b7338443a25c07b3" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="phan5woz">
+    <description>Phantoms Five</description>
+    <year>1980</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-20"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="186874">
+        <rom name="phantoms five.woz" size="186874" crc="98d7b97f" sha1="c7d2d80bd05298cd6d2722eb513138183f302b67" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="pfal2woz">
+    <description>Pitfall II: Lost Caverns</description>
+    <year>1984</year>
+    <publisher>Activision</publisher>
+    <info name="release" value="2018-09-07"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233494">
+        <rom name="pitfall ii.woz" size="233494" crc="f60b2074" sha1="0e09156821766ee6bb7648525e8e72c79d4b1717" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="pstp2woz">
+    <description>Pitstop II</description>
+    <year>1984</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-10-18"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233488">
+        <rom name="pitstop ii.woz" size="233488" crc="618d562d" sha1="646555ea1e06e14cc784330654e4db3c0a53d193" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="plsmnwoz">
+    <description>Plasmania</description>
+    <year>1983</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-02"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226819">
+        <rom name="plasmania.woz" size="226819" crc="9ee4ad64" sha1="5da3b6216521cc40e802ca43110bd7f1fe9af908" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="pltnwoz">
+    <description>Platoon</description>
+    <year>1988</year>
+    <publisher>Data East USA</publisher>
+    <info name="release" value="2018-10-02"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240170">
+        <rom name="platoon - disk 1, side a.woz" size="240170" crc="ed6e658b" sha1="9b0e4cf8e69d96f1ff7c20a77f0b77b6b3df61a6" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="240170">
+        <rom name="platoon - disk 1, side b.woz" size="240170" crc="1e667010" sha1="f6c20194f757446f45e850f2e985c9d08e9686b8" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+
+  <software name="pool15wz">
+    <description>Pool 1.5</description>
+    <year>1981</year>
+    <publisher>Innovative Design Software, Inc.</publisher>
+    <info name="release" value="2018-07-28"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="173574">
+        <rom name="Pool v1.5.woz" size="173574" crc="6F6F67F7" sha1="2473B587AB4C30542D9C0304DC53F5438A62F37C" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="pyanwoz">
+    <description>Pooyan</description>
+    <year>1984</year>
+    <publisher>Datasoft</publisher>
+    <info name="release" value="2018-09-14"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="107006">
+        <rom name="pooyan.woz" size="107006" crc="4a5506f2" sha1="1490572f80ab0196cb809689d911964ecaca5aaa" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="propwoz">
+    <description>Prince of Persia</description>
+    <year>1989</year>
+    <publisher>Broderbund</publisher>
+    <info name="release" value="2018-09-14"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233481">
+        <rom name="prince of persia side a.woz" size="233481" crc="a3820127" sha1="bf7c7c03fcc93b989a8a7e566ec711888553a9de" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233481">
+        <rom name="prince of persia side b.woz" size="233481" crc="6de94d52" sha1="931e264563390d1e76cef9a7db31492643f45b49" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="qixwoz">
+    <description>Qix</description>
+    <year>1989</year>
+    <publisher>Taito America</publisher>
+    <info name="release" value="2018-08-05"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233475">
+        <rom name="qix.woz" size="233475" crc="50acf331" sha1="9cbbe0b29761aa9e19a7e965932e9bf694f97825" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="radwrwoz">
+    <description>Rad Warrior</description>
+    <year>1987</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-08-27"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233497">
+        <rom name="rad warrior.woz" size="233497" crc="d60e8944" sha1="6636e38a149e48d7a4ba20321cb0c92abdf0eb0d" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="rmpagewz">
+    <description>Rampage</description>
+    <year>1988</year>
+    <publisher>Activision</publisher>
+    <info name="release" value="2018-08-02"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240127">
+        <rom name="paperboy.woz" size="240127" crc="5A2455BC" sha1="67A12BF4ADC5080E1BC10A691F4E1F0D1ACA2FB4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="rstblwoz">
+    <description>Raster Blaster</description>
+    <year>1981</year>
+    <publisher>BudgeCo</publisher>
+    <info name="release" value="2018-10-26"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="93685">
+        <rom name="raster blaster.woz" size="93685" crc="edcadeec" sha1="cf7eee7ffbe75cac804ed07237050e0e9ef08032" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="redalwoz">
+    <description>Red Alert</description>
+    <year>1981</year>
+    <publisher>Broderbund</publisher>
+    <info name="release" value="2018-11-19"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="153595">
+        <rom name="red alert.woz" size="153595" crc="cbe193dd" sha1="9e5edaf01ad0ccccf837d5b4952af6ca0dd0a633" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="reptwoz">
+    <description>Repton</description>
+    <year>1982</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-06"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240149">
+        <rom name="repton.woz" size="240149" crc="0f2eb4c5" sha1="f8f606c751eb1f86cb60cb1e6b538acd30a66ab9" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="rescrwoz">
+    <description>Rescue Raiders</description>
+    <year>1984</year>
+    <publisher>Sir-Tech</publisher>
+    <info name="release" value="2018-08-16"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233518">
+        <rom name="rescue raiders.woz" size="233518" crc="f2f5bf46" sha1="4ab4e39d593e35c2b1eebc2b5bd1c51b024ef1fb" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="robocwoz">
+    <description>RoboCop</description>
+    <year>1988</year>
+    <publisher>Data East USA</publisher>
+    <info name="release" value="2018-08-16"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233512">
+        <rom name="robocop side a.woz" size="233512" crc="326415af" sha1="f89422e2570e2d9acf68f0caef30bf896fc57787" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233512">
+        <rom name="robocop side b.woz" size="233512" crc="627ea856" sha1="2076248fbf26883400c3843791f9aeee0489178c" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="r2084woz">
+    <description>Robotron 2084</description>
+    <year>1983</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2019-01-15"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233452">
+        <rom name="robotron 2084.woz" size="233452" crc="f8931d6d" sha1="313e516da05c345e097a34418726604eb6145dd7" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="raboutwz">
+    <description>Roundabout</description>
+    <year>1983</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-12-30"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233457">
+        <rom name="roundabout.woz" size="233457" crc="884efc20" sha1="bbca5ba455f95ac85bcaf4887f9af978f2f20ef0" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="sabotwoz">
+    <description>Sabotage</description>
+    <year>1981</year>
+    <publisher>On-Line Systems</publisher>
+
+    <info name="release" value="2018-08-08"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240141">
+        <rom name="sabotage.woz" size="240141" crc="091eb06f" sha1="72b24f54916e16ae73c495a5a382517bfffe1f6a" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="slghtwoz">
+    <description>Sammy Lightfoot</description>
+    <year>1983</year>
+    <publisher>Sierra On-Line</publisher>
+
+    <info name="release" value="2018-11-07"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240148">
+        <rom name="sammy lightfoot.woz" size="240148" crc="c551624a" sha1="e511b9fa31ed9deb0d18fea7001caac96b0e0832" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="sarg3woz">
+    <description>Sargon III</description>
+    <year>1983</year>
+    <publisher>Hayden Book Company</publisher>
+    <info name="release" value="2018-08-17"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233540">
+        <rom name="sargon iii.woz" size="233540" crc="4221ff2a" sha1="1148babdcf183c9bfe40d89cdb5befc5ed53cd6f" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="seadrgwz">
+    <description>Sea Dragon</description>
+    <year>1982</year>
+    <publisher>Adventure International</publisher>
+    <info name="release" value="2018-08-01"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233487">
+        <rom name="sea dragon.woz" size="233487" crc="A6CD0FC9" sha1="AB137FEFF2E486D2232B32582FC28929BA628D1A" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="shuflwoz">
+    <description>Shuffleboard</description>
+    <year>1981</year>
+    <publisher>IDSI</publisher>
+    <info name="release" value="2018-10-16"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="200145">
+        <rom name="shuffleboard.woz" size="200145" crc="5ce890e6" sha1="5d99f399f075488305989f8f29ded03d6febcb1c" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="skyfwoz">
+    <description>Skyfox</description>
+    <year>1984</year>
+    <publisher>Electronic Arts</publisher>
+    <info name="release" value="2018-11-11"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233473">
+        <rom name="skyfox.woz" size="233473" crc="be10a46c" sha1="acef2901b6166e7cef4a899bb113e9b052c7bcd7" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="snacatwz">
+    <description>Snack Attack</description>
+    <year>1981</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-07-26"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="126977">
+        <rom name="snack attack.woz" size="126977" crc="39FB8FCA" sha1="D751AAF008D366383B41B4D59D665BD5933D334A" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="snkbywoz">
+    <description>Snake Byte</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-04"/>
+    <!-- It requires a 48K Apple ][ or ][+. Due to compatibility issues caused
+    by the copy protection, it will not run on any later models. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="73739">
+        <rom name="snake byte.woz" size="73739" crc="414ee3e7" sha1="c0877515fe5d2182a896344fb8c3fc188a5a9ee9" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="snkrswoz">
+    <description>Sneakers</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-09-11"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="93700">
+        <rom name="sneakers.woz" size="93700" crc="8b432189" sha1="d6ec137c662b0b7246d99d5b0cf5068a9131ef81" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <software name="seggswoz">
+    <description>Space Eggs</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-31"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="87036">
+        <rom name="space eggs.woz" size="87036" crc="c9508fb8" sha1="56ff21e067ceae22fd12019e3cbfcaecab4d9bee" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="spqkswoz">
+    <description>Space Quarks</description>
+    <year>1981</year>
+    <publisher>Broderbund Software</publisher>
+    <info name="release" value="2018-10-30"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="133617">
+        <rom name="space quarks.woz" size="133617" crc="57eaa341" sha1="ba1ff0245ecc9e5d9446224b52e05823d777ebf5" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="spchgwoz">
+    <description>Spare Change</description>
+    <year>1983</year>
+    <publisher>Broderbund Software</publisher>
+    <info name="release" value="2018-11-08"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="346703">
+        <rom name="spare change.woz" size="346703" crc="f70b9057" sha1="c58f7833eb4f8f29ae4bf7820efb4e29c6821531" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="spbotwoz">
+    <description>Spiderbot</description>
+    <year>1988</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-02"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233502">
+        <rom name="spiderbot.woz" size="233502" crc="f7b64cd0" sha1="e72e20f91059801312da133dcc8aa99b354e6428" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="spindwoz">
+    <description>Spindizzy</description>
+    <year>1986</year>
+    <publisher>Activision</publisher>
+
+    <info name="release" value="2018-09-10"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233475">
+        <rom name="spindizzy.woz" size="233475" crc="9e38c7cd" sha1="a2432c3d14734b23c45c47e4087b58a6a27f7686" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="spyhtwoz">
+    <description>Spy Hunter</description>
+    <year>1983</year>
+    <publisher>Bally Midway</publisher>
+    <info name="release" value="2018-08-20"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240108">
+        <rom name="spy hunter.woz" size="240108" crc="58edb0c2" sha1="5e227d8a8cee81e04dcef35a6063dcadd602b8e7" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="spysbwoz">
+    <description>The Spy Strikes Back</description>
+    <year>1983</year>
+    <publisher>Penguin Software</publisher>
+    <info name="release" value="2018-12-19"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="120385">
+        <rom name="the spy strikes back.woz" size="120385" crc="9adf680e" sha1="4210fa5a9bbe40418baad823519b3f2b77e215cc" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="svs3wz">
+    <description>Spy vs Spy III: Arctic Antics</description>
+    <year>1983</year>
+    <publisher>Bally Midway</publisher>
+
+    <info name="release" value="2018-08-20"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233468">
+        <rom name="spy vs. spy iii.woz" size="233468" crc="c19123d1" sha1="2585f7cd612f5f549dacfa2ce9994ede66ab35c6" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="sdemswoz">
+    <description>Spy's Demise</description>
+    <year>1982</year>
+    <publisher>Penguin</publisher>
+
+    <info name="release" value="2018-08-20"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="120328">
+        <rom name="spy's demise.woz" size="120328" crc="0586db9f" sha1="a7520b7c9d7caddb4db74d1931051212df6c996d" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="stcrzwoz">
+    <description>Star Cruiser</description>
+    <year>1980</year>
+    <publisher>Sirius Software</publisher>
+
+    <info name="release" value="2018-11-03"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="126969">
+        <rom name="star cruiser.woz" size="126969" crc="43c1745b" sha1="975002c233af55ee9f11eaaa97faddbfa1be8f48" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="sthfwoz">
+    <description>Star Thief</description>
+    <year>1981</year>
+    <publisher>Cavalier Computer</publisher>
+    <info name="release" value="2018-11-12"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="140293">
+        <rom name="star thief.woz" size="140293" crc="dd2ce2e2" sha1="ec8d947ccb05fa14a13859505998bdf6bc42d9c5" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="stargwoz">
+    <description>Stargate</description>
+    <year>1983</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2019-01-13"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233447">
+        <rom name="stargate.woz" size="233447" crc="379d894d" sha1="56d17415d622395bddbe7200adde32f4ad63b208" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="stel7woz">
+    <description>Stellar 7</description>
+    <year>1984</year>
+    <publisher>Penguin Software</publisher>
+    <info name="release" value="2018-11-17"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233471">
+        <rom name="stellar 7.woz" size="233471" crc="c93bf1da" sha1="df24d579842e7c11c662a533cc43e6a1a03ddbaa" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ssbsewoz">
+    <description>Street Sports Baseball</description>
+    <year>1987</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-11-26"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233452">
+        <rom name="street sports baseball.woz" size="233452" crc="91fb8f2d" sha1="475a27e9cef255d33e626123fd7445325fc641b6" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ssbskwoz">
+    <description>Street Sports Basketball</description>
+    <year>1987</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-11-26"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233454">
+        <rom name="street sports basketball side a.woz" size="233454" crc="545abde9" sha1="3e2c0b7c2d9ef988610e8c6e97a31884f221b5ad" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233454">
+        <rom name="street sports basketball side b.woz" size="233454" crc="76728c7c" sha1="ed7157d4c8f6acf3925098c51afa647347c32453" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ssfotwoz">
+    <description>Street Sports Football</description>
+    <year>1988</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-11-26"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233487">
+        <rom name="street sports football side a.woz" size="233487" crc="2590c882" sha1="6968accc3ad7f9468b703da0d5ac8ffd2372f334" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233487">
+        <rom name="street sports football side b.woz" size="233487" crc="86ef614b" sha1="7933f5410c3b26106ce59d307905a506105bf15f" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ssscwoz">
+    <description>Street Sports Soccer</description>
+    <year>1988</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-11-28"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233473">
+        <rom name="street sports soccer.woz" size="233473" crc="3bb31a45" sha1="e56adb5202d5bb24ab1bc86e86dd82b816a30379" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="sbatswoz">
+    <description>Sub Battle Simulator</description>
+    <year>1986</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-11-28"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233456">
+        <rom name="sub battle simulator side a.woz" size="233456" crc="965de0dd" sha1="365a37e90b7ff8fdd1a00100eadac87b129ec803" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233456">
+        <rom name="sub battle simulator side b.woz" size="233456" crc="fdb27602" sha1="c3a26c99012c8c223d461058d5b1177b477219a3" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="suicwoz">
+    <description>Suicide</description>
+    <year>1981</year>
+    <publisher>Piccadilly Software</publisher>
+    <info name="release" value="2018-10-17"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="80375">
+        <rom name="suicide.woz" size="80375" crc="1e0cfa56" sha1="c73383c16a165705bbe2f7c9d4ed08cd46a77ef7" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+
+  <software name="smgmewoz">
+    <description>Summer Games</description>
+    <year>1984</year>
+    <publisher>Epyx</publisher>
+
+    <info name="release" value="2018-10-17"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233577">
+        <rom name="summer games side a.woz" size="233577" crc="6b4b20cb" sha1="2d57b25187d3eac6099dea3b1456b406a308f4a2" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233577">
+        <rom name="summer games side b.woz" size="233577" crc="95f1a4a3" sha1="e7a4c18a0e59b9ea512c56b727f08c417d654164" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="swfrwoz">
+    <description>Swiss Family Robinson</description>
+    <year>1984</year>
+    <publisher>Windham Classics</publisher>
+    <info name="release" value="2018-09-02"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="253471">
+        <rom name="swiss family robinson.woz" size="253471" crc="7615c53b" sha1="9c33e686c69522bfe434ac0510bdaed0846b4963" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ttwrswoz">
+    <description>Tag Team Wrestling</description>
+    <year>1986</year>
+    <publisher>Data East USA</publisher>
+    <info name="release" value="2018-10-22"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233465">
+        <rom name="tag team wrestling.woz" size="233465" crc="bf8db12d" sha1="0f58c267a228972851c4d7278b0184f966c8d9c1" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="toatwoz">
+    <description>Temple of Apshai Trilogy</description>
+    <year>1985</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-13"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233494">
+        <rom name="temple of apshai trilogy.woz" size="233494" crc="3875d6bc" sha1="cb71555bc29035fa8603849ff0cbc2017aee4604" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="testdr">
+    <description>Test Drive</description>
+    <year>1985</year>
+    <publisher>Accolade</publisher>
+
+    <info name="release" value="2018-12-13"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226947">
+        <rom name="test drive side a.woz" size="226947" crc="5ddb18ec" sha1="b56dbaef11497993e0f139ed16a3d8f6d3bba3ba" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233603">
+        <rom name="test drive side b.woz" size="233603" crc="2a565fde" sha1="4938f541bda0ef8fe1b5dc154d01710b087b27df" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tetrwoz">
+    <description>Tetris (128K)</description>
+    <year>1987</year>
+    <publisher>Spectrum HoloByte</publisher>
+    <info name="release" value="2018-12-13"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233512">
+        <rom name="tetris - 128k.woz" size="233512" crc="58c37ace" sha1="f4786eb5714a8d9f1a93e6570f2d482bf1794625" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="thartwoz">
+    <description>Tharolian Tunnels</description>
+    <year>1982</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-12-23"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233485">
+        <rom name="tharolian tunnels.woz" size="233485" crc="e8377788" sha1="c08df0bc5b937cba5d882870d4bab4431893b4f0" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="thunbwoz">
+    <description>Thunder Bombs</description>
+    <year>1982</year>
+    <publisher>Penguin Software</publisher>
+    <info name="release" value="2018-08-30"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="120334">
+        <rom name="thunder bombs.woz" size="120334" crc="ef8f7a1a" sha1="9e902c5a4baa53cc1f7733d8c709d248d132b1d6" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="thuncwoz">
+    <description>Thunderchopper</description>
+    <year>1987</year>
+    <publisher>ActionSoft</publisher>
+    <info name="release" value="2018-11-04"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="206848">
+        <rom name="thunderchopper.woz" size="206848" crc="a24e21fa" sha1="be8214ef71a5e3fece3e54d26231db579cbdd432" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tomahwoz">
+    <description>Tomahawk</description>
+    <year>1987</year>
+    <publisher>Datasoft</publisher>
+    <info name="release" value="2018-08-23"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233475">
+        <rom name="tomahawk.woz" size="233475" crc="82b33adb" sha1="00ce64718d1153ece12e55795e11305a4090d487" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="trshtwoz">
+    <description>Trick Shot</description>
+    <year>1981</year>
+    <publisher>IDSI</publisher>
+    <info name="release" value="2018-08-23"/>
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="200176">
+        <rom name="trick shot disk 1 (game).woz" size="200176" crc="e84e4d9a" sha1="b0f52dd9391aacc189caae5bac460e8b38c90e2b" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="140273">
+        <rom name="trick shot disk 2 (sample shots).woz" size="140273" crc="e053b0ed" sha1="3fa54660d25e39e6797fe038bbadb4a7c3a3d976" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="tubw2woz">
+    <description>Tubeway II</description>
+    <year>1982</year>
+    <publisher>Datamost</publisher>
+    <info name="release" value="2018-12-18"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233485">
+        <rom name="tubeway ii.woz" size="233485" crc="76d9830f" sha1="2b6a213668c362144f6180cf96ce12fef8c99b30" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="twerpswz">
+    <description>Twerps</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-03"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="426493">
+        <rom name="twerps.woz" size="426493" crc="6da22395" sha1="9eed0ac2a13e4ae2003778bf45591f52c5b5b722" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="upndnwoz">
+    <description>Up 'N Down</description>
+    <year>1981</year>
+    <publisher>Bally Midway</publisher>
+    <info name="release" value="2018-10-03"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233467">
+        <rom name="up 'n down.woz" size="233467" crc="d1b298b6" sha1="cf7726d073c7457c9109387712f8c7b7deb83c7b" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ik2vrwoz">
+    <description>Ikari Warriors 2: Victory Road</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-03"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233484">
+        <rom name="victory road side a.woz" size="233484" crc="36274d74" sha1="cf4e23edc79b6503dca49df24d3ad65c5f5de99b" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233484">
+        <rom name="victory road side b.woz" size="233484" crc="db97aafa" sha1="4aa7360b3e99822e9021503c08e2b224ea5396c4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="vindwoz">
+    <description>Vindicator</description>
+    <year>1983</year>
+    <publisher>H.A.L. Labs</publisher>
+    <info name="release" value="2018-10-15"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="67083">
+        <rom name="vindicator.woz" size="67083" crc="1b706f3d" sha1="2942a8d990c72b7b1e299ecf6f2fd837acc97ac1" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="wavynwoz">
+    <description>Wavy Navy</description>
+    <year>1982</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-09-30"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240135">
+        <rom name="wavy navy.woz" size="240135" crc="aea1ad1a" sha1="69c060bc6b090c0cc58d7102b1410ab8acb9fbc4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="wayoutwz">
+    <description>Wayout</description>
+    <year>1982</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-01"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233476">
+        <rom name="wayout.woz" size="233476" crc="7feac53d" sha1="c229b14f8ff3fe1023fd2be013dd9722455a0173" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="crmusawz">
+    <description>Where in the USA is Carmen Sandiego</description>
+    <year>1986</year>
+    <publisher>Broderbund</publisher>
+    <info name="release" value="2018-10-01"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240205">
+        <rom name="where in the usa is carmen sandiego side a.woz" size="240205" crc="a1cfee60" sha1="fcc406c480127a71e4d186939e9671c0c0bf7c14" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233549">
+        <rom name="where in the usa is carmen sandiego side b.woz" size="233549" crc="1ac6f62d" sha1="7940fad2b4b52615180cf51ce2348efe10e8e780" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="woffwoz">
+    <description>Wings of Fury</description>
+    <year>1987</year>
+    <publisher>Broderbund</publisher>
+    <info name="release" value="2018-10-01"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233481">
+        <rom name="wings of fury side a.woz" size="233481" crc="61f6896e" sha1="44c5f01954d367915315e9e36aa8bb23b0038cac" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233304">
+        <rom name="wings of fury side b.woz" size="233304" crc="e88181a9" sha1="0913de8ee03c5295d2015b481809090695c2c0ea" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="wkchpwoz">
+    <description>World Karate Championship</description>
+    <year>1986</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-04"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233482">
+        <rom name="world karate championship.woz" size="233482" crc="e8030bd9" sha1="3d0569e44a9520a3e27eb50e67f67f4362e1edc8" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="wgbbgwoz">
+    <description>The World's Greatest Baseball Game</description>
+    <year>1984</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-19"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233488">
+        <rom name="the world's greatest baseball game.woz" size="233488" crc="9d415a67" sha1="c7e8f557efd3221ae5a171a92d217b7fb2250b29" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="wgfbgwoz">
+    <description>The World's Greatest Football Game</description>
+    <year>1985</year>
+    <publisher>Epyx</publisher>
+    <info name="release" value="2018-12-19"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233507">
+        <rom name="the world's greatest football game side a.woz" size="233507" crc="fdbacf7f" sha1="301bf537734de76711c51431658fccca2a64bdca" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233507">
+        <rom name="the world's greatest football game side b.woz" size="233507" crc="4c9a39de" sha1="d5b145e52cd9d7438a66a976bbc6cb7baef10c11" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="xeviwoz">
+    <description>Xevious</description>
+    <year>1984</year>
+    <publisher>Mindscape</publisher>
+    <info name="release" value="2018-08-25"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233465">
+        <rom name="xevious.woz" size="233465" crc="97586f7c" sha1="06e17e91e2490952013d407c2234b27677c16090" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="zendarwz">
+    <description>Zendar</description>
+    <year>1982</year>
+    <publisher>subLOGIC</publisher>
+    <info name="release" value="2018-11-10"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="73745">
+        <rom name="zendar.woz" size="73745" crc="fe13d67e" sha1="c04796439e6a9f98d36292f00c9e45934210c5ce" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="zorrowoz">
+    <description>Zorro</description>
+    <year>1985</year>
+    <publisher>Datasoft</publisher>
+    <info name="release" value="2019-01-10"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="133656">
+        <rom name="zorro.woz" size="133656" crc="3cc39ef3" sha1="337f400990cd43a66d8896827ee3ce27940a86bf" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+</softwarelist>
