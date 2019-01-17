@@ -165,6 +165,7 @@ private:
 	int m_spriterambase;
 	int m_pagewidth;
 	int m_pageheight;
+	int m_bytespertile;
 
 	uint8_t m_portdir[3];
 
@@ -321,9 +322,17 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 	int ydraw = ybase;
 	int count = 0;
 
-	for (int i = m_tilerambase + pagesize * which; i < m_tilerambase + pagesize * (which + 1); i += 2)
+	for (int i = m_tilerambase + pagesize * which; i < m_tilerambase + pagesize * (which + 1); i += m_bytespertile)
 	{
-		int tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);
+		int tile = 0;		
+		if (m_bytespertile == 2)
+		{
+			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);
+		}
+		else if (m_bytespertile == 4) // rad_foot hidden test mode, rad_hnt3 shooting range (not yet correct)
+		{
+			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);// | (m_mainram[i + 2] << 16) |  | (m_mainram[i + 3] << 24);
+		}
 
 		draw_tile(bitmap, cliprect, gfxno, tile, base, 0, 0, 0, xdraw, ydraw, 0, size);
 
@@ -344,7 +353,9 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
 
 	int size;
-	// or 0x80?
+
+	// m_tilecfg[0]   b--s ----    b = bytes per tile  s = tilesize / page size?
+
 	if (m_tilecfg[0] & 0x10)
 	{
 		size = 8;
@@ -356,6 +367,15 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 		size = 16;
 		m_pagewidth = 16;
 		m_pageheight = 14;
+	}
+
+	if (m_tilecfg[0] & 0x80)
+	{
+		m_bytespertile = 4;
+	}
+	else
+	{
+		m_bytespertile = 2;
 	}
 
 
@@ -659,7 +679,6 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5043, 0x5043).portr("IN1").w(FUNC(radica_eu3a14_state::portb_dat_w));
 	map(0x5044, 0x5044).w(FUNC(radica_eu3a14_state::portc_dir_w));
 	map(0x5045, 0x5045).portr("IN2").w(FUNC(radica_eu3a14_state::portc_dat_w));
-
 
 	map(0x5046, 0x5046).nopw();
 	map(0x5047, 0x5047).nopw();
