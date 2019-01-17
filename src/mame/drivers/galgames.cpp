@@ -999,10 +999,10 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_SCREEN_UPDATE_DRIVER(galgames_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(24'000'000))
-	MCFG_CESBLIT_MAP(blitter_map)
-	MCFG_CESBLIT_COMPUTE_ADDR(galgames_compute_addr)
-	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, galgames_state, blitter_irq_callback))
+	CESBLIT(config, m_blitter, XTAL(24'000'000), m_screen);
+	m_blitter->set_addrmap(AS_PROGRAM, &galgames_state::blitter_map);
+	m_blitter->set_compute_addr(galgames_compute_addr);
+	m_blitter->irq_callback().set(FUNC(galgames_state::blitter_irq_callback));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000); // only 0x100 used
 

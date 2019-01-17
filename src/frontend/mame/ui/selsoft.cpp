@@ -91,8 +91,7 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 	load_sw_custom_filters();
 	m_filter_highlight = m_filter_type;
 
-	ui_globals::curimage_view = SNAPSHOT_VIEW;
-	ui_globals::switch_image = true;
+	set_switch_image();
 	ui_globals::cur_sw_dats_view = 0;
 	ui_globals::cur_sw_dats_total = 1;
 }
@@ -103,8 +102,6 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 
 menu_select_software::~menu_select_software()
 {
-	ui_globals::curimage_view = CABINETS_VIEW;
-	ui_globals::switch_image = true;
 }
 
 //-------------------------------------------------
@@ -135,12 +132,10 @@ void menu_select_software::handle()
 			break;
 
 		case IPT_UI_LEFT:
-			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view > FIRST_VIEW)
+			if (ui_globals::rpanel == RP_IMAGES)
 			{
 				// Images
-				ui_globals::curimage_view--;
-				ui_globals::switch_image = true;
-				ui_globals::default_image = false;
+				previous_image_view();
 			}
 			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view > 0)
 			{
@@ -151,12 +146,10 @@ void menu_select_software::handle()
 			break;
 
 		case IPT_UI_RIGHT:
-			if (ui_globals::rpanel == RP_IMAGES && ui_globals::curimage_view < LAST_VIEW)
+			if (ui_globals::rpanel == RP_IMAGES)
 			{
 				// Images
-				ui_globals::curimage_view++;
-				ui_globals::switch_image = true;
-				ui_globals::default_image = false;
+				next_image_view();
 			}
 			else if (ui_globals::rpanel == RP_INFOS && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 			{
@@ -205,16 +198,16 @@ void menu_select_software::handle()
 					if ((uintptr_t)swinfo > 2)
 					{
 						favorite_manager &mfav = mame_machine_manager::instance()->favorite();
-						if (!mfav.isgame_favorite(*swinfo))
+						if (!mfav.is_favorite_system_software(*swinfo))
 						{
-							mfav.add_favorite_game(*swinfo);
+							mfav.add_favorite_software(*swinfo);
 							machine().popmessage(_("%s\n added to favorites list."), swinfo->longname.c_str());
 						}
 
 						else
 						{
 							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
-							mfav.remove_favorite_game();
+							mfav.remove_favorite_software(*swinfo);
 						}
 					}
 				}
@@ -490,15 +483,20 @@ void menu_select_software::load_sw_custom_filters()
 void menu_select_software::find_matches(const char *str, int count)
 {
 	// allocate memory to track the penalty value
-	std::vector<int> penalty(count, 9999);
-	int index = 0;
+	std::vector<double> penalty(count, 1.0);
+	std::u32string const search(ustr_from_utf8(normalize_unicode(str, unicode_normalization_form::D, true)));
 
-	for (; index < m_displaylist.size(); ++index)
+	int index = 0;
+	for ( ; index < m_displaylist.size(); ++index)
 	{
-		// pick the best match between driver name and description
-		int curpenalty = fuzzy_substring(str, m_displaylist[index]->longname);
-		int tmp = fuzzy_substring(str, m_displaylist[index]->shortname);
-		curpenalty = std::min(curpenalty, tmp);
+		// pick the best match between shortname and longname
+		// TODO: search alternate title as well
+		double curpenalty(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index]->shortname, unicode_normalization_form::D, true))));
+		if (curpenalty)
+		{
+			double const tmp(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index]->longname, unicode_normalization_form::D, true))));
+			curpenalty = (std::min)(curpenalty, tmp);
+		}
 
 		// insert into the sorted table of matches
 		for (int matchnum = count - 1; matchnum >= 0; --matchnum)

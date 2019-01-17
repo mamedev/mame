@@ -819,8 +819,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	pcat_common(config);
-	MCFG_DEVICE_REMOVE("rtc")
-	MCFG_DS12885_ADD("rtc")
+	DS12885(config.replace(), "rtc");
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, savquest_state, intel82439tx_pci_r, intel82439tx_pci_w)
@@ -842,12 +841,12 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	/* video hardware */
 	pcvideo_s3_vga(config);
 
-	MCFG_DEVICE_ADD("voodoo", VOODOO_2, STD_VOODOO_2_CLOCK)
-	MCFG_VOODOO_FBMEM(4)
-	MCFG_VOODOO_TMUMEM(4,4) /* this is the 12Mb card */
-	MCFG_VOODOO_SCREEN_TAG("screen")
-	MCFG_VOODOO_CPU_TAG("maincpu")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, savquest_state,vblank_assert))
+	VOODOO_2(config, m_voodoo, STD_VOODOO_2_CLOCK);
+	m_voodoo->set_fbmem(4);
+	m_voodoo->set_tmumem(4, 4); /* this is the 12Mb card */
+	m_voodoo->set_screen_tag("screen");
+	m_voodoo->set_cpu_tag(m_maincpu);
+	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));
 MACHINE_CONFIG_END
 
 ROM_START( savquest )

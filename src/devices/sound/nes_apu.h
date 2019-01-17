@@ -54,15 +54,32 @@ public:
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
+	virtual u8 read(offs_t offset);
+	virtual void write(offs_t offset, u8 data);
 
 protected:
+	nesapu_device(const machine_config &mconfig, const char *tag, device_type type, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
+	void apu_init();
+	void calculate_rates();
+	void create_syncs(unsigned long sps);
+	s8 apu_square(apu_t::square_t *chan);
+	s8 apu_triangle(apu_t::triangle_t *chan);
+	s8 apu_noise(apu_t::noise_t *chan);
+	s8 apu_dpcm(apu_t::dpcm_t *chan);
+
+	inline void apu_regwrite(int address, u8 value);
+	inline u8 apu_read(int address);
+	inline void apu_write(int address, u8 value);
+
+	devcb_read8 m_mem_read_cb;
+	devcb_write_line m_irq_handler;
 
 private:
 	/* GLOBAL CONSTANTS */
@@ -78,16 +95,7 @@ private:
 	u32     m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	u32     m_sync_times2[SYNCS_MAX2]; /* Samples per sync table */
 	sound_stream *m_stream;
-	devcb_write_line m_irq_handler;
-	devcb_read8 m_mem_read_cb;
 
-	void calculate_rates();
-	void create_syncs(unsigned long sps);
-	s8 apu_square(apu_t::square_t *chan);
-	s8 apu_triangle(apu_t::triangle_t *chan);
-	s8 apu_noise(apu_t::noise_t *chan);
-	s8 apu_dpcm(apu_t::dpcm_t *chan);
-	inline void apu_regwrite(int address, u8 value);
 };
 
 DECLARE_DEVICE_TYPE(NES_APU, nesapu_device)

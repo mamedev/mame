@@ -271,39 +271,37 @@ void battlane_state::machine_reset()
 	m_cpu_control = 0;
 }
 
-MACHINE_CONFIG_START(battlane_state::battlane)
-
+void battlane_state::battlane(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(battlane_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", battlane_state,  battlane_cpu1_interrupt)
+	M6809(config, m_maincpu, 1500000);		/* 1.5 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &battlane_state::battlane_map);
+	m_maincpu->set_vblank_int("screen", FUNC(battlane_state::battlane_cpu1_interrupt));
 
-	MCFG_DEVICE_ADD("sub", M6809, 1500000)        /* 1.5 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(battlane_map)
+	M6809(config, m_subcpu, 1500000);		/* 1.5 MHz ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &battlane_state::battlane_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
-	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 0 * 8, 32 * 8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(battlane_state, screen_update_battlane)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32 * 8, 32 * 8);
+	screen.set_visarea(1 * 8, 31 * 8 - 1, 0 * 8, 32 * 8 - 1);
+	screen.set_screen_update(FUNC(battlane_state::screen_update_battlane));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlane)
-	MCFG_PALETTE_ADD("palette", 64)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_battlane);
+	PALETTE(config, m_palette).set_entries(64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", 3000000));
+	ymsnd.irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************

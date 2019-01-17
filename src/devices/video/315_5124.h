@@ -52,13 +52,9 @@ public:
 
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_csync_callback(Object &&cb) { return m_csync_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pause_callback(Object &&cb) { return m_pause_cb.set_callback(std::forward<Object>(cb)); }
 	auto irq() { return m_int_cb.bind(); }
 	auto csync() { return m_csync_cb.bind(); }
 	auto pause() { return m_pause_cb.bind(); }
@@ -85,6 +81,7 @@ protected:
 	static constexpr unsigned SEGA315_5377_CRAM_SIZE        = 0x40; /* 32 colors x 2 bytes per color = 64 bytes */
 	static constexpr unsigned SEGA315_5124_CRAM_SIZE        = 0x20; /* 32 colors x 1 bytes per color = 32 bytes */
 
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -202,9 +199,10 @@ class sega315_5246_device : public sega315_5124_device
 {
 public:
 	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 protected:
+	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
+
 	virtual uint16_t name_table_row_mode4(int row) override;
 	virtual uint16_t sprite_attributes_addr_mode4(uint16_t base) override;
 	virtual uint8_t sprite_tile_mask_mode4(uint8_t tile_number) override;
@@ -216,11 +214,12 @@ class sega315_5377_device : public sega315_5246_device
 {
 public:
 	sega315_5377_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5377_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 
 	virtual void set_sega315_5124_compatibility_mode(bool sega315_5124_compatibility_mode) override;
 
 protected:
+	sega315_5377_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
+
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
@@ -237,11 +236,11 @@ private:
 class sega315_5313_mode4_device : public sega315_5246_device
 {
 public:
-	sega315_5313_mode4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
 	void stop_timers();
 
 protected:
+	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, uint8_t reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const uint8_t *line_timing);
+
 	virtual void write_memory(uint8_t data) override;
 	virtual void load_vram_addr(uint8_t data) override;
 	virtual void select_sprites(int line) override;
@@ -251,55 +250,5 @@ protected:
 	virtual void select_extended_res_mode4(bool M1, bool M2, bool M3) override;
 	virtual void draw_leftmost_pixels_mode4(int *line_buffer, int *priority_selected, int fine_x_scroll, int palette_selected, int tile_line) override;
 };
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_SEGA315_5124_SET_SCREEN MCFG_VIDEO_SET_SCREEN
-
-#define MCFG_SEGA315_5124_IS_PAL(_bool) \
-	downcast<sega315_5124_device &>(*device).set_is_pal(_bool);
-
-#define MCFG_SEGA315_5124_INT_CB(_devcb) \
-	downcast<sega315_5124_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5124_CSYNC_CB(_devcb) \
-	downcast<sega315_5124_device &>(*device).set_csync_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5124_PAUSE_CB(_devcb) \
-	downcast<sega315_5124_device &>(*device).set_pause_callback(DEVCB_##_devcb);
-
-
-#define MCFG_SEGA315_5246_SET_SCREEN MCFG_VIDEO_SET_SCREEN
-
-#define MCFG_SEGA315_5246_IS_PAL(_bool) \
-	downcast<sega315_5246_device &>(*device).set_is_pal(_bool);
-
-#define MCFG_SEGA315_5246_INT_CB(_devcb) \
-	downcast<sega315_5246_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5246_CSYNC_CB(_devcb) \
-	downcast<sega315_5246_device &>(*device).set_csync_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5246_PAUSE_CB(_devcb) \
-	downcast<sega315_5246_device &>(*device).set_pause_callback(DEVCB_##_devcb);
-
-
-#define MCFG_SEGA315_5377_SET_SCREEN MCFG_VIDEO_SET_SCREEN
-
-#define MCFG_SEGA315_5377_IS_PAL(_bool) \
-	downcast<sega315_5377_device &>(*device).set_is_pal(_bool);
-
-#define MCFG_SEGA315_5377_INT_CB(_devcb) \
-	downcast<sega315_5377_device &>(*device).set_int_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5377_CSYNC_CB(_devcb) \
-	downcast<sega315_5377_device &>(*device).set_csync_callback(DEVCB_##_devcb);
-
-#define MCFG_SEGA315_5377_PAUSE_CB(_devcb) \
-	downcast<sega315_5377_device &>(*device).set_pause_callback(DEVCB_##_devcb);
-
 
 #endif // MAME_VIDEO_315_5124_H

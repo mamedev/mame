@@ -365,6 +365,29 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/rom/slot.h,BUSES["BBC_ROM"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_ROM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/rom/slot.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/slot.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/rom.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/rom.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/ram.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/ram.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/pal.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/pal.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/rtc.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/rtc.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/tube/tube.h,BUSES["BBC_TUBE"] = true
 ---------------------------------------------------
 
@@ -784,6 +807,19 @@ if (BUSES["ECONET"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/ekara/slot.h,BUSES["EKARA"] = true
+---------------------------------------------------
+
+if (BUSES["EKARA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/ekara/slot.cpp",
+		MAME_DIR .. "src/devices/bus/ekara/slot.h",
+		MAME_DIR .. "src/devices/bus/ekara/rom.cpp",
+		MAME_DIR .. "src/devices/bus/ekara/rom.h",
+	}
+end
 
 ---------------------------------------------------
 --
@@ -3218,6 +3254,22 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/uts_kbd/uts_kbd.h,BUSES["UTS_KBD"] = true
+---------------------------------------------------
+
+if (BUSES["UTS_KBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/uts_kbd/400kbd.cpp",
+		MAME_DIR .. "src/devices/bus/uts_kbd/400kbd.h",
+		MAME_DIR .. "src/devices/bus/uts_kbd/extw.cpp",
+		MAME_DIR .. "src/devices/bus/uts_kbd/extw.h",
+		MAME_DIR .. "src/devices/bus/uts_kbd/uts_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/uts_kbd/uts_kbd.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/vtech/memexp/memexp.h,BUSES["VTECH_MEMEXP"] = true
 ---------------------------------------------------
 
@@ -3484,6 +3536,8 @@ if (BUSES["HP9845_IO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp9845_io/98034.h",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98035.cpp",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98035.h",
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9885.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9885.h",
 	}
 end
 

@@ -136,6 +136,7 @@ cit101.cpp
 cit220.cpp
 ckz80.cpp
 clcd.cpp
+clickstart.cpp
 cm1800.cpp
 cmi.cpp
 cms.cpp
@@ -735,6 +736,7 @@ terco.cpp
 terminal.cpp
 test_t400.cpp
 testconsole.cpp
+testpat.cpp
 textelcomp.cpp
 tg100.cpp
 thomson.cpp

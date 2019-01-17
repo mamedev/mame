@@ -299,11 +299,11 @@ void mjkjidai_state::machine_reset()
 MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,10000000/2) /* 5 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(mjkjidai_map)
-	MCFG_DEVICE_IO_MAP(mjkjidai_io_map)
+	Z80(config, m_maincpu, 10000000/2); /* 5 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mjkjidai_state::mjkjidai_map);
+	m_maincpu->set_addrmap(AS_IO, &mjkjidai_state::mjkjidai_io_map);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("KEYBOARD");
@@ -317,34 +317,29 @@ MACHINE_CONFIG_START(mjkjidai_state::mjkjidai)
 	ppi2.in_pc_callback().set_ioport("DSW2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(3*8, 61*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mjkjidai_state, screen_update_mjkjidai)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mjkjidai_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(3*8, 61*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(mjkjidai_state::screen_update_mjkjidai));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(mjkjidai_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mjkjidai)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mjkjidai);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, 10000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489(config, "sn1", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489(config, "sn2", 10000000/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn2", SN76489, 10000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, mjkjidai_state, adpcm_int))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(mjkjidai_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S64_4B);	/* 6kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

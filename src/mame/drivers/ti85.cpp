@@ -635,8 +635,7 @@ MACHINE_CONFIG_START(ti85_state::ti82)
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
-	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
-	MCFG_T6A04_SIZE(96, 64)
+	T6A04(config, "t6a04", 0).set_size(96, 64);
 
 	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
@@ -662,8 +661,7 @@ MACHINE_CONFIG_START(ti85_state::ti83)
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
-	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
-	MCFG_T6A04_SIZE(96, 64)
+	T6A04(config, "t6a04", 0).set_size(96, 64);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ti85_state::ti86)
@@ -698,8 +696,7 @@ MACHINE_CONFIG_START(ti85_state::ti83p)
 	ADDRESS_MAP_BANK(config, "membank3").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "membank4").set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
-	MCFG_T6A04_SIZE(96, 64)
+	T6A04(config, "t6a04", 0).set_size(96, 64);
 
 	MCFG_DEVICE_ADD("linkport", TI8X_LINK_PORT, default_ti8x_link_devices, nullptr)
 

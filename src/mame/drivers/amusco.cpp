@@ -117,6 +117,7 @@ public:
 
 	void amusco(machine_config &config);
 	void draw88pkr(machine_config &config);
+	void freeway(machine_config &config);
 
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
 
@@ -141,6 +142,7 @@ private:
 
 	void amusco_mem_map(address_map &map);
 	void amusco_io_map(address_map &map);
+	void freeway_mem_map(address_map &map);
 
 	std::unique_ptr<uint8_t []> m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -212,7 +214,13 @@ void amusco_state::machine_start()
 void amusco_state::amusco_mem_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
-	map(0xf8000, 0xfffff).rom();
+	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
+}
+
+void amusco_state::freeway_mem_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0xf0000, 0xfffff).rom().region("maincpu", 0);
 }
 
 READ8_MEMBER( amusco_state::mc6845_r)
@@ -599,19 +607,27 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(amusco_state::draw88pkr)
+void amusco_state::draw88pkr(machine_config &config)
+{
 	amusco(config);
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
-MACHINE_CONFIG_END
+}
 
+void amusco_state::freeway(machine_config &config)
+{
+	amusco(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amusco_state::freeway_mem_map);
+
+	//TODO: everything
+}
 
 /*************************
 *        Rom Load        *
 *************************/
 
 ROM_START( amusco )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "pk_v1.4_u42.u42",  0xf8000, 0x08000, CRC(bf57d7b1) SHA1(fc8b062b12c241c6c096325f728305316b80be8b) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "pk_v1.4_u42.u42",  0x0000, 0x8000, CRC(bf57d7b1) SHA1(fc8b062b12c241c6c096325f728305316b80be8b) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "char_a_u35.u35",  0x0000, 0x4000, CRC(ded67ef6) SHA1(da7326c190211e956e5a5f763d5045615bb8ffb3) )
@@ -638,8 +654,8 @@ ROM_END
 
 */
 ROM_START( draw88pkr )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "u42.bin",  0xf8000, 0x08000, CRC(e98a7cfd) SHA1(8dc581c3e0cfd78bd33fbbbafd40307cf66f154d) )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "u42.bin",  0x0000, 0x8000, CRC(e98a7cfd) SHA1(8dc581c3e0cfd78bd33fbbbafd40307cf66f154d) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
 	ROM_LOAD( "u35.bin",  0x0000, 0x4000, CRC(f608019a) SHA1(f0c5e10a03f39976d9bc6e8bc9f78e30ffefa03e) )
@@ -647,11 +663,32 @@ ROM_START( draw88pkr )
 	ROM_LOAD( "u37.bin",  0x8000, 0x4000, CRC(6e23b9f2) SHA1(6916828d84d1ecb44dc454e6786f97801a8550c7) )
 ROM_END
 
+// this might better fit another driver
+// 8088 CPU
+// Intel 8254 Programmable Interval Timer
+// Intel 8259
+// 2x 8k SRAM
+// 1x 32k SRAM
+// 6845 video chip
+// 5 roms
+// Oscillator 10 MHz
+
+ROM_START( freeway )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "vip88.bin", 0x00000, 0x10000, CRC(aeba6d5e) SHA1(bb84f7040bf1b6976cb2c50b1ffdc59ae88df223) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) // loading might be wrong
+	ROM_LOAD( "sb_51.bin",  0x00000, 0x8000, CRC(d25bd328) SHA1(b8c692298f6dc5fd5ae2f9e7701e14b0436a95bb) ) // xxx0xxxxxxxxxxx = 0xFF
+	ROM_LOAD( "sb_52.bin",  0x08000, 0x8000, CRC(f2b33acd) SHA1(e4786b4f00871d771aadacd9d6ec767691f4d939) )
+	ROM_LOAD( "sb_53.bin",  0x10000, 0x8000, CRC(50407ae6) SHA1(2c6c4803905bed5f27c6783f99a24f8dee62c19b) )
+	ROM_LOAD( "sb_cor.bin", 0x18000, 0x8000, CRC(5f86a160) SHA1(f21b7e0e6a407371c252d6fde6fcb32a2682824c) ) // 00000xxxxxxxxxx = 0xFF
+ROM_END
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY      FULLNAME                       FLAGS                                                LAYOUT    */
-GAMEL( 1987, amusco,    0,      amusco,    amusco,    amusco_state, empty_init, ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
-GAMEL( 1988, draw88pkr, 0,      draw88pkr, draw88pkr, amusco_state, empty_init, ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+/*     YEAR  NAME       PARENT  MACHINE    INPUT      CLASS         INIT        ROT   COMPANY            FULLNAME                       FLAGS                                                LAYOUT    */
+GAMEL( 1987, amusco,    0,      amusco,    amusco,    amusco_state, empty_init, ROT0, "Amusco",          "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+GAMEL( 1988, draw88pkr, 0,      draw88pkr, draw88pkr, amusco_state, empty_init, ROT0, "BTE, Inc.",       "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+GAMEL( 1999, freeway,   0,      draw88pkr, draw88pkr, amusco_state, empty_init, ROT0, "NVC Electronica", "FreeWay (V5.12)",             MACHINE_IS_SKELETON      | MACHINE_NODEVICE_PRINTER, layout_amusco ) // might need an own driver

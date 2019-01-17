@@ -96,7 +96,7 @@ namespace netlist
 			m_sub.m_IP.activate_hl();
 	}
 
-	inline NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
+	NETLIB_FUNC_VOID(CD4020_sub, update_outputs, (const unsigned cnt))
 	{
 		/* static */ const netlist_time out_delayQn[14] = {
 				NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),
@@ -113,7 +113,7 @@ namespace netlist
 			m_Q[i].push((cnt >> i) & 1, out_delayQn[i]);
 	}
 
-	NETLIB_DEVICE_IMPL(CD4020)
+	NETLIB_DEVICE_IMPL_DEPRECATED(CD4020)
 
 	} //namespace devices
 } // namespace netlist

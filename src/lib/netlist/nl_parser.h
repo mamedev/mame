@@ -16,8 +16,8 @@ namespace netlist
 	class parser_t : public plib::ptokenizer
 	{
 	public:
-		parser_t(plib::putf8_reader &strm, setup_t &setup)
-		: plib::ptokenizer(strm), m_setup(setup) {}
+		parser_t(plib::putf8_reader &&strm, setup_t &setup)
+		: plib::ptokenizer(std::move(strm)), m_setup(setup) {}
 
 		bool parse(const pstring &nlname = "");
 
@@ -39,7 +39,7 @@ namespace netlist
 		void net_truthtable_start(const pstring &nlname);
 
 		/* for debugging messages */
-		netlist_t &netlist() { return m_setup.netlist(); }
+		netlist_base_t &netlist() { return m_setup.netlist(); }
 
 		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
 	private:

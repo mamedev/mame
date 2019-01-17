@@ -54,6 +54,7 @@ private:
 	uint8_t compliance;
 
 	void return_no_cd();
+	static int to_msf(int frame);
 };
 
 class nscsi_dec_rrd45_device : public nscsi_cdrom_device

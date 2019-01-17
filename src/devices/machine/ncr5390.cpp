@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
+/*
+ * TODO
+ *   - 16 bit dma order, alignment and last byte handling
+ *   - clean up variable naming and protection
+ */
+
 #include "emu.h"
 #include "ncr5390.h"
 
@@ -143,6 +149,7 @@ ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, const char *ta
 ncr53c94_device::ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ncr53c90a_device(mconfig, NCR53C94, tag, owner, clock)
 	, config3(0)
+	, m_busmd(BUSMD_0)
 {
 }
 
@@ -267,7 +274,7 @@ void ncr5390_device::step(bool timeout)
 		if(win != scsi_id) {
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-			fatalerror("need to wait for bus free\n");
+			fatalerror("ncr5390_device::step need to wait for bus free\n");
 		}
 		state = (state & STATE_MASK) | (ARB_ASSERT_SEL << SUB_SHIFT);
 		scsi_bus->ctrl_w(scsi_refid, S_SEL, S_SEL);
@@ -407,10 +414,9 @@ void ncr5390_device::step(bool timeout)
 
 	case DISC_SEL_ARBITRATION_INIT:
 		// wait until a command is in the fifo
-		if (!fifo_pos && dma_command && !(status & S_TC0)) {
+		if (!fifo_pos) {
 			// dma starts after bus arbitration/selection is complete
-			dma_set(DMA_OUT);
-			step(false);
+			check_drq();
 			break;
 		}
 
@@ -680,7 +686,7 @@ void ncr5390_device::function_bus_complete()
 	state = IDLE;
 	istatus |= I_FUNCTION|I_BUS;
 	dma_set(DMA_NONE);
-	drq_clear();
+	check_drq();
 	check_irq();
 }
 
@@ -690,7 +696,7 @@ void ncr5390_device::function_complete()
 	state = IDLE;
 	istatus |= I_FUNCTION;
 	dma_set(DMA_NONE);
-	drq_clear();
+	check_drq();
 	check_irq();
 }
 
@@ -700,7 +706,7 @@ void ncr5390_device::bus_complete()
 	state = IDLE;
 	istatus |= I_BUS;
 	dma_set(DMA_NONE);
-	drq_clear();
+	check_drq();
 	check_irq();
 }
 
@@ -746,16 +752,14 @@ uint8_t ncr5390_device::fifo_pop()
 	uint8_t r = fifo[0];
 	fifo_pos--;
 	memmove(fifo, fifo+1, fifo_pos);
-	if((!fifo_pos) && dma_dir == DMA_OUT && !(status & S_TC0))
-		drq_set();
+	check_drq();
 	return r;
 }
 
 void ncr5390_device::fifo_push(uint8_t val)
 {
 	fifo[fifo_pos++] = val;
-	if(!drq && dma_dir == DMA_IN && !(status & S_TC0))
-		drq_set();
+	check_drq();
 }
 
 READ8_MEMBER(ncr5390_device::fifo_r)
@@ -878,6 +882,7 @@ void ncr5390_device::start_command()
 			"Select with ATN and stop sequence\n");
 		seq = 0;
 		state = DISC_SEL_ARBITRATION_INIT;
+		dma_set(dma_command ? DMA_OUT : DMA_NONE);
 		arbitrate();
 		break;
 
@@ -896,6 +901,7 @@ void ncr5390_device::start_command()
 		state = INIT_XFR;
 		xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 		dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
+		check_drq();
 		step(false);
 		break;
 
@@ -936,8 +942,14 @@ void ncr5390_device::start_command()
 		command_pop_and_chain();
 		break;
 
+	case CI_RESET_ATN:
+		LOGMASKED(LOG_COMMAND, "Reset ATN\n");
+		scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+		command_pop_and_chain();
+		break;
+
 	default:
-		fatalerror("start unimplemented command %02x\n", c);
+		fatalerror("ncr5390_device::start_command unimplemented command %02x\n", c);
 	}
 }
 
@@ -1065,16 +1077,17 @@ WRITE8_MEMBER(ncr5390_device::clock_w)
 void ncr5390_device::dma_set(int dir)
 {
 	dma_dir = dir;
-	if(dma_dir == DMA_OUT && fifo_pos != 16 && ((tcounter > fifo_pos) || !tcounter))
-		drq_set();
+
+	// account for data already in the fifo
+	if (dir == DMA_OUT && fifo_pos)
+		decrement_tcounter(fifo_pos);
 }
 
 void ncr5390_device::dma_w(uint8_t val)
 {
 	fifo_push(val);
 	decrement_tcounter();
-	if(fifo_pos == 16 || (status & S_TC0))
-		drq_clear();
+	check_drq();
 	step(false);
 }
 
@@ -1082,34 +1095,41 @@ uint8_t ncr5390_device::dma_r()
 {
 	uint8_t r = fifo_pop();
 	decrement_tcounter();
-	if(!fifo_pos || (status & S_TC0))
-		drq_clear();
+	check_drq();
 	step(false);
 	return r;
 }
 
-void ncr5390_device::drq_set()
+void ncr5390_device::check_drq()
 {
-	if(!drq) {
-		drq = true;
+	bool drq_state = drq;
+
+	switch (dma_dir) {
+	case DMA_NONE:
+		drq_state = false;
+		break;
+
+	case DMA_IN: // device to memory
+		drq_state = !(status & S_TC0) && fifo_pos;
+		break;
+
+	case DMA_OUT: // memory to device
+		drq_state = !(status & S_TC0) && fifo_pos < 16;
+		break;
+	}
+
+	if (drq_state != drq) {
+		drq = drq_state;
 		m_drq_handler(drq);
 	}
 }
 
-void ncr5390_device::drq_clear()
-{
-	if(drq) {
-		drq = false;
-		m_drq_handler(drq);
-	}
-}
-
-void ncr5390_device::decrement_tcounter()
+void ncr5390_device::decrement_tcounter(int count)
 {
 	if (!dma_command)
 		return;
 
-	tcounter--;
+	tcounter -= count;
 	if (tcounter == 0)
 		status |= S_TC0;
 }
@@ -1185,4 +1205,70 @@ void ncr53c94_device::reset_soft()
 	config3 = 0;
 
 	ncr53c90a_device::reset_soft();
+}
+
+u16 ncr53c94_device::dma16_r()
+{
+	// check fifo underflow
+	if (fifo_pos < 2)
+		fatalerror("ncr53c94_device::dma16_r fifo_pos %d\n", fifo_pos);
+
+	// pop two bytes from fifo
+	u16 const data = (fifo[0] << 8) | fifo[1];
+	fifo_pos -= 2;
+	memmove(fifo, fifo + 2, fifo_pos);
+
+	// update drq
+	decrement_tcounter(2);
+	check_drq();
+
+	step(false);
+
+	return data;
+}
+
+void ncr53c94_device::dma16_w(u16 data)
+{
+	// check fifo overflow
+	if (fifo_pos > 14)
+		fatalerror("ncr53c94_device::dma16_w fifo_pos %d\n", fifo_pos);
+
+	// push two bytes into fifo
+	fifo[fifo_pos++] = data >> 8;
+	fifo[fifo_pos++] = data;
+
+	// update drq
+	decrement_tcounter(2);
+	check_drq();
+
+	step(false);
+}
+
+void ncr53c94_device::check_drq()
+{
+	if (m_busmd != BUSMD_0)
+	{
+		bool drq_state = drq;
+
+		switch (dma_dir) {
+		case DMA_NONE:
+			drq_state = false;
+			break;
+
+		case DMA_IN: // device to memory
+			drq_state = !(status & S_TC0) && fifo_pos > 1;
+			break;
+
+		case DMA_OUT: // memory to device
+			drq_state = !(status & S_TC0) && fifo_pos < 15;
+			break;
+		}
+
+		if (drq_state != drq) {
+			drq = drq_state;
+			m_drq_handler(drq);
+		}
+	}
+	else
+		ncr5390_device::check_drq();
 }

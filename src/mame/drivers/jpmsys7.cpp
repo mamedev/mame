@@ -59,7 +59,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(jpmsys7_state::jpmsys7)
 	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000)  // seems to be a Coldfire of some kind
 	MCFG_DEVICE_PROGRAM_MAP(jpmsys7_map)
-	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

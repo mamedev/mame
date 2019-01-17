@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "bus/isa/aga.h"
+#include "bus/isa/fdc.h"
 #include "machine/genpc.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
@@ -91,7 +92,6 @@ private:
 	{
 		TIMER_RTC
 	};
-	static void cfg_builtin_720K(device_t *device);
 	void europc_io(address_map &map);
 	void europc_map(address_map &map);
 };
@@ -514,12 +514,41 @@ void europc_pc_state::europc_io(address_map &map)
 	map(0x02e0, 0x02e0).r(FUNC(europc_pc_state::europc_jim2_r));
 }
 
-/* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */
-void europc_pc_state::cfg_builtin_720K(device_t *device)
+class europc_fdc_device : public isa8_fdc_device
 {
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+public:
+	europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+DEFINE_DEVICE_TYPE(EUROPC_FDC, europc_fdc_device, "europc_fdc", "EURO PC FDC hookup")
+
+europc_fdc_device::europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa8_fdc_device(mconfig, EUROPC_FDC, tag, owner, clock)
+{
+}
+
+static void pc_dd_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+void europc_fdc_device::device_add_mconfig(machine_config &config)
+{
+	wd37c65c_device &fdc(WD37C65C(config, m_fdc, 16_MHz_XTAL));
+	fdc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
+	fdc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "", isa8_fdc_device::floppy_formats);
+}
+
+static void europc_fdc(device_slot_interface &device)
+{
+	device.option_add("fdc", EUROPC_FDC);
 }
 
 //Euro PC
@@ -536,8 +565,7 @@ MACHINE_CONFIG_START(europc_pc_state::europc)
 	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
 	MCFG_SLOT_FIXED(true)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_builtin_720K)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", europc_fdc, "fdc", false)
 	MCFG_SLOT_FIXED(true)
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
@@ -592,12 +620,18 @@ ROM_START( europc )
 	ROMX_LOAD("bios_v2.04.bin", 0x8000, 0x8000, CRC(e623967c) SHA1(5196b14018da1f3198e2950af0e6eab41425f556), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS( 7, "v2.05", "EuroPC v2.05" )
 	ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(7)) // v2.04 and v2.05 don't work yet, , see comment section
- ROM_END
+
+	ROM_REGION(0x1000, "kbdctrl", 0)
+	ROM_LOAD("zc86115p-mc6805u2.bin", 0x0000, 0x1000, CRC(d90c1fab) SHA1(ddb7060abddee7294723833c303090de35c1e79c))
+ROM_END
 
 ROM_START( europc2 )
 	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
 	ROM_LOAD("europcii_bios_v3.01_500145.bin", 0x8000, 0x8000, CRC(ecca89c8) SHA1(802b89babdf0ab0a0a9c21d1234e529c8386d6fb))
+
+	ROM_REGION(0x1000, "kbdctrl", 0)
+	ROM_LOAD("zc86115p-mc6805u2.bin", 0x0000, 0x1000, CRC(d90c1fab) SHA1(ddb7060abddee7294723833c303090de35c1e79c))
 ROM_END
 
 ROM_START( euroxt )

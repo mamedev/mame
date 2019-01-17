@@ -9,6 +9,7 @@
 #define NLD_MS_DIRECT_H_
 
 #include <algorithm>
+#include <cmath>
 
 #include "nld_solver.h"
 #include "nld_matrix_solver.h"
@@ -35,8 +36,8 @@ class matrix_solver_direct_t: public matrix_solver_t
 	friend class matrix_solver_t;
 public:
 
-	matrix_solver_direct_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
-	matrix_solver_direct_t(netlist_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name, const eSortType sort, const solver_parameters_t *params, const std::size_t size);
 
 	virtual ~matrix_solver_direct_t() override;
 
@@ -55,15 +56,11 @@ protected:
 	void LE_back_subst(T * RESTRICT x);
 
 #if (NL_USE_DYNAMIC_ALLOCATION)
-	template <typename T1, typename T2>
-	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r * m_pitch + c]; }
-	template <typename T1>
-	nl_ext_double &RHS(const T1 &r) { return m_A[r * m_pitch + N()]; }
+	nl_ext_double &A(const std::size_t r, const std::size_t c) { return m_A[r * m_pitch + c]; }
+	nl_ext_double &RHS(const std::size_t r) { return m_A[r * m_pitch + N()]; }
 #else
-	template <typename T1, typename T2>
-	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
-	template <typename T1>
-	nl_ext_double &RHS(const T1 &r) { return m_A[r][N()]; }
+	nl_ext_double &A(const std::size_t r, const std::size_t c) { return m_A[r][c]; }
+	nl_ext_double &RHS(const std::size_t r) { return m_A[r][N()]; }
 #endif
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
@@ -243,7 +240,7 @@ unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool ne
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-inline unsigned matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	build_LE_A<matrix_solver_direct_t>();
 	build_LE_RHS<matrix_solver_direct_t>();
@@ -256,7 +253,7 @@ inline unsigned matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetlist, const pstring &name,
+matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, ASCENDING, params)
 , m_dim(size)
@@ -272,7 +269,7 @@ matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetli
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_t &anetlist, const pstring &name,
+matrix_solver_direct_t<m_N, storage_N>::matrix_solver_direct_t(netlist_base_t &anetlist, const pstring &name,
 		const eSortType sort, const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, sort, params)
 , m_dim(size)

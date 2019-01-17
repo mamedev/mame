@@ -45,6 +45,8 @@ public:
 	auto intrq_wr_callback() { return intrq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
 	auto hdl_wr_callback() { return hdl_cb.bind(); }
+	auto us_wr_callback() { return us_cb.bind(); }
+	auto idx_wr_callback() { return idx_cb.bind(); }
 
 	virtual void map(address_map &map) override = 0;
 
@@ -91,6 +93,7 @@ public:
 protected:
 	upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -269,7 +272,8 @@ protected:
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
-	devcb_write_line intrq_cb, drq_cb, hdl_cb;
+	devcb_write_line intrq_cb, drq_cb, hdl_cb, idx_cb;
+	devcb_write8 us_cb;
 	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
 	floppy_info flopi[4];
 

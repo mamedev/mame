@@ -4484,6 +4484,16 @@ ROM_START( invasiona )
 	ROM_LOAD( "invasiona_5.bin",   0x1c00, 0x0400, CRC(59134ff8) SHA1(2e6a040066b35b10f867a3e500e3b13922c0eb7a) )
 ROM_END
 
+ROM_START( invasiona2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.0.bin",   0x0000, 0x0400, CRC(7a9b4485) SHA1(dde918ec106971972bf7c7e5085c1262522f7e35) )
+	ROM_LOAD( "1.1.bin",   0x0400, 0x0400, CRC(7c86620d) SHA1(9e92ec0aa4eee96a7fa115a14a611c488d13b9dd) )
+	ROM_LOAD( "2.2.bin",   0x0800, 0x0400, CRC(b949185e) SHA1(f6dad27fdc5a030d2391078926bcf8e4adf21a12) )
+	ROM_LOAD( "3.5.bin",   0x1400, 0x0400, CRC(8ec9eae2) SHA1(48d7a7dc61e0417ca4093e5c2a36efd96e359233) )
+	ROM_LOAD( "4.6.bin",   0x1800, 0x0400, CRC(ec0edb4a) SHA1(8c6946b50ba5c319fe03c55b43c4e714387719b8) )
+	ROM_LOAD( "5.7.bin",   0x1c00, 0x0400, CRC(c3466380) SHA1(19b0f274a1b97a6ab48f3fe11fdee44ed2f50603) )
+ROM_END
+
 ROM_START( invasionb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "invasionb_0.bin",   0x0000, 0x0400, CRC(7a9b4485) SHA1(dde918ec106971972bf7c7e5085c1262522f7e35) )
@@ -5153,10 +5163,11 @@ GAMEL(1980, spaceat2,    invaders, invaders,  spaceat2,  mw8080bw_state, empty_i
 GAMEL(1979, spacecom,    invaders, spacecom,  spacecom,  _8080bw_state,  init_spacecom, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacecom )
 GAME( 1978, spacerng,    invaders, spacerng,  sitv,      _8080bw_state,  empty_init,    ROT90,  "bootleg (Leisure Time Electronics)", "Space Ranger", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // many modifications
 GAMEL(19??, invasion,    invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (Sidam)", "Invasion (Sidam)", MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, invasiona,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg", "Invasion (bootleg set 1, normal graphics)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX
-GAMEL(19??, invasionb,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg", "Invasion (bootleg set 2, no copyright)", MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, invasionrz,  invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg set 3, R Z SRL Bologna)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_invaders )
-GAMEL(19??, invasionrza, invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg set 4, R Z SRL Bologna)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_invaders )
+GAMEL(1979, invasiona,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg", "UFO Robot Attack (bootleg of Invasion, newer set)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX
+GAMEL(1979, invasiona2,  invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg", "UFO Robot Attack (bootleg of Invasion, older set)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX
+GAMEL(1979, invasionb,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg", "Invasion (Italian bootleg)", MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, invasionrz,  invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg set 1, R Z SRL Bologna)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_invaders )
+GAMEL(1979, invasionrza, invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg set 2, R Z SRL Bologna)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_invaders )
 GAMEL(19??, invadersem,  invaders, invaders,  sitv,      mw8080bw_state, empty_init,    ROT270, "Electromar", "Space Invaders (Electromar, Spanish)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // possibly licensed
 GAMEL(1978, superinv,    invaders, invaders,  superinv,  mw8080bw_state, empty_init,    ROT270, "bootleg", "Super Invaders (bootleg set 1)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // not related to Zenitone-Microsec version
 GAMEL(1978, sinvemag,    invaders, invaders,  sinvemag,  mw8080bw_state, empty_init,    ROT270, "bootleg (Emag)", "Super Invaders (bootleg set 2)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // not related to Zenitone-Microsec version

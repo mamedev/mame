@@ -608,6 +608,7 @@ MACHINES["WD_FDC"] = true
 MACHINES["WD11C00_17"] = true
 MACHINES["WD2010"] = true
 MACHINES["WD33C93"] = true
+MACHINES["WD33C9X"] = true
 MACHINES["X2212"] = true
 MACHINES["X76F041"] = true
 MACHINES["X76F100"] = true
@@ -2778,6 +2779,7 @@ files {
 	MAME_DIR .. "src/mame/includes/namcos1.h",
 	MAME_DIR .. "src/mame/machine/namcos1.cpp",
 	MAME_DIR .. "src/mame/video/namcos1.cpp",
+	MAME_DIR .. "src/mame/drivers/namcos1b.cpp",
 	MAME_DIR .. "src/mame/drivers/namcos10.cpp",
 	MAME_DIR .. "src/mame/machine/ns10crypt.cpp",
 	MAME_DIR .. "src/mame/machine/ns10crypt.h",

@@ -35,12 +35,17 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	void generate_serial_data(int upper);
 	void serial_register_state();
 
+	required_ioport m_io_serial_digit;
+
 	uint8_t   m_data[16]; // reused by other devices
 	int     m_upper;
+
 private:
 	uint8_t   m_buff;
 	uint8_t   m_idx;

@@ -871,8 +871,7 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	MCFG_SCREEN_PALETTE(m_palette)
 
 	PALETTE(config, m_palette, FUNC(firetrk_state::firetrk_palette), 28);
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_firetrk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firetrk);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -894,7 +893,7 @@ MACHINE_CONFIG_START(firetrk_state::superbug)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_superbug)
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbug)
+	m_gfxdecode->set_info(gfx_superbug);
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("discrete", DISCRETE, superbug_discrete)
@@ -914,7 +913,7 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_montecar)
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_montecar)
+	m_gfxdecode->set_info(gfx_montecar);
 
 	m_palette->set_entries(46);
 	m_palette->set_init(FUNC(firetrk_state::montecar_palette));

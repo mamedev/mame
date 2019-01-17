@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood,Paul Priest
+#ifndef MAME_INCLUDES_MS32_H
+#define MAME_INCLUDES_MS32_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -9,8 +13,8 @@
 class ms32_state : public driver_device
 {
 public:
-	ms32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ms32_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_audiocpu(*this, "audiocpu"),
@@ -30,7 +34,8 @@ public:
 		m_txram(*this, "txram", 32),
 		m_bgram(*this, "bgram", 32),
 		m_f1superb_extraram(*this, "f1sb_extraram", 32),
-		m_z80bank(*this, "z80bank%u", 1) { }
+		m_z80bank(*this, "z80bank%u", 1)
+	{ }
 
 	void ms32(machine_config &config);
 	void f1superb(machine_config &config);
@@ -148,3 +153,5 @@ private:
 	void ms32_map(address_map &map);
 	void ms32_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MS32_H

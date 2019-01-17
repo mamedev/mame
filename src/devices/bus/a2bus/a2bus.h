@@ -118,10 +118,8 @@ public:
 	void set_nmi_line(int state, int slot);
 	void set_maincpu_halt(int state);
 	void recalc_inh(int slot);
-	uint8_t dma_r(address_space &space, uint16_t offset);
-	void dma_w(address_space &space, uint16_t offset, uint8_t data);
-	uint8_t dma_nospace_r(uint16_t offset);
-	void dma_nospace_w(uint16_t offset, uint8_t data);
+	uint8_t dma_r(uint16_t offset);
+	void dma_w(uint16_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -181,14 +179,8 @@ public:
 	void set_a2bus(a2bus_device *a2bus, const char *slottag) { m_a2bus = a2bus; m_a2bus_slottag = slottag; }
 	template <typename T> void set_onboard(T &&a2bus) { m_a2bus_finder.set_tag(std::forward<T>(a2bus)); m_a2bus_slottag = device().tag(); }
 
-	// pass through the original address space if any for debugger protection
-	// when debugging e.g. coprocessor cards (Z80 SoftCard etc).
-	uint8_t slot_dma_read(address_space &space, uint16_t offset) { return m_a2bus->dma_r(space, offset); }
-	void slot_dma_write(address_space &space, uint16_t offset, uint8_t data) { m_a2bus->dma_w(space, offset, data); }
-
-	// these versions forego that protection for when the DMA isn't coming from a debuggable CPU device
-	uint8_t slot_dma_read_no_space(uint16_t offset) { return m_a2bus->dma_nospace_r(offset); }
-	void slot_dma_write_no_space(uint16_t offset, uint8_t data) { m_a2bus->dma_nospace_w(offset, data); }
+	uint8_t slot_dma_read(uint16_t offset) { return m_a2bus->dma_r(offset); }
+	void slot_dma_write(uint16_t offset, uint8_t data) { m_a2bus->dma_w(offset, data); }
 
 protected:
 	uint32_t get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot

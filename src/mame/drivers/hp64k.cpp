@@ -1390,12 +1390,12 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("linesync_timer", hp64k_state, hp64k_line_sync, attotime::from_hz(50))
 
 	// Clock = 25 MHz / 9 * (112/114)
-	MCFG_DEVICE_ADD("crtc", I8275, 2729045)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_I8275_CHARACTER_WIDTH(9)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(hp64k_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, hp64k_state, hp64k_crtc_drq_w))
-	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, hp64k_state, hp64k_crtc_vrtc_w))
+	I8275(config, m_crtc, 2729045);
+	m_crtc->set_screen("screen");
+	m_crtc->set_character_width(9);
+	m_crtc->set_display_callback(FUNC(hp64k_state::crtc_display_pixels), this);
+	m_crtc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_drq_w));
+	m_crtc->vrtc_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_vrtc_w));
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)

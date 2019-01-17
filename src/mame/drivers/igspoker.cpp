@@ -1943,7 +1943,7 @@ MACHINE_CONFIG_START(igspoker_state::igspoker)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_igs_video)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_igspoker)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_igspoker);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
@@ -1970,6 +1970,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igspoker_state::number10)
 	igspoker(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(number10_io_map)
 
@@ -1985,9 +1986,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igspoker_state::cpokerpk)
 	number10(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(cpokerpk_io_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cpokerpk)
+	m_gfxdecode->set_info(gfx_cpokerpk);
 MACHINE_CONFIG_END
 
 

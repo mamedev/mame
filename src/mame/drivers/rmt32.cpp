@@ -368,7 +368,7 @@ MACHINE_CONFIG_START(mt32_state::mt32)
 
 	PALETTE(config, "palette", FUNC(mt32_state::mt32_palette), 2);
 
-	MCFG_SED1200D0A_ADD( "lcd" )
+	SED1200D0A(config, lcd, 0);
 
 	MCFG_TIMER_DRIVER_ADD( "midi_timer", mt32_state, midi_timer_cb )
 

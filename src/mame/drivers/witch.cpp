@@ -991,7 +991,7 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_witch)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_witch);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
@@ -1027,7 +1027,7 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
 
 	PALETTE(config.replace(), m_palette).set_entries(0x200+0x80);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
+	m_gfxdecode->set_info(gfx_keirinou);
 
 //  MCFG_PALETTE_FORMAT(IIBBGGRR)
 

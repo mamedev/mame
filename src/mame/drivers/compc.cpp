@@ -1,6 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 // Commodore PC 10 / PC 20 / PC 30
+/***************************************************************************
+Commodore PC10 / PC20 / PC30
+Links: http://www.zimmers.net/cbmpics/cpcs.html , https://de.wikipedia.org/wiki/Commodore_PC-10_bis_PC-60 , http://mingos-commodorepage.tumblr.com/post/123656301482/commodore-pc-20-beim-pc-20-handelt-es-sich-um
+http://www.richardlagendijk.nl/cip/computer/item/pc20ii/de
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 256K / 512K / 640K
+BUS: 5x ISA
+Video: MDA
+Mass storage: PC10: 1 or 2x 5.25" 360K , PC20: 1x 360K + 10MB HD, PC30: 1x 360K + 20MB HD
+On board ports: Floppy, serial, parallel, speaker
+Options: 8087 FPU
+
+
+Commodore PC-10 III
+=============
+Links: http://dostalgie.de/downloads/pc10III-20III/PC10III_OM_COMMODORE_EN_DE.pdf ; ftp://ftp.zimmers.net/pub/cbm-pc/documents/PC-8088-Information.txt
+Info: PC10-III and PC20-III are the same machines - PC10 has two floppies, PC20 one floppy and one harddisk
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz / 7.16 MHz / 9.54 MHz
+RAM: 640K
+Bus: 3x ISA
+Video: On board: MDA/CGA/Hercules/Plantronics
+Mass storage: 1x Floppy 5.25" 360K and (PC10) another 360K or (PC20) 3.5" harddisk
+On board ports: Floppy, XT-IDE Harddisk, Mouse, serial, parallel, RTC, Speaker
+Options: 8087 FPU
+***************************************************************************/
+
 #include "emu.h"
 
 #include "cpu/i86/i86.h"

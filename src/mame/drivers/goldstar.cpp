@@ -8513,15 +8513,17 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(goldstar_state::moonlght)
+void goldstar_state::moonlght(machine_config &config)
+{
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ml)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_ml);
+}
 
-MACHINE_CONFIG_START(goldstar_state::goldfrui)
+void goldstar_state::goldfrui(machine_config &config)
+{
 	goldstbl(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_goldfrui)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_goldfrui);
+}
 
 
 MACHINE_CONFIG_START(sanghopm_state::star100)
@@ -8693,30 +8695,35 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cb3_state::cb3c)
+void cb3_state::cb3c(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cb3c)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cb3c);
+}
 
-MACHINE_CONFIG_START(cb3_state::cb3e)
+void cb3_state::cb3e(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cb3e)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cb3e);
+}
 
-MACHINE_CONFIG_START(cb3_state::chrygld)
+void cb3_state::chrygld(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_chry10)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_chry10);
+}
 
-MACHINE_CONFIG_START(cb3_state::cherrys)
+void cb3_state::cherrys(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cherrys)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cherrys);
+}
 
-MACHINE_CONFIG_START(cb3_state::cm97)
+void cb3_state::cm97(machine_config &config)
+{
 	ncb3(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cm97)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cm97);
+}
 
 
 MACHINE_CONFIG_START(goldstar_state::wcherry)
@@ -8808,10 +8815,11 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cmaster_state::cmasterc)
+void cmaster_state::cmasterc(machine_config &config)
+{
 	cm(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cmasterc)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cmasterc);
+}
 
 
 MACHINE_CONFIG_START(goldstar_state::cmast91)
@@ -8969,10 +8977,11 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(wingco_state::bingownga)
+void wingco_state::bingownga(machine_config &config)
+{
 	bingowng(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bingownga)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_bingownga);
+}
 
 
 MACHINE_CONFIG_START(wingco_state::flam7_w4)
@@ -8992,7 +9001,7 @@ MACHINE_CONFIG_START(wingco_state::flaming7)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_flaming7)
+	m_gfxdecode->set_info(gfx_flaming7);
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
@@ -9006,7 +9015,7 @@ MACHINE_CONFIG_START(wingco_state::flam7_tw)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(flaming7_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_flam7_tw)
+	m_gfxdecode->set_info(gfx_flam7_tw);
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
@@ -9337,7 +9346,7 @@ MACHINE_CONFIG_START(cmaster_state::nfm)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(nfm_map)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_nfm)
+	m_gfxdecode->set_info(gfx_nfm);
 MACHINE_CONFIG_END
 
 
@@ -9747,27 +9756,27 @@ Note
 */
 ROM_START( chry10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ver.1h2.u20",  0x0000, 0x10000, CRC(85bbde06) SHA1(f44d335feb4697b195e9fc7e5aeaabf099e21ed8) )
+	ROM_LOAD( "ver.1h2.u20",       0x0000, 0x10000, CRC(85bbde06) SHA1(f44d335feb4697b195e9fc7e5aeaabf099e21ed8) )
 
 	ROM_REGION( 0x10000, "pic", 0 )
-	ROM_LOAD( "pic16f84.bad.dump",    0x00000, 0x014f4, BAD_DUMP CRC(876ff1ed) SHA1(fcd6892e2b8371030af15e4d8c9f4a351ce0551c) )
+	ROM_LOAD( "pic16f84.bad.dump", 0x00000, 0x014f4, BAD_DUMP CRC(876ff1ed) SHA1(fcd6892e2b8371030af15e4d8c9f4a351ce0551c) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "27c010.u1",      0x00000, 0x20000, CRC(05515cf8) SHA1(366dd44ae93bdc4cf456f97f38edac83441cbc89) )
+	ROM_LOAD( "27c010.u1",         0x00000, 0x20000, CRC(05515cf8) SHA1(366dd44ae93bdc4cf456f97f38edac83441cbc89) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
+	ROM_LOAD( "1.u3",              0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
+	ROM_LOAD( "82s147.u2",         0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x02e5, "palgal", 0 )
-	ROM_LOAD( "palce20v8h.pl1.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
-	ROM_LOAD( "palce20v8h.pl2.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
-	ROM_LOAD( "palce16v8h.pl4.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "gal22v10b.pl5.bad.dump",     0x00000, 0x02e5, BAD_DUMP CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
-	ROM_LOAD( "palce16v8h.pl6.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(7e3d99d8) SHA1(983e10eba11e4aeab5103ae644a8e6181d9b27a9) )
-	ROM_LOAD( "palce16v8h.pl7.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce20v8h.pl1",    0x00000, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.pl2",    0x00000, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl4",    0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal22v10b.pl5",     0x00000, 0x02e5, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl6",    0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl7",    0x00000, 0x0117, NO_DUMP )
 ROM_END
 
 
@@ -9811,24 +9820,24 @@ Note
 */
 ROM_START( chrygld )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ol-v9.u20",  0x00000, 0x10000, CRC(b61c0695) SHA1(63c44b20fd7f76bdb33331273d2610e8cfd31add) )
+	ROM_LOAD( "ol-v9.u20",       0x00000, 0x10000, CRC(b61c0695) SHA1(63c44b20fd7f76bdb33331273d2610e8cfd31add) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "ol-la.u1",      0x00000, 0x20000, CRC(c3c912f1) SHA1(a2131f092ae1971f79a11d6a18b031cd98529320) )
+	ROM_LOAD( "ol-la.u1",        0x00000, 0x20000, CRC(c3c912f1) SHA1(a2131f092ae1971f79a11d6a18b031cd98529320) )
 
 	ROM_REGION( 0x08000, "gfx2", 0 )
-	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
+	ROM_LOAD( "1.u3",            0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
+	ROM_LOAD( "82s147.u2",       0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x02dd, "palgal", 0 )
-	ROM_LOAD( "gal20v8.pl1.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(bf885908) SHA1(6cac1022172ee0c178fd3b9c187b1ffb4742898f) )
-	ROM_LOAD( "palce20v8h.pl2.bad.dump", 0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
-	ROM_LOAD( "palce16v8h.pl4.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "peel22cv10a.pl5.bad.dump",0x00000, 0x02dd, BAD_DUMP CRC(8e6075d9) SHA1(f2c1b6497a4d9e873d36b89771c135a2cd91d05f) )
-	ROM_LOAD( "palce16v8h.pl6.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(7e3d99d8) SHA1(983e10eba11e4aeab5103ae644a8e6181d9b27a9) )
-	ROM_LOAD( "palce16v8h.pl7.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "gal20v8.pl1",     0x00000, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.pl2",  0x00000, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl4",  0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "peel22cv10a.pl5", 0x00000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl6",  0x00000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.pl7",  0x00000, 0x0117, NO_DUMP )
 ROM_END
 
 
@@ -14067,6 +14076,49 @@ ROM_START( nfb96seb )
 	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
 ROM_END
 
+ROM_START( nfb96sec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u34",0x00000, 0x1000, CRC(65e7a70d) SHA1(77b8b7e16e842d6debf9bb13d83dbf4289ab0bd4) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x1000)
+	ROM_CONTINUE(0x9000, 0x1000)
+	ROM_CONTINUE(0xa000, 0x1000)
+	ROM_CONTINUE(0xb000, 0x1000)
+	ROM_CONTINUE(0xc000, 0x1000)
+	ROM_CONTINUE(0xd000, 0x1000)
+	ROM_CONTINUE(0xe000, 0x1000)
+	ROM_CONTINUE(0xf000, 0x1000)
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // Same data as other sets, arranged differently
+	ROM_LOAD( "u2", 0x00000, 0x08000, CRC(7d245ff8) SHA1(eebc3c0700aaa5e8d0be22d411f097607e179d5e) )
+	ROM_CONTINUE(   0x10000, 0x08000 )
+	ROM_CONTINUE(   0x08000, 0x08000 )
+	ROM_CONTINUE(   0x00000, 0x08000 )
+
+	ROM_REGION( 0x10000, "gfx2", 0 ) // Same data as other sets, arranged differently
+	ROM_LOAD( "u35", 0x0000, 0x4000, CRC(ddd6b7cb) SHA1(ff5161d7d25b216fd507a43f9102cde1e1518593) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(    0x2000, 0x2000 )
+	ROM_CONTINUE(    0x0000, 0x2000 )
+	ROM_LOAD( "u1",  0x4000, 0x4000, CRC(fdbb5896) SHA1(edfcfcfbf6306ff40c517eeeb05f91b869ba40d2) ) // 0xxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(    0x6000, 0x2000 )
+	ROM_CONTINUE(    0x4000, 0x2000 )
+
+	// taken from new fruit bonus '96, might be wrong
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "proms2", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+ROM_END
 
 // this contains elephants etc. instead of the usual symbols, maybe
 // it's meant to work with the above program roms?
@@ -16856,6 +16908,7 @@ GAME(  1996, roypok96c, roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp96
 GAME( 1996, nfb96se,   nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 1, v97-3.3c Portuguese)", 0 )
 GAME( 1996, nfb96sea,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  init_nfb96sea,  ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 2, v97-3.3c English)",    MACHINE_WRONG_COLORS ) // encrypted program
 GAME( 1996, nfb96seb,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 3, v97-3.3c Portuguese)", MACHINE_WRONG_COLORS )
+GAME( 1996, nfb96sec,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg set 4, v97-3.3c English)",    MACHINE_WRONG_COLORS )
 GAME( 2002, carb2002,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                                            MACHINE_WRONG_COLORS )
 GAME( 2003, carb2003,  nfb96,    amcoe2,   nfb96bl,   cmaster_state,  empty_init,     ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                                            MACHINE_WRONG_COLORS )
 

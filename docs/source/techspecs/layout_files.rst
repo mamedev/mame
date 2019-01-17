@@ -1090,9 +1090,9 @@ when parameters are used, or recursively nested groups.  The ``complay.py``
 script is compatible with both Python 2.7 and Python 3 interpreters.
 
 The ``complay.py`` script takes three parameters -- an input file name, an
-output file name, and a base name for variables in the output::
+output file name, and a base name for variables in the output:
 
-    python scripts/build/complay.py input [output [varname]]
+    **python scripts/build/complay.py** *<input>* [*<output>* [*<varname>*]]
 
 The input file name is required.  If no output file name is supplied,
 ``complay.py`` will parse and check the input, reporting any errors found,
@@ -1104,6 +1104,6 @@ in case of an I/O error.  If an output file name is specified, the file will be
 created/overwritten on success or removed on failure.
 
 To check a layout file for common errors, run the script with the path to the
-file no check and no output file name or base variable name.  For example::
+file no check and no output file name or base variable name.  For example:
 
-    python scripts/build/complay.py artwork/dino/default.lay
+    **python scripts/build/complay.py artwork/dino/default.lay**

@@ -34,6 +34,7 @@ public:
 	virtual ~menu_select_launch() override;
 
 protected:
+	static constexpr std::size_t MAX_ICONS_RENDER = 128;
 
 	// tab navigation
 	enum class focused_menu
@@ -93,6 +94,8 @@ protected:
 
 	focused_menu get_focus() const { return m_focus; }
 	void set_focus(focused_menu focus) { m_focus = focus; }
+	void next_image_view();
+	void previous_image_view();
 
 	bool dismiss_error();
 	void set_error(reset_options ropt, std::string &&message);
@@ -113,6 +116,11 @@ protected:
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
 	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width);
+
+	// forcing refresh
+	bool redraw_icon() const { return m_redraw_icon; }
+	void set_redraw_icon() { m_redraw_icon = true; }
+	void set_switch_image() { m_switch_image = true; }
 
 	bool draw_error_text();
 
@@ -188,9 +196,6 @@ private:
 	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
 
 	using flags_cache = util::lru_cache_map<game_driver const *, system_flags>;
-	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_argb32> >;
-
-	static constexpr std::size_t MAX_ICONS_RENDER = 128;
 
 	void reset_pressed() { m_pressed = false; m_repeat = 0; }
 	bool mouse_pressed() const { return (osd_ticks() >= m_repeat); }
@@ -230,7 +235,7 @@ private:
 
 	void draw_toolbar(float x1, float y1, float x2, float y2);
 	void draw_star(float x0, float y0);
-	float draw_icon(int linenum, void *selectedref, float x1, float y1);
+	virtual float draw_icon(int linenum, void *selectedref, float x1, float y1);
 
 	void get_title_search(std::string &title, std::string &search);
 
@@ -289,8 +294,11 @@ private:
 
 	int                     m_right_visible_lines;  // right box lines
 
+	bool                    m_redraw_icon;
+	bool                    m_switch_image;
+	bool                    m_default_image;
+	uint8_t                 m_image_view;
 	flags_cache             m_flags;
-	icon_cache              m_icons;
 
 	static std::mutex       s_cache_guard;
 	static cache_ptr_map    s_caches;

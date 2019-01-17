@@ -373,7 +373,7 @@ MACHINE_CONFIG_START(gtrak10_state::gtrak10)
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(gtrak10)
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_composite_monochrome, "fixfreq")
 
 	/* video hardware */
 

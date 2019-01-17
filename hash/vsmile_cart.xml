@@ -2,10 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
--->
-
-<!--
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
@@ -119,6 +115,8 @@ Game cartridges
 |        | 80-090275(NO)     | Disney Fairies: Tingeling                                                  |
 |        |          (FI)     | Disney Fairies: Helinä-keiju                                               |
 +========+===================+============================================================================+
+|   XX   | 52-091444(GE)     | Schreibspass                                                               |
++========+===================+============================================================================+
 |                                                                                                         |
 |  Oldest Smartidges start here                                                                           |
 |                                                                                                         |
@@ -180,7 +178,7 @@ Game cartridges
 |   XX   |          (IT)     | Il Re Leone - La Grande Avventura di Simba                                 |
 |        | 80-092102(NL)     | Leeuwenkoning - De wonderwereld van Simba                                  |
 |        | 80-092103(UK)     | The Lion King: Simba's Big Adventure                                       |
-|        | 80-092104(GE)     | Der Koenig der Loewen - Simbas grosses Abenteuer                           |
+|   XX   | 80-092104(GE)     | Der Koenig der Loewen - Simbas grosses Abenteuer (Rev.2 dumped)            |
 |   XX   | 80-092105(FR)     | Roi Lion - Simba Decouvre la Jungle                                        |
 |        | 80-092106(PT)     | O Rei Leao - A grande aventura de Simba (92116 on cart)                    |
 |        | 80-092107(SP)     | Rey León - La Gran Aventura de Simba                                       |
@@ -416,7 +414,7 @@ Game cartridges
 |        | 80-092627(SP)     | Lil' Bratz - Amigos, Moda y Diversion                                       |
 +========+===================+============================================================================+
 |        | 80-092640(US)     | Superman - The Greatest Hero                                               |
-|        | 80-092642(NL)     | Superman - De Grootste Held                                                |
+|   XX   | 80-092642(NL)     | Superman - De Grootste Held                                                |
 |        | 80-092643(UK)     | Superman - The Greatest Hero                                               |
 |   XX   | 80-092644(GE)     | Superman - Der Superheld                                                   |
 |   XX   | 80-092645(FR)     | Superman - À la rescousse !                                                |
@@ -464,7 +462,7 @@ Game cartridges
 |        |          (IT)     | Shrek Terzo L'Advventura Do Artu in un Giorno di Scuola                    |
 |   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                |
 |        | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                             |
-|        | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                 |
+|   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                 |
 |        | 80-092865(FR)     | Shrek Troisieme : L'aventure d'Arthur                                      |
 |        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                         |
 +========+===================+============================================================================+
@@ -502,7 +500,7 @@ Game cartridges
 |        | 80-092960(US)     | Kung Fu Panda - Path of the Panda                                          |
 |        | 80-092962(NL)     | Kung Fu Panda - Het pad van de panda                                       |
 |   XX   | 80-092963(UK)     | Kung Fu Panda - Path of the Panda                                          |
-|        | 80-092964(GE)     | Kung Fu Panda - Der Weg des Panda                                          |
+|   XX   | 80-092964(GE)     | Kung Fu Panda - Der Weg des Panda                                          |
 |        | 80-092965(FR)     | Kung Fu Panda - La ?????                                                   |
 |        | 80-092967(SP)     | Kung Fu Panda - Aventura en el Valle de la Paz                             |
 +========+===================+============================================================================+
@@ -517,7 +515,7 @@ Game cartridges
 
 <softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
 
-	<software name="aladdin" supported="no">
+	<software name="aladdin" supported="yes">
 		<description>Disneys Aladdin - Aladdins Welt der Wunder (Ger)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -533,7 +531,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="redhood" supported="no">
+	<software name="redhood" supported="yes">
 		<description>Entdecke die Welt von Rotkäppchen (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -549,7 +547,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="alphaprk" supported="no">
+	<software name="alphaprk" supported="yes">
 		<description>Alphabet Park Adventure (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -565,7 +563,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="alphaprkg" cloneof="alphaprk" supported="no">
+	<software name="alphaprkg" cloneof="alphaprk" supported="yes">
 		<description>Abenteuer im ABC Park (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -581,7 +579,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="alphaprkf" cloneof="alphaprk" supported="no">
+	<software name="alphaprkf" cloneof="alphaprk" supported="yes">
 		<description>ABC Land Aventure (Fra)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -597,7 +595,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="ariel" supported="no">
+	<software name="ariel" supported="yes">
 		<description>Disneys Arielle die Meerjungfrau - Arielles aufregendes Abenteuer (Ger, Rev. 3?)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -613,7 +611,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="ariel1" cloneof="ariel" supported="no">
+	<software name="ariel1" cloneof="ariel" supported="yes">
 		<description>Disneys Arielle Die Meerjungfrau - Arielles aufregendes Abenteuer (Ger)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -629,7 +627,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="arielf" cloneof="ariel" supported="no">
+	<software name="arielf" cloneof="ariel" supported="yes">
 		<description>Disney La Petite Sirene - Ariel devient une princesse (Fra)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -645,7 +643,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="arieldk" cloneof="ariel" supported="no">
+	<software name="arieldk" cloneof="ariel" supported="yes">
 		<description>Disney Den Lille Havfrue - Ariels majestætiske rejse! (Den)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -661,7 +659,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="arielsw" cloneof="ariel" supported="no">
+	<software name="arielsw" cloneof="ariel" supported="yes">
 		<description>Disneys Den Lilla Sjöjungfrun - Ariels majestätiska resa! (Swe)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -677,7 +675,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="arieli" cloneof="ariel" supported="no">
+	<software name="arieli" cloneof="ariel" supported="yes">
 		<description>Disney La sirenetta - Ariel e la crociera magica (Ita)</description>
 		<year>2005</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
@@ -688,7 +686,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="barney" supported="no">
+	<software name="barney" supported="yes">
 		<description>Barney - Erlebnis-Reise (Ger)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -705,7 +703,7 @@ Game cartridges
 	</software>
 
 	<!-- loads if mapped as Batman TV -->
-	<software name="bobbday" supported="no">
+	<software name="bobbday" supported="yes">
 		<description>Bob the Builder - Bob's Busy Day (USA)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -721,7 +719,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="bobbdayg" cloneof="bobbday" supported="no">
+	<software name="bobbdayg" cloneof="bobbday" supported="yes">
 		<description>Bob der Baumeister - Bobs spannender Arbeitstag (Ger)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -737,7 +735,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="bobbdaydk" cloneof="bobbday" supported="no">
+	<software name="bobbdaydk" cloneof="bobbday" supported="yes">
 		<description>Byggemand Bob - Bobs travle dag (Den)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -753,7 +751,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="bobbdaysw" cloneof="bobbday" supported="no">
+	<software name="bobbdaysw" cloneof="bobbday" supported="yes">
 		<description>Byggare Bob - Bobs stressiga dag (Swe)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -770,7 +768,7 @@ Game cartridges
 	</software>
 
 	<!-- loads if mapped as Batman TV -->
-	<software name="cars" supported="no">
+	<software name="cars" supported="yes">
 		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -786,7 +784,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="carsg" cloneof="cars" supported="no">
+	<software name="carsg" cloneof="cars" supported="yes">
 		<description>Disney/Pixar Cars - Vollgas in Radiator Springs (Ger)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -802,7 +800,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="carsf" cloneof="cars" supported="no">
+	<software name="carsf" cloneof="cars" supported="yes">
 		<description>Disney/Pixar Cars - Quatre Roues (Fra)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -818,7 +816,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="carsdk" cloneof="cars" supported="no">
+	<software name="carsdk" cloneof="cars" supported="yes">
 		<description>Disney/Pixar Biler - Ræs i Kølerkildekøbing (Den)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -834,7 +832,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="carssw" cloneof="cars" supported="no">
+	<software name="carssw" cloneof="cars" supported="yes">
 		<description>Disney/Pixar Bilar - Kör ikapp i Kylarköping (Swe)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -851,7 +849,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="cinderla" supported="no">
+	<software name="cinderla" supported="yes">
 		<description>Disney Princess Cinderella - Cinderella's Magic Wishes (USA)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -867,7 +865,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="cinderlaa" cloneof="cinderla" supported="no">
+	<software name="cinderlaa" cloneof="cinderla" supported="yes">
 		<description>Disney Princess Cinderella - Cinderella's Magic Wishes (USA, Alt)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -879,7 +877,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="cinderlai" cloneof="cinderla" supported="no">
+	<software name="cinderlai" cloneof="cinderla" supported="yes">
 		<description>Disney Cenerentola - I desideri magici di Cenerentola (Ita)</description>
 		<year>2006</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
@@ -891,7 +889,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="cinderlaf" cloneof="cinderla" supported="no">
+	<software name="cinderlaf" cloneof="cinderla" supported="yes">
 		<description>Disney Princesses Cendrillon - Le rêve enchanté de Cendrillon (Fra)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -907,7 +905,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="cinderladk" cloneof="cinderla" supported="no">
+	<software name="cinderladk" cloneof="cinderla" supported="yes">
 		<description>Disney Princess Cinderella - Askepots magiske ønsker (Den)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -923,7 +921,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="cinderlag" cloneof="cinderla" supported="no">
+	<software name="cinderlag" cloneof="cinderla" supported="yes">
 		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger, Rev. 1)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -939,7 +937,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="cinderlag1" cloneof="cinderla" supported="no">
+	<software name="cinderlag1" cloneof="cinderla" supported="yes">
 		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -955,7 +953,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="cinderlasw" cloneof="cinderla" supported="no">
+	<software name="cinderlasw" cloneof="cinderla" supported="yes">
 		<description>Disney Princess Cinderella - Askungens magiska önskningar (Swe)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -971,7 +969,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="mickymag" supported="no">
+	<software name="mickymag" supported="yes">
 		<description>Disney's Mickey Mouse - Mickey's Magical Adventure (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -984,7 +982,7 @@ Game cartridges
 	</software>
 
 	<!-- loads if mapped as Batman TV -->
-	<software name="dora" supported="no">
+	<software name="dora" supported="yes">
 		<description>Nick Jr Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1000,7 +998,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="doraf" cloneof="dora" supported="no">
+	<software name="doraf" cloneof="dora" supported="yes">
 		<description>Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano (Fra)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1016,7 +1014,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="dorag" cloneof="dora" supported="no">
+	<software name="dorag" cloneof="dora" supported="yes">
 		<description>Nick Jr Dora - Doras Reparatur-Abenteuer (Ger, Rev. 1)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1032,7 +1030,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="elmo" supported="no">
+	<software name="elmo" supported="yes">
 		<description>Elmos großes Abenteuer (Ger)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1048,7 +1046,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="elmof" cloneof="elmo" supported="no">
+	<software name="elmof" cloneof="elmo" supported="yes">
 		<description>Le Monde d'ELMO - Les Grandes Decouvertes D'Elmo (Fra)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1064,7 +1062,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="footschl" supported="no">
+	<software name="footschl" supported="yes">
 		<description>V.Smile Fußball Schule (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1080,7 +1078,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="findnemo" supported="no">
+	<software name="findnemo" supported="yes">
 		<description>Disney/Pixar Finding Nemo - Nemo's Ocean Discoveries (USA)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1096,7 +1094,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="findnemonl" cloneof="findnemo" supported="no">
+	<software name="findnemonl" cloneof="findnemo" supported="yes">
 		<description>Disney/Pixar Finding Nemo - De Wonderwereld Van Nemo (NL)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1112,7 +1110,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="fred" supported="no">
+	<software name="fred" supported="yes">
 		<description>Freds Zahlen Rallye (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1128,7 +1126,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="appilote" cloneof="fred" supported="no">
+	<software name="appilote" cloneof="fred" supported="yes">
 		<description>Apprenti' pilote (Fra)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1144,7 +1142,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="kleinstn" supported="no">
+	<software name="kleinstn" supported="yes">
 		<description>Kleine Einsteins (Ger, Rev. 3?)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -1160,7 +1158,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="lionking" supported="no">
+	<software name="lionking" supported="yes">
 		<description>Disney's The Lion King - Simba's Big Adventure (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1176,7 +1174,23 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="lionkingf" cloneof="lionking" supported="no">
+	<software name="lionkingg" cloneof="lionking" supported="yes">
+		<description>Der Koenig der Loewen - Simbas großes Abenteuer (Ger, Rev. 2?)</description>
+		<year>2004</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092104(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92104(2).u1" size="8388608" crc="f2394e3a" sha1="e39e05400279a1328832c873f811ce432be59d13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkingf" cloneof="lionking" supported="yes">
 		<description>Roi Lion - Simba Decouvre la Jungle (Fra)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1192,7 +1206,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="lionkingdk" cloneof="lionking" supported="no">
+	<software name="lionkingdk" cloneof="lionking" supported="yes">
 		<description>Disney Løvernes Konge - Simbas store eventyr (Den)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1208,7 +1222,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="lionkingsw" cloneof="lionking" supported="no">
+	<software name="lionkingsw" cloneof="lionking" supported="yes">
 		<description>Disney Lejonkungen - Simbas stora äventyr (Swe)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1224,7 +1238,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="lionkingi" cloneof="lionking" supported="no">
+	<software name="lionkingi" cloneof="lionking" supported="yes">
 		<description>Disney Il re leone - La grande avventura di Simba (Ita)</description>
 		<year>2005</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
@@ -1236,7 +1250,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="kungfupuk" supported="no">
+	<software name="kungfupuk" supported="yes">
 		<description>Kung Fu Panda - Path of the Panda (UK)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -1248,7 +1262,23 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="manny" supported="no">
+	<software name="kungfupg" cloneof="kungfupuk" supported="yes">
+		<description>Kung Fu Panda - Der Weg des Panda (Ger)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="52-092964(GER)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92964-3.bin" size="8388608" crc="4ef9f7c0" sha1="d60265406e1f1b1f4b86364b3281058feb1a6e1d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="manny" supported="yes">
 		<description>Meister Manny's Werkzeugkiste (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -1280,7 +1310,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="mickymagg" cloneof="mickymag" supported="no">
+	<software name="mickymagg" cloneof="mickymag" supported="yes">
 		<description>Disneys Micky - Mickys magisches Abenteuer (Ger)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -1296,7 +1326,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="mickymagsw" cloneof="mickymag" supported="no">
+	<software name="mickymagsw" cloneof="mickymag" supported="yes">
 		<description>Disneys Musse Pigg - Musses magiska äventyr (Swe)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1312,7 +1342,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="mickeywh" supported="no">
+	<software name="mickeywh" supported="yes">
 		<description>Micky Maus Wunderhaus (Ger, Rev. 3?)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1328,7 +1358,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="mickeychnl" cloneof="mickeywh" supported="no">
+	<software name="mickeychnl" cloneof="mickeywh" supported="yes">
 		<description>Mickey Mouse Clubhouse (NL)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1344,7 +1374,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="mickeychsw" cloneof="mickeywh" supported="no">
+	<software name="mickeychsw" cloneof="mickeywh" supported="yes">
 		<description>Mickey Mouse Clubhouse (Swe)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1360,7 +1390,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="monstaln" supported="no">
+	<software name="monstaln" supported="yes">
 		<description>DreamWorks Monsters vs Aliens (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -1376,7 +1406,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="mypuppy" supported="no">
+	<software name="mypuppy" supported="yes">
 		<description>Mein erster Hund (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1392,7 +1422,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="mypuppysw" cloneof="mypuppy" supported="no">
+	<software name="mypuppysw" cloneof="mypuppy" supported="yes">
 		<description>Min hundvalp (Swe)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -1408,7 +1438,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="noddy" supported="no">
+	<software name="noddy" supported="yes">
 		<description>Noddy - Detektiv für einen Tag (Ger, Rev. 3?)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1424,7 +1454,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="noddyf" cloneof="noddy" supported="no">
+	<software name="noddyf" cloneof="noddy" supported="yes">
 		<description>Oui-Oui - Detective d'un Jour (Fra)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1440,7 +1470,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="oben" supported="no">
+	<software name="oben" supported="yes">
 		<description>Disney/Pixar Oben (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -1456,7 +1486,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="upuk" cloneof="oben" supported="no">
+	<software name="upuk" cloneof="oben" supported="yes">
 		<description>Disney/Pixar Up (UK)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -1468,7 +1498,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="partyprk" supported="no">
+	<software name="partyprk" supported="yes">
 		<description>Cranium Partyland Park - A Carnival of Play-and-Learn Fun (USA)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1484,7 +1514,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="ratat" supported="no">
+	<software name="ratat" supported="yes">
 		<description>Disney/Pixar Ratatouille - Remys neue Rezepte (Ger)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1500,7 +1530,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="ratati" cloneof="ratat" supported="no">
+	<software name="ratati" cloneof="ratat" supported="yes">
 		<description>Disney/Pixar Ratatouille - Le nuove ricette di Remy (Ita)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -1511,7 +1541,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="scoobydo" supported="no">
+	<software name="scoobydo" supported="yes">
 		<description>Scooby-Doo! - Funland Frenzy (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1527,7 +1557,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="scoobydof" cloneof="scoobydo" supported="no">
+	<software name="scoobydof" cloneof="scoobydo" supported="yes">
 		<description>Scooby-Doo - Panique à Funland (Fra)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1543,7 +1573,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="scoobydog" cloneof="scoobydo" supported="no">
+	<software name="scoobydog" cloneof="scoobydo" supported="yes">
 		<description>Scooby-Doo! - Im Lernpark (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1559,7 +1589,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="scoobydodk" cloneof="scoobydo" supported="no">
+	<software name="scoobydodk" cloneof="scoobydo" supported="yes">
 		<description>Scooby-Doo! - Sjov i forlystelsesparken (Den)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1575,7 +1605,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="scoobydosw" cloneof="scoobydo" supported="no">
+	<software name="scoobydosw" cloneof="scoobydo" supported="yes">
 		<description>Scooby-Doo! - Tivoli-tokerier (Swe)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1591,7 +1621,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="scoobydoi" cloneof="scoobydo" supported="no">
+	<software name="scoobydoi" cloneof="scoobydo" supported="yes">
 		<description>Scooby-Doo! - Avventura a Funland (Ita)</description>
 		<year>200?</year>
 		<publisher>VTech / Giochi Preziosi</publisher>
@@ -1602,7 +1632,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="erniebrt" supported="no">
+	<software name="erniebrt" supported="yes">
 		<description>Ernies &amp; Berts Fantastisches Abenteuer (Ger)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1618,7 +1648,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="shrek3" supported="no">
+	<software name="shrek3" supported="yes">
 		<description>DreamWorks Shrek the Third - Arthur's School Day Adventure (USA)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1634,7 +1664,23 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="shrek3nl" cloneof="shrek3" supported="no">
+	<software name="shrek3g" supported="yes">
+		<description>Shrek der Dritte - Ein Spannender Schultag (Ger)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092864(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92864(2).u1" size="8388608" crc="0f11e49d" sha1="c936505dabc4043665f429a9109a1e533b9dc311" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shrek3nl" cloneof="shrek3" supported="yes">
 		<description>Shrek De Derde - Arthurs Schooldag Avontuur (NL)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1650,7 +1696,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="shrek" supported="no">
+	<software name="shrek" supported="yes">
 		<description>DreamWorks Shrek - Die Geschichte des Drachen (Ger)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1666,7 +1712,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="shrekf" cloneof="shrek" supported="no">
+	<software name="shrekf" cloneof="shrek" supported="yes">
 		<description>DreamWorks Shrek - Le rhume de Dragonne (Fra)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1682,7 +1728,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="spidermn" supported="no">
+	<software name="spidermn" supported="yes">
 		<description>Spider-Man &amp; ses amis - Missions secrètes (Fra)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1698,7 +1744,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="spiderm2" supported="no">
+	<software name="spiderm2" supported="yes">
 		<description>Spider-Man &amp; Freunde - Wettkampf im Space-Labor (Ger)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1714,7 +1760,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="spongeb" supported="no">
+	<software name="spongeb" supported="yes">
 		<description>Nickelodeon Spongebob Squarepants - A Day in the Life of a Sponge (USA)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1730,7 +1776,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="spongebg" cloneof="spongeb" supported="no">
+	<software name="spongebg" cloneof="spongeb" supported="yes">
 		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger, Rev. 1)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1746,7 +1792,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="spongebg1" cloneof="spongeb" supported="no">
+	<software name="spongebg1" cloneof="spongeb" supported="yes">
 		<description>Nickelodeon Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1761,8 +1807,8 @@ Game cartridges
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="superman" supported="no">
+	
+	<software name="superman" supported="yes">
 		<description>Superman - Der Superheld (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1778,7 +1824,23 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="supermanf" cloneof="superman" supported="no">
+	<software name="supermannl" supported="yes">
+		<description>Superman - De Grootste Held (NL)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092644(NL)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-2" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="092642.u1" size="8388608" crc="b7f1a750" sha1="c6e60ef2333250c9e0e41d3a7d04fe4178d9be8a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermanf" cloneof="superman" supported="yes">
 		<description>Superman - À la rescousse ! (Fra)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -1794,7 +1856,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="thomas" supported="no">
+	<software name="thomas" supported="yes">
 		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger, Rev. 1)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1810,7 +1872,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="thomas1" cloneof="thomas" supported="no">
+	<software name="thomas1" cloneof="thomas" supported="yes">
 		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Ger)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1826,7 +1888,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="thomasf" cloneof="thomas" supported="no">
+	<software name="thomasf" cloneof="thomas" supported="yes">
 		<description>Thomas er ses Amis - Les locomotives s'entraident (Fra)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1842,7 +1904,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="thomassw" cloneof="thomas" supported="no">
+	<software name="thomassw" cloneof="thomas" supported="yes">
 		<description>Thomas &amp; Friends - Tågen hjälps åt (Swe)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -1858,7 +1920,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="tingelng" supported="no">
+	<software name="tingelng" supported="yes">
 		<description>Tingeling (Swe)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
@@ -1874,7 +1936,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="toystor2" supported="no">
+	<software name="toystor2" supported="yes">
 		<description>Disney/Pixar Toy Story 2 - Operation: Rescue Woody! (USA)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -1886,7 +1948,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="toystor2g" cloneof="toystor2" supported="no">
+	<software name="toystor2g" cloneof="toystor2" supported="yes">
 		<description>Disney/Pixar Toy Story 2 - Woodys Spannende Rettung (Ger)</description>
 		<year>2006?</year>
 		<publisher>VTech</publisher>
@@ -1902,7 +1964,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="toystor2sw" cloneof="toystor2" supported="no">
+	<software name="toystor2sw" cloneof="toystor2" supported="yes">
 		<description>Disney/Pixar Toy Story 2 - Operation: Rädda Woody! (Swe)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -1918,7 +1980,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="walle" supported="no">
+	<software name="walle" supported="yes">
 		<description>Disney/Pixar Wall-E (Ger)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -1934,7 +1996,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="wallesw" cloneof="walle" supported="no">
+	<software name="wallesw" cloneof="walle" supported="yes">
 		<description>Disney/Pixar Wall-E (Swe)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -1950,7 +2012,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="pooh" supported="no">
+	<software name="pooh" supported="yes">
 		<description>Disneys Winnie Puuh - Die Honigjagd (Ger)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -1966,7 +2028,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="pooh1" cloneof="pooh" supported="no">
+	<software name="pooh1" cloneof="pooh" supported="yes">
 		<description>My Friends Tigger &amp; Pooh - Die Honigjagd (Ger)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -1982,7 +2044,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="poohf" cloneof="pooh" supported="no">
+	<software name="poohf" cloneof="pooh" supported="yes">
 		<description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (Fra)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -1998,7 +2060,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="poohfa" cloneof="pooh" supported="no">
+	<software name="poohfa" cloneof="pooh" supported="yes">
 		<description>Disney Winnie l'Ourson - La Chasse au miel de Winnie (Fra, Rev. 2)</description>
 		<year>2004?</year>
 		<publisher>VTech</publisher>
@@ -2014,7 +2076,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="poohdk" cloneof="pooh" supported="no">
+	<software name="poohdk" cloneof="pooh" supported="yes">
 		<description>Disney Peter Plys - Honningjagten (Den)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2030,7 +2092,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="poohsw" cloneof="pooh" supported="no">
+	<software name="poohsw" cloneof="pooh" supported="yes">
 		<description>Disney Nalle Puh - Honungsjakten (Swe)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2047,7 +2109,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="lerntanz" supported="no">
+	<software name="lerntanz" supported="yes">
 		<description>V.Smile - Lern- und Tanzmatte (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2082,7 +2144,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="techartsw" cloneof="techart" supported="no">
+	<software name="techartsw" cloneof="techart" supported="yes">
 		<description>V.Smile Tecknarstudio (Swe)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2101,7 +2163,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="zayzmac" cloneof="zayzaea" supported="no">
+	<software name="zayzmac" cloneof="zayzaea" supported="yes">
 		<description>Zayzoo - My Alien Classmate (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2113,7 +2175,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="zayzaea" supported="no">
+	<software name="zayzaea" supported="yes">
 		<description>Zayzoo: An Earth Adventure (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2129,7 +2191,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="zayzmacg" cloneof="zayzaea" supported="no">
+	<software name="zayzmacg" cloneof="zayzaea" supported="yes">
 		<description>Zayzoos Lernall (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2145,7 +2207,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="zayzaeauk" cloneof="zayzaea" supported="no">
+	<software name="zayzaeauk" cloneof="zayzaea" supported="yes">
 		<description>Zayzoo: An Earth Adventure (UK)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2157,7 +2219,7 @@ Game cartridges
 		</part>
 	</software>
 
-	<software name="zezou" cloneof="zayzaea" supported="no">
+	<software name="zezou" cloneof="zayzaea" supported="yes">
 		<description>Zézou - Notre Ami Venu d'Ailleurs (Fra)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -2169,6 +2231,22 @@ Game cartridges
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92365.u1" size="8388608" crc="e965565e" sha1="9cabefa6a2dc0cd2df9d07bb0e11ae0b2dd4d5f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schreib" supported="no">
+		<description>V.Smile Schreibspaß (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091444(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-3" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="091444.u1" size="8388608" crc="1fcf586f" sha1="e13d229887ea31bfd9fea43683f65162b9626ffa" offset="0" />
 			</dataarea>
 		</part>
 	</software>

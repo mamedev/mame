@@ -64,4 +64,11 @@ std::string &strmakeupper(std::string& str);
 std::string &strmakelower(std::string& str);
 int strreplace(std::string &str, const std::string& search, const std::string& replace);
 
+namespace util {
+
+// based on Jaro-Winkler distance - returns value from 0.0 (totally dissimilar) to 1.0 (identical)
+double edit_distance(std::u32string const &lhs, std::u32string const &rhs);
+
+} // namespace util
+
 #endif // MAME_UTIL_CORESTR_H

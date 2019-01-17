@@ -304,9 +304,9 @@ MACHINE_CONFIG_START(rt1715_state::rt1715)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_rt1715);
 	PALETTE(config, "palette", FUNC(rt1715_state::rt1715_palette), 3);
 
-	MCFG_DEVICE_ADD("a26", I8275, 13.824_MHz_XTAL / 8)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rt1715_state, crtc_display_pixels)
+	i8275_device &a26(I8275(config, "a26", 13.824_MHz_XTAL / 8));
+	a26.set_character_width(8);
+	a26.set_display_callback(FUNC(rt1715_state::crtc_display_pixels), this);
 
 	z80ctc_device& ctc(Z80CTC(config, "a30", 9.832_MHz_XTAL / 4));
 	ctc.zc_callback<0>().set("a29", FUNC(z80sio_device::txca_w));

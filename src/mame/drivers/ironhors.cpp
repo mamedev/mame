@@ -454,7 +454,7 @@ MACHINE_CONFIG_START(ironhors_state::farwest)
 	MCFG_DEVICE_PROGRAM_MAP(farwest_slave_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_farwest)
+	m_gfxdecode->set_info(gfx_farwest);
 	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)

@@ -106,8 +106,8 @@ namespace netlist
 			m_O[i].push((o >> i) & 1, NLTIME_FROM_NS(40)); // FIXME: Timing
 	}
 
-	NETLIB_DEVICE_IMPL(82S115)
-	NETLIB_DEVICE_IMPL(82S115_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(82S115)
+	NETLIB_DEVICE_IMPL_DEPRECATED(82S115_dip)
 
 	} //namespace devices
 } // namespace netlist

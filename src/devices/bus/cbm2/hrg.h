@@ -41,8 +41,9 @@ protected:
 	virtual uint8_t cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
 	virtual void cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
 
-private:
 	required_device<ef9365_device> m_gdc;
+
+private:
 	required_memory_region m_bank3;
 };
 

@@ -70,8 +70,8 @@ namespace netlist
 		m_Q.push(q, NLTIME_FROM_NS(1));
 	}
 
-	NETLIB_DEVICE_IMPL(tristate)
-	NETLIB_DEVICE_IMPL(tristate3)
+	NETLIB_DEVICE_IMPL_DEPRECATED(tristate)
+	NETLIB_DEVICE_IMPL_DEPRECATED(tristate3)
 
 	} //namespace devices
 } // namespace netlist

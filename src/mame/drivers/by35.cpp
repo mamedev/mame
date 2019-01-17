@@ -898,7 +898,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::u11_timer )
     -+                          +---+
 */
 
-	m_display_refresh_timer->adjust(attotime::from_msec(2.85));
+	m_display_refresh_timer->adjust(attotime::from_usec(2850));
 
 	m_u11_ca1 = true;
 	m_pia_u11->ca1_w(m_u11_ca1);

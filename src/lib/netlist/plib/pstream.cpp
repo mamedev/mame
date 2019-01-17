@@ -41,14 +41,6 @@ postream::~postream()
 {
 }
 
-void postream::write(pistream &strm)
-{
-	char buf[1024];
-	pos_type r;
-	while ((r=strm.read(buf, 1024)) > 0)
-		write(buf, r);
-}
-
 // -----------------------------------------------------------------------------
 // Input file stream
 // -----------------------------------------------------------------------------
@@ -119,7 +111,7 @@ void pifilestream::vseek(const pos_type n)
 		throw file_e("Generic file operation failed: {}", m_filename);
 }
 
-pifilestream::pos_type pifilestream::vtell()
+pifilestream::pos_type pifilestream::vtell() const
 {
 	long ret = ftell(static_cast<FILE *>(m_file));
 	if (ret < 0)
@@ -204,7 +196,7 @@ void pofilestream::vseek(const pos_type n)
 	}
 }
 
-pstream::pos_type pofilestream::vtell()
+pstream::pos_type pofilestream::vtell() const
 {
 	std::ptrdiff_t ret = ftell(static_cast<FILE *>(m_file));
 	if (ret < 0)
@@ -259,12 +251,17 @@ pstdout::~pstdout()
 // -----------------------------------------------------------------------------
 
 pimemstream::pimemstream(const void *mem, const pos_type len)
-	: pistream(FLAG_SEEKABLE), m_pos(0), m_len(len), m_mem(static_cast<const pstring::mem_t *>(mem))
+	: pistream(FLAG_SEEKABLE), m_pos(0), m_len(len), m_mem(static_cast<const char *>(mem))
+{
+}
+
+pimemstream::pimemstream()
+	: pistream(FLAG_SEEKABLE), m_pos(0), m_len(0), m_mem(static_cast<const char *>(nullptr))
 {
 }
 
 pimemstream::pimemstream(const pomemstream &ostrm)
-: pistream(FLAG_SEEKABLE), m_pos(0), m_len(ostrm.size()), m_mem(reinterpret_cast<pstring::mem_t *>(ostrm.memory()))
+: pistream(FLAG_SEEKABLE), m_pos(0), m_len(ostrm.size()), m_mem(reinterpret_cast<const char *>(ostrm.memory()))
 {
 }
 
@@ -295,7 +292,7 @@ void pimemstream::vseek(const pos_type n)
 
 }
 
-pimemstream::pos_type pimemstream::vtell()
+pimemstream::pos_type pimemstream::vtell() const
 {
 	return m_pos;
 }
@@ -316,7 +313,8 @@ pomemstream::pomemstream()
 
 pomemstream::~pomemstream()
 {
-	pfree_array(m_mem);
+	if (m_mem != nullptr)
+		pfree_array(m_mem);
 }
 
 void pomemstream::vwrite(const void *buf, const pos_type n)
@@ -359,14 +357,14 @@ void pomemstream::vseek(const pos_type n)
 	}
 }
 
-pstream::pos_type pomemstream::vtell()
+pstream::pos_type pomemstream::vtell() const
 {
 	return m_pos;
 }
 
 bool putf8_reader::readline(pstring &line)
 {
-	pstring::code_t c = 0;
+	putf8string::code_t c = 0;
 	m_linebuf = "";
 	if (!this->readcode(c))
 	{
@@ -378,19 +376,14 @@ bool putf8_reader::readline(pstring &line)
 		if (c == 10)
 			break;
 		else if (c != 13) /* ignore CR */
-			m_linebuf += pstring(c);
+			m_linebuf += putf8string(c);
 		if (!this->readcode(c))
 			break;
 	}
-	line = m_linebuf;
+	line = m_linebuf.c_str();
 	return true;
 }
 
-putf8_fmt_writer::putf8_fmt_writer(postream &strm)
-: pfmt_writer_t()
-, putf8_writer(strm)
-{
-}
 
 putf8_fmt_writer::~putf8_fmt_writer()
 {

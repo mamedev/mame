@@ -401,7 +401,7 @@ void shadfrce_state::shadfrce_sound_map(address_map &map)
 
 /* Input Ports */
 
-/* Similar to MUGSMASH_PLAYER_INPUT in drivers/mugsmash.c */
+// Similar to MUGSMASH_PLAYER_INPUT in drivers/mugsmash.cpp
 #define SHADFRCE_PLAYER_INPUT( player, start ) \
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) PORT_8WAY \
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) PORT_8WAY \

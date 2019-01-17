@@ -366,11 +366,10 @@ MACHINE_CONFIG_START(tiamc1_state::kot)
 	MCFG_VIDEO_START_OVERRIDE(tiamc1_state, kot)
 	MCFG_SCREEN_UPDATE_DRIVER(tiamc1_state, screen_update_kot)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_kot)
+	m_gfxdecode->set_info(gfx_kot);
 
-	MCFG_DEVICE_REMOVE("2x8253")
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	config.device_remove("2x8253");
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
 	pit8253.set_clk<0>(PIXEL_CLOCK / 4);

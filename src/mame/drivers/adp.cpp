@@ -604,19 +604,18 @@ void adp_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(adp_state::funland)
+void adp_state::funland(machine_config &config)
+{
 	quickjac(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(funland_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::funland_mem);
 
 	PALETTE(config.replace(), m_palette, palette_device::BLACK, 0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &adp_state::ramdac_map);
 
-	MCFG_DEVICE_MODIFY("acrtc")
-	MCFG_HD63484_ADDRESS_MAP(fstation_hd63484_map)
-MACHINE_CONFIG_END
+	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
+}
 
 MACHINE_CONFIG_START(adp_state::fstation)
 	funland(config);

@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(C64_REU1764, c64_reu1764_cartridge_device, "c64_1764reu", "17
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c64_reu_cartridge_device::device_add_mconfig)
-	MCFG_MOS8726_ADD(MOS8726R1_TAG)
+	MOS8726(config, m_dmac, 1000000); // dummy clock
 
 	MCFG_GENERIC_SOCKET_ADD("rom", generic_linear_slot, nullptr)
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

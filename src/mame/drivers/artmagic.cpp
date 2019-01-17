@@ -827,7 +827,7 @@ MACHINE_CONFIG_START(artmagic_state::artmagic)
 	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)

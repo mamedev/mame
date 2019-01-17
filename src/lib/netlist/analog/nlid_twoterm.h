@@ -48,6 +48,20 @@ namespace netlist
 // nld_twoterm
 // -----------------------------------------------------------------------------
 
+		template <class C>
+		inline core_device_t &bselect(bool b, C &d1, core_device_t &d2)
+		{
+			core_device_t *h = dynamic_cast<core_device_t *>(&d1);
+			return b ? *h : d2;
+		}
+		template<>
+		inline core_device_t &bselect(bool b, netlist_base_t &d1, core_device_t &d2)
+		{
+			if (b)
+				throw nl_exception("bselect with netlist and b==true");
+			return d2;
+		}
+
 NETLIB_OBJECT(twoterm)
 {
 	NETLIB_CONSTRUCTOR_EX(twoterm, bool terminals_owned = false)
@@ -66,14 +80,14 @@ NETLIB_OBJECT(twoterm)
 	NETLIB_UPDATEI();
 
 public:
-	/* inline */ void set(const nl_double G, const nl_double V, const nl_double I)
+	void set(const nl_double G, const nl_double V, const nl_double I)
 	{
 		/*      GO, GT, I                */
 		m_P.set( G,  G, (  V) * G - I);
 		m_N.set( G,  G, ( -V) * G + I);
 	}
 
-	/* inline */ nl_double deltaV() const
+	nl_double deltaV() const
 	{
 		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
@@ -87,12 +101,6 @@ public:
 	}
 
 private:
-	template <class C>
-	static core_device_t &bselect(bool b, C &d1, core_device_t &d2)
-	{
-		core_device_t *h = dynamic_cast<core_device_t *>(&d1);
-		return b ? *h : d2;
-	}
 };
 
 
@@ -107,7 +115,7 @@ NETLIB_OBJECT_DERIVED(R_base, twoterm)
 	}
 
 public:
-	inline void set_R(const nl_double R)
+	void set_R(const nl_double R)
 	{
 		const nl_double G = NL_FCONST(1.0) / R;
 		set_mat( G, -G, 0.0,

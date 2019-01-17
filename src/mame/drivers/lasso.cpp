@@ -567,7 +567,7 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_wwjgtin)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wwjgtin) // Has 1 additional layer
+	m_gfxdecode->set_info(gfx_wwjgtin); // Has 1 additional layer
 
 	PALETTE(config, m_palette, FUNC(lasso_state::wwjgtin_palette), 0x40 + 16*16, 64);
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 	MCFG_DEVICE_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pinbo)
+	m_gfxdecode->set_info(gfx_pinbo);
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)

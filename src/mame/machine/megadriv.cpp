@@ -899,14 +899,14 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 
 	megadriv_timers(config);
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
+	m_vdp->set_is_pal(false);
+	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->set_screen("megadriv");
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -953,14 +953,14 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 
 	megadriv_timers(config);
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_PAL, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(true)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
+	m_vdp->set_is_pal(true);
+	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->set_screen("megadriv");
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

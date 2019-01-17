@@ -31,10 +31,15 @@ class render_container;
 struct ui_system_info
 {
 	ui_system_info() { }
-	ui_system_info(game_driver const &d, bool a) : driver(&d), available(a) { }
+	ui_system_info(game_driver const &d, int i, bool a) : driver(&d), index(i), available(a) { }
 
 	game_driver const *driver = nullptr;
+	int index;
 	bool available = false;
+
+	std::u32string ucs_shortname;
+	std::u32string ucs_description;
+	std::u32string ucs_manufacturer_description;
 };
 
 struct ui_software_info
@@ -90,35 +95,8 @@ struct ui_software_info
 
 namespace ui {
 
-class software_filter_data
-{
-public:
-	std::vector<std::string> const &regions()           const { return m_regions; }
-	std::vector<std::string> const &publishers()        const { return m_publishers; }
-	std::vector<std::string> const &years()             const { return m_years; }
-	std::vector<std::string> const &device_types()      const { return m_device_types; }
-	std::vector<std::string> const &list_names()        const { return m_list_names; }
-	std::vector<std::string> const &list_descriptions() const { return m_list_descriptions; }
-
-	// adding entries
-	void add_region(std::string const &longname);
-	void add_publisher(std::string const &publisher);
-	void add_year(std::string const &year);
-	void add_device_type(std::string const &device_type);
-	void add_list(std::string const &name, std::string const &description);
-	void finalise();
-
-	// use heuristics to extract meaningful parts from software list fields
-	static std::string extract_region(std::string const &longname);
-	static std::string extract_publisher(std::string const &publisher);
-
-private:
-	std::vector<std::string>    m_regions;
-	std::vector<std::string>    m_publishers;
-	std::vector<std::string>    m_years;
-	std::vector<std::string>    m_device_types;
-	std::vector<std::string>    m_list_names, m_list_descriptions;
-};
+class machine_filter_data;
+class software_filter_data;
 
 
 template <class Impl, typename Entry>
@@ -196,8 +174,8 @@ public:
 	virtual type get_type() const = 0;
 	virtual std::string adorned_display_name(type n) const = 0;
 
-	static ptr create(type n) { return create(n, nullptr, nullptr, 0); }
-	static ptr create(emu_file &file) { return create(file, 0); }
+	static ptr create(type n, machine_filter_data const &data) { return create(n, data, nullptr, nullptr, 0); }
+	static ptr create(emu_file &file, machine_filter_data const &data) { return create(file, data, 0); }
 	static char const *config_name(type n);
 	static char const *display_name(type n);
 
@@ -207,8 +185,8 @@ public:
 protected:
 	machine_filter();
 
-	static ptr create(type n, char const *value, emu_file *file, unsigned indent);
-	static ptr create(emu_file &file, unsigned indent);
+	static ptr create(type n, machine_filter_data const &data, char const *value, emu_file *file, unsigned indent);
+	static ptr create(emu_file &file, machine_filter_data const &data, unsigned indent);
 };
 
 DECLARE_ENUM_INCDEC_OPERATORS(machine_filter::type)
@@ -259,31 +237,81 @@ protected:
 
 DECLARE_ENUM_INCDEC_OPERATORS(software_filter::type)
 
+
+class machine_filter_data
+{
+public:
+	std::vector<std::string> const &manufacturers()     const { return m_manufacturers; }
+	std::vector<std::string> const &years()             const { return m_years; }
+
+	// adding entries
+	void add_manufacturer(std::string const &manufacturer);
+	void add_year(std::string const &year);
+	void finalise();
+
+	// use heuristics to extract meaningful parts from machine metadata
+	static std::string extract_manufacturer(std::string const &manufacturer);
+
+	// the selected filter
+	machine_filter::type get_current_filter_type() const { return m_current_filter; }
+	void set_current_filter_type(machine_filter::type type) { m_current_filter = type; }
+
+	// managing current filters
+	void set_filter(machine_filter::ptr &&filter);
+	auto const &get_filters() { return m_filters; }
+	machine_filter &get_filter(machine_filter::type type);
+	machine_filter *get_current_filter()
+	{
+		auto const it(m_filters.find(m_current_filter));
+		return (m_filters.end() != it) ? it->second.get() : nullptr;
+	}
+	std::string get_config_string() const;
+	bool load_ini(emu_file &file);
+
+private:
+	using filter_map = std::map<machine_filter::type, machine_filter::ptr>;
+
+	std::vector<std::string>    m_manufacturers;
+	std::vector<std::string>    m_years;
+
+	machine_filter::type        m_current_filter = machine_filter::ALL;
+	filter_map                  m_filters;
+};
+
+
+class software_filter_data
+{
+public:
+	std::vector<std::string> const &regions()           const { return m_regions; }
+	std::vector<std::string> const &publishers()        const { return m_publishers; }
+	std::vector<std::string> const &years()             const { return m_years; }
+	std::vector<std::string> const &device_types()      const { return m_device_types; }
+	std::vector<std::string> const &list_names()        const { return m_list_names; }
+	std::vector<std::string> const &list_descriptions() const { return m_list_descriptions; }
+
+	// adding entries
+	void add_region(std::string const &longname);
+	void add_publisher(std::string const &publisher);
+	void add_year(std::string const &year);
+	void add_device_type(std::string const &device_type);
+	void add_list(std::string const &name, std::string const &description);
+	void finalise();
+
+	// use heuristics to extract meaningful parts from software list fields
+	static std::string extract_region(std::string const &longname);
+	static std::string extract_publisher(std::string const &publisher);
+
+private:
+	std::vector<std::string>    m_regions;
+	std::vector<std::string>    m_publishers;
+	std::vector<std::string>    m_years;
+	std::vector<std::string>    m_device_types;
+	std::vector<std::string>    m_list_names, m_list_descriptions;
+};
+
 } // namespace ui
 
 #define MAX_CHAR_INFO            256
-
-enum
-{
-	FIRST_VIEW = 0,
-	SNAPSHOT_VIEW = FIRST_VIEW,
-	CABINETS_VIEW,
-	CPANELS_VIEW,
-	PCBS_VIEW,
-	FLYERS_VIEW,
-	TITLES_VIEW,
-	ENDS_VIEW,
-	ARTPREV_VIEW,
-	BOSSES_VIEW,
-	LOGOS_VIEW,
-	VERSUS_VIEW,
-	GAMEOVER_VIEW,
-	HOWTO_VIEW,
-	SCORES_VIEW,
-	SELECT_VIEW,
-	MARQUEES_VIEW,
-	LAST_VIEW = MARQUEES_VIEW
-};
 
 enum
 {
@@ -326,34 +354,13 @@ enum
 // GLOBAL CLASS
 struct ui_globals
 {
-	static uint8_t        curimage_view, curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
-	static bool         switch_image, redraw_icon, default_image, reset;
+	static uint8_t      curdats_view, curdats_total, cur_sw_dats_view, cur_sw_dats_total, rpanel;
+	static bool         default_image, reset;
 	static int          visible_main_lines, visible_sw_lines;
-	static uint16_t       panels_status;
-	static bool         has_icons;
-};
-
-// Manufacturers
-struct c_mnfct
-{
-	static std::string getname(const char *str);
-	static std::vector<std::string> ui;
-};
-
-// Years
-struct c_year
-{
-	static std::vector<std::string> ui;
-};
-
-struct main_filters
-{
-	static ui::machine_filter::type actual;
-	static std::map<ui::machine_filter::type, ui::machine_filter::ptr> filters;
+	static uint16_t     panels_status;
 };
 
 // GLOBAL FUNCTIONS
-int fuzzy_substring(std::string needle, std::string haystack);
 char* chartrimcarriage(char str[]);
 const char* strensure(const char* s);
 int getprecisionchr(const char* s);

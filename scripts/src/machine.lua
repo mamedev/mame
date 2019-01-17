@@ -2622,6 +2622,8 @@ if (MACHINES["SPG2XX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/spg2xx.cpp",
 		MAME_DIR .. "src/devices/machine/spg2xx.h",
+		MAME_DIR .. "src/devices/machine/spg110.cpp",
+		MAME_DIR .. "src/devices/machine/spg110.h",
 	}
 end
 
@@ -2944,6 +2946,19 @@ if (MACHINES["WD33C93"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/wd33c93.cpp",
 		MAME_DIR .. "src/devices/machine/wd33c93.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/wd33c9x.h,MACHINES["WD33C9X"] = true
+---------------------------------------------------
+
+if (MACHINES["WD33C9X"]~=null) then
+	MACHINES["SCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/wd33c9x.cpp",
+		MAME_DIR .. "src/devices/machine/wd33c9x.h",
 	}
 end
 
@@ -3841,5 +3856,17 @@ if (MACHINES["AIC6250"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/aic6250.cpp",
 		MAME_DIR .. "src/devices/machine/aic6250.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/dc7085.h,MACHINES["DC7085"] = true
+---------------------------------------------------
+
+if (MACHINES["DC7085"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/dc7085.cpp",
+		MAME_DIR .. "src/devices/machine/dc7085.h",
 	}
 end

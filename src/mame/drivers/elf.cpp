@@ -259,19 +259,17 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	/* devices */
-	MCFG_DEVICE_ADD(MM74C923_TAG, MM74C923, 0)
-	MCFG_MM74C922_OSC(CAP_U(0.15))
-	MCFG_MM74C922_DEBOUNCE(CAP_U(1))
-	MCFG_MM74C922_DA_CALLBACK(WRITELINE(*this, elf2_state, da_w))
-	MCFG_MM74C922_X1_CALLBACK(IOPORT("X1"))
-	MCFG_MM74C922_X2_CALLBACK(IOPORT("X2"))
-	MCFG_MM74C922_X3_CALLBACK(IOPORT("X3"))
-	MCFG_MM74C922_X4_CALLBACK(IOPORT("X4"))
+	MM74C923(config, m_kb, 0);
+	m_kb->set_cap_osc(CAP_U(0.15));
+	m_kb->set_cap_debounce(CAP_U(1));
+	m_kb->da_wr_callback().set(FUNC(elf2_state::da_w));
+	m_kb->x1_rd_callback().set_ioport("X1");
+	m_kb->x2_rd_callback().set_ioport("X2");
+	m_kb->x3_rd_callback().set_ioport("X3");
+	m_kb->x4_rd_callback().set_ioport("X4");
 
-	MCFG_DEVICE_ADD(DM9368_H_TAG, DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, elf2_state, digit_w<0>))
-	MCFG_DEVICE_ADD(DM9368_L_TAG, DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, elf2_state, digit_w<1>))
+	DM9368(config, m_led_h, 0).update_cb().set(FUNC(elf2_state::digit_w<0>));
+	DM9368(config, m_led_l, 0).update_cb().set(FUNC(elf2_state::digit_w<1>));
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

@@ -16,6 +16,7 @@
 #include "nl_factory.h"
 #include "nl_config.h"
 #include "netlist_types.h"
+#include "nl_errstr.h"
 
 #include <stack>
 #include <vector>
@@ -126,7 +127,7 @@ namespace netlist
 	class core_device_t;
 	class param_t;
 	class setup_t;
-	class netlist_t;
+	class netlist_base_t;
 	class logic_family_desc_t;
 	class terminal_t;
 
@@ -203,18 +204,17 @@ namespace netlist
 
 		using link_t = std::pair<pstring, pstring>;
 
-		explicit setup_t(netlist_t &netlist);
+		explicit setup_t(netlist_base_t &netlist);
 		~setup_t();
 
-		netlist_t &netlist() { return m_netlist; }
-		const netlist_t &netlist() const { return m_netlist; }
+		netlist_base_t &netlist() { return m_netlist; }
+		const netlist_base_t &netlist() const { return m_netlist; }
 
 		pstring build_fqn(const pstring &obj_name) const;
 
 		void register_param(const pstring &name, param_t &param);
-		pstring get_initial_param_val(const pstring &name, const pstring &def);
-		double get_initial_param_val(const pstring &name, const double def);
-		int get_initial_param_val(const pstring &name, const int def);
+
+		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &obj);
 
@@ -245,7 +245,7 @@ namespace netlist
 
 		param_t *find_param(const pstring &param_in, bool required = true) const;
 
-		void start_devices();
+		void register_dynamic_log_devices();
 		void resolve_inputs();
 
 		/* handle namespace */
@@ -259,7 +259,7 @@ namespace netlist
 
 		std::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
 
-		bool parse_stream(plib::putf8_reader &istrm, const pstring &name);
+		bool parse_stream(plib::putf8_reader &&istrm, const pstring &name);
 
 		/* register a source */
 
@@ -269,7 +269,7 @@ namespace netlist
 		}
 
 		void register_define(pstring def, pstring val) { m_defines.push_back(plib::ppreprocessor::define_t(def, val)); }
-		void register_define(pstring defstr);
+		void register_define(const pstring &defstr);
 
 		factory::list_t &factory() { return m_factory; }
 		const factory::list_t &factory() const { return m_factory; }
@@ -288,10 +288,11 @@ namespace netlist
 		/* helper - also used by nltool */
 		const pstring resolve_alias(const pstring &name) const;
 
-		plib::plog_base<netlist_t, NL_DEBUG> &log();
-		const plib::plog_base<netlist_t, NL_DEBUG> &log() const;
+		log_type &log();
+		const log_type &log() const;
 
-		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+		//std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+		std::unordered_map<pstring, factory::element_t *> m_device_factory;
 
 		std::unordered_map<pstring, pstring> m_alias;
 		std::unordered_map<pstring, pstring> m_param_values;
@@ -318,7 +319,7 @@ namespace netlist
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 
-		netlist_t                                   &m_netlist;
+		netlist_base_t                              &m_netlist;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 		std::vector<link_t>                         m_links;
 		factory::list_t                             m_factory;
@@ -330,12 +331,11 @@ namespace netlist
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;
-};
+	};
 
 	// ----------------------------------------------------------------------------------------
 	// base sources
 	// ----------------------------------------------------------------------------------------
-
 
 	class source_string_t : public source_t
 	{
@@ -371,7 +371,7 @@ namespace netlist
 	{
 	public:
 		source_mem_t(setup_t &setup, const char *mem)
-		: source_t(setup), m_str(mem, pstring::UTF8)
+		: source_t(setup), m_str(mem)
 		{
 		}
 
@@ -398,6 +398,10 @@ namespace netlist
 		void (*m_setup_func)(setup_t &);
 		pstring m_setup_func_name;
 	};
+
+	// -----------------------------------------------------------------------------
+	// inline implementations
+	// -----------------------------------------------------------------------------
 
 }
 

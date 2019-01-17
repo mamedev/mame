@@ -3093,9 +3093,8 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_SCREEN_UPDATE_DRIVER(funworld_state, screen_update_funworld)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fw1stpal)
-
-	PALETTE(config, "palette", FUNC(funworld_state::funworld_palette), 0x200);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fw1stpal);
+	PALETTE(config, m_palette, FUNC(funworld_state::funworld_palette), 0x200);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* 2MHz, verified on jollycrd & royalcrd */
 	crtc.set_screen("screen");
@@ -3117,7 +3116,7 @@ MACHINE_CONFIG_START(funworld_state::fw2ndpal)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(funworld_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+	m_gfxdecode->set_info(gfx_fw2ndpal);
 MACHINE_CONFIG_END
 
 
@@ -3208,7 +3207,7 @@ MACHINE_CONFIG_START(funworld_state::intrgmes)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(intergames_map)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+	m_gfxdecode->set_info(gfx_fw2ndpal);
 MACHINE_CONFIG_END
 
 
@@ -3216,7 +3215,7 @@ MACHINE_CONFIG_START(funworld_state::fw_brick_1)
 	fw1stpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+//  m_gfxdecode->set_info(gfx_fw2ndpal);
 MACHINE_CONFIG_END
 
 
@@ -3224,7 +3223,7 @@ MACHINE_CONFIG_START(funworld_state::fw_brick_2)
 	fw2ndpal(config);
 	MCFG_DEVICE_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_DEVICE_PROGRAM_MAP(fw_a7_11_map)
-//  MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_fw2ndpal)
+//  m_gfxdecode->set_info(gfx_fw2ndpal);
 MACHINE_CONFIG_END
 
 
@@ -4415,9 +4414,9 @@ ROM_START( pool10e )
 	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
 
 	ROM_REGION( 0x3000, "plds", 0 )
-	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, BAD_DUMP CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) ) /* read protected */
-	ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
-	ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
+	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, NO_DUMP ) /* read protected */
+	ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, NO_DUMP ) /* read protected */
+	ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, NO_DUMP ) /* read protected */
 ROM_END
 
 
@@ -4511,9 +4510,9 @@ ROM_START( pool10j )
 	ROM_LOAD( "am27s29pc.u25", 0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 ) // all read protected
-	ROM_LOAD( "palce16v8h.u5", 0x0000, 0x0117, NO_DUMP )
-	ROM_LOAD( "palce20v8h.u22",  0x0200, 0x0157, NO_DUMP )
-	ROM_LOAD( "palce20v8h.u23",  0x0400, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u22", 0x0200, 0x0157, NO_DUMP )
+	ROM_LOAD( "palce20v8h.u23", 0x0400, 0x0157, NO_DUMP )
 ROM_END
 
 /*
@@ -5142,7 +5141,7 @@ ROM_START( royalcrdp )
 	ROM_LOAD( "royalcrdp_nvram.bin", 0x0000, 0x0800, BAD_DUMP CRC(553f8c66) SHA1(d2c21786d715f81c537d860d8515fda6d766f630) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v8h_1.bin", 0x0000, 0x0117, NO_DUMP )
 ROM_END
 
 
@@ -7277,7 +7276,7 @@ GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  funworld_state, init_mong
 GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, init_soccernw, ROT0, "<unknown>",       "Soccer New (Italian)",                            MACHINE_UNEMULATED_PROTECTION )
 
 // Other games...
-GAME(  198?, funquiz,   0,        funquiz,  funquiz,   funworld_state, empty_init,    ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
+GAME(  198?, funquiz,   0,        funquiz,  funquiz,   funworld_state, empty_init,    ROT0, "Fun World",       "Fun World Quiz (Austrian)",                       0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  funworld_state, empty_init,    ROT0, "Admiral/Novomatic","Novo Play Multi Card / Club Card",               0,                       layout_novoplay )
 GAME(  1991, intrgmes,  0,        intrgmes, funworld,  funworld_state, empty_init,    ROT0, "Inter Games",     "unknown Inter Games poker",                       MACHINE_NOT_WORKING )
 GAMEL( 1985, fw_a7_11,  0,        fw_brick_2, funworld, funworld_state, empty_init,   ROT0, "Fun World",       "unknown Fun World A7-11 game 1",                  MACHINE_NOT_WORKING,     layout_jollycrd )

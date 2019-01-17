@@ -785,7 +785,7 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update_bootleg)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_mariobl)
+	m_gfxdecode->set_info(gfx_mariobl);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mario_palette));
 
@@ -798,7 +798,8 @@ MACHINE_CONFIG_START(ambush_state::mariobl)
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.33);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(ambush_state::mariobla)
+void ambush_state::mariobla(machine_config &config)
+{
 	mariobl(config);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::mariobla_palette));
@@ -806,14 +807,14 @@ MACHINE_CONFIG_START(ambush_state::mariobla)
 	auto &outlatch(*subdevice<ls259_device>("outlatch"));
 	outlatch.q_out_cb<5>().set(FUNC(ambush_state::color_bank_1_w));
 	outlatch.q_out_cb<6>().set_nop();
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(ambush_state::dkong3abl)
 	mariobl(config);
 
 	MCFG_MACHINE_START_OVERRIDE(ambush_state, dkong3abl)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dkong3abl)
+	m_gfxdecode->set_info(gfx_dkong3abl);
 
 	subdevice<palette_device>("palette")->set_init(FUNC(ambush_state::dkong3_palette));
 MACHINE_CONFIG_END

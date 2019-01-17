@@ -17,13 +17,15 @@
 #include "solver/nld_solver.h"
 #include "devices/nlid_truthtable.h"
 
+#include <cmath>
+
 // ----------------------------------------------------------------------------------------
 // setup_t
 // ----------------------------------------------------------------------------------------
 
 namespace netlist
 {
-setup_t::setup_t(netlist_t &netlist)
+setup_t::setup_t(netlist_base_t &netlist)
 	: m_netlist(netlist)
 	, m_factory(*this)
 	, m_proxy_cnt(0)
@@ -78,17 +80,15 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 		log().fatal(MF_1_CLASS_1_NOT_FOUND, classname);
 	/* make sure we parse macro library entries */
 	f->macro_actions(netlist(), name);
-	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
+	pstring key = build_fqn(name);
+	if (device_exists(key))
+		log().fatal(MF_1_DEVICE_ALREADY_EXISTS_1, name);
+	m_device_factory[key] = f;
 }
 
 bool setup_t::device_exists(const pstring &name) const
 {
-	for (auto e : m_device_factory)
-	{
-		if (e.first == name)
-			return true;
-	}
-	return false;
+	return (m_device_factory.find(name) != m_device_factory.end());
 }
 
 
@@ -97,8 +97,8 @@ void setup_t::register_model(const pstring &model_in)
 	auto pos = model_in.find(" ");
 	if (pos == pstring::npos)
 		log().fatal(MF_1_UNABLE_TO_PARSE_MODEL_1, model_in);
-	pstring model = model_in.left(pos).trim().ucase();
-	pstring def = model_in.substr(pos + 1).trim();
+	pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
+	pstring def = plib::trim(model_in.substr(pos + 1));
 	if (!m_models.insert({model, def}).second)
 		log().fatal(MF_1_MODEL_ALREADY_EXISTS_1, model_in);
 }
@@ -145,39 +145,11 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 	return pstring("Error");
 }
 
-pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def)
+pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 		return i->second;
-	else
-		return def;
-}
-
-double setup_t::get_initial_param_val(const pstring &name, const double def)
-{
-	auto i = m_param_values.find(name);
-	if (i != m_param_values.end())
-	{
-		double vald = 0;
-		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-		return vald;
-	}
-	else
-		return def;
-}
-
-int setup_t::get_initial_param_val(const pstring &name, const int def)
-{
-	auto i = m_param_values.find(name);
-	if (i != m_param_values.end())
-	{
-		double vald = 0;
-		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
-			log().fatal(MF_2_INVALID_NUMBER_CONVERSION_1_2, name, i->second);
-		return static_cast<int>(vald);
-	}
 	else
 		return def;
 }
@@ -273,7 +245,10 @@ void setup_t::register_frontier(const pstring &attach, const double r_IN, const 
 
 void setup_t::register_param(const pstring &param, const double value)
 {
-	register_param(param, plib::pfmt("{1:.9}").e(value));
+	if (std::abs(value - std::floor(value)) > 1e-30 || std::abs(value) > 1e9)
+		register_param(param, plib::pfmt("{1:.9}").e(value));
+	else
+		register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
 }
 
 void setup_t::register_param(const pstring &param, const pstring &value)
@@ -569,7 +544,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
 		auto anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
-		netlist().m_nets.push_back(plib::owned_ptr<analog_net_t>(anet, true));
+		netlist().register_net(plib::owned_ptr<analog_net_t>(anet, true));
 		t1.set_net(anet);
 		anet->add_terminal(t2);
 		anet->add_terminal(t1);
@@ -712,18 +687,7 @@ void setup_t::resolve_inputs()
 
 	// delete empty nets
 
-	netlist().m_nets.erase(
-			std::remove_if(netlist().m_nets.begin(), netlist().m_nets.end(),
-					[](plib::owned_ptr<detail::net_t> &x)
-					{
-						if (x->num_cons() == 0)
-						{
-							x->netlist().log().verbose("Deleting net {1} ...", x->name());
-							return true;
-						}
-						else
-							return false;
-					}), netlist().m_nets.end());
+	netlist().delete_empty_nets();
 
 	pstring errstr("");
 
@@ -744,7 +708,7 @@ void setup_t::resolve_inputs()
 
 }
 
-void setup_t::start_devices()
+void setup_t::register_dynamic_log_devices()
 {
 	pstring env = plib::util::environment("NL_LOGS", "");
 
@@ -763,11 +727,11 @@ void setup_t::start_devices()
 	}
 }
 
-plib::plog_base<netlist_t, NL_DEBUG> &setup_t::log()
+log_type &setup_t::log()
 {
 	return netlist().log();
 }
-const plib::plog_base<netlist_t, NL_DEBUG> &setup_t::log() const
+const log_type &setup_t::log() const
 {
 	return netlist().log();
 }
@@ -797,15 +761,15 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 		pos = model.find("(");
 		if (pos != pstring::npos) break;
 
-		key = model.ucase();
+		key = plib::ucase(model);
 		auto i = m_models.find(key);
 		if (i == m_models.end())
 			log().fatal(MF_1_MODEL_NOT_FOUND, model);
 		model = i->second;
 	}
-	pstring xmodel = model.left(pos);
+	pstring xmodel = plib::left(model, pos);
 
-	if (xmodel.equals("_"))
+	if (xmodel == "_")
 		map["COREMODEL"] = key;
 	else
 	{
@@ -816,11 +780,11 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 			log().fatal(MF_1_MODEL_NOT_FOUND, model_in);
 	}
 
-	pstring remainder = model.substr(pos + 1).trim();
-	if (!remainder.endsWith(")"))
+	pstring remainder = plib::trim(model.substr(pos + 1));
+	if (!plib::endsWith(remainder, ")"))
 		log().fatal(MF_1_MODEL_ERROR_1, model);
 	// FIMXE: Not optimal
-	remainder = remainder.left(remainder.length() - 1);
+	remainder = plib::left(remainder, remainder.size() - 1);
 
 	std::vector<pstring> pairs(plib::psplit(remainder," ", true));
 	for (pstring &pe : pairs)
@@ -828,7 +792,7 @@ void setup_t::model_parse(const pstring &model_in, detail::model_map_t &map)
 		auto pose = pe.find("=");
 		if (pose == pstring::npos)
 			log().fatal(MF_1_MODEL_ERROR_ON_PAIR_1, model);
-		map[pe.left(pose).ucase()] = pe.substr(pose + 1);
+		map[plib::ucase(plib::left(pe, pose))] = pe.substr(pose + 1);
 	}
 }
 
@@ -836,7 +800,7 @@ const pstring setup_t::model_value_str(detail::model_map_t &map, const pstring &
 {
 	pstring ret;
 
-	if (entity != entity.ucase())
+	if (entity != plib::ucase(entity))
 		log().fatal(MF_2_MODEL_PARAMETERS_NOT_UPPERCASE_1_2, entity,
 				model_string(map));
 	if (map.find(entity) == map.end())
@@ -852,7 +816,7 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 	pstring tmp = model_value_str(map, entity);
 
 	nl_double factor = NL_FCONST(1.0);
-	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.length() - 1));
+	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
 		case 'M': factor = 1e6; break;
@@ -868,25 +832,26 @@ nl_double setup_t::model_value(detail::model_map_t &map, const pstring &entity)
 			log().fatal(MF_1_UNKNOWN_NUMBER_FACTOR_IN_1, entity);
 	}
 	if (factor != NL_FCONST(1.0))
-		tmp = tmp.left(tmp.length() - 1);
-	return tmp.as_double() * factor;
+		tmp = plib::left(tmp, tmp.size() - 1);
+	// FIXME: check for errors
+	return plib::pstonum<nl_double>(tmp) * factor;
 }
 
 class logic_family_std_proxy_t : public logic_family_desc_t
 {
 public:
 	logic_family_std_proxy_t() { }
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_base_t &anetlist,
 			const pstring &name, logic_output_t *proxied) const override;
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
 
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_t &anetlist,
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_base_t &anetlist,
 		const pstring &name, logic_output_t *proxied) const
 {
 	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_base_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
 	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
@@ -959,22 +924,22 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 }
 
 
-bool setup_t::parse_stream(plib::putf8_reader &istrm, const pstring &name)
+bool setup_t::parse_stream(plib::putf8_reader &&istrm, const pstring &name)
 {
 	plib::pomemstream ostrm;
-	plib::putf8_writer owrt(ostrm);
+	plib::putf8_writer owrt(&ostrm);
 
 	plib::ppreprocessor(&m_defines).process(istrm, owrt);
-	plib::pimemstream istrm2(ostrm);
-	plib::putf8_reader reader2(istrm2);
-	return parser_t(reader2, *this).parse(name);
+	plib::putf8_reader reader2 = plib::putf8_reader(plib::pimemstream(ostrm));
+
+	return parser_t(std::move(reader2), *this).parse(name);
 }
 
-void setup_t::register_define(pstring defstr)
+void setup_t::register_define(const pstring &defstr)
 {
 	auto p = defstr.find("=");
 	if (p != pstring::npos)
-		register_define(defstr.left(p), defstr.substr(p+1));
+		register_define(plib::left(defstr, p), defstr.substr(p+1));
 	else
 		register_define(defstr, "1");
 }
@@ -990,19 +955,19 @@ bool source_t::parse(const pstring &name)
 	else
 	{
 		auto rstream = stream(name);
-		plib::putf8_reader reader(*rstream);
-		return m_setup.parse_stream(reader, name);
+		plib::putf8_reader reader(rstream.get());
+		return m_setup.parse_stream(std::move(reader), name);
 	}
 }
 
 std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.mem_t_size());
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
 std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.mem_t_size());
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), std::strlen(m_str.c_str()));
 }
 
 std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)

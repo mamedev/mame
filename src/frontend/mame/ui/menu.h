@@ -151,7 +151,6 @@ protected:
 
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
-	void reset_topmost(reset_options options) { m_global_state->reset_topmost(options); }
 
 	template <typename T> T *topmost_menu() const { return m_global_state->topmost_menu<T>(); }
 	template <typename T> static T *topmost_menu(running_machine &machine) { return get_global_state(machine)->topmost_menu<T>(); }
@@ -309,8 +308,6 @@ private:
 
 		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
 		render_texture *bgrnd_texture() { return m_bgrnd_texture.get(); }
-
-		void reset_topmost(reset_options options) { if (m_stack) m_stack->reset(options); }
 
 		template <typename T>
 		T *topmost_menu() const { return dynamic_cast<T *>(m_stack.get()); }

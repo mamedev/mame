@@ -542,15 +542,14 @@ void hnayayoi_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
-
+void hnayayoi_state::hnayayoi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(hnayayoi_map)
-	MCFG_DEVICE_IO_MAP(hnayayoi_io_map)
+	Z80(config, m_maincpu, 20000000/4);		/* 5 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::hnayayoi_map);
+	m_maincpu->set_addrmap(AS_IO, &hnayayoi_state::hnayayoi_io_map);
 
-	MCFG_DEVICE_ADD("nmiclock", CLOCK, 8000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, hnayayoi_state, nmi_clock_w))
+	CLOCK(config, "nmiclock", 8000).signal_handler().set(FUNC(hnayayoi_state::nmi_clock_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -561,9 +560,9 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w)).invert();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(20_MHz_XTAL / 2, 632, 0, 512, 263, 0, 243)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(20_MHz_XTAL / 2, 632, 0, 512, 263, 0, 243);
+	screen.set_screen_update("crtc", FUNC(hd6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
@@ -586,26 +585,26 @@ MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(hnayayoi_state::hnfubuki)
+void hnayayoi_state::hnfubuki(machine_config &config)
+{
 	hnayayoi(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hnfubuki_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
+	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::hnfubuki_map);
+	m_maincpu->set_addrmap(AS_IO, address_map_constructor());
 
 	// D5
 	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hnayayoi_state::untoucha)
+void hnayayoi_state::untoucha(machine_config &config)
+{
 	hnayayoi(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(untoucha_map)
-	MCFG_DEVICE_IO_MAP(untoucha_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::untoucha_map);
+	m_maincpu->set_addrmap(AS_IO, &hnayayoi_state::untoucha_io_map);
 
 	m_mainlatch->q_out_cb<1>().set(m_msm, FUNC(msm5205_device::vclk_w));
 	m_mainlatch->q_out_cb<2>().set(FUNC(hnayayoi_state::nmi_enable_w));
@@ -615,7 +614,7 @@ MACHINE_CONFIG_START(hnayayoi_state::untoucha)
 	subdevice<hd6845_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row), this);
 
 	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

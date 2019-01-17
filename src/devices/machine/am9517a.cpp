@@ -1108,12 +1108,12 @@ WRITE8_MEMBER(v5x_dmau_device::write)
 			//m_buswidth = data & 0x02;
 			//if (data & 0x01)
 			//  soft_reset();
-			logerror("DMA: Initialise [%02x]\n", data);
+			LOG("DMA: Initialise [%02x]\n", data);
 			break;
 		case 0x01:  // Channel
 			m_selected_channel = data & 0x03;
 			m_base = data & 0x04;
-			logerror("DMA: Channel selected [%02x]\n", data);
+			LOG("DMA: Channel selected [%02x]\n", data);
 			break;
 		case 0x02:  // Count (low)
 			m_channel[channel].m_base_count =
@@ -1121,7 +1121,7 @@ WRITE8_MEMBER(v5x_dmau_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_count =
 				(m_channel[channel].m_count & 0xff00) | data;
-			logerror("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
+			LOG("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
 			break;
 		case 0x03:  // Count (high)
 			m_channel[channel].m_base_count =
@@ -1129,7 +1129,7 @@ WRITE8_MEMBER(v5x_dmau_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_count =
 				(m_channel[channel].m_count & 0x00ff) | (data << 8);
-			logerror("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
+			LOG("DMA: Channel %i Counter set [%04x]\n", m_selected_channel, m_channel[channel].m_base_count);
 			break;
 		case 0x04:  // Address (low)
 			m_channel[channel].m_base_address =
@@ -1137,7 +1137,7 @@ WRITE8_MEMBER(v5x_dmau_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_address =
 				(m_channel[channel].m_address & 0xffffff00) | data;
-			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			LOG("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
 			break;
 		case 0x05:  // Address (mid)
 			m_channel[channel].m_base_address =
@@ -1145,7 +1145,7 @@ WRITE8_MEMBER(v5x_dmau_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_address =
 				(m_channel[channel].m_address & 0xffff00ff) | (data << 8);
-			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			LOG("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
 			break;
 		case 0x06:  // Address (high)
 			m_channel[channel].m_base_address =
@@ -1153,7 +1153,7 @@ WRITE8_MEMBER(v5x_dmau_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_address =
 				(m_channel[channel].m_address & 0xff00ffff) | (data << 16);
-			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			LOG("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
 			break;
 		case 0x07:  // Address (highest)
 			m_channel[channel].m_base_address =
@@ -1161,31 +1161,31 @@ WRITE8_MEMBER(v5x_dmau_device::write)
 			if (m_base == 0)
 				m_channel[channel].m_address =
 				(m_channel[channel].m_address & 0x00ffffff) | (data << 24);
-			logerror("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
+			LOG("DMA: Channel %i Address set [%08x]\n", m_selected_channel, m_channel[channel].m_base_address);
 			break;
 		case 0x0a:  // Mode control
 			m_channel[channel].m_mode = data;
 			// clear terminal count
 			m_status &= ~(1 << channel);
 
-			logerror("DMA: Channel %i Mode control set [%02x]\n",m_selected_channel,m_channel[channel].m_mode);
+			LOG("DMA: Channel %i Mode control set [%02x]\n",m_selected_channel,m_channel[channel].m_mode);
 			break;
 
 		case 0x08:  // Device control (low)
 			m_command = data;
-			logerror("DMA: Device control low set [%02x]\n",data);
+			LOG("DMA: Device control low set [%02x]\n",data);
 			break;
 		case 0x09:  // Device control (high)
 			m_command_high = data;
-			logerror("DMA: Device control high set [%02x]\n",data);
+			LOG("DMA: Device control high set [%02x]\n",data);
 			break;
 		case 0x0e:  // Request
 			//m_reg.request = data;
-			logerror("(invalid) DMA: Request set [%02x]\n",data); // no software requests on the v53 integrated version
+			LOG("(invalid) DMA: Request set [%02x]\n",data); // no software requests on the v53 integrated version
 			break;
 		case 0x0f:  // Mask
 			m_mask = data & 0x0f;
-			logerror("DMA: Mask set [%02x]\n",data);
+			LOG("DMA: Mask set [%02x]\n",data);
 			break;
 
 

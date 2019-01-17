@@ -323,7 +323,7 @@ MACHINE_CONFIG_START(xtheball_state::xtheball)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(10000000, 640, 114, 626, 257, 24, 248)

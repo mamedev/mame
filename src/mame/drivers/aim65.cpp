@@ -194,16 +194,16 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	config.set_default_layout(layout_aim65);
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("ds1", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<1>))
-	MCFG_DEVICE_ADD("ds2", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<2>))
-	MCFG_DEVICE_ADD("ds3", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<3>))
-	MCFG_DEVICE_ADD("ds4", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<4>))
-	MCFG_DEVICE_ADD("ds5", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<5>))
+	DL1416T(config, m_ds[0], u32(0));
+	m_ds[0]->update().set(FUNC(aim65_state::aim65_update_ds<1>));
+	DL1416T(config, m_ds[1], u32(0));
+	m_ds[1]->update().set(FUNC(aim65_state::aim65_update_ds<2>));
+	DL1416T(config, m_ds[2], u32(0));
+	m_ds[2]->update().set(FUNC(aim65_state::aim65_update_ds<3>));
+	DL1416T(config, m_ds[3], u32(0));
+	m_ds[3]->update().set(FUNC(aim65_state::aim65_update_ds<4>));
+	DL1416T(config, m_ds[4], u32(0));
+	m_ds[4]->update().set(FUNC(aim65_state::aim65_update_ds<5>));
 
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();

@@ -996,9 +996,9 @@ MACHINE_CONFIG_START(mazerbla_state::mazerbla)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
 	/* synchronization forced on the fly */
-	MCFG_DEVICE_ADD("vcu", MB_VCU, SOUND_CLOCK/4)
-	MCFG_MB_VCU_CPU("sub2")
-	MCFG_MB_VCU_PALETTE("palette")
+	MB_VCU(config, m_vcu, SOUND_CLOCK/4);
+	m_vcu->set_cpu_tag("sub2");
+	m_vcu->set_palette_tag("palette");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1038,9 +1038,9 @@ MACHINE_CONFIG_START(mazerbla_state::greatgun)
     */
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mazerbla_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("vcu", MB_VCU, SOUND_CLOCK/4)
-	MCFG_MB_VCU_CPU("sub2")
-	MCFG_MB_VCU_PALETTE("palette")
+	MB_VCU(config, m_vcu, SOUND_CLOCK/4);
+	m_vcu->set_cpu_tag("sub2");
+	m_vcu->set_palette_tag("palette");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

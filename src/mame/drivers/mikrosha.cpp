@@ -218,10 +218,10 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	I8255(config, m_ppi8255_2);
 	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::mikrosha_8255_font_page_w));
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
-	MCFG_I8275_CHARACTER_WIDTH(6)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma8257,i8257_device, dreq2_w))
+	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
+	i8275.set_character_width(6);
+	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels), this);
+	i8275.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
 	pit8253.set_clk<0>(0);

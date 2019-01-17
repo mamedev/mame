@@ -73,10 +73,8 @@ typedef __int128_t INT128;
 #undef RESTRICT
 #endif
 #define RESTRICT                __restrict__
-#define ATTR_UNUSED             __attribute__((__unused__))
 #else
 #define RESTRICT
-#define ATTR_UNUSED
 #endif
 
 //============================================================

@@ -213,7 +213,7 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
 	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_DEVICE_PROGRAM_MAP(sc5_map)
-	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -438,10 +438,10 @@ MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	m_maincpu->set_addrmap(AS_IO, &alphasmart_state::alphasmart_io);
 	m_maincpu->set_config(0, 192, 0x00);
 
-	MCFG_KS0066_F05_ADD("ks0066_0")
-	MCFG_HD44780_LCD_SIZE(2, 40)
-	MCFG_KS0066_F05_ADD("ks0066_1")
-	MCFG_HD44780_LCD_SIZE(2, 40)
+	KS0066_F05(config, m_lcdc0, 0);
+	m_lcdc0->set_lcd_size(2, 40);
+	KS0066_F05(config, m_lcdc1, 0);
+	m_lcdc1->set_lcd_size(2, 40);
 
 	RAM(config, RAM_TAG).set_default_size("128K");
 

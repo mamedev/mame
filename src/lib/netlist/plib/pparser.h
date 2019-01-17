@@ -19,7 +19,7 @@ namespace plib {
 class ptokenizer : nocopyassignmove
 {
 public:
-	explicit ptokenizer(plib::putf8_reader &strm);
+	ptokenizer(plib::putf8_reader &&strm);
 
 	virtual ~ptokenizer();
 
@@ -100,7 +100,7 @@ public:
 
 	void set_identifier_chars(pstring s) { m_identifier_chars = s; }
 	void set_number_chars(pstring st, pstring rem) { m_number_chars_start = st; m_number_chars = rem; }
-	void set_string_char(pstring::code_t c) { m_string = c; }
+	void set_string_char(pstring::value_type c) { m_string = c; }
 	void set_whitespace(pstring s) { m_whitespace = s; }
 	void set_comment(pstring start, pstring end, pstring line)
 	{
@@ -118,17 +118,17 @@ protected:
 private:
 	void skipeol();
 
-	pstring::code_t getc();
-	void ungetc(pstring::code_t c);
+	pstring::value_type getc();
+	void ungetc(pstring::value_type c);
 
 	bool eof() { return m_strm.eof(); }
 
-	putf8_reader &m_strm;
+	putf8_reader m_strm;
 
 	int m_lineno;
 	pstring m_cur_line;
 	pstring::const_iterator m_px;
-	pstring::code_t m_unget;
+	pstring::value_type m_unget;
 
 	/* tokenizer stuff follows ... */
 
@@ -137,7 +137,7 @@ private:
 	pstring m_number_chars_start;
 	std::unordered_map<pstring, token_id_t> m_tokens;
 	pstring m_whitespace;
-	pstring::code_t  m_string;
+	pstring::value_type  m_string;
 
 	token_id_t m_tok_comment_start;
 	token_id_t m_tok_comment_end;
@@ -164,7 +164,7 @@ public:
 	void process(putf8_reader &istrm, putf8_writer &ostrm);
 
 protected:
-	double expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
+	int expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
 	define_t *get_define(const pstring &name);
 	pstring replace_macros(const pstring &line);
 	virtual void error(const pstring &err);

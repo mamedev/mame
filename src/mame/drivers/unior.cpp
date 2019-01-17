@@ -426,11 +426,11 @@ MACHINE_CONFIG_START(unior_state::unior)
 	m_dma->in_memr_cb().set(FUNC(unior_state::dma_r));
 	m_dma->out_iow_cb<2>().set("crtc", FUNC(i8275_device::dack_w));
 
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL(20'000'000) / 12)
-	MCFG_I8275_CHARACTER_WIDTH(6)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unior_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma",i8257_device, dreq2_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	i8275_device &crtc(I8275(config, "crtc", XTAL(20'000'000) / 12));
+	crtc.set_character_width(6);
+	crtc.set_display_callback(FUNC(unior_state::display_pixels), this);
+	crtc.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
+	crtc.set_screen("screen");
 MACHINE_CONFIG_END
 
 /* ROM definition */

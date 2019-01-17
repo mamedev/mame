@@ -1435,12 +1435,12 @@ MACHINE_CONFIG_START(gba_state::gbadv)
 	MCFG_DEVICE_ADD("maincpu", ARM7, XTAL(16'777'216))
 	MCFG_DEVICE_PROGRAM_MAP(gba_map)
 
-	MCFG_GBA_LCD_ADD("lcd")
-	MCFG_GBA_LCD_INT_HBLANK(WRITELINE(*this, gba_state, int_hblank_callback))
-	MCFG_GBA_LCD_INT_VBLANK(WRITELINE(*this, gba_state, int_vblank_callback))
-	MCFG_GBA_LCD_INT_VCOUNT(WRITELINE(*this, gba_state, int_vcount_callback))
-	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(*this, gba_state, dma_hblank_callback))
-	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(*this, gba_state, dma_vblank_callback))
+	gba_lcd_device &lcd(GBA_LCD(config, "lcd", 0));
+	lcd.int_hblank_callback().set(FUNC(gba_state::int_hblank_callback));
+	lcd.int_vblank_callback().set(FUNC(gba_state::int_vblank_callback));
+	lcd.int_vcount_callback().set(FUNC(gba_state::int_vcount_callback));
+	lcd.dma_hblank_callback().set(FUNC(gba_state::dma_hblank_callback));
+	lcd.dma_vblank_callback().set(FUNC(gba_state::dma_vblank_callback));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

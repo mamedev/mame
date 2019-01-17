@@ -390,9 +390,9 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
-	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(32'000'000))
-	MCFG_CESBLIT_COMPUTE_ADDR(tmaster_compute_addr)
-	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, tmaster_state, blitter_irq_callback))
+	CESBLIT(config, m_blitter, XTAL(32'000'000), m_screen);
+	m_blitter->set_compute_addr(tmaster_compute_addr);
+	m_blitter->irq_callback().set(FUNC(tmaster_state::blitter_irq_callback));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -401,10 +401,11 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tmaster_state::tmds1204)
+void tmaster_state::tmds1204(machine_config &config)
+{
 	tm(config);
-	MCFG_DS1204_ADD("ds1204")
-MACHINE_CONFIG_END
+	DS1204(config, "ds1204", 0);
+}
 
 /***************************************************************************
 

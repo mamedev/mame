@@ -51,11 +51,11 @@
 	install_slot_pages(_prim, _sec, _page, _numpages, device);
 
 #define MCFG_MSX_LAYOUT_CARTRIDGE(_tag, _prim, _sec) \
-	MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag, WRITELINE(DEVICE_SELF, msx_state, msx_irq_source1)) \
+	MCFG_MSX_SLOT_CARTRIDGE_ADD(_tag, WRITELINE("mainirq", input_merger_device, in_w<1>)) \
 	install_slot_pages(_prim, _sec, 0, 4, device);
 
 #define MCFG_MSX_LAYOUT_YAMAHA_EXPANSION(_tag, _prim, _sec, _default) \
-	MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, WRITELINE(DEVICE_SELF, msx_state, msx_irq_source2), _default) \
+	MCFG_MSX_SLOT_YAMAHA_EXPANSION_ADD(_tag, WRITELINE("mainirq", input_merger_device, in_w<2>), _default) \
 	install_slot_pages(_prim, _sec, 0, 4, device);
 
 #define MCFG_MSX_LAYOUT_RAM_MM(_tag, _prim, _sec, _total_size) \
@@ -121,12 +121,10 @@ public:
 		, m_dac(*this, "dac")
 		, m_region_maincpu(*this, "maincpu")
 		, m_region_kanji(*this, "kanji")
-		, m_io_joy0(*this, "JOY0")
-		, m_io_joy1(*this, "JOY1")
+		, m_io_joy(*this, "JOY%u", 0U)
 		, m_io_dsw(*this, "DSW")
-		, m_io_mouse0(*this, "MOUSE0")
-		, m_io_mouse1(*this, "MOUSE1")
-		, m_io_key(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5"})
+		, m_io_mouse(*this, "MOUSE%u", 0U)
+		, m_io_key(*this, "KEY%u", 0U)
 		, m_leds(*this, "led%u", 1U)
 		, m_psg_b(0)
 		, m_kanji_latch(0)
@@ -148,10 +146,6 @@ public:
 		}
 		m_mouse[0] = m_mouse[1] = 0;
 		m_mouse_stat[0] = m_mouse_stat[1] = 0;
-		for (auto & elem : m_irq_state)
-		{
-			elem = CLEAR_LINE;
-		}
 	}
 
 	void hc6(machine_config &config);
@@ -332,12 +326,6 @@ private:
 
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 
-public:
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source0) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source1) { msx_irq_source(1, state); }  // usually first cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
-
 protected:
 	void msx_io_map(address_map &map);
 	void msx_memory_map(address_map &map);
@@ -348,11 +336,9 @@ protected:
 	required_device<dac_bit_interface> m_dac;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_kanji;
-	required_ioport m_io_joy0;
-	required_ioport m_io_joy1;
+	required_ioport_array<2> m_io_joy;
 	required_ioport m_io_dsw;
-	required_ioport m_io_mouse0;
-	required_ioport m_io_mouse1;
+	required_ioport_array<2> m_io_mouse;
 	required_ioport_array<6> m_io_key;
 	output_finder<2> m_leds;
 
@@ -373,11 +359,6 @@ private:
 	uint8_t m_secondary_slot[4];
 	int m_port_c_old;
 	int m_keylatch;
-
-	int m_irq_state[4];
-
-	void msx_irq_source(int source, int level);
-	void check_irq();
 };
 
 

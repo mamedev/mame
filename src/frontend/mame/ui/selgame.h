@@ -15,6 +15,8 @@
 #include "ui/selmenu.h"
 #include "ui/utils.h"
 
+#include <functional>
+
 
 class media_auditor;
 
@@ -37,15 +39,19 @@ private:
 		CONF_PLUGINS,
 	};
 
-	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	static bool first_start;
-	static int m_isabios;
+	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_argb32> >;
 
-	static std::vector<const game_driver *> m_sortedlist;
-	std::vector<ui_system_info> m_availsortedlist;
-	std::vector<ui_system_info> m_displaylist;
+	class persistent_data;
 
-	const game_driver *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	persistent_data &m_persistent_data;
+	icon_cache m_icons;
+	bool m_has_icons;
+	std::vector<std::reference_wrapper<ui_system_info const> > m_displaylist;
+
+	std::vector<std::pair<double, std::reference_wrapper<ui_system_info const> > > m_searchlist;
+	unsigned m_searched_fields;
+
+	static bool s_first_start;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
@@ -75,7 +81,6 @@ private:
 
 	bool isfavorite() const;
 	void populate_search();
-	void init_sorted_list();
 	bool load_available_machines();
 	void load_custom_filters();
 
@@ -83,6 +88,9 @@ private:
 
 	// General info
 	virtual void general_info(const game_driver *driver, std::string &buffer) override;
+
+	// drawing
+	virtual float draw_icon(int linenum, void *selectedref, float x1, float y1) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);
