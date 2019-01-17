@@ -476,7 +476,7 @@ void neopcb_state::install_common()
 	m_bank_base = 0;
 	init_audio();
 	m_audiocpu->reset();
-	init_ym();
+	m_ym->reset();
 	init_sprites();
 }
 
