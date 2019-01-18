@@ -433,7 +433,7 @@ void netlist_state_t::reset()
 }
 
 
-void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
+void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
 {
 	netlist_time stop(m_time + delta);
 
@@ -443,15 +443,13 @@ void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 
 	if (m_mainclock == nullptr)
 	{
-		detail::queue_t::entry_t e(m_queue.top());
-		m_queue.pop();
+		detail::queue_t::entry_t e(m_queue.pop());
 		m_time = e.m_exec_time;
 		while (e.m_object != nullptr)
 		{
 			e.m_object->update_devs();
 			m_perf_out_processed.inc();
-			e = m_queue.top();
-			m_queue.pop();
+			e = m_queue.pop();
 			m_time = e.m_exec_time;
 		}
 	}
@@ -460,8 +458,6 @@ void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 		logic_net_t &mc_net(m_mainclock->m_Q.net());
 		const netlist_time inc(m_mainclock->m_inc);
 		netlist_time mc_time(mc_net.time());
-
-		detail::queue_t::entry_t e;
 
 		do
 		{
@@ -473,15 +469,16 @@ void netlist_t::process_queue(const netlist_time &delta) NL_NOEXCEPT
 				mc_time += inc;
 			}
 
-			e = m_queue.top();
-			m_queue.pop();
+			detail::queue_t::entry_t e(m_queue.pop());
 			m_time = e.m_exec_time;
 			if (e.m_object != nullptr)
 			{
 				e.m_object->update_devs();
 				m_perf_out_processed.inc();
 			}
-		} while (e.m_object != nullptr);
+			else
+				break;
+		} while (true); //while (e.m_object != nullptr);
 		mc_net.set_time(mc_time);
 	}
 	m_stat_mainloop.stop();
@@ -747,7 +744,8 @@ void detail::net_t::rebuild_list()
 		}
 }
 
-void detail::net_t::process(const std::uint_fast8_t mask)
+template <typename T>
+void detail::net_t::process(const T mask)
 {
 	for (auto & p : m_list_active)
 	{
@@ -767,7 +765,7 @@ void detail::net_t::update_devs() NL_NOEXCEPT
 
 	const auto new_Q(m_new_Q);
 
-	const unsigned mask((new_Q << core_terminal_t::INP_LH_SHIFT)
+	const auto mask((new_Q << core_terminal_t::INP_LH_SHIFT)
 			| (m_cur_Q << core_terminal_t::INP_HL_SHIFT));
 
 	m_in_queue = QS_DELIVERED; /* mark as taken ... */
@@ -932,7 +930,7 @@ void terminal_t::solve_now()
 			net().solver()->update_forced();
 }
 
-void terminal_t::schedule_solve_after(const netlist_time &after)
+void terminal_t::schedule_solve_after(const netlist_time after)
 {
 	// Nets may belong to railnets which do not have a solver attached
 	if (this->has_net())

@@ -192,7 +192,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 }
 
 template <typename T>
-void givens_mult( const T c, const T s, T & g0, T & g1 )
+inline void givens_mult( const T c, const T s, T & g0, T & g1 )
 {
 	const T tg0 = c * g0 - s * g1;
 	const T tg1 = s * g0 + c * g1;

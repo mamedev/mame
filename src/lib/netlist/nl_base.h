@@ -428,14 +428,14 @@ namespace netlist
 	{
 		explicit netlist_ref(netlist_state_t &nl);
 
-		netlist_state_t & state();
-		const netlist_state_t & state() const;
+		netlist_state_t & state() noexcept;
+		const netlist_state_t & state() const noexcept;
 
-		setup_t & setup();
-		const setup_t & setup() const;
+		setup_t & setup() noexcept;
+		const setup_t & setup() const noexcept;
 
-		netlist_t & exec() NL_NOEXCEPT { return m_netlist; }
-		const netlist_t & exec() const NL_NOEXCEPT { return m_netlist; }
+		netlist_t & exec() noexcept { return m_netlist; }
+		const netlist_t & exec() const noexcept { return m_netlist; }
 
 	protected:
 		~netlist_ref() = default; // prohibit polymorphic destruction
@@ -467,8 +467,8 @@ namespace netlist
 		/*! returns reference to owning device.
 		 * \returns reference to owning device.
 		 */
-		core_device_t &device() NL_NOEXCEPT { return m_device; }
-		const core_device_t &device() const NL_NOEXCEPT { return m_device; }
+		core_device_t &device() noexcept { return m_device; }
+		const core_device_t &device() const noexcept { return m_device; }
 
 		/*! The netlist owning the owner of this object.
 		 * \returns reference to netlist object.
@@ -524,24 +524,24 @@ namespace netlist
 		 * \param atype type to check object against.
 		 * \returns true if object is of specified type else false.
 		 */
-		bool is_type(const terminal_type atype) const { return (type() == atype); }
+		bool is_type(const terminal_type atype) const noexcept { return (type() == atype); }
 
-		void set_net(net_t *anet) { m_net = anet; }
-		void clear_net() { m_net = nullptr; }
-		bool has_net() const NL_NOEXCEPT { return (m_net != nullptr); }
+		void set_net(net_t *anet) noexcept { m_net = anet; }
+		void clear_net() noexcept { m_net = nullptr; }
+		bool has_net() const noexcept { return (m_net != nullptr); }
 
 
-		const net_t & net() const NL_NOEXCEPT { return *m_net;}
-		net_t & net() NL_NOEXCEPT { return *m_net;}
+		const net_t & net() const noexcept { return *m_net;}
+		net_t & net() noexcept { return *m_net;}
 
 		bool is_logic() const NL_NOEXCEPT;
 		bool is_analog() const NL_NOEXCEPT;
 
-		bool is_state(const state_e astate) const NL_NOEXCEPT { return (m_state == astate); }
-		const state_e &terminal_state() const NL_NOEXCEPT { return m_state; }
-		void set_state(const state_e astate) NL_NOEXCEPT { m_state = astate; }
+		bool is_state(state_e astate) const noexcept { return (m_state == astate); }
+		state_e terminal_state() const noexcept { return m_state; }
+		void set_state(state_e astate) noexcept { m_state = astate; }
 
-		void reset() { set_state(is_type(OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
+		void reset() noexcept { set_state(is_type(OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
 
 		nldelegate m_delegate;
 
@@ -578,17 +578,17 @@ namespace netlist
 
 		nl_double operator ()() const  NL_NOEXCEPT;
 
-		void set(const nl_double &G) NL_NOEXCEPT
+		void set(const nl_double G) noexcept
 		{
 			set(G,G, 0.0);
 		}
 
-		void set(const nl_double &GO, const nl_double &GT) NL_NOEXCEPT
+		void set(const nl_double GO, const nl_double GT)  noexcept
 		{
 			set(GO, GT, 0.0);
 		}
 
-		void set(const nl_double &GO, const nl_double &GT, const nl_double &I) NL_NOEXCEPT
+		void set(const nl_double GO, const nl_double GT, const nl_double I)  noexcept
 		{
 			set_ptr(m_Idr1, I);
 			set_ptr(m_go1, GO);
@@ -596,9 +596,9 @@ namespace netlist
 		}
 
 		void solve_now();
-		void schedule_solve_after(const netlist_time &after);
+		void schedule_solve_after(const netlist_time after);
 
-		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr) NL_NOEXCEPT
+		void set_ptrs(nl_double *gt, nl_double *go, nl_double *Idr) noexcept
 		{
 			m_gt1 = gt;
 			m_go1 = go;
@@ -608,7 +608,7 @@ namespace netlist
 		terminal_t *m_otherterm;
 
 	private:
-		void set_ptr(nl_double *ptr, const nl_double &val) NL_NOEXCEPT
+		void set_ptr(nl_double *ptr, const nl_double val) noexcept
 		{
 			if (ptr != nullptr && *ptr != val)
 			{
@@ -658,7 +658,7 @@ namespace netlist
 				nldelegate delegate = nldelegate());
 		virtual ~logic_input_t();
 
-		const netlist_sig_t &operator()() const NL_NOEXCEPT
+		netlist_sig_t operator()() const NL_NOEXCEPT
 		{
 			return Q();
 		}
@@ -668,7 +668,7 @@ namespace netlist
 		void activate_hl() NL_NOEXCEPT;
 		void activate_lh() NL_NOEXCEPT;
 	private:
-		const netlist_sig_t &Q() const NL_NOEXCEPT;
+		netlist_sig_t Q() const NL_NOEXCEPT;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -725,26 +725,26 @@ namespace netlist
 
 		void reset();
 
-		void toggle_new_Q() NL_NOEXCEPT { m_new_Q = (m_cur_Q ^ 1);   }
+		void toggle_new_Q() noexcept { m_new_Q = (m_cur_Q ^ 1);   }
 
-		void toggle_and_push_to_queue(const netlist_time &delay) NL_NOEXCEPT
+		void toggle_and_push_to_queue(const netlist_time delay) NL_NOEXCEPT
 		{
 			toggle_new_Q();
 			push_to_queue(delay);
 		}
 
-		void push_to_queue(const netlist_time &delay) NL_NOEXCEPT;
-		bool is_queued() const NL_NOEXCEPT { return m_in_queue == QS_QUEUED; }
+		void push_to_queue(const netlist_time delay) NL_NOEXCEPT;
+		bool is_queued() const noexcept { return m_in_queue == QS_QUEUED; }
 
 		void update_devs() NL_NOEXCEPT;
 
-		const netlist_time &time() const NL_NOEXCEPT { return m_time; }
-		void set_time(const netlist_time &ntime) NL_NOEXCEPT { m_time = ntime; }
+		const netlist_time time() const noexcept { return m_time; }
+		void set_time(const netlist_time ntime) noexcept { m_time = ntime; }
 
-		bool isRailNet() const NL_NOEXCEPT { return !(m_railterminal == nullptr); }
-		core_terminal_t & railterminal() const NL_NOEXCEPT { return *m_railterminal; }
+		bool isRailNet() const noexcept { return !(m_railterminal == nullptr); }
+		core_terminal_t & railterminal() const noexcept { return *m_railterminal; }
 
-		std::size_t num_cons() const NL_NOEXCEPT { return m_core_terms.size(); }
+		std::size_t num_cons() const noexcept { return m_core_terms.size(); }
 
 		void add_to_active_list(core_terminal_t &term) NL_NOEXCEPT;
 		void remove_from_active_list(core_terminal_t &term) NL_NOEXCEPT;
@@ -773,7 +773,8 @@ namespace netlist
 		plib::linkedlist_t<core_terminal_t> m_list_active;
 		core_terminal_t * m_railterminal;
 
-		void process(const std::uint_fast8_t mask);
+		template <typename T>
+		void process(const T mask);
 	};
 
 	class logic_net_t : public detail::net_t
@@ -783,10 +784,10 @@ namespace netlist
 		logic_net_t(netlist_base_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 		virtual ~logic_net_t();
 
-		const netlist_sig_t & Q() const NL_NOEXCEPT { return m_cur_Q; }
-		void initial(const netlist_sig_t val) NL_NOEXCEPT { m_cur_Q = m_new_Q = val; }
+		netlist_sig_t Q() const noexcept { return m_cur_Q; }
+		void initial(const netlist_sig_t val) noexcept { m_cur_Q = m_new_Q = val; }
 
-		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		void set_Q_and_push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q )
 			{
@@ -794,7 +795,7 @@ namespace netlist
 				push_to_queue(delay);
 			}
 		}
-		void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		void set_Q_and_push_force(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q || is_queued())
 			{
@@ -803,7 +804,7 @@ namespace netlist
 			}
 		}
 
-		void set_Q_time(const netlist_sig_t newQ, const netlist_time &at) NL_NOEXCEPT
+		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q)
 			{
@@ -861,17 +862,17 @@ namespace netlist
 
 		void initial(const netlist_sig_t val);
 
-		void push(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		void push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
 			m_my_net.set_Q_and_push(newQ, delay); // take the shortcut
 		}
 
-		void push_force(const netlist_sig_t newQ, const netlist_time &delay) NL_NOEXCEPT
+		void push_force(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
 			m_my_net.set_Q_and_push_force(newQ, delay); // take the shortcut
 		}
 
-		void set_Q_time(const netlist_sig_t newQ, const netlist_time &at) NL_NOEXCEPT
+		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
 		{
 			m_my_net.set_Q_time(newQ, at); // take the shortcut
 		}
@@ -942,7 +943,7 @@ namespace netlist
 	{
 	public:
 		param_num_t(device_t &device, const pstring &name, const T val);
-		const T &operator()() const NL_NOEXCEPT { return m_param; }
+		const T operator()() const NL_NOEXCEPT { return m_param; }
 		void setTo(const T &param) { set(m_param, param); }
 	private:
 		T m_param;
@@ -1368,9 +1369,9 @@ namespace netlist
 
 		/* run functions */
 
-		const netlist_time &time() const NL_NOEXCEPT { return m_time; }
+		const netlist_time time() const NL_NOEXCEPT { return m_time; }
 
-		void process_queue(const netlist_time &delta) NL_NOEXCEPT;
+		void process_queue(const netlist_time delta) NL_NOEXCEPT;
 		void abort_current_queue_slice() NL_NOEXCEPT { m_queue.retime(detail::queue_t::entry_t(m_time, nullptr)); }
 
 		const detail::queue_t &queue() const NL_NOEXCEPT { return m_queue; }
@@ -1442,22 +1443,22 @@ namespace netlist
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-	inline netlist_state_t & detail::netlist_ref::state()
+	inline netlist_state_t & detail::netlist_ref::state() noexcept
 	{
 		return m_netlist.nlstate();
 	}
 
-	inline const netlist_state_t & detail::netlist_ref::state() const
+	inline const netlist_state_t & detail::netlist_ref::state() const noexcept
 	{
 		return m_netlist.nlstate();
 	}
 
-	inline setup_t & detail::netlist_ref::setup()
+	inline setup_t & detail::netlist_ref::setup() noexcept
 	{
 		return m_netlist.nlstate().setup();
 	}
 
-	inline const setup_t & detail::netlist_ref::setup() const
+	inline const setup_t & detail::netlist_ref::setup() const noexcept
 	{
 		return m_netlist.nlstate().setup();
 	}
@@ -1530,7 +1531,7 @@ namespace netlist
 		}
 	}
 
-	inline void detail::net_t::push_to_queue(const netlist_time &delay) NL_NOEXCEPT
+	inline void detail::net_t::push_to_queue(const netlist_time delay) NL_NOEXCEPT
 	{
 		if ((num_cons() != 0))
 		{
@@ -1565,7 +1566,7 @@ namespace netlist
 		return static_cast<const logic_net_t &>(core_terminal_t::net());
 	}
 
-	inline const netlist_sig_t & logic_input_t::Q() const NL_NOEXCEPT
+	inline netlist_sig_t logic_input_t::Q() const NL_NOEXCEPT
 	{
 		nl_assert(terminal_state() != STATE_INP_PASSIVE);
 		return net().Q();

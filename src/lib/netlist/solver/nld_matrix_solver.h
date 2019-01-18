@@ -120,7 +120,7 @@ public:
 	bool has_timestep_devices() const { return m_step_devices.size() > 0; }
 
 	void update_forced();
-	void update_after(const netlist_time &after)
+	void update_after(const netlist_time after)
 	{
 		m_Q_sync.net().toggle_and_push_to_queue(after);
 	}
