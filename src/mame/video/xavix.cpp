@@ -822,7 +822,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			//int count = 0;
 			set_data_address(base + base2, 0);
 
-			for (int y = 0; y < 256; y++)
+			for (int y = top; y < 256; y++)
 			{
 				for (int x = 0; x < width; x++)
 				{
@@ -835,12 +835,15 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						dat |= (get_next_bit() << i);
 					}
 
-					if (x < cliprect.max_x)
+					if (((x < cliprect.max_x) && (x >= cliprect.min_x)) && ((y < cliprect.max_y) && (y >= cliprect.min_y)))
 					{
-						if (zval >= zyposptr[x])
+						if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 						{
-							yposptr[x] = dat + 0x100;
-							zyposptr[x] = zval;
+							if (zval >= zyposptr[x])
+							{
+								yposptr[x] = dat + 0x100;
+								zyposptr[x] = zval;
+							}
 						}
 					}
 				}
