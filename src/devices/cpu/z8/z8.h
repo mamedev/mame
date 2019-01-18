@@ -101,6 +101,7 @@ private:
 	uint8_t m_p01m;             // port 0/1 mode
 	uint8_t m_p2m;              // port 2 mode
 	uint8_t m_p3m;              // port 3 mode
+	uint8_t m_p3_output;        // port 3 output (alternate functions included)
 
 	// timer registers
 	uint8_t m_tmr;              // timer mode
@@ -109,6 +110,18 @@ private:
 	uint8_t m_pre[2];           // prescalers
 	uint8_t m_pre_count[2];     // prescaler counts
 	bool m_tout;                // toggle output
+
+	// serial transmitter registers
+	uint16_t m_transmit_sr;     // transmitter shift register
+	uint8_t m_transmit_count;   // counter for transmitter timing
+	bool m_transmit_parity;     // transmitter parity calculation
+
+	// serial receiver registers
+	uint8_t m_receive_buffer;   // received character
+	uint16_t m_receive_sr;      // receiver shift register
+	uint8_t m_receive_count;    // counter for receiver timing
+	bool m_receive_parity;      // receiver parity calculation
+	bool m_receive_started;     // true if receiver has seen start bit
 
 	// fake registers
 	uint8_t m_fake_r[16];       // fake working registers
@@ -124,6 +137,7 @@ private:
 	// timers
 	emu_timer *m_internal_timer[2];
 
+	bool get_serial_in();
 	void sio_tick();
 
 	template <int T> void timer_start();
@@ -147,6 +161,7 @@ private:
 	void p2_write(uint8_t data);
 	uint8_t p3_read();
 	void p3_write(uint8_t data);
+	void p3_update_output();
 	uint8_t sio_read();
 	void sio_write(uint8_t data);
 	uint8_t tmr_read();

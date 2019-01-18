@@ -11,8 +11,6 @@
     TODO:
 
     - strobed I/O
-    - timer Tin/Tout modes
-    - serial
     - instruction pipeline
     - internal diagnostic ROM in data space (requires high voltage reset)
 
@@ -37,8 +35,8 @@
 #define Z8_P3_IRQ1                  0x08
 #define Z8_P3_IRQ2                  0x02
 #define Z8_P3_IRQ3                  0x01
-#define Z8_P3_DI                    0x01    /* not supported */
-#define Z8_P3_DO                    0x80    /* not supported */
+#define Z8_P3_SIN                   0x01
+#define Z8_P3_SOUT                  0x80
 #define Z8_P3_TIN                   0x02
 #define Z8_P3_TOUT                  0x40
 #define Z8_P3_DM                    0x10    /* not supported */
@@ -437,6 +435,22 @@ void z8_device::p2_write(uint8_t data)
 		m_output_cb[2](0, data & mask, mask);
 }
 
+void z8_device::p3_update_output()
+{
+	uint8_t output = m_output[3] & 0xf0;
+
+	if ((m_tmr & Z8_TMR_TOUT_MASK) != Z8_TMR_TOUT_OFF)
+		output = (output & ~Z8_P3_TOUT) | (output ? Z8_P3_TOUT : 0);
+	if ((m_p3m & Z8_P3M_P3_SERIAL) != 0)
+		output = (output & ~Z8_P3_SOUT) | ((m_transmit_sr == 0 || BIT(m_transmit_sr, 0)) ? Z8_P3_SOUT : 0);
+
+	if (m_p3_output != output)
+	{
+		m_output_cb[3](0, output, output ^ m_p3_output);
+		m_p3_output = output;
+	}
+}
+
 uint8_t z8_device::p3_read()
 {
 	uint8_t mask = 0x0f;
@@ -447,45 +461,136 @@ uint8_t z8_device::p3_read()
 	//{
 	//}
 
-	if ((m_tmr & Z8_TMR_TOUT_MASK) != Z8_TMR_TOUT_OFF)
-	{
-		mask |= Z8_P3_TOUT;
-		if (m_tout)
-			inputs |= Z8_P3_TOUT;
-	}
-
-	return (inputs & mask) | (m_output[3] & ~mask);
+	return (inputs & mask) | (m_p3_output & ~mask);
 }
 
 void z8_device::p3_write(uint8_t data)
 {
-	uint8_t mask = 0xf0;
-
-	m_output[3] = data;
+	m_output[3] = data & 0xf0;
 
 	// TODO: special port 3 modes
 	//if (!(m_p3m & 0x7c))
 	//{
 	//}
 
-	if ((m_tmr & Z8_TMR_TOUT_MASK) != Z8_TMR_TOUT_OFF)
-		data = (data & ~Z8_P3_TOUT) | (m_tout ? Z8_P3_TOUT : 0);
+	p3_update_output();
+}
 
-	if (mask)
-		m_output_cb[3](0, data & mask, mask);
+bool z8_device::get_serial_in()
+{
+	return (m_input[3] & Z8_P3_SIN) != 0;
 }
 
 void z8_device::sio_tick()
 {
+	if (m_receive_started)
+	{
+		m_receive_count = (m_receive_count + 1) & 15;
+		if (m_receive_count == 8)
+		{
+			if (m_receive_sr == 0)
+			{
+				if (!get_serial_in())
+				{
+					// start bit validated
+					m_receive_sr |= 1 << 9;
+					m_receive_parity = false;
+				}
+				else
+				{
+					// false start bit
+					m_receive_started = false;
+					m_receive_count = 0;
+				}
+			}
+			else
+			{
+				// shift in data, parity or stop bit
+				m_receive_sr >>= 1;
+				if (get_serial_in())
+					m_receive_sr |= 1 << 9;
+
+				if (BIT(m_receive_sr, 0))
+				{
+					// received full character
+					m_receive_buffer = (m_receive_sr & 0x1fe) >> 1;
+					request_interrupt(3);
+					m_receive_started = false;
+					m_receive_count = 0;
+				}
+				else
+				{
+					if (BIT(m_receive_sr, 9))
+						m_receive_parity = !m_receive_parity;
+
+					// parity replaces received bit 7 if selected
+					if (BIT(m_receive_sr, 1) && (m_p3m & Z8_P3M_PARITY) != 0)
+					{
+						if (m_receive_parity)
+							m_receive_sr |= 1 << 9;
+						else
+							m_receive_sr &= ~(1 << 9);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		// start bit is high-low transition
+		m_receive_sr >>= 1;
+		if (get_serial_in())
+			m_receive_sr |= 1 << 9;
+		else if (BIT(m_receive_sr, 8))
+		{
+			m_receive_started = true;
+			m_receive_sr = 0;
+			m_receive_count = 0;
+		}
+	}
+
+	if (m_transmit_sr != 0)
+	{
+		m_transmit_count = (m_transmit_count + 1) & 15;
+		if (m_transmit_count == 0)
+		{
+			m_transmit_sr >>= 1;
+			if (m_transmit_sr == 0)
+				request_interrupt(4);
+			else
+			{
+				// parity replaces received bit 7 if selected
+				if ((m_transmit_sr >> 1) == 3 && (m_p3m & Z8_P3M_PARITY) != 0)
+				{
+					if (m_transmit_parity)
+						m_transmit_sr |= 1;
+					else
+						m_transmit_sr &= ~1;
+				}
+				else if (BIT(m_transmit_sr, 0))
+					m_transmit_parity = !m_transmit_parity;
+
+				// serial output
+				logerror("Transmitting %d bit (time = %.2f usec)\n", BIT(m_transmit_sr, 0), machine().time().as_double() * 1.0E6);
+				p3_update_output();
+			}
+		}
+	}
 }
 
 uint8_t z8_device::sio_read()
 {
-	return 0xff;
+	return m_receive_buffer;
 }
 
 void z8_device::sio_write(uint8_t data)
 {
+	// overwrite shift register with data + 1 start bit + 2 stop bits
+	m_transmit_sr = (m_transmit_sr & 1) | (uint16_t(data) << 2) | (3 << 10);
+	m_transmit_parity = false;
+
+	// synchronize the shift clock
+	m_transmit_count = 15;
 }
 
 template <int T>
@@ -569,13 +674,13 @@ void z8_device::t1_trigger()
 void z8_device::tout_init()
 {
 	m_tout = true;
-	m_output_cb[3](0, (m_output[3] & ~Z8_P3_TOUT) | (m_tout ? Z8_P3_TOUT : 0), Z8_P3_TOUT);
+	p3_update_output();
 }
 
 void z8_device::tout_toggle()
 {
 	m_tout = !m_tout;
-	m_output_cb[3](0, (m_output[3] & ~Z8_P3_TOUT) | (m_tout ? Z8_P3_TOUT : 0), Z8_P3_TOUT);
+	p3_update_output();
 }
 
 uint8_t z8_device::tmr_read()
@@ -720,7 +825,16 @@ void z8_device::p2m_write(uint8_t data)
 
 void z8_device::p3m_write(uint8_t data)
 {
+	if ((data & Z8_P3M_P3_SERIAL) == 0)
+	{
+		m_transmit_sr = 0;
+		m_transmit_count = 0;
+		m_receive_started = false;
+		m_receive_count = 0;
+	}
+
 	m_p3m = data;
+	p3_update_output();
 }
 
 void z8_device::ipr_write(uint8_t data)
@@ -1115,8 +1229,17 @@ void z8_device::device_start()
 	m_p01m = 0;
 	m_p2m = 0;
 	m_p3m = 0;
+	m_p3_output = 0;
 	m_tmr = 0;
 	m_tout = true;
+	m_transmit_sr = 0;
+	m_transmit_count = 0;
+	m_transmit_parity = false;
+	m_receive_buffer = 0;
+	m_receive_sr = 0;
+	m_receive_count = 0;
+	m_receive_parity = false;
+	m_receive_started = false;
 	m_irq_taken = false;
 	m_irq_initialized = false;
 
@@ -1131,9 +1254,18 @@ void z8_device::device_start()
 	save_item(NAME(m_p01m));
 	save_item(NAME(m_p2m));
 	save_item(NAME(m_p3m));
+	save_item(NAME(m_p3_output));
 	save_item(NAME(m_tmr));
 	save_item(NAME(m_t));
 	save_item(NAME(m_tout));
+	save_item(NAME(m_transmit_sr));
+	save_item(NAME(m_transmit_count));
+	save_item(NAME(m_transmit_parity));
+	save_item(NAME(m_receive_buffer));
+	save_item(NAME(m_receive_sr));
+	save_item(NAME(m_receive_count));
+	save_item(NAME(m_receive_parity));
+	save_item(NAME(m_receive_started));
 	save_item(NAME(m_count));
 	save_item(NAME(m_pre));
 	save_item(NAME(m_pre_count));
@@ -1336,16 +1468,16 @@ void z8_device::device_reset()
 	m_imr &= ~Z8_IMR_ENABLE;
 	m_irq_initialized = false;
 
-	p01m_write(0x4d);
-	p2m_write(0xff);
-	p3m_write(0x00);
-	p3_write(m_output[3] | 0xf0);
-
 	m_pre[0] &= ~Z8_PRE0_COUNT_MODULO_N;
 	m_pre[1] &= ~(Z8_PRE1_COUNT_MODULO_N | Z8_PRE1_INTERNAL_CLOCK);
 	m_tmr = 0x00;
 	timer_stop<0>();
 	timer_stop<1>();
+
+	m_output[3] = 0xf0;
+	p01m_write(0x4d);
+	p2m_write(0xff);
+	p3m_write(0x00);
 }
 
 
