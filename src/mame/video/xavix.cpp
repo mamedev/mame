@@ -787,14 +787,16 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		if (m_bmp_base[0x14] & 0x01)
 		{
-			popmessage("bitmap %02x %02x %02x %02x %02x %02x %02x %02x  -- -- %02x %02x %02x %02x %02x %02x  -- -- %02x %02x %02x %02x %02x %02x",
+			popmessage("bitmap %02x %02x %02x %02x %02x %02x %02x %02x  -- -- %02x %02x %02x %02x %02x %02x  -- -- %02x %02x %02x %02x %02x",
 				m_bmp_base[0x00], m_bmp_base[0x01], m_bmp_base[0x02], m_bmp_base[0x03], m_bmp_base[0x04], m_bmp_base[0x05], m_bmp_base[0x06], m_bmp_base[0x07],
 				/*m_bmp_base[0x08], m_bmp_base[0x09],*/ m_bmp_base[0x0a], m_bmp_base[0x0b], m_bmp_base[0x0c], m_bmp_base[0x0d], m_bmp_base[0x0e], m_bmp_base[0x0f],
-				/*m_bmp_base[0x10], m_bmp_base[0x11],*/ m_bmp_base[0x12], m_bmp_base[0x13], m_bmp_base[0x14], m_bmp_base[0x15], m_bmp_base[0x16], m_bmp_base[0x17]);
+				/*m_bmp_base[0x10], m_bmp_base[0x11],*/ m_bmp_base[0x12], m_bmp_base[0x13], m_bmp_base[0x15], m_bmp_base[0x16], m_bmp_base[0x17]);
 
 			int base = ((m_bmp_base[0x11] << 8) | m_bmp_base[0x10]) * 0x800;
 			int base2 = ((m_bmp_base[0x09] << 8) | m_bmp_base[0x08]) * 0x8;
 
+			int bpp = ((m_bmp_base[0x14] & 0x0e)>>1)+1;
+			int zval = ((m_bmp_base[0x14] & 0xf0)>>4);
 			//int count = 0;
 			set_data_address(base + base2, 0);
 
@@ -804,7 +806,9 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				{
 					uint16_t* yposptr = &bitmap.pix16(y);
 
-					int bpp = 6;
+					uint16_t* zyposptr = &m_zbuffer.pix16(y);
+
+
 
 					uint8_t dat = 0;
 					for (int i = 0; i < bpp; i++)
@@ -813,7 +817,13 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					}
 
 					if (x < cliprect.max_x)
-						yposptr[x] = dat + 0x100;
+					{
+						if (zval >= zyposptr[x])
+						{
+							yposptr[x] = dat + 0x100;
+							zyposptr[x] = zval;
+						}
+					}
 				}
 			}
 
