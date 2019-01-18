@@ -672,21 +672,23 @@ u32 sbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	return 0;
 }
 
-MACHINE_CONFIG_START(sbrain_state::sbrain)
+void sbrain_state::sbrain(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sbrain_mem)
-	MCFG_DEVICE_IO_MAP(sbrain_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sbrain_state::sbrain_mem);
+	m_maincpu->set_addrmap(AS_IO, &sbrain_state::sbrain_io);
 
-	MCFG_DEVICE_ADD("subcpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sbrain_submem)
-	MCFG_DEVICE_IO_MAP(sbrain_subio)
+	Z80(config, m_subcpu, 16_MHz_XTAL / 4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &sbrain_state::sbrain_submem);
+	m_subcpu->set_addrmap(AS_IO, &sbrain_state::sbrain_subio);
 
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("32K");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
-	MCFG_SCREEN_UPDATE_DRIVER(sbrain_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::amber());
+	screen.set_screen_update(FUNC(sbrain_state::screen_update));
 
 	DP8350(config, m_crtc, 10.92_MHz_XTAL).set_screen("screen"); // XTAL not directly connected
 	m_crtc->character_generator_program(1);
@@ -733,26 +735,25 @@ MACHINE_CONFIG_START(sbrain_state::sbrain)
 
 	FD1791(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->set_force_ready(true);
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", sbrain_state, kbd_scan, attotime::from_hz(15))
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", sbrain_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+
+	TIMER(config, "timer_a", 0).configure_periodic(timer_device::expired_delegate(FUNC(sbrain_state::kbd_scan), this), attotime::from_hz(15));
+}
 
 ROM_START( sbrain )
 	ROM_REGION( 0x0800, "subcpu", ROMREGION_ERASEFF ) // only the second CPU has its own ROM
-	ROM_SYSTEM_BIOS( 0, "4_003", "4.003" )
-	ROMX_LOAD("4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "3_1", "3.1" )
-	ROMX_LOAD("3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "3_05", "3.05" )
-	ROMX_LOAD("qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 0, "4_2", "4.2")
+	ROMX_LOAD("sbii_sb4_2.z69", 0x0000, 0x0800, CRC(89313e26) SHA1(755d494934099a4488abc44a8566c18d7d4fdea3), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "4_003", "4.003" )
+	ROMX_LOAD("4_003_vc8001.z69", 0x0000, 0x0800, CRC(3ce3cd53) SHA1(fb6ade6bd67de3d9f911a1a48481ca619bda65ae), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "3_1", "3.1" )
+	ROMX_LOAD("3_1.z69", 0x0000, 0x0800, CRC(b6a2e6a5) SHA1(a646faaecb9ac45ee1a42764628e8971524d5c13), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "3_05", "3.05" )
+	ROMX_LOAD("qd_3_05.z69", 0x0000, 0x0800, CRC(aedbe777) SHA1(9ee9ca3f05e11ceb80896f06c3a3ae352db214dc), ROM_BIOS(3))
 	// Using the chargen from 'c10' for now.
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
