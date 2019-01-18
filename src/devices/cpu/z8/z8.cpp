@@ -440,7 +440,7 @@ void z8_device::p3_update_output()
 	uint8_t output = m_output[3] & 0xf0;
 
 	if ((m_tmr & Z8_TMR_TOUT_MASK) != Z8_TMR_TOUT_OFF)
-		output = (output & ~Z8_P3_TOUT) | (output ? Z8_P3_TOUT : 0);
+		output = (output & ~Z8_P3_TOUT) | (m_tout ? Z8_P3_TOUT : 0);
 	if ((m_p3m & Z8_P3M_P3_SERIAL) != 0)
 		output = (output & ~Z8_P3_SOUT) | ((m_transmit_sr == 0 || BIT(m_transmit_sr, 0)) ? Z8_P3_SOUT : 0);
 
