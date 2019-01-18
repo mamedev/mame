@@ -969,7 +969,10 @@ ROM_START( jak_dora )
 	ROM_LOAD16_WORD_SWAP( "jakksdoragkr.bin", 0x000000, 0x200000, CRC(bcaa132d) SHA1(3894b980fbc4144731b2a7a94acebb29e30de67c) )
 ROM_END
 
-
+ROM_START( jak_sdoo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksscoobydoogkr.bin", 0x000000, 0x400000, CRC(61062ce5) SHA1(9d21767fd855385ef83e4209c429ecd4bf7e5384) )
+ROM_END
 
 
 
@@ -1165,11 +1168,11 @@ CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS
 CONS( 2008, jak_wall, 0, 0, walle, walle,  spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Wall-E (JAKKS Pacific TV Game)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // 'Game-Key-Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)
-CONS( 2005, jak_wwe,  0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "WWE (JAKKS Pacific TV Game)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
-CONS( 2005, jak_fan4, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Fantastic Four (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
-CONS( 2005, jak_just, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",          "Justice League (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
-CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dora the Explorer (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3+ released)
-// Other Game-Key-Ready systems (not all releases of them?, only Sunplus SPG240 [Sunplus PAC300] versions?)
+CONS( 2005, jak_wwe,  0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "WWE (JAKKS Pacific TV Game)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // WW (no game-keys released)
+CONS( 2005, jak_fan4, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",     "Fantastic Four (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // F4 (no game-keys released)
+CONS( 2005, jak_just, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Taniko",              "Justice League (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DC (no game-keys released)
+CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dora the Explorer (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3+ released)
+CONS( 2005, jak_sdoo, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management","Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)
 // Nicktoons                                   NK (3? keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3? keys available)  ^^
 // Namco Ms. Pac-Man                           NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
@@ -1177,10 +1180,10 @@ CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,jakks_gkr_state, empty_init, "
 // Disney                                      DY (3? keys available)
 // Disney Princess                             DP (? keys available)
 // Spider-Man                                  MV (1? key available)
+
 // no keys released for the following, some were in development but cancelled
 // Dragon Ball Z                               DB (no game-keys released)
 // Capcom 3-in-1                               CC (no game-keys released)
-// Scooby-Doo                                  SD (no game-keys released)
 // Care Bears                                  CB (no game-keys released)
 // Wheel of Fortune                            WF (no game-keys released)
 // Winnie the Pooh                             WP (no game-keys released)

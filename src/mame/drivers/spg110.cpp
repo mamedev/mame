@@ -70,7 +70,7 @@ void spg110_game_state::spg110_base(machine_config &config)
 //	m_spg->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 //	m_spg->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
-	SPG110(config, m_spg, XTAL(27'000'000));
+	SPG110(config, m_spg, XTAL(27'000'000), "maincpu");
 }
 
 ROM_START( jak_capb )
