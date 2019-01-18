@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, AJR
 /**********************************************************************
 
     Zilog Z8 Single-Chip MCU emulation
@@ -32,7 +32,7 @@ protected:
 		Z8_IMR, Z8_IRQ, Z8_IPR,
 		Z8_P0, Z8_P1, Z8_P2, Z8_P3,
 		Z8_P01M, Z8_P3M, Z8_P2M,
-		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR,
+		Z8_PRE0, Z8_T0, Z8_PRE1, Z8_T1, Z8_TMR, Z8_TOUT,
 
 		Z8_R0, Z8_R1, Z8_R2, Z8_R3, Z8_R4, Z8_R5, Z8_R6, Z8_R7, Z8_R8, Z8_R9, Z8_R10, Z8_R11, Z8_R12, Z8_R13, Z8_R14, Z8_R15
 	};
@@ -107,12 +107,14 @@ private:
 	uint8_t m_t[2];             // initial values
 	uint8_t m_count[2];         // current counts
 	uint8_t m_pre[2];           // prescalers
+	uint8_t m_pre_count[2];     // prescaler counts
+	bool m_tout;                // toggle output
 
 	// fake registers
 	uint8_t m_fake_r[16];       // fake working registers
 
 	// interrupts
-	int m_irq_line[4];          // IRQ line state
+	int m_irq_line[4];
 	bool m_irq_taken;
 	bool m_irq_initialized;     // IRQ must be unlocked by EI after reset
 
@@ -120,11 +122,18 @@ private:
 	int32_t m_icount;           // instruction counter
 
 	// timers
-	emu_timer *m_t0_timer;
-	emu_timer *m_t1_timer;
+	emu_timer *m_internal_timer[2];
 
-	TIMER_CALLBACK_MEMBER( t0_tick );
-	TIMER_CALLBACK_MEMBER( t1_tick );
+	void sio_tick();
+
+	template <int T> void timer_start();
+	template <int T> void timer_stop();
+	template <int T> void timer_end();
+	void t1_trigger();
+	void tout_init();
+	void tout_toggle();
+
+	template <int T> TIMER_CALLBACK_MEMBER(timeout);
 
 	void request_interrupt(int irq);
 	void take_interrupt(int irq);
@@ -173,8 +182,8 @@ private:
 	inline uint16_t register_pair_read(uint8_t offset);
 	inline void register_write(uint8_t offset, uint8_t data) { m_regs->write_byte(offset, data); }
 	inline void register_pair_write(uint8_t offset, uint16_t data);
-	inline uint8_t get_working_register(int offset);
-	inline uint8_t get_register(uint8_t offset);
+	inline uint8_t get_working_register(int offset) const;
+	inline uint8_t get_register(uint8_t offset) const;
 	inline uint8_t get_intermediate_register(int offset);
 	inline void stack_push_byte(uint8_t src);
 	inline void stack_push_word(uint16_t src);
