@@ -354,7 +354,9 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 	int size;
 
-	// m_tilecfg[0]   b--s ----    b = bytes per tile  s = tilesize / page size?
+	// m_tilecfg[0]   b-as h-??    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used (3/0 in various places in football and some others) 
+	// m_tilecfg[1]   ---- ---?    ? = used foot
+	// m_tilecfg[2]   ---- -B--    B = 4bpp tiles
 
 	if (m_tilecfg[0] & 0x10)
 	{

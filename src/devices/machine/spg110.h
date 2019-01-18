@@ -7,12 +7,20 @@
 #pragma once
 
 //#include "spg2xx.h"
+#include "cpu/unsp/unsp.h"
 
 class spg110_device : public device_t
 {
 public:
 	spg110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	spg110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: spg110_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
 
 	void map(address_map &map);
 
@@ -22,6 +30,14 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+private:
+	required_device<unsp_device> m_cpu;
+	//TIMER_CALLBACK_MEMBER(test_timer);
+	//emu_timer *m_test_timer;
+	DECLARE_READ16_MEMBER(spg110_2062_r);
+	DECLARE_READ16_MEMBER(spg110_2063_r);
+	DECLARE_WRITE16_MEMBER(spg110_2063_w);
 };
 
 
