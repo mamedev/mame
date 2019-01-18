@@ -684,12 +684,28 @@ void z8_device::t1_write(uint8_t data)
 
 void z8_device::pre0_write(uint8_t data)
 {
-	m_pre[0] = data;
+	if (m_internal_timer[0]->enabled())
+	{
+		timer_stop<0>();
+		m_pre[0] = data;
+		timer_start<0>();
+	}
+	else
+		m_pre[0] = data;
 }
 
 void z8_device::pre1_write(uint8_t data)
 {
+	bool was_enabled = m_internal_timer[1]->enabled();
+	if (was_enabled)
+		timer_stop<1>();
+
 	m_pre[1] = data;
+
+	if ((data & Z8_PRE1_INTERNAL_CLOCK) != 0
+		? (m_tmr & Z8_TMR_ENABLE_T1) != 0
+		: was_enabled && (m_tmr & Z8_TMR_TIN_MASK) != Z8_TMR_TIN_EXTERNAL_CLK)
+		timer_start<1>();
 }
 
 void z8_device::p01m_write(uint8_t data)
