@@ -47,6 +47,13 @@
  *
  *============================================================*/
 
+#ifndef NVCCBUILD
+#define NVCCBUILD (0)
+#endif
+
+#if NVCCBUILD
+#define C14CONSTEXPR
+#else
 #if __cplusplus == 201103L
 #define C14CONSTEXPR
 #elif __cplusplus == 201402L
@@ -57,6 +64,7 @@
 #define C14CONSTEXPR
 #else
 #error "C++ version not supported"
+#endif
 #endif
 
 #ifndef PHAS_INT128

@@ -23,7 +23,7 @@ endif
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -march=native -I../.. -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter $(CEXTRAFLAGS)
+CFLAGS =  $(LTO) -g -O3 -std=c++11 -I../.. $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++11 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl
 
@@ -157,7 +157,7 @@ ALL_OBJS = $(OBJS) $(PMAIN) $(NLOBJ)/prg/nltool.o $(NLOBJ)/prg/nlwav.o
 SOURCES = $(patsubst $(OBJ)%, $(SRC)%, $(ALL_OBJS:.o=.cpp))
 ALLFILES = $(SOURCES) $(VSBUILDS) $(DOCS)
 
-MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw
+MAKEFILE_TARGETS_WITHOUT_INCLUDE := clean doc clang mingw nvcc
 
 
 # git archive HEAD --prefix=project-name-version/ \
@@ -201,13 +201,20 @@ maketree: $(sort $(OBJDIRS))
 # Special targets
 #-------------------------------------------------
 
-.PHONY: clang clang-5 mingw doc
+.PHONY: clang clang-5 mingw doc native
+
+native: 
+	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter"
 
 clang:
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Wno-unused-parameter -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
+
+nvcc:
+	$(MAKE) CC=/usr/local/cuda-9.0/bin/nvcc LD=/usr/local/cuda-9.2/bin/nvcc \
+		CEXTRAFLAGS="-x cu  -DNVCCBUILD=1 --expt-extended-lambda --expt-relaxed-constexpr --default-stream per-thread --restrict"
 
 #
 # Mostly done: -Wno-weak-vtables -Wno-cast-align

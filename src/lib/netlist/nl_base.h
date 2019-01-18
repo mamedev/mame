@@ -434,8 +434,8 @@ namespace netlist
 		setup_t & setup();
 		const setup_t & setup() const;
 
-		C14CONSTEXPR netlist_t & exec() NL_NOEXCEPT { return m_netlist; }
-		constexpr const netlist_t & exec() const NL_NOEXCEPT { return m_netlist; }
+		netlist_t & exec() NL_NOEXCEPT { return m_netlist; }
+		const netlist_t & exec() const NL_NOEXCEPT { return m_netlist; }
 
 	protected:
 		~netlist_ref() = default; // prohibit polymorphic destruction
