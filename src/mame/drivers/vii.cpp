@@ -1137,6 +1137,7 @@ CONS( 2005, jak_sdoo, 0, 0, jakks_gkr,    jak_gkr,jakks_gkr_state, empty_init, "
 // Disney                                      DY (3? keys available)
 // Disney Princess                             DP (? keys available)
 // Spider-Man                                  MV (1? key available)
+
 // no keys released for the following, some were in development but cancelled
 // Dragon Ball Z                               DB (no game-keys released)
 // Capcom 3-in-1                               CC (no game-keys released)
