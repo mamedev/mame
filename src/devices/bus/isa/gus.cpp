@@ -1275,8 +1275,8 @@ MACHINE_CONFIG_START(isa16_gus_device::device_add_mconfig)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, isa16_gus_device, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	acia_clock.signal_handler().set(FUNC(isa16_gus_device::write_acia_clock));
 MACHINE_CONFIG_END
 
 ioport_constructor isa16_gus_device::device_input_ports() const

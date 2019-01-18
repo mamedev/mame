@@ -1043,7 +1043,7 @@ void xday2_namcona2_state::xday2(machine_config &config)
 	EEPROM_2864(config, "eeprom");
 
 	// TODO: unknown sub type
-	MSM6242(config,"rtc", XTAL(32'768));
+	MSM6242(config, "rtc", XTAL(32'768));
 }
 
  /* NA-1 Hardware */

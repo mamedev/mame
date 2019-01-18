@@ -294,8 +294,8 @@ MACHINE_CONFIG_START(prophet600_state::prophet600)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(8'000'000)/16)  // 500kHz = 16 times the MIDI rate
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, prophet600_state, acia_clock_w))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", XTAL(8'000'000)/16));  // 500kHz = 16 times the MIDI rate
+	acia_clock.signal_handler().set(FUNC(prophet600_state::acia_clock_w));
 
 MACHINE_CONFIG_END
 

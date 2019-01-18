@@ -619,8 +619,8 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart[1], FUNC(mc68681_device::rx_a_w));
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))  // rtc interrupt on INT1
+	MSM6242(config, m_rtc, XTAL(32'768));
+	m_rtc->out_int_handler().set_inputline(m_maincpu, M68K_IRQ_1);  // rtc interrupt on INT1
 
 MACHINE_CONFIG_END
 

@@ -644,8 +644,7 @@ MACHINE_CONFIG_START(sun2_state::sun2vme)
 	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
 	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
 	SCC8530N(config, SCC1_TAG, 19.6608_MHz_XTAL / 4);
 	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 19.6608_MHz_XTAL / 4));
@@ -697,8 +696,7 @@ MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
 	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
 	SCC8530N(config, SCC1_TAG, 39.3216_MHz_XTAL / 8);
 	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 39.3216_MHz_XTAL / 8));

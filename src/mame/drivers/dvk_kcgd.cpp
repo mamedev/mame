@@ -368,8 +368,8 @@ MACHINE_CONFIG_START(kcgd_state::kcgd)
 	MS7004(config, m_ms7004, 0);
 	m_ms7004->tx_handler().set("i8251kbd", FUNC(i8251_device::write_rxd));
 
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, kcgd_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800*16));
+	keyboard_clock.signal_handler().set(FUNC(kcgd_state::write_keyboard_clock));
 #endif
 MACHINE_CONFIG_END
 

@@ -1077,8 +1077,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	m_uart_kb->txd_handler().set(V1050_KEYBOARD_TAG, FUNC(v1050_keyboard_device::si_w));
 	m_uart_kb->rxrdy_handler().set(FUNC(v1050_state::kb_rxrdy_w));
 
-	MCFG_DEVICE_ADD(CLOCK_KB_TAG, CLOCK, 16_MHz_XTAL/4/13/8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_keyboard_clock))
+	clock_device &clock_kb(CLOCK(config, CLOCK_KB_TAG, 16_MHz_XTAL/4/13/8));
+	clock_kb.signal_handler().set(FUNC(v1050_state::write_keyboard_clock));
 
 	// keyboard
 	v1050_keyboard_device &keyboard(V1050_KEYBOARD(config, V1050_KEYBOARD_TAG, 0));
@@ -1095,8 +1095,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	rs232.rxd_handler().set(m_uart_sio, FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set(m_uart_sio, FUNC(i8251_device::write_dsr));
 
-	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))
+	CLOCK(config, m_clock_sio, 16_MHz_XTAL/4);
+	m_clock_sio->signal_handler().set(FUNC(v1050_state::write_sio_clock));
 
 	MB8877(config, m_fdc, 16_MHz_XTAL/16);
 	m_fdc->intrq_wr_callback().set(FUNC(v1050_state::fdc_intrq_w));

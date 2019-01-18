@@ -792,7 +792,7 @@ MACHINE_CONFIG_START(skns_state::skns)
 	MCFG_DEVICE_PROGRAM_MAP(skns_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MSM6242(config, "rtc", XTAL(32'768));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

@@ -46,8 +46,8 @@ MACHINE_CONFIG_START(a2bus_midi_device::device_add_mconfig)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, a2bus_midi_device, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	acia_clock.signal_handler().set(FUNC(a2bus_midi_device::write_acia_clock));
 MACHINE_CONFIG_END
 
 //**************************************************************************

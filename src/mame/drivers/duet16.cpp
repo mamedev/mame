@@ -401,11 +401,9 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	kbd.rxd_handler().set("kbusart", FUNC(i8251_device::write_rxd));
 	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir5_w)) // INT2
+	INPUT_MERGER_ANY_HIGH(config, "kbint").output_handler().set(m_pic, FUNC(pic8259_device::ir5_w)); // INT2
 
-	MCFG_INPUT_MERGER_ANY_HIGH("tmint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir0_w)) // INT6
+	INPUT_MERGER_ANY_HIGH(config, m_tmint).output_handler().set(m_pic, FUNC(pic8259_device::ir0_w)); // INT6
 
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));

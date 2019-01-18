@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(d9final_state::d9final)
 	//MCFG_DEVICE_ADD("essnd", ES8712, 24000000/3) // clock unknown
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
+	RTC62421(config, "rtc", XTAL(32'768)); // internal oscillator
 MACHINE_CONFIG_END
 
 

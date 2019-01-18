@@ -26,7 +26,8 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
+void cmi01a_device::device_add_mconfig(machine_config &config)
+{
 	PIA6821(config, m_pia[0], 0); // pia_cmi01a_1_config
 	m_pia[0]->readcb1_handler().set(FUNC(cmi01a_device::tri_r));
 	m_pia[0]->writepa_handler().set(FUNC(cmi01a_device::ws_dir_w));
@@ -49,9 +50,8 @@ MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
 	m_ptm->o1_callback().set(FUNC(cmi01a_device::ptm_o1));
 	m_ptm->irq_callback().set("cmi01a_irq", FUNC(input_merger_device::in_w<4>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("cmi01a_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cmi01a_device, cmi01a_irq))
-MACHINE_CONFIG_END
+	INPUT_MERGER_ANY_HIGH(config, "cmi01a_irq").output_handler().set(FUNC(cmi01a_device::cmi01a_irq));
+}
 
 
 void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)

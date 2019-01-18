@@ -872,7 +872,7 @@ MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, 0)
+	MSM6242(config, "rtc", 0);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -895,7 +895,7 @@ MACHINE_CONFIG_START(luckgrln_state::_7smash)
 	MCFG_DEVICE_PROGRAM_MAP(_7smash_map)
 	MCFG_DEVICE_IO_MAP(_7smash_io)
 
-	MCFG_DEVICE_REMOVE("rtc")
+	config.device_remove("rtc");
 MACHINE_CONFIG_END
 
 void luckgrln_state::init_luckgrln()

@@ -54,8 +54,8 @@ MACHINE_CONFIG_START(c64_namesoft_midi_cartridge_device::device_add_mconfig)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, c64_namesoft_midi_cartridge_device, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	acia_clock.signal_handler().set(FUNC(c64_namesoft_midi_cartridge_device::write_acia_clock));
 MACHINE_CONFIG_END
 
 

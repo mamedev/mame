@@ -10077,8 +10077,7 @@ void ddenlovr_state::kotbinyo(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
-//  MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-//  MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, hanakanz_rtc_irq))
+//  MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
 }
 
 void ddenlovr_state::kotbinsp(machine_config &config)
@@ -10484,8 +10483,7 @@ MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, hanakanz_rtc_irq))
+	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::mjgnight)
@@ -10542,8 +10540,7 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1))
+	RTC62421(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1)); // internal oscillator
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -10591,8 +10588,7 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1))
+	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 MACHINE_CONFIG_END
 
 // Same PCB as janshinp
@@ -10665,8 +10661,7 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE("maincpu", tmpz84c015_device, trg1))
+	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 MACHINE_CONFIG_END
 
 
@@ -10709,8 +10704,7 @@ MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, ddenlovr_state, hanakanz_rtc_irq))
+	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(FUNC(ddenlovr_state::hanakanz_rtc_irq));
 MACHINE_CONFIG_END
 
 

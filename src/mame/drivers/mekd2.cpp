@@ -405,11 +405,11 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set(FUNC(mekd2_state::cass_w));
 
-	MCFG_DEVICE_ADD("acia_tx_clock", CLOCK, XTAL_MEKD2 / 256) // 4800Hz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	clock_device &acia_tx_clock(CLOCK(config, "acia_tx_clock", XTAL_MEKD2 / 256)); // 4800Hz
+	acia_tx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 
-	MCFG_DEVICE_ADD("acia_rx_clock", CLOCK, 300) // toggled by cassette circuit
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_rxc))
+	clock_device &acia_rx_clock(CLOCK(config, "acia_rx_clock", 300)); // toggled by cassette circuit
+	acia_rx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_rxc));
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_c", mekd2_state, mekd2_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_p", mekd2_state, mekd2_p, attotime::from_hz(40000))

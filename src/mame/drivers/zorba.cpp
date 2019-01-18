@@ -149,12 +149,9 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00); // should be horizontal frequency / 16, so depends on CRTC parameters
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq0")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<0>))
-	MCFG_INPUT_MERGER_ANY_HIGH("irq1")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<1>))
-	MCFG_INPUT_MERGER_ANY_HIGH("irq2")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<2>))
+	INPUT_MERGER_ANY_HIGH(config, "irq0").output_handler().set(FUNC(zorba_state::irq_w<0>));
+	INPUT_MERGER_ANY_HIGH(config, "irq1").output_handler().set(FUNC(zorba_state::irq_w<1>));
+	INPUT_MERGER_ANY_HIGH(config, "irq2").output_handler().set(FUNC(zorba_state::irq_w<2>));
 
 	/* devices */
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);

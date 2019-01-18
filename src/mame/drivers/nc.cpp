@@ -1406,8 +1406,8 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	/* uart */
 	I8251(config, m_uart, 0);
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, nc_state, write_uart_clock))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 19200));
+	uart_clock.signal_handler().set(FUNC(nc_state::write_uart_clock));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, nullptr)

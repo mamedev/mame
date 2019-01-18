@@ -1428,9 +1428,9 @@ READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
+void dooyong_z80_ym2203_state::sound_2203(machine_config &config)
+{
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1445,7 +1445,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
 	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
 	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 	SPEAKER(config, "mono").front_center();
@@ -1509,8 +1509,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
 
 	/* sound hardware */
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", 0))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	SPEAKER(config, "mono").front_center();
 

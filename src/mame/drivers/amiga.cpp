@@ -1686,7 +1686,7 @@ MACHINE_CONFIG_START(a2000_state::a2000)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u65", MSM6242, XTAL(32'768))
+	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, nullptr)
@@ -1788,7 +1788,7 @@ MACHINE_CONFIG_START(cdtv_state::cdtv)
 	NVRAM(config, "memcard", nvram_device::DEFAULT_ALL_0);
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u61", MSM6242, XTAL(32'768))
+	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cd-rom controller
 	AMIGA_DMAC(config, m_dmac, amiga_state::CLK_7M_PAL);
@@ -1881,7 +1881,7 @@ MACHINE_CONFIG_START(a500p_state::a500p)
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u9", MSM6242, XTAL(32'768))
+	MSM6242(config, m_rtc, XTAL(32'768));
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)

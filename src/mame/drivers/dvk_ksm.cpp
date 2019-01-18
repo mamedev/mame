@@ -465,8 +465,8 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	m_ms7004->tx_handler().set(m_i8251kbd, FUNC(i8251_device::write_rxd));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ksm_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
+	keyboard_clock.signal_handler().set(FUNC(ksm_state::write_keyboard_clock));
 MACHINE_CONFIG_END
 
 ROM_START( dvk_ksm )

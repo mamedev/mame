@@ -335,7 +335,7 @@ void proconn_state::proconn(machine_config &config)
 	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
 
 	METERS(config, m_meters, 0);
-	m_meters->set_number_meters(8);
+	m_meters->set_number(8);
 }
 
 

@@ -72,8 +72,8 @@ MACHINE_CONFIG_START(c64_passport_midi_cartridge_device::device_add_mconfig)
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) /// TODO: work out if the clock should come from the 6840
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, c64_passport_midi_cartridge_device, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // TODO: work out if the clock should come from the 6840
+	acia_clock.signal_handler().set(FUNC(c64_passport_midi_cartridge_device::write_acia_clock));
 MACHINE_CONFIG_END
 
 

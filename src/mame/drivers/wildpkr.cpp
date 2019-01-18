@@ -508,10 +508,10 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 	MC68681(config, m_duart, 3686400);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
-	MCFG_DEVICE_ADD("id", DS2401, 0)
+	DS2401(config, m_id, 0);
 
-	MCFG_DEVICE_ADD("dacclock", CLOCK, 1500000) // base rate derived from program code
-	MCFG_CLOCK_SIGNAL_HANDLER(ASSERTLINE("maincpu", M68K_IRQ_5))
+	CLOCK(config, m_dac_clock, 1500000); // base rate derived from program code
+	m_dac_clock->signal_handler().set_inputline(m_maincpu, M68K_IRQ_5, ASSERT_LINE);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

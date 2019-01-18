@@ -1519,11 +1519,9 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
@@ -1709,8 +1707,7 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	m_muxb->a_in_callback().set_ioport("INP1");
 	m_muxb->b_in_callback().set_ioport("INP2");
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq_b")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu_b", M6808_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline(m_soundcpu_b, M6808_IRQ_LINE);
 
 	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 
@@ -1722,9 +1719,9 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("speaker")
-	MCFG_DEVICE_REMOVE("dac")
-	MCFG_DEVICE_REMOVE("vref")
+	config.device_remove("speaker");
+	config.device_remove("dac");
+	config.device_remove("vref");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1777,11 +1774,9 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");

@@ -858,7 +858,7 @@ void jpmsys5_state::jpmsys5_ym(machine_config &config)
 	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
 	config.set_default_layout(layout_jpmsys5);
 
-	METERS(config, m_meters, 0).set_number_meters(8);
+	METERS(config, m_meters, 0).set_number(8);
 }
 
 // the first rev PCB used an SAA1099
@@ -914,7 +914,7 @@ void jpmsys5_state::jpmsys5(machine_config &config)
 	ptm.irq_callback().set(FUNC(jpmsys5_state::ptm_irq));
 	config.set_default_layout(layout_jpmsys5);
 
-	METERS(config, m_meters, 0).set_number_meters(8);
+	METERS(config, m_meters, 0).set_number(8);
 }
 
 /*************************************

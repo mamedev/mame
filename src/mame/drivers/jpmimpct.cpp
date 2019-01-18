@@ -871,8 +871,7 @@ MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 
 	MCFG_VIDEO_START_OVERRIDE(jpmimpct_state,jpmimpct)
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(5)
+	METERS(config, m_meters, 0).set_number(5);
 MACHINE_CONFIG_END
 
 
@@ -1348,8 +1347,7 @@ MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	REEL(config, m_reel[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(5)
+	METERS(config, m_meters, 0).set_number(5);
 
 MACHINE_CONFIG_END
 
