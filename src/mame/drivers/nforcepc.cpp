@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "crush11", "NVIDIA Corporation 
 void crush11_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
-	map(0x50, 0x50).rw(FUNC(crush11_host_device::test_r), FUNC(crush11_host_device::test_w));
+	map(0xf0, 0xf0).rw(FUNC(crush11_host_device::test_r), FUNC(crush11_host_device::test_w));
 }
 
 crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -93,7 +93,7 @@ void crush11_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 
 READ8_MEMBER(crush11_host_device::test_r)
 {
-	return 0;
+	return 4;
 }
 
 WRITE8_MEMBER(crush11_host_device::test_w)
@@ -112,13 +112,13 @@ smbus_logger_device::smbus_logger_device(const machine_config &mconfig, const ch
 
 int smbus_logger_device::execute_command(int command, int rw, int data)
 {
-	if (rw == 1) // read
+	if (rw == 1)
 	{
-		logerror("smbus read  %02x %d %02x\n", command, rw, buffer[command]);
+		logerror("smbus read from %02x R %02x\n", command, buffer[command]);
 		return buffer[command];
 	}
 	buffer[command] = (uint8_t)data;
-	logerror("smbus write %02x %d %02d\n", command, rw, data);
+	logerror("smbus write to %02x W %02x\n", command, data);
 	return 0;
 }
 
@@ -129,6 +129,80 @@ void smbus_logger_device::device_start()
 
 void smbus_logger_device::device_reset()
 {
+}
+
+// Asus AS99127F chip
+
+DEFINE_DEVICE_TYPE(AS99127F, as99127f_device, "as99127f", "Asus AS99127F")
+
+as99127f_device::as99127f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AS99127F, tag, owner, clock)
+{
+}
+
+int as99127f_device::execute_command(int command, int rw, int data)
+{
+	if (rw == 1)
+	{
+		logerror("smbus read from %02x R %02x\n", command, buffer[command]);
+		return buffer[command];
+	}
+	buffer[command] = (uint8_t)data;
+	logerror("smbus write to %02x W %02x\n", command, data);
+	return 0;
+}
+
+void as99127f_device::device_start()
+{
+	memset(buffer, 0, sizeof(buffer));
+}
+
+DEFINE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device, "as99127f_sensor2", "Asus AS99127F temperature sensor 2")
+
+as99127f_sensor2_device::as99127f_sensor2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AS99127F_SENSOR2, tag, owner, clock)
+{
+}
+
+int as99127f_sensor2_device::execute_command(int command, int rw, int data)
+{
+	if (rw == 1)
+	{
+		logerror("smbus read from %02x R %02x\n", command, buffer[command]);
+		return buffer[command];
+	}
+	buffer[command] = (uint8_t)data;
+	logerror("smbus write to %02x W %02x\n", command, data);
+	return 0;
+}
+
+void as99127f_sensor2_device::device_start()
+{
+	memset(buffer, 0, sizeof(buffer));
+}
+
+DEFINE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device, "as99127f_sensor3", "Asus AS99127F temperature sensor 3")
+
+as99127f_sensor3_device::as99127f_sensor3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AS99127F_SENSOR2, tag, owner, clock)
+{
+}
+
+int as99127f_sensor3_device::execute_command(int command, int rw, int data)
+{
+	if (rw == 1)
+	{
+		logerror("smbus read from %02x R %02x\n", command, buffer[command]);
+		return buffer[command];
+	}
+	buffer[command] = (uint8_t)data;
+	logerror("smbus write to %02x W %02x\n", command, data);
+	return 0;
+}
+
+void as99127f_sensor3_device::device_start()
+{
+	memset(buffer, 0, sizeof(buffer));
 }
 
 /*
@@ -162,17 +236,20 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcpx_isalpc_device> isalpc;
+	required_device<as99127f_device> m_as99127f;
 };
 
 nforcepc_state::nforcepc_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	isalpc(*this, ":pci:01.0")
+	isalpc(*this, ":pci:01.0"),
+	m_as99127f(*this, ":pci:01.1:2d")
 {
 }
 
 void nforcepc_state::machine_start()
 {
+	m_as99127f->get_buffer()[0x4f] = 0x12;
 }
 
 void nforcepc_state::machine_reset()
@@ -194,7 +271,6 @@ WRITE8_MEMBER(nforcepc_state::boot_state_award_w)
 			break;
 		}
 	logerror("Boot state %02x - %s\n", data, desc);
-
 }
 
 IRQ_CALLBACK_MEMBER(nforcepc_state::irq_callback)
@@ -238,9 +314,9 @@ void nforcepc_state::nforcepc(machine_config &config)
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
 	MCPX_SMBUS(config, ":pci:01.1", 0); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
 	SMBUS_LOGGER(config, ":pci:01.1:08", 0);
-	SMBUS_LOGGER(config, ":pci:01.1:2d", 0);
-	SMBUS_LOGGER(config, ":pci:01.1:48", 0);
-	SMBUS_LOGGER(config, ":pci:01.1:49", 0);
+	AS99127F(config, ":pci:01.1:2d", 0);
+	AS99127F_SENSOR2(config, ":pci:01.1:48", 0);
+	AS99127F_SENSOR3(config, ":pci:01.1:49", 0);
 	/*10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01c2 NVIDIA Corporation nForce USB Controller
 	10de:01b0 NVIDIA Corporation nForce Audio Processing Unit

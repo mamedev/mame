@@ -69,8 +69,8 @@ public:
 	uint32_t acknowledge();
 	void debug_generate_irq(int irq, int state);
 
-	DECLARE_READ32_MEMBER(lpc_r);
-	DECLARE_WRITE32_MEMBER(lpc_w);
+	DECLARE_READ32_MEMBER(acpi_r);
+	DECLARE_WRITE32_MEMBER(acpi_w);
 	DECLARE_WRITE8_MEMBER(boot_state_w);
 
 	DECLARE_WRITE_LINE_MEMBER(irq1);
