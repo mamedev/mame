@@ -343,36 +343,37 @@ static INPUT_PORTS_START( v100 )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(v100_state::v100)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(47'736'000) / 12) // divider not verified
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(v100_state, irq_ack)
+void v100_state::v100(machine_config &config)
+{
+	Z80(config, m_maincpu, 47.736_MHz_XTAL / 20); // 2.387 MHz PCLOCK
+	m_maincpu->set_addrmap(AS_PROGRAM, &v100_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &v100_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(v100_state::irq_ack));
 
-	I8251(config, m_usart[0], XTAL(47'736'000) / 12); // divider not verified
+	I8251(config, m_usart[0], 47.736_MHz_XTAL / 20);
 
-	com8116_device &brg1(COM8116(config, "brg1", 5068800)); // TODO: clock and divisors for this customized variant
+	com8116_device &brg1(COM8116_020(config, "brg1", 1.8432_MHz_XTAL));
 	brg1.fr_handler().set(m_usart[0], FUNC(i8251_device::write_rxc));
 	brg1.ft_handler().set(m_usart[0], FUNC(i8251_device::write_txc));
 
-	I8251(config, m_usart[1], XTAL(47'736'000) / 12);
+	I8251(config, m_usart[1], 47.736_MHz_XTAL / 20);
 
-	com8116_device &brg2(COM8116(config, "brg2", 5068800));
+	com8116_device &brg2(COM8116_020(config, "brg2", 1.8432_MHz_XTAL));
 	brg2.fr_handler().set(m_usart[1], FUNC(i8251_device::write_rxc));
 	brg2.ft_handler().set(m_usart[1], FUNC(i8251_device::write_txc));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000) / 2, 102 * V100_CH_WIDTH, 0, 80 * V100_CH_WIDTH, 260, 0, 240)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(47'736'000), 170 * V100_CH_WIDTH, 0, 132 * V100_CH_WIDTH, 312, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(v100_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_raw(47.736_MHz_XTAL / 2, 102 * V100_CH_WIDTH, 0, 80 * V100_CH_WIDTH, 260, 0, 240);
+	m_screen->set_raw(47.736_MHz_XTAL, 170 * V100_CH_WIDTH, 0, 132 * V100_CH_WIDTH, 312, 0, 240);
+	m_screen->set_screen_update(FUNC(v100_state::screen_update));
 
-	CRT5037(config, m_vtac, XTAL(47'736'000) / V100_CH_WIDTH);
+	CRT5037(config, m_vtac, 47.736_MHz_XTAL / V100_CH_WIDTH);
 	m_vtac->set_char_width(V100_CH_WIDTH);
 	m_vtac->set_screen("screen");
 	m_vtac->hsyn_callback().set(FUNC(v100_state::picu_r_w<7>)).invert();
 	m_vtac->vsyn_callback().set(FUNC(v100_state::picu_r_w<6>)).invert();
 
-	I8214(config, m_picu, XTAL(47'736'000) / 12);
+	I8214(config, m_picu, 47.736_MHz_XTAL / 20);
 	m_picu->int_wr_callback().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	i8255_device &ppi(I8255(config, "ppi", 0));
@@ -384,7 +385,7 @@ MACHINE_CONFIG_START(v100_state::v100)
 	ppi.out_pc_callback().append(m_earom, FUNC(er1400_device::clock_w)).bit(0).invert();
 
 	ER1400(config, m_earom);
-MACHINE_CONFIG_END
+}
 
 
 
