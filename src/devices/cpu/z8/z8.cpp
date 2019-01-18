@@ -119,6 +119,7 @@ DEFINE_DEVICE_TYPE(UB8830D, ub8830d_device, "ub8830d", "UB8830D")
 DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Zilog Z8611")
 DEFINE_DEVICE_TYPE(Z8671,   z8671_device,   "z8671",   "Zilog Z8671")
 DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
+DEFINE_DEVICE_TYPE(Z8682,   z8682_device,   "z8682",   "Zilog Z8682")
 
 
 /***************************************************************************
@@ -212,6 +213,23 @@ const tiny_rom_entry *z8671_device::device_rom_region() const
 z8681_device::z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z8_device(mconfig, Z8681, tag, owner, clock, 0, false)
 {
+}
+
+
+z8682_device::z8682_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z8682, tag, owner, clock, 0x800, true)
+{
+}
+
+ROM_START(z8682)
+	// Zilog admits that this nominally ROMless type uses a "small internal ROM"
+	ROM_REGION(0x0800, "internal", 0)
+	ROM_LOAD("z8682.bin", 0x0000, 0x0800, CRC(37525bc8) SHA1(3ce6251d647c4af4a7cbd854f6de1b4027c9f27a) BAD_DUMP) // hand-crafted bootstrap
+ROM_END
+
+const tiny_rom_entry *z8682_device::device_rom_region() const
+{
+	return ROM_NAME(z8682);
 }
 
 
@@ -845,7 +863,8 @@ TIMER_CALLBACK_MEMBER( z8_device::t0_tick )
 	if (m_count[0] == 0)
 	{
 		m_count[0] = m_t[0];
-		m_t0_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((m_pre[0] >> 2) + 1)));
+		attotime period = cycles_to_attotime(4 * ((m_pre[0] >> 2) + 1));
+		m_t0_timer->adjust(period, 0, period);
 		m_t0_timer->enable(m_pre[0] & Z8_PRE0_COUNT_MODULO_N);
 		request_interrupt(4);
 	}
@@ -858,8 +877,9 @@ TIMER_CALLBACK_MEMBER( z8_device::t1_tick )
 	if (m_count[1] == 0)
 	{
 		m_count[1] = m_t[1];
-		m_t1_timer->adjust(attotime::zero, 0, cycles_to_attotime(4 * ((m_pre[1] >> 2) + 1)));
-		m_t1_timer->enable(m_pre[1] & Z8_PRE0_COUNT_MODULO_N);
+		attotime period = cycles_to_attotime(4 * ((m_pre[1] >> 2) + 1));
+		m_t1_timer->adjust(period, 0, period);
+		m_t1_timer->enable(m_pre[1] & Z8_PRE1_COUNT_MODULO_N);
 		request_interrupt(5);
 	}
 }
