@@ -148,6 +148,7 @@ public:
 	vsmileb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: vsmile_base_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
+		, m_io_logo(*this, "LOGO")
 		, m_cart_region(nullptr)
 		, m_cart_addr_mask(0)
 	{ }
@@ -170,6 +171,7 @@ private:
 	DECLARE_WRITE8_MEMBER(chip_sel_w);
 
 	required_device<generic_slot_device> m_cart;
+	required_ioport m_io_logo;
 
 	memory_region *m_cart_region;
 	uint32_t m_cart_addr_mask;
@@ -446,7 +448,7 @@ DEVICE_IMAGE_LOAD_MEMBER(vsmileb_state, cart)
 
 READ16_MEMBER(vsmileb_state::porta_r)
 {
-	uint16_t data = 0x0380;
+	uint16_t data = 0x0300 | (m_io_logo->read() ? 0x0080 : 0x0000);
 	logerror("%s: GPIO Port A Read: %04x\n", machine().describe_context(), data);
 	return data;
 }
@@ -540,12 +542,17 @@ static INPUT_PORTS_START( vsmile )
 	PORT_DIPSETTING(    0x0c, "Spain" )
 	PORT_DIPSETTING(    0x0d, "France" )
 	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
-	PORT_DIPSETTING(    0x00, "No" )
-	PORT_DIPSETTING(    0x10, "Yes" )
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPSETTING(    0x10, "On" )
 	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsmileb )
+	PORT_START("LOGO")
+	PORT_DIPNAME( 0x10, 0x10, "VTech Intro" )
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPSETTING(    0x10, "On" )
+	PORT_BIT( 0xe0, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 static void vsmile_cart(device_slot_interface &device)
