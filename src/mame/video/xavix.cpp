@@ -835,7 +835,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						dat |= (get_next_bit() << i);
 					}
 
-					if (((x < cliprect.max_x) && (x >= cliprect.min_x)) && ((y < cliprect.max_y) && (y >= cliprect.min_y)))
+					if (((x <= cliprect.max_x) && (x >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
 					{
 						if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 						{
