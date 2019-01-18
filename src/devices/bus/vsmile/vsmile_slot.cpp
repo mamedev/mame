@@ -57,12 +57,12 @@ void device_vsmile_cart_interface::rom_alloc(uint32_t size, const char *tag)
 
 
 //-------------------------------------------------
-//  ram_alloc - alloc the space for the ram
+//  nvram_alloc - alloc the space for the nvram
 //-------------------------------------------------
 
-void device_vsmile_cart_interface::ram_alloc(uint32_t size)
+void device_vsmile_cart_interface::nvram_alloc(uint32_t size)
 {
-	m_ram.resize(size / sizeof(uint16_t));
+	m_nvram.resize(size / sizeof(uint16_t));
 }
 
 
@@ -115,7 +115,7 @@ struct vsmile_slot
 static const vsmile_slot slot_list[] =
 {
 	{ VSMILE_STD, "vsmile_rom" },
-	{ VSMILE_SRAM, "vsmile_ram" },
+	{ VSMILE_NVRAM, "vsmile_nvram" },
 };
 
 static int vsmile_get_pcb_id(const char *slot)
@@ -164,9 +164,15 @@ image_init_result vsmile_cart_slot_device::call_load()
 			osd_printf_info("V.Smile: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
 		}
 
-		if (m_type == VSMILE_SRAM)
+		if (m_type == VSMILE_NVRAM)
 		{
-			m_cart->ram_alloc(0x200000);
+			m_cart->nvram_alloc(0x200000);
+		}
+
+		if (m_cart->get_nvram_size())
+		{
+			printf("nvram_size 1\n");
+			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 		}
 
 		return image_init_result::PASS;
@@ -182,6 +188,12 @@ image_init_result vsmile_cart_slot_device::call_load()
 
 void vsmile_cart_slot_device::call_unload()
 {
+	if (m_cart)
+		printf("nvram_size: %d\n", m_cart->get_nvram_size());
+	if (m_cart && m_cart->get_nvram_size())
+	{
+		battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());
+	}
 }
 
 

@@ -557,8 +557,8 @@ INPUT_PORTS_END
 
 static void vsmile_cart(device_slot_interface &device)
 {
-	device.option_add_internal("vsmile_rom", VSMILE_ROM_STD);
-	device.option_add_internal("vsmile_ram", VSMILE_ROM_RAM);
+	device.option_add_internal("vsmile_rom",   VSMILE_ROM_STD);
+	device.option_add_internal("vsmile_nvram", VSMILE_ROM_NVRAM);
 }
 
 void vsmile_base_state::vsmile_base(machine_config &config)

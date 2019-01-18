@@ -4,7 +4,7 @@
 
  V.Smile cart emulation
 
- We support standard carts and one with on-board RAM
+ We support standard carts and one with on-board NVRAM
 
  ***********************************************************************************************************/
 
@@ -17,8 +17,8 @@
 //  vsmile_rom_device - constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(VSMILE_ROM_STD, vsmile_rom_device,     "vsmile_rom",     "V.Smile Cart")
-DEFINE_DEVICE_TYPE(VSMILE_ROM_RAM, vsmile_rom_ram_device, "vsmile_rom_ram", "V.Smile Cart + RAM")
+DEFINE_DEVICE_TYPE(VSMILE_ROM_STD,   vsmile_rom_device,       "vsmile_rom",       "V.Smile Cart")
+DEFINE_DEVICE_TYPE(VSMILE_ROM_NVRAM, vsmile_rom_nvram_device, "vsmile_rom_nvram", "V.Smile Cart + NVRAM")
 
 
 vsmile_rom_device::vsmile_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -32,13 +32,13 @@ vsmile_rom_device::vsmile_rom_device(const machine_config &mconfig, const char *
 {
 }
 
-vsmile_rom_ram_device::vsmile_rom_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+vsmile_rom_nvram_device::vsmile_rom_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: vsmile_rom_device(mconfig, type, tag, owner, clock)
 {
 }
 
-vsmile_rom_ram_device::vsmile_rom_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: vsmile_rom_ram_device(mconfig, VSMILE_ROM_RAM, tag, owner, clock)
+vsmile_rom_nvram_device::vsmile_rom_nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vsmile_rom_nvram_device(mconfig, VSMILE_ROM_NVRAM, tag, owner, clock)
 {
 }
 
@@ -57,19 +57,19 @@ void vsmile_rom_device::device_reset()
 
 
 /*-------------------------------------------------
- Carts with RAM
+ Cart with NVRAM
  -------------------------------------------------*/
 
-READ16_MEMBER(vsmile_rom_ram_device::bank2_r)
+READ16_MEMBER(vsmile_rom_nvram_device::bank2_r)
 {
-	if (!m_ram.empty() && offset < m_ram.size())
-		return m_ram[offset];
+	if (!m_nvram.empty() && offset < m_nvram.size())
+		return m_nvram[offset];
 	else    // this cannot actually happen...
 		return 0;
 }
 
-WRITE16_MEMBER(vsmile_rom_ram_device::bank2_w)
+WRITE16_MEMBER(vsmile_rom_nvram_device::bank2_w)
 {
-	if (!m_ram.empty() && offset < m_ram.size())
-		COMBINE_DATA(&m_ram[offset]);
+	if (!m_nvram.empty() && offset < m_nvram.size())
+		COMBINE_DATA(&m_nvram[offset]);
 }

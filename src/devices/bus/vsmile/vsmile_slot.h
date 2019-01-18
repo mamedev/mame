@@ -17,7 +17,7 @@
 enum
 {
 	VSMILE_STD = 0,
-	VSMILE_SRAM
+	VSMILE_NVRAM
 };
 
 // ======================> device_vsmile_cart_interface
@@ -39,12 +39,14 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(bank3_w) { printf("3 %08x = %04x\n", offset, data); }
 
 	void rom_alloc(uint32_t size, const char *tag);
-	void ram_alloc(uint32_t size);
+	void nvram_alloc(uint32_t size);
 	uint16_t* get_rom_base() { return m_rom; }
-	uint16_t* get_ram_base() { return &m_ram[0]; }
+	uint16_t* get_nvram_base() { return &m_nvram[0]; }
 	uint32_t get_rom_size() { return m_rom_size; }
-	uint32_t get_ram_size() { return m_ram.size() * sizeof(uint16_t); }
+	uint32_t get_nvram_size() { return m_nvram.size() * sizeof(uint16_t); }
 	void set_rom_size(uint32_t val) { m_rom_size = val; }
+
+	void save_nvram()   { device().save_item(NAME(m_nvram)); }
 
 protected:
 	device_vsmile_cart_interface(const machine_config &mconfig, device_t &device);
@@ -52,7 +54,7 @@ protected:
 	// internal state
 	uint16_t *m_rom;		// this points to the cart rom region
 	uint32_t m_rom_size;	// this is the actual game size, not the rom region size!
-	std::vector<uint16_t> m_ram;
+	std::vector<uint16_t> m_nvram;
 };
 
 
@@ -84,6 +86,7 @@ public:
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
+	void save_nvram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 	uint32_t get_rom_size() { if (m_cart) return m_cart->get_rom_size(); return 0; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }

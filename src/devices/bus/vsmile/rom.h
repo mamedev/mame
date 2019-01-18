@@ -30,25 +30,25 @@ protected:
 };
 
 
-// ======================> vsmile_rom_ram_device
+// ======================> vsmile_rom_nvram_device
 
-class vsmile_rom_ram_device : public vsmile_rom_device
+class vsmile_rom_nvram_device : public vsmile_rom_device
 {
 public:
 	// construction/destruction
-	vsmile_rom_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vsmile_rom_nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_READ16_MEMBER(bank2_r) override;
 	virtual DECLARE_WRITE16_MEMBER(bank2_w) override;
 
 protected:
-	vsmile_rom_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	vsmile_rom_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(VSMILE_ROM_STD, vsmile_rom_device)
-DECLARE_DEVICE_TYPE(VSMILE_ROM_RAM, vsmile_rom_ram_device)
+DECLARE_DEVICE_TYPE(VSMILE_ROM_NVRAM, vsmile_rom_nvram_device)
 
 
 #endif // MAME_BUS_VSMILE_ROM_H
