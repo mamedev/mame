@@ -1081,8 +1081,12 @@ READ16_MEMBER(spg2xx_device::io_r)
 		LOGMASKED(LOG_SEGMENT, "io_r: Data Segment = %04x\n", val);
 		break;
 
+	case 0x30: // UART Control
+		LOGMASKED(LOG_UART, "%s: io_r: UART Control = %04x\n", machine().describe_context(), val);
+		break;
+
 	case 0x31: // UART Status
-		LOGMASKED(LOG_UART, "%s: io_r: UART Status = %04x\n", machine().describe_context(), val);
+		//LOGMASKED(LOG_UART, "%s: io_r: UART Status = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x36: // UART RX Data

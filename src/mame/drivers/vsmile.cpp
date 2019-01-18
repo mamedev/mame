@@ -412,7 +412,7 @@ void vsmile_state::banked_map(address_map &map)
 
 	map(0x1800000, 0x18fffff).rw(m_cart, FUNC(vsmile_cart_slot_device::bank0_r), FUNC(vsmile_cart_slot_device::bank0_w));
 	map(0x1900000, 0x19fffff).rw(m_cart, FUNC(vsmile_cart_slot_device::bank1_r), FUNC(vsmile_cart_slot_device::bank1_w));
-	map(0x1a00000, 0x1afffff).r(m_cart, FUNC(vsmile_cart_slot_device::bank2_r));
+	map(0x1a00000, 0x1afffff).rw(m_cart, FUNC(vsmile_cart_slot_device::bank2_r), FUNC(vsmile_cart_slot_device::bank2_w));
 	map(0x1b00000, 0x1bfffff).r(FUNC(vsmile_state::bank3_r));
 }
 

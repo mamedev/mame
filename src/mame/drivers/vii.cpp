@@ -12,12 +12,12 @@
 		Fantastic 4
 		Justice League
 		Dora the Explorer
-		Mattel Classic Sports 
+		Mattel Classic Sports
 
-		"SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead 
+		"SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead
 
 		"SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
-	
+
     Status:
 
         Mostly working
@@ -101,6 +101,7 @@ public:
 	void wireless60(machine_config &config);
 	void rad_skat(machine_config &config);
 	void rad_skatp(machine_config &config);
+	void rad_sktv(machine_config &config);
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
 
@@ -121,6 +122,10 @@ protected:
 	DECLARE_WRITE16_MEMBER(wireless60_porta_w);
 	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
 	DECLARE_READ16_MEMBER(wireless60_porta_r);
+
+	DECLARE_READ16_MEMBER(rad_porta_r);
+	DECLARE_READ16_MEMBER(rad_portb_r);
+	DECLARE_READ16_MEMBER(rad_portc_r);
 
 	required_device<unsp_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -300,6 +305,27 @@ WRITE16_MEMBER(spg2xx_game_state::walle_portc_w)
 READ16_MEMBER(spg2xx_game_state::jakks_porta_r)
 {
 	return m_io_p1->read();
+}
+
+READ16_MEMBER(spg2xx_game_state::rad_porta_r)
+{
+	uint16_t data = m_io_p1->read();
+	logerror("Port A Read: %04x\n", data);
+	return data;
+}
+
+READ16_MEMBER(spg2xx_game_state::rad_portb_r)
+{
+	uint16_t data = m_io_p2->read();
+	logerror("Port B Read: %04x\n", data);
+	return data;
+}
+
+READ16_MEMBER(spg2xx_game_state::rad_portc_r)
+{
+	uint16_t data = m_io_p3->read();
+	logerror("Port C Read: %04x\n", data);
+	return data;
 }
 
 void spg2xx_game_state::mem_map(address_map &map)
@@ -563,6 +589,9 @@ static INPUT_PORTS_START( rad_sktv )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mattelcs ) // there is a 'secret test mode' that previously got activated before inputs were mapped, might need unused inputs to active?  there also needs to be 'difficult' selection somewhere
@@ -579,7 +608,7 @@ static INPUT_PORTS_START( mattelcs ) // there is a 'secret test mode' that previ
 	PORT_DIPSETTING(      0x0010, "Basketball (Middle)" )
 	PORT_DIPSETTING(      0x0000, "Football (Right)" )
 	// no 4th position possible
-	PORT_BIT( 0xffe0, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0xffe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_NAME("Joypad Up")
@@ -587,13 +616,13 @@ static INPUT_PORTS_START( mattelcs ) // there is a 'secret test mode' that previ
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_NAME("Joypad Left")
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Joypad Right")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_NAME("Sound") // toggles between sound+music, sound only, and no sound
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_NAME("Hike / Pitch")  
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_NAME("Shoot / Run")  
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_NAME("Kick / Hit")  
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_NAME("Hike / Pitch")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_NAME("Shoot / Run")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_NAME("Kick / Hit")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* hold 'Console Down' while powering up to get the test menu, including input tests
@@ -875,6 +904,20 @@ void spg2xx_game_state::rad_skatp(machine_config &config)
 	m_spg->set_pal(true);
 }
 
+void spg2xx_game_state::rad_sktv(machine_config &config)
+{
+	SPG24X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
+	spg2xx_base(config);
+
+	m_spg->porta_in().set(FUNC(spg2xx_game_state::rad_porta_r));
+	m_spg->portb_in().set(FUNC(spg2xx_game_state::rad_portb_r));
+	m_spg->portc_in().set(FUNC(spg2xx_game_state::rad_portc_r));
+	m_spg->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
+	m_spg->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+}
+
 void spg2xx_game_state::rad_crik(machine_config &config)
 {
 	SPG28X(config, m_spg, XTAL(27'000'000), m_maincpu, m_screen);
@@ -1146,7 +1189,7 @@ CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,jakks_gkr_state, empty_init, "
 CONS( 2006, rad_skat,  0,        0, rad_skat, rad_skat,   spg2xx_game_state, init_crc, "Radica", "Play TV Skateboarder (NTSC)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, rad_skatp, rad_skat, 0, rad_skatp,rad_skatp,  spg2xx_game_state, init_crc, "Radica", "Connectv Skateboarder (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, rad_crik,  0,        0, rad_crik, rad_crik,   spg2xx_game_state, init_crc, "Radica", "Connectv Cricket (PAL)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Version 3.00 20/03/06 is listed in INTERNAL TEST
-CONS( 2007, rad_sktv,  0,        0, rad_skat, rad_sktv,   spg2xx_game_state, init_crc, "Radica", "Skannerz TV",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 2007, rad_sktv,  0,        0, rad_sktv, rad_sktv,   spg2xx_game_state, init_crc, "Radica", "Skannerz TV",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 CONS( 2007, rad_fb2,   0,        0, rad_skat, rad_fb2,    spg2xx_game_state, init_crc, "Radica", "Play TV Football 2",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 // Mattel games

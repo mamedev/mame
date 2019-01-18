@@ -2254,7 +2254,7 @@ Game cartridges
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-067021(SE)" />
 		<part name="cart" interface="vsmile_cart">
-			<feature name="slot" value="vsmile_rom" />
+			<feature name="slot" value="vsmile_ram" />
 			<feature name="pcb" value="67000C" />
 			<feature name="pcb_model" value="67000C-2" />
 			<feature name="cart_type" value="yellow" />
