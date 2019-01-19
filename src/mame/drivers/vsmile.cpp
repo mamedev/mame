@@ -21,6 +21,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/vsmile/vsmile_ctrl.h"
 #include "bus/vsmile/vsmile_slot.h"
 #include "bus/vsmile/rom.h"
 
@@ -63,6 +64,7 @@ public:
 	vsmile_state(const machine_config &mconfig, device_type type, const char *tag)
 		: vsmile_base_state(mconfig, type, tag)
 		, m_cart(*this, "cartslot")
+		, m_ctrl(*this, "ctrl%u", 1U)
 		, m_io_joy(*this, "JOY")
 		, m_io_colors(*this, "COLORS")
 		, m_io_buttons(*this, "BUTTONS")
@@ -123,6 +125,7 @@ private:
 	};
 
 	required_device<vsmile_cart_slot_device> m_cart;
+	required_device_array<vsmile_ctrl_port_device, 2> m_ctrl;
 	required_ioport m_io_joy;
 	required_ioport m_io_colors;
 	required_ioport m_io_buttons;
@@ -601,6 +604,14 @@ void vsmile_state::vsmile(machine_config &config)
 	m_bankdev->set_addrmap(AS_PROGRAM, &vsmile_state::banked_map);
 
 	VSMILE_CART_SLOT(config, m_cart, vsmile_cart, nullptr);
+
+	VSMILE_CTRL_PORT(config, m_ctrl[0], vsmile_controllers, "joy");
+	m_ctrl[0]->rts_cb().set([this] (int state) { logerror("controller 1 RTS: %d\n", state); });
+	m_ctrl[0]->data_cb().set([this] (int data) { logerror("controller 1 data: %02X\n", data); });
+
+	VSMILE_CTRL_PORT(config, m_ctrl[1], vsmile_controllers, nullptr);
+	m_ctrl[1]->rts_cb().set([this] (int state) { logerror("controller 2 RTS: %d\n", state); });
+	m_ctrl[1]->data_cb().set([this] (int data) { logerror("controller 2 data: %02X\n", data); });
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
 	SOFTWARE_LIST(config, "cart_list2").set_original("vsmilem_cart");
