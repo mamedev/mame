@@ -15,6 +15,10 @@
 #include "ui/selmenu.h"
 #include "ui/utils.h"
 
+#include <map>
+#include <string>
+#include <vector>
+
 
 namespace ui {
 
@@ -28,6 +32,21 @@ public:
 private:
 	using filter_map = std::map<software_filter::type, software_filter::ptr>;
 	using icon_cache = texture_lru<ui_software_info const *>;
+
+	struct search_item
+	{
+		search_item(ui_software_info const &s);
+		search_item(search_item const &) = default;
+		search_item(search_item &&) = default;
+		search_item &operator=(search_item const &) = default;
+		search_item &operator=(search_item &&) = default;
+		void set_penalty(std::u32string const &search);
+
+		std::reference_wrapper<ui_software_info const> software;
+		std::u32string ucs_shortname;
+		std::u32string ucs_longname;
+		double penalty;
+	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
@@ -51,7 +70,7 @@ private:
 	virtual void inkey_export() override { throw false; }
 
 	void build_software_list();
-	void find_matches(const char *str, int count);
+	void find_matches();
 	void load_sw_custom_filters();
 
 	// handlers
@@ -68,7 +87,7 @@ private:
 	software_filter::type               m_filter_type;
 
 	std::vector<ui_software_info>       m_swinfo;
-	ui_software_info const              *m_searchlist[MAX_VISIBLE_SEARCH + 1];
+	std::vector<search_item>            m_searchlist;
 	std::vector<std::reference_wrapper<ui_software_info const> > m_displaylist;
 };
 

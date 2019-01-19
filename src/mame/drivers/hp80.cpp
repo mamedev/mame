@@ -1395,8 +1395,8 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
 
 	// Printer output
-	MCFG_DEVICE_ADD("prt_graphic", BITBANGER, 0)
-	MCFG_DEVICE_ADD("prt_alpha", BITBANGER, 0)
+	BITBANGER(config, m_prt_graph_out, 0);
+	BITBANGER(config, m_prt_alpha_out, 0);
 
 	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
 MACHINE_CONFIG_END

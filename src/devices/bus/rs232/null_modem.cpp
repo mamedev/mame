@@ -22,9 +22,10 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 {
 }
 
-MACHINE_CONFIG_START(null_modem_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("stream", BITBANGER, 0)
-MACHINE_CONFIG_END
+void null_modem_device::device_add_mconfig(machine_config &config)
+{
+	BITBANGER(config, m_stream, 0);
+}
 
 static INPUT_PORTS_START(null_modem)
 	MCFG_RS232_BAUD("RS232_TXBAUD", RS232_BAUD_9600, "TX Baud", null_modem_device, update_serial)

@@ -184,7 +184,7 @@ void as99127f_sensor2_device::device_start()
 DEFINE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device, "as99127f_sensor3", "Asus AS99127F temperature sensor 3")
 
 as99127f_sensor3_device::as99127f_sensor3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AS99127F_SENSOR2, tag, owner, clock)
+	: device_t(mconfig, AS99127F_SENSOR3, tag, owner, clock)
 {
 }
 
