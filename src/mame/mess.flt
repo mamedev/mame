@@ -693,6 +693,7 @@ spec128.cpp
 special.cpp
 specpls3.cpp
 spectrum.cpp
+spg110.cpp
 squale.cpp
 ssem.cpp
 ssystem3.cpp
@@ -772,6 +773,7 @@ tr175.cpp
 tr606.cpp
 tranz330.cpp
 tricep.cpp
+trkfldch.cpp
 trs80.cpp
 trs80dt1.cpp
 trs80m2.cpp
