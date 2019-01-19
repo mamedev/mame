@@ -577,7 +577,9 @@ void mc6847_base_device::setup_fixed_mode()
 
 
 //-------------------------------------------------
-//  device_config_complete - device-specific startup
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
 //-------------------------------------------------
 
 void mc6847_base_device::device_config_complete()

@@ -51,8 +51,6 @@ public:
 	bool hs_r() const { return m_horizontal_sync; }
 	bool fs_r() const { return m_field_sync; }
 
-	template <class Object> devcb_base &set_hsync_wr_callback(Object &&cb) { return m_write_hsync.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_fsync_wr_callback(Object &&cb) { return m_write_fsync.set_callback(std::forward<Object>(cb)); }
 	auto hsync_wr_callback() { return m_write_hsync.bind(); }
 	auto fsync_wr_callback() { return m_write_fsync.bind(); }
 
@@ -490,7 +488,6 @@ private:
 class mc6847_base_device : public mc6847_friend_device
 {
 public:
-	template <class Object> devcb_base &set_input_callback(Object &&cb) { return m_input_cb.set_callback(std::forward<Object>(cb)); }
 	auto input_callback() { return m_input_cb.bind(); }
 
 	void set_get_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
