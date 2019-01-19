@@ -1084,8 +1084,7 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(FUNC(cubo_state::rs232_rx_w));
 
-	MCFG_CDROM_ADD("cd32_cdrom")
-	MCFG_CDROM_INTERFACE("cd32_cdrom")
+	CDROM(config, "cd32_cdrom").set_interface("cd32_cdrom");
 
 	/* fdc */
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);

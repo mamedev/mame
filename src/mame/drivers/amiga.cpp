@@ -2129,8 +2129,7 @@ MACHINE_CONFIG_START(cd32_state::cd32)
 	m_cia_0->pa_wr_callback().set(FUNC(cd32_state::akiko_cia_0_port_a_write));
 	m_cia_0->sp_wr_callback().set_nop();
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("cd32_cdrom")
+	CDROM(config, "cdrom").set_interface("cd32_cdrom");
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "cd32")
 MACHINE_CONFIG_END
 

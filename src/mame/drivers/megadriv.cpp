@@ -753,8 +753,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 	SEGA_SEGACD_US(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
 MACHINE_CONFIG_END
@@ -771,8 +770,7 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
 MACHINE_CONFIG_END
@@ -789,8 +787,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
 MACHINE_CONFIG_END
@@ -803,8 +800,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 	SEGA_SEGACD_US(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
@@ -823,8 +819,7 @@ MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
@@ -843,8 +838,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
 	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 

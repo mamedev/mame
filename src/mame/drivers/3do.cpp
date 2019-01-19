@@ -168,7 +168,7 @@ MACHINE_CONFIG_START(_3do_state::_3do)
 	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )
 	MCFG_SCREEN_UPDATE_DRIVER(_3do_state, screen_update)
 
-	MCFG_CDROM_ADD("cdrom")
+	CDROM(config, "cdrom");
 MACHINE_CONFIG_END
 
 
@@ -186,7 +186,7 @@ MACHINE_CONFIG_START(_3do_state::_3do_pal)
 	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262 ) // TODO: proper params
 	MCFG_SCREEN_UPDATE_DRIVER(_3do_state, screen_update)
 
-	MCFG_CDROM_ADD("cdrom")
+	CDROM(config, "cdrom");
 MACHINE_CONFIG_END
 
 #if 0

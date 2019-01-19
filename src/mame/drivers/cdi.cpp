@@ -829,8 +829,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono2)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("cdi_cdrom")
+	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 
@@ -884,8 +883,7 @@ MACHINE_CONFIG_START(cdi_state::cdi910)
 	MCFG_DEVICE_ADD("slave", M68HC05EG, 2000000) /* Unknown clock speed, docs say 2MHz internal clock */
 	MCFG_DEVICE_PROGRAM_MAP(cdimono2_slave_mem)
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("cdi_cdrom")
+	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 
@@ -911,8 +909,7 @@ MACHINE_CONFIG_START(cdi_state::cdimono1)
 	cdimono1_base(config);
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, cdimono1)
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("cdi_cdrom")
+	CDROM(config, "cdrom").set_interface("cdi_cdrom");
 	MCFG_SOFTWARE_LIST_ADD("cd_list","cdi")
 	MCFG_SOFTWARE_LIST_FILTER("cd_list","!DVC")
 MACHINE_CONFIG_END

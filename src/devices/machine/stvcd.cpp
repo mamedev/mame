@@ -79,8 +79,7 @@ stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, devic
 }
 
 MACHINE_CONFIG_START(stvcd_device::device_add_mconfig)
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("sat_cdrom")
+	CDROM(config, "cdrom").set_interface("sat_cdrom");
 
 	MCFG_TIMER_DRIVER_ADD("sector_timer", stvcd_device, stv_sector_cb)
 	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stvcd_device, stv_sh1_sim)
