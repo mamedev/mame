@@ -89,7 +89,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="246792">
-        <rom name="aquatron.woz" size="246792" crc="050A69FF" sha1="9BB84494A65B673D3444EDD044206F9A1A148A4A" offset="0x0000" />
+        <rom name="aquatron.woz" size="246792" crc="050a69ff" sha1="9bb84494a65b673d3444edd044206f9a1a148a4a" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -229,7 +229,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240180">
-        <rom name="bellhop.woz" size="240180" crc="14F96DE9" sha1="8B864BDFEB11F029295BD1B7E7337CC857510BC7" offset="0x0000" />
+        <rom name="bellhop.woz" size="240180" crc="14f96de9" sha1="8b864bdfeb11f029295bd1b7e7337cc857510bc7" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -338,7 +338,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233478">
-        <rom name="commando.woz" size="233478" crc="B28E4E2B" sha1="4D41326BE376D529D4172D75365BF8E8162A944E" offset="0x0000" />
+        <rom name="commando.woz" size="233478" crc="b28e4e2b" sha1="4d41326be376d529d4172d75365bf8e8162a944e" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -803,7 +803,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226840">
-        <rom name="the goonies.woz" size="226840" crc="A365005F" sha1="08FAB759030728CFA95C4DC8FA017AA3C32F9E9F" offset="0x0000" />
+        <rom name="the goonies.woz" size="226840" crc="a365005f" sha1="08fab759030728cfa95c4dc8fa017aa3c32f9e9f" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -868,7 +868,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226887">
-        <rom name="hard hat mack.woz" size="226887" crc="82A26A65" sha1="7FE8FA5F6C0A303221F6F6C4FD542FEAEC2C84E3" offset="0x0000" />
+        <rom name="hard hat mack.woz" size="226887" crc="82a26a65" sha1="7fe8fa5f6c0a303221f6f6c4fd542feaec2c84e3" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -930,7 +930,25 @@
     </part>
   </software>
 
-  <software name="igrprwoz">
+  <software name="ik2vrwoz">
+    <description>Ikari Warriors 2: Victory Road</description>
+    <year>1981</year>
+    <publisher>Sirius Software</publisher>
+    <info name="release" value="2018-10-03"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233484">
+        <rom name="victory road side a.woz" size="233484" crc="36274d74" sha1="cf4e23edc79b6503dca49df24d3ad65c5f5de99b" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233484">
+        <rom name="victory road side b.woz" size="233484" crc="db97aafa" sha1="4aa7360b3e99822e9021503c08e2b224ea5396c4" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+<software name="igrprwoz">
     <description>International Gran Prix</description>
     <year>1982</year>
     <publisher>MUSE Software</publisher>
@@ -998,6 +1016,18 @@
     </part>
   </software>
 
+  <software name="1on1woz">
+    <description>Julius Erving and Larry Bird Go One on One</description>
+    <year>1983</year>
+    <publisher>Electronic Arts</publisher>
+    <info name="release" value="2018-08-24"/>
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="226826">
+        <rom name="one on one.woz" size="226826" crc="4b4be4d2" sha1="bf565dafb896dfc1ca7e1a4685656f1fe0241624" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
 
   <software name="jhuntwoz">
     <description>Jungle Hunt</description>
@@ -1322,7 +1352,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233512">
-        <rom name="mr. robot and his robot factory.woz" size="233512" crc="A90E0A85" sha1="ABE595D42A5DF89441B418C4606786DEF433A84A" offset="0x0000" />
+        <rom name="mr. robot and his robot factory.woz" size="233512" crc="a90e0a85" sha1="abe595d42a5df89441b418c4606786def433a84a" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -1362,19 +1392,6 @@
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233461">
         <rom name="night stalker.woz" size="233461" crc="f2dabc02" sha1="231094b414105700cfb288425db32d067cdf69b9" offset="0x0000" />
-      </dataarea>
-    </part>
-  </software>
-
-  <software name="1on1woz">
-    <description>Julius Erving and Larry Bird Go One on One</description>
-    <year>1983</year>
-    <publisher>Electronic Arts</publisher>
-    <info name="release" value="2018-08-24"/>
-
-    <part name="flop1" interface="floppy_5_25">
-      <dataarea name="flop" size="226826">
-        <rom name="one on one.woz" size="226826" crc="4b4be4d2" sha1="bf565dafb896dfc1ca7e1a4685656f1fe0241624" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -1426,7 +1443,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233449">
-        <rom name="paperboy.woz" size="233449" crc="CF0FEDF6" sha1="AA3F286DF6D929C44175270B389EF043930CF77F" offset="0x0000" />
+        <rom name="paperboy.woz" size="233449" crc="cf0fedf6" sha1="aa3f286df6d929c44175270b389ef043930cf77f" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -1523,7 +1540,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="173574">
-        <rom name="Pool v1.5.woz" size="173574" crc="6F6F67F7" sha1="2473B587AB4C30542D9C0304DC53F5438A62F37C" offset="0x0000" />
+        <rom name="Pool v1.5.woz" size="173574" crc="6f6f67f7" sha1="2473b587ab4c30542d9c0304dc53f5438a62f37c" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -1593,7 +1610,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240127">
-        <rom name="paperboy.woz" size="240127" crc="5A2455BC" sha1="67A12BF4ADC5080E1BC10A691F4E1F0D1ACA2FB4" offset="0x0000" />
+        <rom name="rampage.woz" size="240127" crc="5a2455bc" sha1="67a12bf4adc5080e1bc10a691f4e1f0d1aca2fb4" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -1740,7 +1757,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233487">
-        <rom name="sea dragon.woz" size="233487" crc="A6CD0FC9" sha1="AB137FEFF2E486D2232B32582FC28929BA628D1A" offset="0x0000" />
+        <rom name="sea dragon.woz" size="233487" crc="a6cd0fc9" sha1="ab137feff2e486d2232b32582fc28929ba628d1a" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -1779,7 +1796,7 @@
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="126977">
-        <rom name="snack attack.woz" size="126977" crc="39FB8FCA" sha1="D751AAF008D366383B41B4D59D665BD5933D334A" offset="0x0000" />
+        <rom name="snack attack.woz" size="126977" crc="39fb8fca" sha1="d751aaf008d366383b41b4d59d665bd5933d334a" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -2268,24 +2285,6 @@
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233467">
         <rom name="up 'n down.woz" size="233467" crc="d1b298b6" sha1="cf7726d073c7457c9109387712f8c7b7deb83c7b" offset="0x0000" />
-      </dataarea>
-    </part>
-  </software>
-
-  <software name="ik2vrwoz">
-    <description>Ikari Warriors 2: Victory Road</description>
-    <year>1981</year>
-    <publisher>Sirius Software</publisher>
-    <info name="release" value="2018-10-03"/>
-
-    <part name="flop1" interface="floppy_5_25">
-      <dataarea name="flop" size="233484">
-        <rom name="victory road side a.woz" size="233484" crc="36274d74" sha1="cf4e23edc79b6503dca49df24d3ad65c5f5de99b" offset="0x0000" />
-      </dataarea>
-    </part>
-    <part name="flop2" interface="floppy_5_25">
-      <dataarea name="flop" size="233484">
-        <rom name="victory road side b.woz" size="233484" crc="db97aafa" sha1="4aa7360b3e99822e9021503c08e2b224ea5396c4" offset="0x0000" />
       </dataarea>
     </part>
   </software>
