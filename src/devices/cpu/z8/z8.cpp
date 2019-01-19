@@ -222,8 +222,8 @@ z8682_device::z8682_device(const machine_config &mconfig, const char *tag, devic
 
 ROM_START(z8682)
 	// Zilog admits that this nominally ROMless type uses a "small internal ROM"
-	ROM_REGION(0x0800, "internal", 0)
-	ROM_LOAD("z8682.bin", 0x0000, 0x0800, CRC(37525bc8) SHA1(3ce6251d647c4af4a7cbd854f6de1b4027c9f27a) BAD_DUMP) // hand-crafted bootstrap
+	ROM_REGION(0x0800, "internal", ROMREGION_ERASEFF)
+	ROM_LOAD("testrom.bin", 0x0000, 0x0038, CRC(b2239f28) SHA1(9d27957ba0f15657eac5a7295157af6ee51cb261) BAD_DUMP) // typed in from "Z8 MCU Test Mode" application note
 ROM_END
 
 const tiny_rom_entry *z8682_device::device_rom_region() const
@@ -571,7 +571,6 @@ void z8_device::sio_tick()
 					m_transmit_parity = !m_transmit_parity;
 
 				// serial output
-				logerror("Transmitting %d bit (time = %.2f usec)\n", BIT(m_transmit_sr, 0), machine().time().as_double() * 1.0E6);
 				p3_update_output();
 			}
 		}
