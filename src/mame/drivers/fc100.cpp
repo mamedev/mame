@@ -522,14 +522,15 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	MCFG_DEVICE_IO_MAP(fc100_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL(7'159'090)/3)  // Clock not verified
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, fc100_state, mc6847_videoram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(fc100_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(m5c6847p1_device::MODE_INTEXT)
+	M5C6847P1(config, m_vdg, XTAL(7'159'090)/3);  // Clock not verified
+	m_vdg->set_screen("screen");
+	m_vdg->input_callback().set(FUNC(fc100_state::mc6847_videoram_r));
+	m_vdg->set_get_char_rom(FUNC(fc100_state::get_char_rom));
+	m_vdg->set_get_fixed_mode(m5c6847p1_device::MODE_INTEXT);
 	// other lines not connected
 
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "f4palette", gfx_fc100)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	GFXDECODE(config, "gfxdecode", "f4palette", gfx_fc100);
 	PALETTE(config, "f4palette", palette_device::MONOCHROME);
 
 	/* sound hardware */

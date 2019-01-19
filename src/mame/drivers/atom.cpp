@@ -714,10 +714,11 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_DEVICE_PROGRAM_MAP(atom_mem)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
+	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
+	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));
+	m_vdg->set_screen(SCREEN_TAG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -821,10 +822,11 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_DEVICE_PROGRAM_MAP(atombb_mem)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
+	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
+	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));
+	m_vdg->set_screen(SCREEN_TAG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

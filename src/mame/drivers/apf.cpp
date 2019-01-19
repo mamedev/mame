@@ -526,12 +526,13 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	MCFG_DEVICE_PROGRAM_MAP(apfm1000_map)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, 3.579545_MHz_XTAL)
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE("pia0", pia6821_device, cb1_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, apf_state, videoram_r))
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
+	MC6847_NTSC(config, m_crtc, 3.579545_MHz_XTAL);
+	m_crtc->fsync_wr_callback().set("pia0", FUNC(pia6821_device::cb1_w));
+	m_crtc->input_callback().set(FUNC(apf_state::videoram_r));
+	m_crtc->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1);
+	m_crtc->set_screen("screen");
 	// INTEXT = GND
 	// other lines not connected
 

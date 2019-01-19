@@ -558,12 +558,13 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_TIMER_PARAM(ASSERT_LINE)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, mc1000_state, hs_w))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, mc1000_state, fs_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, mc1000_state, videoram_r))
+	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
+	m_vdg->hsync_wr_callback().set(FUNC(mc1000_state::hs_w));
+	m_vdg->fsync_wr_callback().set(FUNC(mc1000_state::fs_w));
+	m_vdg->input_callback().set(FUNC(mc1000_state::videoram_r));
+	m_vdg->set_screen(SCREEN_TAG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

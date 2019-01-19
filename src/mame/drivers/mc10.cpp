@@ -513,10 +513,11 @@ MACHINE_CONFIG_START(mc10_state::mc10)
 	m_maincpu->out_p2_cb().set(FUNC(mc10_state::mc10_port2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, mc10_state, mc6847_videoram_r))
+	mc6847_ntsc_device &vdg(MC6847_NTSC(config, "mc6847", XTAL(3'579'545)));
+	vdg.set_screen("screen");
+	vdg.input_callback().set(FUNC(mc10_state::mc6847_videoram_r));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
