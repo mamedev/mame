@@ -2,7 +2,7 @@
 // copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
-#define USE_FRONTIERS 1
+#define USE_FRONTIERS 0
 #define USE_FIXED_STV 1
 
 /* ----------------------------------------------------------------------------
@@ -308,7 +308,7 @@ NETLIST_END()
 
 NETLIST_START(kidniki)
 
-#if (1 || USE_FRONTIERS)
+#if (0 || USE_FRONTIERS)
 	SOLVER(Solver, 18000)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.NR_LOOPS, 100)
@@ -322,9 +322,9 @@ NETLIST_START(kidniki)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
 #else
-	SOLVER(Solver, 12000)
-	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 300)
+	SOLVER(Solver, 18000)
+	PARAM(Solver.ACCURACY, 1e-6)
+	PARAM(Solver.NR_LOOPS, 100)
 	PARAM(Solver.GS_LOOPS, 20)
 	PARAM(Solver.METHOD, "GMRES")
 #endif

@@ -1064,7 +1064,7 @@ namespace netlist
 	protected:
 		virtual void changed() override
 		{
-			stream()->read(&m_data[0],1<<AW);
+			stream()->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
 		}
 
 	private:
@@ -1490,7 +1490,7 @@ namespace netlist
 	{
 		auto f = stream();
 		if (f != nullptr)
-			f->read(&m_data[0],1<<AW);
+			f->read(reinterpret_cast<plib::pistream::value_type *>(&m_data[0]),1<<AW);
 		else
 			device.state().log().warning("Rom {1} not found", Value());
 	}
