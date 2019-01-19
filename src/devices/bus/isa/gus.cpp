@@ -1250,7 +1250,8 @@ INPUT_PORTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa16_gus_device::device_add_mconfig)
+void isa16_gus_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	GGF1(config, m_gf1, GF1_CLOCK);
@@ -1270,14 +1271,13 @@ MACHINE_CONFIG_START(isa16_gus_device::device_add_mconfig)
 	m_gf1->drq2_handler().set(FUNC(isa16_gus_device::drq2_w));
 	m_gf1->nmi_handler().set(FUNC(isa16_gus_device::nmi_w));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE("gf1", acia6850_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_gf1, FUNC(acia6850_device::write_rxd));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
 	acia_clock.signal_handler().set(FUNC(isa16_gus_device::write_acia_clock));
-MACHINE_CONFIG_END
+}
 
 ioport_constructor isa16_gus_device::device_input_ports() const
 {

@@ -32,7 +32,8 @@ DEFINE_DEVICE_TYPE(A2BUS_MIDI, a2bus_midi_device, "a2midi", "6850 MIDI card")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_midi_device::device_add_mconfig)
+void a2bus_midi_device::device_add_mconfig(machine_config &config)
+{
 	PTM6840(config, m_ptm, 1021800);
 	m_ptm->set_external_clocks(1021800.0f, 1021800.0f, 1021800.0f);
 	m_ptm->irq_callback().set(FUNC(a2bus_midi_device::ptm_irq_w));
@@ -41,14 +42,13 @@ MACHINE_CONFIG_START(a2bus_midi_device::device_add_mconfig)
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(a2bus_midi_device::acia_irq_w));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MIDI_ACIA_TAG, acia6850_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
 	acia_clock.signal_handler().set(FUNC(a2bus_midi_device::write_acia_clock));
-MACHINE_CONFIG_END
+}
 
 //**************************************************************************
 //  LIVE DEVICE

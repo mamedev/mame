@@ -210,12 +210,11 @@ MACHINE_CONFIG_START(fb01_state::fb01)
 	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(4'000'000) / 8)); // 500KHz
 	usart_clock.signal_handler().set(FUNC(fb01_state::write_usart_clock));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(*this, fb01_state, midi_in))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(fb01_state::midi_in));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	MCFG_MIDI_PORT_ADD("mdthru", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
