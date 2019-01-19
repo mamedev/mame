@@ -5,9 +5,9 @@
 	<!-- This list is for the 'NK' coded Game Keys, for Nicktoons and related systems -->
 	
 	<software name="dora" supported="no">
-		<description>Dora the Explorer</description>
+		<description>Soccer Shootout &amp; Juego De Futbol De Dora &amp; Dora's Star Mountain Adventure</description>
 		<year>2005</year>
-		<publisher>JAKKS Pacific</publisher>
+		<publisher>JAKKS Pacific / Handheld Games</publisher>
 		<part name="cart" interface="jakks_gamekey">
 			<dataarea name="rom" size="0x200000">
 				<rom name="nk_dora.bin" size="0x200000" crc="2bcdf9a5" sha1="ac86d967b269cb8c4ecc9c8b99fb5c16424da7be" offset="0" />
