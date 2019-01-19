@@ -29,17 +29,9 @@ pstream::~pstream()
 // pistream: input stream
 // -----------------------------------------------------------------------------
 
-pistream::~pistream()
-{
-}
-
 // -----------------------------------------------------------------------------
 // postream: output stream
 // -----------------------------------------------------------------------------
-
-postream::~postream()
-{
-}
 
 // -----------------------------------------------------------------------------
 // Input file stream
@@ -83,7 +75,7 @@ pifilestream::~pifilestream()
 	}
 }
 
-pifilestream::pos_type pifilestream::vread(void *buf, const pos_type n)
+pifilestream::pos_type pifilestream::vread(value_type *buf, const pos_type n)
 {
 	pos_type r = fread(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
@@ -172,7 +164,7 @@ pofilestream::~pofilestream()
 	}
 }
 
-void pofilestream::vwrite(const void *buf, const pos_type n)
+void pofilestream::vwrite(const value_type *buf, const pos_type n)
 {
 	std::size_t r = fwrite(buf, 1, n, static_cast<FILE *>(m_file));
 	if (r < n)
@@ -269,13 +261,13 @@ pimemstream::~pimemstream()
 {
 }
 
-pimemstream::pos_type pimemstream::vread(void *buf, const pos_type n)
+pimemstream::pos_type pimemstream::vread(value_type *buf, const pos_type n)
 {
 	pos_type ret = (m_pos + n <= m_len) ? n :  m_len - m_pos;
 
 	if (ret > 0)
 	{
-		std::copy(m_mem + m_pos, m_mem + m_pos + ret, static_cast<char *>(buf));
+		std::copy(m_mem + m_pos, m_mem + m_pos + ret, reinterpret_cast<char *>(buf));
 		m_pos += ret;
 	}
 
@@ -317,7 +309,7 @@ pomemstream::~pomemstream()
 		pfree_array(m_mem);
 }
 
-void pomemstream::vwrite(const void *buf, const pos_type n)
+void pomemstream::vwrite(const value_type *buf, const pos_type n)
 {
 	if (m_pos + n >= m_capacity)
 	{
@@ -333,7 +325,7 @@ void pomemstream::vwrite(const void *buf, const pos_type n)
 		pfree_array(o);
 	}
 
-	std::copy(static_cast<const char *>(buf), static_cast<const char *>(buf) + n, m_mem + m_pos);
+	std::copy(buf, buf + n, m_mem + m_pos);
 	m_pos += n;
 	m_size = std::max(m_pos, m_size);
 }

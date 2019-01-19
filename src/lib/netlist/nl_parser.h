@@ -16,8 +16,12 @@ namespace netlist
 	class parser_t : public plib::ptokenizer
 	{
 	public:
-		parser_t(plib::putf8_reader &&strm, setup_t &setup)
-		: plib::ptokenizer(std::move(strm)), m_setup(setup) {}
+		template <typename T>
+		parser_t(T &&strm, setup_t &setup)
+			: plib::ptokenizer(std::move(strm))
+			, m_setup(setup)
+		{
+		}
 
 		bool parse(const pstring &nlname = "");
 

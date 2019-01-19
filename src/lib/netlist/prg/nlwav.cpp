@@ -82,7 +82,7 @@ public:
 	template <typename T>
 	void write(const T &val)
 	{
-		m_f.write(reinterpret_cast<const char *>(&val), sizeof(T));
+		m_f.write(reinterpret_cast<const plib::postream::value_type *>(&val), sizeof(T));
 	}
 
 	void write_sample(int sample)
@@ -153,11 +153,11 @@ class log_processor
 {
 public:
 	typedef plib::pmfp<void, double, double> callback_type;
-	log_processor(plib::pistream &is, callback_type cb) : m_is(is), m_cb(cb) { }
+	log_processor(callback_type cb) : m_cb(cb) { }
 
-	void process()
+	void process(std::unique_ptr<plib::pistream> &&is)
 	{
-		plib::putf8_reader reader(&m_is);
+		plib::putf8_reader reader(std::move(is));
 		pstring line;
 
 		while(reader.readline(line))
@@ -169,7 +169,6 @@ public:
 	}
 
 private:
-	plib::pistream &m_is;
 	callback_type m_cb;
 };
 
@@ -254,8 +253,10 @@ private:
 void nlwav_app::convert(long sample_rate)
 {
 	plib::postream *fo = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
-	plib::pistream *fin = (opt_inp() == "-" ? &pin_strm : plib::palloc<plib::pifilestream>(opt_inp()));
-	plib::putf8_reader reader(fin);
+	std::unique_ptr<plib::pistream> fin = (opt_inp() == "-" ?
+		  plib::make_unique<plib::pstdin>()
+		: plib::make_unique<plib::pifilestream>(opt_inp()));
+	plib::putf8_reader reader(std::move(fin));
 	wav_t *wo = plib::palloc<wav_t>(*fo, static_cast<unsigned>(sample_rate));
 
 	double dt = 1.0 / static_cast<double>(wo->sample_rate());
@@ -324,8 +325,6 @@ void nlwav_app::convert(long sample_rate)
 #endif
 	}
 	plib::pfree(wo);
-	if (opt_inp() != "-")
-		plib::pfree(fin);
 	if (opt_out() != "-")
 		plib::pfree(fo);
 
@@ -341,15 +340,17 @@ void nlwav_app::convert(long sample_rate)
 void nlwav_app::convert1(long sample_rate)
 {
 	plib::postream *fo = (opt_out() == "-" ? &pout_strm : plib::palloc<plib::pofilestream>(opt_out()));
-	plib::pistream *fin = (opt_inp() == "-" ? &pin_strm : plib::palloc<plib::pifilestream>(opt_inp()));
+	std::unique_ptr<plib::pistream> fin = (opt_inp() == "-" ?
+		  plib::make_unique<plib::pstdin>()
+		: plib::make_unique<plib::pifilestream>(opt_inp()));
 
 	double dt = 1.0 / static_cast<double>(sample_rate);
 
 	wavwriter *wo = plib::palloc<wavwriter>(*fo, static_cast<unsigned>(sample_rate), opt_amp());
 	aggregator ag(dt, aggregator::callback_type(&wavwriter::process, wo));
-	log_processor lp(*fin, log_processor::callback_type(&aggregator::process, &ag));
+	log_processor lp(log_processor::callback_type(&aggregator::process, &ag));
 
-	lp.process();
+	lp.process(std::move(fin));
 
 	if (!opt_quiet())
 	{
@@ -360,8 +361,6 @@ void nlwav_app::convert1(long sample_rate)
 	}
 
 	plib::pfree(wo);
-	if (opt_inp() != "-")
-		plib::pfree(fin);
 	if (opt_out() != "-")
 		plib::pfree(fo);
 

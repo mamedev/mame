@@ -24,14 +24,13 @@ void parser_t::verror(const pstring &msg, int line_num, const pstring &line)
 	//throw error;
 }
 
-
 bool parser_t::parse(const pstring &nlname)
 {
-	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
-	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
-	set_whitespace(pstring("") + ' ' + static_cast<char>(9) + static_cast<char>(10) + static_cast<char>(13));
-	set_comment("/*", "*/", "//");
+	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
+		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
+		//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
+		.whitespace(pstring("") + ' ' + static_cast<char>(9) + static_cast<char>(10) + static_cast<char>(13))
+		.comment("/*", "*/", "//");
 	m_tok_param_left = register_token("(");
 	m_tok_param_right = register_token(")");
 	m_tok_comma = register_token(",");

@@ -16,11 +16,6 @@ namespace plib {
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
 
-ptokenizer::ptokenizer(plib::putf8_reader &&strm)
-: m_strm(std::move(strm)), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
-{
-}
-
 ptokenizer::~ptokenizer()
 {
 }
@@ -274,7 +269,11 @@ void ptokenizer::error(const pstring &errs)
 // ----------------------------------------------------------------------------------------
 
 ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
-: m_ifflag(0), m_level(0), m_lineno(0)
+: pistream()
+, m_ifflag(0)
+, m_level(0)
+, m_lineno(0)
+, m_pos(0)
 {
 	m_expr_sep.push_back("!");
 	m_expr_sep.push_back("(");
@@ -302,6 +301,18 @@ ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
 void ppreprocessor::error(const pstring &err)
 {
 	throw pexception("PREPRO ERROR: " + err);
+}
+
+pstream::size_type ppreprocessor::vread(value_type *buf, const pstream::size_type n)
+{
+	size_type bytes = std::min(m_buf.size() - m_pos, n);
+
+	if (bytes==0)
+		return 0;
+
+	std::memcpy(buf, m_buf.c_str() + m_pos, bytes);
+	m_pos += bytes;
+	return bytes;
 }
 
 #define CHECKTOK2(p_op, p_prio) \
@@ -462,15 +473,5 @@ pstring  ppreprocessor::process_line(const pstring &line)
 }
 
 
-void ppreprocessor::process(putf8_reader &istrm, putf8_writer &ostrm)
-{
-	pstring line;
-	while (istrm.readline(line))
-	{
-		m_lineno++;
-		line = process_line(line);
-		ostrm.writeline(line);
-	}
-}
 
 }

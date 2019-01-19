@@ -405,13 +405,12 @@ nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf
 	: plib::ptokenizer(std::move(strm))
 	, m_convert(convert)
 {
-	set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
-	set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
-	set_whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13));
-	/* FIXME: gnetlist doesn't print comments */
-	set_comment("/*", "*/", "//");
-	set_string_char('\'');
+	this->identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-")
+		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
+		.whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13))
+		/* FIXME: gnetlist doesn't print comments */
+		.comment("/*", "*/", "//")
+		.string_char('\'');
 	m_tok_ADD = register_token("ADD");
 	m_tok_VALUE = register_token("VALUE");
 	m_tok_SIGNAL = register_token("SIGNAL");
@@ -542,13 +541,12 @@ nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_
 	: plib::ptokenizer(std::move(strm))
 	, m_convert(convert)
 {
-	set_identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-");
-	set_number_chars("0123456789", "0123456789eE-."); //FIXME: processing of numbers
-	//set_whitespace(pstring("").cat(' ').cat(9).cat(10).cat(13));
-	set_whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13));
-	/* FIXME: gnetlist doesn't print comments */
-	set_comment("","","//"); // FIXME:needs to be confirmed
-	set_string_char('"');
+	this->identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-")
+		.number_chars("0123456789", "0123456789eE-.") //FIXME: processing of numbers
+		.whitespace(pstring("") + ' ' + static_cast<char>(9) +  static_cast<char>(10) + static_cast<char>(13))
+		/* FIXME: gnetlist doesn't print comments */
+		.comment("","","//") // FIXME:needs to be confirmed
+		.string_char('"');
 	m_tok_HEA = register_token(".HEA");
 	m_tok_APP = register_token(".APP");
 	m_tok_TIM = register_token(".TIM");

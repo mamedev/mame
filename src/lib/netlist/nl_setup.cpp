@@ -907,6 +907,11 @@ void setup_t::tt_factory_create(tt_desc &desc, const pstring &sourcefile)
 // Sources
 // ----------------------------------------------------------------------------------------
 
+bool setup_t::parse_stream(std::unique_ptr<plib::pistream> istrm, const pstring &name)
+{
+	return parser_t(std::move(plib::ppreprocessor(&m_defines).process(std::move(istrm))), *this).parse(name);
+}
+
 void setup_t::include(const pstring &netlist_name)
 {
 	for (auto &source : m_sources)
@@ -930,18 +935,6 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring &name)
 	}
 	log().warning(MW_1_DATA_1_NOT_FOUND, name);
 	return std::unique_ptr<plib::pistream>(nullptr);
-}
-
-
-bool setup_t::parse_stream(plib::putf8_reader &&istrm, const pstring &name)
-{
-	plib::pomemstream ostrm;
-	plib::putf8_writer owrt(&ostrm);
-
-	plib::ppreprocessor(&m_defines).process(istrm, owrt);
-	plib::putf8_reader reader2 = plib::putf8_reader(plib::pimemstream(ostrm));
-
-	return parser_t(std::move(reader2), *this).parse(name);
 }
 
 void setup_t::register_define(const pstring &defstr)
@@ -1080,9 +1073,7 @@ bool source_t::parse(const pstring &name)
 		return false;
 	else
 	{
-		auto rstream = stream(name);
-		plib::putf8_reader reader(rstream.get());
-		return m_setup.parse_stream(std::move(reader), name);
+		return m_setup.parse_stream(stream(name), name);
 	}
 }
 
