@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/z80/z80.h"
 #include "emupal.h"
 
 class xxmissio_state : public driver_device
@@ -18,7 +19,8 @@ public:
 		m_palette(*this, "palette"),
 		m_bgram(*this, "bgram"),
 		m_fgram(*this, "fgram"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_subbank(*this, "subbank")
 	{ }
 
 	void xxmissio(machine_config &config);
@@ -30,26 +32,28 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<z80_device> m_maincpu;
+	required_device<z80_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint8_t> m_bgram;
-	required_shared_ptr<uint8_t> m_fgram;
-	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<u8> m_bgram;
+	required_shared_ptr<u8> m_fgram;
+	required_shared_ptr<u8> m_spriteram;
+
+	required_memory_bank m_subbank;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	uint8_t m_status;
-	uint8_t m_xscroll;
-	uint8_t m_yscroll;
-	uint8_t m_flipscreen;
+	u8 m_status;
+	u8 m_xscroll;
+	u8 m_yscroll;
+	u8 m_flipscreen;
 
 	DECLARE_WRITE8_MEMBER(bank_sel_w);
 	DECLARE_WRITE8_MEMBER(status_m_w);
 	DECLARE_WRITE8_MEMBER(status_s_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(fgram_w);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_READ8_MEMBER(bgram_r);
 	DECLARE_WRITE8_MEMBER(scroll_x_w);
@@ -61,13 +65,14 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	static rgb_t BBGGRRII(uint32_t raw);
+	static rgb_t BBGGRRII(u32 raw);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 
 	void map1(address_map &map);
 	void map2(address_map &map);
+	void shared_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_XXMISSIO_H

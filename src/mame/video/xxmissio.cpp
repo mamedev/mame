@@ -23,9 +23,10 @@ WRITE8_MEMBER(xxmissio_state::scroll_y_w)
 	m_yscroll = data;
 }
 
-WRITE8_MEMBER(xxmissio_state::flipscreen_w)
+WRITE8_MEMBER(xxmissio_state::fgram_w)
 {
-	m_flipscreen = data & 0x01;
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(xxmissio_state::bgram_w)
@@ -34,7 +35,9 @@ WRITE8_MEMBER(xxmissio_state::bgram_w)
 	offset = (offset & 0x7e0) | x;
 
 	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
+
 READ8_MEMBER(xxmissio_state::bgram_r)
 {
 	int x = (offset + (m_xscroll >> 3)) & 0x1f;
@@ -77,12 +80,12 @@ void xxmissio_state::video_start()
 	save_item(NAME(m_flipscreen));
 }
 
-rgb_t xxmissio_state::BBGGRRII(uint32_t raw)
+rgb_t xxmissio_state::BBGGRRII(u32 raw)
 {
-	uint8_t const i = raw & 3;
-	uint8_t const r = ((raw >> 0) & 0x0c) | i;
-	uint8_t const g = ((raw >> 2) & 0x0c) | i;
-	uint8_t const b = ((raw >> 4) & 0x0c) | i;
+	u8 const i = raw & 3;
+	u8 const r = ((raw >> 0) & 0x0c) | i;
+	u8 const g = ((raw >> 2) & 0x0c) | i;
+	u8 const b = ((raw >> 4) & 0x0c) | i;
 
 	return rgb_t(r | (r << 4), g | (g << 4), b | (b << 4));
 }
@@ -134,9 +137,8 @@ void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 }
 
 
-uint32_t xxmissio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 xxmissio_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	machine().tilemap().mark_all_dirty();
 	machine().tilemap().set_flip_all(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	m_bg_tilemap->set_scrollx(0, m_xscroll * 2);

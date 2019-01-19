@@ -13,7 +13,6 @@ XX Mission (c) 1986 UPL
 #include "emu.h"
 #include "includes/xxmissio.h"
 
-#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "screen.h"
 #include "speaker.h"
@@ -21,7 +20,7 @@ XX Mission (c) 1986 UPL
 
 WRITE8_MEMBER(xxmissio_state::bank_sel_w)
 {
-	membank("bank1")->set_entry(data & 7);
+	m_subbank->set_entry(data & 7);
 }
 
 CUSTOM_INPUT_MEMBER(xxmissio_state::status_r)
@@ -85,32 +84,38 @@ INTERRUPT_GEN_MEMBER(xxmissio_state::interrupt_s)
 
 void xxmissio_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
-	membank("bank1")->set_entry(0);
+	m_subbank->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
+	m_subbank->set_entry(0);
 
 	save_item(NAME(m_status));
 }
 
 /****************************************************************************/
 
-void xxmissio_state::map1(address_map &map)
+void xxmissio_state::shared_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();
-
 	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("STATUS");
-	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_m_w));
-	map(0xa003, 0xa003).w(FUNC(xxmissio_state::flipscreen_w));
+	map(0xa003, 0xa003).lw8("flipscreen_w", [this](u8 data){ m_flipscreen = data & 0x01; });
 
-	map(0xc000, 0xc7ff).ram().share("fgram");
+	map(0xc000, 0xc7ff).ram().w(FUNC(xxmissio_state::fgram_w)).share("fgram");
 	map(0xc800, 0xcfff).rw(FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w)).share("bgram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
 
 	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+}
+
+
+void xxmissio_state::map1(address_map &map)
+{
+	shared_map(map);
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+
+	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_m_w));
 
 	map(0xe000, 0xefff).share("share5").ram();
 	map(0xf000, 0xffff).share("share6").ram();
@@ -119,24 +124,13 @@ void xxmissio_state::map1(address_map &map)
 
 void xxmissio_state::map2(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
+	shared_map(map);
+	map(0x0000, 0x3fff).rom().region("sub", 0);
+	map(0x4000, 0x7fff).bankr("subbank");
 
-	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x8006, 0x8006).w(FUNC(xxmissio_state::bank_sel_w));
 
-	map(0xa000, 0xa000).portr("P1");
-	map(0xa001, 0xa001).portr("P2");
-	map(0xa002, 0xa002).portr("STATUS");
 	map(0xa002, 0xa002).w(FUNC(xxmissio_state::status_s_w));
-	map(0xa003, 0xa003).w(FUNC(xxmissio_state::flipscreen_w));
-
-	map(0xc000, 0xc7ff).share("fgram").ram();
-	map(0xc800, 0xcfff).share("bgram").rw(FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w));
-	map(0xd000, 0xd7ff).share("spriteram").ram();
-
-	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xe000, 0xefff).share("share6").ram();
 	map(0xf000, 0xffff).share("share5").ram();
@@ -223,69 +217,54 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	16,8,   /* 16*8 characters */
-	2048,   /* 2048 characters */
+	RGN_FRAC(1,1),   /* 2048 characters */
 	4,      /* 4 bits per pixel */
-	{0,1,2,3},
-	{0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60},
-	{64*0, 64*1, 64*2, 64*3, 64*4, 64*5, 64*6, 64*7},
+	{STEP4(0,1)},
+	{STEP16(0,4)},
+	{STEP8(0,4*16)},
 	64*8
 };
 
 static const gfx_layout spritelayout =
 {
 	32,16,    /* 32*16 characters */
-	512,      /* 512 sprites */
+	RGN_FRAC(1,1),      /* 512 sprites */
 	4,        /* 4 bits per pixel */
-	{0,1,2,3},
-	{0,4,8,12,16,20,24,28,
-		32,36,40,44,48,52,56,60,
-		8*64+0,8*64+4,8*64+8,8*64+12,8*64+16,8*64+20,8*64+24,8*64+28,
-		8*64+32,8*64+36,8*64+40,8*64+44,8*64+48,8*64+52,8*64+56,8*64+60},
-	{64*0, 64*1, 64*2, 64*3, 64*4, 64*5, 64*6, 64*7,
-		64*16, 64*17, 64*18, 64*19, 64*20, 64*21, 64*22, 64*23},
+	{STEP4(0,1)},
+	{STEP16(0,4), STEP16(4*16*8,4)},
+	{STEP8(0,4*16), STEP8(4*16*8*2,4*16)},
 	64*8*4
-};
-
-static const gfx_layout bglayout =
-{
-	16,8,   /* 16*8 characters */
-	1024,   /* 1024 characters */
-	4,      /* 4 bits per pixel */
-	{0,1,2,3},
-	{0,4,8,12,16,20,24,28,32,36,40,44,48,52,56,60},
-	{64*0, 64*1, 64*2, 64*3, 64*4, 64*5, 64*6, 64*7},
-	64*8
 };
 
 static GFXDECODE_START( gfx_xxmissio )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,   256,  8 ) /* FG */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout,   0,  8 ) /* sprite */
-	GFXDECODE_ENTRY( "gfx2", 0x0000, bglayout,     512, 16 ) /* BG */
+	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout,   512, 16 ) /* BG */
 GFXDECODE_END
 
 /****************************************************************************/
 
-MACHINE_CONFIG_START(xxmissio_state::xxmissio)
-
+void xxmissio_state::xxmissio(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */
-	MCFG_DEVICE_PROGRAM_MAP(map1)
+	Z80(config, m_maincpu, 12000000/4); /* 3.0MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &xxmissio_state::map1);
 
-	MCFG_DEVICE_ADD("sub", Z80,12000000/4) /* 3.0MHz */
-	MCFG_DEVICE_PROGRAM_MAP(map2)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(xxmissio_state, interrupt_s, 2*60)
+	Z80(config, m_subcpu, 12000000/4); /* 3.0MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &xxmissio_state::map2);
+	m_subcpu->set_periodic_int(FUNC(xxmissio_state::interrupt_s), attotime::from_hz(2*60));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xxmissio_state, interrupt_m))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(xxmissio_state::screen_update));
+	screen.screen_vblank().set(FUNC(xxmissio_state::interrupt_m));
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xxmissio);
 	PALETTE(config, m_palette).set_format(1, &xxmissio_state::BBGGRRII, 768);
@@ -308,15 +287,15 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
 	ym2.add_route(3, "mono", 0.40);
-MACHINE_CONFIG_END
+}
 
 /****************************************************************************/
 
 ROM_START( xxmissio )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* CPU1 */
+	ROM_REGION( 0x08000, "maincpu", 0 ) /* CPU1 */
 	ROM_LOAD( "xx1.4l", 0x0000,  0x8000, CRC(86e07709) SHA1(7bfb7540b6509f07a6388ca2da6b3892f5b1df74) )
 
-	ROM_REGION( 0x10000, "sub", 0 ) /* CPU2 */
+	ROM_REGION( 0x04000, "sub", 0 ) /* CPU2 */
 	ROM_LOAD( "xx2.4b", 0x0000,  0x4000, CRC(13fa7049) SHA1(e8974d9f271a966611b523496ba8cd910e227a23) )
 
 	ROM_REGION( 0x18000, "user1", 0 ) /* BANK */
