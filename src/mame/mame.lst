@@ -904,6 +904,9 @@ viruscl                         // (c) 2004 Access GmbH
 @source:adam.cpp
 adam                            // Coleco Adam
 
+@source:adm23.cpp
+adm23                           //
+
 @source:adp.cpp
 fashiong                        // (c) 1997
 fashiong2                       // (c) 1997
