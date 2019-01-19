@@ -116,7 +116,7 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 	std::vector<double> penalty(matches);
 	for (int matchnum = 0; matchnum < matches; matchnum++)
 	{
-		penalty[matchnum] = 1.0;
+		penalty[matchnum] = 2.0;
 		list[matchnum] = nullptr;
 	}
 
@@ -131,11 +131,11 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 				// pick the best match between driver name and description
 				double const longpenalty = util::edit_distance(search, ustr_from_utf8(normalize_unicode(swinfo.longname(), unicode_normalization_form::D, true)));
 				double const shortpenalty = util::edit_distance(search, ustr_from_utf8(normalize_unicode(swinfo.shortname(), unicode_normalization_form::D, true)));
-				double const curpenalty = std::min(longpenalty, shortpenalty);
+				double const curpenalty = (std::min)(longpenalty, shortpenalty);
 
 				// make sure it isn't already in the table
 				bool skip = false;
-				for (int matchnum = 0; matchnum < matches; matchnum++)
+				for (int matchnum = 0; !skip && (matchnum < matches) && list[matchnum]; matchnum++)
 				{
 					if ((penalty[matchnum] == curpenalty) && (swinfo.longname() == list[matchnum]->longname()) && (swinfo.shortname() == list[matchnum]->shortname()))
 						skip = true;
