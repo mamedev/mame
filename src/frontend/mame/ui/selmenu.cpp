@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Vas Crabb
 /***************************************************************************
 
     ui/selmenu.cpp
@@ -180,7 +180,7 @@ void menu_select_launch::reselect_last::set_software(game_driver const &driver, 
 	s_driver = driver.name;
 	if (swinfo.startempty)
 	{
-		// magic strings are bad...
+		// FIXME: magic strings are bad...
 		s_software = "[Start empty]";
 		s_swlist.clear();
 	}
@@ -373,27 +373,26 @@ void menu_select_launch::bios_selection::custom_render(void *selectedref, float 
 
 menu_select_launch::cache::cache(running_machine &machine)
 	: m_snapx_bitmap(std::make_unique<bitmap_argb32>(0, 0))
-	, m_snapx_texture()
+	, m_snapx_texture(nullptr, machine.render())
 	, m_snapx_driver(nullptr)
 	, m_snapx_software(nullptr)
 	, m_no_avail_bitmap(256, 256)
 	, m_star_bitmap(32, 32)
-	, m_star_texture()
+	, m_star_texture(nullptr, machine.render())
 	, m_toolbar_bitmap()
 	, m_sw_toolbar_bitmap()
 	, m_toolbar_texture()
 	, m_sw_toolbar_texture()
 {
 	render_manager &render(machine.render());
-	auto const texture_free([&render](render_texture *texture) { render.texture_free(texture); });
 
 	// create a texture for snapshot
-	m_snapx_texture = texture_ptr(render.texture_alloc(render_texture::hq_scale), texture_free);
+	m_snapx_texture.reset(render.texture_alloc(render_texture::hq_scale));
 
 	std::memcpy(&m_no_avail_bitmap.pix32(0), no_avail_bmp, 256 * 256 * sizeof(uint32_t));
 
 	std::memcpy(&m_star_bitmap.pix32(0), favorite_star_bmp, 32 * 32 * sizeof(uint32_t));
-	m_star_texture = texture_ptr(render.texture_alloc(), texture_free);
+	m_star_texture.reset(render.texture_alloc());
 	m_star_texture->set_bitmap(m_star_bitmap, m_star_bitmap.cliprect(), TEXFORMAT_ARGB32);
 
 	m_toolbar_bitmap.reserve(UI_TOOLBAR_BUTTONS);
@@ -405,8 +404,8 @@ menu_select_launch::cache::cache(running_machine &machine)
 	{
 		m_toolbar_bitmap.emplace_back(32, 32);
 		m_sw_toolbar_bitmap.emplace_back(32, 32);
-		m_toolbar_texture.emplace_back(texture_ptr(render.texture_alloc(), texture_free));
-		m_sw_toolbar_texture.emplace_back(texture_ptr(render.texture_alloc(), texture_free));
+		m_toolbar_texture.emplace_back(render.texture_alloc(), render);
+		m_sw_toolbar_texture.emplace_back(render.texture_alloc(), render);
 
 		std::memcpy(&m_toolbar_bitmap.back().pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
 		if (m_toolbar_bitmap.back().valid())
@@ -458,7 +457,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_pressed(false)
 	, m_repeat(0)
 	, m_right_visible_lines(0)
-	, m_redraw_icon(false)
+	, m_has_icons(false)
 	, m_switch_image(false)
 	, m_default_image(true)
 	, m_image_view(FIRST_VIEW)
@@ -990,6 +989,150 @@ float menu_select_launch::draw_left_panel(
 }
 
 
+//-------------------------------------------------
+//  icon helpers
+//-------------------------------------------------
+
+void menu_select_launch::check_for_icons(char const *listname)
+{
+	// only ever set the flag, never clear it
+	if (m_has_icons)
+		return;
+
+	// iterate over configured icon paths
+	path_iterator paths(ui().options().icons_directory());
+	std::string current;
+	while (paths.next(current))
+	{
+		// if we're doing a software list, append it to the configured path
+		if (listname)
+		{
+			if (!current.empty() && !util::is_directory_separator(current.back()))
+				current.append(PATH_SEPARATOR);
+			current.append(listname);
+		}
+		osd_printf_verbose("Checking for icons in directory %s\n", current.c_str());
+
+		// open and walk the directory
+		osd::directory::ptr const dir(osd::directory::open(current));
+		if (dir)
+		{
+			// this could be improved in many ways - it's just a rough go/no-go
+			osd::directory::entry const *entry;
+			while ((entry = dir->read()) != nullptr)
+			{
+				current = entry->name;
+				std::string::size_type const found(current.rfind(".ico"));
+				if ((std::string::npos != found) && ((current.length() - 4) == found))
+				{
+					osd_printf_verbose("Entry %s is a candidate icon file\n", entry->name);
+					m_has_icons = true;
+					return;
+				}
+				else if (("icons" == current) || (current.find("icons.") == 0U))
+				{
+					osd_printf_verbose("Entry %s is a candidate icon collection\n", entry->name);
+					m_has_icons = true;
+					return;
+				}
+			}
+		}
+	}
+
+	// nothing promising
+	osd_printf_verbose(
+			"No candidate icons found for %s%s\n",
+			listname ? "software list " : "",
+			listname ? listname : "machines");
+}
+
+std::string menu_select_launch::make_icon_paths(char const *listname) const
+{
+	// iterate over configured icon paths
+	path_iterator paths(ui().options().icons_directory());
+	std::string current, result;
+	while (paths.next(current))
+	{
+		// if we're doing a software list, append it to the configured path
+		if (listname)
+		{
+			if (!current.empty() && !util::is_directory_separator(current.back()))
+				current.append(PATH_SEPARATOR);
+			current.append(listname);
+		}
+
+		// append the configured path
+		if (!result.empty())
+			result.append(1, ';'); // FIXME: should be a macro
+		result.append(current);
+
+		// append with "icons" appended so it'll search icons.zip or icons.7z in the directory
+		if (!current.empty())
+		{
+			result.append(1, ';'); // FIXME: should be a macro
+			result.append(current);
+			if (!util::is_directory_separator(result.back()))
+				result.append(PATH_SEPARATOR);
+		}
+		result.append("icons");
+	}
+
+	// log the result for debugging
+	osd_printf_verbose(
+			"Icon path for %s%s set to %s\n",
+			listname ? "software list " : "",
+			listname ? listname : "machines",
+			result.c_str());
+	return result;
+}
+
+bool menu_select_launch::scale_icon(bitmap_argb32 &&src, texture_and_bitmap &dst) const
+{
+	assert(dst.texture);
+	if (src.valid())
+	{
+		// calculate available space for the icon in pixels
+		float const height(ui().get_line_height());
+		float const width(height * container().manager().ui_aspect());
+		render_target const &target(machine().render().ui_target());
+		uint32_t const dst_height(target.height());
+		uint32_t const dst_width(target.width());
+		bool const rotated((target.orientation() & ORIENTATION_SWAP_XY) != 0);
+		int const max_height(int((rotated ? dst_width : dst_height) * height));
+		int const max_width(int((rotated ? dst_height : dst_width) * width));
+
+		// reduce the source bitmap if it's too big
+		bitmap_argb32 tmp;
+		float const ratio((std::min)({ float(max_height) / src.height(), float(max_width) / src.width(), 1.0F }));
+		if (1.0F > ratio)
+		{
+			float const pix_height(src.height() * ratio);
+			float const pix_width(src.width() * ratio);
+			tmp.allocate(int32_t(pix_width), int32_t(pix_height));
+			render_resample_argb_bitmap_hq(tmp, src, render_color{ 1.0F, 1.0F, 1.0F, 1.0F }, true);
+		}
+		else
+		{
+			tmp = std::move(src);
+		}
+
+		// copy into the destination
+		dst.bitmap.allocate(max_width, max_height);
+		for (int y = 0; tmp.height() > y; ++y)
+			for (int x = 0; tmp.width() > x; ++x)
+				dst.bitmap.pix32(y, x) = tmp.pix32(y, x);
+		dst.texture->set_bitmap(dst.bitmap, dst.bitmap.cliprect(), TEXFORMAT_ARGB32);
+		return true;
+	}
+	else
+	{
+		// couldn't load icon
+		dst.bitmap.reset();
+		return false;
+	}
+}
+
+
 template <typename T> bool menu_select_launch::select_bios(T const &driver, bool inlist)
 {
 	s_bios biosname;
@@ -1095,10 +1238,16 @@ void menu_select_launch::set_pressed()
 //  draw icons
 //-------------------------------------------------
 
-float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, float y0)
+void menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, float y0)
 {
-	// derived class must implement this
-	return 0.0f;
+	render_texture *const icon(get_icon_texture(linenum, selectedref));
+	if (icon)
+	{
+		float const ud_arrow_width = ui().get_line_height() * container().manager().ui_aspect(&container());
+		float const x1 = x0 + ud_arrow_width;
+		float const y1 = y0 + ui().get_line_height();
+		container().add_quad(x0, y0, x1, y1, rgb_t::white(), icon, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	};
 }
 
 
@@ -1612,8 +1761,9 @@ void menu_select_launch::draw(uint32_t flags)
 {
 	bool noinput = (flags & PROCESS_NOINPUT);
 	float line_height = ui().get_line_height();
-	float ud_arrow_width = line_height * machine().render().ui_aspect();
-	float gutter_width = 0.52f * ud_arrow_width;
+	float const ud_arrow_width = line_height * machine().render().ui_aspect();
+	float const gutter_width = 0.52f * ud_arrow_width;
+	float const icon_offset = m_has_icons ? (1.5f * ud_arrow_width) : 0.0f;
 	float right_panel_size = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL) ? 2.0f * UI_BOX_LR_BORDER : 0.3f;
 	float visible_width = 1.0f - 4.0f * UI_BOX_LR_BORDER;
 	float primary_left = (1.0f - visible_width) * 0.5f;
@@ -1698,18 +1848,21 @@ void menu_select_launch::draw(uint32_t flags)
 		if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 			hover = itemnum;
 
-		// if we're selected, draw with a different background
 		if (is_selected(itemnum) && m_focus == focused_menu::MAIN)
 		{
+			// if we're selected, draw with a different background
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
 			fgcolor3 = rgb_t(0xcc, 0xcc, 0x00);
-			ui().draw_textured_box(container(), line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1, bgcolor, rgb_t(43, 43, 43),
+			ui().draw_textured_box(
+					container(),
+					line_x0 + 0.01f, line_y0, line_x1 - 0.01f, line_y1,
+					bgcolor, rgb_t(43, 43, 43),
 					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
-		// else if the mouse is over this item, draw with a different background
 		else if (itemnum == hover)
 		{
+			// else if the mouse is over this item, draw with a different background
 			fgcolor = fgcolor3 = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
@@ -1749,29 +1902,52 @@ void menu_select_launch::draw(uint32_t flags)
 		else if (pitem.subtext.empty())
 		{
 			// draw the item centered
-			int item_invert = pitem.flags & FLAG_INVERT;
-			auto icon = draw_icon(linenum, item[itemnum].ref, effective_left, line_y);
-			ui().draw_text_full(container(), itemtext, effective_left + icon, line_y, effective_width - icon, ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
+			int const item_invert = pitem.flags & FLAG_INVERT;
+			if (m_has_icons)
+				draw_icon(linenum, item[itemnum].ref, effective_left, line_y);
+			ui().draw_text_full(
+					container(),
+					itemtext,
+					effective_left + icon_offset, line_y, effective_width - icon_offset,
+					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
+					nullptr, nullptr);
 		}
 		else
 		{
-			auto item_invert = pitem.flags & FLAG_INVERT;
+			int const item_invert = pitem.flags & FLAG_INVERT;
 			const char *subitem_text = pitem.subtext.c_str();
 			float item_width, subitem_width;
 
 			// compute right space for subitem
-			ui().draw_text_full(container(), subitem_text, effective_left, line_y, ui().get_string_width(pitem.subtext.c_str()),
-					ui::text_layout::RIGHT, ui::text_layout::NEVER, mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor, &subitem_width, nullptr);
+			ui().draw_text_full(
+					container(),
+					subitem_text,
+					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext.c_str()),
+					ui::text_layout::RIGHT, ui::text_layout::NEVER,
+					mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor,
+					&subitem_width, nullptr);
 			subitem_width += gutter_width;
 
 			// draw the item left-justified
-			ui().draw_text_full(container(), itemtext, effective_left, line_y, effective_width - subitem_width,
-					ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, &item_width, nullptr);
+			if (m_has_icons)
+				draw_icon(linenum, item[itemnum].ref, effective_left, line_y);
+			ui().draw_text_full(
+					container(),
+					itemtext,
+					effective_left + icon_offset, line_y, effective_width - icon_offset - subitem_width,
+					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+					mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
+					&item_width, nullptr);
 
 			// draw the subitem right-justified
-			ui().draw_text_full(container(), subitem_text, effective_left + item_width, line_y, effective_width - item_width,
-					ui::text_layout::RIGHT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(
+					container(),
+					subitem_text,
+					effective_left + icon_offset + item_width, line_y, effective_width - icon_offset - item_width,
+					ui::text_layout::RIGHT, ui::text_layout::NEVER,
+					mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
+					nullptr, nullptr);
 		}
 	}
 
@@ -1831,9 +2007,6 @@ void menu_select_launch::draw(uint32_t flags)
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
-
-	// reset redraw icon stage
-	m_redraw_icon = false;
 
 	// noinput
 	if (noinput)
@@ -2299,7 +2472,7 @@ bool menu_select_launch::has_multiple_bios(game_driver const &driver, s_bios &bi
 	for (romload::system_bios const &bios : romload::entries(driver.rom).get_system_bioses())
 	{
 		std::string name(bios.get_description());
-		u32 const bios_flags(bios.get_value());
+		uint32_t const bios_flags(bios.get_value());
 
 		if (default_name && !std::strcmp(bios.get_name(), default_name))
 		{

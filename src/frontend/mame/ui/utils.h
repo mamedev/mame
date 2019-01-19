@@ -200,6 +200,7 @@ public:
 		ALL = 0,
 		AVAILABLE,
 		UNAVAILABLE,
+		FAVORITE,
 		PARENTS,
 		CLONES,
 		YEAR,

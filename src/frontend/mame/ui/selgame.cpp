@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /*********************************************************************
 
     ui/selgame.cpp
@@ -12,6 +12,7 @@
 #include "ui/selgame.h"
 
 #include "ui/auditmenu.h"
+#include "ui/icorender.h"
 #include "ui/inifile.h"
 #include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
@@ -38,8 +39,6 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-
-#include "ui/icorender.h" // this is inline code
 
 
 extern const char UI_VERSION_TAG[];
@@ -220,10 +219,11 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	: menu_select_launch(mui, container, false)
 	, m_persistent_data(persistent_data::instance())
 	, m_icons(MAX_ICONS_RENDER)
-	, m_has_icons(false)
+	, m_icon_paths()
 	, m_displaylist()
 	, m_searchlist()
 	, m_searched_fields(persistent_data::AVAIL_NONE)
+	, m_populated_favorites(false)
 {
 	std::string error_string, last_filter, sub_filter;
 	ui_options &moptions = mui.options();
@@ -231,18 +231,8 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	// load drivers cache
 	m_persistent_data.cache_data();
 
-	// check if there are available icons
-	file_enumerator path(moptions.icons_directory());
-	const osd::directory::entry *dir;
-	while ((dir = path.next()) != nullptr)
-	{
-		std::string src(dir->name);
-		if (src.find(".ico") != std::string::npos || src.find("icons") != std::string::npos)
-		{
-			m_has_icons = true;
-			break;
-		}
-	}
+	// check if there are available system icons
+	check_for_icons(nullptr);
 
 	// build drivers list
 	if (!load_available_machines())
@@ -334,13 +324,13 @@ void menu_select_game::handle()
 		return;
 	}
 
-	// if i have to reselect a software, force software list submenu
+	// if I have to select software, force software list submenu
 	if (reselect_last::get())
 	{
 		const game_driver *driver;
 		const ui_software_info *software;
 		get_selection(software, driver);
-		menu::stack_push<menu_select_software>(ui(), container(), driver);
+		menu::stack_push<menu_select_software>(ui(), container(), *driver);
 		return;
 	}
 
@@ -397,7 +387,7 @@ void menu_select_game::handle()
 				case IPT_UI_SELECT:
 					if (get_focus() == focused_menu::MAIN)
 					{
-						if (isfavorite())
+						if (m_populated_favorites)
 							inkey_select_favorite(menu_event);
 						else
 							inkey_select(menu_event);
@@ -406,7 +396,7 @@ void menu_select_game::handle()
 
 				case IPT_CUSTOM:
 					// handle IPT_CUSTOM (mouse right click)
-					if (!isfavorite())
+					if (!m_populated_favorites)
 					{
 						menu::stack_push<menu_machine_configure>(
 								ui(), container(),
@@ -459,7 +449,7 @@ void menu_select_game::handle()
 					if (uintptr_t(menu_event->itemref) > skip_main_items)
 					{
 						favorite_manager &mfav(mame_machine_manager::instance()->favorite());
-						if (!isfavorite())
+						if (!m_populated_favorites)
 						{
 							game_driver const *const driver(reinterpret_cast<game_driver const *>(menu_event->itemref));
 							if (!mfav.is_favorite_system(*driver))
@@ -506,16 +496,19 @@ void menu_select_game::handle()
 
 void menu_select_game::populate(float &customtop, float &custombottom)
 {
-	set_redraw_icon();
+	for (auto &icon : m_icons) // TODO: why is this here?  maybe better on resize or setting change?
+		icon.second.texture.reset();
+
 	set_switch_image();
 	int old_item_selected = -1;
 	constexpr uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 
 	if (!isfavorite())
 	{
-		// if search is not empty, find approximate matches
+		m_populated_favorites = false;
 		if (!m_search.empty())
 		{
+			// if search is not empty, find approximate matches
 			populate_search();
 		}
 		else
@@ -555,11 +548,11 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	else
 	{
 		// populate favorites list
+		m_populated_favorites = true;
 		m_search.clear();
 		mame_machine_manager::instance()->favorite().apply_sorted(
 				[this, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
 				{
-					auto flags = flags_ui | FLAG_UI_FAVORITE;
 					if (info.startempty == 1)
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
@@ -573,14 +566,14 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(info.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&info);
+						item_append(info.longname, "", cloneof ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)&info);
 					}
 					else
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
 							old_item_selected = curitem;
 						item_append(info.longname, info.devicetype,
-									info.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&info);
+									info.parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&info);
 					}
 					curitem++;
 				});
@@ -792,7 +785,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 			{
 				if (!swlistdev.get_info().empty())
 				{
-					menu::stack_push<menu_select_software>(ui(), container(), driver);
+					menu::stack_push<menu_select_software>(ui(), container(), *driver);
 					return;
 				}
 			}
@@ -862,7 +855,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 			{
 				if (!swlistdev.get_info().empty())
 				{
-					menu::stack_push<menu_select_software>(ui(), container(), ui_swinfo->driver);
+					menu::stack_push<menu_select_software>(ui(), container(), *ui_swinfo->driver);
 					return;
 				}
 			}
@@ -935,7 +928,7 @@ void menu_select_game::change_info_pane(int delta)
 	game_driver const *drv;
 	ui_software_info const *soft;
 	get_selection(soft, drv);
-	if (!isfavorite())
+	if (!m_populated_favorites)
 	{
 		if (uintptr_t(drv) > skip_main_items)
 			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
@@ -1009,7 +1002,7 @@ void menu_select_game::populate_search()
 			m_searchlist.end(),
 			[] (auto const &lhs, auto const &rhs) { return lhs.first < rhs.first; });
 	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
-	for (int curitem = 0; (std::min)(m_searchlist.size(), std::size_t(200)) > curitem; ++curitem)
+	for (int curitem = 0; (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH) > curitem; ++curitem)
 	{
 		game_driver const &drv(*m_searchlist[curitem].second.get().driver);
 		bool cloneof = strcmp(drv.parent, "0") != 0;
@@ -1176,39 +1169,31 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 
 
 //-------------------------------------------------
-//  draw icons
+//  get (possibly cached) icon texture
 //-------------------------------------------------
 
-float menu_select_game::draw_icon(int linenum, void *selectedref, float x0, float y0)
+render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedref)
 {
-	if (!m_has_icons)
-		return 0.0f;
-
-	float ud_arrow_width = ui().get_line_height() * container().manager().ui_aspect(&container());
-	const game_driver *driver = nullptr;
-
-	if (item[0].flags & FLAG_UI_FAVORITE)
-	{
-		ui_software_info *soft = (ui_software_info *)selectedref;
-		if (soft->startempty == 1)
-			driver = soft->driver;
-	}
-	else
-		driver = (const game_driver *)selectedref;
-
-	auto x1 = x0 + ud_arrow_width;
-	auto y1 = y0 + ui().get_line_height();
+	game_driver const *const driver(m_populated_favorites
+			? reinterpret_cast<ui_software_info const *>(selectedref)->driver
+			: reinterpret_cast<game_driver const *>(selectedref));
+	assert(driver);
 
 	icon_cache::iterator icon(m_icons.find(driver));
-	if ((m_icons.end() == icon) || redraw_icon())
+	if ((m_icons.end() == icon) || !icon->second.texture)
 	{
+		if (m_icon_paths.empty())
+			m_icon_paths = make_icon_paths(nullptr);
+
+		// allocate an entry or allocate a texture on forced redraw
 		if (m_icons.end() == icon)
 		{
-			texture_ptr texture(machine().render().texture_alloc(), [&render = machine().render()] (render_texture *texture) { render.texture_free(texture); });
-			icon = m_icons.emplace(
-					std::piecewise_construct,
-					std::forward_as_tuple(driver),
-					std::forward_as_tuple(std::piecewise_construct, std::forward_as_tuple(std::move(texture)), std::tuple<>())).first;
+			icon = m_icons.emplace(driver, texture_ptr(machine().render().texture_alloc(), machine().render())).first;
+		}
+		else
+		{
+			assert(!icon->second.texture);
+			icon->second.texture.reset(machine().render().texture_alloc());
 		}
 
 		// set clone status
@@ -1220,83 +1205,23 @@ float menu_select_game::draw_icon(int linenum, void *selectedref, float x0, floa
 				cloneof = false;
 		}
 
-		// get search path
-		path_iterator path(ui().options().icons_directory());
-		std::string curpath;
-		std::string searchstr(ui().options().icons_directory());
-
-		// iterate over path and add path for zipped formats
-		while (path.next(curpath))
-			searchstr.append(";").append(curpath.c_str()).append(PATH_SEPARATOR).append("icons");
-
 		bitmap_argb32 tmp;
-		emu_file snapfile(searchstr.c_str(), OPEN_FLAG_READ);
-		std::string fullname = std::string(driver->name).append(".ico");
-		render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
-
-		if (!tmp.valid() && cloneof)
+		emu_file snapfile(std::string(m_icon_paths), OPEN_FLAG_READ);
+		if (snapfile.open(std::string(driver->name).append(".ico")) == osd_file::error::NONE)
 		{
-			fullname.assign(driver->parent).append(".ico");
-			render_load_ico(tmp, snapfile, nullptr, fullname.c_str());
+			render_load_ico_highest_detail(snapfile, tmp);
+			snapfile.close();
+		}
+		if (!tmp.valid() && cloneof && (snapfile.open(std::string(driver->parent).append(".ico")) == osd_file::error::NONE))
+		{
+			render_load_ico_highest_detail(snapfile, tmp);
+			snapfile.close();
 		}
 
-		bitmap_argb32 &bitmap(icon->second.second);
-		if (tmp.valid())
-		{
-			float panel_width = x1 - x0;
-			float panel_height = y1 - y0;
-			auto screen_width = machine().render().ui_target().width();
-			auto screen_height = machine().render().ui_target().height();
-
-			if (machine().render().ui_target().orientation() & ORIENTATION_SWAP_XY)
-				std::swap(screen_height, screen_width);
-
-			int panel_width_pixel = panel_width * screen_width;
-			int panel_height_pixel = panel_height * screen_height;
-
-			// Calculate resize ratios for resizing
-			auto ratioW = (float)panel_width_pixel / tmp.width();
-			auto ratioH = (float)panel_height_pixel / tmp.height();
-			auto dest_xPixel = tmp.width();
-			auto dest_yPixel = tmp.height();
-
-			if (ratioW < 1 || ratioH < 1)
-			{
-				// smaller ratio will ensure that the image fits in the view
-				float ratio = std::min(ratioW, ratioH);
-				dest_xPixel = tmp.width() * ratio;
-				dest_yPixel = tmp.height() * ratio;
-			}
-
-			bitmap_argb32 dest_bitmap;
-
-			// resample if necessary
-			if (dest_xPixel != tmp.width() || dest_yPixel != tmp.height())
-			{
-				dest_bitmap.allocate(dest_xPixel, dest_yPixel);
-				render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-				render_resample_argb_bitmap_hq(dest_bitmap, tmp, color, true);
-			}
-			else
-				dest_bitmap = std::move(tmp);
-
-			bitmap.allocate(panel_width_pixel, panel_height_pixel);
-			for (int x = 0; x < dest_xPixel; x++)
-				for (int y = 0; y < dest_yPixel; y++)
-					bitmap.pix32(y, x) = dest_bitmap.pix32(y, x);
-
-			icon->second.first->set_bitmap(bitmap, bitmap.cliprect(), TEXFORMAT_ARGB32);
-		}
-		else
-		{
-			bitmap.reset();
-		}
+		scale_icon(std::move(tmp), icon->second);
 	}
 
-	if (icon->second.second.valid())
-		container().add_quad(x0, y0, x1, y1, rgb_t::white(), icon->second.first.get(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-	return ud_arrow_width * 1.5f;
+	return icon->second.bitmap.valid() ? icon->second.texture.get() : nullptr;
 }
 
 
@@ -1305,12 +1230,12 @@ void menu_select_game::inkey_export()
 	std::vector<game_driver const *> list;
 	if (!m_search.empty())
 	{
-		for (int curitem = 0; (std::min)(m_searchlist.size(), std::size_t(200)); ++curitem)
+		for (int curitem = 0; (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH); ++curitem)
 			list.push_back(m_searchlist[curitem].second.get().driver);
 	}
 	else
 	{
-		if (isfavorite())
+		if (m_populated_favorites)
 		{
 			// iterate over favorites
 			mame_machine_manager::instance()->favorite().apply(
@@ -1421,7 +1346,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 
 void menu_select_game::get_selection(ui_software_info const *&software, game_driver const *&driver) const
 {
-	if (item[0].flags & FLAG_UI_FAVORITE) // TODO: work out why this doesn't use isfavorite()
+	if (m_populated_favorites)
 	{
 		software = reinterpret_cast<ui_software_info const *>(get_selection_ptr());
 		driver = software ? software->driver : nullptr;
@@ -1442,7 +1367,7 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 			(driver_list::total() - 1),
 			m_persistent_data.bios_count());
 
-	if (isfavorite())
+	if (m_populated_favorites)
 	{
 		line1.clear();
 	}

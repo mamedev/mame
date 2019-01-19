@@ -84,6 +84,7 @@ constexpr char const *SOFTWARE_FILTER_NAMES[software_filter::COUNT] = {
 		__("Unfiltered"),
 		__("Available"),
 		__("Unavailable"),
+		__("Favorites"),
 		__("Parents"),
 		__("Clones"),
 		__("Year"),
@@ -1256,6 +1257,21 @@ public:
 };
 
 
+class favorite_software_filter : public simple_filter_impl_base<software_filter, software_filter::FAVORITE>
+{
+public:
+	favorite_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent)
+		: m_manager(mame_machine_manager::instance()->favorite())
+	{
+	}
+
+	virtual bool apply(ui_software_info const &info) const override { return m_manager.is_favorite_software(info); }
+
+private:
+	favorite_manager const &m_manager;
+};
+
+
 class parents_software_filter : public simple_filter_impl_base<software_filter, software_filter::PARENTS>
 {
 public:
@@ -1423,6 +1439,7 @@ public:
 		case UNSUPPORTED:       return (SUPPORTED == m) || (PARTIAL_SUPPORTED == m);
 
 		case ALL:
+		case FAVORITE:
 		case YEAR:
 		case PUBLISHERS:
 		case REGION:
@@ -1740,6 +1757,8 @@ software_filter::ptr software_filter::create(type n, software_filter_data const 
 		return std::make_unique<available_software_filter>(data, value, file, indent);
 	case UNAVAILABLE:
 		return std::make_unique<unavailable_software_filter>(data, value, file, indent);
+	case FAVORITE:
+		return std::make_unique<favorite_software_filter>(data, value, file, indent);
 	case PARENTS:
 		return std::make_unique<parents_software_filter>(data, value, file, indent);
 	case CLONES:

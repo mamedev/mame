@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/selsoft.cpp
@@ -12,6 +12,7 @@
 #include "ui/selsoft.h"
 
 #include "ui/ui.h"
+#include "ui/icorender.h"
 #include "ui/inifile.h"
 #include "ui/selector.h"
 
@@ -24,69 +25,73 @@
 #include "uiinput.h"
 #include "luaengine.h"
 
+#include <algorithm>
+#include <iterator>
+#include <functional>
+
 
 namespace ui {
+
+namespace {
 
 //-------------------------------------------------
 //  compares two items in the software list and
 //  sort them by parent-clone
 //-------------------------------------------------
 
-bool compare_software(ui_software_info a, ui_software_info b)
+bool compare_software(ui_software_info const &a, ui_software_info const &b)
 {
-	ui_software_info *x = &a;
-	ui_software_info *y = &b;
-
-	bool clonex = !x->parentname.empty();
-	bool cloney = !y->parentname.empty();
+	bool const clonex = !a.parentname.empty() && !a.parentlongname.empty();
+	bool const cloney = !b.parentname.empty() && !b.parentlongname.empty();
 
 	if (!clonex && !cloney)
-		return (strmakelower(x->longname) < strmakelower(y->longname));
-
-	std::string cx(x->parentlongname), cy(y->parentlongname);
-
-	if (cx.empty())
-		clonex = false;
-
-	if (cy.empty())
-		cloney = false;
-
-	if (!clonex && !cloney)
-		return (strmakelower(x->longname) < strmakelower(y->longname));
-	else if (clonex && cloney)
 	{
-		if (!core_stricmp(x->parentname.c_str(), y->parentname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
-			return (strmakelower(x->longname) < strmakelower(y->longname));
-		else
-			return (strmakelower(cx) < strmakelower(cy));
+		return 0 > core_stricmp(a.longname.c_str(), b.longname.c_str());
 	}
 	else if (!clonex && cloney)
 	{
-		if (!core_stricmp(x->shortname.c_str(), y->parentname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
+		if ((a.shortname == b.parentname) && (a.instance == b.instance))
 			return true;
 		else
-			return (strmakelower(x->longname) < strmakelower(cy));
+			return 0 > core_stricmp(a.longname.c_str(), b.parentlongname.c_str());
+	}
+	else if (clonex && !cloney)
+	{
+		if ((a.parentname == b.shortname) && (a.instance == b.instance))
+			return false;
+		else
+			return 0 > core_stricmp(a.parentlongname.c_str(), b.longname.c_str());
+	}
+	else if ((a.parentname == b.parentname) && (a.instance == b.instance))
+	{
+		return 0 > core_stricmp(a.longname.c_str(), b.longname.c_str());
 	}
 	else
 	{
-		if (!core_stricmp(x->parentname.c_str(), y->shortname.c_str()) && !core_stricmp(x->instance.c_str(), y->instance.c_str()))
-			return false;
-		else
-			return (strmakelower(cx) < strmakelower(y->longname));
+		return 0 > core_stricmp(a.parentlongname.c_str(), b.parentlongname.c_str());
 	}
 }
+
+} // anonymous namespace
+
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
-menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, const game_driver *driver)
+menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, game_driver const &driver)
 	: menu_select_launch(mui, container, true)
+	, m_icon_paths()
+	, m_icons(MAX_ICONS_RENDER)
+	, m_driver(driver)
+	, m_has_empty_start(false)
+	, m_filter_data()
+	, m_filters()
 	, m_filter_type(software_filter::ALL)
+	, m_swinfo()
 {
 	reselect_last::reselect(false);
 
-	m_driver = driver;
 	build_software_list();
 	load_sw_custom_filters();
 	m_filter_highlight = m_filter_type;
@@ -225,11 +230,14 @@ void menu_select_software::handle()
 
 void menu_select_software::populate(float &customtop, float &custombottom)
 {
+	for (auto &icon : m_icons) // TODO: why is this here?  maybe better on resize or setting change?
+		icon.second.texture.reset();
+
 	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	m_has_empty_start = true;
 	int old_software = -1;
 
-	machine_config config(*m_driver, machine().options());
+	machine_config config(m_driver, machine().options());
 	for (device_image_interface &image : image_interface_iterator(config.root_device()))
 		if (image.filename() == nullptr && image.must_be_loaded())
 		{
@@ -245,31 +253,28 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 			item_append("[Start empty]", "", flags_ui, (void *)&m_swinfo[0]);
 
 		m_displaylist.clear();
-		m_tmp.clear();
-
 		filter_map::const_iterator const it(m_filters.find(m_filter_type));
 		if (m_filters.end() == it)
-			m_displaylist = m_sortedlist;
+			std::copy(std::next(m_swinfo.begin()), m_swinfo.end(), std::back_inserter(m_displaylist));
 		else
-			it->second->apply(std::begin(m_sortedlist), std::end(m_sortedlist), std::back_inserter(m_displaylist));
+			it->second->apply(std::next(m_swinfo.begin()), m_swinfo.end(), std::back_inserter(m_displaylist));
 
 		// iterate over entries
 		for (size_t curitem = 0; curitem < m_displaylist.size(); ++curitem)
 		{
 			if (reselect_last::software() == "[Start empty]" && !reselect_last::driver().empty())
 				old_software = 0;
-
-			else if (m_displaylist[curitem]->shortname == reselect_last::software() && m_displaylist[curitem]->listname == reselect_last::swlist())
+			else if (m_displaylist[curitem].get().shortname == reselect_last::software() && m_displaylist[curitem].get().listname == reselect_last::swlist())
 				old_software = m_has_empty_start ? curitem + 1 : curitem;
 
-			item_append(m_displaylist[curitem]->longname, m_displaylist[curitem]->devicetype,
-						m_displaylist[curitem]->parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)m_displaylist[curitem]);
+			item_append(
+					m_displaylist[curitem].get().longname, m_displaylist[curitem].get().devicetype,
+					m_displaylist[curitem].get().parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&m_displaylist[curitem].get());
 		}
 	}
-
 	else
 	{
-		find_matches(m_search.c_str(), VISIBLE_GAMES_IN_SEARCH);
+		find_matches(m_search.c_str(), MAX_VISIBLE_SEARCH);
 
 		for (int curitem = 0; m_searchlist[curitem] != nullptr; ++curitem)
 			item_append(m_searchlist[curitem]->longname, m_searchlist[curitem]->devicetype,
@@ -299,21 +304,51 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 void menu_select_software::build_software_list()
 {
 	// add start empty item
-	m_swinfo.emplace_back(*m_driver);
+	m_swinfo.emplace_back(m_driver);
 
-	machine_config config(*m_driver, machine().options());
+	machine_config config(m_driver, machine().options());
 
-	// iterate thru all software lists
+	// iterate through all software lists
+	std::vector<std::size_t> orphans;
+	struct orphan_less
+	{
+		std::vector<ui_software_info> &swinfo;
+		bool operator()(std::string const &a, std::string const &b) const { return a < b; };
+		bool operator()(std::string const &a, std::size_t b) const { return a < swinfo[b].parentname; };
+		bool operator()(std::size_t a, std::string const &b) const { return swinfo[a].parentname < b; };
+		bool operator()(std::size_t a, std::size_t b) const { return swinfo[a].parentname < swinfo[b].parentname; };
+	};
+	orphan_less const orphan_cmp{ m_swinfo };
 	for (software_list_device &swlist : software_list_device_iterator(config.root_device()))
 	{
 		m_filter_data.add_list(swlist.list_name(), swlist.description());
+		check_for_icons(swlist.list_name().c_str());
+		orphans.clear();
+		std::map<std::string, std::string> parentnames;
+		std::map<std::string, std::string>::const_iterator prevparent(parentnames.end());
 		for (const software_info &swinfo : swlist.get_info())
 		{
+			// check for previously-encountered clones
+			if (swinfo.parentname().empty())
+			{
+				if (parentnames.emplace(swinfo.shortname(), swinfo.longname()).second)
+				{
+					auto const clones(std::equal_range(orphans.begin(), orphans.end(), swinfo.shortname(), orphan_cmp));
+					for (auto it = clones.first; clones.second != it; ++it)
+						m_swinfo[*it].parentlongname = swinfo.longname();
+					orphans.erase(clones.first, clones.second);
+				}
+				else
+				{
+					assert([] (auto const x) { return x.first == x.second; } (std::equal_range(orphans.begin(), orphans.end(), swinfo.shortname(), orphan_cmp)));
+				}
+			}
+
 			const software_part &part = swinfo.parts().front();
 			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
 			{
-				const char *instance_name = nullptr;
-				const char *type_name = nullptr;
+				char const *instance_name(nullptr);
+				char const *type_name(nullptr);
 				for (device_image_interface &image : image_interface_iterator(config.root_device()))
 				{
 					char const *const interface = image.image_interface();
@@ -324,45 +359,35 @@ void menu_select_software::build_software_list()
 						break;
 					}
 				}
-				if (!instance_name || !type_name)
-					continue;
 
-				ui_software_info tmpmatches(swinfo, part, *m_driver, swlist.list_name(), instance_name, type_name);
+				if (instance_name && type_name)
+				{
+					// add to collection and try to resolve parent if applicable
+					auto const ins(m_swinfo.emplace(m_swinfo.end(), swinfo, part, m_driver, swlist.list_name(), instance_name, type_name));
+					if (!swinfo.parentname().empty())
+					{
+						if ((parentnames.end() == prevparent) || (swinfo.parentname() != prevparent->first))
+							prevparent = parentnames.find(swinfo.parentname());
 
-				m_filter_data.add_region(tmpmatches.longname);
-				m_filter_data.add_publisher(tmpmatches.publisher);
-				m_filter_data.add_year(tmpmatches.year);
-				m_filter_data.add_device_type(tmpmatches.devicetype);
-				m_swinfo.emplace_back(std::move(tmpmatches));
+						if (parentnames.end() != prevparent)
+						{
+							ins->parentlongname = prevparent->second;
+						}
+						else
+						{
+							orphans.emplace(
+									std::upper_bound(orphans.begin(), orphans.end(), swinfo.parentname(), orphan_cmp),
+									std::distance(m_swinfo.begin(), ins));
+						}
+					}
+
+					// populate filter choices
+					m_filter_data.add_region(ins->longname);
+					m_filter_data.add_publisher(ins->publisher);
+					m_filter_data.add_year(ins->year);
+					m_filter_data.add_device_type(ins->devicetype);
+				}
 			}
-		}
-	}
-	m_displaylist.resize(m_swinfo.size() + 1);
-
-	// retrieve and set the long name of software for parents
-	for (size_t y = 1; y < m_swinfo.size(); ++y)
-	{
-		if (!m_swinfo[y].parentname.empty())
-		{
-			std::string lparent(m_swinfo[y].parentname);
-			bool found = false;
-
-			// first scan backward
-			for (int x = y; x > 0; --x)
-				if (lparent == m_swinfo[x].shortname && m_swinfo[y].listname == m_swinfo[x].listname)
-				{
-					m_swinfo[y].parentlongname = m_swinfo[x].longname;
-					found = true;
-					break;
-				}
-
-			// not found? then scan forward
-			for (size_t x = y; !found && x < m_swinfo.size(); ++x)
-				if (lparent == m_swinfo[x].shortname && m_swinfo[y].listname == m_swinfo[x].listname)
-				{
-					m_swinfo[y].parentlongname = m_swinfo[x].longname;
-					break;
-				}
 		}
 	}
 
@@ -401,9 +426,6 @@ void menu_select_software::build_software_list()
 	// sort array
 	std::stable_sort(m_swinfo.begin() + 1, m_swinfo.end(), compare_software);
 	m_filter_data.finalise();
-
-	for (size_t x = 1; x < m_swinfo.size(); ++x)
-		m_sortedlist.push_back(&m_swinfo[x]);
 }
 
 
@@ -467,7 +489,7 @@ void menu_select_software::load_sw_custom_filters()
 {
 	// attempt to open the output file
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_READ);
-	if (file.open("custom_", m_driver->name, "_filter.ini") == osd_file::error::NONE)
+	if (file.open("custom_", m_driver.name, "_filter.ini") == osd_file::error::NONE)
 	{
 		software_filter::ptr flt(software_filter::create(file, m_filter_data));
 		if (flt)
@@ -491,10 +513,10 @@ void menu_select_software::find_matches(const char *str, int count)
 	{
 		// pick the best match between shortname and longname
 		// TODO: search alternate title as well
-		double curpenalty(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index]->shortname, unicode_normalization_form::D, true))));
+		double curpenalty(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index].get().shortname, unicode_normalization_form::D, true))));
 		if (curpenalty)
 		{
-			double const tmp(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index]->longname, unicode_normalization_form::D, true))));
+			double const tmp(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index].get().longname, unicode_normalization_form::D, true))));
 			curpenalty = (std::min)(curpenalty, tmp);
 		}
 
@@ -512,7 +534,7 @@ void menu_select_software::find_matches(const char *str, int count)
 				m_searchlist[matchnum + 1] = m_searchlist[matchnum];
 			}
 
-			m_searchlist[matchnum] = m_displaylist[index];
+			m_searchlist[matchnum] = &m_displaylist[index].get();
 			penalty[matchnum] = curpenalty;
 		}
 	}
@@ -526,6 +548,56 @@ void menu_select_software::find_matches(const char *str, int count)
 float menu_select_software::draw_left_panel(float x1, float y1, float x2, float y2)
 {
 	return menu_select_launch::draw_left_panel<software_filter>(m_filter_type, m_filters, x1, y1, x2, y2);
+}
+
+
+//-------------------------------------------------
+//  get (possibly cached) icon texture
+//-------------------------------------------------
+
+render_texture *menu_select_software::get_icon_texture(int linenum, void *selectedref)
+{
+	ui_software_info const *const swinfo(reinterpret_cast<ui_software_info const *>(selectedref));
+	assert(swinfo);
+
+	if (swinfo->startempty)
+		return nullptr;
+
+	icon_cache::iterator icon(m_icons.find(swinfo));
+	if ((m_icons.end() == icon) || !icon->second.texture)
+	{
+		std::map<std::string, std::string>::iterator paths(m_icon_paths.find(swinfo->listname));
+		if (m_icon_paths.end() == paths)
+			paths = m_icon_paths.emplace(swinfo->listname, make_icon_paths(swinfo->listname.c_str())).first;
+
+		// allocate an entry or allocate a texture on forced redraw
+		if (m_icons.end() == icon)
+		{
+			icon = m_icons.emplace(swinfo, texture_ptr(machine().render().texture_alloc(), machine().render())).first;
+		}
+		else
+		{
+			assert(!icon->second.texture);
+			icon->second.texture.reset(machine().render().texture_alloc());
+		}
+
+		bitmap_argb32 tmp;
+		emu_file snapfile(std::string(paths->second), OPEN_FLAG_READ);
+		if (snapfile.open(std::string(swinfo->shortname).append(".ico")) == osd_file::error::NONE)
+		{
+			render_load_ico_highest_detail(snapfile, tmp);
+			snapfile.close();
+		}
+		if (!tmp.valid() && !swinfo->parentname.empty() && (snapfile.open(std::string(swinfo->parentname).append(".ico")) == osd_file::error::NONE))
+		{
+			render_load_ico_highest_detail(snapfile, tmp);
+			snapfile.close();
+		}
+
+		scale_icon(std::move(tmp), icon->second);
+	}
+
+	return icon->second.bitmap.valid() ? icon->second.texture.get() : nullptr;
 }
 
 
@@ -545,7 +617,7 @@ void menu_select_software::make_topbox_text(std::string &line0, std::string &lin
 	// determine the text for the header
 	int vis_item = !m_search.empty() ? visible_items : (m_has_empty_start ? visible_items - 1 : visible_items);
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_swinfo.size() - 1);
-	line1 = string_format(_("Driver: \"%1$s\" software list "), m_driver->type.fullname());
+	line1 = string_format(_("Driver: \"%1$s\" software list "), m_driver.type.fullname());
 
 	filter_map::const_iterator const it(m_filters.find(m_filter_type));
 	char const *const filter((m_filters.end() != it) ? it->second->filter_text() : nullptr);
@@ -581,13 +653,13 @@ void menu_select_software::filter_selected()
 		it->second->show_ui(
 				ui(),
 				container(),
-				[this, driver = m_driver] (software_filter &filter)
+				[this, &driver = m_driver] (software_filter &filter)
 				{
 					software_filter::type const new_type(filter.get_type());
 					if (software_filter::CUSTOM == new_type)
 					{
 						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (file.open("custom_", driver->name, "_filter.ini") == osd_file::error::NONE)
+						if (file.open("custom_", driver.name, "_filter.ini") == osd_file::error::NONE)
 						{
 							filter.save_ini(file, 0);
 							file.close();

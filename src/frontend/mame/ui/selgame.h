@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/selgame.h
@@ -39,25 +39,27 @@ private:
 		CONF_PLUGINS,
 	};
 
-	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_argb32> >;
+	using icon_cache = texture_lru<game_driver const *>;
 
 	class persistent_data;
 
 	persistent_data &m_persistent_data;
 	icon_cache m_icons;
-	bool m_has_icons;
+	std::string m_icon_paths;
 	std::vector<std::reference_wrapper<ui_system_info const> > m_displaylist;
 
 	std::vector<std::pair<double, std::reference_wrapper<ui_system_info const> > > m_searchlist;
 	unsigned m_searched_fields;
+	bool m_populated_favorites;
 
 	static bool s_first_start;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	// draw left panel
+	// drawing
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
+	virtual render_texture *get_icon_texture(int linenum, void *selectedref) override;
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const override;
@@ -88,9 +90,6 @@ private:
 
 	// General info
 	virtual void general_info(const game_driver *driver, std::string &buffer) override;
-
-	// drawing
-	virtual float draw_icon(int linenum, void *selectedref, float x1, float y1) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);
