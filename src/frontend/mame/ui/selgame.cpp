@@ -1207,12 +1207,12 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 
 		bitmap_argb32 tmp;
 		emu_file snapfile(std::string(m_icon_paths), OPEN_FLAG_READ);
-		if (snapfile.open(std::string(driver->name).append(".ico")) == osd_file::error::NONE)
+		if (snapfile.open(std::string(driver->name), ".ico") == osd_file::error::NONE)
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
 		}
-		if (!tmp.valid() && cloneof && (snapfile.open(std::string(driver->parent).append(".ico")) == osd_file::error::NONE))
+		if (!tmp.valid() && cloneof && (snapfile.open(std::string(driver->parent), ".ico") == osd_file::error::NONE))
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();

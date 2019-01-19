@@ -583,12 +583,12 @@ render_texture *menu_select_software::get_icon_texture(int linenum, void *select
 
 		bitmap_argb32 tmp;
 		emu_file snapfile(std::string(paths->second), OPEN_FLAG_READ);
-		if (snapfile.open(std::string(swinfo->shortname).append(".ico")) == osd_file::error::NONE)
+		if (snapfile.open(std::string(swinfo->shortname), ".ico") == osd_file::error::NONE)
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
 		}
-		if (!tmp.valid() && !swinfo->parentname.empty() && (snapfile.open(std::string(swinfo->parentname).append(".ico")) == osd_file::error::NONE))
+		if (!tmp.valid() && !swinfo->parentname.empty() && (snapfile.open(std::string(swinfo->parentname), ".ico") == osd_file::error::NONE))
 		{
 			render_load_ico_highest_detail(snapfile, tmp);
 			snapfile.close();
@@ -653,13 +653,13 @@ void menu_select_software::filter_selected()
 		it->second->show_ui(
 				ui(),
 				container(),
-				[this, &driver = m_driver] (software_filter &filter)
+				[this] (software_filter &filter)
 				{
 					software_filter::type const new_type(filter.get_type());
 					if (software_filter::CUSTOM == new_type)
 					{
 						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (file.open("custom_", driver.name, "_filter.ini") == osd_file::error::NONE)
+						if (file.open("custom_", m_driver.name, "_filter.ini") == osd_file::error::NONE)
 						{
 							filter.save_ini(file, 0);
 							file.close();
