@@ -15,7 +15,7 @@
 class neogeo_sbp_cart_device : public neogeo_rom_device
 {
 public:
-	neogeo_sbp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	neogeo_sbp_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual DECLARE_WRITE16_MEMBER(protection_w) override;
 	virtual DECLARE_READ16_MEMBER(protection_r) override;
@@ -27,7 +27,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void patch(uint8_t* cpurom, uint32_t cpurom_size);
+	void patch(u8* cpurom, u32 cpurom_size);
 };
 
 DECLARE_DEVICE_TYPE(NEOGEO_SBP_CART, neogeo_sbp_cart_device)

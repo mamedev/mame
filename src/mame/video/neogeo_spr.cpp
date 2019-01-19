@@ -16,7 +16,7 @@ neosprite_base_device::neosprite_base_device(
 		device_type type,
 		const char *tag,
 		device_t *owner,
-		uint32_t clock)
+		u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_bppshift(4)
@@ -26,11 +26,11 @@ neosprite_base_device::neosprite_base_device(
 
 void neosprite_base_device::device_start()
 {
-	m_videoram = std::make_unique<uint16_t[]>(0x8000 + 0x800);
+	m_videoram = std::make_unique<u16[]>(0x8000 + 0x800);
 	m_videoram_drawsource = m_videoram.get();
 
 	/* clear allocated memory */
-	memset(m_videoram.get(), 0x00, (0x8000 + 0x800) * sizeof(uint16_t));
+	memset(m_videoram.get(), 0x00, (0x8000 + 0x800) * sizeof(u16));
 
 	create_sprite_line_timer();
 	create_auto_animation_timer();
@@ -74,7 +74,7 @@ void neosprite_base_device::device_reset()
  *
  *************************************/
 
-void neosprite_base_device::set_videoram_offset(uint16_t data)
+void neosprite_base_device::set_videoram_offset(u16 data)
 {
 	m_vram_offset = (data & 0x8000 ? data & 0x87ff : data);
 
@@ -83,13 +83,13 @@ void neosprite_base_device::set_videoram_offset(uint16_t data)
 }
 
 
-uint16_t neosprite_base_device::get_videoram_data()
+u16 neosprite_base_device::get_videoram_data()
 {
 	return m_vram_read_buffer;
 }
 
 
-void neosprite_base_device::set_videoram_data(uint16_t data)
+void neosprite_base_device::set_videoram_data(u16 data)
 {
 	m_videoram[m_vram_offset] = data;
 
@@ -98,13 +98,13 @@ void neosprite_base_device::set_videoram_data(uint16_t data)
 }
 
 
-void neosprite_base_device::set_videoram_modulo(uint16_t data)
+void neosprite_base_device::set_videoram_modulo(u16 data)
 {
 	m_vram_modulo = data;
 }
 
 
-uint16_t neosprite_base_device::get_videoram_modulo()
+u16 neosprite_base_device::get_videoram_modulo()
 {
 	return m_vram_modulo;
 }
@@ -117,19 +117,19 @@ uint16_t neosprite_base_device::get_videoram_modulo()
  *
  *************************************/
 
-void neosprite_base_device::set_auto_animation_speed(uint8_t data)
+void neosprite_base_device::set_auto_animation_speed(u8 data)
 {
 	m_auto_animation_speed = data;
 }
 
 
-void neosprite_base_device::set_auto_animation_disabled(uint8_t data)
+void neosprite_base_device::set_auto_animation_disabled(u8 data)
 {
 	m_auto_animation_disabled = data;
 }
 
 
-uint8_t neosprite_base_device::neogeo_get_auto_animation_counter()
+u8 neosprite_base_device::neogeo_get_auto_animation_counter()
 {
 	return m_auto_animation_counter;
 }
@@ -168,7 +168,7 @@ void neosprite_base_device::start_auto_animation_timer()
  *
  *************************************/
 
-void neosprite_base_device::neogeo_set_fixed_layer_source(uint8_t data)
+void neosprite_base_device::neogeo_set_fixed_layer_source(u8 data)
 {
 	m_fixed_layer_source = data;
 }
@@ -178,10 +178,10 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 {
 	assert((m_fixed_layer_source && m_region_fixed != nullptr) || (m_region_fixedbios != nullptr));
 
-	uint8_t* gfx_base = m_fixed_layer_source ? m_region_fixed : m_region_fixedbios->base();
-	uint32_t addr_mask = ( m_fixed_layer_source ? m_region_fixed_size : m_region_fixedbios->bytes() ) - 1;
-	uint16_t *video_data = &m_videoram_drawsource[0x7000 | (scanline >> 3)];
-	uint32_t *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
+	u8* gfx_base = m_fixed_layer_source ? m_region_fixed : m_region_fixedbios->base();
+	u32 addr_mask = ( m_fixed_layer_source ? m_region_fixed_size : m_region_fixedbios->bytes() ) - 1;
+	u16 *video_data = &m_videoram_drawsource[0x7000 | (scanline >> 3)];
+	u32 *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
 
 	int garouoffsets[32];
 	int banked = m_fixed_layer_source && (addr_mask > 0x1ffff);
@@ -207,8 +207,8 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 
 	for (int x = 0; x < 40; x++)
 	{
-		uint16_t code_and_palette = *video_data;
-		uint16_t code = code_and_palette & 0x0fff;
+		u16 code_and_palette = *video_data;
+		u16 code = code_and_palette & 0x0fff;
 
 		if (banked)
 		{
@@ -232,7 +232,7 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 
 			char_pens = &m_pens[code_and_palette >> 12 << m_bppshift];
 
-			static const uint32_t pix_offsets[] = { 0x10, 0x18, 0x00, 0x08 };
+			static const u32 pix_offsets[] = { 0x10, 0x18, 0x00, 0x08 };
 
 			for (int i = 0; i < 4; i++)
 			{
@@ -244,9 +244,9 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 }
 
 
-inline void neosprite_base_device::draw_fixed_layer_2pixels(uint32_t*&pixel_addr, int offset, uint8_t* gfx_base, const pen_t* char_pens)
+inline void neosprite_base_device::draw_fixed_layer_2pixels(u32*&pixel_addr, int offset, u8* gfx_base, const pen_t* char_pens)
 {
-	uint8_t data = gfx_base[offset];
+	u8 data = gfx_base[offset];
 
 	if (data & 0x0f)
 		*pixel_addr = char_pens[data & 0x0f];
@@ -287,7 +287,7 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 	int rows = 0;
 	int zoom_y = 0;
 	int zoom_x = 0;
-	uint16_t *sprite_list;
+	u16 *sprite_list;
 
 	/* select the active list */
 	if (scanline & 0x01)
@@ -310,9 +310,9 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 
 	for (int sprite_index = 0; sprite_index <= max_sprite_index; sprite_index++)
 	{
-		uint16_t sprite_number = sprite_list[sprite_index] & 0x01ff;
-		uint16_t y_control = m_videoram_drawsource[0x8200 | sprite_number];
-		uint16_t zoom_control = m_videoram_drawsource[0x8000 | sprite_number];
+		u16 sprite_number = sprite_list[sprite_index] & 0x01ff;
+		u16 y_control = m_videoram_drawsource[0x8200 | sprite_number];
+		u16 zoom_control = m_videoram_drawsource[0x8000 | sprite_number];
 
 		/* if chained, go to next X coordinate and get new X zoom */
 		if (y_control & 0x40)
@@ -342,10 +342,10 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 		{
 			int sprite_y;
 			int tile;
-			uint8_t sprite_y_and_tile;
+			u8 sprite_y_and_tile;
 			offs_t attr_and_code_offs;
-			uint16_t attr;
-			uint32_t code;
+			u16 attr;
+			u32 code;
 			const pen_t *line_pens;
 			int x_inc;
 
@@ -414,7 +414,7 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 			/* draw the line - no wrap-around */
 			if (x <= 0x01f0)
 			{
-				uint32_t *pixel_addr = &bitmap.pix32(scanline, x + NEOGEO_HBEND);
+				u32 *pixel_addr = &bitmap.pix32(scanline, x + NEOGEO_HBEND);
 
 				for (int i = 0; i < 0x10; i++)
 				{
@@ -436,7 +436,7 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 			else
 			{
 				int x_save = x;
-				uint32_t *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
+				u32 *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
 
 				for (int i = 0; i < 0x10; i++)
 				{
@@ -467,10 +467,10 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 
 void neosprite_base_device::parse_sprites(int scanline)
 {
-	uint16_t sprite_number;
+	u16 sprite_number;
 	int y = 0;
 	int rows = 0;
-	uint16_t *sprite_list;
+	u16 *sprite_list;
 
 	int active_sprite_count = 0;
 
@@ -483,7 +483,7 @@ void neosprite_base_device::parse_sprites(int scanline)
 	/* scan all sprites */
 	for (sprite_number = 0; sprite_number < MAX_SPRITES_PER_SCREEN; sprite_number++)
 	{
-		uint16_t y_control = m_videoram_drawsource[0x8200 | sprite_number];
+		u16 y_control = m_videoram_drawsource[0x8200 | sprite_number];
 
 		/* if not chained, get Y position and height, otherwise use previous values */
 		if (~y_control & 0x40)
@@ -546,13 +546,13 @@ void neosprite_base_device::start_sprite_line_timer()
 }
 
 
-uint32_t neosprite_base_device::get_region_mask(uint8_t* rgn, uint32_t rgn_size)
+u32 neosprite_base_device::get_region_mask(u8* rgn, u32 rgn_size)
 {
 	/* convert the sprite graphics data into a format that
 	   allows faster blitting */
-	uint32_t mask;
-	uint32_t len;
-	uint32_t bit;
+	u32 mask;
+	u32 len;
+	u32 bit;
 
 	/* get mask based on the length rounded up to the nearest
 	   power of 2 */
@@ -578,19 +578,19 @@ void neosprite_base_device::optimize_sprite_data()
 	return;
 }
 
-void neosprite_base_device::set_optimized_sprite_data(uint8_t* sprdata, uint32_t mask)
+void neosprite_base_device::set_optimized_sprite_data(u8* sprdata, u32 mask)
 {
 	return;
 }
 
 // these are for passing in pointers from the main system
-void neosprite_base_device::set_sprite_region(uint8_t* region_sprites, uint32_t region_sprites_size)
+void neosprite_base_device::set_sprite_region(u8* region_sprites, u32 region_sprites_size)
 {
 	m_region_sprites = region_sprites;
 	m_region_sprites_size = region_sprites_size;
 }
 
-void neosprite_base_device::set_fixed_regions(uint8_t* fix_cart, uint32_t fix_cart_size, memory_region* fix_bios)
+void neosprite_base_device::set_fixed_regions(u8* fix_cart, u32 fix_cart_size, memory_region* fix_bios)
 {
 	m_region_fixed = fix_cart;
 	m_region_fixed_size = fix_cart_size;
@@ -615,18 +615,18 @@ void neosprite_base_device::set_pens(const pen_t* pens)
 
 DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_REGULAR, neosprite_regular_device, "neosprite_reg", "Neo-Geo Sprites (regular)")
 
-neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: neosprite_base_device(mconfig, NEOGEO_SPRITE_REGULAR, tag, owner, clock)
 {
 }
 
-void neosprite_regular_device::set_sprite_region(uint8_t* region_sprites, uint32_t region_sprites_size)
+void neosprite_regular_device::set_sprite_region(u8* region_sprites, u32 region_sprites_size)
 {
 	m_region_sprites = region_sprites;
 	m_region_sprites_size = region_sprites_size;
 
-	uint32_t mask = get_region_mask(m_region_sprites, m_region_sprites_size);
-	uint32_t proper_size = (mask + 1) >>1;
+	u32 mask = get_region_mask(m_region_sprites, m_region_sprites_size);
+	u32 proper_size = (mask + 1) >>1;
 
 	printf("lengths %08x %08x m_region_sprites", region_sprites_size, proper_size);
 
@@ -638,12 +638,12 @@ void neosprite_regular_device::set_sprite_region(uint8_t* region_sprites, uint32
 	m_sprite_gfx_address_mask = mask;
 }
 
-inline void neosprite_regular_device::draw_pixel(int romaddr, uint32_t* dst, const pen_t *line_pens)
+inline void neosprite_regular_device::draw_pixel(int romaddr, u32* dst, const pen_t *line_pens)
 {
-	const uint8_t* src = m_region_sprites + (((romaddr &~0xff)>>1) | (((romaddr&0x8)^0x8)<<3) | ((romaddr & 0xf0)  >> 2));
+	const u8* src = m_region_sprites + (((romaddr &~0xff)>>1) | (((romaddr&0x8)^0x8)<<3) | ((romaddr & 0xf0)  >> 2));
 	const int x = romaddr & 0x7;
 
-	const uint8_t gfx = (((src[0x3] >> x) & 0x01) << 3) |
+	const u8 gfx = (((src[0x3] >> x) & 0x01) << 3) |
 						(((src[0x1] >> x) & 0x01) << 2) |
 						(((src[0x2] >> x) & 0x01) << 1) |
 						(((src[0x0] >> x) & 0x01) << 0);
@@ -663,22 +663,22 @@ inline void neosprite_regular_device::draw_pixel(int romaddr, uint32_t* dst, con
 
 DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_OPTIMZIED, neosprite_optimized_device, "neosprite_opt", "Neo-Geo Sprites (optimized)")
 
-neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: neosprite_base_device(mconfig, NEOGEO_SPRITE_OPTIMZIED, tag, owner, clock)
 	, m_spritegfx8(nullptr)
 {
 }
 
-uint32_t neosprite_optimized_device::optimize_helper(std::vector<uint8_t> &spritegfx, uint8_t* region_sprites, uint32_t region_sprites_size)
+u32 neosprite_optimized_device::optimize_helper(std::vector<u8> &spritegfx, u8* region_sprites, u32 region_sprites_size)
 {
 	// convert the sprite graphics data into a format that allows faster blitting
-	uint8_t *src;
-	uint8_t *dest;
+	u8 *src;
+	u8 *dest;
 
-	uint32_t mask = get_region_mask(region_sprites, region_sprites_size);
+	u32 mask = get_region_mask(region_sprites, region_sprites_size);
 
 	spritegfx.resize(mask + 1);
-	uint32_t spritegfx_address_mask = mask;
+	u32 spritegfx_address_mask = mask;
 
 	src = region_sprites;
 	dest = &spritegfx[0];
@@ -715,15 +715,15 @@ void neosprite_optimized_device::optimize_sprite_data()
 	m_spritegfx8 = &m_sprite_gfx[0];
 }
 
-void neosprite_optimized_device::set_optimized_sprite_data(uint8_t* sprdata, uint32_t mask)
+void neosprite_optimized_device::set_optimized_sprite_data(u8* sprdata, u32 mask)
 {
 	m_sprite_gfx_address_mask = mask;
 	m_spritegfx8 = &sprdata[0];
 }
 
-inline void neosprite_optimized_device::draw_pixel(int romaddr, uint32_t* dst, const pen_t *line_pens)
+inline void neosprite_optimized_device::draw_pixel(int romaddr, u32* dst, const pen_t *line_pens)
 {
-	const uint8_t gfx = m_spritegfx8[romaddr];
+	const u8 gfx = m_spritegfx8[romaddr];
 
 	if (gfx)
 		*dst = line_pens[gfx];
@@ -740,19 +740,19 @@ inline void neosprite_optimized_device::draw_pixel(int romaddr, uint32_t* dst, c
 DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_MIDAS, neosprite_midas_device, "midassprite", "MIDAS Sprites")
 
 
-neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: neosprite_base_device(mconfig, NEOGEO_SPRITE_MIDAS, tag, owner, clock)
 {
 	m_bppshift = 8;
 }
 
 
-inline void neosprite_midas_device::draw_pixel(int romaddr, uint32_t* dst, const pen_t *line_pens)
+inline void neosprite_midas_device::draw_pixel(int romaddr, u32* dst, const pen_t *line_pens)
 {
-	const uint8_t* src = m_region_sprites + (((romaddr &~0xff)) | (((romaddr&0x8)^0x8)<<4) | ((romaddr & 0xf0)  >> 1));
+	const u8* src = m_region_sprites + (((romaddr &~0xff)) | (((romaddr&0x8)^0x8)<<4) | ((romaddr & 0xf0)  >> 1));
 	const int x = romaddr & 0x7;
 
-	const uint8_t gfx =   (((src[0x7] >> x) & 0x01) << 7) |
+	const u8 gfx =   (((src[0x7] >> x) & 0x01) << 7) |
 						(((src[0x6] >> x) & 0x01) << 6) |
 						(((src[0x5] >> x) & 0x01) << 5) |
 						(((src[0x4] >> x) & 0x01) << 4) |
@@ -770,21 +770,21 @@ void neosprite_midas_device::device_start()
 {
 	neosprite_base_device::device_start();
 
-	m_videoram_buffer = std::make_unique<uint16_t[]>(0x8000 + 0x800);
+	m_videoram_buffer = std::make_unique<u16[]>(0x8000 + 0x800);
 	m_videoram_drawsource = m_videoram_buffer.get();
 
-	memset(m_videoram_buffer.get(), 0x00, (0x8000 + 0x800) * sizeof(uint16_t));
+	memset(m_videoram_buffer.get(), 0x00, (0x8000 + 0x800) * sizeof(u16));
 
 }
 
 void neosprite_midas_device::buffer_vram()
 {
-	memcpy(m_videoram_buffer.get(), m_videoram.get(), (0x8000 + 0x800) * sizeof(uint16_t));
+	memcpy(m_videoram_buffer.get(), m_videoram.get(), (0x8000 + 0x800) * sizeof(u16));
 }
 
-inline void neosprite_midas_device::draw_fixed_layer_2pixels(uint32_t*&pixel_addr, int offset, uint8_t* gfx_base, const pen_t* char_pens)
+inline void neosprite_midas_device::draw_fixed_layer_2pixels(u32*&pixel_addr, int offset, u8* gfx_base, const pen_t* char_pens)
 {
-	uint8_t data;
+	u8 data;
 
 	data = ((gfx_base[(offset * 2)+0] & 0x0f)<<0) | ((gfx_base[(offset * 2)+1] & 0x0f)<<4);
 	if (data)
@@ -797,10 +797,10 @@ inline void neosprite_midas_device::draw_fixed_layer_2pixels(uint32_t*&pixel_add
 	pixel_addr++;
 }
 
-void neosprite_midas_device::set_sprite_region(uint8_t* region_sprites, uint32_t region_sprites_size)
+void neosprite_midas_device::set_sprite_region(u8* region_sprites, u32 region_sprites_size)
 {
 	m_region_sprites = region_sprites;
 	m_region_sprites_size = region_sprites_size;
-	uint32_t mask = get_region_mask(m_region_sprites, m_region_sprites_size);
+	u32 mask = get_region_mask(m_region_sprites, m_region_sprites_size);
 	m_sprite_gfx_address_mask = mask;
 }

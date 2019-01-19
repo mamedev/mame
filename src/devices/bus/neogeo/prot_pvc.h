@@ -8,30 +8,27 @@
 
 DECLARE_DEVICE_TYPE(NG_PVC_PROT, pvc_prot_device)
 
-#define MCFG_PVC_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NG_PVC_PROT, 0)
-
 
 class pvc_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pvc_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void pvc_write_unpack_color();
 	void pvc_write_pack_color();
 //  void pvc_write_bankswitch(address_space &space);
-	uint32_t get_bank_base();
+	u32 get_bank_base();
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE16_MEMBER(protection_w);
 
-	uint16_t m_cart_ram[0x1000];
+	u16 m_cart_ram[0x1000];
 
-	void mslug5_decrypt_68k(uint8_t* rom, uint32_t size);
-	void svc_px_decrypt(uint8_t* rom, uint32_t size);
-	void kf2k3pcb_decrypt_68k(uint8_t* rom, uint32_t size);
-	void kof2003_decrypt_68k(uint8_t* rom, uint32_t size);
-	void kof2003h_decrypt_68k(uint8_t* rom, uint32_t size);
+	void mslug5_decrypt_68k(u8* rom, u32 size);
+	void svc_px_decrypt(u8* rom, u32 size);
+	void kf2k3pcb_decrypt_68k(u8* rom, u32 size);
+	void kof2003_decrypt_68k(u8* rom, u32 size);
+	void kof2003h_decrypt_68k(u8* rom, u32 size);
 
 protected:
 	virtual void device_start() override;

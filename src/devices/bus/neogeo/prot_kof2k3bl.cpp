@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(NG_KOF2K3BL_PROT, kof2k3bl_prot_device, "ng_kof2k3bl_prot", "Neo Geo KoF 2003 Bootleg Protection")
 
 
-kof2k3bl_prot_device::kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+kof2k3bl_prot_device::kof2k3bl_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NG_KOF2K3BL_PROT, tag, owner, clock)
 {
 }
@@ -46,10 +46,10 @@ WRITE16_MEMBER(kof2k3bl_prot_device::kof2003_w)
 	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
 	{
-		uint8_t* cr = (uint8_t *)m_cartridge_ram;
-		uint8_t prt = cr[BYTE_XOR_LE(0x1ff2)];
+		u8* cr = (u8 *)m_cartridge_ram;
+		u8 prt = cr[BYTE_XOR_LE(0x1ff2)];
 		m_bank_base = 0x100000 + ((cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff1)]);
-		//uint32_t address = (cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff1)];
+		//u32 address = (cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff1)];
 		//m_bankdev->neogeo_set_main_cpu_bank_address(address+0x100000);
 
 		cr[BYTE_XOR_LE(0x1ff0)]  = 0xa0;
@@ -65,10 +65,10 @@ WRITE16_MEMBER(kof2k3bl_prot_device::kof2003p_w)
 	data = COMBINE_DATA(&m_cartridge_ram[offset]);
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
 	{
-		uint8_t* cr = (uint8_t *)m_cartridge_ram;
-		uint8_t prt = cr[BYTE_XOR_LE(0x1ff2)];
+		u8* cr = (u8 *)m_cartridge_ram;
+		u8 prt = cr[BYTE_XOR_LE(0x1ff2)];
 		m_bank_base = 0x100000 + ((cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff0)]);
-		//uint32_t address = (cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff0)];
+		//u32 address = (cr[BYTE_XOR_LE(0x1ff3)] << 16) | (cr[BYTE_XOR_LE(0x1ff2)] << 8) | cr[BYTE_XOR_LE(0x1ff0)];
 		//m_bankdev->neogeo_set_main_cpu_bank_address(address+0x100000);
 
 		cr[BYTE_XOR_LE(0x1ff0)] &= 0xfe;
@@ -78,12 +78,12 @@ WRITE16_MEMBER(kof2k3bl_prot_device::kof2003p_w)
 	}
 }
 
-void kof2k3bl_prot_device::bl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void kof2k3bl_prot_device::bl_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	static const uint8_t sec[] = { 0x07, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
+	static const u8 sec[] = { 0x07, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 	int rom_size = 0x800000;
-	uint8_t *rom = cpurom;
-	std::vector<uint8_t> buf(rom_size);
+	u8 *rom = cpurom;
+	std::vector<u8> buf(rom_size);
 
 	memcpy(&buf[0], rom, rom_size);
 	for (int i = 0; i < rom_size / 0x100000; i++)
@@ -93,10 +93,10 @@ void kof2k3bl_prot_device::bl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 
 /* The King of Fighters 2004 Plus / Hero (The King of Fighters 2003 bootleg) */
 
-void kof2k3bl_prot_device::pl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void kof2k3bl_prot_device::pl_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	std::vector<uint16_t> tmp(0x100000/2);
-	uint16_t*rom16 = (uint16_t*)cpurom;
+	std::vector<u16> tmp(0x100000/2);
+	u16*rom16 = (u16*)cpurom;
 
 	for (int i = 0; i < 0x700000/2; i += 0x100000/2)
 	{
@@ -114,20 +114,20 @@ void kof2k3bl_prot_device::pl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 
 /* The King of Fighters 2004 Ultra Plus (The King of Fighters 2003 bootleg) */
 
-void kof2k3bl_prot_device::upl_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void kof2k3bl_prot_device::upl_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	uint8_t *src = cpurom;
+	u8 *src = cpurom;
 	memmove(src + 0x100000, src, 0x600000);
 	memmove(src, src + 0x700000, 0x100000);
 
-	uint8_t *rom = cpurom + 0xfe000;
-	uint8_t *buf = cpurom + 0xd0610;
+	u8 *rom = cpurom + 0xfe000;
+	u8 *buf = cpurom + 0xd0610;
 	for (int i = 0; i < 0x2000 / 2; i++)
 	{
 		int ofst = (i & 0xff00) + bitswap<8>((i & 0x00ff), 7, 6, 0, 4, 3, 2, 1, 5);
 		memcpy(&rom[i * 2], &buf[ofst * 2], 2);
 	}
 
-	uint16_t* rom16 = (uint16_t*)cpurom;
+	u16* rom16 = (u16*)cpurom;
 	m_overlay = rom16[0x58196 / 2];
 }

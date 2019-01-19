@@ -19,7 +19,7 @@
 DEFINE_DEVICE_TYPE(NEOGEO_KOF98_CART, neogeo_kof98_cart_device, "neocart_kof98", "Neo Geo KoF 98 Cart")
 
 
-neogeo_kof98_cart_device::neogeo_kof98_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
+neogeo_kof98_cart_device::neogeo_kof98_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_rom_device(mconfig, NEOGEO_KOF98_CART, tag, owner, clock),
 	m_prot(*this, "kof98_prot")
 {
@@ -43,9 +43,10 @@ void neogeo_kof98_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-MACHINE_CONFIG_START(neogeo_kof98_cart_device::device_add_mconfig)
-	MCFG_KOF98_PROT_ADD("kof98_prot")
-MACHINE_CONFIG_END
+void neogeo_kof98_cart_device::device_add_mconfig(machine_config &config)
+{
+	NG_KOF98_PROT(config, m_prot, 0);
+}
 
 void neogeo_kof98_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 {

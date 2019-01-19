@@ -584,14 +584,14 @@ protected:
 	virtual void machine_start() override;
 
 	virtual void device_post_load() override;
-	virtual void output_strobe(uint8_t bits, uint8_t data) { }
+	virtual void output_strobe(u8 bits, u8 data) { }
 	virtual void set_outputs() { }
 
 	virtual DECLARE_WRITE8_MEMBER(io_control_w) override;
 
 private:
-	uint8_t m_output_data;
-	uint8_t m_output_latch;
+	u8 m_output_data;
+	u8 m_output_latch;
 };
 
 
@@ -677,7 +677,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual void output_strobe(uint8_t bits, uint8_t data) override;
+	virtual void output_strobe(u8 bits, u8 data) override;
 	virtual void set_outputs() override;
 
 	void mv1_fixed(machine_config &config);
@@ -685,8 +685,8 @@ protected:
 private:
 	output_finder<4> m_digits;
 
-	uint8_t m_led1_value;
-	uint8_t m_led2_value;
+	u8 m_led1_value;
+	u8 m_led2_value;
 };
 
 
@@ -707,13 +707,13 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	virtual void output_strobe(uint8_t bits, uint8_t data) override;
+	virtual void output_strobe(u8 bits, u8 data) override;
 	virtual void set_outputs() override;
 
 private:
 	output_finder<6> m_lamps;
 
-	uint8_t m_el_value;
+	u8 m_el_value;
 };
 
 
@@ -761,21 +761,21 @@ void neogeo_base_state::adjust_display_position_interrupt_timer()
 }
 
 
-void neogeo_base_state::set_display_position_interrupt_control(uint16_t data)
+void neogeo_base_state::set_display_position_interrupt_control(u16 data)
 {
 	m_display_position_interrupt_control = data;
 }
 
 
-void neogeo_base_state::set_display_counter_msb(uint16_t data)
+void neogeo_base_state::set_display_counter_msb(u16 data)
 {
-	m_display_counter = (m_display_counter & 0x0000ffff) | ((uint32_t)data << 16);
+	m_display_counter = (m_display_counter & 0x0000ffff) | ((u32)data << 16);
 
 	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", m_maincpu->pc(), m_display_counter);
 }
 
 
-void neogeo_base_state::set_display_counter_lsb(uint16_t data)
+void neogeo_base_state::set_display_counter_lsb(u16 data)
 {
 	m_display_counter = (m_display_counter & 0xffff0000) | data;
 
@@ -797,7 +797,7 @@ void neogeo_base_state::update_interrupts()
 }
 
 
-void neogeo_base_state::acknowledge_interrupt(uint16_t data)
+void neogeo_base_state::acknowledge_interrupt(u16 data)
 {
 	if (data & 0x01)
 		m_irq3_pending = 0;
@@ -913,7 +913,7 @@ READ16_MEMBER(ngarcade_base_state::in1_edge_joy_r)
 
 CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
 {
-	uint32_t ret = m_edge->read_start_sel() | ~0x05;
+	u32 ret = m_edge->read_start_sel() | ~0x05;
 	if (m_ctrl1)
 		ret &= (m_ctrl1->read_start_sel() << 0) | ~0x03;
 	if (m_ctrl2)
@@ -1004,7 +1004,7 @@ WRITE8_MEMBER(neogeo_base_state::audio_command_w)
 
 READ16_MEMBER(neogeo_base_state::unmapped_r)
 {
-	uint16_t ret;
+	u16 ret;
 
 	/* unmapped memory returns the last word on the data bus, which is almost always the opcode
 	   of the next instruction due to prefetch */
@@ -1061,7 +1061,7 @@ READ16_MEMBER(neogeo_base_state::memcard_r)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
-	uint16_t ret;
+	u16 ret;
 
 	if (m_memcard->present())
 		ret = m_memcard->read(space, offset) | 0xff00;
@@ -1092,7 +1092,7 @@ WRITE16_MEMBER(neogeo_base_state::memcard_w)
 
 CUSTOM_INPUT_MEMBER(neogeo_base_state::get_audio_result)
 {
-	uint8_t ret = m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), 0);
+	u8 ret = m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), 0);
 
 	return ret;
 }
@@ -1135,7 +1135,7 @@ WRITE_LINE_MEMBER(neogeo_base_state::set_use_cart_audio)
 
 WRITE16_MEMBER(neogeo_base_state::write_banksel)
 {
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
+	u32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", m_maincpu->pc(), data);
@@ -1148,7 +1148,7 @@ WRITE16_MEMBER(neogeo_base_state::write_banksel)
 			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", m_maincpu->pc(), data);
 			bank = 0;
 		}
-		uint8_t *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (uint8_t *)m_slots[m_curr_slot]->get_rom_base();
+		u8 *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (u8 *)m_slots[m_curr_slot]->get_rom_base();
 		m_bank_base = (bank + 1) * 0x100000;
 		m_bank_cartridge->set_base(ROM + m_bank_base);
 	}
@@ -1163,7 +1163,7 @@ WRITE16_MEMBER(neogeo_base_state::write_banksel)
 
 void mvs_led_state::set_outputs()
 {
-	static constexpr uint8_t led_map[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
+	static constexpr u8 led_map[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// LED1
 	m_digits[0] = led_map[m_led1_value >> 4];
@@ -1186,7 +1186,7 @@ void mvs_led_el_state::set_outputs()
 }
 
 
-void mvs_led_state::output_strobe(uint8_t bits, uint8_t data)
+void mvs_led_state::output_strobe(u8 bits, u8 data)
 {
 	if (BIT(bits, 4))
 		m_led1_value = ~data;
@@ -1197,7 +1197,7 @@ void mvs_led_state::output_strobe(uint8_t bits, uint8_t data)
 	mvs_state::output_strobe(bits, data);
 }
 
-void mvs_led_el_state::output_strobe(uint8_t bits, uint8_t data)
+void mvs_led_el_state::output_strobe(u8 bits, u8 data)
 {
 	if (BIT(bits, 3))
 		m_el_value = ~data & 0x07;
@@ -1220,7 +1220,7 @@ void mvs_led_el_state::output_strobe(uint8_t bits, uint8_t data)
 WRITE16_MEMBER(neogeo_base_state::write_bankprot)
 {
 	m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-	m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+	m_bank_cartridge->set_base((u8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 }
 
 WRITE16_MEMBER(neogeo_base_state::write_bankprot_pvc)
@@ -1232,7 +1232,7 @@ WRITE16_MEMBER(neogeo_base_state::write_bankprot_pvc)
 	if (offset >= 0xff8)
 	{
 		m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((u8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 }
 
@@ -1245,7 +1245,7 @@ WRITE16_MEMBER(neogeo_base_state::write_bankprot_kf2k3bl)
 	if (offset == 0x1ff0/2 || offset == 0x1ff2/2)
 	{
 		m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((u8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 }
 
@@ -1256,12 +1256,12 @@ WRITE16_MEMBER(neogeo_base_state::write_bankprot_ms5p)
 	if ((offset == 0) && (data == 0xa0))
 	{
 		m_bank_base = 0xa0;
-		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((u8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 	else if (offset == 2)
 	{
 		m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((u8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 }
 
@@ -1273,13 +1273,13 @@ WRITE16_MEMBER(neogeo_base_state::write_bankprot_kof10th)
 	{
 		// Standard bankswitch
 		m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
-		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((u8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 	}
 }
 
 READ16_MEMBER(neogeo_base_state::read_lorom_kof10th)
 {
-	uint16_t* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (uint16_t*)m_region_maincpu->base();
+	u16* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (u16*)m_region_maincpu->base();
 	if (offset + 0x80/2 >= 0x10000/2)
 		offset += m_slots[m_curr_slot]->get_special_bank();
 	return rom[offset + 0x80/2];
@@ -1293,8 +1293,8 @@ READ16_MEMBER(neogeo_base_state::read_lorom_kof10th)
 
 void neogeo_base_state::init_cpu()
 {
-	uint8_t *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (uint8_t *)m_slots[m_curr_slot]->get_rom_base();
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
+	u8 *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->base() : (u8 *)m_slots[m_curr_slot]->get_rom_base();
+	u32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
 	if (len > 0x100000)
 		m_bank_base = 0x100000;
@@ -1306,9 +1306,9 @@ void neogeo_base_state::init_cpu()
 
 void neogeo_base_state::init_audio()
 {
-	uint8_t *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->base() : m_slots[m_curr_slot]->get_audio_base();
-	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->bytes() : m_slots[m_curr_slot]->get_audio_size();
-	uint32_t address_mask;
+	u8 *ROM = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->base() : m_slots[m_curr_slot]->get_audio_base();
+	u32 len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_audio_size() == 0) ? m_region_audiocpu->bytes() : m_slots[m_curr_slot]->get_audio_size();
+	u32 address_mask;
 
 	/* audio bios/cartridge selection */
 	m_bank_audio_main->configure_entry(0, (m_region_audiobios != nullptr) ? m_region_audiobios->base() : ROM); /* on hardware with no SM1 ROM, the cart ROM is always enabled */
@@ -1326,7 +1326,7 @@ void neogeo_base_state::init_audio()
 	{
 		for (int bank = 0xff; bank >= 0; bank--)
 		{
-			uint32_t bank_address = 0x10000 + ((bank << (11 + region)) & address_mask);
+			u32 bank_address = 0x10000 + ((bank << (11 + region)) & address_mask);
 			m_bank_audio_cart[region]->configure_entry(bank, &ROM[bank_address]);
 		}
 	}
@@ -1399,9 +1399,9 @@ void neogeo_base_state::set_slot_idx(int slot)
 		space.unmap_readwrite(0x000080, 0x0fffff);
 		space.unmap_readwrite(0x200000, 0x2fffff);
 		if (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0)
-			space.install_rom(0x000080, 0x0fffff, (uint16_t *)m_region_maincpu->base() + 0x80/2);
+			space.install_rom(0x000080, 0x0fffff, (u16 *)m_region_maincpu->base() + 0x80/2);
 		else
-			space.install_rom(0x000080, 0x0fffff, (uint16_t *)m_slots[m_curr_slot]->get_rom_base() + 0x80/2);
+			space.install_rom(0x000080, 0x0fffff, (u16 *)m_slots[m_curr_slot]->get_rom_base() + 0x80/2);
 
 
 		space.install_read_bank(0x200000, 0x2fffff, "cartridge");
@@ -1633,7 +1633,7 @@ void mvs_state::device_post_load()
 
 	set_outputs();
 	if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0)
-		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((u8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 }
 
 
@@ -1680,12 +1680,12 @@ READ16_MEMBER(neogeo_base_state::banked_vectors_r)
 {
 	if (!m_use_cart_vectors)
 	{
-		uint16_t* bios = (uint16_t*)m_region_mainbios->base();
+		u16* bios = (u16*)m_region_mainbios->base();
 		return bios[offset];
 	}
 	else
 	{
-		uint16_t* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (uint16_t*)m_region_maincpu->base();
+		u16* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (u16*)m_region_maincpu->base();
 		return rom[offset];
 	}
 }
@@ -1730,7 +1730,7 @@ void ngarcade_base_state::neogeo_main_map(address_map &map)
 
 READ16_MEMBER(aes_base_state::aes_in2_r)
 {
-	uint32_t ret = m_io_in2->read() & 0xf0ff;
+	u32 ret = m_io_in2->read() & 0xf0ff;
 	ret |= ((m_ctrl1->read_start_sel() & 0x03) << 8) | ((m_ctrl2->read_start_sel() & 0x03) << 10);
 	return ret;
 }
@@ -2130,7 +2130,7 @@ void aes_state::device_post_load()
 	aes_base_state::device_post_load();
 
 	if (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0)
-		m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
+		m_bank_cartridge->set_base((u8 *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 }
 
 

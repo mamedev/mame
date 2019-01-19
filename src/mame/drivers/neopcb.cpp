@@ -285,17 +285,17 @@ ROM_END
 /* ms5pcb and svcpcb have an additional scramble on top of the standard CMC scrambling */
 void neopcb_state::svcpcb_gfx_decrypt()
 {
-	static const uint8_t xorval[4] = { 0x34, 0x21, 0xc4, 0xe9 };
+	static const u8 xorval[4] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int rom_size = memregion("sprites")->bytes();
-	uint8_t *rom = memregion("sprites")->base();
-	std::vector<uint8_t> buf(rom_size);
+	u8 *rom = memregion("sprites")->base();
+	std::vector<u8> buf(rom_size);
 
 	for (int i = 0; i < rom_size; i++)
 		rom[i] ^= xorval[(i % 4)];
 
 	for (int i = 0; i < rom_size; i += 4)
 	{
-		uint32_t rom32 = rom[i] | rom[i+1]<<8 | rom[i+2]<<16 | rom[i+3]<<24;
+		u32 rom32 = rom[i] | rom[i+1]<<8 | rom[i+2]<<16 | rom[i+3]<<24;
 		rom32 = bitswap<32>(rom32, 0x09, 0x0d, 0x13, 0x00, 0x17, 0x0f, 0x03, 0x05, 0x04, 0x0c, 0x11, 0x1e, 0x12, 0x15, 0x0b, 0x06, 0x1b, 0x0a, 0x1a, 0x1c, 0x14, 0x02, 0x0e, 0x1d, 0x18, 0x08, 0x01, 0x10, 0x19, 0x1f, 0x07, 0x16);
 		buf[i]   = rom32       & 0xff;
 		buf[i+1] = (rom32>>8)  & 0xff;
@@ -316,7 +316,7 @@ void neopcb_state::svcpcb_gfx_decrypt()
 /* and a further swap on the s1 data */
 void neopcb_state::svcpcb_s1data_decrypt()
 {
-	uint8_t *s1 = memregion("fixed")->base();
+	u8 *s1 = memregion("fixed")->base();
 	size_t s1_size = memregion("fixed")->bytes();
 
 	for (int i = 0; i < s1_size; i++) // Decrypt S
@@ -329,17 +329,17 @@ void neopcb_state::svcpcb_s1data_decrypt()
 /* Thanks to Razoola & Halrin for the info */
 void neopcb_state::kf2k3pcb_gfx_decrypt()
 {
-	static const uint8_t xorval[4] = { 0x34, 0x21, 0xc4, 0xe9 };
+	static const u8 xorval[4] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int rom_size = memregion("sprites")->bytes();
-	uint8_t *rom = memregion("sprites")->base();
-	std::vector<uint8_t> buf(rom_size);
+	u8 *rom = memregion("sprites")->base();
+	std::vector<u8> buf(rom_size);
 
 	for (int i = 0; i < rom_size; i++)
 		rom[ i ] ^= xorval[ (i % 4) ];
 
 	for (int i = 0; i < rom_size; i +=4)
 	{
-		uint32_t rom32 = rom[i] | rom[i+1]<<8 | rom[i+2]<<16 | rom[i+3]<<24;
+		u32 rom32 = rom[i] | rom[i+1]<<8 | rom[i+2]<<16 | rom[i+3]<<24;
 		rom32 = bitswap<32>(rom32, 0x09, 0x0d, 0x13, 0x00, 0x17, 0x0f, 0x03, 0x05, 0x04, 0x0c, 0x11, 0x1e, 0x12, 0x15, 0x0b, 0x06, 0x1b, 0x0a, 0x1a, 0x1c, 0x14, 0x02, 0x0e, 0x1d, 0x18, 0x08, 0x01, 0x10, 0x19, 0x1f, 0x07, 0x16);
 		buf[i]   =  rom32      & 0xff;
 		buf[i+1] = (rom32>>8)  & 0xff;
@@ -360,8 +360,8 @@ void neopcb_state::kf2k3pcb_gfx_decrypt()
 /* and a further swap on the s1 data */
 void neopcb_state::kf2k3pcb_decrypt_s1data()
 {
-	uint8_t *src;
-	uint8_t *dst;
+	u8 *src;
+	u8 *dst;
 	int tx_size = memregion("fixed")->bytes();
 	int srom_size = memregion("sprites")->bytes();
 	src = memregion("sprites")->base() + srom_size - 0x1000000 - 0x80000; // Decrypt S
@@ -386,7 +386,7 @@ void neopcb_state::kf2k3pcb_decrypt_s1data()
 /* only found on kf2k3pcb */
 void neopcb_state::kf2k3pcb_sp1_decrypt()
 {
-	static const uint8_t address[0x40] = {
+	static const u8 address[0x40] = {
 		0x04,0x0a,0x04,0x0a,0x04,0x0a,0x04,0x0a,
 		0x0a,0x04,0x0a,0x04,0x0a,0x04,0x0a,0x04,
 		0x09,0x07,0x09,0x07,0x09,0x07,0x09,0x07,
@@ -397,8 +397,8 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 		0x04,0x00,0x04,0x00,0x0e,0x0a,0x0e,0x0a
 	};
 
-	uint16_t *rom = (uint16_t *)memregion("mainbios")->base();
-	std::vector<uint16_t> buf(0x80000/2);
+	u16 *rom = (u16 *)memregion("mainbios")->base();
+	std::vector<u16> buf(0x80000/2);
 
 	for (int i = 0; i < 0x80000/2; i++)
 	{
@@ -464,7 +464,7 @@ WRITE16_MEMBER(neopcb_state::write_bankpvc)
 void neopcb_state::install_common()
 {
 	// install memory bank
-	m_maincpu->space(AS_PROGRAM).install_rom(0x000080, 0x0fffff, (uint16_t *)m_region_maincpu->base() + 0x80/2);
+	m_maincpu->space(AS_PROGRAM).install_rom(0x000080, 0x0fffff, (u16 *)m_region_maincpu->base() + 0x80/2);
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x200000, 0x2fffff, "cpu_bank");
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + 0x100000);
 
@@ -539,7 +539,7 @@ void neopcb_state::init_kf2k3pcb()
 	// extra little swap on the m1 - this must be performed AFTER the m1 decrypt
 	// or the m1 checksum (used to generate the key) for decrypting the m1 is
 	// incorrect
-	uint8_t* rom = memregion("audiocpu")->base();
+	u8* rom = memregion("audiocpu")->base();
 	for (int i = 0; i < 0x90000; i++)
 		rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 3, 0, 7, 2);
 

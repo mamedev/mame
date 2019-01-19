@@ -19,13 +19,13 @@
 DEFINE_DEVICE_TYPE(NEOGEO_BOOTLEG_CART, neogeo_bootleg_cart_device, "neocart_boot", "Neo Geo Bootleg Protected Cart")
 
 
-neogeo_bootleg_cart_device::neogeo_bootleg_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint16_t clock) :
+neogeo_bootleg_cart_device::neogeo_bootleg_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	neogeo_rom_device(mconfig, type, tag, owner, clock),
 	m_prot(*this, "bootleg_prot")
 {
 }
 
-neogeo_bootleg_cart_device::neogeo_bootleg_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
+neogeo_bootleg_cart_device::neogeo_bootleg_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_BOOTLEG_CART, tag, owner, clock)
 {
 }
@@ -48,9 +48,10 @@ void neogeo_bootleg_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-MACHINE_CONFIG_START(neogeo_bootleg_cart_device::device_add_mconfig)
-	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
-MACHINE_CONFIG_END
+void neogeo_bootleg_cart_device::device_add_mconfig(machine_config &config)
+{
+	NEOBOOT_PROT(config, m_prot, 0);
+}
 
 
 /*************************************************
@@ -59,7 +60,7 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(NEOGEO_GAROUBL_CART, neogeo_garoubl_cart_device, "neocart_garoubl", "Neo Geo Garou Bootleg Cart")
 
-neogeo_garoubl_cart_device::neogeo_garoubl_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_garoubl_cart_device::neogeo_garoubl_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_GAROUBL_CART, tag, owner, clock)
 {
 }
@@ -78,7 +79,7 @@ void neogeo_garoubl_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_KOF97ORO_CART, neogeo_kof97oro_cart_device, "neocart_kof97oro", "Neo Geo KoF 97 Orochi Bootleg Cart")
 
-neogeo_kof97oro_cart_device::neogeo_kof97oro_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kof97oro_cart_device::neogeo_kof97oro_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_KOF97ORO_CART, tag, owner, clock)
 {
 }
@@ -98,7 +99,7 @@ void neogeo_kof97oro_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_KF10THEP_CART, neogeo_kf10thep_cart_device, "neocart_kf10thep", "Neo Geo KoF 10th Ann. EP Bootleg Cart")
 
-neogeo_kf10thep_cart_device::neogeo_kf10thep_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kf10thep_cart_device::neogeo_kf10thep_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_KF10THEP_CART, tag, owner, clock)
 {
 }
@@ -117,7 +118,7 @@ void neogeo_kf10thep_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_KF2K5UNI_CART, neogeo_kf2k5uni_cart_device, "neocart_kf2k5uni", "Neo Geo KoF 2005 Unique Bootleg Cart")
 
-neogeo_kf2k5uni_cart_device::neogeo_kf2k5uni_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kf2k5uni_cart_device::neogeo_kf2k5uni_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_KF2K5UNI_CART, tag, owner, clock)
 {
 }
@@ -137,7 +138,7 @@ void neogeo_kf2k5uni_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_KF2K4SE_CART, neogeo_kf2k4se_cart_device, "neocart_kf2k4se", "Neo Geo KoF 2004 SE Bootleg Cart")
 
-neogeo_kf2k4se_cart_device::neogeo_kf2k4se_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kf2k4se_cart_device::neogeo_kf2k4se_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_KF2K4SE_CART, tag, owner, clock)
 {
 }
@@ -155,7 +156,7 @@ void neogeo_kf2k4se_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_LANS2004_CART, neogeo_lans2004_cart_device, "neocart_lans2004", "Neo Geo Lansquenet 2004 Bootleg Cart")
 
-neogeo_lans2004_cart_device::neogeo_lans2004_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_lans2004_cart_device::neogeo_lans2004_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_LANS2004_CART, tag, owner, clock)
 {
 }
@@ -175,7 +176,7 @@ void neogeo_lans2004_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_SAMSHO5B_CART, neogeo_samsho5b_cart_device, "neocart_samsho5b", "Neo Geo Samurai Shodown 5 Bootleg Cart")
 
-neogeo_samsho5b_cart_device::neogeo_samsho5b_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_samsho5b_cart_device::neogeo_samsho5b_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_SAMSHO5B_CART, tag, owner, clock)
 {
 }
@@ -195,7 +196,7 @@ void neogeo_samsho5b_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_MSLUG3B6_CART, neogeo_mslug3b6_cart_device, "neocart_mslug3b6", "Neo Geo Metal Slug 6 Bootleg Cart")
 
-neogeo_mslug3b6_cart_device::neogeo_mslug3b6_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_mslug3b6_cart_device::neogeo_mslug3b6_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_MSLUG3B6_CART, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot")
 {
@@ -207,10 +208,11 @@ void neogeo_mslug3b6_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_cmc_prot->cmc42_gfx_decrypt(spr_region, spr_region_size, MSLUG3_GFX_KEY);
 }
 
-MACHINE_CONFIG_START(neogeo_mslug3b6_cart_device::device_add_mconfig)
-	MCFG_CMC_PROT_ADD("cmc_prot")
-	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
-MACHINE_CONFIG_END
+void neogeo_mslug3b6_cart_device::device_add_mconfig(machine_config &config)
+{
+	NG_CMC_PROT(config, m_cmc_prot, 0);
+	NEOBOOT_PROT(config, m_prot, 0);
+}
 
 
 /*************************************************
@@ -219,7 +221,7 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(NEOGEO_MS5PLUS_CART, neogeo_ms5plus_cart_device, "neocart_ms5plus", "Neo Geo Metal Slug 5 Plus Bootleg Cart")
 
-neogeo_ms5plus_cart_device::neogeo_ms5plus_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_ms5plus_cart_device::neogeo_ms5plus_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_MS5PLUS_CART, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot")
@@ -234,11 +236,12 @@ void neogeo_ms5plus_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 	m_prot->sx_decrypt(fix_region, fix_region_size, 1);
 }
 
-MACHINE_CONFIG_START(neogeo_ms5plus_cart_device::device_add_mconfig)
-	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
-	MCFG_CMC_PROT_ADD("cmc_prot")
-	MCFG_PCM2_PROT_ADD("pcm2_prot")
-MACHINE_CONFIG_END
+void neogeo_ms5plus_cart_device::device_add_mconfig(machine_config &config)
+{
+	NEOBOOT_PROT(config, m_prot, 0);
+	NG_CMC_PROT(config, m_cmc_prot, 0);
+	NG_PCM2_PROT(config, m_pcm2_prot, 0);
+}
 
 
 /*************************************************
@@ -247,7 +250,7 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(NEOGEO_KOG_CART, neogeo_kog_cart_device, "neocart_kog", "Neo Geo King of Gladiators Bootleg Cart")
 
-neogeo_kog_cart_device::neogeo_kog_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_kog_cart_device::neogeo_kog_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_bootleg_cart_device(mconfig, NEOGEO_KOG_CART, tag, owner, clock),
 	m_jumper(*this, "JUMPER")
 {

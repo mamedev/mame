@@ -84,7 +84,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual DECLARE_WRITE8_MEMBER(io_control_w);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
@@ -151,8 +151,8 @@ protected:
 	virtual void video_reset() override;
 
 	const pen_t *m_bg_pen;
-	uint8_t      m_vblank_level;
-	uint8_t      m_raster_level;
+	u8      m_vblank_level;
+	u8      m_raster_level;
 
 	int m_use_cart_vectors;
 	int m_use_cart_audio;
@@ -165,7 +165,7 @@ protected:
 	void init_ym();
 	void init_sprites();
 	// temporary helper to restore memory banking while bankswitch is handled in the driver...
-	uint32_t m_bank_base;
+	u32 m_bank_base;
 
 	optional_device_array<neogeo_cart_slot_device, 6> m_slots;
 
@@ -175,13 +175,13 @@ private:
 	void update_interrupts();
 	void create_interrupt_timers();
 	void start_interrupt_timers();
-	void acknowledge_interrupt(uint16_t data);
+	void acknowledge_interrupt(u16 data);
 
 	void adjust_display_position_interrupt_timer();
-	void set_display_position_interrupt_control(uint16_t data);
-	void set_display_counter_msb(uint16_t data);
-	void set_display_counter_lsb(uint16_t data);
-	void set_video_control(uint16_t data);
+	void set_display_position_interrupt_control(u16 data);
+	void set_display_counter_msb(u16 data);
+	void set_display_counter_lsb(u16 data);
+	void set_video_control(u16 data);
 
 	void create_rgb_lookups();
 	void set_pens();
@@ -192,19 +192,19 @@ private:
 	emu_timer  *m_display_position_interrupt_timer;
 	emu_timer  *m_display_position_vblank_timer;
 	emu_timer  *m_vblank_interrupt_timer;
-	uint32_t     m_display_counter;
-	uint8_t      m_vblank_interrupt_pending;
-	uint8_t      m_display_position_interrupt_pending;
-	uint8_t      m_irq3_pending;
-	uint8_t      m_display_position_interrupt_control;
+	u32     m_display_counter;
+	u8      m_vblank_interrupt_pending;
+	u8      m_display_position_interrupt_pending;
+	u8      m_irq3_pending;
+	u8      m_display_position_interrupt_control;
 
-	uint16_t get_video_control();
+	u16 get_video_control();
 
 	required_device<input_merger_device> m_audionmi;
 
 	// color/palette related
-	std::vector<uint16_t> m_paletteram;
-	uint8_t      m_palette_lookup[32][4];
+	std::vector<u16> m_paletteram;
+	u8      m_palette_lookup[32][4];
 	int          m_screen_shadow;
 	int          m_palette_bank;
 };
@@ -241,11 +241,11 @@ protected:
 	void neogeo_main_map(address_map &map);
 
 private:
-	required_shared_ptr<uint16_t> m_save_ram;
+	required_shared_ptr<u16> m_save_ram;
 	required_device<upd4990a_device> m_upd4990a;
 	required_ioport m_dsw;
 
-	uint8_t m_save_ram_unlocked;
+	u8 m_save_ram_unlocked;
 };
 
 

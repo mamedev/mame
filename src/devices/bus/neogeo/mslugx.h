@@ -15,7 +15,7 @@ class neogeo_mslugx_cart_device : public neogeo_rom_device
 {
 public:
 	// construction/destruction
-	neogeo_mslugx_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
+	neogeo_mslugx_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_prot->protection_r(space, offset, mem_mask); }

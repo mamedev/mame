@@ -15,12 +15,12 @@ class neogeo_kof10th_cart_device : public neogeo_bootleg_cart_device
 {
 public:
 	// construction/destruction
-	neogeo_kof10th_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock);
+	neogeo_kof10th_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// reading and writing
-	virtual uint16_t get_helper() override;
-	virtual uint32_t get_bank_base(uint16_t sel) override;
-	virtual uint32_t get_special_bank() override;
+	virtual u16 get_helper() override;
+	virtual u32 get_bank_base(u16 sel) override;
+	virtual u32 get_special_bank() override;
 	virtual DECLARE_READ16_MEMBER(addon_r) override;
 	virtual DECLARE_READ16_MEMBER(protection_r) override;
 	virtual DECLARE_WRITE16_MEMBER(protection_w) override;
@@ -36,10 +36,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	uint8_t* m_fixed;
-	uint32_t m_special_bank;
-	uint16_t m_cart_ram[0x1000];
-	uint16_t m_cart_ram2[0x10000];
+	u8* m_fixed;
+	u32 m_special_bank;
+	u16 m_cart_ram[0x1000];
+	u16 m_cart_ram2[0x10000];
 };
 
 // device type definition

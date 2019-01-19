@@ -26,7 +26,7 @@
 DEFINE_DEVICE_TYPE(NEOBOOT_PROT, neoboot_prot_device, "ngboot_prot", "Neo Geo Bootleg Protection(s)")
 
 
-neoboot_prot_device::neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neoboot_prot_device::neoboot_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NEOBOOT_PROT, tag, owner, clock)
 {
 }
@@ -45,11 +45,11 @@ void neoboot_prot_device::device_reset()
 
 /* General Bootleg Functions - used by more than 1 game */
 
-void neoboot_prot_device::cx_decrypt(uint8_t*sprrom, uint32_t sprrom_size)
+void neoboot_prot_device::cx_decrypt(u8*sprrom, u32 sprrom_size)
 {
 	int cx_size = sprrom_size;
-	uint8_t *rom = sprrom;
-	std::vector<uint8_t> buf(cx_size);
+	u8 *rom = sprrom;
+	std::vector<u8> buf(cx_size);
 
 	memcpy(&buf[0], rom, cx_size);
 
@@ -58,14 +58,14 @@ void neoboot_prot_device::cx_decrypt(uint8_t*sprrom, uint32_t sprrom_size)
 }
 
 
-void neoboot_prot_device::sx_decrypt(uint8_t* fixed, uint32_t fixed_size, int value)
+void neoboot_prot_device::sx_decrypt(u8* fixed, u32 fixed_size, int value)
 {
 	int sx_size = fixed_size;
-	uint8_t *rom = fixed;
+	u8 *rom = fixed;
 
 	if (value == 1)
 	{
-		std::vector<uint8_t> buf(sx_size);
+		std::vector<u8> buf(sx_size);
 		memcpy(&buf[0], rom, sx_size);
 
 		for (int i = 0; i < sx_size; i += 0x10)
@@ -85,10 +85,10 @@ void neoboot_prot_device::sx_decrypt(uint8_t* fixed, uint32_t fixed_size, int va
 
 /* The King of Fighters '97 Oroshi Plus 2003 (bootleg) */
 
-void neoboot_prot_device::kof97oro_px_decode(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::kof97oro_px_decode(u8* cpurom, u32 cpurom_size)
 {
-	std::vector<uint16_t> tmp(0x500000);
-	uint16_t *src = (uint16_t*)cpurom;
+	std::vector<u16> tmp(0x500000);
+	u16 *src = (u16*)cpurom;
 
 	for (int i = 0; i < 0x500000/2; i++)
 		tmp[i] = src[i ^ 0x7ffef];
@@ -100,10 +100,10 @@ void neoboot_prot_device::kof97oro_px_decode(uint8_t* cpurom, uint32_t cpurom_si
 
 /* The King of Fighters 10th Anniversary Extra Plus (The King of Fighters 2002 bootleg) */
 
-void neoboot_prot_device::kf10thep_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::kf10thep_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	uint16_t *rom = (uint16_t*)cpurom;
-	std::vector<uint16_t> buf(0x100000/2);
+	u16 *rom = (u16*)cpurom;
+	std::vector<u16> buf(0x100000/2);
 
 	memcpy(&buf[0x000000/2], &rom[0x060000/2], 0x20000);
 	memcpy(&buf[0x020000/2], &rom[0x100000/2], 0x20000);
@@ -130,10 +130,10 @@ void neoboot_prot_device::kf10thep_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 
 /* The King of Fighters 10th Anniversary 2005 Unique (The King of Fighters 2002 bootleg) */
 
-void neoboot_prot_device::kf2k5uni_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::kf2k5uni_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	uint8_t *src = cpurom;
-	uint8_t dst[0x80];
+	u8 *src = cpurom;
+	u8 dst[0x80];
 
 	for (int i = 0; i < 0x800000; i += 0x80)
 	{
@@ -149,17 +149,17 @@ void neoboot_prot_device::kf2k5uni_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 }
 
 
-void neoboot_prot_device::kf2k5uni_sx_decrypt(uint8_t* fixedrom, uint32_t fixedrom_size)
+void neoboot_prot_device::kf2k5uni_sx_decrypt(u8* fixedrom, u32 fixedrom_size)
 {
-	uint8_t *srom = fixedrom;
+	u8 *srom = fixedrom;
 
 	for (int i = 0; i < 0x20000; i++)
 		srom[i] = bitswap<8>(srom[i], 4, 5, 6, 7, 0, 1, 2, 3);
 }
 
-void neoboot_prot_device::kf2k5uni_mx_decrypt(uint8_t* audiorom, uint32_t audiorom_size)
+void neoboot_prot_device::kf2k5uni_mx_decrypt(u8* audiorom, u32 audiorom_size)
 {
-	uint8_t *mrom = audiorom;
+	u8 *mrom = audiorom;
 
 	for (int i = 0; i < 0x30000; i++)
 		mrom[i] = bitswap<8>(mrom[i], 4, 5, 6, 7, 0, 1, 2, 3);
@@ -169,10 +169,10 @@ void neoboot_prot_device::kf2k5uni_mx_decrypt(uint8_t* audiorom, uint32_t audior
 
 /* King of Fighters Special Edition 2004 (bootleg of King of Fighters 2002) */
 
-void neoboot_prot_device::decrypt_kof2k4se_68k(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::decrypt_kof2k4se_68k(u8* cpurom, u32 cpurom_size)
 {
-	uint8_t *src = cpurom + 0x100000;
-	std::vector<uint8_t> dst(0x400000);
+	u8 *src = cpurom + 0x100000;
+	std::vector<u8> dst(0x400000);
 	static const int sec[] = {0x300000,0x200000,0x100000,0x000000};
 	memcpy(&dst[0], src, 0x400000);
 
@@ -183,21 +183,21 @@ void neoboot_prot_device::decrypt_kof2k4se_68k(uint8_t* cpurom, uint32_t cpurom_
 
 /* Lansquenet 2004 (Shock Troopers - 2nd Squad bootleg) */
 
-void neoboot_prot_device::lans2004_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndrom_size)
+void neoboot_prot_device::lans2004_vx_decrypt(u8* ymsndrom, u32 ymsndrom_size)
 {
-	uint8_t *rom = ymsndrom;
+	u8 *rom = ymsndrom;
 	for (int i = 0; i < 0xA00000; i++)
 		rom[i] = bitswap<8>(rom[i], 0, 1, 5, 4, 3, 2, 6, 7);
 }
 
-void neoboot_prot_device::lans2004_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::lans2004_decrypt_68k(u8* cpurom, u32 cpurom_size)
 {
 	// Descrambling P ROMs - Thanks to Razoola for the info
-	uint8_t *src = cpurom;
-	uint16_t *rom = (uint16_t*)cpurom;
+	u8 *src = cpurom;
+	u16 *rom = (u16*)cpurom;
 
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xc, 0x1, 0xa, 0x6, 0xd };
-	std::vector<uint8_t> dst(0x600000);
+	std::vector<u8> dst(0x600000);
 
 	for (int i = 0; i < 8; i++)
 		memcpy (&dst[i * 0x20000], src + sec[i] * 0x20000, 0x20000);
@@ -229,11 +229,11 @@ void neoboot_prot_device::lans2004_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_
 
 /* Samurai Shodown V / Samurai Spirits Zero (bootleg) */
 
-void neoboot_prot_device::samsho5b_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::samsho5b_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
 	int px_size = cpurom_size;
-	uint8_t *rom = cpurom;
-	std::vector<uint8_t> buf(px_size);
+	u8 *rom = cpurom;
+	std::vector<u8> buf(px_size);
 
 	memcpy(&buf[0], rom, px_size);
 
@@ -253,10 +253,10 @@ void neoboot_prot_device::samsho5b_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 }
 
 
-void neoboot_prot_device::samsho5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndrom_size)
+void neoboot_prot_device::samsho5b_vx_decrypt(u8* ymsndrom, u32 ymsndrom_size)
 {
 	int vx_size = ymsndrom_size;
-	uint8_t *rom = ymsndrom;
+	u8 *rom = ymsndrom;
 
 	for (int i = 0; i < vx_size; i++)
 		rom[i] = bitswap<8>(rom[i], 0, 1, 5, 4, 3, 2, 6, 7);
@@ -296,7 +296,7 @@ WRITE16_MEMBER( neoboot_prot_device::ms5plus_bankswitch_w )
 }
 */
 
-uint32_t neoboot_prot_device::mslug5p_bank_base(uint16_t sel)
+u32 neoboot_prot_device::mslug5p_bank_base(u16 sel)
 {
 	sel = sel >> 4;
 	//sel = sel & 7;
@@ -308,12 +308,12 @@ uint32_t neoboot_prot_device::mslug5p_bank_base(uint16_t sel)
 
 // The protection patching here may be incomplete - Thanks to Razoola for the info
 
-void neoboot_prot_device::kog_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::kog_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
 	// the protection chip does some *very* strange things to the rom
-	uint8_t *src = cpurom;
-	std::vector<uint8_t> dst(0x600000);
-	uint16_t *rom = (uint16_t *)cpurom;
+	u8 *src = cpurom;
+	std::vector<u8> dst(0x600000);
+	u16 *rom = (u16 *)cpurom;
 	static const int sec[] = { 0x3, 0x8, 0x7, 0xc, 0x1, 0xa, 0x6, 0xd };
 
 	for (int i = 0; i < 8; i++)
@@ -369,12 +369,12 @@ void neoboot_prot_device::kog_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 
 /* SNK vs. CAPCOM SVC CHAOS (bootleg) */
 
-void neoboot_prot_device::svcboot_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::svcboot_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	static const uint8_t sec[] = { 0x06, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
+	static const u8 sec[] = { 0x06, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	int size = cpurom_size;
-	uint8_t *src = cpurom;
-	std::vector<uint8_t> dst(size);
+	u8 *src = cpurom;
+	std::vector<u8> dst(size);
 
 	for (int i = 0; i < size / 0x100000; i++)
 		memcpy(&dst[i * 0x100000], &src[sec[i] * 0x100000], 0x100000);
@@ -387,10 +387,10 @@ void neoboot_prot_device::svcboot_px_decrypt(uint8_t* cpurom, uint32_t cpurom_si
 	}
 }
 
-void neoboot_prot_device::svcboot_cx_decrypt(uint8_t* sprrom, uint32_t sprrom_size)
+void neoboot_prot_device::svcboot_cx_decrypt(u8* sprrom, u32 sprrom_size)
 {
-	static const uint8_t idx_tbl[ 0x10 ] = { 0, 1, 0, 1, 2, 3, 2, 3, 3, 4, 3, 4, 4, 5, 4, 5, };
-	static const uint8_t bitswap4_tbl[ 6 ][ 4 ] = {
+	static const u8 idx_tbl[ 0x10 ] = { 0, 1, 0, 1, 2, 3, 2, 3, 3, 4, 3, 4, 4, 5, 4, 5, };
+	static const u8 bitswap4_tbl[ 6 ][ 4 ] = {
 		{ 3, 0, 1, 2 },
 		{ 2, 3, 0, 1 },
 		{ 1, 2, 3, 0 },
@@ -399,8 +399,8 @@ void neoboot_prot_device::svcboot_cx_decrypt(uint8_t* sprrom, uint32_t sprrom_si
 		{ 3, 0, 2, 1 },
 	};
 	int size = sprrom_size;
-	uint8_t *src = sprrom;
-	std::vector<uint8_t> dst(size);
+	u8 *src = sprrom;
+	std::vector<u8> dst(size);
 
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 0x80; i++)
@@ -419,12 +419,12 @@ void neoboot_prot_device::svcboot_cx_decrypt(uint8_t* sprrom, uint32_t sprrom_si
 
 /* SNK vs. CAPCOM SVC CHAOS Plus (bootleg set 1) */
 
-void neoboot_prot_device::svcplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::svcplus_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
 	static const int sec[] = { 0x00, 0x03, 0x02, 0x05, 0x04, 0x01 };
 	int size = cpurom_size;
-	uint8_t *src = cpurom;
-	std::vector<uint8_t> dst(size);
+	u8 *src = cpurom;
+	std::vector<u8> dst(size);
 
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
@@ -443,22 +443,22 @@ void neoboot_prot_device::svcplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_si
 }
 
 
-void neoboot_prot_device::svcplus_px_hack(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::svcplus_px_hack(u8* cpurom, u32 cpurom_size)
 {
 	/* patched by the protection chip? */
-	uint16_t *mem16 = (uint16_t *)cpurom;
+	u16 *mem16 = (u16 *)cpurom;
 	mem16[0x0f8016/2] = 0x33c1;
 }
 
 
 /* SNK vs. CAPCOM SVC CHAOS Plus (bootleg set 2) */
 
-void neoboot_prot_device::svcplusa_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::svcplusa_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
 	static const int sec[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	int size = cpurom_size;
-	uint8_t *src = cpurom;
-	std::vector<uint8_t> dst(size);
+	u8 *src = cpurom;
+	std::vector<u8> dst(size);
 
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < 6; i++)
@@ -468,12 +468,12 @@ void neoboot_prot_device::svcplusa_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 
 /* SNK vs. CAPCOM SVC CHAOS Super Plus (bootleg) */
 
-void neoboot_prot_device::svcsplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::svcsplus_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
 	static const int sec[] = { 0x06, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	int size = cpurom_size;
-	uint8_t *src = cpurom;
-	std::vector<uint8_t> dst(size);
+	u8 *src = cpurom;
+	std::vector<u8> dst(size);
 
 	memcpy(&dst[0], src, size);
 	for (int i = 0; i < size / 2; i++)
@@ -487,10 +487,10 @@ void neoboot_prot_device::svcsplus_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 	}
 }
 
-void neoboot_prot_device::svcsplus_px_hack(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::svcsplus_px_hack(u8* cpurom, u32 cpurom_size)
 {
 	/* patched by the protection chip? */
-	uint16_t *mem16 = (uint16_t *)cpurom;
+	u16 *mem16 = (u16 *)cpurom;
 	mem16[0x9e90/2] = 0x000f;
 	mem16[0x9e92/2] = 0xc9c0;
 	mem16[0xa10c/2] = 0x4eb9;
@@ -501,9 +501,9 @@ void neoboot_prot_device::svcsplus_px_hack(uint8_t* cpurom, uint32_t cpurom_size
 
 /* The King of Fighters 2002 (bootleg) */
 
-void neoboot_prot_device::kof2002b_gfx_decrypt(uint8_t *src, int size)
+void neoboot_prot_device::kof2002b_gfx_decrypt(u8 *src, int size)
 {
-	static const uint8_t t[8][6] =
+	static const u8 t[8][6] =
 	{
 		{ 0, 8, 7, 6, 2, 1 },
 		{ 1, 0, 8, 7, 6, 2 },
@@ -515,7 +515,7 @@ void neoboot_prot_device::kof2002b_gfx_decrypt(uint8_t *src, int size)
 		{ 8, 0, 7, 6, 2, 1 },
 	};
 
-	std::vector<uint8_t> dst(0x10000);
+	std::vector<u8> dst(0x10000);
 
 	for (int i = 0; i < size; i += 0x10000)
 	{
@@ -533,10 +533,10 @@ void neoboot_prot_device::kof2002b_gfx_decrypt(uint8_t *src, int size)
 
 /* The King of Fighters 2002 Magic Plus (bootleg) */
 
-void neoboot_prot_device::kf2k2mp_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::kf2k2mp_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	uint8_t *src = cpurom;
-	uint8_t dst[0x80];
+	u8 *src = cpurom;
+	u8 dst[0x80];
 
 	memmove(src, src + 0x300000, 0x500000);
 
@@ -554,10 +554,10 @@ void neoboot_prot_device::kf2k2mp_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 
 /* The King of Fighters 2002 Magic Plus II (bootleg) */
 
-void neoboot_prot_device::kf2k2mp2_px_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::kf2k2mp2_px_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	uint8_t *src = cpurom;
-	std::vector<uint8_t> dst(0x600000);
+	u8 *src = cpurom;
+	std::vector<u8> dst(0x600000);
 
 	memcpy(&dst[0x000000], &src[0x1C0000], 0x040000);
 	memcpy(&dst[0x040000], &src[0x140000], 0x080000);
@@ -570,10 +570,10 @@ void neoboot_prot_device::kf2k2mp2_px_decrypt(uint8_t* cpurom, uint32_t cpurom_s
 
 /* The King of Fighters 10th Anniversary (The King of Fighters 2002 bootleg) */
 
-void neoboot_prot_device::kof10th_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
+void neoboot_prot_device::kof10th_decrypt(u8* cpurom, u32 cpurom_size)
 {
-	std::vector<uint8_t> dst(0x900000);
-	uint8_t *src = cpurom;
+	std::vector<u8> dst(0x900000);
+	u8 *src = cpurom;
 
 	memcpy(&dst[0x000000], src + 0x700000, 0x100000); // Correct (Verified in Uni-bios)
 	memcpy(&dst[0x100000], src + 0x000000, 0x800000);
@@ -585,10 +585,10 @@ void neoboot_prot_device::kof10th_decrypt(uint8_t* cpurom, uint32_t cpurom_size)
 	}
 
 	// Altera protection chip patches these over P ROM
-	((uint16_t*)src)[0x0124/2] = 0x000d; // Enables XOR for RAM moves, forces SoftDIPs, and USA region
-	((uint16_t*)src)[0x0126/2] = 0xf7a8;
+	((u16*)src)[0x0124/2] = 0x000d; // Enables XOR for RAM moves, forces SoftDIPs, and USA region
+	((u16*)src)[0x0126/2] = 0xf7a8;
 
-	((uint16_t*)src)[0x8bf4/2] = 0x4ef9; // Run code to change "S" data
-	((uint16_t*)src)[0x8bf6/2] = 0x000d;
-	((uint16_t*)src)[0x8bf8/2] = 0xf980;
+	((u16*)src)[0x8bf4/2] = 0x4ef9; // Run code to change "S" data
+	((u16*)src)[0x8bf6/2] = 0x000d;
+	((u16*)src)[0x8bf8/2] = 0xf980;
 }

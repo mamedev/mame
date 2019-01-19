@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(NG_MSLUGX_PROT, mslugx_prot_device, "ng_mslugx_prot", "Neo Geo Metal Slug X Protection")
 
 
-mslugx_prot_device::mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+mslugx_prot_device::mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NG_MSLUGX_PROT, tag, owner, clock),
 	m_counter(0),
 	m_command(0)
@@ -62,7 +62,7 @@ WRITE16_MEMBER( mslugx_prot_device::protection_w )
 
 READ16_MEMBER( mslugx_prot_device::protection_r )
 {
-	uint16_t res = 0;
+	u16 res = 0;
 
 	switch (m_command)
 	{

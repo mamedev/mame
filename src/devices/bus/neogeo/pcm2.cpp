@@ -19,14 +19,14 @@
 DEFINE_DEVICE_TYPE(NEOGEO_PCM2_CART, neogeo_pcm2_cart_device, "neocart_pcm2", "Neo Geo PCM2 Cart")
 
 
-neogeo_pcm2_cart_device::neogeo_pcm2_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint16_t clock) :
+neogeo_pcm2_cart_device::neogeo_pcm2_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	neogeo_rom_device(mconfig, type, tag, owner, clock),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot")
 {
 }
 
-neogeo_pcm2_cart_device::neogeo_pcm2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
+neogeo_pcm2_cart_device::neogeo_pcm2_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_pcm2_cart_device(mconfig, NEOGEO_PCM2_CART, tag, owner, clock)
 {
 }
@@ -49,10 +49,11 @@ void neogeo_pcm2_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-MACHINE_CONFIG_START(neogeo_pcm2_cart_device::device_add_mconfig)
-	MCFG_CMC_PROT_ADD("cmc_prot")
-	MCFG_PCM2_PROT_ADD("pcm2_prot")
-MACHINE_CONFIG_END
+void neogeo_pcm2_cart_device::device_add_mconfig(machine_config &config)
+{
+	NG_CMC_PROT(config, m_cmc_prot, 0);
+	NG_PCM2_PROT(config, m_pcm2_prot, 0);
+}
 
 
 /*************************************************
@@ -61,7 +62,7 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(NEOGEO_PCM2_MSLUG4_CART, neogeo_pcm2_mslug4_cart_device, "neocart_mslug4", "Neo Geo Metal Slug 3 PCM2 Cart")
 
-neogeo_pcm2_mslug4_cart_device::neogeo_pcm2_mslug4_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_pcm2_mslug4_cart_device::neogeo_pcm2_mslug4_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_pcm2_cart_device(mconfig, NEOGEO_PCM2_MSLUG4_CART, tag, owner, clock)
 {
 }
@@ -81,7 +82,7 @@ void neogeo_pcm2_mslug4_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_PCM2_MS4PLUS_CART, neogeo_pcm2_ms4plus_cart_device, "neocart_ms4plus", "Neo Geo Metal Slug 4 Plus PCM2 Cart")
 
-neogeo_pcm2_ms4plus_cart_device::neogeo_pcm2_ms4plus_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_pcm2_ms4plus_cart_device::neogeo_pcm2_ms4plus_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_pcm2_cart_device(mconfig, NEOGEO_PCM2_MS4PLUS_CART, tag, owner, clock)
 {
 }
@@ -100,7 +101,7 @@ void neogeo_pcm2_ms4plus_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_PCM2_ROTD_CART, neogeo_pcm2_rotd_cart_device, "neocart_rotd", "Neo Geo Rage of the Dragon PCM2 Cart")
 
-neogeo_pcm2_rotd_cart_device::neogeo_pcm2_rotd_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_pcm2_rotd_cart_device::neogeo_pcm2_rotd_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_pcm2_cart_device(mconfig, NEOGEO_PCM2_ROTD_CART, tag, owner, clock)
 {
 }
@@ -119,7 +120,7 @@ void neogeo_pcm2_rotd_cart_device::decrypt_all(DECRYPT_ALL_PARAMS)
 
 DEFINE_DEVICE_TYPE(NEOGEO_PCM2_PNYAA_CART, neogeo_pcm2_pnyaa_cart_device, "neocart_pnyaa", "Neo Geo Pnyaa PCM2 Cart")
 
-neogeo_pcm2_pnyaa_cart_device::neogeo_pcm2_pnyaa_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+neogeo_pcm2_pnyaa_cart_device::neogeo_pcm2_pnyaa_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	neogeo_pcm2_cart_device(mconfig, NEOGEO_PCM2_PNYAA_CART, tag, owner, clock)
 {
 }
