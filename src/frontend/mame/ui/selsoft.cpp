@@ -75,6 +75,23 @@ bool compare_software(ui_software_info const &a, ui_software_info const &b)
 } // anonymous namespace
 
 
+menu_select_software::search_item::search_item(ui_software_info const &s)
+	: software(s)
+	, ucs_shortname(ustr_from_utf8(normalize_unicode(s.shortname, unicode_normalization_form::D, true)))
+	, ucs_longname(ustr_from_utf8(normalize_unicode(s.longname, unicode_normalization_form::D, true)))
+	, penalty(1.0)
+{
+}
+
+void menu_select_software::search_item::set_penalty(std::u32string const &search)
+{
+	// TODO: search alternate title as well
+	penalty = util::edit_distance(search, ucs_shortname);
+	if (penalty)
+		penalty = (std::min)(penalty, util::edit_distance(search, ucs_longname));
+}
+
+
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
@@ -89,6 +106,8 @@ menu_select_software::menu_select_software(mame_ui_manager &mui, render_containe
 	, m_filters()
 	, m_filter_type(software_filter::ALL)
 	, m_swinfo()
+	, m_searchlist()
+	, m_displaylist()
 {
 	reselect_last::reselect(false);
 
@@ -237,13 +256,20 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 	m_has_empty_start = true;
 	int old_software = -1;
 
+	// FIXME: why does it do this relatively expensive operation every time?
 	machine_config config(m_driver, machine().options());
 	for (device_image_interface &image : image_interface_iterator(config.root_device()))
-		if (image.filename() == nullptr && image.must_be_loaded())
+	{
+		if (!image.filename() && image.must_be_loaded())
 		{
 			m_has_empty_start = false;
 			break;
 		}
+	}
+
+	// start with an empty list
+	m_displaylist.clear();
+	filter_map::const_iterator const flt(m_filters.find(m_filter_type));
 
 	// no active search
 	if (m_search.empty())
@@ -252,34 +278,44 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 		if (m_has_empty_start)
 			item_append("[Start empty]", "", flags_ui, (void *)&m_swinfo[0]);
 
-		m_displaylist.clear();
-		filter_map::const_iterator const it(m_filters.find(m_filter_type));
-		if (m_filters.end() == it)
+		if (m_filters.end() == flt)
 			std::copy(std::next(m_swinfo.begin()), m_swinfo.end(), std::back_inserter(m_displaylist));
 		else
-			it->second->apply(std::next(m_swinfo.begin()), m_swinfo.end(), std::back_inserter(m_displaylist));
-
-		// iterate over entries
-		for (size_t curitem = 0; curitem < m_displaylist.size(); ++curitem)
-		{
-			if (reselect_last::software() == "[Start empty]" && !reselect_last::driver().empty())
-				old_software = 0;
-			else if (m_displaylist[curitem].get().shortname == reselect_last::software() && m_displaylist[curitem].get().listname == reselect_last::swlist())
-				old_software = m_has_empty_start ? curitem + 1 : curitem;
-
-			item_append(
-					m_displaylist[curitem].get().longname, m_displaylist[curitem].get().devicetype,
-					m_displaylist[curitem].get().parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&m_displaylist[curitem].get());
-		}
+			flt->second->apply(std::next(m_swinfo.begin()), m_swinfo.end(), std::back_inserter(m_displaylist));
 	}
 	else
 	{
-		find_matches(m_search.c_str(), MAX_VISIBLE_SEARCH);
+		find_matches();
 
-		for (int curitem = 0; m_searchlist[curitem] != nullptr; ++curitem)
-			item_append(m_searchlist[curitem]->longname, m_searchlist[curitem]->devicetype,
-						m_searchlist[curitem]->parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui),
-						(void *)m_searchlist[curitem]);
+		if (m_filters.end() == flt)
+		{
+			std::transform(
+					m_searchlist.begin(),
+					std::next(m_searchlist.begin(), (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH)),
+					std::back_inserter(m_displaylist),
+					[] (search_item const &entry) { return entry.software; });
+		}
+		else
+		{
+			for (auto it = m_searchlist.begin(); (m_searchlist.end() != it) && (MAX_VISIBLE_SEARCH > m_displaylist.size()); ++it)
+			{
+				if (flt->second->apply(it->software))
+					m_displaylist.emplace_back(it->software);
+			}
+		}
+	}
+
+	// iterate over entries
+	for (size_t curitem = 0; curitem < m_displaylist.size(); ++curitem)
+	{
+		if (reselect_last::software() == "[Start empty]" && !reselect_last::driver().empty())
+			old_software = 0;
+		else if (m_displaylist[curitem].get().shortname == reselect_last::software() && m_displaylist[curitem].get().listname == reselect_last::swlist())
+			old_software = m_has_empty_start ? curitem + 1 : curitem;
+
+		item_append(
+				m_displaylist[curitem].get().longname, m_displaylist[curitem].get().devicetype,
+				m_displaylist[curitem].get().parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&m_displaylist[curitem].get());
 	}
 
 	item_append(menu_item_type::SEPARATOR, flags_ui);
@@ -502,43 +538,25 @@ void menu_select_software::load_sw_custom_filters()
 //  find approximate matches
 //-------------------------------------------------
 
-void menu_select_software::find_matches(const char *str, int count)
+void menu_select_software::find_matches()
 {
-	// allocate memory to track the penalty value
-	std::vector<double> penalty(count, 1.0);
-	std::u32string const search(ustr_from_utf8(normalize_unicode(str, unicode_normalization_form::D, true)));
-
-	int index = 0;
-	for ( ; index < m_displaylist.size(); ++index)
+	// ensure search list is populated
+	if (m_searchlist.empty())
 	{
-		// pick the best match between shortname and longname
-		// TODO: search alternate title as well
-		double curpenalty(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index].get().shortname, unicode_normalization_form::D, true))));
-		if (curpenalty)
-		{
-			double const tmp(util::edit_distance(search, ustr_from_utf8(normalize_unicode(m_displaylist[index].get().longname, unicode_normalization_form::D, true))));
-			curpenalty = (std::min)(curpenalty, tmp);
-		}
-
-		// insert into the sorted table of matches
-		for (int matchnum = count - 1; matchnum >= 0; --matchnum)
-		{
-			// stop if we're worse than the current entry
-			if (curpenalty >= penalty[matchnum])
-				break;
-
-			// as long as this isn't the last entry, bump this one down
-			if (matchnum < count - 1)
-			{
-				penalty[matchnum + 1] = penalty[matchnum];
-				m_searchlist[matchnum + 1] = m_searchlist[matchnum];
-			}
-
-			m_searchlist[matchnum] = &m_displaylist[index].get();
-			penalty[matchnum] = curpenalty;
-		}
+		m_searchlist.reserve(m_swinfo.size());
+		std::copy(m_swinfo.begin(), m_swinfo.end(), std::back_inserter(m_searchlist));
 	}
-	(index < count) ? m_searchlist[index] = nullptr : m_searchlist[count] = nullptr;
+
+	// update search
+	const std::u32string ucs_search(ustr_from_utf8(normalize_unicode(m_search, unicode_normalization_form::D, true)));
+	for (search_item &entry : m_searchlist)
+		entry.set_penalty(ucs_search);
+
+	// sort according to edit distance
+	std::stable_sort(
+			m_searchlist.begin(),
+			m_searchlist.end(),
+			[] (search_item const &lhs, search_item const &rhs) { return lhs.penalty < rhs.penalty; });
 }
 
 //-------------------------------------------------
@@ -646,7 +664,6 @@ void menu_select_software::filter_selected()
 {
 	if ((software_filter::FIRST <= m_filter_highlight) && (software_filter::LAST >= m_filter_highlight))
 	{
-		m_search.clear();
 		filter_map::const_iterator it(m_filters.find(software_filter::type(m_filter_highlight)));
 		if (m_filters.end() == it)
 			it = m_filters.emplace(software_filter::type(m_filter_highlight), software_filter::create(software_filter::type(m_filter_highlight), m_filter_data)).first;

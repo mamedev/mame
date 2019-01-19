@@ -506,43 +506,57 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	if (!isfavorite())
 	{
 		m_populated_favorites = false;
+		m_displaylist.clear();
+		machine_filter const *const flt(m_persistent_data.filter_data().get_current_filter());
+
+		// if search is not empty, find approximate matches
 		if (!m_search.empty())
 		{
-			// if search is not empty, find approximate matches
 			populate_search();
+			if (flt)
+			{
+				for (auto it = m_searchlist.begin(); (m_searchlist.end() != it) && (MAX_VISIBLE_SEARCH > m_displaylist.size()); ++it)
+				{
+					if (flt->apply(it->second))
+						m_displaylist.emplace_back(it->second);
+				}
+			}
+			else
+			{
+				std::transform(
+						m_searchlist.begin(),
+						std::next(m_searchlist.begin(), (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH)),
+						std::back_inserter(m_displaylist),
+						[] (auto const &entry) { return entry.second; });
+			}
 		}
 		else
 		{
-			// reset search string
-			m_search.clear();
-			m_displaylist.clear();
-
 			// if filter is set on category, build category list
-			machine_filter const *const flt(m_persistent_data.filter_data().get_current_filter());
 			std::vector<ui_system_info> const &sorted(m_persistent_data.sorted_list());
 			if (!flt)
 				std::copy(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
 			else
 				flt->apply(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
+		}
 
-			// iterate over entries
-			int curitem = 0;
-			for (ui_system_info const &elem : m_displaylist)
+		// iterate over entries
+		int curitem = 0;
+		for (ui_system_info const &elem : m_displaylist)
+		{
+			if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
+				old_item_selected = curitem;
+
+			bool cloneof = strcmp(elem.driver->parent, "0");
+			if (cloneof)
 			{
-				if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
-					old_item_selected = curitem;
-
-				bool cloneof = strcmp(elem.driver->parent, "0");
-				if (cloneof)
-				{
-					int cx = driver_list::find(elem.driver->parent);
-					if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
-						cloneof = false;
-				}
-
-				item_append(elem.driver->type.fullname(), "", (cloneof) ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)elem.driver);
-				curitem++;
+				int cx = driver_list::find(elem.driver->parent);
+				if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
+					cloneof = false;
 			}
+
+			item_append(elem.driver->type.fullname(), "", (cloneof) ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)elem.driver);
+			curitem++;
 		}
 	}
 	else
@@ -996,24 +1010,11 @@ void menu_select_game::populate_search()
 		}
 	}
 
-	// sort according to edit distance and put up to 200 in the menu
+	// sort according to edit distance
 	std::stable_sort(
 			m_searchlist.begin(),
 			m_searchlist.end(),
 			[] (auto const &lhs, auto const &rhs) { return lhs.first < rhs.first; });
-	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
-	for (int curitem = 0; (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH) > curitem; ++curitem)
-	{
-		game_driver const &drv(*m_searchlist[curitem].second.get().driver);
-		bool cloneof = strcmp(drv.parent, "0") != 0;
-		if (cloneof)
-		{
-			int const cx = driver_list::find(drv.parent);
-			if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
-				cloneof = false;
-		}
-		item_append(drv.type.fullname(), "", !cloneof ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&drv);
-	}
 }
 
 //-------------------------------------------------
@@ -1228,30 +1229,22 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 void menu_select_game::inkey_export()
 {
 	std::vector<game_driver const *> list;
-	if (!m_search.empty())
+	if (m_populated_favorites)
 	{
-		for (int curitem = 0; (std::min)(m_searchlist.size(), MAX_VISIBLE_SEARCH); ++curitem)
-			list.push_back(m_searchlist[curitem].second.get().driver);
+		// iterate over favorites
+		mame_machine_manager::instance()->favorite().apply(
+				[&list] (ui_software_info const &info)
+				{
+					assert(info.driver);
+					if (info.startempty)
+						list.push_back(info.driver);
+				});
 	}
 	else
 	{
-		if (m_populated_favorites)
-		{
-			// iterate over favorites
-			mame_machine_manager::instance()->favorite().apply(
-					[&list] (ui_software_info const &info)
-					{
-						assert(info.driver);
-						if (info.startempty)
-							list.push_back(info.driver);
-					});
-		}
-		else
-		{
-			list.reserve(m_displaylist.size());
-			for (ui_system_info const &info : m_displaylist)
-				list.emplace_back(info.driver);
-		}
+		list.reserve(m_displaylist.size());
+		for (ui_system_info const &info : m_displaylist)
+			list.emplace_back(info.driver);
 	}
 
 	menu::stack_push<menu_export>(ui(), container(), std::move(list));
