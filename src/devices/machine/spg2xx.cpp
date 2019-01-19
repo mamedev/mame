@@ -1385,7 +1385,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 			{ 128, 256, 512, 1024 },
 			{ 105000, 210000, 420000, 840000 }
 		};
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timebase Control = %04x (Source:%s, TMB2:%s, TMB1:%s)\n", data,
+		LOGMASKED(LOG_TIMERS, "io_w: Timebase Control = %04x (Source:%s, TMB2:%s, TMB1:%s)\n", data,
 			BIT(data, 4) ? "27MHz" : "32768Hz", s_tmb2_sel[BIT(data, 4)][(data >> 2) & 3], s_tmb1_sel[BIT(data, 4)][data & 3]);
 		const uint16_t old = m_io_regs[offset];
 		m_io_regs[offset] = data;
@@ -1408,11 +1408,11 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	}
 
 	case 0x11: // Timebase Clear
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timebase Clear = %04x\n", data);
+		LOGMASKED(LOG_TIMERS, "io_w: Timebase Clear = %04x\n", data);
 		break;
 
 	case 0x12: // Timer A Data
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timer A Data = %04x\n", data);
+		LOGMASKED(LOG_TIMERS, "io_w: Timer A Data = %04x\n", data);
 		m_io_regs[offset] = data;
 		m_timer_a_preload = data;
 		break;
@@ -1421,7 +1421,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	{
 		static const char* const s_source_a[8] = { "0", "0", "32768Hz", "8192Hz", "4096Hz", "1", "0", "ExtClk1" };
 		static const char* const s_source_b[8] = { "2048Hz", "1024Hz", "256Hz", "TMB1", "4Hz", "2Hz", "1", "ExtClk2" };
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timer A Control = %04x (Source A:%s, Source B:%s)\n", data,
+		LOGMASKED(LOG_TIMERS, "io_w: Timer A Control = %04x (Source A:%s, Source B:%s)\n", data,
 			s_source_a[data & 7], s_source_b[(data >> 3) & 7]);
 		m_io_regs[offset] = data;
 		switch (data & 7)
@@ -1480,7 +1480,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x15: // Timer A IRQ Clear
 	{
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timer A IRQ Clear\n");
+		LOGMASKED(LOG_TIMERS, "io_w: Timer A IRQ Clear\n");
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~0x0800;
 		if (IO_IRQ_STATUS != old)
@@ -1489,7 +1489,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	}
 
 	case 0x16: // Timer B Data
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timer B Data = %04x\n", data);
+		LOGMASKED(LOG_TIMERS, "io_w: Timer B Data = %04x\n", data);
 		m_io_regs[offset] = data;
 		m_timer_b_preload = data;
 		break;
@@ -1497,7 +1497,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 	case 0x17: // Timer B Control
 	{
 		static const char* const s_source_c[8] = { "0", "0", "32768Hz", "8192Hz", "4096Hz", "1", "0", "ExtClk1" };
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timer B Control = %04x (Source C:%s)\n", data, s_source_c[data & 7]);
+		LOGMASKED(LOG_TIMERS, "io_w: Timer B Control = %04x (Source C:%s)\n", data, s_source_c[data & 7]);
 		m_io_regs[offset] = data;
 		if (m_io_regs[0x18] == 1)
 		{
@@ -1508,7 +1508,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x18: // Timer B Enable
 	{
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timer B Enable = %04x\n", data);
+		LOGMASKED(LOG_TIMERS, "io_w: Timer B Enable = %04x\n", data);
 		m_io_regs[offset] = data & 1;
 		if (data & 1)
 		{
@@ -1523,7 +1523,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x19: // Timer B IRQ Clear
 	{
-		LOGMASKED(LOG_IO_WRITES, "io_w: Timer B IRQ Clear\n");
+		LOGMASKED(LOG_TIMERS, "io_w: Timer B IRQ Clear\n");
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~0x0400;
 		if (IO_IRQ_STATUS != old)
@@ -1860,16 +1860,20 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		case TIMER_TMB1:
 		{
 			LOGMASKED(LOG_TIMERS, "TMB1 elapsed, setting IRQ Status bit 0 (old:%04x, new:%04x, enable:%04x)\n", IO_IRQ_STATUS, IO_IRQ_STATUS | 1, IO_IRQ_ENABLE);
+			const uint16_t old = IO_IRQ_STATUS;
 			IO_IRQ_STATUS |= 1;
-			check_irqs(0x0001);
+			if (old ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE))
+				check_irqs(0x0001);
 			break;
 		}
 
 		case TIMER_TMB2:
 		{
 			LOGMASKED(LOG_TIMERS, "TMB2 elapsed, setting IRQ Status bit 1 (old:%04x, new:%04x, enable:%04x)\n", IO_IRQ_STATUS, IO_IRQ_STATUS | 2, IO_IRQ_ENABLE);
+			const uint16_t old = IO_IRQ_STATUS;
 			IO_IRQ_STATUS |= 2;
-			check_irqs(0x0002);
+			if (old ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE))
+				check_irqs(0x0002);
 			break;
 		}
 
@@ -1916,6 +1920,7 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void spg2xx_device::system_timer_tick()
 {
+	const uint16_t old = IO_IRQ_STATUS;
 	uint16_t check_mask = 0x0040;
 	IO_IRQ_STATUS |= 0x0040;
 
@@ -1943,7 +1948,8 @@ void spg2xx_device::system_timer_tick()
 		}
 	}
 
-	check_irqs(check_mask);
+	if (old ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE))
+		check_irqs(check_mask);
 }
 
 void spg2xx_device::uart_transmit_tick()
@@ -2011,7 +2017,7 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ2 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00));
+		LOGMASKED(LOG_TIMERS, "%ssserting IRQ2 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00));
 		m_cpu->set_state_unsynced(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
@@ -2043,7 +2049,7 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ6 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070));
+		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070));
 		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 	}
 

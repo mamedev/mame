@@ -237,7 +237,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 
 <softwarelist name="vsmilem_cart" description="VTech V.Smile Motion cartridges">
 
-	<software name="actnmnia" supported="no">
+	<software name="actnmnia" supported="yes">
 		<description>Action Manía (Sp)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -252,7 +252,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="cinderla" supported="no">
+	<software name="cinderla" supported="yes">
 		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
@@ -267,7 +267,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="cinderla2" cloneof="cinderla" supported="no">
+	<software name="cinderla2" cloneof="cinderla" supported="yes">
 		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger, Rev. 2?)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
@@ -279,7 +279,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kfpanda" supported="no">
+	<software name="kfpanda" supported="yes">
 		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Ger)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -294,7 +294,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="dora" supported="no">
+	<software name="dora" supported="yes">
 		<description>Dora - Doras Reparatur-Abenteuer (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -309,7 +309,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="dora2" cloneof="dora" supported="no">
+	<software name="dora2" cloneof="dora" supported="yes">
 		<description>Dora - Doras Reparatur-Abenteuer (Ger, Rev. 2)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -324,7 +324,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kleinstn" supported="no">
+	<software name="kleinstn" supported="yes">
 		<description>Kleine Einsteins (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -336,7 +336,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="kleinstn2" cloneof="kleinstn" supported="no">
+	<software name="kleinstn2" cloneof="kleinstn" supported="yes">
 		<description>Kleine Einsteins (Ger, Rev. 2?)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -348,7 +348,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="thomas" supported="no">
+	<software name="thomas" supported="yes">
 		<description>Thomas - Freunde halten zusammen (Ger)</description>
 		<year>2007?</year>
 		<publisher>VTech</publisher>
@@ -360,7 +360,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="spidermn" supported="no">
+	<software name="spidermn" supported="yes">
 		<description>Spider-Man &amp; Freunde - Geheime Missionen (Ger)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -375,7 +375,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="tinker" supported="no">
+	<software name="tinker" supported="yes">
 		<description>TinkerBell (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -390,7 +390,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="pooh" supported="no">
+	<software name="pooh" supported="yes">
 		<description>Winnie Puuh - Die Honigjagd (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -405,7 +405,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
-	<software name="wintrspt" supported="no">
+	<software name="wintrspt" supported="yes">
 		<description>Wintersport (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
