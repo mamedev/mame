@@ -1268,7 +1268,6 @@ kccomp                          // VEB KC compact
 @source:amusco.cpp
 amusco                          // 1987, Amusco.
 draw88pkr                       // 1988, BTE, Inc.
-freeway
 
 @source:amust.cpp
 amust                           //
@@ -13062,6 +13061,9 @@ oigas                           // (c) 1986 bootleg
 pbillrd                         // (c) 1987 Nihon System
 pbillrds                        // (c) 1987 Nihon System (Sega license?)
 pbillrdsa                       // (c) 1987 Nihon System (Sega license?)
+
+@source:freeway.cpp
+freeway
 
 @source:fresh.cpp
 fresh                           // (c) Chain Leisure
