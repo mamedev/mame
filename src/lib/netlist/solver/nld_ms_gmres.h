@@ -106,8 +106,8 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 					m_term_cr[k].push_back(i);
 					break;
 				}
-			nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
 		}
+		nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
 	}
 
 	mat.ia[iN] = nz;
