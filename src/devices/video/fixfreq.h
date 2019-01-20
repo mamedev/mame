@@ -18,60 +18,13 @@
 #include "screen.h"
 
 
-#define FIXFREQ_INTERFACE(name) \
-	const fixedfreq_interface (name) =
-
-#define MCFG_FIXFREQ_ADD(_tag, _screen_tag) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_RAW_PARAMS(13500000, 858, 0, 858, 525, 0, 525) \
-	MCFG_SCREEN_UPDATE_DEVICE(_tag, fixedfreq_device, screen_update) \
-	MCFG_DEVICE_ADD(_tag, FIXFREQ, 0) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag)
-
-#define MCFG_FIXFREQ_MONITOR_CLOCK(_clock) \
-	downcast<fixedfreq_device &>(*device).set_monitor_clock(_clock);
-
-#define MCFG_FIXFREQ_HORZ_PARAMS(_visible, _frontporch, _sync, _backporch) \
-	downcast<fixedfreq_device &>(*device).set_horz_params(_visible, _frontporch, _sync, _backporch);
-
-#define MCFG_FIXFREQ_VERT_PARAMS(_visible, _frontporch, _sync, _backporch) \
-	downcast<fixedfreq_device &>(*device).set_vert_params(_visible, _frontporch, _sync, _backporch);
-
-#define MCFG_FIXFREQ_FIELDCOUNT(_count) \
-	downcast<fixedfreq_device &>(*device).set_fieldcount(_count);
-
-#define MCFG_FIXFREQ_SYNC_THRESHOLD(_threshold) \
-	downcast<fixedfreq_device &>(*device).set_threshold(_threshold);
-
-#define MCFG_FIXFREQ_GAIN(_gain) \
-	downcast<fixedfreq_device &>(*device).set_gain(_gain);
-
-// pre-defined configurations
-
-//ModeLine "720x480@30i" 13.5 720 736 799 858 480 486 492 525 interlace -hsync -vsync
-#define MCFG_FIXFREQ_MODE_NTSC720 \
-	MCFG_FIXFREQ_MONITOR_CLOCK(13500000) \
-	MCFG_FIXFREQ_HORZ_PARAMS(720, 736, 799, 858) \
-	MCFG_FIXFREQ_VERT_PARAMS(480, 486, 492, 525) \
-	MCFG_FIXFREQ_FIELDCOUNT(2) \
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.3)
-
-//ModeLine "704x480@30i" 13.5 704 728 791 858 480 486 492 525
-#define MCFG_FIXFREQ_MODE_NTSC704 \
-	MCFG_FIXFREQ_MONITOR_CLOCK(13500000) \
-	MCFG_FIXFREQ_HORZ_PARAMS(704, 728, 791, 858) \
-	MCFG_FIXFREQ_VERT_PARAMS(480, 486, 492, 525) \
-	MCFG_FIXFREQ_FIELDCOUNT(2) \
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.3)
-
-
-// ======================> vga_device
+// ======================> fixedfreq_device
 
 class fixedfreq_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fixedfreq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration helpers
 	void set_monitor_clock(uint32_t clock) { m_monitor_clock = clock; }
@@ -93,6 +46,24 @@ public:
 		m_vbackporch = backporch;
 	}
 
+	// pre-defined configurations
+	void set_mode_ntsc720() //ModeLine "720x480@30i" 13.5 720 736 799 858 480 486 492 525 interlace -hsync -vsync
+	{
+		set_monitor_clock(13500000);
+		set_horz_params(720, 736, 799, 858);
+		set_vert_params(480, 486, 492, 525);
+		set_fieldcount(2);
+		set_threshold(0.3);
+	}
+	void set_mode_ntsc704() //ModeLine "704x480@30i" 13.5 704 728 791 858 480 486 492 525
+	{
+		set_monitor_clock(13500000);
+		set_horz_params(704, 728, 791, 858);
+		set_vert_params(480, 486, 492, 525);
+		set_fieldcount(2);
+		set_threshold(0.3);
+	}
+
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(update_composite_monochrome);
@@ -109,6 +80,7 @@ protected:
 	fixedfreq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
