@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/z80/z80.h"
 #include "emupal.h"
 
 class nova2001_state : public driver_device
@@ -31,7 +32,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
