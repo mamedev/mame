@@ -34,6 +34,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#define ENABLE_2PADS	(0)
+
 class vsmile_base_state : public driver_device
 {
 public:
@@ -77,6 +79,9 @@ private:
 
 	void banked_map(address_map &map);
 
+	DECLARE_WRITE8_MEMBER(ctrl_tx_w);
+	template <int Which> DECLARE_WRITE_LINE_MEMBER(ctrl_rts_w);
+
 	DECLARE_READ16_MEMBER(portb_r);
 	DECLARE_READ16_MEMBER(portc_r);
 	DECLARE_WRITE16_MEMBER(portc_w);
@@ -106,7 +111,11 @@ private:
 	};
 
 	required_device<vsmile_cart_slot_device> m_cart;
+#if ENABLE_2PADS
 	required_device_array<vsmile_ctrl_port_device, 2> m_ctrl;
+#else
+	required_device_array<vsmile_ctrl_port_device, 1> m_ctrl;
+#endif
 	required_ioport m_dsw_region;
 
 	bool m_ctrl_rts[2];
@@ -182,13 +191,31 @@ void vsmile_state::machine_reset()
 	memset(m_ctrl_cts, 0, sizeof(bool) * 2);
 }
 
+WRITE8_MEMBER(vsmile_state::ctrl_tx_w)
+{
+	//printf("Transmitting: %02x\n", data);
+	m_spg->uart_rx(data);
+}
+
+template <int Which> WRITE_LINE_MEMBER(vsmile_state::ctrl_rts_w)
+{
+	//printf("Ctrl%d RTS: %d\n", Which, state);
+	m_ctrl_rts[Which] = state;
+	m_spg->extint_w(Which, state);
+}
+
 WRITE8_MEMBER(vsmile_state::uart_rx)
 {
-	printf("Receiving %02x\n", data);
 	if (m_ctrl_cts[0])
+	{
+		//printf("Ctrl0 Rx: %02x\n", data);
 		m_ctrl[0]->data_w(data);
+	}
 	if (m_ctrl_cts[1])
+	{
+		//printf("Ctrl1 Rx: %02x\n", data);
 		m_ctrl[1]->data_w(data);
+	}
 }
 
 READ16_MEMBER(vsmile_state::bank3_r)
@@ -206,7 +233,8 @@ READ16_MEMBER(vsmile_state::portc_r)
 	uint16_t data = m_dsw_region->read();
 	data |= m_ctrl_rts[0] ? 0 : 0x0400;
 	data |= m_ctrl_rts[1] ? 0 : 0x1000;
-	data |= 0x2020;
+	data |= 0x0020;
+	data |= (m_ctrl_rts[0] && m_ctrl_rts[1]) ? 0x0000 : 0x2000;
 	//data = machine().rand() & 0xffff;
 	return data;
 }
@@ -215,13 +243,17 @@ WRITE16_MEMBER(vsmile_state::portc_w)
 {
 	if (BIT(mem_mask, 8))
 	{
+		//printf("Ctrl0 CTS: %d\n", BIT(data, 8));
 		m_ctrl_cts[0] = BIT(data, 8);
 		m_ctrl[0]->cts_w(m_ctrl_cts[0]);
 	}
 	if (BIT(mem_mask, 9))
 	{
-		m_ctrl_cts[1] = BIT(data, 8);
+		//printf("Ctrl1 CTS: %d\n", BIT(data, 9));
+		m_ctrl_cts[1] = BIT(data, 9);
+#if ENABLE_2PADS
 		m_ctrl[1]->cts_w(m_ctrl_cts[1]);
+#endif
 	}
 }
 
@@ -438,12 +470,14 @@ void vsmile_state::vsmile(machine_config &config)
 	VSMILE_CART_SLOT(config, m_cart, vsmile_cart, nullptr);
 
 	VSMILE_CTRL_PORT(config, m_ctrl[0], vsmile_controllers, "pad");
-	m_ctrl[0]->rts_cb().set([this] (int state) { m_ctrl_rts[0] = state; printf("Ctrl0 RTS: %d\n", state); });
-	m_ctrl[0]->data_cb().set([this] (uint8_t data) { m_spg->uart_rx(data); printf("Ctrl0 UART Tx: %02X\n", data); });
+	m_ctrl[0]->rts_cb().set(FUNC(vsmile_state::ctrl_rts_w<0>));
+	m_ctrl[0]->data_cb().set(FUNC(vsmile_state::ctrl_tx_w));
 
+#if ENABLE_2PADS
 	VSMILE_CTRL_PORT(config, m_ctrl[1], vsmile_controllers, nullptr);
-	m_ctrl[1]->rts_cb().set([this] (int state) { m_ctrl_rts[1] = state; printf("Ctrl1 RTS: %d\n", state); });
-	m_ctrl[1]->data_cb().set([this] (uint8_t data) { m_spg->uart_rx(data); printf("Ctrl1 UART Tx: %02X\n", data); });
+	m_ctrl[1]->rts_cb().set(FUNC(vsmile_state::ctrl_rts_w<1>));
+	m_ctrl[1]->data_cb().set(FUNC(vsmile_state::ctrl_tx_w));
+#endif
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
 	SOFTWARE_LIST(config, "cart_list2").set_original("vsmilem_cart");

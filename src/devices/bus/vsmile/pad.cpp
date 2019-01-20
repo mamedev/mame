@@ -65,14 +65,13 @@ void vsmile_pad_device::device_reset()
 
 void vsmile_pad_device::cts_w(int state)
 {
-	printf("Pad CTS: %d\n", state);
-	if (m_uart_tx_state == XMIT_STATE_RTS)
-		m_uart_tx_state = XMIT_STATE_CTS;
+	//printf("%s CTS: %d\n", tag(), state);
+	m_ctrl_cts = state;
 }
 
 void vsmile_pad_device::data_w(uint8_t data)
 {
-	printf("Pad Receiving: %02x\n", data);
+	//printf("%s Receiving: %02x\n", tag(), data);
 	if ((data >> 4) == 7 || (data >> 4) == 11)
 	{
 		m_ctrl_probe_history[0] = m_ctrl_probe_history[1];
@@ -89,7 +88,7 @@ void vsmile_pad_device::uart_tx_fifo_push(uint8_t data)
 		logerror("Warning: Trying to push more than %d bytes onto the controller Tx FIFO, data will be lost\n", ARRAY_LENGTH(m_uart_tx_fifo));
 	}
 
-	printf("Pushing %02x\n", data);
+	//printf("%s Pushing: %02x\n", tag(), data);
 	m_uart_tx_fifo[m_uart_tx_fifo_end] = data;
 	m_uart_tx_fifo_count++;
 	m_uart_tx_fifo_end = (m_uart_tx_fifo_end + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
@@ -102,20 +101,27 @@ void vsmile_pad_device::handle_uart_tx()
 
 	if (m_uart_tx_state == XMIT_STATE_IDLE)
 	{
+		//printf("%s RTS: 1\n", tag());
 		m_uart_tx_state = XMIT_STATE_RTS;
-		printf("Setting RTS\n");
 		rts_out(1);
 		return;
 	}
+	else if (m_uart_tx_state == XMIT_STATE_RTS)
+	{
+		// HACK: This should work. It doesn't.
+		//if (m_ctrl_cts)
+		//	m_uart_tx_state = XMIT_STATE_CTS;
+		//return;
+	}
 
-	printf("Transmitting %02x\n", m_uart_tx_fifo[m_uart_tx_fifo_start]);
+	//printf("%s Transmitting: %02x\n", tag(), m_uart_tx_fifo[m_uart_tx_fifo_start]);
 	data_out(m_uart_tx_fifo[m_uart_tx_fifo_start]);
 	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
 	m_uart_tx_fifo_count--;
 	if (m_uart_tx_fifo_count == 0)
 	{
 		m_uart_tx_state = XMIT_STATE_IDLE;
-		printf("Clearing RTS\n");
+		//printf("%s RTS: 0\n", tag());
 		rts_out(0);
 	}
 }
