@@ -323,10 +323,13 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 	if (yy >= 0x01c0)
 		yy -= 0x0200;
 
-	if (SPG_DEBUG_VIDEO && m_debug_blit)
+    if (yy > 240 || yy < 0)
+        return;
+
+    if (SPG_DEBUG_VIDEO && m_debug_blit)
 		printf("%3d:\n", yy);
 
-	int y_index = yy * 320;
+    int y_index = yy * 320;
 
 	for (int32_t x = FlipX ? (w - 1) : 0; FlipX ? x >= 0 : x < w; FlipX ? x-- : x++)
 	{
@@ -692,19 +695,21 @@ uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if (SPG_DEBUG_VIDEO && m_debug_palette)
 	{
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		printf("Palette entry 0x37 is: %04x, which maps to an RGB value of %08x\n", m_paletteram[0x37], m_rgb555_to_rgb888[m_paletteram[0x37] & 0x7fff]);
+		for (int y = cliprect.min_y; y <= cliprect.max_y && y < 128; y++)
 		{
 			const uint16_t high_nybble = (y / 8) << 4;
 			uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x && x < 256; x++)
 			{
 				const uint16_t low_nybble = x / 16;
 				const uint16_t palette_entry = high_nybble | low_nybble;
 				const uint16_t color = m_paletteram[palette_entry];
 				if (!(color & 0x8000))
 				{
-					*dest++ = m_rgb555_to_rgb888[color & 0x7fff];
+					*dest = m_rgb555_to_rgb888[color & 0x7fff];
 				}
+				dest++;
 			}
 		}
 	}
