@@ -127,7 +127,7 @@ ROM_END
 // ROM image from V.Tech, not padded to the real ROM size
 ROM_START( vreadercafr )
 	ROM_REGION( 0x037d93a6, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "cafre-pack_20111017.bin", 0x000000, 0x200000, CRC(d3e0039c) SHA1(3d69f4afcf56ba40261bba0af335680c3c05b319) )
+	ROM_LOAD( "cafre-pack_20111017.bin", 0x000000, 0x037d93a6, CRC(d3e0039c) SHA1(3d69f4afcf56ba40261bba0af335680c3c05b319) )
 ROM_END
 
 // ROM image from V.Tech, not padded to the real ROM size
