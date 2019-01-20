@@ -135,6 +135,8 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma8237_out_eop )
 
 void ibm5160_mb_device::pc_select_dma_channel(int channel, bool state)
 {
+	m_isabus->dack_line_w(channel, state);
+
 	if(!state) {
 		m_dma_channel = channel;
 		if(m_cur_eop)

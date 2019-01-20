@@ -279,6 +279,7 @@ void pdc_device::device_add_mconfig(machine_config &config)
 	m_dma8237->out_eop_callback().set(FUNC(pdc_device::i8237_eop_w));
 	m_dma8237->in_memr_callback().set(FUNC(pdc_device::i8237_dma_mem_r));
 	m_dma8237->out_memw_callback().set(FUNC(pdc_device::i8237_dma_mem_w));
+	//m_dma8237->out_dack_callback<0>().set(m_fdc, FUNC(upd765a_device::dack_w));
 	m_dma8237->in_ior_callback<0>().set(FUNC(pdc_device::i8237_fdc_dma_r));
 	m_dma8237->out_iow_callback<0>().set(FUNC(pdc_device::i8237_fdc_dma_w));
 	m_dma8237->in_ior_callback<1>().set(FUNC(pdc_device::m68k_dma_r));
