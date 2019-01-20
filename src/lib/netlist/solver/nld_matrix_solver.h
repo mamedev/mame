@@ -54,11 +54,42 @@ public:
 
 	void set_pointers();
 
+	template <typename AP, typename FT>
+	void fill_matrix(AP &tcr, FT &RHS)
+	{
+		FT gtot_t = 0.0;
+		FT RHS_t = 0.0;
+
+		const std::size_t term_count = this->count();
+		const std::size_t railstart = this->m_railstart;
+		const FT * const * RESTRICT other_cur_analog = this->connected_net_V();
+
+		for (std::size_t i = 0; i < railstart; i++)
+		{
+			*tcr[i] 	  -= m_go[i];
+			gtot_t        += m_gt[i];
+			RHS_t         += m_Idr[i];
+		}
+
+		for (std::size_t i = railstart; i < term_count; i++)
+		{
+			RHS_t += (m_Idr[i] + m_go[i] * *other_cur_analog[i]);
+			gtot_t += m_gt[i];
+		}
+
+		RHS = RHS_t;
+		// update diagonal element ...
+		*tcr[railstart] += gtot_t; //mat.A[mat.diag[k]] += gtot_t;
+	}
+
 	std::size_t m_railstart;
 
 	std::vector<unsigned> m_nz;   /* all non zero for multiplication */
 	std::vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
 	std::vector<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+
+
+
 
 	/* state */
 	nl_double m_last_V;
@@ -157,14 +188,15 @@ protected:
 	/* virtual */ void  add_term(std::size_t net_idx, terminal_t *term);
 
 	template <typename T>
-	void store(const T * RESTRICT V);
-	template <typename T>
-	T delta(const T * RESTRICT V);
+	void store(const T & RESTRICT V);
 
 	template <typename T>
-	void build_LE_A();
+	auto delta(const T & RESTRICT V) -> typename std::decay<decltype(V[0])>::type;
+
 	template <typename T>
-	void build_LE_RHS();
+	void build_LE_A(T &child);
+	template <typename T>
+	void build_LE_RHS(T &child);
 
 	std::vector<std::unique_ptr<terms_for_net_t>> m_terms;
 	std::vector<analog_net_t *> m_nets;
@@ -199,7 +231,7 @@ private:
 };
 
 template <typename T>
-T matrix_solver_t::delta(const T * RESTRICT V)
+auto matrix_solver_t::delta(const T & RESTRICT V) -> typename std::decay<decltype(V[0])>::type
 {
 	/* NOTE: Ideally we should also include currents (RHS) here. This would
 	 * need a reevaluation of the right hand side after voltages have been updated
@@ -207,14 +239,14 @@ T matrix_solver_t::delta(const T * RESTRICT V)
 	 */
 
 	const std::size_t iN = this->m_terms.size();
-	T cerr = 0;
+	typename std::decay<decltype(V[0])>::type cerr = 0;
 	for (std::size_t i = 0; i < iN; i++)
-		cerr = std::max(cerr, std::abs(V[i] - static_cast<T>(this->m_nets[i]->Q_Analog())));
+		cerr = std::max(cerr, std::abs(V[i] - this->m_nets[i]->Q_Analog()));
 	return cerr;
 }
 
 template <typename T>
-void matrix_solver_t::store(const T * RESTRICT V)
+void matrix_solver_t::store(const T & RESTRICT V)
 {
 	const std::size_t iN = this->m_terms.size();
 	for (std::size_t i = 0; i < iN; i++)
@@ -222,34 +254,33 @@ void matrix_solver_t::store(const T * RESTRICT V)
 }
 
 template <typename T>
-void matrix_solver_t::build_LE_A()
+void matrix_solver_t::build_LE_A(T &child)
 {
+	typedef typename T::float_type float_type;
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-
-	T &child = static_cast<T &>(*this);
 
 	const std::size_t iN = child.N();
 	for (std::size_t k = 0; k < iN; k++)
 	{
 		terms_for_net_t *terms = m_terms[k].get();
-		nl_double * Ak = &child.A(k, 0ul);
+		float_type * Ak = &child.A(k, 0ul);
 
 		for (std::size_t i=0; i < iN; i++)
 			Ak[i] = 0.0;
 
 		const std::size_t terms_count = terms->count();
 		const std::size_t railstart =  terms->m_railstart;
-		const nl_double * const RESTRICT gt = terms->gt();
+		const float_type * const RESTRICT gt = terms->gt();
 
 		{
-			nl_double akk  = 0.0;
+			float_type akk  = 0.0;
 			for (std::size_t i = 0; i < terms_count; i++)
 				akk += gt[i];
 
 			Ak[k] = akk;
 		}
 
-		const nl_double * const RESTRICT go = terms->go();
+		const float_type * const RESTRICT go = terms->go();
 		int * RESTRICT net_other = terms->connected_net_idx();
 
 		for (std::size_t i = 0; i < railstart; i++)
@@ -258,21 +289,21 @@ void matrix_solver_t::build_LE_A()
 }
 
 template <typename T>
-void matrix_solver_t::build_LE_RHS()
+void matrix_solver_t::build_LE_RHS(T &child)
 {
 	static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-	T &child = static_cast<T &>(*this);
+	typedef typename T::float_type float_type;
 
 	const std::size_t iN = child.N();
 	for (std::size_t k = 0; k < iN; k++)
 	{
-		nl_double rhsk_a = 0.0;
-		nl_double rhsk_b = 0.0;
+		float_type rhsk_a = 0.0;
+		float_type rhsk_b = 0.0;
 
 		const std::size_t terms_count = m_terms[k]->count();
-		const nl_double * const RESTRICT go = m_terms[k]->go();
-		const nl_double * const RESTRICT Idr = m_terms[k]->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
+		const float_type * const RESTRICT go = m_terms[k]->go();
+		const float_type * const RESTRICT Idr = m_terms[k]->Idr();
+		const float_type * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (std::size_t i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];

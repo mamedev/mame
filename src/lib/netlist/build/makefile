@@ -207,7 +207,7 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -Wall -Wpedantic -Wsign-compare -Wextra -Wno-unused-parameter"
 
 clang:
-	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Wno-unused-parameter -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-march=native -Wno-c++11-narrowing -Wno-unused-parameter -Weverything -Werror -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wweak-template-vtables -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"
@@ -217,6 +217,7 @@ nvcc:
 		CEXTRAFLAGS="-x cu  -DNVCCBUILD=1 --expt-extended-lambda --expt-relaxed-constexpr --default-stream per-thread --restrict"
 
 #
+# -Wno-c++11-narrowing : seems a bit broken
 # Mostly done: -Wno-weak-vtables -Wno-cast-align
 # FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
 # FIXME: -Winconsistent-missing-destructor-override : c++ community has diverging opinions on this https://github.com/isocpp/CppCoreGuidelines/issues/721

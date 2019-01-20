@@ -322,11 +322,11 @@ namespace netlist
 				const T &value          //!< Initial value after construction
 				);
 		//! Copy Constructor.
-		constexpr state_var(const state_var &rhs) noexcept = default;
+		constexpr state_var(const state_var &rhs) = default;
 		//! Move Constructor.
 		constexpr state_var(state_var &&rhs) noexcept = default;
 		//! Assignment operator to assign value of a state var.
-		C14CONSTEXPR state_var &operator=(const state_var &rhs) noexcept = default;
+		C14CONSTEXPR state_var &operator=(const state_var &rhs) = default;
 		//! Assignment move operator to assign value of a state var.
 		C14CONSTEXPR state_var &operator=(state_var &&rhs) noexcept = default;
 		//! Assignment operator to assign value of type T.
