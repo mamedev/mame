@@ -466,6 +466,7 @@ protected:
 	bool m_hide_sprites;
 	bool m_debug_sprites;
 	bool m_debug_blit;
+	bool m_debug_palette;
 	uint8_t m_sprite_index_to_debug;
 
 	bool m_debug_samples;

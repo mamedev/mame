@@ -170,6 +170,7 @@ void spg2xx_device::device_start()
 	save_item(NAME(m_hide_sprites));
 	save_item(NAME(m_debug_sprites));
 	save_item(NAME(m_debug_blit));
+	save_item(NAME(m_debug_palette));
 	save_item(NAME(m_sprite_index_to_debug));
 
 	save_item(NAME(m_debug_samples));
@@ -255,7 +256,8 @@ void spg2xx_device::device_reset()
 	m_hide_sprites = false;
 	m_debug_sprites = false;
 	m_debug_blit = false;
-	m_sprite_index_to_debug = 44;
+	m_debug_palette = false;
+	m_sprite_index_to_debug = 0;
 
 	m_debug_samples = false;
 	m_debug_rates = false;
@@ -531,8 +533,6 @@ void spg2xx_device::blit_sprite(const rectangle &cliprect, uint32_t scanline, in
 
 	if (test_y != scanline)
 	{
-		if (SPG_DEBUG_VIDEO && machine().input().code_pressed(KEYCODE_L))
-			printf("Rejecting because %d > %d\n", test_y, scanline);
 		return;
 	}
 
@@ -690,6 +690,24 @@ uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		memcpy(dest, src, sizeof(uint32_t) * ((cliprect.max_x - cliprect.min_x) + 1));
 	}
 
+	if (SPG_DEBUG_VIDEO && m_debug_palette)
+	{
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			const uint16_t high_nybble = (y / 8) << 4;
+			uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				const uint16_t low_nybble = x / 16;
+				const uint16_t palette_entry = high_nybble | low_nybble;
+				const uint16_t color = m_paletteram[palette_entry];
+				if (!(color & 0x8000))
+				{
+					*dest++ = m_rgb555_to_rgb888[color & 0x7fff];
+				}
+			}
+		}
+	}
 	return 0;
 }
 
@@ -944,6 +962,8 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 		m_sprite_index_to_debug--;
 	if (machine().input().code_pressed_once(KEYCODE_0))
 		m_sprite_index_to_debug++;
+	if (machine().input().code_pressed_once(KEYCODE_L))
+		m_debug_palette = !m_debug_palette;
 #endif
 
 #if SPG_DEBUG_AUDIO
