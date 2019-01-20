@@ -2925,6 +2925,9 @@ ldrink                          //
 ldrinka                         //
 merryjn                         //
 
+@source:bert.cpp
+bert                            //
+
 @source:berzerk.cpp
 berzerk                         // (c) 1980
 berzerk1                        // (c) 1980
