@@ -336,7 +336,7 @@ DEVICE_IMAGE_LOAD_MEMBER(vsmileb_state, cart)
 
 READ16_MEMBER(vsmileb_state::porta_r)
 {
-	uint16_t data = 0x0300 | (m_io_logo->read() ? 0x0080 : 0x0000);
+	uint16_t data = 0x0302 | (m_io_logo->read() ? 0x0080 : 0x0000);
 	logerror("%s: GPIO Port A Read: %04x\n", machine().describe_context(), data);
 	return data;
 }
