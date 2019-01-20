@@ -621,8 +621,8 @@
     <description>Flight Simulator II (v2.0)</description>
     <year>1985</year>
     <publisher>Accolade</publisher>
-
     <info name="release" value="2018-09-04"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233510">
         <rom name="flight simulator ii v2.0.woz" size="233510" crc="e73d8996" sha1="88359b00974e857e14d0a104fae7b191d1f52662" offset="0x0000" />
@@ -647,8 +647,8 @@
     <description>Force 7</description>
     <year>1987</year>
     <publisher>Datasoft</publisher>
-
     <info name="release" value="2018-12-20"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="193522">
         <rom name="force 7.woz" size="193522" crc="01d48369" sha1="c248796aa3ef777c00447a4e3049dbd074a16a18" offset="0x0000" />
@@ -1078,6 +1078,7 @@
     <year>1987</year>
     <publisher>Data East</publisher>
     <info name="release" value="2018-10-19"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233499">
         <rom name="kid niki side a.woz" size="233499" crc="c2fcb172" sha1="2001d447a04a03c6c51b698091ef32e1fc149b83" offset="0x0000" />
@@ -1281,6 +1282,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-02"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233478">
         <rom name="money munchers.woz" size="233478" crc="5f157c32" sha1="3dddc118174558495a7bc44591d769c747dc25ba" offset="0x0000" />
@@ -1293,6 +1295,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-04"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233476">
         <rom name="monster smash.woz" size="233476" crc="a2a01373" sha1="a0aeea2f9b66a1ff725fa5e49a3c5398a3be1273" offset="0x0000" />
@@ -1332,6 +1335,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-10-24"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233451">
         <rom name="the movie monster game side a.woz" size="233451" crc="7318e456" sha1="0bf74c85da08fd5c4bebb587c38769eb8aefb953" offset="0x0000" />
@@ -1500,6 +1504,26 @@
     </part>
   </software>
 
+  <software name="plnr10wz">
+    <description>Planetfall (r10)</description>
+    <year>1988</year>
+    <publisher>Infocom</publisher>
+    <info name="release" value="2019-01-19"/>
+    <!-- This is Release 10 / 880531 / Interpreter 2 Version H, the
+    "Solid Gold" edition. It requires a 128K Apple //e, //c, or IIgs. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233542">
+        <rom name="Planetfall r10 side A.woz" size="233542" crc="e2a761e7" sha1="a349b573c66569b4a16381acdaa9d1d61a3badbe" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233542">
+        <rom name="Planetfall r10 side B.woz" size="233542" crc="6a591dfe" sha1="68d6de1e3ed30d4a129382766a8dee612fc2edb2" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
   <software name="plsmnwoz">
     <description>Plasmania</description>
     <year>1983</year>
@@ -1529,8 +1553,6 @@
       </dataarea>
     </part>
   </software>
-
-
 
   <software name="pool15wz">
     <description>Pool 1.5</description>
@@ -1714,8 +1736,8 @@
     <description>Sabotage</description>
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
-
     <info name="release" value="2018-08-08"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240141">
         <rom name="sabotage.woz" size="240141" crc="091eb06f" sha1="72b24f54916e16ae73c495a5a382517bfffe1f6a" offset="0x0000" />
@@ -1727,8 +1749,8 @@
     <description>Sammy Lightfoot</description>
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
-
     <info name="release" value="2018-11-07"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240148">
         <rom name="sammy lightfoot.woz" size="240148" crc="c551624a" sha1="e511b9fa31ed9deb0d18fea7001caac96b0e0832" offset="0x0000" />
@@ -1886,8 +1908,8 @@
     <description>Spindizzy</description>
     <year>1986</year>
     <publisher>Activision</publisher>
-
     <info name="release" value="2018-09-10"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233475">
         <rom name="spindizzy.woz" size="233475" crc="9e38c7cd" sha1="a2432c3d14734b23c45c47e4087b58a6a27f7686" offset="0x0000" />
@@ -1925,8 +1947,8 @@
     <description>Spy vs Spy III: Arctic Antics</description>
     <year>1983</year>
     <publisher>Bally Midway</publisher>
-
     <info name="release" value="2018-08-20"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233468">
         <rom name="spy vs. spy iii.woz" size="233468" crc="c19123d1" sha1="2585f7cd612f5f549dacfa2ce9994ede66ab35c6" offset="0x0000" />
@@ -1938,8 +1960,8 @@
     <description>Spy's Demise</description>
     <year>1982</year>
     <publisher>Penguin</publisher>
-
     <info name="release" value="2018-08-20"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="120328">
         <rom name="spy's demise.woz" size="120328" crc="0586db9f" sha1="a7520b7c9d7caddb4db74d1931051212df6c996d" offset="0x0000" />
@@ -1951,8 +1973,8 @@
     <description>Star Cruiser</description>
     <year>1980</year>
     <publisher>Sirius Software</publisher>
-
     <info name="release" value="2018-11-03"/>
+
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="126969">
         <rom name="star cruiser.woz" size="126969" crc="43c1745b" sha1="975002c233af55ee9f11eaaa97faddbfa1be8f48" offset="0x0000" />
@@ -2237,6 +2259,7 @@
     <description>Trick Shot</description>
     <year>1981</year>
     <publisher>IDSI</publisher>
+
     <info name="release" value="2018-08-23"/>
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="200176">
@@ -2272,6 +2295,84 @@
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="426493">
         <rom name="twerps.woz" size="426493" crc="6da22395" sha1="9eed0ac2a13e4ae2003778bf45591f52c5b5b722" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ult4woz">
+    <description>Ultima IV: Quest of the Avatar</description>
+    <year>1985</year>
+    <publisher>Origin Systems</publisher>
+    <info name="release" value="2019-01-17"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240170">
+        <rom name="Ultima IV - Side A - Program.woz" size="240170" crc="9e1d5595" sha1="a2de1815ffe51b4bdaad8b6abe8ec935911ec394" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233516">
+        <rom name="Ultima IV - Side B - Towne.woz" size="233516" crc="8ba7e933" sha1="f100cec0ae9d04a25f687fc3c1d76b139266826e" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop3" interface="floppy_5_25">
+      <dataarea name="flop" size="233520">
+        <rom name="Ultima IV - Side C - Britannia.woz" size="233520" crc="AC61D6C4" sha1="846BFCEBF3DAFA9642D290EA8D1619E580573E1A" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop4" interface="floppy_5_25">
+      <dataarea name="flop" size="233521">
+        <rom name="Ultima IV - Side D - Underworld.woz" size="233521" crc="7DAAB34F" sha1="D365CB92DD1C737A3C8773F432FE4C880019F324" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="ult5woz">
+    <description>Ultima V: Warriors of Destiny</description>
+    <year>1988</year>
+    <publisher>Origin Systems</publisher>
+    <info name="release" value="2019-01-16"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233616">
+        <rom name="Ultima V - Program.woz" size="233616" crc="77708654" sha1="3623aadefb9b2635cd56635ddb21b6d3f4b6dc63" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233622">
+        <rom name="Ultima V - Britannia.woz" size="233622" crc="8141d042" sha1="ddb85c2ee8bbbb4a66f5e87821df82744b3e3b8f" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop3" interface="floppy_5_25">
+      <dataarea name="flop" size="233618">
+        <rom name="Ultima V - Towne.woz" size="233618" crc="578b66cf" sha1="d13d98470df0f58e9ef2b8ab68aae979831f8d3e" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop4" interface="floppy_5_25">
+      <dataarea name="flop" size="233621">
+        <rom name="Ultima V - Dwelling.woz" size="233621" crc="fa6127b1" sha1="40e4c9054cee15edacdd378e6734052bc3237ee5" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop5" interface="floppy_5_25">
+      <dataarea name="flop" size="233619">
+        <rom name="Ultima V - Castle.woz" size="233619" crc="48d5bad1" sha1="02c1f89411e86096f88e28eb3f6199553efccc90" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop6" interface="floppy_5_25">
+      <dataarea name="flop" size="233617">
+        <rom name="Ultima V - Keep.woz" size="233617" crc="51638f02" sha1="d1bb7658d0056a9a769ecb15e1c69b41780f9e67" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop7" interface="floppy_5_25">
+      <dataarea name="flop" size="233620">
+        <rom name="Ultima V - Dungeon.woz" size="233620" crc="7f981d04" sha1="d97fbd4d7eba2b65fc28e6d9bb19c9e1c4f18d58" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop8" interface="floppy_5_25">
+      <dataarea name="flop" size="233623">
+        <rom name="Ultima V - Underworld.woz" size="233623" crc="60a5113b" sha1="0f6ee9ea94e917042a074934b41a318486099fff" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -2360,6 +2461,26 @@
     <part name="flop2" interface="floppy_5_25">
       <dataarea name="flop" size="233304">
         <rom name="wings of fury side b.woz" size="233304" crc="e88181a9" sha1="0913de8ee03c5295d2015b481809090695c2c0ea" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="wshr23wz">
+    <description>Wishbringer (r23)</description>
+    <year>1988</year>
+    <publisher>Infocom</publisher>
+    <info name="release" value="2019-01-18"/>
+    <!-- This is Release 23 / 880706 / Interpreter 2 Version H, the
+    "Solid Gold" edition. It requires a 128K Apple //e, //c, or IIgs. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233579">
+        <rom name="Wishbringer r23 side A.woz" size="233579" crc="37df44cd" sha1="e85948bf33fefe7c7f5276d01cab4bc7da1d9615" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <dataarea name="flop" size="233579">
+        <rom name="Wishbringer r23 side B.woz" size="233579" crc="2f87fabd" sha1="aa6d3cbad29ea33b9663305f72a30a513ee9e3d3" offset="0x0000" />
       </dataarea>
     </part>
   </software>
