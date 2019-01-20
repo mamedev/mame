@@ -22,6 +22,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_pic(*this, "pic")
+		, m_charram(*this, "charram")
+		, m_colorram(*this, "colorram")
 	{
 	}
 
@@ -35,6 +37,9 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
+
+	required_shared_ptr<u8> m_charram;
+	required_shared_ptr<u8> m_colorram;
 };
 
 MC6845_UPDATE_ROW(freeway_state::update_row)
@@ -44,8 +49,8 @@ MC6845_UPDATE_ROW(freeway_state::update_row)
 void freeway_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
-	map(0xa0000, 0xa0fff).ram(); // video RAM?
-	map(0xa4000, 0xa4fff).ram(); // video RAM?
+	map(0xa0000, 0xa0fff).ram().share("charram");
+	map(0xa4000, 0xa4fff).ram().share("colorram");
 	map(0xf0000, 0xfffff).rom().region("program", 0);
 }
 
@@ -53,11 +58,18 @@ void freeway_state::io_map(address_map &map)
 {
 	map(0x0020, 0x0021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0030, 0x0033).w("pit", FUNC(pit8254_device::write));
+	map(0x00d0, 0x00d0).portr("CONFIG");
 	map(0x03d0, 0x03d0).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x03d1, 0x03d1).w("crtc", FUNC(mc6845_device::register_w));
 }
 
 static INPUT_PORTS_START(freeway)
+	PORT_START("CONFIG")
+	PORT_DIPNAME(0x01, 0x00, "Screen Format")
+	PORT_DIPSETTING(0x00, "PAL")
+	PORT_DIPSETTING(0x01, "NTSC?") // 264 lines total, 58.3 Hz refresh
+	PORT_BIT(0x08, 0x08, IPT_UNKNOWN)
+	PORT_BIT(0xf6, 0xf6, IPT_UNKNOWN) // probably unused
 INPUT_PORTS_END
 
 void freeway_state::freeway(machine_config &config)
@@ -70,7 +82,8 @@ void freeway_state::freeway(machine_config &config)
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	PIT8254(config, "pit");
+	pit8254_device &pit(PIT8254(config, "pit"));
+	pit.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 312, 0, 256);
@@ -81,6 +94,7 @@ void freeway_state::freeway(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_screen("screen");
 	crtc.set_update_row_callback(FUNC(freeway_state::update_row), this);
+	crtc.out_hsync_callback().set("pit", FUNC(pit8254_device::write_clk0)); // guess
 }
 
 // 8088 CPU
