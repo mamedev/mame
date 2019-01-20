@@ -40,6 +40,9 @@
 #include <mutex>
 #include <thread>
 
+namespace {
+    constexpr uint32_t FLAGS_UI = ui::menu::FLAG_LEFT_ARROW | ui::menu::FLAG_RIGHT_ARROW;
+} // anonymous namespace
 
 extern const char UI_VERSION_TAG[];
 
@@ -501,7 +504,6 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 
 	set_switch_image();
 	int old_item_selected = -1;
-	constexpr uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 
 	if (!isfavorite())
 	{
@@ -555,7 +557,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 					cloneof = false;
 			}
 
-			item_append(elem.driver->type.fullname(), "", (cloneof) ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)elem.driver);
+			item_append(elem.driver->type.fullname(), "", (cloneof) ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)elem.driver);
 			curitem++;
 		}
 	}
@@ -580,30 +582,30 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(info.longname, "", cloneof ? (flags_ui | FLAG_INVERT) : flags_ui, (void *)&info);
+						item_append(info.longname, "", cloneof ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&info);
 					}
 					else
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
 							old_item_selected = curitem;
 						item_append(info.longname, info.devicetype,
-									info.parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&info);
+									info.parentname.empty() ? FLAGS_UI : (FLAG_INVERT | FLAGS_UI), (void *)&info);
 					}
 					curitem++;
 				});
 	}
 
-	item_append(menu_item_type::SEPARATOR, flags_ui);
+	item_append(menu_item_type::SEPARATOR, FLAGS_UI);
 
 	// add special items
 	if (stack_has_special_main_menu())
 	{
-		item_append(_("Configure Options"), "", flags_ui, (void *)(uintptr_t)CONF_OPTS);
-		item_append(_("Configure Machine"), "", flags_ui, (void *)(uintptr_t)CONF_MACHINE);
+		item_append(_("Configure Options"), "", FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("Configure Machine"), "", FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 2;
 		if (machine().options().plugins())
 		{
-			item_append(_("Plugins"), "", flags_ui, (void *)(uintptr_t)CONF_PLUGINS);
+			item_append(_("Plugins"), "", FLAGS_UI, (void *)(uintptr_t)CONF_PLUGINS);
 			skip_main_items++;
 		}
 	}
