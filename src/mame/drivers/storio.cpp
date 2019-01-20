@@ -6,7 +6,7 @@
 	Main processor: Nuvoton W55FA9363SDN (ARM926EJ-S CPU core)
 		http://www.dingsung.com.cn/download/n32905/1507301944.pdf
 
-	Storio (Europe) and V.Reader (North America) cartridges are phisically
+	Storio (Europe) and V.Reader (North America) cartridges are physically
 	different, but there is no software region lock, so you can play
 	Storio games on	the V.Reader (and viceversa) by modifying the game's
 	plastic cartrige (so it can fit in).
