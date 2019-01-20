@@ -361,7 +361,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	dragon64(config);
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 4)
+	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 16)
+
+	m_sam->set_clock(14.318181_MHz_XTAL);
 
 	// video hardware
 	MC6847_NTSC(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
