@@ -103,9 +103,9 @@ void vsmile_ctrl_port_device::device_start()
 }
 
 
-#include "joystick.h"
+#include "pad.h"
 
 void vsmile_controllers(device_slot_interface &device)
 {
-	device.option_add("joy", VSMILE_JOYSTICK);
+	device.option_add("pad", VSMILE_PAD);
 }

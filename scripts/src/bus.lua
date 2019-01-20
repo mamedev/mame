@@ -3278,10 +3278,10 @@ if (BUSES["VSMILE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/vsmile/vsmile_ctrl.cpp",
 		MAME_DIR .. "src/devices/bus/vsmile/vsmile_ctrl.h",
+		MAME_DIR .. "src/devices/bus/vsmile/pad.cpp",
+		MAME_DIR .. "src/devices/bus/vsmile/pad.h",
 		MAME_DIR .. "src/devices/bus/vsmile/vsmile_slot.cpp",
 		MAME_DIR .. "src/devices/bus/vsmile/vsmile_slot.h",
-		MAME_DIR .. "src/devices/bus/vsmile/joystick.cpp",
-		MAME_DIR .. "src/devices/bus/vsmile/joystick.h",
 		MAME_DIR .. "src/devices/bus/vsmile/rom.cpp",
 		MAME_DIR .. "src/devices/bus/vsmile/rom.h",
 	}
