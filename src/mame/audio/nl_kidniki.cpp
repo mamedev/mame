@@ -2,7 +2,7 @@
 // copyright-holders:Andrew Gardner, Couriersud
 #include "netlist/devices/net_lib.h"
 
-#define USE_FRONTIERS 0
+#define USE_FRONTIERS 1
 #define USE_FIXED_STV 1
 
 /* ----------------------------------------------------------------------------

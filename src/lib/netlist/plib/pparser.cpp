@@ -274,6 +274,8 @@ ppreprocessor::ppreprocessor(std::vector<define_t> *defines)
 , m_level(0)
 , m_lineno(0)
 , m_pos(0)
+, m_state(PROCESS)
+, m_comment(false)
 {
 	m_expr_sep.push_back("!");
 	m_expr_sep.push_back("(");
@@ -400,8 +402,69 @@ static pstring catremainder(const std::vector<pstring> &elems, std::size_t start
 	return ret;
 }
 
-pstring  ppreprocessor::process_line(const pstring &line)
+pstring ppreprocessor::process_comments(pstring line)
 {
+	bool in_string = false;
+
+	std::size_t e = line.size();
+	pstring ret = "";
+	for (std::size_t i=0; i < e; )
+	{
+		pstring c = plib::left(line, 1);
+		line = line.substr(1);
+		if (!m_comment)
+		{
+			if (c=="\"")
+			{
+				in_string = !in_string;
+				ret += c;
+			}
+			else if (in_string && c=="\\")
+			{
+				i++;
+				ret += (c + plib::left(line, 1));
+				line = line.substr(1);
+			}
+			else if (!in_string && c=="/" && plib::left(line,1) == "*")
+				m_comment = true;
+			else if (!in_string && c=="/" && plib::left(line,1) == "/")
+				break;
+			else
+				ret += c;
+		}
+		else
+			if (c=="*" && plib::left(line,1) == "/")
+			{
+				i++;
+				line = line.substr(1);
+				m_comment = false;
+			}
+		i++;
+	}
+	return ret;
+}
+
+pstring  ppreprocessor::process_line(pstring line)
+{
+	bool line_cont = plib::right(line, 1) == "\\";
+	if (line_cont)
+		line = plib::left(line, line.size() - 1);
+
+	if (m_state == LINE_CONTINUATION)
+		m_line += line;
+	else
+		m_line = line;
+
+	if (line_cont)
+	{
+		m_state = LINE_CONTINUATION;
+		return "";
+	}
+	else
+		m_state = PROCESS;
+
+	line = process_comments(m_line);
+
 	pstring lt = plib::trim(plib::replace_all(line, pstring("\t"), pstring(" ")));
 	pstring ret;
 	// FIXME ... revise and extend macro handling

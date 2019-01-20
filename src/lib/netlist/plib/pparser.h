@@ -188,6 +188,8 @@ public:
 	, m_lineno(s.m_lineno)
 	, m_buf(s.m_buf)
 	, m_pos(s.m_pos)
+	, m_state(s.m_state)
+	, m_comment(s.m_comment)
 	{
 	}
 
@@ -204,7 +206,13 @@ protected:
 
 private:
 
-	pstring process_line(const pstring &line);
+	enum state_e
+	{
+		PROCESS,
+		LINE_CONTINUATION
+	};
+	pstring process_line(pstring line);
+	pstring process_comments(pstring line);
 
 	std::unordered_map<pstring, define_t> m_defines;
 	std::vector<pstring> m_expr_sep;
@@ -214,6 +222,9 @@ private:
 	int m_lineno;
 	pstring_t<pu8_traits> m_buf;
 	pos_type m_pos;
+	state_e m_state;
+	pstring m_line;
+	bool m_comment;
 };
 
 }
