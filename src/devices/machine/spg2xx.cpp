@@ -52,10 +52,10 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT | LOG_FIQ)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_ALL & ~LOG_SPU)
 #include "logmacro.h"
 
-#define SPG_DEBUG_VIDEO     (0)
+#define SPG_DEBUG_VIDEO     (1)
 #define SPG_DEBUG_AUDIO     (0)
 
 #define IO_IRQ_ENABLE       m_io_regs[0x21]
@@ -634,7 +634,7 @@ void spg2xx_device::apply_saturation(const rectangle &cliprect)
 
 void spg2xx_device::apply_fade(const rectangle &cliprect)
 {
-	const uint16_t fade_offset = m_video_regs[0x30] << 1;
+	const uint16_t fade_offset = m_video_regs[0x30];
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t *src = &m_screenbuf[cliprect.min_x + 320 * y];

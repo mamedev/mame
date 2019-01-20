@@ -232,7 +232,6 @@ void spg2xx_game_state::switch_bank(uint32_t bank)
 {
 	if (bank != m_current_bank)
 	{
-		printf("Switching bank to: %d\n", bank); fflush(stdout);
 		m_current_bank = bank;
 		m_bank->set_entry(bank);
 		m_maincpu->invalidate_cache();
@@ -763,7 +762,6 @@ void spg2xx_game_state::machine_start()
 {
 	m_bank->configure_entries(0, (memregion("maincpu")->bytes() + 0x7fffff) / 0x800000, memregion("maincpu")->base(), 0x800000);
 	m_bank->set_entry(0);
-	printf("There are %d banks.\n", (memregion("maincpu")->bytes() + 0x7fffff) / 0x800000);
 
 	m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
 	if (m_nvram)
