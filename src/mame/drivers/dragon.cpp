@@ -364,8 +364,11 @@ MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 4)
 
 	// video hardware
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MC6847_NTSC(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
+	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
+	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
+	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
 
 	// cartridge
 	MCFG_DEVICE_MODIFY(CARTRIDGE_TAG)
