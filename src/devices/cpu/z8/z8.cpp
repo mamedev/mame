@@ -1501,7 +1501,7 @@ void z8_device::state_import(const device_state_entry &entry)
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
 		{
 			auto dis = machine().disable_side_effects();
-			register_write(m_rp + (entry.index() - Z8_R0), m_fake_r[entry.index() - Z8_R0]);
+			register_write((m_rp & 0xf0) + (entry.index() - Z8_R0), m_fake_r[entry.index() - Z8_R0]);
 			break;
 		}
 
@@ -1517,7 +1517,7 @@ void z8_device::state_export(const device_state_entry &entry)
 		case Z8_R0: case Z8_R1: case Z8_R2: case Z8_R3: case Z8_R4: case Z8_R5: case Z8_R6: case Z8_R7: case Z8_R8: case Z8_R9: case Z8_R10: case Z8_R11: case Z8_R12: case Z8_R13: case Z8_R14: case Z8_R15:
 		{
 			auto dis = machine().disable_side_effects();
-			m_fake_r[entry.index() - Z8_R0] = register_read(m_rp + (entry.index() - Z8_R0));
+			m_fake_r[entry.index() - Z8_R0] = register_read((m_rp & 0xf0) + (entry.index() - Z8_R0));
 			break;
 		}
 
