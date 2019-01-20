@@ -150,11 +150,8 @@ void spg2xx_device::device_start()
 	m_4khz_timer = timer_alloc(TIMER_4KHZ);
 	m_4khz_timer->adjust(attotime::never);
 
-	m_timer_src_a = timer_alloc(TIMER_SRC_A);
-	m_timer_src_a->adjust(attotime::never);
-
-	m_timer_src_b = timer_alloc(TIMER_SRC_B);
-	m_timer_src_b->adjust(attotime::never);
+	m_timer_src_ab = timer_alloc(TIMER_SRC_AB);
+	m_timer_src_ab->adjust(attotime::never);
 
 	m_timer_src_c = timer_alloc(TIMER_SRC_C);
 	m_timer_src_c->adjust(attotime::never);
@@ -165,10 +162,8 @@ void spg2xx_device::device_start()
 
 	save_item(NAME(m_timer_a_preload));
 	save_item(NAME(m_timer_b_preload));
-
-	save_item(NAME(m_timer_a_state));
-	save_item(NAME(m_timer_b_state));
-	save_item(NAME(m_timer_c_state));
+	save_item(NAME(m_timer_b_divisor));
+	save_item(NAME(m_timer_b_tick_rate));
 
 	save_item(NAME(m_hide_page0));
 	save_item(NAME(m_hide_page1));
@@ -236,10 +231,8 @@ void spg2xx_device::device_reset()
 
 	m_timer_a_preload = 0;
 	m_timer_b_preload = 0;
-
-	m_timer_a_state = 0;
-	m_timer_b_state = 0;
-	m_timer_c_state = 0;
+	m_timer_b_divisor = 0;
+	m_timer_b_tick_rate = 0;
 
 	m_io_regs[0x23] = 0x0028;
 	m_uart_rx_available = false;
@@ -262,7 +255,7 @@ void spg2xx_device::device_reset()
 	m_hide_sprites = false;
 	m_debug_sprites = false;
 	m_debug_blit = false;
-	m_sprite_index_to_debug = 0;
+	m_sprite_index_to_debug = 44;
 
 	m_debug_samples = false;
 	m_debug_rates = false;
@@ -705,11 +698,11 @@ void spg2xx_device::do_sprite_dma(uint32_t len)
 	address_space &mem = m_cpu->space(AS_PROGRAM);
 
 	uint32_t src = m_video_regs[0x70] & 0x3fff;
-	uint32_t dst = (m_video_regs[0x71] & 0x3ff) + 0x2c00;
+	uint32_t dst = m_video_regs[0x71];
 
 	for (uint32_t j = 0; j < len; j++)
 	{
-		mem.write_word(dst + j, mem.read_word(src + j));
+		m_spriteram[(dst + j) & 0x3ff] = mem.read_word(src + j);
 	}
 
 	m_video_regs[0x72] = 0;
@@ -931,7 +924,12 @@ WRITE16_MEMBER(spg2xx_device::video_w)
 WRITE_LINE_MEMBER(spg2xx_device::vblank)
 {
 	if (!state)
+	{
+		VIDEO_IRQ_STATUS &= ~1;
+		LOGMASKED(LOG_IRQS, "Setting video IRQ status to %04x\n", VIDEO_IRQ_STATUS);
+		check_video_irq();
 		return;
+	}
 
 #if SPG_DEBUG_VIDEO
 	if (machine().input().code_pressed_once(KEYCODE_5))
@@ -977,6 +975,7 @@ WRITE_LINE_MEMBER(spg2xx_device::vblank)
 
 void spg2xx_device::check_video_irq()
 {
+	LOGMASKED(LOG_IRQS, "%ssserting IRQ0 (%04x, %04x)\n", (VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? "A" : "Dea", VIDEO_IRQ_STATUS, VIDEO_IRQ_ENABLE);
 	m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, (VIDEO_IRQ_STATUS & VIDEO_IRQ_ENABLE) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -1053,11 +1052,16 @@ READ16_MEMBER(spg2xx_device::io_r)
 		break;
 
 	case 0x27: // ADC Data
+	{
 		m_io_regs[0x27] = 0;
+		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~0x2000;
-		check_irqs(0x2000);
+		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+		if (changed)
+			check_irqs(changed);
 		LOGMASKED(LOG_IO_READS, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
 		break;
+	}
 
 	case 0x29: // Wakeup Source
 		LOGMASKED(LOG_IO_READS, "io_r: Wakeup Source = %04x\n", val);
@@ -1220,10 +1224,10 @@ void spg2xx_device::update_timer_b_rate()
 	{
 		case 0:
 		case 1:
+		case 5:
 		case 6:
 		case 7:
 			m_timer_src_c->adjust(attotime::never);
-			m_timer_c_state = 0;
 			break;
 		case 2:
 			m_timer_src_c->adjust(attotime::from_hz(32768), 0, attotime::from_hz(32768));
@@ -1234,27 +1238,18 @@ void spg2xx_device::update_timer_b_rate()
 		case 4:
 			m_timer_src_c->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
 			break;
-		case 5:
-			m_timer_src_c->adjust(attotime::never);
-			m_timer_c_state = 1;
-			break;
 	}
 }
 
-void spg2xx_device::update_timer_a_src()
+void spg2xx_device::update_timer_ab_src()
 {
-	m_timer_a_state ^= 1;
-	if (m_timer_a_state && m_timer_b_state)
-	{
-		increment_timer_a();
-	}
-}
+	if (m_timer_b_tick_rate == 0)
+		return;
 
-void spg2xx_device::update_timer_b_src()
-{
-	m_timer_b_state ^= 1;
-	if (m_timer_a_state && m_timer_b_state)
+	m_timer_b_divisor++;
+	if (m_timer_b_divisor >= m_timer_b_tick_rate)
 	{
+		m_timer_b_divisor = 0;
 		increment_timer_a();
 	}
 }
@@ -1267,24 +1262,28 @@ void spg2xx_device::increment_timer_a()
 		m_io_regs[0x12] = m_timer_a_preload;
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS |= 0x0800;
-		if (IO_IRQ_STATUS != old)
+		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+		if (changed)
+		{
+			//printf("Timer A overflow\n");
 			check_irqs(0x0800);
+		}
 	}
 }
 
 void spg2xx_device::update_timer_c_src()
 {
-	m_timer_c_state ^= 1;
-	if (m_timer_c_state)
+	m_io_regs[0x16]++;
+	if (m_io_regs[0x16] == 0)
 	{
-		m_io_regs[0x16]++;
-		if (m_io_regs[0x16] == 0)
+		m_io_regs[0x16] = m_timer_b_preload;
+		const uint16_t old = IO_IRQ_STATUS;
+		IO_IRQ_STATUS |= 0x0400;
+		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+		if (changed)
 		{
-			m_io_regs[0x16] = m_timer_b_preload;
-			const uint16_t old = IO_IRQ_STATUS;
-			IO_IRQ_STATUS |= 0x0400;
-			if (IO_IRQ_STATUS != old)
-				check_irqs(0x0400);
+			printf("Timer B overflow\n");
+			check_irqs(0x0400);
 		}
 	}
 }
@@ -1387,23 +1386,12 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		};
 		LOGMASKED(LOG_TIMERS, "io_w: Timebase Control = %04x (Source:%s, TMB2:%s, TMB1:%s)\n", data,
 			BIT(data, 4) ? "27MHz" : "32768Hz", s_tmb2_sel[BIT(data, 4)][(data >> 2) & 3], s_tmb1_sel[BIT(data, 4)][data & 3]);
-		const uint16_t old = m_io_regs[offset];
 		m_io_regs[offset] = data;
-		const uint16_t changed = old ^ m_io_regs[offset];
-		if (changed & 0x001f)
-		{
-			const uint8_t hifreq = BIT(data, 4);
-			if (changed & 0x0013)
-			{
-				const uint32_t freq = s_tmb1_freq[hifreq][data & 3];
-				m_tmb1->adjust(attotime::from_hz(freq), 0, attotime::from_hz(freq));
-			}
-			if (changed & 0x001c)
-			{
-				const uint32_t freq = s_tmb2_freq[hifreq][(data >> 2) & 3];
-				m_tmb2->adjust(attotime::from_hz(freq), 0, attotime::from_hz(freq));
-			}
-		}
+		const uint8_t hifreq = BIT(data, 4);
+		const uint32_t tmb1freq = s_tmb1_freq[hifreq][data & 3];
+		m_tmb1->adjust(attotime::from_hz(tmb1freq), 0, attotime::from_hz(tmb1freq));
+		const uint32_t tmb2freq = s_tmb2_freq[hifreq][(data >> 2) & 3];
+		m_tmb2->adjust(attotime::from_hz(tmb2freq), 0, attotime::from_hz(tmb2freq));
 		break;
 	}
 
@@ -1424,55 +1412,54 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		LOGMASKED(LOG_TIMERS, "io_w: Timer A Control = %04x (Source A:%s, Source B:%s)\n", data,
 			s_source_a[data & 7], s_source_b[(data >> 3) & 7]);
 		m_io_regs[offset] = data;
+		int timer_a_rate = 0;
 		switch (data & 7)
 		{
 			case 0:
 			case 1:
+			case 5:
 			case 6:
 			case 7:
-				m_timer_src_a->adjust(attotime::never);
-				m_timer_a_state = 0;
+				m_timer_src_ab->adjust(attotime::never);
 				break;
 			case 2:
-				m_timer_src_a->adjust(attotime::from_hz(32768), 0, attotime::from_hz(32768));
+				m_timer_src_ab->adjust(attotime::from_hz(32768), 0, attotime::from_hz(32768));
+				timer_a_rate = 32768;
 				break;
 			case 3:
-				m_timer_src_a->adjust(attotime::from_hz(8192), 0, attotime::from_hz(8192));
+				m_timer_src_ab->adjust(attotime::from_hz(8192), 0, attotime::from_hz(8192));
+				timer_a_rate = 8192;
 				break;
 			case 4:
-				m_timer_src_a->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
-				break;
-			case 5:
-				m_timer_src_a->adjust(attotime::never);
-				m_timer_a_state = 1;
+				m_timer_src_ab->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+				timer_a_rate = 4096;
 				break;
 		}
 		switch ((data >> 3) & 7)
 		{
 			case 0:
-				m_timer_src_b->adjust(attotime::from_hz(2048), 0, attotime::from_hz(2048));
+				m_timer_b_tick_rate = timer_a_rate / 2048;
 				break;
 			case 1:
-				m_timer_src_b->adjust(attotime::from_hz(1024), 0, attotime::from_hz(1024));
+				m_timer_b_tick_rate = timer_a_rate / 1024;
 				break;
 			case 2:
-				m_timer_src_b->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+				m_timer_b_tick_rate = timer_a_rate / 256;
 				break;
 			case 3:
-				m_timer_src_b->adjust(attotime::never);
+				m_timer_b_tick_rate = 0;
 				break;
 			case 4:
-				m_timer_src_b->adjust(attotime::from_hz(4), 0, attotime::from_hz(4));
+				m_timer_b_tick_rate = timer_a_rate / 4;
 				break;
 			case 5:
-				m_timer_src_b->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+				m_timer_b_tick_rate = timer_a_rate / 2;
 				break;
 			case 6:
-				m_timer_src_b->adjust(attotime::never);
-				m_timer_b_state = 1;
+				m_timer_b_tick_rate = 1;
 				break;
 			case 7:
-				m_timer_src_b->adjust(attotime::never);
+				m_timer_b_tick_rate = 0;
 				break;
 		}
 		break;
@@ -1483,7 +1470,8 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		LOGMASKED(LOG_TIMERS, "io_w: Timer A IRQ Clear\n");
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~0x0800;
-		if (IO_IRQ_STATUS != old)
+		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+		if (changed)
 			check_irqs(0x0800);
 		break;
 	}
@@ -1526,7 +1514,8 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		LOGMASKED(LOG_TIMERS, "io_w: Timer B IRQ Clear\n");
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~0x0400;
-		if (IO_IRQ_STATUS != old)
+		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+		if (changed)
 			check_irqs(0x0400);
 		break;
 	}
@@ -1546,10 +1535,10 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 
 	case 0x21: // IRQ Enable
 	{
-		LOGMASKED(LOG_UART, "io_w: IRQ Enable = %04x\n", data);
-		const uint16_t old = IO_IRQ_ENABLE & IO_IRQ_STATUS;
+		LOGMASKED(LOG_IRQS, "io_w: IRQ Enable = %04x\n", data);
+		const uint16_t old = IO_IRQ_ENABLE;
 		m_io_regs[offset] = data;
-		const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
+		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
 			check_irqs(changed);
 		break;
@@ -1560,7 +1549,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		LOGMASKED(LOG_IRQS, "io_w: IRQ Acknowledge = %04x\n", data);
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~data;
-		const uint16_t changed = old ^ (IO_IRQ_ENABLE & IO_IRQ_STATUS);
+		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
 			check_irqs(changed);
 		break;
@@ -1613,7 +1602,7 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 			m_io_regs[0x27] = 0x8000 | (m_adc_in() & 0x7fff);
 			const uint16_t old = IO_IRQ_STATUS;
 			IO_IRQ_STATUS |= 0x2000;
-			const uint16_t changed = IO_IRQ_STATUS ^ old;
+			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 			if (changed)
 			{
 				check_irqs(changed);
@@ -1712,7 +1701,8 @@ WRITE16_MEMBER(spg2xx_device::io_w)
 		{
 			const uint16_t old = IO_IRQ_STATUS;
 			IO_IRQ_STATUS &= ~0x0100;
-			if (IO_IRQ_STATUS != old)
+			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+			if (changed)
 				check_irqs(0x0100);
 		}
 		break;
@@ -1862,7 +1852,8 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			LOGMASKED(LOG_TIMERS, "TMB1 elapsed, setting IRQ Status bit 0 (old:%04x, new:%04x, enable:%04x)\n", IO_IRQ_STATUS, IO_IRQ_STATUS | 1, IO_IRQ_ENABLE);
 			const uint16_t old = IO_IRQ_STATUS;
 			IO_IRQ_STATUS |= 1;
-			if (old ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE))
+			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+			if (changed)
 				check_irqs(0x0001);
 			break;
 		}
@@ -1872,7 +1863,8 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			LOGMASKED(LOG_TIMERS, "TMB2 elapsed, setting IRQ Status bit 1 (old:%04x, new:%04x, enable:%04x)\n", IO_IRQ_STATUS, IO_IRQ_STATUS | 2, IO_IRQ_ENABLE);
 			const uint16_t old = IO_IRQ_STATUS;
 			IO_IRQ_STATUS |= 2;
-			if (old ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE))
+			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+			if (changed)
 				check_irqs(0x0002);
 			break;
 		}
@@ -1904,12 +1896,8 @@ void spg2xx_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			system_timer_tick();
 			break;
 
-		case TIMER_SRC_A:
-			update_timer_a_src();
-			break;
-
-		case TIMER_SRC_B:
-			update_timer_b_src();
+		case TIMER_SRC_AB:
+			update_timer_ab_src();
 			break;
 
 		case TIMER_SRC_C:
@@ -1948,7 +1936,8 @@ void spg2xx_device::system_timer_tick()
 		}
 	}
 
-	if (old ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE))
+	const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+	if (changed)
 		check_irqs(check_mask);
 }
 
@@ -2017,13 +2006,13 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
 	{
-		LOGMASKED(LOG_TIMERS, "%ssserting IRQ2 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00));
+		LOGMASKED(LOG_TIMERS, "%ssserting IRQ2 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00), changed);
 		m_cpu->set_state_unsynced(UNSP_IRQ2_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x2100) // UART, ADC IRQ
 	{
-		LOGMASKED(LOG_UART, "%ssserting IRQ3 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100));
+		LOGMASKED(LOG_UART, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
 		m_cpu->set_state_unsynced(UNSP_IRQ3_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
@@ -2043,19 +2032,19 @@ void spg2xx_device::check_irqs(const uint16_t changed)
 
 	if (changed & 0x1200) // External IRQ
 	{
-		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200));
+		LOGMASKED(LOG_UART, "%ssserting IRQ5 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200), changed);
 		m_cpu->set_state_unsynced(UNSP_IRQ5_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
 	{
-		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070));
+		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070), changed);
 		m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	if (changed & 0x008b) // TMB1, TMB2, 4Hz, key change IRQ
 	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ7 (%04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b));
+		LOGMASKED(LOG_IRQS, "%ssserting IRQ7 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b), changed);
 		m_cpu->set_state_unsynced(UNSP_IRQ7_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
