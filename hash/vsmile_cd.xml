@@ -34,7 +34,7 @@ Language:
 80-093060(US)   | The Amazing Spider-Man - Countdown to Doom
 80-093064(GE)   | Spiderman - Angriff der Superschurken
 80-093065(FR)   | Spider-Man - Course-poursuite A Manhattan
-80-093067(SP)   | El Asombroso Spider-Man - Persecución en la Cuidad
+80-093067(SP)   | El Asombroso Spider-Man - Persecución en la Ciudad
 -
 80-093080(US)   | Scooby-Doo! - Ancient Adventure
 80-093083(UK)   | Scooby-Doo! - Ancient Adventure
@@ -126,7 +126,7 @@ Language:
 	Ring 2: "07/07/07 &minus;&minus; 149550 &minus;&minus; A", "IFPI LQ35"
 	-->
 	<software name="spidermns" cloneof="spidermn" supported="no">
-		<description>El Asombroso Spider-Man - Persecución en la Cuidad (Spa)</description>
+		<description>El Asombroso Spider-Man - Persecución en la Ciudad (Spa)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-093067" />
