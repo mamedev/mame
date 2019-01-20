@@ -74,17 +74,17 @@ WRITE8_MEMBER(nova2001_state::paletteram_w)
 
 TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_bg_tile_info)
 {
-	int code  = m_bg_videoram[tile_index];
-	int color = m_bg_videoram[tile_index + 0x400] & 0x0f;
+	int const code  = m_bg_videoram[tile_index];
+	int const color = m_bg_videoram[tile_index + 0x400] & 0x0f;
 
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
 {
-	int attr  = m_fg_videoram[tile_index + 0x400];
-	int code  = m_fg_videoram[tile_index];
-	int color = attr & 0x0f;
+	int const attr  = m_fg_videoram[tile_index + 0x400];
+	int const code  = m_fg_videoram[tile_index];
+	int const color = attr & 0x0f;
 
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 
@@ -93,18 +93,18 @@ TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_bg_tile_info)
 {
-	int attr  = m_bg_videoram[tile_index + 0x400];
-	int code  = m_bg_videoram[tile_index] + ((attr & 0xc0) << 2);
-	int color = attr & 0x0f;
+	int const attr  = m_bg_videoram[tile_index + 0x400];
+	int const code  = m_bg_videoram[tile_index] + ((attr & 0xc0) << 2);
+	int const color = attr & 0x0f;
 
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
 {
-	int attr  = m_fg_videoram[tile_index + 0x400];
-	int code  = m_fg_videoram[tile_index] + ((attr & 0x20) << 3);
-	int color = attr & 0x0f;
+	int const attr  = m_fg_videoram[tile_index + 0x400];
+	int const code  = m_fg_videoram[tile_index] + ((attr & 0x20) << 3);
+	int const color = attr & 0x0f;
 
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 
@@ -113,9 +113,9 @@ TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(nova2001_state::pkunwar_get_bg_tile_info)
 {
-	int attr  = m_bg_videoram[tile_index + 0x400];
-	int code  = m_bg_videoram[tile_index] + ((attr & 0x07) << 8);
-	int color = (attr & 0xf0) >> 4;
+	int const attr  = m_bg_videoram[tile_index + 0x400];
+	int const code  = m_bg_videoram[tile_index] + ((attr & 0x07) << 8);
+	int const color = (attr & 0xf0) >> 4;
 
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 
@@ -124,17 +124,17 @@ TILE_GET_INFO_MEMBER(nova2001_state::pkunwar_get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_bg_tile_info)
 {
-	int attr  = m_bg_videoram[tile_index + 0x400];
-	int code  = m_bg_videoram[tile_index] + ((attr & 0x01) << 8);
-	int color = (attr & 0xf0) >> 4;
+	int const attr  = m_bg_videoram[tile_index + 0x400];
+	int const code  = m_bg_videoram[tile_index] + ((attr & 0x01) << 8);
+	int const color = (attr & 0xf0) >> 4;
 
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_fg_tile_info)
 {
-	int code  =  m_fg_videoram[tile_index];
-	int color = (m_fg_videoram[tile_index + 0x400] & 0xf0) >> 4;
+	int const code  =  m_fg_videoram[tile_index];
+	int const color = (m_fg_videoram[tile_index + 0x400] & 0xf0) >> 4;
 
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
@@ -199,8 +199,8 @@ WRITE8_MEMBER(nova2001_state::nova2001_bg_videoram_w)
 
 WRITE8_MEMBER(nova2001_state::ninjakun_bg_videoram_w)
 {
-	int x = m_bg_tilemap->scrollx(0) >> 3;
-	int y = m_bg_tilemap->scrolly(0) >> 3;
+	int const x = m_bg_tilemap->scrollx(0) >> 3;
+	int const y = m_bg_tilemap->scrolly(0) >> 3;
 
 	// add scroll registers to address
 	offset = ((offset + x + (y << 5)) & 0x3ff) + (offset & 0x400);
@@ -211,8 +211,8 @@ WRITE8_MEMBER(nova2001_state::ninjakun_bg_videoram_w)
 
 READ8_MEMBER(nova2001_state::ninjakun_bg_videoram_r)
 {
-	int x = m_bg_tilemap->scrollx(0) >> 3;
-	int y = m_bg_tilemap->scrolly(0) >> 3;
+	int const x = m_bg_tilemap->scrollx(0) >> 3;
+	int const y = m_bg_tilemap->scrolly(0) >> 3;
 
 	// add scroll registers to address
 	offset = ((offset + x + (y << 5)) & 0x3ff) + (offset & 0x400);
@@ -253,13 +253,13 @@ void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle
 {
 	for (int offs = 0; offs < 0x800; offs += 32)
 	{
-		int attr = m_spriteram[offs+3];
+		int const attr = m_spriteram[offs+3];
 		int flipx = attr & 0x10;
 		int flipy = attr & 0x20;
 		int sx = m_spriteram[offs+1] - ((attr & 0x40) << 2);  // high bit shown in schematics, not used by game
 		int sy = m_spriteram[offs+2];
-		int tile = m_spriteram[offs+0];
-		int color = attr & 0x0f;
+		int const tile = m_spriteram[offs+0];
+		int const color = attr & 0x0f;
 
 		if (attr & 0x80)    // disable bit shown in schematics, not used by game
 		{
@@ -286,13 +286,13 @@ void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 {
 	for (int offs = 0; offs < 0x800; offs += 32)
 	{
-		int attr = m_spriteram[offs+3];
+		int const attr = m_spriteram[offs+3];
 		int flipx = m_spriteram[offs+0] & 0x01;
 		int flipy = m_spriteram[offs+0] & 0x02;
 		int sx = m_spriteram[offs+1];
 		int sy = m_spriteram[offs+2];
-		int tile = ((m_spriteram[offs+0] & 0xfc) >> 2) + ((attr & 0x07) << 6);
-		int color = (attr & 0xf0) >> 4;
+		int const tile = ((m_spriteram[offs+0] & 0xfc) >> 2) + ((attr & 0x07) << 6);
+		int const color = (attr & 0xf0) >> 4;
 
 		if (attr & 0x08)    // deducted by comparison, not used by game
 		{
