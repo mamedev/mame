@@ -695,7 +695,6 @@ uint32_t spg2xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if (SPG_DEBUG_VIDEO && m_debug_palette)
 	{
-		printf("Palette entry 0x37 is: %04x, which maps to an RGB value of %08x\n", m_paletteram[0x37], m_rgb555_to_rgb888[m_paletteram[0x37] & 0x7fff]);
 		for (int y = cliprect.min_y; y <= cliprect.max_y && y < 128; y++)
 		{
 			const uint16_t high_nybble = (y / 8) << 4;
