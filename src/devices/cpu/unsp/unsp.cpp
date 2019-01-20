@@ -256,13 +256,13 @@ void unsp_device::state_import(const device_state_entry &entry)
 void unsp_device::update_nzsc(uint32_t value, uint16_t r0, uint16_t r1)
 {
 	m_core->m_r[REG_SR] &= ~(UNSP_N | UNSP_Z | UNSP_S | UNSP_C);
-	if((int16_t)r0 < (int16_t)r1)
+	if (int16_t(r0) < int16_t(~r1))
 		m_core->m_r[REG_SR] |= UNSP_S;
-	if(value & 0x8000)
+	if (BIT(value, 15))
 		m_core->m_r[REG_SR] |= UNSP_N;
 	if((uint16_t)value == 0)
 		m_core->m_r[REG_SR] |= UNSP_Z;
-	if(value != (uint16_t)value)
+	if (BIT(value, 16))
 		m_core->m_r[REG_SR] |= UNSP_C;
 }
 
@@ -877,33 +877,37 @@ inline void unsp_device::execute_one(const uint16_t op)
 	switch (op0)
 	{
 		case 0x00: // Add
+		{
 			lres = r0 + r1;
 			if (opa != 7)
 				update_nzsc(lres, r0, r1);
 			break;
+		}
 		case 0x01: // Add w/ carry
-			lres = r0 + r1;
-			if(m_core->m_r[REG_SR] & UNSP_C)
-				lres++;
+		{
+			uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
+			lres = r0 + r1 + c;
 			if (opa != 7)
 				update_nzsc(lres, r0, r1);
 			break;
+		}
 		case 0x02: // Subtract
-			lres = r0 + (uint16_t)(~r1) + 1;
+			lres = r0 + (uint16_t)(~r1) + uint32_t(1);
 			if (opa != 7)
-				update_nzsc(lres, r0, r1);
+				update_nzsc(lres, r0, ~r1);
 			break;
 		case 0x03: // Subtract w/ carry
-			lres = r0 + (uint16_t)(~r1);
-			if(m_core->m_r[REG_SR] & UNSP_C)
-				lres++;
+		{
+			uint32_t c = (m_core->m_r[REG_SR] & UNSP_C) ? 1 : 0;
+			lres = r0 + (uint16_t)(~r1) + c;
 			if (opa != 7)
-				update_nzsc(lres, r0, r1);
+				update_nzsc(lres, r0, ~r1);
 			break;
+		}
 		case 0x04: // Compare
-			lres = r0 + (uint16_t)(~r1) + 1;
+			lres = r0 + (uint16_t)(~r1) + uint32_t(1);
 			if (opa != 7)
-				update_nzsc(lres, r0, r1);
+				update_nzsc(lres, r0, ~r1);
 			return;
 		case 0x06: // Negate
 			lres = -r1;
