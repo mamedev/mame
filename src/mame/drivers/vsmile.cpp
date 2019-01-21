@@ -435,7 +435,7 @@ void vsmile_state::vsmile(machine_config &config)
 	m_spg->portc_out().set(FUNC(vsmile_state::portc_w));
 	m_spg->uart_tx().set(FUNC(vsmile_state::uart_rx));
 
-	VSMILE_CTRL_PORT(config, m_ctrl[0], vsmile_controllers, "pad");
+	VSMILE_CTRL_PORT(config, m_ctrl[0], vsmile_controllers, "joy");
 	m_ctrl[0]->rts_cb().set(FUNC(vsmile_state::ctrl_rts_w<0>));
 	m_ctrl[0]->data_cb().set(FUNC(vsmile_state::ctrl_tx_w));
 

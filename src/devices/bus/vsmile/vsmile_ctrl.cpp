@@ -1,11 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Vas Crabb
 
 #include "emu.h"
 #include "vsmile_ctrl.h"
 
 #include <algorithm>
 #include <cassert>
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -125,6 +128,7 @@ vsmile_ctrl_device_base::vsmile_ctrl_device_base(
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_vsmile_ctrl_interface(mconfig, *this)
 	, m_tx_timer(nullptr)
+	, m_rts_timer(nullptr)
 	, m_tx_fifo_head(0U)
 	, m_tx_fifo_tail(0U)
 	, m_tx_fifo_empty(true)
@@ -144,6 +148,10 @@ void vsmile_ctrl_device_base::device_start()
 	m_tx_timer = machine().scheduler().timer_alloc(
 			timer_expired_delegate(FUNC(vsmile_ctrl_device_base::tx_timer_expired), this));
 
+	// allocate a timer for RTS timeouts
+	m_rts_timer = machine().scheduler().timer_alloc(
+			timer_expired_delegate(FUNC(vsmile_ctrl_device_base::rts_timer_expired), this));
+
 	// start with transmit queue empty
 	m_tx_fifo_head = m_tx_fifo_tail = 0U;
 	m_tx_fifo_empty = true;
@@ -162,7 +170,10 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 	// return false on overrun and drop byte
 	bool const was_empty(m_tx_fifo_empty);
 	if (!was_empty && (m_tx_fifo_head == m_tx_fifo_tail))
+	{
+		LOG("discarding byte %02X because FIFO is full (length %u, Tx %sactive)\n", data, ARRAY_LENGTH(m_tx_fifo), m_tx_active ? "" : "in");
 		return false;
+	}
 
 	// queue the byte
 	m_tx_fifo[m_tx_fifo_tail] = data;
@@ -175,9 +186,20 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 		rts_out(1);
 		if (m_select)
 		{
+			LOG("transmitting byte %02X immediately (Tx was %sactive)\n", data, m_tx_active ? "" : "in");
 			m_tx_active = true;
 			m_tx_timer->adjust(attotime::from_hz(9600 / 10));
 		}
+		else
+		{
+			LOG("asserting RTS to transmit byte %02X\n", data);
+			m_rts_timer->adjust(attotime::from_msec(500));
+		}
+	}
+	else
+	{
+		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		LOG("queued byte %02X (%u bytes queued, Tx %sactive)\n", data, fifo_used, m_tx_active ? "" : "in");
 	}
 
 	// data was queued
@@ -186,16 +208,27 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 
 void vsmile_ctrl_device_base::select_w(int state)
 {
-	m_select = bool(state);
-	if (m_select && !m_tx_fifo_empty && !m_tx_active)
+	if (bool(state) != m_select)
 	{
-		m_tx_active = true;
-		m_tx_timer->adjust(attotime::from_hz(9600 / 10));
+		if (state && !m_tx_fifo_empty && !m_tx_active)
+		{
+			m_rts_timer->reset();
+			unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+			LOG("select asserted, starting transmission (%u bytes queued)\n", fifo_used);
+			m_tx_active = true;
+			m_tx_timer->adjust(attotime::from_hz(9600 / 10));
+		}
+		else
+		{
+			LOG("select %sasserted (Tx %sactive)\n", state ? "" : "de", m_tx_active ? "" : "in");
+		}
+		m_select = bool(state);
 	}
 }
 
 void vsmile_ctrl_device_base::data_w(uint8_t data)
 {
+	LOG("received byte %02X (select %sasserted, Tx %sactive)\n", data, m_select ? "" : "de", m_tx_active ? "" : "in");
 	rx_complete(data, m_select);
 }
 
@@ -213,21 +246,50 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::tx_timer_expired)
 
 	// if queue is drained give implmentation a chance to queue more before dropping RTS
 	if (m_tx_fifo_empty)
+	{
+		LOG("transmitted byte %02X, queue empty (select %sasserted)\n", data, m_select ? "" : "de");
 		tx_complete();
+	}
+	else
+	{
+		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		LOG("transmitted byte %02X (%u bytes queued, select %sasserted)\n", data, fifo_used, m_select ? "" : "de");
+	}
 
 	// drop RTS if no more data, otherwise keep transmitting if CTS is still high
 	if (m_tx_fifo_empty)
 	{
+		LOG("nothing to transmit, deasserting RTS\n");
 		m_tx_active = false;
 		rts_out(0);
 	}
 	else if (m_select)
 	{
+		LOG("select asserted, transmitting next byte %02X\n", m_tx_fifo[m_tx_fifo_head]);
 		m_tx_timer->adjust(attotime::from_hz(9600 / 10));
 	}
 	else
 	{
+		LOG("select deasserted, waiting to transmit\n");
 		m_tx_active = false;
+		m_rts_timer->adjust(attotime::from_msec(500));
+	}
+}
+
+
+TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::rts_timer_expired)
+{
+	assert(!m_tx_fifo_empty);
+	assert(!m_tx_active);
+
+	// clear out anything queued and let the implementation deal with it
+	if (!m_tx_fifo_empty)
+	{
+		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
+		LOG("timeout waiting for select after asserting RTS (%u bytes queued)\n", fifo_used);
+		m_tx_fifo_head = m_tx_fifo_tail = 0U;
+		m_tx_fifo_empty = true;
+		tx_timeout();
 	}
 }
 
@@ -236,5 +298,5 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::tx_timer_expired)
 
 void vsmile_controllers(device_slot_interface &device)
 {
-	device.option_add("pad", VSMILE_PAD);
+	device.option_add("joy", VSMILE_PAD);
 }
