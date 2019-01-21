@@ -6099,13 +6099,14 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(galaxian_state::scramble_base)
+void galaxian_state::scramble_base(machine_config &config)
+{
 	konami_base(config);
 	konami_sound_2x_ay8910(config);
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("stars", galaxian_state, scramble_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
-MACHINE_CONFIG_END
+	TIMER(config, "stars").configure_periodic(FUNC(galaxian_state::scramble_stars_blink_timer), PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001));
+}
 
 
 
@@ -6271,11 +6272,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
 	}
 }
 
-MACHINE_CONFIG_START(galaxian_state::timefgtr)
+void galaxian_state::timefgtr(machine_config &config)
+{
 	fantastc(config);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galaxian_state, timefgtr_scanline, "screen", 0, 1)
-MACHINE_CONFIG_END
+	TIMER(config, "scantimer").configure_scanline(FUNC(galaxian_state::timefgtr_scanline), "screen", 0, 1);
+}
 
 
 MACHINE_CONFIG_START(galaxian_state::jumpbug)
@@ -6319,7 +6321,7 @@ MACHINE_CONFIG_START(galaxian_state::checkmaj)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 1620000)
 	MCFG_DEVICE_PROGRAM_MAP(checkmaj_sound_map)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq0", galaxian_state, checkmaj_irq0_gen, "screen", 0, 8)
+	TIMER(config, "irq0").configure_scanline(FUNC(galaxian_state::checkmaj_irq0_gen), "screen", 0, 8);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
@@ -12097,7 +12099,7 @@ ROM_START( scobrag )
 ROM_END
 
 
-// Super Cobra bootleg. PCB by "GGI Corp.", program by Cocamatic
+// Super Cobra bootleg (Cocamatic). PCB by "GGI Corp."
 ROM_START( scobraggi )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2c_b.bin",   0x0000, 0x1000, CRC(04ffab61) SHA1(302ae8b224d98c405aadd363623eddf88bdc3f0e) ) // 2732
@@ -12867,3 +12869,4 @@ GAME( 1982, losttombh,   losttomb, scobra,     losttomb,   galaxian_state, init_
 GAME( 1984, spdcoin,     0,        scobra,     spdcoin,    galaxian_state, init_scobra,     ROT90,  "Stern Electronics", "Speed Coin (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, superbon,    0,        scobra,     superbon,   galaxian_state, init_superbon,   ROT90,  "Signatron USA", "Agent Super Bond (Super Cobra conversion)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+
