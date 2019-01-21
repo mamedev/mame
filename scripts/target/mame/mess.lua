@@ -374,6 +374,7 @@ VIDEOS["DP8510"] = true
 VIDEOS["MB88303"] = true
 VIDEOS["PS2GS"] = true
 VIDEOS["PS2GIF"] = true
+VIDEOS["DECSFB"] = true
 
 --------------------------------------------------
 -- specify available machine cores
