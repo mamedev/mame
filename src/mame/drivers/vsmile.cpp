@@ -126,6 +126,7 @@ public:
 	{ }
 
 	void vsmileb(machine_config &config);
+	void vsmilebp(machine_config &config);
 
 private:
 	virtual void machine_start() override;
@@ -460,6 +461,13 @@ void vsmileb_state::vsmileb(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmileb_cart");
 }
 
+void vsmileb_state::vsmilebp(machine_config &config)
+{
+	vsmileb(config);
+	m_spg->set_pal(true);
+}
+
+// TODO: decide on a dump endian, these likely differ in endianess due to different dumping technqiues
 ROM_START( vsmile )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
@@ -480,8 +488,15 @@ ROM_START( vsmileb )
 	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
 ROM_END
 
+ROM_START( vsmilebsw )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "vsmileswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
+ROM_END
+
 //    year, name,    parent, compat, machine, input,   class,         init,       company, fullname,            flags
 CONS( 2005, vsmile,  0,      0,      vsmile,  vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (US)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, vsmileg, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2005, vsmilef, vsmile, 0,      vsmilep, vsmile,  vsmile_state,  empty_init, "VTech", "V.Smile (France)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, vsmileb, 0,      0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2005, vsmileb,   0,       0,      vsmileb, vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, vsmilebsw ,vsmileb, 0,      vsmilebp,vsmileb, vsmileb_state, empty_init, "VTech", "V.Smile Baby (Sweden)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

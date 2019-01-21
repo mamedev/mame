@@ -1357,6 +1357,11 @@ ROM_START( ekaraphs )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
+ROM_START( ekarag )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekaragermany.bin", 0x600000, 0x200000, CRC(644f06b0) SHA1(433e65a6ea029b67ee62b4b3de52ff3504cfdf16) )
+	ROM_RELOAD(0x000000, 0x200000)
+ROM_END
 
 
 
@@ -1379,7 +1384,17 @@ ROM_START( taikodp )
 ROM_END
 
 
-/* XaviX hardware titles */
+/* XaviX hardware titles (1st Generation)
+
+	These use
+	SSD 98 PL7351-181
+	SSD 98 PA7351-107
+	SSD 97 PA7270-107 
+	type CPUS
+
+	only new opcodes are callf and retf?
+
+*/
 
 CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )
 
@@ -1442,6 +1457,7 @@ CONS( 2000, ekaraa,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_s
 CONS( 2000, ekaraj,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
 // the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
 CONS( 2002, ekaraphs, 0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2002, ekarag,   ekaraphs,    0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Germany?, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // found in Germany, could just be a Europe-wide model tho?, verify if regular or headset type
 
 CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_state,   init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
 
@@ -1452,7 +1468,13 @@ CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_st
 CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
 
 
-/* SuperXaviX (XaviX 2000 type CPU) hardware titles */
+/* SuperXaviX(?) (XaviX 2000 type CPU) hardware titles (2nd XaviX generation?) 
+
+   these use the SSD 2000 NEC 85605-621 type CPU
+
+   This CPU type adds extra opcodes that don't appear to be present in the 97/98 types
+   It does not appear to support the bitmap modes or 16-bit ROMs found in the 2002 type
+*/
 
 ROM_START( epo_sdb )
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
@@ -1486,13 +1508,19 @@ CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix,    xavix_i2c_lotr_state,
 CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,   xavix_i2c_state,      init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, xavix ,   xavix_i2c_lotr_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-/* SuperXaviX (XaviX 2002 type CPU) hardware titles */
+/* SuperXaviX (XaviX 2002 type CPU) hardware titles (3rd XaviX generation?)
+
+  these use the SSD 2002 NEC 85054-611 type CPU
+  differences include support for 16-bit ROMs, various bitmap modes, interlace screen modes etc.
+  possibly higher horizontal resolution for bitmap layers with others scaled to fit?
+
+*/
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
-*/
 
-// SSD 2002 NEC 85054-611 CPU uses 16-bit ROMs
+   The 'Dyomos' console released in France appears to be nearly identical to XaviXPORT
+*/
 
 ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
@@ -1504,6 +1532,22 @@ ROM_START( xavbaseb )
 	ROM_LOAD( "xpbaseball.bin", 0x000000, 0x800000, CRC(e9ed692d) SHA1(537e390e972156dc7da66ee127ae4c8052038ee5) )
 ROM_END
 
+ROM_START( xavjmat )
+	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "xpjmat.bin", 0x000000, 0x1000000, CRC(71a51eef) SHA1(41fd2c3013d1c86756046ec9174e94400f8fa06d) )
+ROM_END
+
+ROM_START( tmy_thom )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "thomastank.bin", 0x000000, 0x800000, CRC(a52a23be) SHA1(e5b3500239d9e56eb5405f7585982959e5a162da) )
+ROM_END
+
 CONS( 2004, xavtenni, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbaseb, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// TODO: check SEEPROM type and hookup, banking!
+CONS( 2005, xavjmat,  0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// TODO: does it have an SEEPROM? why does it hang? full title?
+CONS( 2005, tmy_thom, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD / Tomy",  "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 
