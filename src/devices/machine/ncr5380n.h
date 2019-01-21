@@ -15,11 +15,6 @@
 
 #include "machine/nscsi_bus.h"
 
-#define MCFG_NCR5380N_IRQ_HANDLER(_devcb) \
-	downcast<ncr5380n_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_NCR5380N_DRQ_HANDLER(_devcb) \
-	downcast<ncr5380n_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 class ncr5380n_device : public nscsi_device
 {
@@ -27,9 +22,6 @@ public:
 	ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
-
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
 

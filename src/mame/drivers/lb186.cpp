@@ -116,9 +116,9 @@ void lb186_state::ncr5380(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_IRQ_HANDLER(WRITELINE(":maincpu", i80186_cpu_device, int1_w))
-	MCFG_NCR5380N_DRQ_HANDLER(WRITELINE(":maincpu", i80186_cpu_device, drq0_w))
+	downcast<ncr5380n_device &>(*device).set_clock(10000000);
+	downcast<ncr5380n_device &>(*device).irq_handler().set(":maincpu", FUNC(i80186_cpu_device::int1_w));
+	downcast<ncr5380n_device &>(*device).drq_handler().set(":maincpu", FUNC(i80186_cpu_device::drq0_w));
 }
 
 static void scsi_devices(device_slot_interface &device)

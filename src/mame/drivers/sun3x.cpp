@@ -623,8 +623,7 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE2, "harddisk", SCSIHD, SCSI_ID_5)
 
-	MCFG_DEVICE_ADD(ESP_TAG, NCR539X, 20000000/2)
-	MCFG_LEGACY_SCSI_PORT("scsi")
+	NCR539X(config, ESP_TAG, 20000000/2).set_scsi_port("scsi");
 
 	N82077AA(config, m_fdc, n82077aa_device::MODE_PS2);
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun3x_state::floppy_formats)
