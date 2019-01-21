@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(mc10_state::mc10)
 	MCFG_CASSETTE_INTERFACE("mc10_cass")
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("20K").set_extra_options("4K");
@@ -573,7 +573,7 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 	MCFG_CASSETTE_INTERFACE("mc10_cass")
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("24K").set_extra_options("8K");

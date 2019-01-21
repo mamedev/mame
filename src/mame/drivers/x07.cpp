@@ -1504,7 +1504,7 @@ MACHINE_CONFIG_START(x07_state::x07)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	TIMER(config, "blink_timer").configure_periodic(FUNC(x07_state::blink_timer), attotime::from_msec(300));
 

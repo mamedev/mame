@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_CASSETTE_INTERFACE("vg5k_cass")
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,48K");
