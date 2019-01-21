@@ -17,13 +17,12 @@ DEFINE_DEVICE_TYPE(VSMILE_PAD, vsmile_pad_device, "vsmile_pad", "V.Smile Control
 //**************************************************************************
 
 vsmile_pad_device::vsmile_pad_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VSMILE_PAD, tag, owner, clock)
-	, device_vsmile_ctrl_interface(mconfig, *this)
+	: vsmile_ctrl_device_base(mconfig, VSMILE_PAD, tag, owner, clock)
 	, m_io_joy(*this, "JOY")
 	, m_io_colors(*this, "COLORS")
 	, m_io_buttons(*this, "BUTTONS")
-	, m_uart_tx_timer(nullptr)
-	, m_pad_timer(nullptr)
+	, m_idle_timer(nullptr)
+	, m_ctrl_probe_count(0U)
 {
 }
 
@@ -33,113 +32,45 @@ vsmile_pad_device::~vsmile_pad_device()
 
 void vsmile_pad_device::device_start()
 {
-	m_pad_timer = timer_alloc(TIMER_PAD);
-	m_pad_timer->adjust(attotime::never);
+	vsmile_ctrl_device_base::device_start();
 
-	m_uart_tx_timer = timer_alloc(TIMER_UART_TX);
-	m_uart_tx_timer->adjust(attotime::never);
+	m_idle_timer = machine().scheduler().timer_alloc(
+			timer_expired_delegate(FUNC(vsmile_pad_device::handle_idle), this));
+	m_idle_timer->adjust(attotime::from_hz(1));
 
-	save_item(NAME(m_ctrl_cts));
 	save_item(NAME(m_ctrl_probe_history));
 	save_item(NAME(m_ctrl_probe_count));
-	save_item(NAME(m_uart_tx_fifo));
-	save_item(NAME(m_uart_tx_fifo_start));
-	save_item(NAME(m_uart_tx_fifo_end));
-	save_item(NAME(m_uart_tx_fifo_count));
 }
 
-void vsmile_pad_device::device_reset()
+void vsmile_pad_device::tx_complete()
 {
-	m_pad_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
-	m_uart_tx_timer->adjust(attotime::from_hz(9600/10), 0, attotime::from_hz(9600/10));
-
-	m_ctrl_cts = false;
-	memset(m_ctrl_probe_history, 0, 2);
-	m_ctrl_probe_count = 0;
-	memset(m_uart_tx_fifo, 0, 32);
-	m_uart_tx_fifo_start = 0;
-	m_uart_tx_fifo_end = 0;
-	m_uart_tx_fifo_count = 0;
-	m_uart_tx_state = XMIT_STATE_IDLE;
+	m_idle_timer->adjust(attotime::from_hz(1));
 }
 
-void vsmile_pad_device::cts_w(int state)
+void vsmile_pad_device::rx_complete(uint8_t data, bool select)
 {
-	//printf("%s CTS: %d\n", tag(), state);
-	m_ctrl_cts = state;
-}
-
-void vsmile_pad_device::data_w(uint8_t data)
-{
-	//printf("%s Receiving: %02x\n", tag(), data);
-	if ((data >> 4) == 7 || (data >> 4) == 11)
+	if (select)
 	{
-		m_ctrl_probe_history[0] = m_ctrl_probe_history[1];
-		m_ctrl_probe_history[1] = data;
-		const uint8_t response = ((m_ctrl_probe_history[0] + m_ctrl_probe_history[1] + 0x0f) & 0x0f) ^ 0x05;
-		uart_tx_fifo_push(0xb0 | response);
+		//printf("%s Receiving: %02x\n", tag(), data);
+		if ((data >> 4) == 7 || (data >> 4) == 11)
+		{
+			m_ctrl_probe_history[0] = m_ctrl_probe_history[1];
+			m_ctrl_probe_history[1] = data;
+			const uint8_t response = ((m_ctrl_probe_history[0] + m_ctrl_probe_history[1] + 0x0f) & 0x0f) ^ 0x05;
+			uart_tx_fifo_push(0xb0 | response);
+		}
 	}
 }
 
 void vsmile_pad_device::uart_tx_fifo_push(uint8_t data)
 {
-	if (m_uart_tx_fifo_count == ARRAY_LENGTH(m_uart_tx_fifo))
-	{
-		logerror("Warning: Trying to push more than %d bytes onto the controller Tx FIFO, data will be lost\n", ARRAY_LENGTH(m_uart_tx_fifo));
-	}
-
-	//printf("%s Pushing: %02x\n", tag(), data);
-	m_uart_tx_fifo[m_uart_tx_fifo_end] = data;
-	m_uart_tx_fifo_count++;
-	m_uart_tx_fifo_end = (m_uart_tx_fifo_end + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
+	m_idle_timer->reset();
+	queue_tx(data);
 }
 
-void vsmile_pad_device::handle_uart_tx()
+TIMER_CALLBACK_MEMBER(vsmile_pad_device::handle_idle)
 {
-	if (m_uart_tx_fifo_count == 0)
-		return;
-
-	if (m_uart_tx_state == XMIT_STATE_IDLE)
-	{
-		//printf("%s RTS: 1\n", tag());
-		m_uart_tx_state = XMIT_STATE_RTS;
-		rts_out(1);
-		return;
-	}
-	else if (m_uart_tx_state == XMIT_STATE_RTS)
-	{
-		// HACK: This should work. It doesn't.
-		//if (m_ctrl_cts)
-		//	m_uart_tx_state = XMIT_STATE_CTS;
-		//return;
-	}
-
-	//printf("%s Transmitting: %02x\n", tag(), m_uart_tx_fifo[m_uart_tx_fifo_start]);
-	data_out(m_uart_tx_fifo[m_uart_tx_fifo_start]);
-	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
-	m_uart_tx_fifo_count--;
-	if (m_uart_tx_fifo_count == 0)
-	{
-		m_uart_tx_state = XMIT_STATE_IDLE;
-		//printf("%s RTS: 0\n", tag());
-		rts_out(0);
-	}
-}
-
-void vsmile_pad_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_UART_TX:
-		handle_uart_tx();
-		break;
-	case TIMER_PAD:
-		uart_tx_fifo_push(0x55);
-		break;
-	default:
-		logerror("Unknown timer ID: %d\n", id);
-		break;
-	}
+	queue_tx(0x55);
 }
 
 INPUT_CHANGED_MEMBER(vsmile_pad_device::pad_joy_changed)

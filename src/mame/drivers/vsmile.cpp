@@ -119,7 +119,7 @@ private:
 	required_ioport m_dsw_region;
 
 	bool m_ctrl_rts[2];
-	bool m_ctrl_cts[2];
+	bool m_ctrl_select[2];
 };
 
 class vsmileb_state : public vsmile_base_state
@@ -201,18 +201,18 @@ void vsmile_state::machine_start()
 	vsmile_base_state::machine_start();
 
 	save_item(NAME(m_ctrl_rts));
-	save_item(NAME(m_ctrl_cts));
+	save_item(NAME(m_ctrl_select));
 }
 
 void vsmile_state::machine_reset()
 {
-	memset(m_ctrl_rts, 0, sizeof(bool) * 2);
-	memset(m_ctrl_cts, 0, sizeof(bool) * 2);
+	std::fill(std::begin(m_ctrl_rts), std::end(m_ctrl_rts), false);
+	std::fill(std::begin(m_ctrl_select), std::end(m_ctrl_select), false);
 }
 
 WRITE8_MEMBER(vsmile_state::ctrl_tx_w)
 {
-	//printf("Transmitting: %02x\n", data);
+	//printf("Ctrl Tx: %02x\n", data);
 	m_spg->uart_rx(data);
 }
 
@@ -225,16 +225,11 @@ template <int Which> WRITE_LINE_MEMBER(vsmile_state::ctrl_rts_w)
 
 WRITE8_MEMBER(vsmile_state::uart_rx)
 {
-	if (m_ctrl_cts[0])
-	{
-		//printf("Ctrl0 Rx: %02x\n", data);
-		m_ctrl[0]->data_w(data);
-	}
-	if (m_ctrl_cts[1])
-	{
-		//printf("Ctrl1 Rx: %02x\n", data);
-		m_ctrl[1]->data_w(data);
-	}
+	//printf("Ctrl Rx: %02x\n", data);
+	m_ctrl[0]->data_w(data);
+#if ENABLE_2PADS
+	m_ctrl[1]->data_w(data);
+#endif
 }
 
 READ16_MEMBER(vsmile_state::portb_r)
@@ -257,16 +252,16 @@ WRITE16_MEMBER(vsmile_state::portc_w)
 {
 	if (BIT(mem_mask, 8))
 	{
-		//printf("Ctrl0 CTS: %d\n", BIT(data, 8));
-		m_ctrl_cts[0] = BIT(data, 8);
-		m_ctrl[0]->cts_w(m_ctrl_cts[0]);
+		//printf("Ctrl0 SEL: %d\n", BIT(data, 8));
+		m_ctrl_select[0] = BIT(data, 8);
+		m_ctrl[0]->select_w(m_ctrl_select[0]);
 	}
 	if (BIT(mem_mask, 9))
 	{
-		//printf("Ctrl1 CTS: %d\n", BIT(data, 9));
-		m_ctrl_cts[1] = BIT(data, 9);
+		//printf("Ctrl1 SEL: %d\n", BIT(data, 9));
+		m_ctrl_select[1] = BIT(data, 9);
 #if ENABLE_2PADS
-		m_ctrl[1]->cts_w(m_ctrl_cts[1]);
+		m_ctrl[1]->select_w(m_ctrl_select[1]);
 #endif
 	}
 }
