@@ -172,7 +172,12 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 	bool const was_empty(m_tx_fifo_empty);
 	if (!was_empty && (m_tx_fifo_head == m_tx_fifo_tail))
 	{
-		LOG("discarding byte %02X because FIFO is full (length %u, Tx %sactive)\n", data, ARRAY_LENGTH(m_tx_fifo), m_tx_active ? "" : "in");
+		LOG(
+				"%s: discarding byte %02X because FIFO is full (length %u, Tx %sactive)\n",
+				machine().describe_context(),
+				data,
+				ARRAY_LENGTH(m_tx_fifo),
+				m_tx_active ? "" : "in");
 		return false;
 	}
 
@@ -187,20 +192,20 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 		rts_out(1);
 		if (m_select)
 		{
-			LOG("transmitting byte %02X immediately (Tx was %sactive)\n", data, m_tx_active ? "" : "in");
+			LOG("%s: transmitting byte %02X immediately (Tx was %sactive)\n", machine().describe_context(), data, m_tx_active ? "" : "in");
 			m_tx_active = true;
 			m_tx_timer->adjust(attotime::from_hz(9600 / 10));
 		}
 		else
 		{
-			LOG("asserting RTS to transmit byte %02X\n", data);
+			LOG("%s: asserting RTS to transmit byte %02X\n", machine().describe_context(), data);
 			m_rts_timer->adjust(attotime::from_msec(500));
 		}
 	}
 	else
 	{
 		unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
-		LOG("queued byte %02X (%u bytes queued, Tx %sactive)\n", data, fifo_used, m_tx_active ? "" : "in");
+		LOG("%s: queued byte %02X (%u bytes queued, Tx %sactive)\n", machine().describe_context(), data, fifo_used, m_tx_active ? "" : "in");
 	}
 
 	// data was queued
@@ -215,13 +220,13 @@ void vsmile_ctrl_device_base::select_w(int state)
 		{
 			m_rts_timer->reset();
 			unsigned const fifo_used((m_tx_fifo_tail + ARRAY_LENGTH(m_tx_fifo) - m_tx_fifo_head) % ARRAY_LENGTH(m_tx_fifo));
-			LOG("select asserted, starting transmission (%u bytes queued)\n", fifo_used);
+			LOG("%s: select asserted, starting transmission (%u bytes queued)\n", machine().describe_context(), fifo_used);
 			m_tx_active = true;
 			m_tx_timer->adjust(attotime::from_hz(9600 / 10));
 		}
 		else
 		{
-			LOG("select %sasserted (Tx %sactive)\n", state ? "" : "de", m_tx_active ? "" : "in");
+			LOG("%s: select %sasserted (Tx %sactive)\n", machine().describe_context(), state ? "" : "de", m_tx_active ? "" : "in");
 		}
 		m_select = bool(state);
 	}
@@ -229,7 +234,12 @@ void vsmile_ctrl_device_base::select_w(int state)
 
 void vsmile_ctrl_device_base::data_w(uint8_t data)
 {
-	LOG("received byte %02X (select %sasserted, Tx %sactive)\n", data, m_select ? "" : "de", m_tx_active ? "" : "in");
+	LOG(
+			"%s: received byte %02X (select %sasserted, Tx %sactive)\n",
+			machine().describe_context(),
+			data,
+			m_select ? "" : "de",
+			m_tx_active ? "" : "in");
 	rx_complete(data, m_select);
 }
 

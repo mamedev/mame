@@ -145,7 +145,8 @@ void vsmile_pad_device::rx_complete(uint8_t data, bool select)
 			m_ctrl_probe_history[1] = data;
 			uint8_t const response = ((m_ctrl_probe_history[0] + m_ctrl_probe_history[1] + 0x0f) & 0x0f) ^ 0x05;
 			LOG(
-					"received probe %02X, %02X, sending response %02X\n",
+					"%s: received probe %02X, %02X, sending response %02X\n",
+					machine().describe_context(),
 					m_ctrl_probe_history[0],
 					m_ctrl_probe_history[1],
 					0xb0 | response);
@@ -213,7 +214,7 @@ INPUT_CHANGED_MEMBER(vsmile_pad_device::pad_color_changed)
 		else
 		{
 			m_sent_colors = m_io_colors->read();
-			uart_tx_fifo_push(0x90 | m_io_colors->read());
+			uart_tx_fifo_push(0x90 | m_sent_colors);
 		}
 	}
 }
