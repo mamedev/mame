@@ -193,7 +193,7 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 		else
 		{
 			LOG("asserting RTS to transmit byte %02X\n", data);
-			m_rts_timer->adjust(attotime::from_msec(500));
+			m_rts_timer->adjust(attotime::from_msec(100));
 		}
 	}
 	else
@@ -290,6 +290,8 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::rts_timer_expired)
 		m_tx_fifo_head = m_tx_fifo_tail = 0U;
 		m_tx_fifo_empty = true;
 		tx_timeout();
+		if (m_tx_fifo_empty)
+			rts_out(0);
 	}
 }
 
