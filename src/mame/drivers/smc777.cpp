@@ -1067,7 +1067,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	BEEP(config, m_beeper, 300); // TODO: correct frequency
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", smc777_state, keyboard_callback, attotime::from_hz(240/32))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(smc777_state::keyboard_callback), attotime::from_hz(240/32));
 MACHINE_CONFIG_END
 
 /* ROM definition */

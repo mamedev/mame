@@ -529,10 +529,11 @@ MACHINE_CONFIG_START(svision_state::svision)
 	PALETTE(config, m_palette, FUNC(svision_state::svision_palette), ARRAY_LENGTH(svision_pens));
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(svision_state::svisions)
+void svision_state::svisions(machine_config &config)
+{
 	svision(config);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pet_timer", svision_state, svision_pet_timer_dev, attotime::from_seconds(8))
-MACHINE_CONFIG_END
+	TIMER(config, "pet_timer").configure_periodic(FUNC(svision_state::svision_pet_timer_dev), attotime::from_seconds(8));
+}
 
 MACHINE_CONFIG_START(svision_state::svisionp)
 	svision(config);

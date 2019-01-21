@@ -1022,7 +1022,7 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", tek4051_state, keyboard_tick, attotime::from_hz(XTAL(12'500'000)/15/4))
+	TIMER(config, "keyboard").configure_periodic(FUNC(tek4051_state::keyboard_tick), attotime::from_hz(XTAL(12'500'000)/15/4));
 
 	pia6821_device &piax(PIA6821(config, MC6820_X_TAG, 0));
 	piax.readpa_handler().set(FUNC(tek4051_state::x_pia_pa_r));

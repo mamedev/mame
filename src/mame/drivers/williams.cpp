@@ -1495,10 +1495,10 @@ MACHINE_CONFIG_START(williams_state::williams)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 (Defender), 5114 or 6514 (later games) + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+	TIMER(config, "scan_timer").configure_scanline(FUNC(williams_state::williams_va11_callback), "screen", 0, 32);
 
 	// also set a timer to go off on scanline 240
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
+	TIMER(config, "240_timer").configure_scanline(FUNC(williams_state::williams_count240_callback), "screen", 0, 240);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1607,7 +1607,8 @@ MACHINE_CONFIG_START(spdball_state::spdball)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(williams_state::lottofun)
+void williams_state::lottofun(machine_config &config)
+{
 	williams(config);
 
 	/* basic machine hardware */
@@ -1616,8 +1617,8 @@ MACHINE_CONFIG_START(williams_state::lottofun)
 	m_pia[0]->writepa_handler().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7);
 	m_pia[0]->ca2_handler().set(FUNC(williams_state::lottofun_coin_lock_w));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+}
 
 
 MACHINE_CONFIG_START(williams_state::sinistar)
@@ -1749,10 +1750,10 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5114 + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)
+	TIMER(config, "scan_timer").configure_scanline(FUNC(williams2_state::williams2_va11_callback), "screen", 0, 32);
 
 	// also set a timer to go off on scanline 254
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("254_timer", williams2_state, williams2_endscreen_callback, "screen", 8, 246)
+	TIMER(config, "254_timer").configure_scanline(FUNC(williams2_state::williams2_endscreen_callback), "screen", 8, 246);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

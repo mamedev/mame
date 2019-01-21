@@ -773,12 +773,12 @@ MACHINE_CONFIG_START(kas89_state::kas89)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
 	MCFG_DEVICE_PROGRAM_MAP(kas89_map)
 	MCFG_DEVICE_IO_MAP(kas89_io)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_nmi", kas89_state, kas89_nmi_cb, attotime::from_hz(138))
+	TIMER(config, "kas89_nmi").configure_periodic(FUNC(kas89_state::kas89_nmi_cb), attotime::from_hz(138));
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/6)   /* Confirmed */
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 	MCFG_DEVICE_IO_MAP(audio_io)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kas89_snmi", kas89_state, kas89_sound_nmi_cb, attotime::from_hz(138))
+	TIMER(config, "kas89_snmi").configure_periodic(FUNC(kas89_state::kas89_sound_nmi_cb), attotime::from_hz(138));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

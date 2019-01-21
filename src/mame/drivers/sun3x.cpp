@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", sun_floppies, "35hd", sun3x_state::floppy_formats)
 
 	// the timekeeper has no interrupt output, so 3/80 includes a dedicated timer circuit
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3x_state, sun380_timer, attotime::from_hz(100))
+	TIMER(config, "timer").configure_periodic(FUNC(sun3x_state::sun380_timer), attotime::from_hz(100));
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun3x_state, bw2_update)

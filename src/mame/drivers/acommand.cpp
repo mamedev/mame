@@ -473,7 +473,7 @@ MACHINE_CONFIG_START(acommand_state::acommand)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",M68000,12000000)
 	MCFG_DEVICE_PROGRAM_MAP(acommand_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", acommand_state, acommand_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(acommand_state::acommand_scanline), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

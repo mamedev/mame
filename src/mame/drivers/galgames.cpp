@@ -984,7 +984,7 @@ int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(galgames_state::scanline_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_GALGAMES_SLOT_ADD("slot")

@@ -413,8 +413,8 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", proteus3_state, timer_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", proteus3_state, timer_p, attotime::from_hz(40000))
+	TIMER(config, "timer_c").configure_periodic(FUNC(proteus3_state::timer_c), attotime::from_hz(4800));
+	TIMER(config, "timer_p").configure_periodic(FUNC(proteus3_state::timer_p), attotime::from_hz(40000));
 
 	// optional tty keyboard
 	ACIA6850(config, m_acia2, 0);

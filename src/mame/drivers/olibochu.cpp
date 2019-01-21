@@ -464,7 +464,7 @@ MACHINE_CONFIG_START(olibochu_state::olibochu)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz ?? */
 	MCFG_DEVICE_PROGRAM_MAP(olibochu_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", olibochu_state, olibochu_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(olibochu_state::olibochu_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ?? */
 	MCFG_DEVICE_PROGRAM_MAP(olibochu_sound_map)

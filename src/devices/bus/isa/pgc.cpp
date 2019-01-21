@@ -158,9 +158,9 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
 #endif
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", isa8_pgc_device, scanline_callback,
-		attotime::from_hz(60*PGC_TOTAL_VERT))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(50'000'000)/(2*PGC_HORZ_START)))
+	timer_device &scantimer(TIMER(config, "scantimer"));
+	scantimer.configure_periodic(FUNC(isa8_pgc_device::scanline_callback), attotime::from_hz(60*PGC_TOTAL_VERT));
+	scantimer.set_start_delay(attotime::from_hz(XTAL(50'000'000)/(2*PGC_HORZ_START)));
 
 	MCFG_SCREEN_ADD(PGC_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(50'000'000)/2,

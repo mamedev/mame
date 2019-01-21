@@ -1419,7 +1419,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* dummy timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))
+	TIMER(config, "dummy_timer").configure_periodic(FUNC(nc_state::dummy_timer_callback), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nc100_state::nc100)

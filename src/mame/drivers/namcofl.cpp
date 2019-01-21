@@ -561,9 +561,9 @@ MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
 	MCFG_DEVICE_IO_MAP(namcoc75_io)
 	/* TODO: irq generation for these */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcofl_state, mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcofl_state, mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcofl_state, mcu_adc_cb, attotime::from_hz(60))
+	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcofl_state::mcu_irq0_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcofl_state::mcu_irq2_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_adc").configure_periodic(FUNC(namcofl_state::mcu_adc_cb), attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(namcofl_state,namcofl)
 	MCFG_MACHINE_RESET_OVERRIDE(namcofl_state,namcofl)

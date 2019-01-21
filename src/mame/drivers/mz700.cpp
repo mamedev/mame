@@ -397,8 +397,8 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* ne556 timers */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cursor", mz_state, ne556_cursor_callback, attotime::from_hz(1.5))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("other", mz_state, ne556_other_callback, attotime::from_hz(34.5))
+	TIMER(config, "cursor").configure_periodic(FUNC(mz_state::ne556_cursor_callback), attotime::from_hz(1.5));
+	TIMER(config, "other").configure_periodic(FUNC(mz_state::ne556_other_callback), attotime::from_hz(34.5));
 
 	/* devices */
 	PIT8253(config, m_pit, 0);

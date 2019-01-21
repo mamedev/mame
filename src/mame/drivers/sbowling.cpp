@@ -416,7 +416,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(19'968'000)/10)   /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_IO_MAP(port_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(sbowling_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

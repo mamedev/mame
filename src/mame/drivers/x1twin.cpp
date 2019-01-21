@@ -515,8 +515,8 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", x1twin_state, x1_keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1twin_state, x1_cmt_wind_timer, attotime::from_hz(16))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::x1_keyboard_callback), attotime::from_hz(250));
+	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::x1_cmt_wind_timer), attotime::from_hz(16));
 MACHINE_CONFIG_END
 
 ROM_START( x1twin )

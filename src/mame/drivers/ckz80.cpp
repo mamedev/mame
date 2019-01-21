@@ -436,13 +436,14 @@ MACHINE_CONFIG_START(ckz80_state::master)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL/2)
 	MCFG_DEVICE_PROGRAM_MAP(master_trampoline)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", ckz80_state, irq_on, attotime::from_hz(429)) // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(429) - attotime::from_nsec(22870)) // active for 22.87us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", ckz80_state, irq_off, attotime::from_hz(429))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(ckz80_state::irq_on), attotime::from_hz(429)); // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
+	irq_on.set_start_delay(attotime::from_hz(429) - attotime::from_nsec(22870)); // active for 22.87us
+	TIMER(config, "irq_off").configure_periodic(FUNC(ckz80_state::irq_off), attotime::from_hz(429));
 
 	ADDRESS_MAP_BANK(config, "master_map").set_map(&ckz80_state::master_map).set_options(ENDIANNESS_LITTLE, 8, 16);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", ckz80_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(ckz80_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_ck_master);
 
 	/* sound hardware */

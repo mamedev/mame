@@ -648,7 +648,7 @@ MACHINE_CONFIG_START(popobear_state::popobear)
 	// levels 2,3,5 look interesting
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popobear_state, irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(popobear_state::irq), "screen", 0, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

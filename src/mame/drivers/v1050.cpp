@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	// keyboard HACK
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", v1050_state, v1050_keyboard_tick, attotime::from_hz(60))
+	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));
 
 	// video hardware
 	v1050_video(config);
@@ -1120,8 +1120,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
 	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
 
-	MCFG_TIMER_DRIVER_ADD(TIMER_ACK_TAG, v1050_state, sasi_ack_tick)
-	MCFG_TIMER_DRIVER_ADD(TIMER_RST_TAG, v1050_state, sasi_rst_tick)
+	TIMER(config, m_timer_ack).configure_generic(FUNC(v1050_state::sasi_ack_tick));
+	TIMER(config, m_timer_rst).configure_generic(FUNC(v1050_state::sasi_rst_tick));
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "v1050_flop")

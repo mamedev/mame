@@ -872,10 +872,11 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
 	TM990_189_RS232(config, "rs232", 0, m_tms9902);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
+	timer_device &display_timer(TIMER(config, "display_timer"));
+	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
 	// Need to delay the timer, or it will spoil the initial LOAD
 	// TODO: Fix this, probably inside CPU
-	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
+	display_timer.set_start_delay(attotime::from_msec(150));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
@@ -934,8 +935,9 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
 	TM990_189_RS232(config, "rs232", 0, m_tms9902);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
-	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
+	timer_device &display_timer(TIMER(config, "display_timer"));
+	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
+	display_timer.set_start_delay(attotime::from_msec(150));
 MACHINE_CONFIG_END
 
 

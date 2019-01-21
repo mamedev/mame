@@ -196,7 +196,7 @@ MACHINE_CONFIG_START(novagf8_state::delta1)
 	f3853_device &f3853(F3853(config, "f3853", 2000000));
 	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novagf8_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(novagf8_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_delta1);
 MACHINE_CONFIG_END
 

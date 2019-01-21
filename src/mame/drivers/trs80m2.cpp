@@ -747,7 +747,7 @@ MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
 	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
+	TIMER(config, "ctc").configure_periodic(FUNC(trs80m2_state::ctc_tick), attotime::from_hz(8_MHz_XTAL / 2 / 2));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
 	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
@@ -836,7 +836,7 @@ MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80dart_device::txca_w));
 	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80dart_device::rxtxcb_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(8_MHz_XTAL / 2 / 2))
+	TIMER(config, "ctc").configure_periodic(FUNC(trs80m2_state::ctc_tick), attotime::from_hz(8_MHz_XTAL / 2 / 2));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
 	m_dmac->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);

@@ -580,13 +580,13 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) // JX-1689F1028N GRX586.V5
 	MCFG_DEVICE_PROGRAM_MAP(skilldrp_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", astrocorp_state, skilldrp_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(astrocorp_state::skilldrp_scanline), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW );
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

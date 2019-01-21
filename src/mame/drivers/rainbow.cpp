@@ -3335,7 +3335,7 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 	prtbrg.set_stages(8);
 	prtbrg.count_out_cb().set(FUNC(rainbow_state::bitrate_counter_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
+	TIMER(config, "motor").configure_periodic(FUNC(rainbow_state::hd_motor_tick), attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

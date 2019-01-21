@@ -1035,7 +1035,7 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun3_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
+	TIMER(config, "timer").configure_periodic(FUNC(sun3_state::sun3_timer), attotime::from_hz(100));
 
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
@@ -1124,7 +1124,7 @@ MACHINE_CONFIG_START(sun3_state::sun3_50)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", sun3_state, sun3_timer, attotime::from_hz(100))
+	TIMER(config, "timer").configure_periodic(FUNC(sun3_state::sun3_timer), attotime::from_hz(100));
 
 	RAM(config, m_ram).set_default_size("4M").set_default_value(0x00);
 

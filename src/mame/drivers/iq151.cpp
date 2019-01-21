@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
 	MCFG_CASSETTE_INTERFACE("iq151_cass")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", iq151_state, cassette_timer, attotime::from_hz(2000))
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(iq151_state::cassette_timer), attotime::from_hz(2000));
 
 	/* cartridge */
 	MCFG_DEVICE_ADD("slot1", IQ151CART_SLOT, 0)

@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80,CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu1)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ikki_state, ikki_irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ikki_state::ikki_irq), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", Z80,CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)

@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(mk2_state::mk2)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk2_state, update_leds, attotime::from_hz(60))
+	TIMER(config, "led_timer").configure_periodic(FUNC(mk2_state::update_leds), attotime::from_hz(60));
 MACHINE_CONFIG_END
 
 

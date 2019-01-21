@@ -568,7 +568,7 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_DEVICE_ADD("master", Z80, XTAL(12'000'000)/2)   /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(master_map)
 	MCFG_DEVICE_IO_MAP(master_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airbustr_state, airbustr_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(airbustr_state::airbustr_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("slave", Z80, XTAL(12'000'000)/2)    /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(slave_map)

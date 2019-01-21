@@ -267,17 +267,17 @@ void vicdual_state::machine_start()
 }
 
 
-MACHINE_CONFIG_START(vicdual_state::vicdual_root)
-
+void vicdual_state::vicdual_root(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
+	Z80(config, m_maincpu, VICDUAL_MAIN_CPU_CLOCK);
 
-	MCFG_TIMER_DRIVER_ADD("coinstate", vicdual_state, clear_coin_status)
+	TIMER(config, m_coinstate_timer).configure_generic(FUNC(vicdual_state::clear_coin_status));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART);
+}
 
 
 
@@ -2599,8 +2599,8 @@ MACHINE_CONFIG_START(nsub_state::nsub)
 	MCFG_DEVICE_PROGRAM_MAP(nsub_map)
 	MCFG_DEVICE_IO_MAP(nsub_io_map)
 
-	MCFG_TIMER_DRIVER_ADD("coinstate", nsub_state, clear_coin_status)
-	MCFG_TIMER_DRIVER_ADD("nsub_coin", nsub_state, nsub_coin_pulse)
+	TIMER(config, m_coinstate_timer).configure_generic(FUNC(nsub_state::clear_coin_status));
+	TIMER(config, m_nsub_coinage_timer).configure_generic(FUNC(nsub_state::nsub_coin_pulse));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

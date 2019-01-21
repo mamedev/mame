@@ -747,9 +747,9 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)
-	MCFG_TIMER_DRIVER_ADD("int3off_timer", atarisy1_state, atarisy1_int3off_callback)
-	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
+	TIMER(config, m_scanline_timer).configure_generic(FUNC(atarisy1_state::atarisy1_int3_callback));
+	TIMER(config, m_int3off_timer).configure_generic(FUNC(atarisy1_state::atarisy1_int3off_callback));
+	TIMER(config, m_yscroll_reset_timer).configure_generic(FUNC(atarisy1_state::atarisy1_reset_yscroll_callback));
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarisy1)

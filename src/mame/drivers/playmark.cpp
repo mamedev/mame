@@ -1273,8 +1273,8 @@ MACHINE_CONFIG_START(playmark_state::hotmind)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,hotmind)
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
-	MCFG_TICKET_DISPENSER_ADD("token",  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1317,8 +1317,8 @@ MACHINE_CONFIG_START(playmark_state::luckboomh)
 
 	MCFG_VIDEO_START_OVERRIDE(playmark_state,luckboomh)
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
-	MCFG_TICKET_DISPENSER_ADD("token",  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_token,  attotime::from_msec(350), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

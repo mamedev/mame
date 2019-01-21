@@ -911,7 +911,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
 	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
+	TIMER(config, "1hz").configure_periodic(FUNC(spc1500_state::timer), attotime::from_hz(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

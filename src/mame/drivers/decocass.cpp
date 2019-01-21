@@ -958,7 +958,7 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
 	MCFG_DEVICE_PROGRAM_MAP(decocass_sound_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
+	TIMER(config, "audionmi").configure_scanline(FUNC(decocass_state::decocass_audio_nmi_gen), "screen", 0, 8);
 
 	I8041(config, m_mcu, HCLK);
 	m_mcu->p1_in_cb().set(FUNC(decocass_state::i8041_p1_r));

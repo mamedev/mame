@@ -913,17 +913,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(astrof_state::base)
-
+void astrof_state::base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank", astrof_state, irq_callback, "screen", VBSTART, 0)
+	M6502(config, m_maincpu, MAIN_CPU_CLOCK);
+	TIMER(config, "vblank").configure_scanline(FUNC(astrof_state::irq_callback), "screen", VBSTART, 0);
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+}
 
 
 MACHINE_CONFIG_START(astrof_state::astrof)

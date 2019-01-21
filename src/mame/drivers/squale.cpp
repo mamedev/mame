@@ -828,7 +828,7 @@ MACHINE_CONFIG_START(squale_state::squale)
 	m_ef9365->set_palette_tag("palette");
 	m_ef9365->set_nb_bitplanes(4);
 	m_ef9365->set_display_mode(ef9365_device::DISPLAY_MODE_256x256);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
+	TIMER(config, "squale_sl").configure_scanline(FUNC(squale_state::squale_scanline), "screen", 0, 10);
 
 	/* Floppy */
 	WD1770(config, m_fdc, 8_MHz_XTAL);

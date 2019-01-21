@@ -285,8 +285,8 @@ MACHINE_CONFIG_START(acrnsys1_state::acrnsys1)
 
 	MCFG_CASSETTE_ADD( "cassette" )
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_c", acrnsys1_state, acrnsys1_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("acrnsys1_p", acrnsys1_state, acrnsys1_p, attotime::from_hz(40000))
+	TIMER(config, "acrnsys1_c").configure_periodic(FUNC(acrnsys1_state::acrnsys1_c), attotime::from_hz(4800));
+	TIMER(config, "acrnsys1_p").configure_periodic(FUNC(acrnsys1_state::acrnsys1_p), attotime::from_hz(40000));
 MACHINE_CONFIG_END
 
 

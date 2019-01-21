@@ -785,8 +785,8 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_CASSETTE_INTERFACE("alphatro_cass")
 	MCFG_SOFTWARE_LIST_ADD("cass_list","alphatro_cass")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", alphatro_state, timer_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", alphatro_state, timer_p, attotime::from_hz(40000))
+	TIMER(config, "timer_c").configure_periodic(FUNC(alphatro_state::timer_c), attotime::from_hz(4800));
+	TIMER(config, "timer_p").configure_periodic(FUNC(alphatro_state::timer_p), attotime::from_hz(40000));
 
 	RAM(config, "ram").set_default_size("64K");
 

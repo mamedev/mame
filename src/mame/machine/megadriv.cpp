@@ -877,9 +877,10 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-MACHINE_CONFIG_START(md_base_state::megadriv_timers)
-	MCFG_TIMER_DEVICE_ADD(m_scan_timer, "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
-MACHINE_CONFIG_END
+void md_base_state::megadriv_timers(machine_config &config)
+{
+	TIMER(config, m_scan_timer).configure_generic("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback));
+}
 
 
 MACHINE_CONFIG_START(md_base_state::md_ntsc)

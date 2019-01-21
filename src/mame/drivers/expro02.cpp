@@ -904,7 +904,7 @@ MACHINE_CONFIG_START(expro02_state::expro02)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(expro02_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", expro02_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(expro02_state::scanline), "screen", 0, 1);
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
 

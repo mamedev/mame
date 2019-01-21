@@ -859,7 +859,7 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
 	MCFG_DEVICE_PROGRAM_MAP(firetrk_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", firetrk_state, firetrk_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(firetrk_state::firetrk_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 5);
 

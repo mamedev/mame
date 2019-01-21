@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, keyboard_timer_callback, attotime::from_hz(50))
+	TIMER(config, "keyboard").configure_periodic(FUNC(einstein_state::keyboard_timer_callback), attotime::from_hz(50));
 
 	z80pio_device& pio(Z80PIO(config, IC_I063, XTAL_X002 / 2));
 	pio.out_int_callback().set(FUNC(einstein_state::int_w<0>));
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_TIMER_DRIVER_ADD("strobe", einstein_state, strobe_callback)
+	TIMER(config, m_strobe_timer).configure_generic(FUNC(einstein_state::strobe_callback));
 
 	// uart
 	i8251_device &ic_i060(I8251(config, IC_I060, XTAL_X002 / 4));

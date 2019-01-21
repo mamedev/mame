@@ -125,7 +125,7 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc_state, kc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kc_state::kc_scanline), "screen", 0, 1);
 
 	PALETTE(config, "palette", FUNC(kc_state::kc85_palette), KC85_PALETTE_SIZE);
 
@@ -205,7 +205,7 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc85_4_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc85_4_state, kc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kc85_4_state::kc_scanline), "screen", 0, 1);
 
 	PALETTE(config, "palette", FUNC(kc85_4_state::kc85_palette), KC85_PALETTE_SIZE);
 

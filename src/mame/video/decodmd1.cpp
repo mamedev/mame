@@ -203,7 +203,7 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", decodmd_type1_device, dmd_nmi, attotime::from_hz(2000))  // seems a lot
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(decodmd_type1_device::dmd_nmi), attotime::from_hz(2000));  // seems a lot
 
 	MCFG_SCREEN_ADD("dmd", LCD)
 	MCFG_SCREEN_SIZE(128, 16)

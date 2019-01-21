@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(busicom_state::busicom)
 
 	PALETTE(config, m_palette, FUNC(busicom_state::busicom_palette), 16);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("busicom_timer", busicom_state, timer_callback, attotime::from_msec(28*2))
+	TIMER(config, "busicom_timer").configure_periodic(FUNC(busicom_state::timer_callback), attotime::from_msec(28*2));
 MACHINE_CONFIG_END
 
 /* ROM definition */

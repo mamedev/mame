@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(vball_state::vball)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)   /* 2 MHz - measured by guru but it makes the game far far too slow ?! */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vball_state, vball_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(vball_state::vball_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3579545)  /* 3.579545 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

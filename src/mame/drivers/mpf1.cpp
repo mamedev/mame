@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
+	TIMER(config, "halt_timer").configure_periodic(FUNC(mpf1_state::check_halt_callback), attotime::from_hz(1));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpf1_state::mpf1b)
@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	MCFG_DEVICE_ADD(TMS5220_TAG, TMS5220, 680000L)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
+	TIMER(config, "halt_timer").configure_periodic(FUNC(mpf1_state::check_halt_callback), attotime::from_hz(1));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mpf1_state::mpf1p)
@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))
+	TIMER(config, "halt_timer").configure_periodic(FUNC(mpf1_state::check_halt_callback), attotime::from_hz(1));
 MACHINE_CONFIG_END
 
 /* ROMs */

@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(20_MHz_XTAL / 8))
+	//TIMER(config, "ctc").configure_periodic(FUNC(xerox820_state::ctc_tick), attotime::from_hz(20_MHz_XTAL / 8));
 
 	FD1771(config, m_fdc, 20_MHz_XTAL / 20);
 	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
@@ -719,7 +719,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(16_MHz_XTAL / 4))
+	//TIMER(config, "ctc").configure_periodic(FUNC(xerox820_state::ctc_tick), attotime::from_hz(16_MHz_XTAL / 4));
 
 	FD1797(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));

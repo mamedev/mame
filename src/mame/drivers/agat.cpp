@@ -1081,7 +1081,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_DEVICE_PROGRAM_MAP(agat7_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(agat7_state::timer_irq), A7_VIDEO_TAG ":a7screen", 0, 1);
 
 	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
 
@@ -1112,7 +1112,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	m_ay3600->ako().set(FUNC(agat7_state::ay3600_ako_w));
 
 	/* repeat timer.  10 Hz per Mymrin's book */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", agat7_state, ay3600_repeat, attotime::from_hz(10))
+	TIMER(config, "repttmr").configure_periodic(FUNC(agat7_state::ay3600_repeat), attotime::from_hz(10));
 
 	/*
 	 * slot 0 is reserved for SECAM encoder or Apple II compat card.

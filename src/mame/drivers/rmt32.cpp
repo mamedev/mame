@@ -370,9 +370,9 @@ MACHINE_CONFIG_START(mt32_state::mt32)
 
 	SED1200D0A(config, lcd, 0);
 
-	MCFG_TIMER_DRIVER_ADD( "midi_timer", mt32_state, midi_timer_cb )
+	TIMER(config, midi_timer).configure_generic(FUNC(mt32_state::midi_timer_cb));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC( "samples_timer", mt32_state, samples_timer_cb, attotime::from_hz(32000*2) )
+	TIMER(config, "samples_timer").configure_periodic(FUNC(mt32_state::samples_timer_cb), attotime::from_hz(32000*2));
 MACHINE_CONFIG_END
 
 ROM_START( mt32 )

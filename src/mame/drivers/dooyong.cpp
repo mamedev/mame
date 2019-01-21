@@ -1730,7 +1730,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 
 	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)  // 8MHz measured on Super-X
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rshark_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(rshark_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8_MHz_XTAL/2)  // 4MHz measured on Super-X
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
@@ -1781,7 +1781,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	// basic machine hardware
 	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)   // 10MHz measured
 	MCFG_DEVICE_PROGRAM_MAP(popbingo_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popbingo_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(popbingo_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL/4)     // 4MHz measured
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)

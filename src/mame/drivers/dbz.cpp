@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(dbz_state::dbz)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(dbz_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dbz_state, dbz_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dbz_state::dbz_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(dbz_sound_map)

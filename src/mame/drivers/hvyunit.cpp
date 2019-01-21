@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_DEVICE_ADD("master", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
 	MCFG_DEVICE_PROGRAM_MAP(master_memory)
 	MCFG_DEVICE_IO_MAP(master_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hvyunit_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hvyunit_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("slave", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
 	MCFG_DEVICE_PROGRAM_MAP(slave_memory)

@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(abc800_state::common)
 	m_ctc->zc_callback<1>().set(FUNC(abc800_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxca_w));
 	m_ctc->zc_callback<2>().append(m_dart, FUNC(z80dart_device::txca_w));
-	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CTC_TAG, abc800_state, ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
+	TIMER(config, TIMER_CTC_TAG).configure_periodic(FUNC(abc800_state::ctc_tick), attotime::from_hz(ABC800_X01/2/2/2));
 
 	Z80SIO(config, m_sio, ABC800_X01/2/2);
 	m_sio->out_txda_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
@@ -1085,7 +1085,7 @@ MACHINE_CONFIG_START(abc800_state::common)
 
 	MCFG_CASSETTE_ADD(CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_CASSETTE_TAG, abc800_state, cassette_input_tick, attotime::from_hz(44100))
+	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));

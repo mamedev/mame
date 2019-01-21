@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 
 	EF9345(config, m_ef9345, 0);
 	m_ef9345->set_palette_tag("palette");
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
+	TIMER(config, "alice32_sl").configure_scanline(FUNC(mc10_state::alice32_scanline), "screen", 0, 10);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

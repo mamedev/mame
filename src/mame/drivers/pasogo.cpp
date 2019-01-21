@@ -574,7 +574,7 @@ MACHINE_CONFIG_START(pasogo_state::pasogo)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pasogo")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vg230_timer", pasogo_state, vg230_timer, attotime::from_hz(1))
+	TIMER(config, "vg230_timer").configure_periodic(FUNC(pasogo_state::vg230_timer), attotime::from_hz(1));
 MACHINE_CONFIG_END
 
 ROM_START( pasogo )

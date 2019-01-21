@@ -554,9 +554,9 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
+	TIMER(config, "timer_c").configure_periodic(FUNC(fc100_state::timer_c), attotime::from_hz(4800)); // cass write
+	TIMER(config, "timer_p").configure_periodic(FUNC(fc100_state::timer_p), attotime::from_hz(40000)); // cass read
+	TIMER(config, "timer_k").configure_periodic(FUNC(fc100_state::timer_k), attotime::from_hz(300)); // keyb scan
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
 

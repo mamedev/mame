@@ -2390,7 +2390,7 @@ MACHINE_CONFIG_START(subsino2_state::bishjan)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)

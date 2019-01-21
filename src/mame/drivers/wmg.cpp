@@ -529,10 +529,10 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	ADDRESS_MAP_BANK(config, "bankc000").set_map(&wmg_state::wmg_banked_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+	TIMER(config, "scan_timer").configure_scanline(FUNC(williams_state::williams_va11_callback), "screen", 0, 32);
 
 	// also set a timer to go off on scanline 240
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
+	TIMER(config, "240_timer").configure_scanline(FUNC(williams_state::williams_count240_callback), "screen", 0, 240);
 
 	WATCHDOG_TIMER(config, "watchdog");
 

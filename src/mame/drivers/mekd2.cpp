@@ -411,8 +411,8 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	clock_device &acia_rx_clock(CLOCK(config, "acia_rx_clock", 300)); // toggled by cassette circuit
 	acia_rx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_rxc));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_c", mekd2_state, mekd2_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_p", mekd2_state, mekd2_p, attotime::from_hz(40000))
+	TIMER(config, "mekd2_c").configure_periodic(FUNC(mekd2_state::mekd2_c), attotime::from_hz(4800));
+	TIMER(config, "mekd2_p").configure_periodic(FUNC(mekd2_state::mekd2_p), attotime::from_hz(40000));
 
 	MCFG_QUICKLOAD_ADD("quickload", mekd2_state, mekd2_quik, "d2", 1)
 MACHINE_CONFIG_END
