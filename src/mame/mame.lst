@@ -30306,6 +30306,7 @@ mc_dg101
 mc_aa2
 mc_105te
 mc_sp69
+polmega
 mc_dcat8
 mc_dcat8a
 pjoyn50
@@ -37969,6 +37970,7 @@ triplhnt                        // 008422-008791    1977/04 [6800]
 
 @source:trkfldch.cpp
 trkfldch                        // (c) 2007 Konami
+my1stddr                        // (c) 2006 Konami
 
 @source:trs80.cpp
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
@@ -38605,9 +38607,10 @@ mattelcs                        //
 
 @source:vsmile.cpp
 vsmile                          //
-vsmileb                         //
 vsmilef                         //
 vsmileg                         //
+vsmileb                         //
+vsmilebsw                       //
 
 @source:vsmilepro.cpp
 vsmilpro
@@ -39756,16 +39759,20 @@ has_wamg                        //
 ekara                           //
 ekaraa                          //
 ekaraj                          //
+ekarag                          //
 ekaraphs                        //
 ddrfammt                        //
 popira                          //
 taikodp                         //
-xavtenni                        //
-xavbaseb                        //
 ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
 drgqst                          //
+xavtenni                        //
+xavbaseb                        //
+xavjmat                         //
+tmy_thom                        //
+
 
 @source:xbox.cpp
 xbox                            //
