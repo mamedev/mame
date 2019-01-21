@@ -32,7 +32,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define ENABLE_2PADS	(0)
 
 class vsmile_base_state : public driver_device
 {
@@ -111,11 +110,7 @@ private:
 		VSMILE_PORTC_SYSRESET = 0x80,
 	};
 
-#if ENABLE_2PADS
 	required_device_array<vsmile_ctrl_port_device, 2> m_ctrl;
-#else
-	required_device_array<vsmile_ctrl_port_device, 1> m_ctrl;
-#endif
 	required_ioport m_dsw_region;
 
 	bool m_ctrl_rts[2];
@@ -227,9 +222,7 @@ WRITE8_MEMBER(vsmile_state::uart_rx)
 {
 	//printf("Ctrl Rx: %02x\n", data);
 	m_ctrl[0]->data_w(data);
-#if ENABLE_2PADS
 	m_ctrl[1]->data_w(data);
-#endif
 }
 
 READ16_MEMBER(vsmile_state::portb_r)
@@ -260,9 +253,7 @@ WRITE16_MEMBER(vsmile_state::portc_w)
 	{
 		//printf("Ctrl1 SEL: %d\n", BIT(data, 9));
 		m_ctrl_select[1] = BIT(data, 9);
-#if ENABLE_2PADS
 		m_ctrl[1]->select_w(m_ctrl_select[1]);
-#endif
 	}
 }
 
@@ -439,11 +430,9 @@ void vsmile_state::vsmile(machine_config &config)
 	m_ctrl[0]->rts_cb().set(FUNC(vsmile_state::ctrl_rts_w<0>));
 	m_ctrl[0]->data_cb().set(FUNC(vsmile_state::ctrl_tx_w));
 
-#if ENABLE_2PADS
 	VSMILE_CTRL_PORT(config, m_ctrl[1], vsmile_controllers, nullptr);
 	m_ctrl[1]->rts_cb().set(FUNC(vsmile_state::ctrl_rts_w<1>));
 	m_ctrl[1]->data_cb().set(FUNC(vsmile_state::ctrl_tx_w));
-#endif
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vsmile_cart");
 	SOFTWARE_LIST(config, "cart_list2").set_original("vsmilem_cart");

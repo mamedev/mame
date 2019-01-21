@@ -45,7 +45,6 @@ protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// vsmile_ctrl_device_base implementation
 	virtual void tx_complete() override;

@@ -102,7 +102,8 @@ void vsmile_ctrl_port_device::device_start()
 	if (card)
 	{
 		if (!m_device)
-		{			throw emu_fatalerror(
+		{
+			throw emu_fatalerror(
 					"vsmile_ctrl_port_device: card device %s (%s) does not implement device_vsmile_ctrl_interface\n",
 					card->tag(),
 					card->name());
@@ -193,7 +194,7 @@ bool vsmile_ctrl_device_base::queue_tx(uint8_t data)
 		else
 		{
 			LOG("asserting RTS to transmit byte %02X\n", data);
-			m_rts_timer->adjust(attotime::from_msec(100));
+			m_rts_timer->adjust(attotime::from_msec(500));
 		}
 	}
 	else
