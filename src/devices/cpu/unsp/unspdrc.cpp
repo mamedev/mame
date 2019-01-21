@@ -649,8 +649,8 @@ void unsp_device::generate_update_nzsc(drcuml_block &block)
 	UML_SETc(block, uml::COND_NZ, I1);
 	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_C_SHIFT, UNSP_C);
 
-	UML_CMP(block, I2, 0);
-	UML_SETc(block, uml::COND_E, I1);
+	UML_TEST(block, I3, 0x0000ffff);
+	UML_SETc(block, uml::COND_Z, I1);
 	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_Z_SHIFT, UNSP_Z);
 }
 
@@ -1230,16 +1230,16 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			break;
 
 		case 0x02: // Subtract
-			UML_XOR(block, I3, I1, 0x0000ffff);
-			UML_ADD(block, I3, I3, I2);
+			UML_XOR(block, I1, I1, 0x0000ffff);
+			UML_ADD(block, I3, I1, I2);
 			UML_ADD(block, I3, I3, 1);
 			if (opa != 7)
 				generate_update_nzsc(block);
 			break;
 
 		case 0x03: // Subtract w/ carry
-			UML_XOR(block, I3, I1, 0x0000ffff);
-			UML_ADD(block, I3, I3, I2);
+			UML_XOR(block, I1, I1, 0x0000ffff);
+			UML_ADD(block, I3, I1, I2);
 			UML_TEST(block, mem(&m_core->m_r[REG_SR]), UNSP_C);
 			UML_JMPc(block, uml::COND_Z, no_carry);
 			UML_ADD(block, I3, I3, 1);
@@ -1250,8 +1250,8 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			break;
 
 		case 0x04: // Compare
-			UML_XOR(block, I3, I1, 0x0000ffff);
-			UML_ADD(block, I3, I3, I2);
+			UML_XOR(block, I1, I1, 0x0000ffff);
+			UML_ADD(block, I3, I1, I2);
 			UML_ADD(block, I3, I3, 1);
 			if (opa != 7)
 				generate_update_nzsc(block);
