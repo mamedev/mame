@@ -110,7 +110,7 @@ This chip *ALWAYS* has a bypass capacitor (ceramic, 104, 0.10 uF) soldered on to
 
 DEFINE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device, "cchip", "Taito TC0030CMD (C-Chip)")
 
-taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+taito_cchip_device::taito_cchip_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, TAITO_CCHIP, tag, owner, clock),
 	m_upd7811(*this, "upd7811"),
 	m_upd4464_bank(*this, "upd4464_bank"),
@@ -148,7 +148,7 @@ void taito_cchip_device::cchip_ram_bank68(address_map &map)
 	map(0x0000, 0x1fff).ram().share("upd4464");
 }
 
-READ8_MEMBER(taito_cchip_device::asic_r)
+u8 taito_cchip_device::asic_r(offs_t offset)
 {
 	if ((offset != 0x001) && (!machine().side_effects_disabled())) // prevent logerror spam for now
 		logerror("%s: asic_r %04x\n", machine().describe_context(), offset);
@@ -157,7 +157,7 @@ READ8_MEMBER(taito_cchip_device::asic_r)
 	return 0x00; // 600-7ff is write-only(?) asic banking reg, may read as open bus or never assert /DTACK on read?
 }
 
-WRITE8_MEMBER(taito_cchip_device::asic_w)
+void taito_cchip_device::asic_w(offs_t offset, u8 data)
 {
 	//logerror("%s: asic_w %04x %02x\n", machine().describe_context(), offset, data);
 	if (offset == 0x200)
@@ -171,7 +171,7 @@ WRITE8_MEMBER(taito_cchip_device::asic_w)
 	}
 }
 
-WRITE8_MEMBER(taito_cchip_device::asic68_w)
+void taito_cchip_device::asic68_w(offs_t offset, u8 data)
 {
 	//logerror("%s: asic68_w %04x %02x\n", machine().describe_context(), offset, data);
 	if (offset == 0x200)
@@ -185,24 +185,24 @@ WRITE8_MEMBER(taito_cchip_device::asic68_w)
 	}
 }
 
-READ8_MEMBER(taito_cchip_device::mem_r)
+u8 taito_cchip_device::mem_r(offs_t offset)
 {
-	return m_upd4464_bank->read8(space, offset & 0x03ff);
+	return m_upd4464_bank->read8(offset & 0x03ff);
 }
 
-WRITE8_MEMBER(taito_cchip_device::mem_w)
+void taito_cchip_device::mem_w(offs_t offset, u8 data)
 {
-	return m_upd4464_bank->write8(space, offset & 0x03ff, data);
+	return m_upd4464_bank->write8(offset & 0x03ff, data);
 }
 
-READ8_MEMBER(taito_cchip_device::mem68_r)
+u8 taito_cchip_device::mem68_r(offs_t offset)
 {
-	return m_upd4464_bank68->read8(space, offset & 0x03ff);
+	return m_upd4464_bank68->read8(offset & 0x03ff);
 }
 
-WRITE8_MEMBER(taito_cchip_device::mem68_w)
+void taito_cchip_device::mem68_w(offs_t offset, u8 data)
 {
-	return m_upd4464_bank68->write8(space, offset & 0x03ff, data);
+	return m_upd4464_bank68->write8(offset & 0x03ff, data);
 }
 
 void taito_cchip_device::cchip_map(address_map &map)

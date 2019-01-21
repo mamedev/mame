@@ -1148,7 +1148,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	}
 	else
 	{
-		space.install_readwrite_handler(0x7000,0x7fff,read8_delegate(FUNC(address_map_bank_device::read8),(address_map_bank_device*)m_avbank[7]),write8_delegate(FUNC(address_map_bank_device::write8),(address_map_bank_device*)m_avbank[7]));
+		space.install_readwrite_handler(0x7000,0x7fff,read8sm_delegate(FUNC(address_map_bank_device::read8),(address_map_bank_device*)m_avbank[7]),write8sm_delegate(FUNC(address_map_bank_device::write8),(address_map_bank_device*)m_avbank[7]));
 	}
 	if(m_init_rom_en)
 	{

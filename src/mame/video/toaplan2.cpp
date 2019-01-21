@@ -192,7 +192,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 	m_dma_space->set_bank(1);
 	for (int i = 0; i < (0x8000 >> 1); i++)
 	{
-		m_dma_space->write16(space, i, m_mainram[i]);
+		m_dma_space->write16(i, m_mainram[i]);
 	}
 }
 
@@ -204,7 +204,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_pal_text_dma_w)
 	m_dma_space->set_bank(0);
 	for (int i = 0; i < (0x3400 >> 1); i++)
 	{
-		m_dma_space->write16(space, i, m_mainram[i]);
+		m_dma_space->write16(i, m_mainram[i]);
 	}
 }
 

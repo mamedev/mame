@@ -88,11 +88,11 @@ public:
 	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 	// Master
-	DECLARE_READ8_MEMBER(master_input_r);
-	DECLARE_WRITE8_MEMBER(master_control_w);
+	u8 master_input_r();
+	void master_control_w(u8 data);
 	void init_master();
-	DECLARE_READ8_MEMBER(master_trampoline_r);
-	DECLARE_WRITE8_MEMBER(master_trampoline_w);
+	u8 master_trampoline_r(offs_t offset);
+	void master_trampoline_w(offs_t offset, u8 data);
 	void master_map(address_map &map);
 	void master_trampoline(address_map &map);
 	void master(machine_config &config);
@@ -234,7 +234,7 @@ u16 ckz80_state::read_inputs(int columns)
 
 // TTL/generic
 
-WRITE8_MEMBER(ckz80_state::master_control_w)
+void ckz80_state::master_control_w(u8 data)
 {
 	// d0-d3: 74145 A-D
 	// 74145 0-9: input mux, led select
@@ -248,7 +248,7 @@ WRITE8_MEMBER(ckz80_state::master_control_w)
 	m_dac->write(data >> 6 & 3);
 }
 
-READ8_MEMBER(ckz80_state::master_input_r)
+u8 ckz80_state::master_input_r()
 {
 	// d0-d7: multiplexed inputs (active low)
 	return ~read_inputs(10);
@@ -286,23 +286,23 @@ void ckz80_state::master_map(address_map &map)
 }
 
 // PCB design is prone to bus conflicts, but should be fine if software obeys
-WRITE8_MEMBER(ckz80_state::master_trampoline_w)
+void ckz80_state::master_trampoline_w(offs_t offset, u8 data)
 {
 	if (offset & 0x2000)
-		m_master_map->write8(space, (offset & 0x3fff) | 0x8000, data);
+		m_master_map->write8((offset & 0x3fff) | 0x8000, data);
 	if (offset & 0x4000)
-		m_master_map->write8(space, (offset & 0x7fff) | 0x8000, data);
+		m_master_map->write8((offset & 0x7fff) | 0x8000, data);
 }
 
-READ8_MEMBER(ckz80_state::master_trampoline_r)
+u8 ckz80_state::master_trampoline_r(offs_t offset)
 {
 	u8 data = 0xff;
 	if (~offset & 0x8000)
-		data &= m_master_map->read8(space, offset);
+		data &= m_master_map->read8(offset);
 	if (offset & 0x2000)
-		data &= m_master_map->read8(space, (offset & 0x3fff) | 0x8000);
+		data &= m_master_map->read8((offset & 0x3fff) | 0x8000);
 	if (offset & 0x4000)
-		data &= m_master_map->read8(space, (offset & 0x7fff) | 0x8000);
+		data &= m_master_map->read8((offset & 0x7fff) | 0x8000);
 
 	return data;
 }

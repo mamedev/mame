@@ -543,7 +543,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
 			case 0: // type 0 space
-				return m_type0space->read32(space, tmp, mem_mask);
+				return m_type0space->read32(tmp, mem_mask);
 
 			case 1: // type 1 space
 				// magic ROM bypass
@@ -551,13 +551,13 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 				{
 					return m_rom_ptr[offset & 0x3fff];
 				}
-				return m_type1space->read32(space, tmp, mem_mask);
+				return m_type1space->read32(tmp, mem_mask);
 
 			case 2: // type 2 space
-				return m_type2space->read32(space, tmp, mem_mask);
+				return m_type2space->read32(tmp, mem_mask);
 
 			case 3: // type 3 space
-				return m_type3space->read32(space, tmp, mem_mask);
+				return m_type3space->read32(tmp, mem_mask);
 		}
 	}
 	else
@@ -693,20 +693,20 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
 			case 0: // type 0
-				m_type0space->write32(space, tmp, data, mem_mask);
+				m_type0space->write32(tmp, data, mem_mask);
 				return;
 
 			case 1: // type 1
 				//printf("write device space @ %x\n", tmp<<1);
-				m_type1space->write32(space, tmp, data, mem_mask);
+				m_type1space->write32(tmp, data, mem_mask);
 				return;
 
 			case 2: // type 2
-				m_type2space->write32(space, tmp, data, mem_mask);
+				m_type2space->write32(tmp, data, mem_mask);
 				return;
 
 			case 3: // type 3
-				m_type3space->write32(space, tmp, data, mem_mask);
+				m_type3space->write32(tmp, data, mem_mask);
 				return;
 		}
 	}
