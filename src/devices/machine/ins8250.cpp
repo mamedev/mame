@@ -390,6 +390,8 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 
 			if ( m_regs.msr & 0x0f )
 				trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
+			else
+				clear_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 			break;
 		case 7:
 			m_regs.scr = data;
