@@ -481,7 +481,7 @@ bool z8_device::get_serial_in()
 	return (m_input[3] & Z8_P3_SIN) != 0;
 }
 
-void z8_device::sio_tick()
+void z8_device::sio_receive()
 {
 	if (m_receive_started)
 	{
@@ -548,31 +548,34 @@ void z8_device::sio_tick()
 			m_receive_count = 0;
 		}
 	}
+}
 
-	if (m_transmit_sr != 0)
+void z8_device::sio_transmit()
+{
+	if (m_transmit_sr == 0)
+		return;
+
+	m_transmit_count = (m_transmit_count + 1) & 15;
+	if (m_transmit_count == 0)
 	{
-		m_transmit_count = (m_transmit_count + 1) & 15;
-		if (m_transmit_count == 0)
+		m_transmit_sr >>= 1;
+		if (m_transmit_sr == 0)
+			request_interrupt(4);
+		else
 		{
-			m_transmit_sr >>= 1;
-			if (m_transmit_sr == 0)
-				request_interrupt(4);
-			else
+			// parity replaces received bit 7 if selected
+			if ((m_transmit_sr >> 1) == 3 && (m_p3m & Z8_P3M_PARITY) != 0)
 			{
-				// parity replaces received bit 7 if selected
-				if ((m_transmit_sr >> 1) == 3 && (m_p3m & Z8_P3M_PARITY) != 0)
-				{
-					if (m_transmit_parity)
-						m_transmit_sr |= 1;
-					else
-						m_transmit_sr &= ~1;
-				}
-				else if (BIT(m_transmit_sr, 0))
-					m_transmit_parity = !m_transmit_parity;
-
-				// serial output
-				p3_update_output();
+				if (m_transmit_parity)
+					m_transmit_sr |= 1;
+				else
+					m_transmit_sr &= ~1;
 			}
+			else if (BIT(m_transmit_sr, 0))
+				m_transmit_parity = !m_transmit_parity;
+
+			// serial output
+			p3_update_output();
 		}
 	}
 }
@@ -622,7 +625,10 @@ void z8_device::timer_end()
 		tout_toggle();
 
 	if (T == 0 && (m_p3m & Z8_P3M_P3_SERIAL) != 0)
-		sio_tick();
+	{
+		sio_receive();
+		sio_transmit();
+	}
 	else
 		request_interrupt(4 + T);
 
