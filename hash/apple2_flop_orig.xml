@@ -8,6 +8,7 @@
     <year>1984</year>
     <publisher>Scholastic</publisher>
     <info name="release" value="2018-11-15"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II model with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -22,6 +23,7 @@
     <year>1986</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-12"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -36,6 +38,7 @@
     <year>1981</year>
     <publisher>Micro Distributors</publisher>
     <info name="release" value="2018-09-17"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!--  It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -50,6 +53,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-08-28"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -64,6 +68,7 @@
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-09-01"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -78,6 +83,7 @@
     <year>1980</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-10"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -92,6 +98,7 @@
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-07-29"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -106,6 +113,7 @@
     <year>1984</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-09-03"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires an 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -120,6 +128,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-09-23"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+ or later. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -134,6 +143,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-05"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -148,6 +158,7 @@
     <year>1982</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-08-10"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -162,6 +173,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-03"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -176,6 +188,7 @@
     <year>1988</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2019-01-03"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It uses double hi-res graphics and thus requires a
     128K Apple //e, //c, or IIgs. -->
 
@@ -198,6 +211,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-08-11"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -212,6 +226,7 @@
     <year>1985</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-08-11"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -233,6 +248,7 @@
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-08-11"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -247,6 +263,7 @@
     <year>1982</year>
     <publisher>Hayden Book Company</publisher>
     <info name="release" value="2018-07-31"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -261,6 +278,7 @@
     <year>1984</year>
     <publisher>Hayden Book Company</publisher>
     <info name="release" value="2018-07-31"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+ or later. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -282,6 +300,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-09-24"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -296,6 +315,7 @@
     <year>1982</year>
     <publisher>United Software of America</publisher>
     <info name="release" value="2018-09-05"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -310,6 +330,7 @@
     <year>1982</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-12-26"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -324,6 +345,7 @@
     <year>1983</year>
     <publisher>Origin Systems</publisher>
     <info name="release" value="2018-10-23"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -338,6 +360,7 @@
     <year>1981</year>
     <publisher>Turnkey Software</publisher>
     <info name="release" value="2018-09-18"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -352,6 +375,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2019-01-14"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -366,6 +390,7 @@
     <year>1987</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-08-02"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It runs on an Apple //e with 128K, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -380,6 +405,7 @@
     <year>1987</year>
     <publisher>SEGA Enterprises</publisher>
     <info name="release" value="2018-08-02"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -394,6 +420,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-06"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -408,6 +435,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-09-20"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -422,6 +450,7 @@
     <year>1981</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-12-31"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -436,6 +465,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-05"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -450,6 +480,7 @@
     <year>1982</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-09-06"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -464,6 +495,7 @@
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2019-01-12"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -478,6 +510,7 @@
     <year>1983</year>
     <publisher>Micromax</publisher>
     <info name="release" value="2018-08-22"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -492,6 +525,7 @@
     <year>1980</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-11-18"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II model with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -506,6 +540,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2018-12-29"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -520,6 +555,7 @@
     <year>1987</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-30"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -534,6 +570,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-07"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -548,6 +585,7 @@
     <year>1983</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-08-07"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -562,6 +600,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-08"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -576,6 +615,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2019-01-08"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -590,6 +630,7 @@
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-13"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -604,6 +645,7 @@
     <year>1982</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-10-14"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -618,6 +660,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-05"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -632,6 +675,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-07"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -646,6 +690,7 @@
     <year>1981</year>
     <publisher>Piccadilly Software</publisher>
     <info name="release" value="2018-09-19"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -661,6 +706,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2018-09-04"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -675,6 +721,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2018-09-04"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -689,6 +736,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-08"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!--  It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -703,6 +751,7 @@
     <year>1987</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-12-20"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -717,6 +766,7 @@
     <year>1983</year>
     <publisher>Gentry Software</publisher>
     <info name="release" value="2018-12-22"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -731,6 +781,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-11-16"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple ][ model with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -745,6 +796,7 @@
     <year>1981</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-09-13"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- The first release refused to boot on anything but an original
     Apple II or II Plus (i.e. not //e or later).
     This updated version runs on any Apple II with 48K. -->
@@ -761,6 +813,7 @@
     <year>1984</year>
     <publisher>SEGA Enterprises</publisher>
     <info name="release" value="2018-12-21"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -775,6 +828,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-09-13"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -796,6 +850,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-05"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <!-- Disk A -->
@@ -831,6 +886,7 @@
     <year>1985</year>
     <publisher>Spectrum Holobyte</publisher>
     <info name="release" value="2018-08-14"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -845,6 +901,7 @@
     <year>1981</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-27"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
     <!-- It requires a 48K Apple ][ or ][+.
     Due to compatibility issues caused by the copy protection,
     it will not run on any later models. -->
@@ -861,6 +918,7 @@
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-12-25"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -875,6 +933,7 @@
     <year>1985</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-08-04"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -889,6 +948,7 @@
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-11"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -903,6 +963,7 @@
     <year>1983</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-12-28"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -917,6 +978,7 @@
     <year>1983</year>
     <publisher>Activision</publisher>
     <info name="release" value="2018-10-11"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -931,6 +993,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-11-20"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -945,6 +1008,7 @@
     <year>1983</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-07-25"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226887">
@@ -958,6 +1022,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2019-01-11"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -972,6 +1037,7 @@
     <year>1980</year>
     <publisher>California Pacific Computers</publisher>
     <info name="release" value="2018-08-09"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 32K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -986,6 +1052,7 @@
     <year>1983</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-09-29"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1000,6 +1067,7 @@
     <year>1983</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-09-29"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1021,6 +1089,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-03"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1042,6 +1111,7 @@
     <year>1982</year>
     <publisher>MUSE Software</publisher>
     <info name="release" value="2018-09-21"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1056,6 +1126,7 @@
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-09-25"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1070,6 +1141,7 @@
     <year>1982</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-09-21"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
     <!-- It requires a 48K Apple II or ][+.
     Due to compatibility issues caused by the copy protection, it will not run
     on any later models. -->
@@ -1086,6 +1158,7 @@
     <year>1986</year>
     <publisher>subLOGIC</publisher>
     <info name="release" value="2018-10-24"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple II+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1100,6 +1173,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2018-10-28"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It run on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1114,6 +1188,7 @@
     <year>1983</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-08-24"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1128,6 +1203,7 @@
     <year>1984</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2018-08-12"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It run on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1142,6 +1218,7 @@
     <year>1985</year>
     <publisher>Data East</publisher>
     <info name="release" value="2018-08-31"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1156,6 +1233,7 @@
     <year>1984</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-19"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K.
     Side B of the original floppy disk had another copy of the game,
     but all the graphics were upside down. -->
@@ -1179,6 +1257,7 @@
     <year>1987</year>
     <publisher>Data East</publisher>
     <info name="release" value="2018-10-19"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1200,6 +1279,7 @@
     <year>1985</year>
     <publisher>Data East</publisher>
     <info name="release" value="2018-08-20"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1214,6 +1294,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-08-20"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1235,6 +1316,7 @@
     <year>1984</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-09-22"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1249,6 +1331,7 @@
     <year>1982</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-10-21"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1263,6 +1346,7 @@
     <year>1986</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-10-21"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1284,6 +1368,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-01"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1298,6 +1383,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-08-13"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1312,6 +1398,7 @@
     <year>1986</year>
     <publisher>Neosoft</publisher>
     <info name="release" value="2018-09-08"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1326,6 +1413,7 @@
     <year>1986</year>
     <publisher>New World Computing</publisher>
     <info name="release" value="2018-09-08"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1359,6 +1447,7 @@
     <year>1982</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-08-19"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1373,6 +1462,7 @@
     <year>1983</year>
     <publisher>Penguin Software</publisher>
     <info name="release" value="2018-12-27"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1387,6 +1477,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-27"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1408,6 +1499,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-02"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1422,6 +1514,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-04"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1436,6 +1529,7 @@
     <year>1984</year>
     <publisher>Parker Brothers</publisher>
     <info name="release" value="2019-01-04"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1450,6 +1544,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2018-08-26"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1464,6 +1559,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-10-24"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1485,6 +1581,7 @@
     <year>1984</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-07-30"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 64K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1499,6 +1596,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2018-07-30"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1513,6 +1611,7 @@
     <year>1982</year>
     <publisher>subLOGIC</publisher>
     <info name="release" value="2018-09-12"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1527,6 +1626,7 @@
     <year>1982</year>
     <publisher>Mattel Electronics</publisher>
     <info name="release" value="2018-08-06"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1541,6 +1641,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-29"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
     <!-- It requires a 48K Apple ][ or ][+. Due to compatibility issues
     caused by the copy protection, it will not run on later models. -->
 
@@ -1556,6 +1657,7 @@
     <year>1981</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-10-29"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1570,6 +1672,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-09-16"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1584,6 +1687,7 @@
     <year>1988</year>
     <publisher>Mindscape</publisher>
     <info name="release" value="2018-07-26"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1598,6 +1702,7 @@
     <year>1982</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-10-25"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
     <!-- It requires a 48K Apple ][ or ][+. Due to compatibility issues caused
     by the copy protection, it will not run on any later models. -->
 
@@ -1613,6 +1718,7 @@
     <year>1980</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-20"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1627,6 +1733,7 @@
     <year>1982</year>
     <publisher>Synapse Software</publisher>
     <info name="release" value="2019-01-20"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1641,6 +1748,7 @@
     <year>1984</year>
     <publisher>Activision</publisher>
     <info name="release" value="2018-09-07"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1655,6 +1763,7 @@
     <year>1984</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-10-18"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1669,6 +1778,7 @@
     <year>1988</year>
     <publisher>Infocom</publisher>
     <info name="release" value="2019-01-19"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- This is Release 10 / 880531 / Interpreter 2 Version H, the
     "Solid Gold" edition. It requires a 128K Apple //e, //c, or IIgs. -->
 
@@ -1691,6 +1801,7 @@
     <year>1983</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-02"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1705,6 +1816,7 @@
     <year>1988</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-10-02"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1726,6 +1838,7 @@
     <year>1981</year>
     <publisher>Innovative Design Software, Inc.</publisher>
     <info name="release" value="2018-07-28"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1740,6 +1853,7 @@
     <year>1984</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-09-14"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1754,6 +1868,7 @@
     <year>1989</year>
     <publisher>Broderbund</publisher>
     <info name="release" value="2018-09-14"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1775,6 +1890,7 @@
     <year>1989</year>
     <publisher>Taito America</publisher>
     <info name="release" value="2018-08-05"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1789,6 +1905,7 @@
     <year>1987</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-08-27"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1803,6 +1920,7 @@
     <year>1988</year>
     <publisher>Activision</publisher>
     <info name="release" value="2018-08-02"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It runs on an Apple //e with 128K, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1817,7 +1935,8 @@
     <year>1981</year>
     <publisher>BudgeCo</publisher>
     <info name="release" value="2018-10-26"/>
-    <!-- It requires a 48K Apple II or II.
+    <sharedfeat name="compatibility" value="A2,A2P" />
+    <!-- It requires a 48K Apple II or II+.
     Due to compatibility issues caused by the copy protection,
     it does not run on later models. -->
 
@@ -1833,6 +1952,7 @@
     <year>1981</year>
     <publisher>Broderbund</publisher>
     <info name="release" value="2018-11-19"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
     <!-- It requires a 48K Apple ][ or ][+.
     Due to compatibility problems caused by the copy protection,
     it will not run on later models. -->
@@ -1849,6 +1969,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-06"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1863,6 +1984,7 @@
     <year>1984</year>
     <publisher>Sir-Tech</publisher>
     <info name="release" value="2018-08-16"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 64K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1877,6 +1999,7 @@
     <year>1988</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-08-16"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1898,6 +2021,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2019-01-15"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1912,6 +2036,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-12-30"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1926,6 +2051,7 @@
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-08-08"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1940,6 +2066,7 @@
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-11-07"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1954,6 +2081,7 @@
     <year>1983</year>
     <publisher>Hayden Book Company</publisher>
     <info name="release" value="2018-08-17"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1968,6 +2096,7 @@
     <year>1982</year>
     <publisher>Adventure International</publisher>
     <info name="release" value="2018-08-01"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1982,6 +2111,7 @@
     <year>1981</year>
     <publisher>IDSI</publisher>
     <info name="release" value="2018-10-16"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -1996,6 +2126,7 @@
     <year>1984</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-11-11"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+ or later. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2010,6 +2141,7 @@
     <year>1981</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-07-26"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2024,6 +2156,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-04"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!--  It runs on any Apple II with 48K -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2038,6 +2171,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-09-11"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2053,6 +2187,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-31"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E" />
     <!-- It requires a 48K Apple ][ or ][+, or an unenhanced Apple //e.
     Due to compatibility issues caused by the copy protection,
     it will not run on any later models. -->
@@ -2069,6 +2204,7 @@
     <year>1981</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-30"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
     <!-- It requires a 48K Apple ][ or ][+.
     Due to compatibility issues caused by the copy protection,
     it will not run on any later models. -->
@@ -2085,6 +2221,7 @@
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-11-08"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2099,6 +2236,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-02"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2113,6 +2251,7 @@
     <year>1986</year>
     <publisher>Activision</publisher>
     <info name="release" value="2018-09-10"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2127,6 +2266,7 @@
     <year>1983</year>
     <publisher>Bally Midway</publisher>
     <info name="release" value="2018-08-20"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2141,6 +2281,7 @@
     <year>1983</year>
     <publisher>Penguin Software</publisher>
     <info name="release" value="2018-12-19"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2155,6 +2296,7 @@
     <year>1983</year>
     <publisher>Bally Midway</publisher>
     <info name="release" value="2018-08-20"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2169,6 +2311,7 @@
     <year>1982</year>
     <publisher>Penguin</publisher>
     <info name="release" value="2018-08-20"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2183,6 +2326,7 @@
     <year>1980</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-11-03"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2197,6 +2341,7 @@
     <year>1981</year>
     <publisher>Cavalier Computer</publisher>
     <info name="release" value="2018-11-12"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
     <!-- It requires a 48K Apple ][ or ][+. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2211,6 +2356,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2019-01-13"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2225,6 +2371,7 @@
     <year>1984</year>
     <publisher>Penguin Software</publisher>
     <info name="release" value="2018-11-17"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple ][ model with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2239,6 +2386,7 @@
     <year>1987</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-26"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2253,6 +2401,7 @@
     <year>1987</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-26"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2274,6 +2423,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-26"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2295,6 +2445,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-28"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2309,6 +2460,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-28"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2330,6 +2482,7 @@
     <year>1981</year>
     <publisher>Piccadilly Software</publisher>
     <info name="release" value="2018-10-17"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2344,6 +2497,7 @@
     <year>1984</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-10-17"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2365,6 +2519,7 @@
     <year>1984</year>
     <publisher>Windham Classics</publisher>
     <info name="release" value="2018-09-02"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2379,6 +2534,7 @@
     <year>1986</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-10-22"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple II+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2393,6 +2549,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-13"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs.
     Double hi-res mode requires a 128K Apple //e, //c, or IIgs. -->
 
@@ -2408,6 +2565,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2018-12-13"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2429,6 +2587,7 @@
     <year>1987</year>
     <publisher>Spectrum HoloByte</publisher>
     <info name="release" value="2018-12-13"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- This version, using double hi-res graphics,
     requires a 128K Apple //e, //c, or IIgs. -->
 
@@ -2444,6 +2603,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-12-23"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2458,6 +2618,7 @@
     <year>1982</year>
     <publisher>Penguin Software</publisher>
     <info name="release" value="2018-08-30"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2472,6 +2633,7 @@
     <year>1987</year>
     <publisher>ActionSoft</publisher>
     <info name="release" value="2018-11-04"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 64K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2486,6 +2648,7 @@
     <year>1987</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-08-23"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2500,6 +2663,7 @@
     <year>1981</year>
     <publisher>IDSI</publisher>
     <info name="release" value="2018-08-23"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
     <!-- It requires a 48K Apple ][ or ][+. It will not run on later models. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2521,6 +2685,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-12-18"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2535,6 +2700,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-03"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2549,6 +2715,7 @@
     <year>1985</year>
     <publisher>Origin Systems</publisher>
     <info name="release" value="2019-01-17"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2582,6 +2749,7 @@
     <year>1988</year>
     <publisher>Origin Systems</publisher>
     <info name="release" value="2019-01-16"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2639,6 +2807,7 @@
     <year>1981</year>
     <publisher>Bally Midway</publisher>
     <info name="release" value="2018-10-03"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2653,6 +2822,7 @@
     <year>1983</year>
     <publisher>H.A.L. Labs</publisher>
     <info name="release" value="2018-10-15"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2667,6 +2837,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-09-30"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2681,6 +2852,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-01"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2695,6 +2867,7 @@
     <year>1986</year>
     <publisher>Broderbund</publisher>
     <info name="release" value="2018-10-01"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It runs on any Apple II with 64K. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2716,6 +2889,7 @@
     <year>1987</year>
     <publisher>Broderbund</publisher>
     <info name="release" value="2018-10-01"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2737,6 +2911,7 @@
     <year>1988</year>
     <publisher>Infocom</publisher>
     <info name="release" value="2019-01-18"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- This is Release 23 / 880706 / Interpreter 2 Version H, the
     "Solid Gold" edition. It requires a 128K Apple //e, //c, or IIgs. -->
 
@@ -2759,6 +2934,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-04"/>
+    <sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2773,6 +2949,7 @@
     <year>1984</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-19"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2787,6 +2964,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-19"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2808,6 +2986,7 @@
     <year>1984</year>
     <publisher>Mindscape</publisher>
     <info name="release" value="2018-08-25"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2822,6 +3001,7 @@
     <year>1982</year>
     <publisher>subLOGIC</publisher>
     <info name="release" value="2018-11-10"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 48K Apple ][+ or later. -->
 
     <part name="flop1" interface="floppy_5_25">
@@ -2836,6 +3016,7 @@
     <year>1985</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2019-01-10"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
     <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
