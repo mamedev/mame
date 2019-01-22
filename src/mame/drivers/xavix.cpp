@@ -1561,6 +1561,11 @@ ROM_START( domfitex )
 	ROM_LOAD( "xpfitnessexercise.bin", 0x000000, 0x1000000, CRC(f1089229) SHA1(803df8ba0a05cb004a4238c6c71ea1ffa4428990) )
 ROM_END
 
+ROM_START( domfitch )
+	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "xpfitnesschallenge.bin", 0x000000, 0x1000000, CRC(e0a4093d) SHA1(2692ac03f8be4f86a4777ad0c365cbab7b469e3b) )
+ROM_END
+
 // TODO: does it have an SEEPROM? why does it hang? full title?
 CONS( 2005, tmy_thom, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",  "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
@@ -1582,8 +1587,9 @@ CONS( 2005, xavjmat,  0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xa
 
 // Domyos Bike Concept (not listed on site above)
 
-// Has SEEPROM and an RTC.  Exercise has some leftover PC buffer stuff.  (TODO, check SEEPROM type, RTC type, banking)
-CONS( 200?, domfitex, 0, 0, xavix2000_i2c_24c04, xavixp, xavix_i2c_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Has SEEPROM and an RTC.  Exercise has some leftover PC buffer stuff.  (TODO, check SEEPROM type, RTC type, banking) (both Exercises and Challenge are identical PCBs)
+CONS( 2008, domfitex, 0, 0, xavix2000_i2c_24c04, xavixp, xavix_i2c_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitch, 0, 0, xavix2000_i2c_24c04, xavixp, xavix_i2c_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Domyos DiS (unknown hardware, or bad dumps)
 // This DOES NOT look like a 6502 based Xavix / Super Xavix! maybe XaviX 2, the cartridges contain the entire system (CPU,Video,Sound,ROM) so that is possible.
