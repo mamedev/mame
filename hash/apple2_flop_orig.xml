@@ -8,6 +8,7 @@
     <year>1984</year>
     <publisher>Scholastic</publisher>
     <info name="release" value="2018-11-15"/>
+    <!-- It runs on any Apple II model with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="80443">
@@ -21,6 +22,7 @@
     <year>1986</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-12"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240141">
@@ -34,6 +36,7 @@
     <year>1981</year>
     <publisher>Micro Distributors</publisher>
     <info name="release" value="2018-09-17"/>
+    <!--  It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233482">
@@ -47,6 +50,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-08-28"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233471">
@@ -60,6 +64,7 @@
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-09-01"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233532">
@@ -73,6 +78,7 @@
     <year>1980</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-10"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="106991">
@@ -86,6 +92,7 @@
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-07-29"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="246792">
@@ -99,6 +106,7 @@
     <year>1984</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-09-03"/>
+    <!-- It requires an 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226901">
@@ -112,6 +120,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-09-23"/>
+    <!-- It requires a 48K Apple ][+ or later. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233476">
@@ -125,6 +134,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-05"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="53760">
@@ -138,6 +148,7 @@
     <year>1982</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-08-10"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226823">
@@ -151,6 +162,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-03"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233469">
@@ -164,6 +176,8 @@
     <year>1988</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2019-01-03"/>
+    <!-- It uses double hi-res graphics and thus requires a
+    128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -184,6 +198,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-08-11"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240138">
@@ -197,6 +212,7 @@
     <year>1985</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-08-11"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -217,6 +233,7 @@
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-08-11"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="253454">
@@ -230,6 +247,7 @@
     <year>1982</year>
     <publisher>Hayden Book Company</publisher>
     <info name="release" value="2018-07-31"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240180">
@@ -243,6 +261,7 @@
     <year>1984</year>
     <publisher>Hayden Book Company</publisher>
     <info name="release" value="2018-07-31"/>
+    <!-- It requires a 48K Apple ][+ or later. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -263,6 +282,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-09-24"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233458">
@@ -276,6 +296,7 @@
     <year>1982</year>
     <publisher>United Software of America</publisher>
     <info name="release" value="2018-09-05"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="67088">
@@ -289,6 +310,7 @@
     <year>1982</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-12-26"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233483">
@@ -302,6 +324,7 @@
     <year>1983</year>
     <publisher>Origin Systems</publisher>
     <info name="release" value="2018-10-23"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="220149">
@@ -315,6 +338,7 @@
     <year>1981</year>
     <publisher>Turnkey Software</publisher>
     <info name="release" value="2018-09-18"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="120335">
@@ -328,6 +352,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2019-01-14"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233448">
@@ -341,6 +366,7 @@
     <year>1987</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-08-02"/>
+    <!-- It runs on an Apple //e with 128K, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233478">
@@ -354,6 +380,7 @@
     <year>1987</year>
     <publisher>SEGA Enterprises</publisher>
     <info name="release" value="2018-08-02"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="220129">
@@ -367,6 +394,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-06"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="220176">
@@ -380,6 +408,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-09-20"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="107016">
@@ -393,6 +422,7 @@
     <year>1981</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-12-31"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="126960">
@@ -406,6 +436,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-05"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233475">
@@ -419,6 +450,7 @@
     <year>1982</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-09-06"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233483">
@@ -432,6 +464,7 @@
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2019-01-12"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233477">
@@ -445,6 +478,7 @@
     <year>1983</year>
     <publisher>Micromax</publisher>
     <info name="release" value="2018-08-22"/>
+    <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233465">
@@ -458,6 +492,7 @@
     <year>1980</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-11-18"/>
+    <!-- It runs on any Apple II model with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="140265">
@@ -471,6 +506,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2018-12-29"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233497">
@@ -484,6 +520,7 @@
     <year>1987</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-30"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233486">
@@ -497,6 +534,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-07"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233484">
@@ -510,6 +548,7 @@
     <year>1983</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-08-07"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233477">
@@ -523,6 +562,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-08"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233475">
@@ -536,6 +576,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2019-01-08"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233450">
@@ -549,6 +590,7 @@
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-13"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233473">
@@ -562,6 +604,7 @@
     <year>1982</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-10-14"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233450">
@@ -575,6 +618,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-05"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233469">
@@ -588,6 +632,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-07"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="107009">
@@ -601,6 +646,7 @@
     <year>1981</year>
     <publisher>Piccadilly Software</publisher>
     <info name="release" value="2018-09-19"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="146916">
@@ -615,6 +661,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2018-09-04"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233490">
@@ -628,6 +675,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2018-09-04"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233510">
@@ -641,6 +689,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-08"/>
+    <!--  It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240132">
@@ -654,6 +703,7 @@
     <year>1987</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-12-20"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="193522">
@@ -667,6 +717,7 @@
     <year>1983</year>
     <publisher>Gentry Software</publisher>
     <info name="release" value="2018-12-22"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="87054">
@@ -680,6 +731,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-11-16"/>
+    <!-- It runs on any Apple ][ model with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233488">
@@ -693,6 +745,9 @@
     <year>1981</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-09-13"/>
+    <!-- The first release refused to boot on anything but an original
+    Apple II or II Plus (i.e. not //e or later).
+    This updated version runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="260154">
@@ -706,6 +761,7 @@
     <year>1984</year>
     <publisher>SEGA Enterprises</publisher>
     <info name="release" value="2018-12-21"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233464">
@@ -719,6 +775,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-09-13"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -739,6 +796,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-05"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <!-- Disk A -->
     <part name="flop1" interface="floppy_5_25">
@@ -773,6 +831,7 @@
     <year>1985</year>
     <publisher>Spectrum Holobyte</publisher>
     <info name="release" value="2018-08-14"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233524">
@@ -786,6 +845,9 @@
     <year>1981</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-27"/>
+    <!-- It requires a 48K Apple ][ or ][+.
+    Due to compatibility issues caused by the copy protection,
+    it will not run on any later models. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="120320">
@@ -799,6 +861,7 @@
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-12-25"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="253442">
@@ -812,6 +875,7 @@
     <year>1985</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-08-04"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226840">
@@ -825,6 +889,7 @@
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-11"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233497">
@@ -838,6 +903,7 @@
     <year>1983</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-12-28"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233483">
@@ -851,6 +917,7 @@
     <year>1983</year>
     <publisher>Activision</publisher>
     <info name="release" value="2018-10-11"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233525">
@@ -864,6 +931,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-11-20"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="133638">
@@ -890,6 +958,7 @@
     <year>1985</year>
     <publisher>Accolade</publisher>
     <info name="release" value="2019-01-11"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226850">
@@ -903,6 +972,7 @@
     <year>1980</year>
     <publisher>California Pacific Computers</publisher>
     <info name="release" value="2018-08-09"/>
+    <!-- It runs on any Apple II with 32K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="40463">
@@ -916,6 +986,7 @@
     <year>1983</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-09-29"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="133632">
@@ -929,6 +1000,7 @@
     <year>1983</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-09-29"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -949,6 +1021,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-03"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -969,6 +1042,7 @@
     <year>1982</year>
     <publisher>MUSE Software</publisher>
     <info name="release" value="2018-09-21"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="140311">
@@ -982,6 +1056,7 @@
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-09-25"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240117">
@@ -995,7 +1070,7 @@
     <year>1982</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-09-21"/>
-    <!-- It requires a 48K Apple ][ or ][+.
+    <!-- It requires a 48K Apple II or ][+.
     Due to compatibility issues caused by the copy protection, it will not run
     on any later models. -->
 
@@ -1011,6 +1086,7 @@
     <year>1986</year>
     <publisher>subLOGIC</publisher>
     <info name="release" value="2018-10-24"/>
+    <!-- It requires a 64K Apple II+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="140293">
@@ -1024,6 +1100,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2018-10-28"/>
+    <!-- It run on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233444">
@@ -1037,6 +1114,7 @@
     <year>1983</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-08-24"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226826">
@@ -1050,6 +1128,7 @@
     <year>1984</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2018-08-12"/>
+    <!-- It run on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233456">
@@ -1063,6 +1142,7 @@
     <year>1985</year>
     <publisher>Data East</publisher>
     <info name="release" value="2018-08-31"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233486">
@@ -1076,6 +1156,9 @@
     <year>1984</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-19"/>
+    <!-- It runs on any Apple II with 48K.
+    Side B of the original floppy disk had another copy of the game,
+    but all the graphics were upside down. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -1096,6 +1179,7 @@
     <year>1987</year>
     <publisher>Data East</publisher>
     <info name="release" value="2018-10-19"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -1116,6 +1200,7 @@
     <year>1985</year>
     <publisher>Data East</publisher>
     <info name="release" value="2018-08-20"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233482">
@@ -1129,6 +1214,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-08-20"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -1149,6 +1235,7 @@
     <year>1984</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-09-22"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="206813">
@@ -1162,6 +1249,7 @@
     <year>1982</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-10-21"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233470">
@@ -1175,6 +1263,7 @@
     <year>1986</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-10-21"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -1195,6 +1284,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-01"/>
+    <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233471">
@@ -1208,6 +1298,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-08-13"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="140285">
@@ -1221,6 +1312,7 @@
     <year>1986</year>
     <publisher>Neosoft</publisher>
     <info name="release" value="2018-09-08"/>
+    <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="220133">
@@ -1234,6 +1326,7 @@
     <year>1986</year>
     <publisher>New World Computing</publisher>
     <info name="release" value="2018-09-08"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Disk A"/>
@@ -1266,6 +1359,7 @@
     <year>1982</year>
     <publisher>Micro Fun</publisher>
     <info name="release" value="2018-08-19"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233469">
@@ -1279,6 +1373,7 @@
     <year>1983</year>
     <publisher>Penguin Software</publisher>
     <info name="release" value="2018-12-27"/>
+    <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233479">
@@ -1287,11 +1382,12 @@
     </part>
   </software>
 
-  <software name="mimp2woz">
-    <description>Mission Impossible II</description>
+  <software name="impm2woz">
+    <description>Impossible Mission II</description>
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-27"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -1312,6 +1408,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-02"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233478">
@@ -1325,6 +1422,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2019-01-04"/>
+    <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233476">
@@ -1338,6 +1436,7 @@
     <year>1984</year>
     <publisher>Parker Brothers</publisher>
     <info name="release" value="2019-01-04"/>
+    <!-- It requires a 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233489">
@@ -1346,12 +1445,12 @@
     </part>
   </software>
 
-
   <software name="mpatrwoz">
     <description>Moon Patrol</description>
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2018-08-26"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="346602">
@@ -1365,6 +1464,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-10-24"/>
+    <!-- It requires a 64K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -1385,6 +1485,7 @@
     <year>1984</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-07-30"/>
+    <!-- It runs on any Apple II with 64K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233512">
@@ -1398,6 +1499,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2018-07-30"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="53744">
@@ -1411,6 +1513,7 @@
     <year>1982</year>
     <publisher>subLOGIC</publisher>
     <info name="release" value="2018-09-12"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="146969">
@@ -1424,6 +1527,7 @@
     <year>1982</year>
     <publisher>Mattel Electronics</publisher>
     <info name="release" value="2018-08-06"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233461">
@@ -1437,6 +1541,8 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-29"/>
+    <!-- It requires a 48K Apple ][ or ][+. Due to compatibility issues
+    caused by the copy protection, it will not run on later models. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="106991">
@@ -1450,6 +1556,7 @@
     <year>1981</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-10-29"/>
+    <!-- It runs on any Apple II with 48K -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="87031">
@@ -1463,6 +1570,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-09-16"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="73733">
@@ -1476,6 +1584,7 @@
     <year>1988</year>
     <publisher>Mindscape</publisher>
     <info name="release" value="2018-07-26"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233449">
@@ -1489,6 +1598,8 @@
     <year>1982</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-10-25"/>
+    <!-- It requires a 48K Apple ][ or ][+. Due to compatibility issues caused
+    by the copy protection, it will not run on any later models. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="253404">
@@ -1502,10 +1613,25 @@
     <year>1980</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-20"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="186874">
         <rom name="phantoms five.woz" size="186874" crc="98d7b97f" sha1="c7d2d80bd05298cd6d2722eb513138183f302b67" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="pparawoz">
+    <description>Picnic Paranoia</description>
+    <year>1982</year>
+    <publisher>Synapse Software</publisher>
+    <info name="release" value="2019-01-20"/>
+    <!-- It runs on any Apple II with 48K. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="240120">
+        <rom name="picnic paranoia.woz" size="240120" crc="7ae4e3a7" sha1="3a31084b745f5254c1fab72fbd9ba437ef0609e2" offset="0x0000" />
       </dataarea>
     </part>
   </software>
@@ -1515,6 +1641,7 @@
     <year>1984</year>
     <publisher>Activision</publisher>
     <info name="release" value="2018-09-07"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233494">
@@ -1528,6 +1655,7 @@
     <year>1984</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-10-18"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233488">
@@ -1563,6 +1691,7 @@
     <year>1983</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-02"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="226819">
@@ -1576,6 +1705,8 @@
     <year>1988</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-10-02"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
+
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
       <dataarea name="flop" size="240170">
@@ -1595,6 +1726,7 @@
     <year>1981</year>
     <publisher>Innovative Design Software, Inc.</publisher>
     <info name="release" value="2018-07-28"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="173574">
@@ -1608,6 +1740,7 @@
     <year>1984</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-09-14"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="107006">
@@ -1621,6 +1754,7 @@
     <year>1989</year>
     <publisher>Broderbund</publisher>
     <info name="release" value="2018-09-14"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -1641,6 +1775,7 @@
     <year>1989</year>
     <publisher>Taito America</publisher>
     <info name="release" value="2018-08-05"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233475">
@@ -1654,6 +1789,7 @@
     <year>1987</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-08-27"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233497">
@@ -1667,6 +1803,7 @@
     <year>1988</year>
     <publisher>Activision</publisher>
     <info name="release" value="2018-08-02"/>
+    <!-- It runs on an Apple //e with 128K, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240127">
@@ -1680,6 +1817,9 @@
     <year>1981</year>
     <publisher>BudgeCo</publisher>
     <info name="release" value="2018-10-26"/>
+    <!-- It requires a 48K Apple II or II.
+    Due to compatibility issues caused by the copy protection,
+    it does not run on later models. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="93685">
@@ -1693,6 +1833,9 @@
     <year>1981</year>
     <publisher>Broderbund</publisher>
     <info name="release" value="2018-11-19"/>
+    <!-- It requires a 48K Apple ][ or ][+.
+    Due to compatibility problems caused by the copy protection,
+    it will not run on later models. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="153595">
@@ -1706,6 +1849,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-06"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240149">
@@ -1719,6 +1863,7 @@
     <year>1984</year>
     <publisher>Sir-Tech</publisher>
     <info name="release" value="2018-08-16"/>
+    <!-- It runs on any Apple II with 64K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233518">
@@ -1732,6 +1877,8 @@
     <year>1988</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-08-16"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
+
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
       <dataarea name="flop" size="233512">
@@ -1751,6 +1898,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2019-01-15"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233452">
@@ -1764,6 +1912,7 @@
     <year>1983</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-12-30"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233457">
@@ -1777,6 +1926,7 @@
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
     <info name="release" value="2018-08-08"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240141">
@@ -1790,6 +1940,7 @@
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
     <info name="release" value="2018-11-07"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240148">
@@ -1803,6 +1954,7 @@
     <year>1983</year>
     <publisher>Hayden Book Company</publisher>
     <info name="release" value="2018-08-17"/>
+    <!-- It runs on any 48K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233540">
@@ -1816,6 +1968,7 @@
     <year>1982</year>
     <publisher>Adventure International</publisher>
     <info name="release" value="2018-08-01"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233487">
@@ -1829,6 +1982,7 @@
     <year>1981</year>
     <publisher>IDSI</publisher>
     <info name="release" value="2018-10-16"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="200145">
@@ -1842,6 +1996,7 @@
     <year>1984</year>
     <publisher>Electronic Arts</publisher>
     <info name="release" value="2018-11-11"/>
+    <!-- It requires a 64K Apple ][+ or later. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233473">
@@ -1855,6 +2010,7 @@
     <year>1981</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-07-26"/>
+    <!-- It runs on any Apple II. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="126977">
@@ -1868,8 +2024,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-04"/>
-    <!-- It requires a 48K Apple ][ or ][+. Due to compatibility issues caused
-    by the copy protection, it will not run on any later models. -->
+    <!--  It runs on any Apple II with 48K -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="73739">
@@ -1883,6 +2038,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-09-11"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="93700">
@@ -1897,6 +2053,9 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-31"/>
+    <!-- It requires a 48K Apple ][ or ][+, or an unenhanced Apple //e.
+    Due to compatibility issues caused by the copy protection,
+    it will not run on any later models. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="87036">
@@ -1910,6 +2069,9 @@
     <year>1981</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-10-30"/>
+    <!-- It requires a 48K Apple ][ or ][+.
+    Due to compatibility issues caused by the copy protection,
+    it will not run on any later models. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="133617">
@@ -1923,6 +2085,7 @@
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
     <info name="release" value="2018-11-08"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="346703">
@@ -1936,6 +2099,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-02"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233502">
@@ -1949,6 +2113,7 @@
     <year>1986</year>
     <publisher>Activision</publisher>
     <info name="release" value="2018-09-10"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233475">
@@ -1962,6 +2127,7 @@
     <year>1983</year>
     <publisher>Bally Midway</publisher>
     <info name="release" value="2018-08-20"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240108">
@@ -1975,6 +2141,7 @@
     <year>1983</year>
     <publisher>Penguin Software</publisher>
     <info name="release" value="2018-12-19"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="120385">
@@ -1988,6 +2155,7 @@
     <year>1983</year>
     <publisher>Bally Midway</publisher>
     <info name="release" value="2018-08-20"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233468">
@@ -2001,6 +2169,7 @@
     <year>1982</year>
     <publisher>Penguin</publisher>
     <info name="release" value="2018-08-20"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="120328">
@@ -2014,6 +2183,7 @@
     <year>1980</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-11-03"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="126969">
@@ -2027,6 +2197,7 @@
     <year>1981</year>
     <publisher>Cavalier Computer</publisher>
     <info name="release" value="2018-11-12"/>
+    <!-- It requires a 48K Apple ][ or ][+. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="140293">
@@ -2040,6 +2211,7 @@
     <year>1983</year>
     <publisher>Atarisoft</publisher>
     <info name="release" value="2019-01-13"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233447">
@@ -2053,6 +2225,7 @@
     <year>1984</year>
     <publisher>Penguin Software</publisher>
     <info name="release" value="2018-11-17"/>
+    <!-- It runs on any Apple ][ model with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233471">
@@ -2066,6 +2239,7 @@
     <year>1987</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-26"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233452">
@@ -2079,6 +2253,7 @@
     <year>1987</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-26"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -2099,6 +2274,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-26"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -2119,6 +2295,7 @@
     <year>1988</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-28"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233473">
@@ -2132,6 +2309,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-11-28"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -2152,6 +2330,7 @@
     <year>1981</year>
     <publisher>Piccadilly Software</publisher>
     <info name="release" value="2018-10-17"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="80375">
@@ -2160,13 +2339,13 @@
     </part>
   </software>
 
-
   <software name="smgmewoz">
     <description>Summer Games</description>
     <year>1984</year>
     <publisher>Epyx</publisher>
-
     <info name="release" value="2018-10-17"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
+
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
       <dataarea name="flop" size="233577">
@@ -2186,6 +2365,7 @@
     <year>1984</year>
     <publisher>Windham Classics</publisher>
     <info name="release" value="2018-09-02"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="253471">
@@ -2199,6 +2379,7 @@
     <year>1986</year>
     <publisher>Data East USA</publisher>
     <info name="release" value="2018-10-22"/>
+    <!-- It requires a 64K Apple II+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233465">
@@ -2212,6 +2393,8 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-13"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs.
+    Double hi-res mode requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233494">
@@ -2224,8 +2407,9 @@
     <description>Test Drive</description>
     <year>1985</year>
     <publisher>Accolade</publisher>
-
     <info name="release" value="2018-12-13"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
+
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
       <dataarea name="flop" size="226947">
@@ -2245,6 +2429,8 @@
     <year>1987</year>
     <publisher>Spectrum HoloByte</publisher>
     <info name="release" value="2018-12-13"/>
+    <!-- This version, using double hi-res graphics,
+    requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233512">
@@ -2258,6 +2444,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-12-23"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233485">
@@ -2271,6 +2458,7 @@
     <year>1982</year>
     <publisher>Penguin Software</publisher>
     <info name="release" value="2018-08-30"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="120334">
@@ -2284,6 +2472,7 @@
     <year>1987</year>
     <publisher>ActionSoft</publisher>
     <info name="release" value="2018-11-04"/>
+    <!-- It runs on any Apple II with 64K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="206848">
@@ -2297,6 +2486,7 @@
     <year>1987</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2018-08-23"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233475">
@@ -2309,8 +2499,9 @@
     <description>Trick Shot</description>
     <year>1981</year>
     <publisher>IDSI</publisher>
-
     <info name="release" value="2018-08-23"/>
+    <!-- It requires a 48K Apple ][ or ][+. It will not run on later models. -->
+
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Game Disk"/>
       <dataarea name="flop" size="200176">
@@ -2330,6 +2521,7 @@
     <year>1982</year>
     <publisher>Datamost</publisher>
     <info name="release" value="2018-12-18"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233485">
@@ -2343,6 +2535,7 @@
     <year>1981</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-03"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="426493">
@@ -2446,6 +2639,7 @@
     <year>1981</year>
     <publisher>Bally Midway</publisher>
     <info name="release" value="2018-10-03"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233467">
@@ -2459,6 +2653,7 @@
     <year>1983</year>
     <publisher>H.A.L. Labs</publisher>
     <info name="release" value="2018-10-15"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="67083">
@@ -2472,6 +2667,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-09-30"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="240135">
@@ -2485,6 +2681,7 @@
     <year>1982</year>
     <publisher>Sirius Software</publisher>
     <info name="release" value="2018-10-01"/>
+    <!-- It runs on any Apple II with 48K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233476">
@@ -2498,6 +2695,7 @@
     <year>1986</year>
     <publisher>Broderbund</publisher>
     <info name="release" value="2018-10-01"/>
+    <!-- It runs on any Apple II with 64K. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -2518,6 +2716,7 @@
     <year>1987</year>
     <publisher>Broderbund</publisher>
     <info name="release" value="2018-10-01"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -2560,6 +2759,7 @@
     <year>1986</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-04"/>
+    <!-- It requires a 128K Apple //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233482">
@@ -2573,6 +2773,7 @@
     <year>1984</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-19"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233488">
@@ -2586,6 +2787,7 @@
     <year>1985</year>
     <publisher>Epyx</publisher>
     <info name="release" value="2018-12-19"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
@@ -2606,6 +2808,7 @@
     <year>1984</year>
     <publisher>Mindscape</publisher>
     <info name="release" value="2018-08-25"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="233465">
@@ -2619,6 +2822,7 @@
     <year>1982</year>
     <publisher>subLOGIC</publisher>
     <info name="release" value="2018-11-10"/>
+    <!-- It requires a 48K Apple ][+ or later. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="73745">
@@ -2632,6 +2836,7 @@
     <year>1985</year>
     <publisher>Datasoft</publisher>
     <info name="release" value="2019-01-10"/>
+    <!-- It requires a 64K Apple ][+, //e, //c, or IIgs. -->
 
     <part name="flop1" interface="floppy_5_25">
       <dataarea name="flop" size="133656">
