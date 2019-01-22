@@ -1392,13 +1392,13 @@
     <part name="flop1" interface="floppy_5_25">
       <feature name="part_id" value="Side A"/>
       <dataarea name="flop" size="233525">
-        <rom name="mission impossible ii side a.woz" size="233525" crc="fb26d565" sha1="20303f1f17ce5975df6c5c32d98fb5afdfb18f36" offset="0x0000" />
+        <rom name="impossible mission ii side a.woz" size="233525" crc="fb26d565" sha1="20303f1f17ce5975df6c5c32d98fb5afdfb18f36" offset="0x0000" />
       </dataarea>
     </part>
     <part name="flop2" interface="floppy_5_25">
       <feature name="part_id" value="Side B"/>
       <dataarea name="flop" size="233525">
-        <rom name="mission impossible ii side b.woz" size="233525" crc="0797da53" sha1="f9512f2f6cc7cc54081433bb97a21fceb159942f" offset="0x0000" />
+        <rom name="impossible mission ii side b.woz" size="233525" crc="0797da53" sha1="f9512f2f6cc7cc54081433bb97a21fceb159942f" offset="0x0000" />
       </dataarea>
     </part>
   </software>
