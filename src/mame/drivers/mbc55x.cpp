@@ -232,8 +232,7 @@ MACHINE_CONFIG_START(mbc55x_state::mbc55x)
 	m_maincpu->esc_data_handler().set("coproc", FUNC(i8087_device::addr_w));
 
 	i8087_device &i8087(I8087(config, "coproc", 14.318181_MHz_XTAL / 4));
-	i8087.set_addrmap(AS_PROGRAM, &mbc55x_state::mbc55x_mem);
-	i8087.set_data_width(8);
+	i8087.set_space_88(m_maincpu, AS_PROGRAM);
 	i8087.irq().set(m_pic, FUNC(pic8259_device::ir6_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
