@@ -348,8 +348,8 @@ enum : uint16_t {
 //  LIVE DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(WD33C92, wd33c92_device, "wd33c92", "Western Digital WD33C92 SCSI Controller")
-DEFINE_DEVICE_TYPE(WD33C93N, wd33c93n_device, "wd33c93n", "Western Digital WD33C93 SCSI Controller")
+DEFINE_DEVICE_TYPE(WD33C92,  wd33c92_device,  "wd33c92",  "Western Digital WD33C92 SCSI Controller")
+DEFINE_DEVICE_TYPE(WD33C93,  wd33c93_device,  "wd33c93",  "Western Digital WD33C93 SCSI Controller")
 DEFINE_DEVICE_TYPE(WD33C93A, wd33c93a_device, "wd33c93a", "Western Digital WD33C93A SCSI Controller")
 DEFINE_DEVICE_TYPE(WD33C93B, wd33c93b_device, "wd33c93b", "Western Digital WD33C93B SCSI Controller")
 
@@ -1715,8 +1715,8 @@ wd33c92_device::wd33c92_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-wd33c93n_device::wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: wd33c9x_base_device(mconfig, WD33C93N, tag, owner, clock)
+wd33c93_device::wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: wd33c9x_base_device(mconfig, WD33C93, tag, owner, clock)
 {
 }
 

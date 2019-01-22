@@ -133,8 +133,8 @@ protected:
 	};
 
 	required_device<mips3_device> m_maincpu;
-	required_device<wd33c93n_device> m_wd33c93;
-	optional_device<wd33c93n_device> m_wd33c93_2;
+	required_device<wd33c93_device> m_wd33c93;
+	optional_device<wd33c93_device> m_wd33c93_2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<ds1386_device> m_rtc;
 	required_device<ioc2_device> m_ioc2;

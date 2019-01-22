@@ -110,7 +110,7 @@ protected:
 	required_device<mips3_device> m_maincpu;
 	required_shared_ptr<uint64_t> m_mainram;
 	required_device<sgi_mc_device> m_mem_ctrl;
-	required_device<wd33c93n_device> m_scsi_ctrl;
+	required_device<wd33c93_device> m_scsi_ctrl;
 	required_device<newport_video_device> m_newport;
 	required_device<hpc3_device> m_hpc3;
 };
@@ -129,7 +129,7 @@ public:
 private:
 	void wd33c93_2(device_t *device);
 
-	required_device<wd33c93n_device> m_scsi_ctrl2;
+	required_device<wd33c93_device> m_scsi_ctrl2;
 };
 
 READ32_MEMBER(ip22_state::eisa_io_r)
@@ -194,8 +194,8 @@ INPUT_PORTS_END
 void ip22_state::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93n_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
-	downcast<wd33c93n_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
+	downcast<wd33c93_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_irq));
+	downcast<wd33c93_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
 }
 
 void ip22_state::scsi_devices(device_slot_interface &device)
@@ -223,7 +223,7 @@ void ip22_state::ip22_base(machine_config &config)
 	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom");
 
 	NSCSI_BUS(config, "scsibus", 0);
-    NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93N)
+    NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93)
         .machine_config([this](device_t *device) { wd33c93(device); });
     NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
@@ -261,8 +261,8 @@ void ip22_state::ip224613(machine_config &config)
 void ip24_state::wd33c93_2(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93n_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
-	downcast<wd33c93n_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
+	downcast<wd33c93_device *>(device)->irq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_irq));
+	downcast<wd33c93_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
 }
 
 void ip24_state::ip244415(machine_config &config)
@@ -275,7 +275,7 @@ void ip24_state::ip244415(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip22_map);
 
 	NSCSI_BUS(config, "scsibus2", 0);
-    NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93N)
+    NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93)
         .machine_config([this](device_t *device) { wd33c93_2(device); });
     NSCSI_CONNECTOR(config, "scsibus2:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:2", scsi_devices, nullptr, false);

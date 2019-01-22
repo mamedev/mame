@@ -130,8 +130,8 @@ void hpc1_device::scsi_devices(device_slot_interface &device)
 void hpc1_device::wd33c93(device_t *device)
 {
 	device->set_clock(10000000);
-	downcast<wd33c93n_device *>(device)->irq_cb().set(*this, FUNC(hpc1_device::scsi_irq));
-	downcast<wd33c93n_device *>(device)->drq_cb().set(*this, FUNC(hpc1_device::scsi_drq));
+	downcast<wd33c93_device *>(device)->irq_cb().set(*this, FUNC(hpc1_device::scsi_irq));
+	downcast<wd33c93_device *>(device)->drq_cb().set(*this, FUNC(hpc1_device::scsi_drq));
 }
 
 void hpc1_device::device_add_mconfig(machine_config &config)
@@ -174,7 +174,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	rs232b.rxd_handler().set(m_scc[1], FUNC(scc85c30_device::rxb_w));
 
 	NSCSI_BUS(config, "scsibus", 0);
-    NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93N)
+    NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93)
         .machine_config([this](device_t *device) { wd33c93(device); });
     NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);

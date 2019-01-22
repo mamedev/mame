@@ -119,15 +119,15 @@ public:
 	wd33c92_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class wd33c93n_device : public wd33c9x_base_device
+class wd33c93_device : public wd33c9x_base_device
 {
 public:
-	wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner)
-		: wd33c93n_device(mconfig, tag, owner, 0)
+	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner)
+		: wd33c93_device(mconfig, tag, owner, 0)
 	{
 	}
 
-	wd33c93n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class wd33c93a_device : public wd33c9x_base_device
@@ -153,8 +153,8 @@ public:
 };
 
 
-DECLARE_DEVICE_TYPE(WD33C92, wd33c92_device)
-DECLARE_DEVICE_TYPE(WD33C93N, wd33c93n_device)
+DECLARE_DEVICE_TYPE(WD33C92,  wd33c92_device)
+DECLARE_DEVICE_TYPE(WD33C93,  wd33c93_device)
 DECLARE_DEVICE_TYPE(WD33C93A, wd33c93a_device)
 DECLARE_DEVICE_TYPE(WD33C93B, wd33c93b_device)
 

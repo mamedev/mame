@@ -62,7 +62,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<wd33c93n_device> m_wd33c93;
+	required_device<wd33c93_device> m_wd33c93;
 	required_device_array<scc85c30_device, 3> m_scc;
 	required_device<pit8254_device> m_pit;
 	required_device<dp8573_device> m_rtc;
