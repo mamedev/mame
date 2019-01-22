@@ -1118,11 +1118,12 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	 * slot 0 is reserved for SECAM encoder or Apple II compat card.
 	 * slot 1 always holds the CPU card.
 	 */
-	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
-	MCFG_A2BUS_CPU(A7_CPU_TAG)
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, agat7_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, agat7_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, agat7_state, a2bus_inh_w))
+	A2BUS(config, m_a2bus, 0);
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
+	m_a2bus->irq_w().set(FUNC(agat7_state::a2bus_irq_w));
+	m_a2bus->nmi_w().set(FUNC(agat7_state::a2bus_nmi_w));
+	m_a2bus->inh_w().set(FUNC(agat7_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl2", m_a2bus, agat7_cards, "a7lang");
 	A2BUS_SLOT(config, "sl3", m_a2bus, agat7_cards, "a7fdc");
 	A2BUS_SLOT(config, "sl4", m_a2bus, agat7_cards, "a7ports");

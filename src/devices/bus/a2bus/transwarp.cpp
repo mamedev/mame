@@ -161,7 +161,7 @@ void a2bus_transwarp_device::device_reset()
 {
 	m_bEnabled = true;
 	m_bReadA2ROM = false;
-	set_maincpu_halt(ASSERT_LINE);
+	raise_slot_dma();
 	if (!(m_dsw2->read() & 0x80))
 	{
 		if (m_dsw1->read() & 0x80)
