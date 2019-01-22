@@ -556,14 +556,14 @@ static INPUT_PORTS_START( taikodp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-/*
+
 static INPUT_PORTS_START( xavixp )
     PORT_INCLUDE(xavix)
 
     PORT_MODIFY("REGION") // PAL/NTSC flag
     PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
-*/
+
 
 /* Test mode lists the following
 
@@ -1533,6 +1533,12 @@ CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, xavix ,   xavix_i2c_lotr_state,
    The 'Domyos Interactive System (DiS)' released in France by Decathlon appears to be identical to XaviXPORT (but for PAL regions, and with an entirely different software range)
 */
 
+ROM_START( tmy_thom )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "thomastank.bin", 0x000000, 0x800000, CRC(a52a23be) SHA1(e5b3500239d9e56eb5405f7585982959e5a162da) )
+ROM_END
+
+// XaviXPORT
 ROM_START( xavtenni )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
@@ -1548,17 +1554,45 @@ ROM_START( xavjmat )
 	ROM_LOAD( "xpjmat.bin", 0x000000, 0x1000000, CRC(71a51eef) SHA1(41fd2c3013d1c86756046ec9174e94400f8fa06d) )
 ROM_END
 
-ROM_START( tmy_thom )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
-	ROM_LOAD( "thomastank.bin", 0x000000, 0x800000, CRC(a52a23be) SHA1(e5b3500239d9e56eb5405f7585982959e5a162da) )
+// Domyos DiS (XaviX 2002 based titles)
+
+ROM_START( domfitex )
+	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "xpfitnessexercise.bin", 0x000000, 0x1000000, CRC(f1089229) SHA1(803df8ba0a05cb004a4238c6c71ea1ffa4428990) )
 ROM_END
+
+// TODO: does it have an SEEPROM? why does it hang? full title?
+CONS( 2005, tmy_thom, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",  "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2004, xavtenni, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbaseb, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // TODO: check SEEPROM type and hookup, banking!
 CONS( 2005, xavjmat,  0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-// TODO: does it have an SEEPROM? why does it hang? full title?
-CONS( 2005, tmy_thom, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",  "Thomas and Friends (Tomy)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+// https://arnaudmeyer.wordpress.com/domyos-interactive-system/
+// Domyos Fitness Adventure
+// Domyos Fitness Challenge
+// Domyos Fitness Exercises
+// Domyos Fit Race
+// Domyos Soft Fitness
+// Domyos Fitness Dance
+// Domyos Fitness Play
+// Domyos Fitness Training
 
+// Domyos Bike Concept (not listed on site above)
+
+// Has SEEPROM and an RTC.  Exercise has some leftover PC buffer stuff.  (TODO, check SEEPROM type, RTC type, banking)
+CONS( 200?, domfitex, 0, 0, xavix2000_i2c_24c04, xavixp, xavix_i2c_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// Domyos DiS (unknown hardware, or bad dumps)
+// This DOES NOT look like a 6502 based Xavix / Super Xavix! maybe XaviX 2, the cartridges contain the entire system (CPU,Video,Sound,ROM) so that is possible.
+// Seems to have 32-bit looking stuff, possible vectors at start?
+
+ROM_START( domfitad )
+	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "xpfitnessadventure.bin", 0x000000, 0x1000000, CRC(a7917081) SHA1(95ae5dc6e64a78ae060cb0e61d8b0af34a93c4ce) )
+ROM_END
+
+// Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times. 
+CONS( 2008, domfitad, 0, 0, xavix2000_i2c_24c04, xavixp, xavix_i2c_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
