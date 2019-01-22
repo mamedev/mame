@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.readpa_handler().set(FUNC(tavernie_state::pa_r));

@@ -910,10 +910,10 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2000_flop")
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mz_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(mz700_cassette_formats);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->set_interface("mz_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz2000_cass")
 
@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 
 	SPEAKER(config, "mono").front_center();
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
 MACHINE_CONFIG_END

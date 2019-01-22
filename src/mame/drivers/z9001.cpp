@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(z9001_state::z9001)
 	ctc.zc_callback<0>().set(FUNC(z9001_state::cass_w));
 	ctc.zc_callback<2>().set("z80ctc", FUNC(z80ctc_device::trg3));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -421,9 +421,9 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	ppi.in_pc_callback().set(FUNC(iq151_state::ppi_portc_r));
 	ppi.out_pc_callback().set(FUNC(iq151_state::ppi_portc_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("iq151_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("iq151_cass");
 
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(iq151_state::cassette_timer), attotime::from_hz(2000));
 

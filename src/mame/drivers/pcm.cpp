@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(pcm_state::pcm)
 
 	/* Devices */
 	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cass);
 
 	Z80PIO(config, m_pio_u, XTAL(10'000'000)/4);
 	m_pio_u->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

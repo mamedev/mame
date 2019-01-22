@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
 	PIA6821(config, m_pia_s, 0);
@@ -541,8 +541,8 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_GENERIC_SOCKET_ADD("exp0d", generic_plain_slot, "pegasus_cart")
 	MCFG_GENERIC_LOAD(pegasus_state, exp0d_load)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED);
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pegasus_cart")

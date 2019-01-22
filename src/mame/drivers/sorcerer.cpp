@@ -426,8 +426,8 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
-	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
+	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	WAVE(config, "wave2", m_cassette2).add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	AY31015(config, m_uart);
 	m_uart->set_tx_clock(ES_UART_CLOCK);
@@ -449,15 +449,15 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", 2)
 	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", 3)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(sorcerer_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sorcerer_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_formats(sorcerer_cassette_formats);
+	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_interface("sorcerer_cass");
 
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_FORMATS(sorcerer_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sorcerer_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_formats(sorcerer_cassette_formats);
+	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_interface("sorcerer_cass");
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "sorcerer_cart")

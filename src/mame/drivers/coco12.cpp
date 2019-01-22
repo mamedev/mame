@@ -463,9 +463,9 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	// Becker Port device
 	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(coco_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
@@ -516,8 +516,8 @@ void coco12_state::cocoe(machine_config &config)
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	COCO_VHD(config, m_vhd_0, 0);
-	COCO_VHD(config, m_vhd_1, 0);
+	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
+	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 }
 
 MACHINE_CONFIG_START(coco12_state::cocoeh)
@@ -534,8 +534,8 @@ void coco12_state::coco2(machine_config &config)
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	COCO_VHD(config, m_vhd_0, 0);
-	COCO_VHD(config, m_vhd_1, 0);
+	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
+	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 }
 
 MACHINE_CONFIG_START(coco12_state::coco2h)

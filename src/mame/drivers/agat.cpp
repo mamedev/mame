@@ -1129,8 +1129,8 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	A2BUS_SLOT(config, "sl5", m_a2bus, agat7_cards, nullptr);
 	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
 
-	MCFG_CASSETTE_ADD(m_cassette)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	CASSETTE(config,m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
 MACHINE_CONFIG_END
 
 

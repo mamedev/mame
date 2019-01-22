@@ -2048,7 +2048,7 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -2059,10 +2059,10 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 
@@ -2099,7 +2099,7 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -2110,10 +2110,10 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
@@ -2150,7 +2150,7 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	m_ym->port_b_read_callback().set(FUNC(fm7_state::fm77av_joy_2_r));
 	m_ym->add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
@@ -2167,10 +2167,10 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	MCFG_PALETTE_ADD("av_palette", 4096)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
 
@@ -2211,7 +2211,7 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
@@ -2227,10 +2227,10 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
@@ -2262,7 +2262,7 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
@@ -2273,10 +2273,10 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));

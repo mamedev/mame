@@ -1522,8 +1522,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// external cassette
-	MCFG_CASSETTE_ADD("extcas")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	CASSETTE(config, m_ext_cas);
+	m_ext_cas->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
 
 	TIMER(config, m_ext_cas_timer).configure_generic(FUNC(px4_state::ext_cassette_read));
 

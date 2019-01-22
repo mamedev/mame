@@ -361,8 +361,8 @@ MACHINE_CONFIG_START(lc80_state::lc80)
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("2K,3K,4K");
 MACHINE_CONFIG_END
@@ -398,8 +398,8 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("4K");

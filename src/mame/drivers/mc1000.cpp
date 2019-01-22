@@ -578,9 +578,9 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mc1000_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("mc1000_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc1000_cass")
 

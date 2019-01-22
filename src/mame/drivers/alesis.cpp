@@ -434,9 +434,9 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 
 	PALETTE(config, "palette", FUNC(alesis_state::alesis_palette), 2);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("hr16_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("hr16_cass");
 
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 16);

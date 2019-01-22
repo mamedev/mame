@@ -780,9 +780,9 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
 	usart_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_rxc));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("alphatro_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->set_interface("alphatro_cass");
 	MCFG_SOFTWARE_LIST_ADD("cass_list","alphatro_cass")
 
 	TIMER(config, "timer_c").configure_periodic(FUNC(alphatro_state::timer_c), attotime::from_hz(4800));

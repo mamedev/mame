@@ -216,10 +216,10 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 
 	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
 	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("dragon_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(coco_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_interface("dragon_cass");
 
 	PRINTER(config, m_printer, 0);
 

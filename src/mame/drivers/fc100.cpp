@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 	ay8910_device &psg(AY8910(config, "psg", XTAL(7'159'090)/3/2));  /* AY-3-8910 - clock not verified */
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
@@ -544,9 +544,9 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	psg.add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fc100_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(fc100_cassette_formats);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(FUNC(fc100_state::txdata_callback));

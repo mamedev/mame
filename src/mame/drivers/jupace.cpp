@@ -776,7 +776,7 @@ MACHINE_CONFIG_START(ace_state::ace)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	AY8910(config, AY8910_TAG, XTAL(6'500'000) / 2).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -785,10 +785,10 @@ MACHINE_CONFIG_START(ace_state::ace)
 	m_sp0256->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(ace_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("jupace_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(ace_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("jupace_cass");
 
 	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 

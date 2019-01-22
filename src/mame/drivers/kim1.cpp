@@ -258,10 +258,10 @@ MACHINE_CONFIG_START(kim1_state::kim1)
 
 	MOS6530(config, "miot_u3", 1000000);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(kim1_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE ("kim1_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(kim1_cassette_formats);
+	m_cass->set_default_state(CASSETTE_STOPPED);
+	m_cass->set_interface ("kim1_cass");
 
 	TIMER(config, "led_timer").configure_periodic(FUNC(kim1_state::kim1_update_leds), attotime::from_hz(60));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::kim1_cassette_input), attotime::from_hz(44100));

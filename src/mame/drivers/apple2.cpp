@@ -1441,9 +1441,9 @@ MACHINE_CONFIG_START(apple2_state::apple2_common)
 	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig");
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
-	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("apple2_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("apple2_cass");
 MACHINE_CONFIG_END
 
 void apple2_state::apple2(machine_config &config)

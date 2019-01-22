@@ -1000,7 +1000,7 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();

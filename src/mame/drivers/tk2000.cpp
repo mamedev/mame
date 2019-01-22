@@ -593,8 +593,8 @@ MACHINE_CONFIG_START(tk2000_state::tk2000)
 
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
 MACHINE_CONFIG_END
 
 /***************************************************************************

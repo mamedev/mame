@@ -249,10 +249,10 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
 	m_dma8257->set_reverse_rw_mode(1);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rkm_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mikrosha_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rkm_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("mikrosha_cass");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mikrosha_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

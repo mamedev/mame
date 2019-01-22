@@ -320,13 +320,13 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
 	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(phc25_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("phc25_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(phc25_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("phc25_cass");
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, phc25_state, write_centronics_busy))

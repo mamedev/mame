@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.50);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
@@ -419,8 +419,8 @@ MACHINE_CONFIG_START(d6800_state::d6800)
 	m_pia->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	TIMER(config, "d6800_c").configure_periodic(FUNC(d6800_state::d6800_c), attotime::from_hz(4800));
 	TIMER(config, "d6800_p").configure_periodic(FUNC(d6800_state::d6800_p), attotime::from_hz(40000));

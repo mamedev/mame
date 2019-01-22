@@ -682,8 +682,8 @@ MACHINE_CONFIG_START(fp1100_state::fp1100)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* Cassette */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	TIMER(config, "timer_c").configure_periodic(FUNC(fp1100_state::timer_c), attotime::from_hz(4800)); // cass write
 MACHINE_CONFIG_END
 

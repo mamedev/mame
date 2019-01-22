@@ -4060,8 +4060,8 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
 	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig");
 
-	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
 MACHINE_CONFIG_END
 
 void apple2e_state::mprof3(machine_config &config)

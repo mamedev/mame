@@ -273,9 +273,9 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	// Becker Port device
 	MCFG_DEVICE_ADD(DWSOCK_TAG, COCO_DWSOCK, 0)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(coco_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
@@ -286,8 +286,8 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	COCO_VHD(config, m_vhd_0, 0);
-	COCO_VHD(config, m_vhd_1, 0);
+	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
+	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 
 	// video hardware
 	config.set_default_layout(layout_coco3);

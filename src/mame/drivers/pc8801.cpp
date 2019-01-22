@@ -2376,8 +2376,8 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	#endif
 	UPD1990A(config, m_rtc);
 	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
 

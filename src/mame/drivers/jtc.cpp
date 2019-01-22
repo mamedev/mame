@@ -818,8 +818,8 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	m_maincpu->p3_out_cb().set(FUNC(jtc_state::p3_w));
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
