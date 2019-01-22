@@ -467,7 +467,8 @@ TIMER_CALLBACK_MEMBER(xavix_state::interrupt_gen)
 
 		m_screen->update_partial(m_screen->vpos());
 	}
-	m_interrupt_timer->adjust(attotime::never, 0);
+//	m_interrupt_timer->adjust(attotime::never, 0);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(m_posirq_y[0], m_posirq_x[0]), 0); // epo_dmon expects it to keep firing without being reloaded? check this doesn't break anything else!
 }
 
 
