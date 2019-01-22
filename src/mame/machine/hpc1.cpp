@@ -10,9 +10,9 @@
 #include "cpu/mips/mips3.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd512.h"
-#include "bus/scsi/scsihd.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
 #include "bus/sgikbd/sgikbd.h"
 #include "machine/hpc1.h"
 #include "speaker.h"
@@ -28,9 +28,10 @@
 #define LOG_DUART1      (1 << 8)
 #define LOG_DUART2      (1 << 9)
 #define LOG_PIT         (1 << 10)
+#define LOG_CHAIN       (1 << 11)
 #define LOG_REGS        (LOG_UNKNOWN | LOG_READS | LOG_WRITES)
 #define LOG_DUART       (LOG_DUART0 | LOG_DUART1 | LOG_DUART2)
-#define LOG_ALL         (LOG_REGS | LOG_INT | LOG_EEPROM | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT)
+#define LOG_ALL         (LOG_REGS | LOG_INT | LOG_EEPROM | LOG_SCSI | LOG_SCSI_DMA | LOG_DUART | LOG_PIT | LOG_CHAIN)
 
 #define VERBOSE         (LOG_UNKNOWN)
 #include "logmacro.h"
@@ -50,7 +51,7 @@ hpc1_device::hpc1_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, SGI_HPC1, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
-	, m_wd33c93(*this, "wd33c93")
+	, m_wd33c93(*this, "scsibus:0:wd33c93")
 	, m_scc(*this, "scc%u", 0U)
 	, m_pit(*this, "pit")
 	, m_rtc(*this, "rtc")
@@ -68,14 +69,14 @@ void hpc1_device::device_start()
 	save_item(NAME(m_vme_int_mask));
 
 	save_item(NAME(m_scsi_dma.m_desc));
-	save_item(NAME(m_scsi_dma.m_ctrl));
 	save_item(NAME(m_scsi_dma.m_addr));
-	save_item(NAME(m_scsi_dma.m_flag));
-	save_item(NAME(m_scsi_dma.m_next));
+	save_item(NAME(m_scsi_dma.m_ctrl));
 	save_item(NAME(m_scsi_dma.m_length));
+	save_item(NAME(m_scsi_dma.m_next));
+	save_item(NAME(m_scsi_dma.m_irq));
+	save_item(NAME(m_scsi_dma.m_drq));
 	save_item(NAME(m_scsi_dma.m_to_mem));
 	save_item(NAME(m_scsi_dma.m_active));
-	save_item(NAME(m_scsi_dma.m_end));
 
 	save_item(NAME(m_duart_int_status));
 }
@@ -91,14 +92,14 @@ void hpc1_device::device_reset()
 	memset(m_vme_int_mask, 0, sizeof(uint32_t) * 2);
 
 	m_scsi_dma.m_desc = 0;
-	m_scsi_dma.m_ctrl = 0;
 	m_scsi_dma.m_addr = 0;
-	m_scsi_dma.m_flag = 0;
-	m_scsi_dma.m_next = 0;
+	m_scsi_dma.m_ctrl = 0;
 	m_scsi_dma.m_length = 0;
+	m_scsi_dma.m_next = 0;
+	m_scsi_dma.m_irq = false;
+	m_scsi_dma.m_drq = false;
 	m_scsi_dma.m_to_mem = false;
 	m_scsi_dma.m_active = false;
-	m_scsi_dma.m_end = false;
 
 	m_duart_int_status = 0;
 
@@ -111,13 +112,26 @@ void hpc1_device::device_reset()
 
 void hpc1_device::cdrom_config(device_t *device)
 {
-	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(ALL_OUTPUTS, "^^mono", 1.0);
+	//	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	//	cdda->add_route(ALL_OUTPUTS, "^^mono", 1.0);
 }
 
 void hpc1_device::indigo_mice(device_slot_interface &device)
 {
 	device.option_add("sgimouse", SGI_HLE_SERIAL_MOUSE);
+}
+
+void hpc1_device::scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+}
+
+void hpc1_device::wd33c93(device_t *device)
+{
+	device->set_clock(10000000);
+	downcast<wd33c93n_device *>(device)->irq_cb().set(*this, FUNC(hpc1_device::scsi_irq));
+	downcast<wd33c93n_device *>(device)->drq_cb().set(*this, FUNC(hpc1_device::scsi_drq));
 }
 
 void hpc1_device::device_add_mconfig(machine_config &config)
@@ -159,16 +173,18 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	rs232b.dcd_handler().set(m_scc[1], FUNC(scc85c30_device::dcdb_w));
 	rs232b.rxd_handler().set(m_scc[1], FUNC(scc85c30_device::rxb_w));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(2, "cdrom", RRD45, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-	scsi.slot(2).set_option_machine_config("cdrom", cdrom_config);
+	NSCSI_BUS(config, "scsibus", 0);
+    NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93N)
+        .machine_config([this](device_t *device) { wd33c93(device); });
+    NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "cdrom", false);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, nullptr, false);
+    NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
 
 	DP8573(config, m_rtc);
-
-	WD33C93(config, m_wd33c93);
-	m_wd33c93->set_scsi_port("scsi");
-	m_wd33c93->irq_cb().set(FUNC(hpc1_device::scsi_irq));
 
 	PIT8254(config, m_pit, 0);
 	m_pit->set_clk<0>(1000000);
@@ -207,13 +223,13 @@ READ32_MEMBER(hpc1_device::read)
 		return 0x00000000;
 	case 0x0120/4:
 	{
-		uint32_t ret = m_wd33c93->read(space, 0) << 8;
+		uint32_t ret = m_wd33c93->indir_addr_r() << 8;
 		LOGMASKED(LOG_SCSI, "%s: HPC SCSI Offset 0 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		return ret;
 	}
 	case 0x0124/4:
 	{
-		uint32_t ret = m_wd33c93->read(space, 1) << 8;
+		uint32_t ret = m_wd33c93->indir_reg_r() << 8;
 		LOGMASKED(LOG_SCSI, "%s: HPC SCSI Offset 1 Read: %08x & %08x\n", machine().describe_context(), ret, mem_mask);
 		return ret;
 	}
@@ -332,6 +348,8 @@ WRITE32_MEMBER(hpc1_device::write)
 		m_scsi_dma.m_ctrl = data &~ (HPC_DMACTRL_FLUSH | HPC_DMACTRL_RESET);
 		m_scsi_dma.m_to_mem = (m_scsi_dma.m_ctrl & HPC_DMACTRL_TO_MEM);
 		m_scsi_dma.m_active = (m_scsi_dma.m_ctrl & HPC_DMACTRL_ENABLE);
+		if (m_scsi_dma.m_drq && m_scsi_dma.m_active)
+			do_scsi_dma();
 		break;
 
 	case 0x00ac/4:
@@ -342,14 +360,14 @@ WRITE32_MEMBER(hpc1_device::write)
 		if (ACCESSING_BITS_8_15)
 		{
 			LOGMASKED(LOG_SCSI, "%s: HPC SCSI Controller Address Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			m_wd33c93->write(space, 0, (uint8_t)(data >> 8));
+			m_wd33c93->indir_addr_w((uint8_t)(data >> 8));
 		}
 		break;
 	case 0x0124/4:
 		if (ACCESSING_BITS_8_15)
 		{
 			LOGMASKED(LOG_SCSI, "%s: HPC SCSI Controller Data Write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			m_wd33c93->write(space, 1, (uint8_t)(data >> 8));
+			m_wd33c93->indir_reg_w((uint8_t)(data >> 8));
 		}
 		break;
 	case 0x01b0/4:
@@ -484,134 +502,76 @@ WRITE32_MEMBER(hpc1_device::write)
 //  SCSI DMA
 //**************************************************************************
 
+void hpc1_device::dump_chain(uint32_t base)
+{
+	const uint32_t addr = m_cpu_space->read_dword(base);
+	const uint32_t ctrl = m_cpu_space->read_dword(base+4);
+	const uint32_t next = m_cpu_space->read_dword(base+8);
+
+	LOGMASKED(LOG_CHAIN, "Chain Node:\n");
+	LOGMASKED(LOG_CHAIN, "    Addr: %08x\n", addr);
+	LOGMASKED(LOG_CHAIN, "    Ctrl: %08x\n", ctrl);
+	LOGMASKED(LOG_CHAIN, "    Next: %08x\n", next);
+
+	if (next != 0 && !BIT(addr, 31))
+	{
+		dump_chain(next & 0x0fffffff);
+	}
+}
 void hpc1_device::fetch_chain()
 {
-	m_scsi_dma.m_flag = m_cpu_space->read_dword(m_scsi_dma.m_desc);
+	m_scsi_dma.m_ctrl = m_cpu_space->read_dword(m_scsi_dma.m_desc);
 	m_scsi_dma.m_addr = m_cpu_space->read_dword(m_scsi_dma.m_desc+4);
 	m_scsi_dma.m_next = m_cpu_space->read_dword(m_scsi_dma.m_desc+8);
-	m_scsi_dma.m_length = m_scsi_dma.m_flag & 0x1fff;
-	LOGMASKED(LOG_SCSI_DMA, "Fetched SCSI DMA Descriptor block:\n");
-	LOGMASKED(LOG_SCSI_DMA, "    Ctrl: %08x\n", m_scsi_dma.m_flag);
-	LOGMASKED(LOG_SCSI_DMA, "    Addr: %08x\n", m_scsi_dma.m_addr);
-	LOGMASKED(LOG_SCSI_DMA, "    Next: %08x\n", m_scsi_dma.m_next);
-	LOGMASKED(LOG_SCSI_DMA, "    Length: %04x\n", m_scsi_dma.m_length);
-	m_scsi_dma.m_end = BIT(m_scsi_dma.m_addr, 31);
-	m_scsi_dma.m_addr &= 0x0fffffff;
-	m_scsi_dma.m_next &= 0x0fffffff;
+	m_scsi_dma.m_length = m_scsi_dma.m_ctrl & 0x3fff;
+
+	LOGMASKED(LOG_CHAIN, "Fetching chain from %08x:\n", m_scsi_dma.m_desc);
+	LOGMASKED(LOG_CHAIN, "    Addr: %08x\n", m_scsi_dma.m_addr);
+	LOGMASKED(LOG_CHAIN, "    Ctrl: %08x\n", m_scsi_dma.m_ctrl);
+	LOGMASKED(LOG_CHAIN, "    Next: %08x\n", m_scsi_dma.m_next);
 }
 
-void hpc1_device::advance_chain()
+void hpc1_device::decrement_chain()
 {
-	m_scsi_dma.m_addr++;
 	m_scsi_dma.m_length--;
 	if (m_scsi_dma.m_length == 0)
 	{
-		if (m_scsi_dma.m_end)
+		if (BIT(m_scsi_dma.m_addr, 31))
 		{
-			LOGMASKED(LOG_SCSI_DMA, "HPC: Disabling SCSI DMA due to end of chain\n");
 			m_scsi_dma.m_active = false;
 			m_scsi_dma.m_ctrl &= ~HPC_DMACTRL_ENABLE;
+			return;
 		}
-		else
-		{
-			m_scsi_dma.m_desc = m_scsi_dma.m_next;
-			fetch_chain();
-		}
+		m_scsi_dma.m_desc = m_scsi_dma.m_next & 0x0fffffff;
+		fetch_chain();
 	}
 }
 
-void hpc1_device::scsi_dma()
+WRITE_LINE_MEMBER(hpc1_device::scsi_drq)
 {
-	int byte_count = m_wd33c93->get_dma_count();
+    m_scsi_dma.m_drq = state;
 
-	LOGMASKED(LOG_SCSI_DMA, "HPC: Transferring %d bytes %s %08x %s SCSI0\n",
-		byte_count, m_scsi_dma.m_to_mem ? "to" : "from", m_scsi_dma.m_addr, m_scsi_dma.m_to_mem ? "from" : "to");
+    if (m_scsi_dma.m_drq && m_scsi_dma.m_active)
+    {
+        do_scsi_dma();
+    }
+}
 
-	uint8_t dma_buffer[512];
-	if (m_scsi_dma.m_to_mem)
-	{
-		// HPC SCSI DMA: device to host
-		if (byte_count <= 512)
-		{
-			m_wd33c93->dma_read_data(byte_count, dma_buffer);
-
-			for (int i = 0; i < byte_count; i++)
-			{
-				LOGMASKED(LOG_SCSI_DMA, "HPC: Reading %02x to %08x\n", dma_buffer[i], m_scsi_dma.m_addr);
-				m_cpu_space->write_byte(m_scsi_dma.m_addr, dma_buffer[i]);
-				advance_chain();
-				if (!m_scsi_dma.m_active)
-					break;
-			}
-		}
-		else
-		{
-			while (byte_count)
-			{
-				int sub_count = m_wd33c93->dma_read_data(512, dma_buffer);
-
-				for (int i = 0; i < sub_count; i++)
-				{
-					LOGMASKED(LOG_SCSI_DMA, "HPC: Reading %02x to %08x\n", dma_buffer[i], m_scsi_dma.m_addr);
-					m_cpu_space->write_byte(m_scsi_dma.m_addr, dma_buffer[i]);
-					advance_chain();
-					if (!m_scsi_dma.m_active)
-						break;
-				}
-
-				byte_count -= sub_count;
-				if (!m_scsi_dma.m_active)
-					break;
-			}
-		}
-	}
+void hpc1_device::do_scsi_dma()
+{
+    if (m_scsi_dma.m_to_mem)
+		m_cpu_space->write_byte(m_scsi_dma.m_addr & 0x0fffffff, m_wd33c93->dma_r());
 	else
+		m_wd33c93->dma_w(m_cpu_space->read_byte(m_scsi_dma.m_addr & 0x0fffffff));
+
+	m_scsi_dma.m_addr++;
+	decrement_chain();
+
+	if (!m_scsi_dma.m_active)
 	{
-		// HPC SCSI DMA: host to device
-		if (byte_count <= 512)
-		{
-			for (int i = 0; i < byte_count; i++)
-			{
-				dma_buffer[i] = m_cpu_space->read_byte(m_scsi_dma.m_addr);
-				LOGMASKED(LOG_SCSI_DMA, "HPC: Writing %02x from %08x\n", dma_buffer[i], m_scsi_dma.m_addr);
-				advance_chain();
-				if (!m_scsi_dma.m_active)
-					break;
-			}
-
-			m_wd33c93->dma_write_data(byte_count, dma_buffer);
-		}
-		else
-		{
-			while (byte_count)
-			{
-				int sub_count = std::min(512, byte_count);
-
-				for (int i = 0; i < sub_count; i++)
-				{
-					dma_buffer[i] = m_cpu_space->read_byte(m_scsi_dma.m_addr);
-					LOGMASKED(LOG_SCSI_DMA, "HPC: Writing %02x from %08x\n", dma_buffer[i], m_scsi_dma.m_addr);
-					advance_chain();
-					if (!m_scsi_dma.m_active)
-						break;
-				}
-
-				m_wd33c93->dma_write_data(sub_count, dma_buffer);
-
-				if (!m_scsi_dma.m_active)
-				{
-					break;
-				}
-				else
-				{
-					byte_count -= sub_count;
-				}
-			}
-		}
+		// clear HPC3 DMA active flag
+		m_scsi_dma.m_ctrl &= ~HPC_DMACTRL_ENABLE;
 	}
-
-	// clear DMA on the controller
-	m_wd33c93->clear_dma();
 }
 
 //**************************************************************************
@@ -710,11 +670,6 @@ WRITE_LINE_MEMBER(hpc1_device::scsi_irq)
 	if (state)
 	{
 		LOGMASKED(LOG_SCSI, "SCSI: Set IRQ\n");
-		int count = m_wd33c93->get_dma_count();
-		LOGMASKED(LOG_SCSI_DMA, "SCSI: count %d, active %d\n", count, m_scsi_dma.m_active);
-		if (count && m_scsi_dma.m_active)
-			scsi_dma();
-
 		raise_local_irq(0, LOCAL0_SCSI);
 	}
 	else

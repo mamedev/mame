@@ -18,18 +18,18 @@ public:
 	auto drq_cb() { return m_drq_cb.bind(); }
 
 	// Direct Addressing Interface
-	DECLARE_READ8_MEMBER(dir_r);
-	DECLARE_WRITE8_MEMBER(dir_w);
+	uint8_t dir_r(offs_t offset);
+	void dir_w(offs_t offset, uint8_t data);
 
 	// Indirect Addressing Interface
-	DECLARE_READ8_MEMBER(indir_r);
-	DECLARE_WRITE8_MEMBER(indir_w);
+	uint8_t indir_r(offs_t offset);
+	void indir_w(offs_t offset, uint8_t data);
 
 	// Alternative Indirect Addressing Interface
-	DECLARE_READ8_MEMBER(indir_addr_r);
-	DECLARE_WRITE8_MEMBER(indir_addr_w);
-	DECLARE_READ8_MEMBER(indir_reg_r);
-	DECLARE_WRITE8_MEMBER(indir_reg_w);
+	uint8_t indir_addr_r();
+	void indir_addr_w(uint8_t data);
+	uint8_t indir_reg_r();
+	void indir_reg_w(uint8_t data);
 
 	// Master Reset (MR) Interface
 	DECLARE_WRITE_LINE_MEMBER(reset_w);

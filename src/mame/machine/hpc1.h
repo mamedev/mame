@@ -14,7 +14,7 @@
 #include "machine/dp8573.h"
 #include "machine/eepromser.h"
 #include "machine/pit8253.h"
-#include "machine/wd33c93.h"
+#include "machine/wd33c9x.h"
 #include "machine/z80scc.h"
 
 class hpc1_device : public device_t
@@ -39,6 +39,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
 
 	void set_timer_int_clear(uint32_t data);
 	DECLARE_WRITE_LINE_MEMBER(timer0_int);
@@ -53,13 +54,15 @@ protected:
 	void lower_local_irq(int channel, uint8_t source_mask);
 	void update_irq(int channel);
 
+    void do_scsi_dma();
+
+	void dump_chain(uint32_t base);
 	void fetch_chain();
-	void advance_chain();
-	void scsi_dma();
+	void decrement_chain();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<wd33c93_device> m_wd33c93;
+	required_device<wd33c93n_device> m_wd33c93;
 	required_device_array<scc85c30_device, 3> m_scc;
 	required_device<pit8254_device> m_pit;
 	required_device<dp8573_device> m_rtc;
@@ -94,18 +97,20 @@ protected:
 	struct scsi_dma_t
 	{
 		uint32_t m_desc;
-		uint32_t m_ctrl;
 		uint32_t m_addr;
-		uint32_t m_flag;
+		uint32_t m_ctrl;
+		uint32_t m_length;
 		uint32_t m_next;
-		uint16_t m_length;
+		bool m_irq;
+        bool m_drq;
 		bool m_to_mem;
 		bool m_active;
-		bool m_end;
 	};
 
 	static void cdrom_config(device_t *device);
+	static void scsi_devices(device_slot_interface &device);
 	static void indigo_mice(device_slot_interface &device);
+	void wd33c93(device_t *device);
 
 	uint8_t m_misc_status;
 	uint32_t m_cpu_aux_ctrl;
