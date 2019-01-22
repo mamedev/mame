@@ -202,21 +202,16 @@ void nscsi_cdrom_device::scsi_command()
 		 * is returned with sense data ILLEGAL REQUEST and LOGICAL UNIT NOT
 		 * SUPPORTED.
 		 */
-		if(lun) {
-			bad_lun();
-			return;
-		}
-
 		int page = scsi_cmdbuf[2];
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
 			std::fill_n(scsi_cmdbuf, 36, 0);
 
-			// vendor and product information must be padded with spaces
-			std::fill_n(&scsi_cmdbuf[8], 28, 0x20);
-
-			scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
+			if (lun != 0)
+				scsi_cmdbuf[0] = 0x7f;
+			else
+				scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
 			scsi_cmdbuf[1] = 0x80; // media is removable
 			scsi_cmdbuf[2] = compliance; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x02; // response data format = SPC-3 standard
@@ -225,6 +220,8 @@ void nscsi_cdrom_device::scsi_command()
 			strncpy((char *)&scsi_cmdbuf[8], manufacturer, 8);
 			strncpy((char *)&scsi_cmdbuf[16], product, 16);
 			strncpy((char *)&scsi_cmdbuf[32], revision, 4);
+
+			// vendor and product information must be padded with spaces
 			for(int i = 8; i < 36; i++)
 				if(scsi_cmdbuf[i] == 0)
 					scsi_cmdbuf[i] = 0x20;
@@ -321,10 +318,11 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = (bytes_per_block>>8)&0xff;
 		scsi_cmdbuf[pos++] = (bytes_per_block & 0xff);
 
+		bool fail = false;
 		int pmax = page == 0x3f ? 0x3e : page;
 		int pmin = page == 0x3f ? 0x00 : page;
-		for(int page=pmax; page >= pmin; page--) {
-			switch(page) {
+		for(int p=pmax; p >= pmin; p--) {
+			switch(p) {
 			case 0x00: // Vendor specific (does not require page format)
 				scsi_cmdbuf[pos++] = 0x80; // PS, page id
 				scsi_cmdbuf[pos++] = 0x02; // Page length
@@ -352,7 +350,10 @@ void nscsi_cdrom_device::scsi_command()
 				break;
 
 			default:
-				LOG("mode sense page %02x unhandled\n", page);
+				if (page != 0x3f) {
+					LOG("mode sense page %02x unhandled\n", p);
+					fail = true;
+				}
 				break;
 			}
 		}
@@ -360,8 +361,13 @@ void nscsi_cdrom_device::scsi_command()
 		if(pos > size)
 			pos = size;
 
-		scsi_data_in(0, pos);
-		scsi_status_complete(SS_GOOD);
+		if (!fail) {
+			scsi_data_in(0, pos);
+			scsi_status_complete(SS_GOOD);
+		} else {
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 	}
 
