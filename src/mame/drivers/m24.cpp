@@ -133,6 +133,7 @@ private:
 void m24_state::machine_start()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
+	subdevice<i8087_device>("ndp")->space(0).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	std::fill_n(&m_dma_segment[0], 4, 0);
 	m_dma_active = 0;
