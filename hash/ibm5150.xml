@@ -10491,6 +10491,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="supertet">
+		<description>Super Tetris</description>
+		<year>1991</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="developer" value="Sphere" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Super Tetris [Spectrum Holobyte] [1991] [3,5DD] [Disk 1 of 1].img" size="737280" crc="7e506514" sha1="a961229ec82ec8f5eafd57b239b61ece448e437b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superman">
 		<description>Superman - The Man of Steel</description>
 		<year>1989</year>
@@ -10813,6 +10826,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Xenon [Melbourne House] [1988] [5.25DD] [Disk 2 of 2].img" size="368640" crc="7b4c8346" sha1="050e699aa3babb52b84cfa9dfe7530859a9d7c14" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenon2">
+		<description>Xenon 2: Megablast (Power Pack Compilation)</description>
+		<year>1990</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="developer" value="The Assembly Line - The Bitmap Brothers" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Xenon 2 (Power Pack Compilation) [Mirrorsoft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="e11986f8" sha1="b70e62ff6af4270188f85dbd4d7bf24d4acc45b7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

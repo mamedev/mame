@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2) /* 6 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", iqblock_state, irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(iqblock_state::irq), "screen", 0, 1);
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.in_pa_callback().set_ioport("P1");

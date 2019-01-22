@@ -794,7 +794,7 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(royalqn_map)
 	MCFG_DEVICE_IO_MAP(royalqn_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("sub", NSC8105, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(royalqn_nsc_map)
@@ -835,14 +835,14 @@ MACHINE_CONFIG_START(nightgal_state::sexygal)
 	MCFG_DEVICE_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(sexygal_audio_map)
 
-	MCFG_DEVICE_ADD("sampleclk", CLOCK, 6000) // quite a wild guess
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	clock_device &sampleclk(CLOCK(config, "sampleclk", 6000)); // quite a wild guess
+	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_REMOVE("aysnd")
+	config.device_remove("aysnd");
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
 	ymsnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
@@ -856,8 +856,8 @@ MACHINE_CONFIG_START(nightgal_state::sweetgal)
 	MCFG_DEVICE_PROGRAM_MAP(sweetgal_map)
 
 	// doesn't have the extra NSC8105 (so how does this play samples?)
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("sampleclk")
+	config.device_remove("audiocpu");
+	config.device_remove("sampleclk");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::ngalsumr)
@@ -876,8 +876,8 @@ MACHINE_CONFIG_START(nightgal_state::sgaltrop)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(sgaltrop_nsc_map)
 
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("sampleclk")
+	config.device_remove("audiocpu");
+	config.device_remove("sampleclk");
 MACHINE_CONFIG_END
 
 /*

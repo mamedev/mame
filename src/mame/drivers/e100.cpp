@@ -596,7 +596,7 @@ MACHINE_CONFIG_START(e100_state::e100)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* There is a 50Hz signal from the video circuit to CA1 which generates interrupts and drives a software RTC */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
+	TIMER(config, "video50hz").configure_periodic(FUNC(e100_state::rtc_w), attotime::from_hz(100)); /* Will be divided by two through toggle in the handler */
 MACHINE_CONFIG_END
 
 /* ROM sets from Didact was not versioned in general, so the numbering are just assumptions */

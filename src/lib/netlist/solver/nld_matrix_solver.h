@@ -120,7 +120,7 @@ public:
 	bool has_timestep_devices() const { return m_step_devices.size() > 0; }
 
 	void update_forced();
-	void update_after(const netlist_time &after)
+	void update_after(const netlist_time after)
 	{
 		m_Q_sync.net().toggle_and_push_to_queue(after);
 	}
@@ -144,7 +144,7 @@ public:
 
 protected:
 
-	matrix_solver_t(netlist_t &anetlist, const pstring &name,
+	matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
 			const eSortType sort, const solver_parameters_t *params);
 
 	void setup_base(analog_net_t::list_t &nets);

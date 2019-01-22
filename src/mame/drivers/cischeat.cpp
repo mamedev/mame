@@ -1954,7 +1954,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("cpu1", M68000, 10000000)
 	MCFG_DEVICE_PROGRAM_MAP(bigrun_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, bigrun_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::bigrun_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("cpu2", M68000, 10000000)
 	MCFG_DEVICE_PROGRAM_MAP(bigrun_map2)
@@ -2133,7 +2133,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::scudhamm_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2189,8 +2189,7 @@ MACHINE_CONFIG_START(cischeat_state::armchmp2)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(armchmp2_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(cischeat_state, armchamp2_scanline)
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(cischeat_state::armchamp2_scanline));
 MACHINE_CONFIG_END
 
 
@@ -2221,9 +2220,9 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
 	MCFG_DEVICE_PROGRAM_MAP(captflag_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, captflag_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::captflag_scanline), "screen", 0, 1);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
+	TICKET_DISPENSER(config, m_captflag_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 
 	WATCHDOG_TIMER(config, m_watchdog);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -2246,8 +2245,8 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
-	MCFG_TIMER_ADD_NONE("motor_left")
-	MCFG_TIMER_ADD_NONE("motor_right")
+	TIMER(config, m_captflag_motor_left).configure_generic(timer_device::expired_delegate());
+	TIMER(config, m_captflag_motor_right).configure_generic(timer_device::expired_delegate());
 
 	// Layout
 	config.set_default_layout(layout_captflag);

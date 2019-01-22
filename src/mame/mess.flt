@@ -20,6 +20,7 @@ acrnsys1.cpp
 acrnsys.cpp
 acvirus.cpp
 adam.cpp
+adm23.cpp
 advision.cpp
 agat.cpp
 aim65.cpp
@@ -90,6 +91,7 @@ bbcbc.cpp
 bcs3.cpp
 bebox.cpp
 beehive.cpp
+bert.cpp
 besta.cpp
 beta.cpp
 bigbord2.cpp
@@ -692,10 +694,12 @@ spec128.cpp
 special.cpp
 specpls3.cpp
 spectrum.cpp
+spg110.cpp
 squale.cpp
 ssem.cpp
 ssystem3.cpp
 st17xx.cpp
+storio.cpp
 stratos.cpp
 studio2.cpp
 sun1.cpp
@@ -770,6 +774,7 @@ tr175.cpp
 tr606.cpp
 tranz330.cpp
 tricep.cpp
+trkfldch.cpp
 trs80.cpp
 trs80dt1.cpp
 trs80m2.cpp

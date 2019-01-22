@@ -160,7 +160,7 @@ MACHINE_CONFIG_START(interact_state::interact)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","interact")
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 MACHINE_CONFIG_END
 
@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(interact_state::hector1)
 	MCFG_CASSETTE_INTERFACE("interact_cass")
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 MACHINE_CONFIG_END
 

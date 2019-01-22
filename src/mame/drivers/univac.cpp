@@ -103,7 +103,7 @@ After entering the characters, press FCTN and CTRL PAGE keys again to save the s
 #include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
-#include "sound/beep.h"
+#include "sound/spkrdev.h"
 #include "video/dp8350.h"
 #include "emupal.h"
 #include "screen.h"
@@ -130,7 +130,7 @@ public:
 		, m_ctc(*this, "ctc")
 		, m_keybclk(*this, "keybclk")
 		, m_sio(*this, "sio")
-		, m_beep(*this, "beeper")
+		, m_alarm(*this, "alarm")
 		, m_screen(*this, "screen")
 		, m_keyboard(*this, "keyboard")
 		, m_printer(*this, "printer")
@@ -142,6 +142,8 @@ public:
 		, m_display_enable(false)
 		, m_framecnt(0)
 		, m_nvram_protect(false)
+		, m_alarm_enable(false)
+		, m_alarm_toggle(false)
 		, m_loopback_control(false)
 		, m_comm_rxd(true)
 		, m_sio_txda(true)
@@ -167,6 +169,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ram_control_w);
 	DECLARE_WRITE_LINE_MEMBER(parity_poison_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(alarm_enable_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_loopback_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
@@ -190,7 +193,7 @@ private:
 	required_device<z80ctc_device>  m_ctc;
 	optional_device<clock_device>   m_keybclk;
 	required_device<z80sio_device>  m_sio;
-	required_device<beep_device>    m_beep;
+	required_device<speaker_sound_device> m_alarm;
 	required_device<screen_device>  m_screen;
 
 	required_device<uts_keyboard_port_device> m_keyboard;
@@ -207,6 +210,9 @@ private:
 	bool m_display_enable;
 	u8  m_framecnt;
 	bool m_nvram_protect;
+
+	bool m_alarm_enable;
+	bool m_alarm_toggle;
 
 	bool m_loopback_control;
 	bool m_comm_rxd;
@@ -270,7 +276,15 @@ WRITE_LINE_MEMBER(univac_state::nvram_protect_w)
 	// There seems to be some timing-based write protection related to the CTC's TRG0 input.
 	// The present implementation is a crude approximation of a wild guess.
 	if (state)
+	{
 		m_nvram_protect = m_screen->vpos() < 10;
+
+		if (m_alarm_enable)
+		{
+			m_alarm_toggle = !m_alarm_toggle;
+			m_alarm->level_w(m_alarm_toggle);
+		}
+	}
 }
 
 WRITE_LINE_MEMBER(univac_state::select_disp_w)
@@ -291,6 +305,16 @@ WRITE_LINE_MEMBER(univac_state::parity_poison_w)
 WRITE_LINE_MEMBER(univac_state::display_enable_w)
 {
 	m_display_enable = state;
+}
+
+WRITE_LINE_MEMBER(univac_state::alarm_enable_w)
+{
+	m_alarm_enable = state;
+	if (!state)
+	{
+		m_alarm_toggle = false;
+		m_alarm->level_w(0);
+	}
 }
 
 WRITE_LINE_MEMBER(univac_state::sio_loopback_w)
@@ -444,6 +468,9 @@ void univac_state::machine_start()
 	save_item(NAME(m_parity_poison));
 	save_item(NAME(m_display_enable));
 	save_item(NAME(m_framecnt));
+	save_item(NAME(m_nvram_protect));
+	save_item(NAME(m_alarm_enable));
+	save_item(NAME(m_alarm_toggle));
 	save_item(NAME(m_loopback_control));
 	save_item(NAME(m_comm_rxd));
 	save_item(NAME(m_sio_txda));
@@ -547,6 +574,7 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	latch_40.q_out_cb<3>().set(FUNC(univac_state::ram_control_w));
 
 	ls259_device &latch_c0(LS259(config, "latch_c0")); // actual type and location unknown
+	latch_c0.q_out_cb<0>().set(FUNC(univac_state::alarm_enable_w));
 	latch_c0.q_out_cb<3>().set(FUNC(univac_state::display_enable_w));
 	latch_c0.q_out_cb<4>().set(FUNC(univac_state::parity_poison_w));
 	latch_c0.q_out_cb<6>().set(FUNC(univac_state::sio_loopback_w));
@@ -592,10 +620,9 @@ MACHINE_CONFIG_START(univac_state::uts20)
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER_SOUND(config, m_alarm).add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	UTS_KEYBOARD(config, m_keyboard, uts_keyboards, "extw");
+	UTS_KEYBOARD(config, m_keyboard, uts20_keyboards, "extw");
 	m_keyboard->rxd_callback().set(FUNC(univac_state::aux_rxd_w));
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
@@ -614,6 +641,9 @@ MACHINE_CONFIG_START(univac_state::uts10)
 	config.device_remove("latch_40");
 	subdevice<ls259_device>("latch_c0")->q_out_cb<6>().set_nop();
 	subdevice<ls259_device>("latch_e0")->q_out_cb<7>().set(FUNC(univac_state::sio_loopback_w)).invert();
+
+	UTS_KEYBOARD(config.replace(), m_keyboard, uts10_keyboards, "extw");
+	m_keyboard->rxd_callback().set(FUNC(univac_state::aux_rxd_w));
 MACHINE_CONFIG_END
 
 

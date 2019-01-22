@@ -636,7 +636,7 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
     thus requiring an extra loading of approx 3-5 */
 	MCFG_DEVICE_PROGRAM_MAP(lazercmd_map)
 	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, lazercmd_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::lazercmd_timer), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -674,7 +674,7 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
     thus requiring an extra loading of approx 3-5 */
 	MCFG_DEVICE_PROGRAM_MAP(medlanes_map)
 	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, lazercmd_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::lazercmd_timer), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -708,7 +708,7 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
     thus requiring an extra loading of approx 3-5 */
 	MCFG_DEVICE_PROGRAM_MAP(bbonk_map)
 	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, bbonk_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::bbonk_timer), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

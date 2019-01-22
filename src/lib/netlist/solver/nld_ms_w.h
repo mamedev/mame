@@ -60,7 +60,7 @@ class matrix_solver_w_t: public matrix_solver_t
 	friend class matrix_solver_t;
 public:
 
-	matrix_solver_w_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_w_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
 
 	virtual ~matrix_solver_w_t() override;
 
@@ -133,10 +133,10 @@ void matrix_solver_w_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_t::setup_base(nets);
 
-	netlist().save(*this, m_last_RHS, "m_last_RHS");
+	state().save(*this, m_last_RHS, "m_last_RHS");
 
 	for (unsigned k = 0; k < N(); k++)
-		netlist().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
+		state().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
 }
 
 
@@ -374,7 +374,7 @@ unsigned matrix_solver_w_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_w_t<m_N, storage_N>::matrix_solver_w_t(netlist_t &anetlist, const pstring &name,
+matrix_solver_w_t<m_N, storage_N>::matrix_solver_w_t(netlist_base_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, NOSORT, params)
 	,m_cnt(0)

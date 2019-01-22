@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(bsktball_state::bsktball)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6502,750000)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bsktball_state, bsktball_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(bsktball_state::bsktball_scanline), "screen", 0, 1);
 
 	f9334_device &outlatch(F9334(config, "outlatch")); // M6
 	outlatch.q_out_cb<1>().set_nop(); // Coin Counter

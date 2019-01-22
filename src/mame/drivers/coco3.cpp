@@ -293,6 +293,7 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	config.set_default_layout(layout_coco3);
 
 	GIME_NTSC(config, m_gime, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
+	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
 	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
 	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));
@@ -339,6 +340,7 @@ MACHINE_CONFIG_START(coco3_state::coco3p)
 
 	// An additional 4.433618 MHz XTAL is required for PAL color encoding
 	GIME_PAL(config.replace(), m_gime, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
+	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
 	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
 	m_gime->irq_wr_callback().set(FUNC(coco3_state::gime_irq_w));

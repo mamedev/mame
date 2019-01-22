@@ -660,7 +660,7 @@ void c1571cr_device::device_add_mconfig(machine_config &config)
 	m_via0->writepa_handler().set(FUNC(c1571cr_device::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c1571cr_device::via0_pb_w));
 
-	//MCFG_MOS5710_ADD(M5710_TAG, 16_MHz_XTAL / 16, 0)
+	//MOS5710(config, M5710_TAG, 16_MHz_XTAL / 16);
 }
 
 

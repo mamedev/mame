@@ -6,16 +6,9 @@
 #pragma once
 
 
-#define MCFG_CLOCK_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, CLOCK, _clock)
-
-#define MCFG_CLOCK_SIGNAL_HANDLER(_devcb) \
-	downcast<clock_device &>(*device).set_signal_handler(DEVCB_##_devcb);
-
 class clock_device : public device_t
 {
 public:
-	template <class Object> devcb_base &set_signal_handler(Object &&cb) { return m_signal_handler.set_callback(std::forward<Object>(cb)); }
 	auto signal_handler() { return m_signal_handler.bind(); }
 
 	clock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

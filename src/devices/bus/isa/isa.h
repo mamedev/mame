@@ -176,7 +176,8 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 
 	uint8_t dack_r(int line);
-	void dack_w(int line,uint8_t data);
+	void dack_w(int line, uint8_t data);
+	void dack_line_w(int line, int state);
 	void eop_w(int channels, int state);
 
 	void nmi();
@@ -246,7 +247,8 @@ public:
 	void set_isa_device();
 	// configuration access
 	virtual uint8_t dack_r(int line);
-	virtual void dack_w(int line,uint8_t data);
+	virtual void dack_w(int line, uint8_t data);
+	virtual void dack_line_w(int line, int state);
 	virtual void eop_w(int state);
 
 	virtual void remap(int space_id, offs_t start, offs_t end) {}
@@ -325,7 +327,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq7_w );
 
 	uint16_t dack16_r(int line);
-	void dack16_w(int line,uint16_t data);
+	void dack16_w(int line, uint16_t data);
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	// 16 bit accessors for ISA-defined address spaces
@@ -370,7 +372,7 @@ public:
 	// construction/destruction
 	virtual ~device_isa16_card_interface();
 	virtual uint16_t dack16_r(int line);
-	virtual void dack16_w(int line,uint16_t data);
+	virtual void dack16_w(int line, uint16_t data);
 
 	void set_isa_device();
 

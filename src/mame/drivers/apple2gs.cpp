@@ -4705,6 +4705,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
 	SOFTWARE_LIST(config, "flop525_list").set_compatible("apple2");
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig");
 }
 
 void apple2gs_state::apple2gsr1(machine_config &config)

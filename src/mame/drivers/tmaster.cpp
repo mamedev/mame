@@ -369,13 +369,13 @@ int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12MHz */
 	MCFG_DEVICE_PROGRAM_MAP(tmaster_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, scanline_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(tmaster_state::scanline_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL(8'664'000) / 2 /*??*/)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, tmaster_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
+	MC68681(config, m_duart, XTAL(8'664'000) / 2 /*??*/);
+	m_duart->irq_cb().set(FUNC(tmaster_state::duart_irq_handler));
+	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart68681", mc68681_device, rx_a_w) )
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -401,10 +401,11 @@ MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tmaster_state::tmds1204)
+void tmaster_state::tmds1204(machine_config &config)
+{
 	tm(config);
-	MCFG_DS1204_ADD("ds1204")
-MACHINE_CONFIG_END
+	DS1204(config, "ds1204", 0);
+}
 
 /***************************************************************************
 

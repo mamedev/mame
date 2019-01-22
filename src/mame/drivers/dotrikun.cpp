@@ -203,9 +203,9 @@ MACHINE_CONFIG_START(dotrikun_state::dotrikun)
 	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(dotrikun_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scanline_on", dotrikun_state, scanline_on, "screen", 0, 1)
-	MCFG_TIMER_DRIVER_ADD("scanline_off", dotrikun_state, scanline_off)
-	MCFG_TIMER_DRIVER_ADD("interrupt", dotrikun_state, interrupt)
+	TIMER(config, "scanline_on").configure_scanline(FUNC(dotrikun_state::scanline_on), "screen", 0, 1);
+	TIMER(config, m_scanline_off_timer).configure_generic(FUNC(dotrikun_state::scanline_off));
+	TIMER(config, m_interrupt_timer).configure_generic(FUNC(dotrikun_state::interrupt));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

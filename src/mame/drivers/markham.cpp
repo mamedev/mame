@@ -582,7 +582,7 @@ MACHINE_CONFIG_START(markham_state::strnskil)
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(strnskil_master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", markham_state, strnskil_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(markham_state::strnskil_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_REMOVE("subcpu")
 	MCFG_DEVICE_ADD("subcpu", Z80, CPU_CLOCK/2) /* 4.000MHz */

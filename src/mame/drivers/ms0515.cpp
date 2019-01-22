@@ -561,8 +561,8 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	m_rs232->cts_handler().set(m_i8251line, FUNC(i8251_device::write_cts));
 	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
-//  MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
-//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
+//  clock_device &line_clock(CLOCK(config, "line_clock", 4800*16)); // 8251 is set to /16 on the clock input
+//  line_clock.signal_handler().set(FUNC(ms0515_state::write_line_clock));
 
 	// serial connection to MS7004 keyboard
 	I8251(config, m_i8251kbd, 0);
@@ -574,8 +574,8 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	m_ms7004->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
+	keyboard_clock.signal_handler().set(FUNC(ms0515_state::write_keyboard_clock));
 
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(XTAL(2'000'000));

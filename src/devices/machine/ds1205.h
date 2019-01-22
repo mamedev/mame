@@ -13,9 +13,6 @@
 #pragma once
 
 
-#define MCFG_DS1205_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, DS1205, 0 )
-
 class ds1205_device : public device_t, public device_nvram_interface
 {
 public:

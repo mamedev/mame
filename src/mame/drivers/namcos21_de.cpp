@@ -186,7 +186,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namco_de_pcbstack_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_DEVICE_PROGRAM_MAP(driveyes_master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namco_de_pcbstack_device, screen_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(namco_de_pcbstack_device::screen_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_DEVICE_PROGRAM_MAP(driveyes_slave_map)

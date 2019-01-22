@@ -1077,9 +1077,9 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(*this, pcw16_state, pcw16_keyboard_callback))
 
 	/* video ints */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("video_timer", pcw16_state, pcw16_timer_callback, attotime::from_usec(5830))
+	TIMER(config, "video_timer").configure_periodic(FUNC(pcw16_state::pcw16_timer_callback), attotime::from_usec(5830));
 	/* rtc timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pcw16_state, rtc_timer_callback, attotime::from_hz(256))
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pcw16_state::rtc_timer_callback), attotime::from_hz(256));
 MACHINE_CONFIG_END
 
 /***************************************************************************

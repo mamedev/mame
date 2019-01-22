@@ -185,7 +185,7 @@ MACHINE_CONFIG_START(mustache_state::mustache)
 	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(memmap)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mustache_state::scanline), "screen", 0, 1);
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("maincpu");
 

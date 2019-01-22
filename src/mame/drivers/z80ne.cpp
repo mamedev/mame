@@ -467,10 +467,11 @@ MACHINE_CONFIG_START(z80ne_state::z80net)
 	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
+	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	m_vdg->set_screen("lx388");
+	m_vdg->input_callback().set(FUNC(z80ne_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
@@ -516,10 +517,11 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	m_lx387_kr2376->control().set(FUNC(z80ne_state::lx387_control_r));
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
+	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	m_vdg->set_screen("lx388");
+	m_vdg->input_callback().set(FUNC(z80ne_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 
@@ -555,10 +557,11 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	KR2376_ST(config, m_lx387_kr2376, 50000);
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD("lx388", "mc6847")
+	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, 4.433619_MHz_XTAL)
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, z80ne_state, lx388_mc6847_videoram_r))
+	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	m_vdg->set_screen("lx388");
+	m_vdg->input_callback().set(FUNC(z80ne_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
 	// other lines not connected
 

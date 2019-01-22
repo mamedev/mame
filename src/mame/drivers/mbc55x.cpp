@@ -67,33 +67,33 @@ void mbc55x_state::mbc55x_iodecode(address_map &map)
 	map(0x1c, 0x1d).mirror(0x02).rw(m_kb_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
-READ8_MEMBER(mbc55x_state::iodecode_r)
+uint8_t mbc55x_state::iodecode_r(offs_t offset)
 {
-	return m_iodecode->read8(space, offset >> 1);
+	return m_iodecode->read8(offset >> 1);
 }
 
-WRITE8_MEMBER(mbc55x_state::iodecode_w)
+void mbc55x_state::iodecode_w(offs_t offset, uint8_t data)
 {
-	m_iodecode->write8(space, offset >> 1, data);
+	m_iodecode->write8(offset >> 1, data);
 }
 
 /* 8255 Configuration */
 
-READ8_MEMBER(mbc55x_state::game_io_r)
+uint8_t mbc55x_state::game_io_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(mbc55x_state::game_io_w)
+void mbc55x_state::game_io_w(uint8_t data)
 {
 }
 
-READ8_MEMBER( mbc55x_state::printer_status_r)
+uint8_t mbc55x_state::printer_status_r()
 {
 	return m_printer_status;
 }
 
-WRITE8_MEMBER(mbc55x_state::printer_data_w)
+void mbc55x_state::printer_data_w(uint8_t data)
 {
 	m_printer->write_data7(!BIT(data, 7));
 	m_printer->write_data6(!BIT(data, 6));
@@ -105,7 +105,7 @@ WRITE8_MEMBER(mbc55x_state::printer_data_w)
 	m_printer->write_data0(!BIT(data, 0));
 }
 
-WRITE8_MEMBER(mbc55x_state::disk_select_w)
+void mbc55x_state::disk_select_w(uint8_t data)
 {
 	floppy_image_device *floppy = nullptr;
 

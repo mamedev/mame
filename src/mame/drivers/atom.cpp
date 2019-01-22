@@ -714,10 +714,11 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_DEVICE_PROGRAM_MAP(atom_mem)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
+	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
+	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));
+	m_vdg->set_screen(SCREEN_TAG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -725,7 +726,7 @@ MACHINE_CONFIG_START(atom_state::atom)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
+	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
 
 	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
 	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
@@ -821,10 +822,11 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_DEVICE_PROGRAM_MAP(atombb_mem)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
+	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
+	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));
+	m_vdg->set_screen(SCREEN_TAG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -832,7 +834,7 @@ MACHINE_CONFIG_START(atom_state::atombb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
+	TIMER(config, "hz2400").configure_periodic(FUNC(atom_state::cassette_output_tick), attotime::from_hz(4806));
 
 	via6522_device &via(VIA6522(config, R6522_TAG, X2/4));
 	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));

@@ -453,8 +453,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	usart.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 	usart.rxrdy_handler().set("mainint", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
+	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, 0);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("usart", FUNC(i8251_device::write_rxd));

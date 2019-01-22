@@ -1148,3 +1148,15 @@ if (VIDEOS["PS2GS"]~=null) then
 		MAME_DIR .. "src/devices/video/ps2gs.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/decsfb.h,VIDEOS["DECSFB"] = true
+--------------------------------------------------
+if (VIDEOS["DECSFB"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/decsfb.cpp",
+		MAME_DIR .. "src/devices/video/decsfb.h",
+	}
+end
+

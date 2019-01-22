@@ -401,7 +401,7 @@ MACHINE_CONFIG_START(exterm_state::exterm)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nmi_timer, exterm_state, master_sound_nmi_callback)
+	TIMER(config, m_nmi_timer).configure_generic(FUNC(exterm_state::master_sound_nmi_callback));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

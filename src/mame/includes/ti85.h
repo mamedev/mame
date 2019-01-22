@@ -226,8 +226,8 @@ private:
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_loop_w);
 	DECLARE_READ8_MEMBER(ti83pse_ctimer3_count_r);
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_count_w);
-	DECLARE_READ8_MEMBER(ti83p_membank2_r);
-	DECLARE_READ8_MEMBER(ti83p_membank3_r);
+	uint8_t ti83p_membank2_r(offs_t offset);
+	uint8_t ti83p_membank3_r(offs_t offset);
 
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory();

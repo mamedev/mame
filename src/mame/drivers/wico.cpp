@@ -446,8 +446,8 @@ MACHINE_CONFIG_START(wico_state::wico)
 	MCFG_DEVICE_PROGRAM_MAP(ccpu_map)
 	MCFG_DEVICE_ADD("hcpu", MC6809E, XTAL(10'000'000) / 8) // MC68A09EP @ U24
 	MCFG_DEVICE_PROGRAM_MAP(hcpu_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", wico_state, irq_housekeeping, attotime::from_hz(120)) // zero crossing
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq", wico_state, firq_housekeeping, attotime::from_hz(750)) // time generator
+	TIMER(config, "irq").configure_periodic(FUNC(wico_state::irq_housekeeping), attotime::from_hz(120)); // zero crossing
+	TIMER(config, "firq").configure_periodic(FUNC(wico_state::firq_housekeeping), attotime::from_hz(750)); // time generator
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */

@@ -132,23 +132,38 @@ std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &fil
 	return std::unique_ptr<plib::pistream>(nullptr);
 }
 
+class netlist_tool_callbacks_t : public netlist::callbacks_t
+{
+public:
+	netlist_tool_callbacks_t(tool_app_t &app)
+	: netlist::callbacks_t()
+	, m_app(app)
+	{ }
+
+	void vlog(const plib::plog_level &l, const pstring &ls) const override;
+
+private:
+	tool_app_t &m_app;
+};
+
 class netlist_tool_t : public netlist::netlist_t
 {
 public:
 
 	netlist_tool_t(tool_app_t &app, const pstring &aname)
-	: netlist::netlist_t(aname), m_app(app)
+	: netlist::netlist_t(aname, plib::make_unique<netlist_tool_callbacks_t>(app))
 	{
 	}
 
-	virtual ~netlist_tool_t() override
+	~netlist_tool_t()
 	{
 	}
 
 	void init()
 	{
-		load_base_libraries();
 	}
+
+	netlist::setup_t &setup() { return nlstate().setup(); }
 
 	void read_netlist(const pstring &filename, const pstring &name,
 			const std::vector<pstring> &logs,
@@ -166,15 +181,15 @@ public:
 		setup().register_source(plib::make_unique_base<netlist::source_t,
 				netlist::source_file_t>(setup(), filename));
 		setup().include(name);
-		log_setup(logs);
+		create_dynamic_logs(logs);
 
 		// start devices
-		this->start();
+		setup().prepare_to_run();
 		// reset
 		this->reset();
 	}
 
-	void log_setup(const std::vector<pstring> &logs)
+	void create_dynamic_logs(const std::vector<pstring> &logs)
 	{
 		log().debug("Creating dynamic logs ...\n");
 		for (auto & log : logs)
@@ -187,15 +202,15 @@ public:
 
 	std::vector<char> save_state()
 	{
-		state().pre_save();
+		run_state_manager().pre_save();
 		std::size_t size = 0;
-		for (auto const & s : state().save_list())
+		for (auto const & s : run_state_manager().save_list())
 			size += s->m_dt.size * s->m_count;
 
 		std::vector<char> buf(size);
 		char *p = buf.data();
 
-		for (auto const & s : state().save_list())
+		for (auto const & s : run_state_manager().save_list())
 		{
 			std::size_t sz = s->m_dt.size * s->m_count;
 			if (s->m_dt.is_float || s->m_dt.is_integral)
@@ -211,7 +226,7 @@ public:
 	void load_state(std::vector<char> &buf)
 	{
 		std::size_t size = 0;
-		for (auto const & s : state().save_list())
+		for (auto const & s : run_state_manager().save_list())
 			size += s->m_dt.size * s->m_count;
 
 		if (buf.size() != size)
@@ -219,7 +234,7 @@ public:
 
 		char *p = buf.data();
 
-		for (auto const & s : state().save_list())
+		for (auto const & s : run_state_manager().save_list())
 		{
 			std::size_t sz = s->m_dt.size * s->m_count;
 			if (s->m_dt.is_float || s->m_dt.is_integral)
@@ -228,19 +243,16 @@ public:
 				log().fatal("found unsupported save element {1}\n", s->m_name);
 			p += sz;
 		}
-		state().post_load();
-		rebuild_lists();
+		run_state_manager().post_load();
+		nlstate().rebuild_lists();
 	}
 
 protected:
 
-	void vlog(const plib::plog_level &l, const pstring &ls) const override;
-
 private:
-	tool_app_t &m_app;
 };
 
-void netlist_tool_t::vlog(const plib::plog_level &l, const pstring &ls) const
+void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls) const
 {
 	pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
 	// FIXME: ...
@@ -292,8 +304,7 @@ static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fn
 	std::vector<input_t> ret;
 	if (fname != "")
 	{
-		plib::pifilestream f(fname);
-		plib::putf8_reader r(f);
+		plib::putf8_reader r = plib::putf8_reader(plib::pifilestream(fname));
 		pstring l;
 		while (r.readline(l))
 		{
@@ -402,7 +413,7 @@ void tool_app_t::static_compile()
 			opt_logs(),
 			opt_defines(), opt_rfolders());
 
-	plib::putf8_writer w(pout_strm);
+	plib::putf8_writer w(&pout_strm);
 	std::map<pstring, pstring> mp;
 
 	nt.solver()->create_solver_code(mp);
@@ -586,7 +597,7 @@ void tool_app_t::listdevices()
 	nt.setup().include("dummy");
 
 
-	nt.start();
+	nt.setup().prepare_to_run();
 
 	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
 
@@ -724,12 +735,12 @@ int tool_app_t::execute()
 			if (opt_file() == "-")
 			{
 				plib::pstdin f;
-				ostrm.write(f);
+				plib::copystream(ostrm, f);
 			}
 			else
 			{
 				plib::pifilestream f(opt_file());
-				ostrm.write(f);
+				plib::copystream(ostrm, f);
 			}
 			contents = ostrm.str();
 

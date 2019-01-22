@@ -63,10 +63,11 @@ const int mos6551_device::transmitter_controls[4][3] =
 	{0, 1, 1}
 };
 
-MACHINE_CONFIG_START(mos6551_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("clock", CLOCK, 0)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, mos6551_device, internal_clock))
-MACHINE_CONFIG_END
+void mos6551_device::device_add_mconfig(machine_config &config)
+{
+	CLOCK(config, m_internal_clock, 0);
+	m_internal_clock->signal_handler().set(FUNC(mos6551_device::internal_clock));
+}
 
 
 void mos6551_device::device_start()

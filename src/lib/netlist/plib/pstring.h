@@ -147,6 +147,8 @@ public:
 			*this += static_cast<code_t>(c); // FIXME: codepage conversion for u8
 	}
 
+	operator string_type () const { return m_str; }
+
 	pstring_t &operator=(const pstring_t &string) { m_str = string.m_str; return *this; }
 
 	template <typename T,

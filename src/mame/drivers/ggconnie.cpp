@@ -306,7 +306,7 @@ MACHINE_CONFIG_START(ggconnie_state::ggconnie)
 	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read));
 	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write));
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MSM6242(config, m_rtc, XTAL(32'768));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

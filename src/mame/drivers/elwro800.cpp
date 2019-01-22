@@ -60,7 +60,7 @@ private:
 	/* NR signal */
 	uint8_t m_NR;
 
-	DECLARE_READ8_MEMBER(nmi_r);
+	uint8_t nmi_r();
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
 	DECLARE_READ8_MEMBER(elwro800jr_io_r);
 	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
@@ -99,12 +99,12 @@ private:
  *
  *************************************/
 
-READ8_MEMBER(elwro800_state::nmi_r)
+uint8_t elwro800_state::nmi_r()
 {
 	if (m_ram_at_0000)
 		return 0xdf;
 	else
-		return m_bank1->read8(space, 0x66);
+		return m_bank1->read8(0x66);
 }
 
 /*************************************

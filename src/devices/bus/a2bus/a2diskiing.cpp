@@ -54,17 +54,19 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(diskiing_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WOZFDC_TAG, DISKII_FDC, 1021800*2)
-	MCFG_FLOPPY_DRIVE_ADD("0", a2_floppies, "525", diskiing_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", a2_floppies, "525", diskiing_device::floppy_formats)
-MACHINE_CONFIG_END
+void diskiing_device::device_add_mconfig(machine_config &config)
+{
+	DISKII_FDC(config, m_wozfdc, 1021800*2);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, a2_floppies, "525", diskiing_device::floppy_formats);
+}
 
-MACHINE_CONFIG_START(a2bus_diskiing13_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WOZFDC_TAG, DISKII_FDC, 1021800*2)
-	MCFG_FLOPPY_DRIVE_ADD("0", a2_floppies, "525", a2bus_diskiing13_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", a2_floppies, "525", a2bus_diskiing13_device::floppy_formats)
-MACHINE_CONFIG_END
+void a2bus_diskiing13_device::device_add_mconfig(machine_config &config)
+{
+	DISKII_FDC(config, m_wozfdc, 1021800*2);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, a2_floppies, "525", a2bus_diskiing13_device::floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -88,8 +90,7 @@ diskiing_device::diskiing_device(const machine_config &mconfig, device_type type
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_wozfdc(*this, WOZFDC_TAG),
-	floppy0(*this, "0"),
-	floppy1(*this, "1"),
+	m_floppy(*this, "%u", 0U),
 	m_rom(nullptr)
 {
 }
@@ -115,7 +116,7 @@ void diskiing_device::device_start()
 
 void diskiing_device::device_reset()
 {
-	m_wozfdc->set_floppies(floppy0, floppy1);
+	m_wozfdc->set_floppies(m_floppy[0], m_floppy[1]);
 }
 
 /*-------------------------------------------------

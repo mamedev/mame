@@ -83,6 +83,7 @@ class hec2hrp_state : public driver_device
 public:
 	hec2hrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_printer(*this, "printer"),
 		m_maincpu(*this, "maincpu"),
 		m_disc2cpu(*this, "disc2cpu"),
 		m_cassette(*this, "cassette"),
@@ -95,8 +96,7 @@ public:
 		m_minidisc_fdc(*this, "wd179x"),
 		m_floppy0(*this, "wd179x:0"),
 		m_upd_fdc(*this, "upd765"),
-		m_upd_connector(*this, "upd765:%u", 0U),
-		m_printer(*this, "printer")
+		m_upd_connector(*this, "upd765:%u", 0U)
 	{}
 
 	void hec2mx80(machine_config &config);
@@ -122,6 +122,8 @@ protected:
 	DECLARE_WRITE8_MEMBER(sn_3000_w);
 	DECLARE_WRITE8_MEMBER(color_a_w);
 	DECLARE_WRITE8_MEMBER(color_b_w);
+
+	optional_device<printer_image_device> m_printer;
 
 private:
 	DECLARE_WRITE8_MEMBER(minidisc_control_w);
@@ -161,8 +163,6 @@ private:
 
 	optional_device<upd765a_device> m_upd_fdc;
 	optional_device_array<floppy_connector, 2> m_upd_connector;
-
-	optional_device<printer_image_device> m_printer;
 
 	uint8_t m_hector_flag_hr;
 	uint8_t m_hector_flag_80c;

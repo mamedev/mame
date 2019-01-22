@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	m_maincpu->set_addrmap(AS_IO, &amu880_state::amu880_io);
 	m_maincpu->set_daisy_config(amu880_daisy_chain);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", amu880_state, keyboard_tick, attotime::from_hz(1500))
+	TIMER(config, "keyboard").configure_periodic(FUNC(amu880_state::keyboard_tick), attotime::from_hz(1500));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(amu880_state::amu880)
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape", amu880_state, tape_tick, attotime::from_hz(44100))
+	TIMER(config, "tape").configure_periodic(FUNC(amu880_state::tape_tick), attotime::from_hz(44100));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

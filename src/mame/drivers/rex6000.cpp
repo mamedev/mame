@@ -901,9 +901,9 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
 	MCFG_DEVICE_IO_MAP(rex6000_io)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(32))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(4096))
+	TIMER(config, "sec_timer").configure_periodic(FUNC(rex6000_state::sec_timer), attotime::from_hz(1));
+	TIMER(config, "irq_timer1").configure_periodic(FUNC(rex6000_state::irq_timer1), attotime::from_hz(32));
+	TIMER(config, "irq_timer2").configure_periodic(FUNC(rex6000_state::irq_timer2), attotime::from_hz(4096));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -966,9 +966,9 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
 	MCFG_DEVICE_IO_MAP(oz750_io)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(64))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(8192))
+	TIMER(config, "sec_timer").configure_periodic(FUNC(rex6000_state::sec_timer), attotime::from_hz(1));
+	TIMER(config, "irq_timer1").configure_periodic(FUNC(rex6000_state::irq_timer1), attotime::from_hz(64));
+	TIMER(config, "irq_timer2").configure_periodic(FUNC(rex6000_state::irq_timer2), attotime::from_hz(8192));
 
 	NS16550(config, m_uart, XTAL(9'830'400) / 4);
 	m_uart->out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));

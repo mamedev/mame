@@ -2,10 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
--->
-
-<!--
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
@@ -42,25 +38,27 @@ VTech V.Smile Baby cartridges
 |        | 80-099022(NL)     | Poeh's Honderd Bunderbos Avontuur                                          |
 |        | 80-099023(UK)     | Pooh's Hundred Acre Wood Adventure                                         |
 |   XX   | 80-099024(GE)     | Puuhs Hundert-Morgen-Wald                                                  |
-|        | 80-099025(FR)     | Winnie et ses amis dans la Faret des Reves Bieus                           |
+|        | 80-099025(FR)     | Winnie et ses amis dans la Forêt des Rêves Bleus                           |
+|   --   | 80-099027(SP)     | Aventuras en el Bosque de los Cien Acres (no ROM cartridge)                |
 |   XX   | 80-099034(SE)     | Nalle Puhs Äventyr i Sjumilaskogen                                         |
 +========+===================+============================================================================+
 |        | 80-099040(US)     | Baby Einstein - World of Discoveries                                       |
 |        | 80-099040(US)     | Baby Einstein - World of Discoveries (no # on front label)                 |
 |        | 80-099043(UK)     | Baby Einstein - World of Discoveries                                       |
-|        | 80-099045(FR)     | Baby Einstein - Un Monde de decouvertes                                    |
+|        | 80-099045(FR)     | Baby Einstein - Un Monde de découvertes                                    |
 +========+===================+============================================================================+
 |        | 80-099060(US)     | A Day On The Farm                                                          |
 |        | 80-099063(UK)     | A Day On The Farm                                                          |
 |   XX   | 80-099064(GE)     | Mein erster Bauernhof                                                      |
-|        | 80-099065(FR)     | Un jour a la ferme                                                         |
+|        | 80-099065(FR)     | Un jour à la ferme                                                         |
+|  SOON  | 80-099067(SP)     | Un Día en la Granja                                                        |
 +========+===================+============================================================================+
 |        | 80-099080(US)     | <Unknown>                                                                  |
 +========+===================+============================================================================+
 |        | 80-099100(US)     | Noah's Ark Animal Adventure                                                |
 |        | 80-099102(NL)     | De ark van Noach                                                           |
 |        | 80-099103(UK)     | Noah's Ark Animal Adventure                                                |
-|        | 80-099105(FR)     | L'arche de Noe - L'aventure des animaux                                    |
+|        | 80-099105(FR)     | L'arche de Noé - L'aventure des animaux                                    |
 +========+===================+============================================================================+
 |        | 80-099120(US)     | Barney - Let's Go to a Party                                               |
 +========+===================+============================================================================+
@@ -141,17 +139,6 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 		</part>
 	</software>
 
-	<software name="poohhawag" cloneof="poohhawa" supported="no">
-		<description>Puuhs Hundert-Morgen-Wald (Ger)</description>
-		<year>2006?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-099024(GE)" />
-		<part name="cart" interface="vsmileb_cart">
-			<feature name="pcb" value="707155" />
-			<feature name="pcb_model" value="707155-2" />
-		</part>
-	</software>
-
 	<software name="poohhawasw" cloneof="poohhawa" supported="no">
 		<description>Nalle Puhs Äventyr i Sjumilaskogen (Swe)</description>
 		<year>2007?</year>
@@ -164,17 +151,6 @@ The V.Baby currently have no dumps available, hence the carts are temporarily li
 			<dataarea name="rom" size="8388608">
 				<rom name="99034.u4" size="8388608" crc="5dbe1c20" sha1="51f56cedbe99fc7438429a4c02c08f65d2313790" offset="0" />
 			</dataarea>
-		</part>
-	</software>
-
-	<software name="lupptack" cloneof="mktierf" supported="no">
-		<description>Lär och upptäck (Swe)</description>
-		<year>200?</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-099014(SE)" />
-		<part name="cart" interface="vsmileb_cart">
-			<feature name="pcb" value="707155" />
-			<feature name="pcb_model" value="707155-2" />
 		</part>
 	</software>
 

@@ -536,7 +536,8 @@ READ8_MEMBER(wd33c9x_base_device::indir_addr_r)
 	if (offset != 0) {
 		fatalerror("%s: Read from invalid address offset %d\n", shortname(), offset);
 	}
-	return m_regs[AUXILIARY_STATUS];
+	// Trick to push the interrupt flag after the fifo is empty to help cps3
+	return m_regs[AUXILIARY_STATUS] & 0x01 ? m_regs[AUXILIARY_STATUS] & 0x7f : m_regs[AUXILIARY_STATUS];
 }
 
 

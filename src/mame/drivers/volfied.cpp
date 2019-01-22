@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
-	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", volfied_state, cchip_irq_clear_cb)
+	TIMER(config, m_cchip_irq_clear).configure_generic(FUNC(volfied_state::cchip_irq_clear_cb));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

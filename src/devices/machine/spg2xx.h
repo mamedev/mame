@@ -27,12 +27,6 @@
         ND - unknown - Wireless Air 60
         ND - Likely many more
 
-    Also on this hardware:
-
-        name                        PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
-        Radica Play TV Football 2   L7278       x16         48          not dumped      no              Sunplus
-        Dream Life                  ?           x16         48          not dumped      no              Sunplus
-
 **********************************************************************/
 
 #ifndef MAME_MACHINE_SPG2XX_H
@@ -402,6 +396,8 @@ protected:
 	static const device_timer_id TIMER_UART_TX = 4;
 	static const device_timer_id TIMER_UART_RX = 5;
 	static const device_timer_id TIMER_4KHZ = 6;
+	static const device_timer_id TIMER_SRC_AB = 7;
+	static const device_timer_id TIMER_SRC_C = 8;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -409,8 +405,13 @@ protected:
 
 	void update_porta_special_modes();
 	void update_portb_special_modes();
-	void do_gpio(uint32_t offset);
+	void do_gpio(uint32_t offset, bool write);
 	uint16_t do_special_gpio(uint32_t index, uint16_t mask);
+
+	void update_timer_b_rate();
+	void update_timer_ab_src();
+	void update_timer_c_src();
+	void increment_timer_a();
 
 	void uart_transmit_tick();
 	void uart_receive_tick();
@@ -465,6 +466,7 @@ protected:
 	bool m_hide_sprites;
 	bool m_debug_sprites;
 	bool m_debug_blit;
+	bool m_debug_palette;
 	uint8_t m_sprite_index_to_debug;
 
 	bool m_debug_samples;
@@ -513,8 +515,15 @@ protected:
 
 	devcb_write8 m_chip_sel;
 
+	uint16_t m_timer_a_preload;
+	uint16_t m_timer_b_preload;
+	uint16_t m_timer_b_divisor;
+	uint16_t m_timer_b_tick_rate;
+
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
+	emu_timer *m_timer_src_ab;
+	emu_timer *m_timer_src_c;
 	emu_timer *m_screenpos_timer;
 	emu_timer *m_audio_beat;
 

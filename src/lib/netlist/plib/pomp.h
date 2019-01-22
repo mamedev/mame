@@ -9,6 +9,8 @@
 #ifndef POMP_H_
 #define POMP_H_
 
+#include <cstddef>
+
 #include "pconfig.h"
 
 #if HAS_OPENMP

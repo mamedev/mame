@@ -331,19 +331,6 @@ READ16_MEMBER(md_boot_state::aladmdb_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(md_boot_state::sonic2mb_r )
-{
-	if (m_maincpu->pc()==0x00010a)
-		return ioport("COIN")->read() & 0x03;
-	
-	if (m_maincpu->pc()==0x000318)
-		return ioport("MCU")->read() << 8; // DSW
-
-	//logerror("sonic2mb_r : %06x\n",m_maincpu->pc());
-
-	return 0x0000;
-}
-
 READ16_MEMBER(md_boot_state::twinktmb_r )
 {
 	if (m_maincpu->pc()==0x02f81e)
@@ -633,29 +620,45 @@ INPUT_PORTS_START( aladmdb )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sonic2mb )
-	PORT_INCLUDE( aladmdb )
+	PORT_INCLUDE( md_common )
 
-	/* As I don't know how it is on real hardware, this is more a guess than anything */
-	PORT_MODIFY("MCU")
-	PORT_DIPNAME(          0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(       0x00, "1" )
-	PORT_DIPSETTING(       0x01, "2" )
-	PORT_DIPSETTING(       0x02, "3" )
-	PORT_DIPSETTING(       0x03, "4" )
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPNAME(          0x30, 0x20, "Timer Speed" ) PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(       0x30, "Slowest" )
-	PORT_DIPSETTING(       0x20, "Normal" )
-	PORT_DIPSETTING(       0x10, "Fast" )
-	PORT_DIPSETTING(       0x00, "Fastest" )
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
-	PORT_DIPUNUSED( 0x100, IP_ACTIVE_HIGH )
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("COIN")
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME(          0x0300, 0x0200, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(       0x0000, "1" )
+	PORT_DIPSETTING(       0x0100, "2" )
+	PORT_DIPSETTING(       0x0200, "3" )
+	PORT_DIPSETTING(       0x0300, "4" )
+	PORT_DIPNAME(  0x3c00, 0x2000, "Timer Speed" ) PORT_DIPLOCATION("SW1:3,4,5,6")
+	PORT_DIPSETTING(       0x3c00, "0 (Slowest)" )
+	PORT_DIPSETTING(       0x3800, "1" )
+	PORT_DIPSETTING(       0x3400, "2" )
+	PORT_DIPSETTING(       0x3000, "3" )
+	PORT_DIPSETTING(       0x2c00, "4" )
+	PORT_DIPSETTING(       0x2800, "5" )
+	PORT_DIPSETTING(       0x2400, "6" )
+	PORT_DIPSETTING(       0x2000, "7" )
+	PORT_DIPSETTING(       0x1c00, "8" )
+	PORT_DIPSETTING(       0x1800, "9" )
+	PORT_DIPSETTING(       0x1400, "10" )
+	PORT_DIPSETTING(       0x1000, "11" )
+	PORT_DIPSETTING(       0x0c00, "12" )
+	PORT_DIPSETTING(       0x0800, "13" )
+	PORT_DIPSETTING(       0x0400, "14" )
+	PORT_DIPSETTING(       0x0000, "15 (Fastest)" )
+	PORT_DIPUNKNOWN_DIPLOC(0x4000, 0x4000, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x8000, 0x8000, "SW1:8")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( twinktmb )
@@ -1056,9 +1059,9 @@ void md_boot_state::init_barek3()
 
 void md_boot_state::init_sonic2mb()
 {
-	// 100000 = writes to mcu? 300000 = reads?
+	// 100000 = writes to unpopulated MCU? 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(md_boot_state::sonic2mb_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x300000, 0x300001, "DSW");
 
 	init_megadrij();
 }
@@ -1073,7 +1076,8 @@ void md_boot_state::init_twinktmb()
 	rom[0x07] = 0x46;
 	rom[0x06] = 0xcc;
 
-	init_sonic2mb();
+	init_megadrij();
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(md_boot_state::twinktmb_r),this));
 }
 

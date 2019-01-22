@@ -418,7 +418,7 @@ MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wwfsstar_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(wwfsstar_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

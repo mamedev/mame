@@ -1406,8 +1406,8 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	/* uart */
 	I8251(config, m_uart, 0);
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, nc_state, write_uart_clock))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 19200));
+	uart_clock.signal_handler().set(FUNC(nc_state::write_uart_clock));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, nullptr)
@@ -1419,7 +1419,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* dummy timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))
+	TIMER(config, "dummy_timer").configure_periodic(FUNC(nc_state::dummy_timer_callback), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nc100_state::nc100)

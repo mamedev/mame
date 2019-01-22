@@ -154,6 +154,7 @@ invadpt2br                      // Taito do Brasil
 invadrmr                        // (c) 1978 Model Racing
 invasion                        // Sidam
 invasiona                       // bootleg
+invasiona2                      // bootleg
 invasionb                       // bootleg
 invasionrz                      // bootleg
 invasionrza                     // bootleg
@@ -902,6 +903,9 @@ viruscl                         // (c) 2004 Access GmbH
 
 @source:adam.cpp
 adam                            // Coleco Adam
+
+@source:adm23.cpp
+adm23                           //
 
 @source:adp.cpp
 fashiong                        // (c) 1997
@@ -2920,6 +2924,9 @@ fairyl2bl                       //
 ldrink                          //
 ldrinka                         //
 merryjn                         //
+
+@source:bert.cpp
+bert                            //
 
 @source:berzerk.cpp
 berzerk                         // (c) 1980
@@ -13058,6 +13065,9 @@ pbillrd                         // (c) 1987 Nihon System
 pbillrds                        // (c) 1987 Nihon System (Sega license?)
 pbillrdsa                       // (c) 1987 Nihon System (Sega license?)
 
+@source:freeway.cpp
+freeway
+
 @source:fresh.cpp
 fresh                           // (c) Chain Leisure
 
@@ -13479,6 +13489,7 @@ scobra                          // GX316 (c) 1981 Konami
 scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
 scobrae                         // GX316 (c) 1981 Stern
 scobrag                         // AVG by Zaccaria (bootleg?)
+scobraggi                       // bootleg (Cocamatic)
 scobras                         // GX316 (c) 1981 Stern
 scobrase                        // GX316 (c) 1981 Sega
 scorpion                        // (c) 1982 Zaccaria
@@ -14377,6 +14388,7 @@ nfb96c                          // (c) 1996 Amcoe
 nfb96se                         // bootleg
 nfb96sea                        // bootleg
 nfb96seb                        // bootleg
+nfb96sec                        // bootleg
 nfb96txt                        // (c) 2000 Amcoe
 nfm                             // bootleg
 ns8lines                        // unknown
@@ -15025,6 +15037,7 @@ gnw_mariocm                     // Nintendo
 gnw_mmouse                      // Nintendo
 gnw_mickdon                     // Nintendo
 gnw_opanic                      // Nintendo
+gnw_rshower                     // Nintendo
 gnw_smb                         // Nintendo
 gnw_squish                      // Nintendo
 gnw_tfish                       // Nintendo
@@ -30294,6 +30307,7 @@ mc_dg101
 mc_aa2
 mc_105te
 mc_sp69
+polmega
 mc_dcat8
 mc_dcat8a
 pjoyn50
@@ -33056,6 +33070,8 @@ rabbitjt                        // (c) 1996 Electronic Arts
 
 @source:rad_eu3a14.cpp
 rad_gtg
+rad_rsg
+rad_rsgp
 rad_foot
 rad_bb3
 rad_bb3p
@@ -34826,6 +34842,7 @@ magspeed                        // (c) 1994 Allumer
 metafox                         // UP   (c) 1989 + Jordan, Romstar or Taito license (DSW)
 msgundam                        // (c) 1993 Banpresto
 msgundam1                       // (c) 1993 Banpresto
+msgundamb                       // bootleg
 neobattl                        // (c) 1992 Banpresto / Sotsu Agency. Sunrise
 oisipuzl                        // (c) 1993 SunSoft / Atlus
 orbs                            // (c) 1994 American Sammy
@@ -34873,6 +34890,7 @@ funcube3                        // (c) 2001 Namco
 funcube4                        // (c) 2001 Namco
 funcube5                        // (c) 2002 Namco
 grdians                         // (c) 1995 Banpresto
+grdiansa                        // (c) 1995 Banpresto
 gundamex                        // (c) 1994 Banpresto
 mj4simai                        // (c) 1996 Maboroshi Ware
 myangel                         // (c) 1996 Namco
@@ -35631,6 +35649,16 @@ sorcerer                        // Sorcerer
 sorcerer2                       // monitor 1.1 1979
 sorcererd                       // Sorcerer with floppies
 
+@source:storio.cpp
+vreader                         // (c) 2011 V.Tech
+vreadercaen                     // (c) 2011 V.Tech
+vreadercafr                     // (c) 2011 V.Tech
+storio                          // (c) 2011 V.Tech
+storiode                        // (c) 2011 V.Tech
+storioes                        // (c) 2011 V.Tech
+storiofr                        // (c) 2011 V.Tech
+storionl                        // (c) 2011 V.Tech
+
 @source:sothello.cpp
 sothello                        // (c) 1986 Success / Fujiwara.
 
@@ -36232,7 +36260,9 @@ humlan                          // (c) 2001 Subsino & Truemax
 mtrain                          // (c) 1996 Subsino
 new2001                         // (c) 2000 Subsino
 ptrain                          // (c) 1999 Subsino
+queenbee                        // (c) 2001 Subsino
 saklove                         // (c) 1998 Subsino
+squeenb                         // (c) 2002 Subsino
 wtrnymph                        // (c) 1996 Subsino
 xplan                           // (c) 2006 Subsino
 xtrain                          // (c) 1999 Subsino
@@ -37939,6 +37969,10 @@ vs4j                            // 2004.10 Virtua Striker 4 (Japan) (Rev E)
 @source:triplhnt.cpp
 triplhnt                        // 008422-008791    1977/04 [6800]
 
+@source:trkfldch.cpp
+trkfldch                        // (c) 2007 Konami
+my1stddr                        // (c) 2006 Konami
+
 @source:trs80.cpp
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
@@ -38547,6 +38581,9 @@ vigilantd                       // (c) 1988 (Japan Rev D)
 vigilantg                       // (c) 1988 (US Rev G)
 vigilanto                       // (c) 1988 (US)
 
+@source:spg110.cpp
+jak_capb                        //
+
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
 jak_wall                        //
@@ -38554,6 +38591,8 @@ jak_wwe                         //
 jak_fan4                        //
 jak_just                        //
 jak_dora                        //
+jak_disf                        //
+jak_sdoo                        //
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wrlshunt                        // Wireless: Hunting Video Game System
 wirels60                        // Wireless 60
@@ -38569,9 +38608,10 @@ mattelcs                        //
 
 @source:vsmile.cpp
 vsmile                          //
-vsmileb                         //
 vsmilef                         //
 vsmileg                         //
+vsmileb                         //
+vsmilebsw                       //
 
 @source:vsmilepro.cpp
 vsmilpro
@@ -39703,12 +39743,15 @@ rad_boxp                        //
 rad_crdn                        //
 rad_crdnp                       //
 rad_opus                        //
+rad_hnt                         //
+rad_hnt2                        //
 rad_bass                        //
 rad_bassp                       //
 rad_snow                        //
 rad_snowp                       //
 rad_madf                        //
 rad_fb                          //
+epo_epp                         //
 epo_efdx                        //
 epo_sdb                         //
 epo_guru                        //
@@ -39717,15 +39760,20 @@ has_wamg                        //
 ekara                           //
 ekaraa                          //
 ekaraj                          //
+ekarag                          //
 ekaraphs                        //
 ddrfammt                        //
 popira                          //
 taikodp                         //
-xavtenni                        //
 ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
 drgqst                          //
+xavtenni                        //
+xavbaseb                        //
+xavjmat                         //
+tmy_thom                        //
+
 
 @source:xbox.cpp
 xbox                            //

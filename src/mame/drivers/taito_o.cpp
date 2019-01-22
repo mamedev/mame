@@ -237,7 +237,7 @@ MACHINE_CONFIG_START(taitoo_state::parentj)
 
 	MCFG_DEVICE_ADD("maincpu", M68000,12000000 )       /*?? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(parentj_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitoo_state, parentj_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(taitoo_state::parentj_interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

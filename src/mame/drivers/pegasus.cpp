@@ -493,7 +493,7 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	MCFG_DEVICE_PROGRAM_MAP(pegasus_mem)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("pegasus_firq", pegasus_state, pegasus_firq, attotime::from_hz(400))
+	TIMER(config, "pegasus_firq").configure_periodic(FUNC(pegasus_state::pegasus_firq), attotime::from_hz(400));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

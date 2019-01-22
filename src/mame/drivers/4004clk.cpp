@@ -153,8 +153,8 @@ MACHINE_CONFIG_START(nixieclock_state::_4004clk)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_CLOCK_ADD("clk", 60)
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I4004_TEST_LINE))
+	clock_device &clk(CLOCK(config, "clk", 60));
+	clk.signal_handler().set_inputline("maincpu", I4004_TEST_LINE);
 MACHINE_CONFIG_END
 
 /* ROM definition */

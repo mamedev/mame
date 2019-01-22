@@ -87,7 +87,7 @@ void gottlieb_sound_r0_device::gottlieb_sound_r0_map(address_map &map)
 {
 	map.global_mask(0x0fff);
 	map(0x0000, 0x003f).ram().mirror(0x1c0);
-	map(0x0200, 0x020f).rw("r6530", FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x0200, 0x020f).rw(m_r6530, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
 	map(0x0400, 0x0fff).rom();
 }
 
@@ -121,9 +121,9 @@ MACHINE_CONFIG_START(gottlieb_sound_r0_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(gottlieb_sound_r0_map)
 
 	// I/O configuration
-	MCFG_DEVICE_ADD("r6530", MOS6530, SOUND1_CLOCK/4) // unknown - same as cpu
-	MCFG_MOS6530_OUT_PA_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_MOS6530_IN_PB_CB(READ8(*this, gottlieb_sound_r0_device, r6530b_r))
+	MOS6530(config, m_r6530, SOUND1_CLOCK/4); // unknown - same as cpu
+	m_r6530->out_pa_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	m_r6530->in_pb_callback().set(FUNC(gottlieb_sound_r0_device::r6530b_r));
 
 	// sound devices
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25) // unknown DAC

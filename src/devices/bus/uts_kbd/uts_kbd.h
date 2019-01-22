@@ -85,7 +85,8 @@ private:
 DECLARE_DEVICE_TYPE(UTS_KEYBOARD, uts_keyboard_port_device)
 
 // standard options
-extern void uts_keyboards(device_slot_interface &slot);
+extern void uts20_keyboards(device_slot_interface &slot);
+extern void uts10_keyboards(device_slot_interface &slot);
 
 //**************************************************************************
 //  INLINE FUNCTIONS

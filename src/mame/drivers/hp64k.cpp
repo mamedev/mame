@@ -1384,10 +1384,10 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	m_cpu->set_irq_acknowledge_callback(FUNC(hp64k_state::hp64k_irq_callback));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", hp64k_state, hp64k_kb_scan, attotime::from_hz(100))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(hp64k_state::hp64k_kb_scan), attotime::from_hz(100));
 
 	// Line sync timer. A line frequency of 50 Hz is assumed.
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("linesync_timer", hp64k_state, hp64k_line_sync, attotime::from_hz(50))
+	TIMER(config, "linesync_timer").configure_periodic(FUNC(hp64k_state::hp64k_line_sync), attotime::from_hz(50));
 
 	// Clock = 25 MHz / 9 * (112/114)
 	I8275(config, m_crtc, 2729045);
@@ -1433,7 +1433,7 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2500).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_TIMER_DRIVER_ADD("beep_timer", hp64k_state, hp64k_beeper_off);
+	TIMER(config, m_beep_timer).configure_generic(FUNC(hp64k_state::hp64k_beeper_off));
 
 	COM8116(config, m_baud_rate, 5.0688_MHz_XTAL);
 	m_baud_rate->fr_handler().set(FUNC(hp64k_state::hp64k_baud_clk_w));

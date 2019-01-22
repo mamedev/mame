@@ -473,13 +473,14 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	MCFG_DEVICE_IO_MAP(spc1000_io)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, spc1000_state, irq_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, spc1000_state, mc6847_videoram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(spc1000_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2)
+	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
+	m_vdg->set_screen("screen");
+	m_vdg->fsync_wr_callback().set(FUNC(spc1000_state::irq_w));
+	m_vdg->input_callback().set(FUNC(spc1000_state::mc6847_videoram_r));
+	m_vdg->set_get_char_rom(FUNC(spc1000_state::get_char_rom));
+	m_vdg->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2);
 	// other lines not connected
 
 	/* sound hardware */

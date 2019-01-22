@@ -29,7 +29,7 @@ class matrix_solver_GMRES_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 public:
 
-	matrix_solver_GMRES_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
+	matrix_solver_GMRES_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_use_iLU_preconditioning(true)
 		, m_use_more_precise_stop_condition(false)
@@ -106,8 +106,8 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 					m_term_cr[k].push_back(i);
 					break;
 				}
-			nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
 		}
+		nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
 	}
 
 	mat.ia[iN] = nz;
@@ -192,7 +192,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 }
 
 template <typename T>
-void givens_mult( const T c, const T s, T & g0, T & g1 )
+inline void givens_mult( const T c, const T s, T & g0, T & g1 )
 {
 	const T tg0 = c * g0 - s * g1;
 	const T tg1 = s * g0 + c * g1;
@@ -288,8 +288,8 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 		vec_set(mr+1, NL_FCONST(0.0), m_g);
 		m_g[0] = rho;
 
-		for (std::size_t i = 0; i < mr; i++)
-			vec_set(mr + 1, NL_FCONST(0.0), m_ht[i]);
+		for (std::size_t i = 0; i < mr + 1; i++)
+			vec_set(mr, NL_FCONST(0.0), m_ht[i]);
 
 		vec_mult_scalar(n, residual, NL_FCONST(1.0) / rho, m_v[0]);
 

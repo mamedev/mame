@@ -86,14 +86,14 @@ DEFINE_DEVICE_TYPE(MCPX_ISALPC, mcpx_isalpc_device, "mcpx_isalpc", "MCPX HUB Int
 
 void mcpx_isalpc_device::lpc_io(address_map &map)
 {
-	map(0x00000000, 0x000000ff).rw(FUNC(mcpx_isalpc_device::lpc_r), FUNC(mcpx_isalpc_device::lpc_w));
+	map(0x00000000, 0x000000ff).rw(FUNC(mcpx_isalpc_device::acpi_r), FUNC(mcpx_isalpc_device::acpi_w));
 }
 
 void mcpx_isalpc_device::internal_io_map(address_map &map)
 {
 	map(0x0020, 0x0023).rw("pic8259_1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x0070, 0x0073).rw("rtc", FUNC(ds12885ext_device::read), FUNC(ds12885ext_device::write));
+	map(0x0070, 0x0073).rw("rtc", FUNC(ds12885ext_device::read_extended), FUNC(ds12885ext_device::write_extended));
 	map(0x0080, 0x0080).w(FUNC(mcpx_isalpc_device::boot_state_w));
 	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
@@ -162,13 +162,15 @@ void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 	*/
 }
 
-READ32_MEMBER(mcpx_isalpc_device::lpc_r)
+READ32_MEMBER(mcpx_isalpc_device::acpi_r)
 {
+	logerror("Acpi read from %04X mask %08X\n", bank_infos[0].adr + offset, mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(mcpx_isalpc_device::lpc_w)
+WRITE32_MEMBER(mcpx_isalpc_device::acpi_w)
 {
+	logerror("Acpi write %08X to %04X mask %08X\n", data, bank_infos[0].adr + offset, mem_mask);
 }
 
 WRITE8_MEMBER(mcpx_isalpc_device::boot_state_w)

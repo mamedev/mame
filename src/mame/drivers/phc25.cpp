@@ -340,31 +340,35 @@ MACHINE_CONFIG_START(phc25_state::phc25)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "phc25_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(phc25_state::pal)
+void phc25_state::pal(machine_config &config)
+{
 	phc25(config);
 	/* video hardware */
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, phc25_state, irq_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, phc25_state, video_ram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, pal_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT)
+	MC6847_PAL(config, m_vdg, XTAL(4'433'619));
+	m_vdg->set_screen("screen");
+	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::irq_w));
+	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
+	m_vdg->set_get_char_rom(FUNC(phc25_state::pal_char_rom_r));
+	m_vdg->set_get_fixed_mode(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT);
 	// other lines not connected
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(phc25_state::ntsc)
+void phc25_state::ntsc(machine_config &config)
+{
 	phc25(config);
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, MC6847_TAG)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, phc25_state, irq_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, phc25_state, video_ram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(phc25_state, ntsc_char_rom_r)
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT)
+	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
+	m_vdg->set_screen("screen");
+	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::irq_w));
+	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
+	m_vdg->set_get_char_rom(FUNC(phc25_state::ntsc_char_rom_r));
+	m_vdg->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT);
 	// other lines not connected
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

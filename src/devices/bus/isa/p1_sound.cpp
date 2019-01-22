@@ -34,10 +34,9 @@ MACHINE_CONFIG_START(p1_sound_device::device_add_mconfig)
 	m_midi->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_midi->rxrdy_handler().set(":isa", FUNC(isa8_device::irq3_w));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE("midi", i8251_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_midi, FUNC(i8251_device::write_rxd));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
 	PIT8253(config, m_d14, 0);
 	m_d14->set_clk<0>(XTAL(12'500'000)/10);

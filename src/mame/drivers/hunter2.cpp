@@ -402,10 +402,10 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
-	// this is all a guess
-	MCFG_MM58274C_MODE24(0) // 12 hour
-	MCFG_MM58274C_DAY1(1)   // monday
+	mm58274c_device &rtc(MM58274C(config, "rtc", 0));
+	// this is all guess
+	rtc.set_mode24(0); // 12 hour
+	rtc.set_day1(1);   // monday
 
 	nsc810_device &iotimer(NSC810(config, "iotimer", 0, XTAL(4'000'000), XTAL(4'000'000)));
 	iotimer.portA_read_callback().set(FUNC(hunter2_state::keyboard_r));

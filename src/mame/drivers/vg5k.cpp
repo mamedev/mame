@@ -373,9 +373,9 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_DEVICE_PROGRAM_MAP(vg5k_mem)
 	MCFG_DEVICE_IO_MAP(vg5k_io)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vg5k_scanline", vg5k_state, vg5k_scanline, "screen", 0, 10)
+	TIMER(config, "vg5k_scanline").configure_scanline(FUNC(vg5k_state::vg5k_scanline), "screen", 0, 10);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", vg5k_state, z80_irq, attotime::from_msec(20))
+	TIMER(config, "irq_timer").configure_periodic(FUNC(vg5k_state::z80_irq), attotime::from_msec(20));
 
 	EF9345(config, m_ef9345, 0);
 	m_ef9345->set_palette_tag("palette");
@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 	MCFG_CASSETTE_INTERFACE("vg5k_cass")
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,48K");

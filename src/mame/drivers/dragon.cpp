@@ -221,15 +221,16 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
 	MCFG_CASSETTE_INTERFACE("dragon_cass")
 
-	MCFG_DEVICE_ADD(PRINTER_TAG, PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	// video hardware
-	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, VDG_TAG)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(VDG_TAG, MC6847_PAL, 4.433619_MHz_XTAL)
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, dragon_state, horizontal_sync))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, dragon_state, field_sync))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(m_sam, sam6883_device, display_read))
+	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
+	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
+	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
 
 	// sound hardware
 	coco_sound(config);
@@ -284,12 +285,12 @@ MACHINE_CONFIG_START(dragon64_state::dragon64h)
 	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(dragon200e_state::dragon200e)
+void dragon200e_state::dragon200e(machine_config &config)
+{
 	dragon64(config);
 	// video hardware
-	MCFG_DEVICE_MODIFY(VDG_TAG)
-	MCFG_MC6847_CHARROM_CALLBACK(dragon200e_state, char_rom_r)
-MACHINE_CONFIG_END
+	m_vdg->set_get_char_rom(FUNC(dragon200e_state::char_rom_r));
+}
 
 MACHINE_CONFIG_START(d64plus_state::d64plus)
 	dragon64(config);
@@ -360,11 +361,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	dragon64(config);
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 4)
+	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 16)
+
+	m_sam->set_clock(14.318181_MHz_XTAL);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MC6847_NTSC(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
+	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
+	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
+	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
 
 	// cartridge
 	MCFG_DEVICE_MODIFY(CARTRIDGE_TAG)

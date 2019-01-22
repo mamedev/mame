@@ -145,9 +145,12 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+//#include "bus/rs232/rs232.h"
 //#include "bus/s100/s100.h"
 #include "imagedev/floppy.h"
 #include "machine/6821pia.h"
+#include "machine/input_merger.h"
+#include "machine/mc2661.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
@@ -160,15 +163,12 @@ public:
 	z100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_pia0(*this, "pia0"),
-		m_pia1(*this, "pia1"),
+		m_pia(*this, "pia%u", 0U),
 		m_picm(*this, "pic8259_master"),
 		m_pics(*this, "pic8259_slave"),
 		m_fdc(*this, "z207_fdc"),
-		m_floppy0(*this, "z207_fdc:0"),
-		m_floppy1(*this, "z207_fdc:1"),
-		m_floppy2(*this, "z207_fdc:2"),
-		m_floppy3(*this, "z207_fdc:3"),
+		m_floppies(*this, "z207_fdc:%u", 0U),
+		m_epci(*this, "epci%u", 0U),
 		m_crtc(*this, "crtc"),
 		m_palette(*this, "palette"),
 		m_floppy(nullptr)
@@ -205,15 +205,12 @@ private:
 	void z100_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
+	required_device_array<pia6821_device, 2> m_pia;
 	required_device<pic8259_device> m_picm;
 	required_device<pic8259_device> m_pics;
 	required_device<fd1797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppies;
+	required_device_array<mc2661_device, 2> m_epci;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 
@@ -376,14 +373,7 @@ WRITE8_MEMBER( z100_state::z100_6845_data_w )
 
 WRITE8_MEMBER( z100_state::floppy_select_w )
 {
-	switch (data & 0x03)
-	{
-	case 0: m_floppy = m_floppy0->get_device(); break;
-	case 1: m_floppy = m_floppy1->get_device(); break;
-	case 2: m_floppy = m_floppy2->get_device(); break;
-	case 3: m_floppy = m_floppy3->get_device(); break;
-	}
-
+	m_floppy = m_floppies[data & 0x03]->get_device();
 	m_fdc->set_floppy(m_floppy);
 }
 
@@ -412,14 +402,14 @@ void z100_state::z100_io(address_map &map)
 //  z-207 secondary disk controller (wd1797)
 //  AM_RANGE (0xcd, 0xce) ET-100 CRT Controller
 //  AM_RANGE (0xd4, 0xd7) ET-100 Trainer Parallel I/O
-	map(0xd8, 0xdb).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //video board
+	map(0xd8, 0xdb).rw(m_pia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //video board
 	map(0xdc, 0xdc).w(FUNC(z100_state::z100_6845_address_w));
 	map(0xdd, 0xdd).w(FUNC(z100_state::z100_6845_data_w));
 //  AM_RANGE (0xde, 0xde) light pen
-	map(0xe0, 0xe3).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
+	map(0xe0, 0xe3).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //main board
 //  AM_RANGE (0xe4, 0xe7) 8253 PIT
-//  AM_RANGE (0xe8, 0xeb) First 2661-2 serial port (printer)
-//  AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
+	map(0xe8, 0xeb).rw(m_epci[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
+	map(0xec, 0xef).rw(m_epci[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf0, 0xf1).rw(m_pics, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf2, 0xf3).rw(m_picm, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0xf4, 0xf4).r(FUNC(z100_state::keyb_data_r)); // -> 8041 MCU
@@ -707,20 +697,34 @@ MACHINE_CONFIG_START(z100_state::z100)
 	m_pics->out_int_callback().set(m_picm, FUNC(pic8259_device::ir3_w));
 	m_pics->in_sp_callback().set_constant(0);
 
-	PIA6821(config, m_pia0, 0);
-	m_pia0->writepa_handler().set(FUNC(z100_state::video_pia_A_w));
-	m_pia0->writepb_handler().set(FUNC(z100_state::video_pia_B_w));
-	m_pia0->ca2_handler().set(FUNC(z100_state::video_pia_CA2_w));
-	m_pia0->cb2_handler().set(FUNC(z100_state::video_pia_CB2_w));
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->writepa_handler().set(FUNC(z100_state::video_pia_A_w));
+	m_pia[0]->writepb_handler().set(FUNC(z100_state::video_pia_B_w));
+	m_pia[0]->ca2_handler().set(FUNC(z100_state::video_pia_CA2_w));
+	m_pia[0]->cb2_handler().set(FUNC(z100_state::video_pia_CB2_w));
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia[1], 0);
 
 	FD1797(config, m_fdc, 1_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:0", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:1", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:2", z100_floppies, "", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:3", z100_floppies, "", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppies[0], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[1], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[2], z100_floppies, "", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[3], z100_floppies, "", floppy_image_device::default_floppy_formats);
+
+	MC2661(config, m_epci[0], 4.9152_MHz_XTAL); // First 2661-2 serial port (printer)
+	m_epci[0]->txrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<0>));
+	m_epci[0]->rxrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<1>));
+
+	MC2661(config, m_epci[1], 4.9152_MHz_XTAL); // Second 2661-2 serial port (modem)
+	m_epci[1]->txrdy_handler().set("epci1int", FUNC(input_merger_device::in_w<0>));
+	m_epci[1]->rxrdy_handler().set("epci1int", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &epci0int(INPUT_MERGER_ANY_HIGH(config, "epci0int"));
+	epci0int.output_handler().set(m_picm, FUNC(pic8259_device::ir4_w));
+
+	input_merger_device &epci1int(INPUT_MERGER_ANY_HIGH(config, "epci1int"));
+	epci1int.output_handler().set(m_picm, FUNC(pic8259_device::ir5_w));
 MACHINE_CONFIG_END
 
 /* ROM definition */

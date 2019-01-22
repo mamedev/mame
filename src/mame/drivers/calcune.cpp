@@ -290,8 +290,8 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	m_vdp2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer2", "gen_vdp2", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
+	TIMER(config, "scantimer2").configure_scanline("gen_vdp2", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
 	MCFG_PALETTE_ADD("palette", 0xc0*2)
 

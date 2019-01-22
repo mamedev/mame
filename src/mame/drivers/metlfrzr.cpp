@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(metlfrzr_map)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metlfrzr_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(metlfrzr_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 

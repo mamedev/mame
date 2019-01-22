@@ -362,7 +362,7 @@ MACHINE_CONFIG_START(meijinsn_state::meijinsn)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 9000000 )
 	MCFG_DEVICE_PROGRAM_MAP(meijinsn_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", meijinsn_state, meijinsn_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(meijinsn_state::meijinsn_interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
 	MCFG_DEVICE_PROGRAM_MAP(meijinsn_sound_map)

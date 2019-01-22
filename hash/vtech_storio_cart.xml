@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="vtech_storio_cart" description="VTech Storio V.Reader Cartridges">
+	
+	<!-- These are NAND Flash ROMs containing a FAT16 filesystem -->
+	<!-- Some cartridges (PCB 35-115600-027-402) contains no ROM, but just some bridges between edge connector pins. -->
+   
+	<!--
+
+	Language:
+	********0 = US
+	********1 = Italy
+	********2 = Netherlands
+	********3 = UK
+	********4 = Germany
+	********5 = France
+	********6 = Portugal
+	********7 = Spain
+
+	xx
+	80-115600(US)   | What's That Noise (it's 52-280800 on VTech catalog)
+	80-115622(SP)	| ¿Qué ruido es ese? (no ROM cartridge)
+	80-280000(US)   | Shrek's Vacation
+	80-280003(UK)   | Shrek's Holiday
+	80-280100(US)   | Toy Story 3
+	80-280200(US)   | Mr. Men/Little Miss
+	80-280300(US)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
+	80-280400(US)   | Scooby Doo! - Scooby Doo and a Mummy, Too!
+	80-280403(UK)   | Scooby Doo! - Scooby Doo and a Mummy, Too!
+	80-280422(SP)   | Scooby Doo! - Scooby Doo y la momia
+	80-280600(US)   | Olivia
+	80-280700(US)   | The Little Engine That Could
+	80-280900(US)   | Dora and the Three Little Pigs
+	80-281000(US)   | Mickey Mouse Clubhouse
+	80-281100(US)   | Disney Princess
+	80-281103(UK)   | Disney Princess
+	80-281200(US)   | Cars
+	80-281300(US)   | Sesame Street The Happy Scientists
+	80-281400(US)   | SpongeBob SquarePants Model Sponge
+	80-281500(US)   | Tangled
+	80-281600(US)   | Chuggington - Babysitter Brewster
+	80-281700(US)   | Penguins of Madagascar - The Helmet
+	80-281800(US)   | Kung Fu Panda 2
+	80-281900(US)   | Cars 2
+	80-282000(US)   | Winnie the Pooh
+	80-282100(US)   | Super Why! - Attack of the Eraser
+	80-282200(US)   | Madagascar 3
+	80-282300(US)   | Dinosaur Train - T.Rex Teeth
+	80-282400(US)   | Hello Kitty's Surprise
+
+	-->
+
+	<software name="scoobysp" supported="no">
+		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="80-280422 - scooby-doo-scooby-doo y la momia (sp).bin" size="0x4200000" crc="cd1ee924" sha1="83e561af5910dc547829d54c84fbef60350f4f54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

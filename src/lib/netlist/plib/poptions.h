@@ -212,6 +212,14 @@ private:
 	std::vector<pstring> m_val;
 };
 
+class option_args : public option_vec
+{
+public:
+	option_args(options &parent, pstring help)
+	: option_vec(parent, "", "", help)
+	{}
+};
+
 class options
 {
 public:
@@ -233,6 +241,8 @@ private:
 	static pstring split_paragraphs(pstring text, unsigned width, unsigned indent,
 			unsigned firstline_indent);
 
+	void check_consistency();
+
 	template <typename T>
 	T *getopt_type()
 	{
@@ -249,6 +259,7 @@ private:
 
 	std::vector<option_base *> m_opts;
 	pstring m_app;
+	option_args * m_other_args;
 };
 
 }

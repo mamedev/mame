@@ -732,7 +732,7 @@ MACHINE_CONFIG_START(st_mp100_state::st_mp100)
 	m_pia_u10->cb2_handler().set(FUNC(st_mp100_state::u10_cb2_w));
 	m_pia_u10->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u10->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", st_mp100_state, timer_x, attotime::from_hz(120)) // mains freq*2
+	TIMER(config, "timer_x").configure_periodic(FUNC(st_mp100_state::timer_x), attotime::from_hz(120)); // mains freq*2
 
 	PIA6821(config, m_pia_u11, 0);
 	m_pia_u11->readpa_handler().set(FUNC(st_mp100_state::u11_a_r));
@@ -742,7 +742,7 @@ MACHINE_CONFIG_START(st_mp100_state::st_mp100)
 	m_pia_u11->cb2_handler().set(FUNC(st_mp100_state::u11_cb2_w));
 	m_pia_u11->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u11->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp100_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
+	TIMER(config, "timer_d").configure_periodic(FUNC(st_mp100_state::u11_timer), attotime::from_hz(634)); // 555 timer*2
 MACHINE_CONFIG_END
 
 

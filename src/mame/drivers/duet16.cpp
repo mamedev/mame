@@ -401,11 +401,9 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	kbd.rxd_handler().set("kbusart", FUNC(i8251_device::write_rxd));
 	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir5_w)) // INT2
+	INPUT_MERGER_ANY_HIGH(config, "kbint").output_handler().set(m_pic, FUNC(pic8259_device::ir5_w)); // INT2
 
-	MCFG_INPUT_MERGER_ANY_HIGH("tmint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE("pic", pic8259_device, ir0_w)) // INT6
+	INPUT_MERGER_ANY_HIGH(config, m_tmint).output_handler().set(m_pic, FUNC(pic8259_device::ir0_w)); // INT6
 
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
@@ -430,14 +428,14 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, 32768_Hz_XTAL)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, duet16_state, rtc_d0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, duet16_state, rtc_d1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, duet16_state, rtc_d2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, duet16_state, rtc_d3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, duet16_state, rtc_busy_w))
-	MCFG_MSM58321_YEAR0(1980)
-	MCFG_MSM58321_DEFAULT_24H(true)
+	MSM58321(config, m_rtc, 32768_Hz_XTAL);
+	m_rtc->d0_handler().set(FUNC(duet16_state::rtc_d0_w));
+	m_rtc->d1_handler().set(FUNC(duet16_state::rtc_d1_w));
+	m_rtc->d2_handler().set(FUNC(duet16_state::rtc_d2_w));
+	m_rtc->d3_handler().set(FUNC(duet16_state::rtc_d3_w));
+	m_rtc->busy_handler().set(FUNC(duet16_state::rtc_busy_w));
+	m_rtc->set_year0(1980);
+	m_rtc->set_default_24h(true);
 MACHINE_CONFIG_END
 
 ROM_START(duet16)

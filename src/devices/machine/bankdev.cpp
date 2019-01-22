@@ -6,7 +6,7 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ADDRESS_MAP_BANK, address_map_bank_device, "address_map_bank", "Address Map Bank")
 
-address_map_bank_device::address_map_bank_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
+address_map_bank_device::address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ADDRESS_MAP_BANK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_endianness(ENDIANNESS_NATIVE),
@@ -46,42 +46,42 @@ void address_map_bank_device::amap64(address_map &map)
 	map(0x00000000, 0xffffffff).rw(FUNC(address_map_bank_device::read64), FUNC(address_map_bank_device::write64));
 }
 
-WRITE8_MEMBER(address_map_bank_device::write8)
+void address_map_bank_device::write8(offs_t offset, u8 data)
 {
 	m_program->write_byte(m_offset + offset, data);
 }
 
-WRITE16_MEMBER(address_map_bank_device::write16)
+void address_map_bank_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_program->write_word(m_offset + (offset << (m_shift+1)), data, mem_mask);
 }
 
-WRITE32_MEMBER(address_map_bank_device::write32)
+void address_map_bank_device::write32(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_program->write_dword(m_offset + (offset << (m_shift+2)), data, mem_mask);
 }
 
-WRITE64_MEMBER(address_map_bank_device::write64)
+void address_map_bank_device::write64(offs_t offset, u64 data, u64 mem_mask)
 {
 	m_program->write_qword(m_offset + (offset << (m_shift+3)), data, mem_mask);
 }
 
-READ8_MEMBER(address_map_bank_device::read8)
+u8 address_map_bank_device::read8(offs_t offset)
 {
 	return m_program->read_byte(m_offset + offset);
 }
 
-READ16_MEMBER(address_map_bank_device::read16)
+u16 address_map_bank_device::read16(offs_t offset, u16 mem_mask)
 {
 	return m_program->read_word(m_offset + (offset << (m_shift+1)), mem_mask);
 }
 
-READ32_MEMBER(address_map_bank_device::read32)
+u32 address_map_bank_device::read32(offs_t offset, u32 mem_mask)
 {
 	return m_program->read_dword(m_offset + (offset << (m_shift+2)), mem_mask);
 }
 
-READ64_MEMBER(address_map_bank_device::read64)
+u64 address_map_bank_device::read64(offs_t offset, u64 mem_mask)
 {
 	return m_program->read_qword(m_offset + (offset << (m_shift+3)), mem_mask);
 }

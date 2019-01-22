@@ -956,7 +956,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 		switch (entry.type)
 		{
 		case 0: // type 0 space
-			return m_type0space->read32(space, tmp, mem_mask);
+			return m_type0space->read32(tmp, mem_mask);
 
 		case 1: // type 1 space
 			// magic EPROM bypass
@@ -965,7 +965,7 @@ READ32_MEMBER( sun4_state::sun4_insn_data_r )
 				return m_rom_ptr[offset & 0x1ffff];
 			}
 			//printf("Read type 1 @ VA %08x, phys %08x\n", offset<<2, tmp<<2);
-			return m_type1space->read32(space, tmp, mem_mask);
+			return m_type1space->read32(tmp, mem_mask);
 
 		default:
 			//logerror("sun4: access to unhandled memory type\n");
@@ -1019,12 +1019,12 @@ WRITE32_MEMBER( sun4_state::sun4_insn_data_w )
 		switch (entry.type)
 		{
 		case 0: // type 0
-			m_type0space->write32(space, tmp, data, mem_mask);
+			m_type0space->write32(tmp, data, mem_mask);
 			return;
 
 		case 1: // type 1
 			//printf("write device space @ %x\n", tmp<<1);
-			m_type1space->write32(space, tmp, data, mem_mask);
+			m_type1space->write32(tmp, data, mem_mask);
 			return;
 
 		default:

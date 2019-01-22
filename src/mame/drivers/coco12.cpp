@@ -477,12 +477,13 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// video hardware
-	MCFG_SCREEN_MC6847_NTSC_ADD(SCREEN_TAG, VDG_TAG)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD(VDG_TAG, MC6847_NTSC, XTAL(14'318'181) / 4) // VClk output from MC6883
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, coco12_state, horizontal_sync))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, coco12_state, field_sync))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(m_sam, sam6883_device, display_read))
+	MC6847_NTSC(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
+	m_vdg->set_screen("screen");
+	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
+	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
+	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
 
 	// sound hardware
 	coco_sound(config);
@@ -544,14 +545,15 @@ MACHINE_CONFIG_START(coco12_state::coco2h)
 	m_ram->set_default_size("64K");
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(coco12_state::coco2b)
+void coco12_state::coco2b(machine_config &config)
+{
 	coco2(config);
-	MCFG_DEVICE_REMOVE(VDG_TAG)
-	MCFG_DEVICE_ADD(VDG_TAG, MC6847T1_NTSC, XTAL(14'318'181) / 4)
-	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(*this, coco12_state, horizontal_sync))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, coco12_state, field_sync))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(m_sam, sam6883_device, display_read))
-MACHINE_CONFIG_END
+	MC6847T1_NTSC(config.replace(), m_vdg, XTAL(14'318'181) / 4);
+	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
+	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
+	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
+}
 
 MACHINE_CONFIG_START(coco12_state::coco2bh)
 	coco2b(config);

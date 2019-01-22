@@ -1063,8 +1063,8 @@ MACHINE_CONFIG_START(midvunit_state::midvcommon)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_ADD_NONE("timer0")
-	MCFG_TIMER_ADD_NONE("timer1")
+	TIMER(config, "timer0").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "timer1").configure_generic(timer_device::expired_delegate());
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

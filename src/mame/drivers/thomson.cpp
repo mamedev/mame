@@ -628,11 +628,9 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 16_MHz_XTAL / 16)
 	MCFG_DEVICE_PROGRAM_MAP(to7)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainfirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainfirq").output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 /* video */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -733,9 +731,8 @@ MACHINE_CONFIG_START(thomson_state::to7_base)
 	m_acia->txd_handler().set(FUNC(thomson_state::to7_modem_tx_w));
 	m_acia->irq_handler().set(FUNC(thomson_state::to7_modem_cb));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 1200) /* 1200 bauds, might be divided by 16 */
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, thomson_state, write_acia_clock))
-
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 1200)); /* 1200 bauds, might be divided by 16 */
+	acia_clock.signal_handler().set(FUNC(thomson_state::write_acia_clock));
 
 /* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "to_cart")

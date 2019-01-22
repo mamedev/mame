@@ -525,8 +525,8 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	/* video hardware */
 	config.set_default_layout(layout_cosmicos);
 	DM9368(config, m_led, 0);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
+	TIMER(config, "digit").configure_periodic(FUNC(cosmicos_state::digit_tick), attotime::from_hz(100));
+	TIMER(config, "interrupt").configure_periodic(FUNC(cosmicos_state::int_tick), attotime::from_hz(1000));
 
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 

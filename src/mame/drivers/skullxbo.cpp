@@ -232,7 +232,7 @@ MACHINE_CONFIG_START(skullxbo_state::skullxbo)
 	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_TIMER_DRIVER_ADD("scan_timer", skullxbo_state, scanline_timer)
+	TIMER(config, m_scanline_timer).configure_generic(FUNC(skullxbo_state::scanline_timer));
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 

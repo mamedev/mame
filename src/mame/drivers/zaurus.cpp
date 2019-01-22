@@ -1525,7 +1525,7 @@ MACHINE_CONFIG_START(zaurus_state::zaurus)
 	MCFG_DEVICE_ADD(m_maincpu,PXA255,MAIN_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(zaurus_map)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", zaurus_state, rtc_irq_callback, attotime::from_hz(XTAL(32'768)))
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(zaurus_state::rtc_irq_callback), attotime::from_hz(XTAL(32'768)));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -240,9 +240,10 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(diablo68k_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag68k_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)) // active for 1.1us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag68k_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
+	timer_device &irq_on(TIMER(config, "irq_on"));
+	irq_on.configure_periodic(FUNC(novag68k_state::irq_on), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
+	irq_on.set_start_delay(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)); // active for 1.1us
+	TIMER(config, "irq_off").configure_periodic(FUNC(novag68k_state::irq_off), attotime::from_hz(32.768_kHz_XTAL/128));
 
 	mos6551_device &acia(MOS6551(config, "acia", 0));
 	acia.set_xtal(1.8432_MHz_XTAL);
@@ -263,7 +264,7 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	m_lcd->set_lcd_size(2, 8);
 	m_lcd->set_pixel_update_cb(FUNC(novag68k_state::novag_lcd_pixel_update), this);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", novag68k_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(novag68k_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_novag_diablo68k);
 
 	/* sound hardware */

@@ -513,10 +513,11 @@ MACHINE_CONFIG_START(mc10_state::mc10)
 	m_maincpu->out_p2_cb().set(FUNC(mc10_state::mc10_port2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, mc10_state, mc6847_videoram_r))
+	mc6847_ntsc_device &vdg(MC6847_NTSC(config, "mc6847", XTAL(3'579'545)));
+	vdg.set_screen("screen");
+	vdg.input_callback().set(FUNC(mc10_state::mc6847_videoram_r));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -530,7 +531,7 @@ MACHINE_CONFIG_START(mc10_state::mc10)
 	MCFG_CASSETTE_INTERFACE("mc10_cass")
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("20K").set_extra_options("4K");
@@ -558,7 +559,7 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 
 	EF9345(config, m_ef9345, 0);
 	m_ef9345->set_palette_tag("palette");
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("alice32_sl", mc10_state, alice32_scanline, "screen", 0, 10)
+	TIMER(config, "alice32_sl").configure_scanline(FUNC(mc10_state::alice32_scanline), "screen", 0, 10);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -572,7 +573,7 @@ MACHINE_CONFIG_START(mc10_state::alice32)
 	MCFG_CASSETTE_INTERFACE("mc10_cass")
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("24K").set_extra_options("8K");

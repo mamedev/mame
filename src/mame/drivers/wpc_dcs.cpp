@@ -430,7 +430,7 @@ MACHINE_CONFIG_START(wpc_dcs_state::wpc_dcs)
 	MCFG_DEVICE_PROGRAM_MAP(wpc_dcs_map)
 
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_dcs_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
+	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_dcs_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
 	MCFG_DEVICE_ADD("lamp", WPC_LAMP, 0)
 	MCFG_DEVICE_ADD("out", WPC_OUT, 0, 3)

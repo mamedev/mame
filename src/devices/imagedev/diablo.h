@@ -73,20 +73,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(DIABLO, diablo_image_device)
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DIABLO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DIABLO, 0)
-
-#define MCFG_DIABLO_LOAD(_class,_method)                                \
-	downcast<diablo_image_device &>(*device).set_device_load(device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
-
-#define MCFG_DIABLO_UNLOAD(_class,_method)                            \
-	downcast<diablo_image_device &>(*device).set_device_unload(device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
-
-#define MCFG_DIABLO_INTERFACE(_interface)                         \
-	downcast<diablo_image_device &>(*device).set_interface(_interface);
-
 #endif // MAME_DEVICES_IMAGEDEV_DIABLO_H

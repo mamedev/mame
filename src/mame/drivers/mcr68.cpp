@@ -918,7 +918,7 @@ MACHINE_CONFIG_START(mcr68_state::mcr68)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_mcr68)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr68_state, scanline_cb, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr68_state::scanline_cb), "screen", 0, 1);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mcr68);
 	PALETTE(config, "palette").set_format(palette_device::xRBG_333, 64);

@@ -4,6 +4,9 @@
 
     Leapfrog Clickstart Emulation
 
+		die markings show
+		"SunPlus QL8041C" ( known as Sunplus SPG2?? )
+
     Status:
 
 		Some games have Checksums listed in the header area that appear to be

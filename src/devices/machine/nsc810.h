@@ -116,35 +116,6 @@ private:
 	};
 };
 
-#define MCFG_NSC810_ADD(_tag, _t0clk, _t1clk) \
-	MCFG_DEVICE_ADD(_tag, NSC810, 0)           \
-	downcast<nsc810_device *>(device)->set_timer0_clock(_t0clk);   \
-	downcast<nsc810_device *>(device)->set_timer1_clock(_t1clk);
-
-#define MCFG_NSC810_PORTA_READ(_read) \
-	downcast<nsc810_device &>(*device).set_portA_read_callback(DEVCB_##_read);
-
-#define MCFG_NSC810_PORTB_READ(_read) \
-	downcast<nsc810_device &>(*device).set_portB_read_callback(DEVCB_##_read);
-
-#define MCFG_NSC810_PORTC_READ(_read) \
-	downcast<nsc810_device &>(*device).set_portC_read_callback(DEVCB_##_read);
-
-#define MCFG_NSC810_PORTA_WRITE(_write) \
-	downcast<nsc810_device &>(*device).set_portA_write_callback(DEVCB_##_write);
-
-#define MCFG_NSC810_PORTB_WRITE(_write) \
-	downcast<nsc810_device &>(*device).set_portB_write_callback(DEVCB_##_write);
-
-#define MCFG_NSC810_PORTC_WRITE(_write) \
-	downcast<nsc810_device &>(*device).set_portC_write_callback(DEVCB_##_write);
-
-#define MCFG_NSC810_TIMER0_OUT(_write) \
-	downcast<nsc810_device &>(*device).set_timer0_callback(DEVCB_##_write);
-
-#define MCFG_NSC810_TIMER1_OUT(_write) \
-	downcast<nsc810_device &>(*device).set_timer1_callback(DEVCB_##_write);
-
 // device type definition
 DECLARE_DEVICE_TYPE(NSC810, nsc810_device)
 

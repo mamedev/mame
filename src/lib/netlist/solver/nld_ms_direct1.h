@@ -19,7 +19,7 @@ class matrix_solver_direct1_t: public matrix_solver_direct_t<1,1>
 {
 public:
 
-	matrix_solver_direct1_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params)
+	matrix_solver_direct1_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params)
 		: matrix_solver_direct_t<1, 1>(anetlist, name, params, 1)
 		{}
 	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;

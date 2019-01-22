@@ -66,9 +66,19 @@ static void cfunc_unimplemented(void *param)
 }
 
 #if UNSP_LOG_REGS
+void unsp_device::cfunc_log_write()
+{
+	log_write(m_core->m_arg0, m_core->m_arg1);
+}
+
 static void cfunc_log_regs(void *param)
 {
 	((unsp_device *)param)->log_regs();
+}
+
+static void ccfunc_log_write(void *param)
+{
+	((unsp_device *)param)->cfunc_log_write();
 }
 #endif
 
@@ -140,7 +150,7 @@ void unsp_device::code_compile_block(offs_t pc)
 		try
 		{
 			/* start the block */
-			drcuml_block &block(m_drcuml->begin_block(32768));
+			drcuml_block &block(m_drcuml->begin_block(1024*8));
 
 			/* loop until we get through all instruction sequences */
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
@@ -186,22 +196,15 @@ void unsp_device::code_compile_block(offs_t pc)
 				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
 					UML_LABEL(block, seqhead->pc | 0x80000000);
 
-				UML_MOV(block, I7, 0);
-				UML_CALLH(block, *m_check_interrupts);
-
 				/* iterate over instructions in the sequence and compile them */
 				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
 				{
+					generate_check_cycles(block, compiler, curdesc->pc + curdesc->length);
 					generate_sequence_instruction(block, compiler, curdesc);
 					UML_CALLH(block, *m_check_interrupts);
 				}
 
-				if (seqlast->flags & OPFLAG_RETURN_TO_START) /* if we need to return to the start, do it */
-					nextpc = pc;
-				else /* otherwise we just go to the next instruction */
-					nextpc = seqlast->pc + seqlast->length;
-
-				generate_update_cycles(block, compiler, nextpc);
+				nextpc = seqlast->pc + seqlast->length;
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
@@ -324,7 +327,14 @@ void unsp_device::static_generate_memory_accessor(bool iswrite, const char *name
 	UML_HANDLE(block, *handleptr);
 
 	if (iswrite)
+	{
+#if UNSP_LOG_REGS
+		UML_MOV(block, mem(&m_core->m_arg0), I0);
+		UML_MOV(block, mem(&m_core->m_arg1), I1);
+		UML_CALLC(block, ccfunc_log_write, this);
+#endif
 		UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM);
+	}
 	else
 		UML_READ(block, I1, I0, SIZE_WORD, SPACE_PROGRAM);
 	UML_RET(block);
@@ -470,17 +480,14 @@ void unsp_device::static_generate_trigger_irq()
 }
 
 /*-------------------------------------------------
-    generate_update_cycles - generate code to
-    subtract cycles from the icount and generate
-    an exception if out
+    generate_check_cycles - generate code to
+    generate an exception if cycles are out
 -------------------------------------------------*/
 
-void unsp_device::generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param)
+void unsp_device::generate_check_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param)
 {
-	UML_SUB(block, mem(&m_core->m_icount), mem(&m_core->m_icount), I7);
-	UML_EXHc(block, uml::COND_Z, *m_out_of_cycles, param);
-	UML_EXHc(block, uml::COND_S, *m_out_of_cycles, param);
-	UML_MOV(block, I7, 0);
+	UML_CMP(block, mem(&m_core->m_icount), 0);
+	UML_EXHc(block, uml::COND_L, *m_out_of_cycles, param);
 }
 
 /*-------------------------------------------------
@@ -495,33 +502,35 @@ void unsp_device::generate_checksum_block(drcuml_block &block, compiler_state &c
 	{
 		block.append_comment("[Validation for %08X]", seqhead->pc);
 	}
-	/* loose verify or single instruction: just compare and fail */
-	if (!(m_drcoptions & UNSP_STRICT_VERIFY) || seqhead->next() == nullptr)
+
+	/* full verification; sum up everything */
+	void *memptr = m_program->get_write_ptr(seqhead->physpc);
+	UML_LOAD(block, I0, memptr, 0, SIZE_WORD, SCALE_x2);
+	uint32_t sum = seqhead->opptr.w[0];
+	for (int i = 1; i < seqhead->length; i++)
 	{
-		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
-		{
-			uint32_t sum = seqhead->opptr.w[0];
-			UML_READ(block, I0, seqhead->physpc, SIZE_WORD, SPACE_PROGRAM);
-			UML_CMP(block, I0, sum);
-			UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);
-		}
+		UML_LOAD(block, I1, memptr, i, SIZE_WORD, SCALE_x2);
+		UML_ADD(block, I0, I0, I1);
+		sum += ((uint16_t*)memptr)[i];
 	}
-	else /* full verification; sum up everything */
+	for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 	{
-		UML_READ(block, I0, seqhead->physpc, SIZE_WORD, SPACE_PROGRAM);
-		uint32_t sum = seqhead->opptr.w[0];
-		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
+		if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
+			memptr = m_program->get_write_ptr(curdesc->physpc);
+			UML_LOAD(block, I1, memptr, 0, SIZE_WORD, SCALE_x2);
+			UML_ADD(block, I0, I0, I1);
+			sum += curdesc->opptr.w[0];
+			for (int i = 1; i < curdesc->length; i++)
 			{
-				UML_READ(block, I1, curdesc->physpc, SIZE_WORD, SPACE_PROGRAM);
+				UML_LOAD(block, I1, memptr, i, SIZE_WORD, SCALE_x2);
 				UML_ADD(block, I0, I0, I1);
-				sum += curdesc->opptr.w[0];
+				sum += ((uint16_t*)memptr)[i];
 			}
 		}
-		UML_CMP(block, I0, sum);
-		UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);
 	}
+	UML_CMP(block, I0, sum);
+	UML_EXHc(block, COND_NE, *m_nocode, seqhead->pc);
 }
 
 
@@ -554,44 +563,14 @@ void unsp_device::generate_branch(drcuml_block &block, compiler_state &compiler,
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(block, compiler, desc->targetpc);
+		UML_CALLH(block, *m_check_interrupts);
 		UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);
 	}
 	else
 	{
-		generate_update_cycles(block, compiler, uml::mem(&m_core->m_jmpdest));
+		UML_CALLH(block, *m_check_interrupts);
 		UML_HASHJMP(block, 0, mem(&m_core->m_jmpdest), *m_nocode);
 	}
-}
-
-
-/*------------------------------------------------------------------
-    generate_push - pushes a register onto a stack addressed by
-    the specified register
-------------------------------------------------------------------*/
-
-void unsp_device::generate_push(drcuml_block &block, uint32_t sp)
-{
-	// value to push is in I1
-	UML_MOV(block, I0, mem(&m_core->m_r[sp]));
-	UML_CALLH(block, *m_mem_write);
-	UML_SUB(block, I0, I0, 1);
-	UML_AND(block, mem(&m_core->m_r[sp]), I0, 0x0000ffff);
-}
-
-
-/*------------------------------------------------------------------
-    generate_pop - pops a value off a stack addressed by the
-    specified register
-------------------------------------------------------------------*/
-
-void unsp_device::generate_pop(drcuml_block &block, uint32_t sp)
-{
-	// popped value is in I1
-	UML_MOV(block, I0, mem(&m_core->m_r[sp]));
-	UML_ADD(block, I0, I0, 1);
-	UML_CALLH(block, *m_mem_read);
-	UML_AND(block, mem(&m_core->m_r[sp]), I0, 0x0000ffff);
 }
 
 
@@ -655,6 +634,7 @@ void unsp_device::generate_add_lpc(drcuml_block &block, int32_t offset)
 
 void unsp_device::generate_update_nzsc(drcuml_block &block)
 {
+	UML_XOR(block, I1, I1, 0x0000ffff);
 	UML_SEXT(block, I1, I1, SIZE_WORD);
 	UML_SEXT(block, I2, I2, SIZE_WORD);
 	UML_CMP(block, I2, I1);
@@ -665,13 +645,12 @@ void unsp_device::generate_update_nzsc(drcuml_block &block)
 	UML_SETc(block, uml::COND_NZ, I1);
 	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_N_SHIFT, UNSP_N);
 
-	UML_AND(block, I2, I3, 0x0000ffff);
-	UML_CMP(block, I3, I2);
-	UML_SETc(block, uml::COND_NE, I1);
+	UML_TEST(block, I3, 0x10000);
+	UML_SETc(block, uml::COND_NZ, I1);
 	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_C_SHIFT, UNSP_C);
 
-	UML_CMP(block, I2, 0);
-	UML_SETc(block, uml::COND_E, I1);
+	UML_TEST(block, I3, 0x0000ffff);
+	UML_SETc(block, uml::COND_Z, I1);
 	UML_ROLINS(block, mem(&m_core->m_r[REG_SR]), I1, UNSP_Z_SHIFT, UNSP_Z);
 }
 
@@ -720,8 +699,6 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 	uml::code_label mul_opb_nohi = compiler.m_labelnum++;
 	uml::code_label shift_no_sign = compiler.m_labelnum++;
 	uml::code_label no_carry = compiler.m_labelnum++;
-
-	UML_ADD(block, I7, I7, desc->cycles);
 
 	if(op0 < 0xf && opa == 0x7 && op1 < 2)
 	{
@@ -793,7 +770,7 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 				break;
 
 			case 14: // JMP
-				UML_ADD(block, I7, I7, 2);
+				UML_SUB(block, mem(&m_core->m_icount), mem(&m_core->m_icount), 4);
 				UML_MOV(block, I0, desc->targetpc);
 				UML_AND(block, mem(&m_core->m_r[REG_PC]), I0, 0x0000ffff);
 				generate_branch(block, compiler, desc);
@@ -802,13 +779,17 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			default:
 				return false;
 		}
-		UML_ADD(block, I7, I7, 2);
+		UML_SUB(block, mem(&m_core->m_icount), mem(&m_core->m_icount), 4);
 		generate_add_lpc(block, (op1 == 0) ? opimm : (0 - opimm));
 		generate_branch(block, compiler, desc);
 		UML_LABEL(block, skip_branch);
+		UML_SUB(block, mem(&m_core->m_icount), mem(&m_core->m_icount), 2);
 		return true;
 	}
-	else if (lower_op == 0x2d) // Push
+
+	UML_SUB(block, mem(&m_core->m_icount), mem(&m_core->m_icount), desc->cycles);
+
+	if (lower_op == 0x2d) // Push
 	{
 		uint32_t r0 = opn;
 		uint32_t r1 = opa;
@@ -818,10 +799,10 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			UML_MOV(block, I1, mem(&m_core->m_r[r1]));
 			UML_CALLH(block, *m_mem_write);
 			UML_SUB(block, I0, I0, 1);
+			UML_AND(block, mem(&m_core->m_r[opb]), I0, 0x0000ffff);
 			r0--;
 			r1--;
 		}
-		UML_AND(block, mem(&m_core->m_r[opb]), I0, 0x0000ffff);
 		return true;
 	}
 	else if (lower_op == 0x29)
@@ -870,13 +851,13 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			{
 				r1++;
 				UML_ADD(block, I0, I0, 1);
+				UML_AND(block, mem(&m_core->m_r[opb]), I0, 0x0000ffff);
 				UML_CALLH(block, *m_mem_read);
 				UML_MOV(block, mem(&m_core->m_r[r1]), I1);
 				if (r1 == REG_PC)
 					do_branch = true;
 				r0--;
 			}
-			UML_AND(block, mem(&m_core->m_r[opb]), I0, 0x0000ffff);
 			if (do_branch)
 				generate_branch(block, compiler, desc);
 		}
@@ -1249,16 +1230,16 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			break;
 
 		case 0x02: // Subtract
-			UML_XOR(block, I3, I1, 0x0000ffff);
-			UML_ADD(block, I3, I3, I2);
+			UML_XOR(block, I1, I1, 0x0000ffff);
+			UML_ADD(block, I3, I1, I2);
 			UML_ADD(block, I3, I3, 1);
 			if (opa != 7)
 				generate_update_nzsc(block);
 			break;
 
 		case 0x03: // Subtract w/ carry
-			UML_XOR(block, I3, I1, 0x0000ffff);
-			UML_ADD(block, I3, I3, I2);
+			UML_XOR(block, I1, I1, 0x0000ffff);
+			UML_ADD(block, I3, I1, I2);
 			UML_TEST(block, mem(&m_core->m_r[REG_SR]), UNSP_C);
 			UML_JMPc(block, uml::COND_Z, no_carry);
 			UML_ADD(block, I3, I3, 1);
@@ -1269,8 +1250,8 @@ bool unsp_device::generate_opcode(drcuml_block &block, compiler_state &compiler,
 			break;
 
 		case 0x04: // Compare
-			UML_XOR(block, I3, I1, 0x0000ffff);
-			UML_ADD(block, I3, I3, I2);
+			UML_XOR(block, I1, I1, 0x0000ffff);
+			UML_ADD(block, I3, I1, I2);
 			UML_ADD(block, I3, I3, 1);
 			if (opa != 7)
 				generate_update_nzsc(block);

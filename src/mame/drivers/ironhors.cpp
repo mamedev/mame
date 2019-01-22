@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(ironhors_state::ironhors)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, ironhors_scanline_tick, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::ironhors_scanline_tick), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(slave_map)
@@ -447,8 +447,7 @@ MACHINE_CONFIG_START(ironhors_state::farwest)
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(farwest_master_map)
-	MCFG_DEVICE_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_scanline_tick)
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(ironhors_state::farwest_scanline_tick));
 
 	MCFG_DEVICE_MODIFY("soundcpu")
 	MCFG_DEVICE_PROGRAM_MAP(farwest_slave_map)

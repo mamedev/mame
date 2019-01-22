@@ -191,7 +191,7 @@ MACHINE_CONFIG_START(pro80_state::pro80)
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
 	Z80PIO(config, "pio", XTAL(4'000'000) / 2);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", pro80_state, timer_p, attotime::from_hz(40000)) // cass read
+	TIMER(config, "timer_p").configure_periodic(FUNC(pro80_state::timer_p), attotime::from_hz(40000)); // cass read
 MACHINE_CONFIG_END
 
 /* ROM definition */

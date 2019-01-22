@@ -111,7 +111,7 @@ TODO:
   zombraid not aligned when flipped vertically or horizontally
 
 - bad sound in sokonuke?
-- in msgunda1, colors for the score display screw up after the second animation
+- in msgundam1, colors for the score display screw up after the second animation
   in attract mode. The end of the animation also has garbled sprites.
   Note that the animation is not present in msgundam.
 - Some games: battery backed portion of RAM (e.g. downtown, kiwame, zombraid)
@@ -2789,6 +2789,32 @@ void seta_state::msgundam_map(address_map &map)
 	map(0xd00000, 0xd00007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 }
 
+void seta_state::msgundamb_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                             // ROM
+	map(0x100000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();          // RAM
+	map(0x400000, 0x400001).portr("P1");                 // P1
+	map(0x400002, 0x400003).portr("P2");                 // P2
+	map(0x400004, 0x400005).portr("COINS");              // Coins
+	map(0x400000, 0x400001).w(FUNC(seta_state::ipl1_ack_w));               // Lev 2 IRQ Ack
+	map(0x400004, 0x400005).w(FUNC(seta_state::ipl2_ack_w));               // Lev 4 IRQ Ack
+	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_counter_w));
+	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
+	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
+	map(0x800000, 0x803fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
+	map(0x880000, 0x883fff).ram().w(FUNC(seta_state::vram_w<1>)).share("vram_1"); // VRAM 2&3
+	map(0x900000, 0x900005).ram().share("vctrl_0");     // VRAM 0&1 Ctrl
+	map(0x980000, 0x980005).ram().share("vctrl_1");     // VRAM 2&3 Ctrl
+	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
+	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
+	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
+	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xd00000, 0xd00007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+}
 
 /***************************************************************************
                                 Oishii Puzzle
@@ -5405,11 +5431,11 @@ static INPUT_PORTS_START( msgundam )
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( msgunda1 )
+static INPUT_PORTS_START( msgundam1 )
 	PORT_INCLUDE(msgundam)
 
 	PORT_MODIFY("COINS") // IN2 - Coins - $400004.w
-	/* this set seems to be a japan set, english mode doesn't work correctly */
+	/* this set seems to be a Japan set, English mode doesn't work correctly */
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Language ) )
 //  PORT_DIPSETTING(      0x0080, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
@@ -9155,7 +9181,12 @@ void seta_state::msgundam(machine_config &config)
 	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void seta_state::msgundamb(machine_config &config)
+{
+	msgundam(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::msgundamb_map);
+}
 
 /***************************************************************************
                             Oishii Puzzle
@@ -10789,6 +10820,33 @@ ROM_START( msgundam1 )
 	ROM_LOAD( "fa001004.u26",  0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )
 ROM_END
 
+ROM_START( msgundamb ) // 2 PCB stack, one has a 'Tecnoval - tecnologia valenciana del recreativo' sticker
+	ROM_REGION( 0x300000, "maincpu", 0 )        /* 68000 Code, on lower board */
+	ROM_LOAD16_BYTE( "d-4.bin", 0x000000, 0x040000, CRC(ca5bfa89) SHA1(108435cb65919b4b90be102e7ac2799501149fc8) ) // 27c020
+	ROM_LOAD16_BYTE( "d-2.bin", 0x000001, 0x040000, CRC(b4b86d1b) SHA1(d9b625cfdabcabed9308fccc29c66adfe566a996) ) // 27c020
+	ROM_LOAD16_BYTE( "27c8001-7.bin",   0x100000, 0x100000, CRC(803f279c) SHA1(1095ac434ce553ed56d106556e7d23ccac1f0cd4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "27c8001-8.bin",   0x100001, 0x100000, CRC(a310fa93) SHA1(2ee1616699c95ed2b8c46d43de4cffece1b033ea) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* Sprites, on top board, almost identical to the original but split */
+	ROM_LOAD16_BYTE( "27c8001-3.bin", 0x000000, 0x100000, CRC(9f36d867) SHA1(01a15dcdcb1077d7c8678762f58ad705dc29e8c9) )
+	ROM_LOAD16_BYTE( "27c8001-2.bin", 0x000001, 0x100000, CRC(70d333d9) SHA1(9ef3b0e0567ceed082921a5c384cfcfeb154f048) )
+	ROM_LOAD16_BYTE( "27c8001-1.bin", 0x200000, 0x100000, CRC(2792692c) SHA1(ed99c589ed15f8c1a4e2ab435a379b35105ba503) )
+	ROM_LOAD16_BYTE( "4.bin", 0x200001, 0x080000, CRC(eb551f1a) SHA1(e9d2fc31c3076164c5ee9722ea1b1e60b4f6d663) ) // mx27c4000
+	ROM_LOAD16_BYTE( "5.bin", 0x300001, 0x080000, CRC(e9aa57e8) SHA1(699c0132f4be81570f748e5ca2f88fc4fc6802bb) ) // mx27c4000
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1, on lower board */
+	ROM_LOAD16_BYTE( "27c8001-6.bin", 0x000000, 0x100000, CRC(8fbb5478) SHA1(247fd080f0ee18282c4d8b918171cfeab4b40d23) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [even] IDENTICAL
+	ROM_LOAD16_BYTE( "27c8001-5.bin", 0x000001, 0x100000, BAD_DUMP CRC(9e10c071) SHA1(2ec1cee04433b30c908548642e7c19862151c8a2) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [odd]  77.495193% - bad, causes GFX glitches
+	// ROM_LOAD16_BYTE( "5_handcrafted.bin", 0x000001, 0x100000, CRC(c83ae34a) SHA1(d7bf49843c443c5b7cb9187404a3518eaed577a6) ) // this was de-interleaved from the original, left here to easily verify an eventual redump
+
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2, on lower board, identical to the original but split */
+	ROM_LOAD16_BYTE( "d-8.bin", 0x000000, 0x040000, CRC(a03c8345) SHA1(d3c3f0045ebb3d82d82432c212db4a801cb53b60) ) // 27c020
+	ROM_LOAD16_BYTE( "d-9.bin", 0x000001, 0x040000, CRC(cfd47024) SHA1(ab4fbaf258d2694407dd6c896f45d69821ccc408) ) // 27c020
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples, on lower board */
+	ROM_LOAD( "27c8001-4.bin", 0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )  // identical to the original
+ROM_END
+
 ROM_START( oisipuzl )
 	ROM_REGION( 0x180000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "ss1u200.v10", 0x000000, 0x080000, CRC(f5e53baf) SHA1(057e8b35bc6f65634685b5d0cf38e12f2e62d72c) )
@@ -12143,7 +12201,8 @@ GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_ini
 
 // end credits shows Allumer as developer.
 GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam", 0 )
-GAME( 1993, msgundam1, msgundam, msgundam,  msgunda1,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam (Japan)", 0 )
+GAME( 1993, msgundam1, msgundam, msgundam,  msgundam1, seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam (Japan)", 0 )
+GAME( 1993, msgundamb, msgundam, msgundamb, msgundam,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Mobile Suit Gundam (bootleg)", MACHINE_IMPERFECT_GRAPHICS ) // GFX glitches due to bad dump
 
 GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     empty_init,     ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Triple Fun", 0 )

@@ -20,6 +20,8 @@
     with the (non-ASCII) keycode being contained in the second byte. The
     only other active line appears to be a ready signal (assumed to be
     active high), which the terminal drives to synchronize transmissions.
+    This might even be a single line driven bidirectionally. There appear
+    to be at most four wires attached to the DE-9 connector.
 
 ***************************************************************************/
 
@@ -27,6 +29,7 @@
 #include "bus/uts_kbd/uts_kbd.h"
 
 #include "bus/uts_kbd/extw.h"
+#include "bus/uts_kbd/400kbd.h"
 
 //**************************************************************************
 //  UTS KEYBOARD PORT DEVICE
@@ -74,7 +77,13 @@ device_uts_keyboard_interface::~device_uts_keyboard_interface()
 //  KEYBOARD OPTIONS
 //**************************************************************************
 
-void uts_keyboards(device_slot_interface &slot)
+void uts10_keyboards(device_slot_interface &slot)
 {
 	slot.option_add("extw", UTS_EXTW_KEYBOARD);
+}
+
+void uts20_keyboards(device_slot_interface &slot)
+{
+	uts10_keyboards(slot);
+	slot.option_add("uts400", UTS_400_KEYBOARD);
 }

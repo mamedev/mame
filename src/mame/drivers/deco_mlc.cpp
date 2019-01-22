@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 
 	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
-	MCFG_TIMER_DRIVER_ADD(m_raster_irq_timer, deco_mlc_state, interrupt_gen)
+	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 
 	EEPROM_93C46_16BIT(config, m_eeprom); /* Actually 93c45 */
 
-	MCFG_TIMER_DRIVER_ADD(m_raster_irq_timer, deco_mlc_state, interrupt_gen)
+	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(m_screen, RASTER)

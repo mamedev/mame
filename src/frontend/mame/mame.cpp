@@ -304,13 +304,13 @@ void mame_machine_manager::ui_initialize(running_machine& machine)
 void mame_machine_manager::create_custom(running_machine& machine)
 {
 	// start the inifile manager
-	m_inifile = std::make_unique<inifile_manager>(machine, m_ui->options());
+	m_inifile = std::make_unique<inifile_manager>(m_ui->options());
 
 	// allocate autoboot timer
 	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
 
 	// start favorite manager
-	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());
+	m_favorite = std::make_unique<favorite_manager>(m_ui->options());
 }
 
 void mame_machine_manager::load_cheatfiles(running_machine& machine)
