@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(srumbler_state::srumbler)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */
 	MCFG_DEVICE_PROGRAM_MAP(srumbler_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(srumbler_state::interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)        /* 3 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(srumbler_sound_map)

@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", nanos_state, keyboard_callback, attotime::from_hz(24000))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(nanos_state::keyboard_callback), attotime::from_hz(24000));
 MACHINE_CONFIG_END
 
 /* ROM definition */

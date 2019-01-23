@@ -120,7 +120,7 @@ protected:
 	virtual size_type vread(T *buf, const size_type n) = 0;
 };
 
-typedef pistream_base<std::uint8_t> pistream;
+typedef pistream_base<char> pistream;
 
 // -----------------------------------------------------------------------------
 // postream: output stream
@@ -150,7 +150,7 @@ protected:
 private:
 };
 
-typedef postream_base<std::uint8_t> postream;
+typedef postream_base<char> postream;
 
 // -----------------------------------------------------------------------------
 // pomemstream: output string stream

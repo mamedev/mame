@@ -1976,7 +1976,7 @@ MACHINE_CONFIG_START(wpc_s_state::wpc_s)
 	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000)/4)
 	MCFG_DEVICE_PROGRAM_MAP(wpc_s_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(wpc_s_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_s_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
+	TIMER(config, "zero_crossing").configure_periodic(FUNC(wpc_s_state::zc_timer), attotime::from_hz(120)); // Mains power zero crossing
 
 	MCFG_DEVICE_ADD("shift", WPC_SHIFT, 0)
 	MCFG_DEVICE_ADD("pic", WPC_PIC, 0)

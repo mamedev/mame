@@ -375,10 +375,11 @@ void mekd2_state::machine_start()
 
 ************************************************************/
 
-MACHINE_CONFIG_START(mekd2_state::mekd2)
+void mekd2_state::mekd2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
-	MCFG_DEVICE_PROGRAM_MAP(mekd2_mem)
+	M6800(config, m_maincpu, XTAL_MEKD2 / 2);        /* 614.4 kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mekd2_state::mekd2_mem);
 
 	config.set_default_layout(layout_mekd2);
 
@@ -386,7 +387,7 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cass);
 
 	/* Devices */
 	PIA6821(config, m_pia_s, 0);
@@ -411,11 +412,11 @@ MACHINE_CONFIG_START(mekd2_state::mekd2)
 	clock_device &acia_rx_clock(CLOCK(config, "acia_rx_clock", 300)); // toggled by cassette circuit
 	acia_rx_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_rxc));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_c", mekd2_state, mekd2_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mekd2_p", mekd2_state, mekd2_p, attotime::from_hz(40000))
+	TIMER(config, "mekd2_c").configure_periodic(FUNC(mekd2_state::mekd2_c), attotime::from_hz(4800));
+	TIMER(config, "mekd2_p").configure_periodic(FUNC(mekd2_state::mekd2_p), attotime::from_hz(40000));
 
-	MCFG_QUICKLOAD_ADD("quickload", mekd2_state, mekd2_quik, "d2", 1)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", 0).set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(mekd2_state, mekd2_quik), this), "d2", 1);
+}
 
 /***********************************************************
 

@@ -657,8 +657,8 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	PC_JOY(config, "pc_joy");
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 

@@ -462,8 +462,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 11) /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(sprint8_map)
 
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("input_timer", sprint8_state, input_callback, attotime::from_hz(60))
+	TIMER(config, "input_timer").configure_periodic(FUNC(sprint8_state::input_callback), attotime::from_hz(60));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

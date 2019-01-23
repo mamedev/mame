@@ -239,5 +239,5 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900_video)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_cgc7900)
 	PALETTE(config, m_palette, FUNC(cgc7900_state::cgc7900_palette), 8);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", cgc7900_state, blink_tick, attotime::from_hz(XTAL(28'480'000)/7500000))
+	TIMER(config, "blink").configure_periodic(FUNC(cgc7900_state::blink_tick), attotime::from_hz(XTAL(28'480'000)/7500000));
 MACHINE_CONFIG_END

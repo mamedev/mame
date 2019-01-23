@@ -309,7 +309,7 @@ MACHINE_CONFIG_START(scorpion_state::scorpion)
 	/* internal ram */
 	m_ram->set_default_size("256K");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", scorpion_state, nmi_check_callback, attotime::from_hz(50))
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(scorpion_state::nmi_check_callback), attotime::from_hz(50));
 
 	config.device_remove("exp");
 MACHINE_CONFIG_END

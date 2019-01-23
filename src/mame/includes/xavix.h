@@ -205,7 +205,7 @@ private:
 
 	virtual void video_start() override;
 
-	virtual DECLARE_READ8_MEMBER(opcodes_000000_r)
+	virtual uint8_t opcodes_000000_r(offs_t offset)
 	{
 		if (offset & 0x8000)
 		{
@@ -213,24 +213,24 @@ private:
 		}
 		else
 		{
-			return m_lowbus->read8(space, offset & 0x7fff);
+			return m_lowbus->read8(offset & 0x7fff);
 		}
 	}
 
-	virtual DECLARE_READ8_MEMBER(opcodes_800000_r)
+	virtual uint8_t opcodes_800000_r(offs_t offset)
 	{
 		// rad_fb, rad_madf confirm that for >0x800000 the CPU only sees ROM when executing opcodes
 		return m_rgn[(offset) & (m_rgnlen - 1)];
 	}
 
-	virtual DECLARE_READ8_MEMBER(extbus_r) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
-	virtual DECLARE_WRITE8_MEMBER(extbus_w)
+	virtual uint8_t extbus_r(offs_t offset) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
+	virtual void extbus_w(offs_t offset, uint8_t data)
 	{
 		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);	
 	}
 
 
-	DECLARE_READ8_MEMBER(sample_read)
+	uint8_t sample_read(offs_t offset)
 	{
 		return read_full_data_sp_bypass(offset);
 	};
@@ -663,7 +663,7 @@ protected:
 
 	// for Cart cases this memory bypass becomes more complex
 
-	virtual DECLARE_READ8_MEMBER(opcodes_000000_r) override
+	virtual uint8_t opcodes_000000_r(offs_t offset) override
 	{
 		if (offset & 0x8000)
 		{
@@ -685,11 +685,11 @@ protected:
 		}
 		else
 		{
-			return m_lowbus->read8(space, offset & 0x7fff);
+			return m_lowbus->read8(offset & 0x7fff);
 		}
 	}
 
-	virtual DECLARE_READ8_MEMBER(opcodes_800000_r) override
+	virtual uint8_t opcodes_800000_r(offs_t offset) override
 	{
 		if (offset & 0x400000)
 		{
@@ -708,7 +708,7 @@ protected:
 		}
 	}
 
-	virtual DECLARE_READ8_MEMBER(extbus_r) override
+	virtual uint8_t extbus_r(offs_t offset) override
 	{
 		if (m_extbusctrl[1] & 0x08)
 		{
@@ -734,7 +734,7 @@ protected:
 			}
 		}
 	}
-	virtual DECLARE_WRITE8_MEMBER(extbus_w) override
+	virtual void extbus_w(offs_t offset, uint8_t data) override
 	{
 		if (m_extbusctrl[0] & 0x08)
 		{

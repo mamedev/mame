@@ -108,7 +108,7 @@ MACHINE_CONFIG_START(hideseek_state::hideseek)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", SH2, 7372800 * 4 )
 	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-//  MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hideseek_state, hideseek_scanline, "screen", 0, 1)
+//  TIMER(config, "scantimer").configure_scanline(FUNC(hideseek_state::hideseek_scanline), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

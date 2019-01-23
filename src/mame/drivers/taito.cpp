@@ -379,7 +379,7 @@ MACHINE_CONFIG_START(taito_state::taito)
 	m_pia->irqa_handler().set_inputline(m_cpu2, INPUT_LINE_NMI);
 	m_pia->irqb_handler().set_inputline(m_cpu2, M6802_IRQ_LINE);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", taito_state, timer_a, attotime::from_hz(200))
+	TIMER(config, "timer_a").configure_periodic(FUNC(taito_state::timer_a), attotime::from_hz(200));
 MACHINE_CONFIG_END
 
 void taito_state::shock(machine_config &config)

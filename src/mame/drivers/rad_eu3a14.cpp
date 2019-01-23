@@ -1291,7 +1291,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14_adc)
 	radica_eu3a14(config);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", radica_eu3a14_state, scanline_cb, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(radica_eu3a14_state::scanline_cb), "screen", 0, 1);
 MACHINE_CONFIG_END
 
 

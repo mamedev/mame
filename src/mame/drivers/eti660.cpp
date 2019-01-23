@@ -342,8 +342,8 @@ MACHINE_CONFIG_START(eti660_state::eti660)
 	m_pia->irqa_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT).invert(); // FIXME: use an input merger for these lines
 	m_pia->irqb_handler().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT).invert();
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("3K");

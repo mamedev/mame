@@ -112,8 +112,7 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 	downcast<asst128_mb_device &>(*device).set_cputag("maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
-	MCFG_DEVICE_MODIFY("mb:cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	subdevice<cassette_image_device>("mb:cassette")->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// FIXME: determine ISA bus clock
 	MCFG_DEVICE_ADD("board0", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga_mc1502", true)

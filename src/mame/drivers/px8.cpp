@@ -768,7 +768,7 @@ MACHINE_CONFIG_START(px8_state::px8)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(0, "mono", 0.25);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
@@ -780,8 +780,8 @@ MACHINE_CONFIG_START(px8_state::px8)
 	/* devices */
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

@@ -427,13 +427,13 @@ MACHINE_CONFIG_START(z80ne_state::z80ne)
 	m_uart->set_tx_clock(4800.0);
 	m_uart->set_rx_clock(4800.0);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_interface("z80ne_cass");
 
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_interface("z80ne_cass");
 
 	config.set_default_layout(layout_z80ne);
 
@@ -496,13 +496,13 @@ MACHINE_CONFIG_START(z80ne_state::z80netb)
 	m_uart->set_tx_clock(4800.0);
 	m_uart->set_rx_clock(4800.0);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_interface("z80ne_cass");
 
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_interface("z80ne_cass");
 
 	KR2376_ST(config, m_lx387_kr2376, 50000);
 	m_lx387_kr2376->x<0>().set_ioport("X0");
@@ -546,13 +546,13 @@ MACHINE_CONFIG_START(z80netf_state::z80netf)
 	m_uart->set_tx_clock(4800.0);
 	m_uart->set_rx_clock(4800.0);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_interface("z80ne_cass");
 
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("z80ne_cass")
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_interface("z80ne_cass");
 
 	KR2376_ST(config, m_lx387_kr2376, 50000);
 

@@ -23,6 +23,8 @@ public:
 		uint32_t base;
 		int width;
 		int height;
+		int x;
+		int y;
 	};
 
 protected:
@@ -37,6 +39,8 @@ private:
 	void fill_rect(uint32_t *cmd);
 	void draw_character(uint32_t *cmd);
 	void fb_config(uint32_t *cmd);
+
+	void draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle &cliprect, bool inverse_trans);
 
 	std::unique_ptr<uint32_t[]> m_vram;
 	uint32_t m_vram_read_addr;
@@ -57,6 +61,8 @@ private:
 	framebuffer m_frame[4];
 	uint32_t m_fb_origin_x;
 	uint32_t m_fb_origin_y;
+	uint32_t m_layer_select;
+	uint32_t m_reg_6c;
 
 	devcb_write_line m_irq;
 };

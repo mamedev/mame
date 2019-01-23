@@ -550,12 +550,14 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	MCFG_DEVICE_IO_MAP(mc1000_io)
 
 	/* timers */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ne555clear", mc1000_state, ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
-	MCFG_TIMER_PARAM(CLEAR_LINE)
+	timer_device &ne555clear(TIMER(config, "ne555clear"));
+	ne555clear.configure_periodic(FUNC(mc1000_state::ne555_tick), attotime::from_hz(MC1000_NE555_FREQ));
+	ne555clear.config_param(CLEAR_LINE);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ne555assert", mc1000_state, ne555_tick, attotime::from_hz(MC1000_NE555_FREQ))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(MC1000_NE555_FREQ * 100 / MC1000_NE555_DUTY_CYCLE))
-	MCFG_TIMER_PARAM(ASSERT_LINE)
+	timer_device &ne555assert(TIMER(config, "ne555assert"));
+	ne555assert.configure_periodic(FUNC(mc1000_state::ne555_tick), attotime::from_hz(MC1000_NE555_FREQ));
+	ne555assert.set_start_delay(attotime::from_hz(MC1000_NE555_FREQ * 100 / MC1000_NE555_DUTY_CYCLE));
+	ne555assert.config_param(ASSERT_LINE);
 
 	/* video hardware */
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
@@ -576,9 +578,9 @@ MACHINE_CONFIG_START(mc1000_state::mc1000)
 	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mc1000_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("mc1000_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mc1000_cass")
 

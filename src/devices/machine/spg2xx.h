@@ -396,9 +396,8 @@ protected:
 	static const device_timer_id TIMER_UART_TX = 4;
 	static const device_timer_id TIMER_UART_RX = 5;
 	static const device_timer_id TIMER_4KHZ = 6;
-	static const device_timer_id TIMER_SRC_A = 7;
-	static const device_timer_id TIMER_SRC_B = 8;
-	static const device_timer_id TIMER_SRC_C = 9;
+	static const device_timer_id TIMER_SRC_AB = 7;
+	static const device_timer_id TIMER_SRC_C = 8;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -410,8 +409,7 @@ protected:
 	uint16_t do_special_gpio(uint32_t index, uint16_t mask);
 
 	void update_timer_b_rate();
-	void update_timer_a_src();
-	void update_timer_b_src();
+	void update_timer_ab_src();
 	void update_timer_c_src();
 	void increment_timer_a();
 
@@ -468,6 +466,7 @@ protected:
 	bool m_hide_sprites;
 	bool m_debug_sprites;
 	bool m_debug_blit;
+	bool m_debug_palette;
 	uint8_t m_sprite_index_to_debug;
 
 	bool m_debug_samples;
@@ -518,15 +517,12 @@ protected:
 
 	uint16_t m_timer_a_preload;
 	uint16_t m_timer_b_preload;
-
-	int m_timer_a_state;
-	int m_timer_b_state;
-	int m_timer_c_state;
+	uint16_t m_timer_b_divisor;
+	uint16_t m_timer_b_tick_rate;
 
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
-	emu_timer *m_timer_src_a;
-	emu_timer *m_timer_src_b;
+	emu_timer *m_timer_src_ab;
 	emu_timer *m_timer_src_c;
 	emu_timer *m_screenpos_timer;
 	emu_timer *m_audio_beat;

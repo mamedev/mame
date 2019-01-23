@@ -386,7 +386,7 @@ MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD("heartbeat", meyc8088_state, heartbeat_callback)
+	TIMER(config, m_heartbeat).configure_generic(FUNC(meyc8088_state::heartbeat_callback));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

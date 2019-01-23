@@ -9388,7 +9388,7 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* payout hardware */
-	MCFG_TICKET_DISPENSER_ADD("tickets", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 MACHINE_CONFIG_END
 
 

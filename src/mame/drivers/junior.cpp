@@ -243,7 +243,7 @@ MACHINE_CONFIG_START(junior_state::junior)
 	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
+	TIMER(config, "led_timer").configure_periodic(FUNC(junior_state::junior_update_leds), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 

@@ -422,7 +422,7 @@ MACHINE_CONFIG_START(ksm_state::ksm)
 	MCFG_DEVICE_IO_MAP(ksm_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ksm_state, scanline_callback, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ksm_state, screen_update)

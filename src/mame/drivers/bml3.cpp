@@ -984,9 +984,9 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", bml3_state, keyboard_callback, attotime::from_hz(H_CLOCK/2))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_c", bml3_state, bml3_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bml3_p", bml3_state, bml3_p, attotime::from_hz(40000))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(bml3_state::keyboard_callback), attotime::from_hz(H_CLOCK/2));
+	TIMER(config, "bml3_c").configure_periodic(FUNC(bml3_state::bml3_c), attotime::from_hz(4800));
+	TIMER(config, "bml3_p").configure_periodic(FUNC(bml3_state::bml3_p), attotime::from_hz(40000));
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set(FUNC(bml3_state::bml3_piaA_w));
@@ -1000,7 +1000,7 @@ MACHINE_CONFIG_START(bml3_state::bml3_common)
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	/* Audio */
 	SPEAKER(config, "mono").front_center();

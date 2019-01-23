@@ -374,6 +374,7 @@ VIDEOS["DP8510"] = true
 VIDEOS["MB88303"] = true
 VIDEOS["PS2GS"] = true
 VIDEOS["PS2GIF"] = true
+VIDEOS["DECSFB"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -621,7 +622,6 @@ MACHINES["V3021"] = true
 MACHINES["WD_FDC"] = true
 MACHINES["WD11C00_17"] = true
 MACHINES["WD2010"] = true
-MACHINES["WD33C93"] = true
 MACHINES["WD33C9X"] = true
 MACHINES["WD7600"] = true
 MACHINES["X2201"] = true
@@ -3622,7 +3622,9 @@ files {
 	MAME_DIR .. "src/mame/audio/socrates.cpp",
 	MAME_DIR .. "src/mame/audio/socrates.h",
 	MAME_DIR .. "src/mame/drivers/inteladv.cpp",
+	MAME_DIR .. "src/mame/includes/vsmile.h",
 	MAME_DIR .. "src/mame/drivers/vsmile.cpp",
+	MAME_DIR .. "src/mame/drivers/vsmileb.cpp",
 	MAME_DIR .. "src/mame/drivers/clickstart.cpp",
 	MAME_DIR .. "src/mame/drivers/storio.cpp",
 }
@@ -3721,6 +3723,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ax20.cpp",
 	MAME_DIR .. "src/mame/drivers/beehive.cpp",
 	MAME_DIR .. "src/mame/drivers/binbug.cpp",
+	MAME_DIR .. "src/mame/drivers/bert.cpp",
 	MAME_DIR .. "src/mame/drivers/besta.cpp",
 	MAME_DIR .. "src/mame/drivers/bitgraph.cpp",
 	MAME_DIR .. "src/mame/drivers/bpmmicro.cpp",

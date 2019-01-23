@@ -351,8 +351,9 @@ MACHINE_CONFIG_START(kcgd_state::kcgd)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kcgd_state::kcgd_mem);
 	m_maincpu->set_initial_mode(0100000);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", kcgd_state, scanline_callback, attotime::from_hz(50*28*11)) // XXX verify
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(30'800'000)/KCGD_HORZ_START))
+	timer_device &scantimer(TIMER(config, "scantimer"));
+	scantimer.configure_periodic(FUNC(kcgd_state::scanline_callback), attotime::from_hz(50*28*11)); // XXX verify
+	scantimer.set_start_delay(attotime::from_hz(XTAL(30'800'000)/KCGD_HORZ_START));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(kcgd_state, screen_update)

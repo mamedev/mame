@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(intv_state::intvecs)
 	speech.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cassette */
-	//MCFG_CASSETTE_ADD( "cassette" )
+	//CASSETTE(config, "cassette");
 
 	/* software lists */
 	MCFG_DEVICE_REMOVE("cart_list")

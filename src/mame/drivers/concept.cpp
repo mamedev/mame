@@ -258,7 +258,7 @@ void concept_state::concept(machine_config &config)
 	m_kbdacia->set_xtal(XTAL(1'843'200));
 
 	/* Apple II bus */
-	A2BUS(config, m_a2bus, 0).set_cputag(m_maincpu);
+	A2BUS(config, m_a2bus, 0).set_space(m_maincpu, AS_PROGRAM);
 	A2BUS_SLOT(config, "sl1", m_a2bus, concept_a2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, concept_a2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, concept_a2_cards, nullptr);

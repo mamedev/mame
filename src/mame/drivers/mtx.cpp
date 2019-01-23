@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	m_z80ctc->zc_callback<1>().set(FUNC(mtx_state::ctc_trg1_w));
 	m_z80ctc->zc_callback<2>().set(FUNC(mtx_state::ctc_trg2_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL(4'000'000)/13))
+	TIMER(config, "z80ctc_timer").configure_periodic(FUNC(mtx_state::ctc_tick), attotime::from_hz(XTAL(4'000'000)/13));
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mtx_state, write_centronics_busy))
@@ -323,11 +323,11 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	MCFG_SNAPSHOT_ADD("snapshot", mtx_state, mtx, "mtx", 1)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("mtx_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_interface("mtx_cass");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(mtx_state::cassette_tick), attotime::from_hz(44100));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("96K,128K,192K,320K,448K,512K");

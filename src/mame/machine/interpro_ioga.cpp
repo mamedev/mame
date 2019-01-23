@@ -133,7 +133,7 @@ DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Arra
 
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_memory_device(*this, finder_base::DUMMY_TAG)
+	, m_memory_space(*this, finder_base::DUMMY_TAG, -1, 32)
 	, m_memory(nullptr)
 	, m_out_nmi_func(*this)
 	, m_out_irq_func(*this)
@@ -168,12 +168,7 @@ sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const 
 
 void interpro_ioga_device::device_start()
 {
-	// get the memory space
-	if (!m_memory_device->has_space(m_memory_spacenum))
-		fatalerror("%s: device %s (%s) doesn't have memory space %d\n",
-			tag(), m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_spacenum);
-
-	m_memory = m_memory_device->space(m_memory_spacenum).cache<2, 0, ENDIANNESS_LITTLE>();
+	m_memory = m_memory_space->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// resolve callbacks
 	m_out_nmi_func.resolve();

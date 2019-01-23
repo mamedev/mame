@@ -169,6 +169,8 @@ void jazz_state::jazz(machine_config &config)
 	m_kbdc->kbd_data().set(kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
 	G364(config, m_ramdac, 0);
+
+	DP83932C(config, m_network, 20_MHz_XTAL);
 }
 
 void jazz_state::mmr4000be(machine_config &config)
@@ -176,8 +178,6 @@ void jazz_state::mmr4000be(machine_config &config)
 	R4000BE(config, m_maincpu, 50_MHz_XTAL);
 
 	jazz(config);
-
-	DP83932C_BE(config, m_network, 20_MHz_XTAL);
 }
 
 void jazz_state::mmr4000le(machine_config &config)
@@ -185,8 +185,6 @@ void jazz_state::mmr4000le(machine_config &config)
 	R4000LE(config, m_maincpu, 50_MHz_XTAL);
 
 	jazz(config);
-
-	DP83932C_LE(config, m_network, 20_MHz_XTAL);
 }
 
 ROM_START(mmr4000be)

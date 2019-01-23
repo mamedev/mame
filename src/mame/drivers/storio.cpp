@@ -2,7 +2,14 @@
 // copyright-holders:David Haywood
 /******************************************************************************
 
-    vtech Storio
+	VTech Storio and VTech V.Reader
+	Main processor: Nuvoton W55FA9363SDN (ARM926EJ-S CPU core)
+		http://www.dingsung.com.cn/download/n32905/1507301944.pdf
+
+	Storio (Europe) and V.Reader (North America) cartridges are physically
+	different, but there is no software region lock, so you can play
+	Storio games on	the V.Reader (and viceversa) by modifying the game's
+	plastic cartrige (so it can fit in).
 
 	Skeleton driver, to reference Software List so that it gets validated
 
@@ -11,6 +18,9 @@
 *******************************************************************************/
 
 #include "emu.h"
+
+#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -24,6 +34,7 @@ class vtech_storio_state : public driver_device
 public:
 	vtech_storio_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_cart(*this, "cartslot")
 		, m_cart_region(nullptr)
@@ -36,6 +47,8 @@ private:
 	virtual void machine_reset() override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart);
+
+	required_device<cpu_device> m_maincpu;
 
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
@@ -79,7 +92,7 @@ INPUT_PORTS_END
 
 void vtech_storio_state::vtech_storio(machine_config &config)
 {
-	//ARM(config, m_maincpu, XTAL(200'000'000)); // What type of CPU?
+	ARM9(config, m_maincpu, 240000000); // ARM926EJ-S CPU core (probably 240MHz, but not sure)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -97,10 +110,62 @@ void vtech_storio_state::vtech_storio(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_storio_cart");
 }
 
-ROM_START( storio )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	/* load BIOS roms here if it doesn't boot straight from cart? */
+// BIOS is 1 GBIT (128M × 8 BIT) CMOS NAND EEPROM (Toshiba TC58NVG0S3ETA00)
+
+// ROM image from VTech, not padded to the real ROM size
+ROM_START( vreader )
+	ROM_REGION( 0x038e906c, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "useng-pack_20111017.bin", 0x000000, 0x038e906c, CRC(add3f7e5) SHA1(43ecfb0ba3c98c5852f93ed620021697167aa156) )
 ROM_END
 
-// year, name, parent, compat, machine, input, class, init, company, fullname, flags
-CONS( 200?, storio,  0,      0, vtech_storio,  vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio",      MACHINE_IS_SKELETON )
+// ROM image from VTech, not padded to the real ROM size
+ROM_START( vreadercaen )
+	ROM_REGION( 0x038e906c, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "caeng-pack_20111017.bin", 0x000000, 0x038e906c, CRC(0b64caf3) SHA1(79648e2b315c59f60aaf8cb8806fdbe773e484a2) )
+ROM_END
+
+// ROM image from VTech, not padded to the real ROM size
+ROM_START( vreadercafr )
+	ROM_REGION( 0x037d93a6, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "cafre-pack_20111017.bin", 0x000000, 0x037d93a6, CRC(d3e0039c) SHA1(3d69f4afcf56ba40261bba0af335680c3c05b319) )
+ROM_END
+
+// ROM image from VTech, not padded to the real ROM size
+ROM_START( storio )
+	ROM_REGION( 0x01bf3dcb, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "gbeng-pack_20111017.bin", 0x000000, 0x01bf3dcb, CRC(b0962d2c) SHA1(4f316cbcc87ae24022568a358ac94c7b4cac39a6) )
+ROM_END
+
+// ROM image from VTech, not padded to the real ROM size
+ROM_START( storiode )
+	ROM_REGION( 0x03740a0d, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "deger-pack_20111017.bin", 0x000000, 0x03740a0d, CRC(548c8882) SHA1(e64474be082bd3ae3c365c6c766b2ec5081f3ebd) )
+ROM_END
+
+// ROM image from VTech, not padded to the real ROM size
+ROM_START( storioes )
+	ROM_REGION( 0x03c62bfc, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "esspa-pack_20111017.bin", 0x000000, 0x03c62bfc, CRC(fe9b78f9) SHA1(c114a8f82799861a0cca432ee145e436aca5f400) )
+ROM_END
+
+// ROM image from VTech, not padded to the real ROM size
+ROM_START( storiofr )
+	ROM_REGION( 0x038c2a19, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "frfre-pack_20111017.bin", 0x000000, 0x038c2a19, CRC(f3d87f50) SHA1(240ddebd4cb1c4be24afb4da35c65ddf64628034) )
+ROM_END
+
+// ROM image from VTech, not padded to the real ROM size
+ROM_START( storionl )
+	ROM_REGION( 0x03af81c6, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "nldut-pack_20111017.bin", 0x000000, 0x03af81c6, CRC(6cfac599) SHA1(d16b45fd287c9d823bde13b88eb6c8158ac2b475) )
+ROM_END
+
+//    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
+CONS( 2011, vreader,      0,       0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (US, English, 2011-10-17)", MACHINE_IS_SKELETON )
+CONS( 2011, vreadercaen,  vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (CA, English, 2011-10-17)", MACHINE_IS_SKELETON )
+CONS( 2011, vreadercafr,  vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (CA, French, 2011-10-17)",  MACHINE_IS_SKELETON )
+CONS( 2011, storio,       vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (GB, English, 2011-10-17)",   MACHINE_IS_SKELETON )
+CONS( 2011, storiode,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (DE, German, 2011-10-17)",    MACHINE_IS_SKELETON )
+CONS( 2011, storioes,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-10-17)",   MACHINE_IS_SKELETON )
+CONS( 2011, storiofr,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (FR, French, 2011-10-17)",    MACHINE_IS_SKELETON )
+CONS( 2011, storionl,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (NL, Dutch, 2011-10-17)",     MACHINE_IS_SKELETON )

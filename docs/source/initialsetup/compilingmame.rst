@@ -319,10 +319,10 @@ ARCHOPTS_CXX
    source files.
 ARCHOPTS_OBJC
    Additional command-line options to pass to the compiler when compiling
-   Objecive-C source files.
+   Objective-C source files.
 ARCHOPTS_OBJCXX
    Additional command-line options to pass to the compiler when compiling
-   Objecive-C++ source files.
+   Objective-C++ source files.
 
 Library/framework locations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

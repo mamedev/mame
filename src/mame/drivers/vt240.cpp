@@ -106,8 +106,8 @@ private:
 	DECLARE_WRITE8_MEMBER(lu_w);
 	DECLARE_WRITE8_MEMBER(hbscrl_w);
 	DECLARE_WRITE8_MEMBER(lbscrl_w);
-	DECLARE_READ16_MEMBER(mem_r);
-	DECLARE_WRITE16_MEMBER(mem_w);
+	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
+	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	void init_vt240();
 	virtual void machine_reset() override;
@@ -321,23 +321,23 @@ WRITE8_MEMBER(vt240_state::mem_map_sel_w)
 	m_mem_map_sel = data & 1;
 }
 
-READ16_MEMBER(vt240_state::mem_r)
+uint16_t vt240_state::mem_r(offs_t offset, uint16_t mem_mask)
 {
 	if(m_mem_map_sel)
 	{
 		m_bank->set_bank(m_mem_map[(offset >> 11) & 0xf]);
-		return m_bank->read16(space, offset & 0x7ff, mem_mask);
+		return m_bank->read16(offset & 0x7ff, mem_mask);
 	}
 	else
 		return m_rom[offset];
 }
 
-WRITE16_MEMBER(vt240_state::mem_w)
+void vt240_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_mem_map_sel)
 	{
 		m_bank->set_bank(m_mem_map[(offset >> 11) & 0xf]);
-		m_bank->write16(space, offset & 0x7ff, data, mem_mask);
+		m_bank->write16(offset & 0x7ff, data, mem_mask);
 	}
 }
 

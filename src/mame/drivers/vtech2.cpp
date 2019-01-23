@@ -511,12 +511,12 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(vtech2_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(vtech2_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 
 	VTECH_IOEXP_SLOT(config, "io");
 

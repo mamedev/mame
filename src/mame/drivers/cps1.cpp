@@ -3452,8 +3452,7 @@ MACHINE_CONFIG_START(cps_state::ganbare)
 	cps1_10MHz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, ganbare_interrupt, "screen", 0, 1) // need to investigate more
+	TIMER(config, "scantimer").configure_scanline(FUNC(cps_state::ganbare_interrupt), "screen", 0, 1); // need to investigate more
 
 	MCFG_DEVICE_ADD("m48t35", M48T35, 0)
 MACHINE_CONFIG_END

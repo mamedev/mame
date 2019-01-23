@@ -343,6 +343,7 @@ void mips3_device::generate_exception(int exception, int backup)
     if ((CAUSE & 0x7f) == 0)
         logerror("Took interrupt -- Cause = %08X, PC =  %08X\n", (uint32_t)CAUSE, m_core->pc);
 */
+	debugger_exception_hook(exception);
 }
 
 

@@ -466,8 +466,8 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("80K"); // 64 + 16
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", fk1_state, keyboard_callback, attotime::from_hz(24000))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vsync_timer", fk1_state, vsync_callback, attotime::from_hz(50))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(fk1_state::keyboard_callback), attotime::from_hz(24000));
+	TIMER(config, "vsync_timer").configure_periodic(FUNC(fk1_state::vsync_callback), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -288,7 +288,7 @@ void NETLIB_NAME(solver)::post_start()
 
 		switch (net_count)
 		{
-#if 1
+#if 0
 			case 1:
 				if (use_specific)
 					ms = plib::palloc<matrix_solver_direct1_t>(state(), sname, &m_params);

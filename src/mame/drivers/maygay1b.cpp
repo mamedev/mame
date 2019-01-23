@@ -809,7 +809,7 @@ MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
+	TIMER(config, "nmitimer").configure_periodic(FUNC(maygay1b_state::maygay1b_nmitimer_callback), attotime::from_hz(75)); // freq?
 
 	i8279_device &kbdc(I8279(config, "i8279", M1_MASTER_CLOCK/4));      // unknown clock
 	kbdc.out_sl_callback().set(FUNC(maygay1b_state::scanlines_w));      // scan SL lines

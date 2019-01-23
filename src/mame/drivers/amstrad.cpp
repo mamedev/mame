@@ -944,7 +944,7 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	AY8912(config, m_ay, 16_MHz_XTAL / 16);
 	m_ay->port_a_read_callback().set(FUNC(amstrad_state::amstrad_psg_porta_read));
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -956,10 +956,10 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(cdt_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("cpc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(cdt_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("cpc_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
@@ -1065,7 +1065,7 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	AY8912(config, m_ay, 40_MHz_XTAL / 40);
 	m_ay->port_a_read_callback().set(FUNC(amstrad_state::amstrad_psg_porta_read));
 	m_ay->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1077,10 +1077,10 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(cdt_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("cpc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(cdt_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("cpc_cass");
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
 	UPD765A(config, m_fdc, 40_MHz_XTAL / 10, true, true);

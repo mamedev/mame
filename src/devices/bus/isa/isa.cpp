@@ -378,10 +378,16 @@ uint8_t isa8_device::dack_r(int line)
 	return 0xff;
 }
 
-void isa8_device::dack_w(int line,uint8_t data)
+void isa8_device::dack_w(int line, uint8_t data)
 {
 	if (m_dma_device[line])
 		return m_dma_device[line]->dack_w(line,data);
+}
+
+void isa8_device::dack_line_w(int line, int state)
+{
+	if (m_dma_device[line])
+		m_dma_device[line]->dack_line_w(line, state);
 }
 
 void isa8_device::eop_w(int channel, int state)
@@ -438,9 +444,15 @@ uint8_t device_isa8_card_interface::dack_r(int line)
 {
 	return 0;
 }
-void device_isa8_card_interface::dack_w(int line,uint8_t data)
+
+void device_isa8_card_interface::dack_w(int line, uint8_t data)
 {
 }
+
+void device_isa8_card_interface::dack_line_w(int line, int state)
+{
+}
+
 void device_isa8_card_interface::eop_w(int state)
 {
 }
@@ -593,7 +605,7 @@ uint16_t isa16_device::dack16_r(int line)
 	return 0xffff;
 }
 
-void isa16_device::dack16_w(int line,uint16_t data)
+void isa16_device::dack16_w(int line, uint16_t data)
 {
 	if (m_dma_device[line])
 		return dynamic_cast<device_isa16_card_interface *>(m_dma_device[line])->dack16_w(line,data);
@@ -647,6 +659,6 @@ uint16_t device_isa16_card_interface::dack16_r(int line)
 	return 0;
 }
 
-void device_isa16_card_interface::dack16_w(int line,uint16_t data)
+void device_isa16_card_interface::dack16_w(int line, uint16_t data)
 {
 }

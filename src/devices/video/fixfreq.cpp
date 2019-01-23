@@ -59,6 +59,18 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *ta
 {
 }
 
+void fixedfreq_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(m_monitor_clock, m_hbackporch, 0, m_hbackporch, m_vbackporch, 0, m_vbackporch);
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(fixedfreq_device::screen_update), this));
+}
+
 void fixedfreq_device::device_start()
 {
 	m_htotal = 0;

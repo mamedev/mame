@@ -1364,7 +1364,7 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 10.738635_MHz_XTAL / 3 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->port_a_read_callback().set(FUNC(msx_state::msx_psg_port_a_r));
@@ -1384,10 +1384,10 @@ MACHINE_CONFIG_START(msx_state::msx)
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("msx_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_interface("msx_cass");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cass_list","msx1_cass")
@@ -1434,7 +1434,7 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->port_a_read_callback().set(FUNC(msx2_state::msx_psg_port_a_r));
@@ -1454,10 +1454,10 @@ MACHINE_CONFIG_START(msx2_state::msx2)
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("msx_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_interface("msx_cass");
 
 	/* real time clock */
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
@@ -1495,7 +1495,7 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 	AY8910(config, m_ay8910, 21.477272_MHz_XTAL / 6 / 2);
 	m_ay8910->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8910->port_a_read_callback().set(FUNC(msx2_state::msx_psg_port_a_r));
@@ -1515,10 +1515,10 @@ MACHINE_CONFIG_START(msx2_state::msx2p)
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("msx_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_interface("msx_cass");
 
 	/* real time clock */
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);

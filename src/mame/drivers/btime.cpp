@@ -1285,7 +1285,7 @@ MACHINE_CONFIG_START(btime_state::btime)
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("8vck", btime_state, audio_nmi_gen, "screen", 0, 8)
+	TIMER(config, "8vck").configure_scanline(FUNC(btime_state::audio_nmi_gen), "screen", 0, 8);
 
 	INPUT_MERGER_ALL_HIGH(config, "audionmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 

@@ -1707,7 +1707,7 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	MCFG_DEVICE_PROGRAM_MAP(ms32_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ms32_state::ms32_interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // Z0840008PSC, Clock from notes
 	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)

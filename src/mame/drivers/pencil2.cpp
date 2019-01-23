@@ -327,11 +327,11 @@ MACHINE_CONFIG_START(pencil2_state::pencil2)
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(10'738'635)/3) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")

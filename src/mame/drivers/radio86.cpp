@@ -496,10 +496,10 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
 	m_dma8257->set_reverse_rw_mode(1);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rkr_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("radio86_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rkr_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("radio86_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "radio86_cass")
 MACHINE_CONFIG_END

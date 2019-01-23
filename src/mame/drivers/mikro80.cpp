@@ -189,12 +189,12 @@ MACHINE_CONFIG_START(mikro80_state::mikro80)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rk8_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mikro80_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rk8_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("mikro80_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikro80")
 MACHINE_CONFIG_END

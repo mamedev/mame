@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(shadfrce_state::shadfrce)
 
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)          /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(shadfrce_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", shadfrce_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(shadfrce_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))         /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(shadfrce_sound_map)

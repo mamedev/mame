@@ -1105,7 +1105,7 @@ MACHINE_CONFIG_START(jalmah_state::jalmah)
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", jalmah_state, mcu_sim, attotime::from_hz(10000))
+	TIMER(config, "mcusim").configure_periodic(FUNC(jalmah_state::mcu_sim), attotime::from_hz(10000));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 4000000, okim6295_device::PIN7_LOW)

@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", KONAMI1, XTAL(18'432'000)/6) /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(finalizr_state::finalizr_scanline), "screen", 0, 1);
 
 	I8039(config, m_audiocpu, XTAL(18'432'000)/2); /* 9.216MHz clkin ?? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &finalizr_state::sound_map);

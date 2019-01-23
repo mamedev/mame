@@ -300,7 +300,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
 			case 0: // type 0 space
-				return m_type0space->read16(space, tmp, mem_mask);
+				return m_type0space->read16(tmp, mem_mask);
 
 			case 1: // type 1 space
 				// EPROM space is special: the MMU has a trap door
@@ -326,13 +326,13 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 				}
 
 				//printf("read device space @ %x\n", tmp<<1);
-				return m_type1space->read16(space, tmp, mem_mask);
+				return m_type1space->read16(tmp, mem_mask);
 
 			case 2: // type 2 space
-				return m_type2space->read16(space, tmp, mem_mask);
+				return m_type2space->read16(tmp, mem_mask);
 
 			case 3: // type 3 space
-				return m_type3space->read16(space, tmp, mem_mask);
+				return m_type3space->read16(tmp, mem_mask);
 		}
 	}
 	else
@@ -445,20 +445,20 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
 			case 0: // type 0
-				m_type0space->write16(space, tmp, data, mem_mask);
+				m_type0space->write16(tmp, data, mem_mask);
 				return;
 
 			case 1: // type 1
 				//printf("write device space @ %x\n", tmp<<1);
-				m_type1space->write16(space, tmp, data, mem_mask);
+				m_type1space->write16(tmp, data, mem_mask);
 				return;
 
 			case 2: // type 2
-				m_type2space->write16(space, tmp, data, mem_mask);
+				m_type2space->write16(tmp, data, mem_mask);
 				return;
 
 			case 3: // type 3
-				m_type3space->write16(space, tmp, data, mem_mask);
+				m_type3space->write16(tmp, data, mem_mask);
 				return;
 		}
 	}

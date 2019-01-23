@@ -162,7 +162,7 @@ MACHINE_CONFIG_START(_3do_state::_3do)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
+	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262 )
@@ -180,7 +180,7 @@ MACHINE_CONFIG_START(_3do_state::_3do_pal)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
+	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
 
 	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262 ) // TODO: proper params

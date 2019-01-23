@@ -813,7 +813,7 @@ void namcos21_c67_state::configure_c148_standard(machine_config &config)
 MACHINE_CONFIG_START(namcos21_c67_state::namcos21)
 	MCFG_DEVICE_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_DEVICE_PROGRAM_MAP(master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_c67_state, screen_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(namcos21_c67_state::screen_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("slave", M68000,12288000) /* Slave */
 	MCFG_DEVICE_PROGRAM_MAP(slave_map)

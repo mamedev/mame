@@ -642,10 +642,10 @@ MACHINE_CONFIG_START(pc100_state::pc100)
 	m_maincpu->set_vblank_int("screen", FUNC(pc100_state::pc100_vblank_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", pc100_state, pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
+	TIMER(config, "600hz").configure_periodic(FUNC(pc100_state::pc100_600hz_irq), attotime::from_hz(MASTER_CLOCK/600));
+	TIMER(config, "100hz").configure_periodic(FUNC(pc100_state::pc100_100hz_irq), attotime::from_hz(MASTER_CLOCK/100));
+	TIMER(config, "50hz").configure_periodic(FUNC(pc100_state::pc100_50hz_irq), attotime::from_hz(MASTER_CLOCK/50));
+	TIMER(config, "10hz").configure_periodic(FUNC(pc100_state::pc100_10hz_irq), attotime::from_hz(MASTER_CLOCK/10));
 
 	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	ppi1.out_pa_callback().set(FUNC(pc100_state::rtc_porta_w));

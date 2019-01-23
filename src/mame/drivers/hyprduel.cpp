@@ -452,7 +452,7 @@ MACHINE_CONFIG_START(hyprduel_state::hyprduel)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hyprduel_state::interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(hyprduel_map2)
@@ -479,7 +479,7 @@ MACHINE_CONFIG_START(hyprduel_state::magerror)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(magerror_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hyprduel_state, interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hyprduel_state::interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", M68000,20000000/2)      /* 10MHz */
 	MCFG_DEVICE_PROGRAM_MAP(magerror_map2)

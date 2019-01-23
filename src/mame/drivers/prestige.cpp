@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(prestige_state::prestige_base)
 	MCFG_DEVICE_IO_MAP(prestige_io)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", prestige_state, irq_timer, attotime::from_hz(200))
+	TIMER(config, "irq_timer").configure_periodic(FUNC(prestige_state::irq_timer), attotime::from_hz(200));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

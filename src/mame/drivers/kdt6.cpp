@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD("beep_timer", kdt6_state, beeper_off)
+	TIMER(config, m_beep_timer).configure_generic(FUNC(kdt6_state::beeper_off));
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
 	m_dma->out_busreq_callback().set(FUNC(kdt6_state::busreq_w));

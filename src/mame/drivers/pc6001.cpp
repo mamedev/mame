@@ -1440,16 +1440,6 @@ void pc6001sr_state::machine_reset()
 }
 
 
-#if 0
-static const cassette_interface pc6001_cassette_interface =
-{
-	pc6001_cassette_formats,
-	nullptr,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	nullptr
-};
-#endif
-
 static const gfx_layout char_layout =
 {
 	8, 16,
@@ -1516,7 +1506,9 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pc6001_cart")
 
-//  MCFG_CASSETTE_ADD("cassette", pc6001_cassette_interface)
+//  CASSETTE(config, m_cassette);
+//  m_cassette->set_formats(pc6001_cassette_formats);
+//  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	MCFG_GENERIC_CARTSLOT_ADD("cas_hack", generic_plain_slot, "pc6001_cass")
 	MCFG_GENERIC_EXTENSIONS("cas,p6")
 
@@ -1528,8 +1520,8 @@ MACHINE_CONFIG_START(pc6001_state::pc6001)
 //  WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* TODO: accurate timing on this */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", pc6001_state, keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", pc6001_state, cassette_callback, attotime::from_hz(1200/12))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
 MACHINE_CONFIG_END
 
 

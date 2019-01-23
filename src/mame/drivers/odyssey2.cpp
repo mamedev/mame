@@ -698,7 +698,6 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(7'159'090)/2 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -707,8 +706,11 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_I8244_ADD( "i8244", XTAL(7'159'090)/2 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, odyssey2_state, scanline_postprocess ) )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	I8244(config, m_i8244, XTAL(7'159'090)/2 * 2);
+	m_i8244->set_screen("screen");
+	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_i8244->postprocess_cb().set(FUNC(odyssey2_state::scanline_postprocess));
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	odyssey2_cartslot(config);
 MACHINE_CONFIG_END
@@ -724,7 +726,6 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(17'734'470)/5 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -733,8 +734,11 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_I8245_ADD( "i8244", XTAL(17'734'470)/5 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, odyssey2_state, scanline_postprocess ) )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	I8245(config, m_i8244, XTAL(17'734'470)/5 * 2);
+	m_i8244->set_screen("screen");
+	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_i8244->postprocess_cb().set(FUNC(odyssey2_state::scanline_postprocess));
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	odyssey2_cartslot(config);
 MACHINE_CONFIG_END
@@ -759,7 +763,6 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -775,8 +778,11 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	EF9340_1(config, m_ef9340_1, 3540000, "screen");
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_I8245_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	I8245(config, m_i8244, 3540000 * 2);
+	m_i8244->set_screen("screen");
+	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_i8244->postprocess_cb().set(FUNC(g7400_state::scanline_postprocess));
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	odyssey2_cartslot(config);
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -804,7 +810,6 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT)
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -820,8 +825,11 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	EF9340_1(config, m_ef9340_1, 3540000, "screen");
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_I8244_ADD("i8244", 3540000 * 2, "screen", INPUTLINE("maincpu", 0), WRITE16(*this, g7400_state, scanline_postprocess))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	I8244(config, m_i8244, 3540000 * 2);
+	m_i8244->set_screen("screen");
+	m_i8244->irq_cb().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	m_i8244->postprocess_cb().set(FUNC(g7400_state::scanline_postprocess));
+	m_i8244->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	odyssey2_cartslot(config);
 	MCFG_DEVICE_REMOVE("cart_list")

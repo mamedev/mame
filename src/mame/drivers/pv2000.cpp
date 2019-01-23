@@ -406,11 +406,11 @@ MACHINE_CONFIG_START(pv2000_state::pv2000)
 	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pv2000_cart")

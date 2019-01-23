@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_DEVICE_ADD("mastercpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
 	MCFG_DEVICE_PROGRAM_MAP(mastercpu_am)
 	MCFG_DEVICE_IO_MAP(mastercpu_port_am)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", djboy_state, djboy_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(djboy_state::djboy_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("slavecpu", Z80, 12_MHz_XTAL / 2) // 6.000MHz, verified
 	MCFG_DEVICE_PROGRAM_MAP(slavecpu_am)

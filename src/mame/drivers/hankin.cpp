@@ -524,8 +524,8 @@ MACHINE_CONFIG_START(hankin_state::hankin)
 	m_ic2->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 	m_ic2->irqb_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x", hankin_state, timer_x, attotime::from_hz(120)) // mains freq*2
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", hankin_state, timer_s, attotime::from_hz(94000)) // 555 on sound board*2
+	TIMER(config, "timer_x").configure_periodic(FUNC(hankin_state::timer_x), attotime::from_hz(120)); // mains freq*2
+	TIMER(config, "timer_s").configure_periodic(FUNC(hankin_state::timer_s), attotime::from_hz(94000)); // 555 on sound board*2
 MACHINE_CONFIG_END
 
 /*--------------------------------

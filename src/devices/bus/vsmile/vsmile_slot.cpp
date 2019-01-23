@@ -171,7 +171,6 @@ image_init_result vsmile_cart_slot_device::call_load()
 
 		if (m_cart->get_nvram_size())
 		{
-			printf("nvram_size 1\n");
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 		}
 
@@ -188,8 +187,6 @@ image_init_result vsmile_cart_slot_device::call_load()
 
 void vsmile_cart_slot_device::call_unload()
 {
-	if (m_cart)
-		printf("nvram_size: %d\n", m_cart->get_nvram_size());
 	if (m_cart && m_cart->get_nvram_size())
 	{
 		battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());

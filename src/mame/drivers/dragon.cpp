@@ -216,12 +216,12 @@ MACHINE_CONFIG_START(dragon_state::dragon_base)
 
 	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
 	m_sam->res_rd_callback().set(FUNC(dragon_state::sam_read));
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(coco_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("dragon_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(coco_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	m_cassette->set_interface("dragon_cass");
 
-	MCFG_DEVICE_ADD(PRINTER_TAG, PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	// video hardware
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
@@ -361,11 +361,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragon64_state::tanodr64)
 	dragon64(config);
 	MCFG_DEVICE_MODIFY(":")
-	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 4)
+	MCFG_DEVICE_CLOCK(14.318181_MHz_XTAL / 16)
+
+	m_sam->set_clock(14.318181_MHz_XTAL);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MC6847_NTSC(config.replace(), m_vdg, 14.318181_MHz_XTAL / 4);
+	m_vdg->set_screen(SCREEN_TAG);
+	m_vdg->hsync_wr_callback().set(FUNC(dragon_state::horizontal_sync));
+	m_vdg->fsync_wr_callback().set(FUNC(dragon_state::field_sync));
+	m_vdg->input_callback().set(m_sam, FUNC(sam6883_device::display_read));
 
 	// cartridge
 	MCFG_DEVICE_MODIFY(CARTRIDGE_TAG)

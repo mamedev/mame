@@ -595,7 +595,7 @@ MACHINE_CONFIG_START(psion_state::psion_2lines)
 	NVRAM(config, "nvram1").set_custom_handler(FUNC(psion_state::nvram_init)); // sys_regs
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", psion_state, nmi_timer, attotime::from_seconds(1))
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(psion_state::nmi_timer), attotime::from_seconds(1));
 
 	/* Datapack */
 	PSION_DATAPACK(config, m_pack1, 0);
@@ -622,8 +622,7 @@ MACHINE_CONFIG_START(psion1_state::psion1)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(psion1_mem)
 
-	MCFG_DEVICE_MODIFY("nmi_timer")
-	MCFG_TIMER_START_DELAY(attotime::from_seconds(1))
+	subdevice<timer_device>("nmi_timer")->set_start_delay(attotime::from_seconds(1));
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(6*16, 1*8)

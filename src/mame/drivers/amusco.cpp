@@ -571,7 +571,7 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	i8155b.in_pc_callback().set(m_rtc, FUNC(msm5832_device::data_r));
 	i8155b.out_pc_callback().set(m_rtc, FUNC(msm5832_device::data_w));
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

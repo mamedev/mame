@@ -6099,13 +6099,14 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(galaxian_state::scramble_base)
+void galaxian_state::scramble_base(machine_config &config)
+{
 	konami_base(config);
 	konami_sound_2x_ay8910(config);
 
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("stars", galaxian_state, scramble_stars_blink_timer, PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001))
-MACHINE_CONFIG_END
+	TIMER(config, "stars").configure_periodic(FUNC(galaxian_state::scramble_stars_blink_timer), PERIOD_OF_555_ASTABLE(100000, 10000, 0.00001));
+}
 
 
 
@@ -6271,11 +6272,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
 	}
 }
 
-MACHINE_CONFIG_START(galaxian_state::timefgtr)
+void galaxian_state::timefgtr(machine_config &config)
+{
 	fantastc(config);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galaxian_state, timefgtr_scanline, "screen", 0, 1)
-MACHINE_CONFIG_END
+	TIMER(config, "scantimer").configure_scanline(FUNC(galaxian_state::timefgtr_scanline), "screen", 0, 1);
+}
 
 
 MACHINE_CONFIG_START(galaxian_state::jumpbug)
@@ -6319,7 +6321,7 @@ MACHINE_CONFIG_START(galaxian_state::checkmaj)
 	MCFG_DEVICE_ADD("audiocpu", Z80, 1620000)
 	MCFG_DEVICE_PROGRAM_MAP(checkmaj_sound_map)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq0", galaxian_state, checkmaj_irq0_gen, "screen", 0, 8)
+	TIMER(config, "irq0").configure_scanline(FUNC(galaxian_state::checkmaj_irq0_gen), "screen", 0, 8);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
@@ -11618,6 +11620,31 @@ ROM_START( scramblebb ) // no PCB, just eproms...
 	ROM_LOAD( "c01s.6e", 0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )    // need proper dump
 ROM_END
 
+// Two PCBs, labeled MU-1A and MU-2A
+ROM_START( kamikazesp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4-b.2c",  0x0000, 0x0800, CRC(ab0eef23) SHA1(53ebb2011969c3eb8d60ce30f118e6627201d2a0) ) // 2716
+	ROM_LOAD( "5-b.2e",  0x0800, 0x0800, CRC(43cb40a4) SHA1(4e500f63a06865a5fd9a7d920eb866ea610a4d92) ) // 2716
+	ROM_LOAD( "6-b.2f",  0x1000, 0x0800, CRC(eec265ee) SHA1(29b6cf6b93220414eb58cddeba591dc8813c4935) ) // 2716
+	ROM_LOAD( "7-b.2h",  0x1800, 0x0800, CRC(dd380a22) SHA1(125e713a58cc5f2c1e38f67dad29f8c985ce5a8b) ) // 2716
+	ROM_LOAD( "8-b.2j",  0x2000, 0x0800, CRC(92980e72) SHA1(7e0605b461ace534f8f91028bb82968ecd907ca1) ) // 2716
+	ROM_LOAD( "9-b.2l",  0x2800, 0x0800, CRC(9fd96374) SHA1(c8456dd8a012353a023a2d3fa5d508e49c36ace8) ) // 2716
+	ROM_LOAD( "10-b.2m", 0x3000, 0x0800, CRC(88ac07a0) SHA1(c57061db5984b472039356bf84a050b5b66e3813) ) // 2716
+	ROM_LOAD( "11-b.2p", 0x3800, 0x0800, CRC(75232e09) SHA1(b0da201bf05c63031cdbe9f7059e3c710557f33d) ) // 2716
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1-a.5c",  0x0000, 0x0800, CRC(be037cf6) SHA1(f28e5ead496e70beaada24775aa58bd5d75f2d25) ) // 2716
+	ROM_LOAD( "2-a.5d",  0x0800, 0x0800, CRC(31bb79e4) SHA1(9f5370f7b1911c6a9f2c82ef2bab3f14cb0e9657) ) // 2716
+	ROM_LOAD( "3-a.5e",  0x1000, 0x0800, CRC(ba2fa933) SHA1(1f976d8595706730e29f93027e7ab4620075c078) ) // 2716
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "12-b.5f", 0x0000, 0x0800, CRC(4708845b) SHA1(a8b1ad19a95a9d35050a2ab7194cc96fc5afcdc9) ) // MB8516, dumped as 2716
+	ROM_LOAD( "13-b.5h", 0x0800, 0x0800, CRC(11fd2887) SHA1(69844e48bb4d372cac7ae83c953df573c7ecbb7f) ) // 2716
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.6e", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // MB7051, dumped as 82S123
+ROM_END
+
 ROM_START( strfbomb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.2c",         0x0000, 0x0800, CRC(b102aaa0) SHA1(00560da7a2ded6afcdc1d46e12cc3c795654639a) )
@@ -12097,6 +12124,30 @@ ROM_START( scobrag )
 ROM_END
 
 
+// Super Cobra bootleg (Cocamatic). PCB by "GGI Corp."
+ROM_START( scobraggi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2c_b.bin",   0x0000, 0x1000, CRC(04ffab61) SHA1(302ae8b224d98c405aadd363623eddf88bdc3f0e) ) // 2732
+	ROM_LOAD( "2e_b.bin",   0x1000, 0x1000, CRC(4e29d35f) SHA1(f48358f30e886c65b0e38220a44d3c2d09a31fee) ) // 2732
+	ROM_LOAD( "2f_b.bin",   0x2000, 0x1000, CRC(9dee81cc) SHA1(e842ad873cd5370f2c5d23334a320ebc448bfcdc) ) // 2732
+	ROM_LOAD( "2h_b.bin",   0x3000, 0x1000, CRC(99dee0c6) SHA1(1f026a40f59fe33cb2ac54a7712d6d259db3ecc8) ) // 2732
+	ROM_LOAD( "2j_b.bin",   0x4000, 0x1000, CRC(db7fb865) SHA1(94f1382dae4f3c12d177fd74b3493e91989b4654) ) // 2732
+	ROM_LOAD( "2l_b.bin",   0x5000, 0x1000, CRC(5825d73b) SHA1(482128d723986fdf586f9ac53a0139b687cb0b58) ) // 2732
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1_13_a.bin", 0x0000, 0x0800, CRC(d4346959) SHA1(5eab4505beb69a5bdd88b23db60e1193371250cf) ) // MB8516 readed as 2716
+	ROM_LOAD( "2_13_a.bin", 0x0800, 0x0800, CRC(cc025d95) SHA1(2b0784c4d05c466e0b7648f16e14f34393d792c3) ) // 2716
+	ROM_LOAD( "3_13_a.bin", 0x1000, 0x0800, CRC(1628c53f) SHA1(ec79a73e4a2d7373454b227dd7eff255f1cc60cc) ) // MB8516 readed as 2716
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "5h_b.bin",   0x0000, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) ) // 2716
+	ROM_LOAD( "5f_b.bin",   0x0800, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) ) // 2716
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6e_b.bin",   0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // MB7051 readed as N82S123
+ROM_END
+
+
 ROM_START( suprheli )
 	/* this is a bootleg of Super Cobra */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -12535,7 +12586,7 @@ GAME( 1980, galaxrcgg,   galaxian, galaxian,   galaxrf,    galaxian_state, init_
 GAME( 1979, moonaln,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1979, galapx,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack", "Galaxian Part X (moonaln hack)", MACHINE_SUPPORTS_SAVE )
 // like above but does have the energy bar, also GFX changed to planes.
-GAME( 1979, kamikazp,    galaxian, galaxian,   kamikazp,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Potomac Games)", "Kamikaze (Potomac Games)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, kamikazp,    galaxian, galaxian,   kamikazp,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Potomac Games)", "Kamikaze (Potomac Games, bootleg of Galaxian)", MACHINE_SUPPORTS_SAVE )
 // this has the tiles to display the energy bar, but use the flag gfx for the 'linescroll effect' title screen, also doesn't work due to bad rom.
 GAME( 1980, supergx,     galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "Namco / Nichibutsu", "Super GX", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 // these have the energy bar, and the tiles needed to display a less corrupt 'linescroll effect' title, but don't display one
@@ -12729,12 +12780,9 @@ GAME( 1981, quaak,       frogger,  quaak,      frogger,    galaxian_state, init_
 GAME( 1981, froggeram,   frogger,  froggeram,  froggeram,  galaxian_state, init_quaak,      ROT90,  "bootleg", "Frogger (bootleg on Amigo? hardware)", MACHINE_SUPPORTS_SAVE ) // meant to be Amigo hardware, but maybe a different bootleg than the one we have?
 
 
-/*
-    Turtles based hardware
-
-    CPU/Video Board: KT-4108-2
-    Sound Board:     KT-4108-1
-*/
+// Turtles based hardware
+// CPU/Video Board: KT-4108-2
+// Sound Board:     KT-4108-1
 GAME( 1981, turtles,     0,        turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Turtles", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, turpin,      turtles,  turtles,    turpin,     galaxian_state, init_turtles,    ROT90,  "Konami (Sega license)", "Turpin", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, 600,         turtles,  turtles,    turtles,    galaxian_state, init_turtles,    ROT90,  "Konami", "600", MACHINE_SUPPORTS_SAVE )
@@ -12758,21 +12806,22 @@ GAME( 1980, theend,      0,        theend,     theend,     galaxian_state, init_
 GAME( 1980, theends,     theend,   theend,     theend,     galaxian_state, init_theend,     ROT90,  "Konami (Stern Electronics license)", "The End (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, takeoff,     theend,   takeoff,    explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)", "Take Off (bootleg of The End)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors likely need bitswap<8> somewhere; needs different sound timer. reference: https://www.youtube.com/watch?v=iPYX3yJORTE
 
-GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami", "Scramble", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambles2,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, strfbomb,    scramble, scramble,   strfbomb,   galaxian_state, init_scramble,   ROT90,  "bootleg (Omni)",                     "Strafe Bomb (bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, explorer,    scramble, explorer,   explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Explorer (bootleg of Scramble)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
-GAME( 1981, scramblebf,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Karateco)",                 "Scramble (Karateco, French bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scrambp,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Billport S.A.)",            "Impacto (Billport S.A., Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE ) // similar to the Karateco set above
-GAME( 1981, scramce,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Centromatic S.A.)",         "Scramble (Centromatic S.A., Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // similar to above
-GAME( 1981, scrampt,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "Scramble (Petaco S.A., Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // ^^
-GAME( 1981, scramrf,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Recreativos Franco)",       "Scramble (Recreativos Franco, Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, offensiv,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Video Dens)",               "Offensive (Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ncentury,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "New Century (Spanish bootleg of Scramble)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
-GAME( 1981, scrammr,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Model Racing)",             "Scramble (Model Racing, Italian bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
-GAME( 1981, scramblebb,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg?", "Scramble (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Alca)", "Bomber (bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scramble,    0,        scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami",                             "Scramble",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambles,   scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambles2,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "Konami (Stern Electronics license)", "Scramble (Stern Electronics set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, strfbomb,    scramble, scramble,   strfbomb,   galaxian_state, init_scramble,   ROT90,  "bootleg (Omni)",                     "Strafe Bomb (bootleg of Scramble)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, explorer,    scramble, explorer,   explorer,   galaxian_state, init_explorer,   ROT90,  "bootleg (Sidam)",                    "Explorer (bootleg of Scramble)",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs different sound timer
+GAME( 1981, scramblebf,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Karateco)",                 "Scramble (Karateco, French bootleg)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scrambp,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Billport S.A.)",            "Impacto (Billport S.A., Spanish bootleg of Scramble)",   MACHINE_SUPPORTS_SAVE ) // similar to the Karateco set above
+GAME( 1981, scramce,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Centromatic S.A.)",         "Scramble (Centromatic S.A., Spanish bootleg)",           MACHINE_SUPPORTS_SAVE ) // similar to above
+GAME( 1981, scrampt,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "Scramble (Petaco S.A., Spanish bootleg)",                MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1981, scramrf,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Recreativos Franco)",       "Scramble (Recreativos Franco, Spanish bootleg)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, offensiv,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Video Dens)",               "Offensive (Spanish bootleg of Scramble)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ncentury,    scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Petaco S.A.)",              "New Century (Spanish bootleg of Scramble)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
+GAME( 1981, scrammr,     scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Model Racing)",             "Scramble (Model Racing, Italian bootleg)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // irq isn't enabled correctly
+GAME( 1981, scramblebb,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg?",                           "Scramble (bootleg?)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kamikazesp,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Euromatic S.A.)",           "Kamikaze (Euromatic S.A., Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Alca)",                     "Bomber (bootleg of Scramble)",                           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, atlantis,    0,        theend,     atlantis,   galaxian_state, init_atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, atlantis2,   atlantis, theend,     atlantis,   galaxian_state, init_atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -12799,13 +12848,14 @@ GAME( 1982, monsterz,    0,        monsterz,   sfx,        galaxian_state, init_
     CPU/Video Board: A969
     Sound Board:     A970
 */
-GAME( 1981, scobra,      0,        scobra,     scobra,     galaxian_state, init_scobra,     ROT90,  "Konami", "Super Cobra", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scobrase,    scobra,   scobra,     scobra,     galaxian_state, init_scobra,     ROT90,  "Konami (Sega license)", "Super Cobra (Sega)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scobras,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scobra,      0,        scobra,     scobra,     galaxian_state, init_scobra,     ROT90,  "Konami",                             "Super Cobra",                                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scobrase,    scobra,   scobra,     scobra,     galaxian_state, init_scobra,     ROT90,  "Konami (Sega license)",              "Super Cobra (Sega)",                                                MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scobras,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scobrae,     scobra,   scobra,     scobras,    galaxian_state, init_scobrae,    ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics) (encrypted, KONATEC XC-103SS CPU)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scobrab,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (Karateco)", "Super Cobra (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, scobrag,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (A.V.G. by Zaccaria)", "Super Cobra (bootleg, set 2)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM
-GAME( 1981, suprheli,    scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scobrab,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (Karateco)",                 "Super Cobra (bootleg, set 1)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, scobrag,     scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (A.V.G. by Zaccaria)",       "Super Cobra (bootleg, set 2)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM
+GAME( 1981, scobraggi,   scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (Cocamatic)",                "Super Cobra (bootleg, set 3)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM
+GAME( 1981, suprheli,    scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg",                            "Super Heli (Super Cobra bootleg)",                                  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, moonwar,     0,        moonwar,    moonwar,    galaxian_state, init_moonwar,    ROT90,  "Stern Electronics", "Moonwar", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, moonwara,    moonwar,  moonwar,    moonwara,   galaxian_state, init_moonwar,    ROT90,  "Stern Electronics", "Moonwar (older)", MACHINE_SUPPORTS_SAVE )

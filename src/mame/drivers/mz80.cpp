@@ -317,10 +317,10 @@ MACHINE_CONFIG_START(mz80_state::mz80k)
 	m_pit->set_clk<2>(0);
 	m_pit->out_handler<2>().set(FUNC(mz80_state::pit_out2_changed));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	TIMER(config, "tempo").configure_periodic(FUNC(mz80_state::ne555_tempo_callback), attotime::from_hz(34));
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 MACHINE_CONFIG_END
 
 void mz80_state::mz80kj(machine_config &config)

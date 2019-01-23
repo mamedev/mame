@@ -816,7 +816,7 @@ MACHINE_CONFIG_START(bnstars_state::bnstars)
 	MCFG_DEVICE_PROGRAM_MAP(bnstars_map)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bnstars_state, ms32_interrupt, "lscreen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(bnstars_state::ms32_interrupt), "lscreen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
 	MCFG_DEVICE_PROGRAM_MAP(bnstars_sound_map)

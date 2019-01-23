@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(exedexes_state::exedexes)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
 	MCFG_DEVICE_PROGRAM_MAP(exedexes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exedexes_state, exedexes_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::exedexes_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)  /* 3 MHz ??? */
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)

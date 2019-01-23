@@ -826,10 +826,10 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(tvc64_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("tvc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tvc64_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
+	m_cassette->set_interface("tvc_cass");
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)

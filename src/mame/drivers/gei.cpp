@@ -1006,7 +1006,7 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 	m_ppi[1]->out_pb_callback().set(FUNC(gei_state::lamps_w));
 	m_ppi[1]->out_pc_callback().set(FUNC(gei_state::lamps2_w));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1039,7 +1039,7 @@ MACHINE_CONFIG_START(gei_state::gselect)
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_REMOVE("ticket")
+	config.device_remove("ticket");
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
@@ -1055,7 +1055,7 @@ MACHINE_CONFIG_START(gei_state::jokpokera)
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_REMOVE("ticket")
+	config.device_remove("ticket");
 
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gselect_map)

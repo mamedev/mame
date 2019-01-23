@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(bcs3_state::bcs3)
 	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
 	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bcs3_state::bcs3a)
@@ -435,7 +435,7 @@ MACHINE_CONFIG_START(bcs3_state::bcs3a)
 	m_ctc->zc_callback<0>().set(FUNC(bcs3_state::ctc_z0_w));
 	m_ctc->zc_callback<1>().set(FUNC(bcs3_state::ctc_z1_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bcs3_state::bcs3b)

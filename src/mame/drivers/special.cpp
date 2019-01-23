@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(special_state::special)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
 	I8255(config, m_ppi);
@@ -398,10 +398,10 @@ MACHINE_CONFIG_START(special_state::special)
 	m_ppi->in_pc_callback().set(FUNC(special_state::specialist_8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(special_state::specialist_8255_portc_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rks_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("special_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rks_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("special_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","special_cass")
 MACHINE_CONFIG_END
@@ -498,13 +498,13 @@ MACHINE_CONFIG_START(special_state::erik)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rks_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("special_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rks_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("special_cass");
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(special_state::specialist_8255_porta_r));

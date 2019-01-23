@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Vas Crabb
 #ifndef MAME_BUS_VSMILE_VSMILE_CTRL_H
 #define MAME_BUS_VSMILE_VSMILE_CTRL_H
 
@@ -37,7 +37,7 @@ protected:
 
 private:
 	// input signal handlers for implementataions to override
-	virtual void cts_w(int state) = 0;
+	virtual void select_w(int state) = 0;
 	virtual void data_w(uint8_t data) = 0;
 
 	vsmile_ctrl_port_device *const m_port;
@@ -69,7 +69,7 @@ public:
 	virtual ~vsmile_ctrl_port_device();
 
 	// input signals
-	void cts_w(int state) { if (m_device) m_device->cts_w(state); }
+	void select_w(int state) { if (m_device) m_device->select_w(state); }
 	void data_w(uint8_t data) { if (m_device) m_device->data_w(data); }
 
 protected:
@@ -84,6 +84,48 @@ private:
 	devcb_write8 m_data_cb;
 
 	friend class device_vsmile_ctrl_interface;
+};
+
+
+// ======================> vsmile_ctrl_device_base
+
+class vsmile_ctrl_device_base : public device_t, public device_vsmile_ctrl_interface
+{
+public:
+	// destruction
+	virtual ~vsmile_ctrl_device_base();
+
+protected:
+	// construction
+	vsmile_ctrl_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_start() override;
+
+	// UART simulation helpers
+	bool is_tx_empty() const { return m_tx_fifo_empty; }
+	bool queue_tx(uint8_t data);
+
+private:
+	// device_vsmile_ctrl_interfaceA implementation
+	virtual void select_w(int state) override;
+	virtual void data_w(uint8_t data) override;
+
+	// UART simulation handlers
+	virtual void tx_complete() = 0;
+	virtual void tx_timeout() = 0;
+	virtual void rx_complete(uint8_t data, bool select) = 0;
+
+	// internal helpers
+	TIMER_CALLBACK_MEMBER(tx_timer_expired);
+	TIMER_CALLBACK_MEMBER(rts_timer_expired);
+
+	emu_timer *m_tx_timer, *m_rts_timer;
+
+	uint8_t m_tx_fifo[32];
+	uint8_t m_tx_fifo_head, m_tx_fifo_tail;
+	bool m_tx_fifo_empty, m_tx_active;
+	bool m_select;
 };
 
 

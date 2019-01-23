@@ -258,8 +258,7 @@ MACHINE_CONFIG_START(pk8020_state::pk8020)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, "cassette").set_default_state(CASSETTE_PLAY);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("258K").set_default_value(0x00); // 64 + 4*48 + 2 = 258

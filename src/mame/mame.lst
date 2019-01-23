@@ -2925,6 +2925,9 @@ ldrink                          //
 ldrinka                         //
 merryjn                         //
 
+@source:bert.cpp
+bert                            //
+
 @source:berzerk.cpp
 berzerk                         // (c) 1980
 berzerk1                        // (c) 1980
@@ -13486,6 +13489,7 @@ scobra                          // GX316 (c) 1981 Konami
 scobrab                         // GX316 (c) 1981 Karateco (bootleg?)
 scobrae                         // GX316 (c) 1981 Stern
 scobrag                         // AVG by Zaccaria (bootleg?)
+scobraggi                       // bootleg (Cocamatic)
 scobras                         // GX316 (c) 1981 Stern
 scobrase                        // GX316 (c) 1981 Sega
 scorpion                        // (c) 1982 Zaccaria
@@ -13494,6 +13498,7 @@ scorpionb                       // (c) 1982 Zaccaria
 scorpionmc                      // bootleg
 scramble                        // GX387 (c) 1981 Konami
 scramblebb                      // bootleg?
+kamikazesp                      // bootleg (Euromatic S.A.)
 scramblebf                      // bootleg
 scrambles                       // GX387 (c) 1981 Stern
 scrambles2                      // GX387 (c) 1981 Stern
@@ -15033,6 +15038,7 @@ gnw_mariocm                     // Nintendo
 gnw_mmouse                      // Nintendo
 gnw_mickdon                     // Nintendo
 gnw_opanic                      // Nintendo
+gnw_rshower                     // Nintendo
 gnw_smb                         // Nintendo
 gnw_squish                      // Nintendo
 gnw_tfish                       // Nintendo
@@ -30302,6 +30308,7 @@ mc_dg101
 mc_aa2
 mc_105te
 mc_sp69
+polmega
 mc_dcat8
 mc_dcat8a
 pjoyn50
@@ -35644,7 +35651,14 @@ sorcerer2                       // monitor 1.1 1979
 sorcererd                       // Sorcerer with floppies
 
 @source:storio.cpp
-storio                          // (c)200? VTech
+vreader                         // (c) 2011 V.Tech
+vreadercaen                     // (c) 2011 V.Tech
+vreadercafr                     // (c) 2011 V.Tech
+storio                          // (c) 2011 V.Tech
+storiode                        // (c) 2011 V.Tech
+storioes                        // (c) 2011 V.Tech
+storiofr                        // (c) 2011 V.Tech
+storionl                        // (c) 2011 V.Tech
 
 @source:sothello.cpp
 sothello                        // (c) 1986 Success / Fujiwara.
@@ -37958,6 +37972,7 @@ triplhnt                        // 008422-008791    1977/04 [6800]
 
 @source:trkfldch.cpp
 trkfldch                        // (c) 2007 Konami
+my1stddr                        // (c) 2006 Konami
 
 @source:trs80.cpp
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
@@ -38594,9 +38609,10 @@ mattelcs                        //
 
 @source:vsmile.cpp
 vsmile                          //
-vsmileb                         //
 vsmilef                         //
 vsmileg                         //
+vsmileb                         //
+vsmilebsw                       //
 
 @source:vsmilepro.cpp
 vsmilpro
@@ -39745,16 +39761,20 @@ has_wamg                        //
 ekara                           //
 ekaraa                          //
 ekaraj                          //
+ekarag                          //
 ekaraphs                        //
 ddrfammt                        //
 popira                          //
 taikodp                         //
-xavtenni                        //
-xavbaseb                        //
 ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
 drgqst                          //
+xavtenni                        //
+xavbaseb                        //
+xavjmat                         //
+tmy_thom                        //
+
 
 @source:xbox.cpp
 xbox                            //

@@ -160,7 +160,7 @@ MACHINE_CONFIG_START(fidelmcs48_state::sc6)
 	maincpu.t0_in_cb().set(FUNC(fidelmcs48_state::sc6_input6_r));
 	maincpu.t1_in_cb().set(FUNC(fidelmcs48_state::sc6_input7_r));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	TIMER(config, "display_decay").configure_periodic(FUNC(fidelbase_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_fidel_sc6);
 
 	/* sound hardware */

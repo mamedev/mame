@@ -805,10 +805,10 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(avigo_state::nvram_init));
 
 	// IRQ 1 is used for scan the pen and for cursor blinking
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scan_timer", avigo_state, avigo_scan_timer, attotime::from_hz(50))
+	TIMER(config, "scan_timer").configure_periodic(FUNC(avigo_state::avigo_scan_timer), attotime::from_hz(50));
 
 	// IRQ 4 is generated every second, used for auto power off
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", avigo_state, avigo_1hz_timer, attotime::from_hz(1))
+	TIMER(config, "1hz_timer").configure_periodic(FUNC(avigo_state::avigo_1hz_timer), attotime::from_hz(1));
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app", 0)

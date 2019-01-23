@@ -600,7 +600,7 @@ MACHINE_CONFIG_START(excali64_state::excali64)
 	m_crtc->out_vsync_callback().set(FUNC(excali64_state::crtc_vs));
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	WD2793(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));

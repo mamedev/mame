@@ -32,7 +32,9 @@ enum
 	SEGA8_MUSIC_EDITOR,
 	SEGA8_DAHJEE_TYPEA,
 	SEGA8_DAHJEE_TYPEB,
-	SEGA8_SEOJIN
+	SEGA8_SEOJIN,
+	SEGA8_MULTICART,
+	SEGA8_MEGACART
 };
 
 
@@ -56,6 +58,9 @@ public:
 	// a few carts (for SG1000) acts as a RAM expansion, taking control of the system RAM in 0xc000-0xffff
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) { }
+	// the SC3000 has I/OR, I/OW lines connected
+	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
+	virtual DECLARE_WRITE8_MEMBER(write_io) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -148,6 +153,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_mapper);
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual DECLARE_READ8_MEMBER(read_io);
+	virtual DECLARE_WRITE8_MEMBER(write_io);
 
 	int get_lphaser_xoffs() { return m_cart ? m_cart->get_lphaser_xoffs() : -1; }
 	int get_sms_mode() { return m_cart->get_sms_mode(); }

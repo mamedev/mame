@@ -453,7 +453,7 @@ void galpani3_state::galpani3_map(address_map &map)
 MACHINE_CONFIG_START(galpani3_state::galpani3)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'636'363)/2) // Confirmed from PCB
 	MCFG_DEVICE_PROGRAM_MAP(galpani3_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpani3_state, galpani3_vblank, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(galpani3_state::galpani3_vblank), "screen", 0, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -1507,8 +1507,8 @@ MACHINE_CONFIG_START(px4_state::px4)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
+	TIMER(config, "one_sec").configure_periodic(FUNC(px4_state::upd7508_1sec_callback), attotime::from_seconds(1));
+	TIMER(config, "frc").configure_periodic(FUNC(px4_state::frc_tick), attotime::from_hz(XTAL(7'372'800) / 2 / 6));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1522,10 +1522,10 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// external cassette
-	MCFG_CASSETTE_ADD("extcas")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	CASSETTE(config, m_ext_cas);
+	m_ext_cas->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
 
-	MCFG_TIMER_DRIVER_ADD("extcas_timer", px4_state, ext_cassette_read)
+	TIMER(config, m_ext_cas_timer).configure_generic(FUNC(px4_state::ext_cassette_read));
 
 	// sio port
 	MCFG_EPSON_SIO_ADD("sio", nullptr)

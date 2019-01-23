@@ -93,7 +93,7 @@ public:
 	virtual bool is_readable()  const override { return 1; }
 	virtual bool is_writeable() const override { return 0; }
 	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 1; }
+	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "vsmile_cart"; }
 	virtual const char *file_extensions() const override { return "u1,u3,bin"; }

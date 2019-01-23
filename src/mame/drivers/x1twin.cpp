@@ -506,17 +506,17 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	ay.add_route(0, "x1_r", 0.25);
 	ay.add_route(1, "x1_l", 0.5);
 	ay.add_route(2, "x1_r", 0.5);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("x1_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(x1_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("x1_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", x1twin_state, x1_keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1twin_state, x1_cmt_wind_timer, attotime::from_hz(16))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::x1_keyboard_callback), attotime::from_hz(250));
+	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::x1_cmt_wind_timer), attotime::from_hz(16));
 MACHINE_CONFIG_END
 
 ROM_START( x1twin )

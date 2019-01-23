@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(23.9616_MHz_XTAL / 2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
+	TIMER(config, "vsync").configure_scanline(FUNC(vixen_state::vsync_tick), SCREEN_TAG, 26*10, 27*10);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 

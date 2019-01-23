@@ -516,10 +516,10 @@ MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I,
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* devices */
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
@@ -531,9 +531,8 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, rtc_interrupt, 40)
 
 	/* devices */
-	MCFG_CASSETTE_MODIFY("cassette")
-	MCFG_CASSETTE_FORMATS(trs80l2_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	m_cassette->set_formats(trs80l2_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 1.0)
 

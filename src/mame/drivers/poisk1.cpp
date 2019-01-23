@@ -685,8 +685,8 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")

@@ -2190,7 +2190,7 @@ void cps3_state::cps3_map(address_map &map)
 	map(0x05100000, 0x05100003).w(FUNC(cps3_state::cps3_irq12_ack_w));
 	map(0x05110000, 0x05110003).w(FUNC(cps3_state::cps3_irq10_ack_w));
 
-	map(0x05140000, 0x05140003).rw("scsi:7:wd33c93", FUNC(wd33c93n_device::indir_r), FUNC(wd33c93n_device::indir_w)).umask32(0x00ff00ff);
+	map(0x05140000, 0x05140003).rw("scsi:7:wd33c93", FUNC(wd33c93_device::indir_r), FUNC(wd33c93_device::indir_w)).umask32(0x00ff00ff);
 
 	map(0x06000000, 0x067fffff).rw(FUNC(cps3_state::cps3_flash1_r), FUNC(cps3_state::cps3_flash1_w)); /* Flash ROMs simm 1 */
 	map(0x06800000, 0x06ffffff).rw(FUNC(cps3_state::cps3_flash2_r), FUNC(cps3_state::cps3_flash2_w)); /* Flash ROMs simm 2 */

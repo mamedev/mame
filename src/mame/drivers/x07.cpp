@@ -1501,12 +1501,12 @@ MACHINE_CONFIG_START(x07_state::x07)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 0).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink_timer", x07_state, blink_timer, attotime::from_msec(300))
+	TIMER(config, "blink_timer").configure_periodic(FUNC(x07_state::blink_timer), attotime::from_msec(300));
 
 	NVRAM(config, "nvram1").set_custom_handler(FUNC(x07_state::nvram_init));   // t6834 RAM
 	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0); // RAM banks
@@ -1525,10 +1525,10 @@ MACHINE_CONFIG_START(x07_state::x07)
 	MCFG_GENERIC_LOAD(x07_state, x07_card)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(x07_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("x07_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(x07_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("x07_cass");
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("card_list", "x07_card")

@@ -82,7 +82,7 @@ void a2bus_softcard_device::write_cnxx(uint8_t offset, uint8_t data)
 	if (!m_bEnabled)
 	{
 		m_z80->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		set_maincpu_halt(ASSERT_LINE);
+		raise_slot_dma();
 
 		if (m_FirstZ80Boot)
 		{
@@ -95,7 +95,7 @@ void a2bus_softcard_device::write_cnxx(uint8_t offset, uint8_t data)
 	else
 	{
 		m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		set_maincpu_halt(CLEAR_LINE);
+		lower_slot_dma();
 		m_bEnabled = false;
 	}
 }

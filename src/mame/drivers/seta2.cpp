@@ -2430,7 +2430,7 @@ MACHINE_CONFIG_START(seta2_state::reelquak)
 	m_tmp68301->out_parallel_callback().set(FUNC(seta2_state::reelquak_leds_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	TICKET_DISPENSER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x140-1, 0x000, 0x0f0-1)
@@ -2479,7 +2479,7 @@ MACHINE_CONFIG_START(seta2_state::telpacfl)
 	EEPROM_93C46_16BIT(config, "eeprom"); // not hooked up, seems unused
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_HOPPER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	HOPPER(config, m_dispenser, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2519,7 +2519,7 @@ MACHINE_CONFIG_START(funcube_state::funcube)
 
 	MCFG_DEVICE_ADD("maincpu", MCF5206E, XTAL(25'447'000))
 	MCFG_DEVICE_PROGRAM_MAP(funcube_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", funcube_state, funcube_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(funcube_state::funcube_interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
 	MCFG_DEVICE_PROGRAM_MAP(funcube_sub_map)

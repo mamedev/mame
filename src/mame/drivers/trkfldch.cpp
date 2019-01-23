@@ -5,8 +5,16 @@
 Track & Field Challenge TV Game
 https://www.youtube.com/watch?v=wjn1lLylqog
 
-HELP!  what type of CPU / SoC is this? seems to be G65816 derived with custom vectors?
+Uses epoxy blobs for CPU etc.
+These have been identified as Winbond 2005 BA5962 (large glob) + Winbond 200506 BA5934 (smaller glob)
+seems to be G65816 derived with custom vectors?
 
+PCB               Game
+TV0001 R1.1       My First DDR
+TV0002 R1.0       Track & Field
+
+DDR & TF PCBs look identical, all the parts are in the same place, the traces are the same, and the silkscreened part # for resistors and caps are the same. 
+ 
 currently dies after call at
 
 00:AE85: LDA $0b
@@ -176,5 +184,12 @@ ROM_START( trkfldch )
 	ROM_LOAD( "trackandfield.bin", 0x000000, 0x400000,  CRC(f4f1959d) SHA1(344dbfe8df1897adf77da6e5ca0435c4d47d6842) )
 ROM_END
 
+ROM_START( my1stddr )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "myfirstddr.bin", 0x000000, 0x400000, CRC(2ef57bfc) SHA1(9feea5adb9de8fe17e915f3a037e8ddd70e58ae7) )
+ROM_END
+
+
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2006, my1stddr,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",             "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
 

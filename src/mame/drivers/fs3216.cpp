@@ -50,8 +50,8 @@ private:
 	MC6845_UPDATE_ROW(crt_update_row);
 
 	void mmu_reg_w(offs_t offset, u16 data);
-	DECLARE_READ16_MEMBER(mmu_read);
-	DECLARE_WRITE16_MEMBER(mmu_write);
+	u16 mmu_read(offs_t offset, u16 mem_mask);
+	void mmu_write(offs_t offset, u16 data, u16 mem_mask);
 	DECLARE_WRITE_LINE_MEMBER(mmu_reset_w);
 	void mmu_init_w(u16 data);
 
@@ -171,7 +171,7 @@ void fs3216_state::mmu_reg_w(offs_t offset, u16 data)
 		reg = (reg & 0x00ffff) | (data & 0x00ff) << 16;
 }
 
-READ16_MEMBER(fs3216_state::mmu_read)
+u16 fs3216_state::mmu_read(offs_t offset, u16 mem_mask)
 {
 	const bool a23 = BIT(offset, 22);
 	const bool mmu_disable = !a23 && BIT(m_maincpu->get_fc(), 2);
@@ -184,10 +184,10 @@ READ16_MEMBER(fs3216_state::mmu_read)
 
 	offs_t clbaddr = offset + ((mmu_reg & 0x000fff) << 9);
 	clbaddr = (clbaddr & 0x1fffff) | (clbaddr & 0x100000) << 1;
-	return m_clb->read16(space, clbaddr, mem_mask);
+	return m_clb->read16(clbaddr, mem_mask);
 }
 
-WRITE16_MEMBER(fs3216_state::mmu_write)
+void fs3216_state::mmu_write(offs_t offset, u16 data, u16 mem_mask)
 {
 	const bool a23 = BIT(offset, 22);
 	const bool mmu_disable = !a23 && BIT(m_maincpu->get_fc(), 2);
@@ -200,7 +200,7 @@ WRITE16_MEMBER(fs3216_state::mmu_write)
 
 	offs_t clbaddr = offset + ((mmu_reg & 0x000fff) << 9);
 	clbaddr = (clbaddr & 0x1fffff) | (clbaddr & 0x100000) << 1;
-	m_clb->write16(space, clbaddr, data, mem_mask);
+	m_clb->write16(clbaddr, data, mem_mask);
 }
 
 WRITE_LINE_MEMBER(fs3216_state::mmu_reset_w)

@@ -369,7 +369,7 @@ int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 MACHINE_CONFIG_START(tmaster_state::tm)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2) /* 12MHz */
 	MCFG_DEVICE_PROGRAM_MAP(tmaster_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, scanline_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(tmaster_state::scanline_interrupt), "screen", 0, 1);
 
 	MC68681(config, m_duart, XTAL(8'664'000) / 2 /*??*/);
 	m_duart->irq_cb().set(FUNC(tmaster_state::duart_irq_handler));

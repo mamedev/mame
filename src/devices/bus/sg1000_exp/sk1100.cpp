@@ -163,10 +163,10 @@ MACHINE_CONFIG_START(sega_sk1100_device::device_add_mconfig)
 
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(sc3000_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sc3000_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(sc3000_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("sc3000_cass");
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("sc3k_cart_list","sc3000_cart")

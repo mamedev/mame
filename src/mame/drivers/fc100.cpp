@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 	ay8910_device &psg(AY8910(config, "psg", XTAL(7'159'090)/3/2));  /* AY-3-8910 - clock not verified */
 	psg.port_a_read_callback().set_ioport("JOY0");
 	psg.port_b_read_callback().set_ioport("JOY1");
@@ -544,9 +544,9 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	psg.add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fc100_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(fc100_cassette_formats);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	I8251(config, m_uart, 0);
 	m_uart->txd_handler().set(FUNC(fc100_state::txdata_callback));
@@ -554,9 +554,9 @@ MACHINE_CONFIG_START(fc100_state::fc100)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
+	TIMER(config, "timer_c").configure_periodic(FUNC(fc100_state::timer_c), attotime::from_hz(4800)); // cass write
+	TIMER(config, "timer_p").configure_periodic(FUNC(fc100_state::timer_p), attotime::from_hz(40000)); // cass read
+	TIMER(config, "timer_k").configure_periodic(FUNC(fc100_state::timer_k), attotime::from_hz(300)); // keyb scan
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
 
