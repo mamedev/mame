@@ -915,7 +915,7 @@ void mcpx_ide_device::device_add_mconfig(machine_config &config)
 {
 	bus_master_ide_controller_device &ide(BUS_MASTER_IDE_CONTROLLER(config, "ide", 0));
 	ide.irq_handler().set(FUNC(mcpx_ide_device::ide_interrupt));
-	ide.set_bus_master_space("maincpu", AS_PROGRAM);
+	ide.set_bus_master_space(":maincpu", AS_PROGRAM);
 }
 
 WRITE_LINE_MEMBER(mcpx_ide_device::ide_interrupt)
