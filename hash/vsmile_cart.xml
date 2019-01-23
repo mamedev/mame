@@ -109,11 +109,11 @@ Game cartridges
 +========+===================+============================================================================+
 |        | 80-090240(US)     | <Unknown>                                                                  |
 +========+===================+============================================================================+
-|        | 80-090260(US)     | Disney Fairies: Tinker Bell                                                |
-|        |          (DK)     | Disney Fairies: Tingeling                                                  |
-|   XX   | 80-090274(SE)     | Disney Fairies: Tingeling                                                  |
-|        | 80-090275(NO)     | Disney Fairies: Tingeling                                                  |
-|        |          (FI)     | Disney Fairies: Helinä-keiju                                               |
+|        | 80-090260(US)     | Disney Fairies - Tinker Bell                                               |
+|        |          (DK)     | Disney Fairies - Tingeling                                                 |
+|   XX   | 80-090274(SE)     | Disney Fairies - Tingeling                                                 |
+|        | 80-090275(NO)     | Disney Fairies - Tingeling                                                 |
+|        |          (FI)     | Disney Fairies - Helinä-keiju                                              |
 +========+===================+============================================================================+
 |   XX   | 52-091444(GE)     | Schreibspass                                                               |
 +========+===================+============================================================================+
@@ -130,6 +130,7 @@ Game cartridges
 |   XX   | 80-092005(FR)     | ABC Land Aventure                                                          |
 |        | 80-092006(PT)     | ABC Adventure (EAN is 3417768920162 cart#92016)                            |
 |        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple)                                   |
+|  SOON  | 80-092007(SP)     | Aventuras en el Parque Alfabeto (purple, no # on label, 92007 on PCB)      |
 |        | 80-092007(SP)     | Aventuras en el Parque Alfabeto (translucent) (No # on label)              |
 +========+===================+============================================================================+
 |        | 80-092020(US)     | The Adventures of Little Red Riding Hood                                   |
@@ -153,8 +154,8 @@ Game cartridges
 |   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                              |
 |   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (ALT)                        |
 |        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                          |
-|        | 80-092067(SP)     | Winnie the Pooh (My Friends Tigger and Pooh) - En Busca de la Miel (no # on label)
-|        | 80-092067-122(SP) | Winnie the Pooh (My Friends Tigger and Pooh) - En Busca de la Miel         |
+|  SOON  | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB)        |
+|        | 80-092067-122(SP) | Winnie the Pooh - En Busca de la Miel                                      |
 |   XX   | 80-092073(DK)     | Peter Plys - Honningjagten                                                 |
 |   XX   | 80-092074(SE)     | Nalle Puh - Honungsjakten                                                  |
 |        |          (NO)     | Winnie the Pooh - Honningjakten                                            |
@@ -169,6 +170,7 @@ Game cartridges
 |        | 80-092085(FR)     | Mickey - Mickey a la recherche de Pluto                                    |
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)     |
 |        | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey                                      |
+|  SOON  | 80-092087(SP)     | Mickey - La Aventura Mágica de Mickey (no # on label, 92087 on PCB)        |
 |        |          (DK)     | Mickey                                                                     |
 |   XX   | 80-092094(SE)     | Musse Pigg - Musses magiska äventyr                                        |
 |        |          (NO)     | Mickey                                                                     |
@@ -181,7 +183,8 @@ Game cartridges
 |   XX   | 80-092104(GE)     | Der Koenig der Loewen - Simbas grosses Abenteuer (Rev.2 dumped)            |
 |   XX   | 80-092105(FR)     | Le Roi Lion - Simba Découvre la Jungle                                     |
 |        | 80-092106(PT)     | O Rei Leao - A grande aventura de Simba (92116 on cart)                    |
-|        | 80-092107(SP)     | Rey León - La Gran Aventura de Simba                                       |
+|        | 80-092107(SP)     | El Rey León - La Gran Aventura de Simba                                    |
+|  SOON  | 80-092107(SP)     | El Rey León - La Gran Aventura de Simba (no # on label, 92187 on PCB)      |
 |   XX   | 80-092113(DK)     | Løvernes Konge - Simbas store eventyr                                      |
 |   XX   | 80-092114(SE)     | Lejonkungen - Simbas stora äventyr                                         |
 |        |          (NO)     | Løvenes konge - Simbas store eventyr                                       |
@@ -210,7 +213,7 @@ Game cartridges
 |   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                     |
 |        | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                    |
 |        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                     |
-|        | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs)                       |
+|  SOON  | 80-092147(SP)     | Spider-Man y Amigos - Misiones Secretas (white webs)                       |
 |        | 80-092147-122(SP) | Spider-Man y Amigos - Misiones Secretas (yellow webs)                      |
 +========+===================+============================================================================+
 |   XX   | 80-092160(US)     | Scooby-Doo! - Funland Frenzy                                               |
@@ -223,7 +226,8 @@ Game cartridges
 |   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                  |
 |   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland                                            |
 |        | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (translucent purple, packin)               |
-|        | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent Purple)                    |
+|        | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (translucent purple)                    |
+|  SOON  | 80-092167(SP)     | Scooby-Doo - Misterio en el Parque (purple, # on back label)               |
 |   XX   | 80-092173(DK)     | Scooby-Doo! - Sjov i forlystelsesparken                                    |
 |   XX   | 80-092174(SE)     | Scooby-Doo! - Tivoli-tokerier                                              |
 |        |          (NO)     | Scooby-Doo! - Moro i fornøyelsesparken                                     |
@@ -241,7 +245,7 @@ Game cartridges
 |        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                   |
 |   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                         |
 |        | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                               |
-|        | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin                                  |
+|  SOON  | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label)     |
 +========+===================+============================================================================+
 |   XX   | 80-092220(US)     | Toy Story 2 - Operation Rescue Woody!                                      |
 |        |          (IT)     | Toy Story 2 - Operazione: Salvataggio di Woody!  gpz06503                  |
@@ -249,14 +253,14 @@ Game cartridges
 |   XX   | 80-092224(GE)     | Toy Story 2 - Woodys Spannende Rettung                                     |
 |        | 80-092225(FR)     | Toy Story 2 - Buzz à la Rescousse!                                         |
 |        | 80-092226(PT)     | Toy Story 2 - O Resgate de Woody (92236 on cart)                           |
-|        | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody                                          |
+|  SOON  | 80-092227(SP)     | Toy Story 2 - El Rescate De Woody (52-92227(SP) on back label)             |
 |        |          (DK)     | Toy Story 2 - Operation: Red Woody!                                        |
 |   XX   | 80-092234(SE)     | Toy Story 2 - Operation: Rädda Woody!                                      |
 |        |          (NO)     | Toy Story 2 - Operasjon: Redd Woody!                                       |
 |        |          (FI)     | Toy Story 2                                                                |
 +========+===================+============================================================================+
 |   XX   | 80-092240(US)     | Cinderella - Cinderella's Magic Wishes                                     |
-|   XX   |          (IT)     | Cenerentola - I desideri magici di Cenerentola   (cart says 52-92251 Ita)  |
+|   XX   |          (IT)     | Cenerentola - I desideri magici di Cenerentola (cart says 52-92251 Ita)    |
 |        | 80-092242(NL)     | Assepoester - De wonderwereld van Assepoester                              |
 |        | 80-092242-123(NL) | Assepoester - De wonderwereld van Assepoester | 2007                       |
 |        | 80-092243(UK)     | Cinderella - Cinderella's Magic Wishes                                     |
@@ -278,7 +282,8 @@ Game cartridges
 +========+===================+============================================================================+
 |        | 80-092260(US)     | Elmo's World - Elmo's Big Discoveries                                      |
 |   XX   | 80-092264(GE)     | Elmos großes Abenteuer                                                     |
-|   XX   | 80-092265(FR)     | Le Monde d'ELMO - Les Grandes Découvertes D'Elmo                           |
+|   XX   | 80-092265(FR)     | Le Monde d'Eelmo - Les Grandes Découvertes D'Elmo                          |
+|  SOON  | 80.092267(SP)     | Mundo Elmo - Grandes descubrimientos de Elmo (52-92267(SP) on back label)  |
 +========+===================+============================================================================+
 |   XX   | 80-092280(US)     | Dora The Explorer - Dora's Fit-it Adventure                                |
 |        | 80-092280-101(US) | Dora The Explorer - Dora's Fit-it Adventure (ALT)                          |
@@ -290,7 +295,7 @@ Game cartridges
 |   XX   | 80-092285(FR)     | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano               |
 |        | 80-092285-1?5(FR) | Dora L'Exploratrice - Les aventures de Dora Apprentie Mécano NTSC French-Canadian
 |        | 80-092286(PT)     | Dora - em busca das pecas perdidas (cart# 92296)                           |
-|        | 80-092287(SP)     | Dora - La Aventura arregla-todo de Dora (seen as purple without#)          |
+|  SOON  | 80-092287-222(SP) | Dora - La Aventura arregla-todo de Dora (purple, no # on front label, 52-092287-222(SP) on back label)
 |        | 80-092287-122(SP) | Dora - La Aventura arregla-todo de Dora                                    |
 +========+===================+============================================================================+
 |   XX   | 80-092300(US)     | Bob the Builder: Bob's Busy Day                                            |
@@ -310,31 +315,31 @@ Game cartridges
 |        | 80-092320(US)     | The Wiggles - It's Wiggle Time!                                            |
 |        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                            |
 +========+===================+============================================================================+
-|        | 80-092340(US)     | Thomas The Tank: Engines Working Together                                  |
-|        | 80-092340-101(US) | Thomas The Tank: Engines Working Together (ALT) (HiT logo on label)        |
+|        | 80-092340(US)     | Thomas The Tank - Engines Working Together                                 |
+|        | 80-092340-101(US) | Thomas The Tank - Engines Working Together (ALT) (HiT logo on label)       |
 |        | 80-092342(NL)     | Thomas de Stoomlocomotief' - Locomotieven Werken Somen  <- need pic even the manual has -123 on cover
 |        | 80-092342-123(NL) | Thomas de Stoomlocomotief' - Locomotieven Werken Somen                     |
-|        | 80-092343(UK)     | Thomas and Friends: Engines Working Together                               |
-|        | 80-092343-103(UK) | Thomas and Friends: Engines Working Together (ALT)                         |
-|        | 80-092343-203(UK) | Thomas and Friends: Engines Working Together (ALT)                         |
+|        | 80-092343(UK)     | Thomas and Friends - Engines Working Together                              |
+|        | 80-092343-103(UK) | Thomas and Friends - Engines Working Together (ALT)                        |
+|        | 80-092343-203(UK) | Thomas and Friends - Engines Working Together (ALT)                        |
 |   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen                         |
 |   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen                         |
 |   XX   | 80-092345(FR)     | Thomas et ses Amis - Les locomotives s'entraident                          |
-|        | 80-092347(SP)     | Thomas and Friends: Juego de Aprendizaje                                   |
-|        |          (DK)     | Thomas and Friends: Togene arbejder sammen                                 |
-|   XX   | 80-092354(SE)     | Thomas and Friends: Tågen hjälps åt                                        |
-|        |          (NO)     | Thomas and Friends: Togene samarbeider (494097(NO) printed on cart)        |
+|        | 80-092347(SP)     | Thomas and Friends - Juego de Aprendizaje                                  |
+|        |          (DK)     | Thomas and Friends - Togene arbejder sammen                                |
+|   XX   | 80-092354(SE)     | Thomas and Friends - Tågen hjälps åt                                       |
+|        |          (NO)     | Thomas and Friends - Togene samarbeider (494097(NO) printed on cart)       |
 |        |          (FI)     | Thomas and Friends                                                         |
 +========+===================+============================================================================+
 |   XX   | 80-092360(US)     | Zayzoo - My Alien Classmate                                                |
 |   XX   | 80-092360-101(US) | Zayzoo: An Earth Adventure                                                 |
 |        | 80-092362(NL)     | Zayzoo - Mijn Buitenaardse Vriendje                                        |
-|        | 80-092363(UK)     | Zayzoo My Alien Classmate   <- yes, duped#                                 |
+|        | 80-092363(UK)     | Zayzoo - My Alien Classmate   <- yes, duped#                               |
 |        | 80-092363(UK)     | Zayzoo - An Earth Adventure <- saw it, can't find pic again                |
 |   XX   | 80-092363-103(UK) | Zayzoo - An Earth Adventure                                                |
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                            |
 |   XX   | 80-092365(FR)     | Zézou - Notre Ami Venu d'Ailleurs                                          |
-|        | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (Alien Classmate)                            |
+|  SOON  | 80-092367(SP)     | Zayzoo - Mi Amiga del Espacio (52-92367(SP) on back label)                 |
 +========+===================+============================================================================+
 |        | 80-092380(US)     | Barney - The Land of Make Believe                                          |
 |        | 80-092383(UK)     | Barney - The Land of Make Believe                                          |
@@ -348,27 +353,27 @@ Game cartridges
 |        | 80-092424(GE)     | Findet Nemo - Nemos Unterwasserabenteuer                                   |
 |        | 80-092425(FR)     | Le Monde de Nemo - Nemo à la découverte de l'océan                         |
 |        | 80-092426(PT)     | Nemo - A descoberta do Oceano  (Cart#92436)                                |
-|        | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo                              |
+|  SOON  | 80-092427(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo (52-92427(SP) on back label) |
 +========+===================+============================================================================+
-|   XX   | 80-092440(US)     | Spongebob Squarepants: A Day In The Life of A Sponge                       |
-|        | 80-092442(NL)     | Spongebob Squarepants: Een Dag uit het Leven van een Spons                 |
-|        | 80-092443(UK)     | Spongebob Squarepants: A Day In The Life of A Sponge                       |
+|   XX   | 80-092440(US)     | Spongebob Squarepants - A Day In The Life of A Sponge                      |
+|        | 80-092442(NL)     | Spongebob Squarepants - Een Dag uit het Leven van een Spons                |
+|        | 80-092443(UK)     | Spongebob Squarepants - A Day In The Life of A Sponge                      |
 |   XX   | 80-092444(GE)     | Spongebob Schwammkopf - Der Tag des Schwamms                               |
 |        | 80-092445(FR)     | Bob L'éponge - Une journée dans la vie d'une éponge                        |
-|        | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja                             |
+|  SOON  | 80-092447(SP)     | Bob Esponja - Un día en la vida de una esponja (52-92447(SP) on back label)|
 +========+===================+============================================================================+
-|        | 80-092460(US)     | Sesame Street : Bert and Ernie's Imagination Adventure                     |
-|        | 80-092462(NL)     | Sesamstraat : Bert and Ernie's Fantasie Avontuur                           |
-|   XX   | 80-092464(GE)     | Sesame Street : Ernie and Berts Fantastisches Abenteuer                    |
-|        | 80-092465(FR)     | 5, Rue Sesame : Les Aventures Imaginaires d'Ernest et Bert                 |
-|        | 80-092467(SP)     | Barrio Sésamo : El Mundo Fantástico de Epi y Blas                          |
+|        | 80-092460(US)     | Sesame Street - Bert and Ernie's Imagination Adventure                     |
+|        | 80-092462(NL)     | Sesamstraat - Bert and Ernie's Fantasie Avontuur                           |
+|   XX   | 80-092464(GE)     | Sesame Street - Ernie and Berts Fantastisches Abenteuer                    |
+|        | 80-092465(FR)     | 5, Rue Sesame - Les Aventures Imaginaires d'Ernest et Bert                 |
+|        | 80-092467(SP)     | Barrio Sésamo - El Mundo Fantástico de Epi y Blas                          |
 +========+===================+============================================================================+
-|        | 80-092480(US)     | Batman: Gotham City Rescue                                                 |
-|        |          (IT)     | Batman: Il Salvataggio di Gotham City 80-092492??   gpz06629               |
-|        | 80-092482(NL)     | Batman: De Redding van Gotham City                                         |
-|        | 80-092483(UK)     | Batman: Gotham City Rescue                                                 |
+|        | 80-092480(US)     | Batman - Gotham City Rescue                                                |
+|        |          (IT)     | Batman - Il Salvataggio di Gotham City 80-092492??   gpz06629              |
+|        | 80-092482(NL)     | Batman - De Redding van Gotham City                                        |
+|        | 80-092483(UK)     | Batman - Gotham City Rescue                                                |
 |        | 80-092484(GE)     | Batman - Rettung von Gotham City                                           |
-|        | 80-092485(FR)     | Batman: Panique a Gotham City                                              |
+|        | 80-092485(FR)     | Batman - Panique a Gotham City                                             |
 +========+===================+============================================================================+
 |        | 80-092500(US)     | Whiz Kid Wheels  (note to self.. no rider in this blue car)                |
 |        | 80-092502(NL)     | Truckie's Rekenrace                                                        |
@@ -377,7 +382,7 @@ Game cartridges
 |        | 80-092504(GE)     | Flitzers Schlaue Staedtetour (normal purple)                               |
 |        | 80-092505(FR)     | Mission Pilote                                                             |
 |        | 80-092506(PT)     | Conducao Diverrido (Cart# 92516)                                           |
-|        | 80-092507(SP)     | Conducción Divertida                                                       |
+|  SOON  | 80-092507(SP)     | Conducción Divertida (52-92507(SP) on back label)                          |
 +========+===================+============================================================================+
 |        | 80-092520(US)     | Spider-Man & Friends Doc Ock's Challenge                                   |
 |        |          (IT)     | Spider-Man la sfida del dottor Ock  (V.smile pocket bundle only?)          |
@@ -420,14 +425,14 @@ Game cartridges
 |   XX   | 80-092645(FR)     | Superman - À la rescousse !                                                |
 |        | 80-092647(SP)     | Superman - El Hombre de Acero                                              |
 +========+===================+============================================================================+
-|   XX   | 80-092660(US)     | Cars: Rev It Up In Radiator Springs                                        |
-|        |          (IT)     | Cars: Motori Ruggenti   gpz06755                                           |
-|        | 80-092662(NL)     | Cars: Spektakel in Radiator Springs                                        |
-|        | 80-092663(UK)     | Cars: Rev It Up In Radiator Springs                                        |
-|   XX   | 80-092664(GE)     | Cars: Vollgas in Radiator Springs                                          |
-|   XX   | 80-092665(FR)     | Cars: Quatre Roues                                                         |
-|        | 80-092666(PT)     | Carros: Aventura em Radiator Springs (92676 on cart)                       |
-|        | 80-092667(SP)     | Cars: Acelera el Motor en Radiador Springs                                 |
+|   XX   | 80-092660(US)     | Cars - Rev It Up In Radiator Springs                                       |
+|        |          (IT)     | Cars - Motori Ruggenti   gpz06755                                          |
+|        | 80-092662(NL)     | Cars - Spektakel in Radiator Springs                                       |
+|        | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                       |
+|   XX   | 80-092664(GE)     | Cars - Vollgas in Radiator Springs                                         |
+|   XX   | 80-092665(FR)     | Cars - Quatre Roues                                                        |
+|        | 80-092666(PT)     | Carros - Aventura em Radiator Springs (92676 on cart)                      |
+|        | 80-092667(SP)     | Cars - Acelera el Motor en Radiador Springs                                |
 |   XX   | 80-092673(DK)     | Biler - Ræs i Kølerkildekøbing                                             |
 |   XX   | 80-092674(SE)     | Bilar - Kör ikapp i Kylarköping                                            |
 |        | 80-092674(SE)     | Biler - Kör ikapp i Kylarköping (Misprinted label)                         |
@@ -452,7 +457,7 @@ Game cartridges
 |        | 80-092843(UK)     | Wall-E                                                                     |
 |   XX   | 80-092844(GE)     | Wall-E                                                                     |
 |        | 80-092845(FR)     | Wall-E                                                                     |
-|        | 80-092847(SP)     | Wall-E                                                                     |
+|  SOON  | 80-092847(SP)     | Wall-E (52-092847 on back label)                                           |
 |        |          (DK)     | Wall-E                                                                     |
 |   XX   | 80-092854(SE)     | Wall-E                                                                     |
 |        |          (NO)     | Wall-E                                                                     |
@@ -463,7 +468,7 @@ Game cartridges
 |   XX   | 80-092862(NL)     | Shrek de Derde - Arthurs Schooldag Avontuur                                |
 |        | 80-092863(UK)     | Shrek the Third: Arthur's School Day Adventure                             |
 |   XX   | 80-092864(GE)     | Shrek der Dritte - Ein Spannender Schultag                                 |
-|        | 80-092865(FR)     | Shrek Troisieme : L'aventure d'Arthur                                      |
+|        | 80-092865(FR)     | Shrek Troisieme - L'aventure d'Arthur                                      |
 |        | 80-092867(SP)     | Shrek Tercero - En Busca de Arturo                                         |
 +========+===================+============================================================================+
 |        | 80-092880(US)     | Ratatouille - Remy's New Recipes                                           |
