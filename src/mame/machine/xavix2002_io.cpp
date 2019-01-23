@@ -103,10 +103,10 @@ READ8_MEMBER(xavix2002_io_device::pio_in_r)
 
 	switch (offset)
 	{
-		case 0: ret = m_in0_cb();
-		case 1: ret = m_in1_cb();
-		case 2: ret = m_in2_cb();
-		default: ret = 0x00;
+		case 0: ret = m_in0_cb(); break;
+		case 1: ret = m_in1_cb(); break;
+		case 2: ret = m_in2_cb(); break;
+		default: ret = 0x00; break;
 	}
 
 	// mask with direction register before returning
