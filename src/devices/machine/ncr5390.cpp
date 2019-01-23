@@ -430,8 +430,8 @@ void ncr5390_device::step(bool timeout)
 			break;
 		}
 
-		// "with atn" variants have a message byte before the command descriptor
-		command_length = (c == CD_SELECT) ? derive_msg_size(fifo[0]) : 1;
+		command_length = fifo_pos + tcounter;
+		logerror("command_length %d\n", command_length);
 		state = DISC_SEL_ARBITRATION;
 		step(false);
 		break;
@@ -465,7 +465,6 @@ void ncr5390_device::step(bool timeout)
 			seq = 1;
 			function_bus_complete();
 		} else {
-			command_length = derive_msg_size(fifo[0]);
 			state = DISC_SEL_WAIT_REQ;
 		}
 		break;
@@ -850,6 +849,8 @@ void ncr5390_device::start_command()
 		// clear transfer count zero flag when counter is reloaded
 		status &= ~S_TC0;
 	}
+	else
+		tcounter = 0;
 
 	switch(c) {
 	case CM_NOP:
@@ -971,12 +972,6 @@ bool ncr5390_device::check_valid_command(uint8_t cmd)
 	case 1: return mode == MODE_I && (subcmd <= 2 || subcmd == 8 || subcmd == 10);
 	}
 	return false;
-}
-
-int ncr5390_device::derive_msg_size(uint8_t msg_id)
-{
-	const static int sizes[8] = { 6, 10, 6, 6, 6, 12, 6, 10 };
-	return sizes[msg_id >> 5];
 }
 
 void ncr5390_device::arbitrate()

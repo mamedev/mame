@@ -212,7 +212,6 @@ protected:
 	void start_command();
 	void step(bool timeout);
 	virtual bool check_valid_command(uint8_t cmd);
-	int derive_msg_size(uint8_t msg_id);
 	void function_complete();
 	void function_bus_complete();
 	void bus_complete();
