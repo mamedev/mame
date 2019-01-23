@@ -37,15 +37,13 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t expbus_r(address_space &space, offs_t offset) override;
 	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
 	DECLARE_WRITE_LINE_MEMBER(ready_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
 	required_memory_region m_exp_rom;
 	required_device<electron_cartslot_device> m_cart_sk1;

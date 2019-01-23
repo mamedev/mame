@@ -2,32 +2,27 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Cumana Floppy Disk System
-
-    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Cumana_FDsystem.html
+    Acorn Electron Tube Interface
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ELECTRON_CART_CUMANA_H
-#define MAME_BUS_ELECTRON_CART_CUMANA_H
+#ifndef MAME_BUS_ELECTRON_CART_TUBE_H
+#define MAME_BUS_ELECTRON_CART_TUBE_H
 
 #include "slot.h"
-#include "imagedev/floppy.h"
-#include "machine/wd_fdc.h"
-#include "machine/mc146818.h"
-#include "formats/acorn_dsk.h"
+#include "bus/bbc/tube/tube.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class electron_cumana_device :
+class electron_tube_device :
 	public device_t,
 	public device_electron_cart_interface
 {
 public:
 	// construction/destruction
-	electron_cumana_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_tube_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -41,18 +36,12 @@ protected:
 	virtual void write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(wd1793_control_w);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
-	required_device<fd1793_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<mc146818_device> m_rtc;
+	required_device<bbc_tube_slot_device> m_tube;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(ELECTRON_CUMANA, electron_cumana_device)
+DECLARE_DEVICE_TYPE(ELECTRON_TUBE, electron_tube_device)
 
 
-#endif // MAME_BUS_ELECTRON_CART_CUMANA_H
+#endif // MAME_BUS_ELECTRON_CART_TUBE_H

@@ -834,6 +834,8 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/fbjoy.h",
 		MAME_DIR .. "src/devices/bus/electron/plus1.cpp",
 		MAME_DIR .. "src/devices/bus/electron/plus1.h",
+		MAME_DIR .. "src/devices/bus/electron/plus2.cpp",
+		MAME_DIR .. "src/devices/bus/electron/plus2.h",
 		MAME_DIR .. "src/devices/bus/electron/plus3.cpp",
 		MAME_DIR .. "src/devices/bus/electron/plus3.h",
 		MAME_DIR .. "src/devices/bus/electron/pwrjoy.cpp",
@@ -861,6 +863,8 @@ if (BUSES["ELECTRON_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/cart/abr.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/ap34.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/ap34.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/ap5.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/ap5.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/aqr.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/aqr.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/click.cpp",
@@ -881,6 +885,8 @@ if (BUSES["ELECTRON_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/cart/std.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/stlefs.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/stlefs.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/tube.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/tube.h",
 	}
 end
 
