@@ -1080,6 +1080,7 @@ void xavix_state::machine_start()
 
 	save_item(NAME(m_sx_pio_dir));
 	save_item(NAME(m_sx_pio_out));
+	save_item(NAME(m_sx_extended_extbus));
 }
 
 void xavix_state::machine_reset()
@@ -1165,6 +1166,10 @@ void xavix_state::machine_reset()
 		m_sx_pio_out[i] = 0x00;
 	}
 
+	for (int i = 0; i < 3; i++)
+	{
+		m_sx_extended_extbus[i] = 0x00;
+	}
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
@@ -1222,4 +1227,22 @@ READ8_MEMBER(xavix_state::pio_in_r)
 {
 	LOG("%s: pio_in_r (port %d)\n", machine().describe_context(), offset);
 	return 0x00;
+}
+
+WRITE8_MEMBER(xavix_state::extended_extbus_reg0_w)
+{
+	LOG("%s: extended_extbus_reg0_w %02x\n", machine().describe_context(), data);
+	m_sx_extended_extbus[0] = data;
+}
+
+WRITE8_MEMBER(xavix_state::extended_extbus_reg1_w)
+{
+	LOG("%s: extended_extbus_reg1_w %02x\n", machine().describe_context(), data);
+	m_sx_extended_extbus[1] = data;
+}
+
+WRITE8_MEMBER(xavix_state::extended_extbus_reg2_w)
+{
+	LOG("%s: extended_extbus_reg2_w %02x\n", machine().describe_context(), data);
+	m_sx_extended_extbus[2] = data;
 }

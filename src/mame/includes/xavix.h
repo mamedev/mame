@@ -576,6 +576,12 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(pio_out_w);
 	virtual DECLARE_READ8_MEMBER(pio_out_r);
 	virtual DECLARE_READ8_MEMBER(pio_in_r);
+
+	uint8_t m_sx_extended_extbus[3];
+
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg0_w);
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg1_w);
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg2_w);
 };
 
 class xavix_i2c_state : public xavix_state
