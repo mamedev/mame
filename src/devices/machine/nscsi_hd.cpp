@@ -166,8 +166,8 @@ void nscsi_harddisk_device::scsi_command()
 
 				// Apple HD SC setup utility needs to see this
 				strcpy((char *)&scsi_cmdbuf[8], " SEAGATE");
-				strcpy((char *)&scsi_cmdbuf[15], "          ST225N");
-				strcpy((char *)&scsi_cmdbuf[31], "1.00");
+				strcpy((char *)&scsi_cmdbuf[16], "          ST225N");
+				strcpy((char *)&scsi_cmdbuf[32], "1.00");
 				scsi_cmdbuf[36] = 0x00; // # of extents high
 				scsi_cmdbuf[37] = 0x08; // # of extents low
 				scsi_cmdbuf[38] = 0x00; // group 0 commands 0-1f
