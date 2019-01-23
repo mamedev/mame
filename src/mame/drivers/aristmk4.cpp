@@ -1773,7 +1773,7 @@ void aristmk4_state::power_fail()
 	2. Trigger powerfail / NMI by pressing ',' for at least 1 second, the game will freeze.
 	3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
 
-	Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
+	Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down ',' for at least 1 second )
 	*/
 
 	if(ioport("powerfail")->read()) // send NMI signal if L pressed
