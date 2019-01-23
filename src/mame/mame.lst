@@ -21578,6 +21578,9 @@ miraxa                          // (c) 1985 Current Technologies
 bublpong                        // bootleg on enhanced hardware
 missb2                          // bootleg on enhanced hardware
 
+@source:missbamby.cpp
+msbamby                         // 198?
+
 @source:missile.cpp
 mcombat                         // bootleg
 mcombata                        // bootleg
@@ -38618,6 +38621,8 @@ mattelcs                        //
 vsmile                          //
 vsmilef                         //
 vsmileg                         //
+
+@source:vsmileb.cpp
 vsmileb                         //
 vsmilebsw                       //
 
