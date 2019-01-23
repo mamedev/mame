@@ -4706,7 +4706,8 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
 	SOFTWARE_LIST(config, "flop525_list").set_compatible("apple2");
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig");
+	// As WOZ images won't load in the 2GS driver yet, comment out the softlist entry.
+	//SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
 }
 
 void apple2gs_state::apple2gsr1(machine_config &config)

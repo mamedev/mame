@@ -4059,10 +4059,12 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_A2EAUXSLOT_SLOT_ADD(A2_AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80")   // default to an extended 80-column card
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
+
+	/* softlist config for baseline A2E */
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");  // By default, filter list to compatible disks for A2E
 MACHINE_CONFIG_END
 
 void apple2e_state::mprof3(machine_config &config)
@@ -4074,6 +4076,8 @@ void apple2e_state::mprof3(machine_config &config)
 
 MACHINE_CONFIG_START(apple2e_state::apple2ee)
 	apple2e(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
 MACHINE_CONFIG_END
@@ -4104,6 +4108,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c)
 	apple2ee(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
 

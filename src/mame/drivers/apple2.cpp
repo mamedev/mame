@@ -1439,7 +1439,7 @@ MACHINE_CONFIG_START(apple2_state::apple2_common)
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig");
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2");
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
 	CASSETTE(config, m_cassette);
@@ -1457,6 +1457,7 @@ void apple2_state::apple2(machine_config &config)
 void apple2_state::apple2p(machine_config &config)
 {
 	apple2_common(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2P"); // Filter list to compatible disks for this machine.
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 }
