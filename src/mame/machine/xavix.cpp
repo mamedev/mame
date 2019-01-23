@@ -1077,6 +1077,9 @@ void xavix_state::machine_start()
 	save_item(NAME(m_timer_baseval));
 	save_item(NAME(m_spritereg));
 	save_item(NAME(m_barrel_params));
+
+	save_item(NAME(m_sx_pio_dir));
+	save_item(NAME(m_sx_pio_out));
 }
 
 void xavix_state::machine_reset()
@@ -1155,6 +1158,13 @@ void xavix_state::machine_reset()
 	m_barrel_params[0] = 0x00;
 	m_barrel_params[1] = 0x00;
 
+	// SuperXaviX
+	for (int i = 0; i < 3; i++)
+	{
+		m_sx_pio_dir[i] = 0x00;
+		m_sx_pio_out[i] = 0x00;
+	}
+
 }
 
 typedef device_delegate<uint8_t(int which, int half)> xavix_interrupt_vector_delegate;
@@ -1182,3 +1192,34 @@ int16_t xavix_state::get_vectors(int which, int half)
 }
 
 
+// additional SuperXaviX / XaviX2002 stuff
+
+WRITE8_MEMBER(xavix_state::pio_dir_w)
+{
+	LOG("%s: pio_dir_w (port %d) %02x\n", machine().describe_context(), offset, data);
+	m_sx_pio_dir[offset] = data;
+}
+
+READ8_MEMBER(xavix_state::pio_dir_r)
+{
+	LOG("%s: pio_dir_r (port %d)\n", machine().describe_context(), offset);
+	return m_sx_pio_dir[offset];
+}
+
+WRITE8_MEMBER(xavix_state::pio_out_w)
+{
+	LOG("%s: pio_out_w (port %d) %02x\n", machine().describe_context(), offset, data);
+	m_sx_pio_out[offset] = data;
+}
+
+READ8_MEMBER(xavix_state::pio_out_r)
+{
+	LOG("%s: pio_out_r (port %d)\n", machine().describe_context(), offset);
+	return m_sx_pio_out[offset];
+}
+
+READ8_MEMBER(xavix_state::pio_in_r)
+{
+	LOG("%s: pio_in_r (port %d)\n", machine().describe_context(), offset);
+	return 0x00;
+}

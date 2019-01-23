@@ -399,6 +399,10 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 	map(0x6c00, 0x6cff).ram().w(FUNC(xavix_state::bmp_palram_sh_w)).share("bmp_palram_sh");
 	map(0x6d00, 0x6dff).ram().w(FUNC(xavix_state::bmp_palram_l_w)).share("bmp_palram_l");
 
+	map(0x7a10, 0x7a12).ram().rw(FUNC(xavix_state::pio_dir_r), FUNC(xavix_state::pio_dir_w));
+	map(0x7a20, 0x7a22).ram().rw(FUNC(xavix_state::pio_out_r), FUNC(xavix_state::pio_out_w));
+	map(0x7a30, 0x7a32).ram().r(FUNC(xavix_state::pio_in_r));
+
 	map(0x6fb0, 0x6fc7).ram().share("bmp_base");
 }
 
@@ -1076,6 +1080,14 @@ void xavix_state::xavix2000(machine_config &config)
 	m_palette->set_entries(512);
 }
 
+void xavix_i2c_jmat_state::xavix_i2c_jmat(machine_config &config)
+{
+	xavix2000(config);
+
+	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x200); // ?
+}
+
+
 void xavix_state::xavix2000_nv(machine_config &config)
 {
 	xavix2000(config);
@@ -1573,7 +1585,7 @@ CONS( 2004, xavtenni, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xa
 CONS( 2004, xavbaseb, 0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // TODO: check SEEPROM type and hookup, banking!
-CONS( 2005, xavjmat,  0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavjmat,  0, 0, xavix_i2c_jmat, xavix, xavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // https://arnaudmeyer.wordpress.com/domyos-interactive-system/
 // Domyos Fitness Adventure
@@ -1588,12 +1600,12 @@ CONS( 2005, xavjmat,  0, 0, xavix2000_i2c_24c04, xavix, xavix_i2c_state, init_xa
 // Domyos Bike Concept (not listed on site above)
 
 // Has SEEPROM and an RTC.  Exercise has some leftover PC buffer stuff.  (TODO, check SEEPROM type, RTC type, banking) (both Exercises and Challenge are identical PCBs)
-CONS( 2008, domfitex, 0, 0, xavix2000_i2c_24c04, xavixp, xavix_i2c_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, domfitch, 0, 0, xavix2000_i2c_24c04, xavixp, xavix_i2c_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitex, 0, 0, xavix_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitch, 0, 0, xavix_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Domyos DiS (unknown hardware, or bad dumps)
 // This DOES NOT look like a 6502 based Xavix / Super Xavix! maybe XaviX 2, the cartridges contain the entire system (CPU,Video,Sound,ROM) so that is possible.
-// Seems to have 32-bit looking stuff, possible vectors at start?
+// Seems to have 32-bit looking stuff, possible vectors at start? possible ARM THUMB mode code
 
 ROM_START( domfitad )
 	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
@@ -1601,4 +1613,8 @@ ROM_START( domfitad )
 ROM_END
 
 // Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times. 
-CONS( 2008, domfitad, 0, 0, xavix2000_i2c_24c04, xavixp, xavix_i2c_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitad, 0, 0, xavix_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+
+
+
