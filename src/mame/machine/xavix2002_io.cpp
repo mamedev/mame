@@ -13,9 +13,9 @@ DEFINE_DEVICE_TYPE(XAVIX2002IO, xavix2002_io_device, "xavix2002io", "XaviX 2002 
 
 xavix2002_io_device::xavix2002_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XAVIX2002IO, tag, owner, clock)
-	, m_space_read0_cb(*this)
-	, m_space_read1_cb(*this)
-	, m_space_read2_cb(*this)
+	, m_in0_cb(*this)
+	, m_in1_cb(*this)
+	, m_in2_cb(*this)
 	, m_out0_cb(*this)
 	, m_out1_cb(*this)
 	, m_out2_cb(*this)
@@ -24,9 +24,9 @@ xavix2002_io_device::xavix2002_io_device(const machine_config &mconfig, const ch
 
 void xavix2002_io_device::device_start()
 {
-	m_space_read0_cb.resolve_safe(0xff);
-	m_space_read1_cb.resolve_safe(0xff);
-	m_space_read2_cb.resolve_safe(0xff);
+	m_in0_cb.resolve_safe(0xff);
+	m_in1_cb.resolve_safe(0xff);
+	m_in2_cb.resolve_safe(0xff);
 
 	m_out0_cb.resolve_safe();
 	m_out1_cb.resolve_safe();
@@ -103,9 +103,9 @@ READ8_MEMBER(xavix2002_io_device::pio_in_r)
 
 	switch (offset)
 	{
-		case 0: ret = m_space_read0_cb();
-		case 1: ret = m_space_read1_cb();
-		case 2: ret = m_space_read2_cb();
+		case 0: ret = m_in0_cb();
+		case 1: ret = m_in1_cb();
+		case 2: ret = m_in2_cb();
 		default: ret = 0x00;
 	}
 

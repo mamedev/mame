@@ -19,6 +19,7 @@
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
 #include "machine/xavix2002_io.h"
+#include "machine/xavix_io.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -76,6 +77,7 @@ public:
 		m_mouse1x(*this, "MOUSE1X"),
 		m_mouse1y(*this, "MOUSE1Y"),
 		m_maincpu(*this, "maincpu"),
+		m_xavio(*this, "xavixio"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
 		m_lowbus(*this, "lowbus"),
@@ -170,10 +172,10 @@ public:
 
 protected:
 
-	virtual uint8_t read_io0(uint8_t direction);
-	virtual uint8_t read_io1(uint8_t direction);
-	virtual void write_io0(uint8_t data, uint8_t direction);
-	virtual void write_io1(uint8_t data, uint8_t direction);
+	//virtual uint8_t read_io0(uint8_t direction);
+	//virtual uint8_t read_io1(uint8_t direction);
+	//virtual void write_io0(uint8_t data, uint8_t direction);
+	//virtual void write_io1(uint8_t data, uint8_t direction);
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport_array<8> m_an_in;
@@ -182,6 +184,10 @@ protected:
 	optional_ioport m_mouse1x;
 	optional_ioport m_mouse1y;
 	required_device<xavix_device> m_maincpu;
+	required_device<xavix_io_device> m_xavio;
+
+	
+
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_lowbus;
@@ -302,21 +308,6 @@ private:
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_params_2_w);
 	DECLARE_WRITE8_MEMBER(spritefragment_dma_trg_w);
 	DECLARE_READ8_MEMBER(spritefragment_dma_status_r);
-
-	DECLARE_READ8_MEMBER(io0_data_r);
-	DECLARE_READ8_MEMBER(io1_data_r);
-	DECLARE_WRITE8_MEMBER(io0_data_w);
-	DECLARE_WRITE8_MEMBER(io1_data_w);
-
-	DECLARE_READ8_MEMBER(io0_direction_r);
-	DECLARE_READ8_MEMBER(io1_direction_r);
-	DECLARE_WRITE8_MEMBER(io0_direction_w);
-	DECLARE_WRITE8_MEMBER(io1_direction_w);
-
-	uint8_t m_io0_data;
-	uint8_t m_io1_data;
-	uint8_t m_io0_direction;
-	uint8_t m_io1_direction;
 
 	uint8_t m_adc_inlatch;
 
@@ -608,8 +599,8 @@ public:
 		hackaddress2 = 0x8524;
 	}
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
-	virtual void write_io1(uint8_t data, uint8_t direction) override;
+	DECLARE_READ8_MEMBER(read_io1);
+	DECLARE_WRITE8_MEMBER(write_io1);
 
 	required_device<i2cmem_device> m_i2cmem;
 
@@ -641,9 +632,10 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
+	void xavix2000_i2c_24c02_lotr(machine_config &config);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
-	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+	DECLARE_READ8_MEMBER(read_lotr_io1);
 };
 
 
@@ -689,7 +681,6 @@ public:
 	{ }
 
 	void xavix_cart(machine_config &config);
-	void xavix_cart_ekara(machine_config &config);
 	void xavix_cart_popira(machine_config &config);
 	void xavix_cart_ddrfammt(machine_config &config);
 
@@ -851,8 +842,8 @@ public:
 	void xavix_i2c_taiko(machine_config &config);
 
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
-	virtual void write_io1(uint8_t data, uint8_t direction) override;
+	DECLARE_READ8_MEMBER(read_cart_io1);
+	DECLARE_WRITE8_MEMBER(write_cart_io1);
 
 	required_device<i2cmem_device> m_i2cmem;
 };
@@ -870,15 +861,16 @@ public:
 	{ }
 
 //	void xavix_ekara(machine_config &config);
+	void xavix_cart_ekara(machine_config &config);
 
 protected:
 
 	required_ioport m_extra0;
 	required_ioport m_extra1;
 
-	virtual uint8_t read_io1(uint8_t direction) override;
-	virtual void write_io0(uint8_t data, uint8_t direction) override;
-	virtual void write_io1(uint8_t data, uint8_t direction) override;
+	DECLARE_READ8_MEMBER(read_ekara_io1);
+	DECLARE_WRITE8_MEMBER(write_ekara_io0);
+	DECLARE_WRITE8_MEMBER(write_ekara_io1);
 
 	uint8_t m_extraioselect;
 	uint8_t m_extraiowrite;

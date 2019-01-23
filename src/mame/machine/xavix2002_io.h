@@ -10,9 +10,9 @@ class xavix2002_io_device : public device_t
 public:
 	xavix2002_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto read_0_callback() { return m_space_read0_cb.bind(); }
-	auto read_1_callback() { return m_space_read1_cb.bind(); }
-	auto read_2_callback() { return m_space_read2_cb.bind(); }
+	auto read_0_callback() { return m_in0_cb.bind(); }
+	auto read_1_callback() { return m_in1_cb.bind(); }
+	auto read_2_callback() { return m_in2_cb.bind(); }
 
 	auto write_0_callback() { return m_out0_cb.bind(); }
 	auto write_1_callback() { return m_out1_cb.bind(); }
@@ -32,9 +32,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	devcb_read8 m_space_read0_cb;
-	devcb_read8 m_space_read1_cb;
-	devcb_read8 m_space_read2_cb;
+	devcb_read8 m_in0_cb;
+	devcb_read8 m_in1_cb;
+	devcb_read8 m_in2_cb;
 
 	devcb_write8 m_out0_cb;
 	devcb_write8 m_out1_cb;
