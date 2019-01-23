@@ -992,17 +992,15 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 	m_pdc->m68k_r_callback().set(FUNC(r9751_state::pdc_dma_r));
 	m_pdc->m68k_w_callback().set(FUNC(r9751_state::pdc_dma_w));
 
-
 	NSCSI_BUS(config, "scsi", 0);
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);
-    NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
-    NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
-    NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93", WD33C93)
-        .machine_config([this](device_t *device) { wd33c93(device); });
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93)
+		.machine_config([this](device_t *device) { wd33c93(device); });
 
 	/* software list */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","r9751")

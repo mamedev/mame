@@ -138,14 +138,13 @@ void dmac_hdc_device::device_add_mconfig(machine_config &config)
 
 	NSCSI_BUS(config, "scsi", 0);
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);
-    NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
-    NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
-    NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93", WD33C93A)
-        .machine_config([this](device_t *device) { wd33c93(device); });
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93A)
+		.machine_config([this](device_t *device) { wd33c93(device); });
 }
 
 
