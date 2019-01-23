@@ -18,7 +18,7 @@
 
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
-
+#include "machine/xavix2002_io.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -99,7 +99,8 @@ public:
 		m_palette(*this, "palette"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_sound(*this, "xavix_sound")
+		m_sound(*this, "xavix_sound"),
+		m_xavix2002io(*this, "xavix2002io")
 	{ }
 
 	void xavix(machine_config &config);
@@ -107,6 +108,8 @@ public:
 	void xavix2000(machine_config &config);
 	void xavix_nv(machine_config &config);
 	void xavix2000_nv(machine_config &config);
+
+	void xavix2002(machine_config &config);
 
 	void init_xavix();
 
@@ -563,19 +566,13 @@ private:
 	int get_current_address_byte();
 
 	required_device<xavix_sound_device> m_sound;
+
+	optional_device<xavix2002_io_device> m_xavix2002io;
+
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
 
 protected:
 	// additional SuperXaviX / XaviX2002 stuff
-	uint8_t m_sx_pio_dir[3];
-	uint8_t m_sx_pio_out[3];
-
-	DECLARE_WRITE8_MEMBER(pio_dir_w);
-	DECLARE_READ8_MEMBER(pio_dir_r);
-
-	virtual DECLARE_WRITE8_MEMBER(pio_out_w);
-	virtual DECLARE_READ8_MEMBER(pio_out_r);
-	virtual DECLARE_READ8_MEMBER(pio_in_r);
 
 	uint8_t m_sx_extended_extbus[3];
 
@@ -602,6 +599,8 @@ public:
 	void xavix2000_i2c_24c04(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
 
+	void xavix2002_i2c_24c04(machine_config &config);
+
 	void init_epo_efdx()
 	{
 		init_xavix();
@@ -627,7 +626,7 @@ public:
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
-	void xavix_i2c_jmat(machine_config &config);
+	void xavix2002_i2c_jmat(machine_config &config);
 
 private:
 
