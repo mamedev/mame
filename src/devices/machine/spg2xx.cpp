@@ -52,8 +52,8 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU             (LOG_PPU_READS | LOG_PPU_WRITES | LOG_UNKNOWN_PPU)
 #define LOG_ALL             (LOG_IO | LOG_SPU | LOG_PPU | LOG_VLINES | LOG_SEGMENT | LOG_FIQ)
 
-//#define VERBOSE             (LOG_ALL & ~LOG_SPU)
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_ALL & ~LOG_SPU)
+//#define VERBOSE             (0)
 #include "logmacro.h"
 
 #define SPG_DEBUG_VIDEO     (0)
