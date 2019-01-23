@@ -470,7 +470,6 @@ void nscsi_cdrom_device::scsi_command()
 		case 1: {
 			int len = 2 + (8 * 1);
 
-			int pos = 0;
 			scsi_cmdbuf[pos++] = (len>>8) & 0xff;
 			scsi_cmdbuf[pos++] = (len & 0xff);
 			scsi_cmdbuf[pos++] = 1;
