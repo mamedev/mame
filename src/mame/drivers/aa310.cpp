@@ -423,7 +423,7 @@ void aa310_state::aa310(machine_config &config)
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 735, 624/2, 0, 292); // RiscOS 3 default screen settings
 	m_screen->set_screen_update(FUNC(archimedes_state::screen_update));
 
-	PALETTE(config, m_palette, 32768);
+	PALETTE(config, m_palette).set_entries(32768);
 
 	RAM(config, m_ram).set_default_size("1M");
 

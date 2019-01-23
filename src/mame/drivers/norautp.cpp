@@ -614,7 +614,7 @@ uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind1
 }
 
 
-PALETTE_INIT_MEMBER(norautp_state, norautp)
+void norautp_state::norautp_palette(palette_device &palette) const
 {
 	/* 1st gfx bank */
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0xff));    /* blue */
@@ -1280,9 +1280,7 @@ void norautp_state::noraut_base(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_norautp);
-
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init(FUNC(norautp_state::palette_init_norautp));
+	PALETTE(config, m_palette, FUNC(norautp_state::norautp_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

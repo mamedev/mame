@@ -52,6 +52,7 @@ void hpc3_device::device_start()
 		save_item(NAME(m_scsi_dma[i].m_length), i);
 		save_item(NAME(m_scsi_dma[i].m_next), i);
 		save_item(NAME(m_scsi_dma[i].m_irq), i);
+        save_item(NAME(m_scsi_dma[i].m_drq), i);
 		save_item(NAME(m_scsi_dma[i].m_big_endian), i);
 		save_item(NAME(m_scsi_dma[i].m_to_device), i);
 		save_item(NAME(m_scsi_dma[i].m_active), i);
@@ -270,6 +271,11 @@ WRITE32_MEMBER(hpc3_device::hd_enet_w)
 		m_scsi_dma[0].m_big_endian = (m_scsi_dma[0].m_ctrl & HPC3_DMACTRL_ENDIAN);
 		m_scsi_dma[0].m_active = (m_scsi_dma[0].m_ctrl & HPC3_DMACTRL_ENABLE);
 		m_scsi_dma[0].m_irq = (m_scsi_dma[0].m_ctrl & HPC3_DMACTRL_IRQ);
+		m_wd33c93->reset_w(BIT(data, 6));
+        if (m_scsi_dma[0].m_drq && m_scsi_dma[0].m_active)
+        {
+            do_scsi_dma(0);
+        }
 		break;
 	case 0x4000/4:
 		LOGMASKED(LOG_ETHERNET, "%s: HPC3 Ethernet CBP Write: %08x\n", machine().describe_context(), data);
@@ -297,7 +303,7 @@ READ32_MEMBER(hpc3_device::hd_r)
 	case 0x4000/4:
 		if (ACCESSING_BITS_0_7)
 		{
-			const uint8_t ret = index ? m_wd33c93_2->read(space, 0) : m_wd33c93->read(space, 0);
+			const uint8_t ret = index ? m_wd33c93_2->indir_addr_r() : m_wd33c93->indir_addr_r();
 			LOGMASKED(LOG_SCSI, "%s: SCSI%d Read 0: %02x\n", machine().describe_context(), index, ret);
 			return ret;
 		}
@@ -306,7 +312,7 @@ READ32_MEMBER(hpc3_device::hd_r)
 	case 0x4004/4:
 		if (ACCESSING_BITS_0_7)
 		{
-			const uint8_t ret = index ? m_wd33c93_2->read(space, 1) : m_wd33c93->read(space, 1);
+			const uint8_t ret = index ? m_wd33c93_2->indir_reg_r() : m_wd33c93->indir_reg_r();
 			LOGMASKED(LOG_SCSI, "%s: SCSI%d Read 1: %02x\n", machine().describe_context(), index, ret);
 			return ret;
 		}
@@ -331,14 +337,14 @@ WRITE32_MEMBER(hpc3_device::hd_w)
 		if (ACCESSING_BITS_0_7)
 		{
 			LOGMASKED(LOG_SCSI, "%s: SCSI%d Write 0 = %02x\n", machine().describe_context(), index, (uint8_t)data);
-			index ? m_wd33c93_2->write(space, 0, data & 0xff) : m_wd33c93->write(space, 0, data & 0xff);
+			index ? m_wd33c93_2->indir_addr_w(data & 0xff) : m_wd33c93->indir_addr_w(data & 0xff);
 		}
 		break;
 	case 0x0001:
 		if (ACCESSING_BITS_0_7)
 		{
 			LOGMASKED(LOG_SCSI, "%s: SCSI%d Write 1 = %02x\n", machine().describe_context(), index, (uint8_t)data);
-			index ? m_wd33c93_2->write(space, 1, data & 0xff) : m_wd33c93->write(space, 1, data & 0xff);
+			index ? m_wd33c93_2->indir_reg_w(data & 0xff) : m_wd33c93->indir_reg_w(data & 0xff);
 		}
 		break;
 	default:
@@ -664,16 +670,20 @@ void hpc3_device::decrement_chain(int channel)
 
 void hpc3_device::scsi_drq(bool state, int channel)
 {
-#if 0
-	scsi_dma_t &dma = m_scsi_dma[channel];
+    scsi_dma_t &dma = m_scsi_dma[channel];
+    dma.m_drq = state;
 
-	if (!dma.m_active)
-	{
-		LOGMASKED(LOG_SCSI_DMA, "HPC3: SCSI%d DRQ set while no active SCSI DMA!\n", channel);
-		return;
-	}
+    if (dma.m_drq && dma.m_active)
+    {
+        do_scsi_dma(channel);
+    }
+}
 
-	if (dma.m_to_device)
+void hpc3_device::do_scsi_dma(int channel)
+{
+    scsi_dma_t &dma = m_scsi_dma[channel];
+
+    if (dma.m_to_device)
 		m_wd33c93->dma_w(m_cpu_space->read_byte(dma.m_big_endian ? BYTE4_XOR_BE(dma.m_addr) : BYTE4_XOR_LE(dma.m_addr)));
 	else
 		m_cpu_space->write_byte(dma.m_big_endian ? BYTE4_XOR_BE(dma.m_addr) : BYTE4_XOR_LE(dma.m_addr), m_wd33c93->dma_r());
@@ -686,7 +696,6 @@ void hpc3_device::scsi_drq(bool state, int channel)
 		// clear HPC3 DMA active flag
 		dma.m_ctrl &= ~HPC3_DMACTRL_ENABLE;
 	}
-#endif
 }
 
 WRITE_LINE_MEMBER(hpc3_device::scsi0_drq)
@@ -699,6 +708,7 @@ WRITE_LINE_MEMBER(hpc3_device::scsi1_drq)
 	scsi_drq(state, 1);
 }
 
+#if 0
 void hpc3_device::scsi_dma(int channel)
 {
 	int byte_count = channel ? m_wd33c93_2->get_dma_count() : m_wd33c93->get_dma_count();
@@ -812,13 +822,14 @@ void hpc3_device::scsi_dma(int channel)
 	// clear DMA on the controller
 	m_wd33c93->clear_dma();
 }
+#endif
 
 WRITE_LINE_MEMBER(hpc3_device::scsi0_irq)
 {
 	if (state)
 	{
-		if (m_wd33c93->get_dma_count() && m_scsi_dma[0].m_active)
-			scsi_dma(0);
+		//if (m_wd33c93->get_dma_count() && m_scsi_dma[0].m_active)
+		//	scsi_dma(0);
 
 		m_ioc2->raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI0);
 	}
@@ -832,8 +843,8 @@ WRITE_LINE_MEMBER(hpc3_device::scsi1_irq)
 {
 	if (state)
 	{
-		if (m_wd33c93_2->get_dma_count() && m_scsi_dma[1].m_active)
-			scsi_dma(1);
+		//if (m_wd33c93_2->get_dma_count() && m_scsi_dma[1].m_active)
+		//	scsi_dma(1);
 
 		m_ioc2->raise_local_irq(0, ioc2_device::INT3_LOCAL0_SCSI1);
 	}

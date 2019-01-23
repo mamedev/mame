@@ -211,10 +211,7 @@ void hcastle_state::hcastle(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hcastle);
-	PALETTE(config, m_palette, 2*8*16*16);
-	m_palette->set_indirect_entries(128);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
-	m_palette->set_init(FUNC(hcastle_state::palette_init_hcastle));
+	PALETTE(config, m_palette, FUNC(hcastle_state::hcastle_palette)).set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 
 	K007121(config, m_k007121_1, 0);
 	m_k007121_1->set_palette_tag(m_palette);

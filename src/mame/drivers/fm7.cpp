@@ -1148,7 +1148,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	}
 	else
 	{
-		space.install_readwrite_handler(0x7000,0x7fff,read8_delegate(FUNC(address_map_bank_device::read8),(address_map_bank_device*)m_avbank[7]),write8_delegate(FUNC(address_map_bank_device::write8),(address_map_bank_device*)m_avbank[7]));
+		space.install_readwrite_handler(0x7000,0x7fff,read8sm_delegate(FUNC(address_map_bank_device::read8),(address_map_bank_device*)m_avbank[7]),write8sm_delegate(FUNC(address_map_bank_device::write8),(address_map_bank_device*)m_avbank[7]));
 	}
 	if(m_init_rom_en)
 	{
@@ -2048,7 +2048,7 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_psg, 4.9152_MHz_XTAL / 4).add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -2057,12 +2057,12 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200) // H = 15.75 KHz, V = 60.1145 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
 
@@ -2070,8 +2070,8 @@ MACHINE_CONFIG_START(fm7_state::fm7)
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
 
@@ -2098,8 +2098,8 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
 
@@ -2108,19 +2108,19 @@ MACHINE_CONFIG_START(fm7_state::fm8)
 	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
@@ -2150,7 +2150,7 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	m_ym->port_b_read_callback().set(FUNC(fm7_state::fm77av_joy_2_r));
 	m_ym->add_route(ALL_OUTPUTS,"mono", 1.00);
 	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
 
@@ -2164,13 +2164,13 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	MCFG_SCREEN_RAW_PARAMS(16.128_MHz_XTAL, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 	MCFG_PALETTE_ADD("av_palette", 4096)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list", "fm7_cass")
 
@@ -2178,8 +2178,8 @@ MACHINE_CONFIG_START(fm7_state::fm77av)
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_SOFTWARE_LIST_ADD("av_flop_list", "fm77av")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list", "fm7_disk")
@@ -2210,8 +2210,8 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	MCFG_DEVICE_IO_MAP(fm11_x86_io)
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
 
@@ -2225,19 +2225,19 @@ MACHINE_CONFIG_START(fm7_state::fm11)
 	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))
@@ -2261,8 +2261,8 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper, 1200).add_route(ALL_OUTPUTS, "mono", 0.50);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
 
@@ -2271,19 +2271,19 @@ MACHINE_CONFIG_START(fm7_state::fm16beta)
 	MCFG_SCREEN_RAW_PARAMS(16128000, 1024, 0, 640, 262, 0, 200)
 	MCFG_SCREEN_UPDATE_DRIVER(fm7_state, screen_update_fm7)
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fm7_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fm7_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fm7_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fm7_cass");
 
 	MB8877(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fm7_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fm7_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fm7_floppies, "qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
 
 	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, fm7_state, write_centronics_busy))

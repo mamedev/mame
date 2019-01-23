@@ -3730,7 +3730,7 @@ void segas16b_state::system16b(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_segas16b);
-	PALETTE(config, "palette", 2048*3);
+	PALETTE(config, "palette").set_entries(2048*3);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
@@ -4114,7 +4114,7 @@ ROM_START( aliensyn3 )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
 
@@ -4200,7 +4200,7 @@ ROM_START( aliensynj )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
 
@@ -4266,7 +4266,7 @@ ROM_START( afighterf )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 
@@ -4298,7 +4298,7 @@ ROM_START( afighterg )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 
@@ -4330,7 +4330,7 @@ ROM_START( afighterh )
 	ROM_LOAD( "epr10039.bin", 0x00000, 0x8000, CRC(b04757b0) SHA1(24bface5a23ed658675f414c9937bf9d7f7ed5ec) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 
@@ -4904,7 +4904,7 @@ ROM_START( aurail1 )
 	ROM_RELOAD(                0x30000, 0x20000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0168.key", 0x0000, 0x2000, CRC(bc2d1792) SHA1(e66d2582eb74ae35f27715fcc9df3e77aba67509) )
+	ROM_LOAD( "317-0168.key", 0x0000, 0x2000, CRC(fed38390) SHA1(b5f458bc70c069542be16d476645c153ed1d1b45) )
 ROM_END
 
 ROM_START( aurail1d )
@@ -5010,7 +5010,7 @@ ROM_START( aurailj )
 	ROM_RELOAD(                0x30000, 0x20000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0167.key", 0x0000, 0x2000, CRC(bc2d1792) SHA1(e66d2582eb74ae35f27715fcc9df3e77aba67509) )
+	ROM_LOAD( "317-0167.key", 0x0000, 0x2000, CRC(fed38390) SHA1(b5f458bc70c069542be16d476645c153ed1d1b45) )
 ROM_END
 
 
@@ -5671,7 +5671,7 @@ ROM_START( dunkshot )
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
 
 ROM_START( dunkshota ) // several ROMs had replacement? (different style to others) labels with 'T' markings, content identical.
@@ -5713,7 +5713,7 @@ ROM_START( dunkshota ) // several ROMs had replacement? (different style to othe
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
 
 
@@ -5756,7 +5756,7 @@ ROM_START( dunkshoto )
 	ROM_LOAD( "epr-10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(3f218333) SHA1(6f73801070a2c9748fc319cc95ab7a802f8ea7b6) )
 ROM_END
 
 
@@ -7503,7 +7503,7 @@ ROM_START( defense )
 	ROM_LOAD( "10775.a7", 0x0000, 0x8000, CRC(4cbd55a8) SHA1(8af2c52ab61338c8a9f1a74a05470dd3d5e0c42f) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
+	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(1514662f) SHA1(d6241cb2a70c5b0442ecc2f8a10307608e5a0870) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -7538,7 +7538,7 @@ ROM_START( sdib )
 	ROM_LOAD( "10775.a7", 0x0000, 0x8000, CRC(4cbd55a8) SHA1(8af2c52ab61338c8a9f1a74a05470dd3d5e0c42f) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
+	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(1514662f) SHA1(d6241cb2a70c5b0442ecc2f8a10307608e5a0870) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -8087,7 +8087,7 @@ ROM_START( sjryuko )
 	ROM_LOAD( "epr-12248.a11",0x40000, 0x8000, CRC(d1eabdab) SHA1(f255a66e082353768e8d2bb574e883a4a45f7670) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, CRC(c3e32937) SHA1(22bccea1c3d97adca3dce2fa418f7e7b058c0837) )
+	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, CRC(8e40b2ab) SHA1(f3e2d70a17ac5270bec586cc67b2b8ba14bf53cf) )
 ROM_END
 
 

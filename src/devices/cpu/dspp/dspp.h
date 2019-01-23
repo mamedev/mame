@@ -66,6 +66,12 @@ public:
 	DECLARE_WRITE16_MEMBER( clock_w );
 	DECLARE_READ16_MEMBER( noise_r );
 
+	void update_fifo_dma();
+    void print_sums() { printf("%04x: %04x\n", (uint16_t)m_core->m_arg0, (uint16_t)m_core->m_arg1); }
+    void print_branches() { printf("Branch: %d %d %d %d %d\n", m_core->m_arg0 ? 1 : 0, m_core->m_arg1 ? 1 : 0, m_core->m_arg2 ? 1 : 0, m_core->m_arg3 ? 1 : 0, m_core->m_arg4 ? 1 : 0); }
+    void print_value() { printf("Value is %08x\n", m_core->m_arg0); }
+    void print_addr() { printf("New value is %08x from %08x\n", m_core->m_arg0, m_core->m_arg1); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -89,6 +95,41 @@ protected:
 
 	void code_map(address_map &map);
 	void data_map(address_map &map);
+
+	enum
+	{
+		DSPX_CONTROL_GWILLING             = 0x0001,
+		DSPX_CONTROL_STEP_CYCLE           = 0x0002,
+		DSPX_CONTROL_STEP_PC              = 0x0004,
+		DSPX_CONTROL_SNOOP                = 0x0008,
+
+		DSPX_RESET_DSPP                   = 0x0001,
+		DSPX_RESET_INPUT                  = 0x0002,
+		DSPX_RESET_OUTPUT                 = 0x0004,
+
+		DSPX_F_DMA_NEXTVALID              = 0x0001,
+		DSPX_F_DMA_GO_FOREVER             = 0x0002,
+		DSPX_F_INT_DMANEXT_EN             = 0x0004,
+		DSPX_F_SHADOW_SET_DMANEXT         = 0x00040000,
+		DSPX_F_SHADOW_SET_FOREVER         = 0x00020000,
+		DSPX_F_SHADOW_SET_NEXTVALID       = 0x00010000,
+		DSPX_F_SHADOW_SET_ADDRESS_COUNT   = 0x80000000,
+
+		DSPX_F_INT_TIMER                  = 0x00000100,
+		DSPX_F_INT_INPUT_UNDER            = 0x00000080,
+		DSPX_F_INT_INPUT_OVER             = 0x00000040,
+		DSPX_F_INT_OUTPUT_UNDER           = 0x00000020,
+		DSPX_F_INT_OUTPUT_OVER            = 0x00000010,
+		DSPX_F_INT_UNDEROVER              = 0x00000008,
+		DSPX_F_INT_CONSUMED               = 0x00000002,
+		DSPX_F_INT_DMANEXT                = 0x00000001,
+
+		DSPX_F_INT_ALL_DMA                = (DSPX_F_INT_DMANEXT | DSPX_F_INT_CONSUMED | DSPX_F_INT_UNDEROVER),
+
+		DSPX_FLD_INT_SOFT_WIDTH           = 16,         /* width of the field and the number of interrupts */
+		DSPX_FLD_INT_SOFT_SHIFT           = 16,
+		DSPX_FLD_INT_SOFT_MASK            = 0xffff0000
+	};
 
 private:
 	// Constants
@@ -130,7 +171,6 @@ private:
 	inline void set_rbase(uint32_t base, uint32_t addr);
 	inline uint16_t translate_reg(uint16_t reg);
 
-	void update_fifo_dma();
 	void process_next_dma(int32_t channel);
 	void service_input_dma(int32_t channel);
 	void service_output_dma(int32_t channel);
@@ -162,6 +202,7 @@ private:
 	address_space *     m_code;
 	address_space *     m_data;
 	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_code_cache;
+	std::function<uint16_t (offs_t)> m_code16;
 	std::function<const void * (offs_t)> m_codeptr;
 
 	struct dspp_internal_state
@@ -187,16 +228,24 @@ private:
 		uint16_t    m_op;
 		uint32_t    m_opidx;
 		int32_t     m_writeback;
+		uint32_t    m_jmpdest;
 
 		const char *m_format;
 		uint32_t    m_arg0;
-	} * m_core;
+        uint32_t    m_arg1;
+        uint32_t    m_arg2;
+        uint32_t    m_arg3;
+        uint32_t    m_arg4;
 
-	struct
-	{
-		uint32_t value;
-		uint32_t addr;
-	} m_operands[MAX_OPERANDS];
+		struct
+		{
+			uint32_t value;
+			uint32_t addr;
+		} m_operands[MAX_OPERANDS];
+
+		// External control registers
+		uint32_t    m_dspx_control;
+	} * m_core;
 
 	// DMA
 	struct fifo_dma
@@ -229,7 +278,6 @@ private:
 	uint32_t    m_output_fifo_count;
 
 	// External control registers
-	uint32_t    m_dspx_control;
 	uint32_t    m_dspx_reset;
 	uint32_t    m_dspx_int_enable;
 	uint32_t    m_dspx_channel_enable;
@@ -268,6 +316,7 @@ private:
 		uint32_t         cycles;                     /* accumulated cycles */
 		uint8_t          checkints;                  /* need to check interrupts before next instruction */
 		uint8_t          checksoftints;              /* need to check software interrupts before next instruction */
+        uml::code_label  abortlabel;                 /* label to abort execution of this block */
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
@@ -288,18 +337,44 @@ public: // TODO
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
-	void static_generate_memory_accessor(int size, bool istlb, bool iswrite, const char *name, uml::code_handle **handleptr);
+	void static_generate_memory_accessor(bool iswrite, const char *name, uml::code_handle *&handleptr);
 	void generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param);
 	void generate_checksum_block(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
 
-	bool generate_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
-
+	void generate_push_pc(drcuml_block &block);
+	void generate_read_next_operand(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_write_next_operand(drcuml_block &block, compiler_state *compiler);
+	void generate_update_pc(drcuml_block &block);
+	void generate_update_ticks(drcuml_block &block);
+	void generate_translate_reg(drcuml_block &block, uint16_t reg);
+	void generate_set_rbase(drcuml_block &block, compiler_state *compiler, uint32_t base, uint32_t addr);
+	void generate_branch(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_branch_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_complex_branch_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_super_special(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_special_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_arithmetic_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_parse_operands(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc, uint32_t numops);
 
 	/* subroutines */
-	uml::code_handle *   m_entry;                      /* entry point */
-	uml::code_handle *   m_nocode;                     /* nocode exception handler */
-	uml::code_handle *   m_out_of_cycles;              /* out of cycles exception handler */
+	uml::code_handle *m_entry;                      /* entry point */
+	uml::code_handle *m_nocode;                     /* nocode exception handler */
+	uml::code_handle *m_out_of_cycles;              /* out of cycles exception handler */
+
+	enum
+	{
+		MEM_ACCESSOR_PM_READ48,
+		MEM_ACCESSOR_PM_WRITE48,
+		MEM_ACCESSOR_PM_READ32,
+		MEM_ACCESSOR_PM_WRITE32,
+		MEM_ACCESSOR_DM_READ32,
+		MEM_ACCESSOR_DM_WRITE32
+	};
+
+	uml::code_handle *m_dm_read16;
+	uml::code_handle *m_dm_write16;
 };
 
 
@@ -312,23 +387,6 @@ public: // TODO
 
 #define DSPPDRC_COMPATIBLE_OPTIONS (DSPPDRC_STRICT_VERIFY | DSPPDRC_FLUSH_PC)
 #define DSPPDRC_FASTEST_OPTIONS    (0)
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DSPP_INT_HANDLER(_devcb) \
-	devcb = &dspp_device::set_int_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_DSPP_DMA_READ_HANDLER(_devcb) \
-	devcb = &dspp_device::set_dma_read_handler(*device, DEVCB_##_devcb);
-
-#define MCFG_DSPP_DMA_WRITE_HANDLER(_devcb) \
-	devcb = &dspp_device::set_dma_write_handler(*device, DEVCB_##_devcb);
-
-
 
 // device type definition
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);

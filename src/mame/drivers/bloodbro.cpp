@@ -522,43 +522,42 @@ WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(bloodbro_state::bloodbro)
+void bloodbro_state::bloodbro(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(bloodbro_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bloodbro_state::bloodbro_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bloodbro_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(7'159'090)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	Z80(config, m_audiocpu, XTAL(7'159'090)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bloodbro_state::seibu_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	// video hardware
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.39)    /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_bloodbro)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.39);    /* verified on pcb */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(bloodbro_state::screen_update_bloodbro));
+	m_screen->set_palette(m_palette);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(bloodbro_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(bloodbro_state::layer_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bloodbro)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bloodbro);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(7'159'090)/2)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM3812(config, m_ymsnd, XTAL(7'159'090)/2);
+	m_ymsnd->irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
@@ -566,53 +565,49 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	m_seibu_sound->set_rombank_tag("seibu_bank1");
 	m_seibu_sound->ym_read_callback().set(m_ymsnd, FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set(m_ymsnd, FUNC(ym3812_device::write));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bloodbro_state::weststry)
+void bloodbro_state::weststry(machine_config &config)
+{
 	bloodbro(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(weststry_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bloodbro_state::weststry_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bloodbro_state::irq6_line_hold));
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_CLOCK(XTAL(20'000'000)/4) /* 5MHz - verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(weststry_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_REMOVE()
+	m_audiocpu->set_clock(XTAL(20'000'000)/4); /* 5MHz - verified on PCB */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bloodbro_state::weststry_sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate());
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_weststry)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	m_gfxdecode->set_info(gfx_weststry);
+	m_palette->set_format(palette_device::xBGR_444, 1024);
 
 	// Bootleg video hardware is non-Seibu
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(59)    /* verified on PCB */
-	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_weststry)
+	m_screen->set_refresh_hz(59);    /* verified on PCB */
+	m_screen->set_screen_update(FUNC(bloodbro_state::screen_update_weststry));
 	config.device_remove("crtc");
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 
-	MCFG_DEVICE_REPLACE("oki", OKIM6295, XTAL(20'000'000)/16, okim6295_device::PIN7_HIGH) /* 1.25MHz - verified on PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	okim6295_device &oki(OKIM6295(config.replace(), "oki", XTAL(20'000'000)/16, okim6295_device::PIN7_HIGH)); /* 1.25MHz - verified on PCB */
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM3812, XTAL(20'000'000)/4) /* ~4.9MHz - see notes at top */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(*this, bloodbro_state, weststry_opl_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM3812(config.replace(), m_ymsnd, XTAL(20'000'000)/4); /* ~4.9MHz - see notes at top */
+	m_ymsnd->irq_handler().set(FUNC(bloodbro_state::weststry_opl_irq_w));
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	m_seibu_sound->ym_write_callback().set(FUNC(bloodbro_state::weststry_opl_w));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(bloodbro_state::skysmash)
+void bloodbro_state::skysmash(machine_config &config)
+{
 	bloodbro(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(skysmash_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq2_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bloodbro_state::skysmash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bloodbro_state::irq2_line_hold));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(bloodbro_state, screen_update_skysmash)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(bloodbro_state::screen_update_skysmash));
+}
+
 
 /* ROMs */
 

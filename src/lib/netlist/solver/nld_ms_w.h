@@ -60,7 +60,7 @@ class matrix_solver_w_t: public matrix_solver_t
 	friend class matrix_solver_t;
 public:
 
-	matrix_solver_w_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+	matrix_solver_w_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
 
 	virtual ~matrix_solver_w_t() override;
 
@@ -80,19 +80,19 @@ protected:
 
 
 	template <typename T1, typename T2>
-	inline nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
+	nl_ext_double &A(const T1 &r, const T2 &c) { return m_A[r][c]; }
 	template <typename T1, typename T2>
-	inline nl_ext_double &W(const T1 &r, const T2 &c) { return m_W[r][c]; }
+	nl_ext_double &W(const T1 &r, const T2 &c) { return m_W[r][c]; }
 
 	/* access to Ainv for fixed columns over row, there store transposed */
 	template <typename T1, typename T2>
-	inline nl_ext_double &Ainv(const T1 &r, const T2 &c) { return m_Ainv[c][r]; }
+	nl_ext_double &Ainv(const T1 &r, const T2 &c) { return m_Ainv[c][r]; }
 	template <typename T1>
-	inline nl_ext_double &RHS(const T1 &r) { return m_RHS[r]; }
+	nl_ext_double &RHS(const T1 &r) { return m_RHS[r]; }
 
 
 	template <typename T1, typename T2>
-	inline nl_ext_double &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
+	nl_ext_double &lA(const T1 &r, const T2 &c) { return m_lA[r][c]; }
 
 	nl_double m_last_RHS[storage_N]; // right hand side - contains currents
 
@@ -133,10 +133,10 @@ void matrix_solver_w_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 {
 	matrix_solver_t::setup_base(nets);
 
-	netlist().save(*this, m_last_RHS, "m_last_RHS");
+	state().save(*this, m_last_RHS, "m_last_RHS");
 
 	for (unsigned k = 0; k < N(); k++)
-		netlist().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
+		state().save(*this, RHS(k), plib::pfmt("RHS.{1}")(k));
 }
 
 
@@ -361,7 +361,7 @@ unsigned matrix_solver_w_t<m_N, storage_N>::solve_non_dynamic(const bool newton_
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-inline unsigned matrix_solver_w_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+unsigned matrix_solver_w_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	build_LE_A<matrix_solver_w_t>();
 	build_LE_RHS<matrix_solver_w_t>();
@@ -374,7 +374,7 @@ inline unsigned matrix_solver_w_t<m_N, storage_N>::vsolve_non_dynamic(const bool
 }
 
 template <std::size_t m_N, std::size_t storage_N>
-matrix_solver_w_t<m_N, storage_N>::matrix_solver_w_t(netlist_t &anetlist, const pstring &name,
+matrix_solver_w_t<m_N, storage_N>::matrix_solver_w_t(netlist_base_t &anetlist, const pstring &name,
 		const solver_parameters_t *params, const std::size_t size)
 : matrix_solver_t(anetlist, name, NOSORT, params)
 	,m_cnt(0)

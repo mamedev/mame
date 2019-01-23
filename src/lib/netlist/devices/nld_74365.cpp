@@ -12,6 +12,14 @@ namespace netlist
 {
 	namespace devices
 	{
+
+	/* FIXME: This should be a single device, i.e. one tristate buffer only.
+	 *
+	 * FIXME: Implement tristate output.
+	 *
+	 */
+
+
 	NETLIB_OBJECT(74365)
 	{
 		NETLIB_CONSTRUCTOR(74365)
@@ -68,8 +76,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(74365)
-	NETLIB_DEVICE_IMPL(74365_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(74365)
+	NETLIB_DEVICE_IMPL_DEPRECATED(74365_dip)
 
 	} //namespace devices
 } // namespace netlist

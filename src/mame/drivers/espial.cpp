@@ -324,7 +324,7 @@ MACHINE_CONFIG_START(espial_state::espial)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(espial_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", espial_state, espial_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(espial_state::espial_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
 	MCFG_DEVICE_PROGRAM_MAP(espial_sound_map)
@@ -340,11 +340,10 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(espial_state, screen_update_espial)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_espial)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(espial_state, espial)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_espial);
+	PALETTE(config, m_palette, FUNC(espial_state::espial_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

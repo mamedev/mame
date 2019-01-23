@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "machine/nscsi_cd.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device, "scsi_cdrom", "SCSI CD-ROM")
@@ -76,10 +76,19 @@ void nscsi_cdrom_device::device_reset()
 	cur_sector = -1;
 }
 
-MACHINE_CONFIG_START(nscsi_cdrom_device::device_add_mconfig)
-	MCFG_CDROM_ADD("image")
-	MCFG_CDROM_INTERFACE("cdrom")
-MACHINE_CONFIG_END
+void nscsi_cdrom_device::device_add_mconfig(machine_config &config)
+{
+	CDROM(config, image).set_interface("cdrom");
+}
+
+int nscsi_cdrom_device::to_msf(int frame)
+{
+	int m = frame / (75 * 60);
+	int s = (frame / 75) % 60;
+	int f = frame % 75;
+
+	return (m << 16) | (s << 8) | f;
+}
 
 void nscsi_cdrom_device::set_block_size(u32 block_size)
 {
@@ -193,21 +202,16 @@ void nscsi_cdrom_device::scsi_command()
 		 * is returned with sense data ILLEGAL REQUEST and LOGICAL UNIT NOT
 		 * SUPPORTED.
 		 */
-		if(lun) {
-			bad_lun();
-			return;
-		}
-
 		int page = scsi_cmdbuf[2];
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
 			std::fill_n(scsi_cmdbuf, 36, 0);
 
-			// vendor and product information must be padded with spaces
-			std::fill_n(&scsi_cmdbuf[8], 28, 0x20);
-
-			scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
+			if (lun != 0)
+				scsi_cmdbuf[0] = 0x7f;
+			else
+				scsi_cmdbuf[0] = 0x05; // device is present, device is CD/DVD (MMC-3)
 			scsi_cmdbuf[1] = 0x80; // media is removable
 			scsi_cmdbuf[2] = compliance; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x02; // response data format = SPC-3 standard
@@ -216,6 +220,12 @@ void nscsi_cdrom_device::scsi_command()
 			strncpy((char *)&scsi_cmdbuf[8], manufacturer, 8);
 			strncpy((char *)&scsi_cmdbuf[16], product, 16);
 			strncpy((char *)&scsi_cmdbuf[32], revision, 4);
+
+			// vendor and product information must be padded with spaces
+			for(int i = 8; i < 36; i++)
+				if(scsi_cmdbuf[i] == 0)
+					scsi_cmdbuf[i] = 0x20;
+
 			if(size > 36)
 				size = 36;
 			scsi_data_in(SBUF_MAIN, size);
@@ -250,7 +260,7 @@ void nscsi_cdrom_device::scsi_command()
 		LOG("command READ CAPACITY\n");
 
 		// get the last used block on the disc
-		const uint32_t temp = cdrom_get_track_start(cdrom, 0xaa) * (bytes_per_sector / bytes_per_block) - 1;
+		const u32 temp = cdrom_get_track_start(cdrom, 0xaa) * (bytes_per_sector / bytes_per_block) - 1;
 
 		scsi_cmdbuf[0] = (temp>>24) & 0xff;
 		scsi_cmdbuf[1] = (temp>>16) & 0xff;
@@ -267,15 +277,14 @@ void nscsi_cdrom_device::scsi_command()
 	}
 
 	case SC_READ_10:
-		if(!cdrom) {
-			return_no_cd();
-			break;
-		}
-
 		lba = (scsi_cmdbuf[2]<<24) | (scsi_cmdbuf[3]<<16) | (scsi_cmdbuf[4]<<8) | scsi_cmdbuf[5];
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
 		LOG("command READ EXTENDED start=%08x blocks=%04x\n", lba, blocks);
+		if(!cdrom) {
+			return_no_cd();
+			break;
+		}
 
 		scsi_data_in(2, blocks*bytes_per_block);
 		scsi_status_complete(SS_GOOD);
@@ -297,7 +306,7 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = 0x80; // WP, cache
 
 		// get the last used block on the disc
-		const uint32_t temp = cdrom_get_track_start(cdrom, 0xaa) * (bytes_per_sector / bytes_per_block) - 1;
+		const u32 temp = cdrom_get_track_start(cdrom, 0xaa) * (bytes_per_sector / bytes_per_block) - 1;
 		scsi_cmdbuf[pos++] = 0x08; // Block descriptor length
 
 		scsi_cmdbuf[pos++] = 0x00; // density code
@@ -309,10 +318,11 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_cmdbuf[pos++] = (bytes_per_block>>8)&0xff;
 		scsi_cmdbuf[pos++] = (bytes_per_block & 0xff);
 
+		bool fail = false;
 		int pmax = page == 0x3f ? 0x3e : page;
 		int pmin = page == 0x3f ? 0x00 : page;
-		for(int page=pmax; page >= pmin; page--) {
-			switch(page) {
+		for(int p=pmax; p >= pmin; p--) {
+			switch(p) {
 			case 0x00: // Vendor specific (does not require page format)
 				scsi_cmdbuf[pos++] = 0x80; // PS, page id
 				scsi_cmdbuf[pos++] = 0x02; // Page length
@@ -340,7 +350,10 @@ void nscsi_cdrom_device::scsi_command()
 				break;
 
 			default:
-				LOG("mode sense page %02x unhandled\n", page);
+				if (page != 0x3f) {
+					LOG("mode sense page %02x unhandled\n", p);
+					fail = true;
+				}
 				break;
 			}
 		}
@@ -348,8 +361,13 @@ void nscsi_cdrom_device::scsi_command()
 		if(pos > size)
 			pos = size;
 
-		scsi_data_in(0, pos);
-		scsi_status_complete(SS_GOOD);
+		if (!fail) {
+			scsi_data_in(0, pos);
+			scsi_status_complete(SS_GOOD);
+		} else {
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+		}
 		break;
 	}
 
@@ -359,9 +377,142 @@ void nscsi_cdrom_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	default:
-		logerror("unhandled command %02x\n", scsi_cmdbuf[0]);
+	case SC_READ_TOC_PMA_ATIP: {
+		/*
+		    Track numbers are problematic here: 0 = lead-in, 0xaa = lead-out.
+		    That makes sense in terms of how real-world CDs are referred to, but
+		    our internal routines for tracks use "0" as track 1.  That probably
+		    should be fixed...
+		*/
+		static const char *const format_names[16] = {
+			"TOC",
+			"Session info",
+			"Full TOC",
+			"PMA",
+			"ATIP"
+			"Reserved 5",
+			"Reserved 6",
+			"Reserved 7",
+			"Reserved 8",
+			"Reserved 9",
+			"Reserved 10",
+			"Reserved 11",
+			"Reserved 12",
+			"Reserved 13",
+			"Reserved 14",
+			"Reserved 15"
+		};
 
+		bool msf = (scsi_cmdbuf[1] & 0x2) != 0;
+		u16 size = (scsi_cmdbuf[7] << 7) | scsi_cmdbuf[8];
+		u8 format = scsi_cmdbuf[2] & 15;
+
+		/// SFF8020 legacy format field (see T10/1836-D Revision 2g page 643)
+		if(!format)
+			format = (scsi_cmdbuf[9] >> 6) & 3;
+
+		LOG("command READ TOC PMA ATIP, format %s msf=%d size=%d\n", format_names[format], msf, size);
+
+		int pos = 0;
+		switch (format) {
+		case 0: {
+			int start_track = scsi_cmdbuf[6];
+			int end_track = cdrom_get_last_track(cdrom);
+
+			int tracks;
+			if(start_track == 0)
+				tracks = end_track + 1;
+			else if(start_track <= end_track)
+				tracks = (end_track - start_track) + 2;
+			else if(start_track <= 0xaa)
+				tracks = 1;
+			else
+				tracks = 0;
+
+			int len = 2 + (tracks * 8);
+
+			// the returned TOC DATA LENGTH must be the full amount,
+			// regardless of how much we're able to pass back due to size
+			scsi_cmdbuf[pos++] = (len>>8) & 0xff;
+			scsi_cmdbuf[pos++] = (len & 0xff);
+			scsi_cmdbuf[pos++] = 1;
+			scsi_cmdbuf[pos++] = cdrom_get_last_track(cdrom);
+
+			if (start_track == 0)
+				start_track = 1;
+
+			for(int i = 0; i < tracks; i++) {
+				int track = start_track + i;
+				int cdrom_track = track - 1;
+				if(i == tracks-1) {
+					track = 0xaa;
+					cdrom_track = 0xaa;
+				}
+
+				scsi_cmdbuf[pos++] = 0;
+				scsi_cmdbuf[pos++] = cdrom_get_adr_control(cdrom, cdrom_track);
+				scsi_cmdbuf[pos++] = track;
+				scsi_cmdbuf[pos++] = 0;
+
+				u32 tstart = cdrom_get_track_start(cdrom, cdrom_track);
+
+				if(msf)
+					tstart = to_msf(tstart+150);
+
+				scsi_cmdbuf[pos++] = (tstart>>24) & 0xff;
+				scsi_cmdbuf[pos++] = (tstart>>16) & 0xff;
+				scsi_cmdbuf[pos++] = (tstart>>8) & 0xff;
+				scsi_cmdbuf[pos++] = (tstart & 0xff);
+			}
+			break;
+		}
+
+		case 1: {
+			int len = 2 + (8 * 1);
+
+			scsi_cmdbuf[pos++] = (len>>8) & 0xff;
+			scsi_cmdbuf[pos++] = (len & 0xff);
+			scsi_cmdbuf[pos++] = 1;
+			scsi_cmdbuf[pos++] = 1;
+
+			scsi_cmdbuf[pos++] = 0;
+			scsi_cmdbuf[pos++] = cdrom_get_adr_control(cdrom, 0);
+			scsi_cmdbuf[pos++] = 1;
+			scsi_cmdbuf[pos++] = 0;
+
+			u32 tstart = cdrom_get_track_start(cdrom, 0);
+
+			if (msf)
+				tstart = to_msf(tstart+150);
+
+			scsi_cmdbuf[pos++] = (tstart>>24) & 0xff;
+			scsi_cmdbuf[pos++] = (tstart>>16) & 0xff;
+			scsi_cmdbuf[pos++] = (tstart>>8) & 0xff;
+			scsi_cmdbuf[pos++] = (tstart & 0xff);
+			break;
+		}
+
+		default:
+			LOG("Unhandled format %d\n", format_names[format]);
+			break;
+		}
+
+		if(pos) {
+			if(pos > size)
+				pos = size;
+
+			scsi_data_in(0, pos);
+			scsi_status_complete(SS_GOOD);
+		} else {
+			// report unit attention condition
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST);
+			break;
+		}
+		break;
+	}
+
+	default:
 		nscsi_full_device::scsi_command();
 		break;
 	}

@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "tf20.h"
-#include "imagedev/floppy.h"
 
 #define XTAL_CR1    XTAL(8'000'000)
 #define XTAL_CR2    XTAL(4'915'200)
@@ -88,10 +87,10 @@ static void tf20_floppies(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */
-	MCFG_DEVICE_PROGRAM_MAP(cpu_mem)
-	MCFG_DEVICE_IO_MAP(cpu_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, epson_tf20_device, irq_callback)
+	Z80(config, m_cpu, XTAL_CR1 / 2); /* uPD780C */
+	m_cpu->set_addrmap(AS_PROGRAM, &epson_tf20_device::cpu_mem);
+	m_cpu->set_addrmap(AS_IO, &epson_tf20_device::cpu_io);
+	m_cpu->set_irq_acknowledge_callback(FUNC(epson_tf20_device::irq_callback));
 
 	// 64k internal ram
 	RAM(config, "ram").set_default_size("64K");
@@ -106,8 +105,8 @@ MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "sd320", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "sd320", floppy_image_device::default_floppy_formats)
+	for (auto &fd : m_fd)
+		FLOPPY_CONNECTOR(config, fd, tf20_floppies, "sd320", floppy_image_device::default_floppy_formats);
 
 	// serial interface to another device
 	MCFG_EPSON_SIO_ADD("sio", nullptr)
@@ -131,7 +130,9 @@ epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *
 	m_ram(*this, "ram"),
 	m_fdc(*this, "5a"),
 	m_mpsc(*this, "3a"),
-	m_sio_output(*this, "sio"), m_fd0(nullptr), m_fd1(nullptr), m_timer_serial(nullptr), m_timer_tc(nullptr),
+	m_sio_output(*this, "sio"),
+	m_fd(*this, "5a:%u", 0U),
+	m_timer_serial(nullptr), m_timer_tc(nullptr),
 	m_rxc(1), m_txda(0), m_dtra(0), m_pinc(0)
 {
 	m_sio_input = dynamic_cast<epson_sio_device *>(owner);
@@ -149,9 +150,6 @@ void epson_tf20_device::device_start()
 
 	m_timer_serial = timer_alloc(0, nullptr);
 	m_timer_tc = timer_alloc(1, nullptr);
-
-	m_fd0 = subdevice<floppy_connector>("5a:0")->get_device();
-	m_fd1 = subdevice<floppy_connector>("5a:1")->get_device();
 
 	// enable second half of ram
 	m_cpu->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x8000);
@@ -248,8 +246,9 @@ WRITE8_MEMBER( epson_tf20_device::fdc_control_w )
 	logerror("%s: tf20_fdc_control_w(%02x)\n", machine().describe_context(), data);
 
 	// bit 0, motor on signal
-	m_fd0->mon_w(!BIT(data, 0));
-	m_fd1->mon_w(!BIT(data, 0));
+	for (auto &fd : m_fd)
+		if (fd->get_device() != nullptr)
+			fd->get_device()->mon_w(!BIT(data, 0));
 }
 
 

@@ -352,9 +352,7 @@ MACHINE_CONFIG_START(rampart_state::rampart)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rampart)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(8)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, rampart_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);

@@ -232,6 +232,11 @@ public:
 
 	void itt3030(machine_config &config);
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -252,15 +257,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
-	DECLARE_PALETTE_INIT(itt3030);
+	void itt3030_palette(palette_device &palette) const;
 
 	void itt3030_io(address_map &map);
 	void itt3030_map(address_map &map);
 	void lower48_map(address_map &map);
-
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -278,7 +279,6 @@ private:
 	// shared pointers
 	required_shared_ptr<uint8_t> m_vram;
 
-private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -532,7 +532,7 @@ static GFXDECODE_START( gfx_itt3030 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(itt3030_state, itt3030)
+void itt3030_state::itt3030_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(215, 229, 82));
@@ -720,7 +720,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_SCREEN_UPDATE_DRIVER(itt3030_state, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*12)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* devices */
 	ADDRESS_MAP_BANK(config, "lowerbank").set_map(&itt3030_state::lower48_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0xc000);
@@ -735,18 +735,16 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_itt3030)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_itt3030);
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(itt3030_state, itt3030)
+	PALETTE(config, m_palette, FUNC(itt3030_state::itt3030_palette), 3);
 
 	/* internal ram */
 	RAM(config, "mainram").set_default_size("256K");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 MACHINE_CONFIG_END
 
 

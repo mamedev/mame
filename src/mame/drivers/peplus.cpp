@@ -20,10 +20,10 @@
 
     History:
 
-    This form of video poker machine has the ability to use different game roms.  The operator
-    changes the game by placing the rom at U68 on the motherboard.  This driver currently supports
-    several PE+ game roms, but should work with all other compatible game roms as far as cpu, video,
-    sound, and inputs are concerned.  Some games can share the same color prom and graphic roms,
+    This form of video poker machine has the ability to use different game ROMs.  The operator
+    changes the game by placing the ROM at U68 on the motherboard.  This driver currently supports
+    several PE+ game ROMs, but should work with all other compatible game ROMs as far as CPU, video,
+    sound, and inputs are concerned.  Some games can share the same color PROM and graphic ROMs,
     but this is not always the case.  It is best to confirm the game, color and graphic combinations.
 
     The game code runs in two different modes, game mode and operator mode.  Game mode is what a
@@ -33,8 +33,8 @@
     has two additional inputs (jackpot reset and self-test) to navigate with, along with the
     normal buttons available to the player.
 
-    A normal machine keeps all coin counts and settings in a battery-backed ram, and will
-    periodically update an external eeprom for an even more secure backup.  This eeprom
+    A normal machine keeps all coin counts and settings in a battery-backed RAM, and will
+    periodically update an external EEPROM for an even more secure backup.  This EEPROM
     also holds the current game state in order to recover the player from a full power failure.
 
 
@@ -348,7 +348,7 @@ private:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void load_superdata(const char *bank_name);
-	DECLARE_PALETTE_INIT(peplus);
+	void peplus_palette(palette_device &palette) const;
 	void handle_lightpen();
 
 	void main_iomap(address_map &map);
@@ -973,36 +973,36 @@ uint32_t peplus_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(peplus_state, peplus)
+void peplus_state::peplus_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	uint32_t proms_size = memregion("proms")->bytes();
-/*  prom bits
-    7654 3210
-    ---- -xxx   red component.
-    --xx x---   green component.
-    xx-- ----   blue component.
-*/
+	uint8_t const *const color_prom = memregion("proms")->base();
+	uint32_t const proms_size = memregion("proms")->bytes();
+	/*  prom bits
+		7654 3210
+		---- -xxx   red component.
+		--xx x---   green component.
+		xx-- ----   blue component.
+	*/
 
-	for (int i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		/* red component */
-		int bit0 = (~color_prom[i % proms_size] >> 0) & 0x01;
-		int bit1 = (~color_prom[i % proms_size] >> 1) & 0x01;
-		int bit2 = (~color_prom[i % proms_size] >> 2) & 0x01;
-		int r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int bit0 = BIT(~color_prom[i % proms_size], 0);
+		int bit1 = BIT(~color_prom[i % proms_size], 1);
+		int bit2 = BIT(~color_prom[i % proms_size], 2);
+		int const r = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* green component */
-		bit0 = (~color_prom[i % proms_size] >> 3) & 0x01;
-		bit1 = (~color_prom[i % proms_size] >> 4) & 0x01;
-		bit2 = (~color_prom[i % proms_size] >> 5) & 0x01;
-		int g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		bit0 = BIT(~color_prom[i % proms_size], 3);
+		bit1 = BIT(~color_prom[i % proms_size], 4);
+		bit2 = BIT(~color_prom[i % proms_size], 5);
+		int const g = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		/* blue component */
-		bit0 = (~color_prom[i % proms_size] >> 6) & 0x01;
-		bit1 = (~color_prom[i % proms_size] >> 7) & 0x01;
+		bit0 = BIT(~color_prom[i % proms_size], 6);
+		bit1 = BIT(~color_prom[i % proms_size], 7);
 		bit2 = 0;
-		int b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
+		int const b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -1373,7 +1373,7 @@ void peplus_state::machine_start()
 
 MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
-	I80C32(config, m_maincpu, XTAL(20'000'000)/2); /* 10MHz */
+	I80C32(config, m_maincpu, XTAL(20'000'000)/2); // 10MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &peplus_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &peplus_state::main_iomap);
 	m_maincpu->port_out_cb<1>().set(FUNC(peplus_state::paldata_w<0>));
@@ -1390,8 +1390,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_peplus);
-
-	PALETTE(config, m_palette, 16*16*2).set_init(FUNC(peplus_state::palette_init_peplus));
+	PALETTE(config, m_palette, FUNC(peplus_state::peplus_palette), 16*16*2);
 
 	R6545_1(config, m_crtc, XTAL(20'000'000)/8/3);
 	m_crtc->set_screen(m_screen);
@@ -11611,7 +11610,7 @@ Also compatible with:
 	ROM_LOAD( "x002127p.u66",   0x00000, 0x10000, CRC(7e50b749) SHA1(37255823b7ccc2304875a46c6e798fee3b0ee4d1) ) /* Double Bonus Poker featuring "Your Property" Royals - 4/15/96  L96/0990 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) )
+	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) ) /* 04/18/96   L96/0977   BBP */
 	ROM_LOAD( "mgo-cg2244.u78",  0x08000, 0x8000, CRC(b2de0a7a) SHA1(34f0ef951560f6f71e14c822baa4ccb1028b5028) )
 	ROM_LOAD( "mbo-cg2244.u79",  0x10000, 0x8000, CRC(d2c12418) SHA1(dfb1aebaac23ff6e2cf556f228dbdb7c272a1b30) )
 	ROM_LOAD( "mxo-cg2244.u80",  0x18000, 0x8000, CRC(8dc10a99) SHA1(92edb31f44e52609ed1ba2a53577048d424c6238) )
@@ -11646,7 +11645,7 @@ Also compatible with:
 	ROM_LOAD( "x002134p.u66",   0x00000, 0x10000, CRC(23c8bbad) SHA1(0a7b2836e180f5ac7900469550f28d2357fa1261) ) /* Faces 'n' Deuces Double Bonus - 4/15/96  L96/1375 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) )
+	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) ) /* 04/18/96   L96/0977   BBP */
 	ROM_LOAD( "mgo-cg2244.u78",  0x08000, 0x8000, CRC(b2de0a7a) SHA1(34f0ef951560f6f71e14c822baa4ccb1028b5028) )
 	ROM_LOAD( "mbo-cg2244.u79",  0x10000, 0x8000, CRC(d2c12418) SHA1(dfb1aebaac23ff6e2cf556f228dbdb7c272a1b30) )
 	ROM_LOAD( "mxo-cg2244.u80",  0x18000, 0x8000, CRC(8dc10a99) SHA1(92edb31f44e52609ed1ba2a53577048d424c6238) )
@@ -11680,7 +11679,7 @@ Also compatible with:
 	ROM_LOAD( "x002143p.u66",   0x00000, 0x10000, CRC(7af2cc1f) SHA1(47f2942a9d3d2a7a0b0c54e839c52a33c660d536) ) /* Joker's Revenge - 4/15/96  L96/0976 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) )
+	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) ) /* 04/18/96   L96/0977   BBP */
 	ROM_LOAD( "mgo-cg2244.u78",  0x08000, 0x8000, CRC(b2de0a7a) SHA1(34f0ef951560f6f71e14c822baa4ccb1028b5028) )
 	ROM_LOAD( "mbo-cg2244.u79",  0x10000, 0x8000, CRC(d2c12418) SHA1(dfb1aebaac23ff6e2cf556f228dbdb7c272a1b30) )
 	ROM_LOAD( "mxo-cg2244.u80",  0x18000, 0x8000, CRC(8dc10a99) SHA1(92edb31f44e52609ed1ba2a53577048d424c6238) )
@@ -11766,7 +11765,7 @@ Also compatible with:
 	ROM_LOAD( "x002152p.u66",   0x00000, 0x10000, CRC(10befd5e) SHA1(b5c6bebed5e5ed4e610be9a3f27a5bbb19b697be) ) /* Blackjack Poker - 4/18/96  L96/0978 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) )
+	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) ) /* 04/18/96   L96/0977   BBP */
 	ROM_LOAD( "mgo-cg2244.u78",  0x08000, 0x8000, CRC(b2de0a7a) SHA1(34f0ef951560f6f71e14c822baa4ccb1028b5028) )
 	ROM_LOAD( "mbo-cg2244.u79",  0x10000, 0x8000, CRC(d2c12418) SHA1(dfb1aebaac23ff6e2cf556f228dbdb7c272a1b30) )
 	ROM_LOAD( "mxo-cg2244.u80",  0x18000, 0x8000, CRC(8dc10a99) SHA1(92edb31f44e52609ed1ba2a53577048d424c6238) )
@@ -11968,7 +11967,7 @@ Also compatible with:
 	ROM_LOAD( "x002211p.u66",   0x00000, 0x10000, CRC(ff677806) SHA1(e7d74c3de278df86c6900d6e2dbb3b12978fe969) ) /* Double Double Bonus with 3 Jacks - 08/9/96  L96/2013 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) )
+	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) ) /* 04/18/96   L96/0977   BBP */
 	ROM_LOAD( "mgo-cg2244.u78",  0x08000, 0x8000, CRC(b2de0a7a) SHA1(34f0ef951560f6f71e14c822baa4ccb1028b5028) )
 	ROM_LOAD( "mbo-cg2244.u79",  0x10000, 0x8000, CRC(d2c12418) SHA1(dfb1aebaac23ff6e2cf556f228dbdb7c272a1b30) )
 	ROM_LOAD( "mxo-cg2244.u80",  0x18000, 0x8000, CRC(8dc10a99) SHA1(92edb31f44e52609ed1ba2a53577048d424c6238) )
@@ -12004,7 +12003,7 @@ Also compatible with:
 	ROM_LOAD( "x002236p.u66",   0x00000, 0x10000, CRC(44912158) SHA1(3c2323773277af31c220d7c3e6491694b9cfc5cc) ) /* Double Double Bonus with 3 Aces Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) )
+	ROM_LOAD( "mro-cg2244.u77",  0x00000, 0x8000, CRC(25561458) SHA1(fe5d624e0e16956df589f3682bad9181bdc99956) ) /* 04/18/96   L96/0977   BBP */
 	ROM_LOAD( "mgo-cg2244.u78",  0x08000, 0x8000, CRC(b2de0a7a) SHA1(34f0ef951560f6f71e14c822baa4ccb1028b5028) )
 	ROM_LOAD( "mbo-cg2244.u79",  0x10000, 0x8000, CRC(d2c12418) SHA1(dfb1aebaac23ff6e2cf556f228dbdb7c272a1b30) )
 	ROM_LOAD( "mxo-cg2244.u80",  0x18000, 0x8000, CRC(8dc10a99) SHA1(92edb31f44e52609ed1ba2a53577048d424c6238) )
@@ -12397,7 +12396,7 @@ Also compatible with:
 	ROM_LOAD( "x002279p.u66",   0x00000, 0x10000, CRC(0b756bd8) SHA1(26622e588bf2e3f823f8baa66ddec05f135d4f6f) ) /* ACE$ Bonus - 01/15/97  L97/0507 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* 12/23/86   L97/0511   BBP */
+	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* 12/23/96   L97/0511   BBP */
 	ROM_LOAD( "mgo-cg2325.u78",  0x08000, 0x8000, CRC(a637679e) SHA1(4cb24f1f907ae482419981cac49af19ca1cdbc99) )
 	ROM_LOAD( "mbo-cg2325.u79",  0x10000, 0x8000, CRC(4a179b6d) SHA1(2ed51ed85444b939bbd48344f18fa97c146438ff) )
 	ROM_LOAD( "mxo-cg2325.u80",  0x18000, 0x8000, CRC(afae8fd5) SHA1(7c6380f21fe8444234ada8d88a46d3a4f1623b29) )
@@ -12435,7 +12434,7 @@ Also compatible with:
 	ROM_LOAD( "x002283p.u66",   0x00000, 0x10000, CRC(90f7f7b3) SHA1(0c8460391303ed16f20c41472840d798950bb2c0) ) /* Barbaric Deuces Wild / Dealt Deuces Wild Bonus Poker */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* 12/23/86   L97/0511   BBP */
+	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* 12/23/96   L97/0511   BBP */
 	ROM_LOAD( "mgo-cg2325.u78",  0x08000, 0x8000, CRC(a637679e) SHA1(4cb24f1f907ae482419981cac49af19ca1cdbc99) )
 	ROM_LOAD( "mbo-cg2325.u79",  0x10000, 0x8000, CRC(4a179b6d) SHA1(2ed51ed85444b939bbd48344f18fa97c146438ff) )
 	ROM_LOAD( "mxo-cg2325.u80",  0x18000, 0x8000, CRC(afae8fd5) SHA1(7c6380f21fe8444234ada8d88a46d3a4f1623b29) )
@@ -12473,7 +12472,7 @@ Also compatible with:
 	ROM_LOAD( "x002284p.u66",   0x00000, 0x10000, CRC(2a3cb2a9) SHA1(76bfbf9a25913604454142716e1433ec73f0f0c9) ) /* Barbaric Deuces Wild / Dealt Deuces Wild Bonus Poker - 01/18/97  97/0527 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* 12/23/86   L97/0511   BBP */
+	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* 12/23/96   L97/0511   BBP */
 	ROM_LOAD( "mgo-cg2325.u78",  0x08000, 0x8000, CRC(a637679e) SHA1(4cb24f1f907ae482419981cac49af19ca1cdbc99) )
 	ROM_LOAD( "mbo-cg2325.u79",  0x10000, 0x8000, CRC(4a179b6d) SHA1(2ed51ed85444b939bbd48344f18fa97c146438ff) )
 	ROM_LOAD( "mxo-cg2325.u80",  0x18000, 0x8000, CRC(afae8fd5) SHA1(7c6380f21fe8444234ada8d88a46d3a4f1623b29) )
@@ -12512,7 +12511,7 @@ Also compatible with:
 	ROM_LOAD( "x002287p.u66",   0x00000, 0x10000, CRC(f5a8f485) SHA1(4bf9ad2a75acd5445e97661efe8a39ceb8b97549) ) /* No Faces Pay the Aces - 01/22/97   L97/0530 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* 12/23/86   L97/0511   BBP */
+	ROM_LOAD( "mro-cg2325.u77",  0x00000, 0x8000, CRC(ae53d1f6) SHA1(bf28b8f784d6683bb352944b88d0b646d7313efd) ) /* 12/23/96   L97/0511   BBP */
 	ROM_LOAD( "mgo-cg2325.u78",  0x08000, 0x8000, CRC(a637679e) SHA1(4cb24f1f907ae482419981cac49af19ca1cdbc99) )
 	ROM_LOAD( "mbo-cg2325.u79",  0x10000, 0x8000, CRC(4a179b6d) SHA1(2ed51ed85444b939bbd48344f18fa97c146438ff) )
 	ROM_LOAD( "mxo-cg2325.u80",  0x18000, 0x8000, CRC(afae8fd5) SHA1(7c6380f21fe8444234ada8d88a46d3a4f1623b29) )

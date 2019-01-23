@@ -258,7 +258,7 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80,CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu1)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ikki_state, ikki_irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(ikki_state::ikki_irq), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sub", Z80,CPU_CLOCK/2) /* 4.000MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ikki_cpu2)
@@ -271,12 +271,10 @@ MACHINE_CONFIG_START(ikki_state::ikki)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(ikki_state, screen_update_ikki)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikki)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
-	MCFG_PALETTE_INIT_OWNER(ikki_state, ikki)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ikki);
+	PALETTE(config, m_palette, FUNC(ikki_state::ikki_palette), 1024, 256 + 1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -461,8 +461,7 @@ void bishi_state::bishi(machine_config &config)
 	m_screen->set_visarea(29, 29+288-1, 16, 16+224-1);
 	m_screen->set_screen_update(FUNC(bishi_state::screen_update_bishi));
 
-	PALETTE(config, m_palette, 4096);
-	m_palette->set_format(PALETTE_FORMAT_XBGR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 

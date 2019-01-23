@@ -1769,7 +1769,7 @@ void centiped_state::centiped_base(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_centiped);
-	PALETTE(config, m_palette, 4+4*4*4*4);
+	PALETTE(config, m_palette).set_entries(4+4*4*4*4);
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,centiped)
 }
@@ -1907,7 +1907,7 @@ void centiped_state::warlords(machine_config &config)
 	/* video hardware */
 	m_gfxdecode->set_info(gfx_warlords);
 	m_palette->set_entries(8*4+8*4);
-	m_palette->set_init(FUNC(centiped_state::palette_init_warlords));
+	m_palette->set_init(FUNC(centiped_state::warlords_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,warlords)
 
@@ -1963,7 +1963,7 @@ void centiped_state::bullsdrt(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_centiped);
-	PALETTE(config, m_palette, 4+4*4*4*4);
+	PALETTE(config, m_palette).set_entries(4+4*4*4*4);
 
 	MCFG_VIDEO_START_OVERRIDE(centiped_state,bullsdrt)
 

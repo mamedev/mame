@@ -66,7 +66,7 @@ Notes:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(homerun_state::homerun_control_w)
+void homerun_state::control_w(u8 data)
 {
 	// d0, d1: somehow related to port $40?
 
@@ -95,7 +95,7 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 	m_control = data;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
+void homerun_state::d7756_sample_w(u8 data)
 {
 	m_sample = data;
 
@@ -103,21 +103,21 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 		m_d7756->port_w(data);
 }
 
-void homerun_state::homerun_memmap(address_map &map)
+void homerun_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("bank1");
-	map(0x8000, 0x9fff).ram().w(FUNC(homerun_state::homerun_videoram_w)).share("videoram");
+	map(0x4000, 0x7fff).bankr("mainbank");
+	map(0x8000, 0x9fff).ram().w(FUNC(homerun_state::videoram_w)).share("videoram");
 	map(0xa000, 0xa0ff).ram().share("spriteram");
-	map(0xb000, 0xb03f).ram().w(FUNC(homerun_state::homerun_color_w)).share("colorram");
+	map(0xb000, 0xb03f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xc000, 0xdfff).ram();
 }
 
-void homerun_state::homerun_iomap(address_map &map)
+void homerun_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x10, 0x10).w(FUNC(homerun_state::homerun_d7756_sample_w));
-	map(0x20, 0x20).w(FUNC(homerun_state::homerun_control_w));
+	map(0x10, 0x10).w(FUNC(homerun_state::d7756_sample_w));
+	map(0x20, 0x20).w(FUNC(homerun_state::control_w));
 	map(0x30, 0x33).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x40).portr("IN0");
 	map(0x50, 0x50).portr("IN2");
@@ -152,7 +152,7 @@ CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, sprite0_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, nullptr)
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -189,7 +189,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, sprite0_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // doesn't have d7756
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, sprite0_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, nullptr)
 	PORT_BIT( 0x36, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -301,8 +301,8 @@ static const gfx_layout gfxlayout =
 	RGN_FRAC(1,1),
 	2,
 	{ 8*8,0},
-	{ 0, 1, 2, 3, 4, 5, 6, 7},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8*2
 };
 
@@ -311,15 +311,15 @@ static const gfx_layout spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	2,
-	{ 8*8,0},
-	{ 0, 1, 2, 3, 4, 5, 6, 7,0+8*8*2,1+8*8*2,2+8*8*2,3+8*8*2,4+8*8*2,5+8*8*2,6+8*8*2,7+8*8*2},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0*8+2*8*8*2,1*8+2*8*8*2,2*8+2*8*8*2,3*8+2*8*8*2,4*8+2*8*8*2,5*8+2*8*8*2,6*8+2*8*8*2,7*8+2*8*8*2},
+	{ 8*8,0 },
+	{ STEP8(0,1), STEP8(8*8*2,1) },
+	{ STEP8(0,8), STEP8(8*8*2*2,8) },
 	8*8*2*4
 };
 
 static GFXDECODE_START( gfx_homerun )
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,    0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -327,23 +327,19 @@ GFXDECODE_END
 
 void homerun_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	u8 *ROM = memregion("maincpu")->base();
 
-	membank("bank1")->configure_entry(0, &ROM[0x00000]);
-	membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);
+	m_mainbank->configure_entries(0, 8, &ROM[0x00000], 0x4000);
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_sample));
-	save_item(NAME(m_gfx_ctrl));
-	save_item(NAME(m_scrolly));
-	save_item(NAME(m_scrollx));
 }
 
 void homerun_state::machine_reset()
 {
-	m_control = 0;
-	m_sample = 0;
-	m_gfx_ctrl = 0;
+	control_w(0);
+	d7756_sample_w(0);
+	banking_w(0);
 	m_scrolly = 0;
 	m_scrollx = 0;
 }
@@ -354,30 +350,30 @@ void homerun_state::dynashot(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(20'000'000)/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &homerun_state::homerun_memmap);
-	m_maincpu->set_addrmap(AS_IO, &homerun_state::homerun_iomap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &homerun_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &homerun_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(homerun_state::irq0_line_hold));
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
-	ppi.out_pa_callback().set(FUNC(homerun_state::homerun_scrollhi_w));
-	ppi.out_pb_callback().set(FUNC(homerun_state::homerun_scrolly_w));
-	ppi.out_pc_callback().set(FUNC(homerun_state::homerun_scrollx_w));
+	ppi.out_pa_callback().set(FUNC(homerun_state::scrollhi_w));
+	ppi.out_pb_callback().set(FUNC(homerun_state::scrolly_w));
+	ppi.out_pc_callback().set(FUNC(homerun_state::scrollx_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(20'000'000)/4,328,0,256,253,0,240);
-	m_screen->set_screen_update(FUNC(homerun_state::screen_update_homerun));
+	m_screen->set_screen_update(FUNC(homerun_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_homerun);
-	PALETTE(config, m_palette, 16*4);
+	PALETTE(config, m_palette).set_format(1, &homerun_state::homerun_RGB332, 16*4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(20'000'000)/8));
 	ymsnd.port_a_read_callback().set_ioport("DSW");
-	ymsnd.port_b_write_callback().set(FUNC(homerun_state::homerun_banking_w));
+	ymsnd.port_b_write_callback().set(FUNC(homerun_state::banking_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -412,9 +408,8 @@ void homerun_state::ganjaja(machine_config &config)
 /**************************************************************************/
 
 ROM_START( homerun )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "homerun.ic43",   0x00000, 0x04000, CRC(e759e476) SHA1(ad4f356ff26209033320a3e6353e4d4d9beb59c1) )
-	ROM_CONTINUE(               0x10000, 0x1c000)
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "homerun.ic43",   0x00000, 0x20000, CRC(e759e476) SHA1(ad4f356ff26209033320a3e6353e4d4d9beb59c1) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "homerun.ic60",   0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
@@ -427,9 +422,8 @@ ROM_START( homerun )
 ROM_END
 
 ROM_START( nhomerun )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.ic43",   0x00000, 0x04000, CRC(aed96d6d) SHA1(5cb3932f4cfa3f6c0134ac20a1747c562db31a65) )
-	ROM_CONTINUE(         0x10000, 0x1c000)
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "1.ic43",   0x00000, 0x20000, CRC(aed96d6d) SHA1(5cb3932f4cfa3f6c0134ac20a1747c562db31a65) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "3.ic60",   0x00000, 0x10000, CRC(69a720d1) SHA1(0f0a4877578f358e9e829ece8c31e23f01adcf83) )
@@ -442,9 +436,8 @@ ROM_START( nhomerun )
 ROM_END
 
 ROM_START( dynashot )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.ic43",         0x00000, 0x04000, CRC(bf3c9586) SHA1(439effbda305f5fa265e5897c81dc1447e5d867d) )
-	ROM_CONTINUE(               0x10000, 0x1c000)
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "1.ic43",         0x00000, 0x20000, CRC(bf3c9586) SHA1(439effbda305f5fa265e5897c81dc1447e5d867d) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "3.ic60",         0x00000, 0x10000, CRC(77d6a608) SHA1(a31ff343a5d4d6f20301c030ecc2e252149bcf9d) )
@@ -455,9 +448,8 @@ ROM_END
 
 
 ROM_START( ganjaja )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "1.ic43",         0x00000, 0x04000, CRC(dad57543) SHA1(dbd8b5cee33756ee5e3c41bf84c0f7141d3466dc) )
-	ROM_CONTINUE(               0x10000, 0x1c000)
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "1.ic43",         0x00000, 0x20000, CRC(dad57543) SHA1(dbd8b5cee33756ee5e3c41bf84c0f7141d3466dc) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "ic60",           0x00000, 0x10000, CRC(855f6b28) SHA1(386411e88cf9bed54fe2073f0828d579cb1d04ee) )

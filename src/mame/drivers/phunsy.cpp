@@ -65,7 +65,7 @@ private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
-	DECLARE_PALETTE_INIT(phunsy);
+	void phunsy_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void phunsy_data(address_map &map);
@@ -210,14 +210,10 @@ void phunsy_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(phunsy_state, phunsy)
+void phunsy_state::phunsy_palette(palette_device &palette) const
 {
-	for ( int i = 0; i < 8; i++ )
-	{
-		int j = ( i << 5 ) | ( i << 2 ) | ( i >> 1 );
-
-		palette.set_pen_color( i, j, j, j );
-	}
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(i, pal3bit(i), pal3bit(i), pal3bit(i));
 }
 
 
@@ -364,7 +360,7 @@ void phunsy_state::phunsy(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_phunsy);
-	PALETTE(config, "palette", 8).set_init(FUNC(phunsy_state::palette_init_phunsy));
+	PALETTE(config, "palette", FUNC(phunsy_state::phunsy_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

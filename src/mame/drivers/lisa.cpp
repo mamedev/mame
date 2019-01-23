@@ -135,8 +135,7 @@ void lisa_state::lisa(machine_config &config)
 	m_screen->set_screen_update(FUNC(lisa_state::screen_update_lisa));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -1175,7 +1175,7 @@ void segaorun_state::outrun_base(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaorun);
-	PALETTE(config, m_palette, 4096*3);
+	PALETTE(config, m_palette).set_entries(4096*3);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
@@ -1694,8 +1694,7 @@ ROM_START( outrundxj )
 	ROM_RELOAD(               0x58000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0019.key", 0x0000, 0x2000, CRC(6ff847c6) SHA1(e6b7bb77d0971c25eba3f168d939d0d5f1486537) )
-
+	ROM_LOAD( "317-0019.key", 0x0000, 0x2000, CRC(8ffbed98) SHA1(9c1147a1115c2b8555405bdbb5f04cae55b8ba29) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -1999,7 +1998,7 @@ ROM_START( shangon3 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 ROM_START( shangon3d )
@@ -2112,7 +2111,7 @@ ROM_START( shangon2 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2173,7 +2172,7 @@ ROM_START( shangon1 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 //*************************************************************************************************************************

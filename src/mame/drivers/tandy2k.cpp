@@ -786,7 +786,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	//screen.set_screen_update(CRT9021B_TAG, FUNC(crt9021_device::screen_update));
 	screen.set_screen_update(FUNC(tandy2k_state::screen_update));
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	crt9007_device &vpac(CRT9007(config, CRT9007_TAG, 16_MHz_XTAL * 28 / 20 / 8));
 	vpac.set_addrmap(0, &tandy2k_state::vpac_mem);

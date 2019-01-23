@@ -31,12 +31,11 @@
 
 mame_machine_manager* mame_machine_manager::m_manager = nullptr;
 
-mame_machine_manager* mame_machine_manager::instance(emu_options &options,osd_interface &osd)
+mame_machine_manager* mame_machine_manager::instance(emu_options &options, osd_interface &osd)
 {
-	if(!m_manager)
-	{
-		m_manager = global_alloc(mame_machine_manager(options,osd));
-	}
+	if (!m_manager)
+		m_manager = global_alloc(mame_machine_manager(options, osd));
+
 	return m_manager;
 }
 
@@ -49,13 +48,13 @@ mame_machine_manager* mame_machine_manager::instance()
 //  mame_machine_manager - constructor
 //-------------------------------------------------
 
-mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &osd)
-		: machine_manager(options, osd),
-		m_plugins(std::make_unique<plugin_options>()),
-		m_lua(global_alloc(lua_engine)),
-		m_new_driver_pending(nullptr),
-		m_firstrun(true),
-		m_autoboot_timer(nullptr)
+mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &osd) :
+	machine_manager(options, osd),
+	m_plugins(std::make_unique<plugin_options>()),
+	m_lua(global_alloc(lua_engine)),
+	m_new_driver_pending(nullptr),
+	m_firstrun(true),
+	m_autoboot_timer(nullptr)
 {
 }
 
@@ -100,7 +99,8 @@ std::vector<std::string> split(const std::string &text, char sep)
 {
 	std::vector<std::string> tokens;
 	std::size_t start = 0, end = 0;
-	while ((end = text.find(sep, start)) != std::string::npos) {
+	while ((end = text.find(sep, start)) != std::string::npos)
+	{
 		std::string temp = text.substr(start, end - start);
 		if (temp != "") tokens.push_back(temp);
 		start = end + 1;
@@ -120,8 +120,8 @@ void mame_machine_manager::start_luaengine()
 		{
 			m_plugins->parse_json(pluginpath);
 		}
-		std::vector<std::string> include = split(options().plugin(),',');
-		std::vector<std::string> exclude = split(options().no_plugin(),',');
+		std::vector<std::string> include = split(options().plugin(), ',');
+		std::vector<std::string> exclude = split(options().no_plugin(), ',');
 		{
 			// parse the file
 			// attempt to open the output file
@@ -410,13 +410,13 @@ void mame_machine_manager::ui_initialize(running_machine& machine)
 void mame_machine_manager::create_custom(running_machine& machine)
 {
 	// start the inifile manager
-	m_inifile = std::make_unique<inifile_manager>(machine, m_ui->options());
+	m_inifile = std::make_unique<inifile_manager>(m_ui->options());
 
 	// allocate autoboot timer
 	m_autoboot_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_machine_manager::autoboot_callback), this));
 
 	// start favorite manager
-	m_favorite = std::make_unique<favorite_manager>(machine, m_ui->options());
+	m_favorite = std::make_unique<favorite_manager>(m_ui->options());
 }
 
 void mame_machine_manager::load_cheatfiles(running_machine& machine)

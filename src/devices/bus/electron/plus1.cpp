@@ -90,14 +90,16 @@ ioport_constructor electron_plus1_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
+void electron_plus1_device::device_add_mconfig(machine_config &config)
+{
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, electron_plus1_device, busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(electron_plus1_device::busy_w));
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* adc */
-	ADC0844(config, m_adc, 0);
+	ADC0844(config, m_adc);
 	m_adc->intr_callback().set(FUNC(electron_plus1_device::ready_w));
 	m_adc->ch1_callback().set_ioport("JOY1");
 	m_adc->ch2_callback().set_ioport("JOY2");
@@ -105,13 +107,13 @@ MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
 	m_adc->ch4_callback().set_ioport("JOY4");
 
 	/* cartridges */
-	MCFG_ELECTRON_CARTSLOT_ADD("cart_sk1", electron_cart, nullptr)
-	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(*this, electron_plus1_device, irq_w))
-	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(*this, electron_plus1_device, nmi_w))
-	MCFG_ELECTRON_CARTSLOT_ADD("cart_sk2", electron_cart, nullptr)
-	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(*this, electron_plus1_device, irq_w))
-	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(*this, electron_plus1_device, nmi_w))
-MACHINE_CONFIG_END
+	ELECTRON_CARTSLOT(config, m_cart_sk1, DERIVED_CLOCK(1, 1), electron_cart, nullptr);
+	m_cart_sk1->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_cart_sk1->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
+	ELECTRON_CARTSLOT(config, m_cart_sk2, DERIVED_CLOCK(1, 1), electron_cart, nullptr);
+	m_cart_sk2->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+	m_cart_sk2->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -154,7 +156,6 @@ electron_plus1_device::electron_plus1_device(const machine_config &mconfig, cons
 
 void electron_plus1_device::device_start()
 {
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 }
 
 
@@ -162,8 +163,10 @@ void electron_plus1_device::device_start()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset)
 {
+	uint8_t data = 0xff;
+
 	switch (offset >> 12)
 	{
 	case 0x8:
@@ -174,14 +177,18 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset, uin
 		{
 		case 0:
 		case 1:
-			data = m_cart_sk2->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
+			data = m_cart_sk2->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 2:
 		case 3:
-			data = m_cart_sk1->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
+			data = m_cart_sk1->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 12:
 			data = m_exp_rom->base()[offset & 0x1fff];
+			break;
+		case 13:
+			data &= m_cart_sk1->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			data &= m_cart_sk2->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
 			break;
 		}
 		break;
@@ -190,22 +197,22 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset, uin
 		switch (offset >> 8)
 		{
 		case 0xfc:
-			data &= m_cart_sk1->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
-			data &= m_cart_sk2->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+			data &= m_cart_sk1->read(space, offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
+			data &= m_cart_sk2->read(space, offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
 
 			if (offset == 0xfc70)
 			{
-				data &= m_adc->read(space, offset);
+				data &= m_adc->read(space, 0);
 			}
 			else if (offset == 0xfc72)
 			{
-				data &= status_r(space, offset);
+				data &= status_r(space, 0);
 			}
 			break;
 
 		case 0xfd:
-			data &= m_cart_sk1->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
-			data &= m_cart_sk2->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
+			data &= m_cart_sk1->read(space, offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
+			data &= m_cart_sk2->read(space, offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
 			break;
 		}
 	}
@@ -230,11 +237,11 @@ void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_
 		{
 		case 0:
 		case 1:
-			m_cart_sk2->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			m_cart_sk2->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 2:
 		case 3:
-			m_cart_sk1->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			m_cart_sk1->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		}
 		break;
@@ -243,12 +250,12 @@ void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_
 		switch (offset >> 8)
 		{
 		case 0xfc:
-			m_cart_sk1->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
-			m_cart_sk2->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+			m_cart_sk1->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
+			m_cart_sk2->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
 
 			if (offset == 0xfc70)
 			{
-				m_adc->write(space, offset, data);
+				m_adc->write(space, 0, data);
 			}
 			else if (offset == 0xfc71)
 			{
@@ -257,8 +264,8 @@ void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_
 			break;
 
 		case 0xfd:
-			m_cart_sk1->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
-			m_cart_sk2->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
+			m_cart_sk1->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
+			m_cart_sk2->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
 			break;
 
 		case 0xfe:
@@ -298,14 +305,4 @@ WRITE_LINE_MEMBER(electron_plus1_device::busy_w)
 WRITE_LINE_MEMBER(electron_plus1_device::ready_w)
 {
 	m_adc_ready = !state;
-}
-
-WRITE_LINE_MEMBER(electron_plus1_device::irq_w)
-{
-	m_slot->irq_w(state);
-}
-
-WRITE_LINE_MEMBER(electron_plus1_device::nmi_w)
-{
-	m_slot->nmi_w(state);
 }

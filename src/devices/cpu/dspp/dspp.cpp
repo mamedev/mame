@@ -10,10 +10,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "dspp.h"
 #include "dsppfe.h"
 #include "dsppdasm.h"
+
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -33,8 +34,8 @@ enum
 #define SINGLE_INSTRUCTION_MODE         (0)
 
 
-#define CACHE_SIZE  (4 * 1024 * 1024) // FIXME
-// FIXME!!!
+#define CACHE_SIZE  (4 * 1024 * 1024)
+
 /* compilation boundaries -- how far back/forward does the analysis extend? */
 #define COMPILE_BACKWARDS_BYTES         128
 #define COMPILE_FORWARDS_BYTES          512
@@ -46,56 +47,6 @@ enum
 #define EXECUTE_MISSING_CODE            1
 #define EXECUTE_UNMAPPED_CODE           2
 #define EXECUTE_RESET_CACHE             3
-
-
-
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-//#define DSPI_FLAG_CC_CARRY                    0x0001
-//#define DSPI_FLAG_CC_ZERO                 0x0002
-//#define DSPI_FLAG_CC_NEG                  0x0004
-//#define DSPI_FLAG_CC_OVER                 0x0008
-//#define DSPI_FLAG_CC_EXACT                    0x0010
-//#define DSPI_FLAG_AUDLOCK                 0x0020
-//#define DSPI_FLAG_SLEEP                       0x0040
-//#define DSPI_FLAG_CC_MASK                 0x001f
-
-#define DSPX_CONTROL_GWILLING               0x0001
-#define DSPX_CONTROL_STEP_CYCLE             0x0002
-#define DSPX_CONTROL_STEP_PC                0x0004
-#define DSPX_CONTROL_SNOOP                  0x0008
-
-#define DSPX_RESET_DSPP                     0x0001
-#define DSPX_RESET_INPUT                    0x0002
-#define DSPX_RESET_OUTPUT                   0x0004
-
-#define DSPX_F_DMA_NEXTVALID                0x0001
-#define DSPX_F_DMA_GO_FOREVER               0x0002
-#define DSPX_F_INT_DMANEXT_EN               0x0004
-#define DSPX_F_SHADOW_SET_DMANEXT           0x00040000
-#define DSPX_F_SHADOW_SET_FOREVER           0x00020000
-#define DSPX_F_SHADOW_SET_NEXTVALID         0x00010000
-#define DSPX_F_SHADOW_SET_ADDRESS_COUNT     0x80000000
-
-#define DSPX_F_INT_TIMER                    0x00000100
-#define DSPX_F_INT_INPUT_UNDER              0x00000080
-#define DSPX_F_INT_INPUT_OVER               0x00000040
-#define DSPX_F_INT_OUTPUT_UNDER             0x00000020
-#define DSPX_F_INT_OUTPUT_OVER              0x00000010
-#define DSPX_F_INT_UNDEROVER                0x00000008
-#define DSPX_F_INT_CONSUMED                 0x00000002
-#define DSPX_F_INT_DMANEXT                  0x00000001
-
-#define DSPX_F_INT_ALL_DMA                  (DSPX_F_INT_DMANEXT | DSPX_F_INT_CONSUMED | DSPX_F_INT_UNDEROVER)
-
-#define DSPX_FLD_INT_SOFT_WIDTH             16          /* width of the field and the number of interrupts */
-#define DSPX_FLD_INT_SOFT_SHIFT             16
-#define DSPX_FLD_INT_SOFT_MASK              (0xffff0000)
-
-
 
 //**************************************************************************
 //  INTERNAL MEMORY MAPS
@@ -153,7 +104,6 @@ dspp_device::dspp_device(const machine_config &mconfig, device_type type, const 
 		m_data(nullptr),
 		m_output_fifo_start(0),
 		m_output_fifo_count(0),
-		m_dspx_control(0),
 		m_dspx_reset(0),
 		m_dspx_int_enable(0),
 		m_dspx_channel_enable(0),
@@ -194,7 +144,6 @@ dspp_device::dspp_device(const machine_config &mconfig, device_type type, const 
 
 void dspp_device::device_start()
 {
-	// DSPP DRC is not yet ready for prime time
 	m_isdrc = false;//allow_drc();
 
 	m_core = (dspp_internal_state *)m_cache.alloc_near(sizeof(dspp_internal_state));
@@ -215,6 +164,7 @@ void dspp_device::device_start()
 	m_data = &space(AS_DATA);
 	auto code_cache = m_code->cache<1, -1, ENDIANNESS_BIG>();
 	m_code_cache = code_cache;
+	m_code16 = [code_cache](offs_t address) -> uint16_t { return code_cache->read_word(address); };
 	m_codeptr = [code_cache](offs_t address) -> const void * { return code_cache->read_ptr(address); };
 
 	// Register our state for the debugger
@@ -275,7 +225,7 @@ void dspp_device::device_start()
 
 	save_item(NAME(m_core->m_partial_int));
 
-	save_item(NAME(m_dspx_control));
+	save_item(NAME(m_core->m_dspx_control));
 	save_item(NAME(m_dspx_reset));
 	save_item(NAME(m_dspx_int_enable));
 	save_item(NAME(m_dspx_channel_enable));
@@ -489,8 +439,8 @@ void dspp_device::parse_operands(uint32_t numops)
 	for (uint32_t i = 0; i < MAX_OPERANDS; ++i)
 	{
 		// Reset operands
-		m_operands[i].value = -1;
-		m_operands[i].addr = -1;
+		m_core->m_operands[i].value = -1;
+		m_core->m_operands[i].addr = -1;
 	}
 
 	// Reset global op index
@@ -520,7 +470,7 @@ void dspp_device::parse_operands(uint32_t numops)
 					if (val & 0x1000)
 						val |= 0xe000;
 				}
-				m_operands[opidx++].value = val;
+				m_core->m_operands[opidx++].value = val;
 			}
 			else if((operand & 0xe000) == 0x8000)
 			{
@@ -532,14 +482,14 @@ void dspp_device::parse_operands(uint32_t numops)
 					 // Indirect
 					addr = read_data(addr);
 				}
-				m_operands[opidx].addr = addr;
+				m_core->m_operands[opidx].addr = addr;
 
 				if (operand & 0x0800)
 				{
 					// Write Back
 					m_core->m_writeback = addr;
 				}
-				++opidx;
+				opidx++;
 			}
 			else if ((operand & 0xe000) == 0xa000)
 			{
@@ -582,7 +532,7 @@ void dspp_device::parse_operands(uint32_t numops)
 						m_core->m_writeback = addr;
 				}
 
-				m_operands[opidx++].addr = addr;
+				m_core->m_operands[opidx++].addr = addr;
 			}
 			numregs = 0;
 		}
@@ -597,10 +547,14 @@ void dspp_device::parse_operands(uint32_t numops)
 
 uint16_t dspp_device::read_next_operand()
 {
-	int32_t value = m_operands[m_core->m_opidx].value;
+	int32_t value = m_core->m_operands[m_core->m_opidx].value;
+	//if (m_core->m_op == 0x46a0) printf("Value is %08x\n", value);
 
 	if (value < 0)
-		value = read_data(m_operands[m_core->m_opidx].addr);
+	{
+		value = read_data(m_core->m_operands[m_core->m_opidx].addr);
+		//if (m_core->m_op == 0x46a0) printf("New value is %08x from %08x\n", value, m_core->m_operands[m_core->m_opidx].addr);
+	}
 
 	// Next operand
 	++m_core->m_opidx;
@@ -616,7 +570,7 @@ uint16_t dspp_device::read_next_operand()
 
 void dspp_device::write_next_operand(uint16_t value)
 {
-	int32_t addr = m_operands[m_core->m_opidx].addr;
+	int32_t addr = m_core->m_operands[m_core->m_opidx].addr;
 
 	assert(addr != -1);
 
@@ -724,11 +678,19 @@ void dspp_device::execute_run()
 {
 	if (m_isdrc)
 	{
-		// TODO: TEMPORARY HACK!
-		if (m_dspx_control & DSPX_CONTROL_GWILLING)
-			execute_run_drc();
-		else
-			m_core->m_icount = 0;
+		// Only run if enabled
+		do
+		{
+			if (m_core->m_dspx_control & DSPX_CONTROL_GWILLING)
+			{
+				execute_run_drc();
+			}
+			else
+			{
+				update_ticks();
+				update_fifo_dma();
+			}
+		} while (m_core->m_icount > 0);
 		return;
 	}
 
@@ -740,12 +702,13 @@ void dspp_device::execute_run()
 		update_fifo_dma();
 
 		// Only run if enabled
-		if (m_dspx_control & DSPX_CONTROL_GWILLING)
+		if (m_core->m_dspx_control & DSPX_CONTROL_GWILLING)
 		{
 			if (check_debugger)
 				debugger_instruction_hook(m_core->m_pc);
 
 			m_core->m_op = read_op(m_core->m_pc);
+			//printf("%04x: %04x\n", (uint16_t)m_core->m_pc, (uint16_t)m_core->m_op);
 			update_pc();
 
 			// Decode and execute
@@ -845,7 +808,6 @@ inline void dspp_device::exec_special()
 			if (regdi & 0x0010)
 			{
 				addr = read_data(addr);
-				break;
 			}
 
 			parse_operands(1);
@@ -907,6 +869,8 @@ void dspp_device::exec_branch()
 
 	if (mode == 2)
 		branch = !branch;
+
+	//printf("Branch: %d %d %d %d %d\n", branch ? 1 : 0, flag0 ? 1 : 0, mask0 ? 1 : 0, flag1 ? 1 : 0, mask1 ? 1 : 0);
 
 	if (branch)
 		m_core->m_pc = m_core->m_op & 0x3ff;
@@ -1072,6 +1036,9 @@ inline void dspp_device::exec_arithmetic()
 
 	int32_t alu_a, alu_b;
 
+	//if (m_core->m_op == 0x46a0)
+		//printf("Arithmetic: numops:%d, muxa:%d, muxb:%d, alu_op:%d, barrel_code:%d\n", numops, muxa, muxb, alu_op, barrel_code);
+
 	switch (muxa)
 	{
 		case 0:
@@ -1082,6 +1049,8 @@ inline void dspp_device::exec_arithmetic()
 		case 1: case 2:
 		{
 			alu_a = read_next_operand() << 4;
+			//if (m_core->m_op == 0x46a0)
+				//printf("Arithmetic: Next operand: %04x\n", alu_a >> 4);
 			break;
 		}
 		case 3:
@@ -1505,7 +1474,7 @@ void dspp_device::process_next_dma(int32_t channel)
 int16_t dspp_device::decode_sqxd(int8_t data, int16_t prev)
 {
 	int16_t temp = sign_extend8(data & 0xfe);
-	int32_t expanded = (temp * abs(temp)) << 1;
+	int32_t expanded = (temp * iabs(temp)) << 1;
 	int16_t output;
 
 	if (data & 1)
@@ -2122,7 +2091,7 @@ uint32_t dspp_device::read_ext_control(offs_t offset)
 		// DSPX_CONTROL
 		case 0x6070/4:
 		{
-			data = m_dspx_control;
+			data = m_core->m_dspx_control;
 			break;
 		}
 		default:
@@ -2346,7 +2315,7 @@ void dspp_device::write_ext_control(offs_t offset, uint32_t data)
 		// DSPX_CONTROL
 		case 0x6070/4:
 		{
-			m_dspx_control = data;
+			m_core->m_dspx_control = data;
 			break;
 		}
 
@@ -2620,7 +2589,7 @@ void dspp_device::dump_state()
 	char buffer[64];
 
 	printf("\n=== GLOBAL REGISTER===\n");
-	printf("DSPX_CONTROL:           %08X\n", m_dspx_control);
+	printf("DSPX_CONTROL:           %08X\n", m_core->m_dspx_control);
 	printf("DSPX_RESET:             %08X\n", m_dspx_reset);
 	printf("DSPX_INT_ENABLE:        %08X\n", m_dspx_int_enable);
 	printf("DSPX_CHANNEL_ENABLE:    %08X %s\n", m_dspx_channel_enable, GetBinary(buffer, m_dspx_channel_enable, 32));

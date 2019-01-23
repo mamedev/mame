@@ -153,7 +153,7 @@ public:
 	void ibm6580(machine_config &config);
 
 private:
-	DECLARE_PALETTE_INIT(ibm6580);
+	void ibm6580_palette(palette_device &palette) const;
 
 	DECLARE_WRITE16_MEMBER(pic_latch_w);
 	DECLARE_WRITE16_MEMBER(unk_latch_w);
@@ -834,11 +834,11 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-PALETTE_INIT_MEMBER( ibm6580_state, ibm6580 )
+void ibm6580_state::ibm6580_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
-	palette.set_pen_color(1, 0, 192, 0 );   /* Normal */
-	palette.set_pen_color(2, 0, 255, 0 );   /* Bright */
+	palette.set_pen_color(0, 0, 0, 0 );     // Black
+	palette.set_pen_color(1, 0, 192, 0 );   // Normal
+	palette.set_pen_color(2, 0, 255, 0 );   // Bright
 }
 
 void ibm6580_state::machine_start()
@@ -896,8 +896,7 @@ MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ibm6580_state, vblank_w))
 	config.set_default_layout(layout_ibm6580);
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(ibm6580_state, ibm6580)
+	PALETTE(config, "palette", FUNC(ibm6580_state::ibm6580_palette), 3);
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);

@@ -124,8 +124,8 @@
 class ddealer_state : public driver_device
 {
 public:
-	ddealer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ddealer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vregs(*this, "vregs"),
 		m_left_fg_vram_top(*this, "left_fg_vratop"),
 		m_right_fg_vram_top(*this, "right_fg_vratop"),
@@ -136,7 +136,8 @@ public:
 		m_mcu_shared_ram(*this, "mcu_shared_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void ddealer(machine_config &config);
 
@@ -636,7 +637,7 @@ MACHINE_CONFIG_START(ddealer_state::ddealer)
 
 	// M50747 or NMK-110 8131 MCU
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ddealer)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddealer);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -644,12 +645,11 @@ MACHINE_CONFIG_START(ddealer_state::ddealer)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddealer_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x200);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", ddealer_state, mcu_sim, attotime::from_hz(10000))
+	TIMER(config, "coinsim").configure_periodic(FUNC(ddealer_state::mcu_sim), attotime::from_hz(10000));
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(6'000'000) / 8) /* 7.5KHz */

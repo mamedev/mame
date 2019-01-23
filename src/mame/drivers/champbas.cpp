@@ -554,12 +554,10 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_talbot)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_talbot)
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -598,12 +596,10 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_champbas)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_champbas)
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -695,8 +691,9 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_DEVICE_IO_MAP(exctsccr_sound_io_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(exctsccr_state, nmi_line_pulse, 4000) // 4 kHz, updates the dac
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("exc_snd_irq", exctsccr_state, exctsccr_sound_irq, attotime::from_hz(75)) // irq source unknown, determines music tempo
-	MCFG_TIMER_START_DELAY(attotime::from_hz(75))
+	timer_device &exc_snd_irq(TIMER(config, "exc_snd_irq"));
+	exc_snd_irq.configure_periodic(FUNC(exctsccr_state::exctsccr_sound_irq), attotime::from_hz(75)); // irq source unknown, determines music tempo
+	exc_snd_irq.set_start_delay(attotime::from_hz(75));
 
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
@@ -709,12 +706,10 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccr)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exctsccr_state,exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -769,12 +764,10 @@ MACHINE_CONFIG_START(exctsccr_state::exctsccrb)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(exctsccr_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exctsccr_state,exctsccr)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_exctsccr)
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

@@ -104,7 +104,6 @@
 
 
 #include "emu.h"
-#include "includes/mcr.h"
 #include "includes/mcr3.h"
 
 #include "machine/nvram.h"
@@ -1086,7 +1085,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	m_maincpu->set_addrmap(AS_IO, &mcr3_state::mcrmono_portmap);
 	m_maincpu->set_daisy_config(mcr_daisy_chain);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr3_state::mcr_interrupt), "screen", 0, 1);
 
 	Z80CTC(config, m_ctc, MASTER_CLOCK/4 /* same as "maincpu" */);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1108,10 +1107,10 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	MCFG_SCREEN_SIZE(32*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr3)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr3);
+	PALETTE(config, m_palette).set_entries(64);
 MACHINE_CONFIG_END
 
 
@@ -1132,7 +1131,7 @@ void mcr3_state::maxrpm(machine_config &config)
 {
 	mono_tcs(config);
 
-	ADC0844(config, m_maxrpm_adc, 0);
+	ADC0844(config, m_maxrpm_adc);
 	m_maxrpm_adc->ch1_callback().set_ioport("MONO.IP1");
 	m_maxrpm_adc->ch2_callback().set_ioport("MONO.IP1.ALT1");
 	m_maxrpm_adc->ch3_callback().set_ioport("MONO.IP1.ALT2");
@@ -1171,11 +1170,9 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	MCFG_SCREEN_SIZE(30*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64+4)
+	m_gfxdecode->set_info(gfx_spyhunt);
+	subdevice<palette_device>("palette")->set_entries(64 + 4).set_init(FUNC(mcr3_state::spyhunt_palette));
 
-	MCFG_PALETTE_INIT_OWNER(mcr3_state,spyhunt)
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)
 MACHINE_CONFIG_END
 

@@ -96,8 +96,8 @@
 class nyny_state : public driver_device
 {
 public:
-	nyny_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nyny_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram1(*this, "videoram1"),
 		m_colorram1(*this, "colorram1"),
 		m_videoram2(*this, "videoram2"),
@@ -112,7 +112,8 @@ public:
 		m_pia2(*this, "pia2"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_soundlatch3(*this, "soundlatch3") { }
+		m_soundlatch3(*this, "soundlatch3")
+	{ }
 
 	void nyny(machine_config &config);
 
@@ -615,7 +616,7 @@ MACHINE_CONFIG_START(nyny_state::nyny)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	H46505(config, m_mc6845, CRTC_CLOCK);
 	m_mc6845->set_screen("screen");

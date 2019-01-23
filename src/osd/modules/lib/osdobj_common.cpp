@@ -163,7 +163,7 @@ const options_entry osd_options::s_option_entries[] =
 };
 
 osd_options::osd_options()
-: emu_options()
+	: emu_options()
 {
 	add_entries(osd_options::s_option_entries);
 }
@@ -176,20 +176,20 @@ std::list<std::shared_ptr<osd_window>> osd_common_t::s_window_list;
 //-------------------------------------------------
 
 osd_common_t::osd_common_t(osd_options &options)
-	: osd_output(), m_machine(nullptr),
-		m_options(options),
-		m_print_verbose(false),
-		m_font_module(nullptr),
-		m_sound(nullptr),
-		m_debugger(nullptr),
-		m_midi(nullptr),
-		m_keyboard_input(nullptr),
-		m_mouse_input(nullptr),
-		m_lightgun_input(nullptr),
-		m_joystick_input(nullptr),
-		m_output(nullptr),
-		m_monitor_module(nullptr),
-		m_watchdog(nullptr)
+	: osd_output(), m_machine(nullptr)
+	, m_options(options)
+	, m_print_verbose(false)
+	, m_font_module(nullptr)
+	, m_sound(nullptr)
+	, m_debugger(nullptr)
+	, m_midi(nullptr)
+	, m_keyboard_input(nullptr)
+	, m_mouse_input(nullptr)
+	, m_lightgun_input(nullptr)
+	, m_joystick_input(nullptr)
+	, m_output(nullptr)
+	, m_monitor_module(nullptr)
+	, m_watchdog(nullptr)
 {
 	osd_output::push(this);
 }
@@ -438,7 +438,6 @@ void osd_common_t::output_callback(osd_output_channel channel, const char *msg, 
 
 void osd_common_t::init(running_machine &machine)
 {
-	//
 	// This function is responsible for initializing the OSD-specific
 	// video and input functionality, and registering that functionality
 	// with the MAME core.
@@ -466,7 +465,6 @@ void osd_common_t::init(running_machine &machine)
 	//
 	// Audio initialization may eventually move into here as well,
 	// instead of relying on independent callbacks from each system.
-	//
 
 	m_machine = &machine;
 

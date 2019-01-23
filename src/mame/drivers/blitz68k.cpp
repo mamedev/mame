@@ -1715,7 +1715,7 @@ void blitz68k_state::ramdac_map(address_map &map)
 
 void blitz68k_state::ramdac_config(machine_config &config)
 {
-	PALETTE(config, m_palette, 0x100);
+	PALETTE(config, m_palette).set_entries(0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
@@ -1783,7 +1783,7 @@ MACHINE_CONFIG_START(blitz68k_state::steaser)
 	MCFG_DEVICE_PROGRAM_MAP(steaser_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", blitz68k_state, steaser_mcu_sim, attotime::from_hz(10000))
+	TIMER(config, "coinsim").configure_periodic(FUNC(blitz68k_state::steaser_mcu_sim), attotime::from_hz(10000));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blitz68k_state::cjffruit)

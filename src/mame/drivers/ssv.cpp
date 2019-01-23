@@ -2598,7 +2598,7 @@ void ssv_state::ssv(machine_config &config)
 	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssv);
-	PALETTE(config, m_palette, 0x8000).set_format(PALETTE_FORMAT_XRGB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x8000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

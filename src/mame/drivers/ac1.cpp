@@ -148,16 +148,16 @@ MACHINE_CONFIG_START(ac1_state::ac1)
 	MCFG_SCREEN_SIZE(64*6, 16*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 16*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ac1_state, screen_update_ac1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ac1 )
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cassette);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ac1_state::ac1_32)

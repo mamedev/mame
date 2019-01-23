@@ -27,14 +27,17 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG 0
+#include <algorithm>
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 class microvision_state : public driver_device
 {
 public:
-	microvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	microvision_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_dac( *this, "dac" ),
 		m_i8021( *this, "maincpu1" ),
 		m_tms1100( *this, "maincpu2" ),
@@ -43,12 +46,17 @@ public:
 
 	void microvision(machine_config &config);
 
+protected:
+	static constexpr device_timer_id TIMER_PADDLE = 0;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_PALETTE_INIT(microvision);
-	DECLARE_MACHINE_START(microvision);
-	DECLARE_MACHINE_RESET(microvision);
+	void microvision_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
@@ -100,9 +108,7 @@ private:
 	required_device<generic_slot_device> m_cart;
 
 	// Timers
-	static const device_timer_id TIMER_PADDLE = 0;
 	emu_timer *m_paddle_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// i8021 variables
 	uint8_t   m_p0;
@@ -126,7 +132,7 @@ private:
 };
 
 
-PALETTE_INIT_MEMBER(microvision_state,microvision)
+void microvision_state::microvision_palette(palette_device &palette) const
 {
 	palette.set_pen_color( 15, 0x00, 0x00, 0x00 );
 	palette.set_pen_color( 14, 0x11, 0x11, 0x11 );
@@ -134,20 +140,20 @@ PALETTE_INIT_MEMBER(microvision_state,microvision)
 	palette.set_pen_color( 12, 0x33, 0x33, 0x33 );
 	palette.set_pen_color( 11, 0x44, 0x44, 0x44 );
 	palette.set_pen_color( 10, 0x55, 0x55, 0x55 );
-	palette.set_pen_color( 9, 0x66, 0x66, 0x66 );
-	palette.set_pen_color( 8, 0x77, 0x77, 0x77 );
-	palette.set_pen_color( 7, 0x88, 0x88, 0x88 );
-	palette.set_pen_color( 6, 0x99, 0x99, 0x99 );
-	palette.set_pen_color( 5, 0xaa, 0xaa, 0xaa );
-	palette.set_pen_color( 4, 0xbb, 0xbb, 0xbb );
-	palette.set_pen_color( 3, 0xcc, 0xcc, 0xcc );
-	palette.set_pen_color( 2, 0xdd, 0xdd, 0xdd );
-	palette.set_pen_color( 1, 0xee, 0xee, 0xee );
-	palette.set_pen_color( 0, 0xff, 0xff, 0xff );
+	palette.set_pen_color(  9, 0x66, 0x66, 0x66 );
+	palette.set_pen_color(  8, 0x77, 0x77, 0x77 );
+	palette.set_pen_color(  7, 0x88, 0x88, 0x88 );
+	palette.set_pen_color(  6, 0x99, 0x99, 0x99 );
+	palette.set_pen_color(  5, 0xaa, 0xaa, 0xaa );
+	palette.set_pen_color(  4, 0xbb, 0xbb, 0xbb );
+	palette.set_pen_color(  3, 0xcc, 0xcc, 0xcc );
+	palette.set_pen_color(  2, 0xdd, 0xdd, 0xdd );
+	palette.set_pen_color(  1, 0xee, 0xee, 0xee );
+	palette.set_pen_color(  0, 0xff, 0xff, 0xff );
 }
 
 
-MACHINE_START_MEMBER(microvision_state, microvision)
+void microvision_state::machine_start()
 {
 	m_paddle_timer = timer_alloc(TIMER_PADDLE);
 
@@ -165,20 +171,12 @@ MACHINE_START_MEMBER(microvision_state, microvision)
 }
 
 
-MACHINE_RESET_MEMBER(microvision_state, microvision)
+void microvision_state::machine_reset()
 {
-	for (auto & elem : m_lcd_latch)
-	{
-		elem = 0;
-	}
+	std::fill(std::begin(m_lcd_latch), std::end(m_lcd_latch), 0);
 
-	for (auto & elem : m_lcd)
-	{
-		for (int j = 0; j < 16; j++)
-		{
-			elem[j] = 0;
-		}
-	}
+	for (auto &elem : m_lcd)
+		std::fill(std::begin(elem), std::end(elem), 0);
 
 	m_o = 0;
 	m_r = 0;
@@ -224,7 +222,7 @@ void microvision_state::update_lcd()
 	uint16_t row = ( m_lcd_holding_latch[0] << 12 ) | ( m_lcd_holding_latch[1] << 8 ) | ( m_lcd_holding_latch[2] << 4 ) | m_lcd_holding_latch[3];
 	uint16_t col = ( m_lcd_holding_latch[4] << 12 ) | ( m_lcd_holding_latch[5] << 8 ) | ( m_lcd_holding_latch[6] << 4 ) | m_lcd_holding_latch[7];
 
-	if (LOG) logerror("row = %04x, col = %04x\n", row, col );
+	LOG( "row = %04x, col = %04x\n", row, col );
 	for ( int i = 0; i < 16; i++ )
 	{
 		uint16_t temp = row;
@@ -341,7 +339,7 @@ void microvision_state::device_timer(emu_timer &timer, device_timer_id id, int p
 */
 WRITE8_MEMBER( microvision_state::i8021_p0_write )
 {
-	if (LOG) logerror( "p0_write: %02x\n", data );
+	LOG( "p0_write: %02x\n", data );
 
 	m_p0 = data;
 }
@@ -357,7 +355,7 @@ WRITE8_MEMBER( microvision_state::i8021_p0_write )
 */
 WRITE8_MEMBER( microvision_state::i8021_p1_write )
 {
-	if (LOG) logerror( "p1_write: %02x\n", data );
+	LOG( "p1_write: %02x\n", data );
 
 	lcd_write( data & 0x03, data >> 4 );
 }
@@ -370,7 +368,7 @@ WRITE8_MEMBER( microvision_state::i8021_p1_write )
 */
 WRITE8_MEMBER( microvision_state::i8021_p2_write )
 {
-	if (LOG) logerror( "p2_write: %02x\n", data );
+	LOG( "p2_write: %02x\n", data );
 
 	m_p2 = data;
 
@@ -438,7 +436,7 @@ READ8_MEMBER( microvision_state::tms1100_read_k )
 {
 	uint8_t data = 0;
 
-	if (LOG) logerror("read_k\n");
+	LOG("read_k\n");
 
 	if ( m_r & 0x100 )
 	{
@@ -458,7 +456,7 @@ READ8_MEMBER( microvision_state::tms1100_read_k )
 
 WRITE16_MEMBER( microvision_state::tms1100_write_o )
 {
-	if (LOG) logerror("write_o: %04x\n", data);
+	LOG("write_o: %04x\n", data);
 
 	m_o = data;
 
@@ -477,7 +475,7 @@ x-- ---- ---- KEY2
 */
 WRITE16_MEMBER( microvision_state::tms1100_write_r )
 {
-	if (LOG) logerror("write_r: %04x\n", data);
+	LOG("write_r: %04x\n", data);
 
 	m_r = data;
 
@@ -654,17 +652,13 @@ MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(microvision_state, microvision )
-	MCFG_MACHINE_RESET_OVERRIDE(microvision_state, microvision )
-
 	MCFG_SCREEN_UPDATE_DRIVER(microvision_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, microvision_state, screen_vblank))
 	MCFG_SCREEN_SIZE(16, 16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 15, 0, 15)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(microvision_state,microvision)
+	PALETTE(config, "palette", FUNC(microvision_state::microvision_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

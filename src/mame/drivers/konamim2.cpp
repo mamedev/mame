@@ -8,11 +8,11 @@
     driver by Phil Bennett
 
     TODO:
+    * Fix Heat of Eleven '98 soft-lock when selecting Japan as a team
+    * Fix incorrect speed in Tobe! Polystars
     * Fix texture compression
     * Sort out CD images
-    * Fix Polystars blending issues
     * Fix PowerPC 602 Protection Only mode handling.
-    * Implement CDDA muting
 
     DONE
     * Fix Polystars blending
@@ -247,8 +247,8 @@ Notes:
 class konamim2_state : public driver_device
 {
 public:
-	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	konamim2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ppc1(*this, "ppc1"),
 		m_ppc2(*this, "ppc2"),
 		m_bda(*this, "bda"),
@@ -1111,8 +1111,8 @@ INPUT_PORTS_END
 
 void konamim2_state::cr589_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 0.5);
-	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 0.5);
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 1.0);
 	device = device->subdevice("cdda");
 }
 
@@ -1203,9 +1203,10 @@ void konamim2_state::set_arcres(machine_config &config)
 
 void konamim2_state::add_ymz280b(machine_config &config)
 {
+    // TODO: The YMZ280B outputs are actually routed to a speaker in each gun
 	YMZ280B(config, m_ymz280b, XTAL(16'934'400));
-	m_ymz280b->add_route(0, "lspeaker", 1.0);
-	m_ymz280b->add_route(1, "rspeaker", 1.0);
+	m_ymz280b->add_route(0, "lspeaker", 0.5);
+	m_ymz280b->add_route(1, "rspeaker", 0.5);
 }
 
 void konamim2_state::add_mt48t58(machine_config &config)

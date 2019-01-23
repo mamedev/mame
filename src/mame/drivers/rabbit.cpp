@@ -96,8 +96,8 @@ public:
 		TIMER_BLIT_DONE
 	};
 
-	rabbit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rabbit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -110,7 +110,8 @@ public:
 		m_tilemap_regs(*this, "tilemap_regs.%u", 0),
 		m_spriteregs(*this, "spriteregs"),
 		m_blitterregs(*this, "blitterregs"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram")
+	{ }
 
 	void rabbit(machine_config &config);
 
@@ -921,9 +922,7 @@ void rabbit_state::rabbit(machine_config &config)
 	screen.set_screen_update(FUNC(rabbit_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 0x4000);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_all_black));
-	m_palette->set_format(PALETTE_FORMAT_XGRB);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xGRB_888, 0x4000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -933,8 +932,6 @@ void rabbit_state::rabbit(machine_config &config)
 	i5000snd.add_route(0, "rspeaker", 1.0);
 	i5000snd.add_route(1, "lspeaker", 1.0);
 }
-
-
 
 
 

@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 #include "machine/taitocchip.h"
 #include "machine/taitoio.h"
 
@@ -17,7 +16,7 @@
 #include "video/tc0480scp.h"
 #include "machine/timer.h"
 #include "emupal.h"
-
+#include "screen.h"
 
 class taitof2_state : public driver_device
 {
@@ -42,6 +41,7 @@ public:
 		, m_tc0220ioc(*this, "tc0220ioc")
 		, m_tc0510nio(*this, "tc0510nio")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 	{ }
 
@@ -168,6 +168,7 @@ protected:
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	DECLARE_WRITE8_MEMBER(coin_nibble_w);

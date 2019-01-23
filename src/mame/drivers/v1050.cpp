@@ -1036,7 +1036,7 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	// keyboard HACK
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", v1050_state, v1050_keyboard_tick, attotime::from_hz(60))
+	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));
 
 	// video hardware
 	v1050_video(config);
@@ -1045,12 +1045,12 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	I8214(config, m_pic, 16_MHz_XTAL/4);
 	m_pic->int_wr_callback().set(FUNC(v1050_state::pic_int_w));
 
-	MCFG_DEVICE_ADD(MSM58321RS_TAG, MSM58321, 32.768_kHz_XTAL)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pa_3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(*this, v1050_state, rtc_ppi_pc_3_w))
+	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->d0_handler().set(FUNC(v1050_state::rtc_ppi_pa_0_w));
+	m_rtc->d1_handler().set(FUNC(v1050_state::rtc_ppi_pa_1_w));
+	m_rtc->d2_handler().set(FUNC(v1050_state::rtc_ppi_pa_2_w));
+	m_rtc->d3_handler().set(FUNC(v1050_state::rtc_ppi_pa_3_w));
+	m_rtc->busy_handler().set(FUNC(v1050_state::rtc_ppi_pc_3_w));
 
 	I8255A(config, m_ppi_disp);
 	m_ppi_disp->in_pa_callback().set(I8255A_M6502_TAG, FUNC(i8255_device::pb_r));
@@ -1077,8 +1077,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	m_uart_kb->txd_handler().set(V1050_KEYBOARD_TAG, FUNC(v1050_keyboard_device::si_w));
 	m_uart_kb->rxrdy_handler().set(FUNC(v1050_state::kb_rxrdy_w));
 
-	MCFG_DEVICE_ADD(CLOCK_KB_TAG, CLOCK, 16_MHz_XTAL/4/13/8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_keyboard_clock))
+	clock_device &clock_kb(CLOCK(config, CLOCK_KB_TAG, 16_MHz_XTAL/4/13/8));
+	clock_kb.signal_handler().set(FUNC(v1050_state::write_keyboard_clock));
 
 	// keyboard
 	v1050_keyboard_device &keyboard(V1050_KEYBOARD(config, V1050_KEYBOARD_TAG, 0));
@@ -1095,8 +1095,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	rs232.rxd_handler().set(m_uart_sio, FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set(m_uart_sio, FUNC(i8251_device::write_dsr));
 
-	MCFG_DEVICE_ADD(CLOCK_SIO_TAG, CLOCK, 16_MHz_XTAL/4)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, v1050_state, write_sio_clock))
+	CLOCK(config, m_clock_sio, 16_MHz_XTAL/4);
+	m_clock_sio->signal_handler().set(FUNC(v1050_state::write_sio_clock));
 
 	MB8877(config, m_fdc, 16_MHz_XTAL/16);
 	m_fdc->intrq_wr_callback().set(FUNC(v1050_state::fdc_intrq_w));
@@ -1120,8 +1120,8 @@ MACHINE_CONFIG_START(v1050_state::v1050)
 	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
 	MCFG_DEVICE_ADD("scsi_ctrl_in", INPUT_BUFFER, 0)
 
-	MCFG_TIMER_DRIVER_ADD(TIMER_ACK_TAG, v1050_state, sasi_ack_tick)
-	MCFG_TIMER_DRIVER_ADD(TIMER_RST_TAG, v1050_state, sasi_rst_tick)
+	TIMER(config, m_timer_ack).configure_generic(FUNC(v1050_state::sasi_ack_tick));
+	TIMER(config, m_timer_rst).configure_generic(FUNC(v1050_state::sasi_rst_tick));
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "v1050_flop")

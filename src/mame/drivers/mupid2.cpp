@@ -247,8 +247,7 @@ void mupid2_state::c2a2(machine_config &config)
 
 	M58990(config, "adc", 1000000);
 
-	PALETTE(config, m_palette, 32);
-	m_palette->set_init(DEVICE_SELF, FUNC(mupid2_state::palette_init));
+	PALETTE(config, m_palette, FUNC(mupid2_state::palette_init), 32);
 }
 
 

@@ -209,18 +209,18 @@ MACHINE_CONFIG_START(mk2_state::mk2)
 	/* video hardware */
 	config.set_default_layout(layout_mk2);
 
-	MCFG_DEVICE_ADD("miot", MOS6530, 1000000)
-	MCFG_MOS6530_IN_PA_CB(READ8(*this, mk2_state, mk2_read_a))
-	MCFG_MOS6530_OUT_PA_CB(WRITE8(*this, mk2_state, mk2_write_a))
-	MCFG_MOS6530_IN_PB_CB(READ8(*this, mk2_state, mk2_read_b))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, mk2_state, mk2_write_b))
+	MOS6530(config, m_miot, 1000000);
+	m_miot->in_pa_callback().set(FUNC(mk2_state::mk2_read_a));
+	m_miot->out_pa_callback().set(FUNC(mk2_state::mk2_write_a));
+	m_miot->in_pb_callback().set(FUNC(mk2_state::mk2_read_b));
+	m_miot->out_pb_callback().set(FUNC(mk2_state::mk2_write_b));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", mk2_state, update_leds, attotime::from_hz(60))
+	TIMER(config, "led_timer").configure_periodic(FUNC(mk2_state::update_leds), attotime::from_hz(60));
 MACHINE_CONFIG_END
 
 

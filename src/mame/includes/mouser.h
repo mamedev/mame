@@ -55,7 +55,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
-	DECLARE_PALETTE_INIT(mouser);
+	void mouser_palette(palette_device &palette) const;
 	uint32_t screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(mouser_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(mouser_sound_nmi_assert);

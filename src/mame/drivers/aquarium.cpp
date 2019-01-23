@@ -308,11 +308,10 @@ MACHINE_CONFIG_START(aquarium_state::aquarium)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 34*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(aquarium_state, screen_update_aquarium)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarium)
-	MCFG_PALETTE_ADD("palette", 0x1000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_aquarium)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000/2);
 
 	MCFG_DEVICE_ADD("spritegen", EXCELLENT_SPRITE, 0)
 

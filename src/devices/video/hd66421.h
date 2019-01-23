@@ -62,7 +62,7 @@ private:
 
 	void hd66421(address_map &map);
 
-	DECLARE_PALETTE_INIT(hd66421);
+	void hd66421_palette(palette_device &palette) const;
 };
 
 

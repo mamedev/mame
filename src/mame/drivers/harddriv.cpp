@@ -1500,7 +1500,7 @@ void harddriv_state::driver_nomsp(machine_config &config)
 	rs232.rxd_handler().set("duartn68681", FUNC(mc68681_device::rx_a_w));
 
 	/* video hardware */
-	PALETTE(config, m_palette, 1024);
+	PALETTE(config, m_palette).set_entries(1024);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(HARDDRIV_GSP_CLOCK/12*4, 160*4, 0, 127*4, 417, 0, 384);

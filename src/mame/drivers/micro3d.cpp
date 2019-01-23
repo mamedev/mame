@@ -331,12 +331,12 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	m_audiocpu->serial_tx_cb().set(FUNC(micro3d_state::data_from_i8031));
 	m_audiocpu->serial_rx_cb().set(FUNC(micro3d_state::data_to_i8031));
 
-	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, micro3d_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("monitor_host", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, micro3d_state, duart_txb))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, micro3d_state, duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, micro3d_state, duart_output_w))
+	MC68681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
+	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
+	m_duart->outport_cb().set(FUNC(micro3d_state::duart_output_w));
 
 	mc68901_device &mfp(MC68901(config, "mfp", 4000000));
 	mfp.set_timer_clock(4000000);
@@ -350,13 +350,12 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(BBBBBRRRRRGGGGGx)
+	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
 	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
@@ -372,7 +371,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
 	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
 
-	ADC0844(config, m_adc, 0);
+	ADC0844(config, m_adc);
 	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));
 	m_adc->ch1_callback().set_ioport("THROTTLE");
 	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));

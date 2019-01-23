@@ -312,9 +312,7 @@ void jrpacman_state::jrpacman(machine_config &config)
 	screen.screen_vblank().set(FUNC(jrpacman_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jrpacman);
-	PALETTE(config, m_palette, 128*4);
-	m_palette->set_indirect_entries(32);
-	m_palette->set_init(FUNC(jrpacman_state::palette_init_pacman));
+	PALETTE(config, m_palette, FUNC(jrpacman_state::pacman_palette), 128 * 4, 32);
 
 	MCFG_VIDEO_START_OVERRIDE(jrpacman_state,jrpacman)
 

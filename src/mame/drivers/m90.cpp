@@ -754,7 +754,7 @@ void m90_state::m90(machine_config &config)
 	m_screen->screen_vblank().set_inputline("maincpu", NEC_INPUT_LINE_INTP0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m90);
-	PALETTE(config, m_palette, 512).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1139,23 +1139,32 @@ ROM_START( newapunk )
 	ROM_LOAD( "bbm2-v0.30",    0x0000, 0x20000, CRC(4ad889ed) SHA1(b685892a2348f17f89c6d6ce91216f6cf1e33751) )
 ROM_END
 
+//PCB is marked: "BOMBER LORD 030" and "lc" on component side ("LC" is the Italian for "Lato Componenti" which translates to "Components Side")
+//PCB is marked: "BOMBER LORD 030" and "ls" on solder side ("LS" is the Italian for "Lato Saldature" which translates to "Solders Side") 
 ROM_START( bomblord )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "bomblord.3",  0x00001, 0x40000, CRC(65d5c54a) SHA1(f794a193d5927b5fb838ab2351c176d8cbd37236) )
-	ROM_LOAD16_BYTE( "bomblord.4",  0x00000, 0x40000, CRC(cfe65f81) SHA1(8dae94abc67bc53f1c8dbe13243dc08a62fd5d22) )
+	ROM_LOAD16_BYTE( "27c020_3.u6",  0x00001, 0x40000, CRC(65d5c54a) SHA1(f794a193d5927b5fb838ab2351c176d8cbd37236) )
+	ROM_LOAD16_BYTE( "27c020_4.u5",  0x00000, 0x40000, CRC(cfe65f81) SHA1(8dae94abc67bc53f1c8dbe13243dc08a62fd5d22) )
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "bbm2-sp.33",    0x0000, 0x10000, CRC(6bc1689e) SHA1(099c275632965e19eb6131863f69d2afa9916e90) ) // bomblord.1
+	ROM_LOAD( "27c512_1.u100",    0x0000, 0x10000, CRC(6bc1689e) SHA1(099c275632965e19eb6131863f69d2afa9916e90) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "bomblord.5",  0x000000, 0x40000, CRC(3ded3278) SHA1(2fec2f10d875e44d966b6f652e3b09308db9b343) )
-	ROM_LOAD( "bomblord.6",  0x080000, 0x40000, CRC(1c489632) SHA1(f4412b138e4933c8d152ec51d05baa02abc7fc00) )
-	ROM_LOAD( "bomblord.7",  0x100000, 0x40000, CRC(68935e94) SHA1(6725c7ad49bd0ee6ed1db22193852a11cdf95aaa) )
-	ROM_LOAD( "bomblord.8",  0x180000, 0x40000, CRC(6a423b24) SHA1(d30dac90a7dc2a616714eae7450ae0edef566c31) )
+	ROM_LOAD( "27c020_5.u69",  0x000000, 0x40000, CRC(3ded3278) SHA1(2fec2f10d875e44d966b6f652e3b09308db9b343) )
+	ROM_LOAD( "27c020_6.u70",  0x080000, 0x40000, CRC(1c489632) SHA1(f4412b138e4933c8d152ec51d05baa02abc7fc00) )
+	ROM_LOAD( "27c020_7.u71",  0x100000, 0x40000, CRC(cc2b6237) SHA1(8450edac25817afdc393e2e6960fec4da382d2c9) )
+	// previous 7.u71 dump had a single different byte at 0x86eb: 0x6f instead of 0x2f. Hashes left as a remainder:
+	// ROM_LOAD( "bomblord.7",  0x100000, 0x40000, CRC(68935e94) SHA1(6725c7ad49bd0ee6ed1db22193852a11cdf95aaa) )
+	ROM_LOAD( "27c020_8.u72",  0x180000, 0x40000, CRC(6a423b24) SHA1(d30dac90a7dc2a616714eae7450ae0edef566c31) )
 
 	ROM_REGION( 0x20000, "samples", 0 )
-	ROM_LOAD( "bomblord.2",    0x0000, 0x20000, CRC(37d356bd) SHA1(15f187954f94e2b1a4757e4a27ab7be9598972ff) )
+	ROM_LOAD( "27c010_2.u104",    0x0000, 0x20000, CRC(37d356bd) SHA1(15f187954f94e2b1a4757e4a27ab7be9598972ff) )
+
+	ROM_REGION( 0x700, "plds", ROMREGION_ERASE00 ) // all read protected
+	ROM_LOAD( "palce16v8h.u45",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u119",  0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "palce22v10h.u105", 0x400, 0x2dd, NO_DUMP )
 ROM_END
 
 ROM_START( quizf1 )
@@ -1183,8 +1192,8 @@ ROM_END
 
 ROM_START( riskchal )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "rc_h0.ic77",    0x00001, 0x40000, CRC(4c9b5344) SHA1(61e26950a672c6404e2386acdd098536b61b9933) ) /* Need to verify rom label. Likely L4-A-H0-B */
-	ROM_LOAD16_BYTE( "rc_l0.ic79",    0x00000, 0x40000, CRC(0455895a) SHA1(1072b8d280f7ccc48cd8fbd81323e1f8c8d0db95) ) /* Need to verify rom label. Likely L4-A-L0-B */
+	ROM_LOAD16_BYTE( "l4-a-h0-b.ic77",    0x00001, 0x40000, CRC(4c9b5344) SHA1(61e26950a672c6404e2386acdd098536b61b9933) )
+	ROM_LOAD16_BYTE( "l4-a-l0-b.ic79",    0x00000, 0x40000, CRC(0455895a) SHA1(1072b8d280f7ccc48cd8fbd81323e1f8c8d0db95) )
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )

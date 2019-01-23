@@ -69,8 +69,8 @@
 class mmagic_state : public driver_device
 {
 public:
-	mmagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mmagic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -82,7 +82,7 @@ public:
 		m_ball_y(0x00),
 		m_color(0x00),
 		m_audio(0x00)
-	{}
+	{ }
 
 	void mmagic(machine_config &config);
 
@@ -318,8 +318,7 @@ void mmagic_state::mmagic(machine_config &config)
 	m_screen->set_raw(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 192);
 	m_screen->set_screen_update(FUNC(mmagic_state::screen_update));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

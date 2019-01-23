@@ -1342,9 +1342,7 @@ void mappy_state::superpac_common(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superpac);
-	PALETTE(config, m_palette, 64*4+64*4);
-	m_palette->set_indirect_entries(32);
-	m_palette->set_init(FUNC(mappy_state::palette_init_superpac));
+	PALETTE(config, m_palette, FUNC(mappy_state::superpac_palette), 64*4+64*4, 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
@@ -1469,9 +1467,7 @@ void mappy_state::phozon(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phozon);
-	PALETTE(config, m_palette, 64*4+64*4);
-	m_palette->set_indirect_entries(32);
-	m_palette->set_init(FUNC(mappy_state::palette_init_phozon));
+	PALETTE(config, m_palette, FUNC(mappy_state::phozon_palette), 64*4+64*4, 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
@@ -1517,9 +1513,7 @@ void mappy_state::mappy_common(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mappy);
-	PALETTE(config, m_palette, 64*4+16*16);
-	m_palette->set_indirect_entries(32);
-	m_palette->set_init(FUNC(mappy_state::palette_init_mappy));
+	PALETTE(config, m_palette, FUNC(mappy_state::mappy_palette), 64*4+16*16, 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);

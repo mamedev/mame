@@ -304,18 +304,15 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(polyplay_state, screen_update_polyplay)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_polyplay)
-	MCFG_PALETTE_ADD("palette", 10)
-	MCFG_PALETTE_INIT_OWNER(polyplay_state, polyplay)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polyplay);
+	PALETTE(config, m_palette, FUNC(polyplay_state::polyplay_palette), 10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker1", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_DEVICE_ADD("speaker2", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	SPEAKER_SOUND(config, m_speaker1).add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, m_speaker2).add_route(ALL_OUTPUTS, "mono", 0.5);
 MACHINE_CONFIG_END
 
 void polyplay_state::polyplay_zrepp(machine_config &config)

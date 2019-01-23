@@ -79,8 +79,8 @@ Dumped by Uki
 class galpani3_state : public driver_device
 {
 public:
-	galpani3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galpani3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_grap2(*this,"grap2_%u", 0),
 		m_palette(*this, "palette"),
@@ -453,7 +453,7 @@ void galpani3_state::galpani3_map(address_map &map)
 MACHINE_CONFIG_START(galpani3_state::galpani3)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'636'363)/2) // Confirmed from PCB
 	MCFG_DEVICE_PROGRAM_MAP(galpani3_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpani3_state, galpani3_vblank, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(galpani3_state::galpani3_vblank), "screen", 0, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -469,8 +469,7 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 
 	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
 
-	MCFG_PALETTE_ADD("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000);
 
 	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
 

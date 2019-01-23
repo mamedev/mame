@@ -377,8 +377,7 @@ MACHINE_CONFIG_START(pk8000_state::pk8000)
 	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8000_state, pk8000)
+	PALETTE(config, "palette", FUNC(pk8000_state::pk8000_palette), 16);
 
 	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	ppi1.out_pa_callback().set(FUNC(pk8000_state::_80_porta_w));
@@ -393,11 +392,11 @@ MACHINE_CONFIG_START(pk8000_state::pk8000)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

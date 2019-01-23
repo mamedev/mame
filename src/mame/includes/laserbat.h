@@ -173,7 +173,7 @@ protected:
 	virtual void machine_start() override;
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(laserbat);
+	void laserbat_palette(palette_device &palette) const;
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound2_w) override;
@@ -202,7 +202,7 @@ public:
 protected:
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(catnmous);
+	void catnmous_palette(palette_device &palette) const;
 
 	// sound control ports
 	virtual DECLARE_WRITE8_MEMBER(csound1_w) override;

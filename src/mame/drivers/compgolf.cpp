@@ -235,12 +235,11 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(compgolf_state, screen_update_compgolf)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(compgolf_state, compgolf)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_compgolf)
+	PALETTE(config, m_palette, FUNC(compgolf_state::compgolf_palette), 0x100);
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_compgolf)
 
 
 	SPEAKER(config, "mono").front_center();

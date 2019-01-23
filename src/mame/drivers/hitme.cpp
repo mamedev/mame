@@ -331,14 +331,12 @@ MACHINE_CONFIG_START(hitme_state::hitme)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitme)
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_hitme);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, hitme_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	DISCRETE(config, m_discrete, hitme_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 
@@ -359,7 +357,7 @@ MACHINE_CONFIG_START(hitme_state::barricad)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_barricad)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_barricad)
+	m_gfxdecode->set_info(gfx_barricad);
 
 	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
 MACHINE_CONFIG_END

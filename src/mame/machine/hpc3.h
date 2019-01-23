@@ -16,7 +16,7 @@
 #include "machine/eepromser.h"
 #include "machine/hal2.h"
 #include "machine/ioc2.h"
-#include "machine/wd33c93.h"
+#include "machine/wd33c9x.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "speaker.h"
@@ -78,12 +78,13 @@ protected:
 	DECLARE_WRITE32_MEMBER(pio_config_w);
 
 	void do_pbus_dma(uint32_t channel);
+    void do_scsi_dma(int channel);
 
 	void dump_chain(uint32_t base);
 	void fetch_chain(int channel);
 	void decrement_chain(int channel);
 	void scsi_drq(bool state, int channel);
-	void scsi_dma(int channel);
+	//void scsi_dma(int channel);
 
 	static const device_timer_id TIMER_PBUS_DMA = 0;
 
@@ -132,8 +133,8 @@ protected:
 	};
 
 	required_device<mips3_device> m_maincpu;
-	required_device<wd33c93_device> m_wd33c93;
-	optional_device<wd33c93_device> m_wd33c93_2;
+	required_device<wd33c93b_device> m_wd33c93;
+	optional_device<wd33c93b_device> m_wd33c93_2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<ds1386_device> m_rtc;
 	required_device<ioc2_device> m_ioc2;
@@ -153,6 +154,7 @@ protected:
 		uint32_t m_length;
 		uint32_t m_next;
 		bool m_irq;
+        bool m_drq;
 		bool m_big_endian;
 		bool m_to_device;
 		bool m_active;

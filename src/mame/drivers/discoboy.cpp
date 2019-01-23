@@ -456,31 +456,30 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_toggle);
 }
 
-MACHINE_CONFIG_START(discoboy_state::discoboy)
-
+void discoboy_state::discoboy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* 6 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(discoboy_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);		/* 6 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &discoboy_state::discoboy_map);
+	m_maincpu->set_addrmap(AS_IO, &discoboy_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(discoboy_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(10'000'000)/2) /* 5 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(10'000'000)/2); /* 5 MHz? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &discoboy_state::sound_map);
 
 	ADDRESS_MAP_BANK(config, "rambank1").set_map(&discoboy_state::rambank1_map).set_options(ENDIANNESS_BIG, 8, 13, 0x800);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, 512-1-8*8, 0+8, 256-1-8)
-	MCFG_SCREEN_UPDATE_DRIVER(discoboy_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(8*8, 512-1-8*8, 0+8, 256-1-8);
+	screen.set_screen_update(FUNC(discoboy_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_discoboy)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_discoboy);
+	PALETTE(config, m_palette).set_entries(0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -489,19 +488,19 @@ MACHINE_CONFIG_START(discoboy_state::discoboy)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(10'000'000)/4)   /* 2.5 MHz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(10'000'000)/4));   /* 2.5 MHz? */
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.6);
 
 	LS157(config, m_adpcm_select, 0);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, discoboy_state, yunsung8_adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, XTAL(400'000));
+	m_msm->vck_legacy_callback().set(FUNC(discoboy_state::yunsung8_adpcm_int)); /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);      /* 4KHz, 4 Bits */
+	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
 
 
 ROM_START( discoboy )

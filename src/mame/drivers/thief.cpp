@@ -415,7 +415,7 @@ void thief_state::thief(machine_config &config)
 	m_tms->set_char_width(8);
 	m_tms->vsyn_callback().set_inputline("maincpu", 0, ASSERT_LINE);
 
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

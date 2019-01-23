@@ -89,8 +89,8 @@ Component Side   A   B   Solder Side
 class popobear_state : public driver_device
 {
 public:
-	popobear_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	popobear_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -648,19 +648,18 @@ MACHINE_CONFIG_START(popobear_state::popobear)
 	// levels 2,3,5 look interesting
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", popobear_state, irq5_line_assert)
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(popobear_state, irq2_line_assert, 120)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popobear_state, irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(popobear_state::irq), "screen", 0, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(popobear_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_SCREEN_SIZE(128*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 239)
 
-	MCFG_PALETTE_ADD("palette", 256*2)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256*2);
 
 	SPEAKER(config, "mono").front_center();
 

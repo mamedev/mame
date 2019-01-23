@@ -454,8 +454,7 @@ void timeplt_state::timeplt(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(timeplt_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_timeplt);
-	PALETTE(config, m_palette, 32*4+64*4);
-	m_palette->set_init(FUNC(timeplt_state::palette_init_timeplt));
+	PALETTE(config, m_palette, FUNC(timeplt_state::timeplt_palette), 32*4 + 64*4);
 
 	/* sound hardware */
 	TIMEPLT_AUDIO(config, "timeplt_audio");

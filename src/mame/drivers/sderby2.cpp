@@ -44,13 +44,14 @@
 class sderby2_state : public driver_device
 {
 public:
-	sderby2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sderby2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_proms(*this, "proms"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void sderby2(machine_config &config);
 
@@ -61,7 +62,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(sderby2);
+	void sderby2_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(palette_w);
@@ -96,7 +97,7 @@ private:
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(sderby2_state,sderby2)
+void sderby2_state::sderby2_palette(palette_device &palette) const
 {
 
 }
@@ -316,11 +317,10 @@ MACHINE_CONFIG_START(sderby2_state::sderby2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 256 - 1)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_UPDATE_DRIVER(sderby2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 256+256*3)
-	MCFG_PALETTE_INIT_OWNER(sderby2_state,sderby2)
+	MCFG_SCREEN_PALETTE(m_palette)
+	PALETTE(config, m_palette, FUNC(sderby2_state::sderby2_palette), 256+256*3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby2);
 
 	// sound hardware
 MACHINE_CONFIG_END

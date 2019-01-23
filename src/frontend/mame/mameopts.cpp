@@ -39,8 +39,8 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 		parse_one_ini(options, "debug", OPTION_PRIORITY_DEBUG_INI, &error_stream);
 
 	// if we have a valid system driver, parse system-specific INI files
-	const game_driver *cursystem = (driver == nullptr) ? system(options) : driver;
-	if (cursystem == nullptr)
+	game_driver const *const cursystem = !driver ? system(options) : driver;
+	if (!cursystem)
 		return;
 
 	// parse "vertical.ini" or "horizont.ini"

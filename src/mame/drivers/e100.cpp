@@ -585,18 +585,18 @@ MACHINE_CONFIG_START(e100_state::e100)
 	 * Once created it may be given on the commandline or mounted via TAB and select
 	 * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
 	 */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED);
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265)
 	MCFG_SCREEN_UPDATE_DRIVER(e100_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* There is a 50Hz signal from the video circuit to CA1 which generates interrupts and drives a software RTC */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
+	TIMER(config, "video50hz").configure_periodic(FUNC(e100_state::rtc_w), attotime::from_hz(100)); /* Will be divided by two through toggle in the handler */
 MACHINE_CONFIG_END
 
 /* ROM sets from Didact was not versioned in general, so the numbering are just assumptions */

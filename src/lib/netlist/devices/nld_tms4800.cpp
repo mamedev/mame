@@ -39,9 +39,9 @@ namespace netlist
 		param_rom_t<uint8_t, 11, 8> m_ROM; // 16 Kbits, used as 2 Kbit x 8
 	};
 
-	NETLIB_OBJECT_DERIVED(tms4800_dip, TMS4800)
+	NETLIB_OBJECT_DERIVED(TMS4800_dip, TMS4800)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(tms4800_dip, TMS4800)
+		NETLIB_CONSTRUCTOR_DERIVED(TMS4800_dip, TMS4800)
 		{
 			register_subalias("2",     m_A[0]);
 			register_subalias("3",     m_A[1]);
@@ -97,8 +97,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(TMS4800)
-	NETLIB_DEVICE_IMPL(tms4800_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(TMS4800)
+	NETLIB_DEVICE_IMPL_DEPRECATED(TMS4800_dip)
 
 	} //namespace devices
 } // namespace netlist

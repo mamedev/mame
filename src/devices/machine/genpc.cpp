@@ -135,6 +135,8 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma8237_out_eop )
 
 void ibm5160_mb_device::pc_select_dma_channel(int channel, bool state)
 {
+	m_isabus->dack_line_w(channel, state);
+
 	if(!state) {
 		m_dma_channel = channel;
 		if(m_cur_eop)
@@ -604,8 +606,8 @@ MACHINE_CONFIG_START(ibm5150_mb_device::device_add_mconfig)
 	m_ppi8255->out_pb_callback().set(FUNC(ibm5150_mb_device::pc_ppi_portb_w));
 	m_ppi8255->in_pc_callback().set(FUNC(ibm5150_mb_device::pc_ppi_portc_r));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 MACHINE_CONFIG_END
 
 //**************************************************************************

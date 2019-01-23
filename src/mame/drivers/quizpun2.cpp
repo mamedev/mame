@@ -100,8 +100,8 @@ Notes:
 class quizpun2_state : public driver_device
 {
 public:
-	quizpun2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	quizpun2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -115,6 +115,11 @@ public:
 	void quizpun2_base(machine_config &config);
 	void quizpun(machine_config &config);
 	void quizpun2(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -130,6 +135,12 @@ private:
 	tilemap_t *m_fg_tmap;
 	uint8_t m_scroll;
 
+	uint8_t m_mcu_data_port;
+	uint8_t m_mcu_control_port;
+	bool m_mcu_pending;
+	bool m_mcu_written;
+	bool m_mcu_repeat;
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_WRITE8_MEMBER(bg_ram_w);
@@ -139,9 +150,6 @@ private:
 	DECLARE_WRITE8_MEMBER(irq_ack);
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
 	uint32_t screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// quizpun2
@@ -164,11 +172,6 @@ private:
 	DECLARE_READ8_MEMBER(quizpun_protection_r);
 	DECLARE_WRITE8_MEMBER(quizpun_protection_w);
 
-	uint8_t m_mcu_data_port;
-	uint8_t m_mcu_control_port;
-	bool m_mcu_pending;
-	bool m_mcu_written;
-	bool m_mcu_repeat;
 	void quizpun2_cop_map(address_map &map);
 	void quizpun2_io_map(address_map &map);
 	void quizpun2_map(address_map &map);
@@ -600,7 +603,7 @@ void quizpun2_state::quizpun2_base(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quizpun2);
-	PALETTE(config, m_palette, 0x200).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -676,9 +679,6 @@ ROM_START( quizpun2 )
 	ROM_REGION( 0x20000, "fg2", 0 )    // 16x16x1
 	ROM_LOAD( "u1", 0x00000, 0x10000, CRC(58506040) SHA1(9d8bed2585e8f188a20270fccd9cfbdb91e48599) )
 	ROM_LOAD( "u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM
-	ROM_LOAD( "93c46", 0x00, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) BAD_DUMP ) // backup ram error
 ROM_END
 
 ROM_START( quizpun )
@@ -713,9 +713,6 @@ ROM_START( quizpun )
 	ROM_REGION( 0x20000, "fg2", 0 )    // 16x16x1
 	ROM_LOAD( "01.u1", 0x00000, 0x10000, CRC(58506040) SHA1(9d8bed2585e8f188a20270fccd9cfbdb91e48599) )
 	ROM_LOAD( "02.u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
-
-	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46eeprom.bin", 0, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) BAD_DUMP ) // backup ram error
 ROM_END
 
 GAME( 1988, quizpun,  0, quizpun,  quizpun2, quizpun2_state, empty_init, ROT270, "Space Computer", "Quiz Punch",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

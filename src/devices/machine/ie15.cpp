@@ -613,7 +613,7 @@ MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
 	ie15core(config);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ie15)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 MACHINE_CONFIG_END
 
 ioport_constructor ie15_device::device_input_ports() const

@@ -80,6 +80,7 @@ public:
 	void blandiap(machine_config &config);
 	void wits(machine_config &config);
 	void msgundam(machine_config &config);
+	void msgundamb(machine_config &config);
 	void extdwnhl(machine_config &config);
 	void pairlove(machine_config &config);
 	void zingzip(machine_config &config);
@@ -124,7 +125,7 @@ public:
 	void init_eightfrc();
 	void init_pairlove();
 
-	DECLARE_PALETTE_INIT(palette_init_RRRRRGGGGGBBBBB_proms);
+	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const;
 
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
 
@@ -235,11 +236,11 @@ protected:
 	DECLARE_MACHINE_RESET(calibr50);
 
 	DECLARE_VIDEO_START(seta_2_layers);
-	DECLARE_PALETTE_INIT(blandia);
-	DECLARE_PALETTE_INIT(zingzip);
+	void blandia_palette(palette_device &palette) const;
+	void zingzip_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(wrofaero);
-	DECLARE_PALETTE_INIT(gundhara);
-	DECLARE_PALETTE_INIT(jjsquawk);
+	void gundhara_palette(palette_device &palette) const;
+	void jjsquawk_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(keroppi);
 	DECLARE_MACHINE_START(magspeed);
 	DECLARE_VIDEO_START(oisipuzl_2_layers);
@@ -297,6 +298,7 @@ protected:
 	void magspeed_map(address_map &map);
 	void metafox_sub_map(address_map &map);
 	void msgundam_map(address_map &map);
+	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
 	void orbs_map(address_map &map);
 	void pairlove_map(address_map &map);
@@ -341,7 +343,7 @@ private:
 	uint16_t dsw_r(offs_t offset);
 	void lockout_w(uint8_t data);
 
-	DECLARE_PALETTE_INIT(usclssic);
+	void usclssic_palette(palette_device &palette) const;
 
 	uint32_t screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -453,7 +455,7 @@ private:
 	DECLARE_MACHINE_RESET(setaroul);
 
 	DECLARE_VIDEO_START(setaroul_1_layer);
-	DECLARE_PALETTE_INIT(setaroul);
+	void setaroul_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);

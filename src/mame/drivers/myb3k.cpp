@@ -1017,8 +1017,8 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("myb3k_keyboard", MYB3K_KEYBOARD, 0)
-	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+	MYB3K_KEYBOARD(config, m_kb, 0);
+	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
 
 	/* Monitor */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1026,23 +1026,24 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(myb3k_state::jb3000)
+void myb3k_state::jb3000(machine_config &config)
+{
 	myb3k(config);
 	/* Keyboard */
-	MCFG_DEVICE_REPLACE("myb3k_keyboard", JB3000_KEYBOARD, 0)
-	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+	JB3000_KEYBOARD(config.replace(), m_kb, 0);
+	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(myb3k_state::stepone)
+void myb3k_state::stepone(machine_config &config)
+{
 	myb3k(config);
 	/* Keyboard */
-	MCFG_DEVICE_REPLACE("myb3k_keyboard", STEPONE_KEYBOARD, 0)
-	MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
+	STEPONE_KEYBOARD(config.replace(), m_kb, 0);
+	m_kb->set_keyboard_callback(FUNC(myb3k_state::kbd_set_data_and_interrupt));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("stepone_flop_list", "stepone_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "stepone_flop_list").set_original("stepone_flop");
+}
 
 /* ROM definitions, ROM area is 8 x 8Kb and can be populated with 2732 mask ROMs or 2764s */
 ROM_START( myb3k )

@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

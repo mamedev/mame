@@ -175,29 +175,30 @@ INPUT_PORTS_START(whousetc)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
-	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(program_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void whouse_testcons_state::whousetc(machine_config &config)
+{
+	i8085a_cpu_device &maincpu(I8085A(config, "maincpu", 6.144_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &whouse_testcons_state::program_map);
+	maincpu.set_addrmap(AS_IO, &whouse_testcons_state::io_map);
 
 	I8155(config, "i8155", 6.144_MHz_XTAL);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
+	I8255(config, "i8255", 0);
 
-	MCFG_DEVICE_ADD("dsp0", DL1416B, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<0>))
+	DL1416B(config, m_dsp[0], u32(0));
+	m_dsp[0]->update().set(FUNC(whouse_testcons_state::update_dsp<0>));
 
-	MCFG_DEVICE_ADD("dsp1", DL1416B, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<1>))
+	DL1416B(config, m_dsp[1], u32(0));
+	m_dsp[1]->update().set(FUNC(whouse_testcons_state::update_dsp<1>));
 
-	MCFG_DEVICE_ADD("dsp2", DL1416B, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<2>))
+	DL1416B(config, m_dsp[2], u32(0));
+	m_dsp[2]->update().set(FUNC(whouse_testcons_state::update_dsp<2>));
 
-	MCFG_DEVICE_ADD("dsp3", DL1416B, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, whouse_testcons_state, update_dsp<3>))
+	DL1416B(config, m_dsp[3], u32(0));
+	m_dsp[3]->update().set(FUNC(whouse_testcons_state::update_dsp<3>));
 
 	config.set_default_layout(layout_whousetc);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(whousetc)

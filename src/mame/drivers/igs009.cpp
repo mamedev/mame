@@ -853,12 +853,11 @@ MACHINE_CONFIG_START(igs009_state::jingbell)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs009_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igs009_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jingbell)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jingbell);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -876,7 +875,7 @@ MACHINE_CONFIG_START(igs009_state::gp98)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_IO_MAP(gp98_portmap)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_gp98)
+	m_gfxdecode->set_info(gfx_gp98);
 
 	MCFG_VIDEO_START_OVERRIDE(igs009_state,gp98)
 MACHINE_CONFIG_END
@@ -1072,10 +1071,10 @@ ROM_START( jingbelli )
 	ROM_LOAD( "jingle133isp.u38", 0x00000, 0x20000, CRC(a42d73b1) SHA1(93157e9630d5c8bb34c71186415d0aa8c5d51951) )
 
 	ROM_REGION( 0x2dd, "plds",0 )
-	ROM_LOAD( "palce16v8h-ch-jin-u12v.u12", 0x000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-	ROM_LOAD( "palce16v8h-ch-jin-u33v.u33", 0x000, 0x117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "palce16v8h-ch-jin-u12v.u12", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h-ch-jin-u33v.u33", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "palce22v10h-ajbu24.u24",     0x000, 0x2dd, CRC(6310f441) SHA1(b610e170ccca1fcb06a57f718ece1408b696ba9c) )
-	ROM_LOAD( "palce22v10h-ch-jin-u27.u27", 0x000, 0x2dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )
+	ROM_LOAD( "palce22v10h-ch-jin-u27.u27", 0x000, 0x2dd, NO_DUMP )
 ROM_END
 
 void igs009_state::decrypt_jingbell()

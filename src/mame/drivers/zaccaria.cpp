@@ -361,18 +361,15 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zaccaria_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, zaccaria_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaccaria)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(512)
-	MCFG_PALETTE_INIT_OWNER(zaccaria_state, zaccaria)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaccaria);
+	PALETTE(config, m_palette, FUNC(zaccaria_state::zaccaria_palette), 32*8 + 32*8, 512);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("audiopcb", ZACCARIA_1B11142)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	ZACCARIA_1B11142(config, "audiopcb").add_route(ALL_OUTPUTS, "speaker", 1.0);
 MACHINE_CONFIG_END
 
 

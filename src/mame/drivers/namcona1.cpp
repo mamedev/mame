@@ -995,7 +995,7 @@ void namcona1_state::namcona_base(machine_config &config)
 	m_screen->set_screen_update(FUNC(namcona1_state::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, m_palette, 0x2000).enable_shadows();
+	PALETTE(config, m_palette).set_entries(0x2000).enable_shadows();
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcona1);
 
@@ -1043,7 +1043,7 @@ void xday2_namcona2_state::xday2(machine_config &config)
 	EEPROM_2864(config, "eeprom");
 
 	// TODO: unknown sub type
-	MSM6242(config,"rtc", XTAL(32'768));
+	MSM6242(config, "rtc", XTAL(32'768));
 }
 
  /* NA-1 Hardware */

@@ -12,6 +12,8 @@
 #include "drivenum.h"
 #include "softlist_dev.h"
 
+#include <algorithm>
+
 #include <ctype.h>
 
 
@@ -61,47 +63,6 @@ bool driver_list::matches(const char *wildstring, const char *string)
 
 	// match everything else normally
 	return (wildstring == nullptr || core_strwildcmp(wildstring, string) == 0);
-}
-
-
-//-------------------------------------------------
-//  penalty_compare - compare two strings for
-//  closeness and assign a score.
-//-------------------------------------------------
-
-int driver_list::penalty_compare(const char *source, const char *target)
-{
-	int gaps = 1;
-	bool last = true;
-
-	// scan the strings
-	for ( ; *source && *target; target++)
-	{
-		// do a case insensitive match
-		bool const match(tolower(u8(*source)) == tolower(u8(*target)));
-
-		// if we matched, advance the source
-		if (match)
-			source++;
-
-		// if the match state changed, count gaps
-		if (match != last)
-		{
-			last = match;
-			if (!match)
-				gaps++;
-		}
-	}
-
-	// penalty if short string does not completely fit in
-	for ( ; *source; source++)
-		gaps++;
-
-	// if we matched perfectly, gaps == 0
-	if (gaps == 1 && *source == 0 && *target == 0)
-		gaps = 0;
-
-	return gaps;
 }
 
 
@@ -260,12 +221,12 @@ bool driver_enumerator::next_excluded()
 //  an array of game_driver pointers
 //-------------------------------------------------
 
-void driver_enumerator::find_approximate_matches(const char *string, std::size_t count, int *results)
+void driver_enumerator::find_approximate_matches(std::string const &string, std::size_t count, int *results)
 {
 #undef rand
 
 	// if no name, pick random entries
-	if (!string || !string[0])
+	if (string.empty())
 	{
 		// seed the RNG first
 		srand(osd_ticks());
@@ -295,14 +256,11 @@ void driver_enumerator::find_approximate_matches(const char *string, std::size_t
 	else
 	{
 		// allocate memory to track the penalty value
-		std::vector<int> penalty(count);
-
-		// initialize everyone's states
-		for (int matchnum = 0; matchnum < count; matchnum++)
-		{
-			penalty[matchnum] = 9999;
-			results[matchnum] = -1;
-		}
+		std::vector<std::pair<double, int> > penalty;
+		penalty.reserve(count);
+		std::u32string const search(ustr_from_utf8(normalize_unicode(string, unicode_normalization_form::D, true)));
+		std::string composed;
+		std::u32string candidate;
 
 		// scan the entire drivers array
 		for (int index = 0; index < s_driver_count; index++)
@@ -310,29 +268,58 @@ void driver_enumerator::find_approximate_matches(const char *string, std::size_t
 			// skip things that can't run
 			if (m_included[index])
 			{
-				// pick the best match between driver name and description
-				int curpenalty = penalty_compare(string, s_drivers_sorted[index]->type.fullname());
-				int tmp = penalty_compare(string, s_drivers_sorted[index]->name);
-				curpenalty = (std::min)(curpenalty, tmp);
+				// cheat on the shortname as it's always lowercase ASCII
+				game_driver const &drv(*s_drivers_sorted[index]);
+				std::size_t const namelen(std::strlen(drv.name));
+				candidate.resize(namelen);
+				std::copy_n(drv.name, namelen, candidate.begin());
+				double curpenalty(util::edit_distance(search, candidate));
+
+				// if it's not a perfect match, try the description
+				if (curpenalty)
+				{
+					candidate = ustr_from_utf8(normalize_unicode(drv.type.fullname(), unicode_normalization_form::D, true));
+					double p(util::edit_distance(search, candidate));
+					if (p < curpenalty)
+						curpenalty = p;
+				}
+
+				// also check "<manufacturer> <description>"
+				if (curpenalty)
+				{
+					composed.assign(drv.manufacturer);
+					composed.append(1, ' ');
+					composed.append(drv.type.fullname());
+					candidate = ustr_from_utf8(normalize_unicode(composed, unicode_normalization_form::D, true));
+					double p(util::edit_distance(search, candidate));
+					if (p < curpenalty)
+						curpenalty = p;
+				}
 
 				// insert into the sorted table of matches
-				for (int matchnum = count - 1; matchnum >= 0; matchnum--)
+				auto const it(std::upper_bound(penalty.begin(), penalty.end(), std::make_pair(curpenalty, index)));
+				if (penalty.end() != it)
 				{
-					// stop if we're worse than the current entry
-					if (curpenalty >= penalty[matchnum])
-						break;
-
-					// as long as this isn't the last entry, bump this one down
-					if (matchnum < count - 1)
-					{
-						penalty[matchnum + 1] = penalty[matchnum];
-						results[matchnum + 1] = results[matchnum];
-					}
-					results[matchnum] = index;
-					penalty[matchnum] = curpenalty;
+					if (penalty.size() >= count)
+						penalty.resize(count - 1);
+					penalty.emplace(it, curpenalty, index);
+				}
+				else if (penalty.size() < count)
+				{
+					penalty.emplace(it, curpenalty, index);
 				}
 			}
 		}
+
+		// copy to output and pad with -1
+		std::fill(
+				std::transform(
+					penalty.begin(),
+					penalty.end(),
+					results,
+					[] (std::pair<double, int> const &x) { return x.second; }),
+				results + count,
+				-1);
 	}
 }
 

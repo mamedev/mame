@@ -252,9 +252,8 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, battlnts_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_battlnts)
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_battlnts);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 128);
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);

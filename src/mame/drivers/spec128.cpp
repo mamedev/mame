@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(spectrum_state::spectrum_128)
 	MCFG_SCREEN_RAW_PARAMS(X1_128_SINCLAIR / 2.5f, 456, 0, 352,  311, 0, 296)
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", spec128)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
 	/* sound hardware */
 	AY8912(config, "ay8912", X1_128_SINCLAIR / 10).add_route(ALL_OUTPUTS, "mono", 0.25);

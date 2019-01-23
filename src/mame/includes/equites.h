@@ -114,7 +114,7 @@ public:
 	TILE_GET_INFO_MEMBER(equites_fg_info);
 	TILE_GET_INFO_MEMBER(equites_bg_info);
 	DECLARE_VIDEO_START(equites);
-	DECLARE_PALETTE_INIT(equites);
+	void equites_palette(palette_device &palette) const;
 	uint32_t screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(equites_8155_timer_pulse);
 	TIMER_CALLBACK_MEMBER(equites_frq_adjuster_callback);
@@ -171,7 +171,7 @@ protected:
 	TILE_GET_INFO_MEMBER(splndrbt_fg_info);
 	TILE_GET_INFO_MEMBER(splndrbt_bg_info);
 	DECLARE_VIDEO_START(splndrbt);
-	DECLARE_PALETTE_INIT(splndrbt);
+	void splndrbt_palette(palette_device &palette) const;
 	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
 	void splndrbt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

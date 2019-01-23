@@ -60,11 +60,7 @@ public:
 	auto fdc_tc_callback() { return m_fdc_tc_func.bind(); }
 	auto eth_ca_callback() { return m_eth_ca_func.bind(); }
 
-	template <typename T> void set_memory(T &&tag, int spacenum)
-	{
-		m_memory_device.set_tag(std::forward<T>(tag));
-		m_memory_spacenum = spacenum;
-	}
+	template <typename T> void set_memory(T &&tag, int spacenum) { m_memory_space.set_tag(std::forward<T>(tag), spacenum); }
 
 	virtual void map(address_map &map) = 0;
 
@@ -246,8 +242,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	required_device<device_memory_interface> m_memory_device;
-	int m_memory_spacenum;
+	required_address_space m_memory_space;
 	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_memory;
 
 	// callbacks

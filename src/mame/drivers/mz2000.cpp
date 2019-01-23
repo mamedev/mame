@@ -53,8 +53,8 @@
 class mz2000_state : public driver_device
 {
 public:
-	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mz2000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_cass(*this, "cassette"),
 		m_floppy(nullptr),
 		m_maincpu(*this, "maincpu"),
@@ -73,7 +73,8 @@ public:
 		m_region_wram(*this, "wram"),
 		m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"}),
 		m_io_config(*this, "CONFIG"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void mz2000(machine_config &config);
 	void mz80b(machine_config &config);
@@ -909,10 +910,10 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "mz2000_flop")
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(mz700_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mz_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(mz700_cassette_formats);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->set_interface("mz_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz2000_cass")
 
@@ -923,14 +924,14 @@ MACHINE_CONFIG_START(mz2000_state::mz2000)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mz2000_state, screen_update_mz2000)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mz2000)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
 MACHINE_CONFIG_END

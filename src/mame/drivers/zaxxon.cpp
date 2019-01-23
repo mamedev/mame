@@ -941,9 +941,8 @@ MACHINE_CONFIG_START(zaxxon_state::root)
 	m_mainlatch[1]->q_out_cb<7>().set(FUNC(zaxxon_state::bg_enable_w)); // BEN
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zaxxon)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaxxon);
+	PALETTE(config, m_palette, FUNC(zaxxon_state::zaxxon_palette), 256);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
@@ -1062,9 +1061,7 @@ MACHINE_CONFIG_START(zaxxon_state::congo)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(512)
-	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
+	m_palette->set_entries(512).set_init(FUNC(zaxxon_state::zaxxon_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
 	MCFG_SCREEN_MODIFY("screen")

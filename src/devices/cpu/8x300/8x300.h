@@ -28,11 +28,11 @@ enum
 	_8X300_IVL,
 	_8X300_OVF,
 	_8X300_R11,
-	_8X300_UNUSED12,
-	_8X300_UNUSED13,
-	_8X300_UNUSED14,
-	_8X300_UNUSED15,
-	_8X300_UNUSED16,
+	_8X300_R12,
+	_8X300_R13,
+	_8X300_R14,
+	_8X300_R15,
+	_8X300_R16,
 	_8X300_IVR,
 	_8X300_LIV,
 	_8X300_RIV,
@@ -45,8 +45,13 @@ public:
 	// construction/destruction
 	n8x300_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto sc_callback() { return m_sc_callback.bind(); }
+
 protected:
+	n8x300_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -65,6 +70,12 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual void set_reg(uint8_t reg, uint8_t val, bool xmit);
+	virtual uint8_t get_reg(uint8_t reg);
+
+	void xmit_lb(uint8_t dst, uint8_t mask);
+	void xmit_rb(uint8_t dst, uint8_t mask);
+
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
@@ -74,6 +85,8 @@ protected:
 	address_space *m_program;
 	memory_access_cache<1, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_io;
+
+	devcb_write8 m_sc_callback;  // Select Command (address latch)
 
 	uint16_t m_PC;  // Program Counter
 	uint16_t m_AR;  // Address Register
@@ -86,13 +99,17 @@ protected:
 	uint8_t m_R5;
 	uint8_t m_R6;
 	uint8_t m_R11;
+	uint8_t m_R12;
+	uint8_t m_R13;
+	uint8_t m_R14;
+	uint8_t m_R15;
+	uint8_t m_R16;
 	uint8_t m_IVL;  // Interface vector (I/O) left bank  (write-only)
 	uint8_t m_IVR;  // Interface vector (I/O) right bank (write-only)
 	uint8_t m_OVF;  // Overflow register (read-only)
 	uint16_t m_genPC;
 
-	uint8_t m_left_IV;  // IV bank contents, these are latched when IVL or IVR are set
-	uint8_t m_right_IV;
+	uint8_t m_IV_latch;  // IV bank contents, these are latched when IVL or IVR are set
 
 private:
 	inline bool is_rot(uint16_t opcode)
@@ -120,10 +137,20 @@ private:
 	{
 		return ((s & ((uint8_t)0xff << n)) >> n) | ((s & ((uint8_t)0xff >> (8-n))) << (8-n));
 	}
-	void set_reg(uint8_t reg,uint8_t val);
-	uint8_t get_reg(uint8_t reg);
+};
+
+class n8x305_cpu_device : public n8x300_cpu_device
+{
+public:
+	// construction/destruction
+	n8x305_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void set_reg(uint8_t reg, uint8_t val, bool xmit) override;
+	virtual uint8_t get_reg(uint8_t reg) override;
 };
 
 DECLARE_DEVICE_TYPE(N8X300, n8x300_cpu_device)
+DECLARE_DEVICE_TYPE(N8X305, n8x305_cpu_device)
 
 #endif // MAME_CPU_8X300_8X300_H

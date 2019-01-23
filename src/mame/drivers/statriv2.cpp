@@ -94,7 +94,6 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-
 	void statriv2(machine_config &config);
 	void funcsino(machine_config &config);
 	void statriv2v(machine_config &config);
@@ -121,6 +120,7 @@ private:
 	uint8_t m_question_offset_high;
 	uint8_t m_latched_coin;
 	uint8_t m_last_coin;
+
 	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
 	DECLARE_READ8_MEMBER(question_data_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
@@ -128,7 +128,7 @@ private:
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(statriv2);
+	void statriv2_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(vertical);
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
@@ -171,12 +171,12 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(statriv2_state, statriv2)
+void statriv2_state::statriv2_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 64; i++)
 	{
-		palette.set_pen_color(2*i+0, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
-		palette.set_pen_color(2*i+1, pal1bit(i >> 5), pal1bit(i >> 3), pal1bit(i >> 4));
+		palette.set_pen_color(2*i + 0, pal1bit(i >> 2), pal1bit(i >> 0), pal1bit(i >> 1));
+		palette.set_pen_color(2*i + 1, pal1bit(i >> 5), pal1bit(i >> 3), pal1bit(i >> 4));
 	}
 }
 
@@ -628,13 +628,12 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	TMS9927(config, m_tms, MASTER_CLOCK/2/8).set_char_width(8);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_horizontal)
-	MCFG_PALETTE_ADD("palette", 2*64)
-	MCFG_PALETTE_INIT_OWNER(statriv2_state, statriv2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_horizontal);
+	PALETTE(config, m_palette, FUNC(statriv2_state::statriv2_palette), 2*64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -651,7 +650,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2v)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
 	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_vertical)
+	m_gfxdecode->set_info(gfx_vertical);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(statriv2_state::funcsino)

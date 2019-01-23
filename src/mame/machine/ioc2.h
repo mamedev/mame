@@ -79,6 +79,7 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(timer0_int);
 	DECLARE_WRITE_LINE_MEMBER(timer1_int);
+	DECLARE_WRITE_LINE_MEMBER(pit_clock2_out);
 	DECLARE_WRITE_LINE_MEMBER(kbdc_int_w);
 	DECLARE_WRITE_LINE_MEMBER(duart_int_w);
 

@@ -457,13 +457,11 @@ void bagman_state::bagman_base(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(bagman_state::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(bagman_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bagman);
-
-	PALETTE(config, m_palette, 64);
-	m_palette->set_init(DEVICE_SELF, FUNC(bagman_state::palette_init_bagman));
+	PALETTE(config, m_palette, FUNC(bagman_state::bagman_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -543,7 +541,7 @@ void bagman_state::pickin(machine_config &config)
 	screen.screen_vblank().set(FUNC(bagman_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pickin);
-	PALETTE(config, m_palette, 64).set_init(FUNC(bagman_state::palette_init_bagman));
+	PALETTE(config, m_palette, FUNC(bagman_state::bagman_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -600,7 +598,7 @@ void bagman_state::botanic(machine_config &config)
 	screen.screen_vblank().set(FUNC(bagman_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bagman);
-	PALETTE(config, m_palette, 64).set_init(FUNC(bagman_state::palette_init_bagman));
+	PALETTE(config, m_palette, FUNC(bagman_state::bagman_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

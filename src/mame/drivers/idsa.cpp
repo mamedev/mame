@@ -332,17 +332,18 @@ void idsa_state::machine_reset()
 	m_irqcnt = 0;
 }
 
-MACHINE_CONFIG_START(idsa_state::idsa)
+void idsa_state::idsa(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &idsa_state::maincpu_map);
+	m_maincpu->set_addrmap(AS_IO, &idsa_state::maincpu_io_map);
 
-	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL(8'000'000) / 4 )
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, idsa_state, clock_w))
+	clock_device &irqclock(CLOCK(config, "irqclock", XTAL(8'000'000) / 4));
+	irqclock.signal_handler().set(FUNC(idsa_state::clock_w));
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout()
 
 	/* sound hardware */
 	genpin_audio(config);
@@ -360,7 +361,7 @@ MACHINE_CONFIG_START(idsa_state::idsa)
 	aysnd2.port_a_write_callback().set(FUNC(idsa_state::ay2_a_w));
 	aysnd2.port_b_write_callback().set(FUNC(idsa_state::ay2_b_w));
 	aysnd2.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
-MACHINE_CONFIG_END
+}
 
 void idsa_state::bsktbllp(machine_config &config)
 {

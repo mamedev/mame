@@ -603,7 +603,8 @@ void dbox_state::dbox_map(address_map &map)
 static INPUT_PORTS_START( dbox )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(dbox_state::dbox)
+void dbox_state::dbox(machine_config &config)
+{
 	M68340(config, m_maincpu, 0);       // The 68340 has an internal VCO as clock source, hence need no CPU clock
 	m_maincpu->set_crystal(XTAL(32'768)); // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
 	m_maincpu->set_addrmap(AS_PROGRAM, &dbox_state::dbox_map);
@@ -614,9 +615,8 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	//m_maincpu->tgate2_in_callback().set("dsc", FUNC(descrambler_device::rxd_receiver));
 
 	/* Configure the serial ports */
-	MCFG_DEVICE_MODIFY("maincpu:serial")
-	MCFG_MC68340SER_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68340SER_B_TX_CALLBACK(WRITELINE("modem", rs232_port_device, write_txd))
+	subdevice<mc68340_serial_module_device>("maincpu:serial")->a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
+	subdevice<mc68340_serial_module_device>("maincpu:serial")->b_tx_cb().set("modem", FUNC(rs232_port_device::write_txd));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set("maincpu:serial", FUNC(mc68340_serial_module_device::rx_a_w));
 	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
@@ -626,13 +626,13 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	AMD_29F800B_16BIT(config, "flash");
 
 	/* LED Matrix Display */
-	MCFG_SDA5708_ADD("display")
+	SDA5708(config, m_display, 0);
 	config.set_default_layout(layout_sda5708);
 
 	/* IP16 74256 8 bit latch */
 	LATCH8(config, m_ip16_74259);
 	m_ip16_74259->write_cb<4>().set("display", FUNC(sda5708_device::reset_w));
-MACHINE_CONFIG_END
+}
 
 void dbox_state::init_dbox()
 {

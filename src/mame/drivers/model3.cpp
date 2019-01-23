@@ -6036,8 +6036,7 @@ void model3_state::add_base_devices(machine_config &config)
 	m_screen->set_size(512, 400);
 	m_screen->set_screen_update(FUNC(model3_state::screen_update_model3));
 
-	PALETTE(config, m_palette, 32768);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGBBBBB));
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 

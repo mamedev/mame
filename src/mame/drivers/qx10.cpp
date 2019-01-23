@@ -125,7 +125,7 @@ private:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(qx10);
 
-	DECLARE_PALETTE_INIT(qx10);
+	void qx10_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
@@ -684,7 +684,7 @@ void qx10_state::video_start()
 	m_video_ram = make_unique_clear<uint16_t[]>(0x30000);
 }
 
-PALETTE_INIT_MEMBER(qx10_state, qx10)
+void qx10_state::qx10_palette(palette_device &palette) const
 {
 	// ...
 }
@@ -735,9 +735,8 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 	m_screen->set_screen_update(FUNC(qx10_state::screen_update));
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_qx10)
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(qx10_state, qx10)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_qx10)
+	PALETTE(config, m_palette, FUNC(qx10_state::qx10_palette), 8);
 
 	/* Devices */
 

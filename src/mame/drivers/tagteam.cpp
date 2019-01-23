@@ -227,11 +227,10 @@ MACHINE_CONFIG_START(tagteam_state::tagteam)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tagteam)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tagteam);
+	PALETTE(config, m_palette, FUNC(tagteam_state::tagteam_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -240,7 +239,6 @@ MACHINE_CONFIG_START(tagteam_state::tagteam)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
 	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.25);
-
 	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC

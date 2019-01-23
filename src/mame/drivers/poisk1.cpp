@@ -84,6 +84,11 @@ public:
 
 	void init_poisk1();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
@@ -99,19 +104,6 @@ private:
 
 	required_ioport_array<8> m_kbdio;
 
-	DECLARE_MACHINE_START(poisk1);
-	DECLARE_MACHINE_RESET(poisk1);
-
-	DECLARE_PALETTE_INIT(p1);
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void set_palette_luts();
-	POISK1_UPDATE_ROW(cga_gfx_2bpp_update_row);
-	POISK1_UPDATE_ROW(cga_gfx_1bpp_update_row);
-	POISK1_UPDATE_ROW(poisk1_gfx_1bpp_update_row);
-
-	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
 	uint8_t m_p1_spkrdata;
 	uint8_t m_p1_input;
 
@@ -129,6 +121,15 @@ private:
 		void *update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *videoram, uint16_t ma, uint8_t ra, uint8_t stride);
 	} m_video;
 
+	void p1_palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void set_palette_luts();
+	POISK1_UPDATE_ROW(cga_gfx_2bpp_update_row);
+	POISK1_UPDATE_ROW(cga_gfx_1bpp_update_row);
+	POISK1_UPDATE_ROW(poisk1_gfx_1bpp_update_row);
+
+	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
+	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
 	DECLARE_READ8_MEMBER(p1_trap_r);
 	DECLARE_WRITE8_MEMBER(p1_trap_w);
 	DECLARE_READ8_MEMBER(p1_cga_r);
@@ -145,7 +146,7 @@ private:
 	DECLARE_WRITE8_MEMBER(p1_ppi2_porta_w);
 	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
 	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
-	const char *m_cputag;
+
 	void poisk1_io(address_map &map);
 	void poisk1_map(address_map &map);
 };
@@ -402,17 +403,13 @@ POISK1_UPDATE_ROW(p1_state::poisk1_gfx_1bpp_update_row)
 	}
 }
 
-/* Initialise the cga palette */
-PALETTE_INIT_MEMBER(p1_state, p1)
+// Initialise the cga palette
+void p1_state::p1_palette(palette_device &palette) const
 {
-	int i;
-
 	DBG_LOG(0, "init", ("palette_init()\n"));
 
-	for (i = 0; i < CGA_PALETTE_SETS * 16; i++)
-	{
+	for (int i = 0; i < CGA_PALETTE_SETS * 16; i++)
 		palette.set_pen_color(i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
-	}
 }
 
 void p1_state::video_start()
@@ -608,12 +605,12 @@ void p1_state::init_poisk1()
 	membank("bank10")->set_base(m_ram->pointer());
 }
 
-MACHINE_START_MEMBER(p1_state, poisk1)
+void p1_state::machine_start()
 {
 	DBG_LOG(0, "init", ("machine_start()\n"));
 }
 
-MACHINE_RESET_MEMBER(p1_state, poisk1)
+void p1_state::machine_reset()
 {
 	DBG_LOG(0, "init", ("machine_reset()\n"));
 
@@ -652,9 +649,6 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	m_maincpu->set_addrmap(AS_IO, &p1_state::poisk1_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_MACHINE_START_OVERRIDE( p1_state, poisk1 )
-	MCFG_MACHINE_RESET_OVERRIDE( p1_state, poisk1 )
-
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(XTAL(15'000'000)/12); /* heartbeat IRQ */
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
@@ -691,8 +685,8 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "isa", p1_isa8_cards, nullptr, false)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","poisk1_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","poisk1_cass")
@@ -706,8 +700,7 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_SCREEN_UPDATE_DRIVER( p1_state, screen_update )
 
 	/* XXX verify palette */
-	MCFG_PALETTE_ADD("palette",  CGA_PALETTE_SETS * 16 )
-	MCFG_PALETTE_INIT_OWNER(p1_state, p1)
+	PALETTE(config, m_palette, FUNC(p1_state::p1_palette), CGA_PALETTE_SETS * 16);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K");

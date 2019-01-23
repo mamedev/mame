@@ -1844,7 +1844,7 @@ MACHINE_CONFIG_START(m72_state::m72_base)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);

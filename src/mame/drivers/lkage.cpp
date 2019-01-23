@@ -86,11 +86,12 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "includes/lkage.h"
+
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -487,108 +488,95 @@ void lkage_state::machine_reset()
 	m_soundnmi->in_w<1>(0);
 }
 
-MACHINE_CONFIG_START(lkage_state::lkage)
-
+void lkage_state::lkage(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(lkage_map_mcu)
-	MCFG_DEVICE_IO_MAP(lkage_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_map_mcu);
+	m_maincpu->set_addrmap(AS_IO, &lkage_state::lkage_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lkage_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(lkage_sound_map)
-								/* IRQs are triggered by the YM2203 */
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_sound_map);	/* IRQs are triggered by the YM2203 */
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,MCU_CLOCK)
-
+	TAITO68705_MCU(config, m_bmcu, MCU_CLOCK);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(2*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lkage_state::screen_update_lkage));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lkage)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lkage);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, AUDIO_CLOCK )
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", AUDIO_CLOCK));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, AUDIO_CLOCK )
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", AUDIO_CLOCK));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.40);
+}
 
-
-MACHINE_CONFIG_START(lkage_state::lkageb)
-
+void lkage_state::lkageb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(lkage_map_boot)
-	MCFG_DEVICE_IO_MAP(lkage_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_map_boot);
+	m_maincpu->set_addrmap(AS_IO, &lkage_state::lkage_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lkage_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(lkage_sound_map)
-								/* IRQs are triggered by the YM2203 */
-
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lkage_state::lkage_sound_map); /* IRQs are triggered by the YM2203 */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lkage_state, screen_update_lkage)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(2*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lkage_state::screen_update_lkage));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lkage)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lkage);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, AUDIO_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", AUDIO_CLOCK));
+	ym1.irq_handler().set_inputline("audiocpu", 0);
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, AUDIO_CLOCK)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", AUDIO_CLOCK));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.40);
+}
 
 ROM_START( lkage )
 	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 code (main CPU) */

@@ -90,41 +90,51 @@ class chinagat_state : public ddragon_state
 {
 public:
 	chinagat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ddragon_state(mconfig, type, tag),
-		m_adpcm(*this, "adpcm") { };
+		: ddragon_state(mconfig, type, tag)
+		, m_adpcm(*this, "adpcm")
+	{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
+	void chinagat(machine_config &config);
+	void saiyugoub1(machine_config &config);
+	void saiyugoub2(machine_config &config);
+
 	void init_chinagat();
-	DECLARE_MACHINE_START(chinagat);
-	DECLARE_MACHINE_RESET(chinagat);
-	DECLARE_VIDEO_START(chinagat);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
 	DECLARE_WRITE8_MEMBER(interrupt_w);
 	DECLARE_WRITE8_MEMBER(video_ctrl_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sub_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sub_irq_ack_w);
-	DECLARE_READ8_MEMBER( saiyugoub1_mcu_command_r );
-	DECLARE_WRITE8_MEMBER( saiyugoub1_mcu_command_w );
-	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_rom_addr_w );
-	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_control_w );
-	DECLARE_WRITE8_MEMBER( saiyugoub1_m5205_clk_w );
+	DECLARE_READ8_MEMBER(saiyugoub1_mcu_command_r);
+	DECLARE_WRITE8_MEMBER(saiyugoub1_mcu_command_w);
+	DECLARE_WRITE8_MEMBER(saiyugoub1_adpcm_rom_addr_w);
+	DECLARE_WRITE8_MEMBER(saiyugoub1_adpcm_control_w);
+	DECLARE_WRITE8_MEMBER(saiyugoub1_m5205_clk_w);
 	DECLARE_READ_LINE_MEMBER(saiyugoub1_m5205_irq_r);
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
-	optional_device<msm5205_device> m_adpcm;
-	void saiyugoub2(machine_config &config);
-	void saiyugoub1(machine_config &config);
-	void chinagat(machine_config &config);
+
 	void i8748_map(address_map &map);
 	void main_map(address_map &map);
 	void saiyugoub1_sound_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void ym2203c_sound_map(address_map &map);
+
+	optional_device<msm5205_device> m_adpcm;
 };
 
 
-VIDEO_START_MEMBER(chinagat_state,chinagat)
+void chinagat_state::video_start()
 {
+	ddragon_state::video_start();
+
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(chinagat_state::background_scan),this), 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -519,8 +529,10 @@ static GFXDECODE_START( gfx_chinagat )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(chinagat_state,chinagat)
+void chinagat_state::machine_start()
 {
+	ddragon_state::machine_start();
+
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
@@ -540,8 +552,10 @@ MACHINE_START_MEMBER(chinagat_state,chinagat)
 }
 
 
-MACHINE_RESET_MEMBER(chinagat_state,chinagat)
+void chinagat_state::machine_reset()
 {
+	ddragon_state::machine_reset();
+
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
 	m_adpcm_sound_irq = 0;
@@ -557,35 +571,29 @@ MACHINE_RESET_MEMBER(chinagat_state,chinagat)
 }
 
 
-MACHINE_CONFIG_START(chinagat_state::chinagat)
-
+void chinagat_state::chinagat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", chinagat_state, chinagat_scanline, "screen", 0, 1)
+	HD6309(config, m_maincpu, MAIN_CLOCK / 2);		/* 1.5 MHz (12MHz oscillator / 4 internally) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &chinagat_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(chinagat_state::chinagat_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	HD6309(config, m_subcpu, MAIN_CLOCK / 2);		/* 1.5 MHz (12MHz oscillator / 4 internally) */
+	m_subcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sub_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_soundcpu, XTAL(3'579'545));     /* 3.579545 MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
-
-	MCFG_MACHINE_START_OVERRIDE(chinagat_state,chinagat)
-	MCFG_MACHINE_RESET_OVERRIDE(chinagat_state,chinagat)
+	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)   /* based on ddragon driver */
-	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);   /* based on ddragon driver */
+	m_screen->set_screen_update(FUNC(chinagat_state::screen_update_ddragon));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
-	MCFG_PALETTE_ADD("palette", 384)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chinagat);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 384);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -598,22 +606,22 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 	ymsnd.add_route(0, "mono", 0.80);
 	ymsnd.add_route(1, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1065000, okim6295_device::PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1065000, okim6295_device::PIN7_HIGH)); // pin 7 not verified, clock frequency estimated with recording
+	oki.add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
-MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
-
+void chinagat_state::saiyugoub1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", chinagat_state, chinagat_scanline, "screen", 0, 1)
+	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &chinagat_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(chinagat_state::chinagat_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", MC6809E, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	m_subcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sub_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
-	MCFG_DEVICE_PROGRAM_MAP(saiyugoub1_sound_map)
+	Z80(config, m_soundcpu, XTAL(3'579'545));		/* 3.579545 MHz oscillator */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::saiyugoub1_sound_map);
 
 	i8748_device &mcu(I8748(config, "mcu", 9263750));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
 	mcu.set_addrmap(AS_PROGRAM, &chinagat_state::i8748_map);
@@ -623,23 +631,16 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	mcu.p1_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_rom_addr_w));
 	mcu.p2_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_control_w));
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* heavy interleaving to sync up sprite<->main cpu's */
-
-	MCFG_MACHINE_START_OVERRIDE(chinagat_state,chinagat)
-	MCFG_MACHINE_RESET_OVERRIDE(chinagat_state,chinagat)
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)   /* based on ddragon driver */
-	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);   /* based on ddragon driver */
+	m_screen->set_screen_update(FUNC(chinagat_state::screen_update_ddragon));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
-	MCFG_PALETTE_ADD("palette", 384)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chinagat);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 384);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -652,41 +653,35 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	ymsnd.add_route(0, "mono", 0.80);
 	ymsnd.add_route(1, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("adpcm", MSM5205, 9263750 / 24)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, chinagat_state, saiyugoub1_m5205_irq_w)) /* Interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)          /* vclk input mode (6030Hz, 4-bit) */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	MSM5205(config, m_adpcm, 9263750 / 24);
+	m_adpcm->vck_legacy_callback().set(FUNC(chinagat_state::saiyugoub1_m5205_irq_w)); /* Interrupt function */
+	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B);	/* vclk input mode (6030Hz, 4-bit) */
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
-
+void chinagat_state::saiyugoub2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", chinagat_state, chinagat_scanline, "screen", 0, 1)
+	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);		/* 1.5 MHz (12MHz oscillator) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &chinagat_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(chinagat_state::chinagat_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("sub", MC6809E, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);		/* 1.5 MHz (12MHz oscillator) */
+	m_subcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sub_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
-	MCFG_DEVICE_PROGRAM_MAP(ym2203c_sound_map)
+	Z80(config, m_soundcpu, XTAL(3'579'545));		/* 3.579545 MHz oscillator */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::ym2203c_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
-
-	MCFG_MACHINE_START_OVERRIDE(chinagat_state,chinagat)
-	MCFG_MACHINE_RESET_OVERRIDE(chinagat_state,chinagat)
+	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)   /* based on ddragon driver */
-	MCFG_SCREEN_UPDATE_DRIVER(chinagat_state, screen_update_ddragon)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);   /* based on ddragon driver */
+	m_screen->set_screen_update(FUNC(chinagat_state::screen_update_ddragon));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinagat)
-	MCFG_PALETTE_ADD("palette", 384)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
-	MCFG_VIDEO_START_OVERRIDE(chinagat_state,chinagat)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chinagat);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 384);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -694,19 +689,19 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 3579545)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym1(YM2203(config, "ym1", 3579545));
+	ym1.irq_handler().set_inputline(m_soundcpu, 0);
+	ym1.add_route(0, "mono", 0.50);
+	ym1.add_route(1, "mono", 0.50);
+	ym1.add_route(2, "mono", 0.50);
+	ym1.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 3579545)
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
-	MCFG_SOUND_ROUTE(2, "mono", 0.50)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 3579545));
+	ym2.add_route(0, "mono", 0.50);
+	ym2.add_route(1, "mono", 0.50);
+	ym2.add_route(2, "mono", 0.50);
+	ym2.add_route(3, "mono", 0.80);
+}
 
 
 /***************************************************************************

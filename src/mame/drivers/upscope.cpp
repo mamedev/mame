@@ -37,11 +37,11 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag),
-	m_prev_cia1_porta(0xff),
-	m_parallel_data(0xff),
-	m_ppi(*this, "ppi")
+	upscope_state(const machine_config &mconfig, device_type type, const char *tag) :
+		amiga_state(mconfig, type, tag),
+		m_prev_cia1_porta(0xff),
+		m_parallel_data(0xff),
+		m_ppi(*this, "ppi")
 	{ }
 
 	void upscope(machine_config &config);
@@ -278,8 +278,7 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	/* video hardware */
 	ntsc_video(config);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(upscope_state,amiga)
+	PALETTE(config, m_palette, FUNC(upscope_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 
@@ -296,15 +295,16 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, upscope_state, upscope_cia_0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_0_portb_w))
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, upscope_state, upscope_cia_1_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_1_porta_w))
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
+	m_cia_0->pb_rd_callback().set(FUNC(upscope_state::upscope_cia_0_portb_r));
+	m_cia_0->pb_wr_callback().set(FUNC(upscope_state::upscope_cia_0_portb_w));
+
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
+	m_cia_1->pa_rd_callback().set(FUNC(upscope_state::upscope_cia_1_porta_r));
+	m_cia_1->pa_wr_callback().set(FUNC(upscope_state::upscope_cia_1_porta_w));
 
 	/* fdc */
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);

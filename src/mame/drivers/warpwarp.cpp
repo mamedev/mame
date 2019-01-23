@@ -733,13 +733,12 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1k)
-	MCFG_PALETTE_ADD("palette", 4*2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1k);
+	PALETTE(config, m_palette, FUNC(warpwarp_state::geebee_palette), 4*2);
 
-	MCFG_PALETTE_INIT_OWNER(warpwarp_state,geebee)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,geebee)
 
 	/* sound hardware */
@@ -759,11 +758,10 @@ MACHINE_CONFIG_START(warpwarp_state::navarone)
 	geebee(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_2k)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(2*2)
+	m_gfxdecode->set_info(gfx_2k);
+	m_palette->set_entries(2*2);
+	m_palette->set_init(FUNC(warpwarp_state::navarone_palette));
 
-	MCFG_PALETTE_INIT_OWNER(warpwarp_state,navarone)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
@@ -771,9 +769,8 @@ MACHINE_CONFIG_START(warpwarp_state::kaitei)
 	geebee(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_1k)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4*2+1)
+	m_gfxdecode->set_info(gfx_1k);
+	m_palette->set_entries(4*2+1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(warpwarp_state,kaitei)
 MACHINE_CONFIG_END
@@ -801,13 +798,12 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, warpwarp_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_color)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_color);
 
-	MCFG_PALETTE_ADD("palette", 2*256+1)
-	MCFG_PALETTE_INIT_OWNER(warpwarp_state,warpwarp)
+	PALETTE(config, m_palette, FUNC(warpwarp_state::warpwarp_palette), 2*256+1);
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,warpwarp)
 
 	/* sound hardware */

@@ -199,6 +199,7 @@ const double XTAL::known_xtals[] = {
 	 14'318'181, /* 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier) */
 	 14'580'000, /* 14.58_MHz_XTAL         Fortune 32:16 Video Controller */
 	 14'705'882, /* 14.705882_MHz_XTAL     Aleck64 */
+	 14'742'800, /* 14.7428_MHz_XTAL       ADM 23 */
 	 14'745'600, /* 14.7456_MHz_XTAL       Namco System 12 & System Super 22/23 for JVS */
 	 14'784'000, /* 14.784_MHz_XTAL        Zenith Z-29 */
 	 14'916'000, /* 14.916_MHz_XTAL        ADDS Viewpoint 122 */
@@ -219,6 +220,7 @@ const double XTAL::known_xtals[] = {
 	 16'000'000, /* 16_MHz_XTAL            Extremely common, used on 100's of PCBs */
 	 16'097'280, /* 16.09728_MHz_XTAL      DEC VT240 (1024 * 262 * 60) */
 	 16'128'000, /* 16.128_MHz_XTAL        Fujitsu FM-7 */
+	 16'364'000, /* 16.364_MHz_XTAL        Corvus Concept */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
 	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
@@ -361,7 +363,7 @@ const double XTAL::known_xtals[] = {
 	 51'200'000, /* 51.2_MHz_XTAL          Namco Super System 22 video clock */
 	 52'000'000, /* 52_MHz_XTAL            Cojag */
 	 52'832'000, /* 52.832_MHz_XTAL        Wang PC TIG video controller */
-	 53'203'400, /* 53.2034_MHz_XTAL       Master System, Mega Drive PAL (~12x PAL subcarrier) */
+	 53'203'424, /* 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier) */
 	 53'693'175, /* 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier) */
 	 54'000'000, /* 54_MHz_XTAL            Taito JC */
 	 55'000'000, /* 55_MHz_XTAL            Eolith Vega */
@@ -382,6 +384,7 @@ const double XTAL::known_xtals[] = {
 	 77'414'400, /* 77.4144_MHz_XTAL       NCD17c */
 	 80'000'000, /* 80_MHz_XTAL            ARM710 */
 	 87'183'360, /* 87.18336_MHz_XTAL      AT&T 630 MTG */
+	 92'940'500, /* 92.9405_MHz_XTAL       Sun cgthree */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
 	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */

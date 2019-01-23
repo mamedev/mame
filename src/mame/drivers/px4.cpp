@@ -91,7 +91,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( key_callback );
 
 protected:
-	DECLARE_PALETTE_INIT( px4 );
+	void px4_palette(palette_device &palette) const;
 	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( icrlc_r );
@@ -257,11 +257,11 @@ class px4p_state : public px4_state
 {
 public:
 	px4p_state(const machine_config &mconfig, device_type type, const char *tag) :
-	px4_state(mconfig, type, tag),
-	m_rdnvram(*this, "rdnvram"),
-	m_rdsocket(*this, "ramdisk_socket"),
-	m_ramdisk_address(0),
-	m_ramdisk(nullptr)
+		px4_state(mconfig, type, tag),
+		m_rdnvram(*this, "rdnvram"),
+		m_rdsocket(*this, "ramdisk_socket"),
+		m_ramdisk_address(0),
+		m_ramdisk(nullptr)
 	{ }
 
 	void px4p(machine_config &config);
@@ -269,7 +269,7 @@ public:
 	void init_px4p();
 
 private:
-	DECLARE_PALETTE_INIT( px4p );
+	void px4p_palette(palette_device &palette) const;
 
 	DECLARE_WRITE8_MEMBER( ramdisk_address_w );
 	DECLARE_READ8_MEMBER( ramdisk_data_r );
@@ -1468,13 +1468,13 @@ INPUT_PORTS_END
 //  PALETTE
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( px4_state, px4 )
+void px4_state::px4_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-PALETTE_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::px4p_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(149, 157, 130));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -1501,16 +1501,14 @@ MACHINE_CONFIG_START(px4_state::px4)
 
 	config.set_default_layout(layout_px4);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(px4_state, px4)
+	PALETTE(config, "palette", FUNC(px4_state::px4_palette), 2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
+	TIMER(config, "one_sec").configure_periodic(FUNC(px4_state::upd7508_1sec_callback), attotime::from_seconds(1));
+	TIMER(config, "frc").configure_periodic(FUNC(px4_state::frc_tick), attotime::from_hz(XTAL(7'372'800) / 2 / 6));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1524,10 +1522,10 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	// external cassette
-	MCFG_CASSETTE_ADD("extcas")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
+	CASSETTE(config, m_ext_cas);
+	m_ext_cas->set_default_state(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
 
-	MCFG_TIMER_DRIVER_ADD("extcas_timer", px4_state, ext_cassette_read)
+	TIMER(config, m_ext_cas_timer).configure_generic(FUNC(px4_state::ext_cassette_read));
 
 	// sio port
 	MCFG_EPSON_SIO_ADD("sio", nullptr)
@@ -1557,8 +1555,7 @@ MACHINE_CONFIG_START(px4p_state::px4p)
 
 	NVRAM(config, "rdnvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(px4p_state, px4p)
+	subdevice<palette_device>("palette")->set_init(FUNC(px4p_state::px4p_palette));
 
 	MCFG_GENERIC_CARTSLOT_ADD("ramdisk_socket", generic_plain_slot, "px4_cart")
 MACHINE_CONFIG_END

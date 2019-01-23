@@ -22,8 +22,8 @@
 class fk1_state : public driver_device
 {
 public:
-	fk1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fk1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG)
 	{ }
@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
 	pit8253.set_clk<0>(50);
@@ -466,8 +466,8 @@ MACHINE_CONFIG_START(fk1_state::fk1)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("80K"); // 64 + 16
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", fk1_state, keyboard_callback, attotime::from_hz(24000))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vsync_timer", fk1_state, vsync_callback, attotime::from_hz(50))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(fk1_state::keyboard_callback), attotime::from_hz(24000));
+	TIMER(config, "vsync_timer").configure_periodic(FUNC(fk1_state::vsync_callback), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -57,8 +57,8 @@
 class giclassic_state : public driver_device
 {
 public:
-	giclassic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	giclassic_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_palette(*this, "palette")
@@ -70,8 +70,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
-
-	DECLARE_PALETTE_INIT(giclassic);
 
 	INTERRUPT_GEN_MEMBER(giclassic_interrupt);
 
@@ -311,11 +309,10 @@ MACHINE_CONFIG_START(giclassic_state::giclassic)
 	MCFG_SCREEN_SIZE(600, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(giclassic_state, screen_update_giclassic)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
+	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(giclassic_state::tile_callback), this);
@@ -337,11 +334,10 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 	MCFG_SCREEN_SIZE(600, 384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 599, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(giclassicsvr_state, screen_update_giclassicsvr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 16384)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 16384);
+	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(giclassicsvr_state::tile_callback), this);

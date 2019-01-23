@@ -33,8 +33,8 @@
 class pcjr_state : public driver_device
 {
 public:
-	pcjr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pcjr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pic8259(*this, "pic8259"),
 		m_pit8253(*this, "pit8253"),
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_DEVICE_ADD("pcvideo_pcjr", PCVIDEO_PCJR, 0)
 	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_pcjr:palette", gfx_pcjr)
+	GFXDECODE(config, "gfxdecode", "pcvideo_pcjr:palette", gfx_pcjr);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -657,8 +657,8 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	PC_JOY(config, "pc_joy");
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 
@@ -692,6 +692,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	ibmpcjr(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_DEVICE_IO_MAP(ibmpcjx_io)
@@ -702,7 +703,8 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ibmpcjx)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ibmpcjx);
+
 	/* internal ram */
 	m_ram->set_default_size("512K").set_extra_options(""); // only boots with 512k currently
 MACHINE_CONFIG_END

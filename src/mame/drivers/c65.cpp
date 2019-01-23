@@ -94,7 +94,7 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(c65);
+	void c65_palette(palette_device &palette);
 	void init_c65();
 	void init_c65pal();
 
@@ -632,7 +632,7 @@ void c65_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(c65_state, c65)
+void c65_state::c65_palette(palette_device &palette)
 {
 	for (int i = 0; i < 0x100; i++)
 		PalEntryFlush(i);
@@ -691,19 +691,19 @@ MACHINE_CONFIG_START(c65_state::c65)
 	MCFG_DEVICE_PROGRAM_MAP(c65_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", c65_state, vic3_vblank_irq)
 
-	MCFG_DEVICE_ADD("cia_0", MOS6526, MAIN_CLOCK)
-	MCFG_MOS6526_TOD(60)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c65_state, cia0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c65_state, cia0_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c65_state, cia0_porta_w))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, c65_state, cia0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, c65_state, cia0_portb_w))
+	MOS6526(config, m_cia0, MAIN_CLOCK);
+	m_cia0->set_tod_clock(60);
+	m_cia0->irq_wr_callback().set(FUNC(c65_state::cia0_irq));
+	m_cia0->pa_rd_callback().set(FUNC(c65_state::cia0_porta_r));
+	m_cia0->pa_wr_callback().set(FUNC(c65_state::cia0_porta_w));
+	m_cia0->pb_rd_callback().set(FUNC(c65_state::cia0_portb_r));
+	m_cia0->pb_wr_callback().set(FUNC(c65_state::cia0_portb_w));
 
-	MCFG_DEVICE_ADD("cia_1", MOS6526, MAIN_CLOCK)
-	MCFG_MOS6526_TOD(60)
-//  MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, c65_state, c65_cia1_interrupt))
-//  MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, c65_state, c65_cia1_port_a_r))
-//  MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, c65_state, c65_cia1_port_a_w))
+	MOS6526(config, m_cia1, MAIN_CLOCK);
+	m_cia1->set_tod_clock(60);
+//  m_cia1->irq_wr_callback().set(FUNC(c65_state::c65_cia1_interrupt));
+//  m_cia1->pa_rd_callback().set(FUNC(c65_state::c65_cia1_port_a_r));
+//  m_cia1->pa_wr_callback().set(FUNC(c65_state::c65_cia1_port_a_w));
 
 
 	/* video hardware */
@@ -714,12 +714,11 @@ MACHINE_CONFIG_START(c65_state::c65)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK*4, 910, 0, 640, 262, 0, 200) // mods needed
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c65)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_c65)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(c65_state, c65)
+	PALETTE(config, m_palette, FUNC(c65_state::c65_palette), 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

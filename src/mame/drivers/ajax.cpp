@@ -194,9 +194,8 @@ void ajax_state::ajax(machine_config &config)
 	screen.set_screen_update(FUNC(ajax_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);

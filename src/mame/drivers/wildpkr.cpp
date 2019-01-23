@@ -182,8 +182,8 @@
 class wildpkr_state : public driver_device
 {
 public:
-	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_id(*this, "id"),
@@ -197,6 +197,10 @@ public:
 
 	void init_wildpkr();
 
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -208,9 +212,7 @@ private:
 
 	u16 m_clock_rate;
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(wildpkr);
+	void wildpkr_palette(palette_device &palette) const;
 	DECLARE_READ8_MEMBER(unknown_read8);
 	DECLARE_WRITE8_MEMBER(unknown_write8);
 	DECLARE_WRITE16_MEMBER(nvram_w);
@@ -238,7 +240,7 @@ void wildpkr_state::video_start()
 {
 }
 
-PALETTE_INIT_MEMBER(wildpkr_state, wildpkr)
+void wildpkr_state::wildpkr_palette(palette_device &palette) const
 {
 }
 
@@ -470,7 +472,7 @@ MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 	MCFG_DEVICE_PROGRAM_MAP(wildpkr_map)
 	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // guess
 
-	MCFG_DEVICE_ADD("duart", MC68681, SEC_CLOCK)
+	MC68681(config, m_duart, SEC_CLOCK);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -480,13 +482,12 @@ MACHINE_CONFIG_START(wildpkr_state::wildpkr)
 	MCFG_SCREEN_UPDATE_DEVICE("acrtc", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_HD63484_ADD("acrtc", 0, hd63484_map)
+	HD63484(config, "acrtc", 0).set_addrmap(0, &wildpkr_state::hd63484_map);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
+	PALETTE(config, "palette", FUNC(wildpkr_state::wildpkr_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -504,13 +505,13 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // DS1220Y
 
-	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
-	MCFG_MC68681_IRQ_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_2))
+	MC68681(config, m_duart, 3686400);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
-	MCFG_DEVICE_ADD("id", DS2401, 0)
+	DS2401(config, m_id, 0);
 
-	MCFG_DEVICE_ADD("dacclock", CLOCK, 1500000) // base rate derived from program code
-	MCFG_CLOCK_SIGNAL_HANDLER(ASSERTLINE("maincpu", M68K_IRQ_5))
+	CLOCK(config, m_dac_clock, 1500000); // base rate derived from program code
+	m_dac_clock->signal_handler().set_inputline(m_maincpu, M68K_IRQ_5, ASSERT_LINE);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -521,13 +522,12 @@ MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", M68K_IRQ_4))
 
-	MCFG_HD63484_ADD("acrtc", 0, hd63484_map)
+	HD63484(config, "acrtc", 0).set_addrmap(0, &wildpkr_state::hd63484_map);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
 	ramdac.set_addrmap(0, &wildpkr_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
+	PALETTE(config, "palette", FUNC(wildpkr_state::wildpkr_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

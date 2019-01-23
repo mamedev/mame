@@ -149,18 +149,18 @@ MACHINE_CONFIG_START(nitedrvr_state::nitedrvr)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 3);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("crash_timer", nitedrvr_state, nitedrvr_crash_toggle_callback, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)))
+	TIMER(config, "crash_timer").configure_periodic(FUNC(nitedrvr_state::nitedrvr_crash_toggle_callback), PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 278, 0, 256) // ~57 Hz
 	// PROM derives VRESET, VBLANK, VSYNC, IRQ from vertical scan count and last VBLANK
 	MCFG_SCREEN_UPDATE_DRIVER(nitedrvr_state, screen_update_nitedrvr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nitedrvr)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

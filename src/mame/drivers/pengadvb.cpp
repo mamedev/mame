@@ -54,15 +54,15 @@ public:
 	void init_pengadvb();
 
 private:
-	DECLARE_READ8_MEMBER(mem_r);
-	DECLARE_WRITE8_MEMBER(mem_w);
-	DECLARE_WRITE8_MEMBER(megarom_bank_w);
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+	void megarom_bank_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER(pengadvb_psg_port_b_w);
-	DECLARE_READ8_MEMBER(pengadvb_ppi_port_a_r);
-	DECLARE_WRITE8_MEMBER(pengadvb_ppi_port_a_w);
-	DECLARE_READ8_MEMBER(pengadvb_ppi_port_b_r);
-	DECLARE_WRITE8_MEMBER(pengadvb_ppi_port_c_w);
+	void psg_port_b_w(uint8_t data);
+	uint8_t ppi_port_a_r();
+	void ppi_port_a_w(uint8_t data);
+	uint8_t ppi_port_b_r();
+	void ppi_port_c_w(uint8_t data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -86,17 +86,17 @@ private:
 
 ***************************************************************************/
 
-READ8_MEMBER(pengadvb_state::mem_r)
+uint8_t pengadvb_state::mem_r(offs_t offset)
 {
-	return m_page[offset >> 14 & 3]->read8(space, offset);
+	return m_page[offset >> 14 & 3]->read8(offset);
 }
 
-WRITE8_MEMBER(pengadvb_state::mem_w)
+void pengadvb_state::mem_w(offs_t offset, uint8_t data)
 {
-	m_page[offset >> 14 & 3]->write8(space, offset, data);
+	m_page[offset >> 14 & 3]->write8(offset, data);
 }
 
-WRITE8_MEMBER(pengadvb_state::megarom_bank_w)
+void pengadvb_state::megarom_bank_w(offs_t offset, uint8_t data)
 {
 	m_bank[offset >> 13 & 3]->set_entry(data & 0xf);
 }
@@ -165,7 +165,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 // AY8910
-WRITE8_MEMBER(pengadvb_state::pengadvb_psg_port_b_w)
+void pengadvb_state::psg_port_b_w(uint8_t data)
 {
 	// leftover from msx ver?
 }
@@ -173,12 +173,12 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_psg_port_b_w)
 /**************************************************************************/
 
 // I8255
-READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_r)
+uint8_t pengadvb_state::ppi_port_a_r()
 {
 	return m_primary_slot_reg;
 }
 
-WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_w)
+void pengadvb_state::ppi_port_a_w(uint8_t data)
 {
 	if (data != m_primary_slot_reg)
 	{
@@ -189,7 +189,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_w)
 	}
 }
 
-READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
+uint8_t pengadvb_state::ppi_port_b_r()
 {
 	// TODO: dipswitch
 	switch (m_kb_matrix_row)
@@ -204,7 +204,7 @@ READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
+void pengadvb_state::ppi_port_c_w(uint8_t data)
 {
 	m_kb_matrix_row = data & 0x0f;
 }
@@ -227,10 +227,10 @@ void pengadvb_state::pengadvb(machine_config &config)
 	ADDRESS_MAP_BANK(config, "page3").set_map(&pengadvb_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 
 	i8255_device &ppi(I8255(config, "ppi8255"));
-	ppi.in_pa_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_a_r));
-	ppi.out_pa_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_a_w));
-	ppi.in_pb_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_b_r));
-	ppi.out_pc_callback().set(FUNC(pengadvb_state::pengadvb_ppi_port_c_w));
+	ppi.in_pa_callback().set(FUNC(pengadvb_state::ppi_port_a_r));
+	ppi.out_pa_callback().set(FUNC(pengadvb_state::ppi_port_a_w));
+	ppi.in_pb_callback().set(FUNC(pengadvb_state::ppi_port_b_r));
+	ppi.out_pc_callback().set(FUNC(pengadvb_state::ppi_port_c_w));
 
 	/* video hardware */
 	tms9128_device &vdp(TMS9128(config, "tms9128", XTAL(10'738'635)));
@@ -243,7 +243,7 @@ void pengadvb_state::pengadvb(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(10'738'635)/6));
 	aysnd.port_a_read_callback().set_ioport("IN0");
-	aysnd.port_b_write_callback().set(FUNC(pengadvb_state::pengadvb_psg_port_b_w));
+	aysnd.port_b_write_callback().set(FUNC(pengadvb_state::psg_port_b_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

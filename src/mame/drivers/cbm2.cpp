@@ -2535,7 +2535,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	screen.set_size(768, 312);
 	screen.set_visarea(0, 768-1, 0, 312-1);
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, XTAL(18'000'000)/9);
 	m_crtc->set_screen(SCREEN_TAG);

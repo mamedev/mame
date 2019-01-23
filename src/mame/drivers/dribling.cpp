@@ -299,8 +299,7 @@ MACHINE_CONFIG_START(dribling_state::dribling)
 	MCFG_SCREEN_UPDATE_DRIVER(dribling_state, screen_update_dribling)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(dribling_state, dribling)
+	PALETTE(config, "palette", FUNC(dribling_state::dribling_palette), 256);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

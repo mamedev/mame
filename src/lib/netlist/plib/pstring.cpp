@@ -67,18 +67,6 @@ pstring_t<F> pstring_t<F>::substr(size_type start, size_type nlen) const
 }
 
 template<typename F>
-pstring_t<F> pstring_t<F>::ucase() const
-{
-	pstring_t ret;
-	for (const auto &c : *this)
-		if (c >= 'a' && c <= 'z')
-			ret += (c - 'a' + 'A');
-		else
-			ret += c;
-	return ret;
-}
-
-template<typename F>
 typename pstring_t<F>::size_type pstring_t<F>::find_first_not_of(const pstring_t &no) const
 {
 	size_type pos = 0;
@@ -148,114 +136,6 @@ typename pstring_t<F>::size_type pstring_t<F>::find(code_t search, size_type sta
 	pstring_t ss;
 	traits_type::encode(search, ss.m_str);
 	return find(ss, start);
-}
-
-
-template<typename F>
-pstring_t<F> pstring_t<F>::replace_all(const pstring_t &search, const pstring_t &replace) const
-{
-	pstring_t ret;
-	const size_type slen = search.length();
-
-	size_type last_s = 0;
-	size_type s = find(search, last_s);
-	while (s != npos)
-	{
-		ret += substr(last_s, s - last_s);
-		ret += replace;
-		last_s = s + slen;
-		s = find(search, last_s);
-	}
-	ret += substr(last_s);
-	return ret;
-}
-
-template<typename F>
-pstring_t<F> pstring_t<F>::rpad(const pstring_t &ws, const size_type cnt) const
-{
-	// FIXME: pstringbuffer ret(*this);
-
-	pstring_t ret(*this);
-	size_type wsl = ws.length();
-	for (auto i = ret.length(); i < cnt; i+=wsl)
-		ret += ws;
-	return ret;
-}
-
-static double pstod(const pstring_t<pu8_traits> &str, std::size_t *e)
-{
-	return std::stod(str.cpp_string(), e);
-}
-
-static double pstod(const pstring &str, std::size_t *e)
-{
-	return std::stod(str.cpp_string(), e);
-}
-
-static double pstod(const pwstring &str, std::size_t *e)
-{
-	return std::stod(str.cpp_string(), e);
-}
-
-static double pstod(const pu16string &str, std::size_t *e)
-{
-	pstring c;
-	c = str;
-	return std::stod(c.cpp_string(), e);
-}
-
-static long pstol(const pstring_t<pu8_traits> &str, std::size_t *e, int base = 10)
-{
-	return std::stol(str.cpp_string(), e, base);
-}
-
-static long pstol(const pstring &str, std::size_t *e, int base = 10)
-{
-	return std::stol(str.cpp_string(), e, base);
-}
-
-static long pstol(const pwstring &str, std::size_t *e, int base = 10)
-{
-	return std::stol(str.cpp_string(), e, base);
-}
-
-static long pstol(const pu16string &str, std::size_t *e, int base = 10)
-{
-	pstring c;
-	c = str;
-	return std::stol(c.cpp_string(), e, base);
-}
-
-template<typename F>
-double pstring_t<F>::as_double(bool *error) const
-{
-	std::size_t e = 0;
-	if (error != nullptr)
-		*error = false;
-	double ret = pstod(*this, &e);
-	if (e != mem_t_size())
-		if (error != nullptr)
-			*error = true;
-	return ret;
-}
-
-template<typename F>
-long pstring_t<F>::as_long(bool *error) const
-{
-	static pstring_t prefix(pstring("0x"));
-	long ret;
-	std::size_t e = 0;
-
-	if (error != nullptr)
-		*error = false;
-	if (startsWith(prefix))
-		ret = pstol(substr(2), &e, 16);
-	else
-		ret = pstol(*this, &e, 10);
-	if (e != mem_t_size())
-		if (error != nullptr)
-			*error = true;
-	return ret;
 }
 
 // ----------------------------------------------------------------------------------------

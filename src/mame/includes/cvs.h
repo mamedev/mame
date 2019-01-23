@@ -91,7 +91,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(cvs_tms5110_ctl_w);
 	DECLARE_WRITE8_MEMBER(cvs_tms5110_pdc_w);
 	DECLARE_VIDEO_START(cvs);
-	DECLARE_PALETTE_INIT(cvs);
+	void cvs_palette(palette_device &palette) const;
 	uint32_t screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);
 	TIMER_CALLBACK_MEMBER(cvs_393hz_timer_cb);

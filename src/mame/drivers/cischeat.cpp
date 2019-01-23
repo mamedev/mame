@@ -1954,7 +1954,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("cpu1", M68000, 10000000)
 	MCFG_DEVICE_PROGRAM_MAP(bigrun_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, bigrun_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::bigrun_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("cpu2", M68000, 10000000)
 	MCFG_DEVICE_PROGRAM_MAP(bigrun_map2)
@@ -1979,12 +1979,11 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_bigrun)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bigrun)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x4000/2)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigrun);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x4000/2);
+	m_palette->enable_shadows();
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x0e00/2);
 	MEGASYS1_TILEMAP(config, m_tmap[1], m_palette, 0x1600/2);
@@ -2034,10 +2033,8 @@ MACHINE_CONFIG_START(cischeat_state::cischeat)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,  0+16, 256-16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_cischeat)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cischeat)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x8000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	m_gfxdecode->set_info(gfx_cischeat);
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
 
 	m_tmap[0]->set_colorbase(0x1c00/2);
 	m_tmap[0]->set_bits_per_color_code(5);
@@ -2070,10 +2067,8 @@ MACHINE_CONFIG_START(cischeat_state::f1gpstar)
 	MCFG_DEVICE_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_f1gpstar)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x8000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	m_gfxdecode->set_info(gfx_f1gpstar);
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
 
 	m_tmap[0]->set_colorbase(0x1e00/2);
 
@@ -2138,7 +2133,7 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
 	MCFG_DEVICE_PROGRAM_MAP(scudhamm_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, scudhamm_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::scudhamm_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -2150,12 +2145,11 @@ MACHINE_CONFIG_START(cischeat_state::scudhamm)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
+	m_palette->enable_shadows();
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x1e00/2);
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
@@ -2195,8 +2189,7 @@ MACHINE_CONFIG_START(cischeat_state::armchmp2)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(armchmp2_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(cischeat_state, armchamp2_scanline)
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(cischeat_state::armchamp2_scanline));
 MACHINE_CONFIG_END
 
 
@@ -2227,9 +2220,9 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(24'000'000) / 2)  // TMP68000P-12
 	MCFG_DEVICE_PROGRAM_MAP(captflag_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cischeat_state, captflag_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(cischeat_state::captflag_scanline), "screen", 0, 1);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
+	TICKET_DISPENSER(config, m_captflag_hopper, attotime::from_msec(2000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 
 	WATCHDOG_TIMER(config, m_watchdog);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -2244,17 +2237,16 @@ MACHINE_CONFIG_START(cischeat_state::captflag)
 	MCFG_SCREEN_UPDATE_DRIVER(cischeat_state, screen_update_scudhamm)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scudhamm)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x8000/2)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scudhamm);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x8000/2);
+	m_palette->enable_shadows();
 
 	MEGASYS1_TILEMAP(config, m_tmap[0], m_palette, 0x1e00/2);
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
-	MCFG_TIMER_ADD_NONE("motor_left")
-	MCFG_TIMER_ADD_NONE("motor_right")
+	TIMER(config, m_captflag_motor_left).configure_generic(timer_device::expired_delegate());
+	TIMER(config, m_captflag_motor_right).configure_generic(timer_device::expired_delegate());
 
 	// Layout
 	config.set_default_layout(layout_captflag);

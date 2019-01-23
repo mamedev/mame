@@ -3544,11 +3544,9 @@ void pacman_state::pacman(machine_config &config, bool latch)
 	m_watchdog->set_vblank_count("screen", 16);
 
 	/* video hardware */
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_pacman);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pacman);
 
-	PALETTE(config, m_palette, 128*4);
-	m_palette->set_indirect_entries(32);
-	m_palette->set_init(DEVICE_SELF, FUNC(pacman_state::palette_init_pacman));
+	PALETTE(config, m_palette, FUNC(pacman_state::pacman_palette), 128*4, 32);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
@@ -3789,7 +3787,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	m_mainlatch->q_out_cb<6>().set_nop();
 	m_mainlatch->q_out_cb<7>().set(FUNC(pacman_state::coin_counter_w));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_s2650games)
+	m_gfxdecode->set_info(gfx_s2650games);
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -3871,16 +3869,17 @@ MACHINE_CONFIG_START(pacman_state::superabc)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,superabc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superabc)
+	m_gfxdecode->set_info(gfx_superabc);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(pacman_state::crush4)
+void pacman_state::crush4(machine_config &config)
+{
 	mschamp(config);
 
 	/* basic machine hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_crush4)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_crush4);
+}
 
 MACHINE_CONFIG_START(pacman_state::crushs)
 	pacman(config);

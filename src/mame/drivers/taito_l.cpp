@@ -1452,44 +1452,43 @@ WRITE8_MEMBER(fhawk_state::portA_w)
 	//logerror ("YM2203 bank change val=%02x  %s\n", data & 0x03, machine().describe_context() );
 }
 
-MACHINE_CONFIG_START(taitol_state::l_system_video)
+void taitol_state::l_system_video(machine_config &config)
+{
 	for (int bank = 0; bank < 4; bank++)
 	{
 		ADDRESS_MAP_BANK(config, m_ram_bnks[bank]).set_map(&taitol_state::tc0090lvc_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x1000);
 	}
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitol_state, screen_update_taitol)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, taitol_state, screen_vblank_taitol))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(taitol_state::screen_update_taitol));
+	screen.screen_vblank().set(FUNC(taitol_state::screen_vblank_taitol));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", taito_l)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, taito_l);
+	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 256);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", taitol_state, vbl_interrupt, "screen", 0, 1)
-MACHINE_CONFIG_END
+	TIMER(config, "scantimer").configure_scanline(FUNC(taitol_state::vbl_interrupt), "screen", 0, 1);
+}
 
-
-MACHINE_CONFIG_START(fhawk_state::fhawk)
-
+void fhawk_state::fhawk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(13'330'560)/2)    /* verified freq on pin122 of TC0090LVC cpu */
-	MCFG_DEVICE_PROGRAM_MAP(fhawk_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
+	Z80(config, m_main_cpu, XTAL(13'330'560)/2);	/* verified freq on pin122 of TC0090LVC cpu */
+	m_main_cpu->set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_map);
+	m_main_cpu->set_irq_acknowledge_callback(FUNC(taitol_state::irq_callback));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL/3)     /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(fhawk_3_map)
+	Z80(config, m_audio_cpu, 12_MHz_XTAL/3);		/* verified on pcb */
+	m_audio_cpu->set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_3_map);
 
-	MCFG_DEVICE_ADD("slave", Z80, 12_MHz_XTAL/3)        /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(fhawk_2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
+	z80_device &slave(Z80(config, "slave", 12_MHz_XTAL/3));	/* verified on pcb */
+	slave.set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_2_map);
+	slave.set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
@@ -1519,47 +1518,42 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag("slave");
 	ciu.set_slave_tag(m_audio_cpu);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(champwr_state::champwr)
+void champwr_state::champwr(machine_config &config)
+{
 	fhawk(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(champwr_map)
+	m_main_cpu->set_addrmap(AS_PROGRAM, &champwr_state::champwr_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(champwr_3_map)
+	m_audio_cpu->set_addrmap(AS_PROGRAM, &champwr_state::champwr_3_map);
 
-	MCFG_DEVICE_MODIFY("slave")
-	MCFG_DEVICE_PROGRAM_MAP(champwr_2_map)
+	subdevice<cpu_device>("slave")->set_addrmap(AS_PROGRAM, &champwr_state::champwr_2_map);
 
 	/* sound hardware */
 	subdevice<ym2203_device>("ymsnd")->port_b_write_callback().set(FUNC(champwr_state::msm5205_volume_w));
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384_kHz_XTAL)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, champwr_state, msm5205_vck)) /* VCK function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384_kHz_XTAL);
+	m_msm->vck_legacy_callback().set(FUNC(champwr_state::msm5205_vck));	/* VCK function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 kHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
+void taitol_2cpu_state::raimais(machine_config &config)
+{
+	Z80(config, m_main_cpu, 13330560/2);	// needs verification from pin122 of TC0090LVC
+	m_main_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_map);
+	m_main_cpu->set_irq_acknowledge_callback(FUNC(taitol_state::irq_callback));
 
+	Z80(config, m_audio_cpu, 12000000/3);	// not verified
+	m_audio_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_3_map);
 
-MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
+	z80_device &slave(Z80(config, "slave", 12000000/3));	// not verified
+	slave.set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_2_map);
+	slave.set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", Z80, 13330560/2)    // needs verification from pin122 of TC0090LVC
-	MCFG_DEVICE_PROGRAM_MAP(raimais_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/3)     // not verified
-	MCFG_DEVICE_PROGRAM_MAP(raimais_3_map)
-
-	MCFG_DEVICE_ADD("slave", Z80, 12000000/3)        // not verified
-	MCFG_DEVICE_PROGRAM_MAP(raimais_2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -1589,8 +1583,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
 	tc0140syt.set_master_tag("slave");
 	tc0140syt.set_slave_tag(m_audio_cpu);
-MACHINE_CONFIG_END
-
+}
 
 void taitol_2cpu_state::kurikint(machine_config &config)
 {
@@ -1735,18 +1728,18 @@ void taitol_1cpu_state::cachat(machine_config &config)
 	m_ymsnd->port_b_read_callback().set_ioport("DSWB");
 }
 
-MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
-
+void taitol_2cpu_state::evilston(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(13'330'560)/2)    /* not verified */
-	MCFG_DEVICE_PROGRAM_MAP(evilston_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
+	Z80(config, m_main_cpu, XTAL(13'330'560)/2);	/* not verified */
+	m_main_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::evilston_map);
+	m_main_cpu->set_irq_acknowledge_callback(FUNC(taitol_state::irq_callback));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12_MHz_XTAL/3)     /* not verified */
-	MCFG_DEVICE_PROGRAM_MAP(evilston_2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
+	Z80(config, m_audio_cpu, 12_MHz_XTAL/3);		/* not verified */
+	m_audio_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::evilston_2_map);
+	m_audio_cpu->set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_0_callback().set_ioport("DSWA");
@@ -1773,7 +1766,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	ymsnd.add_route(1, "mono", 0.25);
 	ymsnd.add_route(2, "mono", 0.25);
 	ymsnd.add_route(3, "mono", 0.80);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( raimais )

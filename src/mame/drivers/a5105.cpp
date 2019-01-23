@@ -61,6 +61,10 @@ public:
 
 	void a5105(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	DECLARE_READ8_MEMBER(a5105_memsel_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -71,7 +75,7 @@ private:
 	DECLARE_WRITE8_MEMBER( a5105_upd765_w );
 	DECLARE_WRITE8_MEMBER(pcg_addr_w);
 	DECLARE_WRITE8_MEMBER(pcg_val_w);
-	DECLARE_PALETTE_INIT(a5105);
+	void a5105_palette(palette_device &palette) const;
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
@@ -87,8 +91,6 @@ private:
 	uint16_t m_pcg_internal_addr;
 	uint8_t m_key_mux;
 	uint8_t m_memsel[4];
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
@@ -108,16 +110,13 @@ private:
 /* TODO */
 UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	int xi,gfx;
-	uint8_t pen;
+	int const gfx = m_video_ram[(address & 0x1ffff) >> 1];
 
-	gfx = m_video_ram[(address & 0x1ffff) >> 1];
-
-	for(xi=0;xi<16;xi++)
+	for (int xi = 0; xi < 16; xi++)
 	{
-		pen = ((gfx >> xi) & 1) ? 7 : 0;
+		int const pen = ((gfx >> xi) & 1) ? 7 : 0;
 
 		bitmap.pix32(y, x + xi) = palette[pen];
 	}
@@ -125,38 +124,32 @@ UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( a5105_state::hgdc_draw_text )
 {
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int x;
-	int xi,yi;
-	int tile,color;
-	uint8_t tile_data;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	for( x = 0; x < pitch; x++ )
+	for (int x = 0; x < pitch; x++)
 	{
-		tile = (m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] & 0xff);
-		color = ((m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] >> 8) & 0x0f);
+		int const tile = (m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] & 0xff);
+		int const color = ((m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] >> 8) & 0x0f);
 
-		for( yi = 0; yi < lr; yi++)
+		for (int yi = 0; yi < lr; yi++)
 		{
-			tile_data = m_char_ram[(tile*8+yi) & 0x7ff];
+			uint8_t tile_data = m_char_ram[(tile*8+yi) & 0x7ff];
 
-			if(cursor_on && cursor_addr == addr+x && m_screen->frame_number() & 0x10)
-				tile_data^=0xff;
+			if (cursor_on && cursor_addr == addr+x && m_screen->frame_number() & 0x10)
+				tile_data ^= 0xff;
 
-			for( xi = 0; xi < 8; xi++)
+			for (int xi = 0; xi < 8; xi++)
 			{
-				int res_x,res_y;
 				int pen = (tile_data >> xi) & 1 ? color : 0;
 
-				res_x = x * 8 + xi;
-				res_y = y + yi;
+				int const res_x = x * 8 + xi;
+				int const res_y = y + yi;
 
-				if(yi >= 8) { pen = 0; }
+				if (yi >= 8)
+					pen = 0;
 
-				if(!m_screen->visible_area().contains(res_x+0, res_y))
-					continue;
-
-				bitmap.pix32(res_y, res_x) = palette[pen];
+				if (m_screen->visible_area().contains(res_x+0, res_y))
+					bitmap.pix32(res_y, res_x) = palette[pen];
 			}
 		}
 	}
@@ -526,18 +519,16 @@ static GFXDECODE_START( gfx_a5105 )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(a5105_state, a5105)
+void a5105_state::a5105_palette(palette_device &palette) const
 {
-	int i;
-	int r,g,b;
-
-	for ( i = 0; i < 16; i++ )
+	for (int i = 0; i < 16; i++)
 	{
-		r = i & 4 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
-		g = i & 2 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
-		b = i & 1 ? ((i & 8) ? 0xaa : 0xff) : 0x00;
+		int const x = (i & 8) ? 0xaa : 0xff;
+		int const r = (i & 4) ? x : 0x00;
+		int const g = (i & 2) ? x : 0x00;
+		int const b = (i & 1) ? x : 0x00;
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -583,9 +574,8 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 25*8-1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_a5105)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(a5105_state, a5105)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_a5105);
+	PALETTE(config, m_palette, FUNC(a5105_state::a5105_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -606,7 +596,7 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(15'000'000) / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", a5105_state::floppy_formats)

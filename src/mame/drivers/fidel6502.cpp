@@ -536,8 +536,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(dummy) { ; } // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
 
-	DECLARE_WRITE8_MEMBER(div_trampoline_w);
-	DECLARE_READ8_MEMBER(div_trampoline_r);
+	void div_trampoline_w(offs_t offset, u8 data);
+	u8 div_trampoline_r(offs_t offset);
 	void div_set_cpu_freq(offs_t offset);
 	void div_trampoline(address_map &map);
 	u16 m_div_status;
@@ -670,18 +670,18 @@ void fidel6502_state::div_set_cpu_freq(offs_t offset)
 	m_div_status = status;
 }
 
-WRITE8_MEMBER(fidel6502_state::div_trampoline_w)
+void fidel6502_state::div_trampoline_w(offs_t offset, u8 data)
 {
 	div_set_cpu_freq(offset);
-	m_mainmap->write8(space, offset, data);
+	m_mainmap->write8(offset, data);
 }
 
-READ8_MEMBER(fidel6502_state::div_trampoline_r)
+u8 fidel6502_state::div_trampoline_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		div_set_cpu_freq(offset);
 
-	return m_mainmap->read8(space, offset);
+	return m_mainmap->read8(offset);
 }
 
 void fidel6502_state::div_trampoline(address_map &map)

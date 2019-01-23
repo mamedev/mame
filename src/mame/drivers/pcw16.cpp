@@ -1051,13 +1051,11 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_SCREEN_UPDATE_DRIVER(pcw16_state, screen_update_pcw16)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", PCW16_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(pcw16_state, pcw16)
+	PALETTE(config, "palette", FUNC(pcw16_state::pcw16_colours), PCW16_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	BEEP(config, m_beeper, 3750).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* printer */
 	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
@@ -1079,9 +1077,9 @@ MACHINE_CONFIG_START(pcw16_state::pcw16)
 	MCFG_AT_KEYB_ADD("at_keyboard", 3, WRITELINE(*this, pcw16_state, pcw16_keyboard_callback))
 
 	/* video ints */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("video_timer", pcw16_state, pcw16_timer_callback, attotime::from_usec(5830))
+	TIMER(config, "video_timer").configure_periodic(FUNC(pcw16_state::pcw16_timer_callback), attotime::from_usec(5830));
 	/* rtc timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pcw16_state, rtc_timer_callback, attotime::from_hz(256))
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pcw16_state::rtc_timer_callback), attotime::from_hz(256));
 MACHINE_CONFIG_END
 
 /***************************************************************************

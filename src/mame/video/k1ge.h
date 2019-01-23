@@ -61,7 +61,7 @@ protected:
 	TIMER_CALLBACK_MEMBER( timer_callback );
 
 private:
-	DECLARE_PALETTE_INIT(k1ge);
+	void k1ge_palette(palette_device &palette) const;
 };
 
 
@@ -88,7 +88,7 @@ protected:
 	void k1ge_draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y );
 
 private:
-	DECLARE_PALETTE_INIT(k2ge);
+	void k2ge_palette(palette_device &palette) const;
 };
 
 DECLARE_DEVICE_TYPE(K1GE, k1ge_device)

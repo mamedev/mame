@@ -493,8 +493,7 @@ void xexex_state::xexex(machine_config &config)
 	m_screen->set_visarea(40, 40+384-1, 0, 0+256-1);
 	m_screen->set_screen_update(FUNC(xexex_state::screen_update_xexex));
 
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_XRGB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
 

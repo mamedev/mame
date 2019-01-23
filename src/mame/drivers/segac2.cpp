@@ -563,7 +563,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 		m_sp_palbase = new_sp_palbase;
 		m_bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
+		if (LOG_PALETTE && m_screen) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, m_screen->vpos());
 	}
 }
 
@@ -1542,15 +1542,16 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 
-MACHINE_CONFIG_START(segac2_state::segac)
-
+void segac2_state::segac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XL2_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+	M68000(config, m_maincpu, XL2_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segac2_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
 
 	MCFG_MACHINE_START_OVERRIDE(segac2_state,segac2)
 	MCFG_MACHINE_RESET_OVERRIDE(segac2_state,segac2)
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // borencha requires 0xff fill or there is no sound (it lacks some of the init code of the borench set)
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", XL2_CLOCK/6)); // clock divider guessed
@@ -1564,36 +1565,36 @@ MACHINE_CONFIG_START(segac2_state::segac)
 	io.out_ph_callback().set(FUNC(segac2_state::io_porth_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, XL2_CLOCK, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_sndirqline_callback_c2));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv6irqline_callback_c2));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, segac2_state, vdp_lv4irqline_callback_c2));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	SEGA315_5313(config, m_vdp, XL2_CLOCK, m_maincpu);
+	m_vdp->set_is_pal(false);
+	m_vdp->snd_irq().set(FUNC(segac2_state::vdp_sndirqline_callback_c2));
+	m_vdp->lv6_irq().set(FUNC(segac2_state::vdp_lv6irqline_callback_c2));
+	m_vdp->lv4_irq().set(FUNC(segac2_state::vdp_lv4irqline_callback_c2));
+	m_vdp->set_alt_timing(1);
+	m_vdp->set_screen("megadriv");
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
+	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
-	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, segac2_state, screen_vblank_megadriv))
+	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(512, 262);
+	screen.set_visarea(0, 32*8-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(segac2_state::screen_update_segac2_new));
+	screen.screen_vblank().set(FUNC(segac2_state::screen_vblank_megadriv));
 
-	MCFG_PALETTE_ADD("palette", 2048*3)
+	PALETTE(config, m_palette).set_entries(2048*3);
 
 	MCFG_VIDEO_START_OVERRIDE(segac2_state,segac2_new)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, XL2_CLOCK/7)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, segac2_state, segac2_irq2_interrupt))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", XL2_CLOCK/7));
+	ymsnd.irq_handler().set(FUNC(segac2_state::segac2_irq2_interrupt));
+	ymsnd.add_route(0, "mono", 0.50);
 	/* right channel not connected */
-MACHINE_CONFIG_END
+}
 
 
 void segac2_state::segac2(machine_config &config)

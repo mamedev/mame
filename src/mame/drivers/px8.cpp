@@ -666,7 +666,7 @@ INPUT_PORTS_END
     VIDEO
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(px8_state, px8)
+void px8_state::px8_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
@@ -764,12 +764,11 @@ MACHINE_CONFIG_START(px8_state::px8)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_px8)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
+	PALETTE(config, "palette", FUNC(px8_state::px8_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(0, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(0, "mono", 0.25);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
@@ -781,8 +780,8 @@ MACHINE_CONFIG_START(px8_state::px8)
 	/* devices */
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

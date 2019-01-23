@@ -42,9 +42,6 @@
  *      1 1 1 1 GR1 bank 3 0E000-0FFFF
  */
 
-void vtech2_state::video_start()
-{
-}
 
 static const int offs_2[192] = {
 	0x0000,0x0800,0x1000,0x1800,0x2000,0x2800,0x3000,0x3800,

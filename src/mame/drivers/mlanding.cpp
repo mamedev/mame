@@ -100,6 +100,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -108,7 +109,7 @@ private:
 		TIMER_DMA_COMPLETE
 	};
 
-	static const uint32_t c_dma_bank_words = 0x2000;
+	static constexpr uint32_t c_dma_bank_words = 0x2000;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -980,7 +981,7 @@ void mlanding_state::mlanding(machine_config &config)
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 32768);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

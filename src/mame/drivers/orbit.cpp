@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orbit_state, interrupt)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
+	TIMER(config, "32v").configure_scanline(FUNC(orbit_state::nmi_32v), "screen", 0, 32);
 
 	F9334(config, m_latch); // M6
 	/* BIT0 => UNUSED       */
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_orbit)
 
-	MCFG_PALETTE_ADD_MONOCHROME(m_palette)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

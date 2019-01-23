@@ -87,6 +87,7 @@ public:
 	TIMER_CALLBACK_MEMBER(update_tape);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
@@ -411,6 +412,11 @@ void oric_state::machine_start()
 }
 
 
+void oric_state::machine_reset()
+{
+	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
+}
+
 void telestrat_state::machine_start()
 {
 	machine_start_common();
@@ -428,6 +434,7 @@ void telestrat_state::machine_start()
 
 void telestrat_state::machine_reset()
 {
+	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
 	m_port_314 = 0x00;
 	m_via2_a = 0xff;
 	remap();
@@ -791,8 +798,7 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	screen.set_screen_update(FUNC(oric_state::screen_update_oric));
 	screen.screen_vblank().set(FUNC(oric_state::vblank_w));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

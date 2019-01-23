@@ -47,8 +47,8 @@
 class mquake_state : public amiga_state
 {
 public:
-	mquake_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag),
+	mquake_state(const machine_config &mconfig, device_type type, const char *tag) :
+		amiga_state(mconfig, type, tag),
 		m_es5503(*this, "es5503"),
 		m_es5503_rom(*this, "es5503")
 	{ }
@@ -326,8 +326,7 @@ void mquake_state::mquake(machine_config &config)
 	/* video hardware */
 	ntsc_video(config);
 
-	PALETTE(config, m_palette, 4096);
-	m_palette->set_init(FUNC(mquake_state::palette_init_amiga));
+	PALETTE(config, m_palette, FUNC(mquake_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(mquake_state,amiga)
 

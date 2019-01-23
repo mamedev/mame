@@ -74,7 +74,7 @@ MACHINE_CONFIG_START(newbrain_eim_device::device_add_mconfig)
 	m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_txc));
 	m_ctc->zc_callback<2>().set(FUNC(newbrain_eim_device::ctc_z2_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_c2", newbrain_eim_device, ctc_c2_tick, attotime::from_hz(XTAL(16'000'000)/4/13))
+	TIMER(config, "z80ctc_c2").configure_periodic(FUNC(newbrain_eim_device::ctc_c2_tick), attotime::from_hz(XTAL(16'000'000)/4/13));
 
 	adc0809_device &adc(ADC0809(config, ADC0809_TAG, 500000));
 	adc.eoc_callback().set(FUNC(newbrain_eim_device::adc_eoc_w));

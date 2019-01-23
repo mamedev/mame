@@ -667,7 +667,7 @@ void lordgun_state::lordgun(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lordgun);
 
 	// 0x800 real colors, repeated per priority level
-	PALETTE(config, m_palette, 0x800 * 8).set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x800 * 8);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -721,7 +721,7 @@ void lordgun_state::aliencha(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lordgun);
 
 	// 0x800 real colors, repeated per priority level
-	PALETTE(config, m_palette, 0x800 * 8).set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x800 * 8);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

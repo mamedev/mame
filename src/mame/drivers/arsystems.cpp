@@ -313,8 +313,7 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	/* video hardware */
 	ntsc_video(config);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(arcadia_amiga_state,amiga)
+	PALETTE(config, m_palette, FUNC(arcadia_amiga_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(arcadia_amiga_state,amiga)
 
@@ -331,14 +330,15 @@ MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(IOPORT("CIA0PORTA"))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(IOPORT("CIA0PORTB"))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, arcadia_amiga_state,arcadia_cia_0_portb_w))
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_rd_callback().set_ioport("CIA0PORTA");
+	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
+	m_cia_0->pb_rd_callback().set_ioport("CIA0PORTB");
+	m_cia_0->pb_wr_callback().set(FUNC(arcadia_amiga_state::arcadia_cia_0_portb_w));
+
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
 	/* fdc */
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);

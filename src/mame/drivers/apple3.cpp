@@ -72,12 +72,12 @@ void apple3_state::apple3(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple3_state::screen_update));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_via[1], FUNC(via6522_device::write_cb1));
 	m_screen->screen_vblank().append(m_via[1], FUNC(via6522_device::write_cb2));
 	m_screen->screen_vblank().append(FUNC(apple3_state::vbl_w));
 
-	PALETTE(config, m_palette, 32).set_init(FUNC(apple3_state::palette_init_apple3));
+	PALETTE(config, m_palette, FUNC(apple3_state::palette_init), 32);
 
 	/* keyboard controller */
 	AY3600(config, m_ay3600, 0);
@@ -96,10 +96,11 @@ void apple3_state::apple3(machine_config &config)
 
 	/* slot bus */
 	A2BUS(config, m_a2bus, 0);
-	m_a2bus->set_cputag("maincpu");
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple3_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
 	//m_a2bus->inh_w().set(FUNC(apple3_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple3_cards, nullptr);

@@ -60,7 +60,7 @@ private:
 	DECLARE_WRITE8_MEMBER(pio_portb_w);
 
 	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
-	DECLARE_PALETTE_INIT(polyplay);
+	void polyplay_palette(palette_device &palette) const;
 	uint32_t screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void polyplay_io_zre(address_map &map);
 	void polyplay_io_zrepp(address_map &map);

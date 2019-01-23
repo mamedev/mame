@@ -275,44 +275,42 @@ void metlclsh_state::machine_reset()
 	m_gfxbank = 0;
 }
 
-MACHINE_CONFIG_START(metlclsh_state::metlclsh)
-
+void metlclsh_state::metlclsh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, 1500000)        // ?
-	MCFG_DEVICE_PROGRAM_MAP(metlclsh_master_map)
-	// IRQ by YM3526, NMI by cpu #2
+	M6809(config, m_maincpu, 1500000);	// ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &metlclsh_state::metlclsh_master_map);
+	// IRQ by YM3526, NMI by CPU #2
 
-	MCFG_DEVICE_ADD("sub", M6809, 1500000)        // ?
-	MCFG_DEVICE_PROGRAM_MAP(metlclsh_slave_map)
-	// IRQ by cpu #1, NMI by coins insertion
-
+	M6809(config, m_subcpu, 1500000);	// ?
+	m_subcpu->set_addrmap(AS_PROGRAM, &metlclsh_state::metlclsh_slave_map);
+	// IRQ by CPU #1, NMI by coin insertion
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // we're using PORT_VBLANK
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metlclsh_state, screen_update_metlclsh)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */   // we're using PORT_VBLANK
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 30*8-1);
+	screen.set_screen_update(FUNC(metlclsh_state::screen_update_metlclsh));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_metlclsh)
-	MCFG_PALETTE_ADD("palette", 3 * 16)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_metlclsh);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 3 * 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.10)
-	MCFG_SOUND_ROUTE(1, "mono", 0.10)
-	MCFG_SOUND_ROUTE(2, "mono", 0.10)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(0, "mono", 0.10);
+	ym1.add_route(1, "mono", 0.10);
+	ym1.add_route(2, "mono", 0.10);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************

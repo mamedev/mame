@@ -520,7 +520,7 @@ void buggychl_state::buggychl(machine_config &config)
 	Z80(config, m_audiocpu, 8_MHz_XTAL/2); /* 4 MHz according to schematics */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &buggychl_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(buggychl_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL/2/2/256/64)); // timer irq
-	//MCFG_TIMER_DEVICE_ADD_PERIODIC("soundirq", "audiocpu",  irq0_line_hold, 8_MHz_XTAL/2/2/256/64)
+	//TIMER(config, "soundirq").configure_periodic(m_audiocpu, FUNC(buggychl_state::irq0_line_hold), 8_MHz_XTAL/2/2/256/64);
 	// The schematics (which are at least partly for the wrong sound board) show a configurable timer with rates of
 	// 61.035Hz (8_MHz_XTAL/2/2/256/128)
 	// or 122.0Hz (8_MHz_XTAL/2/2/256/64)
@@ -546,20 +546,16 @@ void buggychl_state::buggychl(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_buggychl);
-	PALETTE(config, m_palette, 128+128);
-	m_palette->set_format(PALETTE_FORMAT_xxxxRRRRGGGGBBBB);
+	PALETTE(config, m_palette, FUNC(buggychl_state::buggychl_palette)).set_format(palette_device::xRGB_444, 128 + 128);
 	m_palette->set_endianness(ENDIANNESS_BIG);
-	m_palette->set_init(FUNC(buggychl_state::palette_init_buggychl));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set("soundnmi", FUNC(input_merger_device::in_w<0>));
-
-	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
-
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 	GENERIC_LATCH_8(config, m_soundlatch2);
+
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	TA7630(config, m_ta7630);
 

@@ -681,7 +681,7 @@ void c1pmf_state::machine_start()
 
 	// drive select logic missing
 	if (m_floppy0->get_device())
-		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&sb2m600_state::floppy_index_callback, this));
+		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&c1pmf_state::floppy_index_callback, this));
 }
 
 // disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
@@ -754,9 +754,9 @@ void uk101_state::uk101(machine_config &config)
 
 	/* cassette ACIA */
 	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
+	m_acia_0->txd_handler().set(FUNC(uk101_state::cassette_tx));
 
-	CLOCK(config, "cassette_clock", 500000).signal_handler().set(FUNC(sb2m600_state::write_cassette_clock));
+	CLOCK(config, "cassette_clock", 500000).signal_handler().set(FUNC(uk101_state::write_cassette_clock));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -790,9 +790,9 @@ void c1p_state::c1p(machine_config &config)
 
 	/* cassette ACIA */
 	ACIA6850(config, m_acia_0, 0);
-	m_acia_0->txd_handler().set(FUNC(sb2m600_state::cassette_tx));
+	m_acia_0->txd_handler().set(FUNC(c1p_state::cassette_tx));
 
-	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(sb2m600_state::write_cassette_clock));
+	CLOCK(config, "cassette_clock", X1/32).signal_handler().set(FUNC(c1p_state::write_cassette_clock));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

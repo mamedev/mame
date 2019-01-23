@@ -36,9 +36,7 @@ void sbus_cgthree_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(sbus_cgthree_device::screen_update));
-	m_screen->set_size(1152, 900);
-	m_screen->set_visarea(0, 1152-1, 0, 900-1);
-	m_screen->set_refresh_hz(72);
+	m_screen->set_raw(92.9405_MHz_XTAL, 1504, 0, 1152, 937, 0, 900);
 
 	BT458(config, m_ramdac, 0);
 }

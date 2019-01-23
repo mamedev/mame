@@ -434,7 +434,7 @@ MACHINE_CONFIG_START(s4_state::s4)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6800, 3580000)
 	MCFG_DEVICE_PROGRAM_MAP(s4_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s4_state, irq, attotime::from_hz(250))
+	TIMER(config, "irq").configure_periodic(FUNC(s4_state::irq), attotime::from_hz(250));
 	MCFG_MACHINE_RESET_OVERRIDE(s4_state, s4)
 
 	/* Video */

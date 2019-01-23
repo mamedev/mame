@@ -454,21 +454,20 @@ MACHINE_CONFIG_START(lviv_state::lviv)
 	MCFG_SCREEN_UPDATE_DRIVER(lviv_state, screen_update)
 	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD(m_palette, sizeof (s_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(lviv_state, lviv)
+	PALETTE(config, m_palette, FUNC(lviv_state::lviv_palette), ARRAY_LENGTH(s_palette));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav", 0)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(lviv_lvt_format)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("lviv_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(lviv_lvt_format);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("lviv_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")
 

@@ -519,7 +519,7 @@ void exelv_state::exl100(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 8).set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
@@ -573,7 +573,7 @@ void exelv_state::exeltel(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 8).set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	SPEECHROM(config, "vsm", 0);
 

@@ -399,6 +399,7 @@ foodf.cpp
 forte2.cpp
 fortecar.cpp
 freekick.cpp
+freeway.cpp
 fresh.cpp
 fromanc2.cpp
 fromance.cpp
@@ -817,6 +818,7 @@ namcos1.cpp
 namcos10.cpp
 namcos11.cpp
 namcos12.cpp
+namcos1b.cpp
 namcos2.cpp
 namcos21.cpp
 namcos21_c67.cpp

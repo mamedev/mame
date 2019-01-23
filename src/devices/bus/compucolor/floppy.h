@@ -91,7 +91,7 @@ protected:
 private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	required_device<floppy_image_device> m_floppy;
+	required_device<floppy_connector> m_floppy;
 
 	bool read_bit();
 	void write_bit(bool bit);

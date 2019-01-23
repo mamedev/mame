@@ -2103,6 +2103,33 @@ ROM_START( tetrisp2 ) /* Version 2.8 */
 	ROM_LOAD( "96019-07.7", 0x000000, 0x400000, CRC(a8a61954) SHA1(86c3db10b348ba1f44ff696877b8b20845fa53de) )
 ROM_END
 
+ROM_START( tetrisp2a ) /* Version 2.7 */
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "tet2_4_ver2.7.ic59", 0x000000, 0x080000, CRC(3070bfde) SHA1(ba4f69961411fb7d64bcdf83763322e8ff097a59) )
+	ROM_LOAD16_BYTE( "tet2_1_ver2.7.ic65", 0x000001, 0x080000, CRC(fe3eb1d2) SHA1(7ab27de254a0701a5ba8879456db794e871e6d69) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )   /* 8x8x8 (Sprites) */
+	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
+	ROM_LOAD32_WORD( "96019-02.8", 0x000002, 0x400000, CRC(3e613bed) SHA1(038b5e43fa3d69654107c8093126eeb2e8fa4ddc) )
+
+	/* If t2p_m01&2 from this board were correctly read, since they hold the same data of the above but with swapped halves, it
+	       means they had to invert the top bit of the "page select" register in the sprite's hardware on this board! */
+
+	ROM_REGION( 0x800000, "gfx2", 0 )   /* 16x16x8 (Background) */
+	ROM_LOAD( "96019-06.13", 0x000000, 0x400000, CRC(16f7093c) SHA1(2be77c6a692c5d762f5553ae24e8c415ab194cc6) )
+	//ROM_LOAD( "96019-04.6",  0x400000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* 16x16x8 (Rotation) */
+	ROM_COPY( "gfx2",        0x400000, 0x000000, 0x100000 )
+	ROM_LOAD( "96019-04.6",  0x000000, 0x100000, CRC(b849dec9) SHA1(fa7ac00fbe587a74c3fb8c74a0f91f7afeb8682f) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 )   /* 8x8x8 (Foreground) */
+	ROM_LOAD( "tetp2-10.ic27", 0x000000, 0x080000, CRC(34dd1bad) SHA1(9bdf1dde11f82839676400de5dd7acb06ea8cdb2) )   // 11111xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
+	ROM_LOAD( "96019-07.7", 0x000000, 0x400000, CRC(a8a61954) SHA1(86c3db10b348ba1f44ff696877b8b20845fa53de) )
+ROM_END
+
 ROM_START( tetrisp2j ) /* Version 2.2 */
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "tet2_4_ver2.2.ic59", 0x000000, 0x080000, CRC(5bfa32c8) SHA1(55fb2872695fcfbad13f5c0723302e72da69e44a) )
@@ -2823,7 +2850,8 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     STATE,          INIT,     MONITOR, COMPANY,                       FULLNAME,                               FLAGS
-GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2,  0,        tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.8)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (World, V2.7)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 

@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(13'516'800), 824, 48, 688, 274, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_kdt6);
 
 	MC6845(config, m_crtc, XTAL(13'516'800) / 8);
@@ -644,7 +644,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_TIMER_DRIVER_ADD("beep_timer", kdt6_state, beeper_off)
+	TIMER(config, m_beep_timer).configure_generic(FUNC(kdt6_state::beeper_off));
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
 	m_dma->out_busreq_callback().set(FUNC(kdt6_state::busreq_w));

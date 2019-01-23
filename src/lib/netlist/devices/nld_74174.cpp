@@ -134,8 +134,8 @@ namespace netlist
 		//m_sub.do_reset();
 	}
 
-	NETLIB_DEVICE_IMPL(74174)
-	NETLIB_DEVICE_IMPL(74174_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(74174)
+	NETLIB_DEVICE_IMPL_DEPRECATED(74174_dip)
 
 	} //namespace devices
 } // namespace netlist

@@ -261,7 +261,7 @@ void craft_state::craft(machine_config &config)
 	screen.set_size(635, 525);
 	screen.set_visarea(47, 526, 36, 515);
 	screen.set_screen_update(FUNC(craft_state::screen_update_craft));
-	PALETTE(config, "palette", 0x1000);
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "avr8").front_center();

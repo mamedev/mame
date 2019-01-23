@@ -92,15 +92,16 @@ Notes:
 class calorie_state : public driver_device
 {
 public:
-	calorie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	calorie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_ram(*this, "fg_ram"),
 		m_sprites(*this, "sprites"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fg_ram;
@@ -485,11 +486,10 @@ MACHINE_CONFIG_START(calorie_state::calorie)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calorie)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calorie);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

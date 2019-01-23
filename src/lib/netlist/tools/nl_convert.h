@@ -166,7 +166,7 @@ public:
 	class tokenizer : public plib::ptokenizer
 	{
 	public:
-		tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &strm);
+		tokenizer(nl_convert_eagle_t &convert, plib::putf8_reader &&strm);
 
 		token_id_t m_tok_ADD;
 		token_id_t m_tok_VALUE;
@@ -202,7 +202,7 @@ public:
 	class tokenizer : public plib::ptokenizer
 	{
 	public:
-		tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &strm);
+		tokenizer(nl_convert_rinf_t &convert, plib::putf8_reader &&strm);
 
 		token_id_t m_tok_HEA;
 		token_id_t m_tok_APP;

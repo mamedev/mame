@@ -694,6 +694,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(spectrum_state::ts2068)
 	spectrum_128(config);
+
 	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(ts2068_mem)
 	MCFG_DEVICE_IO_MAP(ts2068_io)
@@ -710,7 +711,7 @@ MACHINE_CONFIG_START(spectrum_state::ts2068)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ts2068)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ts2068);
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 

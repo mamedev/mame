@@ -512,9 +512,8 @@ void lethal_state::lethalen(machine_config &config)
 	screen.set_screen_update(FUNC(lethal_state::screen_update_lethalen));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, 8192);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
 	m_palette->enable_shadows();
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback), this);

@@ -643,7 +643,7 @@ void meadows_state::meadows(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(meadows_state::meadows_vblank_irq)); // one interrupt per frame!?
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_meadows);
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -676,7 +676,7 @@ void meadows_state::minferno(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(meadows_state::minferno_vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_minferno);
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* audio hardware */
 	// TODO
@@ -704,7 +704,7 @@ void meadows_state::bowl3d(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(meadows_state::meadows_vblank_irq)); // one interrupt per frame!?
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_meadows);
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();

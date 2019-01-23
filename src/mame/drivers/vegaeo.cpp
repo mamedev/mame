@@ -189,8 +189,7 @@ void vegaeo_state::vega(machine_config &config)
 	m_screen->set_screen_update(FUNC(vegaeo_state::screen_update_vega));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 256);
-	m_palette->set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256);
 	m_palette->set_membits(16);
 
 	MCFG_VIDEO_START_OVERRIDE(vegaeo_state,vega)

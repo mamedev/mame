@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nanos)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
 	Z80CTC(config, m_ctc_0, XTAL(4'000'000));
@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(nanos_state::nanos)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", nanos_state, keyboard_callback, attotime::from_hz(24000))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(nanos_state::keyboard_callback), attotime::from_hz(24000));
 MACHINE_CONFIG_END
 
 /* ROM definition */

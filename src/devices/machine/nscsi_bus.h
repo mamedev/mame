@@ -18,7 +18,7 @@ class nscsi_device;
 class nscsi_bus_device : public device_t
 {
 public:
-	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void ctrl_w(int refid, uint32_t lines, uint32_t mask);
 	void data_w(int refid, uint32_t lines);
@@ -49,10 +49,19 @@ private:
 };
 
 class nscsi_connector: public device_t,
-						public device_slot_interface
+					   public device_slot_interface
 {
 public:
-	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false)
+		: nscsi_connector(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
+	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~nscsi_connector();
 
 	nscsi_device *get_device();
@@ -84,6 +93,33 @@ public:
 		S_PHASE_MSG_OUT  = S_MSG|S_CTL,
 		S_PHASE_MSG_IN   = S_MSG|S_CTL|S_INP,
 		S_PHASE_MASK     = S_MSG|S_CTL|S_INP
+	};
+
+	// SCSI Messages
+	// Here because some controllers interpret messages
+	enum {
+		SM_COMMAND_COMPLETE              = 0x00,
+		SM_EXTENDED_MSG                  = 0x01,
+		SM_SAVE_DATA_PTR                 = 0x02,
+		SM_RESTORE_PTR                   = 0x03,
+		SM_DISCONNECT                    = 0x04,
+		SM_INITIATOR_ERROR               = 0x05,
+		SM_ABORT                         = 0x06,
+		SM_MSG_REJECT                    = 0x07,
+		SM_NOP                           = 0x08,
+		SM_MSG_PARITY                    = 0x09,
+		SM_LCMD_COMPLETE                 = 0x0a,
+		SM_LCMD_COMPLETE_F               = 0x0b,
+		SM_BUS_DEVICE_RESET              = 0x0c,
+		SM_ABORT_TAG                     = 0x0d,
+		SM_CLEAR_QUEUE                   = 0x0e,
+		SM_INIT_RECOVERY                 = 0x0f,
+		SM_RELEASE_RECOVERY              = 0x10,
+		SM_TERMINATE_IO                  = 0x11,
+		SM_SIMPLE_QUEUE                  = 0x20,
+		SM_HEAD_QUEUE                    = 0x21,
+		SM_ORDERED_QUEUE                 = 0x22,
+		SM_IGNORE_WIDE_RES               = 0x23
 	};
 
 	void connect_to_bus(nscsi_bus_device *bus, int refid, int default_scsi_id);
@@ -140,7 +176,9 @@ protected:
 
 	// SCSI addtional sense code qualifiers
 	enum {
-		SK_ASC_MEDIUM_NOT_PRESENT       = 0x3a
+		SK_ASC_INVALID_FIELD_IN_CDB       = 0x24,
+		SK_ASC_LOGICAL_UNIT_NOT_SUPPORTED = 0x25,
+		SK_ASC_MEDIUM_NOT_PRESENT         = 0x3a
 	};
 
 	// SCSI commands
@@ -262,32 +300,6 @@ protected:
 		SC_MECHANISM_STATUS              = 0xbd,
 		SC_READ_CD                       = 0xbe,
 		SC_SEND_DVD_STRUCTURE            = 0xbf
-	};
-
-	// SCSI Messages
-	enum {
-		SM_COMMAND_COMPLETE              = 0x00,
-		SM_EXTENDED_MSG                  = 0x01,
-		SM_SAVE_DATA_PTR                 = 0x02,
-		SM_RESTORE_PTR                   = 0x03,
-		SM_DISCONNECT                    = 0x04,
-		SM_INITIATOR_ERROR               = 0x05,
-		SM_ABORT                         = 0x06,
-		SM_MSG_REJECT                    = 0x07,
-		SM_NOP                           = 0x08,
-		SM_MSG_PARITY                    = 0x09,
-		SM_LCMD_COMPLETE                 = 0x0a,
-		SM_LCMD_COMPLETE_F               = 0x0b,
-		SM_BUS_DEVICE_RESET              = 0x0c,
-		SM_ABORT_TAG                     = 0x0d,
-		SM_CLEAR_QUEUE                   = 0x0e,
-		SM_INIT_RECOVERY                 = 0x0f,
-		SM_RELEASE_RECOVERY              = 0x10,
-		SM_TERMINATE_IO                  = 0x11,
-		SM_SIMPLE_QUEUE                  = 0x20,
-		SM_HEAD_QUEUE                    = 0x21,
-		SM_ORDERED_QUEUE                 = 0x22,
-		SM_IGNORE_WIDE_RES               = 0x23
 	};
 
 	enum {

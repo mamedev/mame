@@ -48,7 +48,7 @@ public:
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(cesclassic);
+	void cesclassic_palette(palette_device &palette) const;
 	void cesclassic(machine_config &config);
 	void cesclassic_map(address_map &map);
 protected:
@@ -242,11 +242,9 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("l_lcd")
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(cesclassic_state, cesclassic)
+void cesclassic_state::cesclassic_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, pal2bit(i), 0, 0);
 }
 
@@ -267,8 +265,7 @@ MACHINE_CONFIG_START(cesclassic_state::cesclassic)
 	MCFG_SCREEN_SIZE(8*16*2, 8*8+3*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 8*16*2-1, 0*8, 8*8-1)
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(cesclassic_state, cesclassic)
+	PALETTE(config, m_palette, FUNC(cesclassic_state::cesclassic_palette), 4);
 
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("oki", OKIM6295, 24000000/16, okim6295_device::PIN7_LOW)

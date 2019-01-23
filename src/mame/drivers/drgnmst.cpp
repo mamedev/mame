@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	m_audiocpu->read_c().set(FUNC(drgnmst_state::snd_flag_r));
 	m_audiocpu->write_c().set(FUNC(drgnmst_state::snd_control_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnmst)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drgnmst);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -395,10 +395,9 @@ MACHINE_CONFIG_START(drgnmst_state::drgnmst)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(drgnmst_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT_CLASS(2, drgnmst_state, drgnmst_IIIIRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(2, &drgnmst_state::drgnmst_IIIIRRRRGGGGBBBB, 0x2000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

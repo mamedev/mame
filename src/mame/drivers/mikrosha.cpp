@@ -8,7 +8,6 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
 #include "includes/radio86.h"
 
@@ -169,9 +168,8 @@ WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 
 I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const uint8_t *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charmap = &m_charmap[(m_mikrosha_font_page & 1) * 0x400];
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;
@@ -182,7 +180,7 @@ I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 	if (rvv) {
 		pixels ^= 0xff;
 	}
-	for(i=0;i<6;i++) {
+	for(int i=0;i<6;i++) {
 		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 	}
 }
@@ -220,10 +218,10 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	I8255(config, m_ppi8255_2);
 	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::mikrosha_8255_font_page_w));
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
-	MCFG_I8275_CHARACTER_WIDTH(6)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma8257,i8257_device, dreq2_w))
+	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
+	i8275.set_character_width(6);
+	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels), this);
+	i8275.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
 	pit8253.set_clk<0>(0);
@@ -238,9 +236,8 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikrosha)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(mikrosha_state,radio86)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mikrosha);
+	PALETTE(config, m_palette, FUNC(mikrosha_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -252,10 +249,10 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
 	m_dma8257->set_reverse_rw_mode(1);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rkm_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mikrosha_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rkm_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("mikrosha_cass");
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mikrosha_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")

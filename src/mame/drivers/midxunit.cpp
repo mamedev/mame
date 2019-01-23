@@ -259,7 +259,7 @@ void midxunit_state::midxunit(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 32768);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PIXEL_CLOCK, 506, 101, 501, 289, 20, 274);
@@ -270,7 +270,7 @@ void midxunit_state::midxunit(machine_config &config)
 	/* serial prefixes 419, 420 */
 	m_midway_serial_pic->set_upper(419);
 
-	adc0848_device &adc(ADC0848(config, "adc", 0));
+	adc0848_device &adc(ADC0848(config, "adc"));
 	adc.intr_callback().set(FUNC(midxunit_state::adc_int_w)); // ADC INT passed through PLSI1032
 	adc.ch1_callback().set_ioport("AN0");
 	adc.ch2_callback().set_ioport("AN1");

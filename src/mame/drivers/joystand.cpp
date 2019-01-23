@@ -103,8 +103,8 @@ Notes:
 class joystand_state : public driver_device
 {
 public:
-	joystand_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	joystand_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tmp68301(*this, "tmp68301"),
 		m_palette(*this, "palette"),
@@ -134,6 +134,11 @@ public:
 	{ }
 
 	void joystand(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	// devices
@@ -201,11 +206,8 @@ private:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void video_start() override;
 
 	// machine
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
 	void joystand_map(address_map &map);
 };
@@ -605,11 +607,10 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 	MCFG_SCREEN_SIZE(0x200, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x40+0x178-1, 0x10, 0x100-1)
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_joystand)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_joystand);
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("bg15_palette")
+	PALETTE(config, m_bg15_palette, palette_device::RGB_555);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -636,7 +637,7 @@ MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// devices
 	EEPROM_93C46_16BIT(config, "eeprom");
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
+	MSM6242(config, "rtc", XTAL(32'768));
 MACHINE_CONFIG_END
 
 

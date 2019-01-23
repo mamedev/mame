@@ -62,7 +62,7 @@ protected:
 	DECLARE_WRITE8_MEMBER( rombank2_w );
 	DECLARE_READ8_MEMBER( beep_r );
 	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_PALETTE_INIT(pc2000);
+	void pc2000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
 
 	void pc2000_io(address_map &map);
@@ -846,7 +846,7 @@ void pc1000_state::machine_reset()
 	m_bank1->set_entry(0);
 }
 
-PALETTE_INIT_MEMBER(pc2000_state, pc2000)
+void pc2000_state::pc2000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -897,7 +897,7 @@ void pc2000_state::pc2000(machine_config &config)
 	m_screen->set_visarea(0, 120-1, 0, 18-1);
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init(FUNC(pc2000_state::palette_init_pc2000));
+	PALETTE(config, "palette", FUNC(pc2000_state::pc2000_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_pc2000);
 
 	HD44780(config, m_lcdc, 0);
@@ -916,6 +916,7 @@ void pc2000_state::pc2000(machine_config &config)
 void pc2000_state::gl2000(machine_config &config)
 {
 	pc2000(config);
+
 	SOFTWARE_LIST(config, "cart_list").set_original("gl2000");
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 }
@@ -940,6 +941,7 @@ HD44780_PIXEL_UPDATE(gl4004_state::gl4000_pixel_update)
 void gl3000s_state::gl3000s(machine_config &config)
 {
 	pc2000(config);
+
 	m_maincpu->set_addrmap(AS_IO, &gl3000s_state::gl3000s_io);
 
 	config.device_remove("hd44780");
@@ -960,6 +962,7 @@ MACHINE_CONFIG_END
 void gl4004_state::gl4000(machine_config &config)
 {
 	pc2000(config);
+
 	m_screen->set_size(120, 36); // 4x20 chars
 	m_screen->set_visarea(0, 120-1, 0, 36-1);
 
@@ -973,6 +976,7 @@ void gl4004_state::gl4000(machine_config &config)
 void pc1000_state::misterx(machine_config &config)
 {
 	pc2000(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1000_state::pc1000_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc1000_state::pc1000_io);
@@ -992,6 +996,7 @@ void pc1000_state::misterx(machine_config &config)
 void pc1000_state::pc1000(machine_config &config)
 {
 	misterx(config);
+
 	config.device_remove("cart_list");
 	config.device_remove("pc1000_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("pc1000");

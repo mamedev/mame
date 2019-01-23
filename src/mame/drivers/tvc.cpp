@@ -58,6 +58,10 @@ public:
 
 	void tvc(machine_config &config);
 
+protected:
+	void machine_start() override;
+	void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -74,8 +78,16 @@ private:
 	memory_region *m_ext;
 	memory_region *m_vram;
 
-	void machine_start() override;
-	void machine_reset() override;
+	uint8_t       m_video_mode;
+	uint8_t       m_keyline;
+	uint8_t       m_active_slot;
+	uint8_t       m_int_flipflop;
+	uint8_t       m_col[4];
+	uint8_t       m_bank_type[4];
+	uint8_t       m_bank;
+	uint8_t       m_vram_bank;
+	uint8_t       m_cassette_ff;
+	uint8_t       m_centronics_ff;
 
 	void set_mem_page(uint8_t data);
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -102,17 +114,7 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	uint8_t       m_video_mode;
-	uint8_t       m_keyline;
-	uint8_t       m_active_slot;
-	uint8_t       m_int_flipflop;
-	uint8_t       m_col[4];
-	uint8_t       m_bank_type[4];
-	uint8_t       m_bank;
-	uint8_t       m_vram_bank;
-	uint8_t       m_cassette_ff;
-	uint8_t       m_centronics_ff;
-	DECLARE_PALETTE_INIT(tvc);
+	void tvc_palette(palette_device &palette) const;
 
 	void tvc_io(address_map &map);
 	void tvc_mem(address_map &map);
@@ -700,31 +702,29 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 	}
 }
 
-PALETTE_INIT_MEMBER(tvc_state, tvc)
+void tvc_state::tvc_palette(palette_device &palette) const
 {
-	const static unsigned char tvc_palette[16][3] =
+	static constexpr rgb_t tvc_pens[16] =
 	{
-		{ 0x00,0x00,0x00 },
-		{ 0x00,0x00,0x7f },
-		{ 0x7f,0x00,0x00 },
-		{ 0x7f,0x00,0x7f },
-		{ 0x00,0x7f,0x00 },
-		{ 0x00,0x7f,0x7f },
-		{ 0x7f,0x7f,0x00 },
-		{ 0x7f,0x7f,0x7f },
-		{ 0x00,0x00,0x00 },
-		{ 0x00,0x00,0xff },
-		{ 0xff,0x00,0x00 },
-		{ 0xff,0x00,0xff },
-		{ 0x00,0xff,0x00 },
-		{ 0x00,0xff,0xff },
-		{ 0xff,0xff,0x00 },
-		{ 0xff,0xff,0xff }
+		{ 0x00, 0x00, 0x00 },
+		{ 0x00, 0x00, 0x7f },
+		{ 0x7f, 0x00, 0x00 },
+		{ 0x7f, 0x00, 0x7f },
+		{ 0x00, 0x7f, 0x00 },
+		{ 0x00, 0x7f, 0x7f },
+		{ 0x7f, 0x7f, 0x00 },
+		{ 0x7f, 0x7f, 0x7f },
+		{ 0x00, 0x00, 0x00 },
+		{ 0x00, 0x00, 0xff },
+		{ 0xff, 0x00, 0x00 },
+		{ 0xff, 0x00, 0xff },
+		{ 0x00, 0xff, 0x00 },
+		{ 0x00, 0xff, 0xff },
+		{ 0xff, 0xff, 0x00 },
+		{ 0xff, 0xff, 0xff }
 	};
-	int i;
 
-	for(i = 0; i < 16; i++)
-		palette.set_pen_color(i, tvc_palette[i][0], tvc_palette[i][1], tvc_palette[i][2]);
+	palette.set_pen_colors(0, tvc_pens);
 }
 
 WRITE_LINE_MEMBER(tvc_state::int_ff_set)
@@ -780,8 +780,7 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 240 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD( "palette", 16 )
-	MCFG_PALETTE_INIT_OWNER(tvc_state, tvc)
+	PALETTE(config, m_palette, FUNC(tvc_state::tvc_palette), 16);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 3125000/2)); // clk taken from schematics
 	crtc.set_screen("screen");
@@ -827,10 +826,10 @@ MACHINE_CONFIG_START(tvc_state::tvc)
 	MCFG_TVCEXP_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(tvc64_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("tvc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tvc64_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED);
+	m_cassette->set_interface("tvc_cass");
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)

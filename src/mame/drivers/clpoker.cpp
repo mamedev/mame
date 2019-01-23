@@ -271,7 +271,7 @@ MACHINE_CONFIG_START(clpoker_state::clpoker)
 	ppi_inputs.in_pb_callback().set_ioport("INB");
 	ppi_inputs.in_pc_callback().set_ioport("INC");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60) // wrong

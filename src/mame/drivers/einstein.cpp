@@ -585,7 +585,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, keyboard_timer_callback, attotime::from_hz(50))
+	TIMER(config, "keyboard").configure_periodic(FUNC(einstein_state::keyboard_timer_callback), attotime::from_hz(50));
 
 	z80pio_device& pio(Z80PIO(config, IC_I063, XTAL_X002 / 2));
 	pio.out_int_callback().set(FUNC(einstein_state::int_w<0>));
@@ -625,7 +625,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	m_psg->port_a_write_callback().set(FUNC(einstein_state::keyboard_line_write));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	adc0844_device &adc(ADC0844(config, "adc", 0));
+	adc0844_device &adc(ADC0844(config, "adc"));
 	adc.intr_callback().set(m_adc_daisy, FUNC(z80daisy_generic_device::int_w));
 	adc.ch1_callback().set_ioport("analogue_1_x");
 	adc.ch2_callback().set_ioport("analogue_1_y");
@@ -641,7 +641,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_TIMER_DRIVER_ADD("strobe", einstein_state, strobe_callback)
+	TIMER(config, m_strobe_timer).configure_generic(FUNC(einstein_state::strobe_callback));
 
 	// uart
 	i8251_device &ic_i060(I8251(config, IC_I060, XTAL_X002 / 4));
@@ -671,8 +671,8 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// tatung pipe connector
-	MCFG_TATUNG_PIPE_ADD("pipe")
-	MCFG_TATUNG_PIPE_NMI_HANDLER(INPUTLINE(IC_I001, INPUT_LINE_NMI))
+	TATUNG_PIPE(config, m_pipe, XTAL_X002 / 2, tatung_pipe_cards, nullptr);
+	m_pipe->nmi_handler().set_inputline(IC_I001, INPUT_LINE_NMI);
 
 	// user port
 	MCFG_EINSTEIN_USERPORT_ADD("user")

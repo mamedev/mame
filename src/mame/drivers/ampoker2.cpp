@@ -391,9 +391,6 @@
 
 *********************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL(6'000'000)
-
 #include "emu.h"
 #include "includes/ampoker2.h"
 
@@ -405,6 +402,9 @@
 
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
+
+
+#define MASTER_CLOCK    XTAL(6'000'000)
 
 
 void ampoker2_state::machine_start()
@@ -1189,9 +1189,8 @@ MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 	MCFG_SCREEN_UPDATE_DRIVER(ampoker2_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ampoker2)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(ampoker2_state, ampoker2)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ampoker2);
+	PALETTE(config, "palette", FUNC(ampoker2_state::ampoker2_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1202,7 +1201,7 @@ MACHINE_CONFIG_START(ampoker2_state::sigma2k)
 	ampoker2(config);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sigma2k)
+	m_gfxdecode->set_info(gfx_sigma2k);
 	MCFG_VIDEO_START_OVERRIDE(ampoker2_state, sigma2k)
 MACHINE_CONFIG_END
 

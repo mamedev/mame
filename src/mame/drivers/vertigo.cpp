@@ -143,7 +143,7 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, m_vector, 0);
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(400, 300)

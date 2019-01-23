@@ -261,7 +261,7 @@ public:
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
-	{}
+	{ }
 
 	void spc1500(machine_config &config);
 
@@ -291,7 +291,7 @@ private:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_PALETTE_INIT(spc);
+	void spc_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
@@ -507,7 +507,7 @@ WRITE8_MEMBER( spc1500_state::palet_w)
 	}
 }
 
-PALETTE_INIT_MEMBER(spc1500_state,spc)
+void spc1500_state::spc_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1,rgb_t(0x00,0x00,0xff));
@@ -893,8 +893,9 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
+
+	PALETTE(config, m_palette, FUNC(spc1500_state::spc_palette), 8);
+
 	MC6845(config, m_vdg, (VDP_CLOCK/48)); //unknown divider
 	m_vdg->set_screen("screen");
 	m_vdg->set_show_border_area(false);
@@ -910,7 +911,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
 	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
+	TIMER(config, "1hz").configure_periodic(FUNC(spc1500_state::timer), attotime::from_hz(1));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -918,17 +919,17 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 	m_sound->port_a_read_callback().set(FUNC(spc1500_state::psga_r));
 	m_sound->port_b_write_callback().set(FUNC(spc1500_state::psgb_w));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, spc1500_state, centronics_busy_w))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("spc1500_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(spc1000_cassette_formats);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED);
+	m_cass->set_interface("spc1500_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
 

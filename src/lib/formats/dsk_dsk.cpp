@@ -436,7 +436,8 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				else
 					pos += 128 << tr.sector_size_code;
 			}
-			build_pc_track_mfm(track, side, image, 100000, tr.number_of_sector, sects, tr.gap3_length);
+			// larger cell count (was 100000) to allow for slightly out of spec images (theatre europe on einstein)
+			build_pc_track_mfm(track, side, image, 105000, tr.number_of_sector, sects, tr.gap3_length);
 			counter++;
 		}
 	}

@@ -66,7 +66,7 @@ private:
 	DECLARE_WRITE8_MEMBER(malzak_playfield_w);
 	DECLARE_READ8_MEMBER(videoram_r);
 
-	DECLARE_PALETTE_INIT(malzak);
+	void malzak_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void malzak2_map(address_map &map);

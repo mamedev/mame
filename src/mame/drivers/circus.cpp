@@ -301,7 +301,7 @@ void circus_state::circus(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -333,7 +333,7 @@ void circus_state::robotbwl(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robotbwl);
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -373,7 +373,7 @@ void circus_state::crash(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -405,7 +405,7 @@ void circus_state::ripcord(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circus);
 
-	PALETTE(config, m_palette, 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

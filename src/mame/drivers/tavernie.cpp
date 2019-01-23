@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.readpa_handler().set(FUNC(tavernie_state::pa_r));
@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_SCREEN_SIZE(80*8, 25*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	config.set_default_layout(layout_tavernie);
 
 	/* sound hardware */

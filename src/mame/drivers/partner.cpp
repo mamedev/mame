@@ -188,9 +188,8 @@ void partner_state::partner(machine_config &config)
 	screen.set_size(78*6, 30*10);
 	screen.set_visarea(0, 78*6-1, 0, 30*10-1);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_partner);
-	auto &palette(PALETTE(config, m_palette, 3));
-	palette.set_init(palette_init_delegate(FUNC(radio86_state::palette_init_radio86), this));
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_partner);
+	PALETTE(config, m_palette, FUNC(partner_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
 	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);

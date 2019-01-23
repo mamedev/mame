@@ -53,26 +53,34 @@
 class unichamp_state : public driver_device
 {
 public:
-	unichamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	unichamp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gic(*this, "gic"),
 		m_cart(*this, "cartslot"),
-		m_ctrls(*this, "CTRLS"){}
+		m_ctrls(*this, "CTRLS")
+	{ }
 
 	void unichamp(machine_config &config);
 
 	void init_unichamp();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	required_device<cp1610_cpu_device> m_maincpu;
 	required_device<gic_device> m_gic;
 	required_device<generic_slot_device> m_cart;
 
+	required_ioport m_ctrls;
+
 	uint8_t m_ram[256];
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(unichamp);
+
+	void unichamp_palette(palette_device &palette) const;
 
 	DECLARE_READ8_MEMBER(bext_r);
 
@@ -87,26 +95,23 @@ private:
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void unichamp_mem(address_map &map);
-
-	required_ioport m_ctrls;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-PALETTE_INIT_MEMBER(unichamp_state, unichamp)
+void unichamp_state::unichamp_palette(palette_device &palette) const
 {
 	/*
 	palette.set_pen_color(GIC_BLACK, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(GIC_RED,   rgb_t(0xAE, 0x49, 0x41));//(from box shot)
+	palette.set_pen_color(GIC_RED,   rgb_t(0xae, 0x49, 0x41));//(from box shot)
 	palette.set_pen_color(GIC_GREEN, rgb_t(0x62, 0x95, 0x88));//(from box shot)
-	palette.set_pen_color(GIC_WHITE, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(GIC_WHITE, rgb_t(0xff, 0xff, 0xff));
 	*/
 
 	//using from intv.c instead as suggested by RB
 	palette.set_pen_color(GIC_BLACK, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(GIC_RED,   rgb_t(0xFF, 0x3D, 0x10));
-	//palette.set_pen_color(GIC_GREEN, rgb_t(0x38, 0x6B, 0x3F)); //intv's DARK GREEN
-	palette.set_pen_color(GIC_GREEN, rgb_t(0x00, 0xA7, 0x56)); //intv's GREEN
-	palette.set_pen_color(GIC_WHITE, rgb_t(0xFF, 0xFC, 0xFF));
+	palette.set_pen_color(GIC_RED,   rgb_t(0xff, 0x3d, 0x10));
+	//palette.set_pen_color(GIC_GREEN, rgb_t(0x38, 0x6b, 0x3f)); //intv's DARK GREEN
+	palette.set_pen_color(GIC_GREEN, rgb_t(0x00, 0xa7, 0x56)); //intv's GREEN
+	palette.set_pen_color(GIC_WHITE, rgb_t(0xff, 0xfc, 0xff));
 }
 
 
@@ -260,7 +265,7 @@ void unichamp_state::unichamp(machine_config &config)
 	screen.set_screen_update(FUNC(unichamp_state::screen_update_unichamp));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 4).set_init(FUNC(unichamp_state::palette_init_unichamp));
+	PALETTE(config, "palette", FUNC(unichamp_state::unichamp_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -73,6 +73,11 @@ uint32_t concept_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
+WRITE_LINE_MEMBER(concept_state::ioc_interrupt)
+{
+	concept_set_interrupt(IOCINT_level, state);
+}
+
 void concept_state::concept_set_interrupt(int level, int state)
 {
 	int interrupt_mask;
@@ -164,11 +169,8 @@ WRITE_LINE_MEMBER(concept_state::via_irq_func)
 	concept_set_interrupt(TIMINT_level, state);
 }
 
-READ16_MEMBER(concept_state::concept_io_r)
+READ8_MEMBER(concept_state::io_r)
 {
-	if (! ACCESSING_BITS_0_7)
-		return 0;
-
 	switch ((offset >> 8) & 7)
 	{
 	case 0:
@@ -216,7 +218,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 	case 5:
 		/* slot status */
 		LOG(("concept_io_r: Slot status read at address 0x03%4.4x\n", offset << 1));
-		break;
+		return (~m_a2bus->get_a2bus_nmi_mask() & 0x0f) | (~m_a2bus->get_a2bus_irq_mask() & 0x0f) << 4;
 
 	case 6:
 		/* calendar R/W */
@@ -275,13 +277,8 @@ READ16_MEMBER(concept_state::concept_io_r)
 	return 0;
 }
 
-WRITE16_MEMBER(concept_state::concept_io_w)
+WRITE8_MEMBER(concept_state::io_w)
 {
-	if (! ACCESSING_BITS_0_7)
-		return;
-
-	data &= 0xff;
-
 	switch ((offset >> 8) & 7)
 	{
 	case 0:

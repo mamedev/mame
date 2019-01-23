@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", KONAMI1, XTAL(18'432'000)/6) /* ??? */
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", finalizr_state, finalizr_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(finalizr_state::finalizr_scanline), "screen", 0, 1);
 
 	I8039(config, m_audiocpu, XTAL(18'432'000)/2); /* 9.216MHz clkin ?? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &finalizr_state::sound_map);
@@ -285,12 +285,10 @@ MACHINE_CONFIG_START(finalizr_state::finalizr)
 	MCFG_SCREEN_SIZE(36*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(finalizr_state, screen_update_finalizr)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_finalizr)
-	MCFG_PALETTE_ADD("palette", 2*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(finalizr_state, finalizr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_finalizr);
+	PALETTE(config, m_palette, FUNC(finalizr_state::finalizr_palette), 2*16*16, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

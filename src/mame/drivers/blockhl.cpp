@@ -40,14 +40,15 @@
 class blockhl_state : public driver_device
 {
 public:
-	blockhl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	blockhl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_bank5800(*this, "bank5800"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k052109(*this, "k052109"),
 		m_k051960(*this, "k051960"),
-		m_rombank(*this, "rombank") { }
+		m_rombank(*this, "rombank")
+	{ }
 
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
@@ -300,9 +301,7 @@ void blockhl_state::blockhl(machine_config &config)
 	screen.set_screen_update(FUNC(blockhl_state::screen_update_blockhl));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 1024));
-	palette.enable_shadows();
-	palette.set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024).enable_shadows();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");

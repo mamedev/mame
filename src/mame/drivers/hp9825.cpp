@@ -17,10 +17,16 @@
 // - Printer
 // - Beeper
 // - Internal expansion ROMs
+// - I/O expansion slots: 98032, 98034 & 98035 modules can be connected
 // What's not yet in:
 // - External expansion ROMs
 // - Configurable RAM size
-// - I/O expansion slots: 98034 & 98035 modules from hp9845 emulation can be used here, too
+//
+// Thanks to Dyke Shaffer for publishing (on https://groups.io/g/VintHPcom)
+// the source code of 98217 mass memory ROM. The 98217.bin image was reconstructed
+// by re-assembling the source code (this is the reason why it's marked as
+// a BAD_DUMP). And thanks to Ansgar Kueckes for adapting his assembler to
+// handle HP9825 source files.
 //
 // 9825A & 9825T can also be emulated. At the moment I haven't all the necessary
 // ROM dumps, though.
@@ -225,8 +231,9 @@ void hp9825_state::cpu_io_map(address_map &map)
 void hp9825_state::cpu_mem_map(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000 , 0x2fff).rom();
-	map(0x3400 , 0x3bff).rom();
+	// map(0x0000 , 0x2fff).rom();
+	// map(0x3400 , 0x3bff).rom();
+	map(0x0000 , 0x3bff).rom();
 	map(0x4000 , 0x4fff).rom();
 	map(0x5000 , 0x7fff).ram();
 }
@@ -824,6 +831,7 @@ ROM_START(hp9825b)
 	ROM_LOAD("sysrom1.bin" , 0x0000 , 0x2000 , CRC(fe429268) SHA1(f2fe7c5abca92bd13f81b4385fc4fce0cafb0da0))
 	ROM_LOAD("sysrom2.bin" , 0x2000 , 0x2000 , CRC(96093b5d) SHA1(c6ec4cafd019887df0fa849b3c7070bb74faee54))
 	ROM_LOAD("sysrom3.bin" , 0x4000 , 0x2000 , CRC(f9470f67) SHA1(b80cb4a366d93bd7acc3508ce987bb11c5986b2a))
+	ROM_LOAD("98217.bin"   , 0x6000 , 0x0800 , BAD_DUMP CRC(ea1fcf63) SHA1(e535c82897210a1c67c1ca16f44f936d4c470463))
 	ROM_LOAD("genio_t.bin" , 0x6800 , 0x0800 , CRC(ade1d1ed) SHA1(9af74a65b29ef1885f74164238ecf8d16ac995d6))
 	ROM_LOAD("plot72.bin"  , 0x7000 , 0x0800 , CRC(0a9cb8db) SHA1(d0d126fca108f2715e1e408cb31b09ba69385ac4))
 	ROM_LOAD("advpgm_t.bin", 0x8000 , 0x0800 , CRC(965b5e5a) SHA1(ff44dd15f8fa4ca03dfd970ed8b200e8a071ec13))

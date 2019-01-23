@@ -25,23 +25,24 @@ DEFINE_DEVICE_TYPE(CMS_HIRES, cms_hires_device, "cms_hires", "CMS High Resolutio
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cms_hires_device::device_add_mconfig)
+void cms_hires_device::device_add_mconfig(machine_config &config)
+{
 	/* video hardware */
-	device = &SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_size(512, 312);
 	m_screen->set_visarea(0, 512 - 1, 0, 256 - 1);
 	m_screen->set_refresh_hz(50);
-	MCFG_SCREEN_UPDATE_DEVICE("ef9366", ef9365_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 16)
+	m_screen->set_screen_update("ef9366", FUNC(ef9365_device::screen_update));
+	PALETTE(config, "palette").set_entries(16);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("flash_rate", cms_hires_device, flash_rate, attotime::from_hz(3)) // from 555 timer (4.7uF, 100K, 470R)
+	TIMER(config, "flash_rate").configure_periodic(FUNC(cms_hires_device::flash_rate), attotime::from_hz(3)); // from 555 timer (4.7uF, 100K, 470R)
 
 	EF9365(config, m_gdp, 14_MHz_XTAL / 8);
 	m_gdp->set_screen("screen");
 	m_gdp->set_palette_tag("palette");
 	m_gdp->set_nb_bitplanes(4);
 	m_gdp->set_display_mode(ef9365_device::DISPLAY_MODE_512x256);
-MACHINE_CONFIG_END
+}
 
 
 //**************************************************************************

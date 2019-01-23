@@ -187,6 +187,7 @@ void sg1000_state::sc3000_map(address_map &map)
 void sg1000_state::sc3000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x00, 0xff).rw(CARTSLOT_TAG, FUNC(sega8_cart_slot_device::read_io), FUNC(sega8_cart_slot_device::write_io));
 	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
 	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
 	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
@@ -485,7 +486,8 @@ void sc3000_state::machine_start()
 	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
 	if (m_cart && m_cart->exists() && (m_cart->get_type() == SEGA8_BASIC_L3 || m_cart->get_type() == SEGA8_MUSIC_EDITOR
-								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB))
+								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB
+								|| m_cart->get_type() == SEGA8_MULTICART || m_cart->get_type() == SEGA8_MEGACART))
 	{
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cart));
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cart));

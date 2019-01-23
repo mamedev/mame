@@ -59,19 +59,22 @@
 class tattack_state : public driver_device
 {
 public:
-	tattack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tattack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_samples(*this,"samples")
-		{ }
+	{ }
 
 	void tattack(machine_config &config);
 
 	void init_tattack();
+
+protected:
+	virtual void video_start() override;
 
 private:
 	DECLARE_WRITE8_MEMBER(paddle_w);
@@ -80,12 +83,10 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_w);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_PALETTE_INIT(tattack);
+	void tattack_palette(palette_device &palette) const;
 
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tattack_map(address_map &map);
-
-	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
@@ -103,11 +104,11 @@ private:
 	void draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	static const uint8_t white_pen = 0xf;
-	static const uint8_t green_pen = 0x5;
-	static const uint8_t yellow_pen = 0x7;
-	static const uint8_t red_pen = 0x3;
-	static const int paddle_xpos = 38;
+	static constexpr uint8_t white_pen = 0xf;
+	static constexpr uint8_t green_pen = 0x5;
+	static constexpr uint8_t yellow_pen = 0x7;
+	static constexpr uint8_t red_pen = 0x3;
+	static constexpr int paddle_xpos = 38;
 };
 
 
@@ -117,15 +118,15 @@ TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
 
-	if((color&1 ) || (color>15) )
-		logerror("COLOR %i\n",color);
+	if((color & 1) || (color > 15))
+		logerror("COLOR %i\n", color);
 
-	color>>=1;
+	color >>= 1;
 
 	SET_TILE_INFO_MEMBER(0,
-		code,
-		color,
-		0);
+			code,
+			color,
+			0);
 }
 
 void tattack_state::draw_edge_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -376,22 +377,22 @@ static GFXDECODE_START( gfx_tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(tattack_state, tattack)
+void tattack_state::tattack_palette(palette_device &palette) const
 {
-	int i,r,g,b;
-	for(i=0;i<8;i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if(i)
+		int r, g, b;
+		if (i)
 		{
-			r=(i&1)?0xff:0;
-			g=(i&2)?0xff:0;
-			b=(i&4)?0xff:0;
+			r = (i & 1) ? 0xff : 0;
+			g = (i & 2) ? 0xff : 0;
+			b = (i & 4) ? 0xff : 0;
 		}
 		else
-			r=g=b=128;
+			r = g = b = 128;
 
-		palette.set_pen_color(2*i,rgb_t(0x00,0x00,0xff));
-		palette.set_pen_color(2*i+1,rgb_t(r,g,b));
+		palette.set_pen_color(2 * i, rgb_t(0x00, 0x00, 0xff));
+		palette.set_pen_color(2 * i + 1, rgb_t(r, g, b));
 	}
 }
 
@@ -422,7 +423,7 @@ void tattack_state::tattack(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tattack);
-	PALETTE(config, "palette", 16).set_init(FUNC(tattack_state::palette_init_tattack));
+	PALETTE(config, "palette", FUNC(tattack_state::tattack_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

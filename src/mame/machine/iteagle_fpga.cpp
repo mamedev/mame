@@ -277,7 +277,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;
 		case 0x14/4: // GUN1-- Interrupt & 0x4==0x00080000
-			result = (m_guny_cb(0) << 16) | (m_gunx_cb(0) << 0);
+			result = (m_gun_y << 16) | (m_gun_x << 0);
 			if (LOG_FPGA)
 				logerror("%s:fpga_r offset %04X = %08X & %08X\n", machine().describe_context(), offset*4, result, mem_mask);
 			break;

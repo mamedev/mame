@@ -69,7 +69,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(superqix_0410_w);
 
 	DECLARE_VIDEO_START(superqix);
-	DECLARE_PALETTE_DECODER(BBGGRRII);
+	static rgb_t BBGGRRII(uint32_t raw);
 	uint32_t screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 

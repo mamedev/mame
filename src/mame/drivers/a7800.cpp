@@ -136,7 +136,7 @@ protected:
 	DECLARE_READ8_MEMBER(bios_or_cart_r);
 	DECLARE_READ8_MEMBER(tia_r);
 	DECLARE_WRITE8_MEMBER(tia_w);
-	DECLARE_PALETTE_INIT(a7800);
+	void a7800_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
 	DECLARE_READ8_MEMBER(riot_joystick_r);
@@ -183,7 +183,7 @@ public:
 	void a7800_pal(machine_config &config);
 
 protected:
-	DECLARE_PALETTE_INIT(a7800p);
+	void a7800p_palette(palette_device &palette) const;
 };
 
 
@@ -553,7 +553,7 @@ upon display type.
 	rgb_t(0xA1,0x8F,0x1A), rgb_t(0xB2,0xA0,0x2B), rgb_t(0xC3,0xB1,0x3C), rgb_t(0xD4,0xC2,0x4D), \
 	rgb_t(0xE5,0xD3,0x5E), rgb_t(0xF6,0xE4,0x6F), rgb_t(0xFF,0xF5,0x82), rgb_t(0xFF,0xFF,0x96   )
 
-static const rgb_t a7800_palette[256] =
+static constexpr rgb_t a7800_colors[256] =
 {
 	NTSC_GREY,
 	NTSC_GOLD,
@@ -573,7 +573,7 @@ static const rgb_t a7800_palette[256] =
 	NTSC_LIGHT_ORANGE
 };
 
-static const rgb_t a7800p_palette[256] =
+static constexpr rgb_t a7800p_colors[256] =
 {
 	NTSC_GREY,
 	NTSC_ORANGE_GREEN,
@@ -1307,15 +1307,15 @@ define NTSC_LIGHT_ORANGE
 ***************************************************************************/
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(a7800_state, a7800)
+void a7800_state::a7800_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, a7800_palette, ARRAY_LENGTH(a7800_palette));
+	palette.set_pen_colors(0, a7800_colors);
 }
 
 
-PALETTE_INIT_MEMBER(a7800_pal_state,a7800p)
+void a7800_pal_state::a7800p_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, a7800p_palette, ARRAY_LENGTH(a7800p_palette));
+	palette.set_pen_colors(0, a7800p_colors);
 }
 
 
@@ -1388,7 +1388,7 @@ void a7800_state::a7800_ntsc(machine_config &config)
 	m_screen->set_screen_update("maria", FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", ARRAY_LENGTH(a7800_palette)).set_init(FUNC(a7800_state::palette_init_a7800));
+	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), ARRAY_LENGTH(a7800_colors));
 
 	ATARI_MARIA(config, m_maria, 0);
 	m_maria->set_dmacpu_tag(m_maincpu);
@@ -1420,7 +1420,7 @@ void a7800_pal_state::a7800_pal(machine_config &config)
 
 	m_screen->set_raw(7093788, 454, 0, 320, 313, 35, 35 + 228 + 32);
 
-	subdevice<palette_device>("palette")->set_init(FUNC(a7800_pal_state::palette_init_a7800p));
+	subdevice<palette_device>("palette")->set_init(FUNC(a7800_pal_state::a7800p_palette));
 
 	/* devices */
 	subdevice<mos6532_new_device>("riot")->set_clock(CLK_PAL);

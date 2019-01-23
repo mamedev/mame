@@ -229,7 +229,7 @@ void astrocde_home_state::astrocde(machine_config &config)
 	m_screen->set_screen_update(FUNC(astrocde_state::screen_update_astrocde));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 512).set_init(FUNC(astrocde_state::palette_init_astrocde));
+	PALETTE(config, "palette", FUNC(astrocde_home_state::astrocade_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

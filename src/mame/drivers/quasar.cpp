@@ -326,9 +326,7 @@ void quasar_state::quasar(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_quasar);
-	PALETTE(config, m_palette, (64+1)*8+(4*256));
-	m_palette->set_indirect_entries(0x500);
-	m_palette->set_init(FUNC(quasar_state::palette_init_quasar));
+	PALETTE(config, m_palette, FUNC(quasar_state::quasar_palette), (64 + 1) * 8 + (4 * 256), 0x500);
 
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(CVS_S2636_Y_OFFSET - 8, CVS_S2636_X_OFFSET - 9);

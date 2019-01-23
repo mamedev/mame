@@ -931,7 +931,7 @@ MACHINE_CONFIG_START(abc1600_state::abc1600)
 	m_cio->pc_rd_cb().set(FUNC(abc1600_state::cio_pc_r));
 	m_cio->pc_wr_cb().set(FUNC(abc1600_state::cio_pc_w));
 
-	MCFG_NMC9306_ADD(NMC9306_TAG)
+	NMC9306(config, m_nvram, 0);
 
 	E0516(config, E050_C16PC_TAG, 32.768_kHz_XTAL);
 

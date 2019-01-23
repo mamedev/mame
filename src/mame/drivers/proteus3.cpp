@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	MCFG_SCREEN_UPDATE_DRIVER(proteus3_state, screen_update_proteus3)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_proteus3)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
 	PIA6821(config, m_pia, 0);
@@ -409,12 +409,12 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 	ACIA6850(config, m_acia1, 0);
 	m_acia1->txd_handler().set(FUNC(proteus3_state::acia1_txdata_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", proteus3_state, timer_c, attotime::from_hz(4800))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", proteus3_state, timer_p, attotime::from_hz(40000))
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.25);
+	TIMER(config, "timer_c").configure_periodic(FUNC(proteus3_state::timer_c), attotime::from_hz(4800));
+	TIMER(config, "timer_p").configure_periodic(FUNC(proteus3_state::timer_p), attotime::from_hz(40000));
 
 	// optional tty keyboard
 	ACIA6850(config, m_acia2, 0);

@@ -1678,8 +1678,7 @@ void itech32_state::base_devices(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	PALETTE(config, m_palette, 8192);
-	m_palette->set_format(PALETTE_FORMAT_GRBX);
+	PALETTE(config, m_palette).set_format(palette_device::GRBx_888, 8192);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -1725,8 +1724,7 @@ void itech32_state::bloodstm(machine_config &config)
 
 	base_devices(config);
 
-	m_palette->set_entries(32768);
-	m_palette->set_format(PALETTE_FORMAT_XBGR);
+	m_palette->set_format(palette_device::xBGR_888, 32768);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	via(config);
@@ -1746,8 +1744,7 @@ void drivedge_state::drivedge(machine_config &config)
 	TMS32031(config, m_dsp2, TMS_CLOCK);
 	m_dsp2->set_addrmap(AS_PROGRAM, &drivedge_state::tms2_map);
 
-	m_palette->set_entries(32768);
-	m_palette->set_format(PALETTE_FORMAT_XBGR);
+	m_palette->set_format(palette_device::xBGR_888, 32768);
 
 	via(config);
 	m_via->writepb_handler().set(FUNC(drivedge_state::portb_out));
@@ -1777,8 +1774,7 @@ void itech32_state::sftm(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_020_map);
 	m_soundcpu->set_periodic_int(FUNC(itech32_state::irq1_line_assert), attotime::from_hz(4*60));
 
-	m_palette->set_entries(32768);
-	m_palette->set_format(PALETTE_FORMAT_XRGB);
+	m_palette->set_format(palette_device::xRGB_888, 32768);
 }
 
 void itech32_state::tourny(machine_config &config)

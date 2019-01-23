@@ -194,26 +194,26 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	config.set_default_layout(layout_aim65);
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("ds1", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<1>))
-	MCFG_DEVICE_ADD("ds2", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<2>))
-	MCFG_DEVICE_ADD("ds3", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<3>))
-	MCFG_DEVICE_ADD("ds4", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<4>))
-	MCFG_DEVICE_ADD("ds5", DL1416T, u32(0))
-	MCFG_DL1416_UPDATE_HANDLER(WRITE16(*this, aim65_state, aim65_update_ds<5>))
+	DL1416T(config, m_ds[0], u32(0));
+	m_ds[0]->update().set(FUNC(aim65_state::aim65_update_ds<1>));
+	DL1416T(config, m_ds[1], u32(0));
+	m_ds[1]->update().set(FUNC(aim65_state::aim65_update_ds<2>));
+	DL1416T(config, m_ds[2], u32(0));
+	m_ds[2]->update().set(FUNC(aim65_state::aim65_update_ds<3>));
+	DL1416T(config, m_ds[3], u32(0));
+	m_ds[3]->update().set(FUNC(aim65_state::aim65_update_ds<4>));
+	DL1416T(config, m_ds[4], u32(0));
+	m_ds[4]->update().set(FUNC(aim65_state::aim65_update_ds<5>));
 
 	/* Sound - wave sound only */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette1).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* other devices */
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, AIM65_CLOCK)
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, aim65_state, aim65_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, aim65_state, aim65_riot_b_r))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	mos6532_new_device &riot(MOS6532_NEW(config, "riot", AIM65_CLOCK));
+	riot.pa_wr_callback().set(FUNC(aim65_state::aim65_riot_a_w));
+	riot.pb_rd_callback().set(FUNC(aim65_state::aim65_riot_b_r));
+	riot.irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	via6522_device &via0(VIA6522(config, "via6522_0", AIM65_CLOCK));
 	via0.readpb_handler().set(FUNC(aim65_state::aim65_pb_r));
@@ -232,12 +232,12 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	pia.writepb_handler().set(FUNC(aim65_state::aim65_pia_b_w));
 
 	// Deck 1 can play and record
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette1);
+	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
 	// Deck 2 can only record
-	MCFG_CASSETTE_ADD( "cassette2" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette2);
+	m_cassette2->set_default_state(CASSETTE_RECORD | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 
 	MCFG_GENERIC_SOCKET_ADD("z26", generic_plain_slot, "aim65_z26_cart")
 	MCFG_GENERIC_EXTENSIONS("z26")

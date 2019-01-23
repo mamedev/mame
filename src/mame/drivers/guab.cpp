@@ -488,7 +488,7 @@ void guab_state::guab(machine_config &config)
 	screen.set_screen_update(FUNC(guab_state::screen_update_guab));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, ef9369_device::NUMCOLORS);
+	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 
 	EF9369(config, "ef9369").set_color_update_callback(FUNC(guab_state::ef9369_color_update));
 

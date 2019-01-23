@@ -289,7 +289,7 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 	MCFG_DEVICE_ADD("isa2",   ISA8_SLOT, 0, "isa", mc1502_isa8_cards, "rom", false)
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette"); // FIXME: really no output routes for the cassette sound?
+	WAVE(config, "wave", m_cassette); // FIXME: really no output routes for the cassette sound?
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
@@ -302,8 +302,8 @@ MACHINE_CONFIG_START(mc1502_state::mc1502)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
 //  MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")

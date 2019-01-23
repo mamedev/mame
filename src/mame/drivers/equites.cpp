@@ -1184,9 +1184,7 @@ void equites_state::equites(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_equites);
-	PALETTE(config, m_palette, 0x180);
-	m_palette->set_indirect_entries(0x100);
-	m_palette->set_init(FUNC(equites_state::palette_init_equites));
+	PALETTE(config, m_palette, FUNC(equites_state::equites_palette), 0x180, 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
 }
@@ -1232,9 +1230,7 @@ void splndrbt_state::splndrbt(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_splndrbt);
-	PALETTE(config, m_palette, 0x280);
-	m_palette->set_indirect_entries(0x100);
-	m_palette->set_init(FUNC(splndrbt_state::palette_init_splndrbt));
+	PALETTE(config, m_palette, FUNC(splndrbt_state::splndrbt_palette), 0x280, 0x100);
 
 	MCFG_VIDEO_START_OVERRIDE(splndrbt_state,splndrbt)
 }

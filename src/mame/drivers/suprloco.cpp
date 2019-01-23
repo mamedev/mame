@@ -191,9 +191,8 @@ MACHINE_CONFIG_START(suprloco_state::suprloco)
 	MCFG_SCREEN_UPDATE_DRIVER(suprloco_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suprloco)
-	MCFG_PALETTE_ADD("palette", 512+256)
-	MCFG_PALETTE_INIT_OWNER(suprloco_state, suprloco)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_suprloco);
+	PALETTE(config, "palette", FUNC(suprloco_state::suprloco_palette), 512+256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

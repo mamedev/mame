@@ -611,8 +611,7 @@ MACHINE_CONFIG_START(z88_state::z88)
 	m_screen->set_palette(m_palette);
 	m_screen->set_screen_update("blink", FUNC(upd65031_device::screen_update));
 
-	device = &PALETTE(config, m_palette, Z88_NUM_COLOURS);
-	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
+	PALETTE(config, m_palette, FUNC(z88_state::z88_palette), Z88_NUM_COLOURS);
 
 	UPD65031(config, m_blink, XTAL(9'830'400));
 	m_blink->kb_rd_callback().set(FUNC(z88_state::kb_r));

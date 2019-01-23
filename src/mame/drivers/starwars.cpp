@@ -335,7 +335,7 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	outlatch.q_out_cb<7>().set(FUNC(starwars_state::recall_w)); // NVRAM array recall
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
+	VECTOR(config, "vector", 0);
 	MCFG_SCREEN_ADD("screen", VECTOR)
 	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ / 12 / 6)
 	MCFG_SCREEN_SIZE(400, 300)

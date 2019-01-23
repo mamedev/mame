@@ -702,9 +702,7 @@ void fortyl_state::common(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_40love);
-	PALETTE(config, m_palette, 1024);
-	m_palette->set_prom_region("proms");
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms));
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

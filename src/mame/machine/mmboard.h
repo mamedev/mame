@@ -99,13 +99,13 @@ public:
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_WRITE8_MEMBER(io_w);
 
-	DECLARE_PALETTE_INIT(lcd_palette);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+
+	void lcd_palette(palette_device &palette) const;
 
 private:
 	optional_device<hd44780_device> m_lcdc;

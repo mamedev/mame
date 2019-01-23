@@ -776,18 +776,16 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_SCREEN_UPDATE_DRIVER(avigo_state, screen_update)
 	MCFG_SCREEN_SIZE(AVIGO_SCREEN_WIDTH, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, AVIGO_SCREEN_WIDTH-1, 0, AVIGO_SCREEN_HEIGHT + AVIGO_PANEL_HEIGHT -1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	config.set_default_layout(layout_avigo);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_avigo)
-	MCFG_PALETTE_ADD("palette", AVIGO_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(avigo_state, avigo)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_avigo);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* real time clock */
 	tc8521_device &rtc(TC8521(config, "rtc", XTAL(32'768)));
@@ -807,10 +805,10 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(avigo_state::nvram_init));
 
 	// IRQ 1 is used for scan the pen and for cursor blinking
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scan_timer", avigo_state, avigo_scan_timer, attotime::from_hz(50))
+	TIMER(config, "scan_timer").configure_periodic(FUNC(avigo_state::avigo_scan_timer), attotime::from_hz(50));
 
 	// IRQ 4 is generated every second, used for auto power off
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", avigo_state, avigo_1hz_timer, attotime::from_hz(1))
+	TIMER(config, "1hz_timer").configure_periodic(FUNC(avigo_state::avigo_1hz_timer), attotime::from_hz(1));
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app", 0)

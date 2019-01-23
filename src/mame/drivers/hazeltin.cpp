@@ -700,8 +700,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	MCFG_DEVICE_IO_MAP(hazl1500_io)
 	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -713,7 +712,7 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 		SCREEN_HTOTAL, 0, SCREEN_HTOTAL,
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hazl1500)
 
 	com8116_device &baudgen(COM8116(config, BAUDGEN_TAG, XTAL(5'068'800)));

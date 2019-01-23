@@ -139,7 +139,7 @@ READ8_MEMBER( abc800c_state::char_ram_r )
 //  PALETTE_INIT( abc800c )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc800c_state, abc800c )
+void abc800c_state::abc800c_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
@@ -164,12 +164,11 @@ MACHINE_CONFIG_START(abc800c_state::abc800c_video)
 	MCFG_SCREEN_SIZE(480, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 480-1)
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(abc800c_state, abc800c)
+	PALETTE(config, m_palette, FUNC(abc800c_state::abc800c_palette), 8);
 
-	MCFG_DEVICE_ADD(SAA5052_TAG, SAA5052, XTAL(12'000'000)/2)
-	MCFG_SAA5050_D_CALLBACK(READ8(*this, abc800c_state, char_ram_r))
-	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
+	SAA5052(config, m_trom, XTAL(12'000'000)/2);
+	m_trom->d_cb().set(FUNC(abc800c_state::char_ram_r));
+	m_trom->set_screen_size(40, 24, 40);
 MACHINE_CONFIG_END
 
 
@@ -289,5 +288,5 @@ MACHINE_CONFIG_START(abc800m_state::abc800m_video)
 	MCFG_SCREEN_UPDATE_DRIVER(abc800m_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xf0)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 MACHINE_CONFIG_END

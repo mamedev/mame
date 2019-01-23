@@ -184,8 +184,7 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_IO_MAP(sound_io_map)
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -200,9 +199,9 @@ MACHINE_CONFIG_START(ultraman_state::ultraman)
 	MCFG_SCREEN_UPDATE_DRIVER(ultraman_state, screen_update_ultraman)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	auto &palette(PALETTE(config, "palette"));
+	palette.set_format(palette_device::xRGB_555, 8192);
+	palette.enable_shadows();
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");

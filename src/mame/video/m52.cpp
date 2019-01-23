@@ -88,9 +88,9 @@ void m52_state::init_sprite_palette(const int *resistances_3, const int *resista
 
 	/* compute palette information for sprites */
 	compute_resistor_weights(0, 255, scale,
-		2, resistances_2, weights_r, 470, 0,
-		3, resistances_3, weights_g, 470, 0,
-		3, resistances_3, weights_b, 470, 0);
+			2, resistances_2, weights_r, 470, 0,
+			3, resistances_3, weights_g, 470, 0,
+			3, resistances_3, weights_b, 470, 0);
 
 	/* sprite palette */
 	for (int i = 0; i < 32; i++)

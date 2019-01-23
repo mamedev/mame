@@ -309,28 +309,26 @@ static GFXDECODE_START( gfx_taxidriv )
 	GFXDECODE_ENTRY( "gfx5", 0, charlayout2, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
+void taxidriv_state::taxidriv_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, r, g, b;
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	/* TODO: resistors, 1k & 470*/
-
-	for (i = 0; i < 0x10; ++i)
+	// TODO: resistors, 1k & 470
+	for (int i = 0; i < 0x10; ++i)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		r = 0x55 * bit0 + 0xaa * bit1;
-		bit0 = (color_prom[0] >> 2) & 0x01;
-		bit1 = (color_prom[0] >> 3) & 0x01;
-		g = 0x55 * bit0 + 0xaa * bit1;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		b = 0x55 * bit0 + 0xaa * bit1;
+		int bit0, bit1;
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const r = 0x55 * bit0 + 0xaa * bit1;
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		int const g = 0x55 * bit0 + 0xaa * bit1;
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		int const b = 0x55 * bit0 + 0xaa * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
@@ -387,11 +385,10 @@ MACHINE_CONFIG_START(taxidriv_state::taxidriv)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 27*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taxidriv_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_taxidriv)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(taxidriv_state, taxidriv)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taxidriv);
+	PALETTE(config, m_palette, FUNC(taxidriv_state::taxidriv_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -411,8 +411,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_atarig1)
-	MCFG_PALETTE_ADD("palette", 1280)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 1280);
 
 	/* initialize the playfield */
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, atarig1_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,64)

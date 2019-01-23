@@ -517,7 +517,7 @@ MACHINE_CONFIG_START(lastbank_state::lastbank)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/4) //!!! TC0091LVC !!!
 	MCFG_DEVICE_PROGRAM_MAP(lastbank_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lastbank_state, irq_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::irq_scanline), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

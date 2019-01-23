@@ -4175,8 +4175,7 @@ void igs011_state::igs011_base(machine_config &config)
 	m_screen->set_screen_update(FUNC(igs011_state::screen_update_igs011));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 0x2000/4);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000/4);
 	m_palette->set_membits(8);
 //  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011);
 

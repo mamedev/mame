@@ -2089,7 +2089,7 @@ void st_state::st(machine_config &config)
 	m_screen->set_screen_update(FUNC(st_state::screen_update));
 	m_screen->set_raw(Y2/2, ATARIST_HTOT_PAL*2, ATARIST_HBEND_PAL*2, ATARIST_HBSTART_PAL*2, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2121,7 +2121,7 @@ void megast_state::megast(machine_config &config)
 	m_screen->set_screen_update(FUNC(megast_state::screen_update));
 	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2156,7 +2156,7 @@ void ste_state::ste(machine_config &config)
 	m_screen->set_screen_update(FUNC(ste_state::screen_update));
 	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	PALETTE(config, m_palette, 512);
+	PALETTE(config, m_palette).set_entries(512);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2217,7 +2217,7 @@ void stbook_state::stbook(machine_config &config)
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 639, 0, 399);
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

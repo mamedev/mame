@@ -434,34 +434,31 @@ void mcatadv_state::machine_start()
 	save_item(NAME(m_palette_bank));
 }
 
-MACHINE_CONFIG_START(mcatadv_state::mcatadv)
-
+void mcatadv_state::mcatadv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(mcatadv_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mcatadv_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000)); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcatadv_state::mcatadv_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mcatadv_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(mcatadv_sound_map)
-	MCFG_DEVICE_IO_MAP(mcatadv_sound_io_map)
-
+	Z80(config, m_soundcpu, XTAL(16'000'000)/4); /* verified on pcb */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mcatadv_state::mcatadv_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &mcatadv_state::mcatadv_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mcatadv_state, screen_vblank_mcatadv))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 320-1, 0, 224-1);
+	screen.set_screen_update(FUNC(mcatadv_state::screen_update_mcatadv));
+	screen.screen_vblank().set(FUNC(mcatadv_state::screen_vblank_mcatadv));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcatadv)
-	MCFG_PALETTE_ADD("palette", 0x2000/2)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcatadv);
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x2000/2);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
-
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -470,26 +467,26 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.32)
-	MCFG_SOUND_ROUTE(1, "mono", 0.5)
-	MCFG_SOUND_ROUTE(2, "mono", 0.5)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2)); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "mono", 0.32);
+	ymsnd.add_route(1, "mono", 0.5);
+	ymsnd.add_route(2, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(mcatadv_state::nost)
+void mcatadv_state::nost(machine_config &config)
+{
 	mcatadv(config);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(nost_sound_map)
-	MCFG_DEVICE_IO_MAP(nost_sound_io_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mcatadv_state::nost_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &mcatadv_state::nost_sound_io_map);
 
-	MCFG_DEVICE_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.2)
-	MCFG_SOUND_ROUTE(1, "mono", 0.5)
-	MCFG_SOUND_ROUTE(2, "mono", 0.5)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config.replace(), "ymsnd", XTAL(16'000'000)/2)); /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
+	ymsnd.add_route(0, "mono", 0.2);
+	ymsnd.add_route(1, "mono", 0.5);
+	ymsnd.add_route(2, "mono", 0.5);
+}
 
 
 ROM_START( mcatadv )

@@ -286,18 +286,10 @@ uint32_t metalmx_state::screen_update_metalmx(screen_device &screen, bitmap_ind1
 	/* TODO: TMS34020 should take care of this */
 
 //  uint32_t *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
-	uint16_t *src_base = m_gsp_vram;
-	int y;
+	uint16_t const *const src_base = m_gsp_vram;
 
-	for (y = 0; y < 384; ++y)
-	{
-		int x;
-		uint16_t *src = &src_base[512 * y];
-		uint16_t *dst = &bitmap.pix16(y);
-
-		for(x = 0; x < 512; x++)
-			*dst++ = *src++;
-	}
+	for (int y = (std::max)(0, cliprect.min_y); y <= (std::min)(383, cliprect.max_y); ++y)
+		std::copy_n(&src_base[512 * y], 512, &bitmap.pix16(y));
 
 	return 0;
 }
@@ -695,7 +687,7 @@ MACHINE_CONFIG_START(metalmx_state::metalmx)
 	MCFG_SCREEN_UPDATE_DRIVER(metalmx_state, screen_update_metalmx)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_565);
 
 	ATARI_CAGE(config, m_cage, 0);
 	m_cage->set_speedup(0); // TODO: speedup address

@@ -37,6 +37,9 @@ public:
 
 	void pc1500(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	required_device<lh5801_cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
@@ -48,7 +51,6 @@ private:
 	uint8_t m_kb_matrix;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
 	DECLARE_READ8_MEMBER( port_a_r );
@@ -56,7 +58,7 @@ private:
 	DECLARE_WRITE8_MEMBER( port_c_w );
 
 	DECLARE_READ8_MEMBER( pc1500_kb_r );
-	DECLARE_PALETTE_INIT(pc1500);
+	void pc1500_palette(palette_device &palette) const;
 	void pc1500_mem(address_map &map);
 	void pc1500_mem_io(address_map &map);
 };
@@ -264,7 +266,7 @@ READ8_MEMBER( pc1500_state::port_a_r )
 	return 0xff;
 }
 
-PALETTE_INIT_MEMBER(pc1500_state, pc1500)
+void pc1500_state::pc1500_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -286,7 +288,7 @@ void pc1500_state::pc1500(machine_config &config)
 	screen.set_palette("palette");
 
 	config.set_default_layout(layout_pc1500);
-	PALETTE(config, "palette", 2).set_init(FUNC(pc1500_state::palette_init_pc1500));
+	PALETTE(config, "palette", FUNC(pc1500_state::pc1500_palette), 2);
 
 	lh5810_device &ioports(LH5810(config, "lh5810"));
 	ioports.porta_r().set(FUNC(pc1500_state::port_a_r));

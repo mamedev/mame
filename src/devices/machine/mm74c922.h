@@ -36,38 +36,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MM74C922_OSC(_value) \
-	downcast<mm74c922_device &>(*device).set_cap_osc(_value);
-
-#define MCFG_MM74C922_DEBOUNCE(_value) \
-	downcast<mm74c922_device &>(*device).set_cap_debounce(_value);
-
-#define MCFG_MM74C922_DA_CALLBACK(_write) \
-	downcast<mm74c922_device &>(*device).set_da_wr_callback(DEVCB_##_write);
-
-#define MCFG_MM74C922_X1_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x1_rd_callback(DEVCB_##_read);
-
-#define MCFG_MM74C922_X2_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x2_rd_callback(DEVCB_##_read);
-
-#define MCFG_MM74C922_X3_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x3_rd_callback(DEVCB_##_read);
-
-#define MCFG_MM74C922_X4_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x4_rd_callback(DEVCB_##_read);
-
-#define MCFG_MM74C922_X5_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x5_rd_callback(DEVCB_##_read);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -83,12 +51,12 @@ public:
 	void set_cap_osc(double value) { m_cap_osc = value; }
 	void set_cap_debounce(double value) { m_cap_debounce = value; }
 
-	template <class Object> devcb_base &set_da_wr_callback(Object &&cb) { return m_write_da.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x1_rd_callback(Object &&cb) { return m_read_x1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x2_rd_callback(Object &&cb) { return m_read_x2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x3_rd_callback(Object &&cb) { return m_read_x3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x4_rd_callback(Object &&cb) { return m_read_x4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x5_rd_callback(Object &&cb) { return m_read_x5.set_callback(std::forward<Object>(cb)); }
+	auto da_wr_callback() { return m_write_da.bind(); }
+	auto x1_rd_callback() { return m_read_x1.bind(); }
+	auto x2_rd_callback() { return m_read_x2.bind(); }
+	auto x3_rd_callback() { return m_read_x3.bind(); }
+	auto x4_rd_callback() { return m_read_x4.bind(); }
+	auto x5_rd_callback() { return m_read_x5.bind(); }
 
 	uint8_t read();
 

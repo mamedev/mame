@@ -2024,8 +2024,7 @@ void cave_state::add_base_config(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(cave_state::screen_update));
 
-	PALETTE(config, m_palette, 0x8000);
-	m_palette->set_init(FUNC(cave_state::palette_init_cave));
+	PALETTE(config, m_palette, FUNC(cave_state::cave_palette), 0x8000);
 }
 
 void cave_state::add_ymz(machine_config &config)
@@ -2052,9 +2051,7 @@ void cave_state::dfeveron(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dfeveron);
-
-	/* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(FUNC(cave_state::palette_init_dfeveron));
+	m_palette->set_init(FUNC(cave_state::dfeveron_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
@@ -2101,9 +2098,7 @@ void cave_state::donpachi(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_donpachi);
-
-	/* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(FUNC(cave_state::palette_init_dfeveron));
+	m_palette->set_init(FUNC(cave_state::dfeveron_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
@@ -2216,9 +2211,7 @@ void cave_state::hotdogst(machine_config &config)
 	m_screen->set_visarea(0, 384-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hotdogst);
-
-	/* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(FUNC(cave_state::palette_init_dfeveron));
+	m_palette->set_init(FUNC(cave_state::dfeveron_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
@@ -2258,9 +2251,7 @@ void cave_state::korokoro(machine_config &config)
 	m_screen->set_visarea(0, 320-1-2, 0, 240-1-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_korokoro);
-
-	/* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(FUNC(cave_state::palette_init_korokoro));
+	m_palette->set_init(FUNC(cave_state::korokoro_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_1_layer)
 
@@ -2299,9 +2290,7 @@ void cave_state::mazinger(machine_config &config)
 	m_screen->set_visarea(0, 384-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mazinger);
-
-	/* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(FUNC(cave_state::palette_init_mazinger));
+	m_palette->set_init(FUNC(cave_state::mazinger_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_2_layers)
 
@@ -2349,9 +2338,7 @@ void cave_state::metmqstr(machine_config &config)
 	m_screen->set_visarea(0x7d, 0x7d + 0x180-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_donpachi);
-
-	/* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(FUNC(cave_state::palette_init_dfeveron));
+	m_palette->set_init(FUNC(cave_state::dfeveron_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_3_layers)
 
@@ -2467,7 +2454,7 @@ void cave_state::ppsatan(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ppsatan);
 
-	m_palette->set_init(FUNC(cave_state::palette_init_ppsatan));
+	m_palette->set_init(FUNC(cave_state::ppsatan_palette));
 
 	config.set_default_layout(layout_ppsatan);
 
@@ -2507,9 +2494,8 @@ void cave_state::pwrinst2(machine_config &config)
 	m_screen->set_visarea(0x70, 0x70 + 0x140-1, 0, 240-1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pwrinst2);
-
 	m_palette->set_entries(0x8000+0x2800);
-	m_palette->set_init(FUNC(cave_state::palette_init_pwrinst2));
+	m_palette->set_init(FUNC(cave_state::pwrinst2_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,cave_4_layers)
 
@@ -2576,10 +2562,8 @@ void cave_state::sailormn(machine_config &config)
 	m_screen->set_size(320+1, 240);
 	m_screen->set_visarea(0+1, 320+1-1, 0, 240-1);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sailormn);
-
-	/* $8000 palette entries for consistency with the other games */
-	m_palette->set_init(FUNC(cave_state::palette_init_sailormn)); // 4 bit sprites, 6 bit tiles
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sailormn); // 4 bit sprites, 6 bit tiles
+	m_palette->set_init(FUNC(cave_state::sailormn_palette)); // $8000 palette entries for consistency with the other games
 
 	MCFG_VIDEO_START_OVERRIDE(cave_state,sailormn_3_layers) /* Layer 2 has 1 banked ROM */
 

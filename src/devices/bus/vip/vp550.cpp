@@ -50,15 +50,18 @@ DEFINE_DEVICE_TYPE(VP550, vp550_device, "vp550", "VP-550 Super Sound")
 //  MACHINE_CONFIG_START( vp550 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vp550_device::device_add_mconfig)
+void vp550_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_CDP1863_ADD(CDP1863_A_TAG, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	CDP1863(config, m_pfg_a, 0);
+	m_pfg_a->set_clock2(0);
+	m_pfg_a->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_CDP1863_ADD(CDP1863_B_TAG, 0, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	CDP1863(config, m_pfg_b, 0);
+	m_pfg_b->set_clock2(0);
+	m_pfg_b->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

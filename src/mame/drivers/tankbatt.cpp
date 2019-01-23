@@ -301,9 +301,7 @@ void tankbatt_state::tankbatt(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tankbatt);
-	PALETTE(config, m_palette, 256*2);
-	m_palette->set_indirect_entries(256);
-	m_palette->set_init(FUNC(tankbatt_state::palette_init_tankbatt));
+	PALETTE(config, m_palette, FUNC(tankbatt_state::tankbatt_palette), 256*2, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

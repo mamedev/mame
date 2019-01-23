@@ -388,8 +388,7 @@ void baraduke_state::baraduke(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_baraduke);
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_init(FUNC(baraduke_state::palette_init_baraduke));
+	PALETTE(config, m_palette, FUNC(baraduke_state::baraduke_palette), 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

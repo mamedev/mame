@@ -595,15 +595,15 @@ static GFXDECODE_START( gfx_lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(lazercmd_state, lazercmd)
+void lazercmd_state::lazercmd_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
-	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* black */
+	palette.set_pen_color(0, rgb_t(0xb0, 0xb0, 0xb0)); // white
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // black
 
-	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00)); /* black */
-	palette.set_pen_color(3, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_pen_color(3, rgb_t(0xb0, 0xb0, 0xb0)); // white
 
-	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff)); /* bright white */
+	palette.set_pen_color(4, rgb_t(0xff, 0xff, 0xff)); // bright white
 }
 
 
@@ -636,7 +636,7 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
     thus requiring an extra loading of approx 3-5 */
 	MCFG_DEVICE_PROGRAM_MAP(lazercmd_map)
 	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, lazercmd_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::lazercmd_timer), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -645,11 +645,10 @@ MACHINE_CONFIG_START(lazercmd_state::lazercmd)
 	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR + 16)
 	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1, 0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
+	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -675,7 +674,7 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
     thus requiring an extra loading of approx 3-5 */
 	MCFG_DEVICE_PROGRAM_MAP(medlanes_map)
 	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, lazercmd_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::lazercmd_timer), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -686,9 +685,8 @@ MACHINE_CONFIG_START(lazercmd_state::medlanes)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
+	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -710,7 +708,7 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
     thus requiring an extra loading of approx 3-5 */
 	MCFG_DEVICE_PROGRAM_MAP(bbonk_map)
 	MCFG_DEVICE_DATA_MAP(lazercmd_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lazercmd_state, bbonk_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lazercmd_state::bbonk_timer), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -721,9 +719,8 @@ MACHINE_CONFIG_START(lazercmd_state::bbonk)
 	MCFG_SCREEN_UPDATE_DRIVER(lazercmd_state, screen_update_lazercmd)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lazercmd)
-	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_PALETTE_INIT_OWNER(lazercmd_state, lazercmd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lazercmd);
+	PALETTE(config, m_palette, FUNC(lazercmd_state::lazercmd_palette), 5);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

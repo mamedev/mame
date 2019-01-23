@@ -46,8 +46,8 @@ ZPS stands for "Základní Počítačová Sestava" (basic computer system).
 class sapi1_state : public driver_device
 {
 public:
-	sapi1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sapi1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "videoram"),
 		m_bank1(*this, "bank1"),
 		m_line0(*this, "LINE0"),
@@ -636,9 +636,9 @@ MACHINE_CONFIG_START(sapi1_state::sapi1)
 	MCFG_SCREEN_SIZE(40*6, 24*9)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*6-1, 0, 24*9-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sapi1_state, screen_update_sapi1)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

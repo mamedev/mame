@@ -420,9 +420,8 @@ MACHINE_CONFIG_START(seicross_state::no_nvram)
 	MCFG_SCREEN_UPDATE_DRIVER(seicross_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_seicross)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seicross);
+	PALETTE(config, m_palette, FUNC(seicross_state::seicross_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

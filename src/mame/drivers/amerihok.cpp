@@ -78,19 +78,18 @@ void amerihok_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(amerihok_state::amerihok)
-
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z8681, 12_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(amerihok_map)
-	MCFG_DEVICE_DATA_MAP(amerihok_data_map)
+void amerihok_state::amerihok(machine_config &config)
+{
+	Z8681(config, m_maincpu, 12_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amerihok_state::amerihok_map);
+	m_maincpu->set_addrmap(AS_DATA, &amerihok_state::amerihok_data_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6376, 1000000) // 64-pin QFP (probably actually MSM6650)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6376(config, m_oki, 12_MHz_XTAL / 96); // 64-pin QFP, type/clock unverified (probably clocked by Z8681 TOUT)
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

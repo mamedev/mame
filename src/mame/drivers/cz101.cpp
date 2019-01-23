@@ -45,7 +45,7 @@ public:
 
 	void cz101(machine_config &config);
 
-	DECLARE_PALETTE_INIT(cz101);
+	void cz101_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
@@ -250,7 +250,7 @@ INPUT_PORTS_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( cz101_state, cz101 )
+void cz101_state::cz101_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // lcd pixel on
@@ -400,12 +400,11 @@ MACHINE_CONFIG_START( cz101_state::cz101 )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(cz101_state, cz101)
+	PALETTE(config, "palette", FUNC(cz101_state::cz101_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(cz101_state, lcd_pixel_update)
+	HD44780(config, m_hd44780, 0);
+	m_hd44780->set_lcd_size(2, 16);
+	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update), this);
 
 	config.set_default_layout(layout_cz101);
 MACHINE_CONFIG_END

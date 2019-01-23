@@ -2188,8 +2188,7 @@ void system1_state::sys1ppi(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_system1);
-
-	PALETTE(config, m_palette, 2048).set_format(PALETTE_FORMAT_BBGGGRRR);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -841,8 +841,6 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 
 		case 3:
 			lr8 = [](offs_t pc) -> u8 { abort(); };
-			lr32 = [](offs_t pc) -> u32 { abort(); };
-			lr64 = [](offs_t pc) -> u64 { abort(); };
 			lr16 = [this](offs_t pc) -> u16 {
 				if(pc < base_pc)
 					return 0x0000;
@@ -851,6 +849,31 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 					return 0x0000;
 				return reinterpret_cast<const u16 *>(&data[delta])[0];
 			};
+			switch(entry->endian) {
+			case le:
+				lr32 = [this](offs_t pc) -> u32 {
+					if(pc < base_pc)
+						return 0x00000000;
+					offs_t delta = (pc - base_pc) >> 3;
+					if(delta >= size + 2)
+						return 0x00000000;
+					auto p = reinterpret_cast<const u16 *>(&data[delta]);
+					return p[0] | (u32(p[1]) << 16);
+				};
+				break;
+			case be:
+				lr32 = [this](offs_t pc) -> u32 {
+					if(pc < base_pc)
+						return 0x00000000;
+					offs_t delta = (pc - base_pc) >> 3;
+					if(delta >= size + 2)
+						return 0x00000000;
+					auto p = reinterpret_cast<const u16 *>(&data[delta]);
+					return (u32(p[0]) << 16) | p[1];
+				};
+				break;
+			}
+			lr64 = [](offs_t pc) -> u64 { abort(); };
 			break;
 
 		default:

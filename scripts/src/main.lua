@@ -150,7 +150,7 @@ end
 			targetsuffix "dp"
 		end
 
-	configuration { "mingw*" or "vs*" }
+	configuration { "mingw*" or "vs20*" }
 		targetextension ".exe"
 
 	configuration { "rpi" }
@@ -527,7 +527,7 @@ if (STANDALONE~=true) then
 			{ GEN_DIR .. "version.cpp" ,  GEN_DIR  .. "resource/" .. rctarget .. "vers.rc",    {  MAME_DIR .. "scripts/build/verinfo.py" }, {"@echo Emitting " .. rctarget .. "vers.rc" .. "...",    PYTHON .. " $(1)  -r -b " .. rctarget .. " $(<) > $(@)" }},
 		}
 
-	configuration { "vs*" }
+	configuration { "vs20*" }
 		prebuildcommands {
 			"mkdir \"" .. path.translate(GEN_DIR  .. "resource/","\\") .. "\" 2>NUL",
 			"@echo Emitting ".. rctarget .. "vers.rc...",

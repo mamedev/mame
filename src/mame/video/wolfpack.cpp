@@ -10,23 +10,22 @@ Atari Wolf Pack (prototype) video emulation
 #include "includes/wolfpack.h"
 
 
-PALETTE_INIT_MEMBER(wolfpack_state, wolfpack)
+void wolfpack_state::wolfpack_palette(palette_device &palette) const
 {
-	int i;
-
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(1, rgb_t(0xc1, 0xc1, 0xc1));
 	palette.set_indirect_color(2, rgb_t(0x81, 0x81, 0x81));
 	palette.set_indirect_color(3, rgb_t(0x48, 0x48, 0x48));
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		rgb_t color = palette.indirect_color(i);
-
-		palette.set_indirect_color(4 + i,
-										rgb_t(color.r()   < 0xb8 ? color.r()   + 0x48 : 0xff,
-												color.g() < 0xb8 ? color.g()  + 0x48 : 0xff,
-												color.b()  < 0xb8 ? color.b()  + 0x48 : 0xff));
+		rgb_t const color = palette.indirect_color(i);
+		palette.set_indirect_color(
+				4 + i,
+				rgb_t(
+					(color.r() < 0xb8) ? (color.r() + 0x48) : 0xff,
+					(color.g() < 0xb8) ? (color.g() + 0x48) : 0xff,
+					(color.b() < 0xb8) ? (color.b() + 0x48) : 0xff));
 	}
 
 	palette.set_pen_indirect(0x00, 0);

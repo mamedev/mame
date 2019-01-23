@@ -56,11 +56,13 @@
 #include "includes/mikromik.h"
 #include "softlist.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
 
 #define MMU_IOEN    0x01
 #define MMU_RAMEN   0x02
@@ -215,12 +217,12 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 	switch (offset)
 	{
 	case 0: // IC24 A8
-		if (LOG) logerror("IC24 A8 %u\n", d);
+		LOG("IC24 A8 %u\n", d);
 		m_a8 = d;
 		break;
 
 	case 1: // RECALL
-		if (LOG) logerror("RECALL %u\n", d);
+		LOG("RECALL %u\n", d);
 		m_recall = d;
 		if (d) m_fdc->soft_reset();
 		break;
@@ -242,12 +244,12 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 		break;
 
 	case 6: // LLEN
-		if (LOG) logerror("LLEN %u\n", d);
+		LOG("LLEN %u\n", d);
 		m_llen = d;
 		break;
 
 	case 7: // MOTOR ON
-		if (LOG) logerror("MOTOR %u\n", d);
+		LOG("MOTOR %u\n", d);
 		m_floppy0->mon_w(!d);
 		m_floppy1->mon_w(!d);
 		break;

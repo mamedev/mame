@@ -210,7 +210,7 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("ns16450_0", ins8250_uart_device, rx_w) )
+	MICROTOUCH(config, "microtouch", 9600).stx().set("ns16450_0", FUNC(ins8250_uart_device::rx_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

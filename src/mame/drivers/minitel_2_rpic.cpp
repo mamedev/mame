@@ -424,7 +424,7 @@ void minitel_state::minitel2(machine_config &config)
 	screen.set_size(512, 312);
 	screen.set_visarea(2, 512-10, 0, 278-1);
 
-	PALETTE(config, m_palette, 8+1);
+	PALETTE(config, m_palette).set_entries(8+1);
 }
 
 ROM_START( minitel2 )

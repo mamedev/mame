@@ -419,8 +419,7 @@ void gridlee_state::gridlee(machine_config &config)
 	m_screen->set_screen_update(FUNC(gridlee_state::screen_update_gridlee));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_init(FUNC(gridlee_state::palette_init_gridlee));
+	PALETTE(config, m_palette, FUNC(gridlee_state::gridlee_palette), 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

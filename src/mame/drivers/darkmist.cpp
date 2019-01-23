@@ -244,7 +244,7 @@ MACHINE_CONFIG_START(darkmist_state::darkmist)
 	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(memmap)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(darkmist_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
@@ -255,13 +255,12 @@ MACHINE_CONFIG_START(darkmist_state::darkmist)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(darkmist_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkmist)
-	MCFG_PALETTE_ADD("palette", 0x100*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+1)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_INIT_OWNER(darkmist_state, darkmist)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darkmist);
+	PALETTE(config, m_palette, FUNC(darkmist_state::darkmist_palette));
+	m_palette->set_format(palette_device::xRGB_444, 0x100*4);
+	m_palette->set_indirect_entries(256+1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

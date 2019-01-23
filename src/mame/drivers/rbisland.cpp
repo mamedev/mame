@@ -670,7 +670,7 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	m_cchip->in_ad_callback().set_ioport("80000D");
 	m_cchip->out_pb_callback().set(FUNC(rbisland_state::counters_w));
 
-	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", rbisland_state, cchip_irq_clear_cb)
+	TIMER(config, m_cchip_irq_clear).configure_generic(FUNC(rbisland_state::cchip_irq_clear_cb));
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -681,11 +681,10 @@ MACHINE_CONFIG_START(rbisland_state::rbisland)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_rainbow)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rbisland)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbisland);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	PC080SN(config, m_pc080sn, 0);
 	m_pc080sn->set_gfx_region(1);
@@ -731,11 +730,10 @@ MACHINE_CONFIG_START(rbisland_state::jumping)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rbisland_state, screen_update_jumping)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jumping)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jumping);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(rbisland_state,jumping)
 
@@ -757,6 +755,7 @@ MACHINE_CONFIG_END
 /* Imnoe PCB uses 16MHz CPU crystal instead of 18.432 for CPU */
 MACHINE_CONFIG_START(rbisland_state::jumpingi)
 	jumping(config);
+
 	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)/2)  /* verified on pcb */
 	MCFG_DEVICE_PROGRAM_MAP(jumping_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rbisland_state,  irq4_line_hold)

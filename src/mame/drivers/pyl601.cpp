@@ -54,14 +54,15 @@
 class pyl601_state : public driver_device
 {
 public:
-	pyl601_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pyl601_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_speaker(*this, "speaker"),
 		m_fdc(*this, "upd765"),
 		m_floppy(*this, "upd765:%u", 0U),
 		m_ram(*this, RAM_TAG),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void pyl601(machine_config &config);
 	void pyl601a(machine_config &config);
@@ -545,7 +546,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pyl601_state::pyl601)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6800, XTAL(1'000'000))
+	MCFG_DEVICE_ADD(m_maincpu, M6800, 1_MHz_XTAL)
 	MCFG_DEVICE_PROGRAM_MAP(pyl601_mem)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
 
@@ -556,16 +557,15 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pyl601)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pyl601);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	mc6845_device &crtc(MC6845(config, "crtc", XTAL(2'000'000)));
+	mc6845_device &crtc(MC6845(config, "crtc", 2_MHz_XTAL));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);   /* ? */
@@ -580,15 +580,16 @@ MACHINE_CONFIG_START(pyl601_state::pyl601)
 	RAM(config, RAM_TAG).set_default_size("576K"); // 64 + 512
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pyl601_state::pyl601a)
+void pyl601_state::pyl601a(machine_config &config)
+{
 	pyl601(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( XTAL(2'000'000))
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pyl601a)
+	m_maincpu->set_clock(2_MHz_XTAL);
+
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pyl601a);
 
 	subdevice<mc6845_device>("crtc")->set_update_row_callback(FUNC(pyl601_state::pyl601a_update_row), this);
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( pyl601 )

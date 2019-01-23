@@ -32,25 +32,21 @@ class svmu_state : public driver_device
 {
 public:
 	svmu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_flash(*this, "flash"),
-			m_speaker(*this, "speaker"),
-			m_bios(*this, "bios")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_flash(*this, "flash")
+		, m_speaker(*this, "speaker")
+		, m_bios(*this, "bios")
+	{ }
 
 	void svmu(machine_config &config);
 
-private:
-	required_device<lc8670_cpu_device> m_maincpu;
-	required_device<intelfsh8_device> m_flash;
-	required_device<speaker_sound_device> m_speaker;
-	required_region_ptr<uint8_t> m_bios;
-
-	LC8670_LCD_UPDATE(svmu_lcd_update);
-	DECLARE_PALETTE_INIT(svmu);
+protected:
 	virtual void machine_reset() override;
 
+private:
+	LC8670_LCD_UPDATE(svmu_lcd_update);
+	void svmu_palette(palette_device &palette) const;
 	DECLARE_WRITE8_MEMBER(page_w);
 	DECLARE_READ8_MEMBER(prog_r);
 	DECLARE_WRITE8_MEMBER(prog_w);
@@ -61,6 +57,11 @@ private:
 
 	void svmu_io_mem(address_map &map);
 	void svmu_mem(address_map &map);
+
+	required_device<lc8670_cpu_device> m_maincpu;
+	required_device<intelfsh8_device> m_flash;
+	required_device<speaker_sound_device> m_speaker;
+	required_region_ptr<uint8_t> m_bios;
 
 	uint8_t       m_page;
 };
@@ -163,7 +164,7 @@ void svmu_state::machine_reset()
 	m_page = 0;
 }
 
-PALETTE_INIT_MEMBER(svmu_state, svmu)
+void svmu_state::svmu_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -331,7 +332,7 @@ void svmu_state::svmu(machine_config &config)
 	screen.set_palette("palette");
 
 	config.set_default_layout(layout_svmu);
-	PALETTE(config, "palette", 2).set_init(FUNC(svmu_state::palette_init_svmu));
+	PALETTE(config, "palette", FUNC(svmu_state::svmu_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

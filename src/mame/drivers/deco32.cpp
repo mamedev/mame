@@ -1865,7 +1865,7 @@ void captaven_state::captaven(machine_config &config)
 	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
 
-	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
 
 	DECO_IRQ(config, m_deco_irq, 0);
 	m_deco_irq->set_screen_tag(m_screen);
@@ -1878,8 +1878,7 @@ void captaven_state::captaven(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_captaven);
-	PALETTE(config, m_palette, 2048);
-	m_palette->set_format(PALETTE_FORMAT_XBGR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 2048);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);
@@ -1960,7 +1959,7 @@ void fghthist_state::fghthist(machine_config &config)
 	m_screen->set_screen_update(FUNC(fghthist_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghthist);
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);
@@ -2123,7 +2122,7 @@ void dragngun_state::dragngun(machine_config &config)
 	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -2213,7 +2212,7 @@ void dragngun_state::lockload(machine_config &config)
 	BUFFERED_SPRITERAM32(config, m_spriteram);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
-	PALETTE(config, m_palette, 2048);
+	PALETTE(config, m_palette).set_entries(2048);
 
 	DECO16IC(config, m_deco_tilegen[0], 0);
 	m_deco_tilegen[0]->set_split(0);

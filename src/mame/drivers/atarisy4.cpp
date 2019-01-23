@@ -823,7 +823,7 @@ void atarisy4_state::atarisy4(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_screen_update(FUNC(atarisy4_state::screen_update_atarisy4));
 
-	PALETTE(config, m_palette, 256);
+	PALETTE(config, m_palette).set_entries(256);
 }
 
 void airrace_state::airrace(machine_config &config)

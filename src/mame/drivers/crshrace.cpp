@@ -402,17 +402,16 @@ void crshrace_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-MACHINE_CONFIG_START(crshrace_state::crshrace)
-
+void crshrace_state::crshrace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(crshrace_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crshrace_state,  irq1_line_hold)
+	M68000(config, m_maincpu, 16000000);    /* 16 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &crshrace_state::crshrace_map);
+	m_maincpu->set_vblank_int("screen", FUNC(crshrace_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-
+	Z80(config, m_audiocpu, 4000000);   /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &crshrace_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &crshrace_state::sound_io_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -424,17 +423,16 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	screen.screen_vblank().append(m_spriteram2, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crshrace)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGBBBBBRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_crshrace);
+	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 2048);
 
 	VSYSTEM_SPR(config, m_spr, 0);
 	m_spr->set_tile_indirect_cb(FUNC(crshrace_state::crshrace_tile_callback), this);
 	m_spr->set_gfx_region(2);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
-	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+	BUFFERED_SPRITERAM16(config, m_spriteram2);
 
 	K053936(config, m_k053936, 0);
 	m_k053936->set_wrap(1);
@@ -448,13 +446,13 @@ MACHINE_CONFIG_START(crshrace_state::crshrace)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
 
 ROM_START( crshrace )

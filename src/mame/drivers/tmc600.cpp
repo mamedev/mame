@@ -289,8 +289,8 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	m_centronics->busy_handler().set(CDP1802_TAG, FUNC(cosmac_device::ef4_w)).exor(1);
 
 	// cassette
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	// expansion bus connector
 	MCFG_TMC600_EURO_BUS_SLOT_ADD(TMC600_EURO_BUS_TAG, tmc600_euro_bus_cards, nullptr)

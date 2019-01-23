@@ -548,17 +548,17 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'635) / 6));
 	psg.port_a_read_callback().set_ioport("JOY");
 	psg.port_b_write_callback().set(FUNC(svi3x8_state::bank_w));
 	psg.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// cassette
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(svi_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("svi318_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(svi_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("svi318_cass");
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "svi318_cass")
 
 	// cartridge slot

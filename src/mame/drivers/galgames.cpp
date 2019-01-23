@@ -729,8 +729,8 @@ WRITE_LINE_MEMBER(galgames_slot_device::eeprom_cs_write)
 class galgames_state : public driver_device
 {
 public:
-	galgames_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galgames_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -984,7 +984,7 @@ int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_DEVICE_PROGRAM_MAP(galgames_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galgames_state, scanline_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(galgames_state::scanline_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_GALGAMES_SLOT_ADD("slot")
@@ -997,15 +997,14 @@ MACHINE_CONFIG_START(galgames_state::galgames_base)
 	MCFG_SCREEN_SIZE(400, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galgames_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_CESBLIT_ADD("blitter", "screen", XTAL(24'000'000))
-	MCFG_CESBLIT_MAP(blitter_map)
-	MCFG_CESBLIT_COMPUTE_ADDR(galgames_compute_addr)
-	MCFG_CESBLIT_IRQ_CB(WRITELINE(*this, galgames_state, blitter_irq_callback))
+	CESBLIT(config, m_blitter, XTAL(24'000'000), m_screen);
+	m_blitter->set_addrmap(AS_PROGRAM, &galgames_state::blitter_map);
+	m_blitter->set_compute_addr(galgames_compute_addr);
+	m_blitter->irq_callback().set(FUNC(galgames_state::blitter_irq_callback));
 
-	MCFG_PALETTE_ADD("palette", 0x1000) // only 0x100 used
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000); // only 0x100 used
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

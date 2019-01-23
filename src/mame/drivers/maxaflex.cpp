@@ -358,7 +358,7 @@ void maxaflex_state::maxaflex(machine_config &config)
 	screen.set_screen_update("antic", FUNC(antic_device::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 256).set_init(FUNC(maxaflex_state::palette_init_atari));
+	PALETTE(config, "palette", FUNC(maxaflex_state::atari_palette), 256);
 	config.set_default_layout(layout_maxaflex);
 
 	/* sound hardware */

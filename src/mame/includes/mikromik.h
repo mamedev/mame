@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_MIKROMIK_H
+#define MAME_INCLUDES_MIKROMIK_H
 
-#ifndef MAME_INCLUDES_MIKROMIKKO_H
-#define MAME_INCLUDES_MIKROMIKKO_H
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
@@ -70,6 +70,10 @@ public:
 	void mm1m6_video(machine_config &config);
 	void mm1m7(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8212_device> m_iop;
@@ -91,8 +95,22 @@ private:
 	required_memory_region m_char_rom;
 	required_shared_ptr<uint16_t> m_video_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	int m_a8;
+
+	// video state
+	int m_llen;
+
+	// serial state
+	int m_intc;
+	int m_rx21;
+	int m_tx21;
+	int m_rcl;
+
+	// floppy state
+	int m_recall;
+	int m_dack3;
+	int m_tc;
+	int m_fdc_tc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -113,29 +131,12 @@ private:
 
 	void update_tc();
 
-	int m_a8;
-
-	// video state
-	int m_llen;
-
-	// serial state
-	int m_intc;
-	int m_rx21;
-	int m_tx21;
-	int m_rcl;
-
-	// floppy state
-	int m_recall;
-	int m_dack3;
-	int m_tc;
-	int m_fdc_tc;
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	DECLARE_PALETTE_INIT( mm1 );
+	void mm1_palette(palette_device &palette) const;
 	void mm1_map(address_map &map);
 	void mm1_upd7220_map(address_map &map);
 };
 
-#endif
+#endif // MAME_INCLUDES_MIKROMIK_H

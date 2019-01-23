@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gcpinbal_state, scanline_cb, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(gcpinbal_state::scanline_cb), "screen", 0, 1);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -371,13 +371,12 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gcpinbal_state, screen_update_gcpinbal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gcpinbal)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gcpinbal);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 4096);
 
-	MCFG_DEVICE_ADD("spritegen", EXCELLENT_SPRITE, 0)
+	EXCELLENT_SPRITE(config, m_sprgen, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

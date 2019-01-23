@@ -597,7 +597,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
 	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)

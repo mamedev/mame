@@ -66,6 +66,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
@@ -111,7 +114,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	virtual void video_start() override;
 	uint32_t screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(const rectangle &cliprect);
@@ -723,8 +725,7 @@ void limenko_state::limenko(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_limenko);
-	PALETTE(config, m_palette, 0x1000);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -769,8 +770,7 @@ void limenko_state::spotty(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_limenko);
-	PALETTE(config, m_palette, 0x1000);
-	m_palette->set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

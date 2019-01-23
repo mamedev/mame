@@ -212,7 +212,7 @@ public:
 		m_orig_config.m_overscalex = m_overscalex = scalex;
 		m_orig_config.m_overscaley = m_overscaley = scaley;
 	}
-	void set_overlay_palette(const char *tag) { m_overlay_palette.set_tag(tag); }
+	template <typename T> void set_overlay_palette(T &&tag) { m_overlay_palette.set_tag(std::forward<T>(tag)); }
 
 protected:
 	// timer IDs

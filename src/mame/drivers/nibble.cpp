@@ -62,28 +62,33 @@
 class nibble_state : public driver_device
 {
 public:
-	nibble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nibble_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void nibble(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	DECLARE_WRITE8_MEMBER(nibble_videoram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nibble);
+	void nibble_palette(palette_device &palette) const;
 	uint32_t screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nibble_interrupt);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
+
 	void nibble_map(address_map &map);
 	void ramdac1_map(address_map &map);
 	void ramdac2_map(address_map &map);
@@ -126,7 +131,7 @@ uint32_t nibble_state::screen_update_nibble(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(nibble_state, nibble)
+void nibble_state::nibble_palette(palette_device &palette) const
 {
 }
 
@@ -343,7 +348,7 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 	MCFG_SCREEN_UPDATE_DRIVER(nibble_state, screen_update_nibble)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nibble)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_nibble);
 
 	ramdac_device &ramdac1(RAMDAC(config, "ramdac1", 0, "palette"));
 	ramdac1.set_addrmap(0, &nibble_state::ramdac1_map);
@@ -353,7 +358,7 @@ MACHINE_CONFIG_START(nibble_state::nibble)
 	ramdac2.set_addrmap(0, &nibble_state::ramdac2_map);
 	ramdac2.set_color_base(0x100);
 
-	MCFG_PALETTE_ADD("palette", 0x200)
+	PALETTE(config, "palette", FUNC(nibble_state::nibble_palette), 0x200);
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8)); /* guess */
 	crtc.set_screen("screen");

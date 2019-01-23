@@ -428,7 +428,7 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	PALETTE(config, m_palette, 16).set_format(PALETTE_FORMAT_BBGGGRRR);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 16);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

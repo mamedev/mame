@@ -404,9 +404,7 @@ void pengo_state::pengo(machine_config &config)
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pengo);
-	PALETTE(config, m_palette, 128*4);
-	m_palette->set_indirect_entries(32);
-	m_palette->set_init(FUNC(pengo_state::palette_init_pacman));
+	PALETTE(config, m_palette, FUNC(pengo_state::pacman_palette), 128 * 4, 32);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
