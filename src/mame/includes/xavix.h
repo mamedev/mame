@@ -18,7 +18,8 @@
 
 #include "machine/xavix_mtrk_wheel.h"
 #include "machine/xavix_madfb_ball.h"
-
+#include "machine/xavix2002_io.h"
+#include "machine/xavix_io.h"
 
 class xavix_sound_device : public device_t, public device_sound_interface
 {
@@ -99,7 +100,8 @@ public:
 		m_palette(*this, "palette"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_sound(*this, "xavix_sound")
+		m_sound(*this, "xavix_sound"),
+		m_xavix2002io(*this, "xavix2002io")
 	{ }
 
 	void xavix(machine_config &config);
@@ -107,6 +109,8 @@ public:
 	void xavix2000(machine_config &config);
 	void xavix_nv(machine_config &config);
 	void xavix2000_nv(machine_config &config);
+
+	void xavix2002(machine_config &config);
 
 	void init_xavix();
 
@@ -563,7 +567,20 @@ private:
 	int get_current_address_byte();
 
 	required_device<xavix_sound_device> m_sound;
+
+
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
+
+protected:
+	optional_device<xavix2002_io_device> m_xavix2002io;
+
+	// additional SuperXaviX / XaviX2002 stuff
+
+	uint8_t m_sx_extended_extbus[3];
+
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg0_w);
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg1_w);
+	DECLARE_WRITE8_MEMBER(extended_extbus_reg2_w);
 };
 
 class xavix_i2c_state : public xavix_state
@@ -578,10 +595,13 @@ public:
 
 	void xavix_i2c_24lc02(machine_config &config);
 	void xavix_i2c_24lc04(machine_config &config);
+	void xavix_i2c_24c02(machine_config &config);
 	void xavix_i2c_24c08(machine_config &config);
 
 	void xavix2000_i2c_24c04(machine_config &config);
 	void xavix2000_i2c_24c02(machine_config &config);
+
+	void xavix2002_i2c_24c04(machine_config &config);
 
 	void init_epo_efdx()
 	{
@@ -589,8 +609,10 @@ public:
 		hackaddress1 = 0x958a;
 		hackaddress2 = 0x8524;
 	}
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
@@ -600,6 +622,25 @@ private:
 	int hackaddress2;
 };
 
+class xavix_i2c_jmat_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_jmat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	void xavix2002_i2c_jmat(machine_config &config);
+
+private:
+	READ8_MEMBER(read_extended_io0);
+	READ8_MEMBER(read_extended_io1);
+	READ8_MEMBER(read_extended_io2);
+	WRITE8_MEMBER(write_extended_io0);
+	WRITE8_MEMBER(write_extended_io1);
+	WRITE8_MEMBER(write_extended_io2);
+};
+
+
 class xavix_i2c_lotr_state : public xavix_i2c_state
 {
 public:
@@ -607,9 +648,20 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_i2c_bowl_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_bowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
 };
 
 
@@ -816,8 +868,9 @@ public:
 
 	void xavix_i2c_taiko(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
@@ -835,6 +888,9 @@ public:
 		m_extraiowrite(0)
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi1_r);
+
 //	void xavix_ekara(machine_config &config);
 
 protected:
@@ -842,7 +898,6 @@ protected:
 	required_ioport m_extra0;
 	required_ioport m_extra1;
 
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io0(uint8_t data, uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
