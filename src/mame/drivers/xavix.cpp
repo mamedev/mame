@@ -201,10 +201,30 @@
     Fitness Dance has an Atmel H93864C (maybe SEEPROM?) a Microchip DSPIC 33FJ12GP202 and two JRC 2740 dual op amps.
     Music and Circuit has a 24CS64, two UTC324 quad op amps, a 74HC14, a 74HCT04, and an 8-pin SOIC labeled 61545, which is likely an M61545 dual electronic volume control.
 
+	It looks like the sensors (cameras) are from ETOMS
+	They are all 32x32 arrays except Fitness Play, which is 64x64.  Most of the PCBs are marked CIS.
+	Bowling and Boxing look identical.
+	LOTR and SW look identical
+	DQ looks similar to LOTR
+	Real Swing Golf (different driver) and Fitness Play look different from all the others.
+
+	The sensor dies for Bowling, Boxing, Star Wars and DQ are labeled CU5501A.
+	LOTR is CU5501
+	Real Swing Golf is CU5502
+	Fitness Play is S-5300A SLH2039H and does not have ETOMS on it.
+	The Fitness Play main PCB has an extra glob next to the ribbon cable to the camera.
+	Most of the camera PCBs connect to the main PCB with an 18-20 wire ribbon cable.
+	
+	Real Swing Golf just has 6 wires, Its camera PCB is the only one with a ceramic resonator
+	Maybe the CU5502 chip offloads some processing from the CPU?
+
+
+
 	NOTES:
 
 	Play TV Monster Truck runs off an entirely different codebase to everything else, presumably coded by the developer from scratch rather than using code supplied by SSD Company LTD
 	Play TV Rescue Heroes fails to display any kind of XaviX logo or SSD Copyright, it is the only XaviX based game so far to not show these details anywhere in the game.
+
 
 
 ***************************************************************************/
@@ -1636,6 +1656,12 @@ ROM_START( xavbassf )
 	ROM_LOAD( "xpbassfishing.bin", 0x000000, 0x800000, CRC(09ab2f29) SHA1(616254176315d0947002e9ae5a6371a3ffa2e8eb) )
 ROM_END
 
+ROM_START( xavbox )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "xpboxing.bin", 0x000000, 0x800000, CRC(b61e7717) SHA1(162b9c53ac8c9d7b6972db44f7bc1cb0a7837b70) )
+ROM_END
+
+
 ROM_START( xavjmat )
 	ROM_REGION( 0x1000000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpjmat.bin", 0x000000, 0x1000000, CRC(71a51eef) SHA1(41fd2c3013d1c86756046ec9174e94400f8fa06d) )
@@ -1658,6 +1684,7 @@ CONS( 2005, tmy_thom, 0, 0, xavix2002_i2c_24c04, xavix, xavix_i2c_state, init_xa
 CONS( 2004, xavtenni, 0, 0, xavix2002_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbaseb, 0, 0, xavix2002_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbowl,  0, 0, xavix2002_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
+CONS( 2004, xavbox,   0, 0, xavix2002_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Boxing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
 // Bass Fishing PCB is just like Tennis except with an RF daughterboard.
 CONS( 2004, xavbassf, 0, 0, xavix2002_i2c_24c04, xavix, xavix_i2c_state, init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
