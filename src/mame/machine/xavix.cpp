@@ -488,15 +488,42 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 
 /* Per Game IO port callbacks */
 
-READ8_MEMBER(xavix_i2c_state::read_io1)
+uint8_t xavix_state::read_io0(uint8_t direction)
+{
+	// no special handling
+	return m_in0->read();
+}
+
+uint8_t xavix_state::read_io1(uint8_t direction)
+{
+	// no special handling
+	return m_in1->read();
+}
+
+void xavix_state::write_io0(uint8_t data, uint8_t direction)
+{
+	// no special handling
+}
+
+void xavix_state::write_io1(uint8_t data, uint8_t direction)
+{
+	// no special handling
+}
+
+uint8_t xavix_i2c_state::read_io1(uint8_t direction)
 {
 	uint8_t ret = m_in1->read();
-	ret &= ~0x08;
-	ret |= (m_i2cmem->read_sda() & 1) << 3;
+
+	if (!(direction & 0x08))
+	{
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
+	}
+
 	return ret;
 }
 
-WRITE8_MEMBER(xavix_i2c_state::write_io1)
+void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
 	// ignore these writes so that epo_edfx can send read requests to the ee-prom and doesn't just report an error
 	// TODO: check if these writes shouldn't be happening (the first is a direct write, the 2nd is from a port direction change)
@@ -505,28 +532,46 @@ WRITE8_MEMBER(xavix_i2c_state::write_io1)
 		if ((m_maincpu->pc() == hackaddress1) || (m_maincpu->pc() == hackaddress2))
 			return;
 
-	m_i2cmem->write_sda((data & 0x08) >> 3);
-	m_i2cmem->write_scl((data & 0x10) >> 4);
+	if (direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (direction & 0x10)
+	{
+		m_i2cmem->write_scl((data & 0x10) >> 4);
+	}
 }
 
-
 // for taikodp
-READ8_MEMBER(xavix_i2c_cart_state::read_cart_io1)
+uint8_t xavix_i2c_cart_state::read_io1(uint8_t direction)
 {
 	uint8_t ret = m_in1->read();
-	ret &= ~0x08;
-	ret |= (m_i2cmem->read_sda() & 1) << 3;
+
+	if (!(direction & 0x08))
+	{
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
+	}
+
 	return ret;
 }
 
-WRITE8_MEMBER(xavix_i2c_cart_state::write_cart_io1)
+void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
-	m_i2cmem->write_sda((data & 0x08) >> 3);
-	m_i2cmem->write_scl((data & 0x10) >> 4);
+	if (direction & 0x08)
+	{
+		m_i2cmem->write_sda((data & 0x08) >> 3);
+	}
+
+	if (direction & 0x10)
+	{
+		m_i2cmem->write_scl((data & 0x10) >> 4);
+	}
 }
 
 
-READ8_MEMBER(xavix_i2c_lotr_state::read_lotr_io1)
+uint8_t xavix_i2c_lotr_state::read_io1(uint8_t direction)
 {
 	uint8_t ret = m_in1->read();
 
@@ -534,13 +579,16 @@ READ8_MEMBER(xavix_i2c_lotr_state::read_lotr_io1)
 	ret ^= (machine().rand() & 0x02);
 	ret ^= (machine().rand() & 0x04);
 
-	ret &= ~0x08;
-	ret |= (m_i2cmem->read_sda() & 1) << 3;
+	if (!(direction & 0x08))
+	{
+		ret &= ~0x08;
+		ret |= (m_i2cmem->read_sda() & 1) << 3;
+	}
 
 	return ret;
 }
 
-READ8_MEMBER(xavix_ekara_state::read_ekara_io1)
+uint8_t xavix_ekara_state::read_io1(uint8_t direction)
 {
 	uint8_t extrainlatch0 = 0x00;
 	uint8_t extrainlatch1 = 0x00;
@@ -587,16 +635,72 @@ READ8_MEMBER(xavix_ekara_state::read_ekara_io1)
 	return ret;
 }
 
-WRITE8_MEMBER(xavix_ekara_state::write_ekara_io0)
+void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
 {
 	// is bit 0x80 an enable for something else? LED? Microphone? it doesn't seem related to the multiplexing
-	m_extraioselect = data;
+	m_extraioselect = data & direction;
 }
 
-WRITE8_MEMBER(xavix_ekara_state::write_ekara_io1)
+void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 {
-	uint8_t extraiowrite = data;
+	uint8_t extraiowrite = data & direction;
 	m_extraiowrite = extraiowrite;
+}
+
+/* General IO port handling */
+
+READ8_MEMBER(xavix_state::io0_data_r)
+{
+	uint8_t ret = read_io0(m_io0_direction) & ~m_io0_direction;
+	ret |= m_io0_data & m_io0_direction;
+	return ret;
+}
+
+READ8_MEMBER(xavix_state::io1_data_r)
+{
+	uint8_t ret = read_io1(m_io1_direction) & ~m_io1_direction;
+	ret |= m_io1_data & m_io1_direction;
+	return ret;
+}
+
+READ8_MEMBER(xavix_state::io0_direction_r)
+{
+	return m_io0_direction;
+}
+
+READ8_MEMBER(xavix_state::io1_direction_r)
+{
+	return m_io1_direction;
+}
+
+
+WRITE8_MEMBER(xavix_state::io0_data_w)
+{
+	m_io0_data = data;
+	write_io0(data, m_io0_direction);
+	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(xavix_state::io1_data_w)
+{
+	m_io1_data = data;
+	write_io1(data, m_io1_direction);
+	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
+}
+
+
+WRITE8_MEMBER(xavix_state::io0_direction_w)
+{
+	m_io0_direction = data;
+	LOG("%s: io0_direction_w %02x\n", machine().describe_context(), data);
+	io0_data_w(space, 0, m_io0_data);
+}
+
+WRITE8_MEMBER(xavix_state::io1_direction_w)
+{
+	m_io1_direction = data;
+	LOG("%s: io1_direction_w %02x\n", machine().describe_context(), data);
+	io1_data_w(space, 0, m_io1_data); // requires this for i2cmem to work, is it correct tho?
 }
 
 /* Arena (Visible Area + hblank?) handling */
@@ -936,6 +1040,10 @@ void xavix_state::machine_start()
 	save_item(NAME(m_extbusctrl));
 	save_item(NAME(m_ioevent_enable));
 	save_item(NAME(m_ioevent_active));
+	save_item(NAME(m_io0_data));
+	save_item(NAME(m_io1_data));
+	save_item(NAME(m_io0_direction));
+	save_item(NAME(m_io1_direction));
 	save_item(NAME(m_adc_control));
 	save_item(NAME(m_sound_irqstatus));
 	save_item(NAME(m_soundreg16_0));
@@ -1018,6 +1126,12 @@ void xavix_state::machine_reset()
 	std::fill_n(&m_fragment_sprite[0], 0x800, 0x00); // taito nostalgia 1 never initializes the ram at 0x6400 but there's no condition on using it at present?
 
 	//m_lowbus->set_bank(0);
+
+	m_io0_data = 0x00;
+	m_io1_data = 0x00;
+
+	m_io0_direction = 0x00;
+	m_io1_direction = 0x00;
 
 	m_irqsource = 0x00;
 

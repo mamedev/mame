@@ -358,8 +358,10 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7986, 0x7987).ram().w(FUNC(xavix_state::rom_dmalen_w)).share("rom_dma_len");
 
 	// IO Ports
-	map(0x7a00, 0x7a01).rw("xavixio", FUNC(xavix_io_device::xav_7a0x_dat_r), FUNC(xavix_io_device::xav_7a0x_dat_w));
-	map(0x7a02, 0x7a03).rw("xavixio", FUNC(xavix_io_device::xav_7a0x_dir_r), FUNC(xavix_io_device::xav_7a0x_dir_w));
+	map(0x7a00, 0x7a00).rw(FUNC(xavix_state::io0_data_r), FUNC(xavix_state::io0_data_w));
+	map(0x7a01, 0x7a01).rw(FUNC(xavix_state::io1_data_r), FUNC(xavix_state::io1_data_w));
+	map(0x7a02, 0x7a02).rw(FUNC(xavix_state::io0_direction_r), FUNC(xavix_state::io0_direction_w));
+	map(0x7a03, 0x7a03).rw(FUNC(xavix_state::io1_direction_r), FUNC(xavix_state::io1_direction_w));
 
 	// IO Event Interrupt control
 	map(0x7a80, 0x7a80).rw(FUNC(xavix_state::ioevent_enable_r), FUNC(xavix_state::ioevent_enable_w));
@@ -1027,10 +1029,6 @@ void xavix_state::xavix(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
-	XAVIXIO(config, m_xavio, 0);
-	m_xavio->read_0_callback().set_ioport("IN0");
-	m_xavio->read_1_callback().set_ioport("IN1");
-
 	/* sound hardware */
 
 	//SPEAKER(config, "mono").front_center();
@@ -1049,9 +1047,6 @@ void xavix_i2c_state::xavix_i2c_24lc02(machine_config &config)
 {
 	xavix(config);
 
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_state::read_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_i2c_state::write_io1));
-
 	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x100); // 24LC02 (taiko)
 }
 
@@ -1059,18 +1054,12 @@ void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 {
 	xavix(config);
 
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_state::read_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_i2c_state::write_io1));
-
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02
 }
 
 void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 {
 	xavix(config);
-
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_state::read_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_i2c_state::write_io1));
 
 	// according to http://ww1.microchip.com/downloads/en/devicedoc/21708k.pdf 'the master transmits up to 16 data bytes' however this breaks the Nostalgia games
 	// of note Galplus Phalanx on Namco Nostalgia 2, which will hang between stages unable to properly access the device, but with no page support it doesn't hang and scores save
@@ -1080,9 +1069,6 @@ void xavix_i2c_state::xavix_i2c_24lc04(machine_config &config)
 void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
-
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_state::read_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_i2c_state::write_io1));
 
 	I2CMEM(config, "i2cmem", 0)/*.set_page_size(16)*/.set_data_size(0x400); // 24C08 (Excite Fishing DX)
 }
@@ -1152,9 +1138,6 @@ void xavix_i2c_state::xavix2000_i2c_24c04(machine_config &config)
 {
 	xavix2000(config);
 
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_state::read_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_i2c_state::write_io1));
-
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04
 }
 
@@ -1162,19 +1145,8 @@ void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 {
 	xavix2000(config);
 
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_state::read_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_i2c_state::write_io1));
-
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x100); // 24C02
 }
-
-void xavix_i2c_lotr_state::xavix2000_i2c_24c02_lotr(machine_config &config)
-{
-	xavix2000_i2c_24c02(config);
-
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_lotr_state::read_lotr_io1));
-}
-
 
 void xavix_mtrk_state::xavix_mtrk(machine_config &config)
 {
@@ -1216,13 +1188,10 @@ void xavix_i2c_cart_state::xavix_i2c_taiko(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_d").set_original("ekara_japan_d");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
 
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_cart_state::read_cart_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_i2c_cart_state::write_cart_io1));
-
 	// do any of the later G/P series carts with SEEPROM work with this too? check
 }
 
-void xavix_ekara_state::xavix_cart_ekara(machine_config &config)
+void xavix_cart_state::xavix_cart_ekara(machine_config &config)
 {
 	xavix_cart(config);
 
@@ -1238,10 +1207,6 @@ void xavix_ekara_state::xavix_cart_ekara(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list_japan_en").set_original("ekara_japan_en");
 	SOFTWARE_LIST(config, "cart_list_japan_sp").set_original("ekara_japan_sp");
 	SOFTWARE_LIST(config, "cart_list_japan_web").set_original("ekara_japan_web");
-
-	m_xavio->write_0_callback().set(FUNC(xavix_ekara_state::write_ekara_io0));
-	m_xavio->read_1_callback().set(FUNC(xavix_ekara_state::read_ekara_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_ekara_state::write_ekara_io1));
 }
 
 void xavix_cart_state::xavix_cart_popira(machine_config &config)
@@ -1272,9 +1237,6 @@ void xavix_cart_state::xavix_cart_ddrfammt(machine_config &config)
 void xavix_i2c_state::xavix2002_i2c_24c04(machine_config &config)
 {
 	xavix2002(config);
-
-	m_xavio->read_1_callback().set(FUNC(xavix_i2c_state::read_io1));
-	m_xavio->write_1_callback().set(FUNC(xavix_i2c_state::write_io1));
 
 	I2CMEM(config, "i2cmem", 0).set_page_size(16).set_data_size(0x200); // 24C04
 }
@@ -1611,10 +1573,10 @@ ROM_END
 
 CONS( 2004, epo_sdb,  0, 0, xavix2000_nv,        epo_sdb,  xavix_state,          init_xavix, "Epoch / SSD Company LTD",       "Super Dash Ball (Japan)",  MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02_lotr, xavix,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02_lotr, xavix,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04,      ttv_mx,   xavix_i2c_state,      init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02_lotr, xavix,    xavix_i2c_lotr_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_sw,   0, 0, xavix2000_i2c_24c02, xavix,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_lotr, 0, 0, xavix2000_i2c_24c02, xavix,    xavix_i2c_lotr_state, init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_mx,   0, 0, xavix2000_i2c_24c04, ttv_mx,   xavix_i2c_state,      init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, drgqst,   0, 0, xavix2000_i2c_24c02, xavix ,   xavix_i2c_lotr_state, init_xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 /* SuperXaviX (XaviX 2002 type CPU) hardware titles (3rd XaviX generation?)
 
