@@ -141,5 +141,5 @@ ROM_START( tp1985 ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-SYST(  1983, tp1983, 0, 0, tp1983,   tp1983,    tp1983_state,   empty_init, "Radio", "TV Test Pattern Generator 1983", MACHINE_NO_SOUND_HW)
+SYST(  1983, tp1983, 0, 0, tp1983,   tp1983,    tp1983_state,   empty_init, "Radio", "TV Test Pattern Generator 1983", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
 SYST(  1985, tp1985, 0, 0, tp1985,   tp1985,    tp1985_state,   empty_init, "Radio", "TV Test Pattern Generator 1985", MACHINE_NO_SOUND_HW)
