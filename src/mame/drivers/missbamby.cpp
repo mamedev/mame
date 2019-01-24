@@ -2,25 +2,25 @@
 // copyright-holders:
 
 /*
-Miss Bamby - Automatics Pascual (ClawGrip 2019-01-21)
+Miss Bamby - Automatics Pasqual (ClawGrip 2019-01-21)
    _____________________________________________________________
    |                             _______                        |
    |                             |__??__|      ____________     |
    |                  __________________       | EMPTY     |    |
-   |                  | M5L8085AP       |      |___________|    |
+   |                  | M5L8085AP       |      |_SOCKET____|    |
    |                  |_________________|      ____________     |
    |                       ______________      | ROM1      |    |
-   |         XTAL          |M5L82??     |      |___________|    |
+   |         XTAL          |M5L8212P    |      |___________|    |
    |   __   6.144          |____________|      ____________     |
    |   |R|                                     | ROM0      |    |
  __|                                           |___________|    |
-|__| ________  ________  ___________________   _____________    |
-|__| |ULN2003A |ULN2003A | M5L8155P         |  |    ???     |   |
-|__|                     |__________________|  _____________    |
-|__|                     ________   _________  |    ???     |   |
-|__|           _______   |74LS393|  |74LS7481                   |
+|__| ________  ________  ___________________   ____________     |
+|__| |ULN2003A |ULN2003A | M5L8155P         |  |_D5101LC__|     |
+|__|                     |__________________|  ____________     |
+|__|                     ________   _________  |_D5101LC__|     |
+|__|           _______   |74LS393|  |74LS74B1                   |
 |__|           |7407N |                        ________         |
-|__|                     ________   ________   |GD40018|        |
+|__|                     ________   ________   |GD4001B|        |
 |__|                     |74LS14_|  |74LS153|        _________  |
 |__|                                          ____  | BATT    | |
 |__|   _______           ___________________  |D  | | 3.6V    | |
@@ -36,6 +36,7 @@ Miss Bamby - Automatics Pascual (ClawGrip 2019-01-21)
 #include "speaker.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
+//#include "machine/nvram.h"
 #include "machine/pit8253.h"
 #include "sound/ay8910.h"
 
@@ -130,4 +131,4 @@ ROM_START( msbamby )
 ROM_END
 
 
-GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Pascual Automatics", "Miss Bamby", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, msbamby, 0, missbamby, missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby", MACHINE_IS_SKELETON_MECHANICAL )
