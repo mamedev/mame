@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// TODO: hook this back up, and work out why taikodp eeprom breaks when it is hooked up.  epo_efdx breakage is expected because that requires an ugly hack to get to the title
+//       note, eeproms don't work properly in most games at the moment, but no behavioral change was expected with taikodp
+
 #include "emu.h"
 #include "xavix_io.h"
 
