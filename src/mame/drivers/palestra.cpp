@@ -3,7 +3,7 @@
 
 /***************************************************************************
 
-	Palestra-02 (a Pong clone)
+    Palestra-02 (a Pong clone)
 
     https://www.mobygames.com/game/dedicated-console/palestra-02
         database entry
@@ -92,4 +92,4 @@ ROM_START( palestra ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-GAME(  1978, palestra,    0, palestra,   palestra,    palestra_state,   empty_init, ROT0,  "LPO", "Palestra-02", MACHINE_IS_SKELETON)
+CONS(  1978, palestra, 0,   0, palestra,   palestra,    palestra_state,   empty_init, "LPO", "Palestra-02", MACHINE_IS_SKELETON)
