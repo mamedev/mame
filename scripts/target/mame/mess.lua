@@ -136,6 +136,7 @@ CPUS["MB86901"] = true
 CPUS["NANOPROCESSOR"] = true
 CPUS["CLIPPER"] = true
 CPUS["CAPRICORN"] = true
+CPUS["ALPHA"] = true
 --CPUS["DSPP"] = true
 
 --------------------------------------------------
