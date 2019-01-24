@@ -2783,6 +2783,39 @@ ROM_START( fantzonep )
 	ROM_LOAD( "epr-7391.12",  0x0000, 0x8000, CRC(c03e155e) SHA1(6bbdf308c47b96ba622329520b70fa0ea47248a4) ) // Original encrypted sound code
 ROM_END
 
+//*************************************************************************************************************************
+//  Fantasy Zone, Sega System 16A
+//  CPU: FD1089B 317-0016
+//
+ROM_START( fantzonee )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-10170.43", 0x000000, 0x8000, CRC(063c6d76) SHA1(02d52d776330c88d949b10fb715b00507dba1227) )
+	ROM_LOAD16_BYTE( "epr-10167.26", 0x000001, 0x8000, CRC(0ee190b0) SHA1(18c27046a523d73bccf733ecd956e454199a1ee8) )
+	ROM_LOAD16_BYTE( "epr-10171.42", 0x010000, 0x8000, CRC(2ca92d64) SHA1(2eea4d1ae38bba28b806824951a0df4c9f74af6f) )
+	ROM_LOAD16_BYTE( "epr-10168.25", 0x010001, 0x8000, CRC(850964ad) SHA1(bdf603b025b981cc5af47446526562c425990b89) )
+	ROM_LOAD16_BYTE( "epr-10172.41", 0x020000, 0x8000, CRC(b5b624f0) SHA1(a728582efdc9c1b0ed1a27975d6b4e1974339ab2) )
+	ROM_LOAD16_BYTE( "epr-10169.24", 0x020001, 0x8000, CRC(9c57d613) SHA1(cdfaf92b5f44a66ccd6267e0221e4d9ada924e2e) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-7388.95",  0x00000, 0x08000, CRC(8eb02f6b) SHA1(80511b944b57541669010bd5a0ca52bc98eabd62) )
+	ROM_LOAD( "epr-7389.94",  0x08000, 0x08000, CRC(2f4f71b8) SHA1(ceb39e95cd43904b8e4f89c7227491e139fb3ca6) )
+	ROM_LOAD( "epr-7390.93",  0x10000, 0x08000, CRC(d90609c6) SHA1(4232f6ecb21f242c0c8d81e06b88bc742668609f) )
+
+	ROM_REGION16_BE( 0x30000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-7392.10",  0x00001, 0x8000, CRC(5bb7c8b6) SHA1(eaa0ed63ac4f66ee285757e842bdd7b005292600) )
+	ROM_LOAD16_BYTE( "epr-7396.11",  0x00000, 0x8000, CRC(74ae4b57) SHA1(1f24b1faea765994b85f0e7ac8e944c8da22103f) )
+	ROM_LOAD16_BYTE( "epr-7393.17",  0x10001, 0x8000, CRC(14fc7e82) SHA1(ca7caca989a3577dd30ad4f66b0fcce712a454ef) )
+	ROM_LOAD16_BYTE( "epr-7397.18",  0x10000, 0x8000, CRC(e05a1e25) SHA1(9691d9f0763b7483ee6912437902f22ab4b78a05) )
+	ROM_LOAD16_BYTE( "epr-7394.23",  0x20001, 0x8000, CRC(531ca13f) SHA1(19e68bc515f6021e1145cff4f3f0e083839ee8f3) )
+	ROM_LOAD16_BYTE( "epr-7398.24",  0x20000, 0x8000, CRC(68807b49) SHA1(0a189da8cdd2090e76d6d06c55b478abce60542d) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-7535a.12", 0x0000, 0x8000, CRC(bc1374fa) SHA1(ed2c87ae024dc251e175239f1bccc728fc096548) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-0016.key", 0x0000, 0x2000, BAD_DUMP CRC(16869a2c) SHA1(112b044d0b1b76620a7d75d6f4c4a16eca37e343) ) // hand-crafted?
+ROM_END
+
 
 ROM_START( fantzonepr )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -3962,6 +3995,7 @@ GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,        seg
 GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (317-5000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, fantzonee,  fantzone, system16a_fd1089b_no7751, fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (FD1089B 317-0016)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad / missing gfx ROMs
 
 GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a,      segas16a_state,            init_passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A) (FD1094 317-0071)", MACHINE_SUPPORTS_SAVE )
