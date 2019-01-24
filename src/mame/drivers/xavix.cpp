@@ -430,26 +430,6 @@ void xavix_state::superxavix_lowbus_map(address_map &map)
 
 
 
-CUSTOM_INPUT_MEMBER(xavix_i2c_state::i2c_r)
-{
-	return m_i2cmem->read_sda();
-}
-
-CUSTOM_INPUT_MEMBER(xavix_i2c_cart_state::i2c_r)
-{
-	return m_i2cmem->read_sda();
-}
-
-CUSTOM_INPUT_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
-{
-	return machine().rand();
-}
-
-CUSTOM_INPUT_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
-{
-	return machine().rand();
-}
-
 static INPUT_PORTS_START( xavix )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x00, "IN0" )
@@ -785,8 +765,8 @@ static INPUT_PORTS_START( ekara )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) // multiplexed input
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) // multiplexed input
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_ekara_state,ekara_multi0_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_ekara_state,ekara_multi1_r, nullptr)
 
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
 

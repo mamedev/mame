@@ -488,6 +488,63 @@ WRITE8_MEMBER(xavix_state::dispctrl_posirq_y_w)
 
 /* Per Game IO port callbacks */
 
+
+CUSTOM_INPUT_MEMBER(xavix_i2c_state::i2c_r)
+{
+	return m_i2cmem->read_sda();
+}
+
+CUSTOM_INPUT_MEMBER(xavix_i2c_cart_state::i2c_r)
+{
+	return m_i2cmem->read_sda();
+}
+
+CUSTOM_INPUT_MEMBER(xavix_i2c_lotr_state::camera_r) // seems to be some kind of camera status bits
+{
+	return machine().rand();
+}
+
+CUSTOM_INPUT_MEMBER(xavix_i2c_bowl_state::camera_r) // seems to be some kind of camera status bits
+{
+	return machine().rand();
+}
+
+CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi0_r)
+{
+	switch (m_extraioselect & 0x7f)
+	{
+	case 0x01: return (m_extra0->read() & 0x01) >> 0; break;
+	case 0x02: return (m_extra0->read() & 0x04) >> 2; break;
+	case 0x04: return (m_extra0->read() & 0x10) >> 4; break;
+	case 0x08: return (m_extra0->read() & 0x40) >> 6; break;
+	case 0x10: return (m_extra1->read() & 0x01) >> 0; break;
+	case 0x20: return (m_extra1->read() & 0x04) >> 2; break;
+	case 0x40: return (m_extra1->read() & 0x10) >> 4; break;
+	default:
+		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
+		return 0x00;
+	}
+	return 0x00;
+}
+
+CUSTOM_INPUT_MEMBER(xavix_ekara_state::ekara_multi1_r)
+{
+	switch (m_extraioselect & 0x7f)
+	{
+	case 0x01: return (m_extra0->read() & 0x02) >> 1;
+	case 0x02: return (m_extra0->read() & 0x08) >> 3;
+	case 0x04: return (m_extra0->read() & 0x20) >> 5;
+	case 0x08: return (m_extra0->read() & 0x80) >> 7;
+	case 0x10: return (m_extra1->read() & 0x02) >> 1;
+	case 0x20: return (m_extra1->read() & 0x08) >> 3;
+	case 0x40: return (m_extra1->read() & 0x20) >> 5;
+	default:
+		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
+		return 0x00;
+	}
+	return 0x00;
+}
+
 uint8_t xavix_state::read_io0(uint8_t direction)
 {
 	// no special handling
@@ -542,55 +599,6 @@ void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 	{
 		m_i2cmem->write_scl((data & 0x10) >> 4);
 	}
-}
-
-
-
-uint8_t xavix_ekara_state::read_io1(uint8_t direction)
-{
-	uint8_t extrainlatch0 = 0x00;
-	uint8_t extrainlatch1 = 0x00;
-
-	switch (m_extraioselect & 0x7f)
-	{
-	case 0x01:
-		extrainlatch0 = (m_extra0->read() & 0x01) >> 0;
-		extrainlatch1 = (m_extra0->read() & 0x02) >> 1;
-		break;
-	case 0x02:
-		extrainlatch0 = (m_extra0->read() & 0x04) >> 2;
-		extrainlatch1 = (m_extra0->read() & 0x08) >> 3;
-		break;
-	case 0x04:
-		extrainlatch0 = (m_extra0->read() & 0x10) >> 4;
-		extrainlatch1 = (m_extra0->read() & 0x20) >> 5;
-		break;
-	case 0x08:
-		extrainlatch0 = (m_extra0->read() & 0x40) >> 6;
-		extrainlatch1 = (m_extra0->read() & 0x80) >> 7;
-		break;
-	case 0x10:
-		extrainlatch0 = (m_extra1->read() & 0x01) >> 0;
-		extrainlatch1 = (m_extra1->read() & 0x02) >> 1;
-		break;
-	case 0x20:
-		extrainlatch0 = (m_extra1->read() & 0x04) >> 2;
-		extrainlatch1 = (m_extra1->read() & 0x08) >> 3;
-		break;
-	case 0x40:
-		extrainlatch0 = (m_extra1->read() & 0x10) >> 4;
-		extrainlatch1 = (m_extra1->read() & 0x20) >> 5;
-		break;
-	default:
-		LOG("latching inputs with invalid m_extraioselect value of %02x\n", m_extraioselect);
-		break;
-	}
-
-	uint8_t ret = m_in1->read();
-	ret &= 0xfc;
-	ret |= extrainlatch0 << 0;
-	ret |= extrainlatch1 << 1;
-	return ret;
 }
 
 void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)

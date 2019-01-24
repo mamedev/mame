@@ -884,6 +884,9 @@ public:
 		m_extraiowrite(0)
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi1_r);
+
 //	void xavix_ekara(machine_config &config);
 
 protected:
@@ -891,7 +894,6 @@ protected:
 	required_ioport m_extra0;
 	required_ioport m_extra1;
 
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io0(uint8_t data, uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
