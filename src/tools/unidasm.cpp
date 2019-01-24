@@ -300,7 +300,7 @@ struct options
 
 static const dasm_table_entry dasm_table[] =
 {
-	{ "8x300",           be,  0, []() -> util::disasm_interface * { return new n8x300_disassembler; } },
+	{ "8x300",           be, -1, []() -> util::disasm_interface * { return new n8x300_disassembler; } },
 	{ "adsp21xx",        le, -2, []() -> util::disasm_interface * { return new adsp21xx_disassembler; } },
 	{ "alpha",           le,  0, []() -> util::disasm_interface * { return new alpha_disassembler; } },
 	{ "alpha8201",       le,  0, []() -> util::disasm_interface * { return new alpha8201_disassembler; } },
