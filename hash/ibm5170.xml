@@ -8543,6 +8543,20 @@
 		</part>
 	</software>
 
+	<software name="cischeat">
+		<!-- Dumped via Kryoflux -->
+		<description>Cisco Heat - All American Police Car Race</description>
+		<year>1991</year>
+		<publisher>Image Works</publisher>
+		<info name="developer" value="Jaleco" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2153384">
+				<rom name="Cisco Heat [Image Works] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2153384" crc="07c98b52" sha1="dc195a57fb7ca8289e803c4f9173d17be72518ef" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wincr2">
 		<!-- converted from DDI format -->
 		<description>Classic Road 2</description>
@@ -10440,6 +10454,20 @@
 			<feature name="part_id" value="Disk 8" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="King's Quest V - Absence Makes the Heart Go Yonder! (USA) (Re-release) (Disk 8).img" size="1228800" crc="99a71113" sha1="3d68e348c5412b78174c54c558a4cca11de053ef" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemmings">
+		<!-- Dumped via Kryoflux -->
+		<description>Lemmings</description>
+		<year>1991</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="DMA Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Copy-protected key disk -->
+			<dataarea name="flop" size = "2181136">
+				<rom name="Lemmings [Psygnosis] [1991] [3.5DD] [Disk 1 of 1].mfm" size="2181136" crc="82b47a9b" sha1="7f0912d798c97a56ac8eea1f87caa20cc2044b94" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
