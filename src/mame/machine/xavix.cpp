@@ -510,14 +510,6 @@ void xavix_state::write_io1(uint8_t data, uint8_t direction)
 	// no special handling
 }
 
-uint8_t xavix_i2c_state::read_io1(uint8_t direction)
-{
-	uint8_t ret = m_in1->read();
-	ret &= ~0x08;
-	ret |= (m_i2cmem->read_sda() & 1) << 3;
-	return ret;
-}
-
 void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 {
 	// ignore these writes so that epo_edfx can send read requests to the ee-prom and doesn't just report an error
@@ -539,14 +531,6 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 }
 
 // for taikodp
-uint8_t xavix_i2c_cart_state::read_io1(uint8_t direction)
-{
-	uint8_t ret = m_in1->read();
-	ret &= ~0x08;
-	ret |= (m_i2cmem->read_sda() & 1) << 3;
-	return ret;
-}
-
 void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
 	if (direction & 0x08)
@@ -561,19 +545,6 @@ void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 }
 
 
-uint8_t xavix_i2c_lotr_state::read_io1(uint8_t direction)
-{
-	uint8_t ret = m_in1->read();
-
-	// some kind of comms with the IR sensor?
-	ret ^= (machine().rand() & 0x02);
-	ret ^= (machine().rand() & 0x04);
-
-	ret &= ~0x08;
-	ret |= (m_i2cmem->read_sda() & 1) << 3;
-
-	return ret;
-}
 
 uint8_t xavix_ekara_state::read_io1(uint8_t direction)
 {

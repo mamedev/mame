@@ -608,8 +608,10 @@ public:
 		hackaddress1 = 0x958a;
 		hackaddress2 = 0x8524;
 	}
+
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
@@ -642,9 +644,20 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
+};
+
+class xavix_i2c_bowl_state : public xavix_i2c_state
+{
+public:
+	xavix_i2c_bowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(camera_r);
 };
 
 
@@ -851,8 +864,9 @@ public:
 
 	void xavix_i2c_taiko(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(i2c_r);
+
 protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
