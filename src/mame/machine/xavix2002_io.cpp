@@ -59,7 +59,6 @@ WRITE8_MEMBER(xavix2002_io_device::pio_dir_w)
 READ8_MEMBER(xavix2002_io_device::pio_dir_r)
 {
 	LOG("%s: superxavix pio_dir_r (port %d)\n", machine().describe_context(), offset);
-
 	uint8_t ret = 0x00;
 
 	if (offset < 3)
@@ -78,20 +77,33 @@ WRITE8_MEMBER(xavix2002_io_device::pio_out_w)
 	{
 		m_sx_pio_out[offset] = data;
 
-		// look at direction register and output
+		// TODO: look at direction register
+
+		uint8_t outdata = m_sx_pio_out[offset];
+
+		switch (offset)
+		{
+			case 0: m_out0_cb(space,0,outdata); break;
+			case 1: m_out1_cb(space,0,outdata); break;
+			case 2: m_out2_cb(space,0,outdata); break;
+			default: break;
+		}
 	}
 }
 
 READ8_MEMBER(xavix2002_io_device::pio_out_r)
 {
+	// what does this actually read?
+
 	LOG("%s: superxavix pio_out_r (port %d)\n", machine().describe_context(), offset);
+	return 0x00;
 
-	uint8_t ret = 0x00;
+//	uint8_t ret = 0x00;
 
-	if (offset<3)
-		ret = m_sx_pio_out[offset];
+//	if (offset<3)
+//		ret = m_sx_pio_out[offset];
 
-	return ret;
+//	return ret;
 }
 	
 

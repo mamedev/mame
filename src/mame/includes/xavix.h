@@ -568,11 +568,12 @@ private:
 
 	required_device<xavix_sound_device> m_sound;
 
-	optional_device<xavix2002_io_device> m_xavix2002io;
 
 	DECLARE_READ8_MEMBER(sound_regram_read_cb);
 
 protected:
+	optional_device<xavix2002_io_device> m_xavix2002io;
+
 	// additional SuperXaviX / XaviX2002 stuff
 
 	uint8_t m_sx_extended_extbus[3];
@@ -621,19 +622,22 @@ private:
 	int hackaddress2;
 };
 
-class xavix_i2c_jmat_state : public xavix_state
+class xavix_i2c_jmat_state : public xavix_i2c_state
 {
 public:
 	xavix_i2c_jmat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_state(mconfig, type, tag),
-		m_i2cmem(*this, "i2cmem")
+		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
 	void xavix2002_i2c_jmat(machine_config &config);
 
 private:
-
-	required_device<i2cmem_device> m_i2cmem;
+	READ8_MEMBER(read_extended_io0);
+	READ8_MEMBER(read_extended_io1);
+	READ8_MEMBER(read_extended_io2);
+	WRITE8_MEMBER(write_extended_io0);
+	WRITE8_MEMBER(write_extended_io1);
+	WRITE8_MEMBER(write_extended_io2);
 };
 
 

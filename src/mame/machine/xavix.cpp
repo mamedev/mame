@@ -590,15 +590,8 @@ void xavix_i2c_state::write_io1(uint8_t data, uint8_t direction)
 // for taikodp
 void xavix_i2c_cart_state::write_io1(uint8_t data, uint8_t direction)
 {
-	if (direction & 0x08)
-	{
-		m_i2cmem->write_sda((data & 0x08) >> 3);
-	}
-
-	if (direction & 0x10)
-	{
-		m_i2cmem->write_scl((data & 0x10) >> 4);
-	}
+	m_i2cmem->write_sda((data & 0x08) >> 3);
+	m_i2cmem->write_scl((data & 0x10) >> 4);
 }
 
 void xavix_ekara_state::write_io0(uint8_t data, uint8_t direction)
@@ -612,6 +605,36 @@ void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 	uint8_t extraiowrite = data & direction;
 	m_extraiowrite = extraiowrite;
 }
+
+/* SuperXavix IO port handliner (per game) */
+
+READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io0)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io1)
+{
+	return 0x00;
+}
+
+READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io2)
+{
+	return 0x00;
+}
+
+WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io0)
+{
+}
+
+WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io1)
+{
+}
+
+WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io2)
+{
+}
+
 
 /* General IO port handling */
 
