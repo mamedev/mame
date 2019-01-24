@@ -3942,6 +3942,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/testpat.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1983.cpp",
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
+	MAME_DIR .. "src/mame/drivers/palestra.cpp",
+	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
 }
 
 end
