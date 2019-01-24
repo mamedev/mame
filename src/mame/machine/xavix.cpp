@@ -610,29 +610,42 @@ void xavix_ekara_state::write_io1(uint8_t data, uint8_t direction)
 
 READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io0)
 {
+	LOG("%s: read_extended_io0\n", machine().describe_context());
 	return 0x00;
 }
 
 READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io1)
 {
-	return 0x00;
+	LOG("%s: read_extended_io1\n", machine().describe_context());
+	
+	// reads this by reading the byte, then shifting right 4 times to place value into carry flag
+	return m_i2cmem->read_sda() << 3;
+	//return 0x00;
 }
 
 READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io2)
 {
+	LOG("%s: read_extended_io2\n", machine().describe_context());
 	return 0x00;
 }
 
 WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io0)
 {
+	LOG("%s: io0_data_w %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io1)
 {
+	LOG("%s: io1_data_w %02x\n", machine().describe_context(), data);
+
+	m_i2cmem->write_sda((data & 0x08) >> 3);
+	m_i2cmem->write_scl((data & 0x10) >> 4);
+
 }
 
 WRITE8_MEMBER(xavix_i2c_jmat_state::write_extended_io2)
 {
+	LOG("%s: io2_data_w %02x\n", machine().describe_context(), data);
 }
 
 
