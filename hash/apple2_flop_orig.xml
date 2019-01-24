@@ -3,7 +3,7 @@
 
 <softwarelist name="apple2_flop_orig" description="Apple II 5.25 Original disks">
 
-  <software name="agusawoz">
+  <software name="agentusa">
     <description>Agent USA</description>
     <year>1984</year>
     <publisher>Scholastic</publisher>
@@ -18,7 +18,7 @@
     </part>
   </software>
 
-  <software name="arhrtwoz">
+  <software name="airheart">
     <description>Airheart</description>
     <year>1986</year>
     <publisher>Broderbund Software</publisher>
@@ -33,7 +33,7 @@
     </part>
   </software>
 
-  <software name="aambhwoz">
+  <software name="alambush">
     <description>Alien Ambush</description>
     <year>1981</year>
     <publisher>Micro Distributors</publisher>
@@ -48,7 +48,7 @@
     </part>
   </software>
 
-  <software name="ankhwoz">
+  <software name="ankh">
     <description>Ankh</description>
     <year>1983</year>
     <publisher>Datamost</publisher>
@@ -63,7 +63,7 @@
     </part>
   </software>
 
-  <software name="apcspwoz">
+  <software name="aplcdspd">
     <description>Apple Cider Spider</description>
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
@@ -78,7 +78,7 @@
     </part>
   </software>
 
-  <software name="agalxwoz">
+  <software name="agalxian">
     <description>Apple Galaxian</description>
     <year>1980</year>
     <publisher>Broderbund Software</publisher>
@@ -93,7 +93,7 @@
     </part>
   </software>
 
-  <software name="aquatwoz">
+  <software name="aquatron">
     <description>Aquatron</description>
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
@@ -108,7 +108,7 @@
     </part>
   </software>
 
-  <software name="archnwoz">
+  <software name="archon">
     <description>Archon: The Light and The Dark</description>
     <year>1984</year>
     <publisher>Electronic Arts</publisher>
@@ -123,7 +123,7 @@
     </part>
   </software>
 
-  <software name="ardyawoz">
+  <software name="ardyardv">
     <description>Ardy the Aardvark</description>
     <year>1983</year>
     <publisher>Datamost</publisher>
@@ -138,7 +138,7 @@
     </part>
   </software>
 
-  <software name="autobwoz">
+  <software name="autobahn">
     <description>Autobahn</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -153,7 +153,7 @@
     </part>
   </software>
 
-  <software name="axisawoz">
+  <software name="axisassn">
     <description>Axis Assassin</description>
     <year>1982</year>
     <publisher>Electronic Arts</publisher>
@@ -168,7 +168,7 @@
     </part>
   </software>
 
-  <software name="aztecwoz">
+  <software name="aztec">
     <description>Aztec</description>
     <year>1982</year>
     <publisher>Datamost</publisher>
@@ -183,7 +183,7 @@
     </part>
   </software>
 
-  <software name="bdudewoz">
+  <software name="baddudes">
     <description>Bad Dudes</description>
     <year>1988</year>
     <publisher>Data East USA</publisher>
@@ -206,7 +206,7 @@
     </part>
   </software>
 
-  <software name="blblzwoz">
+  <software name="ballblaz">
     <description>Ballblazer</description>
     <year>1985</year>
     <publisher>Epyx</publisher>
@@ -221,7 +221,7 @@
     </part>
   </software>
 
-  <software name="batmnwoz">
+  <software name="batman">
     <description>Batman: The Caped Crusader</description>
     <year>1985</year>
     <publisher>Data East USA</publisher>
@@ -243,7 +243,7 @@
     </part>
   </software>
 
-  <software name="bcqftwoz">
+  <software name="bcqft">
     <description>BC's Quest for Tires</description>
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
@@ -258,7 +258,7 @@
     </part>
   </software>
 
-  <software name="bellhpwz">
+  <software name="bellhop">
     <description>Bellhop</description>
     <year>1982</year>
     <publisher>Hayden Book Company</publisher>
@@ -273,7 +273,7 @@
     </part>
   </software>
 
-  <software name="belrtwoz">
+  <software name="belwrt">
     <description>Below the Root</description>
     <year>1984</year>
     <publisher>Hayden Book Company</publisher>
@@ -295,7 +295,7 @@
     </part>
   </software>
 
-  <software name="tbilewoz">
+  <software name="bilestod">
     <description>The Bilestoad</description>
     <year>1983</year>
     <publisher>Datamost</publisher>
@@ -310,7 +310,7 @@
     </part>
   </software>
 
-  <software name="bgbatwoz">
+  <software name="bugbattl">
     <description>Bug Battle</description>
     <year>1982</year>
     <publisher>United Software of America</publisher>
@@ -325,7 +325,7 @@
     </part>
   </software>
 
-  <software name="cbbltwoz">
+  <software name="canbalbz">
     <description>Cannonball Blitz</description>
     <year>1982</year>
     <publisher>On-Line Systems</publisher>
@@ -340,7 +340,7 @@
     </part>
   </software>
 
-  <software name="cavocwoz">
+  <software name="cvrncsto">
     <description>Caverns of Callisto</description>
     <year>1983</year>
     <publisher>Origin Systems</publisher>
@@ -355,7 +355,7 @@
     </part>
   </software>
 
-  <software name="czerowoz">
+  <software name="ceilzero">
     <description>Ceiling Zero</description>
     <year>1981</year>
     <publisher>Turnkey Software</publisher>
@@ -370,7 +370,7 @@
     </part>
   </software>
 
-  <software name="centiwoz">
+  <software name="centiped">
     <description>Centipede</description>
     <year>1983</year>
     <publisher>Atarisoft</publisher>
@@ -385,7 +385,7 @@
     </part>
   </software>
 
-  <software name="comndowz">
+  <software name="commando">
     <description>Commando</description>
     <year>1987</year>
     <publisher>Data East USA</publisher>
@@ -400,7 +400,7 @@
     </part>
   </software>
 
-  <software name="cbongwoz">
+  <software name="congobng">
     <description>Congo Bongo</description>
     <year>1987</year>
     <publisher>SEGA Enterprises</publisher>
@@ -415,7 +415,7 @@
     </part>
   </software>
 
-  <software name="conqwwoz">
+  <software name="cnqwrlds">
     <description>Conquering Worlds</description>
     <year>1983</year>
     <publisher>Datamost</publisher>
@@ -430,7 +430,7 @@
     </part>
   </software>
 
-  <software name="coptswoz">
+  <software name="cptsrbrs">
     <description>Copts and Robbers</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -445,7 +445,7 @@
     </part>
   </software>
 
-  <software name="cfairwoz">
+  <software name="counfair">
     <description>County Fair</description>
     <year>1981</year>
     <publisher>Datamost</publisher>
@@ -460,7 +460,7 @@
     </part>
   </software>
 
-  <software name="cmazewoz">
+  <software name="crmazey">
     <description>Crazy Mazey</description>
     <year>1982</year>
     <publisher>Datamost</publisher>
@@ -475,7 +475,7 @@
     </part>
   </software>
 
-  <software name="crismwoz">
+  <software name="crismntn">
     <description>Crisis Mountain</description>
     <year>1982</year>
     <publisher>Micro Fun</publisher>
@@ -490,7 +490,7 @@
     </part>
   </software>
 
-  <software name="crosfwoz">
+  <software name="crosfire">
     <description>Crossfire</description>
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
@@ -505,7 +505,7 @@
     </part>
   </software>
 
-  <software name="cubitwoz">
+  <software name="cubit">
     <description>Cubit</description>
     <year>1983</year>
     <publisher>Micromax</publisher>
@@ -520,7 +520,7 @@
     </part>
   </software>
 
-  <software name="cstrkwoz">
+  <software name="cybrstrk">
     <description>Cyber Strike</description>
     <year>1980</year>
     <publisher>Sirius Software</publisher>
@@ -535,7 +535,7 @@
     </part>
   </software>
 
-  <software name="tdambwoz">
+  <software name="dambstrs">
     <description>The Dam Busters</description>
     <year>1985</year>
     <publisher>Accolade</publisher>
@@ -550,7 +550,7 @@
     </part>
   </software>
 
-  <software name="dswrdwoz">
+  <software name="deathswd">
     <description>Death Sword</description>
     <year>1987</year>
     <publisher>Epyx</publisher>
@@ -565,7 +565,22 @@
     </part>
   </software>
 
-  <software name="dstrywoz">
+  <software name="stargate">
+    <description>Defender II: Stargate</description>
+    <year>1983</year>
+    <publisher>Atarisoft</publisher>
+    <info name="release" value="2019-01-13"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+    <!-- It runs on any Apple II with 48K. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233447">
+        <rom name="stargate.woz" size="233447" crc="379d894d" sha1="56d17415d622395bddbe7200adde32f4ad63b208" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="destroyr">
     <description>Destroyer</description>
     <year>1986</year>
     <publisher>Epyx</publisher>
@@ -580,7 +595,7 @@
     </part>
   </software>
 
-  <software name="deggswoz">
+  <software name="dinoeggs">
     <description>Dino Eggs</description>
     <year>1983</year>
     <publisher>Micro Fun</publisher>
@@ -595,7 +610,7 @@
     </part>
   </software>
 
-  <software name="dbombwoz">
+  <software name="divebmbr">
     <description>Dive Bomber</description>
     <year>1988</year>
     <publisher>Epyx</publisher>
@@ -610,7 +625,7 @@
     </part>
   </software>
 
-  <software name="dkongwoz">
+  <software name="dkong">
     <description>Donkey Kong</description>
     <year>1983</year>
     <publisher>Atarisoft</publisher>
@@ -625,7 +640,7 @@
     </part>
   </software>
 
-  <software name="drolwoz">
+  <software name="drol">
     <description>Drol</description>
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
@@ -640,7 +655,7 @@
     </part>
   </software>
 
-  <software name="dbeetwoz">
+  <software name="dungbeet">
     <description>Dung Beetles</description>
     <year>1982</year>
     <publisher>Datasoft</publisher>
@@ -655,7 +670,7 @@
     </part>
   </software>
 
-  <software name="teidowoz">
+  <software name="teidolon">
     <description>The Eidolon</description>
     <year>1985</year>
     <publisher>Epyx</publisher>
@@ -670,7 +685,7 @@
     </part>
   </software>
 
-  <software name="epochwoz">
+  <software name="epoch">
     <description>Epoch</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -685,7 +700,7 @@
     </part>
   </software>
 
-  <software name="flcnswoz">
+  <software name="falcons">
     <description>Falcons</description>
     <year>1981</year>
     <publisher>Piccadilly Software</publisher>
@@ -701,7 +716,7 @@
   </software>
 
 
-  <software name="fnghtwoz">
+  <software name="fnight">
     <description>Fight Night</description>
     <year>1985</year>
     <publisher>Accolade</publisher>
@@ -716,7 +731,7 @@
     </part>
   </software>
 
-  <software name="fs2v20wz">
+  <software name="fs2v20">
     <description>Flight Simulator II (v2.0)</description>
     <year>1985</year>
     <publisher>Accolade</publisher>
@@ -731,7 +746,7 @@
     </part>
   </software>
 
-  <software name="floutwoz">
+  <software name="flipout">
     <description>Flip Out</description>
     <year>1982</year>
     <publisher>Sirius Software</publisher>
@@ -761,7 +776,7 @@
     </part>
   </software>
 
-  <software name="f1rcrwoz">
+  <software name="f1racer">
     <description>Formula 1 Racer</description>
     <year>1983</year>
     <publisher>Gentry Software</publisher>
@@ -776,7 +791,7 @@
     </part>
   </software>
 
-  <software name="ffallwoz">
+  <software name="freefall">
     <description>Free Fall</description>
     <year>1982</year>
     <publisher>Sirius Software</publisher>
@@ -791,7 +806,7 @@
     </part>
   </software>
 
-  <software name="frogrwoz">
+  <software name="frogger">
     <description>Frogger</description>
     <year>1981</year>
     <publisher>Sierra On-Line</publisher>
@@ -808,8 +823,8 @@
     </part>
   </software>
 
-  <software name="frog2woz">
-    <description>Frogger II</description>
+  <software name="frogger2">
+    <description>Frogger II: Threedeep</description>
     <year>1984</year>
     <publisher>SEGA Enterprises</publisher>
     <info name="release" value="2018-12-21"/>
@@ -823,7 +838,7 @@
     </part>
   </software>
 
-  <software name="gijoewoz">
+  <software name="gijoe">
     <description>G.I. Joe</description>
     <year>1985</year>
     <publisher>Epyx</publisher>
@@ -845,7 +860,7 @@
     </part>
   </software>
 
-  <software name="tgsewoz">
+  <software name="tgsumed">
     <description>The Games - Summer Edition</description>
     <year>1988</year>
     <publisher>Epyx</publisher>
@@ -881,7 +896,7 @@
     </part>
   </software>
 
-  <software name="gatowoz">
+  <software name="gato">
     <description>GATO</description>
     <year>1985</year>
     <publisher>Spectrum Holobyte</publisher>
@@ -896,7 +911,7 @@
     </part>
   </software>
 
-  <software name="gdrftwoz">
+  <software name="gendrift">
     <description>Genetic Drift</description>
     <year>1981</year>
     <publisher>Broderbund Software</publisher>
@@ -913,7 +928,7 @@
     </part>
   </software>
 
-  <software name="gbblrwoz">
+  <software name="gobbler">
     <description>Gobbler</description>
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
@@ -928,7 +943,7 @@
     </part>
   </software>
 
-  <software name="gooniewz">
+  <software name="goonies">
     <description>The Goonies</description>
     <year>1985</year>
     <publisher>Datasoft</publisher>
@@ -943,7 +958,7 @@
     </part>
   </software>
 
-  <software name="gumblwoz">
+  <software name="gumball">
     <description>Gumball</description>
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
@@ -958,7 +973,7 @@
     </part>
   </software>
 
-  <software name="heistwoz">
+  <software name="heist">
     <description>The Heist</description>
     <year>1983</year>
     <publisher>Micro Fun</publisher>
@@ -973,7 +988,7 @@
     </part>
   </software>
 
-  <software name="herowoz">
+  <software name="hero">
     <description>HERO - Helicopter Emergency Rescue Operation</description>
     <year>1983</year>
     <publisher>Activision</publisher>
@@ -988,7 +1003,7 @@
     </part>
   </software>
 
-  <software name="hadrnwoz">
+  <software name="hadron">
     <description>Hadron</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -1003,7 +1018,7 @@
     </part>
   </software>
 
-  <software name="hhmackwz">
+  <software name="hhmack">
     <description>Hard Hat Mack</description>
     <year>1983</year>
     <publisher>Electronic Arts</publisher>
@@ -1017,7 +1032,7 @@
     </part>
   </software>
 
-  <software name="hrdblwoz">
+  <software name="hardball">
     <description>Hardball</description>
     <year>1985</year>
     <publisher>Accolade</publisher>
@@ -1032,7 +1047,7 @@
     </part>
   </software>
 
-  <software name="hedonwoz">
+  <software name="headon">
     <description>Head On</description>
     <year>1980</year>
     <publisher>California Pacific Computers</publisher>
@@ -1047,7 +1062,7 @@
     </part>
   </software>
 
-  <software name="hghrswoz">
+  <software name="highrise">
     <description>High Rise</description>
     <year>1983</year>
     <publisher>Micro Fun</publisher>
@@ -1062,7 +1077,7 @@
     </part>
   </software>
 
-  <software name="ikariwoz">
+  <software name="ikari">
     <description>Ikari Warriors</description>
     <year>1983</year>
     <publisher>Data East USA</publisher>
@@ -1084,7 +1099,7 @@
     </part>
   </software>
 
-  <software name="ik2vrwoz">
+  <software name="victroad">
     <description>Ikari Warriors 2: Victory Road</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -1106,7 +1121,7 @@
     </part>
   </software>
 
-<software name="igrprwoz">
+<software name="igprix">
     <description>International Gran Prix</description>
     <year>1982</year>
     <publisher>MUSE Software</publisher>
@@ -1121,7 +1136,7 @@
     </part>
   </software>
 
-  <software name="jwbrkwoz">
+  <software name="jawbrekr">
     <description>Jawbreaker</description>
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
@@ -1136,7 +1151,7 @@
     </part>
   </software>
 
-  <software name="jwbk2woz">
+  <software name="jawbrkr2">
     <description>Jawbreaker ][</description>
     <year>1982</year>
     <publisher>Sierra On-Line</publisher>
@@ -1153,7 +1168,7 @@
     </part>
   </software>
 
-  <software name="tjetwoz">
+  <software name="thejet">
     <description>The Jet</description>
     <year>1986</year>
     <publisher>subLOGIC</publisher>
@@ -1168,7 +1183,7 @@
     </part>
   </software>
 
-  <software name="joustwoz">
+  <software name="joust">
     <description>Joust</description>
     <year>1983</year>
     <publisher>Atarisoft</publisher>
@@ -1183,7 +1198,7 @@
     </part>
   </software>
 
-  <software name="1on1woz">
+  <software name="1on1">
     <description>Julius Erving and Larry Bird Go One on One</description>
     <year>1983</year>
     <publisher>Electronic Arts</publisher>
@@ -1198,7 +1213,7 @@
     </part>
   </software>
 
-  <software name="jhuntwoz">
+  <software name="junghunt">
     <description>Jungle Hunt</description>
     <year>1984</year>
     <publisher>Atarisoft</publisher>
@@ -1213,7 +1228,7 @@
     </part>
   </software>
 
-  <software name="kchmpwoz">
+  <software name="krtechm">
     <description>Karate Champ</description>
     <year>1985</year>
     <publisher>Data East</publisher>
@@ -1228,7 +1243,7 @@
     </part>
   </software>
 
-  <software name="krtkawoz">
+  <software name="karateka">
     <description>Karateka</description>
     <year>1984</year>
     <publisher>Broderbund Software</publisher>
@@ -1252,7 +1267,7 @@
     </part>
   </software>
 
-  <software name="kdnkiwoz">
+  <software name="kidniki">
     <description>Kid Niki</description>
     <year>1987</year>
     <publisher>Data East</publisher>
@@ -1274,7 +1289,7 @@
     </part>
   </software>
 
-  <software name="kngfmwoz">
+  <software name="kungfum">
     <description>Kung Fu Master</description>
     <year>1985</year>
     <publisher>Data East</publisher>
@@ -1289,7 +1304,7 @@
     </part>
   </software>
 
-  <software name="lacrkwoz">
+  <software name="lacrkdwn">
     <description>L.A. Crackdown</description>
     <year>1988</year>
     <publisher>Epyx</publisher>
@@ -1311,7 +1326,7 @@
     </part>
   </software>
 
-  <software name="lsttwoz">
+  <software name="losttomb">
     <description>Lost Tomb</description>
     <year>1984</year>
     <publisher>Datasoft</publisher>
@@ -1326,7 +1341,7 @@
     </part>
   </software>
 
-  <software name="maradwoz">
+  <software name="marauder">
     <description>Marauder</description>
     <year>1982</year>
     <publisher>On-Line Systems</publisher>
@@ -1341,7 +1356,7 @@
     </part>
   </software>
 
-  <software name="mmadnwoz">
+  <software name="marble">
     <description>Marble Madness</description>
     <year>1986</year>
     <publisher>Electronic Arts</publisher>
@@ -1363,7 +1378,7 @@
     </part>
   </software>
 
-  <software name="mrscswoz">
+  <software name="marscars">
     <description>Mars Cars</description>
     <year>1982</year>
     <publisher>Datamost</publisher>
@@ -1378,7 +1393,7 @@
     </part>
   </software>
 
-  <software name="matznwoz">
+  <software name="matezone">
     <description>Mating Zone</description>
     <year>1982</year>
     <publisher>Datamost</publisher>
@@ -1393,7 +1408,7 @@
     </part>
   </software>
 
-  <software name="mgabtwoz">
+  <software name="megabots">
     <description>Megabots</description>
     <year>1986</year>
     <publisher>Neosoft</publisher>
@@ -1408,8 +1423,8 @@
     </part>
   </software>
 
-  <software name="mamgcwoz">
-    <description>Might_and_Magic_-_Disk_A</description>
+  <software name="mightmg1">
+    <description>Might and Magic</description>
     <year>1986</year>
     <publisher>New World Computing</publisher>
     <info name="release" value="2018-09-08"/>
@@ -1442,7 +1457,7 @@
     </part>
   </software>
 
-  <software name="m2049woz">
+  <software name="minr2049">
     <description>Miner 2049er</description>
     <year>1982</year>
     <publisher>Micro Fun</publisher>
@@ -1457,7 +1472,7 @@
     </part>
   </software>
 
-  <software name="minitwoz">
+  <software name="minitman">
     <description>Minit Man</description>
     <year>1983</year>
     <publisher>Penguin Software</publisher>
@@ -1472,7 +1487,7 @@
     </part>
   </software>
 
-  <software name="impm2woz">
+  <software name="impmiss2">
     <description>Impossible Mission II</description>
     <year>1988</year>
     <publisher>Epyx</publisher>
@@ -1494,7 +1509,7 @@
     </part>
   </software>
 
-  <software name="mnmunwoz">
+  <software name="mnymunch">
     <description>Money Muncher</description>
     <year>1982</year>
     <publisher>Datamost</publisher>
@@ -1509,7 +1524,7 @@
     </part>
   </software>
 
-  <software name="mnstswoz">
+  <software name="mnstsmsh">
     <description>Monster Smash</description>
     <year>1983</year>
     <publisher>Datamost</publisher>
@@ -1524,8 +1539,8 @@
     </part>
   </software>
 
-  <software name="montrwoz">
-    <description>Montezumas Revenge</description>
+  <software name="monterev">
+    <description>Montezuma's Revenge</description>
     <year>1984</year>
     <publisher>Parker Brothers</publisher>
     <info name="release" value="2019-01-04"/>
@@ -1539,7 +1554,7 @@
     </part>
   </software>
 
-  <software name="mpatrwoz">
+  <software name="mpatrol">
     <description>Moon Patrol</description>
     <year>1983</year>
     <publisher>Atarisoft</publisher>
@@ -1554,7 +1569,7 @@
     </part>
   </software>
 
-  <software name="movimwoz">
+  <software name="movimons">
     <description>The Movie Monster Game</description>
     <year>1986</year>
     <publisher>Epyx</publisher>
@@ -1576,7 +1591,7 @@
     </part>
   </software>
 
-  <software name="mrrobtwz">
+  <software name="mrrobot">
     <description>Mr. Robot and his Robot Factory</description>
     <year>1984</year>
     <publisher>Datamost</publisher>
@@ -1591,7 +1606,7 @@
     </part>
   </software>
 
-  <software name="mspcmwoz">
+  <software name="mspac">
     <description>Ms. Pac-Man</description>
     <year>1983</year>
     <publisher>Atarisoft</publisher>
@@ -1606,7 +1621,7 @@
     </part>
   </software>
 
-  <software name="nmpinwoz">
+  <software name="nightmsn">
     <description>Night Mission Pinball</description>
     <year>1982</year>
     <publisher>subLOGIC</publisher>
@@ -1621,7 +1636,7 @@
     </part>
   </software>
 
-  <software name="nstlkwoz">
+  <software name="nstalker">
     <description>Night Stalker</description>
     <year>1982</year>
     <publisher>Mattel Electronics</publisher>
@@ -1636,7 +1651,7 @@
     </part>
   </software>
 
-  <software name="orbtnwoz">
+  <software name="orbitron">
     <description>Orbitron</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -1652,7 +1667,7 @@
     </part>
   </software>
 
-  <software name="ormsnewoz">
+  <software name="ormine">
     <description>O'Riley's Mine</description>
     <year>1981</year>
     <publisher>Datasoft</publisher>
@@ -1667,7 +1682,7 @@
     </part>
   </software>
 
-  <software name="opstwoz">
+  <software name="outpost">
     <description>Outpost</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -1682,7 +1697,7 @@
     </part>
   </software>
 
-  <software name="pprboywz">
+  <software name="paperboy">
     <description>Paperboy</description>
     <year>1988</year>
     <publisher>Mindscape</publisher>
@@ -1697,7 +1712,7 @@
     </part>
   </software>
 
-  <software name="ppatrwoz">
+  <software name="pestpatr">
     <description>Pest Patrol</description>
     <year>1982</year>
     <publisher>Sierra On-Line</publisher>
@@ -1713,7 +1728,7 @@
     </part>
   </software>
 
-  <software name="phan5woz">
+  <software name="phantom5">
     <description>Phantoms Five</description>
     <year>1980</year>
     <publisher>Sirius Software</publisher>
@@ -1728,7 +1743,7 @@
     </part>
   </software>
 
-  <software name="pparawoz">
+  <software name="pparanoi">
     <description>Picnic Paranoia</description>
     <year>1982</year>
     <publisher>Synapse Software</publisher>
@@ -1743,7 +1758,7 @@
     </part>
   </software>
 
-  <software name="pfal2woz">
+  <software name="pitfall2">
     <description>Pitfall II: Lost Caverns</description>
     <year>1984</year>
     <publisher>Activision</publisher>
@@ -1758,7 +1773,7 @@
     </part>
   </software>
 
-  <software name="pstp2woz">
+  <software name="pitstop2">
     <description>Pitstop II</description>
     <year>1984</year>
     <publisher>Epyx</publisher>
@@ -1773,7 +1788,7 @@
     </part>
   </software>
 
-  <software name="plnr10wz">
+  <software name="plnflr10">
     <description>Planetfall (r10)</description>
     <year>1988</year>
     <publisher>Infocom</publisher>
@@ -1796,7 +1811,7 @@
     </part>
   </software>
 
-  <software name="plsmnwoz">
+  <software name="plasmnia">
     <description>Plasmania</description>
     <year>1983</year>
     <publisher>Sirius Software</publisher>
@@ -1811,7 +1826,7 @@
     </part>
   </software>
 
-  <software name="pltnwoz">
+  <software name="platoon">
     <description>Platoon</description>
     <year>1988</year>
     <publisher>Data East USA</publisher>
@@ -1833,7 +1848,7 @@
     </part>
   </software>
 
-  <software name="pool15wz">
+  <software name="pool15">
     <description>Pool 1.5</description>
     <year>1981</year>
     <publisher>Innovative Design Software, Inc.</publisher>
@@ -1848,7 +1863,7 @@
     </part>
   </software>
 
-  <software name="pyanwoz">
+  <software name="pooyan">
     <description>Pooyan</description>
     <year>1984</year>
     <publisher>Datasoft</publisher>
@@ -1863,7 +1878,7 @@
     </part>
   </software>
 
-  <software name="propwoz">
+  <software name="pop">
     <description>Prince of Persia</description>
     <year>1989</year>
     <publisher>Broderbund</publisher>
@@ -1885,7 +1900,7 @@
     </part>
   </software>
 
-  <software name="qixwoz">
+  <software name="qix">
     <description>Qix</description>
     <year>1989</year>
     <publisher>Taito America</publisher>
@@ -1900,7 +1915,7 @@
     </part>
   </software>
 
-  <software name="radwrwoz">
+  <software name="radwarr">
     <description>Rad Warrior</description>
     <year>1987</year>
     <publisher>Epyx</publisher>
@@ -1915,7 +1930,7 @@
     </part>
   </software>
 
-  <software name="rmpagewz">
+  <software name="rampage">
     <description>Rampage</description>
     <year>1988</year>
     <publisher>Activision</publisher>
@@ -1930,7 +1945,7 @@
     </part>
   </software>
 
-  <software name="rstblwoz">
+  <software name="rstrblst">
     <description>Raster Blaster</description>
     <year>1981</year>
     <publisher>BudgeCo</publisher>
@@ -1947,7 +1962,7 @@
     </part>
   </software>
 
-  <software name="redalwoz">
+  <software name="redalert">
     <description>Red Alert</description>
     <year>1981</year>
     <publisher>Broderbund</publisher>
@@ -1964,7 +1979,7 @@
     </part>
   </software>
 
-  <software name="reptwoz">
+  <software name="repton">
     <description>Repton</description>
     <year>1982</year>
     <publisher>Sirius Software</publisher>
@@ -1979,7 +1994,7 @@
     </part>
   </software>
 
-  <software name="rescrwoz">
+  <software name="rescraid">
     <description>Rescue Raiders</description>
     <year>1984</year>
     <publisher>Sir-Tech</publisher>
@@ -1994,7 +2009,7 @@
     </part>
   </software>
 
-  <software name="robocwoz">
+  <software name="robocop">
     <description>RoboCop</description>
     <year>1988</year>
     <publisher>Data East USA</publisher>
@@ -2016,7 +2031,7 @@
     </part>
   </software>
 
-  <software name="r2084woz">
+  <software name="robotron">
     <description>Robotron 2084</description>
     <year>1983</year>
     <publisher>Atarisoft</publisher>
@@ -2031,7 +2046,7 @@
     </part>
   </software>
 
-  <software name="raboutwz">
+  <software name="rabout">
     <description>Roundabout</description>
     <year>1983</year>
     <publisher>Datamost</publisher>
@@ -2046,7 +2061,7 @@
     </part>
   </software>
 
-  <software name="sabotwoz">
+  <software name="sabotage">
     <description>Sabotage</description>
     <year>1981</year>
     <publisher>On-Line Systems</publisher>
@@ -2061,7 +2076,7 @@
     </part>
   </software>
 
-  <software name="slghtwoz">
+  <software name="sammyltf">
     <description>Sammy Lightfoot</description>
     <year>1983</year>
     <publisher>Sierra On-Line</publisher>
@@ -2076,7 +2091,7 @@
     </part>
   </software>
 
-  <software name="sarg3woz">
+  <software name="sargon3">
     <description>Sargon III</description>
     <year>1983</year>
     <publisher>Hayden Book Company</publisher>
@@ -2091,7 +2106,7 @@
     </part>
   </software>
 
-  <software name="seadrgwz">
+  <software name="seadragn">
     <description>Sea Dragon</description>
     <year>1982</year>
     <publisher>Adventure International</publisher>
@@ -2106,7 +2121,7 @@
     </part>
   </software>
 
-  <software name="shuflwoz">
+  <software name="shuflbrd">
     <description>Shuffleboard</description>
     <year>1981</year>
     <publisher>IDSI</publisher>
@@ -2121,7 +2136,7 @@
     </part>
   </software>
 
-  <software name="skyfwoz">
+  <software name="skyfox">
     <description>Skyfox</description>
     <year>1984</year>
     <publisher>Electronic Arts</publisher>
@@ -2136,7 +2151,7 @@
     </part>
   </software>
 
-  <software name="snacatwz">
+  <software name="snackatk">
     <description>Snack Attack</description>
     <year>1981</year>
     <publisher>Datamost</publisher>
@@ -2151,7 +2166,7 @@
     </part>
   </software>
 
-  <software name="snkbywoz">
+  <software name="snakebyt">
     <description>Snake Byte</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -2166,7 +2181,7 @@
     </part>
   </software>
 
-  <software name="snkrswoz">
+  <software name="sneakers">
     <description>Sneakers</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -2182,7 +2197,7 @@
   </software>
 
 
-  <software name="seggswoz">
+  <software name="spaceggs">
     <description>Space Eggs</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -2199,7 +2214,7 @@
     </part>
   </software>
 
-  <software name="spqkswoz">
+  <software name="spquarks">
     <description>Space Quarks</description>
     <year>1981</year>
     <publisher>Broderbund Software</publisher>
@@ -2216,7 +2231,7 @@
     </part>
   </software>
 
-  <software name="spchgwoz">
+  <software name="sparechg">
     <description>Spare Change</description>
     <year>1983</year>
     <publisher>Broderbund Software</publisher>
@@ -2231,7 +2246,7 @@
     </part>
   </software>
 
-  <software name="spbotwoz">
+  <software name="spidrbot">
     <description>Spiderbot</description>
     <year>1988</year>
     <publisher>Epyx</publisher>
@@ -2246,7 +2261,7 @@
     </part>
   </software>
 
-  <software name="spindwoz">
+  <software name="spindizy">
     <description>Spindizzy</description>
     <year>1986</year>
     <publisher>Activision</publisher>
@@ -2261,7 +2276,7 @@
     </part>
   </software>
 
-  <software name="spyhtwoz">
+  <software name="spyhunt">
     <description>Spy Hunter</description>
     <year>1983</year>
     <publisher>Bally Midway</publisher>
@@ -2276,7 +2291,7 @@
     </part>
   </software>
 
-  <software name="spysbwoz">
+  <software name="spysback">
     <description>The Spy Strikes Back</description>
     <year>1983</year>
     <publisher>Penguin Software</publisher>
@@ -2291,7 +2306,7 @@
     </part>
   </software>
 
-  <software name="svs3wz">
+  <software name="spyvspy3">
     <description>Spy vs Spy III: Arctic Antics</description>
     <year>1983</year>
     <publisher>Bally Midway</publisher>
@@ -2306,7 +2321,7 @@
     </part>
   </software>
 
-  <software name="sdemswoz">
+  <software name="spydemis">
     <description>Spy's Demise</description>
     <year>1982</year>
     <publisher>Penguin</publisher>
@@ -2321,7 +2336,7 @@
     </part>
   </software>
 
-  <software name="stcrzwoz">
+  <software name="starcrsr">
     <description>Star Cruiser</description>
     <year>1980</year>
     <publisher>Sirius Software</publisher>
@@ -2336,7 +2351,7 @@
     </part>
   </software>
 
-  <software name="sthfwoz">
+  <software name="starthf">
     <description>Star Thief</description>
     <year>1981</year>
     <publisher>Cavalier Computer</publisher>
@@ -2351,22 +2366,7 @@
     </part>
   </software>
 
-  <software name="stargwoz">
-    <description>Stargate</description>
-    <year>1983</year>
-    <publisher>Atarisoft</publisher>
-    <info name="release" value="2019-01-13"/>
-    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-    <!-- It runs on any Apple II with 48K. -->
-
-    <part name="flop1" interface="floppy_5_25">
-      <dataarea name="flop" size="233447">
-        <rom name="stargate.woz" size="233447" crc="379d894d" sha1="56d17415d622395bddbe7200adde32f4ad63b208" offset="0x0000" />
-      </dataarea>
-    </part>
-  </software>
-
-  <software name="stel7woz">
+  <software name="stellar7">
     <description>Stellar 7</description>
     <year>1984</year>
     <publisher>Penguin Software</publisher>
@@ -2381,7 +2381,7 @@
     </part>
   </software>
 
-  <software name="ssbsewoz">
+  <software name="ssbaseb">
     <description>Street Sports Baseball</description>
     <year>1987</year>
     <publisher>Epyx</publisher>
@@ -2396,7 +2396,7 @@
     </part>
   </software>
 
-  <software name="ssbskwoz">
+  <software name="ssbasket">
     <description>Street Sports Basketball</description>
     <year>1987</year>
     <publisher>Epyx</publisher>
@@ -2418,7 +2418,7 @@
     </part>
   </software>
 
-  <software name="ssfotwoz">
+  <software name="ssfootb">
     <description>Street Sports Football</description>
     <year>1988</year>
     <publisher>Epyx</publisher>
@@ -2440,7 +2440,7 @@
     </part>
   </software>
 
-  <software name="ssscwoz">
+  <software name="sssoccer">
     <description>Street Sports Soccer</description>
     <year>1988</year>
     <publisher>Epyx</publisher>
@@ -2455,7 +2455,7 @@
     </part>
   </software>
 
-  <software name="sbatswoz">
+  <software name="subatsim">
     <description>Sub Battle Simulator</description>
     <year>1986</year>
     <publisher>Epyx</publisher>
@@ -2477,7 +2477,7 @@
     </part>
   </software>
 
-  <software name="suicwoz">
+  <software name="suicide">
     <description>Suicide</description>
     <year>1981</year>
     <publisher>Piccadilly Software</publisher>
@@ -2492,7 +2492,7 @@
     </part>
   </software>
 
-  <software name="smgmewoz">
+  <software name="sumrgame">
     <description>Summer Games</description>
     <year>1984</year>
     <publisher>Epyx</publisher>
@@ -2514,7 +2514,7 @@
     </part>
   </software>
 
-  <software name="swfrwoz">
+  <software name="swfrobin">
     <description>Swiss Family Robinson</description>
     <year>1984</year>
     <publisher>Windham Classics</publisher>
@@ -2529,7 +2529,7 @@
     </part>
   </software>
 
-  <software name="ttwrswoz">
+  <software name="ttwrestl">
     <description>Tag Team Wrestling</description>
     <year>1986</year>
     <publisher>Data East USA</publisher>
@@ -2544,7 +2544,7 @@
     </part>
   </software>
 
-  <software name="toatwoz">
+  <software name="apshaitr">
     <description>Temple of Apshai Trilogy</description>
     <year>1985</year>
     <publisher>Epyx</publisher>
@@ -2560,7 +2560,7 @@
     </part>
   </software>
 
-  <software name="testdr">
+  <software name="testdrv">
     <description>Test Drive</description>
     <year>1985</year>
     <publisher>Accolade</publisher>
@@ -2582,7 +2582,7 @@
     </part>
   </software>
 
-  <software name="tetrwoz">
+  <software name="tetr128k">
     <description>Tetris (128K)</description>
     <year>1987</year>
     <publisher>Spectrum HoloByte</publisher>
@@ -2598,7 +2598,7 @@
     </part>
   </software>
 
-  <software name="thartwoz">
+  <software name="thartunn">
     <description>Tharolian Tunnels</description>
     <year>1982</year>
     <publisher>Datamost</publisher>
@@ -2613,7 +2613,7 @@
     </part>
   </software>
 
-  <software name="thunbwoz">
+  <software name="thunbomb">
     <description>Thunder Bombs</description>
     <year>1982</year>
     <publisher>Penguin Software</publisher>
@@ -2628,7 +2628,7 @@
     </part>
   </software>
 
-  <software name="thuncwoz">
+  <software name="thunchop">
     <description>Thunderchopper</description>
     <year>1987</year>
     <publisher>ActionSoft</publisher>
@@ -2643,7 +2643,7 @@
     </part>
   </software>
 
-  <software name="tomahwoz">
+  <software name="tomahawk">
     <description>Tomahawk</description>
     <year>1987</year>
     <publisher>Datasoft</publisher>
@@ -2658,7 +2658,7 @@
     </part>
   </software>
 
-  <software name="trshtwoz">
+  <software name="tricksht">
     <description>Trick Shot</description>
     <year>1981</year>
     <publisher>IDSI</publisher>
@@ -2680,7 +2680,7 @@
     </part>
   </software>
 
-  <software name="tubw2woz">
+  <software name="tubeway2">
     <description>Tubeway II</description>
     <year>1982</year>
     <publisher>Datamost</publisher>
@@ -2695,7 +2695,7 @@
     </part>
   </software>
 
-  <software name="twerpswz">
+  <software name="twerps">
     <description>Twerps</description>
     <year>1981</year>
     <publisher>Sirius Software</publisher>
@@ -2710,7 +2710,7 @@
     </part>
   </software>
 
-  <software name="ult4woz">
+  <software name="ultima4">
     <description>Ultima IV: Quest of the Avatar</description>
     <year>1985</year>
     <publisher>Origin Systems</publisher>
@@ -2744,7 +2744,7 @@
     </part>
   </software>
 
-  <software name="ult5woz">
+  <software name="ultima5">
     <description>Ultima V: Warriors of Destiny</description>
     <year>1988</year>
     <publisher>Origin Systems</publisher>
@@ -2802,7 +2802,7 @@
     </part>
   </software>
 
-  <software name="upndnwoz">
+  <software name="upndown">
     <description>Up 'N Down</description>
     <year>1981</year>
     <publisher>Bally Midway</publisher>
@@ -2817,7 +2817,7 @@
     </part>
   </software>
 
-  <software name="vindwoz">
+  <software name="vindicat">
     <description>Vindicator</description>
     <year>1983</year>
     <publisher>H.A.L. Labs</publisher>
@@ -2832,7 +2832,7 @@
     </part>
   </software>
 
-  <software name="wavynwoz">
+  <software name="wavynavy">
     <description>Wavy Navy</description>
     <year>1982</year>
     <publisher>Sirius Software</publisher>
@@ -2847,7 +2847,7 @@
     </part>
   </software>
 
-  <software name="wayoutwz">
+  <software name="wayout">
     <description>Wayout</description>
     <year>1982</year>
     <publisher>Sirius Software</publisher>
@@ -2862,7 +2862,7 @@
     </part>
   </software>
 
-  <software name="crmusawz">
+  <software name="carmnusa">
     <description>Where in the USA is Carmen Sandiego</description>
     <year>1986</year>
     <publisher>Broderbund</publisher>
@@ -2884,7 +2884,7 @@
     </part>
   </software>
 
-  <software name="woffwoz">
+  <software name="wof">
     <description>Wings of Fury</description>
     <year>1987</year>
     <publisher>Broderbund</publisher>
@@ -2906,7 +2906,7 @@
     </part>
   </software>
 
-  <software name="wshr23wz">
+  <software name="wishbr23">
     <description>Wishbringer (r23)</description>
     <year>1988</year>
     <publisher>Infocom</publisher>
@@ -2929,7 +2929,7 @@
     </part>
   </software>
 
-  <software name="wkchpwoz">
+  <software name="wkchamp">
     <description>World Karate Championship</description>
     <year>1986</year>
     <publisher>Epyx</publisher>
@@ -2944,7 +2944,7 @@
     </part>
   </software>
 
-  <software name="wgbbgwoz">
+  <software name="wgbbg">
     <description>The World's Greatest Baseball Game</description>
     <year>1984</year>
     <publisher>Epyx</publisher>
@@ -2959,7 +2959,7 @@
     </part>
   </software>
 
-  <software name="wgfbgwoz">
+  <software name="wgfbg">
     <description>The World's Greatest Football Game</description>
     <year>1985</year>
     <publisher>Epyx</publisher>
@@ -2981,7 +2981,7 @@
     </part>
   </software>
 
-  <software name="xeviwoz">
+  <software name="xevious">
     <description>Xevious</description>
     <year>1984</year>
     <publisher>Mindscape</publisher>
@@ -2996,7 +2996,7 @@
     </part>
   </software>
 
-  <software name="zendarwz">
+  <software name="zendar">
     <description>Zendar</description>
     <year>1982</year>
     <publisher>subLOGIC</publisher>
@@ -3011,7 +3011,7 @@
     </part>
   </software>
 
-  <software name="zorrowoz">
+  <software name="zorro">
     <description>Zorro</description>
     <year>1985</year>
     <publisher>Datasoft</publisher>
