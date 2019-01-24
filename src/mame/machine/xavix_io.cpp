@@ -47,16 +47,10 @@ WRITE8_MEMBER(xavix_io_device::xav_7a0x_dir_w)
 	if (offset < 2)
 	{
 		m_dir[offset] = data;
-
-		// write out again in case of direction changes
-		uint8_t outdata = m_dat[offset] & m_dir[offset];
-
-		switch (offset)
-		{
-		case 0x0: m_out0_cb(space, 0, outdata); break;
-		case 0x1: m_out1_cb(space, 0, outdata); break;
-		}
+		// write back to the port
+		xav_7a0x_dat_w(space,offset,m_dat[offset]);
 	}
+
 }
 
 WRITE8_MEMBER(xavix_io_device::xav_7a0x_dat_w)
