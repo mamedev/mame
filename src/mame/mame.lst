@@ -37950,10 +37950,12 @@ avalns12                        // 2004.03 The Key Of Avalon 1.20 - Summon The N
 avalns13                        // 2004.06.08 The Key Of Avalon 1.30 - Chaotic Sabbat (server) (Rev C)
 avalon20                        // 2004.11.02 The Key Of Avalon 2.0 - Eutaxy Commandment (client) (Rev B)
 avalonc                         // 2003.11 The Key Of Avalon: The Wizard Master (client) (Rev G)
+avalonca                        // 2003.07 The Key Of Avalon: The Wizard Master (client) (Rev A)
 avalonce                        // 2003.08 The Key Of Avalon: The Wizard Master (client) (Rev E)
 avaloncc                        // 2003.07 The Key Of Avalon: The Wizard Master (client) (Rev C)
 avaloncf                        // 2003.09 The Key Of Avalon: The Wizard Master (client) (Rev F)
 avalons                         // 2003.11 The Key Of Avalon: The Wizard Master (server) (Rev G)
+avalonsa                        // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev A)
 avalonsc                        // 2003.07 The Key Of Avalon: The Wizard Master (server) (Rev C)
 avalonse                        // 2003.08 The Key Of Avalon: The Wizard Master (server) (Rev E)
 avalonsf                        // 2003.09 The Key Of Avalon: The Wizard Master (server) (Rev F)
@@ -37963,6 +37965,7 @@ avalnc25                        // 2005.08 The Key Of Avalon 2.5 - War of the Ke
 avalnc25a                       // 2005.05 The Key Of Avalon 2.5 - War of the Key (client) (Rev A)
 fzeroax                         // 2003.12 F-Zero AX (Rev E)
 fzeroaxc                        // 2003.06.11 F-Zero AX (Rev C)
+fzeroaxd                        // 2003.06.28 F-Zero AX (Rev D)
 fzeroaxm                        // 2003.09 F-Zero AX Monster Ride
 gekpurya                        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C)
 gekpuryb                        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev B)
@@ -37974,12 +37977,16 @@ tfupdate                        // 2004.?? Triforce GDROM Boot Update
 triforce                        // 2002.?? Triforce BIOS
 vs2002ex                        // 2002.07.30 Virtua Striker 2002 (Export)
 vs2002j                         // 2002.10 Virtua Striker 2002 (Japan)
-vs4                             // 2004.12.02 Virtua Striker 4 (Export) (GDT-0015)
-vs4e                            // 2004.12.03 Virtua Striker 4 (Export) (GDT-0014)
+vs2002t3                        // 2004.03 Virtua Striker 2002 (Type 3)
+vs4                             // 2005.04.11 Virtua Striker 4 (Export) (GDT-0015A)
+vs4o                            // 2004.12.02 Virtua Striker 4 (Export) (GDT-0015)
+vs4e                            // 2005.05.23 Virtua Striker 4 (Asia) (GDT-0014B)
+vs4eo                           // 2004.12.03 Virtua Striker 4 (Asia) (GDT-0014)
 vs42006b                        // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev B)
 vs42006                         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
 vs42k6ex                        // 2006.01.31 Virtua Striker 4 Ver.2006 (Export)
 vs4j                            // 2004.10 Virtua Striker 4 (Japan) (Rev E)
+vs4jc                           // 2004.09 Virtua Striker 4 (Japan) (Rev C)
 
 @source:triplhnt.cpp
 triplhnt                        // 008422-008791    1977/04 [6800]
