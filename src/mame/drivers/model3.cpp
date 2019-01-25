@@ -4311,6 +4311,7 @@ ROM_START( swtrilgy )   /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 	ROM_LOAD( "mpr-21378.24", 0xc00000, 0x400000, CRC(1fcf715e) SHA1(9706f36e7a61d885d34a6974311a2410fe3d6760) )
 
 	ROM_REGION( 0x10000, "ffcpu", 0 )   /* force feedback controller prg */
+	ROM_LOAD( "dvctbd.bin",     0x00000, 0x10000, CRC(f5208c59) SHA1(f8216b2dc0dac94dcbcf4f8f09dc606777251209) ) // ROM label unknown, not clear if older or newer than epr-21119
 	ROM_LOAD( "epr-21119.ic8",  0x00000, 0x10000, CRC(65082b14) SHA1(6c3c192dd6ef3780c6202dd63fc6086328928818) )
 
 	//             ????     317-0241-COM   Model 3
