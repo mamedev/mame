@@ -29515,6 +29515,7 @@ cleoftp                         // 2002.05 Cleopatra Fortune Plus
 clubk2k3                        // 2003.?? Club Kart: European Session (2003, Rev A)
 clubk2kp                        // 2003.?? Club Kart: European Session (2003, prototype)
 clubkcyc                        // 2003.?? Club Kart Cycraft Edition (Rev A)
+clubkcyco                       // 2003.?? Club Kart Cycraft Edition
 clubkprz                        // 2003.?? Club Kart Prize
 clubkpzb                        // 2004.01.23 Club Kart Prize Ver. B (strings in the EPROM indicate a build date of Jan. 23, 2004 for the game's program)
 clubkrt                         // 2001.06 Club Kart: European Session (Rev D)
@@ -29593,6 +29594,7 @@ initdexpo                       // 2002.?? Initial D Arcade Stage (Export)
 initdo                          // 2002.03 Initial D Arcade Stage (Japan)
 initdv2e                        // 2002.12 Initial D Arcade Stage Ver. 2 (export)
 initdv2j                        // 2003.05.27 Initial D Arcade Stage Ver. 2 (Japan) (Rev B)
+initdv2ja                       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan) (Rev A)
 initdv2jo                       // 2002.12 Initial D Arcade Stage Ver. 2 (Japan)
 initdv3e                        // 2004.05.18 Initial D Arcade Stage Ver. 3 (Export)
 initdv3j                        // 2004.01.30 Initial D Arcade Stage Ver. 3 (Japan) (Rev C)
@@ -29609,7 +29611,8 @@ kofnwj                          // 2004.07 The King of Fighters Neo Wave (Japan)
 kofxi                           // 2005.10 The King of Fighters XI
 kov7sprt                        // 2003.11 Knights of Valour - The Seven Sprits
 kurucham                        // 2006.03 Kurukuru Chameleon
-lupinsho                        // 2001.12 Lupin the Third: the Shooting
+lupinsho                        // 2002.05 Lupin the Third: the Shooting (Rev A)
+lupinshoo                       // 2001.12 Lupin the Third: the Shooting
 luptype                         // 2002.04 Lupin The Third - The Typing (Rev A)
 mamonoro                        // 2008.07 Mamoru-kun wa Norowarete Shimatta!
 manicpnc                        // 2007.07 Manic Panic Ghosts! (USA)
