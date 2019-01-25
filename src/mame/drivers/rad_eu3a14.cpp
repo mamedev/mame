@@ -25,6 +25,14 @@
     but the video system has changed, here the sprites are more traditional non-tile based, rather
     than coming from 'pages'
 
+	--
+
+	Compared to the XaviXport games camera hookups, Real Swing Golf just has 6 wires, Its camera PCB is the only one with a ceramic resonator.
+	Maybe the CU5502 chip offloads some processing from the CPU?
+
+	The Basketball camera also uses an ETOMS CU5502.  It’s different from the others (XaviXport + Real Swing Golf) in that the sensor is on a small PCB with
+	a 3.58MHz resonator with 16 wires going to another small PCB that has a glob and a 4MHz resonator.  6 wires go from that PCB to the main game PCB.
+
 */
 
 #include "emu.h"

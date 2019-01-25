@@ -172,6 +172,7 @@ public:
 	void jakks_gkr_2m(machine_config &config);
 	void jakks_gkr_nk(machine_config &config);
 	void jakks_gkr_dy(machine_config &config);
+	void jakks_gkr_sw(machine_config &config);
 
 private:
 	virtual void machine_start() override;
@@ -349,7 +350,7 @@ READ16_MEMBER(jakks_gkr_state::jakks_porta_key_io_r)
 
 WRITE16_MEMBER(jakks_gkr_state::jakks_porta_key_io_w)
 {
-	//logerror("%s: jakks_porta_key_io_w %04x\n", machine().describe_context(), data);
+	logerror("%s: jakks_porta_key_io_w %04x\n", machine().describe_context(), data);
 	// only seen 0xffff and 0x0000 written here.. writes 0xffff before the 2nd part of the port a gamekey check read.
 	if (data == 0xffff)
 	{
@@ -442,7 +443,7 @@ static INPUT_PORTS_START( walle )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 
-	PORT_START("C")
+	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
 	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -459,7 +460,7 @@ static INPUT_PORTS_START( jak_gkr )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 
-	PORT_START("C")
+	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, spg2xx_game_state,i2c_r, nullptr)
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -930,6 +931,7 @@ void jakks_gkr_state::jakks_gkr(machine_config &config)
 
 	m_spg->porta_in().set(FUNC(jakks_gkr_state::jakks_porta_key_io_r));
 	m_spg->porta_out().set(FUNC(jakks_gkr_state::jakks_porta_key_io_w));
+	//m_spg->portb_in().set_ioport("P2");
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "jakks_gamekey");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -962,12 +964,19 @@ void jakks_gkr_state::jakks_gkr_dy(machine_config &config)
 	SOFTWARE_LIST(config, "jakks_gamekey_dy").set_original("jakks_gamekey_dy");
 }
 
+void jakks_gkr_state::jakks_gkr_sw(machine_config &config)
+{
+	jakks_gkr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_gkr_state::mem_map_1m);
+	SOFTWARE_LIST(config, "jakks_gamekey_sw").set_original("jakks_gamekey_sw");
+}
+
 
 void spg2xx_game_state::walle(machine_config &config)
 {
 	jakks(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_2m);
-	m_spg->portc_in().set_ioport("C");
+	m_spg->portc_in().set_ioport("P3");
 	m_spg->portc_out().set(FUNC(spg2xx_game_state::walle_portc_w));
 }
 
@@ -1066,6 +1075,10 @@ ROM_START( jak_sdoo )
 	ROM_LOAD16_WORD_SWAP( "jakksscoobydoogkr.bin", 0x000000, 0x400000, CRC(61062ce5) SHA1(9d21767fd855385ef83e4209c429ecd4bf7e5384) )
 ROM_END
 
+ROM_START( jak_sith )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksstarwarsgkr.bin", 0x000000, 0x200000, CRC(932cde19) SHA1(b88b748c235e9eeeda574e4d5b4077ae9da6fbd0) )
+ROM_END
 
 
 ROM_START( zone40 )
@@ -1266,11 +1279,11 @@ CONS( 2005, jak_just, 0, 0, jakks_gkr_1m, jak_gkr,jakks_gkr_state, empty_init, "
 CONS( 2005, jak_dora, 0, 0, jakks_gkr_nk, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",      "Dora the Explorer - Race To Play Park (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3+ released)
 CONS( 2005, jak_sdoo, 0, 0, jakks_gkr_2m, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management","Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)
 CONS( 2005, jak_disf, 0, 0, jakks_gkr_dy, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",          "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
+CONS( 2005, jak_sith, 0, 0, jakks_gkr_sw, jak_gkr,jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",    "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
 
 // Nicktoons                                   NK (3? keys available) (same keys as Dora the Explorer)
 // SpongeBob SquarePants: The Fry Cook Games   NK (3? keys available)  ^^
 // Namco Ms. Pac-Man                           NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
-// Star Wars                                   SW (1 key available)
 // Disney Princess                             DP (? keys available)
 // Spider-Man                                  MV (1? key available)
 
