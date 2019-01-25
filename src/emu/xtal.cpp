@@ -280,6 +280,7 @@ const double XTAL::known_xtals[] = {
 	 24'883'200, /* 24.8832_MHz_XTAL       DEC VT100 */
 	 25'000'000, /* 25_MHz_XTAL            Namco System 22, Taito GNET, Dogyuun h/w */
 	 25'174'800, /* 25.1748_MHz_XTAL       Sega System 16A/16B (1600x NTSC line rate) */
+	 25'175'000, /* 25.175_MHz_XTAL        IBM MCGA/VGA 320/640-pixel graphics */
 	 25'200'000, /* 25.2_MHz_XTAL          Tektronix 4404 video clock */
 	 25'398'360, /* 25.39836_MHz_XTAL      Tandberg TDV 2324 */
 	 25'400'000, /* 25.4_MHz_XTAL          PC9801-86 PCM base clock */
@@ -338,6 +339,7 @@ const double XTAL::known_xtals[] = {
 	 39'710'000, /* 39.71_MHz_XTAL         Wyse WY-60 132-column display clock */
 	 40'000'000, /* 40_MHz_XTAL            - */
 	 40'210'000, /* 40.21_MHz_XTAL         Fairlight CMI IIx */
+	 41'539'000, /* 41.539_MHz_XTAL        IBM PS/2 132-column text mode */
 	 42'000'000, /* 42_MHz_XTAL            BMC A-00211 - Popo Bear */
 	 42'105'200, /* 42.1052_MHz_XTAL       NEC PC-88xx */
 	 42'954'545, /* 42.954545_MHz_XTAL     CPS3 (12x NTSC subcarrier)*/
@@ -345,6 +347,7 @@ const double XTAL::known_xtals[] = {
 	 44'100'000, /* 44.1_MHz_XTAL          Subsino's Bishou Jan */
 	 44'236'800, /* 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16 */
 	 44'452'800, /* 44.4528_MHz_XTAL       TeleVideo 965 */
+	 44'900'000, /* 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics */
 	 45'000'000, /* 45_MHz_XTAL            Eolith with Hyperstone CPUs */
 	 45'158'000, /* 45.158_MHz_XTAL        Sega Model 2A video board, Model 3 CPU board */
 	 45'619'200, /* 45.6192_MHz_XTAL       DEC VK100 */
