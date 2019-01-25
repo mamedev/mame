@@ -589,8 +589,8 @@ void m24_state::olivetti(machine_config &config)
 	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, m_isabus, pc_isa8_cards, nullptr, false);
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
+	// 2 banks of 16 64Kx1 or 256Kx1 DRAMs on motherboard
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	TMS7000(config, m_kbc, 24_MHz_XTAL / 6);
 	m_kbc->set_addrmap(AS_PROGRAM, &m24_state::kbc_map);
