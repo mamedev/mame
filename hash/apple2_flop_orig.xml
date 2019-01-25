@@ -1326,7 +1326,37 @@
     </part>
   </software>
 
-  <software name="losttomb">
+  <software name="lnc">
+    <description>Lock 'n Chase</description>
+    <year>1982</year>
+    <publisher>Mattel Electronics</publisher>
+    <info name="release" value="2019-01-23"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+    <!-- It runs on any Apple II with 48K. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233462">
+        <rom name="lock 'n' chase.woz" size="233462" crc="c9355b25" sha1="7165eba681f16958138c659597e6737aa611cc86" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="loderunr">
+    <description>Lode Runner</description>
+    <year>1983</year>
+    <publisher>Broderbund</publisher>
+    <info name="release" value="2019-01-21"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+    <!-- It runs on any Apple II with 48K. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="353289">
+        <rom name="lode runner.woz" size="353289" crc="62728de0" sha1="8bbad930b34415be05e854e1cad20326d2dc9390" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+<software name="losttomb">
     <description>Lost Tomb</description>
     <year>1984</year>
     <publisher>Datasoft</publisher>
@@ -2061,6 +2091,23 @@
     </part>
   </software>
 
+  <software name="russduck">
+    <description>Russki Duck</description>
+    <year>1982</year>
+    <publisher>Gebelli Software</publisher>
+    <info name="release" value="2019-01-24"/>
+    <sharedfeat name="compatibility" value="A2,A2P" />
+    <!-- It requires a 48K Apple ][ or ][+.
+    Due to compatibility issues caused by the copy protection,
+    it will not run on any later models. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="366642">
+        <rom name="russki duck.woz" size="366642" crc="966e3da1" sha1="4ab54d8b475d12bc54fa8c58fca4af1c68f059b5" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
   <software name="sabotage">
     <description>Sabotage</description>
     <year>1981</year>
@@ -2121,7 +2168,56 @@
     </part>
   </software>
 
-  <software name="shuflbrd">
+  <software name="shdwkeep">
+    <description>Shadowkeep</description>
+    <year>1983</year>
+    <publisher>Trillium</publisher>
+    <info name="release" value="2019-01-25"/>
+    <sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+    <!-- It runs on any Apple II with 48K -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <feature name="part_id" value="Disk 1 Side A"/>
+      <dataarea name="flop" size="233523">
+        <rom name="shadowkeep disk 1a.woz" size="233523" crc="9285c776" sha1="fe18bc648cdab6e69c0268b0302e6b70c7f82d71" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_5_25">
+      <feature name="part_id" value="Disk 1 Side B"/>
+      <dataarea name="flop" size="233556">
+        <rom name="shadowkeep disk 1b.woz" size="233556" crc="d3a643c1" sha1="477d689d740018907d20ddbf73b5dc9eb4be936a" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop3" interface="floppy_5_25">
+      <feature name="part_id" value="Disk 2 Side A"/>
+      <dataarea name="flop" size="233523">
+        <rom name="shadowkeep disk 2a.woz" size="233523" crc="996b5248" sha1="721cc6398773cc9064f46926c783d6771ad16717" offset="0x0000" />
+      </dataarea>
+    </part>
+    <part name="flop4" interface="floppy_5_25">
+      <feature name="part_id" value="Disk 2 Side B"/>
+      <dataarea name="flop" size="233523">
+        <rom name="shadowkeep disk 2b.woz" size="233523" crc="c31bbbcf" sha1="bcfe69cd5cb6cb513b36262d56bbf362198d6285" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+  <software name="shanghai">
+    <description>Shanghai</description>
+    <year>1986</year>
+    <publisher>Activision</publisher>
+    <info name="release" value="2019-01-22"/>
+    <sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+    <!-- It requires a 48K Apple ][+ or later. -->
+
+    <part name="flop1" interface="floppy_5_25">
+      <dataarea name="flop" size="233495">
+        <rom name="shanghai.woz" size="233495" crc="44e84399" sha1="e1b0cb44d5897df7dfa422b243d7d4a6842d4795" offset="0x0000" />
+      </dataarea>
+    </part>
+  </software>
+
+<software name="shuflbrd">
     <description>Shuffleboard</description>
     <year>1981</year>
     <publisher>IDSI</publisher>
