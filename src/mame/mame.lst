@@ -9749,6 +9749,7 @@ dmodrbcc                        // (c) 1976 Chicago Coin
 @source:chihiro.cpp
 ccfboxa                         // 2009.03.31 Firmware Update For Compact Flash Box (Rev A)
 chihiro                         // 2002.?? Chihiro BIOS
+cregchg                         // 2003.02 Chihiro Change Region USA
 crtaxihr                        // 2003.02.24 Crazy Taxi High Roller (Rev B)
 ghostsqo                        // 2004.12 Ghost Squad
 ghostsqu                        // 2004.12.09 Ghost Squad (Rev A)
@@ -9758,8 +9759,10 @@ mj2                             // 2005.02.02 Sega Network Taisen Mahjong MJ 2 (
 mj2c                            // 2004.12 Sega Network Taisen Mahjong MJ 2 (Rev C)
 mj2f                            // 2005.02 Sega Network Taisen Mahjong MJ 2 (Rev F)
 mj3                             // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev F)
+mj3c                            // 2005.11 Sega Network Taisen Mahjong MJ 3 (Rev C)
 mj3d                            // 2005.12 Sega Network Taisen Mahjong MJ 3 (Rev D)
 mj3evo                          // 2007.06 Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)
+mj3evoa                         // 2007.02 Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)
 ollie                           // 2004.03 Ollie King
 outr2                           // 2003.12 Outrun 2 (Rev A)
 outr2stjo                       // 2004.09 Outrun 2 Special Tours (Japan)
