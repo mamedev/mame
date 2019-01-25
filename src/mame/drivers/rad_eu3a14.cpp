@@ -354,7 +354,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 	int size;
 
-	// m_tilecfg[0]   b-as h-??    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used (3/0 in various places in football and some others) 
+	// m_tilecfg[0]   b-as ?-hh    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used 
 	// m_tilecfg[1]   ---- ---?    ? = used foot
 	// m_tilecfg[2]   ---- -B--    B = 4bpp tiles
 
@@ -381,29 +381,47 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	}
 
 
-	// normal
-	draw_page(screen, bitmap, cliprect, 0, 0 - xscroll,                            0 - yscroll,                             size);
-	draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll,         0 - yscroll,                             size);
-	draw_page(screen, bitmap, cliprect, 2, 0 - xscroll,                            (size * m_pageheight) - yscroll,         size);
-	draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll,         (size * m_pageheight) - yscroll,         size);
+	if ((m_tilecfg[0] & 0x03) == 0x00) // tilemaps arranged as 2x2 pages?
+	{
+		// normal
+		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight) - yscroll, size);
 
-	// wrap x
-	draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, 0 - yscroll,                             size);
-	draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll,     0 - yscroll,                             size);
-	draw_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight) - yscroll,         size);
-	draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll,     (size * m_pageheight) - yscroll,         size);
+		// wrap x
+		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight) - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight) - yscroll, size);
 
-	// wrap y
-	draw_page(screen, bitmap, cliprect, 0, 0 - xscroll,                            (size * m_pageheight * 2) + 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll,         (size * m_pageheight * 2) + 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 2, 0 - xscroll,                            (size * m_pageheight * 3) - yscroll,     size);
-	draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll,         (size * m_pageheight * 3) - yscroll,     size);
+		// wrap y
+		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth) - xscroll, (size * m_pageheight * 3) - yscroll, size);
 
-	// wrap x+y
-	draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll,     (size * m_pageheight * 2) + 0 - yscroll, size);
-	draw_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 3) - yscroll,     size);
-	draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll,     (size * m_pageheight * 3) - yscroll,     size);
+		// wrap x+y
+		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 1, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 2) + 0 - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 2, (size * m_pagewidth * 2) + 0 - xscroll, (size * m_pageheight * 3) - yscroll, size);
+		draw_page(screen, bitmap, cliprect, 3, (size * m_pagewidth * 3) - xscroll, (size * m_pageheight * 3) - yscroll, size);
+	}
+	else if ((m_tilecfg[0] & 0x03) == 0x03) // individual tilemaps? multiple layers?
+	{
+		// normal
+		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
+		// wrap x
+		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, 0 - yscroll, size);
+		// wrap y
+		draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
+		// wrap x+y
+		draw_page(screen, bitmap, cliprect, 0, (size * m_pagewidth) + 0 - xscroll, (size * m_pageheight) + 0 - yscroll, size);
+	}
+	else
+	{
+		popmessage("m_tilecfg[0] & 0x03 unknown config");
+	}
 
 }
 
