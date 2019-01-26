@@ -56,6 +56,7 @@
 #include "ne2000.h"
 #include "3c505.h"
 #include "eis_sad8852.h"
+#include "np600.h"
 
 // communication ports
 #include "lpt.h"
@@ -168,6 +169,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("sb16_lle", ISA16_SB16);
 	device.option_add("mcd", ISA16_MCD);
 	device.option_add("sad8852", ISA16_SAD8852);
+	device.option_add("np600a3", NP600A3);
 	device.option_add("wd1007a", WD1007A);
 	device.option_add("ev346", EV346);
 	device.option_add("jc1310", JC1310);
