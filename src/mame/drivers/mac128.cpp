@@ -110,7 +110,7 @@ c0   8 data bits, Rx disabled
 #define SCC_TAG "scc"
 
 #define C7M (15.6672_MHz_XTAL / 2)
-#define C3_7M (15.6672_MHz_XTAL / 4)
+#define C3_7M (15.6672_MHz_XTAL / 4).value()
 
 // uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
