@@ -220,7 +220,7 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 	config.set_default_layout(layout_llc1);
 
 	z80pio_device& pio1(Z80PIO(config, "z80pio1", XTAL(3'000'000)));
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_llc2)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -768,23 +768,25 @@ void tandy2k_state::device_reset_after_children()
 
 // Machine Driver
 
-MACHINE_CONFIG_START(tandy2k_state::tandy2k)
+void tandy2k_state::tandy2k(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(I80186_TAG, I80186, 16_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(tandy2k_mem)
-	MCFG_DEVICE_IO_MAP(tandy2k_io)
-	MCFG_80186_IRQ_SLAVE_ACK(READ8(DEVICE_SELF, tandy2k_state, irq_callback))
+	I80186(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tandy2k_state::tandy2k_mem);
+	m_maincpu->set_addrmap(AS_IO, &tandy2k_state::tandy2k_io);
+	m_maincpu->read_slave_ack_callback().set(FUNC(tandy2k_state::irq_callback));
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	//MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_device, screen_update)
-	MCFG_SCREEN_UPDATE_DRIVER(tandy2k_state, screen_update)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::green());
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(640, 400);
+	screen.set_visarea(0, 640-1, 0, 400-1);
+	//screen.set_screen_update(CRT9021B_TAG, FUNC(crt9021_device::screen_update));
+	screen.set_screen_update(FUNC(tandy2k_state::screen_update));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	crt9007_device &vpac(CRT9007(config, CRT9007_TAG, 16_MHz_XTAL * 28 / 20 / 8));
 	vpac.set_addrmap(0, &tandy2k_state::vpac_mem);
@@ -800,23 +802,22 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	vpac.sld_callback().set(FUNC(tandy2k_state::vpac_sld_w));
 	vpac.set_screen(SCREEN_TAG);
 
-	MCFG_DEVICE_ADD(CRT9212_0_TAG, CRT9212, 0)
-	MCFG_CRT9212_WEN2_VCC()
-	MCFG_CRT9212_DOUT_CALLBACK(WRITE8(*this, tandy2k_state, vidla_w))
+	CRT9212(config, m_drb0, 0);
+	m_drb0->set_wen2(1);
+	m_drb0->dout().set(FUNC(tandy2k_state::vidla_w));
 
-	MCFG_DEVICE_ADD(CRT9212_1_TAG, CRT9212, 0)
-	MCFG_CRT9212_WEN2_VCC()
-	MCFG_CRT9212_DOUT_CALLBACK(WRITE8(*this, tandy2k_state, drb_attr_w))
+	CRT9212(config, m_drb1, 0);
+	m_drb1->set_wen2(1);
+	m_drb1->dout().set(FUNC(tandy2k_state::drb_attr_w));
 
-	MCFG_DEVICE_ADD(CRT9021B_TAG, CRT9021, 16_MHz_XTAL * 28 / 20)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	CRT9021(config, m_vac, 16_MHz_XTAL * 28 / 20);
+	m_vac->set_screen(SCREEN_TAG);
 
-	MCFG_TIMER_DRIVER_ADD("vidldsh", tandy2k_state, vidldsh_tick)
+	TIMER(config, "vidldsh").configure_generic(FUNC(tandy2k_state::vidldsh_tick));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	I8255A(config, m_i8255a);
@@ -856,44 +857,44 @@ MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	m_fdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(FUNC(tandy2k_state::fdc_drq_w));
 	m_fdc->hdl_wr_callback().set(FUNC(tandy2k_state::fdc_hdl_w));
-	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, I8272A_TAG ":0", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, I8272A_TAG ":1", tandy2k_floppies, "525qd", tandy2k_state::floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, tandy2k_state, write_centronics_fault))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(tandy2k_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(tandy2k_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(tandy2k_state::write_centronics_perror));
+	m_centronics->select_handler().set(FUNC(tandy2k_state::write_centronics_select));
+	m_centronics->fault_handler().set(FUNC(tandy2k_state::write_centronics_fault));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	TANDY2K_KEYBOARD(config, m_kb, 0);
 	m_kb->clock_wr_callback().set(FUNC(tandy2k_state::kbdclk_w));
 	m_kb->data_wr_callback().set(FUNC(tandy2k_state::kbddat_w));
 
 	// temporary until the tandy keyboard has a rom dump
-	MCFG_PC_KEYB_ADD(m_pc_keyboard, WRITELINE(I8259A_1_TAG, pic8259_device, ir0_w))
-
+	PC_KEYB(config, m_pc_keyboard, 0).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "tandy2k")
+	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,384K,512K,640K,768K,896K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tandy2k_state::tandy2k_hd)
+void tandy2k_state::tandy2k_hd(machine_config &config)
+{
 	tandy2k(config);
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY(I80186_TAG)
-	MCFG_DEVICE_IO_MAP(tandy2k_hd_io)
+	m_maincpu->set_addrmap(AS_IO, &tandy2k_state::tandy2k_hd_io);
 
 	// Tandon TM502 hard disk
-	MCFG_HARDDISK_ADD("harddisk0")
+	HARDDISK(config, "harddisk0", 0);
 	//MCFG_WD1010_ADD(WD1010_TAG, wd1010_intf)
 	//MCFG_WD1100_11_ADD(WD1100_11_TAG, wd1100_11_intf)
-MACHINE_CONFIG_END
+}
 
 // ROMs
 

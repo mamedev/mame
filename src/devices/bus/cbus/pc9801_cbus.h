@@ -22,11 +22,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-
-#define MCFG_PC9801CBUS_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PC9801CBUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 #define MCFG_PC9801CBUS_CPU(_cputag) \
 	downcast<pc9801_slot_device &>(*device).set_cpu_tag(_cputag);
 
@@ -79,11 +74,20 @@ class pc9801_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	pc9801_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&cpu_tag, U &&opts, char const *dflt)
+		: pc9801_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	pc9801_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration access
-	template<class T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template<int I, class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_callback[I].set_callback(std::forward<Object>(cb)); }
+	template<std::size_t Line> auto int_cb() { return m_int_callback[Line].bind(); }
 
 	address_space &program_space() const { return m_cpu->space(AS_PROGRAM); }
 	address_space &io_space() const { return m_cpu->space(AS_IO); }

@@ -143,18 +143,15 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_zorba)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(m_palette)
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 1.00); // should be horizontal frequency / 16, so depends on CRTC parameters
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq0")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<0>))
-	MCFG_INPUT_MERGER_ANY_HIGH("irq1")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<1>))
-	MCFG_INPUT_MERGER_ANY_HIGH("irq2")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, zorba_state, irq_w<2>))
+	INPUT_MERGER_ANY_HIGH(config, "irq0").output_handler().set(FUNC(zorba_state::irq_w<0>));
+	INPUT_MERGER_ANY_HIGH(config, "irq1").output_handler().set(FUNC(zorba_state::irq_w<1>));
+	INPUT_MERGER_ANY_HIGH(config, "irq2").output_handler().set(FUNC(zorba_state::irq_w<2>));
 
 	/* devices */
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
@@ -215,12 +212,12 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	pit.out_handler<2>().append(m_uart2, FUNC(i8251_device::write_rxc));
 
 	// CRTC
-	MCFG_DEVICE_ADD(m_crtc, I8275, 14.318'181_MHz_XTAL / 7)
-	MCFG_I8275_CHARACTER_WIDTH(8)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(m_dma, z80dma_device, rdy_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE("irq0", input_merger_device, in_w<1>))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8275(config, m_crtc, 14.318'181_MHz_XTAL / 7);
+	m_crtc->set_character_width(8);
+	m_crtc->set_display_callback(FUNC(zorba_state::zorba_update_chr), this);
+	m_crtc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
+	m_crtc->irq_wr_callback().set("irq0", FUNC(input_merger_device::in_w<1>));
+	m_crtc->set_screen("screen");
 
 	// Floppies
 	FD1793(config, m_fdc, 24_MHz_XTAL / 24);

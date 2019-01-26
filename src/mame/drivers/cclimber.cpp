@@ -1124,13 +1124,12 @@ MACHINE_CONFIG_START(cclimber_state::root)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cclimber)
-	MCFG_PALETTE_ADD("palette", 16*4+8*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cclimber);
+	PALETTE(config, m_palette, FUNC(cclimber_state::cclimber_palette), 16*4+8*4);
 
-	MCFG_PALETTE_INIT_OWNER(cclimber_state,cclimber)
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,cclimber)
 MACHINE_CONFIG_END
 
@@ -1161,7 +1160,8 @@ void cclimber_state::ckongb(machine_config &config)
 }
 
 
-MACHINE_CONFIG_START(cclimber_state::cannonb)
+void cclimber_state::cannonb(machine_config &config)
+{
 	cclimber(config);
 
 	/* basic machine hardware */
@@ -1172,8 +1172,8 @@ MACHINE_CONFIG_START(cclimber_state::cannonb)
 	m_mainlatch->q_out_cb<2>().set_nop(); // not used
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cannonb)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cannonb);
+}
 
 void cclimber_state::bagmanf(machine_config &config)
 {
@@ -1190,20 +1190,19 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	root(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE(m_maincpu, SEGA_315_5018, XTAL(18'432'000)/3/2)  /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(yamato_map)
-	MCFG_DEVICE_IO_MAP(yamato_portmap)
-	MCFG_DEVICE_OPCODES_MAP(yamato_decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &cclimber_state::yamato_map);
+	maincpu.set_addrmap(AS_IO, &cclimber_state::yamato_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::yamato_decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
 	MCFG_DEVICE_PROGRAM_MAP(yamato_audio_map)
 	MCFG_DEVICE_IO_MAP(yamato_audio_portmap)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16*4+8*4+256)
-	MCFG_PALETTE_INIT_OWNER(cclimber_state,yamato)
+	m_palette->set_entries(16*4+8*4+256);
+	m_palette->set_init(FUNC(cclimber_state::yamato_palette));
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
 
@@ -1219,26 +1218,24 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cclimber_state::toprollr)
 	cclimber(config);
 
-	MCFG_DEVICE_REPLACE(m_maincpu, SEGA_315_5018, XTAL(18'432'000)/3/2)  /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(toprollr_map)
-	MCFG_DEVICE_IO_MAP(cclimber_portmap)
-	MCFG_DEVICE_OPCODES_MAP(toprollr_decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_SIZE(0)
-	MCFG_SEGACRPT_SET_NUMBANKS(3)
-	MCFG_SEGACRPT_SET_BANKSIZE(0x6000)
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &cclimber_state::toprollr_map);
+	maincpu.set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::toprollr_decrypted_opcodes_map);
+	maincpu.set_size(0);
+	maincpu.set_numbanks(3);
+	maincpu.set_banksize(0x6000);
 
 	m_mainlatch->q_out_cb<5>().set(FUNC(cclimber_state::toprollr_rombank_w));
 	m_mainlatch->q_out_cb<6>().set(FUNC(cclimber_state::toprollr_rombank_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_toprollr)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32*5)
-	MCFG_PALETTE_INIT_OWNER(cclimber_state,toprollr)
+	m_gfxdecode->set_info(gfx_toprollr);
+	m_palette->set_entries(32*5);
+	m_palette->set_init(FUNC(cclimber_state::toprollr_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_toprollr)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_toprollr));
 MACHINE_CONFIG_END
 
 
@@ -1267,13 +1264,12 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, cclimber_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_swimmer)
-	MCFG_PALETTE_ADD("palette", 32*8+4*8+1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_swimmer);
+	PALETTE(config, m_palette, FUNC(cclimber_state::swimmer_palette), 32*8+4*8+1);
 
-	MCFG_PALETTE_INIT_OWNER(cclimber_state,swimmer)
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */
@@ -1289,6 +1285,7 @@ MACHINE_CONFIG_END
 void cclimber_state::guzzler(machine_config &config)
 {
 	swimmer(config);
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::guzzler_map);
 }

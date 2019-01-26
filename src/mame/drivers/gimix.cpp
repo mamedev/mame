@@ -487,8 +487,8 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	MCFG_DEVICE_PROGRAM_MAP(gimix_mem)
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, gimix_state,irq_w))
+	mm58167_device &rtc(MM58167(config, "rtc", 32.768_kHz_XTAL));
+	rtc.irq().set(FUNC(gimix_state::irq_w));
 
 	/* timer */
 	ptm6840_device &ptm(PTM6840(config, "timer", 2'000'000));  // clock is a guess
@@ -563,7 +563,7 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 
 	// uncomment this timer to use a hack that generates a regular IRQ, this will get OS-9 to boot
 	// for some unknown reason, OS-9 does not touch the 6840, and only clears/disables IRQs on the RTC
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("test_timer",gimix_state,test_timer_w,attotime::from_msec(100))
+	//TIMER(config, "test_timer").configure_periodic(FUNC(gimix_state::test_timer_w), attotime::from_msec(100));
 MACHINE_CONFIG_END
 
 ROM_START( gimix )

@@ -36,9 +36,9 @@ public:
 	virtual void vsetup(analog_net_t::list_t &nets) override;
 	virtual void reset() override { matrix_solver_t::reset(); }
 
-	inline unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
+	unsigned N() const { if (m_N == 0) return m_dim; else return m_N; }
 
-	inline int vsolve_non_dynamic(const bool newton_raphson);
+	int vsolve_non_dynamic(const bool newton_raphson);
 
 protected:
 	virtual void add_term(int net_idx, terminal_t *term) override;
@@ -139,7 +139,7 @@ protected:
 	nl_double compute_next_timestep();
 
 	template <typename T1, typename T2>
-	inline nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
+	nl_ext_double &A(const T1 r, const T2 c) { return m_A[r][c]; }
 
 	//nl_double m_A[storage_N][((storage_N + 7) / 8) * 8];
 	nl_double m_RHS[storage_N];
@@ -590,7 +590,7 @@ unsigned matrix_solver_direct_t<m_N, storage_N>::solve_non_dynamic(const bool ne
 }
 
 template <unsigned m_N, unsigned storage_N>
-inline int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
+int matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
 {
 	this->build_LE_A();
 	this->build_LE_RHS(m_last_RHS);

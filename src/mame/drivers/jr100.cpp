@@ -30,8 +30,8 @@
 class jr100_state : public driver_device
 {
 public:
-	jr100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jr100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_pcg(*this, "pcg"),
 		m_vram(*this, "vram"),
@@ -49,7 +49,8 @@ public:
 		m_line6(*this, "LINE6"),
 		m_line7(*this, "LINE7"),
 		m_line8(*this, "LINE8") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu")
+	{ }
 
 	void jr100(machine_config &config);
 
@@ -391,7 +392,7 @@ void jr100_state::jr100(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_jr100);
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	VIA6522(config, m_via, XTAL(14'318'181) / 16);
 	m_via->readpb_handler().set(FUNC(jr100_state::jr100_via_read_b));

@@ -14,6 +14,7 @@ namespace netlist
 {
 	namespace devices
 	{
+	//FIXME: Convert sub devices into NETDEV_DELEGATE logic
 	NETLIB_OBJECT(9310_subABCD)
 	{
 		NETLIB_CONSTRUCTOR(9310_subABCD)
@@ -262,8 +263,8 @@ namespace netlist
 	#endif
 	}
 
-	NETLIB_DEVICE_IMPL(9310)
-	NETLIB_DEVICE_IMPL(9310_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(9310)
+	NETLIB_DEVICE_IMPL_DEPRECATED(9310_dip)
 
 	} //namespace devices
 } // namespace netlist

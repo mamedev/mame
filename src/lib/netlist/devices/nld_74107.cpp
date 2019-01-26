@@ -137,9 +137,9 @@ namespace netlist
 			m_clk.activate_hl();
 	}
 
-	NETLIB_DEVICE_IMPL(74107)
-	NETLIB_DEVICE_IMPL(74107A)
-	NETLIB_DEVICE_IMPL(74107_dip)
+	NETLIB_DEVICE_IMPL(74107, 		"TTL_74107",	"+CLK,+J,+K,+CLRQ")
+	NETLIB_DEVICE_IMPL(74107A, 		"TTL_74107A",   "+CLK,+J,+K,+CLRQ")
+	NETLIB_DEVICE_IMPL(74107_dip, 	"TTL_74107_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

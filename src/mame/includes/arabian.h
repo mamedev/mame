@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "cpu/mb88xx/mb88xx.h"
 #include "emupal.h"
 
 class arabian_state : public driver_device
@@ -52,7 +53,7 @@ private:
 	DECLARE_WRITE8_MEMBER(arabian_videoram_w);
 	DECLARE_WRITE8_MEMBER(ay8910_porta_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
-	DECLARE_PALETTE_INIT(arabian);
+	void arabian_palette(palette_device &palette) const;
 	uint32_t screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_area(uint8_t plane, uint16_t src, uint8_t x, uint8_t y, uint8_t sx, uint8_t sy);
 
@@ -73,7 +74,7 @@ private:
 	uint8_t    m_mcu_port_r[4];
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<mb8841_cpu_device> m_mcu;
 	required_device<palette_device> m_palette;
 };
 

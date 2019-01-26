@@ -497,19 +497,19 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76477_TAG, SN76477)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(330), CAP_P(390)) // noise + filter: R26 47k - R24 330k - C52 390p
-	MCFG_SN76477_DECAY_RES(RES_K(47))                   //  decay_res: R23 47k
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(10), RES_K(2.2))   // attack_decay_cap + attack_res: C50 10u/35V - R21 2.2k
-	MCFG_SN76477_AMP_RES(RES_K(33))                     // amplitude_res: R19 33k
-	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res: R18 10k
-	MCFG_SN76477_VCO_PARAMS(0, CAP_N(10), RES_K(100))   // VCO volt + cap + res: 0V/2.5V (voltage divider R17 1k / R16 1k) - C48 10n - R20 100k
-	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage: N/C
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1), RES_K(220))       // slf caps + res: C51 1u/35V - R22 220k
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_U(0.1), RES_K(330)) // oneshot caps + res: C53 0.1u - R25 330k
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SN76477(config, m_csg);
+	m_csg->set_noise_params(RES_K(47), RES_K(330), CAP_P(390));
+	m_csg->set_decay_res(RES_K(47));
+	m_csg->set_attack_params(CAP_U(10), RES_K(2.2));
+	m_csg->set_amp_res(RES_K(33));
+	m_csg->set_feedback_res(RES_K(10));
+	m_csg->set_vco_params(0, CAP_N(10), RES_K(100));
+	m_csg->set_pitch_voltage(0);
+	m_csg->set_slf_params(CAP_U(1), RES_K(220));
+	m_csg->set_oneshot_params(CAP_U(0.1), RES_K(330));
+	m_csg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	WAVE(config, "wave", CASSETTE_TAG).add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	Z80PIO(config, m_pio, XTAL(11'980'800)/2/2);
@@ -518,9 +518,9 @@ MACHINE_CONFIG_START(abc80_state::abc80)
 	m_pio->in_pb_callback().set(FUNC(abc80_state::pio_pb_r));
 	m_pio->out_pb_callback().set(FUNC(abc80_state::pio_pb_w));
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("abc80_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("abc80_cass");
 
 	ABC80_KEYBOARD(config, m_kb, 0);
 	m_kb->keydown_wr_callback().set(FUNC(abc80_state::keydown_w));

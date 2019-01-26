@@ -59,40 +59,101 @@
     F    0x3c000 - 0x3ffff ROM expansion
 
     TODO:
-        Add ROMs and drivers for the Laser100, 110,
-        210 and 310 machines and the Texet 8000.
-        They should probably go to the vtech1.c files, though.
+    - Ram pak
+    - undumped DOS ROM
+    - need software
+
+    Cartslot works, even though it seems there were no game carts made
+    for these systems. The bios checks the first few bytes for a particular
+    sequence; if found, the cart is executed at the next byte.
+    We allow a cart of any size up to 64k, and it gets loaded into bank 12,
+    continuing on to banks 13, 14 and 15 if needed. The bios checks for the
+    sequence at each bank boundary.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/vtech2.h"
-
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
-
+#include "formats/vt_cas.h"
 #include "screen.h"
 #include "speaker.h"
 
-#include "formats/vt_cas.h"
 
 
-void vtech2_state::vtech2_mem(address_map &map)
+void vtech2_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).m(m_banka, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x7fff).m(m_bankb, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xbfff).m(m_bankc, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xffff).m(m_bankd, FUNC(address_map_bank_device::amap8));
 }
 
-void vtech2_state::vtech2_io(address_map &map)
+void vtech2_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x1f).rw(FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
-	map(0x40, 0x43).w(FUNC(vtech2_state::laser_bank_select_w));
+	map(0x40, 0x40).lw8("set_bankA", [this] (u8 data) { m_banka->set_bank(data & 15); });
+	map(0x41, 0x41).lw8("set_bankB", [this] (u8 data) { m_bankb->set_bank(data & 15); });
+	map(0x42, 0x42).lw8("set_bankC", [this] (u8 data) { m_bankc->set_bank(data & 15); });
+	map(0x43, 0x43).lw8("set_bankD", [this] (u8 data) { m_bankd->set_bank(data & 15); });
 	map(0x44, 0x44).w(FUNC(vtech2_state::laser_bg_mode_w));
 	map(0x45, 0x45).w(FUNC(vtech2_state::laser_two_color_w));
+}
+
+// Laser 350, 16k ram
+void vtech2_state::m_map350(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("maincpu", 0);
+	map(0x04000, 0x07fff).rom().region("maincpu", 0x4000);
+	map(0x08000, 0x0bfff).rw(FUNC(vtech2_state::mmio_r), FUNC(vtech2_state::mmio_w));
+	map(0x0c000, 0x0ffff).ram().share(m_videoram);
+	map(0x10000, 0x13fff).noprw();
+	map(0x14000, 0x17fff).noprw();
+	map(0x18000, 0x1bfff).noprw();
+	map(0x1c000, 0x1ffff).noprw();
+	map(0x20000, 0x23fff).noprw(); // TODO: 64k ram expansion pak
+	map(0x24000, 0x27fff).noprw(); // TODO: 64k ram expansion pak
+	map(0x28000, 0x2bfff).noprw(); // TODO: 64k ram expansion pak
+	map(0x2c000, 0x2ffff).noprw(); // TODO: 64k ram expansion pak
+	map(0x30000, 0x3ffff).r(FUNC(vtech2_state::cart_r));
+}
+
+// Laser 500, 64k ram
+void vtech2_state::m_map500(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("maincpu", 0);
+	map(0x04000, 0x07fff).rom().region("maincpu", 0x4000);
+	map(0x08000, 0x0bfff).rw(FUNC(vtech2_state::mmio_r), FUNC(vtech2_state::mmio_w));
+	map(0x0c000, 0x0ffff).noprw();
+	map(0x10000, 0x13fff).ram();
+	map(0x14000, 0x17fff).ram();
+	map(0x18000, 0x1bfff).ram();
+	map(0x1c000, 0x1ffff).ram().share(m_videoram);
+	map(0x20000, 0x23fff).noprw(); // TODO: 64k ram expansion pak
+	map(0x24000, 0x27fff).noprw(); // TODO: 64k ram expansion pak
+	map(0x28000, 0x2bfff).noprw(); // TODO: 64k ram expansion pak
+	map(0x2c000, 0x2ffff).noprw(); // TODO: 64k ram expansion pak
+	map(0x30000, 0x3ffff).r(FUNC(vtech2_state::cart_r));
+}
+
+// Laser 700, 128k ram
+void vtech2_state::m_map700(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("maincpu", 0);
+	map(0x04000, 0x07fff).rom().region("maincpu", 0x4000);
+	map(0x08000, 0x0bfff).rw(FUNC(vtech2_state::mmio_r), FUNC(vtech2_state::mmio_w));
+	map(0x0c000, 0x0ffff).noprw();
+	map(0x10000, 0x13fff).ram();
+	map(0x14000, 0x17fff).ram();
+	map(0x18000, 0x1bfff).ram();
+	map(0x1c000, 0x1ffff).ram().share(m_videoram);
+	map(0x20000, 0x23fff).ram();
+	map(0x24000, 0x27fff).ram();
+	map(0x28000, 0x2bfff).ram();
+	map(0x2c000, 0x2ffff).ram();
+	map(0x30000, 0x3ffff).r(FUNC(vtech2_state::cart_r));
 }
 
 
@@ -150,8 +211,10 @@ static INPUT_PORTS_START( laser500 )
 	PORT_START("ROW5") /* KEY ROW 5 */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_CONFNAME( 0x30, 0x30, "Language")
+	PORT_CONFSETTING(    0x10, "French")
+	PORT_CONFSETTING(    0x20, "German")
+	PORT_CONFSETTING(    0x30, "English")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)            PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)            PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)            PORT_CHAR('i') PORT_CHAR('I')
@@ -170,7 +233,7 @@ static INPUT_PORTS_START( laser500 )
 	PORT_START("ROW7") /* KEY ROW 7 */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Graph") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)        PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.') PORT_CHAR('>')
@@ -210,10 +273,10 @@ static INPUT_PORTS_START( laser500 )
 	PORT_START("ROWD") /* KEY ROW D */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xCE\xBC  \xC2\xA3") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0xa3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xCE\xBC  \xC2\xA3") PORT_CODE(KEYCODE_END) PORT_CHAR(0xa3)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_DEL)             PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ins") PORT_CODE(KEYCODE_INSERT)          PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
@@ -273,11 +336,11 @@ INPUT_PORTS_END
 static const gfx_layout charlayout_80 =
 {
 	8,8,                    /* 8 x 8 characters */
-	256,                    /* 256 characters */
+	1024,                    /* characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
 	/* x offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	/* y offsets */
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
 	8*8                     /* every char takes 8 bytes */
@@ -286,11 +349,11 @@ static const gfx_layout charlayout_80 =
 static const gfx_layout charlayout_40 =
 {
 	8*2,8,                  /* 8*2 x 8 characters */
-	256,                    /* 256 characters */
+	1024,                    /* characters */
 	1,                      /* 1 bits per pixel */
 	{ 0 },                  /* no bitplanes; 1 bit per pixel */
 	/* x offsets */
-	{ 0,0, 1,1, 2,2, 3,3, 4,4, 5,5, 6,6, 7,7 },
+	{ 7,7, 6,6, 5,5, 4,4, 3,3, 2,2, 1,1, 0,0 },
 	/* y offsets */
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
 	8*8                     /* every char takes 8 bytes */
@@ -372,43 +435,41 @@ static GFXDECODE_START( gfx_vtech2 )
 GFXDECODE_END
 
 
-static const rgb_t vt_colors[] =
+static constexpr rgb_t vt_colors[] =
 {
 	rgb_t::black(),
-	rgb_t(0x00, 0x00, 0x7f),  /* blue */
-	rgb_t(0x00, 0x7f, 0x00),  /* green */
-	rgb_t(0x00, 0x7f, 0x7f),  /* cyan */
-	rgb_t(0x7f, 0x00, 0x00),  /* red */
-	rgb_t(0x7f, 0x00, 0x7f),  /* magenta */
-	rgb_t(0x7f, 0x7f, 0x00),  /* yellow */
-	rgb_t(0xa0, 0xa0, 0xa0),  /* bright grey */
-	rgb_t(0x7f, 0x7f, 0x7f),  /* dark grey */
-	rgb_t(0x00, 0x00, 0xff),  /* bright blue */
-	rgb_t(0x00, 0xff, 0x00),  /* bright green */
-	rgb_t(0x00, 0xff, 0xff),  /* bright cyan */
-	rgb_t(0xff, 0x00, 0x00),  /* bright red */
-	rgb_t(0xff, 0x00, 0xff),  /* bright magenta */
-	rgb_t(0xff, 0xff, 0x00),  /* bright yellow */
+	{ 0x00, 0x00, 0x7f },  // blue
+	{ 0x00, 0x7f, 0x00 },  // green
+	{ 0x00, 0x7f, 0x7f },  // cyan
+	{ 0x7f, 0x00, 0x00 },  // red
+	{ 0x7f, 0x00, 0x7f },  // magenta
+	{ 0x7f, 0x7f, 0x00 },  // yellow
+	{ 0xa0, 0xa0, 0xa0 },  // bright grey
+	{ 0x7f, 0x7f, 0x7f },  // dark grey
+	{ 0x00, 0x00, 0xff },  // bright blue
+	{ 0x00, 0xff, 0x00 },  // bright green
+	{ 0x00, 0xff, 0xff },  // bright cyan
+	{ 0xff, 0x00, 0x00 },  // bright red
+	{ 0xff, 0x00, 0xff },  // bright magenta
+	{ 0xff, 0xff, 0x00 },  // bright yellow
 	rgb_t::white()
 };
 
 
-/* Initialise the palette */
-PALETTE_INIT_MEMBER(vtech2_state, vtech2)
+// Initialise the palette
+void vtech2_state::vtech2_palette(palette_device &palette) const
 {
-	int i;
-
-	for ( i = 0; i < 16; i++ )
+	for (int i = 0; i < 16; i++)
 		palette.set_indirect_color(i, vt_colors[i]);
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		palette.set_pen_indirect(2*i, i&15);
-		palette.set_pen_indirect(2*i+1, i>>4);
+		palette.set_pen_indirect(2*i, i & 15);
+		palette.set_pen_indirect(2*i + 1, i >> 4);
 	}
 
-	for (i = 0; i < 16; i++)
-		palette.set_pen_indirect(512+i, i);
+	for (int i = 0; i < 16; i++)
+		palette.set_pen_indirect(512 + i, i);
 }
 
 INTERRUPT_GEN_MEMBER(vtech2_state::vtech2_interrupt)
@@ -426,10 +487,15 @@ static const floppy_interface vtech2_floppy_interface =
 MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(vtech2_mem)
-	MCFG_DEVICE_IO_MAP(vtech2_io)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vtech2_state,  vtech2_interrupt)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankc").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config, "bankd").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -438,40 +504,50 @@ MACHINE_CONFIG_START(vtech2_state::laser350)
 	MCFG_SCREEN_SIZE(88*8, 24*8+32)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 88*8-1, 0*8, 24*8+32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(vtech2_state, screen_update_laser)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vtech2)
-	MCFG_PALETTE_ADD("palette", 512+16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(vtech2_state, vtech2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vtech2);
+	PALETTE(config, m_palette, FUNC(vtech2_state::vtech2_palette), 512 + 16, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(vtech2_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(vtech2_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+
+	VTECH_IOEXP_SLOT(config, "io");
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vtech_cart")
 	MCFG_GENERIC_EXTENSIONS("rom,bin")
+	MCFG_GENERIC_LOAD(vtech2_state, cart_load)
 
 	/* 5.25" Floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_interface )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(vtech2_state::laser500)
+void vtech2_state::laser500(machine_config &config)
+{
 	laser350(config);
-	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
-MACHINE_CONFIG_END
+
+	ADDRESS_MAP_BANK(config.replace(), "banka").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankb").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankc").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankd").set_map(&vtech2_state::m_map500).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+}
 
 
 MACHINE_CONFIG_START(vtech2_state::laser700)
 	laser350(config);
-	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
+
+	ADDRESS_MAP_BANK(config.replace(), "banka").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankb").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankc").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
+	ADDRESS_MAP_BANK(config.replace(), "bankd").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* Second 5.25" floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_1, vtech2_floppy_interface )
@@ -479,31 +555,31 @@ MACHINE_CONFIG_END
 
 
 ROM_START(laser350)
-	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
-	ROM_REGION(0x00800,"gfx1",0)
-	ROM_LOAD("laser.fnt",   0x00000, 0x00800, CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87))
-	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
+	ROM_REGION(0x8000,"maincpu",0)
+	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) )
+	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
 
 
 ROM_START(laser500) // based on the picture at http://www.8bit-museum.de/hardware/laser500pcb-h.jpg
 // There should be two roms, one 0x2000 long for the font at u10, and one longer one for the os rom at u6.
-	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("27-0401-00-00.u6", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1)) // may be dumped at wrong size; label is: "VTL 27-0401-00-00 // 6133-7081 // 8611MAK"
-	ROM_REGION(0x00800,"gfx1",0)
-	ROM_LOAD("27-393-00.u10",   0x00000, 0x00800, BAD_DUMP CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87)) // dumped at wrong size; correct size is 0x2000; label is "TMS 2364-25NL // D8614L // ZA234015 // 27-393-00/VT 85 // SINGAPORE"
-	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
+	ROM_REGION(0x8000,"maincpu",0)
+	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1)) // may be dumped at wrong size; label is: "VTL 27-0401-00-00 // 6133-7081 // 8611MAK"
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) ) // label is "TMS 2364-25NL // D8614L // ZA234015 // 27-393-00/VT 85 // SINGAPORE"
+	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
 
 ROM_START(laser700)
-	ROM_REGION(0x40000,"maincpu",0)
-	ROM_LOAD("laserv3.rom", 0x00000, 0x08000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
-	ROM_REGION(0x00800,"gfx1",0)
-	ROM_LOAD("laser.fnt",   0x00000, 0x00800, CRC(ed6bfb2a) SHA1(95e247021a10167b9de1d6ffc91ec4ba83b0ec87))
-	ROM_REGION(0x00100,"gfx2",ROMREGION_ERASEFF)
+	ROM_REGION(0x8000,"maincpu",0)
+	ROM_LOAD("27-0401-00-00.u6", 0x0000, 0x8000, CRC(9bed01f7) SHA1(3210fddfab2f4c7855fa902fb8e2fc18d10d48f1))
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD( "27-393-00.u10", 0x0000, 0x2000, CRC(d47313a2) SHA1(4650e8e339aad628c0e5d8a1944b21abff793446) )
+	ROM_REGION(0x0100,"gfx2",ROMREGION_ERASEFF)
 	/* initialized in init_laser */
 ROM_END
 
@@ -515,6 +591,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS         INIT        COMPANY             FULLNAME      FLAGS
-COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , 0)
+COMP( 1985, laser350, 0,        0,      laser350, laser350, vtech2_state, init_laser, "Video Technology", "Laser 350" , 0)
+COMP( 1985, laser500, laser350, 0,      laser500, laser500, vtech2_state, init_laser, "Video Technology", "Laser 500" , 0)
+COMP( 1985, laser700, laser350, 0,      laser700, laser500, vtech2_state, init_laser, "Video Technology", "Laser 700" , 0)

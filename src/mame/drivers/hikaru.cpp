@@ -529,10 +529,10 @@ void hikaru_state::hikaru(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(hikaru_state::screen_update_hikaru));
 
-	PALETTE(config, "palette", 0x1000);
+	PALETTE(config, "palette").set_entries(0x1000);
 
-//	SPEAKER(config, "lspeaker").front_left();
-//	SPEAKER(config, "rspeaker").front_right();
+//  SPEAKER(config, "lspeaker").front_left();
+//  SPEAKER(config, "rspeaker").front_right();
 
 //  MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block // 33.8688MHz on Board
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)

@@ -945,23 +945,23 @@ FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
+void fanucspmg_state::fanucspmg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, I8086, XTAL(15'000'000)/3)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
-	MCFG_DEVICE_IO_MAP(maincpu_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic0", pic8259_device, inta_cb)
-	MCFG_I8086_ESC_OPCODE_HANDLER(WRITE32("i8087", i8087_device, insn_w))
-	MCFG_I8086_ESC_DATA_HANDLER(WRITE32("i8087", i8087_device, addr_w))
+	I8086(config, m_maincpu, XTAL(15'000'000)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fanucspmg_state::maincpu_mem);
+	m_maincpu->set_addrmap(AS_IO, &fanucspmg_state::maincpu_io);
+	m_maincpu->set_irq_acknowledge_callback("pic0", FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
 
 	i8087_device &i8087(I8087(config, "i8087", XTAL(15'000'000)/3));
-	i8087.set_addrmap(AS_PROGRAM, &fanucspmg_state::maincpu_mem);
-	i8087.set_data_width(16);
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
 	//i8087.irq().set_inputline("maincpu", INPUT_LINE_NMI);  // TODO: presumably this is connected to the pic
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
-	MCFG_DEVICE_ADD(SUBCPU_TAG, I8085A, XTAL(16'000'000)/2/2)
-	MCFG_DEVICE_PROGRAM_MAP(subcpu_mem)
+	I8085A(config, m_subcpu, XTAL(16'000'000)/2/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &fanucspmg_state::subcpu_mem);
 
 	I8251(config, m_usart[0], 0);
 	I8251(config, m_usart[1], 0);
@@ -998,12 +998,12 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic[0], FUNC(pic8259_device::ir3_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq0_w));
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", fanuc_floppies, "525dd", fanucspmg_state::floppy_formats);
 
-	MCFG_SCREEN_ADD( SCREEN_TAG, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000), 640, 0, 512, 390, 0, 384 )
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(15'000'000), 640, 0, 512, 390, 0, 384);
+	screen.set_screen_update(CRTC_TAG, FUNC(mc6845_device::screen_update));
 
 	HD6845(config, m_crtc, XTAL(8'000'000)/2);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -1011,7 +1011,7 @@ MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(fanucspmg_state::crtc_update_row), this);
 	m_crtc->out_vsync_callback().set(FUNC(fanucspmg_state::vsync_w));
-MACHINE_CONFIG_END
+}
 
 void fanucspmg_state::fanucspmgm(machine_config &config)
 {

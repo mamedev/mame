@@ -419,84 +419,75 @@ INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(appoooh_state::appoooh_common)
-
+void appoooh_state::appoooh_common(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-
+	Z80(config, m_maincpu, 18432000/6); /* ??? the main xtal is 18.432 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &appoooh_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &appoooh_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(appoooh_state::vblank_irq));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76489, 18432000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	SN76489(config, "sn1", 18432000/6).add_route(ALL_OUTPUTS, "mono", 0.30);
+	SN76489(config, "sn2", 18432000/6).add_route(ALL_OUTPUTS, "mono", 0.30);
+	SN76489(config, "sn3", 18432000/6).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("sn2", SN76489, 18432000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(appoooh_state::adpcm_int)); /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S64_4B);  /* 6KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-	MCFG_DEVICE_ADD("sn3", SN76489, 18432000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, appoooh_state, adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6KHz               */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(appoooh_state::appoooh)
+void appoooh_state::appoooh(machine_config &config)
+{
 	appoooh_common(config);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_appoooh)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(appoooh_state::screen_update_appoooh));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_appoooh)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
-
-	MCFG_PALETTE_INIT_OWNER(appoooh_state,appoooh)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_appoooh);
+	PALETTE(config, m_palette, FUNC(appoooh_state::appoooh_palette), 32*8+32*8);
+}
 
 
-MACHINE_CONFIG_START(appoooh_state::robowres)
+void appoooh_state::robowres(machine_config &config)
+{
 	appoooh_common(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	m_maincpu->set_addrmap(AS_OPCODES, &appoooh_state::decrypted_opcodes_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(appoooh_state, screen_update_robowres)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(appoooh_state::screen_update_robowres));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_robowres)
-	MCFG_PALETTE_ADD("palette", 32*8+32*8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_robowres);
+	PALETTE(config, m_palette, FUNC(appoooh_state::robowres_palette), 32*8+32*8);
+}
 
-	MCFG_PALETTE_INIT_OWNER(appoooh_state,robowres)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(appoooh_state::robowrese)
+void appoooh_state::robowrese(machine_config &config)
+{
 	robowres(config);
 
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5179,18432000/6) /* ??? the main xtal is 18.432 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", appoooh_state,  vblank_irq)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_5179_device &maincpu(SEGA_315_5179(config.replace(), m_maincpu, 18432000/6)); /* ??? the main xtal is 18.432 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &appoooh_state::main_map);
+	maincpu.set_addrmap(AS_IO, &appoooh_state::main_portmap);
+	maincpu.set_vblank_int("screen", FUNC(appoooh_state::vblank_irq));
+	maincpu.set_addrmap(AS_OPCODES, &appoooh_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*************************************
  *

@@ -432,7 +432,7 @@ void thedeep_state::thedeep(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thedeep);
-	PALETTE(config, m_palette, 512).set_init(FUNC(thedeep_state::palette_init_thedeep));
+	PALETTE(config, m_palette, FUNC(thedeep_state::thedeep_palette), 512);
 
 	DECO_MXC06(config, m_spritegen, 0);
 	m_spritegen->set_gfx_region(0);

@@ -30,15 +30,14 @@
 #define BALSENTE_VBSTART        (0x100)
 
 
-#define POLY17_BITS 17
-#define POLY17_SIZE ((1 << POLY17_BITS) - 1)
-#define POLY17_SHL  7
-#define POLY17_SHR  10
-#define POLY17_ADD  0x18000
-
-
 class balsente_state : public driver_device
 {
+	static constexpr unsigned POLY17_BITS = 17;
+	static constexpr size_t POLY17_SIZE = (1 << POLY17_BITS) - 1;
+	static constexpr unsigned POLY17_SHL = 7;
+	static constexpr unsigned POLY17_SHR = 10;
+	static constexpr uint32_t POLY17_ADD = 0x18000;
+
 public:
 	balsente_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)

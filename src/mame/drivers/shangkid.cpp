@@ -413,8 +413,8 @@ MACHINE_CONFIG_START(shangkid_state::chinhero)
 	screen.screen_vblank().set(FUNC(shangkid_state::irq_1_w));
 	screen.screen_vblank().append(FUNC(shangkid_state::irq_2_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chinhero)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chinhero);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 	MCFG_VIDEO_START_OVERRIDE(shangkid_state,shangkid)
 
 	/* sound hardware */
@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(shangkid_state::shangkid)
 	MCFG_MACHINE_RESET_OVERRIDE(shangkid_state,shangkid)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_shangkid)
+	m_gfxdecode->set_info(gfx_shangkid);
 
 	m_aysnd->port_a_write_callback().set(FUNC(shangkid_state::shangkid_ay8910_porta_w));
 MACHINE_CONFIG_END
@@ -501,10 +501,8 @@ MACHINE_CONFIG_START(shangkid_state::dynamski)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, shangkid_state, irq_1_w))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dynamski)
-	MCFG_PALETTE_ADD("palette", 16*4+16*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(shangkid_state,dynamski)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dynamski);
+	PALETTE(config, m_palette, FUNC(shangkid_state::dynamski_palette), 16*4 + 16*4, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

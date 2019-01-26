@@ -2536,7 +2536,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_maincpu, FUNC(tmpz84c011_device::trg1)).invert();
 
-	MCFG_PALETTE_ADD(m_palette, 256)
+	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -2579,8 +2579,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV3)
 	MSCOUTM_TMZ84C011_MAIN_PORTS
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(512)
+	m_palette->set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,nb22090)
 MACHINE_CONFIG_END

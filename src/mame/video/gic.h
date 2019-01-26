@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -50,8 +48,6 @@ public:
 
 	// configuration helpers
 	auto ram_callback() { return m_ram.bind(); }
-
-	DECLARE_PALETTE_INIT(gic);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -838,13 +838,13 @@ MACHINE_CONFIG_START(segag80r_state::g80r_base)
 	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segag80r)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segag80r);
+	PALETTE(config, m_palette).set_entries(64);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(segag80r_state, screen_update_segag80r)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 MACHINE_CONFIG_END
 
 
@@ -886,9 +886,8 @@ MACHINE_CONFIG_START(segag80r_state::spaceod)
 	/* background board changes */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spaceod)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64+64)
+	m_gfxdecode->set_info(gfx_spaceod);
+	m_palette->set_entries(64 + 64);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -912,24 +911,24 @@ MACHINE_CONFIG_START(segag80r_state::monsterb)
 	ppi.out_pc_callback().set(m_soundbrd, FUNC(monsterb_sound_device::n7751_command_w));
 
 	/* background board changes */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64+64)
+	m_gfxdecode->set_info(gfx_monsterb);
+	m_palette->set_entries(64 + 64);
 
 	/* sound boards */
 	MCFG_DEVICE_ADD(m_soundbrd, MONSTERB_SOUND, 0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(segag80r_state::monster2)
+void segag80r_state::monster2(machine_config &config)
+{
 	monsterb(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_SPAT, VIDEO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_ppi8255_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state, segag80r_vblank_start)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(segag80r_state, segag80r_irq_ack)
-	MCFG_DEVICE_OPCODES_MAP(sega_315_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_315_spat_device &maincpu(SEGA_315_SPAT(config.replace(), m_maincpu, VIDEO_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &segag80r_state::main_map);
+	maincpu.set_addrmap(AS_IO, &segag80r_state::main_ppi8255_portmap);
+	maincpu.set_vblank_int("screen", FUNC(segag80r_state::segag80r_vblank_start));
+	maincpu.set_irq_acknowledge_callback(FUNC(segag80r_state::segag80r_irq_ack));
+	maincpu.set_addrmap(AS_OPCODES, &segag80r_state::sega_315_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+}
 
 MACHINE_CONFIG_START(segag80r_state::pignewt)
 	g80r_base(config);
@@ -937,9 +936,8 @@ MACHINE_CONFIG_START(segag80r_state::pignewt)
 	/* basic machine hardware */
 
 	/* background board changes */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64+64)
+	m_gfxdecode->set_info(gfx_monsterb);
+	m_palette->set_entries(64 + 64);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -953,21 +951,20 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	g80r_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_315_5028, VIDEO_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(sindbadm_portmap)
-	MCFG_DEVICE_OPCODES_MAP(sega_315_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segag80r_state,  sindbadm_vblank_start)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	sega_315_5028_device &maincpu(SEGA_315_5028(config.replace(), m_maincpu, VIDEO_CLOCK/4));
+	maincpu.set_addrmap(AS_PROGRAM, &segag80r_state::main_map);
+	maincpu.set_addrmap(AS_IO, &segag80r_state::sindbadm_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &segag80r_state::sega_315_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(segag80r_state::sindbadm_vblank_start));
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.in_pb_callback().set_ioport("FC");
 	ppi.out_pc_callback().set(FUNC(segag80r_state::sindbadm_misc_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_monsterb)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64+64)
+	m_gfxdecode->set_info(gfx_monsterb);
+	m_palette->set_entries(64 + 64);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

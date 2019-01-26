@@ -1388,8 +1388,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", NC_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(nc_state, nc)
+	PALETTE(config, "palette", FUNC(nc_state::nc_colours), NC_NUM_COLOURS);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1407,8 +1406,8 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	/* uart */
 	I8251(config, m_uart, 0);
 
-	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, nc_state, write_uart_clock))
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 19200));
+	uart_clock.signal_handler().set(FUNC(nc_state::write_uart_clock));
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, nullptr)
@@ -1420,7 +1419,7 @@ MACHINE_CONFIG_START(nc_state::nc_base)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	/* dummy timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", nc_state, dummy_timer_callback, attotime::from_hz(50))
+	TIMER(config, "dummy_timer").configure_periodic(FUNC(nc_state::dummy_timer_callback), attotime::from_hz(50));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nc100_state::nc100)
@@ -1471,9 +1470,9 @@ MACHINE_CONFIG_START(nc200_state::nc200)
 	MCFG_SCREEN_VISIBLE_AREA(0, NC200_SCREEN_WIDTH-1, 0, NC200_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nc200_state, screen_update_nc200)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(NC200_NUM_COLOURS)
-	MCFG_PALETTE_INIT_OWNER(nc200_state, nc)
+	palette_device &palette(*subdevice<palette_device>("palette"));
+	palette.set_entries(NC200_NUM_COLOURS);
+	palette.set_init(FUNC(nc200_state::nc_colours));
 
 	/* printer */
 	MCFG_DEVICE_MODIFY("centronics")

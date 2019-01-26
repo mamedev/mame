@@ -49,7 +49,7 @@ private:
 	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);
 	DECLARE_WRITE8_MEMBER(audio_dac_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(trucocl);
+	void trucocl_palette(palette_device &palette) const;
 	uint32_t screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(trucocl_interrupt);
 	required_device<cpu_device> m_maincpu;

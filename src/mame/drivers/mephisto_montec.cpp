@@ -500,7 +500,7 @@ MACHINE_CONFIG_START(mephisto_montec_state::mondial2)
 	MCFG_DEVICE_PROGRAM_MAP(mondial2_mem)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
+	TIMER(config, "refresh_leds").configure_periodic(FUNC(mephisto_montec_state::refresh_leds), attotime::from_hz(10));
 	config.set_default_layout(layout_mephisto_mondial2);
 MACHINE_CONFIG_END
 

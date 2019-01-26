@@ -131,8 +131,8 @@ Dip locations verified for:
 class m63_state : public driver_device
 {
 public:
-	m63_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m63_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
 		m_videoram2(*this, "videoram2"),
@@ -212,7 +212,7 @@ private:
 	DECLARE_MACHINE_START(m63);
 	DECLARE_MACHINE_RESET(m63);
 	DECLARE_VIDEO_START(m63);
-	DECLARE_PALETTE_INIT(m63);
+	void m63_palette(palette_device &palette) const;
 	uint32_t screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -224,59 +224,58 @@ private:
 };
 
 
-PALETTE_INIT_MEMBER(m63_state,m63)
+void m63_state::m63_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b;
+		int bit0, bit1, bit2, bit3;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* green component */
-		bit0 = (color_prom[i + 256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 256] >> 3) & 0x01;
-		g =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
-		bit0 = (color_prom[i + 2*256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*256] >> 3) & 0x01;
-		b =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const r =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// green component
+		bit0 = BIT(color_prom[i + 256], 0);
+		bit1 = BIT(color_prom[i + 256], 1);
+		bit2 = BIT(color_prom[i + 256], 2);
+		bit3 = BIT(color_prom[i + 256], 3);
+		int const g =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		// blue component
+		bit0 = BIT(color_prom[i + 2*256], 0);
+		bit1 = BIT(color_prom[i + 2*256], 1);
+		bit2 = BIT(color_prom[i + 2*256], 2);
+		bit3 = BIT(color_prom[i + 2*256], 3);
+		int const b =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 
 	color_prom += 3 * 256;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = 0x4f * bit0 + 0xa8 * bit1;
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette.set_pen_color(i+256,rgb_t(r,g,b));
+		palette.set_pen_color(i + 256, rgb_t(r, g, b));
 	}
 }
 
@@ -759,9 +758,9 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 MACHINE_CONFIG_START(m63_state::m63)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(12'000'000)/4)     /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(m63_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4); /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m63_state::m63_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m63_state::vblank_irq));
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // probably chip at E7 obscured by pulldown resistor
 	outlatch.q_out_cb<0>().set(FUNC(m63_state::nmi_mask_w));
@@ -782,18 +781,17 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(m63_state::screen_update_m63));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m63)
-	MCFG_PALETTE_ADD("palette", 256+4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m63);
+	PALETTE(config, m_palette, FUNC(m63_state::m63_palette), 256+4);
 
-	MCFG_PALETTE_INIT_OWNER(m63_state,m63)
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
@@ -802,47 +800,47 @@ MACHINE_CONFIG_START(m63_state::m63)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, m_ay1, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	AY8910(config, m_ay2, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.00); /* ????? */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(m63_state::atomboy)
+void m63_state::atomboy(machine_config &config)
+{
 	m63(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
-MACHINE_CONFIG_END
+	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60/2));
+}
 
-MACHINE_CONFIG_START(m63_state::fghtbskt)
-
+void m63_state::fghtbskt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)     /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fghtbskt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4); /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m63_state::fghtbskt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m63_state::vblank_irq));
 
 	ls259_device &outlatch(LS259(config, "outlatch"));
 	outlatch.q_out_cb<1>().set(FUNC(m63_state::nmi_mask_w));
 	outlatch.q_out_cb<2>().set(FUNC(m63_state::fghtbskt_flipscreen_w));
 	//outlatch.q_out_cb<7>().set(FUNC(m63_state::fghtbskt_samples_w));
 
-	MCFG_DEVICE_ADD("soundcpu", I8039,XTAL(12'000'000)/4)    /* ????? */
-	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
-	MCFG_DEVICE_IO_MAP(i8039_port_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
+	I8039(config, m_soundcpu, XTAL(12'000'000)/4); /* ????? */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m63_state::i8039_map);
+	m_soundcpu->set_addrmap(AS_IO, &m63_state::i8039_port_map);
+	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60/2));
 
 	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
 	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m63_state, screen_update_m63)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(m63_state::screen_update_m63));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fghtbskt)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghtbskt);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
+
 	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
@@ -852,11 +850,11 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	AY8910(config, m_ay1, XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(m63_state, fghtbskt_sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_start_callback(FUNC(m63_state::fghtbskt_sh_start));
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************

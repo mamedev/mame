@@ -1301,7 +1301,7 @@ MACHINE_CONFIG_START(cps2_state::cps2)
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(cps2_map)
 	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps2_state, cps2_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(qsound_sub_map)

@@ -28,7 +28,7 @@ public:
 	void burglarx(machine_config &config);
 
 protected:
-	DECLARE_PALETTE_DECODER(unico_R6G6B6X);
+	static rgb_t unico_R6G6B6X(uint32_t raw);
 	DECLARE_READ16_MEMBER(vram_r);
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_READ16_MEMBER(scroll_r);

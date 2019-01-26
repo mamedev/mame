@@ -93,11 +93,11 @@ public:
 	DECLARE_MACHINE_START(cosmic);
 	DECLARE_MACHINE_RESET(cosmic);
 	DECLARE_MACHINE_RESET(cosmicg);
-	DECLARE_PALETTE_INIT(cosmicg);
-	DECLARE_PALETTE_INIT(panic);
-	DECLARE_PALETTE_INIT(cosmica);
-	DECLARE_PALETTE_INIT(magspot);
-	DECLARE_PALETTE_INIT(nomnlnd);
+	void panic_palette(palette_device &palette);
+	void cosmica_palette(palette_device &palette);
+	void cosmicg_palette(palette_device &palette);
+	void magspot_palette(palette_device &palette);
+	void nomnlnd_palette(palette_device &palette);
 	uint32_t screen_update_cosmicg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_panic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cosmica(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

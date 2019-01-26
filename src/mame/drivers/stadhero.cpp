@@ -54,7 +54,7 @@ void stadhero_state::main_map(address_map &map)
 	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::pf_control_1_w));
 	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
 	map(0x30c000, 0x30c001).portr("INPUTS");
-	map(0x30c002, 0x30c003).portr("COIN");
+	map(0x30c002, 0x30c003).lr8("30c002", [this]() { return uint8_t(m_coin->read()); });
 	map(0x30c004, 0x30c005).portr("DSW").w(FUNC(stadhero_state::int_ack_w));
 	map(0x30c007, 0x30c007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x310000, 0x3107ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
@@ -133,10 +133,6 @@ static INPUT_PORTS_START( stadhero )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 
 	PORT_START("COIN")  /* 0x30c002 & 0x30c003 */
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "FAKE")
-
-	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
@@ -190,15 +186,15 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(stadhero_state::stadhero)
-
+void stadhero_state::stadhero(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stadhero_state, irq5_line_assert)
+	M68000(config, m_maincpu, 20_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stadhero_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(stadhero_state::irq5_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 24_MHz_XTAL/16)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	M6502(config, m_audiocpu, 24_MHz_XTAL/16);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &stadhero_state::audio_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -210,8 +206,7 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_stadhero);
-
-	PALETTE(config, "palette", 1024).set_format(PALETTE_FORMAT_xxxxBBBBGGGGRRRR);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO_BAC06(config, m_tilegen, 0);
 	m_tilegen->set_gfx_region_wide(1, 1, 2);
@@ -227,19 +222,19 @@ MACHINE_CONFIG_START(stadhero_state::stadhero)
 	GENERIC_LATCH_8(config, m_soundlatch, 0);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 24_MHz_XTAL/16)
-	MCFG_SOUND_ROUTE(0, "mono", 0.95)
-	MCFG_SOUND_ROUTE(1, "mono", 0.95)
-	MCFG_SOUND_ROUTE(2, "mono", 0.95)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL/16));
+	ym1.add_route(0, "mono", 0.95);
+	ym1.add_route(1, "mono", 0.95);
+	ym1.add_route(2, "mono", 0.95);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, 24_MHz_XTAL/8)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	ym3812_device &ym2(YM3812(config, "ym2", 24_MHz_XTAL/8));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1.056_MHz_XTAL, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 /******************************************************************************/
 

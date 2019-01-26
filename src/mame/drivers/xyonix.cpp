@@ -24,6 +24,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/xyonix.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "screen.h"
@@ -263,18 +264,14 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xyonix_state, nmiclk_w))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xyonix)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(xyonix_state, xyonix)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_xyonix);
+	PALETTE(config, "palette", FUNC(xyonix_state::xyonix_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, 16000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("sn2", SN76496, 16000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SN76496(config, "sn1", 16000000/4).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76496(config, "sn2", 16000000/4).add_route(ALL_OUTPUTS, "mono", 1.0);
 MACHINE_CONFIG_END
 
 /* ROM Loading ***************************************************************/

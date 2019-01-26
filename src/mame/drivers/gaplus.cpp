@@ -514,18 +514,19 @@ void gaplus_state::machine_start()
 	m_lamps.resolve();
 }
 
-MACHINE_CONFIG_START(gaplus_base_state::gaplus_base)
+void gaplus_base_state::gaplus_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
+	MC6809E(config, m_maincpu, XTAL(24'576'000) / 16);   /* 1.536 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaplus_base_state::cpu1_map);
 
-	MCFG_DEVICE_ADD("sub", MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MC6809E(config, m_subcpu, XTAL(24'576'000) / 16);    /* 1.536 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &gaplus_base_state::cpu2_map);
 
-	MCFG_DEVICE_ADD("sub2", MC6809E, XTAL(24'576'000) / 16)    /* 1.536 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cpu3_map)
+	MC6809E(config, m_subcpu2, XTAL(24'576'000) / 16);   /* 1.536 MHz */
+	m_subcpu2->set_addrmap(AS_PROGRAM, &gaplus_base_state::cpu3_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* a high value to ensure proper synchronization of the CPUs */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* a high value to ensure proper synchronization of the CPUs */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -548,23 +549,21 @@ MACHINE_CONFIG_START(gaplus_base_state::gaplus_base)
 	m_screen->screen_vblank().append(FUNC(gaplus_base_state::vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaplus)
-	MCFG_PALETTE_ADD("palette", 64 * 4 + 64 * 8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(gaplus_base_state, gaplus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaplus);
+	PALETTE(config, m_palette, FUNC(gaplus_base_state::gaplus_palette), 64 * 4 + 64 * 8, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_15XX, XTAL(24'576'000) / 1024)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	NAMCO_15XX(config, m_namco_15xx, XTAL(24'576'000) / 1024);
+	m_namco_15xx->set_voices(8);
+	m_namco_15xx->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(gaplus_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(gaplus_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 void gaplus_state::gaplus(machine_config &config)
 {

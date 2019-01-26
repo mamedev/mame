@@ -779,18 +779,17 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	m_tmp68301->out_parallel_callback().set(FUNC(realbrk_state::realbrk_flipscreen_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(0x140, 0xe0)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, realbrk_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_realbrk)
-	MCFG_PALETTE_ADD("palette", 0x8000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_realbrk);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -807,6 +806,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(realbrk_state::pkgnsh)
 	realbrk(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(pkgnsh_mem)
 
@@ -815,18 +815,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(realbrk_state::pkgnshdx)
 	pkgnsh(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(realbrk_state::dai2kaku)
 	realbrk(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(dai2kaku_mem)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dai2kaku)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update_dai2kaku)
+	m_gfxdecode->set_info(gfx_dai2kaku);
+	m_screen->set_screen_update(FUNC(realbrk_state::screen_update_dai2kaku));
 MACHINE_CONFIG_END
 
 

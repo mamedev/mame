@@ -58,7 +58,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(shootout);
+	void shootout_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

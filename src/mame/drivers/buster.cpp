@@ -25,12 +25,13 @@ TODO:
 class buster_state : public driver_device
 {
 public:
-	buster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	buster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(coin_output_w);
 	uint32_t screen_update_buster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -334,7 +335,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	mc6845_device &crtc(MC6845(config, "crtc", XTAL(3'579'545)/4)); //unknown clock / type
 	crtc.set_screen("screen");
@@ -343,7 +344,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_buster)
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 

@@ -880,12 +880,13 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
 	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
-	MCFG_DEVICE_ADD(m_duart, SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, dectalk_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, dectalk_state, duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, dectalk_state, duart_input))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, dectalk_state, duart_output))
+
+	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
+	m_duart->irq_cb().set(FUNC(dectalk_state::duart_irq_handler));
+	m_duart->a_tx_cb().set(FUNC(dectalk_state::duart_txa));
+	m_duart->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_duart->inport_cb().set(FUNC(dectalk_state::duart_input));
+	m_duart->outport_cb().set(FUNC(dectalk_state::duart_output));
 
 	TMS32010(config, m_dsp, XTAL(20'000'000)); /* Y1 20MHz xtal */
 	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_state::tms32010_mem);

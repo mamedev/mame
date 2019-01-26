@@ -6,9 +6,6 @@
 #pragma once
 
 
-#define MCFG_YM3526_IRQ_HANDLER(cb) \
-		downcast<ym3526_device &>(*device).set_irq_handler((DEVCB_##cb));
-
 class ym3526_device : public device_t, public device_sound_interface
 {
 public:

@@ -1342,16 +1342,16 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
 	MCFG_SCREEN_UPDATE_DRIVER(hp85_state , screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp85_state, vblank_w))
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_TIMER_DRIVER_ADD("vm_timer", hp85_state, vm_timer)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	TIMER(config, m_vm_timer).configure_generic(FUNC(hp85_state::vm_timer));
 
 	// No idea at all about the actual keyboard scan frequency
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp85_state , kb_scan , attotime::from_hz(100))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(hp85_state::kb_scan), attotime::from_hz(100));
 
 	// Hw timers are updated at 1 kHz rate
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("hw_timer" , hp85_state , timer_update , attotime::from_hz(1000))
-	MCFG_TIMER_DRIVER_ADD("clk_busy_timer", hp85_state, clk_busy_timer)
-	MCFG_TIMER_DRIVER_ADD("prt_busy_timer", hp85_state, prt_busy_timer)
+	TIMER(config, "hw_timer").configure_periodic(FUNC(hp85_state::timer_update), attotime::from_hz(1000));
+	TIMER(config, m_clk_busy_timer).configure_generic(FUNC(hp85_state::clk_busy_timer));
+	TIMER(config, m_prt_busy_timer).configure_generic(FUNC(hp85_state::prt_busy_timer));
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
@@ -1395,8 +1395,8 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
 
 	// Printer output
-	MCFG_DEVICE_ADD("prt_graphic", BITBANGER, 0)
-	MCFG_DEVICE_ADD("prt_alpha", BITBANGER, 0)
+	BITBANGER(config, m_prt_graph_out, 0);
+	BITBANGER(config, m_prt_alpha_out, 0);
 
 	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
 MACHINE_CONFIG_END

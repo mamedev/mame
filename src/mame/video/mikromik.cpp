@@ -117,11 +117,11 @@ static GFXDECODE_START( gfx_mm1 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( mm1_state, mm1 )
+void mm1_state::mm1_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x00,0x00,0x00));
-	palette.set_pen_color(1, rgb_t(0x00,0x7F,0x0A)); // dark green ("highlight" mode color)
-	palette.set_pen_color(2, rgb_t(0x08,0xD0,0x1A)); // bright green (normal color)
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x0a)); // dark green ("highlight" mode color)
+	palette.set_pen_color(2, rgb_t(0x08, 0xd0, 0x1a)); // bright green (normal color)
 }
 
 
@@ -137,16 +137,15 @@ MACHINE_CONFIG_START(mm1_state::mm1m6_video)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 800-1, 0, 375-1 )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL(18'720'000), ...)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mm1)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(mm1_state, mm1)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm1);
+	PALETTE(config, m_palette, FUNC(mm1_state::mm1_palette), 3);
 
-	MCFG_DEVICE_ADD(I8275_TAG, I8275, XTAL(18'720'000)/8)
-	MCFG_I8275_CHARACTER_WIDTH(HORIZONTAL_CHARACTER_PIXELS)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mm1_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(I8237_TAG, am9517a_device, dreq0_w))
-	MCFG_I8275_VRTC_CALLBACK(WRITELINE(UPD7220_TAG, upd7220_device, ext_sync_w))
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	I8275(config, m_crtc, XTAL(18'720'000)/8);
+	m_crtc->set_character_width(HORIZONTAL_CHARACTER_PIXELS);
+	m_crtc->set_display_callback(FUNC(mm1_state::crtc_display_pixels), this);
+	m_crtc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
+	m_crtc->vrtc_wr_callback().set(m_hgdc, FUNC(upd7220_device::ext_sync_w));
+	m_crtc->set_screen("screen");
 
 	UPD7220(config, m_hgdc, XTAL(18'720'000)/8);
 	m_hgdc->set_addrmap(0, &mm1_state::mm1_upd7220_map);

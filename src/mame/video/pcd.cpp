@@ -99,7 +99,8 @@ ioport_constructor pcd_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(pcd_mouse);
 }
 
-MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
+void pcd_video_device::device_add_mconfig(machine_config &config)
+{
 	i8741_device &mcu(I8741(config, "graphics", 16_MHz_XTAL / 2));
 	mcu.p1_in_cb().set(FUNC(pcd_video_device::p1_r));
 	mcu.p2_out_cb().set(FUNC(pcd_video_device::p2_w));
@@ -110,16 +111,15 @@ MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
 	screen.set_raw(16_MHz_XTAL, 832, 0, 640, 381, 0, 350);
 	screen.set_screen_update("crtc", FUNC(scn2674_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(pcdx_video_device, pcdx)
+	PALETTE(config, "palette", FUNC(pcd_video_device::pcdx_palette), 3);
 
 	SCN2674(config, m_crtc, 16_MHz_XTAL / 16);
 	m_crtc->set_character_width(16);
 	m_crtc->set_display_callback(FUNC(pcd_video_device::display_pixels));
 	m_crtc->set_screen("screen");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pcd_video_device, mouse_timer, attotime::from_hz(15000)) // guess
-MACHINE_CONFIG_END
+	TIMER(config, "mouse_timer").configure_periodic(FUNC(pcd_video_device::mouse_timer), attotime::from_hz(15000)); // guess
+}
 
 void pcx_video_device::pcx_vid_map(address_map &map)
 {
@@ -160,7 +160,7 @@ void pcx_video_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(24_MHz_XTAL, 1272, 0, 960, 381, 0, 350);
 	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	SCN2672(config, m_crtc, 24_MHz_XTAL / 12); // used with SCB2673B
 	m_crtc->intr_callback().set_inputline("graphics", MCS51_INT0_LINE);
@@ -240,7 +240,7 @@ SCN2672_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 	}
 }
 
-PALETTE_INIT_MEMBER(pcdx_video_device, pcdx)
+void pcdx_video_device::pcdx_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::white());

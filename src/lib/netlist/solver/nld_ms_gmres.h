@@ -13,6 +13,7 @@
 #define NLD_MS_GMRES_H_
 
 #include <algorithm>
+#include <cmath>
 
 #include "mat_cr.h"
 #include "nld_ms_direct.h"
@@ -28,7 +29,7 @@ class matrix_solver_GMRES_t: public matrix_solver_direct_t<m_N, storage_N>
 {
 public:
 
-	matrix_solver_GMRES_t(netlist_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
+	matrix_solver_GMRES_t(netlist_base_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_direct_t<m_N, storage_N>(anetlist, name, matrix_solver_t::ASCENDING, params, size)
 		, m_use_iLU_preconditioning(true)
 		, m_use_more_precise_stop_condition(false)
@@ -105,8 +106,8 @@ void matrix_solver_GMRES_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 					m_term_cr[k].push_back(i);
 					break;
 				}
-			nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
 		}
+		nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
 	}
 
 	mat.ia[iN] = nz;
@@ -167,21 +168,19 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 		new_V[k] = this->m_nets[k]->Q_Analog();
 
 	}
-	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
 
+	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
 	const nl_double accuracy = this->m_params.m_accuracy;
 
-	unsigned mr = iN;
-	if (iN > 3 )
-		mr = static_cast<unsigned>(std::sqrt(iN) * 2.0);
+	const std::size_t mr = (iN > 3 ) ? static_cast<std::size_t>(std::sqrt(iN) * 2.0) : iN;
 	unsigned iter = std::max(1u, this->m_params.m_gs_loops);
 	unsigned gsl = solve_ilu_gmres(new_V, RHS, iter, mr, accuracy);
-	unsigned failed = mr * iter;
+	const std::size_t failed = mr * iter;
 
 	this->m_iterative_total += gsl;
 	this->m_stat_calculations++;
 
-	if (gsl>=failed)
+	if (gsl >= failed)
 	{
 		this->m_iterative_fail++;
 		return matrix_solver_direct_t<m_N, storage_N>::vsolve_non_dynamic(newton_raphson);
@@ -193,7 +192,7 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::vsolve_non_dynamic(const bool ne
 }
 
 template <typename T>
-inline static void givens_mult( const T c, const T s, T & g0, T & g1 )
+inline void givens_mult( const T c, const T s, T & g0, T & g1 )
 {
 	const T tg0 = c * g0 - s * g1;
 	const T tg1 = s * g0 + c * g1;
@@ -289,8 +288,8 @@ unsigned matrix_solver_GMRES_t<m_N, storage_N>::solve_ilu_gmres (nl_double (& RE
 		vec_set(mr+1, NL_FCONST(0.0), m_g);
 		m_g[0] = rho;
 
-		for (std::size_t i = 0; i < mr; i++)
-			vec_set(mr + 1, NL_FCONST(0.0), m_ht[i]);
+		for (std::size_t i = 0; i < mr + 1; i++)
+			vec_set(mr, NL_FCONST(0.0), m_ht[i]);
 
 		vec_mult_scalar(n, residual, NL_FCONST(1.0) / rho, m_v[0]);
 

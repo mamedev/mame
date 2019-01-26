@@ -39,14 +39,15 @@ class silvmil_state : public driver_device
 {
 public:
 	silvmil_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_sprgen(*this, "spritegen"),
-			m_soundlatch(*this, "soundlatch"),
-			m_bg_videoram(*this, "bg_videoram"),
-			m_fg_videoram(*this, "fg_videoram"),
-			m_spriteram(*this, "spriteram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_sprgen(*this, "spritegen")
+		, m_soundlatch(*this, "soundlatch")
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_fg_videoram(*this, "fg_videoram")
+		, m_spriteram(*this, "spriteram")
+	{ }
 
 	void puzzlovek(machine_config &config);
 	void puzzlove(machine_config &config);
@@ -426,8 +427,7 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 	MCFG_SCREEN_UPDATE_DRIVER(silvmil_state, screen_update_silvmil)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x300);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_silvmil)
 
 	DECO_SPRITE(config, m_sprgen, 0);

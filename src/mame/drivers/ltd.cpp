@@ -536,7 +536,7 @@ MACHINE_CONFIG_START(ltd_state::ltd3)
 	/* Sound */
 	genpin_audio(config);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_r", ltd_state, timer_r, attotime::from_hz(500))
+	TIMER(config, "timer_r").configure_periodic(FUNC(ltd_state::timer_r), attotime::from_hz(500));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ltd_state::ltd4)

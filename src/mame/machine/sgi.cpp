@@ -85,11 +85,11 @@ void sgi_mc_device::device_start()
 	// if Indigo2, ID appropriately
 	if (!strcmp(machine().system().name, "ip244415"))
 	{
-		m_sys_id = 0x12; // rev. C MC, EISA bus present
+		m_sys_id = 0x13; // rev. C MC, EISA bus present
 	}
 	else
 	{
-		m_sys_id = 0x02; // rev. C MC, no EISA bus
+		m_sys_id = 0x03; // rev. C MC, no EISA bus
 	}
 
 	m_rpss_timer = timer_alloc(TIMER_RPSS);

@@ -27,7 +27,7 @@ class cdrom_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~cdrom_image_device();
 
 	void set_interface(const char *interface) { m_interface = interface; }
@@ -66,16 +66,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(CDROM, cdrom_image_device)
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-
-#define MCFG_CDROM_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CDROM, 0)
-
-#define MCFG_CDROM_INTERFACE(_interface)                         \
-	downcast<cdrom_image_device &>(*device).set_interface(_interface);
 
 #endif // MAME_DEVICES_IMAGEDEV_CHD_CD_H

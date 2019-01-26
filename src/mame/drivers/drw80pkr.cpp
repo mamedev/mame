@@ -39,12 +39,13 @@
 class drw80pkr_state : public driver_device
 {
 public:
-	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_aysnd(*this, "aysnd"),
-		m_mainbank(*this, "mainbank") { }
+		m_mainbank(*this, "mainbank")
+	{ }
 
 	void init_drw80pkr();
 	void drw80pkr(machine_config &config);
@@ -85,7 +86,7 @@ private:
 	DECLARE_READ8_MEMBER(io_r);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(drw80pkr);
+	void drw80pkr_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
@@ -345,29 +346,24 @@ uint32_t drw80pkr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
+void drw80pkr_state::drw80pkr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int j;
-
-	for (j = 0; j < palette.entries(); j++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int j = 0; j < palette.entries(); j++)
 	{
-		int r, g, b, tr, tg, tb, i;
+		int const i = BIT(color_prom[j], 3);
 
-		i = (color_prom[j] >> 3) & 0x01;
-		//i = color_prom[j];
+		// red component
+		int const tr = 0xf0 - (0xf0 * BIT(color_prom[j], 0));
+		int const r = tr - (i * (tr / 5));
 
-		/* red component */
-		tr = 0xf0 - (0xf0 * ((color_prom[j] >> 0) & 0x01));
-		r = tr - (i * (tr / 5));
+		// green component
+		int const tg = 0xf0 - (0xf0 * BIT(color_prom[j], 1));
+		int const g = tg - (i * (tg / 5));
 
-		/* green component */
-		tg = 0xf0 - (0xf0 * ((color_prom[j] >> 1) & 0x01));
-		g = tg - (i * (tg / 5));
-
-		/* blue component */
-		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
-		b = tb - (i * (tb / 5));
+		// blue component
+		int const tb = 0xf0 - (0xf0 * BIT(color_prom[j], 2));
+		int const b = tb - (i * (tb / 5));
 
 		palette.set_pen_color(j, rgb_t(r, g, b));
 	}
@@ -481,8 +477,7 @@ MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_drw80pkr)
-	MCFG_PALETTE_ADD("palette", 16*16)
-	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
+	PALETTE(config, "palette", FUNC(drw80pkr_state::drw80pkr_palette), 16 * 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

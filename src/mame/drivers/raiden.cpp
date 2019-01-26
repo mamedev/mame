@@ -334,20 +334,20 @@ WRITE_LINE_MEMBER(raiden_state::vblank_irq)
 	}
 }
 
-MACHINE_CONFIG_START(raiden_state::raiden)
-
+void raiden_state::raiden(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30,XTAL(20'000'000)/2) /* NEC V30 CPU, 20MHz verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	V30(config, m_maincpu, XTAL(20'000'000)/2); /* NEC V30 CPU, 20MHz verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::main_map);
 
-	MCFG_DEVICE_ADD("sub", V30,XTAL(20'000'000)/2) /* NEC V30 CPU, 20MHz verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	V30(config, m_subcpu, XTAL(20'000'000)/2); /* NEC V30 CPU, 20MHz verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::sub_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4)); /* verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &raiden_state::seibu_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -362,19 +362,18 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	screen.screen_vblank().append(FUNC(raiden_state::vblank_irq));
 	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_raiden)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_raiden);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181)/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH) // frequency and pin 7 verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)); // frequency and pin 7 verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
@@ -382,51 +381,43 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	m_seibu_sound->set_rombank_tag("seibu_bank1");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(raiden_state::raidene)
+void raiden_state::raidene(machine_config &config)
+{
 	raiden(config);
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(raiden_sound_map)
-	MCFG_DEVICE_OPCODES_MAP(raiden_sound_decrypted_opcodes_map)
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &raiden_state::raiden_sound_map);
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_OPCODES, &raiden_state::raiden_sound_decrypted_opcodes_map);
 
 	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
 	sei80bu.set_addrmap(AS_PROGRAM, &raiden_state::sei80bu_encrypted_full_map);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(raiden_state::raidenu)
+void raiden_state::raidenu(machine_config &config)
+{
 	raidene(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(raidenu_main_map)
-
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(raidenu_sub_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenu_main_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenu_sub_map);
+}
 
 WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
 {
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }
 
-MACHINE_CONFIG_START(raiden_state::raidenkb)
+void raiden_state::raidenkb(machine_config &config)
+{
+	raiden(config);
+	m_maincpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
+	m_subcpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
+}
+
+void raiden_state::raidenb(machine_config &config)
+{
 	raiden(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(32'000'000) / 4) // Xtal and clock verified
-
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_CLOCK(XTAL(32'000'000) / 4) // Xtal and clock verified
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(raiden_state::raidenb)
-	raiden(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(raidenb_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenb_main_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(raiden_state,raidenb)
@@ -435,9 +426,8 @@ MACHINE_CONFIG_START(raiden_state::raidenb)
 	crtc.layer_en_callback().set(FUNC(raiden_state::raidenb_layer_enable_w));
 	crtc.layer_scroll_callback().set(FUNC(raiden_state::raidenb_layer_scroll_w));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raidenb)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(raiden_state::screen_update_raidenb));
+}
 
 
 /***************************************************************************/

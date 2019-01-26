@@ -204,12 +204,11 @@ Address bus A0-A11 is Y0-Y11
 class apple2e_state : public driver_device
 {
 public:
-	apple2e_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apple2e_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_screen(*this, "screen"),
 		m_scantimer(*this, "scantimer"),
-		m_palette(*this, "palette"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, "maincpu"),
 		m_cecbanks(*this, "cecexp"),
@@ -252,7 +251,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_scantimer;
-	required_device<palette_device> m_palette;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	optional_memory_region m_cecbanks;
@@ -290,7 +288,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(apple2);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram0000_r);
@@ -1039,11 +1036,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 			m_maincpu->reset();
 		}
 	}
-}
-
-PALETTE_INIT_MEMBER(apple2e_state, apple2)
-{
-	m_video->palette_init_apple2(palette);
 }
 
 uint32_t apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -3977,10 +3969,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update));
-	m_screen->set_palette("palette");
-
-	PALETTE(config, m_palette, 16);
-	m_palette->set_init(DEVICE_SELF, FUNC(apple2e_state::palette_init_apple2));
+	m_screen->set_palette(m_video);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4050,10 +4039,11 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
-	m_a2bus->set_cputag("maincpu");
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple2e_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple2e_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple2e_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl1", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl2", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl3", m_a2bus, apple2_cards, nullptr);
@@ -4070,8 +4060,11 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
 
-	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+
+	/* softlist config for baseline A2E */
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");  // By default, filter list to compatible disks for A2E
 MACHINE_CONFIG_END
 
 void apple2e_state::mprof3(machine_config &config)
@@ -4083,6 +4076,8 @@ void apple2e_state::mprof3(machine_config &config)
 
 MACHINE_CONFIG_START(apple2e_state::apple2ee)
 	apple2e(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
 MACHINE_CONFIG_END
@@ -4113,6 +4108,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(apple2e_state::apple2c)
 	apple2ee(config);
+	subdevice<software_list_device>("flop525_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
 

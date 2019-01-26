@@ -722,7 +722,7 @@ void apollo_sio::device_reset()
 	ip6_w((input_data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( apollo_sio::read )
+uint8_t apollo_sio::read(offs_t offset)
 {
 	static int last_read8_offset[2] = { -1, -1 };
 	static int last_read8_value[2] = { -1, -1 };
@@ -732,7 +732,7 @@ READ8_MEMBER( apollo_sio::read )
 			"1X/16X Test", "RHRB", "IVR", "Input Ports", "Start Counter",
 			"Stop Counter" };
 
-	int data = duart_base_device::read(space, offset/2, mem_mask);
+	int data = duart_base_device::read(offset/2);
 
 	switch (offset / 2)
 	{
@@ -766,7 +766,7 @@ READ8_MEMBER( apollo_sio::read )
 	return data;
 }
 
-WRITE8_MEMBER( apollo_sio::write )
+void apollo_sio::write(offs_t offset, uint8_t data)
 {
 	static const char * const duart68681_reg_write_names[0x10] = { "MRA",
 			"CSRA", "CRA", "THRA", "ACR", "IMR", "CRUR", "CTLR", "MRB", "CSRB",
@@ -788,7 +788,7 @@ WRITE8_MEMBER( apollo_sio::write )
 		break;
 #endif
 	}
-	duart_base_device::write(space, offset/2, data, mem_mask);
+	duart_base_device::write(offset/2, data);
 }
 
 // device type definition
@@ -1097,8 +1097,8 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_ptm->set_external_clocks(250000, 125000, 62500);
 	m_ptm->irq_callback().set(FUNC(apollo_state::apollo_ptm_irq_function));
 
-	MCFG_DEVICE_ADD("ptmclock", CLOCK, 250000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, apollo_state, apollo_ptm_timer_tick))
+	clock_device &ptmclock(CLOCK(config, "ptmclock", 250000));
+	ptmclock.signal_handler().set(FUNC(apollo_state::apollo_ptm_timer_tick));
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	// FIXME: is this interrupt really only connected on DN3000?
@@ -1114,7 +1114,6 @@ MACHINE_CONFIG_START(apollo_state::common)
 	m_sio2->irq_cb().set(FUNC(apollo_state::sio2_irq_handler));
 
 	ISA16(config, m_isa, 0);
-	m_isa->set_cputag(MAINCPU);
 	m_isa->set_custom_spaces();
 	m_isa->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w)); // in place of irq 2 on at irq 9 is used
 	m_isa->irq3_callback().set(m_pic8259_master, FUNC(pic8259_device::ir3_w));

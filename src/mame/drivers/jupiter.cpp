@@ -334,7 +334,7 @@ MACHINE_CONFIG_START(jupiter3_state::jupiter3)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 320-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// devices
 	FD1771(config, INS1771N1_TAG, 1000000);

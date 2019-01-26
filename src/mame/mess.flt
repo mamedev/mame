@@ -20,6 +20,7 @@ acrnsys1.cpp
 acrnsys.cpp
 acvirus.cpp
 adam.cpp
+adm23.cpp
 advision.cpp
 agat.cpp
 aim65.cpp
@@ -90,6 +91,7 @@ bbcbc.cpp
 bcs3.cpp
 bebox.cpp
 beehive.cpp
+bert.cpp
 besta.cpp
 beta.cpp
 bigbord2.cpp
@@ -116,6 +118,7 @@ c900.cpp
 camplynx.cpp
 candela.cpp
 canon_s80.cpp
+cardinal.cpp
 casloopy.cpp
 cat.cpp
 cbm2.cpp
@@ -135,6 +138,7 @@ cit101.cpp
 cit220.cpp
 ckz80.cpp
 clcd.cpp
+clickstart.cpp
 cm1800.cpp
 cmi.cpp
 cms.cpp
@@ -466,6 +470,7 @@ mt735.cpp
 mtx.cpp
 multi16.cpp
 multi8.cpp
+mupid2.cpp
 mvme147.cpp
 mx2178.cpp
 myb3k.cpp
@@ -522,6 +527,7 @@ p2000t.cpp
 p8k.cpp
 palm.cpp
 palmz22.cpp
+palestra.cpp
 partner.cpp
 paso1600.cpp
 pasogo.cpp
@@ -689,10 +695,12 @@ spec128.cpp
 special.cpp
 specpls3.cpp
 spectrum.cpp
+spg110.cpp
 squale.cpp
 ssem.cpp
 ssystem3.cpp
 st17xx.cpp
+storio.cpp
 stratos.cpp
 studio2.cpp
 sun1.cpp
@@ -733,6 +741,7 @@ terco.cpp
 terminal.cpp
 test_t400.cpp
 testconsole.cpp
+testpat.cpp
 textelcomp.cpp
 tg100.cpp
 thomson.cpp
@@ -766,6 +775,7 @@ tr175.cpp
 tr606.cpp
 tranz330.cpp
 tricep.cpp
+trkfldch.cpp
 trs80.cpp
 trs80dt1.cpp
 trs80m2.cpp
@@ -823,6 +833,8 @@ votrpss.cpp
 votrtnt.cpp
 vp415.cpp
 vp60.cpp
+vsmile.cpp
+vsmileb.cpp
 vsmilepro.cpp
 vt100.cpp
 vt220.cpp
@@ -888,7 +900,6 @@ zx.cpp
 +jaguar
 +jaguarcd
 //konamim2.cpp
-+3do_m2
 //neogeo.cpp
 +aes
 //vectrex.cpp

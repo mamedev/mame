@@ -469,12 +469,11 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pbaction_state, screen_update_pbaction)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pbaction_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pbaction)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pbaction);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -482,9 +481,7 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	AY8910(config, "ay1", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	AY8910(config, "ay2", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	AY8910(config, "ay3", 12_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 

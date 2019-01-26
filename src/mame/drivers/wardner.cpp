@@ -379,18 +379,18 @@ void wardner_state::machine_reset()
 	m_membank->set_bank(0);
 }
 
-MACHINE_CONFIG_START(wardner_state::wardner)
-
+void wardner_state::wardner(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000)/4)      /* 6MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4);	/* 6MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wardner_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &wardner_state::main_io_map);
 
 	ADDRESS_MAP_BANK(config, "membank").set_map(&wardner_state::main_bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x8000);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(14'000'000)/4)     /* 3.5MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_program_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'000'000) / 4));	/* 3.5MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &wardner_state::sound_program_map);
+	audiocpu.set_addrmap(AS_IO, &wardner_state::sound_io_map);
 
 	TMS32010(config, m_dsp, XTAL(14'000'000));       /* 14MHz Crystal CLKin */
 	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))      /* 100 CPU slices per frame */
+	config.m_minimum_quantum = attotime::from_hz(6000);	/* 100 CPU slices per frame */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<2>().set(FUNC(wardner_state::int_enable_w));
@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_xoffsets(32, 14);
 
-	MCFG_DEVICE_ADD("spriteram8", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_spriteram8);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
@@ -434,17 +434,16 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	m_screen->screen_vblank().append(FUNC(wardner_state::wardner_vblank_irq));
 	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wardner)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wardner);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 4096);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'000'000)/4)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'000'000) / 4));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

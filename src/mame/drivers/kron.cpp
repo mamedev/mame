@@ -128,8 +128,8 @@
 class kron180_state : public driver_device
 {
 public:
-	kron180_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	kron180_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_videoram(*this, "videoram")
 		, m_keyboard(*this, "pc_keyboard")
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(kron180_state::kron180)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199) // TODO: This need to be fixed once the real char table is used...
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* keyboard TODO: fix it, doesn't work yet */
 	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, kron180_state, keyb_interrupt))

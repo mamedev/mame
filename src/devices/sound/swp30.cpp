@@ -117,7 +117,7 @@
   offset is o << 10.  There are no alignment issues, e.g. you can have
   a buffer at 0x28000 which is 0x10000 samples long.
 
-  
+
   fp<nnn>    fixed point 2.14 value associated with instruction nnn
   of<nn>     16-bits offset associated with instruction 3*nn
   lfo<nn>    LFO registers
@@ -561,7 +561,7 @@ u16 swp30_device::freq_r(offs_t offset)
 void swp30_device::freq_w(offs_t offset, u16 data)
 {
 	u8 chan = offset >> 6;
-	//	delta is 4*256 per octave, positive means higher freq, e.g 4.10 format.
+	//  delta is 4*256 per octave, positive means higher freq, e.g 4.10 format.
 	s16 v = data & 0x2000 ? data | 0xc000 : data;
 	if(0 && m_freq[chan] != data)
 		logerror("snd chan %02x freq %c%c %d.%03x\n", chan, data & 0x8000 ? '#' : '.', data & 0x4000 ? '#' : '.', v / 1024, (v < 0 ? -v : v) & 0x3ff);
@@ -697,8 +697,8 @@ template<int sel> void swp30_device::prg_lfo_w(offs_t offset, u16 data)
 	offs_t adr = (offset >> 6)*2 + sel;
 	m_program_plfo[adr] = data;
 
-    static const int dt[8] = { 0, 32, 64, 128, 256, 512,  1024, 2048 };
-    static const int sh[8] = { 0,  0,  1,   2,   3,   4,     5,    6 };
+	static const int dt[8] = { 0, 32, 64, 128, 256, 512,  1024, 2048 };
+	static const int sh[8] = { 0,  0,  1,   2,   3,   4,     5,    6 };
 
 	int scale = (data >> 5) & 7;
 	int step = ((data & 31) << sh[scale]) + dt[scale];

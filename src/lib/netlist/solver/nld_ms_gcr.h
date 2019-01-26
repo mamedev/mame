@@ -28,7 +28,7 @@ class matrix_solver_GCR_t: public matrix_solver_t
 {
 public:
 
-	matrix_solver_GCR_t(netlist_t &anetlist, const pstring &name,
+	matrix_solver_GCR_t(netlist_base_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_t(anetlist, name, matrix_solver_t::ASCENDING, params)
 		, m_dim(size)
@@ -151,7 +151,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 
 	// FIXME: Move me
 
-	if (netlist().lib().isLoaded())
+	if (state().lib().isLoaded())
 	{
 		pstring symname = static_compile_name();
 #if 0
@@ -161,7 +161,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		else
 			this->log().warning("External static solver {1} not found ...", symname);
 #else
-		m_proc.load(this->netlist().lib(), symname);
+		m_proc.load(this->state().lib(), symname);
 		if (m_proc.resolved())
 			this->log().warning("External static solver {1} found ...", symname);
 		else
@@ -298,7 +298,7 @@ template <std::size_t m_N, std::size_t storage_N>
 pstring matrix_solver_GCR_t<m_N, storage_N>::static_compile_name()
 {
 	plib::postringstream t;
-	plib::putf8_fmt_writer w(t);
+	plib::putf8_fmt_writer w(&t);
 	csc_private(w);
 	std::hash<pstring> h;
 
@@ -309,7 +309,7 @@ template <std::size_t m_N, std::size_t storage_N>
 std::pair<pstring, pstring> matrix_solver_GCR_t<m_N, storage_N>::create_solver_code()
 {
 	plib::postringstream t;
-	plib::putf8_fmt_writer strm(t);
+	plib::putf8_fmt_writer strm(&t);
 	pstring name = static_compile_name();
 
 	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS, double * __restrict V)\n")(name));

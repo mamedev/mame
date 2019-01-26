@@ -357,10 +357,11 @@ void mephisto_academy_state::machine_reset()
 	m_enable_nmi = true;
 }
 
-MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
-	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(polgar_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
+void mephisto_polgar_state::polgar(machine_config &config)
+{
+	m65c02_device &maincpu(M65C02(config, "maincpu", XTAL(4'915'200)));
+	maincpu.set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
+	maincpu.set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(XTAL(4'915'200) / (1 << 13)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -375,24 +376,25 @@ MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
 	MEPHISTO_SENSORS_BOARD(config, "board", 0);
 	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
 	config.set_default_layout(layout_mephisto_lcd);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mephisto_polgar_state::polgar10)
+void mephisto_polgar_state::polgar10(machine_config &config)
+{
 	polgar(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK( XTAL(10'000'000) )
-MACHINE_CONFIG_END
+	subdevice<m65c02_device>("maincpu")->set_clock(XTAL(10'000'000));
+}
 
-MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
-	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(10'000'000) / 4)     // G65SC02
-	MCFG_DEVICE_PROGRAM_MAP(mrisc_mem)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_risc_state, irq0_line_hold, XTAL(10'000'000) / (1 << 14))
+void mephisto_risc_state::mrisc(machine_config &config)
+{
+	m65c02_device &maincpu(M65C02(config, "maincpu", XTAL(10'000'000) / 4)); // G65SC02
+	maincpu.set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_mem);
+	maincpu.set_periodic_int(FUNC(mephisto_risc_state::irq0_line_hold), attotime::from_hz(XTAL(10'000'000) / (1 << 14)));
 
-	MCFG_DEVICE_ADD("subcpu", ARM, XTAL(14'000'000))             // VY86C010
-	MCFG_DEVICE_PROGRAM_MAP(mrisc_arm_mem)
-	MCFG_ARM_COPRO(VL86C020)
+	ARM(config, m_subcpu, XTAL(14'000'000)); // VY86C010
+	m_subcpu->set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_arm_mem);
+	m_subcpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -410,29 +412,29 @@ MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
 	MEPHISTO_SENSORS_BOARD(config, "board", 0);
 	MEPHISTO_DISPLAY_MODUL(config, "display", 0);
 	config.set_default_layout(layout_mephisto_lcd);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mephisto_milano_state::milano)
+void mephisto_milano_state::milano(machine_config &config)
+{
 	polgar(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(milano_mem)
+	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
 
 	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board, 0);
 	m_board->set_disable_leds(true);
 	config.set_default_layout(layout_mephisto_milano);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(mephisto_academy_state::academy)
+void mephisto_academy_state::academy(machine_config &config)
+{
 	polgar(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(academy_mem)
+	subdevice<m65c02_device>("maincpu")->set_addrmap(AS_PROGRAM, &mephisto_academy_state::academy_mem);
 
 	hc259_device &outlatch(HC259(config.replace(), "outlatch"));
 	outlatch.q_out_cb<1>().set(FUNC(mephisto_academy_state::academy_nmi_w));
 	outlatch.q_out_cb<2>().set("display:beeper", FUNC(beep_device::set_state)).invert();
 
 	config.set_default_layout(layout_mephisto_academy);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(polgar)

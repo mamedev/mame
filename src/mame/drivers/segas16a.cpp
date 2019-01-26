@@ -2009,7 +2009,7 @@ void segas16a_state::system16a(machine_config &config)
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segas16a);
-	PALETTE(config, m_palette, 2048*3);
+	PALETTE(config, m_palette).set_entries(2048*3);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -2092,7 +2092,7 @@ void segas16a_state::system16a_no7751p(machine_config &config)
 	z80.set_addrmap(AS_PROGRAM, &segas16a_state::sound_map);
 	z80.set_addrmap(AS_IO, &segas16a_state::sound_no7751_portmap);
 	z80.set_addrmap(AS_OPCODES, &segas16a_state::sound_decrypted_opcodes_map);
-	z80.set_decrypted_tag(":sound_decrypted_opcodes");
+	z80.set_decrypted_tag(m_sound_decrypted_opcodes);
 }
 
 /*
@@ -2241,7 +2241,7 @@ ROM_START( afighter )
 	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 ROM_START( afightera )
@@ -2328,7 +2328,7 @@ ROM_START( afighterc )
 	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 ROM_START( afighterd )
@@ -2359,7 +2359,7 @@ ROM_START( afighterd )
 	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
+	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(65b5b1af) SHA1(9a236c0c223064f9a2a56561e10b9ffed0f567a3) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2438,8 +2438,8 @@ ROM_START( alexkidd1 )
 	ROM_LOAD( "epr-10436.2",  0x8000, 0x8000, CRC(96c76613) SHA1(fe3e4e649fd2cb2453eec0c92015bd54b3b9a1b5) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0021.key", 0x0000, 0x2000, BAD_DUMP CRC(85be8eac) SHA1(3857bf43b3b0ab60c04223e2393d99504a730d73) )
-ROM_END
+	ROM_LOAD( "317-0021.key", 0x0000, 0x2000, BAD_DUMP CRC(504388a3) SHA1(20625e9e99c08a28b253676cc843ae5228ec9d5b) )
+	ROM_END
 
 
 //*************************************************************************************************************************
@@ -2492,7 +2492,7 @@ ROM_START( aliensyn5 )
 	ROM_LOAD( "epr-10708.4",  0x10000, 0x8000, CRC(5921ef52) SHA1(eff9978361692e6e60a9c6caf5740dd6182cfe4a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0037.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0037.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2543,7 +2543,7 @@ ROM_START( aliensyn2 )
 	ROM_LOAD( "epr-10708.c3", 0x10000, 0x8000, CRC(5921ef52) SHA1(eff9978361692e6e60a9c6caf5740dd6182cfe4a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2594,7 +2594,7 @@ ROM_START( aliensynjo )
 	ROM_LOAD( "epr-10708.4",  0x10000, 0x8000, CRC(5921ef52) SHA1(eff9978361692e6e60a9c6caf5740dd6182cfe4a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(68bb7745) SHA1(f0c60d8a503a90ba6a2443be856b18322e3ec759) )
 ROM_END
 
 
@@ -2781,6 +2781,39 @@ ROM_START( fantzonep )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
 	ROM_LOAD( "epr-7391.12",  0x0000, 0x8000, CRC(c03e155e) SHA1(6bbdf308c47b96ba622329520b70fa0ea47248a4) ) // Original encrypted sound code
+ROM_END
+
+//*************************************************************************************************************************
+//  Fantasy Zone, Sega System 16A
+//  CPU: FD1089B 317-0016
+//
+ROM_START( fantzonee )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-10170.43", 0x000000, 0x8000, CRC(063c6d76) SHA1(02d52d776330c88d949b10fb715b00507dba1227) )
+	ROM_LOAD16_BYTE( "epr-10167.26", 0x000001, 0x8000, CRC(0ee190b0) SHA1(18c27046a523d73bccf733ecd956e454199a1ee8) )
+	ROM_LOAD16_BYTE( "epr-10171.42", 0x010000, 0x8000, CRC(2ca92d64) SHA1(2eea4d1ae38bba28b806824951a0df4c9f74af6f) )
+	ROM_LOAD16_BYTE( "epr-10168.25", 0x010001, 0x8000, CRC(850964ad) SHA1(bdf603b025b981cc5af47446526562c425990b89) )
+	ROM_LOAD16_BYTE( "epr-10172.41", 0x020000, 0x8000, CRC(b5b624f0) SHA1(a728582efdc9c1b0ed1a27975d6b4e1974339ab2) )
+	ROM_LOAD16_BYTE( "epr-10169.24", 0x020001, 0x8000, CRC(9c57d613) SHA1(cdfaf92b5f44a66ccd6267e0221e4d9ada924e2e) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-7388.95",  0x00000, 0x08000, CRC(8eb02f6b) SHA1(80511b944b57541669010bd5a0ca52bc98eabd62) )
+	ROM_LOAD( "epr-7389.94",  0x08000, 0x08000, CRC(2f4f71b8) SHA1(ceb39e95cd43904b8e4f89c7227491e139fb3ca6) )
+	ROM_LOAD( "epr-7390.93",  0x10000, 0x08000, CRC(d90609c6) SHA1(4232f6ecb21f242c0c8d81e06b88bc742668609f) )
+
+	ROM_REGION16_BE( 0x30000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-7392.10",  0x00001, 0x8000, CRC(5bb7c8b6) SHA1(eaa0ed63ac4f66ee285757e842bdd7b005292600) )
+	ROM_LOAD16_BYTE( "epr-7396.11",  0x00000, 0x8000, CRC(74ae4b57) SHA1(1f24b1faea765994b85f0e7ac8e944c8da22103f) )
+	ROM_LOAD16_BYTE( "epr-7393.17",  0x10001, 0x8000, CRC(14fc7e82) SHA1(ca7caca989a3577dd30ad4f66b0fcce712a454ef) )
+	ROM_LOAD16_BYTE( "epr-7397.18",  0x10000, 0x8000, CRC(e05a1e25) SHA1(9691d9f0763b7483ee6912437902f22ab4b78a05) )
+	ROM_LOAD16_BYTE( "epr-7394.23",  0x20001, 0x8000, CRC(531ca13f) SHA1(19e68bc515f6021e1145cff4f3f0e083839ee8f3) )
+	ROM_LOAD16_BYTE( "epr-7398.24",  0x20000, 0x8000, CRC(68807b49) SHA1(0a189da8cdd2090e76d6d06c55b478abce60542d) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-7535a.12", 0x0000, 0x8000, CRC(bc1374fa) SHA1(ed2c87ae024dc251e175239f1bccc728fc096548) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
+	ROM_LOAD( "317-0016.key", 0x0000, 0x2000, BAD_DUMP CRC(16869a2c) SHA1(112b044d0b1b76620a7d75d6f4c4a16eca37e343) ) // hand-crafted?
 ROM_END
 
 
@@ -3144,7 +3177,7 @@ ROM_START( sdi )
 	ROM_LOAD( "epr-10759.12", 0x0000, 0x8000, CRC(d7f9649f) SHA1(ce4abe7dd7e33da048569d7817063345fab75ea7) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0027.key", 0x0000, 0x2000, CRC(6f022730) SHA1(68461abff8808b7ba294083d4e297fef37d8fb9b) )
+	ROM_LOAD( "317-0027.key", 0x0000, 0x2000, CRC(7bdeed05) SHA1(d5fc1dbafdafdc6ff27fa208cad6f488ae4a8b39) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -3185,7 +3218,7 @@ ROM_START( sdia )
 	ROM_LOAD( "epr-10759.12", 0x0000, 0x8000, CRC(d7f9649f) SHA1(ce4abe7dd7e33da048569d7817063345fab75ea7) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0027.key", 0x0000, 0x2000, CRC(6f022730) SHA1(68461abff8808b7ba294083d4e297fef37d8fb9b) )
+	ROM_LOAD( "317-0027.key", 0x0000, 0x2000, CRC(7bdeed05) SHA1(d5fc1dbafdafdc6ff27fa208cad6f488ae4a8b39) )
 ROM_END
 
 
@@ -3484,7 +3517,7 @@ ROM_START( sjryuko1 )
 	ROM_LOAD( "epr-12231.5", 0x18000, 0x8000, CRC(780bdc57) SHA1(8c859043bba389292604385b88c743728180f9a9) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, CRC(c3e32937) SHA1(22bccea1c3d97adca3dce2fa418f7e7b058c0837) )
+	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, CRC(8e40b2ab) SHA1(f3e2d70a17ac5270bec586cc67b2b8ba14bf53cf) )
 ROM_END
 
 
@@ -3689,7 +3722,7 @@ ROM_START( timescan1 )
 	ROM_LOAD( "epr-10547.1",  0x0000, 0x8000, CRC(d24ffc4b) SHA1(3b250e1f026664f7a37f65d1c1a07381e88f11e8) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0024.key", 0x0000, 0x2000, CRC(0e64a504) SHA1(8fb61568d2775e403eb521f82f9d1058a0555a65) )
+	ROM_LOAD( "317-0024.key", 0x0000, 0x2000, CRC(dcd41d24) SHA1(2bd96bc7467ad40f4d981d767f9685ec142d6d87) )
 ROM_END
 
 
@@ -3808,7 +3841,7 @@ ROM_START( wb35 )
 	ROM_LOAD( "epr-12089.12", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key - Software decrypt, still need an actual hardware dump!
-	ROM_LOAD( "317-0086.key", 0x0000, 0x2000, BAD_DUMP CRC(ec480b80) SHA1(f0b1244ba290a59aa95f2f0262802487a505755c) )
+	ROM_LOAD( "317-0086.key", 0x0000, 0x2000, BAD_DUMP CRC(5b8e7076) SHA1(387d6446266c32668a5182f825bb60b059d67f10) )
 ROM_END
 
 ROM_START( wb35d )
@@ -3962,6 +3995,7 @@ GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,        seg
 GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzonep,  fantzone, system16a_no7751p,        fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (317-5000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, fantzonee,  fantzone, system16a_fd1089b_no7751, fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (FD1089B 317-0016)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, fantzonepr, fantzone, system16a_no7751,         fantzone,        segas16a_state,            init_generic,     ROT0,   "Sega", "Fantasy Zone (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bad / missing gfx ROMs
 
 GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a,      segas16a_state,            init_passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A) (FD1094 317-0071)", MACHINE_SUPPORTS_SAVE )

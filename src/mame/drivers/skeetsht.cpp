@@ -60,7 +60,7 @@ private:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_device<cpu_device> m_68hc11;
+	required_device<mc68hc11_cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
 	void hc11_io_map(address_map &map);
@@ -236,12 +236,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(skeetsht_state::skeetsht)
-
-	MCFG_DEVICE_ADD("68hc11", MC68HC11, 4000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(hc11_pgm_map)
-	MCFG_DEVICE_IO_MAP(hc11_io_map)
-	MCFG_MC68HC11_CONFIG( 0, 0x100, 0x01 )  // And 512 bytes EEPROM? (68HC11A1)
+void skeetsht_state::skeetsht(machine_config &config)
+{
+	MC68HC11(config, m_68hc11, 4000000); // ?
+	m_68hc11->set_addrmap(AS_PROGRAM, &skeetsht_state::hc11_pgm_map);
+	m_68hc11->set_addrmap(AS_IO, &skeetsht_state::hc11_io_map);
+	m_68hc11->set_config(0, 0x100, 0x01);  // And 512 bytes EEPROM? (68HC11A1)
 
 	TMS34010(config, m_tms, 48000000);
 	m_tms->set_addrmap(AS_PROGRAM, &skeetsht_state::tms_program_map);
@@ -251,17 +251,17 @@ MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 	m_tms->set_scanline_rgb32_callback(FUNC(skeetsht_state::scanline_update));
 	m_tms->output_int().set(FUNC(skeetsht_state::tms_irq));
 
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, 0);
+	m_tlc34076->set_bits(tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(48000000 / 8, 156*4, 0, 100*4, 328, 0, 300) // FIXME
-	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
-
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(48000000 / 8, 156*4, 0, 100*4, 328, 0, 300); // FIXME
+	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
 
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, m_ay, 2000000).add_route(ALL_OUTPUTS, "mono", 0.50); // ?
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

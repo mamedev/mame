@@ -10,7 +10,7 @@ Atari Sprint 8 video emulation
 #include "includes/sprint8.h"
 
 
-PALETTE_INIT_MEMBER(sprint8_state, sprint8)
+void sprint8_state::sprint8_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 0x10; i++)
 	{

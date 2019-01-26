@@ -160,7 +160,7 @@ void SCSPDSP::Step()
 		else if (IRA <= 0x2F)
 			INPUTS = MIXS[IRA - 0x20] << 4;  //MIXS is 20 bit
 		else if (IRA <= 0x31)
-			INPUTS = EXTS[IRA - 0x30] << 8;  //EXTS is 16 bit 
+			INPUTS = EXTS[IRA - 0x30] << 8;  //EXTS is 16 bit
 		else
 			return;
 

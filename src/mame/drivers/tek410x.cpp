@@ -30,15 +30,17 @@ class tek4107a_state : public driver_device
 {
 public:
 	tek4107a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+	{ }
 
 	void tek4109a(machine_config &config);
 	void tek4107a(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
-
 	virtual void video_start() override;
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tek4107a_io(address_map &map);
 	void tek4107a_mem(address_map &map);
@@ -109,16 +111,17 @@ MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tek4107a)
+	PALETTE(config, "palette").set_entries(64);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_tek4107a);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tek4107a_state::tek4109a)
+void tek4107a_state::tek4109a(machine_config &config)
+{
 	tek4107a(config);
+
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4096)
-MACHINE_CONFIG_END
+	subdevice<palette_device>("palette")->set_entries(4096);
+}
 
 /* ROMs */
 

@@ -2126,7 +2126,7 @@ MACHINE_CONFIG_START(hng64_state::hng64)
 	m_screen->set_screen_update(FUNC(hng64_state::screen_update_hng64));
 	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
 
-	PALETTE(config, m_palette, 0x1000).set_format(PALETTE_FORMAT_XRGB);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x1000);
 
 	hng64_audio(config);
 	hng64_network(config);

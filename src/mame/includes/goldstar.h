@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
-
 #ifndef MAME_INCLUDES_GOLDSTAR_H
 #define MAME_INCLUDES_GOLDSTAR_H
 
@@ -53,10 +52,10 @@ public:
 	void init_wcherry();
 	void init_super9();
 	DECLARE_VIDEO_START(goldstar);
-	DECLARE_PALETTE_INIT(cm);
+	void cm_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(cherrym);
-	DECLARE_PALETTE_INIT(cmast91);
-	DECLARE_PALETTE_INIT(lucky8);
+	void cmast91_palette(palette_device &palette) const;
+	void lucky8_palette(palette_device &palette) const;
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -227,7 +226,7 @@ public:
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
-	DECLARE_PALETTE_INIT(magodds);
+	void magodds_palette(palette_device &palette) const;
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

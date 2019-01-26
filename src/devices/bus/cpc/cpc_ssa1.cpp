@@ -133,7 +133,7 @@ void cpc_ssa1_device::device_add_mconfig(machine_config &config)
 void cpc_dkspeech_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	SP0256(config, m_sp0256_device, XTAL(4'000'000));  // uses the CPC's clock from pin 50 of the expansion port
+	SP0256(config, m_sp0256_device, DERIVED_CLOCK(1, 1));  // uses the CPC's clock from pin 50 of the expansion port
 	m_sp0256_device->data_request_callback().set(FUNC(cpc_dkspeech_device::lrq_cb));
 	m_sp0256_device->standby_callback().set(FUNC(cpc_dkspeech_device::sby_cb));
 	m_sp0256_device->add_route(ALL_OUTPUTS, "mono", 1.00);

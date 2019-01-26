@@ -140,8 +140,8 @@ WRITE16_MEMBER(midtunit_video_device::midtunit_vram_w)
 	offset *= 2;
 	if (m_videobank_select)
 	{
-        if (ACCESSING_BITS_0_7)
-            m_local_videoram[offset] = (data & 0xff) | ((m_dma_register[DMA_PALETTE] & 0xff) << 8);
+		if (ACCESSING_BITS_0_7)
+			m_local_videoram[offset] = (data & 0xff) | ((m_dma_register[DMA_PALETTE] & 0xff) << 8);
 		if (ACCESSING_BITS_8_15)
 			m_local_videoram[offset + 1] = ((data >> 8) & 0xff) | (m_dma_register[DMA_PALETTE] & 0xff00);
 	}

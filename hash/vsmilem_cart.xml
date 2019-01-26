@@ -2,10 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
--->
-
-<!--
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
@@ -34,7 +30,7 @@ Language:
 |        | 80-084004(GE)     | Sportskanone                                                               |
 |        | 80-084005(FR)     | Sporti Folies                                                              |
 |        | 80-084006(PT)     | Action Mania (84016 on cart)                                               |
-|        | 80-084007(SP)     | Action Manía                                                               |
+|   XX   | 80-084007(SP)     | Action Manía                                                               |
 +========+===================+============================================================================+
 |        | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                 |
 |        | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version)                |
@@ -53,7 +49,7 @@ Language:
 +========+===================+============================================================================+
 |        | 80-084060(US)     | Thomas and Friends - Engines Working Together                              |
 |        | 80-084063(UK)     | Thomas and Friends - Engines Working Together                              |
-|        | 80-084064(GE)     | Thomas - Freunde halten zusammen                                           |
+|   XX   | 80-084064(GE)     | Thomas - Freunde halten zusammen                                           |
 +========+===================+============================================================================+
 |        | 80-084080(US)     | Wall-E                                                                     |
 |        | 80-084083(UK)     | Wall-E                                                                     |
@@ -71,7 +67,7 @@ Language:
 +========+===================+============================================================================+
 |        | 80-084140(US)     | Spider-Man & Friends - Secret Missions (AKA Professor V's Secret Missions with diff label)
 |        | 80-084143(UK)     | Spider-Man & Friends - Secret Missions                                     |
-|        | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen                                   |
+|   XX   | 80-084144(GE)     | Spider-Man & Freunde - Geheime Missionen                                   |
 |        | 80-084145(FR)     | Spider-Man and ses amis - Missions Secretes                                |
 |        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas  (no # on label)                    |
 +========+===================+============================================================================+
@@ -93,7 +89,7 @@ Language:
 |        | 80-084220(US)     | Snow Park Challenge                                                        |
 |        | 80-084222(NL)     | Wintersport Games                                                          |
 |        | 80-084223(UK)     | Snow Park Challenge                                                        |
-|        | 80-084224(GE)     | Wintersport                                                                |
+|   XX   | 80-084224(GE)     | Wintersport                                                                |
 |        | 80-084225(FR)     | ?????? picture too fuzzy for positve confirm                               |
 +========+===================+============================================================================+
 |        | 80-084240(US)     | Ni Hao Kai Lan                                                             |
@@ -102,7 +98,7 @@ Language:
 |        | 80-084260(US)     | My Pet Puppy (unreleased in USA?? UK version plays AOK on NTSC console)    |
 |        | 80-084262(NL)     | Mijn Puppy!                                                                |
 |        | 80-084263(UK)     | My Pet Puppy                                                               |
-|        | 80-084264(GE)     | Mein erster Hund                                                           |
+|   XX   | 80-084264(GE)     | Mein erster Hund                                                           |
 |        | 80-084265(FR)     | Mon Youtou Tout Fou!                                                       |
 |        | 80-084267(SP)     | Dakota y su Mascota                                                        |
 +========+===================+============================================================================+
@@ -154,7 +150,7 @@ Language:
 |        | 80-084400(US)     | Cars: Rev It Up in Radiator Springs                                        |
 |        | 80-084402(NL)     | Cars: Spektakel in Radiator Springs                                        |
 |        | 80-084403(UK)     | Cars: Rev it up in Radiator Springs                                        |
-|        | 80-084404(GE)     | Cars: Vollgas in Radiator Springs                                          |
+|   XX   | 80-084404(GE)     | Cars: Vollgas in Radiator Springs                                          |
 |        | 80-084405(FR)     | Cars: Quatre Roues                                                         |
 |        | 80-084406(PT)     | Cars: Aventura Em Radiator Springs (84416 on cart)                         |
 |        | 80-084407(SP)     | Cars: Acelera el Motor en Radiador Springs                                 |
@@ -184,7 +180,7 @@ Language:
 |        | 80-084481(US)     | The Princess and the Frog  (pocket version)                                |
 |        | 80-084482(NL)     | Prinses en de Kikker (label in english)                                    |
 |        | 80-084483(UK)     | The Princess and the Frog                                                  |
-|        | 80-084484(GE)     | Kuess den Frosch                                                           |
+|   XX   | 80-084484(GE)     | Kuess den Frosch                                                           |
 |        | 80-084485(FR)     | La Princesse Et La Grenouille                                              |
 |        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                   |
 +========+===================+============================================================================+
@@ -241,12 +237,42 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 
 <softwarelist name="vsmilem_cart" description="VTech V.Smile Motion cartridges">
 
+	<software name="actnmnia" supported="no">
+		<description>Action Manía (Sp)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084006(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84007 G.u1" size="8388608" crc="c14a04d2" sha1="6db09fd90f88773aafd5d95c4ea403dacddc9e58" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars" supported="no">
+		<description>Cars: Vollgas in Radiator Springs (Ger)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084404(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708106" />
+			<feature name="pcb_model" value="708106-3" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="A84404(2).u1" size="8388608" crc="beaa1b6a" sha1="c6e68da7935642035e13cc7922b0193cc6e5272c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cinderla" supported="no">
 		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger)</description>
 		<year>2010?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084604(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
@@ -256,12 +282,24 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
+	<software name="cinderla2" cloneof="cinderla" supported="no">
+		<description>Disney Princess Cinderella - Lernen im Märchenland (Ger, Rev. 2?)</description>
+		<year>2010?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084604(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084604.bin" size="8388608" crc="9170597a" sha1="2c3235e7e8986b1c62af6b218a8ba49bb3571345" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kfpanda" supported="no">
 		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Ger)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084124(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
@@ -272,11 +310,11 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 	</software>
 
 	<software name="dora" supported="no">
-		<description>Nick Dora - Doras Reparatur-Abenteuer (Ger)</description>
+		<description>Dora - Doras Reparatur-Abenteuer (Ger)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084024(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
@@ -286,29 +324,56 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		</part>
 	</software>
 
+	<software name="dora2" cloneof="dora" supported="no">
+		<description>Dora - Doras Reparatur-Abenteuer (Ger, Rev. 2)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084024(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-4" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="84024 OK.u1" size="8388608" crc="7848fa93" sha1="567a337f27cc5ff0ce832afa903efafc8a305f17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kleinstn" supported="no">
 		<description>Kleine Einsteins (Ger)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084164(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="80-084164.bin" size="8388608" crc="b0ec807e" sha1="e947c84efd3f061cbf10f73e412d4cfdd474bade" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tinker" supported="no">
-		<description>TinkerBell (Ger)</description>
-		<year>2009?</year>
+	<software name="kleinstn2" cloneof="kleinstn" supported="no">
+		<description>Kleine Einsteins (Ger, Rev. 2?)</description>
+		<year>200?</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-084324(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<info name="serial" value="80-084164(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084164.bin" size="8388608" crc="6bb78a9b" sha1="341d773b774af3153e2490605d8d3d9d88fb6903" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mypuppy" supported="no">
+		<description>Mein erster Hund (Ger)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084264(GE)" />
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-7" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
-				<rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" offset="0" />
+				<rom name="C84264.u1" size="8388608" crc="ca98e437" sha1="8c4964a671c6c3d3c8bd5859b14143b901d54021" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -318,12 +383,93 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084384(GE)" />
-		<part name="cart" interface="vsmilem_cart">
+		<part name="cart" interface="vsmile_cart">
 			<feature name="pcb" value="708201" />
 			<feature name="pcb_model" value="708201-4" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="84384.u1" size="8388608" crc="60649955" sha1="2eda79cbf138e25ffb33281987cc885ec98e9b04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prinfrog" supported="no">
+		<description>Küss den Frosch - Tianas großer Traum (Ger)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084484(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="C84484.bin" size="8388608" crc="8abc088c" sha1="3637de0af0371a4bb473ae28b35141b10bbb047f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermn" supported="no">
+		<description>Spider-Man &amp; Freunde - Geheime Missionen (Ger)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084144(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C84144.u1" size="8388608" crc="93d129ef" sha1="8e67e2ad36104c34b6fd944e25bbfbf0313a1d7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongeb" supported="no">
+		<description>Spongebob Schwammkopf - Der Tag des Schwamms (Ger)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084644(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C84644.u1" size="8388608" crc="c89d9c51" sha1="11836295ebfd0a8c62e0d5f482a3c7dc18b71d1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomas" supported="no">
+		<description>Thomas - Freunde halten zusammen (Ger)</description>
+		<year>2007?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084064(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084064.bin" size="8388608" crc="40b28ac8" sha1="ed67e92e25dbc64c78a6e0d28c9632e9b57bd60b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinker" supported="no">
+		<description>TinkerBell (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084324(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="pcb" value="708201" />
+			<feature name="pcb_model" value="708201-7" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wintrspt" supported="no">
+		<description>Wintersport (Ger)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084224(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="80-84224.bin" size="8388608" crc="76e0952f" sha1="fd4bed2303a0e98af85645a477edb34281a5d17d" offset="0" />
 			</dataarea>
 		</part>
 	</software>

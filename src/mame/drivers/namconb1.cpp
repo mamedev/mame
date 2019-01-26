@@ -1046,12 +1046,12 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 
 	EEPROM_2816(config, "eeprom");
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namconb1_state, scantimer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(namconb1_state::scantimer), "screen", 0, 1);
 
 	// has to be 60 hz or music will go crazy in nebulray, vshoot, gslugrs*
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namconb1_state, mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namconb1_state, mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namconb1_state, mcu_adc_cb, attotime::from_hz(60))
+	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namconb1_state::mcu_irq0_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namconb1_state::mcu_irq2_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_adc").configure_periodic(FUNC(namconb1_state::mcu_adc_cb), attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK/8, 384, 0, 288, 264, 0, 224);
@@ -1059,7 +1059,7 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 	m_screen->set_palette(m_c116);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_c116, gfx_namconb1)
+	GFXDECODE(config, "gfxdecode", m_c116, gfx_namconb1);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -1091,6 +1091,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::namconb2)
 	namconb1(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(namconb2_am)
 
@@ -1101,7 +1102,6 @@ MACHINE_CONFIG_START(namconb1_state::namconb2)
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x20000/2);
 	m_c169roz->set_color_base(0x1800);
-
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::machbrkr)

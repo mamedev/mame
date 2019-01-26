@@ -578,11 +578,11 @@ MACHINE_CONFIG_START(sms_state::sms2_ntsc)
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(XTAL(10'738'635)/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("screen")
-	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5246(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(false);
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	m_has_bios_full = true;
 MACHINE_CONFIG_END
@@ -614,11 +614,11 @@ MACHINE_CONFIG_START(sms_state::sms1_ntsc)
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
-	MCFG_SEGA315_5124_SET_SCREEN("screen")
-	MCFG_SEGA315_5124_IS_PAL(false)
-	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5124(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(false);
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
@@ -631,8 +631,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(smssdisp_state::sms_sdisp)
 	sms1_ntsc(config);
 
-	MCFG_DEVICE_MODIFY("sms_vdp")
-	MCFG_SEGA315_5124_INT_CB(WRITELINE(*this, smssdisp_state, sms_store_int_callback))
+	m_vdp->irq().set(FUNC(smssdisp_state::sms_store_int_callback));
 
 	MCFG_DEVICE_ADD("control", Z80, XTAL(10'738'635)/3)
 	MCFG_DEVICE_PROGRAM_MAP(sms_store_mem)
@@ -702,11 +701,11 @@ MACHINE_CONFIG_START(sms_state::sms2_pal)
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PAL/10)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("screen")
-	MCFG_SEGA315_5246_IS_PAL(true)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5246(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(true);
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	m_has_bios_full = true;
 MACHINE_CONFIG_END
@@ -737,11 +736,11 @@ MACHINE_CONFIG_START(sms_state::sms1_pal)
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
-	MCFG_SEGA315_5124_SET_SCREEN("screen")
-	MCFG_SEGA315_5124_IS_PAL(true)
-	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5124(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(true);
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	// card and expansion slots, not present in Master System II
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
@@ -774,11 +773,11 @@ MACHINE_CONFIG_START(sms_state::sms3_paln)
 	MCFG_SCREEN_SMS_PAL_RAW_PARAMS(MASTER_CLOCK_PALN/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("screen")
-	MCFG_SEGA315_5246_IS_PAL(true)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5246(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(true);
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	m_has_bios_full = true;
 MACHINE_CONFIG_END
@@ -809,11 +808,11 @@ MACHINE_CONFIG_START(sms_state::sms1_paln)
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
-	MCFG_SEGA315_5124_SET_SCREEN("screen")
-	MCFG_SEGA315_5124_IS_PAL(true)
-	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5124(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(true);
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	// card and expansion slots, not present in Tec Toy Master System III
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
@@ -847,11 +846,11 @@ MACHINE_CONFIG_START(sms_state::sms3_br)
 	MCFG_SCREEN_SMS_NTSC_RAW_PARAMS(MASTER_CLOCK_PALM/2)
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("screen")
-	MCFG_SEGA315_5246_IS_PAL(false) // PAL-M has same line count of NTSC
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5246_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5246(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(false); // PAL-M has same line count of NTSC
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	m_has_bios_full = true;
 MACHINE_CONFIG_END
@@ -883,11 +882,11 @@ MACHINE_CONFIG_START(sms_state::sms1_br)
 	MCFG_VIDEO_START_OVERRIDE(sms_state,sms1)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,sms1)
 
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5124, 0)
-	MCFG_SEGA315_5124_SET_SCREEN("screen")
-	MCFG_SEGA315_5124_IS_PAL(false) // PAL-M has same line count of NTSC
-	MCFG_SEGA315_5124_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5124_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5124(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(false); // PAL-M has same line count of NTSC
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	// card and expansion slots, not present in Tec Toy Master System III
 	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
@@ -927,8 +926,7 @@ MACHINE_CONFIG_START(sms_state::sms1_kr)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
-	MCFG_DEVICE_MODIFY("sms_vdp")
-	MCFG_SEGA315_5124_CSYNC_CB(WRITELINE(*this, sms_state, sms_csync_callback))
+	m_vdp->csync().set(FUNC(sms_state::sms_csync_callback));
 
 	m_has_bios_full = false;
 	m_has_bios_2000 = true;
@@ -993,11 +991,11 @@ MACHINE_CONFIG_START(sms_state::gamegear)
 	MCFG_VIDEO_RESET_OVERRIDE(sms_state,gamegear)
 
 	/* VDP chip of the Gamegear 2 ASIC version */
-	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5377, 0)
-	MCFG_SEGA315_5377_SET_SCREEN("screen")
-	MCFG_SEGA315_5377_IS_PAL(false)
-	MCFG_SEGA315_5377_INT_CB(INPUTLINE("maincpu", 0))
-	MCFG_SEGA315_5377_PAUSE_CB(WRITELINE(*this, sms_state, sms_pause_callback))
+	SEGA315_5377(config, m_vdp, 0);
+	m_vdp->set_screen(m_main_scr);
+	m_vdp->set_is_pal(false);
+	m_vdp->irq().set_inputline(m_maincpu, 0);
+	m_vdp->pause().set(FUNC(sms_state::sms_pause_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

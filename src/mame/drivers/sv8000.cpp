@@ -391,10 +391,11 @@ MACHINE_CONFIG_START(sv8000_state::sv8000)
 
 	/* video hardware */
 	// S68047P - Unknown whether the internal or an external character rom is used
-	MCFG_DEVICE_ADD("s68047p", S68047, XTAL(10'738'635)/3 )  // Clock not verified
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, sv8000_state, mc6847_videoram_r))
+	S68047(config, m_s68047p, XTAL(10'738'635)/3);  // Clock not verified
+	m_s68047p->input_callback().set(FUNC(sv8000_state::mc6847_videoram_r));
+	m_s68047p->set_screen("screen");
 
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "s68047p")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

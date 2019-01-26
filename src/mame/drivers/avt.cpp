@@ -452,6 +452,9 @@ public:
 	void avtnfl(machine_config &config);
 	void avt(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
 	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
@@ -461,7 +464,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(avtnfl_w);
 	DECLARE_WRITE_LINE_MEMBER(avtbingo_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(avt);
+	void avt_palette(palette_device &palette) const;
 	uint32_t screen_update_avt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void avt_map(address_map &map);
@@ -469,7 +472,6 @@ private:
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
-	virtual void video_start() override;
 	required_device<z80_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80pio_device> m_pio0;
@@ -563,50 +565,43 @@ uint32_t avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-PALETTE_INIT_MEMBER(avt_state, avt)
+void avt_state::avt_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-/*  prom bits
-    7654 3210
-    ---- ---x   Intensity?.
-    ---- --x-   Red component.
-    ---- -x--   Green component.
-    ---- x---   Blue component.
-    xxxx ----   Unused.
-*/
-	int j;
+	/*  prom bits
+		7654 3210
+		---- ---x   Intensity?.
+		---- --x-   Red component.
+		---- -x--   Green component.
+		---- x---   Blue component.
+		xxxx ----   Unused.
+	*/
 
 	/* 0000BGRI */
-	if (color_prom == nullptr) return;
+	const uint8_t *color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (j = 0; j < palette.entries(); j++)
+	for (int j = 0; j < palette.entries(); j++)
 	{
-		int bit1, bit2, bit3, r, g, b, inten, intenmin, intenmax, i;
+		constexpr int intenmin = 0xe0;
+		constexpr int intenmax = 0xff;
 
-		intenmin = 0xe0;
-		intenmax = 0xff;
+		int const i = ((j & 0x7) << 4) | ((j & 0x78) >> 3);
 
-		i = ((j & 0x7) << 4) | ((j & 0x78) >> 3);
+		// intensity component
+//      int const inten = BIT(~color_prom[i], 0);
+		int const inten = BIT(color_prom[i], 0);
 
+		// red component
+		int const r = BIT(color_prom[i], 1) * (inten ? intenmax : intenmin);
 
-		/* intensity component */
-//      inten = 1 - (color_prom[i] & 0x01);
-		inten = (color_prom[i] & 0x01);
+		// green component
+		int const g = BIT(color_prom[i], 2) * (inten ? intenmax : intenmin);
 
-		/* red component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		r = (bit1 * intenmin) + (inten * (bit1 * (intenmax - intenmin)));
+		// blue component
+		int const b = BIT(color_prom[i], 3) * (inten ? intenmax : intenmin);
 
-		/* green component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		g = (bit2 * intenmin) + (inten * (bit2 * (intenmax - intenmin)));
-
-		/* blue component */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		b = (bit3 * intenmin) + (inten * (bit3 * (intenmax - intenmin)));
-
-
-		/* hack to switch cyan->magenta for highlighted background */
+		// hack to switch cyan->magenta for highlighted background
 		if (j == 0x40)
 			palette.set_pen_color(j, rgb_t(g, r, b)); // Why this one has R-G swapped?...
 		else
@@ -975,11 +970,10 @@ MACHINE_CONFIG_START(avt_state::avt)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* 240x224 (through CRTC) */
 	MCFG_SCREEN_UPDATE_DRIVER(avt_state, screen_update_avt)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_avt)
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 8*16)
-	MCFG_PALETTE_INIT_OWNER(avt_state, avt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_avt);
+	PALETTE(config, m_palette, FUNC(avt_state::avt_palette), 8*16);
 
 	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK)); // guess
 	crtc.set_screen("screen");
@@ -1021,6 +1015,7 @@ WRITE_LINE_MEMBER( avt_state::avtnfl_w )
 void avt_state::avtnfl(machine_config &config)
 {
 	avt(config);
+
 	mc6845_device &crtc(MC6845(config.replace(), "crtc", CRTC_CLOCK)); // guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);

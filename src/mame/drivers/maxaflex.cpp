@@ -38,6 +38,7 @@ public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atari_common_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
+		, m_pokey(*this, "pokey")
 		, m_speaker(*this, "speaker")
 		, m_region_maincpu(*this, "maincpu")
 		, m_dsw(*this, "dsw")
@@ -77,6 +78,7 @@ private:
 	uint8_t m_portc_out;
 
 	required_device<m68705p3_device> m_mcu;
+	required_device<pokey_device> m_pokey;
 	required_device<speaker_sound_device> m_speaker;
 	required_region_ptr<uint8_t> m_region_maincpu;
 	required_ioport m_dsw;
@@ -306,7 +308,7 @@ void maxaflex_state::machine_reset()
 {
 	atari_common_state::machine_reset();
 
-	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
+	m_pokey->write(machine().dummy_space(), 15, 0);
 
 	// Supervisor board reset
 	m_portb_out = 0xff;
@@ -321,11 +323,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )
 	m_antic->generic_interrupt(2);
 }
 
-MACHINE_CONFIG_START(maxaflex_state::maxaflex)
+void maxaflex_state::maxaflex(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
-	MCFG_DEVICE_PROGRAM_MAP(a600xl_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", maxaflex_state, mf_interrupt, "screen", 0, 1)
+	m6502_device &maincpu(M6502(config, "maincpu", pokey_device::FREQ_17_EXACT));
+	maincpu.set_addrmap(AS_PROGRAM, &maxaflex_state::a600xl_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(maxaflex_state::mf_interrupt), "screen", 0, 1);
 
 	M68705P3(config, m_mcu, 3579545);
 	m_mcu->porta_r().set(FUNC(maxaflex_state::mcu_porta_r));
@@ -347,32 +350,30 @@ MACHINE_CONFIG_START(maxaflex_state::maxaflex)
 	pia.cb2_handler().set(FUNC(maxaflex_state::pia_cb2_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_VISIBLE_AREA(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y)
-	MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
-	MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
-	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
+	screen.set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	screen.set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	screen.set_screen_update("antic", FUNC(antic_device::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(maxaflex_state, atari)
+	PALETTE(config, "palette", FUNC(maxaflex_state::atari_palette), 256);
 	config.set_default_layout(layout_maxaflex);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
-	MCFG_POKEY_INTERRUPT_CB(maxaflex_state, interrupt_cb)
-	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.0), 5.0)
+	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
+	m_pokey->set_interrupt_callback(FUNC(maxaflex_state::interrupt_cb));
+	m_pokey->set_output_rc(RES_K(1), CAP_U(0.0), 5.0);
+	m_pokey->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	RAM(config, RAM_TAG).set_default_size("16K");
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(maxaflex)

@@ -280,11 +280,10 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(8, 24*16-8-1, 16, 16*16-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wrally)
-	MCFG_PALETTE_ADD("palette", 1024*8)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_wrally)
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*8);
 
 	GAELCO_WRALLY_SPRITES(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag("gfxdecode");

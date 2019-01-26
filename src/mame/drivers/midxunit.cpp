@@ -248,18 +248,18 @@ void midxunit_state::midxunit(machine_config &config)
 	/* basic machine hardware */
 	TMS34020(config, m_maincpu, 40000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midxunit_state::main_map);
-	m_maincpu->set_halt_on_reset(false);		/* halt on reset */
-	m_maincpu->set_pixel_clock(PIXEL_CLOCK);	/* pixel clock */
-	m_maincpu->set_pixels_per_clock(1);			/* pixels per clock */
-	m_maincpu->set_scanline_ind16_callback("video", FUNC(midxunit_video_device::scanline_update));	/* scanline updater (indexed16) */
-	m_maincpu->set_shiftreg_in_callback("video", FUNC(midxunit_video_device::to_shiftreg));			/* write to shiftreg function */
-	m_maincpu->set_shiftreg_out_callback("video", FUNC(midtunit_video_device::from_shiftreg));		/* read from shiftreg function */
+	m_maincpu->set_halt_on_reset(false);        /* halt on reset */
+	m_maincpu->set_pixel_clock(PIXEL_CLOCK);    /* pixel clock */
+	m_maincpu->set_pixels_per_clock(1);         /* pixels per clock */
+	m_maincpu->set_scanline_ind16_callback("video", FUNC(midxunit_video_device::scanline_update));  /* scanline updater (indexed16) */
+	m_maincpu->set_shiftreg_in_callback("video", FUNC(midxunit_video_device::to_shiftreg));         /* write to shiftreg function */
+	m_maincpu->set_shiftreg_out_callback("video", FUNC(midtunit_video_device::from_shiftreg));      /* read from shiftreg function */
 	m_maincpu->set_screen("screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	PALETTE(config, m_palette, 32768).set_format(PALETTE_FORMAT_xRRRRRGGGGGBBBBB);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 32768);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PIXEL_CLOCK, 506, 101, 501, 289, 20, 274);
@@ -270,7 +270,7 @@ void midxunit_state::midxunit(machine_config &config)
 	/* serial prefixes 419, 420 */
 	m_midway_serial_pic->set_upper(419);
 
-	adc0848_device &adc(ADC0848(config, "adc", 0));
+	adc0848_device &adc(ADC0848(config, "adc"));
 	adc.intr_callback().set(FUNC(midxunit_state::adc_int_w)); // ADC INT passed through PLSI1032
 	adc.ch1_callback().set_ioport("AN0");
 	adc.ch2_callback().set_ioport("AN1");

@@ -21,26 +21,11 @@
 // device type definition
 DECLARE_DEVICE_TYPE(SAMPLES, samples_device)
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SAMPLES_CHANNELS(_channels) \
-	downcast<samples_device &>(*device).set_channels(_channels);
-
-#define MCFG_SAMPLES_NAMES(_names) \
-	downcast<samples_device &>(*device).set_samples_names(_names);
-
-#define SAMPLES_START_CB_MEMBER(_name) void _name()
-
-#define MCFG_SAMPLES_START_CB(_class, _method) \
-	downcast<samples_device &>(*device).set_samples_start_callback(samples_device::start_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+#define SAMPLES_START_CB_MEMBER(_name) void _name()
 
 // ======================> samples_device
 
@@ -58,7 +43,6 @@ public:
 	void set_samples_names(const char *const *names) { m_names = names; }
 
 	// start callback helpers
-	template <typename Object> void set_samples_start_callback(Object &&cb) { m_samples_start_cb = std::forward<Object>(cb); }
 	void set_samples_start_callback(start_cb_delegate callback) { m_samples_start_cb = callback; }
 	template <class FunctionClass> void set_samples_start_callback(const char *devname, void (FunctionClass::*callback)(), const char *name)
 	{

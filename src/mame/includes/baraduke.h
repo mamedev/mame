@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/m6800/m6801.h"
 #include "sound/namco.h"
 #include "emupal.h"
 
@@ -43,7 +44,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(baraduke);
+	void baraduke_palette(palette_device &palette) const;
 	uint32_t screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_baraduke);
 	void scroll_w(address_space &space, int layer, int offset, int data);
@@ -62,7 +63,7 @@ protected:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_textram;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<hd63701_cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

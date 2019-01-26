@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(mc8020_state::mc8020)
 	MCFG_SCREEN_UPDATE_DRIVER(mc8020_state, screen_update_mc8020)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* devices */
 	z80pio_device& pio(Z80PIO(config, "pio", XTAL(2'457'600)));

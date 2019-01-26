@@ -308,7 +308,7 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD(m_maincpu, HD6309E, XTAL(24'000'000) / 8) // divider not verified (from 007342 custom)
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bladestl_state, bladestl_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(bladestl_state::bladestl_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD(m_audiocpu, MC6809E, XTAL(24'000'000) / 16)
 	MCFG_DEVICE_PROGRAM_MAP(sound_map)
@@ -326,11 +326,8 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_bladestl)
-	MCFG_PALETTE_ADD("palette", 32 + 16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(bladestl_state, bladestl)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_bladestl);
+	PALETTE(config, "palette", FUNC(bladestl_state::bladestl_palette)).set_format(palette_device::xBGR_555, 32 + 16*16, 32+16);
 
 	K007342(config, m_k007342, 0);
 	m_k007342->set_gfxnum(0);

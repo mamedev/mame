@@ -368,7 +368,7 @@ MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 
 VIDEO_START_MEMBER(speglsht_state,speglsht)
 {
-	m_bitmap = std::make_unique<bitmap_ind16>(512, 5122 );
+	m_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 //  VIDEO_START_CALL_MEMBER(st0016);
 }
 

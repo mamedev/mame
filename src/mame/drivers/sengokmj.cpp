@@ -66,11 +66,11 @@ RSSENGO2.72   chr.
 #include "speaker.h"
 
 
-class sengokmj_state : public driver_device, protected seibu_sound_common
+class sengokmj_state : public driver_device, public seibu_sound_common
 {
 public:
-	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -78,7 +78,8 @@ public:
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
-		m_spriteram16(*this, "sprite_ram") { }
+		m_spriteram16(*this, "sprite_ram")
+	{ }
 
 	void sengokmj(machine_config &config);
 
@@ -579,43 +580,42 @@ WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
 MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, 16000000/2) /* V30-8 */
-	MCFG_DEVICE_PROGRAM_MAP(sengokmj_map)
-	MCFG_DEVICE_IO_MAP(sengokmj_io_map)
+	V30(config, m_maincpu, 16000000/2); /* V30-8 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sengokmj_state::sengokmj_map);
+	m_maincpu->set_addrmap(AS_IO, &sengokmj_state::sengokmj_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_DEVICE_PROGRAM_MAP(seibu_sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("seibu_sound", seibu_sound_device, im0_vector_cb)
+	z80_device &audiocpu(Z80(config, "audiocpu", 14318180/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &sengokmj_state::seibu_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1) //TODO: dynamic resolution
-	MCFG_SCREEN_UPDATE_DRIVER(sengokmj_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sengokmj_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 320-1, 16, 256-1); //TODO: dynamic resolution
+	screen.set_screen_update(FUNC(sengokmj_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(sengokmj_state::vblank_irq));
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.layer_en_callback().set(FUNC(sengokmj_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(sengokmj_state::layer_scroll_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sengokmj)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sengokmj);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1320000, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	okim6295_device &oki(OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline("audiocpu", 0);
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	seibu_sound.set_rombank_tag("seibu_bank1");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( sengokmj )

@@ -53,26 +53,34 @@
 class unichamp_state : public driver_device
 {
 public:
-	unichamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	unichamp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gic(*this, "gic"),
 		m_cart(*this, "cartslot"),
-		m_ctrls(*this, "CTRLS"){}
+		m_ctrls(*this, "CTRLS")
+	{ }
 
 	void unichamp(machine_config &config);
 
 	void init_unichamp();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<cp1610_cpu_device> m_maincpu;
 	required_device<gic_device> m_gic;
 	required_device<generic_slot_device> m_cart;
 
+	required_ioport m_ctrls;
+
 	uint8_t m_ram[256];
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(unichamp);
+
+	void unichamp_palette(palette_device &palette) const;
 
 	DECLARE_READ8_MEMBER(bext_r);
 
@@ -87,26 +95,23 @@ private:
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void unichamp_mem(address_map &map);
-
-	required_ioport m_ctrls;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-PALETTE_INIT_MEMBER(unichamp_state, unichamp)
+void unichamp_state::unichamp_palette(palette_device &palette) const
 {
 	/*
 	palette.set_pen_color(GIC_BLACK, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(GIC_RED,   rgb_t(0xAE, 0x49, 0x41));//(from box shot)
+	palette.set_pen_color(GIC_RED,   rgb_t(0xae, 0x49, 0x41));//(from box shot)
 	palette.set_pen_color(GIC_GREEN, rgb_t(0x62, 0x95, 0x88));//(from box shot)
-	palette.set_pen_color(GIC_WHITE, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(GIC_WHITE, rgb_t(0xff, 0xff, 0xff));
 	*/
 
 	//using from intv.c instead as suggested by RB
 	palette.set_pen_color(GIC_BLACK, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(GIC_RED,   rgb_t(0xFF, 0x3D, 0x10));
-	//palette.set_pen_color(GIC_GREEN, rgb_t(0x38, 0x6B, 0x3F)); //intv's DARK GREEN
-	palette.set_pen_color(GIC_GREEN, rgb_t(0x00, 0xA7, 0x56)); //intv's GREEN
-	palette.set_pen_color(GIC_WHITE, rgb_t(0xFF, 0xFC, 0xFF));
+	palette.set_pen_color(GIC_RED,   rgb_t(0xff, 0x3d, 0x10));
+	//palette.set_pen_color(GIC_GREEN, rgb_t(0x38, 0x6b, 0x3f)); //intv's DARK GREEN
+	palette.set_pen_color(GIC_GREEN, rgb_t(0x00, 0xa7, 0x56)); //intv's GREEN
+	palette.set_pen_color(GIC_WHITE, rgb_t(0xff, 0xfc, 0xff));
 }
 
 
@@ -238,34 +243,29 @@ WRITE16_MEMBER( unichamp_state::unichamp_trapl_w )
 	logerror("trapl_w(%x) = %x\n",offset,data);
 }
 
-MACHINE_CONFIG_START(unichamp_state::unichamp)
+void unichamp_state::unichamp(machine_config &config)
+{
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:
 	//MCFG_DEVICE_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
 	//But since it is only running 7752/29868 th's of the time...
 	//TODO find a more accurate method? (the emulation will be the same though)
-	MCFG_DEVICE_ADD("maincpu", CP1610, (7752.0/29868.0)*XTAL(3'579'545)/4)
+	CP1610(config, m_maincpu, (7752.0/29868.0)*XTAL(3'579'545)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unichamp_state::unichamp_mem);
+	m_maincpu->bext().set(FUNC(unichamp_state::bext_r));
 
-	MCFG_DEVICE_PROGRAM_MAP(unichamp_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_CP1610_BEXT_CALLBACK(READ8(*this, unichamp_state, bext_r))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL(3'579'545),
-							gic_device::LINE_CLOCKS,
-							gic_device::START_ACTIVE_SCAN,
-							gic_device::END_ACTIVE_SCAN,
-							gic_device::LINES,
-							gic_device::START_Y,
-							gic_device::START_Y + gic_device::SCREEN_HEIGHT )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(3'579'545),
+		gic_device::LINE_CLOCKS, gic_device::START_ACTIVE_SCAN, gic_device::END_ACTIVE_SCAN,
+		gic_device::LINES,       gic_device::START_Y,           gic_device::START_Y + gic_device::SCREEN_HEIGHT);
+	screen.set_screen_update(FUNC(unichamp_state::screen_update_unichamp));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_UPDATE_DRIVER(unichamp_state, screen_update_unichamp)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(unichamp_state, unichamp)
+	PALETTE(config, "palette", FUNC(unichamp_state::unichamp_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -275,12 +275,9 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 	m_gic->add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "unichamp_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "unichamp")
-
-MACHINE_CONFIG_END
-
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "unichamp_cart", "bin,rom");
+	SOFTWARE_LIST(config, "cart_list").set_original("unichamp");
+}
 
 ROM_START(unichamp)
 	ROM_REGION(0x1000,"maincpu", ROMREGION_ERASEFF)

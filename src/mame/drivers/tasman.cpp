@@ -38,8 +38,8 @@
 class kongambl_state : public driver_device
 {
 public:
-	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kongambl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_k053252(*this, "k053252"),
 		m_k055673(*this, "k055673"),
@@ -51,7 +51,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram")
-		{ }
+	{ }
 
 	void kongambl(machine_config &config);
 
@@ -648,7 +648,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_DEVICE_ADD("maincpu", M68EC020, 25000000)
 	MCFG_DEVICE_PROGRAM_MAP(kongambl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kongambl_state::kongambl_vblank), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("sndcpu", M68000, 16000000)
 	MCFG_DEVICE_PROGRAM_MAP(kongamaud_map)
@@ -665,10 +665,9 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(25000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223) // fake, they'll be changed by CCU anyway, TBD
 	MCFG_SCREEN_UPDATE_DRIVER(kongambl_state, screen_update_kongambl)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(XRGB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
 	MCFG_VIDEO_START_OVERRIDE(kongambl_state,kongambl)
 
@@ -680,7 +679,7 @@ MACHINE_CONFIG_START(kongambl_state::kongambl)
 	m_k055673->set_palette(m_palette);
 
 #if CUSTOM_DRAW
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tasman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tasman);
 #endif
 
 	K056832(config, m_k056832, 0);

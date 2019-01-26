@@ -71,6 +71,10 @@ public:
 	void init_game1();
 	void init_game2();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p3_r);
@@ -99,7 +103,7 @@ private:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	DECLARE_PALETTE_INIT(spinb);
+	void spinb_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -130,8 +134,6 @@ private:
 	uint8_t *m_p_audio;
 	uint8_t *m_p_music;
 	uint8_t *m_p_dmdcpu;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	void update_sound_a();
 	void update_sound_m();
 	required_device<cpu_device> m_maincpu;
@@ -577,7 +579,7 @@ void spinb_state::init_game2()
 	m_game = 2;
 }
 
-PALETTE_INIT_MEMBER( spinb_state, spinb )
+void  spinb_state::spinb_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
@@ -586,8 +588,7 @@ PALETTE_INIT_MEMBER( spinb_state, spinb )
 
 uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t y,gfx,gfx1;
-	uint16_t sy=0,ma,x;
+	uint16_t sy=0,ma;
 	address_space &internal = m_dmdcpu->space(AS_DATA);
 	ma = internal.read_byte(0x05) << 8; // find where display memory is
 
@@ -596,13 +597,13 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		ma = ((ma - 0x200) & 0x1c00) + 0x200;
 		if (ma > 0x1c00) return 1; // not initialised yet
 
-		for(y=0; y<32; y++)
+		for (uint8_t y = 0; y < 32; y++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
-			for(x = 0; x < 16; x++)
+			for (uint16_t x = 0; x < 16; x++)
 			{
-				gfx = m_dmdram[ma+0x200];
-				gfx1 = m_dmdram[ma++];
+				uint8_t const gfx = m_dmdram[ma+0x200];
+				uint8_t const gfx1 = m_dmdram[ma++];
 
 				*p++ = BIT(gfx1, 0) ? 1 : BIT(gfx, 0) ? 2 : 0;
 				*p++ = BIT(gfx1, 1) ? 1 : BIT(gfx, 1) ? 2 : 0;
@@ -619,12 +620,12 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		ma &= 0x1e00;
 
-		for(y=0; y<32; y++)
+		for (uint8_t y = 0; y < 32; y++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
-			for(x = 0; x < 16; x++)
+			for (uint16_t x = 0; x < 16; x++)
 			{
-				gfx = m_dmdram[ma++];
+				uint8_t const gfx = m_dmdram[ma++];
 
 				*p++ = BIT(gfx, 0);
 				*p++ = BIT(gfx, 1);
@@ -671,7 +672,7 @@ void spinb_state::spinb(machine_config &config)
 	screen.set_visarea(0, 127, 0, 31);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 3).set_init(FUNC(spinb_state::palette_init_spinb));
+	PALETTE(config, "palette", FUNC(spinb_state::spinb_palette), 3);
 
 	/* Sound */
 	genpin_audio(config);

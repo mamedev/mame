@@ -83,7 +83,8 @@ namespace netlist
 			NLTIME_FROM_NS(18),
 			NLTIME_FROM_NS(36) - NLTIME_FROM_NS(18),
 			NLTIME_FROM_NS(54) - NLTIME_FROM_NS(18),
-			NLTIME_FROM_NS(72) - NLTIME_FROM_NS(18)};
+			NLTIME_FROM_NS(72) - NLTIME_FROM_NS(18)
+	};
 
 	NETLIB_UPDATE(7490)
 	{
@@ -125,8 +126,8 @@ namespace netlist
 			m_Q[i].push((m_cnt >> i) & 1, delay[i]);
 	}
 
-	NETLIB_DEVICE_IMPL(7490)
-	NETLIB_DEVICE_IMPL(7490_dip)
+	NETLIB_DEVICE_IMPL(7490, 	 "TTL_7490", 		"+A,+B,+R1,+R2,+R91,+R92")
+	NETLIB_DEVICE_IMPL(7490_dip, "TTL_7490_DIP", 	"")
 
 	} //namespace devices
 } // namespace netlist

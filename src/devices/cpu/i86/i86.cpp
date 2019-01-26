@@ -317,7 +317,7 @@ void i8086_cpu_device::execute_run()
 			case 0xdd:
 			case 0xde:
 			case 0xdf:
-				m_esc_opcode_handler(m_pc - 1);
+				m_esc_opcode_handler(m_pc);
 				m_modrm = fetch();
 				if(m_modrm < 0xc0)
 					m_esc_data_handler(get_ea(1, I8086_READ));

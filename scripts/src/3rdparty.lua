@@ -203,9 +203,6 @@ buildoptions {
 }
 
 configuration { }
-buildoptions {
-	"-Wno-error=maybe-uninitialized"
-}
 defines {
 	"SOFTFLOAT_ROUND_ODD",
 	"INLINE_LEVEL=5",

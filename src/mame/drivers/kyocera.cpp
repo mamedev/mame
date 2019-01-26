@@ -533,32 +533,16 @@ READ8_MEMBER( kc85_state::lcd_r )
 {
 	uint8_t data = 0;
 
-	data |= m_lcdc0->read(space, offset);
-	data |= m_lcdc1->read(space, offset);
-	data |= m_lcdc2->read(space, offset);
-	data |= m_lcdc3->read(space, offset);
-	data |= m_lcdc4->read(space, offset);
-	data |= m_lcdc5->read(space, offset);
-	data |= m_lcdc6->read(space, offset);
-	data |= m_lcdc7->read(space, offset);
-	data |= m_lcdc8->read(space, offset);
-	data |= m_lcdc9->read(space, offset);
+	for (uint8_t i = 0; i < 10; i++)
+		data |= m_lcdc[i]->read(space, offset);
 
 	return data;
 }
 
 WRITE8_MEMBER( kc85_state::lcd_w )
 {
-	m_lcdc0->write(space, offset, data);
-	m_lcdc1->write(space, offset, data);
-	m_lcdc2->write(space, offset, data);
-	m_lcdc3->write(space, offset, data);
-	m_lcdc4->write(space, offset, data);
-	m_lcdc5->write(space, offset, data);
-	m_lcdc6->write(space, offset, data);
-	m_lcdc7->write(space, offset, data);
-	m_lcdc8->write(space, offset, data);
-	m_lcdc9->write(space, offset, data);
+	for (uint8_t i = 0; i < 10; i++)
+		m_lcdc[i]->write(space, offset, data);
 }
 
 /* Memory Maps */
@@ -963,14 +947,8 @@ WRITE8_MEMBER( kc85_state::i8155_pa_w )
 	m_keylatch = (m_keylatch & 0x100) | data;
 
 	/* LCD */
-	m_lcdc0->cs2_w(BIT(data, 0));
-	m_lcdc1->cs2_w(BIT(data, 1));
-	m_lcdc2->cs2_w(BIT(data, 2));
-	m_lcdc3->cs2_w(BIT(data, 3));
-	m_lcdc4->cs2_w(BIT(data, 4));
-	m_lcdc5->cs2_w(BIT(data, 5));
-	m_lcdc6->cs2_w(BIT(data, 6));
-	m_lcdc7->cs2_w(BIT(data, 7));
+	for (uint8_t i = 0; i < 8; i++)
+		m_lcdc[i]->cs2_w(BIT(data, i));
 
 	/* RTC */
 	m_rtc->c0_w(BIT(data, 0));
@@ -1001,8 +979,8 @@ WRITE8_MEMBER( kc85_state::i8155_pb_w )
 	m_keylatch = (BIT(data, 0) << 8) | (m_keylatch & 0xff);
 
 	/* LCD */
-	m_lcdc8->cs2_w(BIT(data, 0));
-	m_lcdc9->cs2_w(BIT(data, 1));
+	m_lcdc[8]->cs2_w(BIT(data, 0));
+	m_lcdc[9]->cs2_w(BIT(data, 1));
 
 	/* beeper */
 	m_buzzer = BIT(data, 2);
@@ -1345,21 +1323,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)
 	m_tp = !m_tp;
 }
 
-MACHINE_CONFIG_START(kc85_state::kc85)
+void kc85_state::kc85(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8085A, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(kc85_mem)
-	MCFG_DEVICE_IO_MAP(kc85_io)
-	MCFG_I8085A_SID(READLINE(*this, kc85_state,kc85_sid_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, kc85_state,kc85_sod_w))
+	I8085A(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kc85_state::kc85_mem);
+	m_maincpu->set_addrmap(AS_IO, &kc85_state::kc85_io);
+	m_maincpu->in_sid_func().set(FUNC(kc85_state::kc85_sid_r));
+	m_maincpu->out_sod_func().set(FUNC(kc85_state::kc85_sod_w));
 
 	/* video hardware */
 	kc85_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
@@ -1377,39 +1355,38 @@ MACHINE_CONFIG_START(kc85_state::kc85)
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, kc85_state, write_centronics_select))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(kc85_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(kc85_state::write_centronics_select));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("opt_cartslot", generic_linear_slot, "trsm100_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "trsm100_cart", "bin,rom");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
+	SOFTWARE_LIST(config, "cart_list").set_original("trsm100");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pc8201_state::pc8201)
+void pc8201_state::pc8201(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8085A, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(pc8201_mem)
-	MCFG_DEVICE_IO_MAP(pc8201_io)
-	MCFG_I8085A_SID(READLINE(*this, kc85_state,kc85_sid_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, kc85_state,kc85_sod_w))
+	I8085A(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc8201_state::pc8201_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc8201_state::pc8201_io);
+	m_maincpu->in_sid_func().set(FUNC(kc85_state::kc85_sid_r));
+	m_maincpu->out_sod_func().set(FUNC(kc85_state::kc85_sod_w));
 
 	/* video hardware */
 	kc85_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
@@ -1427,27 +1404,25 @@ MACHINE_CONFIG_START(pc8201_state::pc8201)
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, kc85_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, kc85_state, write_centronics_select))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(kc85_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(kc85_state::write_centronics_select));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("opt_cartslot", generic_linear_slot, "pc8201_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "pc8201_cart", "bin,rom");
 
 	/* 128KB ROM cassette */
-	MCFG_GENERIC_CARTSLOT_ADD("cas_cartslot", generic_linear_slot, "pc8201_cart2")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, "cas_cartslot", generic_linear_slot, "pc8201_cart2", "bin,rom");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pc8201")
+	SOFTWARE_LIST(config, "cart_list").set_original("pc8201");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("16K").set_extra_options("32K,64K,96K");
-MACHINE_CONFIG_END
+}
 
 void pc8201_state::pc8300(machine_config &config)
 {
@@ -1455,21 +1430,21 @@ void pc8201_state::pc8300(machine_config &config)
 	m_ram->set_default_size("32K").set_extra_options("64K,96K");
 }
 
-MACHINE_CONFIG_START(trsm100_state::trsm100)
+void trsm100_state::trsm100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8085A, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(kc85_mem)
-	MCFG_DEVICE_IO_MAP(trsm100_io)
-	MCFG_I8085A_SID(READLINE(*this, kc85_state,kc85_sid_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, kc85_state,kc85_sod_w))
+	I8085A(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &trsm100_state::kc85_mem);
+	m_maincpu->set_addrmap(AS_IO, &trsm100_state::trsm100_io);
+	m_maincpu->in_sid_func().set(FUNC(kc85_state::kc85_sid_r));
+	m_maincpu->out_sod_func().set(FUNC(kc85_state::kc85_sod_w));
 
 	/* video hardware */
 	kc85_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));
@@ -1487,22 +1462,22 @@ MACHINE_CONFIG_START(trsm100_state::trsm100)
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(im6402_device::write_rri));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL(1'000'000))
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("opt_cartslot", generic_linear_slot, "trsm100_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "trsm100_cart", "bin,rom");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "trsm100")
+	SOFTWARE_LIST(config, "cart_list").set_original("trsm100");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("8K").set_extra_options("16K,24K,32K");
-MACHINE_CONFIG_END
+}
 
 void trsm100_state::tandy102(machine_config &config)
 {
@@ -1510,24 +1485,26 @@ void trsm100_state::tandy102(machine_config &config)
 	m_ram->set_default_size("24K").set_extra_options("32K");
 }
 
-MACHINE_CONFIG_START(tandy200_state::tandy200)
+void tandy200_state::tandy200(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8085A, XTAL(4'915'200))
-	MCFG_DEVICE_PROGRAM_MAP(tandy200_mem)
-	MCFG_DEVICE_IO_MAP(tandy200_io)
-	MCFG_I8085A_SID(READLINE(*this, tandy200_state,kc85_sid_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, tandy200_state,kc85_sod_w))
+	I8085A(config, m_maincpu, XTAL(4'915'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tandy200_state::tandy200_mem);
+	m_maincpu->set_addrmap(AS_IO, &tandy200_state::tandy200_io);
+	m_maincpu->in_sid_func().set(FUNC(tandy200_state::kc85_sid_r));
+	m_maincpu->out_sod_func().set(FUNC(tandy200_state::kc85_sod_w));
 
 	/* video hardware */
 	tandy200_video(config);
 
 	/* TP timer */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("tp", tandy200_state, tandy200_tp_tick, attotime::from_hz(XTAL(4'915'200)/2/8192))
+	TIMER(config, "tp").configure_periodic(FUNC(tandy200_state::tandy200_tp_tick), attotime::from_hz(XTAL(4'915'200)/2/8192));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+
 //  MCFG_TCM5089_ADD(TCM5089_TAG, XTAL(3'579'545))
 
 	/* devices */
@@ -1549,25 +1526,25 @@ MACHINE_CONFIG_START(tandy200_state::tandy200)
 	rs232.dsr_handler().set(I8251_TAG, FUNC(i8251_device::write_dsr));
 
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL(1'000'000))
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, tandy200_state, write_centronics_busy))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, tandy200_state, write_centronics_select))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(tandy200_state::write_centronics_busy));
+	m_centronics->select_handler().set(FUNC(tandy200_state::write_centronics_select));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state((cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED));
 
 	/* option ROM cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("opt_cartslot", generic_linear_slot, "tandy200_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_opt_cart, generic_linear_slot, "tandy200_cart", "bin,rom");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "tandy200")
+	SOFTWARE_LIST(config, "cart_list").set_original("tandy200");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("24K").set_extra_options("48K,72K");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

@@ -353,10 +353,9 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldx)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pktgaldx_state, vblank_w))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 4096);
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pktgaldx)
 
@@ -414,12 +413,11 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldb)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pktgaldx_state, vblank_w))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bootleg)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_bootleg)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

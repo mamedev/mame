@@ -498,7 +498,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("16K");
 
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, m_cass);
 
 	SPEAKER(config, "mono").front_center();
 

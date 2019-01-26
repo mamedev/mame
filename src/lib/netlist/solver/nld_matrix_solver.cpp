@@ -74,7 +74,7 @@ void terms_for_net_t::set_pointers()
 // matrix_solver
 // ----------------------------------------------------------------------------------------
 
-matrix_solver_t::matrix_solver_t(netlist_t &anetlist, const pstring &name,
+matrix_solver_t::matrix_solver_t(netlist_base_t &anetlist, const pstring &name,
 		const eSortType sort, const solver_parameters_t *params)
 	: device_t(anetlist, name)
 	, m_params(*params)
@@ -344,13 +344,13 @@ void matrix_solver_t::setup_matrix()
 	{
 		pstring num = plib::pfmt("{1}")(k);
 
-		netlist().save(*this, m_terms[k]->m_last_V, "lastV." + num);
-		netlist().save(*this, m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
-		netlist().save(*this, m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
+		state().save(*this, m_terms[k]->m_last_V, "lastV." + num);
+		state().save(*this, m_terms[k]->m_DD_n_m_1, "m_DD_n_m_1." + num);
+		state().save(*this, m_terms[k]->m_h_n_m_1, "m_h_n_m_1." + num);
 
-		netlist().save(*this, m_terms[k]->go(),"GO" + num, m_terms[k]->count());
-		netlist().save(*this, m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
-		netlist().save(*this, m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
+		state().save(*this, m_terms[k]->go(),"GO" + num, m_terms[k]->count());
+		state().save(*this, m_terms[k]->gt(),"GT" + num, m_terms[k]->count());
+		state().save(*this, m_terms[k]->Idr(),"IDR" + num , m_terms[k]->count());
 	}
 
 	for (unsigned k=0; k<iN; k++)
@@ -390,7 +390,9 @@ void matrix_solver_t::update() NL_NOEXCEPT
 
 void matrix_solver_t::update_forced()
 {
-	ATTR_UNUSED const netlist_time new_timestep = solve();
+	const netlist_time new_timestep = solve();
+	plib::unused_var(new_timestep);
+
 	update_inputs();
 
 	if (m_params.m_dynamic_ts && has_timestep_devices())
@@ -437,7 +439,7 @@ void matrix_solver_t::solve_base()
 
 const netlist_time matrix_solver_t::solve()
 {
-	const netlist_time now = netlist().time();
+	const netlist_time now = exec().time();
 	const netlist_time delta = now - m_last_step;
 
 	// We are already up to date. Avoid oscillations.
@@ -543,7 +545,7 @@ void matrix_solver_t::log_stats()
 					static_cast<double>(this->m_stat_newton_raphson) / static_cast<double>(this->m_stat_vsolver_calls));
 		log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 				this->m_stat_calculations,
-				static_cast<double>(this->m_stat_calculations) / this->netlist().time().as_double(),
+				static_cast<double>(this->m_stat_calculations) / this->exec().time().as_double(),
 				this->m_iterative_fail,
 				100.0 * static_cast<double>(this->m_iterative_fail)
 					/ static_cast<double>(this->m_stat_calculations),

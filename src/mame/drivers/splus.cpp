@@ -690,7 +690,7 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 	NVRAM(config, "cmosh", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware (ALL FAKE, NO VIDEO)
-	PALETTE(config, "palette", 16*16);
+	PALETTE(config, "palette").set_entries(16*16);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

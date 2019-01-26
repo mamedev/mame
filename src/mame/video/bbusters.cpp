@@ -26,7 +26,7 @@
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
+TILE_GET_INFO_MEMBER(bbusters_state_base::get_tile_info)
 {
 	uint16_t tile = m_videoram[tile_index];
 
@@ -34,14 +34,14 @@ TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
 }
 
 template<int Layer, int Gfx>
-TILE_GET_INFO_MEMBER(bbusters_state::get_pf_tile_info)
+TILE_GET_INFO_MEMBER(bbusters_state_base::get_pf_tile_info)
 {
 	uint16_t tile = m_pf_data[Layer][tile_index];
 
 	SET_TILE_INFO_MEMBER(Gfx,tile&0xfff,tile>>12,0);
 }
 
-WRITE16_MEMBER(bbusters_state::video_w)
+WRITE16_MEMBER(bbusters_state_base::video_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
@@ -49,28 +49,32 @@ WRITE16_MEMBER(bbusters_state::video_w)
 
 /******************************************************************************/
 
-void bbusters_state::video_start()
+void bbusters_state_base::video_start()
 {
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<0,3>, "layer0_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
-	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<1,4>, "layer1_gfx4", this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
-
-	m_pf_tilemap[0]->set_transparent_pen(15);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bbusters_state_base::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_scale_line_count));
 }
 
+void bbusters_state::video_start()
+{
+	bbusters_state_base::video_start();
+
+	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<0,3>, "layer0_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&bbusters_state::get_pf_tile_info<1,4>, "layer1_gfx4", this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
+
+	m_pf_tilemap[0]->set_transparent_pen(15);
+}
+
 void mechatt_state::video_start()
 {
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mechatt_state::get_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	bbusters_state_base::video_start();
+
 	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&mechatt_state::get_pf_tile_info<0,2>, "layer0_gfx2", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(&mechatt_state::get_pf_tile_info<1,3>, "layer1_gfx3", this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 
 	m_pf_tilemap[0]->set_transparent_pen(15);
-	m_fix_tilemap->set_transparent_pen(15);
-
-	save_item(NAME(m_scale_line_count));
 }
 
 /******************************************************************************/
@@ -90,7 +94,7 @@ void mechatt_state::video_start()
 		else if (dy&0x40) code+=32;             \
 		else if (dx&0x40) code+=16
 
-inline const uint8_t *bbusters_state::get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block)
+inline const uint8_t *bbusters_state_base::get_source_ptr(gfx_element *gfx, uint32_t sprite, int dx, int dy, int block)
 {
 	int code=0;
 
@@ -128,7 +132,7 @@ inline const uint8_t *bbusters_state::get_source_ptr(gfx_element *gfx, uint32_t 
 	return gfx->get_data((sprite+code) % gfx->elements()) + ((dy%16) * gfx->rowbytes());
 }
 
-void bbusters_state::draw_block(screen_device &screen, bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block,int priority)
+void bbusters_state_base::draw_block(screen_device &screen, bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int bank,int block,int priority)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(bank);
 	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
@@ -177,7 +181,7 @@ void bbusters_state::draw_block(screen_device &screen, bitmap_ind16 &dest,int x,
 	}
 }
 
-void bbusters_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const uint16_t *source, int bank)
+void bbusters_state_base::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const uint16_t *source, int bank)
 {
 	int offs;
 

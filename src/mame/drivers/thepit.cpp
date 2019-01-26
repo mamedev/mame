@@ -737,14 +737,13 @@ MACHINE_CONFIG_START(thepit_state::thepit)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thepit)
-	MCFG_PALETTE_ADD("palette", 32+8)
-	MCFG_PALETTE_INIT_OWNER(thepit_state, thepit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thepit);
+	PALETTE(config, m_palette, FUNC(thepit_state::thepit_palette), 32+8);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -775,7 +774,7 @@ MACHINE_CONFIG_START(thepit_state::desertdn)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
+	m_gfxdecode->set_info(gfx_intrepid);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thepit_state::intrepid)
@@ -788,20 +787,18 @@ MACHINE_CONFIG_START(thepit_state::intrepid)
 	m_mainlatch->q_out_cb<5>().set(FUNC(thepit_state::intrepid_graphics_bank_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
+	m_gfxdecode->set_info(gfx_intrepid);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(thepit_state::suprmous)
+void thepit_state::suprmous(machine_config &config)
+{
 	intrepid(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(thepit_state,suprmous)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
-MACHINE_CONFIG_END
+	m_palette->set_init(FUNC(thepit_state::suprmous_palette));
+	m_gfxdecode->set_info(gfx_suprmous);
+}
 
 
 

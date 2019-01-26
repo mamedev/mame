@@ -116,9 +116,9 @@ void lb186_state::ncr5380(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_IRQ_HANDLER(WRITELINE(":maincpu", i80186_cpu_device, int1_w))
-	MCFG_NCR5380N_DRQ_HANDLER(WRITELINE(":maincpu", i80186_cpu_device, drq0_w))
+	downcast<ncr5380n_device &>(*device).set_clock(10000000);
+	downcast<ncr5380n_device &>(*device).irq_handler().set(":maincpu", FUNC(i80186_cpu_device::int1_w));
+	downcast<ncr5380n_device &>(*device).drq_handler().set(":maincpu", FUNC(i80186_cpu_device::drq0_w));
 }
 
 static void scsi_devices(device_slot_interface &device)
@@ -137,11 +137,11 @@ MACHINE_CONFIG_START(lb186_state::lb186)
 	MCFG_DEVICE_PROGRAM_MAP(lb186_map)
 	MCFG_DEVICE_IO_MAP(lb186_io)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int0_w))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232_2", rs232_port_device, write_txd))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, lb186_state, sio_out_w))
+	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL));
+	duart.irq_cb().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	duart.a_tx_cb().set("rs232_1", FUNC(rs232_port_device::write_txd));
+	duart.b_tx_cb().set("rs232_2", FUNC(rs232_port_device::write_txd));
+	duart.outport_cb().set(FUNC(lb186_state::sio_out_w));
 
 	rs232_port_device &rs232_1(RS232_PORT(config, "rs232_1", default_rs232_devices, "terminal"));
 	rs232_1.rxd_handler().set("duart", FUNC(scn2681_device::rx_a_w));

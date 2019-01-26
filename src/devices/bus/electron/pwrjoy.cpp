@@ -78,8 +78,10 @@ void electron_pwrjoy_device::device_start()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_pwrjoy_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t electron_pwrjoy_device::expbus_r(address_space &space, offs_t offset)
 {
+	uint8_t data = 0xff;
+
 	if (offset >= 0x8000 && offset < 0xc000)
 	{
 		if (m_romsel == 15)

@@ -848,8 +848,7 @@ void bbc_state::bbca(machine_config &config)
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("hd6845", FUNC(hd6845_device::screen_update));
 
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(palette_init_delegate(FUNC(bbc_state::palette_init_bbc), this));
+	PALETTE(config, m_palette, FUNC(bbc_state::bbc_colours), 16);
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
 	m_trom->set_screen_size(40, 25, 40);
@@ -908,14 +907,10 @@ void bbc_state::bbca(machine_config &config)
 	m_via6522_0->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	/* eprom sockets */
-	GENERIC_SOCKET(config, m_rom[12], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic101 */
-	m_rom[12]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_romc, this));
-	GENERIC_SOCKET(config, m_rom[13], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic100 */
-	m_rom[13]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_romd, this));
-	GENERIC_SOCKET(config, m_rom[14], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic88 */
-	m_rom[14]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rome, this));
-	GENERIC_SOCKET(config, m_rom[15], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic52 */
-	m_rom[15]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_romf, this));
+	BBC_ROMSLOT16(config, m_rom[0x0c], bbc_rom_devices, nullptr); /* ic101 */
+	BBC_ROMSLOT16(config, m_rom[0x0d], bbc_rom_devices, nullptr); /* ic100 */
+	BBC_ROMSLOT16(config, m_rom[0x0e], bbc_rom_devices, nullptr); /* ic88 */
+	BBC_ROMSLOT16(config, m_rom[0x0f], bbc_rom_devices, nullptr); /* ic52 */
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_ls_a").set_original("bbca_cass");
@@ -962,7 +957,7 @@ void bbc_state::bbcb(machine_config &config)
 	centronics.set_output_latch(latch);
 
 	/* fdc */
-	BBC_FDC_SLOT(config, m_fdc, bbc_fdc_devices, "acorn8271");
+	BBC_FDC_SLOT(config, m_fdc, 16_MHz_XTAL / 2, bbc_fdc_devices, "acorn8271");
 	m_fdc->intrq_wr_callback().set(FUNC(bbc_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(bbc_state::fdc_drq_w));
 
@@ -985,7 +980,7 @@ void bbc_state::bbcb(machine_config &config)
 	m_analog->lpstb_handler().set(FUNC(bbc_state::lpstb_w));
 
 	/* 1mhz bus port */
-	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbc_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, 16_MHz_XTAL / 16, bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	m_1mhzbus->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
@@ -1134,16 +1129,11 @@ void bbcbp_state::bbcbp(machine_config &config)
 	FLOPPY_CONNECTOR(config, "wd1770:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 
 	/* eprom sockets */
-	GENERIC_SOCKET(config, m_rom[2], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic35 */
-	m_rom[2]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom23, this));
-	GENERIC_SOCKET(config, m_rom[4], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic44 */
-	m_rom[4]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom45, this));
-	GENERIC_SOCKET(config, m_rom[6], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic57 */
-	m_rom[6]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom67, this));
-	GENERIC_SOCKET(config, m_rom[8], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic62 */
-	m_rom[8]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom89, this));
-	GENERIC_SOCKET(config, m_rom[10], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic68 */
-	m_rom[10]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_romab, this));
+	BBC_ROMSLOT32(config, m_rom[0x02], bbc_rom_devices, nullptr); /* ic35 */
+	BBC_ROMSLOT32(config, m_rom[0x04], bbc_rom_devices, nullptr); /* ic44 */
+	BBC_ROMSLOT32(config, m_rom[0x06], bbc_rom_devices, nullptr); /* ic57 */
+	BBC_ROMSLOT32(config, m_rom[0x08], bbc_rom_devices, nullptr); /* ic62 */
+	BBC_ROMSLOT32(config, m_rom[0x0a], bbc_rom_devices, nullptr); /* ic68 */
 	config.device_remove("romslot12");
 	config.device_remove("romslot13");
 	config.device_remove("romslot14");
@@ -1352,8 +1342,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("hd6845", FUNC(hd6845_device::screen_update));
 
-	palette_device &palette(PALETTE(config, "palette", 16));
-	palette.set_init(palette_init_delegate(FUNC(bbc_state::palette_init_bbc), this));
+	PALETTE(config, m_palette, FUNC(bbc_state::bbc_colours), 16);
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
 	m_trom->set_screen_size(40, 25, 40);
@@ -1459,7 +1448,7 @@ void bbcm_state::bbcm(machine_config &config)
 	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
 
 	/* 1mhz bus port */
-	BBC_1MHZBUS_SLOT(config, m_1mhzbus, bbcm_1mhzbus_devices, nullptr);
+	BBC_1MHZBUS_SLOT(config, m_1mhzbus, 16_MHz_XTAL / 16, bbcm_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	m_1mhzbus->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 
@@ -1481,12 +1470,9 @@ void bbcm_state::bbcm(machine_config &config)
 	m_cart[1]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_cart2, this));
 
 	/* eprom sockets */
-	GENERIC_SOCKET(config, m_rom[8], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic27 */
-	m_rom[8]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom8, this));
-	GENERIC_SOCKET(config, m_rom[4], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic41 */
-	m_rom[4]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom45, this));
-	GENERIC_SOCKET(config, m_rom[6], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic37 */
-	m_rom[6]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom67, this));
+	BBC_ROMSLOT16(config, m_rom[0x08], bbc_rom_devices, nullptr); /* ic27 */
+	BBC_ROMSLOT32(config, m_rom[0x04], bbc_rom_devices, nullptr); /* ic41 */
+	BBC_ROMSLOT32(config, m_rom[0x06], bbc_rom_devices, nullptr); /* ic37 */
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_ls_m").set_original("bbcm_cass");
@@ -1688,14 +1674,13 @@ void bbcm_state::bbcmc(machine_config &config)
 	config.device_remove("cartslot2");
 
 	/* eprom sockets */
-	GENERIC_SOCKET(config, m_rom[2], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic23 */
-	m_rom[2]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom2, this));
-	GENERIC_SOCKET(config, m_rom[3], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic17 */
-	m_rom[3]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom3, this));
-	GENERIC_SOCKET(config, m_rom[0], generic_linear_slot, "bbc_rom", "bin,rom"); /* ic38 */
-	m_rom[0]->set_device_load(device_image_load_delegate(&bbc_state::device_image_load_rom01, this));
 	config.device_remove("romslot4");
 	config.device_remove("romslot6");
+	config.device_remove("romslot8");
+	BBC_ROMSLOT16(config, m_rom[0x03], bbc_rom_devices, nullptr); /* ic17 */
+	BBC_ROMSLOT16(config, m_rom[0x02], bbc_rom_devices, nullptr); /* ic23 */
+	BBC_ROMSLOT32(config, m_rom[0x00], bbc_rom_devices, nullptr); /* ic38 */
+	BBC_ROMSLOT16(config, m_rom[0x08], bbc_rom_devices, nullptr); /* ic29 */
 
 	/* software lists */
 	SOFTWARE_LIST(config, "flop_ls_mc").set_original("bbcmc_flop");
@@ -1707,7 +1692,7 @@ void bbcm_state::bbcmc(machine_config &config)
 	config.device_remove("cart_ls_m");
 
 	/* expansion ports */
-	BBC_EXP_SLOT(config, m_exp, bbc_exp_devices, nullptr);
+	BBC_EXP_SLOT(config, m_exp, 16_MHz_XTAL / 2, bbc_exp_devices, nullptr);
 	m_exp->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<3>));
 	m_exp->nmi_handler().set(FUNC(bbc_state::bus_nmi_w));
 

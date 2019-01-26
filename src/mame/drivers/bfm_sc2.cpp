@@ -2248,20 +2248,20 @@ INPUT_PORTS_END
 // machine config fragments for different meters numbers //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-MACHINE_CONFIG_START(bfm_sc2_state::_3meters)
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(3)
-MACHINE_CONFIG_END
+void bfm_sc2_state::_3meters(machine_config &config)
+{
+	METERS(config, m_meters, 0).set_number(3);
+}
 
-MACHINE_CONFIG_START(bfm_sc2_state::_5meters)
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(5)
-MACHINE_CONFIG_END
+void bfm_sc2_state::_5meters(machine_config &config)
+{
+	METERS(config, m_meters, 0).set_number(5);
+}
 
-MACHINE_CONFIG_START(bfm_sc2_state::_8meters)
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+void bfm_sc2_state::_8meters(machine_config &config)
+{
+	METERS(config, m_meters, 0).set_number(8);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 // machine driver for scorpion2 board + adder2 expansion //////////////////

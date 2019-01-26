@@ -3222,14 +3222,14 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_DEVICE_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 MHz
 	MCFG_DEVICE_PROGRAM_MAP(system_h1_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, interrupt_main, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("soundcpu", M68000, 22579000/2) // 22.579 MHz XTAL / 2 = 11.2895 MHz
 	MCFG_DEVICE_PROGRAM_MAP(system_h1_sound_map)
 
 	MCFG_DEVICE_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 MHz
 	MCFG_DEVICE_PROGRAM_MAP(coolridr_submap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, interrupt_sub, "screen", 0, 1)
+	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3252,16 +3252,16 @@ MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_SCREEN_SIZE(640, 512)
 	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update<0>)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_SCREEN_ADD("screen2", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
 	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update<1>)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	config.set_default_layout(layout_dualhsxs);
 

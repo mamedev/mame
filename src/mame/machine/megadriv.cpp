@@ -877,21 +877,22 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-MACHINE_CONFIG_START(md_base_state::megadriv_timers)
-	MCFG_TIMER_DEVICE_ADD(m_scan_timer, "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
-MACHINE_CONFIG_END
+void md_base_state::megadriv_timers(machine_config &config)
+{
+	TIMER(config, m_scan_timer).configure_generic("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback));
+}
 
 
 MACHINE_CONFIG_START(md_base_state::md_ntsc)
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
 
 	/* IRQs are handled via the timers */
 
-	MCFG_DEVICE_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_z80_map)
-	MCFG_DEVICE_IO_MAP(megadriv_z80_io_map)
+	Z80(config, m_z80snd, MASTER_CLOCK_NTSC / 15); /* 3.58 MHz */
+	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
+	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
 	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
@@ -899,14 +900,14 @@ MACHINE_CONFIG_START(md_base_state::md_ntsc)
 
 	megadriv_timers(config);
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
+	m_vdp->set_is_pal(false);
+	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->set_screen("megadriv");
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -938,14 +939,14 @@ MACHINE_CONFIG_END
 /************ PAL hardware has a different master clock *************/
 
 MACHINE_CONFIG_START(md_base_state::md_pal)
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
+	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(md_base_state::genesis_int_callback));
 	/* IRQs are handled via the timers */
 
-	MCFG_DEVICE_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(megadriv_z80_map)
-	MCFG_DEVICE_IO_MAP(megadriv_z80_io_map)
+	Z80(config, m_z80snd, MASTER_CLOCK_PAL / 15); /* 3.58 MHz */
+	m_z80snd->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_z80_map);
+	m_z80snd->set_addrmap(AS_IO, &md_base_state::megadriv_z80_io_map);
 	/* IRQ handled via the timers */
 
 	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
@@ -953,14 +954,14 @@ MACHINE_CONFIG_START(md_base_state::md_pal)
 
 	megadriv_timers(config);
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_PAL, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(true)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, md_base_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_VIDEO_SET_SCREEN("megadriv")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
+	m_vdp->set_is_pal(true);
+	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp->lv6_irq().set(FUNC(md_base_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp->lv4_irq().set(FUNC(md_base_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->set_screen("megadriv");
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

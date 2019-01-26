@@ -724,7 +724,7 @@ function cheatfind.startplugin()
 					elseif wid == "4" then
 						wid = "u32"
 						form = "%08x %08x"
-						widchart = "d"
+						widchar = "d"
 					elseif wid == "8" then
 						wid = "u64"
 						form = "%08x %016x"

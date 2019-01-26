@@ -27,7 +27,7 @@ MACHINE_CONFIG_START(nascom_avc_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(16250000, 1024, 0, 768, 320, 0, 256)
 	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update)
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	MC6845(config, m_crtc, XTAL(16'000'000) / 8);
 	m_crtc->set_screen("screen");

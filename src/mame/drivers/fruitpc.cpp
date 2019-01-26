@@ -132,7 +132,8 @@ MACHINE_CONFIG_START(fruitpc_state::fruitpc)
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
 	ISA8(config, m_isabus, 0);
-	m_isabus->set_cputag("maincpu");
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
 	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));

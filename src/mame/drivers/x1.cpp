@@ -1009,7 +1009,7 @@ READ8_MEMBER( x1_state::x1_ex_gfxram_r )
 	if (!machine().side_effects_disabled())
 	{
 		m_iobank->set_bank(0); // any read disables the extended mode
-		return m_iobank->read8(space, offset);
+		return m_iobank->read8(offset);
 	}
 	else
 	{
@@ -2182,14 +2182,6 @@ MACHINE_START_MEMBER(x1_state,x1)
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
 
-PALETTE_INIT_MEMBER(x1_state,x1)
-{
-	int i;
-
-	for(i=0;i<(0x10+0x1000);i++)
-		palette.set_pen_color(i,rgb_t(0x00,0x00,0x00));
-}
-
 FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
@@ -2240,10 +2232,9 @@ MACHINE_CONFIG_START(x1_state::x1)
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
-	MCFG_PALETTE_INIT_OWNER(x1_state,x1)
+	PALETTE(config, m_palette, palette_device::BLACK, 0x10+0x1000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_x1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
@@ -2272,17 +2263,17 @@ MACHINE_CONFIG_START(x1_state::x1)
 	ay.add_route(0, "rspeaker", 0.25);
 	ay.add_route(1, "lspeaker", 0.5);
 	ay.add_route(2, "rspeaker", 0.5);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(x1_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("x1_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(x1_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("x1_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", x1_state, x1_keyboard_callback, attotime::from_hz(250))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cmt_wind_timer", x1_state, x1_cmt_wind_timer, attotime::from_hz(16))
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1_state::x1_keyboard_callback), attotime::from_hz(250));
+	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1_state::x1_cmt_wind_timer), attotime::from_hz(16));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(x1_state::x1turbo)

@@ -44,8 +44,8 @@ TODO:
 class nightgal_state : public driver_device
 {
 public:
-	nightgal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	nightgal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_comms_ram(*this, "comms_ram"),
 		m_sound_ram(*this, "sound_ram"),
 		m_maincpu(*this, "maincpu"),
@@ -70,7 +70,8 @@ public:
 		m_io_dswb(*this, "DSWB"),
 		m_io_dswc(*this, "DSWC"),
 		m_palette(*this, "palette"),
-		m_blitter(*this, "blitter") { }
+		m_blitter(*this, "blitter")
+	{ }
 
 	void ngalsumr(machine_config &config);
 	void sexygal(machine_config &config);
@@ -114,7 +115,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nightgal);
+	void nightgal_palette(palette_device &palette) const;
 	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void common_nsc_map(address_map &map);
@@ -193,42 +194,40 @@ uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_in
 	return 0;
 }
 
-/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(nightgal_state, nightgal)
+// guess: use the same resistor values as Crazy Climber (needs checking on the real HW)
+void nightgal_state::nightgal_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_rg[3], weights_b[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights_rg[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
+		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const r = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* green component */
+		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		int const g = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
-		/* blue component */
+		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -795,23 +794,22 @@ MACHINE_CONFIG_START(nightgal_state::royalqn)
 	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK / 8)        /* ? MHz */
 	MCFG_DEVICE_PROGRAM_MAP(royalqn_map)
 	MCFG_DEVICE_IO_MAP(royalqn_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state,  irq0_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nightgal_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("sub", NSC8105, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(royalqn_nsc_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_JANGOU_BLITTER_ADD("blitter", MASTER_CLOCK/4)
+	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4,320,0,256,264,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(nightgal_state, screen_update_nightgal)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(nightgal_state, nightgal)
+	PALETTE(config, m_palette, FUNC(nightgal_state::nightgal_palette), 0x20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -837,14 +835,14 @@ MACHINE_CONFIG_START(nightgal_state::sexygal)
 	MCFG_DEVICE_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
 	MCFG_DEVICE_PROGRAM_MAP(sexygal_audio_map)
 
-	MCFG_DEVICE_ADD("sampleclk", CLOCK, 6000) // quite a wild guess
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	clock_device &sampleclk(CLOCK(config, "sampleclk", 6000)); // quite a wild guess
+	sampleclk.signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_DEVICE_REMOVE("aysnd")
+	config.device_remove("aysnd");
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
 	ymsnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
@@ -858,8 +856,8 @@ MACHINE_CONFIG_START(nightgal_state::sweetgal)
 	MCFG_DEVICE_PROGRAM_MAP(sweetgal_map)
 
 	// doesn't have the extra NSC8105 (so how does this play samples?)
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("sampleclk")
+	config.device_remove("audiocpu");
+	config.device_remove("sampleclk");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::ngalsumr)
@@ -878,8 +876,8 @@ MACHINE_CONFIG_START(nightgal_state::sgaltrop)
 	MCFG_DEVICE_MODIFY("sub")
 	MCFG_DEVICE_PROGRAM_MAP(sgaltrop_nsc_map)
 
-	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_DEVICE_REMOVE("sampleclk")
+	config.device_remove("audiocpu");
+	config.device_remove("sampleclk");
 MACHINE_CONFIG_END
 
 /*

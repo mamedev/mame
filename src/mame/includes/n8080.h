@@ -1,6 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
+#ifndef MAME_INCLUDES_N8080_H
+#define MAME_INCLUDES_N8080_H
 
+#pragma once
+
+#include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -11,8 +16,8 @@
 class n8080_state : public driver_device
 {
 public:
-	n8080_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	n8080_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
@@ -21,7 +26,8 @@ public:
 		m_helifire_dac(*this, "helifire_dac"),
 		m_sn(*this, "snsnd"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void sheriff(machine_config &config);
 	void sheriff_sound(machine_config &config);
@@ -30,6 +36,9 @@ public:
 	void helifire_sound(machine_config &config);
 	void spacefev(machine_config &config);
 	void spacefev_sound(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	/* memory pointers */
@@ -64,7 +73,7 @@ private:
 	int m_inte;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 	required_device<i8035_device> m_audiocpu;
 	optional_device<dac_bit_interface> m_n8080_dac;
 	optional_device<dac_8bit_r2r_device> m_helifire_dac;
@@ -89,15 +98,14 @@ private:
 	DECLARE_WRITE8_MEMBER(helifire_sound_ctrl_w);
 	DECLARE_WRITE_LINE_MEMBER(n8080_inte_callback);
 	DECLARE_WRITE8_MEMBER(n8080_status_callback);
-	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(spacefev);
 	DECLARE_VIDEO_START(spacefev);
-	DECLARE_PALETTE_INIT(n8080);
+	void n8080_palette(palette_device &palette) const;
 	DECLARE_MACHINE_RESET(sheriff);
 	DECLARE_VIDEO_START(sheriff);
 	DECLARE_MACHINE_RESET(helifire);
 	DECLARE_VIDEO_START(helifire);
-	DECLARE_PALETTE_INIT(helifire);
+	void helifire_palette(palette_device &palette) const;
 	DECLARE_SOUND_START(spacefev);
 	DECLARE_SOUND_RESET(spacefev);
 	DECLARE_SOUND_START(sheriff);
@@ -138,3 +146,5 @@ private:
 	void main_io_map(address_map &map);
 	void n8080_sound_cpu_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_N8080_H

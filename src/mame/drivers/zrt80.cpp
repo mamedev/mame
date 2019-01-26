@@ -293,13 +293,11 @@ void zrt80_state::zrt80(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_zrt80);
 
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 800);
-	m_beep->add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beep, 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
 	MC6845(config, m_crtc, XTAL(20'000'000) / 8);

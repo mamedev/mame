@@ -114,7 +114,8 @@ const tiny_rom_entry *stereo_fx_device::device_rom_region() const
 	return ROM_NAME( stereo_fx );
 }
 
-MACHINE_CONFIG_START(stereo_fx_device::device_add_mconfig)
+void stereo_fx_device::device_add_mconfig(machine_config &config)
+{
 	I80C31(config, m_cpu, XTAL(30'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &stereo_fx_device::stereo_fx_rom);
 	m_cpu->set_addrmap(AS_IO, &stereo_fx_device::stereo_fx_io);
@@ -125,19 +126,22 @@ MACHINE_CONFIG_START(stereo_fx_device::device_add_mconfig)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ym3812", YM3812, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	ym3812_device &ym3812(YM3812(config, "ym3812", XTAL(3'579'545)));
+	ym3812.add_route(ALL_OUTPUTS, "lspeaker", 1.00);
+	ym3812.add_route(ALL_OUTPUTS, "rspeaker", 1.00);
 	/* no CM/S support (empty sockets) */
 
-	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_PC_JOY_ADD("pc_joy")
-MACHINE_CONFIG_END
+	PC_JOY(config, m_joy);
+}
 
 READ8_MEMBER( stereo_fx_device::dsp_data_r )
 {

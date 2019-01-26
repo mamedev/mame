@@ -473,13 +473,14 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	MCFG_DEVICE_IO_MAP(spc1000_io)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(*this, spc1000_state, irq_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, spc1000_state, mc6847_videoram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(spc1000_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2)
+	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
+	m_vdg->set_screen("screen");
+	m_vdg->fsync_wr_callback().set(FUNC(spc1000_state::irq_w));
+	m_vdg->input_callback().set(FUNC(spc1000_state::mc6847_videoram_r));
+	m_vdg->set_get_char_rom(FUNC(spc1000_state::get_char_rom));
+	m_vdg->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2);
 	// other lines not connected
 
 	/* sound hardware */
@@ -488,7 +489,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	ay8910.port_a_read_callback().set(FUNC(spc1000_state::porta_r));
 	ay8910.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	MCFG_DEVICE_ADD("ext1", SPC1000_EXP_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(spc1000_exp, nullptr, false)
@@ -498,10 +499,10 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("spc1000_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(spc1000_cassette_formats);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->set_interface("spc1000_cass");
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1000_cass")
 

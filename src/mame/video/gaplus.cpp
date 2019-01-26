@@ -25,38 +25,41 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(gaplus_base_state, gaplus)
+void gaplus_base_state::gaplus_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = m_proms_region->base();
 	for (int i = 0; i < 256; i++)
 	{
-		/* red component */
-		int bit0 = BIT(color_prom[i], 0);
-		int bit1 = BIT(color_prom[i], 1);
-		int bit2 = BIT(color_prom[i], 2);
-		int bit3 = BIT(color_prom[i], 3);
-		int r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int bit0, bit1, bit2, bit3;
 
-		/* green component */
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		// green component
 		bit0 = BIT(color_prom[i + 0x100], 0);
 		bit1 = BIT(color_prom[i + 0x100], 1);
 		bit2 = BIT(color_prom[i + 0x100], 2);
 		bit3 = BIT(color_prom[i + 0x100], 3);
-		int g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		// blue component
 		bit0 = BIT(color_prom[i + 0x200], 0);
 		bit1 = BIT(color_prom[i + 0x200], 1);
 		bit2 = BIT(color_prom[i + 0x200], 2);
 		bit3 = BIT(color_prom[i + 0x200], 3);
-		int b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
 	color_prom += 0x300;
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 
-	/* characters use colors 0xf0-0xff */
+	// characters use colors 0xf0-0xff
 	for (int i = 0; i < m_gfxdecode->gfx(0)->colors() * m_gfxdecode->gfx(0)->granularity(); i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, 0xf0 + (*color_prom++ & 0x0f));
 

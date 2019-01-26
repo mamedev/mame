@@ -523,30 +523,31 @@ void qdrmfgp_state::machine_reset()
  *  Machine driver
  *
  *************************************/
-MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
+void qdrmfgp_state::qdrmfgp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(qdrmfgp_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", qdrmfgp_state, qdrmfgp_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qdrmfgp_state::qdrmfgp_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(qdrmfgp_state::qdrmfgp_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set(FUNC(qdrmfgp_state::ide_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(qdrmfgp_state, screen_update_qdrmfgp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(40, 40+384-1, 16, 16+224-1);
+	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update_qdrmfgp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
@@ -562,19 +563,19 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, qdrmfgp_state, k054539_irq1_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, m_k054539, XTAL(18'432'000)));
+	k054539.set_addrmap(0, &qdrmfgp_state::qdrmfgp_k054539_map);
+	k054539.timer_handler().set(FUNC(qdrmfgp_state::k054539_irq1_gen));
+	k054539.add_route(0, "lspeaker", 1.0);
+	k054539.add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
-
+void qdrmfgp_state::qdrmfgp2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(qdrmfgp2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", qdrmfgp_state,  qdrmfgp2_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qdrmfgp_state::qdrmfgp2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(qdrmfgp_state::qdrmfgp2_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -583,16 +584,15 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	m_ata->irq_handler().set(FUNC(qdrmfgp_state::gp2_ide_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(qdrmfgp_state, screen_update_qdrmfgp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(40, 40+384-1, 16, 16+224-1);
+	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update_qdrmfgp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
@@ -608,11 +608,11 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.set_addrmap(0, &qdrmfgp_state::qdrmfgp_k054539_map);
+	k054539.add_route(0, "lspeaker", 1.0);
+	k054539.add_route(1, "rspeaker", 1.0);
+}
 
 
 /*************************************

@@ -84,34 +84,32 @@ ioport_constructor electron_romboxp_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_romboxp_device::device_add_mconfig)
+void electron_romboxp_device::device_add_mconfig(machine_config &config)
+{
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, electron_romboxp_device, busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(electron_romboxp_device::busy_w));
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* rom sockets */
-	MCFG_GENERIC_SOCKET_ADD("rom1", generic_plain_slot, "electron_rom") // ROM SLOT 4/12
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_romboxp_device, rom1_load)
-	MCFG_GENERIC_SOCKET_ADD("rom2", generic_plain_slot, "electron_rom") // ROM SLOT 5/13
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_romboxp_device, rom2_load)
-	MCFG_GENERIC_SOCKET_ADD("rom3", generic_plain_slot, "electron_rom") // ROM SLOT 6/14 also ROM/RAM
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_romboxp_device, rom3_load)
-	MCFG_GENERIC_SOCKET_ADD("rom4", generic_plain_slot, "electron_rom") // ROM SLOT 7/15
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(electron_romboxp_device, rom4_load)
+	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 4/12
+	m_rom[0]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom1_load, this));
+	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 5/13
+	m_rom[1]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom2_load, this));
+	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 6/14 also ROM/RAM
+	m_rom[2]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom3_load, this));
+	GENERIC_SOCKET(config, m_rom[3], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 7/15
+	m_rom[3]->set_device_load(device_image_load_delegate(&electron_romboxp_device::device_image_load_rom4_load, this));
 
 	/* cartridges */
-	MCFG_ELECTRON_CARTSLOT_ADD("cart1", electron_cart, nullptr) // ROM SLOT 0/1
-	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(*this, electron_romboxp_device, irq_w))
-	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(*this, electron_romboxp_device, nmi_w))
-	MCFG_ELECTRON_CARTSLOT_ADD("cart2", electron_cart, nullptr) // ROM SLOT 2/3
-	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(*this, electron_romboxp_device, irq_w))
-	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(*this, electron_romboxp_device, nmi_w))
-MACHINE_CONFIG_END
+	ELECTRON_CARTSLOT(config, m_cart[0], DERIVED_CLOCK(1, 1), electron_cart, nullptr); // ROM SLOT 0/1
+	m_cart[0]->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w)); 
+	m_cart[0]->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
+	ELECTRON_CARTSLOT(config, m_cart[1], DERIVED_CLOCK(1, 1), electron_cart, nullptr); // ROM SLOT 2/3
+	m_cart[1]->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w)); 
+	m_cart[1]->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
+}
 
 const tiny_rom_entry *electron_romboxp_device::device_rom_region() const
 {
@@ -147,7 +145,6 @@ electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, 
 
 void electron_romboxp_device::device_start()
 {
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -163,8 +160,10 @@ void electron_romboxp_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset)
 {
+	uint8_t data = 0xff;
+
 	switch (offset >> 12)
 	{
 	case 0x8:
@@ -175,11 +174,11 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 		{
 		case 0:
 		case 1:
-			data = m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
+			data = m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 2:
 		case 3:
-			data = m_cart[0]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
+			data = m_cart[0]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 4:
 		case 5:
@@ -194,6 +193,8 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 			data = m_exp_rom->base()[offset & 0x1fff];
 			break;
 		case 13:
+			data &= m_cart[0]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			data &= m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
 		case 14:
 		case 15:
 			if (m_rom_base == 12)
@@ -208,8 +209,8 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 		switch (offset >> 8)
 		{
 		case 0xfc:
-			data &= m_cart[0]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
-			data &= m_cart[1]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+			data &= m_cart[0]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
+			data &= m_cart[1]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01, 0, 0);
 
 			if (offset == 0xfc72)
 			{
@@ -218,8 +219,8 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 			break;
 
 		case 0xfd:
-			data &= m_cart[0]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
-			data &= m_cart[1]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
+			data &= m_cart[0]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
+			data &= m_cart[1]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01, 0, 0);
 			break;
 		}
 	}
@@ -243,11 +244,11 @@ void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint
 		{
 		case 0:
 		case 1:
-			m_cart[1]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			m_cart[1]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		case 2:
 		case 3:
-			m_cart[0]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			m_cart[0]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 1, 0);
 			break;
 		}
 		break;
@@ -256,8 +257,8 @@ void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint
 		switch (offset >> 8)
 		{
 		case 0xfc:
-			m_cart[0]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
-			m_cart[1]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+			m_cart[0]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
+			m_cart[1]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01, 0, 0);
 
 			if (offset == 0xfc71)
 			{
@@ -266,8 +267,8 @@ void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint
 			break;
 
 		case 0xfd:
-			m_cart[0]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
-			m_cart[1]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
+			m_cart[0]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
+			m_cart[1]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01, 0, 0);
 			break;
 
 		case 0xfe:
@@ -316,14 +317,4 @@ image_init_result electron_romboxp_device::load_rom(device_image_interface &imag
 	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
 
 	return image_init_result::PASS;
-}
-
-WRITE_LINE_MEMBER(electron_romboxp_device::irq_w)
-{
-	m_slot->irq_w(state);
-}
-
-WRITE_LINE_MEMBER(electron_romboxp_device::nmi_w)
-{
-	m_slot->nmi_w(state);
 }

@@ -40,7 +40,7 @@ public:
 
 	template<typename T> struct datatype_f
 	{
-		static inline const datatype_t f()
+		static const datatype_t f()
 		{
 			return datatype_t(sizeof(T),
 					plib::is_integral<T>::value || std::is_enum<T>::value,

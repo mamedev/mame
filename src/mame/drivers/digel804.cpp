@@ -643,12 +643,12 @@ MACHINE_CONFIG_START(digel804_state::digel804)
 	/* video hardware */
 	config.set_default_layout(layout_digel804);
 
-	MCFG_DEVICE_ADD("74c923", MM74C923, 0)
-	MCFG_MM74C922_DA_CALLBACK(WRITELINE(*this, digel804_state, da_w))
-	MCFG_MM74C922_X1_CALLBACK(IOPORT("LINE0"))
-	MCFG_MM74C922_X2_CALLBACK(IOPORT("LINE1"))
-	MCFG_MM74C922_X3_CALLBACK(IOPORT("LINE2"))
-	MCFG_MM74C922_X4_CALLBACK(IOPORT("LINE3"))
+	MM74C923(config, m_kb, 0);
+	m_kb->da_wr_callback().set(FUNC(digel804_state::da_w));
+	m_kb->x1_rd_callback().set_ioport("LINE0");
+	m_kb->x2_rd_callback().set_ioport("LINE1");
+	m_kb->x3_rd_callback().set_ioport("LINE2");
+	m_kb->x4_rd_callback().set_ioport("LINE3");
 
 	/* acia */
 	MOS6551(config, m_acia, 0);

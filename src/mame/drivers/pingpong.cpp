@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
 	MCFG_DEVICE_PROGRAM_MAP(pingpong_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pingpong_state, pingpong_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(pingpong_state::pingpong_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
@@ -463,12 +463,10 @@ MACHINE_CONFIG_START(pingpong_state::pingpong)
 	MCFG_SCREEN_SIZE(456, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pingpong_state, screen_update_pingpong)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pingpong)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(pingpong_state, pingpong)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pingpong);
+	PALETTE(config, m_palette, FUNC(pingpong_state::pingpong_palette), 64*4+64*4, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -482,8 +480,7 @@ MACHINE_CONFIG_START(pingpong_state::merlinmm)
 	pingpong(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(merlinmm_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(pingpong_state, merlinmm_interrupt)
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(pingpong_state::merlinmm_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 MACHINE_CONFIG_END

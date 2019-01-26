@@ -49,7 +49,16 @@ class snes_control_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	snes_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: snes_control_port_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~snes_control_port_device();
 
 	template <typename Object> void set_onscreen_callback(Object &&cb) { m_onscreen_cb = std::forward<Object>(cb); }

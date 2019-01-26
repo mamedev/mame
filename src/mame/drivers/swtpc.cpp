@@ -169,10 +169,8 @@ MACHINE_CONFIG_START(swtpc_state::swtpc)
 	MCFG_SS50_INTERFACE_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<7>))
 	MCFG_SS50_INTERFACE_FIRQ_CALLBACK(WRITELINE("mainnmi", input_merger_device, in_w<7>))
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
-	MCFG_INPUT_MERGER_ANY_HIGH("mainnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "mainnmi").output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	RAM(config, RAM_TAG).set_default_size("2K").set_extra_options("4K,8K,12K,16K,20K,24K,28K,32K");
 MACHINE_CONFIG_END

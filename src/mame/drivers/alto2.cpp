@@ -298,14 +298,15 @@ MACHINE_CONFIG_START(alto2_state::alto2)
 	screen.set_screen_update("maincpu", FUNC(alto2_cpu_device::screen_update));
 	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_DIABLO_DRIVES_ADD()
+	DIABLO_HD(config, DIABLO_HD_0, 3333333);
+	DIABLO_HD(config, DIABLO_HD_1, 3333333);
 MACHINE_CONFIG_END
 
 /* Driver Init */

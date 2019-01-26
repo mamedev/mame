@@ -7,12 +7,12 @@
 
 const rgb_t pocketc_state::indirect_palette[] =
 {
-	rgb_t( 99, 107,  99),
-	rgb_t( 94, 111, 103),
-	rgb_t(255, 255, 255),
-	rgb_t(255, 255, 255),
-	rgb_t( 60,  66,  60),
-	rgb_t(  0,   0,   0)
+	{  99, 107,  99 },
+	{  94, 111, 103 },
+	{ 255, 255, 255 },
+	{ 255, 255, 255 },
+	{  60,  66,  60 },
+	{   0,   0,   0 }
 };
 
 const int pocketc_state::colortable[8][2] =
@@ -27,12 +27,12 @@ const int pocketc_state::colortable[8][2] =
 	{ 3, 5 }
 };
 
-PALETTE_INIT_MEMBER(pocketc_state, pocketc)
+void pocketc_state::pocketc_palette(palette_device &palette) const
 {
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < ARRAY_LENGTH(indirect_palette); i++)
 		palette.set_indirect_color(i, indirect_palette[i]);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < ARRAY_LENGTH(colortable); i++)
 	{
 		palette.set_pen_indirect(i*2,   colortable[i][0]);
 		palette.set_pen_indirect(i*2+1, colortable[i][1]);

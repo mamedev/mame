@@ -16,6 +16,7 @@
 
   TODO:
   - external module support (no dumps yet)
+  - make MM5445N a device
 
 ***************************************************************************/
 
@@ -461,9 +462,8 @@ void k28_state::k28(machine_config &config)
 
 	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL); // CLK tied to 8021 ALE pin
 
-	TIMER(config, "on_button", 0).configure_generic(timer_device::expired_delegate());
-	TIMER(config, "display_decay", 0).configure_periodic(timer_device::expired_delegate(FUNC(k28_state::display_decay_tick), this), attotime::from_msec(1));
-
+	TIMER(config, "on_button").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "display_decay").configure_periodic(FUNC(k28_state::display_decay_tick), attotime::from_msec(1));
 	config.set_default_layout(layout_k28);
 
 	/* sound hardware */

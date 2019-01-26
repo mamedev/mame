@@ -2,11 +2,11 @@
 // copyright-holders:David Haywood
 /*****************************************************************************
 
-	AXC51-CORE (AppoTech Inc.)
+    AXC51-CORE (AppoTech Inc.)
 
-	used in
+    used in
 
-	AX208 SoC
+    AX208 SoC
 
  *****************************************************************************/
 
@@ -22,6 +22,8 @@ class axc51core_disassembler : public mcs51_disassembler
 public:
 	axc51core_disassembler();
 	virtual ~axc51core_disassembler() = default;
+
+	static const mem_info axc51core_names[];
 
 protected:
 	virtual offs_t disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op) override;

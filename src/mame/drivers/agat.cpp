@@ -1081,7 +1081,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_DEVICE_PROGRAM_MAP(agat7_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", agat7_state, timer_irq, A7_VIDEO_TAG ":a7screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(agat7_state::timer_irq), A7_VIDEO_TAG ":a7screen", 0, 1);
 
 	MCFG_DEVICE_ADD(m_video, AGAT7VIDEO, RAM_TAG, "gfx1")
 
@@ -1112,25 +1112,26 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	m_ay3600->ako().set(FUNC(agat7_state::ay3600_ako_w));
 
 	/* repeat timer.  10 Hz per Mymrin's book */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("repttmr", agat7_state, ay3600_repeat, attotime::from_hz(10))
+	TIMER(config, "repttmr").configure_periodic(FUNC(agat7_state::ay3600_repeat), attotime::from_hz(10));
 
 	/*
 	 * slot 0 is reserved for SECAM encoder or Apple II compat card.
 	 * slot 1 always holds the CPU card.
 	 */
-	MCFG_DEVICE_ADD(m_a2bus, A2BUS, 0)
-	MCFG_A2BUS_CPU(A7_CPU_TAG)
-	MCFG_A2BUS_OUT_IRQ_CB(WRITELINE(*this, agat7_state, a2bus_irq_w))
-	MCFG_A2BUS_OUT_NMI_CB(WRITELINE(*this, agat7_state, a2bus_nmi_w))
-	MCFG_A2BUS_OUT_INH_CB(WRITELINE(*this, agat7_state, a2bus_inh_w))
+	A2BUS(config, m_a2bus, 0);
+	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
+	m_a2bus->irq_w().set(FUNC(agat7_state::a2bus_irq_w));
+	m_a2bus->nmi_w().set(FUNC(agat7_state::a2bus_nmi_w));
+	m_a2bus->inh_w().set(FUNC(agat7_state::a2bus_inh_w));
+	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	A2BUS_SLOT(config, "sl2", m_a2bus, agat7_cards, "a7lang");
 	A2BUS_SLOT(config, "sl3", m_a2bus, agat7_cards, "a7fdc");
 	A2BUS_SLOT(config, "sl4", m_a2bus, agat7_cards, "a7ports");
 	A2BUS_SLOT(config, "sl5", m_a2bus, agat7_cards, nullptr);
 	A2BUS_SLOT(config, "sl6", m_a2bus, agat7_cards, "a7ram");
 
-	MCFG_CASSETTE_ADD(m_cassette)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	CASSETTE(config,m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
 MACHINE_CONFIG_END
 
 

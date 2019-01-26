@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(st0016_state::st0016)
 	MCFG_DEVICE_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
 	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
 	MCFG_DEVICE_IO_MAP(st0016_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", st0016_state, st0016_int, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(st0016_state::st0016_int), "screen", 0, 1);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

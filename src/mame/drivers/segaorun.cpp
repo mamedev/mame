@@ -1144,20 +1144,20 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segaorun_state::outrun_base)
-
+void segaorun_state::outrun_base(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(outrun_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 
-	MCFG_DEVICE_ADD("subcpu", M68000, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, MASTER_CLOCK/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sub_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, SOUND_CLOCK/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segaorun_state::sound_portmap);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1174,16 +1174,16 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segaorun)
-	MCFG_PALETTE_ADD("palette", 4096*3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaorun);
+	PALETTE(config, m_palette).set_entries(4096*3);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_outrun));
+	m_screen->set_palette(m_palette);
 
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
-	MCFG_DEVICE_ADD("segaic16road", SEGAIC16_ROAD, 0)
+	SEGAIC16_ROAD(config, m_segaic16road, 0);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -1191,11 +1191,11 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 
 	YM2151(config, "ymsnd", SOUND_CLOCK/4).add_route(0, "lspeaker", 0.43).add_route(1, "rspeaker", 0.43);
 
-	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
+	pcm.set_bank(segapcm_device::BANK_512);
+	pcm.add_route(0, "lspeaker", 1.0);
+	pcm.add_route(1, "rspeaker", 1.0);
+}
 
 
 
@@ -1203,15 +1203,16 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segaorun_state::outrundx)
+void segaorun_state::outrundx(machine_config &config)
+{
 	outrun_base(config);
 
 	// basic machine hardware
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
+	TIMER(config, "bankmotor").configure_periodic(FUNC(segaorun_state::bankmotor_update), attotime::from_msec(10));
 
 	// video hardware
 	SEGA_OUTRUN_SPRITES(config, m_sprites, 0);
-MACHINE_CONFIG_END
+}
 
 void segaorun_state::outrun(machine_config &config)
 {
@@ -1220,25 +1221,27 @@ void segaorun_state::outrun(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
-MACHINE_CONFIG_START(segaorun_state::outrun_fd1094)
+void segaorun_state::outrun_fd1094(machine_config &config)
+{
 	outrun(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(outrun_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segaorun_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(segaorun_state::outrun_fd1089a)
+void segaorun_state::outrun_fd1089a(machine_config &config)
+{
 	outrun(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(outrun_map)
-MACHINE_CONFIG_END
+	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+}
 
-
-MACHINE_CONFIG_START(segaorun_state::shangon)
+void segaorun_state::shangon(machine_config &config)
+{
 	outrun_base(config);
 
 	// basic machine hardware
@@ -1252,20 +1255,20 @@ MACHINE_CONFIG_START(segaorun_state::shangon)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_shangon)
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_shangon));
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(segaorun_state::shangon_fd1089b)
+void segaorun_state::shangon_fd1089b(machine_config &config)
+{
 	shangon(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(outrun_map)
-MACHINE_CONFIG_END
+	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+}
 
 
 
@@ -1691,8 +1694,7 @@ ROM_START( outrundxj )
 	ROM_RELOAD(               0x58000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0019.key", 0x0000, 0x2000, CRC(6ff847c6) SHA1(e6b7bb77d0971c25eba3f168d939d0d5f1486537) )
-
+	ROM_LOAD( "317-0019.key", 0x0000, 0x2000, CRC(8ffbed98) SHA1(9c1147a1115c2b8555405bdbb5f04cae55b8ba29) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -1996,7 +1998,7 @@ ROM_START( shangon3 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 ROM_START( shangon3d )
@@ -2109,7 +2111,7 @@ ROM_START( shangon2 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -2170,7 +2172,7 @@ ROM_START( shangon1 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 //*************************************************************************************************************************

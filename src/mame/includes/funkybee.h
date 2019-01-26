@@ -44,7 +44,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(funkybee_tilemap_scan);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(funkybee);
+	void funkybee_palette(palette_device &palette) const;
 	uint32_t screen_update_funkybee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_columns( bitmap_ind16 &bitmap, const rectangle &cliprect );

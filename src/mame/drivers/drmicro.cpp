@@ -240,48 +240,40 @@ void drmicro_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(drmicro_state::drmicro)
-
+void drmicro_state::drmicro(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(drmicro_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drmicro_state,  drmicro_interrupt)
+	Z80(config, m_maincpu, MCLK/6); /* 3.072MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &drmicro_state::drmicro_map);
+	m_maincpu->set_addrmap(AS_IO, &drmicro_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(drmicro_state::drmicro_interrupt));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(drmicro_state, screen_update_drmicro)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(drmicro_state::screen_update_drmicro));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drmicro)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(drmicro_state, drmicro)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drmicro);
+	PALETTE(config, m_palette, FUNC(drmicro_state::drmicro_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn1", SN76496, MCLK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76496(config, "sn1", MCLK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76496(config, "sn2", MCLK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76496(config, "sn3", MCLK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("sn2", SN76496, MCLK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("sn3", SN76496, MCLK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, drmicro_state, pcm_w))          /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(drmicro_state::pcm_w));	/* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S64_4B);  /* 6 KHz */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 /*************************************
  *

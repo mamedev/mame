@@ -731,7 +731,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	dsp.set_addrmap(AS_IO, &coolpool_state::amerdart_dsp_io_map);
 	dsp.bio().set(FUNC(coolpool_state::amerdart_dsp_bio_line_r));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
+	TIMER(config, "audioint").configure_scanline(FUNC(coolpool_state::amerdart_audio_int_gen), "screen", 0, 1);
 
 	GENERIC_LATCH_16(config, m_main2dsp);
 	GENERIC_LATCH_16(config, m_dsp2main);
@@ -740,7 +740,7 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
+	TIMER(config, m_nvram_timer).configure_generic(FUNC(coolpool_state::nvram_write_timeout));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -785,10 +785,10 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TIMER_DRIVER_ADD(m_nvram_timer, coolpool_state, nvram_write_timeout)
+	TIMER(config, m_nvram_timer).configure_generic(FUNC(coolpool_state::nvram_write_timeout));
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240)

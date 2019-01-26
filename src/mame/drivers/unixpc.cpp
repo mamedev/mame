@@ -372,7 +372,7 @@ MACHINE_CONFIG_START(unixpc_state::unixpc)
 
 	config.set_default_layout(layout_unixpc);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");

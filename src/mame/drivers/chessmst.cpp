@@ -448,8 +448,8 @@ MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 
 	config.set_default_layout(layout_chessmstdm);
 
-	MCFG_DEVICE_ADD("555_timer", CLOCK, 500) // from 555 timer
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, chessmst_state, timer_555_w))
+	clock_device &_555_timer(CLOCK(config, "555_timer", 500)); // from 555 timer
+	_555_timer.signal_handler().set(FUNC(chessmst_state::timer_555_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

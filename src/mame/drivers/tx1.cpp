@@ -180,8 +180,7 @@ MACHINE_CONFIG_START(tx1_state::tx1)
 	MCFG_MACHINE_RESET_OVERRIDE(tx1_state,tx1)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,tx1)
+	PALETTE(config, "palette", FUNC(tx1_state::tx1_palette), 256);
 
 	config.set_default_layout(layout_triphsxs);
 
@@ -245,8 +244,7 @@ MACHINE_CONFIG_START(tx1_state::buggyboy)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
+	PALETTE(config, "palette", FUNC(tx1_state::buggyboy_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggyboy)
 
 	MCFG_DEVICE_ADD("soundbrd", BUGGYBOY_SOUND, BUGGYBOY_ZCLK)
@@ -272,8 +270,7 @@ MACHINE_CONFIG_START(tx1_state::buggybjr)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx1_state, screen_vblank_buggyboy))
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(tx1_state,buggyboy)
+	PALETTE(config, "palette", FUNC(tx1_state::buggyboy_palette), 256);
 	MCFG_VIDEO_START_OVERRIDE(tx1_state,buggybjr)
 
 	MCFG_DEVICE_ADD("soundbrd", BUGGYBOYJR_SOUND, BUGGYBOY_ZCLK)

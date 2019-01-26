@@ -456,7 +456,7 @@ void n64_mess_state::n64(machine_config &config)
 	screen.set_screen_update(FUNC(n64_state::screen_update_n64));
 	screen.screen_vblank().set(FUNC(n64_state::screen_vblank_n64));
 
-	PALETTE(config, "palette", 0x1000);
+	PALETTE(config, "palette").set_entries(0x1000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -467,8 +467,7 @@ void n64_mess_state::n64(machine_config &config)
 	N64PERIPH(config, m_rcp_periphs, 0);
 
 	/* cartridge */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart"));
-	cartslot.set_extensions("v64,z64,rom,n64,bin");
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));
 	cartslot.set_must_be_loaded(true);
 	cartslot.set_device_load(device_image_load_delegate(&n64_mess_state::device_image_load_n64_cart, this));
 

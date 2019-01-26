@@ -6,15 +6,6 @@
 #pragma once
 
 
-#define MCFG_SCMP_CONFIG(_flag_out_devcb, _sout_devcb, _sin_devcb, _sensea_devcb, _senseb_devcb, _halt_devcb) \
-	downcast<scmp_device &>(*device).set_flag_out_cb(DEVCB_##_flag_out_devcb); \
-	downcast<scmp_device &>(*device).set_sout_cb(DEVCB_##_sout_devcb); \
-	downcast<scmp_device &>(*device).set_sin_cb(DEVCB_##_sin_devcb); \
-	downcast<scmp_device &>(*device).set_sensea_cb( DEVCB_##_sensea_devcb); \
-	downcast<scmp_device &>(*device).set_senseb_cb(DEVCB_##_senseb_devcb); \
-	downcast<scmp_device &>(*device).set_halt_cb(DEVCB_##_halt_devcb);
-
-
 class scmp_device : public cpu_device
 {
 public:

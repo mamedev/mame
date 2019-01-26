@@ -272,7 +272,7 @@ MACHINE_CONFIG_START(lw700i_state::lw700i)
 	MCFG_DEVICE_ADD("maincpu", H83003, XTAL(16'000'000))
 	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lw700i_state, vbl_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lw700i_state::vbl_interrupt), "screen", 0, 1);
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

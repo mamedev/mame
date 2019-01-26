@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "includes/hp48.h"
 
-#include "cpu/saturn/saturn.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
 #include "screen.h"
@@ -1119,6 +1118,130 @@ static INPUT_PORTS_START( hp49g )
 INPUT_PORTS_END
 
 
+/**************************** memory *******************************/
+
+/* In memory, nibbles are unpacked: one nibble at each address.
+   This is due to the way the SATURN emulation is done.
+   As a consequence only the 4 lower bits of each byte is used, the 4 higher
+   bits being zeros.
+   Another consequence is that ROMs must be unpacked before use.
+
+   Because of the complex memory manager, actual address mapping is done at
+   run-time.
+ */
+
+void hp48_state::hp48(address_map &map)
+{
+	map(0x00000, 0xfffff).noprw(); /* configured at run-time */
+}
+
+
+/*************************** driver ********************************/
+
+void hp48_state::hp48_common(machine_config &config)
+{
+	/* cpu */
+	SATURN(config, m_maincpu, 3937007); /* almost 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp48_state::hp48);
+	m_maincpu->out_func().set(FUNC(hp48_state::reg_out));
+	m_maincpu->in_func().set(FUNC(hp48_state::reg_in));
+	m_maincpu->reset_func().set(FUNC(hp48_state::mem_reset));
+	m_maincpu->config_func().set(FUNC(hp48_state::mem_config));
+	m_maincpu->unconfig_func().set(FUNC(hp48_state::mem_unconfig));
+	m_maincpu->id_func().set(FUNC(hp48_state::mem_id));
+	m_maincpu->crc_func().set(FUNC(hp48_state::mem_crc));
+	m_maincpu->rsi_func().set(FUNC(hp48_state::rsi));
+
+	/* memory */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	/* video */
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(64);
+	m_screen->set_vblank_time(0);
+	m_screen->set_size(131, 64);
+	m_screen->set_visarea(0, 130, 0, 63);
+	m_screen->set_screen_update(FUNC(hp48_state::screen_update_hp48));
+	m_screen->set_palette(m_palette);
+
+	/* monochrome, but with varying contrast and grayscale */
+	PALETTE(config, m_palette, FUNC(hp48_state::hp48_palette), 256);
+
+	/* sound */
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
+
+void hp48_state::hp48gx(machine_config &config)
+{
+	hp48_common(config);
+	MCFG_MACHINE_START_OVERRIDE(hp48_state, hp48gx)
+
+	/* expansion ports */
+	HP48_PORT(config, m_port[0], HP48_CE2,     128*1024);
+	HP48_PORT(config, m_port[1], HP48_NCE3, 4*1024*1024);
+
+	/* serial I/O */
+	//MCFG_XMODEM_ADD("rs232_x", hp48_xmodem_rs232_conf)
+	//MCFG_KERMIT_ADD("rs232_k", hp48_kermit_rs232_conf)
+}
+
+void hp48_state::hp48g(machine_config &config)
+{
+	hp48_common(config);
+	MCFG_MACHINE_START_OVERRIDE(hp48_state, hp48g);
+
+	/* serial I/O */
+	//MCFG_XMODEM_ADD("rs232_x", hp48_xmodem_rs232_conf)
+	//MCFG_KERMIT_ADD("rs232_k", hp48_kermit_rs232_conf)
+}
+
+void hp48_state::hp48gp(machine_config &config)
+{
+	hp48_common(config);
+	MCFG_MACHINE_START_OVERRIDE(hp48_state, hp48gp)
+
+	/* serial I/O */
+	//MCFG_XMODEM_ADD("rs232_x", hp48_xmodem_rs232_conf)
+	//MCFG_KERMIT_ADD("rs232_k", hp48_kermit_rs232_conf)
+}
+
+void hp48_state::hp48sx(machine_config &config)
+{
+	hp48_common(config);
+	m_maincpu->set_clock(2000000);
+	MCFG_MACHINE_START_OVERRIDE(hp48_state, hp48sx)
+
+	/* expansion ports */
+	HP48_PORT(config, m_port[0], HP48_CE1, 128*1024);
+	HP48_PORT(config, m_port[1], HP48_CE2, 128*1024);
+
+	/* serial I/O */
+	//MCFG_KERMIT_ADD("rs232_k", hp48_kermit_rs232_conf)
+}
+
+void hp48_state::hp48s(machine_config &config)
+{
+	hp48_common(config);
+	m_maincpu->set_clock(2000000);
+	MCFG_MACHINE_START_OVERRIDE(hp48_state, hp48s)
+
+	/* serial I/O */
+	//MCFG_KERMIT_ADD("rs232_k", hp48_kermit_rs232_conf)
+}
+
+void hp48_state::hp49g(machine_config &config)
+{
+	hp48_common(config);
+	MCFG_MACHINE_START_OVERRIDE(hp48_state, hp49g)
+
+	/* serial I/O */
+	//MCFG_XMODEM_ADD("rs232_x", hp48_xmodem_rs232_conf)
+	//MCFG_KERMIT_ADD("rs232_k", hp48_kermit_rs232_conf)
+}
 
 /**************************** I/O **********************************/
 
@@ -1144,7 +1267,7 @@ INPUT_PORTS_END
    no extension may be physically present).
    The G+ model has always revision R.
  */
-ROM_START ( hp48gx )
+ROM_START( hp48gx )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("r")
 
@@ -1179,7 +1302,7 @@ ROM_END
    (Note that G/GX revisions start at K, after the S/S revisions ends...)
  */
 
-ROM_START ( hp48sx )
+ROM_START( hp48sx )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("j")
 
@@ -1208,17 +1331,17 @@ ROM_END
 
 #define rom_hp48s rom_hp48sx
 
-ROM_START ( hp38g )
+ROM_START( hp38g )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "hp38g.rom", 0x00000, 0x80000, CRC(31d9affc) SHA1(bab3f5907a16cbb087943fd77230514af8fd5ac0))
 ROM_END
 
-ROM_START ( hp39g )
+ROM_START( hp39g )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "hp39g.rom", 0x00000, 0x100000, CRC(28268fdc) SHA1(57a2b19075fe60307a9affa79d8e7cb550c621c3))
 ROM_END
 
-ROM_START ( hp49g )
+ROM_START( hp49g )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS( 0, "1.00", "Version C-1.00" )
 	ROMX_LOAD("hp49gv100.rom", 0x00000, 0x200000, CRC(64c9826a) SHA1(da25371b97d439fc0003cb786dba143ee2be9160), ROM_BIOS(0))
@@ -1233,130 +1356,6 @@ ROM_START ( hp49g )
 	ROM_SYSTEM_BIOS( 5, "1.19", "Version B-1.19-6" )
 	ROMX_LOAD("hp49gv119.rom", 0x00000, 0x200000, CRC(75218a18) SHA1(ec0f661f0aa7158d1f6df61f24410260b5324fa9), ROM_BIOS(5))
 ROM_END
-
-/**************************** memory *******************************/
-
-/* In memory, nibbles are unpacked: one nibble at each address.
-   This is due to the way the SATURN emulation is done.
-   As a consequence only the 4 lower bits of each byte is used, the 4 higher
-   bits being zeros.
-   Another consequence is that ROMs must be unpacked before use.
-
-   Because of the complex memory manager, actual address mapping is done at
-   run-time.
- */
-
-void hp48_state::hp48(address_map &map)
-{
-
-	map(0x00000, 0xfffff).noprw(); /* configured at run-time */
-
-}
-
-
-
-/*************************** driver ********************************/
-
-
-MACHINE_CONFIG_START(hp48_state::hp48_common)
-
-	/* cpu */
-	MCFG_DEVICE_ADD ( "maincpu", SATURN, 3937007 ) /* almost 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP ( hp48)
-	MCFG_SATURN_CONFIG( WRITE32(*this, hp48_state, reg_out), READ32(*this, hp48_state, reg_in),
-						WRITELINE(*this, hp48_state, mem_reset), WRITE32(*this, hp48_state, mem_config),
-						WRITE32(*this, hp48_state, mem_unconfig), READ32(*this, hp48_state, mem_id),
-						WRITE32(*this, hp48_state, mem_crc), WRITELINE(*this, hp48_state, rsi) )
-
-	/* memory */
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	/* video */
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_REFRESH_RATE( 64 )
-	MCFG_SCREEN_VBLANK_TIME(0)
-	MCFG_SCREEN_SIZE ( 131, 64 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 130, 0, 63 )
-	MCFG_SCREEN_UPDATE_DRIVER(hp48_state, screen_update_hp48)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD( "palette", 256 ) /* monochrome, but with varying contrast and grayscale */
-	MCFG_PALETTE_INIT_OWNER(hp48_state, hp48)
-
-	/* sound */
-	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(hp48_state::hp48gx)
-	hp48_common(config);
-	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gx )
-
-	/* expansion ports */
-	HP48_PORT(config, m_port[0], HP48_CE2,     128*1024 );
-	HP48_PORT(config, m_port[1], HP48_NCE3, 4*1024*1024 );
-
-	/* serial I/O */
-	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(hp48_state::hp48g)
-	hp48_common(config);
-	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48g )
-
-	/* serial I/O */
-	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(hp48_state::hp48gp)
-	hp48_common(config);
-	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gp )
-
-	/* serial I/O */
-	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(hp48_state::hp48sx)
-	hp48_common(config);
-	MCFG_DEVICE_MODIFY     ( "maincpu" )
-	MCFG_DEVICE_CLOCK      ( 2000000 )
-	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48sx )
-
-	/* expansion ports */
-	HP48_PORT(config, m_port[0], HP48_CE1, 128*1024 );
-	HP48_PORT(config, m_port[1], HP48_CE2, 128*1024 );
-
-	/* serial I/O */
-	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(hp48_state::hp48s)
-	hp48_common(config);
-	MCFG_DEVICE_MODIFY     ( "maincpu" )
-	MCFG_DEVICE_CLOCK      ( 2000000 )
-	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48s )
-
-	/* serial I/O */
-	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(hp48_state::hp49g)
-	hp48_common(config);
-	MCFG_DEVICE_MODIFY     ( "maincpu" )
-	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp49g )
-
-	/* serial I/O */
-		//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
-		//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
-MACHINE_CONFIG_END
-
 
 COMP( 1990, hp48sx, 0,      0, hp48sx, hp48sx, hp48_state, init_hp48, "Hewlett Packard", "HP48SX", 0 )
 COMP( 1991, hp48s,  hp48sx, 0, hp48s,  hp48sx, hp48_state, init_hp48, "Hewlett Packard", "HP48S",  0 )

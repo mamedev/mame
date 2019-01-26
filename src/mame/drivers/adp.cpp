@@ -172,8 +172,8 @@ Quick Jack administration/service mode:
 class adp_state : public driver_device
 {
 public:
-	adp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	adp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_microtouch(*this, "microtouch"),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
@@ -207,8 +207,8 @@ private:
 	DECLARE_WRITE16_MEMBER(input_w);
 	DECLARE_MACHINE_START(skattv);
 	DECLARE_MACHINE_RESET(skattv);
-	DECLARE_PALETTE_INIT(adp);
-	DECLARE_PALETTE_INIT(fstation);
+	void adp_palette(palette_device &device) const;
+	void fstation_palette(palette_device &device) const;
 	IRQ_CALLBACK_MEMBER(duart_iack_handler);
 	//INTERRUPT_GEN_MEMBER(adp_int);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
@@ -263,35 +263,19 @@ MACHINE_RESET_MEMBER(adp_state,skattv)
 	m_mux_data = 0;
 }
 
-PALETTE_INIT_MEMBER(adp_state,adp)
+void adp_state::adp_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int const r = 0x21 * BIT(i, 0) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 0);
+		int const g = 0x21 * BIT(i, 1) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 1);
+		int const b = 0x21 * BIT(i, 2) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 2);
 
-		// red component
-		bit0 = (i >> 0) & 0x01;
-		bit1 = (i >> 3) & 0x01;
-		bit2 = (i >> 0) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		// green component
-		bit0 = (i >> 1) & 0x01;
-		bit1 = (i >> 3) & 0x01;
-		bit2 = (i >> 1) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		// blue component
-		bit0 = (i >> 2) & 0x01;
-		bit1 = (i >> 3) & 0x01;
-		bit2 = (i >> 2) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-PALETTE_INIT_MEMBER(adp_state,fstation)
+void adp_state::fstation_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 		palette.set_pen_color(i, rgb_t(pal3bit(i>>5), pal3bit(i>>2), pal2bit(i>>0)));
@@ -565,17 +549,17 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 	MCFG_MACHINE_START_OVERRIDE(adp_state,skattv)
 	MCFG_MACHINE_RESET_OVERRIDE(adp_state,skattv)
 
-	MCFG_DEVICE_ADD( "duart", MC68681, XTAL(8'664'000) / 2 )
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
+	MC68681(config, m_duart, XTAL(8'664'000) / 2);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
+	m_duart->inport_cb().set_ioport("DSW1");
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("duart", mc68681_device, rx_a_w) )
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	//MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(*this, adp_state, rtc_irq))
+	MSM6242(config, "rtc", XTAL(32'768));
+	//rtc.out_int_handler().set(FUNC(adp_state::rtc_irq));
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -583,11 +567,9 @@ MACHINE_CONFIG_START(adp_state::quickjac)
 	MCFG_SCREEN_SIZE(384, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MCFG_SCREEN_UPDATE_DEVICE("acrtc", hd63484_device, update_screen)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x10)
-
-	MCFG_PALETTE_INIT_OWNER(adp_state,adp)
+	PALETTE(config, m_palette, FUNC(adp_state::adp_palette), 0x10);
 
 	HD63484(config, m_acrtc, 0).set_addrmap(0, &adp_state::adp_hd63484_map);
 
@@ -622,22 +604,22 @@ void adp_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
-MACHINE_CONFIG_START(adp_state::funland)
+void adp_state::funland(machine_config &config)
+{
 	quickjac(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(funland_mem)
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x100)
+	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::funland_mem);
+
+	PALETTE(config.replace(), m_palette, palette_device::BLACK, 0x100);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
 	ramdac.set_addrmap(0, &adp_state::ramdac_map);
 
-	MCFG_DEVICE_MODIFY("acrtc")
-	MCFG_HD63484_ADDRESS_MAP(fstation_hd63484_map)
-MACHINE_CONFIG_END
+	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
+}
 
 MACHINE_CONFIG_START(adp_state::fstation)
 	funland(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(fstation_mem)
 
@@ -645,8 +627,7 @@ MACHINE_CONFIG_START(adp_state::fstation)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(adp_state, fstation)
+	m_palette->set_init(FUNC(adp_state::fstation_palette));
 MACHINE_CONFIG_END
 
 

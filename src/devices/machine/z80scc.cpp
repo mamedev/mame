@@ -436,6 +436,7 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 	m_out_rxdrq_cb{ { *this }, { *this } },
 	m_out_txdrq_cb{ { *this }, { *this } },
 	m_out_int_cb(*this),
+	m_out_int_state(CLEAR_LINE),
 	m_variant(variant),
 	m_wr0_ptrbits(0),
 	m_cputag(nullptr)
@@ -517,6 +518,7 @@ void z80scc_device::device_start()
 	LOG("%s", FUNCNAME);
 
 	// state saving
+	save_item(NAME(m_out_int_state));
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_int_source));
 	save_item(NAME(m_wr9));
@@ -681,8 +683,12 @@ void z80scc_device::z80daisy_irq_reti()
 void z80scc_device::check_interrupts()
 {
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
-	LOGINT("%s %s \n",tag(), FUNCNAME);
-	m_out_int_cb(state);
+	if (m_out_int_state != state)
+	{
+		m_out_int_state = state;
+		LOGINT("%s\n", FUNCNAME);
+		m_out_int_cb(state);
+	}
 }
 
 

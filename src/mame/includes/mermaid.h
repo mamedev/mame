@@ -106,8 +106,9 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mermaid);
-	DECLARE_PALETTE_INIT(rougien);
+	void common_palette(palette_device &palette) const;
+	void mermaid_palette(palette_device &palette) const;
+	void rougien_palette(palette_device &palette) const;
 	uint32_t screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mermaid);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

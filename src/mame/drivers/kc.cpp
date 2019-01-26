@@ -125,26 +125,25 @@ MACHINE_CONFIG_START(kc_state::kc85_3)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc_state, kc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kc_state::kc_scanline), "screen", 0, 1);
 
-	MCFG_PALETTE_ADD("palette", KC85_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(kc_state, kc85 )
+	PALETTE(config, "palette", FUNC(kc_state::kc85_palette), KC85_PALETTE_SIZE);
 
 	kc_keyboard_device &keyboard(KC_KEYBOARD(config, "keyboard", XTAL(4'000'000)));
 	keyboard.out_wr_callback().set(FUNC(kc_state::keyboard_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(kc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("kc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(kc_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_interface("kc_cass");
 
 	/* cartridge slot */
 	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
@@ -206,26 +205,25 @@ MACHINE_CONFIG_START(kc85_4_state::kc85_4)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(kc85_4_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kc85_4_state, kc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(kc85_4_state::kc_scanline), "screen", 0, 1);
 
-	MCFG_PALETTE_ADD("palette", KC85_PALETTE_SIZE)
-	MCFG_PALETTE_INIT_OWNER(kc85_4_state, kc85 )
+	PALETTE(config, "palette", FUNC(kc85_4_state::kc85_palette), KC85_PALETTE_SIZE);
 
 	kc_keyboard_device &keyboard(KC_KEYBOARD(config, "keyboard", XTAL(4'000'000)));
 	keyboard.out_wr_callback().set(FUNC(kc_state::keyboard_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc_state, kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(kc_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
-	MCFG_CASSETTE_INTERFACE("kc_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(kc_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->set_interface("kc_cass");
 
 	/* cartridge slot */
 	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)

@@ -41,55 +41,53 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(sonson_state, sonson)
+void sonson_state::sonson_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x20; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x20; i++)
 	{
 		int bit0, bit1, bit2, bit3;
-		int r, g, b;
 
-		/* red component */
+		// red component
 		bit0 = (color_prom[i + 0x20] >> 0) & 0x01;
 		bit1 = (color_prom[i + 0x20] >> 1) & 0x01;
 		bit2 = (color_prom[i + 0x20] >> 2) & 0x01;
 		bit3 = (color_prom[i + 0x20] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* green component */
+		// green component
 		bit0 = (color_prom[i + 0x00] >> 4) & 0x01;
 		bit1 = (color_prom[i + 0x00] >> 5) & 0x01;
 		bit2 = (color_prom[i + 0x00] >> 6) & 0x01;
 		bit3 = (color_prom[i + 0x00] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		/* blue component */
+		// blue component
 		bit0 = (color_prom[i + 0x00] >> 0) & 0x01;
 		bit1 = (color_prom[i + 0x00] >> 1) & 0x01;
 		bit2 = (color_prom[i + 0x00] >> 2) & 0x01;
 		bit3 = (color_prom[i + 0x00] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x40;
 
-	/* characters use colors 0-0x0f */
-	for (i = 0; i < 0x100; i++)
+	// characters use colors 0-0x0f
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = color_prom[i] & 0x0f;
+		uint8_t const ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* sprites use colors 0x10-0x1f */
-	for (i = 0x100; i < 0x200; i++)
+	// sprites use colors 0x10-0x1f
+	for (int i = 0x100; i < 0x200; i++)
 	{
-		uint8_t ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

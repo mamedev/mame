@@ -81,8 +81,11 @@ public:
 
 	void ms0515(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_PALETTE_INIT(ms0515);
+	void ms0515_palette(palette_device &palette) const;
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
@@ -108,8 +111,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq11_w);
 
 	void ms0515_mem(address_map &map);
-
-	virtual void machine_reset() override;
 
 	void irq_encoder(int irq, int state);
 
@@ -444,7 +445,7 @@ WRITE_LINE_MEMBER(ms0515_state::screen_vblank)
 		irq11_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-PALETTE_INIT_MEMBER(ms0515_state, ms0515)
+void ms0515_state::ms0515_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0, 0, 0));
 	palette.set_pen_color(1, rgb_t(0, 0, 127));
@@ -536,8 +537,7 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	MCFG_SCREEN_PALETTE("palette")
 	config.set_default_layout(layout_ms0515);
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(ms0515_state, ms0515)
+	PALETTE(config, "palette", FUNC(ms0515_state::ms0515_palette), 16);
 
 	KR1818VG93(config, m_fdc, 1000000);
 	MCFG_FLOPPY_DRIVE_ADD("vg93:0", ms0515_floppies, "525qd", ms0515_state::floppy_formats)
@@ -561,8 +561,8 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	m_rs232->cts_handler().set(m_i8251line, FUNC(i8251_device::write_cts));
 	m_rs232->dsr_handler().set(m_i8251line, FUNC(i8251_device::write_dsr));
 
-//  MCFG_DEVICE_ADD("line_clock", CLOCK, 4800*16) // 8251 is set to /16 on the clock input
-//  MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_line_clock))
+//  clock_device &line_clock(CLOCK(config, "line_clock", 4800*16)); // 8251 is set to /16 on the clock input
+//  line_clock.signal_handler().set(FUNC(ms0515_state::write_line_clock));
 
 	// serial connection to MS7004 keyboard
 	I8251(config, m_i8251kbd, 0);
@@ -574,8 +574,8 @@ MACHINE_CONFIG_START(ms0515_state::ms0515)
 	m_ms7004->rts_handler().set(m_i8251kbd, FUNC(i8251_device::write_cts));
 
 	// baud rate is supposed to be 4800 but keyboard is slightly faster
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4960*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, ms0515_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4960*16));
+	keyboard_clock.signal_handler().set(FUNC(ms0515_state::write_keyboard_clock));
 
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(XTAL(2'000'000));

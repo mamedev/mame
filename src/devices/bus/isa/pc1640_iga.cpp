@@ -28,8 +28,6 @@
 //**************************************************************************
 
 #define PEGA1A_TAG      "ic910"
-#define EGA_CRTC_NAME   "crtc_ega_ega"
-
 
 
 //**************************************************************************
@@ -102,8 +100,6 @@ void isa8_pc1640_iga_device::device_start()
 	m_plane[1] = m_videoram + 0x10000;
 	m_plane[2] = m_videoram + 0x20000;
 	m_plane[3] = m_videoram + 0x30000;
-
-	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "ega", "iga");
 	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));

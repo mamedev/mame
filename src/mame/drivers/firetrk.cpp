@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/firetrk.h"
+
 #include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
 #include "speaker.h"
@@ -858,7 +859,7 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
 	MCFG_DEVICE_PROGRAM_MAP(firetrk_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", firetrk_state, firetrk_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(firetrk_state::firetrk_scanline), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 5);
 
@@ -867,12 +868,10 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_firetrk)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 28)
-	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_firetrk)
+	PALETTE(config, m_palette, FUNC(firetrk_state::firetrk_palette), 28);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_firetrk);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -894,11 +893,7 @@ MACHINE_CONFIG_START(firetrk_state::superbug)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_superbug)
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,superbug)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbug)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(28)
-	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
+	m_gfxdecode->set_info(gfx_superbug);
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("discrete", DISCRETE, superbug_discrete)
@@ -918,11 +913,10 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrk_state, screen_update_montecar)
 
 	MCFG_VIDEO_START_OVERRIDE(firetrk_state,montecar)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_montecar)
+	m_gfxdecode->set_info(gfx_montecar);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(46)
-	MCFG_PALETTE_INIT_OWNER(firetrk_state,montecar)
+	m_palette->set_entries(46);
+	m_palette->set_init(FUNC(firetrk_state::montecar_palette));
 
 	/* sound hardware */
 	MCFG_DEVICE_REPLACE("discrete", DISCRETE, montecar_discrete)

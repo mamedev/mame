@@ -125,7 +125,7 @@ MACHINE_CONFIG_START(spirit76_state::spirit76)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M6800, 500000)
 	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", spirit76_state, irq, attotime::from_hz(120))
+	TIMER(config, "irq").configure_periodic(FUNC(spirit76_state::irq), attotime::from_hz(120));
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()

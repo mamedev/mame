@@ -197,11 +197,20 @@
 class cocoloco_state : public driver_device
 {
 public:
-	cocoloco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cocoloco_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+	void cocoloco(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
@@ -214,13 +223,9 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_clear_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cocoloco);
+	void cocoloco_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cocoloco(machine_config &config);
 	void cocoloco_map(address_map &map);
 };
 
@@ -275,15 +280,13 @@ NETLIST_END()
 *          Video Hardware          *
 ***********************************/
 
-PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
+void cocoloco_state::cocoloco_palette(palette_device &palette) const
 {
-	for(int i = 0; i < 0x10; i += 2)
+	for (int i = 0; i < 0x10; i += 2)
 	{
-		int r,g,b;
-
-		r = pal2bit(i & 3);
-		g = pal2bit((i >> 1) & 3);
-		b = pal2bit((i >> 2) & 3);
+		int const r = pal2bit(i & 3);
+		int const g = pal2bit((i >> 1) & 3);
+		int const b = pal2bit((i >> 2) & 3);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -310,17 +313,15 @@ void cocoloco_state::video_start()
 
 uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, count, xi;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = 0;
+	int count = 0;
 
-	for(x = 0; x < 256; x += 8)
+	for (int x = 0; x < 256; x += 8)
 	{
-		for(y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
-			for (xi = 0; xi < 8; xi++)
+			for (int xi = 0; xi < 8; xi++)
 			{
 				int color;
 				color  =  (m_videoram[count|0x0000] >> (xi)) & 1;
@@ -328,7 +329,7 @@ uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				color |= ((m_videoram[count|0x4000] >> (xi)) & 1) << 2;
 				color |= ((m_videoram[count|0x6000] >> (xi)) & 1) << 3;
 
-				if(cliprect.contains(x + xi, 256 - y))
+				if (cliprect.contains(x + xi, 256 - y))
 					bitmap.pix16(256 - y, x + xi) = m_palette->pen(color & 0x0f);
 			}
 
@@ -520,10 +521,9 @@ MACHINE_CONFIG_START(cocoloco_state::cocoloco)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256)  // TODO: not accurate, ~50 Hz
 	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x10)
-	MCFG_PALETTE_INIT_OWNER(cocoloco_state, cocoloco)
+	PALETTE(config, m_palette, FUNC(cocoloco_state::cocoloco_palette), 0x10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

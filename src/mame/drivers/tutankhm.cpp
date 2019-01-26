@@ -253,12 +253,10 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 	MCFG_SCREEN_UPDATE_DRIVER(tutankhm_state, screen_update_tutankhm)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tutankhm_state, vblank_irq))
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 16);
 
 	/* sound hardware */
-
-	MCFG_DEVICE_ADD("timeplt_audio", TIMEPLT_AUDIO)
+	TIMEPLT_AUDIO(config, "timeplt_audio");
 MACHINE_CONFIG_END
 
 

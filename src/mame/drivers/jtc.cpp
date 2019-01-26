@@ -55,7 +55,7 @@ public:
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
-	DECLARE_PALETTE_INIT(jtc_es40);
+	void es40_palette(palette_device &palette) const;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jtc );
 
 	int m_centronics_busy;
@@ -716,7 +716,7 @@ uint32_t jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(jtc_state,jtc_es40)
+void jtc_state::es40_palette(palette_device &palette) const
 {
 	for (u8 i = 8; i < 16; i++)
 		palette.set_pen_color(i, rgb_t(BIT(i, 0) ? 0xc0 : 0, BIT(i, 1) ? 0xc0 : 0, BIT(i, 2) ? 0xc0 : 0));
@@ -741,21 +741,20 @@ void jtces40_state::video_start()
 
 uint32_t jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 i, y, z, x;
 	u16 ma = 0;
 
-	for (y = 0; y < 64; y++)
+	for (int y = 0; y < 64; y++)
 	{
-		for (z = 0; z < 3; z++)
+		for (int z = 0; z < 3; z++)
 		{
-			for (x = 0; x < 40; x++)
+			for (int x = 0; x < 40; x++)
 			{
-				u8 data = m_video_ram[ma + x];
-				u8 r = ~m_color_ram_r[ma + x];
-				u8 g = ~m_color_ram_g[ma + x];
-				u8 b = ~m_color_ram_b[ma + x];
+				u8 const data = m_video_ram[ma + x];
+				u8 const r = ~m_color_ram_r[ma + x];
+				u8 const g = ~m_color_ram_g[ma + x];
+				u8 const b = ~m_color_ram_b[ma + x];
 
-				for (i = 0; i < 8; i++)
+				for (int i = 0; i < 8; i++)
 					bitmap.pix16(y*3+z, (x * 8) + 7 - i) = (BIT(r, i) << 0) | (BIT(g, i) << 1) | (BIT(b, i) << 2) | (BIT(data, i) << 3);
 			}
 			ma+=40;
@@ -819,8 +818,8 @@ MACHINE_CONFIG_START(jtc_state::basic)
 	m_maincpu->p3_out_cb().set(FUNC(jtc_state::p3_w));
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -846,7 +845,7 @@ MACHINE_CONFIG_START(jtc_state::jtc)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64-1, 0, 64-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("2K");
@@ -874,7 +873,7 @@ MACHINE_CONFIG_START(jtces23_state::jtces23)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces23)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("4K");
@@ -895,8 +894,7 @@ MACHINE_CONFIG_START(jtces40_state::jtces40)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jtces40)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(jtc_state,jtc_es40)
+	PALETTE(config, "palette", FUNC(jtc_state::es40_palette), 16);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K,32K");

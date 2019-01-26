@@ -163,7 +163,13 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 
 	// special case for configure inputs
 	if ((uintptr_t)driver == 1)
-		menu::stack_push<menu_game_options>(ui(), container());
+	{
+		menu::stack_push<menu_simple_game_options>(
+				ui(),
+				container(),
+				[this] () { reset(reset_options::SELECT_FIRST); });
+	}
+
 	// anything else is a driver
 	else
 	{
@@ -250,7 +256,7 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	// otherwise, rebuild the match list
 	assert(m_drivlist != nullptr);
 	if (!m_search.empty() || m_matchlist[0] == -1 || m_rerandomize)
-		m_drivlist->find_approximate_matches(m_search.c_str(), matchcount, m_matchlist);
+		m_drivlist->find_approximate_matches(m_search, matchcount, m_matchlist);
 	m_rerandomize = false;
 
 	// iterate over entries

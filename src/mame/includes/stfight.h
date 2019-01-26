@@ -13,11 +13,6 @@
 class stfight_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_STFIGHT_INTERRUPT_1
-	};
-
 	stfight_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_coin_mech(*this, "COIN")
@@ -48,6 +43,17 @@ public:
 	void init_empcity();
 	void init_cshooter();
 
+protected:
+	enum
+	{
+		TIMER_STFIGHT_INTERRUPT_1
+	};
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 
@@ -74,11 +80,6 @@ private:
 	void cshooter_cpu1_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void stfight_cpu1_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_ioport                  m_coin_mech;
 

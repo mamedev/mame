@@ -95,8 +95,8 @@ namespace netlist
 		m_Q.push(res, times[1 - res]);// ? 22000 : 15000);
 	}
 
-	NETLIB_DEVICE_IMPL(7450)
-	NETLIB_DEVICE_IMPL(7450_dip)
+	NETLIB_DEVICE_IMPL(7450, 		"TTL_7450_ANDORINVERT", "+A,+B,+C,+D")
+	NETLIB_DEVICE_IMPL(7450_dip, 	"TTL_7450_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

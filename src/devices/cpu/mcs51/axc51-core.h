@@ -2,11 +2,11 @@
 // copyright-holders:David Haywood
 /*****************************************************************************
 
-	AXC51-CORE (AppoTech Inc.)
+    AXC51-CORE (AppoTech Inc.)
 
-	used in
+    used in
 
-	AX208 SoC
+    AX208 SoC
 
  *****************************************************************************/
 

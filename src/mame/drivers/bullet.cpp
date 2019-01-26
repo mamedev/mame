@@ -1120,7 +1120,7 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 	m_ctc->zc_callback<1>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(4.9152_MHz_XTAL /4))
+	TIMER(config, "ctc").configure_periodic(FUNC(bullet_state::ctc_tick), attotime::from_hz(4.9152_MHz_XTAL / 4));
 
 	Z80DART(config, m_dart, 16_MHz_XTAL / 4);
 	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -1199,7 +1199,7 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 	m_ctc->zc_callback<1>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(4.9152_MHz_XTAL / 4))
+	TIMER(config, "ctc").configure_periodic(FUNC(bullet_state::ctc_tick), attotime::from_hz(4.9152_MHz_XTAL / 4));
 
 	Z80DART(config, m_dart, 16_MHz_XTAL / 4);
 	m_dart->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));

@@ -59,27 +59,27 @@ void electron_m2105_device::device_add_mconfig(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	INPUT_MERGER_ANY_HIGH(config, m_irqs);
-	m_irqs->output_handler().set(FUNC(electron_m2105_device::intrq_w));
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
+
+	/* nvram */
+	RAM(config, m_ram).set_default_size("64K");
 
 	/* system via */
-	VIA6522(config, m_via6522_0, 1000000);
-	/*m_via6522_0->readpa_handler().set(FUNC(electron_m2105_device::m2105_via_system_read_porta));
-	m_via6522_0->readpb_handler().set(FUNC(electron_m2105_device::m2105_via_system_read_portb));
-	m_via6522_0->writepa_handler().set(FUNC(electron_m2105_device::m2105_via_system_write_porta));
-	m_via6522_0->writepb_handler().set(FUNC(electron_m2105_device::m2105_via_system_write_portb));*/
+	VIA6522(config, m_via6522_0, DERIVED_CLOCK(1, 16));
+	//m_via6522_0->readpa_handler().set(FUNC(electron_m2105_device::m2105_via_system_read_porta));
+	m_via6522_0->readpb_handler().set(m_tms, FUNC(tms5220_device::status_r));
+	//m_via6522_0->writepa_handler().set(FUNC(electron_m2105_device::m2105_via_system_write_porta));
+	m_via6522_0->writepb_handler().set(m_tms, FUNC(tms5220_device::data_w));
 	m_via6522_0->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	/* user via */
-	VIA6522(config, m_via6522_1, 1000000);
-	//m_via6522_1->readpb_handler().set(FUNC(electron_m2105_device::m2105_via_user_read_portb));
-	m_via6522_1->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
-	//m_via6522_1->writepb_handler().set(FUNC(electron_m2105_device::m2105_via_user_write_portb));
+	VIA6522(config, m_via6522_1, DERIVED_CLOCK(1, 16));
+	m_via6522_1->writepb_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));
 	m_via6522_1->ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
 	m_via6522_1->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	/* duart */
-	SCN2681(config, m_duart, XTAL(3'686'400));
+		/* duart */
+	SCN2681(config, m_duart, XTAL(3'686'400)); // TODO: confirm clock
 	m_duart->irq_cb().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	m_duart->a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	//m_duart->outport_cb().set(FUNC(electron_m2105_device::sio_out_w));
@@ -93,10 +93,14 @@ void electron_m2105_device::device_add_mconfig(machine_config &config)
 	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(latch);
 
+	/* AM7910 modem */
+
 	/* speech hardware */
 	SPEECHROM(config, "vsm", 0);
 	TMS5220(config, m_tms, 640000);
 	m_tms->set_speechrom_tag("vsm");
+	//m_tms->irq_handler().set(m_via6522_0, FUNC(via6522_device::write_cb1));
+	//m_tms->readyq_handler().set(m_via6522_0, FUNC(via6522_device::write_cb2));
 	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -117,12 +121,14 @@ electron_m2105_device::electron_m2105_device(const machine_config &mconfig, cons
 	: device_t(mconfig, ELECTRON_M2105, tag, owner, clock)
 	, device_electron_expansion_interface(mconfig, *this)
 	, m_exp_rom(*this, "exp_rom")
+	, m_ram(*this, RAM_TAG)
 	, m_via6522_0(*this, "via6522_0")
 	, m_via6522_1(*this, "via6522_1")
 	, m_duart(*this, "duart")
 	, m_tms(*this, "tms5220")
 	, m_centronics(*this, "centronics")
 	, m_irqs(*this, "irqs")
+	, m_ram_page(0)
 	, m_romsel(0)
 {
 }
@@ -133,7 +139,7 @@ electron_m2105_device::electron_m2105_device(const machine_config &mconfig, cons
 
 void electron_m2105_device::device_start()
 {
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
+	save_item(NAME(m_ram_page));
 }
 
 //-------------------------------------------------
@@ -148,37 +154,57 @@ void electron_m2105_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset)
 {
-	if (offset >= 0x8000 && offset < 0xc000)
+	uint8_t data = 0xff;
+
+	switch (offset >> 12)
 	{
+	case 0x8:
+	case 0x9:
+	case 0xa:
+	case 0xb:
 		switch (m_romsel)
 		{
 		case 0:
-			data = m_exp_rom->base()[0x8000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x8000 | (offset & 0x3fff)];
 			break;
 		case 2:
-			data = m_exp_rom->base()[0xc000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0xc000 | (offset & 0x3fff)];
 			break;
 		case 12:
-			data = m_exp_rom->base()[0x0000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x0000 | (offset & 0x3fff)];
 			break;
 		case 13:
-			data = m_exp_rom->base()[0x4000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x4000 | (offset & 0x3fff)];
 			break;
 		}
-	}
-	else if (offset >= 0xfc40 && offset < 0xfc60)
-	{
-		data = m_via6522_1->read(offset);
-	}
-	else if (offset >= 0xfc60 && offset < 0xfc70)
-	{
-		data = m_duart->read(space, offset & 0x0f);
-	}
-	else if (offset >= 0xfc70 && offset < 0xfc90)
-	{
-		data = m_via6522_0->read(offset);
+		break;
+
+	case 0xf:
+		switch (offset >> 8)
+		{
+		case 0xfc:
+			logerror("read %04x\n", offset);
+			if (offset >= 0xfc50 && offset < 0xfc60)
+			{
+				data = m_duart->read(offset & 0x0f);
+			}
+			else if (offset >= 0xfc60 && offset < 0xfc70)
+			{
+				data = m_via6522_1->read(offset & 0x0f);
+			}
+			else if (offset >= 0xfc70 && offset < 0xfc80)
+			{
+				data = m_via6522_0->read(offset & 0x0f);
+			}
+			break;
+
+		case 0xfd:
+			//if (m_ram_page < 0x80)
+				data = m_ram->pointer()[(m_ram_page << 8) | (offset & 0xff)];
+			break;
+		}
 	}
 
 	return data;
@@ -190,34 +216,42 @@ uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uin
 
 void electron_m2105_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
 {
-	if (offset >= 0x8000 && offset < 0xc000)
+	switch (offset >> 12)
 	{
-		logerror("write ram bank %d\n", m_romsel);
-	}
-	else if (offset >= 0xfc40 && offset < 0xfc60)
-	{
-		m_via6522_1->write(offset, data);
-	}
-	else if (offset >= 0xfc60 && offset < 0xfc70)
-	{
-		m_duart->write(space, offset & 0x0f, data);
-	}
-	else if (offset >= 0xfc70 && offset < 0xfc90)
-	{
-		m_via6522_0->write(offset, data);
-	}
-	else if (offset == 0xfe05)
-	{
-		m_romsel = data & 0x0f;
-	}
-}
+	case 0xf:
+		switch (offset >> 8)
+		{
+		case 0xfc:
+			logerror("write %04x %02x\n", offset, data);
+			if (offset >= 0xfc50 && offset < 0xfc60)
+			{
+				m_duart->write(offset & 0x0f, data);
+			}
+			else if (offset >= 0xfc60 && offset < 0xfc70)
+			{
+				m_via6522_1->write(offset & 0x0f, data);
+			}
+			else if (offset >= 0xfc70 && offset < 0xfc80)
+			{
+				m_via6522_0->write(offset & 0x0f, data);
+			}
+			else if (offset == 0xfcff)
+			{
+				m_ram_page = data;
+			}
+			break;
 
+		case 0xfd:
+			//if (m_ram_page < 0x80)
+				m_ram->pointer()[(m_ram_page << 8) | (offset & 0xff)] = data;
+			break;
 
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-WRITE_LINE_MEMBER(electron_m2105_device::intrq_w)
-{
-	m_slot->irq_w(state);
+		case 0xfe:
+			if (offset == 0xfe05)
+			{
+				m_romsel = data & 0x0f;
+			}
+			break;
+		}
+	}
 }

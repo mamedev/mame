@@ -74,8 +74,8 @@ D.9B         [f99cac4b] /
 class panicr_state : public driver_device
 {
 public:
-	panicr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	panicr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_t5182(*this, "t5182"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -84,7 +84,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
-		m_spritebank(*this, "spritebank") { }
+		m_spritebank(*this, "spritebank")
+	{ }
 
 	void panicr(machine_config &config);
 
@@ -123,10 +124,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(panicr);
+	void panicr_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void panicr_map(address_map &map);
@@ -144,57 +145,45 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(panicr_state, panicr)
+void panicr_state::panicr_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
 	// txt lookup table
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry;
-
-		if (color_prom[i] & 0x40)
-			ctabentry = 0;
-		else
-			ctabentry = (color_prom[i] & 0x3f) | 0x80;
-
+		uint8_t const ctabentry = (color_prom[i] & 0x40) ? 0 : ((color_prom[i] & 0x3f) | 0x80);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	// tile lookup table
-	for (i = 0x000; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = (color_prom[i+0x100] & 0x3f) | 0x00;
+		uint8_t const ctabentry = (color_prom[i + 0x100] & 0x3f) | 0x00;
 
-		palette.set_pen_indirect(((i&0x0f) + ((i&0xf0)<<1))  +0x200, ctabentry);
-		palette.set_pen_indirect(((i&0x0f) + ((i&0xf0)<<1))  +0x210, ctabentry);
+		palette.set_pen_indirect(((i & 0x0f) + ((i & 0xf0) << 1)) + 0x200, ctabentry);
+		palette.set_pen_indirect(((i & 0x0f) + ((i & 0xf0) << 1)) + 0x210, ctabentry);
 	}
 
 	// sprite lookup table
-	for (i = 0x000; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry;
+		uint8_t const ctabentry = (color_prom[i + 0x200] & 0x40) ? 0 : ((color_prom[i + 0x200] & 0x3f) | 0x40);
 
-		if (color_prom[i+0x200] & 0x40)
-			ctabentry = 0;
-		else
-			ctabentry = (color_prom[i+0x200] & 0x3f) | 0x40;
-
-		palette.set_pen_indirect(i+0x100, ctabentry);
+		palette.set_pen_indirect(i + 0x100, ctabentry);
 	}
 }
 
@@ -616,7 +605,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 MACHINE_CONFIG_START(panicr_state::panicr)
 	MCFG_DEVICE_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MCFG_DEVICE_PROGRAM_MAP(panicr_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", panicr_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(panicr_state::scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
@@ -628,12 +617,10 @@ MACHINE_CONFIG_START(panicr_state::panicr)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(panicr_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panicr)
-	MCFG_PALETTE_ADD("palette", 256*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(panicr_state, panicr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panicr);
+	PALETTE(config, m_palette, FUNC(panicr_state::panicr_palette), 256 * 4, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

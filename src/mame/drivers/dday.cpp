@@ -268,19 +268,16 @@ MACHINE_CONFIG_START(dday_state::dday)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dday_state, screen_update_dday)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dday)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256) /* HACK!!! */
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_INIT_OWNER(dday_state, dday)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dday);
+	PALETTE(config, m_palette, FUNC(dday_state::dday_palette), 256).enable_shadows();
+	m_palette->set_indirect_entries(256); // HACK!!!
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, m_ay1, 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	AY8910(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 MACHINE_CONFIG_END
 

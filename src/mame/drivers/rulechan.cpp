@@ -21,7 +21,7 @@
 
   PCB specs: Hardware not available
 
- 
+
 *********************************************************************
 
   Edge Connector:
@@ -72,7 +72,7 @@
   +---------------------------------------+-----+-----+-----+-----------------------------+
   | Demo                         No       |     |     | OFF |                             |
   |                              Si       |     |     | ON  |                             |
-  +---------------------------------------+-----+-----+-----+-----+-----------------------+ 
+  +---------------------------------------+-----+-----+-----+-----+-----------------------+
   | Acceso a Pagina              No       |                 | OFF |                       |
   | (settings access)            Si       |                 | ON  |                       |
   +---------------------------------------+-----------------+-----+-----+-----------------+
@@ -96,18 +96,18 @@
   -------------------
 
   (You must enable "LAMPS" layout for this procedure)
-  
+
   When the game runs by the very first time (no nvram yet), it will
   complain about "DATA ERROR" in a blue message window. After a few
-  seconds, it will bring up another red window with the "HARD ERROR 02" 
+  seconds, it will bring up another red window with the "HARD ERROR 02"
   message.
-  
+
   So, we must initialize the game following the next instructions:
-  
+
   1.- Toggle ON "Operator Key" (turn to green).
 
-  2.- Press once "Page Key". It will show a green window titled 
-      "CONTROL ADMINISTRATIVO" and a message with a security token. 
+  2.- Press once "Page Key". It will show a green window titled
+      "CONTROL ADMINISTRATIVO" and a message with a security token.
 
   3.- Press again "Page Key". It will bring up a new window where we
       must type a password. At this time, in the layout, under the
@@ -115,25 +115,25 @@
 
   4.- Enter the required paswword using the credits in (IN1....IN6)
       and credits out (OUT1...OUT6) buttons following the key assignment
-	  indications located under the password field.
-	  Use the "E" button to finish once all numbers were typed.
-	  Use the "B" button clear last digit typed, in case of mistake. 
+      indications located under the password field.
+      Use the "E" button to finish once all numbers were typed.
+      Use the "B" button clear last digit typed, in case of mistake.
 
   5.- Once finished that, the game will reboot and will be ready
       to play. Also, password showed on layout will dissapear.
 
-	  In case that (by unknown reason) the game asks for
-	  "CONTROL ADMINISTRATIVO" again, follow the instructions starting
-	  from step "1". After that, we will can play again.
+      In case that (by unknown reason) the game asks for
+      "CONTROL ADMINISTRATIVO" again, follow the instructions starting
+      from step "1". After that, we will can play again.
 
 
 *********************************************************************/
-  
-  
+
+
 /*********************************************************************
 
   Dev notes:
-  
+
   Again, this driver was written based on a couple of ROM dumps and a
   lot of reverse engineering, with no harware available, but guessing
   that this firmware and hardware are similar to others well known
@@ -141,30 +141,30 @@
 
   The most exciting part of this work was discover that this game runs
   with an electromechanical roulette, not a tipical LED roulette. It
-  added an extra challenge to the work, wich implies a full develop 
+  added an extra challenge to the work, wich implies a full develop
   of an electromechanical part simulation, objective that finally
   could be reached.
-  
-  Surprisingly, this game firmware includes a full communications 
+
+  Surprisingly, this game firmware includes a full communications
   module, accesible via RS232 serial interface, that let the users
   some useful things like reconfigure hardware and game options or
-  get different kinds of reports, like accounting, statistics and 
+  get different kinds of reports, like accounting, statistics and
   many other technical items. All this tasks are performed from a
   PC running a D.O.S. program provided by the maker and fortunately
   still available. Even more, there is another standalone D.O.S.
   software provided by the manufacturer (also still available) to
   get the passwords needed when hardware fails or administrative
   tasks are required.
-  
-  Another interesting thing found on this game is that it can be 
+
+  Another interesting thing found on this game is that it can be
   configured for a single or a double zero roulette, depending on
   what kind of roulette has attached.
 
- 
+
 *********************************************************************/
 
 
-#define CPU_CLOCK       XTAL(8'000'000)		// guess
+#define CPU_CLOCK       XTAL(8'000'000)     // guess
 #define VID_CLOCK       XTAL(21'477'272)    // guess
 #define TMS_CLOCK       (CPU_CLOCK / 4)      // guess
 #define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
@@ -311,7 +311,7 @@ void rulechan_state::main_io(address_map &map)
 	map(0x31, 0x31).rw(FUNC(rulechan_state::port31_r),FUNC(rulechan_state::port31_w)); // wheel control - read: Must be 0x00 at power-up.
 	map(0x32, 0x32).w(FUNC(rulechan_state::port32_w));                                 // wheel control.
 	map(0x40, 0x43).nopr().nopw();
-	map(0x60, 0x60).nopw();                                                            // Watchdog. 
+	map(0x60, 0x60).nopw();                                                            // Watchdog.
 }
 
 
@@ -334,7 +334,7 @@ READ8_MEMBER(rulechan_state::port3_r)
 	return 0xff;
 }
 
-/****************************** 
+/******************************
    Port 30 - Wheel control    *
 *  bit 2 - ball detector      *
 *  bit 3 - step detector      *
@@ -397,7 +397,7 @@ WRITE8_MEMBER(rulechan_state::port31_w)
 	}
 
 	if(BIT(m_p31, 7))                      // Shoot ball.
-	{ 
+	{
 		m_p30 &= 0xdf;                     // ball out....
 		m_num = machine().rand() % 37;     // sort winning number.
 
@@ -426,7 +426,7 @@ void rulechan_state::sound_off()
 {
 		m_maincpu->space(AS_IO).write_byte(0x10, 0x07);
 		m_maincpu->space(AS_IO).write_byte(0x11, m_maincpu->space(AS_PROGRAM).read_byte(SND_FLG) | 0x20);
-		m_maincpu->space(AS_IO).write_byte(0x10, 0x0e); 
+		m_maincpu->space(AS_IO).write_byte(0x10, 0x0e);
 }
 
 void rulechan_state::sound_sort()
@@ -436,9 +436,9 @@ void rulechan_state::sound_sort()
 		m_maincpu->space(AS_IO).write_byte(0x10, m_sndsrt[(2 * i)]);
 		m_maincpu->space(AS_IO).write_byte(0x11, m_sndsrt[(2 * i) + 1]);
 	}
-	m_maincpu->space(AS_IO).write_byte(0x10, 0x07);  
+	m_maincpu->space(AS_IO).write_byte(0x10, 0x07);
 	m_maincpu->space(AS_IO).write_byte(0x11, m_maincpu->space(AS_PROGRAM).read_byte(SND_FLG) & 0xdf);
-	m_maincpu->space(AS_IO).write_byte(0x10, 0x0e); 
+	m_maincpu->space(AS_IO).write_byte(0x10, 0x0e);
 }
 
 
@@ -451,24 +451,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 	if(m_step == 0)
 	{
 		if((BIT4) & (m_updn4 == 0))
-		{	
+		{
 			m_p30 &= 0xef;
 			m_updn4 = 1;
 
 			//logerror("1:port_p30:- Reset bit 4 pulse start -%2x cont_pasos:%2d\n",m_p30, m_step);
 			return;
 		}
-		
+
 		if((!BIT4) & (m_updn4 == 1))
-		{	
+		{
 			m_p30 |= 0x10;
-			
+
 			//logerror("2:port_p30:- Set bit 4 -%2x cont_pasos:%2d\n",m_p30, m_step);
 			return;
-		}		
-		
+		}
+
 		if((BIT4) & (m_updn4 == 1))
-		{	
+		{
 			m_updn4 = 0;
 			m_step++;
 
@@ -485,9 +485,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 			//logerror("4:port_p30:-reset bit 3 -%2x cont_pasos:%2d\n",m_p30, m_step);
 			return;
 		}
-		
+
 		if(!BIT3 & (m_updn3 == 0))
-		{	
+		{
 			if(!BIT2)
 			{
 				m_p30 |= 0x04;
@@ -497,13 +497,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 			}
 			else
 			{
-				if((m_step - 1 == m_num) & (m_updn2 == 0)) 
+				if((m_step - 1 == m_num) & (m_updn2 == 0))
 				{
 					if(!BIT5)   // ball in pocket?...
-					{ 
+					{
 						m_p30 &= 0xfb;
 						m_updn2 = 1;
-						m_ballin++; 
+						m_ballin++;
 						logerror("Ball In Pocket m_num:%2x\n", m_num);
 						return;
 					}
@@ -513,18 +513,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 			m_updn2 = 0;
 			m_updn3 = 1;
 		}
-		
+
 		if(!BIT3 & (m_updn3 == 1))
 		{
 			m_p30 |= 0x08;
 			m_updn3 = 0;
 			m_step++;
-			
+
 			if (m_step == 39)
 			{
 				m_step = 0;
 				m_p30 |= 0x1c;
-			} 
+			}
 
 			//logerror("6:port_p30:-set bit 3 -%2x cont_pasos:%2d \n",m_p30, m_step);
 			return;
@@ -540,7 +540,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::wheel_speed)
 TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::ball_speed)
 {
 	if(MOTORON)
-	{	
+	{
 		if(d_spin == 0)
 		{
 			m_tspin++;
@@ -550,18 +550,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::ball_speed)
 			{
 				m_tspin = 37;   // breaking ball once per number step.
 			}
-			
+
 			if(m_tspin == 37)
 			{
 				m_tspin = 0;
 				m_spin++;
 				d_spin = m_spin;   // breaking ball once per round.
 			}
-			
+
 			if((!BALLIN) | (LEDNOTNUM & BALLIN ))
 			{
 				m_led++;
-				
+
 				if(m_led == 37)
 				{
 					m_led = 0;
@@ -596,7 +596,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rulechan_state::ball_speed)
 /* if needed, get pass and shows it on layout*/
 	m_pass[0] = m_maincpu->space(AS_PROGRAM).read_byte(RAM_PSW);
 
-	if((m_pass[0] <= 0x39) & (m_pass[0] >= 0x30)) 
+	if((m_pass[0] <= 0x39) & (m_pass[0] >= 0x30))
 	{
 		for(int i = 0; i < 6; i++)
 		{
@@ -687,7 +687,7 @@ static INPUT_PORTS_START( rulechan )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_TOGGLE            PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // bit 6 is EEPROM data. 
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // bit 6 is EEPROM data.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9)
 
 	PORT_START("DSW")
@@ -727,8 +727,8 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-MACHINE_CONFIG_START(rulechan_state::rulechan)
-
+void rulechan_state::rulechan(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rulechan_state::main_map);
@@ -737,28 +737,27 @@ MACHINE_CONFIG_START(rulechan_state::rulechan)
 
 	/* nvram */
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	
+
 	/* eeprom */
 	EEPROM_93C46_8BIT(config, "eeprom");
-	
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ball_speed", rulechan_state, ball_speed, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("wheel_speed", rulechan_state, wheel_speed, attotime::from_hz(60))
-	
+
+	TIMER(config, "ball_speed").configure_periodic(FUNC(rulechan_state::ball_speed), attotime::from_hz(60));
+	TIMER(config, "wheel_speed").configure_periodic(FUNC(rulechan_state::wheel_speed), attotime::from_hz(60));
+
 	/* video hardware */
 	v9938_device &v9938(V9938(config, "v9938", VID_CLOCK));
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	//v9938.int_cb().set_inputline("maincpu", 0);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	
+
 	/* sound hardware   */
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay_re900(AY8910(config, "ay8910", TMS_CLOCK));
 	ay_re900.port_a_read_callback().set(FUNC(rulechan_state::psg_portA_r));
 	ay_re900.port_b_read_callback().set(FUNC(rulechan_state::psg_portB_r));
 	ay_re900.add_route(ALL_OUTPUTS, "mono", 0.5);
-	
-MACHINE_CONFIG_END
+}
 
 
 /**************************************
@@ -788,7 +787,7 @@ ROM_END
 
 void rulechan_state::rulechan_init()
 {
-	m_p30 = 0x3c; 
+	m_p30 = 0x3c;
 	m_p32 = 0xf0;  // Motor off at startup
 	m_step = 0;
 	m_updn2 = 0;

@@ -1285,25 +1285,21 @@ MACHINE_CONFIG_START(btime_state::btime)
 
 	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("8vck", btime_state, audio_nmi_gen, "screen", 0, 8)
+	TIMER(config, "8vck").configure_scanline(FUNC(btime_state::audio_nmi_gen), "screen", 0, 8);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("audionmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "audionmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(m_screen, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_btime)
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_btime);
+	PALETTE(config, m_palette, FUNC(btime_state::btime_palette)).set_format(palette_device::BGR_233_inverted, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1342,10 +1338,8 @@ MACHINE_CONFIG_START(btime_state::cookrace)
 	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cookrace)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_cookrace)
+	m_gfxdecode->set_info(gfx_cookrace);
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_cookrace));
 MACHINE_CONFIG_END
 
 
@@ -1359,26 +1353,22 @@ MACHINE_CONFIG_START(btime_state::lnc)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnc)
+	m_gfxdecode->set_info(gfx_lnc);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(btime_state,lnc)
+	m_palette->set_entries(8);
+	m_palette->set_init(FUNC(btime_state::lnc_palette));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_lnc)
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_lnc));
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(btime_state::wtennis)
+void btime_state::wtennis(machine_config &config)
+{
 	lnc(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_eggs)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_eggs));
+}
 
 
 MACHINE_CONFIG_START(btime_state::mmonkey)
@@ -1401,13 +1391,12 @@ MACHINE_CONFIG_START(btime_state::bnj)
 	MCFG_DEVICE_PROGRAM_MAP(bnj_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bnj)
+	m_gfxdecode->set_info(gfx_bnj);
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_bnj)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_bnj));
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
 MACHINE_CONFIG_END
 
 
@@ -1428,14 +1417,12 @@ MACHINE_CONFIG_START(btime_state::zoar)
 	MCFG_DEVICE_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
+	m_gfxdecode->set_info(gfx_zoar);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
+	m_palette->set_entries(64);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_zoar));
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
 
 	/* sound hardware */
 	ay8910_device &ay1(AY8910(config.replace(), "ay1", HCLK1));
@@ -1463,15 +1450,12 @@ MACHINE_CONFIG_START(btime_state::disco)
 	m_soundlatch->set_separate_acknowledge(true);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_disco)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32)
+	m_gfxdecode->set_info(gfx_disco);
+	m_palette->set_entries(32);
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_disco)
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_disco));
 MACHINE_CONFIG_END
 
 
@@ -1483,7 +1467,7 @@ MACHINE_CONFIG_START(btime_state::tisland)
 	MCFG_DEVICE_PROGRAM_MAP(tisland_map)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
+	m_gfxdecode->set_info(gfx_zoar);
 MACHINE_CONFIG_END
 
 

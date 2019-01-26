@@ -59,26 +59,26 @@ class rex6000_state : public driver_device
 {
 public:
 	rex6000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG),
-			m_beep(*this, "beeper"),
-			m_uart(*this, "ns16550"),
-			m_bankdev0(*this, "bank0"),
-			m_bankdev1(*this, "bank1"),
-			m_flash0a(*this, "flash0a"),
-			m_flash0b(*this, "flash0b"),
-			m_flash1a(*this, "flash1a"),
-			m_flash1b(*this, "flash1b"),
-			m_nvram(*this, "nvram"),
-			m_battery(*this, "BATTERY"),
-			m_pen_x(*this, "PENX"),
-			m_pen_y(*this, "PENY")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_beep(*this, "beeper")
+		, m_uart(*this, "ns16550")
+		, m_bankdev0(*this, "bank0")
+		, m_bankdev1(*this, "bank1")
+		, m_flash0a(*this, "flash0a")
+		, m_flash0b(*this, "flash0b")
+		, m_flash1a(*this, "flash1a")
+		, m_flash1b(*this, "flash1b")
+		, m_nvram(*this, "nvram")
+		, m_battery(*this, "BATTERY")
+		, m_pen_x(*this, "PENX")
+		, m_pen_y(*this, "PENY")
+	{ }
 
 	void rex6000(machine_config &config);
 
-	DECLARE_PALETTE_INIT(rex6000);
+	void rex6000_palettte(palette_device &palette) const;
 	DECLARE_QUICKLOAD_LOAD_MEMBER(rex6000);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	DECLARE_WRITE_LINE_MEMBER(serial_irq);
@@ -722,7 +722,7 @@ WRITE_LINE_MEMBER( rex6000_state::serial_irq )
 	}
 }
 
-PALETTE_INIT_MEMBER(rex6000_state, rex6000)
+void rex6000_state::rex6000_palettte(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -901,9 +901,9 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
 	MCFG_DEVICE_IO_MAP(rex6000_io)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(32))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(4096))
+	TIMER(config, "sec_timer").configure_periodic(FUNC(rex6000_state::sec_timer), attotime::from_hz(1));
+	TIMER(config, "irq_timer1").configure_periodic(FUNC(rex6000_state::irq_timer1), attotime::from_hz(32));
+	TIMER(config, "irq_timer2").configure_periodic(FUNC(rex6000_state::irq_timer2), attotime::from_hz(4096));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -914,9 +914,8 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 120-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rex6000)
+	PALETTE(config, "palette", FUNC(rex6000_state::rex6000_palettte), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_rex6000);
 
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&rex6000_state::rex6000_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&rex6000_state::rex6000_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
@@ -967,9 +966,9 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_DEVICE_PROGRAM_MAP(rex6000_mem)
 	MCFG_DEVICE_IO_MAP(oz750_io)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sec_timer", rex6000_state, sec_timer, attotime::from_hz(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(64))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(8192))
+	TIMER(config, "sec_timer").configure_periodic(FUNC(rex6000_state::sec_timer), attotime::from_hz(1));
+	TIMER(config, "irq_timer1").configure_periodic(FUNC(rex6000_state::irq_timer1), attotime::from_hz(64));
+	TIMER(config, "irq_timer2").configure_periodic(FUNC(rex6000_state::irq_timer2), attotime::from_hz(8192));
 
 	NS16550(config, m_uart, XTAL(9'830'400) / 4);
 	m_uart->out_tx_callback().set("serport", FUNC(rs232_port_device::write_txd));
@@ -993,8 +992,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 80-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(rex6000_state, rex6000)
+	PALETTE(config, "palette", FUNC(rex6000_state::rex6000_palettte), 2);
 
 	ADDRESS_MAP_BANK(config, "bank0").set_map(&oz750_state::oz750_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
 	ADDRESS_MAP_BANK(config, "bank1").set_map(&oz750_state::oz750_banked_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);

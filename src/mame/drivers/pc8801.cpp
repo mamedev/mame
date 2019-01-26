@@ -2303,11 +2303,9 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_cdrom)
 	}
 }
 
-PALETTE_INIT_MEMBER(pc8801_state, pc8801)
+void pc8801_state::pc8801_palette(palette_device &palette) const
 {
-	int i;
-
-	for(i=0;i<0x10;i++) //text + bitmap
+	for(int i = 0; i< 0x10; i++) //text + bitmap
 		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
@@ -2378,8 +2376,8 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	#endif
 	UPD1990A(config, m_rtc);
 	//MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED);
 
 	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
 
@@ -2395,11 +2393,10 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_24KHz,848,0,640,448,0,400)
 	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pc8801)
-	MCFG_PALETTE_ADD("palette", 0x10)
-	MCFG_PALETTE_INIT_OWNER(pc8801_state, pc8801)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc8801);
+	PALETTE(config, m_palette, FUNC(pc8801_state::pc8801_palette), 0x10);
 
 //  MCFG_VIDEO_START_OVERRIDE(pc8801_state,pc8801)
 
@@ -2420,7 +2417,7 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))
+	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::pc8801_rtc_irq), attotime::from_hz(600));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc8801_state::pc8801fh)

@@ -65,7 +65,7 @@ namespace netlist
 			logic_net_t &net = m_Q.net();
 			// this is only called during setup ...
 			net.toggle_new_Q();
-			net.set_time(netlist().time() + m_inc);
+			net.set_time(exec().time() + m_inc);
 		}
 
 	public:
@@ -74,7 +74,12 @@ namespace netlist
 		param_double_t m_freq;
 		netlist_time m_inc;
 
-		inline static void mc_update(logic_net_t &net);
+		static void mc_update(logic_net_t &net)
+		{
+			net.toggle_new_Q();
+			net.update_devs();
+		}
+
 	};
 
 	// -----------------------------------------------------------------------------
@@ -136,7 +141,9 @@ namespace netlist
 				unsigned long total = 0;
 				for (unsigned i=0; i<m_size; i++)
 				{
-					pati[i] = static_cast<unsigned long>(pat[i].as_long());
+					// FIXME: use pstonum_ne
+					//pati[i] = plib::pstonum<decltype(pati[i])>(pat[i]);
+					pati[i] = plib::pstonum<unsigned long>(pat[i]);
 					total += pati[i];
 				}
 				netlist_time ttotal = netlist_time::zero();
@@ -310,7 +317,7 @@ namespace netlist
 		, m_N(*this, "N", 1)
 		, m_func(*this, "FUNC", "A0")
 		, m_Q(*this, "Q")
-		, m_compiled(this->name() + ".FUNCC", this, this->netlist().state())
+		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
 		{
 			std::vector<pstring> inps;
 			for (int i=0; i < m_N(); i++)

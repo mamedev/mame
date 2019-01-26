@@ -369,28 +369,27 @@ void sidepckt_state::machine_reset()
 	m_scroll_y      = 0;
 }
 
-MACHINE_CONFIG_START(sidepckt_state::sidepckt)
-
+void sidepckt_state::sidepckt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000) /* MC68B09EP, 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sidepckt_map)
+	MC6809E(config, m_maincpu, 2000000); /* MC68B09EP, 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sidepckt_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000) /* 1.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	M6502(config, m_audiocpu, 1500000); /* 1.5 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58) /* VERIFY: May be 55 or 56 */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sidepckt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58); /* VERIFY: May be 55 or 56 */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(sidepckt_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sidepckt)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(sidepckt_state, sidepckt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sidepckt);
+	PALETTE(config, m_palette, FUNC(sidepckt_state::sidepckt_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -398,21 +397,21 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(sidepckt_state::sidepcktb)
+void sidepckt_state::sidepcktb(machine_config &config)
+{
 	sidepckt(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sidepcktb_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sidepcktb_map);
+}
 
 
 /***************************************************************************

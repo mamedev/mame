@@ -12,18 +12,6 @@
 #pragma once
 
 
-#define MCFG_HD44780_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, HD44780, 0 )
-
-#define MCFG_KS0066_F05_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, KS0066_F05, 0 )
-
-#define MCFG_HD44780_LCD_SIZE(_lines, _chars) \
-	downcast<hd44780_device &>(*device).set_lcd_size(_lines, _chars);
-
-#define MCFG_HD44780_PIXEL_UPDATE_CB(_class, _method) \
-	downcast<hd44780_device &>(*device).set_pixel_update_cb(&_class::_method, #_class "::" #_method, this);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -44,6 +32,17 @@ public:
 	// static configuration helpers
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
 	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb = pixel_update_delegate(std::forward<T>(args)...); }
+	void set_pixel_update_cb(pixel_update_delegate callback) { m_pixel_update_cb = callback; }
+	template <class FunctionClass> void set_pixel_update_cb(const char *devname,
+		void (FunctionClass::*callback)(bitmap_ind16 &, uint8_t, uint8_t, uint8_t, uint8_t, int), const char *name)
+	{
+		set_pixel_update_cb(pixel_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_pixel_update_cb(
+		void (FunctionClass::*callback)(bitmap_ind16 &, uint8_t, uint8_t, uint8_t, uint8_t, int), const char *name)
+	{
+		set_pixel_update_cb(pixel_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// device interface
 	virtual void write(offs_t offset, u8 data);

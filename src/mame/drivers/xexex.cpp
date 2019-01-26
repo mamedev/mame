@@ -469,34 +469,33 @@ void xexex_state::machine_reset()
 	m_frame = -1;
 }
 
-MACHINE_CONFIG_START(xexex_state::xexex)
-
+void xexex_state::xexex(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xexex_state, xexex_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2); // 16MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &xexex_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(xexex_state::xexex_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // Z80E 8Mhz
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // Z80E 8Mhz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &xexex_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
+	config.m_minimum_quantum = attotime::from_hz(1920);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-//  MCFG_SCREEN_REFRESH_RATE(XTAL(32'000'000)/4/512/288)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255) // 8Mhz horizontal dotclock
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 0, 0+256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xexex_state, screen_update_xexex)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+//  m_screen->set_refresh_hz(XTAL(32'000'000)/4/512/288);
+	m_screen->set_raw(XTAL(32'000'000)/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255); // 8Mhz horizontal dotclock
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(40, 40+384-1, 0, 0+256-1);
+	m_screen->set_screen_update(FUNC(xexex_state::screen_update_xexex));
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(xexex_state::tile_callback), this);
@@ -512,7 +511,7 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 
 	K053251(config, m_k053251, 0);
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
+	K053252(config, m_k053252, XTAL(32'000'000)/4);
 
 	K054338(config, m_k054338, 0);
 
@@ -528,18 +527,18 @@ MACHINE_CONFIG_START(xexex_state::xexex)
 	ymsnd.add_route(1, "filter2_l", 0.50);
 	ymsnd.add_route(1, "filter2_r", 0.50);
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_APAN_CB(xexex_state, ym_set_mixing)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	K054539(config, m_k054539, XTAL(18'432'000));
+	m_k054539->set_analog_callback(FUNC(xexex_state::ym_set_mixing));
+	m_k054539->add_route(0, "lspeaker", 1.0);
+	m_k054539->add_route(0, "rspeaker", 1.0);
+	m_k054539->add_route(1, "lspeaker", 1.0);
+	m_k054539->add_route(1, "rspeaker", 1.0);
 
 	FILTER_VOLUME(config, "filter1_l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "filter1_r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	FILTER_VOLUME(config, "filter2_l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "filter2_r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( xexex ) /* Europe, Version AA */

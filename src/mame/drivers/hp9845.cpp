@@ -3639,8 +3639,8 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	m_ppu->pa_changed_cb().set(m_io_sys , FUNC(hp98x5_io_sys_device::pa_w));
 
 	HP98X5_IO_SYS(config , m_io_sys , 0);
-	m_io_sys->irl().set([this](int state) { m_ppu->set_input_line(HPHYBRID_IRL , state); });
-	m_io_sys->irh().set([this](int state) { m_ppu->set_input_line(HPHYBRID_IRH , state); });
+	m_io_sys->irl().set_inputline(m_ppu, HPHYBRID_IRL);
+	m_io_sys->irh().set_inputline(m_ppu, HPHYBRID_IRH);
 	m_io_sys->sts().set(m_ppu , FUNC(hp_5061_3001_cpu_device::status_w));
 	m_io_sys->flg().set(m_ppu , FUNC(hp_5061_3001_cpu_device::flag_w));
 	m_io_sys->dmar().set(m_ppu , FUNC(hp_5061_3001_cpu_device::dmar_w));
@@ -3648,17 +3648,17 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 
-	MCFG_TIMER_DRIVER_ADD("gv_timer", hp9845_base_state, gv_timer)
+	TIMER(config, m_gv_timer).configure_generic(FUNC(hp9845_base_state::gv_timer));
 
 	// Actual keyboard refresh rate should be KEY_SCAN_OSCILLATOR / 128 (2560 Hz)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp9845_base_state , kb_scan , attotime::from_hz(100))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(hp9845_base_state::kb_scan), attotime::from_hz(100));
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
 	MCFG_DEVICE_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 0.50)
 
-	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp9845_base_state , beeper_off);
+	TIMER(config, m_beep_timer).configure_generic(FUNC(hp9845_base_state::beeper_off));
 
 	// Tape drives
 	HP_TACO(config , m_t15 , 4000000);
@@ -3721,7 +3721,7 @@ MACHINE_CONFIG_START(hp9845b_state::hp9845b)
 	// These parameters are for alpha video
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
 	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845b_state, scanline_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845b_state::scanline_timer), "screen", 0, 1);
 
 	config.set_default_layout(layout_hp9845b);
 
@@ -3737,7 +3737,7 @@ MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845c_state, vblank_w))
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_770_PIXEL_CLOCK , VIDEO_770_HTOTAL , VIDEO_770_HBEND , VIDEO_770_HBSTART , VIDEO_770_VTOTAL , VIDEO_770_VBEND , VIDEO_770_VBSTART)
 	MCFG_PALETTE_ADD("palette", 24)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845c_state, scanline_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845c_state::scanline_timer), "screen", 0, 1);
 
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 
@@ -3752,7 +3752,7 @@ MACHINE_CONFIG_START(hp9845t_state::hp9845t)
 	MCFG_SCREEN_COLOR(rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_780_PIXEL_CLOCK , VIDEO_780_HTOTAL , VIDEO_780_HBEND , VIDEO_780_HBSTART , VIDEO_780_VTOTAL , VIDEO_780_VBEND , VIDEO_780_VBSTART)
 	MCFG_PALETTE_ADD("palette", 5)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845t_state, scanline_timer, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(hp9845t_state::scanline_timer), "screen", 0, 1);
 
 	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
 

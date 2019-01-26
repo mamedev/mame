@@ -188,10 +188,8 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xybots)
-
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_xybots);
+	PALETTE(config, "palette").set_format(palette_device::IRGB_4444, 1024);
 
 	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, xybots_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
 	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, xybots_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)

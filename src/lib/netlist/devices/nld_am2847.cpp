@@ -116,7 +116,7 @@ namespace netlist
 		/* do nothing */
 	}
 
-	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
+	NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
 	{
 		uint32_t out = m_buffer[0] & 1;
 		uint32_t in = (m_RC() ? out : m_IN());
@@ -130,8 +130,8 @@ namespace netlist
 		m_OUT.push(out, NLTIME_FROM_NS(200));
 	}
 
-	NETLIB_DEVICE_IMPL(AM2847)
-	NETLIB_DEVICE_IMPL(AM2847_dip)
+	NETLIB_DEVICE_IMPL_DEPRECATED(AM2847)
+	NETLIB_DEVICE_IMPL_DEPRECATED(AM2847_dip)
 
 	} //namespace devices
 } // namespace netlist

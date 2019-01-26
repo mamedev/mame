@@ -52,8 +52,11 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/terminal.h"
 
-#include "bus/scsi/scsi.h"
-#include "machine/wd33c93.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cd.h"
+#include "machine/nscsi_hd.h"
+
+#include "machine/wd33c9x.h"
 
 #include "machine/pdc.h"
 #include "machine/smioc.h"
@@ -85,7 +88,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pdc(*this, "pdc"),
 		m_smioc(*this, "smioc"),
-		m_wd33c93(*this, "wd33c93"),
+		m_wd33c93(*this, "scsi:7:wd33c93"),
 		m_main_ram(*this, "main_ram")
 	{
 		device_trace_init();
@@ -166,6 +169,9 @@ private:
 	void device_trace_disable(int device);
 
 	void* system_trace_context;
+
+	static void scsi_devices(device_slot_interface &device);
+	void wd33c93(device_t *device);
 };
 
 #if ENABLE_TRACE_ALL_DEVICES
@@ -957,6 +963,19 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 
+void r9751_state::scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+}
+
+void r9751_state::wd33c93(device_t *device)
+{
+	device->set_clock(10000000);
+	//	downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(r9751_state::scsi_irq_w));
+	//	downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(r9751_state::scsi_drq_w));
+}
+
 MACHINE_CONFIG_START(r9751_state::r9751)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", M68030, 20000000)
@@ -972,9 +991,16 @@ MACHINE_CONFIG_START(r9751_state::r9751)
 	PDC(config, m_pdc, 0);
 	m_pdc->m68k_r_callback().set(FUNC(r9751_state::pdc_dma_r));
 	m_pdc->m68k_w_callback().set(FUNC(r9751_state::pdc_dma_w));
-	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
-	WD33C93(config, m_wd33c93);
-	m_wd33c93->set_scsi_port("scsi");
+
+	NSCSI_BUS(config, "scsi", 0);
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, "cdrom", false);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93)
+		.machine_config([this](device_t *device) { wd33c93(device); });
 
 	/* software list */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","r9751")

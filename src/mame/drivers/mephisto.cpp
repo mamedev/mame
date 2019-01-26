@@ -319,7 +319,7 @@ MACHINE_CONFIG_START(mephisto_state::mephisto)
 	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(mephisto_state::update_nmi), attotime::from_hz(600));
 
 	MEPHISTO_SENSORS_BOARD(config, "board", 0);
 	config.set_default_layout(layout_mephisto);
@@ -330,8 +330,8 @@ MACHINE_CONFIG_START(mephisto_state::rebel5)
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(rebel5_mem)
-	MCFG_DEVICE_REMOVE("nmi_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer_r5", mephisto_state, update_nmi_r5, attotime::from_hz(600))
+	config.device_remove("nmi_timer");
+	TIMER(config, "nmi_timer_r5").configure_periodic(FUNC(mephisto_state::update_nmi_r5), attotime::from_hz(600));
 
 MACHINE_CONFIG_END
 
@@ -341,8 +341,8 @@ MACHINE_CONFIG_START(mephisto_state::mm2)
 	MCFG_DEVICE_PROGRAM_MAP(mm2_mem)
 	MCFG_MACHINE_START_OVERRIDE(mephisto_state, mm2 )
 
-	MCFG_DEVICE_REMOVE("nmi_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", mephisto_state, update_irq, attotime::from_hz(450))
+	config.device_remove("nmi_timer");
+	TIMER(config, "irq_timer").configure_periodic(FUNC(mephisto_state::update_irq), attotime::from_hz(450));
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_state::mm4tk)

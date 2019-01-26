@@ -644,7 +644,8 @@ WRITE_LINE_MEMBER(playch10_state::vblank_irq)
 	}
 }
 
-MACHINE_CONFIG_START(playch10_state::playch10)
+void playch10_state::playch10(machine_config &config)
+{
 	// basic machine hardware
 	Z80(config, m_maincpu, 8000000/2); // 4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &playch10_state::bios_map);
@@ -669,23 +670,22 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	outlatch2.parallel_out_cb().set(FUNC(playch10_state::cart_sel_w)).rshift(3).mask(0x0f);
 
 	// video hardware
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_playch10)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_playch10);
+	PALETTE(config, "palette", FUNC(playch10_state::playch10_palette), 256);
 	config.set_default_layout(layout_playch10);
 
-	MCFG_SCREEN_ADD("top", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_top)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, playch10_state, vblank_irq))
+	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	top.set_refresh_hz(60);
+	top.set_size(32*8, 262);
+	top.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	top.set_screen_update(FUNC(playch10_state::screen_update_playch10_top));
+	top.screen_vblank().set(FUNC(playch10_state::vblank_irq));
 
-	MCFG_SCREEN_ADD("bottom", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_bottom)
+	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	bottom.set_refresh_hz(60);
+	bottom.set_size(32*8, 262);
+	bottom.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	bottom.set_screen_update(FUNC(playch10_state::screen_update_playch10_bottom));
 
 	PPU_2C03B(config, m_ppu, 0);
 	m_ppu->set_screen("bottom");
@@ -696,7 +696,7 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	SPEAKER(config, "mono").front_center();
 
 	RP5H01(config, m_rp5h01, 0);
-MACHINE_CONFIG_END
+}
 
 void playch10_state::playchnv(machine_config &config)
 {
@@ -704,11 +704,12 @@ void playch10_state::playchnv(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
-MACHINE_CONFIG_START(playch10_state::playch10_hboard)
+void playch10_state::playch10_hboard(machine_config &config)
+{
 	playch10(config);
 	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
 	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 

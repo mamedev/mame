@@ -34,20 +34,20 @@ Debug cheats:
 class ron_state : public driver_device
 {
 public:
-	ron_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_audiocpu(*this, "audiocpu"),
-		  m_ay(*this, "aysnd"),
-		  m_gfxdecode(*this, "gfxdecode"),
-		  m_vram(*this, "vram"),
-		  m_cram(*this, "cram"),
-		  m_mj_ports1(*this, { "PL1_1", "PL1_2", "PL1_3", "PL1_4","PL1_5", "PL1_6", "PL1_7", "PL1_8" }),
-		  m_mj_ports2(*this, { "PL2_1", "PL2_2", "PL2_3", "PL2_4","PL2_5", "PL2_6", "PL2_7", "PL2_8" }),
-		  m_in0(*this, "IN0"),
-		  m_in1(*this, "IN1"),
-		  m_in2(*this, "IN2"),
-		  m_in3(*this, "IN3")
+	ron_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_ay(*this, "aysnd"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram"),
+		m_mj_ports1(*this, "PL1_%u", 1U),
+		m_mj_ports2(*this, "PL2_%u", 1U),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_in2(*this, "IN2"),
+		m_in3(*this, "IN3")
 	{
 	}
 
@@ -56,7 +56,7 @@ public:
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(ron);
+	void ron_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	DECLARE_WRITE8_MEMBER(output_w);
@@ -417,7 +417,7 @@ void ron_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(ron_state, ron)
+void ron_state::ron_palette(palette_device &palette) const
 {
 	// TODO: proms?
 	palette.set_pen_color(0, rgb_t(pal1bit(0), pal1bit(0), pal1bit(0)));
@@ -509,12 +509,10 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ron_state, vblank_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ron)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ron);
 
-	MCFG_PALETTE_ADD("palette", 8)
-	//MCFG_PALETTE_ADD("palette", 512)
-	//MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(ron_state, ron)
+	PALETTE(config, "palette", FUNC(ron_state::ron_palette), 8);
+	//PALETTE(config, "palette", FUNC(ron_state::ron_palette), 512, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

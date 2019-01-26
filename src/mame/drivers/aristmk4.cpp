@@ -97,7 +97,7 @@
     The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
     The remaining 4 bits are connected to other hardware, read via the VIA.
 
-    The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
+    The AY8910 named ay1 has writes on PORT B to the ZN434 DA converter.
     The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
 
 
@@ -355,8 +355,8 @@ uint8_t crtc_reg = 0;
 class aristmk4_state : public driver_device
 {
 public:
-	aristmk4_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
+	aristmk4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "rtc"),
 		m_ay1(*this, "ay1"),
@@ -451,8 +451,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void aristmk4_palette(palette_device &palette);
-	void lions_palette(palette_device &palette);
+	void aristmk4_palette(palette_device &palette) const;
+	void lions_palette(palette_device &palette) const;
 	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(note_input_reset);
 	TIMER_CALLBACK_MEMBER(coin_input_reset);
@@ -1511,10 +1511,10 @@ static INPUT_PORTS_START(cgold2)
 	PORT_MODIFY("500e")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play 1 Line") PORT_CODE(KEYCODE_W)
 
-	PORT_MODIFY("via_port_b")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP ) PORT_NAME("Test1") PORT_CODE(KEYCODE_2) // coin optic 1?
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) PORT_NAME("Test2") PORT_CODE(KEYCODE_3) // coin optic 2?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) PORT_NAME("Test3") PORT_CODE(KEYCODE_4) // coin to cashbox?
+	PORT_MODIFY("5201")
+	PORT_DIPNAME( 0x10, 0x10, "5201-5") // Must be "on" otherwise the game will not respond
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5201:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(fhunter)
@@ -1701,7 +1701,7 @@ READ8_MEMBER(aristmk4_state::pc1_r)
 }
 
 /* same as Casino Winner HW */
-void aristmk4_state::aristmk4_palette(palette_device &palette)
+void aristmk4_state::aristmk4_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -1770,10 +1770,10 @@ void aristmk4_state::power_fail()
 	To enter the robot test
 
 	1. Open the main door
-	2. Trigger powerfail / NMI by presing L for at least 1 second, the game will freeze.
+	2. Trigger powerfail / NMI by pressing ',' for at least 1 second, the game will freeze.
 	3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
 
-	Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
+	Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down ',' for at least 1 second )
 	*/
 
 	if(ioport("powerfail")->read()) // send NMI signal if L pressed
@@ -1801,8 +1801,7 @@ void aristmk4_state::aristmk4(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aristmk4);
-	PALETTE(config, m_palette, 512);
-	m_palette->set_init(DEVICE_SELF, FUNC(aristmk4_state::aristmk4_palette));
+	PALETTE(config, m_palette, FUNC(aristmk4_state::aristmk4_palette), 512);
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set(FUNC(aristmk4_state::pa1_r));
@@ -1861,7 +1860,7 @@ void aristmk4_state::aristmk4_poker(machine_config &config)
 }
 
 /* same as Aristocrat Mark-IV HW color offset 7 */
-void aristmk4_state::lions_palette(palette_device &palette)
+void aristmk4_state::lions_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -1876,7 +1875,7 @@ void aristmk4_state::lions_palette(palette_device &palette)
 void aristmk4_state::_86lions(machine_config &config)
 {
 	aristmk4(config);
-	m_palette->set_init(DEVICE_SELF, FUNC(aristmk4_state::lions_palette));
+	m_palette->set_init(FUNC(aristmk4_state::lions_palette));
 }
 
 ROM_START( 3bagflvt )

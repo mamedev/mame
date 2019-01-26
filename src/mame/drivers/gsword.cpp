@@ -141,19 +141,41 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 
 gsword notes:
 
-There are three 8041 MCUs:
+There are two 8041 MCUs and one 8741 MCU:
 * One connected to the main CPU for communicating with the sub CPU and
   reading DIP switch C.
 * One connected to the sub CPU for communicating with the main CPU and
   reading DIP switches A and B.
 * One connected to the sub CPU for reading player, start and coin
   inputs, and driving the coin counter outputs.
+* TODO: confirm which MCU is connected to which CPU.
 
 So far, only the AA-016 MCU has been dumped successfully.  There's no
-reason to believe that the three MCUs run different programs.  Other
+reason to believe that the AA-017 MCU runs a different program.  Other
 Allumer-developed games are known to have different silkscreen on
 identical parts.  It's not clear which of the MCUs (AA-013 at 5A, AA-016
-at 9C and AA-017 at 9G) plays which role,
+at 9C and AA-017 at 9G) plays which role.
+
+The AA-016 MCU program is divided into several parts, each entirely
+contained in a single program page.  The initialisation/self test, mode
+selection, and the main loop of the communication mode are in page 0;
+the subroutines implementing communication mode are in page 1; the
+input/coin handling main loop and host communiction code is in page 2;
+finally, the subroutines that implement coin handling are in page 3.
+This suggests componentes were assigned to different developers who were
+each given exclusive use of a page to simplify integration.  There was
+insufficient space in page 3 for the program checksum fragment, so the
+coin handling subroutines are not checksummed, despite plenty of zero-
+filled space elsewhere in the ROM.
+
+At least two Great Swordsman boards have been seen with a UVEPROM-based
+D8741A-8 MCU for AA-103 at 5A.  This suggests the developers made some
+last-minute change to the code that only affected one of the three use
+cases.  The AA-016 program contains complete code for communication and
+input/coin handling, so it would have to be some change in behaviour.
+One possibility is that they decided they needed to ensure the coin
+handling code is checksummed, and rearranged or refactored the code to
+allow this.
 
 The clock inputs for the MCUs are unknown - the values used are taken
 from gladiatr, where a superficially similar arrangement is used.  It
@@ -692,7 +714,7 @@ static INPUT_PORTS_START( gsword )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )           PORT_DIPLOCATION("A:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_A ) )		    PORT_DIPLOCATION("A:3,4,5")
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("A:3,4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -892,21 +914,21 @@ static GFXDECODE_START( gfx_gsword )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(gsword_state::gsword)
-
+void gsword_state::gsword(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_IO_MAP(cpu1_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &gsword_state::cpu1_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gsword_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD(m_subcpu, Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_IO_MAP(cpu2_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(gsword_state, sound_interrupt, 4*60)
+	Z80(config, m_subcpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu2_map);
+	m_subcpu->set_addrmap(AS_IO, &gsword_state::cpu2_io_map);
+	m_subcpu->set_periodic_int(FUNC(gsword_state::sound_interrupt), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(18'000'000)/6) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(cpu3_map)
+	Z80(config, m_audiocpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu3_map);
 
 	upi41_cpu_device &mcu1(I8041(config, "mcu1", 12'000'000/2));        // clock unknown, using value from gladiatr
 	mcu1.p1_in_cb().set([this] () { return ioport("MCU1.P1")->read() | BIT(m_mcu2_p1, 0); });
@@ -933,50 +955,48 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 	CLOCK(config, "tclk", 12'000'000/8/128/2).signal_handler().set([this] (int state) { m_tclk_val = state != 0; });
 
 	// lazy way to ensure communication works
-	MCFG_QUANTUM_PERFECT_CPU("mcu1")
+	config.m_perfect_cpu_quantum = subtag("mcu1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gsword_state, screen_update_gsword)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(gsword_state::screen_update_gsword));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gsword)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(gsword_state,gsword)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gsword);
+	PALETTE(config, m_palette, FUNC(gsword_state::gsword_palette), 64*4 + 64*4, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, m_ay0, XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30); /* verified on pcb */
+	AY8910(config, m_ay0, XTAL(18'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.30); // Clock verified on PCB
 
 	AY8910(config, m_ay1, 1500000);
 	m_ay1->port_a_write_callback().set(FUNC(gsword_state::nmi_set_w));
 	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
-	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	msm5205_device &msm(MSM5205(config, "msm", XTAL(400'000))); /* verified on pcb */
+	msm.set_prescaler_selector(msm5205_device::SEX_4B);  /* vclk input mode    */
+	msm.add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-MACHINE_CONFIG_START(josvolly_state::josvolly)
-
+void josvolly_state::josvolly(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18000000/4) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_IO_MAP(josvolly_cpu1_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(josvolly_state, irq0_line_hold, 2*60)
+	Z80(config, m_maincpu, 18000000/4);		/* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &josvolly_state::cpu1_map);
+	m_maincpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu1_io_map);
+	m_maincpu->set_periodic_int(FUNC(josvolly_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/4) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(josvolly_cpu2_map)
-	MCFG_DEVICE_IO_MAP(josvolly_cpu2_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", josvolly_state, irq0_line_assert)
+	Z80(config, m_audiocpu, 12000000/4);	/* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &josvolly_state::josvolly_cpu2_map);
+	m_audiocpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu2_io_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(josvolly_state::irq0_line_assert));
 
 	upi41_cpu_device &mcu1(I8741(config, "mcu1", 18000000/2)); /* ? */
 	mcu1.p1_in_cb().set(FUNC(josvolly_state::mcu1_p1_r));
@@ -999,35 +1019,30 @@ MACHINE_CONFIG_START(josvolly_state::josvolly)
 	ppi.in_pc_callback().set_ioport("IN0");   // START
 
 	// the second MCU polls the first MCU's outputs, so it needs tight sync
-	MCFG_QUANTUM_PERFECT_CPU("mcu2")
-
+	config.m_perfect_cpu_quantum = subtag("mcu2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(josvolly_state, screen_update_gsword)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(josvolly_state::screen_update_gsword));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gsword)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(josvolly_state, josvolly)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gsword);
+	PALETTE(config, m_palette, FUNC(josvolly_state::josvolly_palette), 64*4 + 64*4, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, m_ay0, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
-
 	AY8910(config, m_ay1, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 #if 0
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MSM5205(config, "msm", 384000).add_route(ALL_OUTPUTS, "mono", 0.60);
 #endif
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 
@@ -1054,7 +1069,7 @@ ROM_START( gsword )
 	ROM_LOAD( "ac10-14.3d",   0x4000, 0x2000, CRC(819db933) SHA1(5e8b10d94ca6ba608a074bd5f30f14b95122fe85) )
 	ROM_LOAD( "ac10-17.4d",   0x6000, 0x2000, CRC(87817985) SHA1(370399a4622958829ca6d1545e614b121f09c2c0) )
 
-	ROM_REGION( 0x0400, "mcu1", 0 )    // 8041AH
+	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
 	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH
@@ -1101,7 +1116,7 @@ ROM_START( gsword2 )
 	ROM_LOAD( "ac0-14.3d",    0x4000, 0x2000, CRC(455364b6) SHA1(ebabf077d1ba113c13e7620d61720ed141acb5ad) )
 	// 6000-7fff empty
 
-	ROM_REGION( 0x0400, "mcu1", 0 )    // 8041AH
+	ROM_REGION( 0x0400, "mcu1", 0 )    // D8741A-8
 	ROM_LOAD( "aa-013.5a",    0x0000, 0x0400, CRC(e546aa52) SHA1(b8197c836713b1ace8ecd8238e645405c929364f) )
 
 	ROM_REGION( 0x0400, "mcu2", 0 )    // 8041AH

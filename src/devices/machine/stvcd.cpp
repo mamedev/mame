@@ -78,17 +78,17 @@ stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-MACHINE_CONFIG_START(stvcd_device::device_add_mconfig)
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("sat_cdrom")
+void stvcd_device::device_add_mconfig(machine_config &config)
+{
+	CDROM(config, "cdrom").set_interface("sat_cdrom");
 
-	MCFG_TIMER_DRIVER_ADD("sector_timer", stvcd_device, stv_sector_cb)
-	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stvcd_device, stv_sh1_sim)
+	TIMER(config, m_sector_timer).configure_generic(FUNC(stvcd_device::stv_sector_cb));
+	TIMER(config, m_sh1_timer).configure_generic(FUNC(stvcd_device::stv_sh1_sim));
 
-	MCFG_DEVICE_ADD("cdda", CDDA)
-	MCFG_MIXER_ROUTE(0, *this, 1.0, 0)
-	MCFG_MIXER_ROUTE(1, *this, 1.0, 1)
-MACHINE_CONFIG_END
+	CDDA(config, m_cdda);
+	m_cdda->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_cdda->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+}
 
 void stvcd_device::device_start()
 {

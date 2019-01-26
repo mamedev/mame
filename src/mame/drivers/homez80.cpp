@@ -34,7 +34,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	void homez80(machine_config &config);
 
@@ -303,7 +303,7 @@ MACHINE_CONFIG_START(homez80_state::homez80)
 	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_homez80)
 MACHINE_CONFIG_END
 

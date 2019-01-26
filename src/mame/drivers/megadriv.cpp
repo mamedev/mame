@@ -604,13 +604,12 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
-	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
-	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->reset_routes();
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_palette_tag("gen_vdp:palette");
@@ -642,13 +641,12 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
-	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
-	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->reset_routes();
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_NTSC(config, m_32x, (MASTER_CLOCK_NTSC * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_palette_tag("gen_vdp:palette");
@@ -680,13 +678,12 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_32X_SCANLINE_CB(md_cons_state, _32x_scanline_callback);
-	MCFG_SEGA315_5313_32X_SCANLINE_HELPER_CB(md_cons_state, _32x_scanline_helper_callback);
-	MCFG_SEGA315_5313_32X_INTERRUPT_CB(md_cons_state, _32x_interrupt_callback);
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->reset_routes();
+	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.25)/2);
+	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.25)/2);
 
 	SEGA_32X_PAL(config, m_32x, (MASTER_CLOCK_PAL * 3) / 7, m_maincpu, m_scan_timer);
 	m_32x->set_palette_tag("gen_vdp:palette");
@@ -753,11 +750,10 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_US(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
 MACHINE_CONFIG_END
@@ -771,11 +767,10 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
 MACHINE_CONFIG_END
@@ -789,11 +784,10 @@ MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 	MCFG_SCREEN_MODIFY("megadriv")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
 MACHINE_CONFIG_END
@@ -803,11 +797,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
 	genesis_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_US(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
@@ -823,11 +816,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
 	md_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_EUROPE(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
@@ -843,11 +835,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
 	mdj_32x(config);
 
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
-	MCFG_GFX_PALETTE("gen_vdp:palette")
+	SEGA_SEGACD_JAPAN(config, m_segacd, 0);
+	m_segacd->set_palette("gen_vdp:palette");
 
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("scd_cdrom")
+	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 

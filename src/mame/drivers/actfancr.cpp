@@ -285,30 +285,28 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(actfancr_state::actfancr)
-
+void actfancr_state::actfancr(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, 21477200/3); /* Should be accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::actfan_map);
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DEVICE_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
-	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
+	M6502(config, m_audiocpu, 1500000); /* Should be accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &actfancr_state::dec0_s_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0)) /* VBL */
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(actfancr_state::screen_update));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE); /* VBL */
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actfan)
-
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_actfan);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 2);
@@ -328,22 +326,22 @@ MACHINE_CONFIG_START(actfancr_state::actfancr)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.90)
-	MCFG_SOUND_ROUTE(1, "mono", 0.90)
-	MCFG_SOUND_ROUTE(2, "mono", 0.90)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(0, "mono", 0.90);
+	ym1.add_route(1, "mono", 0.90);
+	ym1.add_route(2, "mono", 0.90);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	ym3812_device &ym2(YM3812(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline("audiocpu", M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1024188, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1024188, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.85);
+}
 
-MACHINE_CONFIG_START(actfancr_state::triothep)
-
+void actfancr_state::triothep(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, XTAL(21'477'272)/3); /* XIN=21.4772Mhz, verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::triothep_map);
@@ -351,26 +349,24 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	m_maincpu->port_out_cb().set(FUNC(actfancr_state::triothep_control_select_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DEVICE_ADD("audiocpu",M6502, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
+	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &actfancr_state::dec0_s_map);
 
 	MCFG_MACHINE_START_OVERRIDE(actfancr_state,triothep)
 	MCFG_MACHINE_RESET_OVERRIDE(actfancr_state,triothep)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0)) /* VBL */
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(actfancr_state::screen_update));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE); /* VBL */
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triothep)
-
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_triothep);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
 	DECO_BAC06(config, m_tilegen[0], 0);
 	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
@@ -390,19 +386,19 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 0.90)
-	MCFG_SOUND_ROUTE(1, "mono", 0.90)
-	MCFG_SOUND_ROUTE(2, "mono", 0.90)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000)/8)); /* verified on pcb */
+	ym1.add_route(0, "mono", 0.90);
+	ym1.add_route(1, "mono", 0.90);
+	ym1.add_route(2, "mono", 0.90);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000)/4)); /* verified on pcb */
+	ym2.irq_handler().set_inputline("audiocpu", M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'056'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'056'000), okim6295_device::PIN7_HIGH)); /* verified on pcb */
+	oki.add_route(ALL_OUTPUTS, "mono", 0.85);
+}
 
 /******************************************************************************/
 

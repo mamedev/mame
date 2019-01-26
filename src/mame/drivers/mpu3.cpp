@@ -100,9 +100,11 @@ TODO: - Distinguish door switches using manual
       - 12V meter alarm on hyper viper - how are meters sensed?
 
 ***********************************************************************************************************/
+
 #include "emu.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 
@@ -165,8 +167,6 @@ TODO: - Distinguish door switches using manual
 
 #include "video/awpvid.h"       //Fruit Machines Only
 
-static constexpr XTAL MPU3_MASTER_CLOCK = 4_MHz_XTAL;
-
 /* Lookup table for CHR data */
 
 struct mpu3_chr_table
@@ -206,7 +206,6 @@ private:
 	DECLARE_READ8_MEMBER(characteriser_r);
 	DECLARE_WRITE8_MEMBER(mpu3ptm_w);
 	DECLARE_READ8_MEMBER(mpu3ptm_r);
-	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
@@ -312,20 +311,6 @@ void mpu3_state::machine_reset()
 	m_IC11G1    = 1;
 	m_IC11G2A   = 0;
 	m_IC11G2B   = 0;
-}
-
-/* 6808 IRQ handler */
-WRITE_LINE_MEMBER(mpu3_state::cpu0_irq)
-{
-	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
-	int combined_state = m_pia3->irq_a_state() | m_pia3->irq_b_state() |
-						 m_pia4->irq_a_state() | m_pia4->irq_b_state() |
-						 m_pia5->irq_a_state() | m_pia5->irq_b_state() |
-						 m_pia6->irq_a_state() | m_pia6->irq_b_state() |
-						 m_ptm2->irq_state();
-
-	m_maincpu->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-	LOG(("6808 int%d \n", combined_state));
 }
 
 
@@ -837,28 +822,32 @@ void mpu3_state::mpu3_basemap(address_map &map)
 	map(0xa800, 0xa803).rw(m_pia6, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC6 */
 }
 
-MACHINE_CONFIG_START(mpu3_state::mpu3base)
-	MCFG_DEVICE_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
-	MCFG_DEVICE_PROGRAM_MAP(mpu3_basemap)
+void mpu3_state::mpu3base(machine_config &config)
+{
+	M6808(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu3_state::mpu3_basemap);
+
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // open collector
+	mainirq.output_handler().set_inputline("maincpu", M6808_IRQ_LINE);
 
 	MSC1937(config, m_vfd);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", mpu3_state, gen_50hz, attotime::from_hz(100))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("555_ic10", mpu3_state, ic10_callback, PERIOD_OF_555_ASTABLE(10000,1000,0.0000001))
+	TIMER(config, "50hz").configure_periodic(FUNC(mpu3_state::gen_50hz), attotime::from_hz(100));
+	TIMER(config, "555_ic10").configure_periodic(FUNC(mpu3_state::ic10_callback), PERIOD_OF_555_ASTABLE(10000,1000,0.0000001));
 
 	/* 6840 PTM */
-	PTM6840(config, m_ptm2, MPU3_MASTER_CLOCK);
+	PTM6840(config, m_ptm2, 4_MHz_XTAL / 4);
 	m_ptm2->set_external_clocks(0, 0, 0);
 	m_ptm2->o1_callback().set(FUNC(mpu3_state::ic2_o1_callback));
 	m_ptm2->o2_callback().set(FUNC(mpu3_state::ic2_o2_callback));
 	m_ptm2->o3_callback().set(FUNC(mpu3_state::ic2_o3_callback));
-	m_ptm2->irq_callback().set(FUNC(mpu3_state::cpu0_irq));
+	m_ptm2->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	PIA6821(config, m_pia3, 0);
 	m_pia3->readpa_handler().set(FUNC(mpu3_state::pia_ic3_porta_r));
 	m_pia3->writepb_handler().set(FUNC(mpu3_state::pia_ic3_portb_w));
 	m_pia3->ca2_handler().set(FUNC(mpu3_state::pia_ic3_ca2_w));
-	m_pia3->irqb_handler().set(FUNC(mpu3_state::cpu0_irq));
+	m_pia3->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	PIA6821(config, m_pia4, 0);
 	m_pia4->readpa_handler().set(FUNC(mpu3_state::pia_ic4_porta_r));
@@ -866,7 +855,7 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	m_pia4->writepb_handler().set(FUNC(mpu3_state::pia_ic4_portb_w));
 	m_pia4->ca2_handler().set(FUNC(mpu3_state::pia_ic4_ca2_w));
 	m_pia4->cb2_handler().set(FUNC(mpu3_state::pia_ic4_cb2_w));
-	m_pia4->irqa_handler().set(FUNC(mpu3_state::cpu0_irq));
+	m_pia4->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	PIA6821(config, m_pia5, 0);
 	m_pia5->readpb_handler().set(FUNC(mpu3_state::pia_ic5_portb_r));
@@ -880,8 +869,8 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	m_pia6->readpb_handler().set(FUNC(mpu3_state::pia_ic6_portb_r));
 	m_pia6->writepa_handler().set(FUNC(mpu3_state::pia_ic6_porta_w));
 	m_pia6->writepb_handler().set(FUNC(mpu3_state::pia_ic6_portb_w));
-	m_pia6->irqa_handler().set(FUNC(mpu3_state::cpu0_irq));
-	m_pia6->irqb_handler().set(FUNC(mpu3_state::cpu0_irq));
+	m_pia6->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
+	m_pia6->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
 	REEL(config, m_reels[0], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reels[0]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<0>));
@@ -892,13 +881,12 @@ MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	REEL(config, m_reels[3], MPU3_48STEP_REEL, 1, 3, 0x00, 2);
 	m_reels[3]->optic_handler().set(FUNC(mpu3_state::reel_optic_cb<3>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0).set_number(8);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HM4334 or HMI6514 or MB8414 + 2.4V battery
 
 	config.set_default_layout(layout_mpu3);
-MACHINE_CONFIG_END
+}
 
 
 static const mpu3_chr_table hprvpr_data[64] = {

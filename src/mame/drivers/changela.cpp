@@ -444,8 +444,7 @@ void changela_state::changela(machine_config &config)
 	m_screen->set_screen_update(FUNC(changela_state::screen_update_changela));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 0x40);
-
+	PALETTE(config, m_palette).set_entries(0x40);
 
 	SPEAKER(config, "mono").front_center();
 

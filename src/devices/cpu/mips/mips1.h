@@ -9,6 +9,18 @@
 class mips1core_device_base : public cpu_device
 {
 public:
+	// floating point coprocessor revision numbers recognised by RISC/os 4.52 and IRIX
+	enum fpu_rev_t : u32
+	{
+		MIPS_R2360    = 0x0100, // MIPS R2360 Floating Point Board
+		MIPS_R2010    = 0x0200, // MIPS R2010 VLSI Floating Point Chip
+		MIPS_R2010A   = 0x0310, // MIPS R2010A VLSI Floating Point Chip
+		MIPS_R3010    = 0x0320, // MIPS R3010 VLSI Floating Point Chip
+		MIPS_R3010A   = 0x0330, // MIPS R3010A VLSI Floating Point Chip
+		MIPS_R3010Av4 = 0x0340, // MIPS R3010A VLSI Floating Point Chip
+		MIPS_R6010    = 0x0400, // MIPS R6010 Floating Point Chip
+	};
+
 	// device configuration
 	void set_endianness(endianness_t endianness) { m_endianness = endianness; }
 	void set_fpurev(u32 revision) { m_hasfpu = true; m_fpurev = revision; }
@@ -50,22 +62,25 @@ protected:
 		MIPS1_COP0_PRID,     // reg 15
 	};
 
-	enum exception : int
+	enum exception : u32
 	{
-		EXCEPTION_INTERRUPT = 0,
-		EXCEPTION_TLBMOD    = 1,
-		EXCEPTION_TLBLOAD   = 2,
-		EXCEPTION_TLBSTORE  = 3,
-		EXCEPTION_ADDRLOAD  = 4,
-		EXCEPTION_ADDRSTORE = 5,
-		EXCEPTION_BUSINST   = 6,
-		EXCEPTION_BUSDATA   = 7,
-		EXCEPTION_SYSCALL   = 8,
-		EXCEPTION_BREAK     = 9,
-		EXCEPTION_INVALIDOP = 10,
-		EXCEPTION_BADCOP    = 11,
-		EXCEPTION_OVERFLOW  = 12,
-		EXCEPTION_TRAP      = 13,
+		EXCEPTION_INTERRUPT = 0x00000000,
+		EXCEPTION_TLBMOD    = 0x00000004,
+		EXCEPTION_TLBLOAD   = 0x00000008,
+		EXCEPTION_TLBSTORE  = 0x0000000c,
+		EXCEPTION_ADDRLOAD  = 0x00000010,
+		EXCEPTION_ADDRSTORE = 0x00000014,
+		EXCEPTION_BUSINST   = 0x00000018,
+		EXCEPTION_BUSDATA   = 0x0000001c,
+		EXCEPTION_SYSCALL   = 0x00000020,
+		EXCEPTION_BREAK     = 0x00000024,
+		EXCEPTION_INVALIDOP = 0x00000028,
+		EXCEPTION_BADCOP0   = 0x0000002c,
+		EXCEPTION_BADCOP1   = 0x1000002c,
+		EXCEPTION_BADCOP2   = 0x2000002c,
+		EXCEPTION_BADCOP3   = 0x3000002c,
+		EXCEPTION_OVERFLOW  = 0x00000030,
+		EXCEPTION_TRAP      = 0x00000034,
 	};
 
 	enum cop0_reg : u8
@@ -89,32 +104,55 @@ protected:
 
 	enum sr_mask : u32
 	{
-		SR_IEc   = 0x00000001,
-		SR_KUc   = 0x00000002,
-		SR_IEp   = 0x00000004,
-		SR_KUp   = 0x00000008,
-		SR_IEo   = 0x00000010,
-		SR_KUo   = 0x00000020,
-		SR_IMSW0 = 0x00000100,
-		SR_IMSW1 = 0x00000200,
-		SR_IMEX0 = 0x00000400,
-		SR_IMEX1 = 0x00000800,
-		SR_IMEX2 = 0x00001000,
-		SR_IMEX3 = 0x00002000,
-		SR_IMEX4 = 0x00004000,
-		SR_IMEX5 = 0x00008000,
-		SR_IsC   = 0x00010000,
-		SR_SwC   = 0x00020000,
-		SR_PZ    = 0x00040000,
-		SR_CM    = 0x00080000,
-		SR_PE    = 0x00100000,
-		SR_TS    = 0x00200000,
-		SR_BEV   = 0x00400000,
-		SR_RE    = 0x02000000,
-		SR_COP0  = 0x10000000,
-		SR_COP1  = 0x20000000,
-		SR_COP2  = 0x40000000,
-		SR_COP3  = 0x80000000,
+		SR_IEc   = 0x00000001, // interrupt enable (current)
+		SR_KUc   = 0x00000002, // user mode (current)
+		SR_IEp   = 0x00000004, // interrupt enable (previous)
+		SR_KUp   = 0x00000008, // user mode (previous)
+		SR_IEo   = 0x00000010, // interrupt enable (old)
+		SR_KUo   = 0x00000020, // user mode (old)
+		SR_IMSW0 = 0x00000100, // software interrupt 0 enable
+		SR_IMSW1 = 0x00000200, // software interrupt 1 enable
+		SR_IMEX0 = 0x00000400, // external interrupt 0 enable
+		SR_IMEX1 = 0x00000800, // external interrupt 1 enable
+		SR_IMEX2 = 0x00001000, // external interrupt 2 enable
+		SR_IMEX3 = 0x00002000, // external interrupt 3 enable
+		SR_IMEX4 = 0x00004000, // external interrupt 4 enable
+		SR_IMEX5 = 0x00008000, // external interrupt 5 enable
+		SR_IsC   = 0x00010000, // isolate (data) cache
+		SR_SwC   = 0x00020000, // swap caches
+		SR_PZ    = 0x00040000, // cache parity zero
+		SR_CM    = 0x00080000, // cache match
+		SR_PE    = 0x00100000, // cache parity error
+		SR_TS    = 0x00200000, // tlb shutdown
+		SR_BEV   = 0x00400000, // boot exception vectors
+		SR_RE    = 0x02000000, // reverse endianness in user mode
+		SR_COP0  = 0x10000000, // coprocessor 0 usable
+		SR_COP1  = 0x20000000, // coprocessor 1 usable
+		SR_COP2  = 0x40000000, // coprocessor 2 usable
+		SR_COP3  = 0x80000000, // coprocessor 3 usable
+
+		SR_KUIE   = 0x0000003f, // all interrupt enable and user mode bits
+		SR_KUIEpc = 0x0000000f, // previous and current interrupt enable and user mode bits
+		SR_KUIEop = 0x0000003c, // old and previous interrupt enable and user mode bits
+		SR_IM     = 0x0000ff00, // all interrupt mask bits
+	};
+
+	enum cause_mask : u32
+	{
+		CAUSE_EXCCODE = 0x0000007c, // exception code
+		CAUSE_IPSW0   = 0x00000100, // software interrupt 0 pending
+		CAUSE_IPSW1   = 0x00000200, // software interrupt 1 pending
+		CAUSE_IPEX0   = 0x00000400, // external interrupt 0 pending
+		CAUSE_IPEX1   = 0x00000800, // external interrupt 1 pending
+		CAUSE_IPEX2   = 0x00001000, // external interrupt 2 pending
+		CAUSE_IPEX3   = 0x00002000, // external interrupt 3 pending
+		CAUSE_IPEX4   = 0x00004000, // external interrupt 4 pending
+		CAUSE_IPEX5   = 0x00008000, // external interrupt 5 pending
+		CAUSE_IP      = 0x0000ff00, // interrupt pending
+		CAUSE_CE      = 0x30000000, // co-processor error
+		CAUSE_BD      = 0x80000000, // branch delay
+
+		CAUSE_IPEX    = 0x0000fc00, // external interrupt pending
 	};
 
 	enum entryhi_mask : u32
@@ -129,6 +167,11 @@ protected:
 		EL_D   = 0x00000400, // dirty
 		EL_V   = 0x00000200, // valid
 		EL_G   = 0x00000100, // global
+	};
+	enum context_mask : u32
+	{
+		PTE_BASE = 0xffe00000, // base address of page table
+		BAD_VPN  = 0x001ffffc, // virtual address bits 30..12
 	};
 
 	// device_t overrides
@@ -154,7 +197,7 @@ protected:
 	void dcache_map(address_map &map);
 
 	// interrupts
-	void generate_exception(int exception);
+	void generate_exception(u32 exception, bool refill = false);
 	void check_irqs();
 	void set_irq_line(int irqline, int state);
 
@@ -185,6 +228,10 @@ protected:
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, T>::value, void> store(u32 program_address, U data);
 	bool fetch(u32 program_address, std::function<void(u32)> &&apply);
 
+	// debug helpers
+	std::string debug_string(u32 string_pointer, int const limit = 0);
+	std::string debug_string_array(u32 array_pointer);
+
 	// address spaces
 	const address_space_config m_program_config_be;
 	const address_space_config m_program_config_le;
@@ -201,7 +248,6 @@ protected:
 
 	// core registers
 	u32 m_pc;
-	u32 m_nextpc;
 	u32 m_hi;
 	u32 m_lo;
 	u32 m_r[32];
@@ -211,8 +257,16 @@ protected:
 	u32 m_ccr[4][32];
 
 	// internal stuff
-	u32 m_ppc;
 	int m_icount;
+	enum branch_state_t : unsigned
+	{
+		NONE      = 0,
+		DELAY     = 1, // delay slot instruction active
+		BRANCH    = 2, // branch instruction active
+		EXCEPTION = 3, // exception triggered
+	}
+	m_branch_state;
+	u32 m_branch_target;
 
 	// cache memory
 	size_t const m_icache_size;

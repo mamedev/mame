@@ -552,38 +552,37 @@ WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 	m_sound_intck = state;
 }
 
-MACHINE_CONFIG_START(polygonet_state::plygonet)
+void polygonet_state::plygonet(machine_config &config)
+{
+	M68EC020(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &polygonet_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(polygonet_state::polygonet_interrupt));
 
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", polygonet_state, polygonet_interrupt)
+	DSP56156(config, m_dsp, XTAL(40'000'000));
+	m_dsp->set_addrmap(AS_PROGRAM, &polygonet_state::dsp_program_map);
+	m_dsp->set_addrmap(AS_DATA, &polygonet_state::dsp_data_map);
 
-	MCFG_DEVICE_ADD("dsp", DSP56156, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(dsp_program_map)
-	MCFG_DEVICE_DATA_MAP(dsp_data_map)
+	Z80(config, m_audiocpu, 8000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	config.m_perfect_cpu_quantum = subtag("maincpu"); /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
-
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_plygonet)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_plygonet);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(polygonet_state, screen_update_polygonet)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(64, 64+368-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(polygonet_state::screen_update_polygonet));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(XRGB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
 	K053936(config, m_k053936, 0);
 
@@ -593,11 +592,11 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, polygonet_state, k054539_nmi_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.timer_handler().set(FUNC(polygonet_state::k054539_nmi_gen));
+	k054539.add_route(0, "lspeaker", 0.75);
+	k054539.add_route(1, "rspeaker", 0.75);
+}
 
 
 /**********************************************************************************/

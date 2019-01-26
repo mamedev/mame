@@ -173,7 +173,7 @@
 #define N_SHIFT                 2
 #define V_SHIFT                 3
 #define S_SHIFT                 18
-#define ILC_SHIFT				19
+#define ILC_SHIFT               19
 
 /* SR flags */
 #define GET_C                   ( SR & C_MASK)          // bit 0 //CARRY

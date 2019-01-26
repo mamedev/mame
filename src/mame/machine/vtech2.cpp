@@ -8,8 +8,7 @@
     Davide Moretti <dave@rimini.com> ROM dump and hardware description
 
     TODO:
-        Add loading images from WAV files.
-        Printer and RS232 support.
+        RS232 support.
         Check if the FDC is really the same as in the
         Laser 210/310 (aka VZ200/300) series.
 
@@ -26,36 +25,6 @@
 
 static const uint8_t laser_fdc_wrprot[2] = {0x80, 0x80};
 
-/* wrappers for bank #1 to #4 */
-WRITE8_MEMBER(vtech2_state::mwa_bank1 ) { mwa_bank(0,offset,data); }
-WRITE8_MEMBER(vtech2_state::mwa_bank2 ) { mwa_bank(1,offset,data); }
-WRITE8_MEMBER(vtech2_state::mwa_bank3 ) { mwa_bank(2,offset,data); }
-WRITE8_MEMBER(vtech2_state::mwa_bank4 ) { mwa_bank(3,offset,data); }
-
-/* wrappers for bank #1 to #4 */
-READ8_MEMBER(vtech2_state::mra_bank1 ) { return mra_bank(0,offset); }
-READ8_MEMBER(vtech2_state::mra_bank2 ) { return mra_bank(1,offset); }
-READ8_MEMBER(vtech2_state::mra_bank3 ) { return mra_bank(2,offset); }
-READ8_MEMBER(vtech2_state::mra_bank4 ) { return mra_bank(3,offset); }
-
-/* read banked memory (plain ROM/RAM) */
-static const char *const mra_bank_hard[4] =
-{
-	"bank1",  /* mapped in 0000-3fff */
-	"bank2",  /* mapped in 4000-7fff */
-	"bank3",  /* mapped in 8000-bfff */
-	"bank4"   /* mapped in c000-ffff */
-};
-
-/* write banked memory (plain ROM/RAM) */
-static const char *const mwa_bank_hard[4] =
-{
-	"bank1",  /* mapped in 0000-3fff */
-	"bank2",  /* mapped in 4000-7fff */
-	"bank3",  /* mapped in 8000-bfff */
-	"bank4"   /* mapped in c000-ffff */
-};
-
 void vtech2_state::init_laser()
 {
 	uint8_t *gfx = memregion("gfx2")->base();
@@ -64,119 +33,52 @@ void vtech2_state::init_laser()
 	m_laser_track_x2[0] = m_laser_track_x2[1] = 80;
 	m_laser_fdc_bits = 8;
 	m_laser_drive = -1;
+	m_cart_size = 0;
 
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
 	m_laser_latch = -1;
-	m_mem = memregion("maincpu")->base();
 
 	// check ROM expansion
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
-	for (i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
-		m_laser_bank[i] = -1;
+	// setup expansion slot
+	m_ioexp->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 
-
-void vtech2_state::laser_machine_init(int bank_mask, int video_mask)
+DEVICE_IMAGE_LOAD_MEMBER( vtech2_state, cart_load )
 {
-	m_laser_bank_mask = bank_mask;
-	m_laser_video_bank = video_mask;
-	m_videoram = m_mem + m_laser_video_bank * 0x04000;
-	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", m_laser_bank_mask, m_laser_video_bank, m_laser_video_bank * 0x04000);
+	m_cart_size = m_cart->common_get_size("rom");
 
-	for (int i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
-		laser_bank_select_w(m_maincpu->space(AS_PROGRAM), i, 0);
+	if (m_cart_size > 0x10000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge bigger than 64k");
+		m_cart_size = 0;
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(m_cart_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), m_cart_size, "rom");
+
+	return image_init_result::PASS;
 }
 
 void vtech2_state::machine_reset()
 {
-	/* banks 0 to 3 only, optional ROM extension */
-	laser_machine_init(0x00f, 3);
+	m_language = m_io_keyboard[5]->read() & 0x30;
 }
 
-MACHINE_RESET_MEMBER(vtech2_state,laser500)
+
+READ8_MEMBER( vtech2_state::cart_r )
 {
-	/* banks 0 to 2, and 4-7 only, optional ROM extension */
-	laser_machine_init(0x0f7, 7);
+	if (offset >= m_cart_size)
+		return 0xff;
+	return m_cart->read_rom(space, offset);
 }
 
-MACHINE_RESET_MEMBER(vtech2_state,laser700)
-{
-	/* all banks except #3 */
-	laser_machine_init(0xff7, 7);
-}
-
-
-WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
-{
-	static const char *const bank_name[16] = {
-		"ROM lo","ROM hi","MM I/O","Video RAM lo",
-		"RAM #0","RAM #1","RAM #2","RAM #3",
-		"RAM #4","RAM #5","RAM #6","RAM #7/Video RAM hi",
-		"ext ROM #0","ext ROM #1","ext ROM #2","ext ROM #3"
-	};
-	char bank[10];
-	offset %= 4;
-	data &= 15;
-
-	if( data != m_laser_bank[offset] )
-	{
-		m_laser_bank[offset] = data;
-		logerror("select bank #%d $%02X [$%05X] %s\n", offset+1, data, 0x4000 * (data & 15), bank_name[data]);
-
-		/* memory mapped I/O bank selected? */
-		if (data == 2)
-		{
-			static read8_delegate mra_bank_soft[] =
-			{
-				read8_delegate(FUNC(vtech2_state::mra_bank1), this),
-				read8_delegate(FUNC(vtech2_state::mra_bank2), this),
-				read8_delegate(FUNC(vtech2_state::mra_bank3), this),
-				read8_delegate(FUNC(vtech2_state::mra_bank4), this),
-			};
-
-			static write8_delegate mwa_bank_soft[] =
-			{
-				write8_delegate(FUNC(vtech2_state::mwa_bank1), this),
-				write8_delegate(FUNC(vtech2_state::mwa_bank2), this),
-				write8_delegate(FUNC(vtech2_state::mwa_bank3), this),
-				write8_delegate(FUNC(vtech2_state::mwa_bank4), this),
-			};
-
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_soft[offset], mwa_bank_soft[offset]);
-		}
-		else
-		{
-			sprintf(bank, "bank%d", offset + 1);
-			if (data >= 12 && m_cart_rom && (m_cart_rom->bytes() > (data % 12) * 0x4000))   // Expansion ROM banks
-			{
-				membank(bank)->set_base(m_cart_rom->base()+ (data % 12) * 0x4000);
-				m_maincpu->space(AS_PROGRAM).install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
-				m_maincpu->space(AS_PROGRAM).install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
-			}
-			else if (data < 12 && (m_laser_bank_mask & (1 << data)))    // ROM/RAM banks
-			{
-				// video RAM bank selected?
-				if (data == m_laser_video_bank)
-					logerror("select bank #%d VIDEO!\n", offset + 1);
-
-				membank(bank)->set_base(&m_mem[0x4000 * m_laser_bank[offset]]);
-				m_maincpu->space(AS_PROGRAM).install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
-				m_maincpu->space(AS_PROGRAM).install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
-			}
-			else
-			{
-				logerror("select bank #%d MASKED!\n", offset + 1);
-				m_maincpu->space(AS_PROGRAM).nop_readwrite(offset * 0x4000, offset * 0x4000 + 0x3fff);
-			}
-		}
-
-	}
-}
 
 /*************************************************
  * memory mapped I/O read
@@ -190,69 +92,22 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
  * 1    column 1
  * 0    column 0
  ************************************************/
-int vtech2_state::mra_bank(int bank, int offs)
+READ8_MEMBER( vtech2_state::mmio_r )
 {
-	uint8_t data = 0x7f;
+	u8 data = 0x7f;
 
-	/* Laser 500/700 only: keyboard rows A through D */
-	if( (offs & 0x00ff) == 0x00ff )
+	offset = ~offset & 0x7ff;
+	if (BIT(offset, 10))
 	{
-		if( (offs & 0x0300) == 0x0000 ) /* keyboard row A */
-		{
-			if( ioport("ROWA")->read() != m_row_a )
-			{
-				m_row_a = ioport("ROWA")->read();
-				data &= m_row_a;
-			}
-		}
-		if( (offs & 0x0300) == 0x0100 ) /* keyboard row B */
-		{
-			if( ioport("ROWB")->read() != m_row_b )
-			{
-				m_row_b = ioport("ROWB")->read();
-				data &= m_row_b;
-			}
-		}
-		if( (offs & 0x0300) == 0x0200 ) /* keyboard row C */
-		{
-			if( ioport("ROWC")->read() != m_row_c )
-			{
-				m_row_c = ioport("ROWC")->read();
-				data &= m_row_c;
-			}
-		}
-		if( (offs & 0x0300) == 0x0300 ) /* keyboard row D */
-		{
-			if( ioport("ROWD")->read() != m_row_d )
-			{
-				m_row_d = ioport("ROWD")->read();
-				data &= m_row_d;
-			}
-		}
+		offset = (offset >> 8) & 3;
+		data &= m_io_keyboard[offset + 8]->read();     // ROW A-D
 	}
 	else
-	{
-		/* All Lasers keyboard rows 0 through 7 */
-		if( !(offs & 0x01) )
-			data &= ioport("ROW0")->read();
-		if( !(offs & 0x02) )
-			data &= ioport("ROW1")->read();
-		if( !(offs & 0x04) )
-			data &= ioport("ROW2")->read();
-		if( !(offs & 0x08) )
-			data &= ioport("ROW3")->read();
-		if( !(offs & 0x10) )
-			data &= ioport("ROW4")->read();
-		if( !(offs & 0x20) )
-			data &= ioport("ROW5")->read();
-		if( !(offs & 0x40) )
-			data &= ioport("ROW6")->read();
-		if( !(offs & 0x80) )
-			data &= ioport("ROW7")->read();
-	}
+	for (u8 i = 0; i < 8; i++)
+		if (BIT(offset, i))
+			data &= m_io_keyboard[i]->read();    // ROW 0-7
 
 	/* BIT 7 - tape input */
-
 	data |= (m_cassette->input() > +0.02) ? 0x80 : 0;
 
 	return data;
@@ -269,40 +124,11 @@ int vtech2_state::mra_bank(int bank, int offs)
  * 1    cassette out (LSB)
  * 0    speaker A
  ************************************************/
-void vtech2_state::mwa_bank(int bank, int offs, int data)
+WRITE8_MEMBER( vtech2_state::mmio_w )
 {
-	offs += 0x4000 * m_laser_bank[bank];
-	switch (m_laser_bank[bank])
-	{
-	case  0:    /* ROM lower 16K */
-	case  1:    /* ROM upper 16K */
-		logerror("bank #%d write to ROM [$%05X] $%02X\n", bank+1, offs, data);
-		break;
-	case  2:    /* memory mapped output */
-		if (data != m_laser_latch)
-		{
-			logerror("bank #%d write to I/O [$%05X] $%02X\n", bank+1, offs, data);
-			/* Toggle between graphics and text modes? */
-			if ((data ^ m_laser_latch) & 0x01)
-				m_speaker->level_w(data & 1);
-			m_laser_latch = data;
-		}
-		m_cassette->output( BIT(data, 2) ? -1.0 : +1.0);
-		break;
-	case 12:    /* ext. ROM #1 */
-	case 13:    /* ext. ROM #2 */
-	case 14:    /* ext. ROM #3 */
-	case 15:    /* ext. ROM #4 */
-		logerror("bank #%d write to ROM [$%05X] $%02X\n", bank+1, offs, data);
-		break;
-	default:    /* RAM */
-		if( m_laser_bank[bank] == m_laser_video_bank && m_mem[offs] != data )
-		{
-			logerror("bank #%d write to videoram [$%05X] $%02X\n", bank+1, offs, data);
-		}
-		m_mem[offs] = data;
-		break;
-	}
+	m_speaker->level_w(data & 1);
+	m_laser_latch = data;
+	m_cassette->output( BIT(data, 2) ? -1.0 : +1.0);
 }
 
 

@@ -49,8 +49,9 @@ class scobra_state : public scramble_state
 {
 public:
 	scobra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: scramble_state(mconfig, type, tag),
-			m_soundram(*this, "soundram") { }
+		: scramble_state(mconfig, type, tag)
+		, m_soundram(*this, "soundram")
+	{ }
 
 	void mimonkey(machine_config &config);
 	void stratgyx(machine_config &config);
@@ -896,7 +897,7 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(scobra_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -907,12 +908,11 @@ MACHINE_CONFIG_START(scobra_state::type1)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scobra)
-	MCFG_PALETTE_ADD("palette", 32+64+2+1)  /* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_scobra);
+	PALETTE(config, m_palette, FUNC(scobra_state::scrambold_palette), 32+64+2+1); // 32 for characters, 64 for stars, 2 for bullets, 1 for background
 
-	MCFG_PALETTE_INIT_OWNER(scobra_state,scrambold)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
 
 	/* sound hardware */
@@ -938,11 +938,9 @@ MACHINE_CONFIG_START(scobra_state::rescue)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+128)    /* 32 for characters, 64 for stars, 2 for bullets, 128 for background */
+	m_palette->set_entries(32+64+2+128); // 32 for characters, 64 for stars, 2 for bullets, 128 for background
+	m_palette->set_init(FUNC(scobra_state::rescue_palette));
 
-	MCFG_PALETTE_INIT_OWNER(scobra_state,rescue)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
 MACHINE_CONFIG_END
 
@@ -966,11 +964,9 @@ MACHINE_CONFIG_START(scobra_state::minefld)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2+256)    /* 32 for characters, 64 for stars, 2 for bullets, 256 for background */
+	m_palette->set_entries(32+64+2+256); // 32 for characters, 64 for stars, 2 for bullets, 256 for background
+	m_palette->set_init(FUNC(scobra_state::minefld_palette));
 
-	MCFG_PALETTE_INIT_OWNER(scobra_state,minefld)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
 MACHINE_CONFIG_END
 
@@ -1020,10 +1016,9 @@ MACHINE_CONFIG_START(scobra_state::stratgyx)
 	m_ppi8255_1->in_pc_callback().set_ioport("IN3");
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES( 32+64+2+8)  /* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
+	m_palette->set_entries(32+64+2+8); // 32 for characters, 64 for stars, 2 for bullets, 8 for background
+	m_palette->set_init(FUNC(scobra_state::stratgyx_palette));
 
-	MCFG_PALETTE_INIT_OWNER(scobra_state,stratgyx)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,stratgyx)
 MACHINE_CONFIG_END
 
@@ -1034,10 +1029,9 @@ MACHINE_CONFIG_START(scobra_state::darkplnt)
 	/* basic machine hardware */
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32+64+2) /* 32 for characters, 64 (buffer) for stars, 2 for bullets */
+	m_palette->set_entries(32+64+2); // 32 for characters, 64 (buffer) for stars, 2 for bullets
+	m_palette->set_init(FUNC(scobra_state::darkplnt_palette));
 
-	MCFG_PALETTE_INIT_OWNER(scobra_state,darkplnt)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,darkplnt)
 MACHINE_CONFIG_END
 
@@ -1064,7 +1058,7 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	ttl7474_device &ttl7474_9m_2(TTL7474(config, "7474_9m_2", 0));
 	ttl7474_9m_2.comp_output_cb().set(FUNC(scobra_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(scobra_state::galaxold_interrupt_timer));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1086,10 +1080,9 @@ MACHINE_CONFIG_START(scobra_state::hustler)
 	MCFG_SCREEN_UPDATE_DRIVER(scobra_state, screen_update_galaxold)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scobra)
-	MCFG_PALETTE_ADD("palette", 32+64+2)    /* 32 for characters, 64 for stars, 2 for bullets */
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_scobra);
+	PALETTE(config, m_palette, FUNC(scobra_state::galaxold_palette), 32+64+2); // 32 for characters, 64 for stars, 2 for bullets
 
-	MCFG_PALETTE_INIT_OWNER(scobra_state,galaxold)
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,scrambold)
 
 	/* sound hardware */

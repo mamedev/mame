@@ -481,15 +481,15 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 }
 
 
-MACHINE_CONFIG_START(exelv_state::exl100)
-
+void exelv_state::exl100(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS7020_EXL(config, m_maincpu, XTAL(4'915'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &exelv_state::tms7020_mem);
 	m_maincpu->in_porta().set(FUNC(exelv_state::tms7020_porta_r));
 	m_maincpu->out_portb().set(FUNC(exelv_state::tms7020_portb_w));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(exelv_state::exelv_hblank_interrupt), "screen", 0, 1);
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
 	tms7041_device &subcpu(TMS7041(config, "tms7041", XTAL(4'915'200)));
@@ -500,52 +500,50 @@ MACHINE_CONFIG_START(exelv_state::exl100)
 	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
 	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_TMS3556_ADD("tms3556")
+	TMS3556(config, m_tms3556);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_UPDATE_DEVICE("tms3556", tms3556_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_screen_update("tms3556", FUNC(tms3556_device::screen_update));
 #if TMS3556_DOUBLE_WIDTH
-	MCFG_SCREEN_SIZE(tms3556_device::TOTAL_WIDTH*2, tms3556_device::TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, tms3556_device::TOTAL_WIDTH*2-1, 0, tms3556_device::TOTAL_HEIGHT*2-1)
+	screen.set_size(tms3556_device::TOTAL_WIDTH*2, tms3556_device::TOTAL_HEIGHT*2);
+	screen.set_visarea(0, tms3556_device::TOTAL_WIDTH*2-1, 0, tms3556_device::TOTAL_HEIGHT*2-1);
 #else
-	MCFG_SCREEN_SIZE(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1)
+	screen.set_size(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2);
+	screen.set_visarea(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1);
 #endif
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	// MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("tms5220c", TMS5220C, 640000)
-	// MCFG_TMS52XX_SPEECHROM("vsm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	TMS5220C(config, m_tms5220c, 640000);
+	// m_tms5220c->set_speechrom_tag("vsm");
+	m_tms5220c->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "exelvision_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "exelvision_cart", "bin,rom");
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "exl100")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("exl100");
+}
 
-
-MACHINE_CONFIG_START(exelv_state::exeltel)
-
+void exelv_state::exeltel(machine_config &config)
+{
 	/* basic machine hardware */
 	TMS7040(config, m_maincpu, XTAL(4'915'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &exelv_state::tms7040_mem);
 	m_maincpu->in_porta().set(FUNC(exelv_state::tms7020_porta_r));
 	m_maincpu->out_portb().set(FUNC(exelv_state::tms7020_portb_w));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(exelv_state::exelv_hblank_interrupt), "screen", 0, 1);
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
 	tms7042_device &subcpu(TMS7042(config, "tms7042", XTAL(4'915'200)));
@@ -556,35 +554,35 @@ MACHINE_CONFIG_START(exelv_state::exeltel)
 	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
 	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_TMS3556_ADD("tms3556")
+	TMS3556(config, m_tms3556);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_UPDATE_DEVICE("tms3556", tms3556_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_screen_update("tms3556", FUNC(tms3556_device::screen_update));
 #if TMS3556_DOUBLE_WIDTH
-	MCFG_SCREEN_SIZE(tms3556_device::TOTAL_WIDTH*2, tms3556_device::TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, tms3556_device::TOTAL_WIDTH*2-1, 0, tms3556_device::TOTAL_HEIGHT*2-1)
+	screen.set_size(tms3556_device::TOTAL_WIDTH*2, tms3556_device::TOTAL_HEIGHT*2);
+	screen.set_visarea(0, tms3556_device::TOTAL_WIDTH*2-1, 0, tms3556_device::TOTAL_HEIGHT*2-1);
 #else
-	MCFG_SCREEN_SIZE(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1)
+	screen.set_size(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2);
+	screen.set_visarea(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1);
 #endif
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+	SPEECHROM(config, "vsm", 0);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("tms5220c", TMS5220C, 640000)
-	MCFG_TMS52XX_SPEECHROM("vsm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	TMS5220C(config, m_tms5220c, 640000);
+	m_tms5220c->set_speechrom_tag("vsm");
+	m_tms5220c->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 /*

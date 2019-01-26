@@ -248,8 +248,8 @@ void jpmmps_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(jpmmps_state::jpmmps)
-
+void jpmmps_state::jpmmps(machine_config &config)
+{
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmmps_state::jpmmps_map);
@@ -284,14 +284,13 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn", SN76489, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489(config, m_psg, SOUND_CLOCK);
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(9) // TODO: meters.cpp sets a max of 8
+	METERS(config, m_meters, 0).set_number(9); // TODO: meters.cpp sets a max of 8
 
 	config.set_default_layout(layout_jpmmps);
-MACHINE_CONFIG_END
+}
 
 
 

@@ -664,52 +664,56 @@ void esripsys_state::init_esripsys()
 	save_item(NAME(m_fbsel));
 }
 
-MACHINE_CONFIG_START(esripsys_state::esripsys)
-	MCFG_DEVICE_ADD("game_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(game_cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
-	MCFG_QUANTUM_PERFECT_CPU("game_cpu")
+void esripsys_state::esripsys(machine_config &config)
+{
+	MC6809E(config, m_gamecpu, XTAL(8'000'000) / 4);
+	m_gamecpu->set_addrmap(AS_PROGRAM, &esripsys_state::game_cpu_map);
+	m_gamecpu->set_vblank_int("screen", FUNC(esripsys_state::esripsys_vblank_irq));
 
-	MCFG_DEVICE_ADD("frame_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(frame_cpu_map)
+	config.m_perfect_cpu_quantum = subtag("game_cpu");
 
-	MCFG_DEVICE_ADD("video_cpu", ESRIP, XTAL(40'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(video_cpu_map)
-	MCFG_ESRIP_FDT_R_CALLBACK(READ16(*this, esripsys_state, fdt_rip_r))
-	MCFG_ESRIP_FDT_W_CALLBACK(WRITE16(*this, esripsys_state, fdt_rip_w))
-	MCFG_ESRIP_STATUS_IN_CALLBACK(READ8(*this, esripsys_state, rip_status_in))
-	MCFG_ESRIP_DRAW_CALLBACK_OWNER(esripsys_state, esripsys_draw)
-	MCFG_ESRIP_LBRM_PROM("proms")
-	MCFG_ESRIP_SCREEN("screen")
+	MC6809E(config, m_framecpu, XTAL(8'000'000) / 4);
+	m_framecpu->set_addrmap(AS_PROGRAM, &esripsys_state::frame_cpu_map);
 
-	MCFG_DEVICE_ADD("sound_cpu", MC6809E, XTAL(8'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
+	ESRIP(config, m_videocpu, XTAL(40'000'000) / 4);
+	m_videocpu->set_addrmap(AS_PROGRAM, &esripsys_state::video_cpu_map);
+	m_videocpu->fdt_r().set(FUNC(esripsys_state::fdt_rip_r));
+	m_videocpu->fdt_w().set(FUNC(esripsys_state::fdt_rip_w));
+	m_videocpu->status_in().set(FUNC(esripsys_state::rip_status_in));
+	m_videocpu->set_draw_callback(FUNC(esripsys_state::esripsys_draw));
+	m_videocpu->set_lbrm_prom_region("proms");
+	m_videocpu->set_screen_tag(m_screen);
+
+	MC6809E(config, m_soundcpu, XTAL(8'000'000) / 4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &esripsys_state::sound_cpu_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(ESRIPSYS_PIXEL_CLOCK, ESRIPSYS_HTOTAL, ESRIPSYS_HBLANK_END, ESRIPSYS_HBLANK_START, ESRIPSYS_VTOTAL, ESRIPSYS_VBLANK_END, ESRIPSYS_VBLANK_START)
-	MCFG_SCREEN_UPDATE_DRIVER(esripsys_state, screen_update_esripsys)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(ESRIPSYS_PIXEL_CLOCK, ESRIPSYS_HTOTAL, ESRIPSYS_HBLANK_END, ESRIPSYS_HBLANK_START,
+											ESRIPSYS_VTOTAL, ESRIPSYS_VBLANK_END, ESRIPSYS_VBLANK_START);
+	m_screen->set_screen_update(FUNC(esripsys_state::screen_update_esripsys));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 
 	/* Sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", MC3410, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("dacvol", MC3408, 0) // unknown DAC
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
+	MC3410(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	mc3408_device &dacvol(MC3408(config, "dacvol", 0)); // unknown DAC
+	dacvol.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	dacvol.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.set_output(5.0);
+	vref.add_route(0, "dacvol", 1.0, DAC_VREF_POS_INPUT);
 
-	MCFG_DEVICE_ADD("tms5220nl", TMS5220, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	TMS5220(config, m_tms, 640000).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	/* 6840 PTM */
 	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(8'000'000) / 4));
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.irq_callback().set(FUNC(esripsys_state::ptm_irq));
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

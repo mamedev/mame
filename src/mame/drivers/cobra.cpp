@@ -3283,20 +3283,19 @@ void cobra_state::machine_reset()
 MACHINE_CONFIG_START(cobra_state::cobra)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC603, 100000000)      /* 603EV, 100? MHz */
-	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))  /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cobra_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cobra_state,  cobra_vblank)
+	PPC603(config, m_maincpu, 100000000);      /* 603EV, 100? MHz */
+	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cobra_state::cobra_vblank));
 
-	MCFG_DEVICE_ADD("subcpu", PPC403GA, 32000000)      /* 403GA, 33? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cobra_sub_map)
+	PPC403GA(config, m_subcpu, 32000000);      /* 403GA, 33? MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_sub_map);
 
-	MCFG_DEVICE_ADD("gfxcpu", PPC604, 100000000)       /* 604, 100? MHz */
-	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_DEVICE_PROGRAM_MAP(cobra_gfx_map)
+	PPC604(config, m_gfxcpu, 100000000);       /* 604, 100? MHz */
+	m_gfxcpu->set_bus_frequency(XTAL(66'666'700));   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_gfxcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_gfx_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(15005))
-
+	config.m_minimum_quantum = attotime::from_hz(15005);
 
 	MCFG_PCI_BUS_LEGACY_ADD(m_legacy_pci, 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, cobra_state, mpc106_pci_r, mpc106_pci_w)

@@ -1196,10 +1196,10 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	m_dmac->out_dack_callback<2>().set(FUNC(pc1512_state::dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(pc1512_state::dack3_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
@@ -1239,7 +1239,8 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 
 	// ISA8 bus
 	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
-	isa.set_cputag(I8086_TAG);
+	isa.set_memspace(m_maincpu, AS_PROGRAM);
+	isa.set_iospace(m_maincpu, AS_IO);
 	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
 	isa.irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 	isa.irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
@@ -1370,7 +1371,8 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 
 	// ISA8 bus
 	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
-	isa.set_cputag(I8086_TAG);
+	isa.set_memspace(m_maincpu, AS_PROGRAM);
+	isa.set_iospace(m_maincpu, AS_IO);
 	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
 	isa.irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 	isa.irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));

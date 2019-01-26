@@ -1495,10 +1495,10 @@ MACHINE_CONFIG_START(williams_state::williams)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5101 (Defender), 5114 or 6514 (later games) + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+	TIMER(config, "scan_timer").configure_scanline(FUNC(williams_state::williams_va11_callback), "screen", 0, 32);
 
 	// also set a timer to go off on scanline 240
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
+	TIMER(config, "240_timer").configure_scanline(FUNC(williams_state::williams_count240_callback), "screen", 0, 240);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1510,8 +1510,7 @@ MACHINE_CONFIG_START(williams_state::williams)
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(williams_state,williams)
+	PALETTE(config, m_palette, FUNC(williams_state::williams_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -1520,11 +1519,9 @@ MACHINE_CONFIG_START(williams_state::williams)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
@@ -1610,7 +1607,8 @@ MACHINE_CONFIG_START(spdball_state::spdball)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(williams_state::lottofun)
+void williams_state::lottofun(machine_config &config)
+{
 	williams(config);
 
 	/* basic machine hardware */
@@ -1619,8 +1617,8 @@ MACHINE_CONFIG_START(williams_state::lottofun)
 	m_pia[0]->writepa_handler().set("ticket", FUNC(ticket_dispenser_device::motor_w)).bit(7);
 	m_pia[0]->ca2_handler().set(FUNC(williams_state::lottofun_coin_lock_w));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
+}
 
 
 MACHINE_CONFIG_START(williams_state::sinistar)
@@ -1710,8 +1708,7 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	m_muxb->a_in_callback().set_ioport("INP1");
 	m_muxb->b_in_callback().set_ioport("INP2");
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq_b")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu_b", M6808_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline(m_soundcpu_b, M6808_IRQ_LINE);
 
 	m_pia[1]->writepb_handler().set(FUNC(blaster_state::blaster_snd_cmd_w));
 
@@ -1723,9 +1720,9 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	m_pia[3]->irqb_handler().set("soundirq_b", FUNC(input_merger_any_high_device::in_w<1>));
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("speaker")
-	MCFG_DEVICE_REMOVE("dac")
-	MCFG_DEVICE_REMOVE("vref")
+	config.device_remove("speaker");
+	config.device_remove("dac");
+	config.device_remove("vref");
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1753,16 +1750,16 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 5114 + battery
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams2_state, williams2_va11_callback, "screen", 0, 32)
+	TIMER(config, "scan_timer").configure_scanline(FUNC(williams2_state::williams2_va11_callback), "screen", 0, 32);
 
 	// also set a timer to go off on scanline 254
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("254_timer", williams2_state, williams2_endscreen_callback, "screen", 8, 246)
+	TIMER(config, "254_timer").configure_scanline(FUNC(williams2_state::williams2_endscreen_callback), "screen", 8, 246);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_williams2)
+	PALETTE(config, m_palette).set_entries(1024);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_williams2);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
@@ -1778,11 +1775,9 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");

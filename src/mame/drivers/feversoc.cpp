@@ -81,8 +81,8 @@ U0564 LH28F800SU OBJ4-1
 class feversoc_state : public driver_device
 {
 public:
-	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	feversoc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_mainram1(*this, "workram1"),
 		m_mainram2(*this, "workram2"),
 		m_nvram(*this, "nvram"),
@@ -95,7 +95,8 @@ public:
 		m_rtc(*this, "rtc"),
 		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void init_feversoc();
 	void feversoc(machine_config &config);
@@ -298,13 +299,11 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
 	MCFG_SCREEN_UPDATE_DRIVER(feversoc_state, screen_update_feversoc)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, feversoc_state, feversoc_irq))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_feversoc)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_feversoc);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -317,7 +316,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH )
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -458,17 +458,19 @@ void cgc7900_state::machine_reset()
     MACHINE_DRIVER( cgc7900 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(cgc7900_state::cgc7900)
+void cgc7900_state::cgc7900(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, XTAL(28'480'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(cgc7900_mem)
+	M68000(config, m_maincpu, XTAL(28'480'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cgc7900_state::cgc7900_mem);
 
 	i8035_device &kbmcu(I8035(config, I8035_TAG, 1000000));
 	kbmcu.set_addrmap(AS_PROGRAM, &cgc7900_state::keyboard_mem);
 	kbmcu.set_disable();
 
-/*  MCFG_DEVICE_ADD(AM2910_TAG, AM2910, XTAL(17'360'000))
-    MCFG_DEVICE_PROGRAM_MAP(omti10_mem)*/
+//  am2910_device &am2910(AM2910(config, AM2910_TAG, XTAL(17'360'000)));
+//  am2910.set_addrmap(AS_PROGRAM, &cgc7900_state::omti10_mem);
+
 
 	/* video hardware */
 	cgc7900_video(config);
@@ -481,8 +483,8 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(cgc7900_state::kbd_put));
 
-	MCFG_DEVICE_ADD(MM58167_TAG, MM58167, XTAL(32'768))
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, cgc7900_state, irq<0x0>))
+	mm58167_device &rtc(MM58167(config, MM58167_TAG, XTAL(32'768)));
+	rtc.irq().set(FUNC(cgc7900_state::irq<0x0>));
 
 	com8116_device &k1135a(COM8116(config, K1135A_TAG, XTAL(5'068'800)));
 	k1135a.fr_handler().set(m_i8251_0, FUNC(i8251_device::write_txc));
@@ -511,7 +513,7 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900)
 	rs232_port_device &rs449(RS232_PORT(config, "rs449", default_rs232_devices, nullptr));
 	rs449.rxd_handler().set(m_i8251_1, FUNC(i8251_device::write_rxd));
 	rs449.dsr_handler().set(m_i8251_1, FUNC(i8251_device::write_dsr));
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
     ROMS

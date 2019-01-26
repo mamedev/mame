@@ -2852,7 +2852,7 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2861,14 +2861,13 @@ MACHINE_CONFIG_START(sigmab98_state::sigmab98)
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sigmab98)
-	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sigmab98);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
+	BUFFERED_SPRITERAM8(config, m_buffered_spriteram);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -2929,7 +2928,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000) / 2)  // !! TAXAN KY-80, clock @X1? !!
 	MCFG_DEVICE_PROGRAM_MAP(lufykzku_mem_map)
 	MCFG_DEVICE_IO_MAP(lufykzku_io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lufykzku_state, lufykzku_irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(lufykzku_state::lufykzku_irq), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(lufykzku_state, lufykzku)
 
@@ -2937,7 +2936,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	// No EEPROM
 
 	MCFG_DEVICE_ADD("watchdog_mb3773", MB3773, 0)
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
 	// 2 x 8-bit parallel/serial converters
 	TTL165(config, m_dsw_shifter[0]);
@@ -2955,14 +2954,13 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_SCREEN_SIZE(0x140, 0x100)
 	MCFG_SCREEN_VISIBLE_AREA(0,0x140-1, 0,0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lufykzku)
-	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lufykzku);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
-//  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // same as sammymdl?
+	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // same as sammymdl?
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -3000,14 +2998,14 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(20'000'000) / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_DEVICE_PROGRAM_MAP( animalc_map )
 	MCFG_DEVICE_IO_MAP( animalc_io )
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(sigmab98_state::sammymdl_irq), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(sigmab98_state, sammymdl )
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM
 	EEPROM_93C46_8BIT(config, "eeprom");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -3019,14 +3017,13 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sigmab98_state, screen_update_sigmab98)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sigmab98_state, screen_vblank_sammymdl))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sigmab98)
-	MCFG_PALETTE_ADD("palette", 0x1000 + 1)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sigmab98);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000 + 1);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
-//  MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8) // not on sammymdl?
+	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // not on sammymdl?
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -3050,9 +3047,9 @@ MACHINE_CONFIG_START(sigmab98_state::gocowboy)
 	MCFG_DEVICE_PROGRAM_MAP( gocowboy_map )
 	MCFG_DEVICE_IO_MAP( gocowboy_io )
 
-	MCFG_DEVICE_REMOVE("hopper")
-	MCFG_TICKET_DISPENSER_ADD("hopper_small", attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("hopper_large", attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+	config.device_remove("hopper");
+	TICKET_DISPENSER(config, m_hopper_small, attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
+	TICKET_DISPENSER(config, m_hopper_large, attotime::from_msec(1000), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW );
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sigmab98_state::haekaka)

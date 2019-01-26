@@ -295,9 +295,8 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	MCFG_SCREEN_UPDATE_DRIVER(mosaic_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mosaic)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mosaic);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 256);
 
 
 	/* sound hardware */
@@ -310,6 +309,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mosaic_state::gfire2)
 	mosaic(config);
+
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_PROGRAM_MAP(gfire2_map)
 	MCFG_DEVICE_IO_MAP(gfire2_io_map)

@@ -23,9 +23,10 @@
 #include <ctype.h>
 
 
-
 namespace util {
+
 namespace {
+
 /***************************************************************************
     VALIDATION
 ***************************************************************************/
@@ -332,23 +333,6 @@ private:
 	std::uint32_t   m_bufferbytes;              // bytes currently loaded into buffer
 	std::uint8_t    m_buffer[FILE_BUFFER_SIZE]; // buffer data
 };
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    is_directory_separator - is a given character
-    a directory separator? The following logic
-    works for most platforms
--------------------------------------------------*/
-
-inline int is_directory_separator(char c)
-{
-	return (c == '\\' || c == '/' || c == ':');
-}
 
 
 
@@ -1275,7 +1259,7 @@ core_file::core_file()
 std::string core_filename_extract_base(const std::string &name, bool strip_extension)
 {
 	// find the start of the basename
-	auto const start = std::find_if(name.rbegin(), name.rend(), [](char c) { return util::is_directory_separator(c); });
+	auto const start = std::find_if(name.rbegin(), name.rend(), &util::is_directory_separator);
 
 	// find the end of the basename
 	auto const chop_position = strip_extension

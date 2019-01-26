@@ -14,7 +14,7 @@
 #include "video/bufsprite.h"
 #include "emupal.h"
 
-class raiden_state : public driver_device, protected seibu_sound_common
+class raiden_state : public driver_device, public seibu_sound_common
 {
 public:
 	raiden_state(const machine_config &mconfig, device_type type, const char *tag) :

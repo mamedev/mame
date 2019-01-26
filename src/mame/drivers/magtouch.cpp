@@ -210,14 +210,15 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, WRITELINE("ns16450_0", ins8250_uart_device, rx_w) )
+	MICROTOUCH(config, "microtouch", 9600).stx().set("ns16450_0", FUNC(ins8250_uart_device::rx_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(magtouch_state::dma8237_1_dack_w));
 
 	ISA8(config, m_isabus, 0);
-	m_isabus->set_cputag("maincpu");
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
 	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
 	//m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));

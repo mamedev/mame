@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -421,11 +421,11 @@ MACHINE_CONFIG_START(iq151_state::iq151)
 	ppi.in_pc_callback().set(FUNC(iq151_state::ppi_portc_r));
 	ppi.out_pc_callback().set(FUNC(iq151_state::ppi_portc_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("iq151_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("iq151_cass");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", iq151_state, cassette_timer, attotime::from_hz(2000))
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(iq151_state::cassette_timer), attotime::from_hz(2000));
 
 	/* cartridge */
 	MCFG_DEVICE_ADD("slot1", IQ151CART_SLOT, 0)

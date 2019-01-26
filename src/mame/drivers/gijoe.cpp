@@ -291,31 +291,29 @@ void gijoe_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-MACHINE_CONFIG_START(gijoe_state::gijoe)
-
+void gijoe_state::gijoe(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 16MHz Confirmed */
-	MCFG_DEVICE_PROGRAM_MAP(gijoe_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);   /* 16MHz Confirmed */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gijoe_state::gijoe_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gijoe_state::gijoe_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/4);     /* Amuse & confirmed. Z80E at 8MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gijoe_state::sound_map);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gijoe_state, screen_update_gijoe)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(24, 24+288-1, 16, 16+224-1);
+	screen.set_screen_update(FUNC(gijoe_state::screen_update_gijoe));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(gijoe_state::tile_callback), this);
@@ -335,11 +333,11 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
+	k054539.add_route(0, "rspeaker", 1.0);
+	k054539.add_route(1, "lspeaker", 1.0);
+}
 
 
 ROM_START( gijoe )

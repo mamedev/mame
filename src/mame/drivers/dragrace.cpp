@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/dragrace.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
@@ -239,23 +240,23 @@ static GFXDECODE_START( gfx_dragrace )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(dragrace_state, dragrace)
+void dragrace_state::dragrace_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff));   // 2 color tiles
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(3, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));
 	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(5, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(6, rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(7, rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(8, rgb_t(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
-	palette.set_pen_color(9, rgb_t(0xB0, 0xB0, 0xB0));
-	palette.set_pen_color(10,rgb_t(0x5F, 0x5F, 0x5F));
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(8, rgb_t(0xff, 0xff, 0xff));   // 4 color tiles
+	palette.set_pen_color(9, rgb_t(0xb0, 0xb0, 0xb0));
+	palette.set_pen_color(10,rgb_t(0x5f, 0x5f, 0x5f));
 	palette.set_pen_color(11,rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(12,rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(13,rgb_t(0x5F, 0x5F, 0x5F));
-	palette.set_pen_color(14,rgb_t(0xB0, 0xB0, 0xB0));
+	palette.set_pen_color(12,rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(13,rgb_t(0x5f, 0x5f, 0x5f));
+	palette.set_pen_color(14,rgb_t(0xb0, 0xb0, 0xb0));
 	palette.set_pen_color(15,rgb_t(0x00, 0x00, 0x00));
 }
 
@@ -274,13 +275,13 @@ void dragrace_state::machine_reset()
 MACHINE_CONFIG_START(dragrace_state::dragrace)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 12)
+	MCFG_DEVICE_ADD("maincpu", M6800, 12.096_MHz_XTAL / 12)
 	MCFG_DEVICE_PROGRAM_MAP(dragrace_map)
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
+	TIMER(config, "frame_timer").configure_periodic(FUNC(dragrace_state::dragrace_frame_callback), attotime::from_hz(60));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -291,8 +292,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragrace)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(dragrace_state, dragrace)
+	PALETTE(config, "palette", FUNC(dragrace_state::dragrace_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

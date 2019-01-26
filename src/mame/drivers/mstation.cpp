@@ -53,6 +53,10 @@ public:
 
 	void mstation(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -94,10 +98,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq );
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(mstation);
+	void mstation_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
 	void mstation_banked_map(address_map &map);
@@ -437,7 +439,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mstation_state::mstation_kb_timer)
 	refresh_ints();
 }
 
-PALETTE_INIT_MEMBER(mstation_state, mstation)
+void mstation_state::mstation_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -459,17 +461,16 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 128-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(mstation_state, mstation)
+	PALETTE(config, "palette", FUNC(mstation_state::mstation_palette), 2);
 
 	AMD_29F080(config, "flash0");
 	SST_28SF040(config, "flash1");
 
 	// IRQ 4 is generated every second, used for auto power off
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", mstation_state, mstation_1hz_timer, attotime::from_hz(1))
+	TIMER(config, "1hz_timer").configure_periodic(FUNC(mstation_state::mstation_1hz_timer), attotime::from_hz(1));
 
 	// IRQ 1 is used for scan the kb and for cursor blinking
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(mstation_state::mstation_kb_timer), attotime::from_hz(50));
 
 	rp5c01_device &rtc(RP5C01(config, "rtc", XTAL(32'768)));
 	rtc.out_alarm_callback().set(FUNC(mstation_state::rtc_irq));

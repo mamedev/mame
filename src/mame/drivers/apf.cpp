@@ -526,12 +526,13 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	MCFG_DEVICE_PROGRAM_MAP(apfm1000_map)
 
 	/* video hardware */
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, 3.579545_MHz_XTAL)
-	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE("pia0", pia6821_device, cb1_w))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, apf_state, videoram_r))
-	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)
+	MC6847_NTSC(config, m_crtc, 3.579545_MHz_XTAL);
+	m_crtc->fsync_wr_callback().set("pia0", FUNC(pia6821_device::cb1_w));
+	m_crtc->input_callback().set(FUNC(apf_state::videoram_r));
+	m_crtc->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1);
+	m_crtc->set_screen("screen");
 	// INTEXT = GND
 	// other lines not connected
 
@@ -563,17 +564,17 @@ MACHINE_CONFIG_START(apf_state::apfimag)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("8K").set_extra_options("16K");
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.15);
+	WAVE(config, "wave", m_cass).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set(FUNC(apf_state::pia1_porta_r));
 	m_pia1->readpb_handler().set(FUNC(apf_state::pia1_portb_r));
 	m_pia1->writepb_handler().set(FUNC(apf_state::pia1_portb_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(apf_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("apf_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(apf_cassette_formats);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->set_interface("apf_cass");
 
 	FD1771(config, m_fdc, 1000000); // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats)

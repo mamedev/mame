@@ -703,58 +703,56 @@ void darius_state::machine_reset()
 	}
 }
 
-
-MACHINE_CONFIG_START(darius_state::darius)
-
+void darius_state::darius(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2)  /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(darius_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2);  /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &darius_state::darius_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(darius_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(darius_sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &darius_state::darius_sound_map);
 
-	MCFG_DEVICE_ADD("cpub", M68000, XTAL(16'000'000)/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(darius_cpub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
+	M68000(config, m_cpub, XTAL(16'000'000)/2); /* 8 MHz */
+	m_cpub->set_addrmap(AS_PROGRAM, &darius_state::darius_cpub_map);
+	m_cpub->set_vblank_int("lscreen", FUNC(darius_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("adpcm", Z80, XTAL(8'000'000)/2) /* 4 MHz */  /* ADPCM player using MSM5205 */
-	MCFG_DEVICE_PROGRAM_MAP(darius_sound2_map)
-	MCFG_DEVICE_IO_MAP(darius_sound2_io_map)
+	Z80(config, m_adpcm, XTAL(8'000'000)/2); /* 4 MHz */  /* ADPCM player using MSM5205 */
+	m_adpcm->set_addrmap(AS_PROGRAM, &darius_state::darius_sound2_map);
+	m_adpcm->set_addrmap(AS_IO, &darius_state::darius_sound2_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame ? */
+	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame ? */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darius)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darius);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	config.set_default_layout(layout_darius);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(36*8, 32*8);
+	lscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
+	lscreen.set_screen_update(FUNC(darius_state::screen_update_darius_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("mscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_middle)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	mscreen.set_refresh_hz(60);
+	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	mscreen.set_size(36*8, 32*8);
+	mscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
+	mscreen.set_screen_update(FUNC(darius_state::screen_update_darius_middle));
+	mscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 29*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darius_state, screen_update_darius_right)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(36*8, 32*8);
+	rscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
+	rscreen.set_screen_update(FUNC(darius_state::screen_update_darius_right));
+	rscreen.set_palette(m_palette);
 
 	PC080SN(config, m_pc080sn, 0);
 	m_pc080sn->set_gfx_region(1);
@@ -792,37 +790,37 @@ MACHINE_CONFIG_START(darius_state::darius)
 	ym2.add_route(3, "filter1.3l", 0.60);
 	ym2.add_route(3, "filter1.3r", 0.60);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, darius_state, darius_adpcm_int))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz   */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(darius_state::darius_adpcm_int));   /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      /* 8KHz   */
+	m_msm->add_route(ALL_OUTPUTS, "msm5205.l", 1.0);
+	m_msm->add_route(ALL_OUTPUTS, "msm5205.r", 1.0);
 
-	FILTER_VOLUME(config, "filter0.0l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.0r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter0.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_0l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_0r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_1l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_1r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_2l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_2r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_3l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter0_3r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	FILTER_VOLUME(config, "filter1.0l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.0r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_0l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_0r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_1l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_1r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_2l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_2r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_3l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_filter1_3r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	FILTER_VOLUME(config, "msm5205.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "msm5205.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_msm5205_l).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, m_msm5205_r).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

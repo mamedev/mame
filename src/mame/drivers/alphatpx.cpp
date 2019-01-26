@@ -1224,7 +1224,7 @@ MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
 	MCFG_SCREEN_RAW_PARAMS(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288)
 	MCFG_SCREEN_UPDATE_DRIVER(alphatp_12_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	CRT5027(config, m_crtc, 12.8544_MHz_XTAL / 8);
 	m_crtc->set_char_width(8);
@@ -1301,7 +1301,7 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_SCREEN_RAW_PARAMS(12.8544_MHz_XTAL, 824, 0, 640, 312, 0, 288)
 	MCFG_SCREEN_UPDATE_DRIVER(alphatp_34_state, screen_update)
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	CRT5037(config, m_crtc, 12.8544_MHz_XTAL / 8);
 	m_crtc->set_char_width(8);

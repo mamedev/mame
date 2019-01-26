@@ -83,7 +83,7 @@ private:
 	DECLARE_WRITE16_MEMBER(blitter_vidparam_w);
 	DECLARE_WRITE16_MEMBER(blitter_unknown_w);
 	DECLARE_READ16_MEMBER(blitter_vidparam_r);
-	DECLARE_PALETTE_INIT(dcheese);
+	void dcheese_palette(palette_device &palette) const;
 	uint32_t screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(dcheese_vblank);
 	void dcheese_signal_irq(int which);

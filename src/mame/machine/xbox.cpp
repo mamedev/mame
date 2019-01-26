@@ -7,7 +7,6 @@
 #include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
-#include "machine/pit8253.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 
@@ -523,54 +522,7 @@ void xbox_base_state::debug_generate_irq(int irq, bool active)
 		debug_irq_active = false;
 		state = 0;
 	}
-	switch (irq)
-	{
-	case 0:
-		xbox_base_devs.pic8259_1->ir0_w(state);
-		break;
-	case 1:
-		xbox_base_devs.pic8259_1->ir1_w(state);
-		break;
-	case 3:
-		xbox_base_devs.pic8259_1->ir3_w(state);
-		break;
-	case 4:
-		xbox_base_devs.pic8259_1->ir4_w(state);
-		break;
-	case 5:
-		xbox_base_devs.pic8259_1->ir5_w(state);
-		break;
-	case 6:
-		xbox_base_devs.pic8259_1->ir6_w(state);
-		break;
-	case 7:
-		xbox_base_devs.pic8259_1->ir7_w(state);
-		break;
-	case 8:
-		xbox_base_devs.pic8259_2->ir0_w(state);
-		break;
-	case 9:
-		xbox_base_devs.pic8259_2->ir1_w(state);
-		break;
-	case 10:
-		xbox_base_devs.pic8259_2->ir2_w(state);
-		break;
-	case 11:
-		xbox_base_devs.pic8259_2->ir3_w(state);
-		break;
-	case 12:
-		xbox_base_devs.pic8259_2->ir4_w(state);
-		break;
-	case 13:
-		xbox_base_devs.pic8259_2->ir5_w(state);
-		break;
-	case 14:
-		xbox_base_devs.pic8259_2->ir6_w(state);
-		break;
-	case 15:
-		xbox_base_devs.pic8259_2->ir7_w(state);
-		break;
-	}
+	mcpxlpc->debug_generate_irq(irq, state);
 }
 
 WRITE_LINE_MEMBER(xbox_base_state::vblank_callback)
@@ -587,54 +539,38 @@ uint32_t xbox_base_state::screen_update_callback(screen_device &screen, bitmap_r
  * PIC & PIT
  */
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_pic8259_1_set_int_line)
+WRITE_LINE_MEMBER(xbox_base_state::maincpu_interrupt)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(xbox_base_state::get_slave_ack)
-{
-	if (offset == 2) { // IRQ = 2
-		return xbox_base_devs.pic8259_2->acknowledge();
-	}
-	return 0x00;
-}
-
 IRQ_CALLBACK_MEMBER(xbox_base_state::irq_callback)
 {
-	int r = 0;
-	r = xbox_base_devs.pic8259_1->acknowledge();
+	int r;
+	r = mcpxlpc->acknowledge();
 	if (debug_irq_active)
 		debug_generate_irq(debug_irq_number, false);
 	return r;
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_pit8254_out0_changed)
+WRITE_LINE_MEMBER(xbox_base_state::ohci_usb_interrupt_changed)
 {
-	if (xbox_base_devs.pic8259_1)
-	{
-		xbox_base_devs.pic8259_1->ir0_w(state);
-	}
+	mcpxlpc->irq1(state);
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_pit8254_out2_changed)
+WRITE_LINE_MEMBER(xbox_base_state::nv2a_interrupt_changed)
 {
-	//xbox_speaker_set_input( state ? 1 : 0 );
+	mcpxlpc->irq3(state);
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_ohci_usb_interrupt_changed)
+WRITE_LINE_MEMBER(xbox_base_state::smbus_interrupt_changed)
 {
-	xbox_base_devs.pic8259_1->ir1_w(state);
+	mcpxlpc->irq11(state);
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_smbus_interrupt_changed)
+WRITE_LINE_MEMBER(xbox_base_state::ide_interrupt_changed)
 {
-	xbox_base_devs.pic8259_2->ir3_w(state);
-}
-
-WRITE_LINE_MEMBER(xbox_base_state::xbox_nv2a_interrupt_changed)
-{
-	xbox_base_devs.pic8259_1->ir3_w(state);
+	mcpxlpc->irq14(state);
 }
 
 /*
@@ -846,9 +782,6 @@ void xbox_base_state::machine_start()
 {
 	find_debug_params();
 	nvidia_nv2a = subdevice<nv2a_gpu_device>("pci:1e.0:00.0")->debug_get_renderer();
-	xbox_base_devs.pic8259_1 = subdevice<pic8259_device>("pic8259_1");
-	xbox_base_devs.pic8259_2 = subdevice<pic8259_device>("pic8259_2");
-	xbox_base_devs.ide = subdevice<bus_master_ide_controller_device>("ide");
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
@@ -869,7 +802,7 @@ void xbox_base_state::machine_start()
 	memset(&superiost, 0, sizeof(superiost));
 	superiost.configuration_mode = false;
 	superiost.registers[0][0x26] = 0x2e; // Configuration port address byte 0
-										 // savestates
+	// savestates
 	save_item(NAME(debug_irq_active));
 	save_item(NAME(debug_irq_number));
 }
@@ -890,10 +823,7 @@ void xbox_base_state::xbox_base_map(address_map &map)
 
 void xbox_base_state::xbox_base_map_io(address_map &map)
 {
-	map(0x0020, 0x0023).rw("pic8259_1", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x002e, 0x002f).rw(FUNC(xbox_base_state::superio_read), FUNC(xbox_base_state::superio_write));
-	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x00a0, 0x00a3).rw("pic8259_2", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x01f0, 0x01f7).rw(":pci:09.0:ide", FUNC(bus_master_ide_controller_device::cs0_r), FUNC(bus_master_ide_controller_device::cs0_w));
 	map(0x03f8, 0x03ff).rw(FUNC(xbox_base_state::superiors232_read), FUNC(xbox_base_state::superiors232_write));
 #if 0
@@ -917,40 +847,24 @@ MACHINE_CONFIG_START(xbox_base_state::xbox_base)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	PCI_ROOT(config, ":pci", 0);
-	NV2A_HOST(config, ":pci:00.0", 0, m_maincpu);
-	NV2A_RAM(config, ":pci:00.3", 0);
-	MCPX_LPC(config, ":pci:01.0", 0);
-	MCPX_SMBUS(config, ":pci:01.1", 0).interrupt_handler().set(FUNC(xbox_base_state::xbox_smbus_interrupt_changed));
-	XBOX_PIC16LC(config, ":pci:01.1:10", 0);
-	XBOX_CX25871(config, ":pci:01.1:45", 0);
-	XBOX_EEPROM(config, ":pci:01.1:54", 0);
-	MCPX_OHCI(config, ":pci:02.0", 0).interrupt_handler().set(FUNC(xbox_base_state::xbox_ohci_usb_interrupt_changed));
-	MCPX_OHCI(config, ":pci:03.0", 0);
-	MCPX_ETH(config, ":pci:04.0", 0);
-	MCPX_APU(config, ":pci:05.0", 0, m_maincpu);
+	PCI_ROOT(config,        ":pci", 0);
+	NV2A_HOST(config,       ":pci:00.0", 0, m_maincpu);
+	NV2A_RAM(config,        ":pci:00.3", 0);
+	MCPX_ISALPC(config,     ":pci:01.0", 0, 0).interrupt_output().set(FUNC(xbox_base_state::maincpu_interrupt));
+	MCPX_SMBUS(config,      ":pci:01.1", 0).interrupt_handler().set(FUNC(xbox_base_state::smbus_interrupt_changed));
+	XBOX_PIC16LC(config,    ":pci:01.1:10", 0);
+	XBOX_CX25871(config,    ":pci:01.1:45", 0);
+	XBOX_EEPROM(config,     ":pci:01.1:54", 0);
+	MCPX_OHCI(config,       ":pci:02.0", 0).interrupt_handler().set(FUNC(xbox_base_state::ohci_usb_interrupt_changed));
+	MCPX_OHCI(config,       ":pci:03.0", 0);
+	MCPX_ETH(config,        ":pci:04.0", 0);
+	MCPX_APU(config,        ":pci:05.0", 0, m_maincpu);
 	MCPX_AC97_AUDIO(config, ":pci:06.0", 0);
 	MCPX_AC97_MODEM(config, ":pci:06.1", 0);
-	PCI_BRIDGE(config, ":pci:08.0", 0, 0x10de01b8, 0);
-	MCPX_IDE(config, ":pci:09.0", 0).interrupt_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
-	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0);
-	NV2A_GPU(config, ":pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set(FUNC(xbox_base_state::xbox_nv2a_interrupt_changed));
-
-	pic8259_device &pic8259_1(PIC8259(config, "pic8259_1", 0));
-	pic8259_1.out_int_callback().set(FUNC(xbox_base_state::xbox_pic8259_1_set_int_line));
-	pic8259_1.in_sp_callback().set_constant(1);
-	pic8259_1.read_slave_ack_callback().set(FUNC(xbox_base_state::get_slave_ack));
-
-	pic8259_device &pic8259_2(PIC8259(config, "pic8259_2", 0));
-	pic8259_2.out_int_callback().set("pic8259_1", FUNC(pic8259_device::ir2_w));
-	pic8259_2.in_sp_callback().set_constant(0);
-
-	pit8254_device &pit8254(PIT8254(config, "pit8254", 0));
-	pit8254.set_clk<0>(1125000); /* heartbeat IRQ */
-	pit8254.out_handler<0>().set(FUNC(xbox_base_state::xbox_pit8254_out0_changed));
-	pit8254.set_clk<1>(1125000); /* (unused) dram refresh */
-	pit8254.set_clk<2>(1125000); /* (unused) pio port c pin 4, and speaker polling enough */
-	pit8254.out_handler<2>().set(FUNC(xbox_base_state::xbox_pit8254_out2_changed));
+	PCI_BRIDGE(config,      ":pci:08.0", 0, 0x10de01b8, 0);
+	MCPX_IDE(config,        ":pci:09.0", 0).interrupt_handler().set(FUNC(xbox_base_state::ide_interrupt_changed));
+	NV2A_AGP(config,        ":pci:1e.0", 0, 0x10de01b7, 0);
+	NV2A_GPU(config,        ":pci:1e.0:00.0", 0, m_maincpu).interrupt_handler().set(FUNC(xbox_base_state::nv2a_interrupt_changed));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

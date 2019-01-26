@@ -577,7 +577,7 @@ void jackie_state::jackie(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackie);
-	PALETTE(config, m_palette, 2048).set_format(PALETTE_FORMAT_xBBBBBGGGGGRRRRR);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -603,10 +603,10 @@ ROM_START( jackie )
 	ROM_LOAD( "jackie7sv.u22",   0x0000, 0x10000, CRC(8b4eb6da) SHA1(480784917dfaf9a0343c1d56eb590b32bf5e94fd) )
 
 	ROM_REGION( 0x10000, "misc", 0 )
-	ROM_LOAD( "16l8.u31",   0x0000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "18cv8.u14",  0x0000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
-	ROM_LOAD( "18cv8.u8",   0x0000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
-	ROM_LOAD( "18cv8.u9",   0x0000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
+	ROM_LOAD( "16l8.u31",   0x0000, 0x104, NO_DUMP )
+	ROM_LOAD( "18cv8.u14",  0x0000, 0x155, NO_DUMP )
+	ROM_LOAD( "18cv8.u8",   0x0000, 0x155, NO_DUMP )
+	ROM_LOAD( "18cv8.u9",   0x0000, 0x155, NO_DUMP )
 ROM_END
 
 

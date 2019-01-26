@@ -20,13 +20,14 @@ public:
 		TIMER_INTERRUPT
 	};
 
-	cball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_video_ram(*this, "video_ram") { }
+		m_video_ram(*this, "video_ram")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -52,7 +53,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cball);
+	void cball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -139,7 +140,7 @@ void cball_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(cball_state, cball)
+void cball_state::cball_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80));
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
@@ -276,11 +277,11 @@ MACHINE_CONFIG_START(cball_state::cball)
 	MCFG_SCREEN_SIZE(256, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(cball_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cball)
-	MCFG_PALETTE_ADD("palette", 6)
-	MCFG_PALETTE_INIT_OWNER(cball_state, cball)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_cball)
+
+	PALETTE(config, m_palette, FUNC(cball_state::cball_palette), 6);
 
 	/* sound hardware */
 MACHINE_CONFIG_END

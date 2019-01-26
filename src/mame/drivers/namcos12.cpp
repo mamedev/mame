@@ -1106,8 +1106,8 @@ class namcos12_state : public driver_device
 public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_ram(*this, "maincpu:ram")
 		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, "maincpu:ram")
 		, m_sub(*this, "sub")
 		, m_adc(*this, "sub:adc")
 		, m_rtc(*this, "rtc")
@@ -1149,11 +1149,11 @@ protected:
 	void tdjvsmap(address_map &map);
 	void tektagt_map(address_map &map);
 
+	required_device<psxcpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<h83002_device> m_sub;
 
 private:
-	required_device<psxcpu_device> m_maincpu;
-	required_device<h83002_device> m_sub;
 	required_device<h8_adc_device> m_adc;
 	required_device<rtc4543_device> m_rtc;
 	required_device<namco_settings_device> m_settings;
@@ -1724,12 +1724,12 @@ void namcos12_state::init_golgo13()
 }
 
 // SYSTEM12 MOTHER PCB
-MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
-
+void namcos12_state::namcos12_mobo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_sub, H83002, 16934400) // frequency based on research (superctr)
-	MCFG_DEVICE_PROGRAM_MAP(s12h8rwmap)
-	MCFG_DEVICE_IO_MAP(s12h8iomap)
+	H83002(config, m_sub, 16934400); // frequency based on research (superctr)
+	m_sub->set_addrmap(AS_PROGRAM, &namcos12_state::s12h8rwmap);
+	m_sub->set_addrmap(AS_IO, &namcos12_state::s12h8iomap);
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -1742,78 +1742,74 @@ MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
 	sub_sci1.clk_handler().set(m_rtc, FUNC(rtc4543_device::clk_w)).invert();
 	sub_sci1.clk_handler().append(m_settings, FUNC(namco_settings_device::clk_w));
 
-	MCFG_DEVICE_ADD("at28c16", AT28C16, 0)
+	AT28C16(config, "at28c16", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("c352", C352, 25401600, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-MACHINE_CONFIG_END
+	c352_device &c352(C352(config, "c352", 25401600, 288));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "rspeaker", 1.00);
+}
 
 // CPU PCB COH700
-MACHINE_CONFIG_START(namcos12_state::coh700)
+void namcos12_state::coh700(machine_config &config)
+{
 	namcos12_mobo(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CXD8661R, XTAL(100'000'000))
-	MCFG_DEVICE_PROGRAM_MAP( namcos12_map)
-
-	subdevice<ram_device>("maincpu:ram")->set_default_size("4M");
-
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
+	CXD8661R(config, m_maincpu, XTAL(100'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::namcos12_map);
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this));
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CXD8654Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
-MACHINE_CONFIG_END
+}
 
 // CPU PCB COH716
-MACHINE_CONFIG_START(namcos12_state::coh716)
+void namcos12_state::coh716(machine_config &config)
+{
 	namcos12_mobo(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CXD8606BQ, XTAL(100'000'000))
-	MCFG_DEVICE_PROGRAM_MAP( namcos12_map)
-
-	subdevice<ram_device>("maincpu:ram")->set_default_size("16M");
-
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
+	CXD8606BQ(config, m_maincpu, XTAL(100'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_state::namcos12_map);
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("16M");
+	m_maincpu->subdevice<psxdma_device>("dma")->install_read_handler(5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this));
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x400000, XTAL(53'693'175) )
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x400000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(namcos12_state::namcos12_sub_irq));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos12_boothack_state::ptblank2)
+void namcos12_boothack_state::ptblank2(machine_config &config)
+{
 	coh700(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( ptblank2_map )
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_boothack_state::ptblank2_map);
+}
 
-MACHINE_CONFIG_START(namcos12_boothack_state::tektagt)
+void namcos12_boothack_state::tektagt(machine_config &config)
+{
 	coh700(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP( tektagt_map )
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos12_boothack_state::tektagt_map);
+}
 
-MACHINE_CONFIG_START(namcos12_boothack_state::golgo13)
+void namcos12_boothack_state::golgo13(machine_config &config)
+{
 	coh700(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_IO_MAP(golgo13_h8iomap)
-MACHINE_CONFIG_END
+	m_sub->set_addrmap(AS_IO, &namcos12_boothack_state::golgo13_h8iomap);
+}
 
 #define JVSCLOCK    (XTAL(14'745'600))
 void namcos12_state::jvsmap(address_map &map)
@@ -1827,23 +1823,21 @@ void namcos12_state::jvsiomap(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(namcos12_boothack_state::truckk)
+void namcos12_boothack_state::truckk(machine_config &config)
+{
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
-	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_DEVICE_PROGRAM_MAP( jvsmap )
-	MCFG_DEVICE_IO_MAP( jvsiomap )
+	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
+	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::jvsmap);
+	iocpu.set_addrmap(AS_IO, &namcos12_boothack_state::jvsiomap);
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
+	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
+	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(2*115200);
+}
 
 READ16_MEMBER(namcos12_state::iob_p4_r)
 {
@@ -1901,51 +1895,45 @@ void namcos12_state::plarailjvsiomap(address_map &map)
 	map(h8_device::ADC_2, h8_device::ADC_2).noprw();
 }
 
-MACHINE_CONFIG_START(namcos12_boothack_state::technodr)
+void namcos12_boothack_state::technodr(machine_config &config)
+{
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
 	// modify H8/3002 map to omit direct-connected controls
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(s12h8rwjvsmap)
-	MCFG_DEVICE_IO_MAP(s12h8jvsiomap)
+	m_sub->set_addrmap(AS_PROGRAM, &namcos12_boothack_state::s12h8rwjvsmap);
+	m_sub->set_addrmap(AS_IO, &namcos12_boothack_state::s12h8jvsiomap);
 
-	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_DEVICE_PROGRAM_MAP( tdjvsmap )
-	MCFG_DEVICE_IO_MAP( tdjvsiomap )
+	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
+	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::tdjvsmap);
+	iocpu.set_addrmap(AS_IO, &namcos12_boothack_state::tdjvsiomap);
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
+	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
+	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(2*115200);
+}
 
-MACHINE_CONFIG_START(namcos12_boothack_state::aplarail)
+void namcos12_boothack_state::aplarail(machine_config &config)
+{
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
+	subdevice<h8_sci_device>("sub:sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
 	// modify H8/3002 map to omit direct-connected controls
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(s12h8rwjvsmap)
-	MCFG_DEVICE_IO_MAP(s12h8railiomap)
+	m_sub->set_addrmap(AS_PROGRAM, &namcos12_boothack_state::s12h8rwjvsmap);
+	m_sub->set_addrmap(AS_IO, &namcos12_boothack_state::s12h8railiomap);
 
-	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_DEVICE_PROGRAM_MAP( plarailjvsmap )
-	MCFG_DEVICE_IO_MAP( plarailjvsiomap )
+	h83334_device &iocpu(H83334(config, "iocpu", JVSCLOCK));
+	iocpu.set_addrmap(AS_PROGRAM, &namcos12_boothack_state::plarailjvsmap);
+	iocpu.set_addrmap(AS_IO, &namcos12_boothack_state::plarailjvsiomap);
 
-	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
-	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
+	subdevice<h8_sci_device>("iocpu:sci0")->tx_handler().set("sub:sci0", FUNC(h8_sci_device::rx_w));
+	subdevice<h8_sci_device>("sub:sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(2*115200);
+}
 
 static INPUT_PORTS_START( namcos12 )
 	PORT_START("DSW")

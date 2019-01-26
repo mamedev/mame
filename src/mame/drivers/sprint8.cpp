@@ -462,8 +462,7 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 11) /* ? */
 	MCFG_DEVICE_PROGRAM_MAP(sprint8_map)
 
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("input_timer", sprint8_state, input_callback, attotime::from_hz(60))
+	TIMER(config, "input_timer").configure_periodic(FUNC(sprint8_state::input_callback), attotime::from_hz(60));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -472,12 +471,10 @@ MACHINE_CONFIG_START(sprint8_state::sprint8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint8_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint8_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sprint8)
-	MCFG_PALETTE_ADD("palette", 36)
-	MCFG_PALETTE_INDIRECT_ENTRIES(18)
-	MCFG_PALETTE_INIT_OWNER(sprint8_state, sprint8)
+	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_sprint8)
+	PALETTE(config, m_palette, FUNC(sprint8_state::sprint8_palette), 36, 18);
 
 	sprint8_audio(config);
 MACHINE_CONFIG_END

@@ -41,7 +41,7 @@ public:
 
 	template <typename... T> void set_tile_callback(T &&... args) { m_k056832_cb = k056832_cb_delegate(std::forward<T>(args)...); }
 
-	template <typename T> 
+	template <typename T>
 	void set_config(T &&gfx_reg, int bpp, int big, int djmain_hack)
 	{
 		m_rombase.set_tag(std::forward<T>(gfx_reg));

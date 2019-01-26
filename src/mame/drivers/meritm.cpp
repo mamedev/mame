@@ -1172,8 +1172,8 @@ MACHINE_CONFIG_START(meritm_state::crt250_crt252_crt258)
 	NS16550(config, m_uart, UART_CLK);
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(meritm_state::crt260)
@@ -1190,8 +1190,8 @@ MACHINE_CONFIG_START(meritm_state::crt260)
 	NS16550(config, m_uart, UART_CLK);
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
-	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
 MACHINE_CONFIG_END
 
 

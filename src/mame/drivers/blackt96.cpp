@@ -90,8 +90,8 @@ Bugs (all of these looks BTANBs):
 class blackt96_state : public driver_device
 {
 public:
-	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	blackt96_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_tilemapram(*this, "tilemapram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -99,7 +99,7 @@ public:
 		m_sprites(*this, "sprites"),
 		m_oki(*this, "oki%u", 1U),
 		m_oki1bank(*this, "oki1bank")
-		{ }
+	{ }
 
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER(output_w);
@@ -482,12 +482,12 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_DEVICE_PROGRAM_MAP(blackt96_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
 
-	MCFG_DEVICE_ADD("audiocpu", PIC16C57, 8000000) /* ? */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_a_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(*this, blackt96_state, blackt96_soundio_port_b_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_b_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(*this, blackt96_state, blackt96_soundio_port_c_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(*this, blackt96_state, blackt96_soundio_port_c_w))
+	pic16c57_device &audiocpu(PIC16C57(config, "audiocpu", 8000000)); /* ? */
+	audiocpu.write_a().set(FUNC(blackt96_state::blackt96_soundio_port_a_w));
+	audiocpu.read_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_r));
+	audiocpu.write_b().set(FUNC(blackt96_state::blackt96_soundio_port_b_w));
+	audiocpu.read_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_r));
+	audiocpu.write_c().set(FUNC(blackt96_state::blackt96_soundio_port_c_w));
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blackt96)
 
@@ -498,10 +498,9 @@ MACHINE_CONFIG_START(blackt96_state::blackt96)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 16*32-1, 0*8, 16*32-1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 256-1, 2*8, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blackt96_state, screen_update_blackt96)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);

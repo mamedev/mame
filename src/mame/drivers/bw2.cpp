@@ -511,7 +511,7 @@ static void bw2_floppies(device_slot_interface &device)
 //**************************************************************************
 
 
-PALETTE_INIT_MEMBER(bw2_state, bw2)
+void bw2_state::bw2_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
@@ -555,8 +555,7 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(bw2_state, bw2)
+	PALETTE(config, "palette", FUNC(bw2_state::bw2_palette), 2);
 
 	// devices
 	PIT8253(config, m_pit, 0);

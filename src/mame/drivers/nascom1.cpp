@@ -39,9 +39,11 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_hd6402(*this, "hd6402"),
 		m_cassette(*this, "cassette"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
+		m_gfx1_region(*this, "gfx1"),
 		m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
@@ -63,14 +65,16 @@ protected:
 
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 
-private:
 	required_device<ay31015_device> m_hd6402;
 	required_device<cassette_image_device> m_cassette;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_videoram;
+	required_memory_region m_gfx1_region;
 	required_ioport_array<8> m_keyboard;
 
+private:
 	int m_tape_size;
 	uint8_t *m_tape_image;
 	int m_tape_index;
@@ -82,7 +86,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
-
+	DECLARE_SNAPSHOT_LOAD_MEMBER( charrom );
 };
 
 class nascom1_state : public nascom_state
@@ -124,8 +128,8 @@ private:
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1) { return load_cart(image, m_socket1, 1); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2) { return load_cart(image, m_socket2, 2); }
 
 	void nascom2_io(address_map &map);
 	void nascom2_mem(address_map &map);
@@ -229,23 +233,60 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
 
 SNAPSHOT_LOAD_MEMBER( nascom_state, nascom1 )
 {
-	uint8_t line[35];
+	uint8_t line[28];
 
-	while (image.fread( &line, sizeof(line)) == sizeof(line))
+	while (image.fread(&line, sizeof(line)) == sizeof(line))
 	{
-		unsigned int addr, b0, b1, b2, b3, b4, b5, b6, b7, dummy;
+		unsigned int addr, b[8], dummy;
 
-		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
-			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
+		if (sscanf((char *)line, "%4x %x %x %x %x %x %x %x %x",
+			&addr, &b[0], &b[1], &b[2], &b[3], &b[4], &b[5], &b[6], &b[7]) == 9)
 		{
-			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b0);
-			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b1);
-			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b2);
-			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b3);
-			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b4);
-			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b5);
-			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b6);
-			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b7);
+			for (int i = 0; i < 8; i++)
+			{
+				m_maincpu->space(AS_PROGRAM).write_byte(addr++, b[i]);
+			}
+		}
+		else
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file format");
+			return image_init_result::FAIL;
+		}
+		dummy = 0x00;
+		while (!image.image_feof() && dummy != 0x0a && dummy != 0x1f)
+		{
+			image.fread(&dummy, 1);
+		}
+	}
+
+	return image_init_result::PASS;
+}
+
+SNAPSHOT_LOAD_MEMBER(nascom_state, charrom)
+{
+	uint8_t line[28];
+
+	while (image.fread(&line, sizeof(line)) == sizeof(line))
+	{
+		unsigned int addr, b[8], dummy;
+
+		if (sscanf((char *)line, "%4x %x %x %x %x %x %x %x %x",
+			&addr, &b[0], &b[1], &b[2], &b[3], &b[4], &b[5], &b[6], &b[7]) == 9)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				m_gfx1_region->base()[addr++] = b[i];
+			}
+		}
+		else
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported file format");
+			return image_init_result::FAIL;
+		}
+		dummy = 0x00;
+		while (!image.image_feof() && dummy != 0x0a && dummy != 0x1f)
+		{
+			image.fread(&dummy, 1);
 		}
 	}
 
@@ -577,7 +618,6 @@ static INPUT_PORTS_START( nascom1 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)     PORT_CHAR('R') PORT_CHAR('r')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nascom2 )
@@ -597,7 +637,7 @@ static INPUT_PORTS_START( nascom2 )
 	// link switch on board
 	PORT_START("lsw1")
 	PORT_DIPNAME(0x0f, 0x00, "Restart address")
-	PORT_DIPLOCATION("LSW1:2,3,4,5")
+	PORT_DIPLOCATION("LSW1:1,2,3,4")
 	PORT_DIPSETTING(0x00, "0000H")
 	PORT_DIPSETTING(0x01, "1000H")
 	PORT_DIPSETTING(0x02, "2000H")
@@ -621,7 +661,7 @@ static INPUT_PORTS_START( nascom2c )
 
 	PORT_MODIFY("lsw1")
 	PORT_DIPNAME(0x0f, 0x0f, "Restart address")
-	PORT_DIPLOCATION("LSW1:2,3,4,5")
+	PORT_DIPLOCATION("LSW1:1,2,3,4")
 	PORT_DIPSETTING(0x00, "0000H")
 	PORT_DIPSETTING(0x01, "1000H")
 	PORT_DIPSETTING(0x02, "2000H")
@@ -645,67 +685,77 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(nascom_state::nascom)
+void nascom_state::nascom(machine_config &config)
+{
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(48 * 8, 16 * 16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 16 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(nascom1_state, screen_update_nascom)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(48 * 8, 16 * 16);
+	m_screen->set_visarea(0, 48 * 8 - 1, 0, 16 * 16 - 1);
+	m_screen->set_screen_update(FUNC(nascom1_state::screen_update_nascom));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_nascom1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nascom1);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// uart
 	AY31015(config, m_hd6402);
-	m_hd6402->set_tx_clock(( XTAL(16'000'000) / 16 ) / 256);
-	m_hd6402->set_rx_clock(( XTAL(16'000'000) / 16 ) / 256);
+	m_hd6402->set_tx_clock((16_MHz_XTAL / 16) / 256);
+	m_hd6402->set_rx_clock((16_MHz_XTAL / 16) / 256);
 	m_hd6402->read_si_callback().set(FUNC(nascom_state::nascom1_hd6402_si));
 	m_hd6402->write_so_callback().set(FUNC(nascom_state::nascom1_hd6402_so));
 
 	// cassette is connected to the uart
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_interface("nascom_cass");
 
 	// pio
-	Z80PIO(config, "z80pio", XTAL(16'000'000)/8);
+	Z80PIO(config, "z80pio", 16_MHz_XTAL / 8);
 
 	// internal extra ram
 	RAM(config, m_ram).set_default_size("48K").set_extra_options("8K,16K,32K");
 
 	// devices
-	MCFG_SNAPSHOT_ADD("snapshot", nascom_state, nascom1, "nas", 0.5)
-MACHINE_CONFIG_END
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", 0));
+	snapshot.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, nascom1), this), "nas", 0.5);
+	snapshot.set_interface("nascom_snap");
+	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar", 0));
+	snapchar.set_handler(snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(nascom_state, charrom), this), "chr", 0.5);
+	snapchar.set_interface("nascom_char");
+}
 
-MACHINE_CONFIG_START(nascom1_state::nascom1)
+void nascom1_state::nascom1(machine_config &config)
+{
 	nascom(config);
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
-	MCFG_DEVICE_PROGRAM_MAP(nascom1_mem)
-	MCFG_DEVICE_IO_MAP(nascom1_io)
-MACHINE_CONFIG_END
+
+	Z80(config, m_maincpu, 16_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nascom1_state::nascom1_mem);
+	m_maincpu->set_addrmap(AS_IO, &nascom1_state::nascom1_io);
+
+	// software
+	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM1");
+}
 
 MACHINE_CONFIG_START(nascom2_state::nascom2)
 	nascom(config);
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(nascom2_mem)
-	MCFG_DEVICE_IO_MAP(nascom2_io)
+
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nascom2_state::nascom2_mem);
+	m_maincpu->set_addrmap(AS_IO, &nascom2_state::nascom2_io);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(48 * 8, 16 * 14)
-	MCFG_SCREEN_VISIBLE_AREA(0, 48 * 8 - 1, 0, 16 * 14 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(nascom2_state, screen_update_nascom)
+	m_screen->set_size(48 * 8, 16 * 14);
+	m_screen->set_visarea(0, 48 * 8 - 1, 0, 16 * 14 - 1);
+	m_screen->set_screen_update(FUNC(nascom2_state::screen_update_nascom));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_nascom2)
+	m_gfxdecode->set_info(gfx_nascom2);
 
 	// generic sockets for ram/rom (todo: support ram here)
-	MCFG_GENERIC_SOCKET_ADD("socket1", generic_plain_slot, "nascom_socket")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(nascom2_state, socket1_load)
-	MCFG_GENERIC_SOCKET_ADD("socket2", generic_plain_slot, "nascom_socket")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(nascom2_state, socket2_load)
+	GENERIC_SOCKET(config, m_socket1, generic_plain_slot, "nascom_socket", "bin,rom");
+	m_socket1->set_device_load(device_image_load_delegate(&nascom2_state::device_image_load_socket1, this));
+	GENERIC_SOCKET(config, m_socket2, generic_plain_slot, "nascom_socket", "bin,rom");
+	m_socket2->set_device_load(device_image_load_delegate(&nascom2_state::device_image_load_socket2, this));
 
 	// nasbus expansion bus
 	MCFG_NASBUS_ADD(NASBUS_TAG)
@@ -716,19 +766,22 @@ MACHINE_CONFIG_START(nascom2_state::nascom2)
 	MCFG_NASBUS_SLOT_ADD("nasbus4", nasbus_slot_cards, nullptr)
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("socket_list", "nascom_socket")
-	MCFG_SOFTWARE_LIST_ADD("floppy_list", "nascom_flop")
+	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM2");
+	SOFTWARE_LIST(config, "socket_list").set_original("nascom_socket");
+	SOFTWARE_LIST(config, "floppy_list").set_original("nascom_flop");
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nascom2_state::nascom2c)
 	nascom2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(nascom2c_mem)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nascom2_state::nascom2c_mem);
 
 	m_ram->set_default_size("60K");
 
 	MCFG_DEVICE_MODIFY(NASBUS_TAG)
 	MCFG_NASBUS_RAM_DISABLE_HANDLER(WRITELINE(*this, nascom2_state, ram_disable_cpm_w))
+	MCFG_DEVICE_MODIFY("nasbus1")
+	MCFG_SLOT_DEFAULT_OPTION("floppy")
 MACHINE_CONFIG_END
 
 
@@ -745,6 +798,8 @@ ROM_START( nascom1 )
 	ROMX_LOAD("nasbugt2.ic38", 0x0000, 0x0400, CRC(e371b58a) SHA1(485b20a560b587cf9bb4208ba203b12b3841689b), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "t4", "NasBug T4")
 	ROMX_LOAD("nasbugt4.rom", 0x0000, 0x0800, CRC(f391df68) SHA1(00218652927afc6360c57e77d6a4fd32d4e34566), ROM_BIOS(2)) // should really be split in halves for ic38 and ic39
+	ROM_SYSTEM_BIOS(3, "bbug", "B-Bug") // by Viewfax 1978
+	ROMX_LOAD("bbug.rom",     0x0000, 0x0800, CRC(1b1a340d) SHA1(99ce4d771871b3d797cc465d6245c40e41acef3e), ROM_BIOS(3))
 
 	ROM_REGION(0x0800, "gfx1", 0)
 	ROM_LOAD("nascom1.ic16",   0x0000, 0x0800, CRC(33e92a04) SHA1(be6e1cc80e7f95a032759f7df19a43c27ff93a52)) // MCM6576P
@@ -753,13 +808,13 @@ ROM_END
 ROM_START( nascom2 )
 	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ns3")
-	ROM_SYSTEM_BIOS(0, "ns1", "NasSys 1")
+	ROM_SYSTEM_BIOS(0, "ns1", "Nas-Sys 1")
 	ROMX_LOAD("nassys1.ic34", 0x0000, 0x0800, CRC(b6300716) SHA1(29da7d462ba3f569f70ed3ecd93b981f81c7adfa), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "ns3", "NasSys 3")
+	ROM_SYSTEM_BIOS(1, "ns3", "Nas-Sys 3")
 	ROMX_LOAD("nassys3.ic34", 0x0000, 0x0800, CRC(6804e675) SHA1(d55dccec2d1da992a39c38b0b6d24e3809073513), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "ns3a", "NasSys 3 (AVC)")
+	ROM_SYSTEM_BIOS(2, "ns3a", "Nas-Sys 3 (AVC)")
 	ROMX_LOAD("nassys3a.ic34", 0x0000, 0x0800, CRC(39d24a05) SHA1(7bfb574c1f8ce0f460a53b9a6c11c711aabccbb8), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "ns3n", "NasSys 3 (NET)")
+	ROM_SYSTEM_BIOS(3, "ns3n", "Nas-Sys 3 (NET)")
 	ROMX_LOAD("nassys3n.ic34", 0x0000, 0x0800, CRC(87ef62bb) SHA1(dab81511925be36044b3e8b0ba26a0c717fe83ae), ROM_BIOS(3))
 
 	ROM_REGION(0x2000, "basic", 0)
@@ -789,6 +844,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS          INIT           COMPANY                  FULLNAME           FLAGS
-COMP( 1977, nascom1,  0,       0,      nascom1,  nascom1,  nascom1_state, init_nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
+COMP( 1978, nascom1,  0,       0,      nascom1,  nascom1,  nascom1_state, init_nascom,   "Nascom Microcomputers", "Nascom 1",        MACHINE_NO_SOUND_HW )
 COMP( 1979, nascom2,  0,       0,      nascom2,  nascom2,  nascom2_state, init_nascom2,  "Nascom Microcomputers", "Nascom 2",        MACHINE_NO_SOUND_HW )
 COMP( 1980, nascom2c, nascom2, 0,      nascom2c, nascom2c, nascom2_state, init_nascom2c, "Nascom Microcomputers", "Nascom 2 (CP/M)", MACHINE_NO_SOUND_HW )

@@ -64,9 +64,10 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
 
+	required_device<tms32031_device> m_cpu;
+
 private:
 	required_shared_ptr<uint32_t> m_cageram;
-	required_device<tms32031_device> m_cpu;
 	required_device<generic_latch_16_device> m_soundlatch;
 	required_device<timer_device> m_dma_timer;
 	required_device_array<timer_device, 2> m_timer;

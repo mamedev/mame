@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(pc8401a_state::pc8401a)
 	MCFG_DEVICE_IO_MAP(pc8401a_io)
 
 	/* fake keyboard */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
+	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::pc8401a_keyboard_tick), attotime::from_hz(64));
 
 	/* devices */
 	UPD1990A(config, m_rtc);
@@ -617,7 +617,7 @@ MACHINE_CONFIG_START(pc8500_state::pc8500)
 	MCFG_DEVICE_IO_MAP(pc8500_io)
 
 	/* fake keyboard */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
+	TIMER(config, "keyboard").configure_periodic(FUNC(pc8401a_state::pc8401a_keyboard_tick), attotime::from_hz(64));
 
 	/* devices */
 	UPD1990A(config, m_rtc);

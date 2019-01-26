@@ -764,12 +764,11 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_liberate)
-	MCFG_PALETTE_ADD("palette", 33)
-	MCFG_PALETTE_INIT_OWNER(liberate_state,liberate)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_liberate);
+	PALETTE(config, m_palette, FUNC(liberate_state::liberate_palette), 33);
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,liberate)
 
@@ -824,7 +823,7 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosoccr)
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_prosoccr)
+	m_gfxdecode->set_info(gfx_prosoccr);
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
@@ -852,12 +851,11 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_PALETTE(m_palette)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prosport)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prosport);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosport)
 

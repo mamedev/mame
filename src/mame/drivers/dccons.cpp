@@ -317,6 +317,18 @@ void dc_cons_state::init_dcjp()
 	init_dc();
 }
 
+void dc_cons_state::init_tream()
+{
+	// Modchip connected to BIOS ROM chip changes 4 bytes (actually bits) as shown below, which allow to boot any region games.
+	u8 *rom = (u8 *)memregion("maincpu")->base();
+	rom[0x503] |= 0x40;
+	rom[0x50f] |= 0x40;
+	rom[0x523] |= 0x40;
+	rom[0x531] |= 0x40;
+
+	init_dcus();
+}
+
 READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 {
 	uint64_t out = PCTRA<<32;
@@ -597,7 +609,7 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
 	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
 	MCFG_DEVICE_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_DEVICE_PROGRAM_MAP(dc_audio_map)
@@ -608,10 +620,42 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 
 	MAPLE_DC(config, m_maple, 0, m_maincpu);
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
-	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, ":P1:0", ":P1:1", ":P1:A0", ":P1:A1", ":P1:A2", ":P1:A3", ":P1:A4", ":P1:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, ":P2:0", ":P2:1", ":P2:A0", ":P2:A1", ":P2:A2", ":P2:A3", ":P2:A4", ":P2:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl2", "maple_dc", 2, ":P3:0", ":P3:1", ":P3:A0", ":P3:A1", ":P3:A2", ":P3:A3", ":P3:A4", ":P3:A5")
-	MCFG_DC_CONTROLLER_ADD("dcctrl3", "maple_dc", 3, ":P4:0", ":P4:1", ":P4:A0", ":P4:A1", ":P4:A2", ":P4:A3", ":P4:A4", ":P4:A5")
+	dc_controller_device &dcctrl0(DC_CONTROLLER(config, "dcctrl0", 0, m_maple, 0));
+	dcctrl0.set_port_tag<0>("P1:0");
+	dcctrl0.set_port_tag<1>("P1:1");
+	dcctrl0.set_port_tag<2>("P1:A0");
+	dcctrl0.set_port_tag<3>("P1:A1");
+	dcctrl0.set_port_tag<4>("P1:A2");
+	dcctrl0.set_port_tag<5>("P1:A3");
+	dcctrl0.set_port_tag<6>("P1:A4");
+	dcctrl0.set_port_tag<7>("P1:A5");
+	dc_controller_device &dcctrl1(DC_CONTROLLER(config, "dcctrl1", 0, m_maple, 1));
+	dcctrl1.set_port_tag<0>("P2:0");
+	dcctrl1.set_port_tag<1>("P2:1");
+	dcctrl1.set_port_tag<2>("P2:A0");
+	dcctrl1.set_port_tag<3>("P2:A1");
+	dcctrl1.set_port_tag<4>("P2:A2");
+	dcctrl1.set_port_tag<5>("P2:A3");
+	dcctrl1.set_port_tag<6>("P2:A4");
+	dcctrl1.set_port_tag<7>("P2:A5");
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dcctrl2.set_port_tag<0>("P3:0");
+	dcctrl2.set_port_tag<1>("P3:1");
+	dcctrl2.set_port_tag<2>("P3:A0");
+	dcctrl2.set_port_tag<3>("P3:A1");
+	dcctrl2.set_port_tag<4>("P3:A2");
+	dcctrl2.set_port_tag<5>("P3:A3");
+	dcctrl2.set_port_tag<6>("P3:A4");
+	dcctrl2.set_port_tag<7>("P3:A5");
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dcctrl3.set_port_tag<0>("P4:0");
+	dcctrl3.set_port_tag<1>("P4:1");
+	dcctrl3.set_port_tag<2>("P4:A0");
+	dcctrl3.set_port_tag<3>("P4:A1");
+	dcctrl3.set_port_tag<4>("P4:A2");
+	dcctrl3.set_port_tag<5>("P4:A3");
+	dcctrl3.set_port_tag<6>("P4:A4");
+	dcctrl3.set_port_tag<7>("P4:A5");
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -624,12 +668,12 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("aica", AICA, (XTAL(33'868'800)*2)/3) // 67.7376MHz(2*33.8688MHz), div 3 for audio block
-	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(*this, dc_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(*this, dc_state, sh4_aica_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
+	m_aica->set_master(true);
+	m_aica->irq().set(FUNC(dc_state::aica_irq));
+	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
+	m_aica->add_route(0, "lspeaker", 1.0);
+	m_aica->add_route(1, "rspeaker", 1.0);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 
@@ -733,8 +777,8 @@ ROM_END
 // unauthorised portable modification
 ROM_START( dctream )
 	ROM_REGION(0x200000, "maincpu", 0)
-	// multi-region hack of mpr-21931/1.01d BIOS, hardware checksum protection passes OK due to algorithm weakness
-	ROM_LOAD( "dc_bios.bin", 0x000000, 0x200000, CRC(cff88d0d) SHA1(e3f84705b183ffded0a349ac7f2ab00be2ab74ee) ) // dumped in software way, ROM label unknown
+	// uses regular mpr-21931 BIOS chip, have region-free mod-chip installed, see driver init.
+	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
 	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
@@ -764,5 +808,5 @@ ROM_END
 CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dcjp, "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "<unknown>", "Treamcast", MACHINE_NOT_WORKING )
+CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

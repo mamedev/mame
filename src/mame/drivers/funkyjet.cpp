@@ -305,7 +305,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2) /* 28 MHz crystal */
+	MCFG_DEVICE_ADD(m_maincpu, M68000, XTAL(28'000'000)/2) /* 28 MHz crystal */
 	MCFG_DEVICE_PROGRAM_MAP(funkyjet_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funkyjet_state,  irq6_line_hold)
 
@@ -331,8 +331,7 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	m_deco146->set_interface_scramble_interleave();
 
 	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_funkyjet)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
 	DECO16IC(config, m_deco_tilegen, 0);
 	m_deco_tilegen->set_split(0);

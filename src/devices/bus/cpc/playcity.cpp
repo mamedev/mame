@@ -26,16 +26,16 @@ DEFINE_DEVICE_TYPE(CPC_PLAYCITY, cpc_playcity_device, "cpc_playcity", "PlayCity"
 // device machine config
 void cpc_playcity_device::device_add_mconfig(machine_config &config)
 {
-	Z80CTC(config, m_ctc, XTAL(4'000'000));
+	Z80CTC(config, m_ctc, DERIVED_CLOCK(1, 1));
 	m_ctc->zc_callback<1>().set(FUNC(cpc_playcity_device::ctc_zc1_cb));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_ctc->intr_callback().set(FUNC(cpc_playcity_device::ctc_intr_cb));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	YMZ294(config, m_ymz1, XTAL(4'000'000));  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
+	YMZ294(config, m_ymz1, DERIVED_CLOCK(1, 1));  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
 	m_ymz1->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
-	YMZ294(config, m_ymz2, XTAL(4'000'000));
+	YMZ294(config, m_ymz2, DERIVED_CLOCK(1, 1));
 	m_ymz2->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
 
 	// pass-through

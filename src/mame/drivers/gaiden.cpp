@@ -750,32 +750,30 @@ static GFXDECODE_START( gfx_drgnbowl )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(gaiden_state::shadoww)
-
+void gaiden_state::shadoww(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gaiden_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	M68000(config, m_maincpu, 18432000/2); /* 9.216 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaiden_state::gaiden_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaiden_state::irq5_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-								/* IRQs are triggered by the YM2203 */
+	Z80(config, m_audiocpu, 4000000);  /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::sound_map);	/* IRQs are triggered by the YM2203 */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17)   /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_gaiden)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.17);   /* verified on pcb */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
+	m_screen->set_screen_update(FUNC(gaiden_state::screen_update_gaiden));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gaiden)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaiden);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
 	TECMO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(3);
@@ -795,75 +793,70 @@ MACHINE_CONFIG_START(gaiden_state::shadoww)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.60)
+	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym1.irq_handler().set_inputline(m_audiocpu, 0);
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 4000000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.60)
+	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.20);
+}
 
-MACHINE_CONFIG_START(gaiden_state::wildfang)
+void gaiden_state::wildfang(machine_config &config)
+{
 	shadoww(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(wildfang_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaiden_state::wildfang_map);
 
-	MCFG_DEVICE_ADD("mcu", I8749, 4_MHz_XTAL)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
+	I8749(config, "mcu", 4_MHz_XTAL).set_disable();
+}
 
-MACHINE_CONFIG_START(gaiden_state::raiga)
+void gaiden_state::raiga(machine_config &config)
+{
 	shadoww(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(raiga_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaiden_state::raiga_map);
 
-	MCFG_DEVICE_ADD("mcu", I8749, 4_MHz_XTAL)
-	MCFG_DEVICE_DISABLE()
+	I8749(config, "mcu", 4_MHz_XTAL).set_disable();
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,raiga)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_raiga)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	m_screen->set_screen_update(FUNC(gaiden_state::screen_update_raiga));
+	m_screen->screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(gaiden_state::drgnbowl)
-
+void gaiden_state::drgnbowl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(drgnbowl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	M68000(config, m_maincpu, 20000000/2); /* 10 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaiden_state::drgnbowl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaiden_state::irq5_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/2)   /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(drgnbowl_sound_map)
-	MCFG_DEVICE_IO_MAP(drgnbowl_sound_port_map)
+	Z80(config, m_audiocpu, 12000000/2);   /* 6 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::drgnbowl_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &gaiden_state::drgnbowl_sound_port_map);
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(gaiden_state::screen_update_drgnbowl));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_drgnbowl)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_drgnbowl);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
 	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
@@ -876,9 +869,8 @@ MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 
 	YM2151(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /*
 Master Ninja
@@ -994,15 +986,15 @@ void gaiden_state::mastninj_map(address_map &map)
 	map(0x07e000, 0x07e000).w(FUNC(gaiden_state::drgnbowl_irq_ack_w));
 }
 
-MACHINE_CONFIG_START(gaiden_state::mastninj)
-
+void gaiden_state::mastninj(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(mastninj_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
+	M68000(config, m_maincpu, 10000000);   /* 10 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaiden_state::mastninj_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gaiden_state::irq5_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mastninj_sound_map)
+	Z80(config, m_audiocpu, 4000000);  /* ?? MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gaiden_state::mastninj_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
 
@@ -1011,17 +1003,16 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_drgnbowl)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(gaiden_state::screen_update_drgnbowl));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mastninj)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mastninj);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 4096);
 
 	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
@@ -1033,17 +1024,17 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// YM2203 clocks chosen by analogy with Automat; actual rate unknown, but 4 MHz is obviously too fast
-	MCFG_DEVICE_ADD("ym1", YM2203, 1250000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.60)
+	ym2203_device &ym1(YM2203(config, "ym1", 1250000));
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 1250000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.60)
+	ym2203_device &ym2(YM2203(config, "ym2", 1250000));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.60);
 
 	LS157(config, m_adpcm_select[0], 0);
 	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
@@ -1060,7 +1051,7 @@ MACHINE_CONFIG_START(gaiden_state::mastninj)
 	MSM5205(config, m_msm[1], 384000);
 	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
 	m_msm[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
 
@@ -1329,9 +1320,9 @@ ROM_START( mastninj )
 	ROM_LOAD( "19.ic2",            0x0f0000, 0x10000, CRC(c12c367b) SHA1(9835292f335f1353f7b9bd0bb85124942822646f) )
 
 	ROM_REGION( 0x080000, "misc", 0 )
-	ROM_LOAD( "gal16v8.ic42.bad.dump",    0x000, 0x117, BAD_DUMP CRC(61d6a8d7) SHA1(d3a6331b1fccd374e4f080740094d3832ff98ad9) )
-	ROM_LOAD( "tibpal16l8.ic15.bad.dump", 0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "tibpal16l8.ic54.bad.dump", 0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "gal16v8.ic42",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "tibpal16l8.ic15", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16l8.ic54", 0x000, 0x104, NO_DUMP )
 ROM_END
 
 

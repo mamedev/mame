@@ -370,8 +370,8 @@ void hp64k_state::cpu_io_map(address_map &map)
 	map(HP_MAKE_IOADDR(12, 0), HP_MAKE_IOADDR(12, 3)).w(FUNC(hp64k_state::hp64k_irl_mask_w));
 }
 
-hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig , type , tag),
+hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig , type , tag),
 	m_cpu(*this , "cpu"),
 	m_crtc(*this , "crtc"),
 	m_palette(*this , "palette"),
@@ -1384,25 +1384,25 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	m_cpu->set_irq_acknowledge_callback(FUNC(hp64k_state::hp64k_irq_callback));
 
 	// Actual keyboard refresh rate should be between 1 and 2 kHz
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", hp64k_state, hp64k_kb_scan, attotime::from_hz(100))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(hp64k_state::hp64k_kb_scan), attotime::from_hz(100));
 
 	// Line sync timer. A line frequency of 50 Hz is assumed.
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("linesync_timer", hp64k_state, hp64k_line_sync, attotime::from_hz(50))
+	TIMER(config, "linesync_timer").configure_periodic(FUNC(hp64k_state::hp64k_line_sync), attotime::from_hz(50));
 
 	// Clock = 25 MHz / 9 * (112/114)
-	MCFG_DEVICE_ADD("crtc", I8275, 2729045)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_I8275_CHARACTER_WIDTH(9)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(hp64k_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, hp64k_state, hp64k_crtc_drq_w))
-	MCFG_I8275_VRTC_CALLBACK(WRITELINE(*this, hp64k_state, hp64k_crtc_vrtc_w))
+	I8275(config, m_crtc, 2729045);
+	m_crtc->set_screen("screen");
+	m_crtc->set_character_width(9);
+	m_crtc->set_display_callback(FUNC(hp64k_state::crtc_display_pixels), this);
+	m_crtc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_drq_w));
+	m_crtc->vrtc_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_vrtc_w));
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(720, 390)
 	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 390-1)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	FD1791(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed
@@ -1433,7 +1433,7 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2500).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_TIMER_DRIVER_ADD("beep_timer", hp64k_state, hp64k_beeper_off);
+	TIMER(config, m_beep_timer).configure_generic(FUNC(hp64k_state::hp64k_beeper_off));
 
 	COM8116(config, m_baud_rate, 5.0688_MHz_XTAL);
 	m_baud_rate->fr_handler().set(FUNC(hp64k_state::hp64k_baud_clk_w));

@@ -135,7 +135,7 @@ public:
 	void sr16(machine_config &config);
 
 protected:
-	DECLARE_PALETTE_INIT(alesis);
+	void alesis_palette(palette_device &palette) const;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

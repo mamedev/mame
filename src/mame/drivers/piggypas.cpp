@@ -204,7 +204,7 @@ HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 void piggypas_state::piggypas(machine_config &config)
 {
 	/* basic machine hardware */
-	I80C31(config, m_maincpu, XTAL(8'448'000)); // OKI M80C31F or M80C154S
+	I80C31(config, m_maincpu, 8.448_MHz_XTAL); // OKI M80C31F or M80C154S
 	m_maincpu->set_addrmap(AS_PROGRAM, &piggypas_state::piggypas_map);
 	m_maincpu->set_addrmap(AS_IO, &piggypas_state::piggypas_io);
 	m_maincpu->port_out_cb<1>().set(FUNC(piggypas_state::led_strobe_w));
@@ -221,7 +221,7 @@ void piggypas_state::piggypas(machine_config &config)
 	screen.set_visarea(0, 16*6-1, 0, 8-1);
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2);
+	PALETTE(config, "palette").set_entries(2);
 	config.set_default_layout(layout_piggypas);
 
 	hd44780_device &hd44780(HD44780(config, "hd44780"));
@@ -231,7 +231,7 @@ void piggypas_state::piggypas(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(8'448'000) / 8, okim6295_device::PIN7_HIGH)); // clock and pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 8.448_MHz_XTAL / 8, okim6295_device::PIN7_HIGH)); // clock not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	i8255_device &ppi(I8255A(config, "ppi")); // OKI M82C55A-2
@@ -291,6 +291,42 @@ ROM_START( fidlstix )
 	ROM_LOAD( "fiddle.u14", 0x00000, 0x40000, CRC(baf4e1cd) SHA1(ae153f832cbd188e9f3f357a1a1f68cc8264d346) )
 ROM_END
 
+/*
+
+8.448MHz Crystal
+P-80C31-16 cpu
+M6295 (Verified with DMM that Pin 7 tied to VCC)
+DS1220AD-150
+M82C55A-2
+UCN5832A
+2 Line Display LCD
+HD44780A00 (underneath board the LCD is mounted to)
+
+-----------------------------------------------------------------------------
+
+Factory Wire Mods
+
+
+Parts Side:
+
+    - Pin 1 of U25 (74LS373) pulled up and jumper wired to pin 5 of U2 (CM1232P)
+
+Solder Side:
+
+    - Ground test point near C32 jumper wired to pin 2 of J8
+      (pin 2 of J8 connected to pins 5 and 6 of L6 (CM1232P))
+
+    - Pin 1 of J1 jumper wired with a 1K +/-5% 1/4 watt resistor to pin 10 of J1
+
+*/
+ROM_START( hoopitup )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "us a05449-01c.u6", 0x00000, 0x08000, CRC(8fc6a07d) SHA1(c1c7ad708eb84e9801fb5acea0b3b797923886c3) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "sound ad5.u14", 0x00000, 0x40000, CRC(e6f647c3) SHA1(8f208af76e5f94b5db479ecbd65922fd834250cf) )
+ROM_END
+
 // bad dump of program rom
 ROM_START( jackbean )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -323,16 +359,18 @@ ROM_END
 
 
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 04.40
-GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Piggy Pass (version 04.40)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 05.22
-GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // Quick $ilver   Development Co.    10/08/96      ROUND  REV 6
-GAME( 1996, rndrndqs,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1996, rndrndqs,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 //  Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T
-GAME( 1995, fidlstix,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, fidlstix,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+// Quick $ilver   Development Co.    11/20/95     HoopItUp REV 23
+GAME( 1995, hoopitup,  0,    fidlstix, piggypas, piggypas_state,  empty_init, ROT0, "Atari Games", "Hoop it Up World Tour - 3 on 3 (Rev 23)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, dumpump,   0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, dumpump,   0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "Dump The Ump", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
 // bad dump, so version unknown
-GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, 3lilpigs,  0,    piggypas, piggypas, piggypas_state,  empty_init, ROT0, "Doyle & Assoc.", "3 Lil' Pigs", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
