@@ -15,9 +15,11 @@
 class xavix2000_device : public xavix_device {
 public:
 	xavix2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	xavix2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+protected:
+	xavix2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 

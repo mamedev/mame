@@ -15,7 +15,6 @@
 class xavix_device : public m6502_device {
 public:
 	xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
@@ -100,6 +99,8 @@ protected:
 	uint8_t m_databank;
 	uint8_t m_codebank;
 	uint32_t XPC;
+
+	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t adr_with_codebank(uint16_t adr) { return adr | (get_codebank() << 16); }
 
