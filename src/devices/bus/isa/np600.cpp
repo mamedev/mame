@@ -43,6 +43,16 @@ ROM_START(np600a3)
 	ROM_REGION(0x4000, "npcpu", 0)
 	ROM_LOAD16_BYTE("258-0032-00_rev_ba.u38", 0x0000, 0x2000, CRC(84ccb317) SHA1(3ecc8e265336f5d3b0f276f18dd1b7001778f2c3))
 	ROM_LOAD16_BYTE("258-0033-00_rev_ba.u39", 0x0001, 0x2000, CRC(0e0f726c) SHA1(520773e235a826438b025381cd3861df86d4965d))
+
+	// Undumped small devices (mostly or all PLDs):
+	// 258-0037-00 REV AA (U17, 20 pins)
+	// 258-0027-01 REV AB (U20, 20 pins)
+	// 020701079BFA (U29, 16 pins)
+	// 258-0031-00 REV AC (U34, PAL20xx, 24 pins)
+	// 258-0030-00 REV AA (U36, 20 pins)
+	// 258-0028-01 REV AA (U44, 20 pins)
+	// 258-0029-01 REV AA (U46, 20 pins)
+	// 258-0089-00 REV AA (U48, 20 pins)
 ROM_END
 
 const tiny_rom_entry *np600a3_device::device_rom_region() const
