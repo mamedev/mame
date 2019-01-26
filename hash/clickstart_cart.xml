@@ -48,7 +48,7 @@
 	</software>
 
 	<software name="cars" supported="no">
-		<description>Disney/Pixar The World of Cars - The Road to Learning!(UK)</description>
+		<description>Disney/Pixar The World of Cars - The Road to Learning! (UK)</description>
 		<year>2008</year>
 		<publisher>LeapFrog / Disney / Pixar</publisher>
 		<part name="cart" interface="clickstart_cart">
