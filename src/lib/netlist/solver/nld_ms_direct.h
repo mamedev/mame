@@ -59,7 +59,7 @@ private:
 
 	const std::size_t m_dim;
 	const std::size_t m_pitch;
-	plib::parray<FT, SIZE * m_pitch_ABS> m_A;
+	plib::parray<FT, SIZE * int(m_pitch_ABS)> m_A;
 
 };
 

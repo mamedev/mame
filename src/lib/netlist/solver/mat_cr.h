@@ -15,6 +15,7 @@
 #include <array>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
 
 #include "../plib/pconfig.h"
 #include "../plib/palloc.h"
