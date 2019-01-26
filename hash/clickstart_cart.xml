@@ -104,7 +104,7 @@
 	</software>
 
 	<software name="nemo" supported="no">
-		<description>Disney/Pixar Finding Nemo  - Sea of Keys (UK)</description>
+		<description>Disney/Pixar Finding Nemo - Sea of Keys (UK)</description>
 		<year>2007</year>
 		<publisher>LeapFrog / Disney / Pixar</publisher>
 		<part name="cart" interface="clickstart_cart">
