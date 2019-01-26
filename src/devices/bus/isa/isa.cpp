@@ -209,8 +209,8 @@ void isa8_device::device_config_complete()
 {
 	if (m_allocspaces)
 	{
-		m_memspace.set_tag(*this, DEVICE_SELF, AS_PROGRAM);
-		m_iospace.set_tag(*this, DEVICE_SELF, AS_IO);
+		m_memspace.set_tag(*this, DEVICE_SELF, AS_ISA_MEM);
+		m_iospace.set_tag(*this, DEVICE_SELF, AS_ISA_IO);
 	}
 }
 
