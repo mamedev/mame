@@ -36,7 +36,7 @@
 #include "wd1007a.h"
 #include "mcd.h"
 #include "lbaenhancer.h"
-#include "jc1310.h"
+#include "cl_sh260.h"
 
 // sound
 #include "adlib.h"
@@ -169,5 +169,6 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("mcd", ISA16_MCD);
 	device.option_add("sad8852", ISA16_SAD8852);
 	device.option_add("wd1007a", WD1007A);
+	device.option_add("ev346", EV346);
 	device.option_add("jc1310", JC1310);
 }
