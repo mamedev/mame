@@ -202,7 +202,7 @@
 	</software>	
 
 	<software name="dora" supported="no">
-		<description>Dora the Explorer - Friends! ¡Amigos! (UK)</description>
+		<description>Nick Jr. Dora the Explorer - Friends! ¡Amigos! (UK)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
