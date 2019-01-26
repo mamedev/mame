@@ -49,7 +49,7 @@ void i82371sb_isa_device::internal_io_map(address_map &map)
 
 void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 {
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(FUNC(i82371sb_isa_device::at_pit8254_out0_changed));
 	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
@@ -90,12 +90,12 @@ void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 	m_dma8237_2->out_dack_callback<2>().set(FUNC(i82371sb_isa_device::pc_dack6_w));
 	m_dma8237_2->out_dack_callback<3>().set(FUNC(i82371sb_isa_device::pc_dack7_w));
 
-	PIC8259(config, m_pic8259_master, 0);
+	PIC8259(config, m_pic8259_master);
 	m_pic8259_master->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic8259_master->in_sp_callback().set_constant(1);
 	m_pic8259_master->read_slave_ack_callback().set(FUNC(i82371sb_isa_device::get_slave_ack));
 
-	PIC8259(config, m_pic8259_slave, 0);
+	PIC8259(config, m_pic8259_slave);
 	m_pic8259_slave->out_int_callback().set(m_pic8259_master, FUNC(pic8259_device::ir2_w));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
@@ -104,7 +104,8 @@ void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	ISA16(config, m_isabus, 0);
-	m_isabus->set_cputag(":maincpu");
+	m_isabus->set_memspace(":maincpu", AS_PROGRAM);
+	m_isabus->set_iospace(":maincpu", AS_IO);
 	m_isabus->irq3_callback().set(FUNC(i82371sb_isa_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(i82371sb_isa_device::pc_irq4_w));
 	m_isabus->irq5_callback().set(FUNC(i82371sb_isa_device::pc_irq5_w));
@@ -123,6 +124,7 @@ void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 	m_isabus->drq5_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq1_w));
 	m_isabus->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
+	m_isabus->iochck_callback().set(FUNC(i82371sb_isa_device::iochck_w));
 }
 
 i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -820,7 +822,14 @@ WRITE8_MEMBER( i82371sb_isa_device::at_portb_w )
 	m_pit8254->write_gate2(BIT(data, 0));
 	at_speaker_set_spkrdata( BIT(data, 1));
 	m_channel_check = BIT(data, 3);
-	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
+	if (m_channel_check)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER( i82371sb_isa_device::iochck_w )
+{
+	if (!state && !m_channel_check && m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER( i82371sb_isa_device::at_dma8237_2_r )

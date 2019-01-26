@@ -941,7 +941,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K, 256K");
 
 	/* Interrupt controller */
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set(FUNC(myb3k_state::pic_int_w));
 
 	/* Parallel port */
@@ -970,7 +970,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	m_dma8257->out_dack_cb<3>().set(FUNC(myb3k_state::dack3_w));
 
 	/* Timer */
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(XTAL(14'318'181) / 12.0); /* TIMINT straight into IRQ0 */
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_pit8253->set_clk<1>(XTAL(14'318'181) / 12.0); /* speaker if port c bit 5 is low */
@@ -987,7 +987,8 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* ISA8+ Expansion bus */
 	ISA8(config, m_isabus, 0);
-	m_isabus->set_cputag("maincpu");
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
