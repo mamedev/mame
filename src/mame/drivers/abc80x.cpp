@@ -1102,7 +1102,7 @@ MACHINE_CONFIG_START(abc800_state::common)
 	MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(WRITELINE(m_dart, z80dart_device, rxtxcb_w))
 	MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(WRITELINE(m_dart, z80dart_device, dcdb_w))
 
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_cards, nullptr)
+	ABCBUS_SLOT(config, ABCBUS_TAG, ABC800_X01/2/2, abcbus_cards, nullptr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
