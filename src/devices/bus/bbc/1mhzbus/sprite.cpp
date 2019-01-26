@@ -26,6 +26,7 @@ DEFINE_DEVICE_TYPE(BBC_SPRITE, bbc_sprite_device, "bbc_sprite", "Logotron Sprite
 void bbc_sprite_device::device_add_mconfig(machine_config &config)
 {
 	TMS9129(config, m_vdp, 10.738635_MHz_XTAL);
+	m_vdp->int_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_vdp->set_screen("screen");
 	m_vdp->set_vram_size(0x4000);
 
