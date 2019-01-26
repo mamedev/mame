@@ -1640,16 +1640,19 @@ qnilece                         // (c) 2001
 qnilecea                        // (c) 2001
 qnileceb                        // (c) 2001
 qniled                          // (c) 1999
+qnilefl                         // (c) 2001
+qnilemax                        // (c) 1999
 qnilenl                         // (c) 2000
+qnilenz                         // (c) 1998
+qnileql                         // (c) 1999
 qnileu                          // (c) 1997
 qnileua                         // (c) 1997
 qnilev                          // (c) 1997
-qnilemax                        // (c) 1999
-qnilenz                         // (c) 1998
 qtbird                          // (c) 1994
 rainwrce                        // (c) 2000
 reelpwr                         // (c) 1996
 reelrock                        // (c) 1998
+reelrockql                      // (c) 2000
 retrsam                         // (c) 1997
 retrsama                        // (c) 1997
 retrsamb                        // (c) 1997
@@ -1897,6 +1900,7 @@ qnilemt2                        // (c) 2005
 qsheba                          // (c) 2003
 raprichs                        // (c) 2005
 redbara6                        // (c) 2002
+redbarfl                        // (c) 2003
 reelrkfl                        // (c) 201?
 retsama6                        // (c) 2002
 roadtrip                        // (c) 2005
@@ -1917,6 +1921,7 @@ silgola6                        // (c) 2002
 skydnca6                        // (c) 2008
 spgcarn                         // (c) 1999
 spgcarnq                        // (c) 2001
+spgfest                         // (c) 2008
 stardrft                        // (c) 2003
 stardrftu                       // (c) 2004
 starqst                         // (c) 2001
@@ -39809,7 +39814,7 @@ tmy_thom                        //
 domfitex                        //
 domfitch                        //
 domfitad                        //
-dombikec                        //                       
+dombikec                        //
 
 @source:xbox.cpp
 xbox                            //
