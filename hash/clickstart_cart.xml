@@ -174,7 +174,7 @@
 	</software>	
 	
 	<software name="bobbuild" supported="no">
-		<description>Bob the Builder  - Project: Learn It! (UK)</description>
+		<description>Bob the Builder - Project: Learn It! (UK)</description>
 		<year>2008</year>
 		<publisher>LeapFrog</publisher>
 		<part name="cart" interface="clickstart_cart">
