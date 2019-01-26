@@ -26,7 +26,10 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	u16 status_r();
+
 	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 	required_device<cpu_device> m_npcpu;
 };
