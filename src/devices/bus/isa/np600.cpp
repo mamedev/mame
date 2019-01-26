@@ -36,7 +36,7 @@ void np600a3_device::device_add_mconfig(machine_config &config)
 	I80186(config, m_npcpu, 16_MHz_XTAL);
 	m_npcpu->set_addrmap(AS_PROGRAM, &np600a3_device::mem_map);
 
-	//I82586(config, "enet", 30_MHz_XTAL / 3); // what divider?
+	//I82586(config, "enet", 20_MHz_XTAL);
 }
 
 ROM_START(np600a3)
