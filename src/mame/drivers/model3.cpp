@@ -2274,7 +2274,7 @@ ROM_START( scud )   /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-1
 	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 ROM_END
 
-ROM_START( scudj )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 12934 SPG DX */
+ROM_START( scudj )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 12934 SPG DX, Digital Audio board ID# 837-12941 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19610a.17",  0x0600006,  0x80000,  CRC(53f5cd94) SHA1(e27609165087ef7000b61ce628883561ffe64b22) )
