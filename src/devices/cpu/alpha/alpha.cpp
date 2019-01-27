@@ -14,9 +14,11 @@
  */
 
 #include "emu.h"
-#include "debugger.h"
 #include "alpha.h"
 #include "alphad.h"
+
+#include "debugger.h"
+
 
 #define LOG_GENERAL   (1U << 0)
 #define LOG_EXCEPTION (1U << 1)

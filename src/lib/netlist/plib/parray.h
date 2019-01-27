@@ -53,7 +53,7 @@ namespace plib {
 	struct parray
 	{
 	public:
-	    static constexpr std::size_t SIZEABS() { return sizeabs<FT, SIZE>::ABS(); }
+		static constexpr std::size_t SIZEABS() { return sizeabs<FT, SIZE>::ABS(); }
 
 		typedef typename sizeabs<FT, SIZE>::container base_type;
 		typedef typename base_type::size_type size_type;
@@ -84,29 +84,29 @@ namespace plib {
 				throw plib::pexception("parray: size error");
 		}
 
-	    inline size_type size() const noexcept { return SIZE <= 0 ? m_size : SIZEABS(); }
+		inline size_type size() const noexcept { return SIZE <= 0 ? m_size : SIZEABS(); }
 
-	    constexpr size_type max_size() const noexcept { return base_type::max_size(); }
+		constexpr size_type max_size() const noexcept { return base_type::max_size(); }
 
-	    bool empty() const noexcept { return size() == 0; }
+		bool empty() const noexcept { return size() == 0; }
 
 #if 0
-	    reference operator[](size_type i) /*noexcept*/
-	    {
-	    	if (i >= m_size) throw plib::pexception("limits error " + to_string(i) + ">=" + to_string(m_size));
-	    	return m_a[i];
-	    }
-	    const_reference operator[](size_type i) const /*noexcept*/
-	    {
-	    	if (i >= m_size) throw plib::pexception("limits error " + to_string(i) + ">=" + to_string(m_size));
-	    	return m_a[i];
-	    }
+		reference operator[](size_type i) /*noexcept*/
+		{
+			if (i >= m_size) throw plib::pexception("limits error " + to_string(i) + ">=" + to_string(m_size));
+			return m_a[i];
+		}
+		const_reference operator[](size_type i) const /*noexcept*/
+		{
+			if (i >= m_size) throw plib::pexception("limits error " + to_string(i) + ">=" + to_string(m_size));
+			return m_a[i];
+		}
 #else
-	    reference operator[](size_type i) noexcept { return m_a[i]; }
-	    constexpr const_reference operator[](size_type i) const noexcept { return m_a[i]; }
+		reference operator[](size_type i) noexcept { return m_a[i]; }
+		constexpr const_reference operator[](size_type i) const noexcept { return m_a[i]; }
 #endif
-	    FT * data() noexcept { return m_a.data(); }
-	    const FT * data() const noexcept { return m_a.data(); }
+		FT * data() noexcept { return m_a.data(); }
+		const FT * data() const noexcept { return m_a.data(); }
 
 	private:
 		base_type m_a;

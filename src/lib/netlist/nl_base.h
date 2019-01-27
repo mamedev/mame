@@ -1346,13 +1346,13 @@ namespace netlist
 		pstring                             m_name;
 		std::unique_ptr<plib::dynlib>       m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
-		std::unique_ptr<callbacks_t> 		m_callbacks;
-		log_type							m_log;
+		std::unique_ptr<callbacks_t>        m_callbacks;
+		log_type                            m_log;
 		std::unique_ptr<setup_t>            m_setup;
 
-		nets_collection_type 			    m_nets;
+		nets_collection_type                m_nets;
 		/* sole use is to manage lifetime of net objects */
-		devices_collection_type 		    m_devices;
+		devices_collection_type             m_devices;
 
 	};
 
@@ -1405,7 +1405,7 @@ namespace netlist
 		void print_stats() const;
 
 	private:
-		std::unique_ptr<netlist_state_t>	m_state;
+		std::unique_ptr<netlist_state_t>    m_state;
 
 		/* mostly rw */
 		netlist_time                        m_time;

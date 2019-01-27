@@ -488,12 +488,12 @@ void tbowl_state::tbowl(machine_config &config)
 	/* something for the samples? */
 	MSM5205(config, m_msm1, 384000);
 	m_msm1->vck_legacy_callback().set(FUNC(tbowl_state::adpcm_int_1));    /* interrupt function */
-	m_msm1->set_prescaler_selector(msm5205_device::S48_4B);	/* 8KHz */
+	m_msm1->set_prescaler_selector(msm5205_device::S48_4B); /* 8KHz */
 	m_msm1->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MSM5205(config, m_msm2, 384000);
 	m_msm2->vck_legacy_callback().set(FUNC(tbowl_state::adpcm_int_2));    /* interrupt function */
-	m_msm2->set_prescaler_selector(msm5205_device::S48_4B);	/* 8KHz */
+	m_msm2->set_prescaler_selector(msm5205_device::S48_4B); /* 8KHz */
 	m_msm2->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

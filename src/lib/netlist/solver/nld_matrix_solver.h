@@ -66,7 +66,7 @@ public:
 
 		for (std::size_t i = 0; i < railstart; i++)
 		{
-			*tcr[i] 	  -= m_go[i];
+			*tcr[i]       -= m_go[i];
 			gtot_t        += m_gt[i];
 			RHS_t         += m_Idr[i];
 		}

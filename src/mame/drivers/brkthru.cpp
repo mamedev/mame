@@ -460,10 +460,10 @@ WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
 void brkthru_state::brkthru(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MASTER_CLOCK/8);			/* 1.5 MHz ? */
+	MC6809E(config, m_maincpu, MASTER_CLOCK/8);         /* 1.5 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::brkthru_map);
 
-	MC6809(config, m_audiocpu, MASTER_CLOCK/2);			/* 1.5 MHz ? */
+	MC6809(config, m_audiocpu, MASTER_CLOCK/2);         /* 1.5 MHz ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	/* video hardware */
@@ -497,10 +497,10 @@ void brkthru_state::brkthru(machine_config &config)
 void brkthru_state::darwin(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MASTER_CLOCK/8);			/* 1.5 MHz ? */
+	MC6809E(config, m_maincpu, MASTER_CLOCK/8);         /* 1.5 MHz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::darwin_map);
 
-	MC6809(config, m_audiocpu, MASTER_CLOCK/2);			/* 1.5 MHz ? */
+	MC6809(config, m_audiocpu, MASTER_CLOCK/2);         /* 1.5 MHz ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	/* video hardware */

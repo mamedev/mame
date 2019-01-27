@@ -189,9 +189,9 @@ namespace netlist
 		using mutex_type = pspin_mutex<TS>;
 		using lock_guard_type = std::lock_guard<mutex_type>;
 
-		mutex_type 		m_lock;
-		T 			  * m_end;
-		std::vector<T> 	m_list;
+		mutex_type      m_lock;
+		T             * m_end;
+		std::vector<T>  m_list;
 
 	public:
 		// profiling

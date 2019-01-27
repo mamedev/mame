@@ -59,7 +59,7 @@
 #define MF_1_UNABLE_TO_PARSE_MODEL_1            "Unable to parse model: {1}"
 #define MF_1_MODEL_ALREADY_EXISTS_1             "Model already exists: {1}"
 #define MF_1_DEVICE_ALREADY_EXISTS_1            "Device already exists: {1}"
-#define MF_1_ADDING_ALI1_TO_ALIAS_LIST       	"Error adding alias {1} to alias list"
+#define MF_1_ADDING_ALI1_TO_ALIAS_LIST          "Error adding alias {1} to alias list"
 #define MF_1_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1 "You must pass an equal number of pins to DIPPINS {1}"
 #define MF_1_UNKNOWN_OBJECT_TYPE_1              "Unknown object type {1}"
 #define MF_2_INVALID_NUMBER_CONVERSION_1_2      "Invalid number conversion {1} : {2}"

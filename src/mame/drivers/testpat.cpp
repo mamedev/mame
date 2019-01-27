@@ -5,11 +5,11 @@
 TV test pattern generators
 
 Radio, 1983, N5
-	http://radioway.ru/1983/05/generator_telesignalov.html
-	http://radioway.ru/1984/04/generator_telesignalov.html
+    http://radioway.ru/1983/05/generator_telesignalov.html
+    http://radioway.ru/1984/04/generator_telesignalov.html
 
 Radio, 1985, N6
-	http://radioway.ru/1985/06/generator_ispytatelnyh_signalov.html
+    http://radioway.ru/1985/06/generator_ispytatelnyh_signalov.html
 
 ***************************************************************************/
 
@@ -31,7 +31,7 @@ Radio, 1985, N6
 
 #define MASTER_CLOCK    (4000000)
 #define V_TOTAL_PONG    315
-#define H_TOTAL_PONG    256		// tbc
+#define H_TOTAL_PONG    256     // tbc
 
 class tp1983_state : public driver_device
 {

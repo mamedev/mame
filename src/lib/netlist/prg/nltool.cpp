@@ -23,7 +23,7 @@ public:
 	tool_app_t() :
 		plib::app(),
 		opt_grp1(*this,     "General options",              "The following options apply to all commands."),
-		opt_cmd (*this,     "c", "cmd",         0,		    std::vector<pstring>({"run","convert","listdevices","static","header","docheader"}), "run|convert|listdevices|static|header|docheader"),
+		opt_cmd (*this,     "c", "cmd",         0,          std::vector<pstring>({"run","convert","listdevices","static","header","docheader"}), "run|convert|listdevices|static|header|docheader"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
 		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),

@@ -5,10 +5,10 @@
     SMC-777 (c) 1983 Sony
 
     driver by Angelo Salese
-	
+
     TODO:
-	- Implement SMC-70 specific features;
-	- Implement GFX modes other than 160x100x4
+    - Implement SMC-70 specific features;
+    - Implement GFX modes other than 160x100x4
     - ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
       We currently use an hackish implementation until the MAME/MESS framework can
       support that ...
@@ -653,14 +653,14 @@ WRITE8_MEMBER(smc777_state::gcw_w)
 	 * --x- ---- color mode (1=for 2bpp mode, blue is replaced with white)
 	 * ---x ---- [SMC-70] interlace
 	 * ---- xxyy gfx mode (model dependant)
-     * [SMC-70]
+	 * [SMC-70]
 	 * ---- 11-- 640x400x1 bpp
 	 * ---- 10-- 640x200x2 bpp
 	 * ---- 01-- 320x200x4 bpp
 	 * ---- 00yy 160x100x4 bpp, bits 0-1 selects page
 	 * [SMC-777]
 	 * ---- 1--- 640x200x2 bpp
-     * ---- 0--- 320x200x4 bpp
+	 * ---- 0--- 320x200x4 bpp
 	 */
 
 	m_display_reg = data;
@@ -671,7 +671,7 @@ READ8_MEMBER(smc777_state::smc777_mem_r)
 	uint8_t z80_r;
 
 	// TODO: do the bankswitch AFTER that the prefetch instruction is executed (hackish implementation)
-	if(m_raminh_prefetch != 0xff) 
+	if(m_raminh_prefetch != 0xff)
 	{
 		z80_r = (uint8_t)m_maincpu->state_int(Z80_R);
 
@@ -700,7 +700,7 @@ READ8_MEMBER(smc777_state::vsync_irq_status_r)
 		m_vsync_idf = false;
 		return 1;
 	}
-	
+
 	return 0;
 }
 
@@ -743,7 +743,7 @@ void smc777_state::smc777_io(address_map &map)
 	map(0x30, 0x33).mirror(0xff00).rw(FUNC(smc777_state::fdc_r), FUNC(smc777_state::fdc_w));
 	map(0x34, 0x34).mirror(0xff00).rw(FUNC(smc777_state::fdc1_fast_status_r), FUNC(smc777_state::fdc1_select_w));
 //  map(0x35, 0x37) rs232 #3
-//  map(0x38, 0x3b) cache disk unit 
+//  map(0x38, 0x3b) cache disk unit
 	// 0x38 (R) CDSTS status port (W) CDCMD command port
 	// 0x39 (W) track register
 	// 0x3a (W) sector register
@@ -898,7 +898,7 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_UNKNOWN ) //status?
-	
+
 	PORT_START("GPDSW")
 	PORT_DIPNAME( 0x01, 0x00, "GPDSW" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

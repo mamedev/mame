@@ -30,11 +30,11 @@
 
 NETLIST_START(palestra)
 
-//	SOLVER(Solver, 10000000) to maintain accuracy when SLOW is set and CAP()s are connected
+//  SOLVER(Solver, 10000000) to maintain accuracy when SLOW is set and CAP()s are connected
 	SOLVER(Solver, 50000)
-//	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
+//  PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
 	PARAM(Solver.ACCURACY, 1e-5) // ???
-//	PARAM(Solver.LTE,     1e-4) // Default is not enough for paddle control if using LTE
+//  PARAM(Solver.LTE,     1e-4) // Default is not enough for paddle control if using LTE
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	ANALOG_INPUT(V5, 5)
@@ -90,7 +90,7 @@ NETLIST_START(palestra)
 	TTL_7450_ANDORINVERT(A2D14_1, a2x7, N0X6, a2x8, N1X6)
 	TTL_7450_ANDORINVERT(A2D14_2, a2x10, N0X6, a2x9, N1X6)
 	TTL_7450_ANDORINVERT(A2D15_1, A2D6_1.Q, N0X6, A2D6_2.Q, N1X6)
-//	NET_C(A2D17_1.A, a2x21) // XXX typo in schematics?
+//  NET_C(A2D17_1.A, a2x21) // XXX typo in schematics?
 
 	TTL_7400_NAND(A2D16_1, A2D13_1.Q, A2D13_1.Q)
 	TTL_7400_NAND(A2D16_2, A2D13_2.Q, A2D13_2.Q)
@@ -238,7 +238,7 @@ NETLIST_START(palestra)
 	CAP(A3C5, CAP_P(200))
 	NET_C(clk, A3C5.1)
 	NET_C(N1X1, A3C5.2)
-//	NET_C(A3C5.2, A3D21.CLKB)
+//  NET_C(A3C5.2, A3D21.CLKB)
 #endif
 
 	// CLK1, CLK2, R1, R2  [14, 1, 2, 3]
@@ -480,7 +480,7 @@ NETLIST_START(palestra)
 	TTL_7400_NAND(A4D27_1, A4D30_3.Q, G_SPEED_AUTO)
 	TTL_7400_NAND(A4D27_3, A4D27_1.Q, G_SPEED_4)
 	TTL_7400_NAND(A4D27_4, A4D29_3.Q, G_SPEED_4)
-//	TTL_74H53_AND_OR_INVERT(A4D32, tbc, tbc, A4D24_3.Q, A4D27_3.Q, A4D16_1.Q, A4D25_4.Q, A4D16_4.Q, A4D27_4.Q, G_SPEED_1)
+//  TTL_74H53_AND_OR_INVERT(A4D32, tbc, tbc, A4D24_3.Q, A4D27_3.Q, A4D16_1.Q, A4D25_4.Q, A4D16_4.Q, A4D27_4.Q, G_SPEED_1)
 
 // sound
 
@@ -505,7 +505,7 @@ NETLIST_START(palestra)
 	// outputs
 	ALIAS(MOVE_UP, A4D18_1.Q)
 	ALIAS(MOVE_DOWN, A4D18_2.Q)
-//	ALIAS(P_SPEED_X, A4D32.Q)
+//  ALIAS(P_SPEED_X, A4D32.Q)
 	ALIAS(P_SPEED_X, low)
 	ALIAS(P_SPEED_Y, A4D29_1.Q)
 	ALIAS(P_I1Y, A4D4_2.Q)

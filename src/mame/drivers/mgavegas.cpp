@@ -590,7 +590,7 @@ void mgavegas_state::mgavegas(machine_config &config)
 	Z80(config, m_maincpu, CPU_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mgavegas_state::mgavegas_map);
 
-	TIMER(config, "int_0").configure_periodic(FUNC(mgavegas_state::int_0), attotime::from_hz(6000));	//6KHz from MSM5205 /VCK
+	TIMER(config, "int_0").configure_periodic(FUNC(mgavegas_state::int_0), attotime::from_hz(6000));    //6KHz from MSM5205 /VCK
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

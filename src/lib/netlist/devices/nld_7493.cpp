@@ -127,7 +127,7 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(7493,		"TTL_7493", "+CLKA,+CLKB,+R1,+R2")
+	NETLIB_DEVICE_IMPL(7493,        "TTL_7493", "+CLKA,+CLKB,+R1,+R2")
 	NETLIB_DEVICE_IMPL(7493_dip,    "TTL_7493_DIP", "")
 
 	} //namespace devices

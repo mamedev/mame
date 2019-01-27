@@ -898,10 +898,10 @@ Parasol Stars
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x26"/>
 			<dataarea name="rom" size="524288">
-		<!-- NOT identical to the set in the PCE list
-		50000-5000F: FF 10 10 00 1C F9 0F F8 0F 87 FF 3F 0F 4F 00 2E - PCE Dump
-		50000-5000F: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 - Tourvision
-		otherwise 0x80000 identical -->
+				<!-- NOT identical to the set in the PCE list
+				50000-5000F: FF 10 10 00 1C F9 0F F8 0F 87 FF 3F 0F 4F 00 2E - PCE Dump
+				50000-5000F: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 - Tourvision
+				otherwise 0x80000 identical -->
 				<rom name="out run (japan) [a].pce" size="524288" crc="92b654a7" sha1="7d669e78978ebb2a3169f4428a664c81a8888b6e" offset="000000" />
 			</dataarea>
 		</part>
@@ -1041,7 +1041,7 @@ Parasol Stars
 		<description>Pro Yakyuu World Stadium '91 (TourVision PCE bootleg)</description>
 		<year>1991</year>
 		<publisher>bootleg (TourVision) / Namcot</publisher>
-                <info name="alt_title" value="プロ野球 ワールドスタジアム'91"/>
+		<info name="alt_title" value="プロ野球 ワールドスタジアム'91"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0xc0"/>
 			<dataarea name="rom" size="262144">
@@ -1067,7 +1067,7 @@ Parasol Stars
 		<description>Puzzle Boy (TourVision PCE bootleg)</description>
 		<year>1991</year>
 		<publisher>bootleg (TourVision) / Nihon Telenet</publisher>
-                <info name="alt_title" value="パズルボーイ"/>
+		<info name="alt_title" value="パズルボーイ"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x39"/>
 			<dataarea name="rom" size="262144">
@@ -1080,11 +1080,11 @@ Parasol Stars
 		<description>Puzznic (TourVision PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (TourVision) / Taito</publisher>
-                <info name="alt_title" value="パズニック"/>
+		<info name="alt_title" value="パズニック"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x45"/>
 			<dataarea name="rom" size="262144">
-		<!-- 0x40000 matches PCE puzznic -->
+				<!-- 0x40000 matches PCE puzznic -->
 				<rom name="puzznic (japan).pce" size="262144" crc="965c95b3" sha1="3906d644f5901e6d2e732cbd0a6dd0d38a29486b" offset="000000" />
 			</dataarea>
 		</part>
@@ -1123,7 +1123,7 @@ Parasol Stars
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x3d"/>
 			<dataarea name="rom" size="262144">
-		<!-- NOT identical to the set in the PCE list, copyright strings have been erased -->
+				<!-- NOT identical to the set in the PCE list, copyright strings have been erased -->
 				<rom name="tourv_r-type_ii_hacked.pce" size="262144" crc="ae65fe80" sha1="1a6c6f5bd017f23ab9d00a9385986ddf498f9a82" offset="000000" />
 			</dataarea>
 		</part>

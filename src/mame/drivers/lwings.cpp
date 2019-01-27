@@ -934,11 +934,11 @@ void lwings_state::machine_reset()
 void lwings_state::lwings(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);		/* verified on PCB */
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);     /* verified on PCB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_map);
 	m_maincpu->set_vblank_int("screen", FUNC(lwings_state::lwings_interrupt));
 
-	Z80(config, m_soundcpu, XTAL(12'000'000)/4);	/* verified on PCB */
+	Z80(config, m_soundcpu, XTAL(12'000'000)/4);    /* verified on PCB */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_sound_map);
 	m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
 	// above frequency is an approximation from PCB music recording - where is the frequency actually derived from?
@@ -965,13 +965,13 @@ void lwings_state::lwings(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym2203a(YM2203(config, "2203a", XTAL(12'000'000)/8));	/* verified on PCB */
+	ym2203_device &ym2203a(YM2203(config, "2203a", XTAL(12'000'000)/8));    /* verified on PCB */
 	ym2203a.add_route(0, "mono", 0.20);
 	ym2203a.add_route(1, "mono", 0.20);
 	ym2203a.add_route(2, "mono", 0.20);
 	ym2203a.add_route(3, "mono", 0.10);
 
-	ym2203_device &ym2203b(YM2203(config, "2203b", XTAL(12'000'000)/8));	/* verified on PCB */
+	ym2203_device &ym2203b(YM2203(config, "2203b", XTAL(12'000'000)/8));    /* verified on PCB */
 	ym2203b.add_route(0, "mono", 0.20);
 	ym2203b.add_route(1, "mono", 0.20);
 	ym2203b.add_route(2, "mono", 0.20);
@@ -1011,7 +1011,7 @@ void lwings_state::fball(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH));	// clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 	oki.set_addrmap(0, &lwings_state::fball_oki_map);
 }
@@ -1021,12 +1021,12 @@ void lwings_state::trojan(machine_config &config)
 	lwings(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(XTAL(12'000'000)/4);	/* verified on PCB */
+	m_maincpu->set_clock(XTAL(12'000'000)/4);   /* verified on PCB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::trojan_map);
 
-	m_soundcpu->set_clock(XTAL(12'000'000)/4);	/* verified on PCB */
+	m_soundcpu->set_clock(XTAL(12'000'000)/4);  /* verified on PCB */
 
-	z80_device &adpcm(Z80(config, "adpcm", XTAL(12'000'000)/4));	/* verified on PCB */
+	z80_device &adpcm(Z80(config, "adpcm", XTAL(12'000'000)/4));    /* verified on PCB */
 	adpcm.set_addrmap(AS_PROGRAM, &lwings_state::trojan_adpcm_map);
 	adpcm.set_addrmap(AS_IO, &lwings_state::trojan_adpcm_io_map);
 	adpcm.set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(4000));
@@ -1040,8 +1040,8 @@ void lwings_state::trojan(machine_config &config)
 	/* sound hardware */
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MSM5205(config, m_msm, XTAL(384'000));					/* verified on PCB */
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);	/* slave mode */
+	MSM5205(config, m_msm, XTAL(384'000));                  /* verified on PCB */
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);  /* slave mode */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

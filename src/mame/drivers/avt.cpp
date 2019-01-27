@@ -568,12 +568,12 @@ uint32_t avt_state::screen_update_avt(screen_device &screen, bitmap_ind16 &bitma
 void avt_state::avt_palette(palette_device &palette) const
 {
 	/*  prom bits
-		7654 3210
-		---- ---x   Intensity?.
-		---- --x-   Red component.
-		---- -x--   Green component.
-		---- x---   Blue component.
-		xxxx ----   Unused.
+	    7654 3210
+	    ---- ---x   Intensity?.
+	    ---- --x-   Red component.
+	    ---- -x--   Green component.
+	    ---- x---   Blue component.
+	    xxxx ----   Unused.
 	*/
 
 	/* 0000BGRI */

@@ -128,14 +128,14 @@ public:
 
 	enum : uint16_t
 	{
-		BUTTON_YELLOW	= 0x01fe,
-		BUTTON_BLUE		= 0x03ee,
-		BUTTON_ORANGE	= 0x03de,
-		BUTTON_GREEN	= 0x03be,
-		BUTTON_RED		= 0x02fe,
-		BUTTON_CLOUD	= 0x03f6,
-		BUTTON_BALL		= 0x03fa,
-		BUTTON_EXIT		= 0x03fc
+		BUTTON_YELLOW   = 0x01fe,
+		BUTTON_BLUE     = 0x03ee,
+		BUTTON_ORANGE   = 0x03de,
+		BUTTON_GREEN    = 0x03be,
+		BUTTON_RED      = 0x02fe,
+		BUTTON_CLOUD    = 0x03f6,
+		BUTTON_BALL     = 0x03fa,
+		BUTTON_EXIT     = 0x03fc
 	};
 
 	DECLARE_INPUT_CHANGED_MEMBER(pad_button_changed);

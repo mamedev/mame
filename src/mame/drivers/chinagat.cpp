@@ -574,11 +574,11 @@ void chinagat_state::machine_reset()
 void chinagat_state::chinagat(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309(config, m_maincpu, MAIN_CLOCK / 2);		/* 1.5 MHz (12MHz oscillator / 4 internally) */
+	HD6309(config, m_maincpu, MAIN_CLOCK / 2);      /* 1.5 MHz (12MHz oscillator / 4 internally) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &chinagat_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(chinagat_state::chinagat_scanline), "screen", 0, 1);
 
-	HD6309(config, m_subcpu, MAIN_CLOCK / 2);		/* 1.5 MHz (12MHz oscillator / 4 internally) */
+	HD6309(config, m_subcpu, MAIN_CLOCK / 2);       /* 1.5 MHz (12MHz oscillator / 4 internally) */
 	m_subcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sub_map);
 
 	Z80(config, m_soundcpu, XTAL(3'579'545));     /* 3.579545 MHz */
@@ -613,14 +613,14 @@ void chinagat_state::chinagat(machine_config &config)
 void chinagat_state::saiyugoub1(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);     /* 68B09EP 1.5 MHz (12MHz oscillator) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &chinagat_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(chinagat_state::chinagat_scanline), "screen", 0, 1);
 
-	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);      /* 68B09EP 1.5 MHz (12MHz oscillator) */
 	m_subcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sub_map);
 
-	Z80(config, m_soundcpu, XTAL(3'579'545));		/* 3.579545 MHz oscillator */
+	Z80(config, m_soundcpu, XTAL(3'579'545));       /* 3.579545 MHz oscillator */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::saiyugoub1_sound_map);
 
 	i8748_device &mcu(I8748(config, "mcu", 9263750));     /* 9.263750 MHz oscillator, divided by 3*5 internally */
@@ -655,21 +655,21 @@ void chinagat_state::saiyugoub1(machine_config &config)
 
 	MSM5205(config, m_adpcm, 9263750 / 24);
 	m_adpcm->vck_legacy_callback().set(FUNC(chinagat_state::saiyugoub1_m5205_irq_w)); /* Interrupt function */
-	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B);	/* vclk input mode (6030Hz, 4-bit) */
+	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B);    /* vclk input mode (6030Hz, 4-bit) */
 	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 void chinagat_state::saiyugoub2(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);		/* 1.5 MHz (12MHz oscillator) */
+	MC6809E(config, m_maincpu, MAIN_CLOCK / 8);     /* 1.5 MHz (12MHz oscillator) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &chinagat_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(chinagat_state::chinagat_scanline), "screen", 0, 1);
 
-	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);		/* 1.5 MHz (12MHz oscillator) */
+	MC6809E(config, m_subcpu, MAIN_CLOCK / 8);      /* 1.5 MHz (12MHz oscillator) */
 	m_subcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sub_map);
 
-	Z80(config, m_soundcpu, XTAL(3'579'545));		/* 3.579545 MHz oscillator */
+	Z80(config, m_soundcpu, XTAL(3'579'545));       /* 3.579545 MHz oscillator */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::ym2203c_sound_map);
 
 	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */

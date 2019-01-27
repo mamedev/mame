@@ -29,7 +29,7 @@ public:
 		set_timer0_clock(clk0.value());
 		set_timer1_clock(clk1.value());
 	}
-	
+
 	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto portA_read_callback() { return m_portA_r.bind(); }

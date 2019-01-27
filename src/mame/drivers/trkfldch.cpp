@@ -13,8 +13,8 @@ PCB               Game
 TV0001 R1.1       My First DDR
 TV0002 R1.0       Track & Field
 
-DDR & TF PCBs look identical, all the parts are in the same place, the traces are the same, and the silkscreened part # for resistors and caps are the same. 
- 
+DDR & TF PCBs look identical, all the parts are in the same place, the traces are the same, and the silkscreened part # for resistors and caps are the same.
+
 currently dies after call at
 
 00:AE85: LDA $0b

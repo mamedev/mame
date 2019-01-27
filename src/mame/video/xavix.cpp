@@ -802,7 +802,7 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		uint8_t size = m_bmp_base[0x13]; // some kind of additional scaling?
 		uint8_t mode = m_bmp_base[0x14]; // eanble,bpp, zval etc.
 
-		uint32_t unused = ((m_bmp_base[0x15] << 16) | (m_bmp_base[0x16] << 8) | (m_bmp_base[0x17] << 0));  
+		uint32_t unused = ((m_bmp_base[0x15] << 16) | (m_bmp_base[0x16] << 8) | (m_bmp_base[0x17] << 0));
 
 		if (mode & 0x01)
 		{

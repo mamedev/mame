@@ -4,21 +4,21 @@
 
     Leapfrog Clickstart Emulation
 
-		die markings show
-		"SunPlus QL8041C" ( known as Sunplus SPG2?? )
+        die markings show
+        "SunPlus QL8041C" ( known as Sunplus SPG2?? )
 
     Status:
 
-		Some games have Checksums listed in the header area that appear to be
-		 like the byte checksums on the Radica games in vii.cpp, however the
-		 calculation doesn't add up correctly.  There is also a checksum in
-		 a footer area at the end of every ROM that does add up correctly in
-		 all cases.
+        Some games have Checksums listed in the header area that appear to be
+         like the byte checksums on the Radica games in vii.cpp, however the
+         calculation doesn't add up correctly.  There is also a checksum in
+         a footer area at the end of every ROM that does add up correctly in
+         all cases.
 
-		 The ROM carts are marked for 4MByte ROMs at least so the sizes
-		 should be correct.
+         The ROM carts are marked for 4MByte ROMs at least so the sizes
+         should be correct.
 
-		What type of SPG is this?
+        What type of SPG is this?
 
 *******************************************************************************/
 

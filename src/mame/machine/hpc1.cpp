@@ -112,8 +112,8 @@ void hpc1_device::device_reset()
 
 void hpc1_device::cdrom_config(device_t *device)
 {
-	//	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	//	cdda->add_route(ALL_OUTPUTS, "^^mono", 1.0);
+	//  cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	//  cdda->add_route(ALL_OUTPUTS, "^^mono", 1.0);
 }
 
 void hpc1_device::indigo_mice(device_slot_interface &device)
@@ -174,15 +174,15 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	rs232b.rxd_handler().set(m_scc[1], FUNC(scc85c30_device::rxb_w));
 
 	NSCSI_BUS(config, "scsibus", 0);
-    NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93)
-        .machine_config([this](device_t *device) { wd33c93(device); });
-    NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93)
+		.machine_config([this](device_t *device) { wd33c93(device); });
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, nullptr, false);
-    NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
 
 	DP8573(config, m_rtc);
 
@@ -549,17 +549,17 @@ void hpc1_device::decrement_chain()
 
 WRITE_LINE_MEMBER(hpc1_device::scsi_drq)
 {
-    m_scsi_dma.m_drq = state;
+	m_scsi_dma.m_drq = state;
 
-    if (m_scsi_dma.m_drq && m_scsi_dma.m_active)
-    {
-        do_scsi_dma();
-    }
+	if (m_scsi_dma.m_drq && m_scsi_dma.m_active)
+	{
+		do_scsi_dma();
+	}
 }
 
 void hpc1_device::do_scsi_dma()
 {
-    if (m_scsi_dma.m_to_mem)
+	if (m_scsi_dma.m_to_mem)
 		m_cpu_space->write_byte(m_scsi_dma.m_addr & 0x0fffffff, m_wd33c93->dma_r());
 	else
 		m_wd33c93->dma_w(m_cpu_space->read_byte(m_scsi_dma.m_addr & 0x0fffffff));

@@ -270,7 +270,7 @@ void drmicro_state::drmicro(machine_config &config)
 	SN76496(config, "sn3", MCLK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(drmicro_state::pcm_w));	/* IRQ handler */
+	m_msm->vck_legacy_callback().set(FUNC(drmicro_state::pcm_w));   /* IRQ handler */
 	m_msm->set_prescaler_selector(msm5205_device::S64_4B);  /* 6 KHz */
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.75);
 }

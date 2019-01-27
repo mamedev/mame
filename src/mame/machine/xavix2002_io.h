@@ -23,7 +23,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(pio_out_w);
 	DECLARE_READ8_MEMBER(pio_out_r);
-	
+
 	DECLARE_READ8_MEMBER(pio_in_r);
 
 protected:

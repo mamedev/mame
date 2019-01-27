@@ -93,7 +93,7 @@ namespace netlist
 	ENTRYX_N(7497_dip)
 	ENTRYX_N(74107)
 	ENTRYX_N(74107_dip)
-	ENTRYX_N(74107A)	// FIXME: implement missing DIP
+	ENTRYX_N(74107A)    // FIXME: implement missing DIP
 	ENTRYX(74123,               TTL_74123,              "")
 	ENTRYX(74123_dip,           TTL_74123_DIP,          "")
 	ENTRYX_N(74153)

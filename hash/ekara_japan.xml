@@ -7,9 +7,9 @@
 
 	Japanese e-kara carts appear to have a number of different genres split across various
 	cart sub-series (often supporting different hw types) special releases etc.
-	
+
 	This file is for the base set (number on case, ECxxxx-xxx part numbers)
-	
+
 	The genres in the Japanese games are represented by the code after the EC/DC/MC/GC/PC etc. number
 	JPM = J-Pop Mix
 	ATS = Artist Selection (all songs by a single artist)
@@ -27,21 +27,21 @@
 	ATM = unknown (used by the M series 'mini' carts)
 	TPJ = TV Pop
 	MIN = unknown
-	
+
 	Some Japanese carts have a number starting with S  (S-x on case, SCxxxx-xxx part numbers) (see ekara_japan_s.xml)  (for e-kara - custom presentation)
 	                                                M  (M-x on case, MCxxxx-xxx part numbers) (see ekara_japan_m.xml)  (for e-kara - custom presentation)
-													EN (EN-X on case, no part numbers)        (see ekara_japan_en.xml) (for e-kara - custom presentation) (check other compatibility)
+	                                                EN (EN-X on case, no part numbers)        (see ekara_japan_en.xml) (for e-kara - custom presentation) (check other compatibility)
 	                                                G  (G-x on case, GCxxxx-xxx part numbers) (see ekara_japan_g.xml)  (for e-kara, Popira / 2)
 	                                                P  (P-x on case, PCxxxx-xxx part numbers) (see ekara_japan_p.xml)  (for e-kara, Popira / 2, DDR Family Mat)
-                                                    D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
+	                                                D  (D-x on case, DCxxxx-xxx part numbers) (see ekara_japan_d.xml)  (for e-kara, Popira / 2, Taiko De Popira)
 	                                                SP (SP-x on case, no part numbers)        (see ekara_japan_sp.xml) (for e-kara, Popira / 2, Taiko de Popira, Jumping Popira)
 
 	these exist but haven't got any
 	Some Japanese carts have a number starting with JP (for Jumping Popira Only?)
 	                                                A  (for Pichi Pichi Pitch Only?)
 	                                                KE (for Kids Lyric book device Only?)
-													KD (for e-kara?)
-	
+	                                                KD (for e-kara?)
+
 	(there are others, need to document them)
 
 
@@ -50,7 +50,7 @@
 	Genres can cross multiple cart types, eg. TV Pop 1,3,4,5,6 are in the 'G' series, while TV Pop 2 is in the 'P' series, and TV Pop 9 is in the 'D' series (where are 7,8?)
 
 	for non-Japanese carts see ekara_us.xml and ekara_pal.xml, the PAL ones are noteworthy for using a different timing system
-	
+
 	***********************************************************************************
 
 	Japanese cart listing (by 'just number' code) (number on cartridge / box, EC in cart identifier code)
@@ -312,7 +312,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="ec0010">
 		<description>Kid's Mix Volume 1 (Japan) (EC0010-KID)</description>
 		<year>2000</year>
@@ -369,7 +369,7 @@
 	</software>
 
 	<!-- EC0016-ENK  ENK Volume 2 -->
-	
+
 	<!-- EC0017-G73  1973-75 Volume 1 -->
 
 	<software name="ec0018">
@@ -386,7 +386,7 @@
 	<!-- EC0019-BSC  Graduation Encouragement Volume 1 -->
 
 	<!-- EC0020-KID  Kid's Mix Volume 2 -->
-	
+
 	<software name="ec0021">
 		<description>J-Pop Mix Volume 9 (Japan) (EC0021-JPM)</description>
 		<year>2000</year>
@@ -604,7 +604,7 @@
 				<rom name="ec0044-ats.u1" size="0x100000" crc="5ed25544" sha1="2cb30b442d97813af32530c6f61d7fcc7653f533" offset="0" />
 				<!-- this has 0x0b at address 0x00007 in an otherwise list of ascending values, above dump has 0x0f and looks more correct
 				     both dumps have been verified multiple times, so this appears to be a case of bitrot in the cartridge the dump below was taken from -->
-				<!--<rom name="ec0044-ats.u1" size="0x100000" crc="06557370" sha1="0ce7a193b214adaf14f3332ddd8ccbcbec830985" offset="0" />--> 
+				<!--<rom name="ec0044-ats.u1" size="0x100000" crc="06557370" sha1="0ce7a193b214adaf14f3332ddd8ccbcbec830985" offset="0" />-->
 			</dataarea>
 		</part>
 	</software>
@@ -740,11 +740,11 @@
 	<!-- EC0064-ENK  ENK Volume 9 -->
 
 	<!-- EC0065-JPM  J-Pop Mix Volume 30 -->
-	
+
 	<!-- EC0066-JPM  J-Pop Mix Volume 31 -->
-	
+
 	<!-- EC0067-JPM  J-Pop Mix Volume 32 -->
-	
+
 	<software name="ec0068">
 		<description>J-Pop Mix Volume 33 (Japan) (EC0068-JPM)</description>
 		<year>2001</year>
@@ -783,9 +783,9 @@
 	</software>
 
 	<!-- EC0073-     untranslated volume 1 -->
-	
-	<!-- EC0074-JPM  J-Pop Mix Volume 37 --> 
-	
+
+	<!-- EC0074-JPM  J-Pop Mix Volume 37 -->
+
 	<!-- EC0075-JPM  J-Pop Mix Volume 38 -->
 
 	<software name="ec0076">
@@ -798,11 +798,11 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- EC0077-ATS  Artist Selection Volume 15 - unknown artist -->
-	
+
 	<!-- EC0078-     (unknown) -->
-	
+
 	<software name="ec0079"> <!-- custom presentation -->
 		<description>ETZ (Japan) (EC0079-ETZ)</description> <!-- Japanese text in 'Volume' box -->
 		<year>2002</year>
@@ -812,12 +812,12 @@
 				<rom name="ec0079-etz.u1" size="0x200000" crc="c03b5411" sha1="a88156aec4e0f024461f129c955a953647f51554" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<!-- EC0080-     (unknown) -->
-	
+
 	<!-- EC0081-JPM  J-Pop Mix Volume 42 -->
-	
+
 	<software name="ec0082"> <!-- custom presentation -->
 		<description>Matthew's Best Hit Selection (Japan) (EC0082-MBH)</description>
 		<year>2003</year>
@@ -827,12 +827,12 @@
 				<rom name="ec0082-mbh.u1" size="0x100000" crc="3998e478" sha1="29dad31dfd79c57b2ccec0caac81b3489946b798" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<!-- EC0083-JPM  J-Pop Mix Volume 43 -->
-	
+
 	<!-- EC0084-     (unknown, seen) -->
-	
+
 	<!-- EC0085-     (unknown, seen in the wild) -->
-	
+
 </softwarelist>

@@ -41,10 +41,10 @@ DEFINE_DEVICE_TYPE(SPG28X, spg28x_device, "spg28x", "SPG280-series System-on-a-C
 #define LOG_PPU_READS       (1U << 22)
 #define LOG_PPU_WRITES      (1U << 23)
 #define LOG_UNKNOWN_PPU     (1U << 24)
-#define LOG_FIQ				(1U << 25)
+#define LOG_FIQ             (1U << 25)
 #define LOG_SIO             (1U << 26)
-#define LOG_EXT_MEM			(1U << 27)
-#define LOG_EXTINT			(1U << 28)
+#define LOG_EXT_MEM         (1U << 27)
+#define LOG_EXTINT          (1U << 28)
 #define LOG_IO              (LOG_IO_READS | LOG_IO_WRITES | LOG_IRQS | LOG_GPIO | LOG_UART | LOG_I2C | LOG_DMA | LOG_TIMERS | LOG_UNKNOWN_IO)
 #define LOG_CHANNELS        (LOG_CHANNEL_READS | LOG_CHANNEL_WRITES)
 #define LOG_SPU             (LOG_SPU_READS | LOG_SPU_WRITES | LOG_UNKNOWN_SPU | LOG_CHANNEL_READS | LOG_CHANNEL_WRITES \
@@ -116,8 +116,8 @@ void spg2xx_device::device_start()
 	for (uint16_t i = 0; i < 0x8000; i++)
 	{
 		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
-		                        (m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
-		                        (m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
+								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
+								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
 	}
 	m_porta_out.resolve_safe();
 	m_portb_out.resolve_safe();
@@ -324,13 +324,13 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 	if (yy >= 0x01c0)
 		yy -= 0x0200;
 
-    if (yy > 240 || yy < 0)
-        return;
+	if (yy > 240 || yy < 0)
+		return;
 
-    if (SPG_DEBUG_VIDEO && m_debug_blit)
+	if (SPG_DEBUG_VIDEO && m_debug_blit)
 		printf("%3d:\n", yy);
 
-    int y_index = yy * 320;
+	int y_index = yy * 320;
 
 	for (int32_t x = FlipX ? (w - 1) : 0; FlipX ? x >= 0 : x < w; FlipX ? x-- : x++)
 	{
@@ -377,8 +377,8 @@ void spg2xx_device::blit(const rectangle &cliprect, uint32_t line, uint32_t xoff
 					if (SPG_DEBUG_VIDEO && m_debug_blit)
 						printf("M\n");
 					m_screenbuf[pix_index] = (mix_channel((uint8_t)(m_screenbuf[pix_index] >> 16), m_rgb5_to_rgb8[(rgb >> 10) & 0x1f]) << 16) |
-					                         (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
-					                         (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  0), m_rgb5_to_rgb8[rgb & 0x1f]));
+											 (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  8), m_rgb5_to_rgb8[(rgb >> 5) & 0x1f]) << 8) |
+											 (mix_channel((uint8_t)(m_screenbuf[pix_index] >>  0), m_rgb5_to_rgb8[rgb & 0x1f]));
 				}
 				else
 				{
@@ -627,8 +627,8 @@ void spg2xx_device::apply_saturation(const rectangle &cliprect)
 			const int integer_g = (int)floor(adjusted_g * 255.0f);
 			const int integer_b = (int)floor(adjusted_b * 255.0f);
 			*src++ = (integer_r > 255 ? 0xff0000 : (integer_r < 0 ? 0 : ((uint8_t)integer_r << 16))) |
-			         (integer_g > 255 ? 0x00ff00 : (integer_g < 0 ? 0 : ((uint8_t)integer_g << 8))) |
-			         (integer_b > 255 ? 0x0000ff : (integer_b < 0 ? 0 : (uint8_t)integer_b));
+					 (integer_g > 255 ? 0x00ff00 : (integer_g < 0 ? 0 : ((uint8_t)integer_g << 8))) |
+					 (integer_b > 255 ? 0x0000ff : (integer_b < 0 ? 0 : (uint8_t)integer_b));
 		}
 	}
 }
@@ -649,8 +649,8 @@ void spg2xx_device::apply_fade(const rectangle &cliprect)
 			const uint8_t g = src_g - fade_offset;
 			const uint8_t b = src_b - fade_offset;
 			*src++ = (r > src_r ? 0 : (r << 16)) |
-			         (g > src_g ? 0 : (g <<  8)) |
-			         (b > src_b ? 0 : (b <<  0));
+					 (g > src_g ? 0 : (g <<  8)) |
+					 (b > src_b ? 0 : (b <<  0));
 		}
 	}
 }

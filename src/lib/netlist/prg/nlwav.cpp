@@ -318,7 +318,7 @@ public:
 		std::size_t i = 0;
 		for (auto ch : channels)
 		{
-			// 		$var real 64 N1X1 N1X1 $end
+			//      $var real 64 N1X1 N1X1 $end
 			if (format == ANALOG)
 				write(pstring("$var real 64 ") + m_ids[i++] + " " + ch + " $end\n");
 			else if (format == DIGITAL)
@@ -380,7 +380,7 @@ class nlwav_app : public plib::app
 public:
 	nlwav_app() :
 		plib::app(),
-		opt_fmt(*this,  "f", "format",      0,		 std::vector<pstring>({"wav","vcda","vcdd"}),
+		opt_fmt(*this,  "f", "format",      0,       std::vector<pstring>({"wav","vcda","vcdd"}),
 			"output format. Available options are wav|vcda|vcdd.\n"
 			"wav  : multichannel wav output\n"
 			"vcda : analog VCD output\n"
@@ -390,11 +390,11 @@ public:
 		opt_out(*this,  "o", "output",      "-",     "output file"),
 		opt_rate(*this, "r", "rate",   48000,        "sample rate of output file"),
 		opt_amp(*this,  "a", "amp",    10000.0,      "amplification after mean correction (wav only)"),
-		opt_high(*this, "u", "high",   2.0,      	 "minimum input for high level (vcdd only)"),
-		opt_low(*this,  "l", "low",   1.0,      	 "maximum input for low level (vcdd only)"),
+		opt_high(*this, "u", "high",   2.0,          "minimum input for high level (vcdd only)"),
+		opt_low(*this,  "l", "low",   1.0,           "maximum input for low level (vcdd only)"),
 		opt_verb(*this, "v", "verbose",              "be verbose - this produces lots of output"),
 		opt_quiet(*this,"q", "quiet",                "be quiet - no warnings"),
-		opt_args(*this,   		         			 "input file(s)"),
+		opt_args(*this,                              "input file(s)"),
 		opt_version(*this,  "",  "version",          "display version and exit"),
 		opt_help(*this, "h", "help",                 "display help and exit"),
 		opt_ex1(*this, "./nlwav -f vcdd -o x.vcd log_V*",
@@ -411,7 +411,7 @@ public:
 	plib::option_num<double> opt_low;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
-	plib::option_args  	opt_args;
+	plib::option_args   opt_args;
 	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
 	plib::option_example   opt_ex1;

@@ -16,10 +16,10 @@
 #include "ps2vu.h"
 #include <cmath>
 
-#define ENABLE_OVERFLOWS        	(0)
-#define ENABLE_EE_ELF_LOADER    	(0)
-#define ENABLE_EE_DECI2         	(0)
-#define DELAY_SLOT_EXCEPTION_HACK	(0)
+#define ENABLE_OVERFLOWS            (0)
+#define ENABLE_EE_ELF_LOADER        (0)
+#define ENABLE_EE_DECI2             (0)
+#define DELAY_SLOT_EXCEPTION_HACK   (0)
 
 /***************************************************************************
     HELPER MACROS

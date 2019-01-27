@@ -7,7 +7,7 @@
     The dies for these are marked
 
     SSD 2000 NEC 85605-621
- 
+
     SSD 2002 NEC 85054-611
 
     6502 with custom opcodes
@@ -17,12 +17,12 @@
 
     see xavix.cpp for basic notes
 
-	the 2000 chip has more opcodes than the 97/98 chips in xavix.cpp, and
-	is a similar die structure to the 2002 chip, but doesn't seem to have any
-	additional capabilities.
+    the 2000 chip has more opcodes than the 97/98 chips in xavix.cpp, and
+    is a similar die structure to the 2002 chip, but doesn't seem to have any
+    additional capabilities.
 
-	the 2002 chip seems to be the one that was officially dubbed 'SuperXaviX'
-	and has additional video capabilities on top of the extended opcodes.
+    the 2002 chip seems to be the one that was officially dubbed 'SuperXaviX'
+    and has additional video capabilities on top of the extended opcodes.
 
 
 ***************************************************************************/

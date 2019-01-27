@@ -12,7 +12,7 @@ To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side e
 Native single sided 5.25" images with 80 tracks, 10 sectors are well tested (*.IMD / *.TD0=TeleDisk / *.IMG with 400 K).
 VT180 images (184.320 Bytes) are very unreliable in CP/M - though a real machine can read them.
 5.25 MFM PC style drives and 720 K (3.5 " DS-DD MFM PC formatted disks) (on slots 3 + 4) show regressions / bugs
-  as of Dec.2018 (file content bad while dir is OK, seek errors, write fault errors when copying _to_ hard disk). 
+  as of Dec.2018 (file content bad while dir is OK, seek errors, write fault errors when copying _to_ hard disk).
 
 ALWAYS USE THE RIGHT SLOT AND SAVE YOUR DATA BEFORE MOUNTING FOREIGN DISK FORMATS!
 
@@ -27,7 +27,7 @@ The public domain file RBCONVERT.ZIP documents how model 'A' differs from versio
 NVRAM files from -A and -B machines are not interchangeable. If problems arise, delete the NVRAM file.
 
 Venix 86-R (BSW) is working, just follow https://github.com/bsdimp/venix/blob/master/doc/MESS-RB-INSTALL.md
-    
+
 CPM 2.1 / DOS2.11 / DOS 3.x / diag disks boot. UCSD systems (fort_sys, pas_sys) boot, but expect 4 QD drives
   loaded with disks (reassign slots, reset and mount three empty 400 K images before startup at #2, #3, #4).
 
@@ -802,7 +802,7 @@ private:
 
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 {
-	if(m_inp7->read() == 0) 
+	if(m_inp7->read() == 0)
 		return;
 
 	const rgb_t *paletteX = m_palette2->palette()->entry_list_raw();

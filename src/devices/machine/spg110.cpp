@@ -5,7 +5,7 @@
     SunPlus SPG110-series SoC peripheral emulation
 
     It is possible this shares some video features with spg110 and
-	can be made a derived device
+    can be made a derived device
 
 **********************************************************************/
 
@@ -60,12 +60,12 @@ void spg110_device::map(address_map &map)
 /*
 TIMER_CALLBACK_MEMBER(spg110_device::test_timer)
 {
-	//
+    //
 }
 */
 void spg110_device::device_start()
 {
-//	m_test_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg110_device::test_timer), this));
+//  m_test_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg110_device::test_timer), this));
 }
 
 void spg110_device::device_reset()
@@ -83,7 +83,7 @@ WRITE_LINE_MEMBER(spg110_device::vblank)
 	if (!state)
 	{
 		m_cpu->set_state_unsynced(UNSP_IRQ0_LINE, ASSERT_LINE);
-	//	m_test_timer->adjust(attotime::from_usec(100), 0);
+	//  m_test_timer->adjust(attotime::from_usec(100), 0);
 	}
 
 	return;

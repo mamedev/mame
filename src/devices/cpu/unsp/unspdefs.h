@@ -14,9 +14,9 @@
 #define UNSP_S  0x0080
 #define UNSP_C  0x0040
 
-#define UNSP_N_SHIFT	9
-#define UNSP_Z_SHIFT	8
-#define UNSP_S_SHIFT	7
-#define UNSP_C_SHIFT	6
+#define UNSP_N_SHIFT    9
+#define UNSP_Z_SHIFT    8
+#define UNSP_S_SHIFT    7
+#define UNSP_C_SHIFT    6
 
 #endif // MAME_CPU_UNSP_UNSPDEFS_H

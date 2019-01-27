@@ -158,7 +158,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="toystors" cloneof="toystor" supported="no">
 		<description>Toy Story (SP)</description>
 		<year>2007</year>
@@ -171,8 +171,8 @@
 				<rom name="500-12894-a - toy story (sp).bin" size="0x400000" crc="91a748f6" sha1="05da46b6ded3fee24bc1167395f8139647368b68" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="bobbuild" supported="no">
 		<description>Bob the Builder (UK)</description>
 		<year>2007</year>
@@ -185,8 +185,8 @@
 				<rom name="500-13084-a - bob the builder (uk).bin" size="0x400000" crc="387920df" sha1="ac071987f5389604f368ea0a59962a0c28f73a80" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="thomas" supported="no">
 		<description>Thomas &amp; Friends (UK)</description>
 		<year>2007</year>
@@ -199,7 +199,7 @@
 				<rom name="500-12781-a - thomas and friends (uk).bin" size="0x400000" crc="8485c99a" sha1="2a4899868f383b8a6e8cdc0e65dfed86222ff697" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="dora" supported="no">
 		<description>Dora the Explorer (UK)</description>
@@ -213,6 +213,6 @@
 				<rom name="500-12729-a - dora the explorer (uk).bin" size="0x400000" crc="e93bd91a" sha1="e4c9649becd6370d555c6475cb491ba78c54ad17" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 </softwarelist>
 
