@@ -34760,6 +34760,7 @@ rdft2it                         // (c) 1997 Seibu Kaihatsu
 rdft2j                          // (c) 1997 Seibu Kaihatsu
 rdft2ja                         // (c) 1997 Seibu Kaihatsu
 rdft2jb                         // (c) 1997 Seibu Kaihatsu
+rdft2jc                         // (c) 1997 Seibu Kaihatsu
 rdft2t                          // (c) 1997 Seibu Kaihatsu
 rdft2u                          // (c) 1997 Seibu Kaihatsu (Fabtek license)
 rdft2us                         // (c) 1997 Seibu Kaihatsu (Fabtek license)
