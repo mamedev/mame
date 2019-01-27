@@ -392,8 +392,8 @@ Issues with specific compiler versions
   Adding **DEPRECATED=0** to your build options works around this by disabling
   deprecation warnings.
 * MinGW GCC 7 for Windows i386 produces spurious out-of-bounds access warnings.
-  Adding **NOWERROR=1** to your build options works around this by disabling
-  deprecation warnings.
+  Adding **NOWERROR=1** to your build options works around this by not treating
+  warnings as errors.
 * Initial versions of GNU libstdc++ 6 have a broken ``std::unique_ptr``
   implementation.  If you encounter errors with ``std::unique_ptr`` you need to
   upgrade to a newer version of libstdc++ that fixes the issue.
