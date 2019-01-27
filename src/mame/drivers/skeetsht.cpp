@@ -113,7 +113,7 @@ READ16_MEMBER(skeetsht_state::ramdac_r)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	return m_tlc34076->read(space, offset);
+	return m_tlc34076->read(offset);
 }
 
 WRITE16_MEMBER(skeetsht_state::ramdac_w)
@@ -123,7 +123,7 @@ WRITE16_MEMBER(skeetsht_state::ramdac_w)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	m_tlc34076->write(space, offset, data);
+	m_tlc34076->write(offset, data);
 }
 
 
