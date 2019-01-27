@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/bsmt2000.h"
 #include "emupal.h"
@@ -75,8 +73,8 @@ private:
 	u8    m_sound_msb_latch;
 
 	/* devices */
-	required_device<m68000_device> m_maincpu;
-	required_device<m6809_device> m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<bsmt2000_device> m_bsmt;
 	required_device<generic_latch_8_device> m_soundlatch;

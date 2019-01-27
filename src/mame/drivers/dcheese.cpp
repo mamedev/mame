@@ -33,6 +33,8 @@
 #include "emu.h"
 #include "includes/dcheese.h"
 
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
