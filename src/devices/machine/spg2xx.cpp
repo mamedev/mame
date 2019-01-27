@@ -237,6 +237,9 @@ void spg2xx_device::device_reset()
 	m_timer_b_tick_rate = 0;
 
 	m_io_regs[0x23] = 0x0028;
+	m_io_regs[0x2c] = 0x1418;
+	m_io_regs[0x2d] = 0x1658;
+
 	m_uart_rx_available = false;
 	memset(m_uart_rx_fifo, 0, ARRAY_LENGTH(m_uart_rx_fifo));
 	m_uart_rx_fifo_start = 0;
@@ -1022,6 +1025,38 @@ void spg2xx_device::uart_rx(uint8_t data)
 	}
 }
 
+static uint16_t prng_mul(uint16_t a, uint16_t b)
+{
+	uint16_t d = 0;
+	if (a >= 0x8000) a &= 0x7fff;
+	if (b >= 0x8000) b &= 0x7fff;
+	for (int i = 0; i < 16; i++)
+	{
+		d = (d > 0x4000) ? ((d << 1) - 0x8000) : (d << 1);
+		if (a & 0x8000)
+			d += b;
+		if (d >= 0x8000)
+			d -= 0x8000;
+		a <<= 1;
+	}
+	return d;
+}
+
+static uint16_t prng_pow(uint16_t value, uint16_t exponent)
+{
+	uint16_t r = 1;
+	while (exponent > 0)
+	{
+		if (exponent & 1)
+		{
+			r = prng_mul(r, value);
+		}
+		exponent >>= 1;
+		value = prng_mul(value, value);
+	}
+	return r;
+}
+
 READ16_MEMBER(spg2xx_device::io_r)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
@@ -1096,10 +1131,21 @@ READ16_MEMBER(spg2xx_device::io_r)
 		LOGMASKED(LOG_IO_READS, "io_r: NTSC/PAL = %04x\n", m_pal_flag);
 		return m_pal_flag;
 
-	case 0x2c: case 0x2d: // PRNG 0/1
-		val = machine().rand() & 0x0000ffff;
-		LOGMASKED(LOG_IO_READS, "io_r: PRNG %d = %04x\n", offset - 0x2c, val);
-		break;
+	case 0x2c: // PRNG 0
+	{
+		const uint16_t value = m_io_regs[0x2c];
+		const uint16_t pow14 = prng_pow(value, 14);
+		m_io_regs[0x2c] = (pow14*value + pow14 + 1) & 0x7fff;
+		return value;
+	}
+
+	case 0x2d: // PRNG 1
+	{
+		const uint16_t value = m_io_regs[0x2d];
+		const uint16_t pow14 = prng_pow(value, 14);
+		m_io_regs[0x2d] = (pow14*value + pow14 + 1) & 0x7fff;
+		return value;
+	}
 
 	case 0x2e: // FIQ Source Select
 		LOGMASKED(LOG_FIQ, "io_r: FIQ Source Select = %04x\n", val);
