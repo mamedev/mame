@@ -303,8 +303,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(btoads_state::btoads)
-
+void btoads_state::btoads(machine_config &config)
+{
 	TMS34020(config, m_maincpu, CPU_CLOCK/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &btoads_state::main_map);
 	m_maincpu->set_halt_on_reset(false);
@@ -314,28 +314,28 @@ MACHINE_CONFIG_START(btoads_state::btoads)
 	m_maincpu->set_shiftreg_in_callback(FUNC(btoads_state::to_shiftreg));
 	m_maincpu->set_shiftreg_out_callback(FUNC(btoads_state::from_shiftreg));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(btoads_state, irq0_line_assert,  183)
+	Z80(config, m_audiocpu, SOUND_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btoads_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &btoads_state::sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(btoads_state::irq0_line_assert), attotime::from_ticks(32768, SOUND_CLOCK/4));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34020_device, tms340x0_rgb32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224);
+	m_screen->set_screen_update("maincpu", FUNC(tms34020_device::tms340x0_rgb32));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("bsmt", BSMT2000, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	BSMT2000(config, m_bsmt, SOUND_CLOCK);
+	m_bsmt->add_route(0, "lspeaker", 1.0);
+	m_bsmt->add_route(1, "rspeaker", 1.0);
+}
 
 
 

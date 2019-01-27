@@ -522,12 +522,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(tapatune_state::tapatune_base)
+void tapatune_state::tapatune_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
-	MCFG_DEVICE_IO_MAP(maincpu_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(tapatune_state, irq0_line_assert, XTAL(24'000'000) / 4 / 4 / 4096)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tapatune_state::maincpu_map);
+	m_maincpu->set_addrmap(AS_IO, &tapatune_state::maincpu_io_map);
+	m_maincpu->set_periodic_int(FUNC(tapatune_state::irq0_line_assert), attotime::from_ticks(4 * 4096, XTAL(24'000'000) / 4));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -537,17 +538,19 @@ MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("bsmt", BSMT2000, XTAL(24'000'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	BSMT2000(config, m_bsmt, XTAL(24'000'000));
+	m_bsmt->add_route(0, "lspeaker", 1.0);
+	m_bsmt->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(tapatune_state::tapatune)
+void tapatune_state::tapatune(machine_config &config)
+{
 	tapatune_base(config);
-	MCFG_DEVICE_ADD("videocpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(video_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("videocpu")
+	M68000(config, m_videocpu, XTAL(24'000'000) / 2);
+	m_videocpu->set_addrmap(AS_PROGRAM, &tapatune_state::video_map);
+
+	config.m_perfect_cpu_quantum = subtag("videocpu");
 
 	h46505_device &crtc(H46505(config, "crtc", XTAL(24'000'000) / 16));
 	crtc.set_screen("screen");
@@ -558,10 +561,10 @@ MACHINE_CONFIG_START(tapatune_state::tapatune)
 	crtc.out_vsync_callback().set(FUNC(tapatune_state::crtc_vsync));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 16 * 5, 500, 0, 320, 250, 0, 240)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000) / 16 * 5, 500, 0, 320, 250, 0, 240);
+	screen.set_screen_update("crtc", FUNC(h46505_device::screen_update));
+}
 
 /*************************************
  *
