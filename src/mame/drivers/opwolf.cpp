@@ -940,7 +940,7 @@ void opwolf_state::opwolf(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &opwolf_state::opwolf_map);
 	m_maincpu->set_vblank_int("screen", FUNC(opwolf_state::interrupt));
 
-	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);	/* 4 MHz */
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);   /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &opwolf_state::opwolf_sound_z80_map);
 
 	TAITO_CCHIP(config, m_cchip, 12_MHz_XTAL); /* 12MHz measured on pin 20 */
@@ -950,7 +950,7 @@ void opwolf_state::opwolf(machine_config &config)
 
 	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(opwolf_state::cchip_irq_clear_cb));
 
-	config.m_minimum_quantum = attotime::from_hz(600);	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_RESET_OVERRIDE(opwolf_state,opwolf)
 
@@ -986,13 +986,13 @@ void opwolf_state::opwolf(machine_config &config)
 
 	MSM5205(config, m_msm[0], 384000);
 	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
-	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 kHz */
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
 	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MSM5205(config, m_msm[1], 384000);
 	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
-	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 kHz */
+	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
 	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
@@ -1022,11 +1022,11 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 	Z80(config, m_audiocpu, SOUND_CPU_CLOCK); /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &opwolf_state::opwolf_sound_z80_map);
 
-	z80_device &sub(Z80(config, "sub", SOUND_CPU_CLOCK));	/* 4 MHz ??? */
+	z80_device &sub(Z80(config, "sub", SOUND_CPU_CLOCK));   /* 4 MHz ??? */
 	sub.set_addrmap(AS_PROGRAM, &opwolf_state::opwolfb_sub_z80_map);
 	sub.set_vblank_int("screen", FUNC(opwolf_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1060,13 +1060,13 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 
 	MSM5205(config, m_msm[0], 384000);
 	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
-	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 kHz */
+	m_msm[0]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
 	m_msm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MSM5205(config, m_msm[1], 384000);
 	m_msm[1]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<1>));
-	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);	/* 8 kHz */
+	m_msm[1]->set_prescaler_selector(msm5205_device::S48_4B);   /* 8 kHz */
 	m_msm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	m_msm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 

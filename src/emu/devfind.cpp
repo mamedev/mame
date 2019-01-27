@@ -318,7 +318,7 @@ bool finder_base::report_missing(bool found, const char *objname, bool required)
 	{
 		osd_printf_error("Tag not defined for required %s\n", objname);
 		return false;
-        }
+	}
 
 	// just pass through in the found case
 	if (found)

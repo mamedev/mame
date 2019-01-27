@@ -54,7 +54,7 @@ protected:
 	void lower_local_irq(int channel, uint8_t source_mask);
 	void update_irq(int channel);
 
-    void do_scsi_dma();
+	void do_scsi_dma();
 
 	void dump_chain(uint32_t base);
 	void fetch_chain();
@@ -102,7 +102,7 @@ protected:
 		uint32_t m_length;
 		uint32_t m_next;
 		bool m_irq;
-        bool m_drq;
+		bool m_drq;
 		bool m_to_mem;
 		bool m_active;
 	};

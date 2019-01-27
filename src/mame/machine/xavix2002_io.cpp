@@ -105,7 +105,7 @@ READ8_MEMBER(xavix2002_io_device::pio_out_r)
 
 	return ret;
 }
-	
+
 
 READ8_MEMBER(xavix2002_io_device::pio_in_r)
 {

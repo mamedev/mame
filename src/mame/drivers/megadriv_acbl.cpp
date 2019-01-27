@@ -1059,7 +1059,7 @@ void md_boot_state::init_barek3()
 
 void md_boot_state::init_sonic2mb()
 {
-	// 100000 = writes to unpopulated MCU? 
+	// 100000 = writes to unpopulated MCU?
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x300000, 0x300001, "DSW");
 

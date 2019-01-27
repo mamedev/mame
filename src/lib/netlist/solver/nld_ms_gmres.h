@@ -84,11 +84,11 @@ private:
 
 	plib::mat_cr_t<float_type, SIZE> m_LU;
 
-	float_type m_c[restart_N + 1];  			/* mr + 1 */
-	float_type m_g[restart_N + 1];  			/* mr + 1 */
+	float_type m_c[restart_N + 1];              /* mr + 1 */
+	float_type m_g[restart_N + 1];              /* mr + 1 */
 	float_type m_ht[restart_N + 1][restart_N];  /* (mr + 1), mr */
-	float_type m_s[restart_N + 1];     			/* mr + 1 */
-	float_type m_y[restart_N + 1];       		/* mr + 1 */
+	float_type m_s[restart_N + 1];              /* mr + 1 */
+	float_type m_y[restart_N + 1];              /* mr + 1 */
 
 	//plib::parray<float_type, SIZE> m_v[restart_N + 1];  /* mr + 1, n */
 	float_type m_v[restart_N + 1][storage_N];  /* mr + 1, n */
@@ -177,7 +177,7 @@ unsigned matrix_solver_GMRES_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_r
 	}
 
 	//if (newton_raphson)
-	//	printf("%e %e\n", this->delta(this->m_new_V),  this->m_params.m_accuracy);
+	//  printf("%e %e\n", this->delta(this->m_new_V),  this->m_params.m_accuracy);
 
 	const float_type err = (newton_raphson ? this->delta(this->m_new_V) : 0.0);
 	this->store(this->m_new_V);

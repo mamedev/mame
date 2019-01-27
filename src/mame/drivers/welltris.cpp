@@ -674,11 +674,11 @@ void welltris_state::machine_start()
 void welltris_state::welltris(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 20000000/2);	/* 10 MHz */
+	M68000(config, m_maincpu, 20000000/2);  /* 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &welltris_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(welltris_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, 8000000/2);		/* 4 MHz ??? */
+	Z80(config, m_audiocpu, 8000000/2);     /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &welltris_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &welltris_state::sound_port_map); /* IRQs are triggered by the YM2610 */
 

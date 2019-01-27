@@ -186,9 +186,9 @@ INPUT_PORTS_END
 
 //static void cdrom_config(device_t *device)
 //{
-//	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-//	cdda->add_route(0, ":hpc3:lspeaker", 1.0);
-//	cdda->add_route(1, ":hpc3:rspeaker", 1.0);
+//  cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+//  cdda->add_route(0, ":hpc3:lspeaker", 1.0);
+//  cdda->add_route(1, ":hpc3:rspeaker", 1.0);
 //}
 
 void ip22_state::wd33c93(device_t *device)
@@ -223,15 +223,15 @@ void ip22_state::ip22_base(machine_config &config)
 	SGI_MC(config, m_mem_ctrl, m_maincpu, ":hpc3:eeprom");
 
 	NSCSI_BUS(config, "scsibus", 0);
-    NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93B)
-        .machine_config([this](device_t *device) { wd33c93(device); });
-    NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93B)
+		.machine_config([this](device_t *device) { wd33c93(device); });
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom", false);
-    NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
 }
 
 void ip22_state::ip225015(machine_config &config)
@@ -275,15 +275,15 @@ void ip24_state::ip244415(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip22_map);
 
 	NSCSI_BUS(config, "scsibus2", 0);
-    NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)
-        .machine_config([this](device_t *device) { wd33c93_2(device); });
-    NSCSI_CONNECTOR(config, "scsibus2:1", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)
+		.machine_config([this](device_t *device) { wd33c93_2(device); });
+	NSCSI_CONNECTOR(config, "scsibus2:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:3", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:6", scsi_devices, nullptr, false);
-    NSCSI_CONNECTOR(config, "scsibus2:7", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus2:7", scsi_devices, nullptr, false);
 
 	SGI_HPC3(config, m_hpc3, m_maincpu, m_scsi_ctrl, m_scsi_ctrl2);
 }

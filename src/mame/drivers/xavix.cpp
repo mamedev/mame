@@ -201,29 +201,29 @@
     Fitness Dance has an Atmel H93864C (maybe SEEPROM?) a Microchip DSPIC 33FJ12GP202 and two JRC 2740 dual op amps.
     Music and Circuit has a 24CS64, two UTC324 quad op amps, a 74HC14, a 74HCT04, and an 8-pin SOIC labeled 61545, which is likely an M61545 dual electronic volume control.
 
-	It looks like the sensors (cameras) are from ETOMS
-	They are all 32x32 arrays except Fitness Play, which is 64x64.  Most of the PCBs are marked CIS.
-	Bowling and Boxing look identical.
-	LOTR and SW look identical
-	DQ looks similar to LOTR
-	Real Swing Golf (different driver) and Fitness Play look different from all the others.
+    It looks like the sensors (cameras) are from ETOMS
+    They are all 32x32 arrays except Fitness Play, which is 64x64.  Most of the PCBs are marked CIS.
+    Bowling and Boxing look identical.
+    LOTR and SW look identical
+    DQ looks similar to LOTR
+    Real Swing Golf (different driver) and Fitness Play look different from all the others.
 
-	The sensor dies for Bowling, Boxing, Star Wars and DQ are labeled CU5501A.
-	LOTR is CU5501
-	Real Swing Golf is CU5502
-	Fitness Play is S-5300A SLH2039H and does not have ETOMS on it.
-	The Fitness Play main PCB has an extra glob next to the ribbon cable to the camera.
-	Most of the camera PCBs connect to the main PCB with an 18-20 wire ribbon cable.
-	
-	Real Swing Golf just has 6 wires, Its camera PCB is the only one with a ceramic resonator
-	Maybe the CU5502 chip offloads some processing from the CPU?
+    The sensor dies for Bowling, Boxing, Star Wars and DQ are labeled CU5501A.
+    LOTR is CU5501
+    Real Swing Golf is CU5502
+    Fitness Play is S-5300A SLH2039H and does not have ETOMS on it.
+    The Fitness Play main PCB has an extra glob next to the ribbon cable to the camera.
+    Most of the camera PCBs connect to the main PCB with an 18-20 wire ribbon cable.
+
+    Real Swing Golf just has 6 wires, Its camera PCB is the only one with a ceramic resonator
+    Maybe the CU5502 chip offloads some processing from the CPU?
 
 
 
-	NOTES:
+    NOTES:
 
-	Play TV Monster Truck runs off an entirely different codebase to everything else, presumably coded by the developer from scratch rather than using code supplied by SSD Company LTD
-	Play TV Rescue Heroes fails to display any kind of XaviX logo or SSD Copyright, it is the only XaviX based game so far to not show these details anywhere in the game.
+    Play TV Monster Truck runs off an entirely different codebase to everything else, presumably coded by the developer from scratch rather than using code supplied by SSD Company LTD
+    Play TV Rescue Heroes fails to display any kind of XaviX logo or SSD Copyright, it is the only XaviX based game so far to not show these details anywhere in the game.
 
 
 
@@ -514,7 +514,7 @@ static INPUT_PORTS_START( xavix )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xavix_an )
-    PORT_INCLUDE(xavix)
+	PORT_INCLUDE(xavix)
 
 	// test inputs, not real!
 	PORT_MODIFY("AN0") // 00
@@ -536,14 +536,14 @@ static INPUT_PORTS_START( xavix_an )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xavix_i2c )
-    PORT_INCLUDE(xavix)
+	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_i2c_state,i2c_r, nullptr)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ttv_lotr )
-    PORT_INCLUDE(xavix)
+	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_i2c_lotr_state,camera_r, nullptr)
@@ -552,7 +552,7 @@ static INPUT_PORTS_START( ttv_lotr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xavix_bowl )
-    PORT_INCLUDE(xavix)
+	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xavix_i2c_bowl_state,camera_r, nullptr)
@@ -561,7 +561,7 @@ static INPUT_PORTS_START( xavix_bowl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( epo_sdb )
-    PORT_INCLUDE(xavix)
+	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("MOUSE0X")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
@@ -582,8 +582,8 @@ INPUT_PORTS_END
 
 // left + right drums together = select / forward (needed on initial screen).  left drum = left in menus   right drum  = right in menus
 // analog reading depends heavily on timers, they're too fast right now so drum hits are too hard and register multiple times
-static INPUT_PORTS_START( taikodp ) 
-    PORT_INCLUDE(xavix_an)
+static INPUT_PORTS_START( taikodp )
+	PORT_INCLUDE(xavix_an)
 
 	PORT_MODIFY("AN0") // 00  (read by one type of function, handled in timer interrupt at 0x1d92 in RAM)
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
@@ -593,7 +593,7 @@ static INPUT_PORTS_START( taikodp )
 
 	PORT_MODIFY("AN5") // 11  (read by different function, handled in timer interrupt at 0x1de8) (battery status related?)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_MODIFY("AN7") // 13  (read by identical function to 11 but with different addresses, handled in timer interrupt at 0x1e09 in RAM) (battery status related?)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -613,10 +613,10 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( xavixp )
-    PORT_INCLUDE(xavix)
+	PORT_INCLUDE(xavix)
 
-    PORT_MODIFY("REGION") // PAL/NTSC flag
-    PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1272,7 +1272,7 @@ void xavix_cart_state::xavix_cart_popira(machine_config &config)
 	xavix_cart(config);
 
 	// is a battery / power source required to store NVRAM in the CPU?  Popira definitely needs NVRAM storing on power-of
-	// XaviX Tennis won't boot if you do (but that could be an unrelated SEEPROM issue?) & DDR Family Mat gets stuck in 2 Player mode with no obvious way of changing back 
+	// XaviX Tennis won't boot if you do (but that could be an unrelated SEEPROM issue?) & DDR Family Mat gets stuck in 2 Player mode with no obvious way of changing back
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* software lists */
@@ -1512,13 +1512,13 @@ ROM_END
 
 /* XaviX hardware titles (1st Generation)
 
-	These use
-	SSD 98 PL7351-181
-	SSD 98 PA7351-107
-	SSD 97 PA7270-107 
-	type CPUS
+    These use
+    SSD 98 PL7351-181
+    SSD 98 PA7351-107
+    SSD 97 PA7270-107
+    type CPUS
 
-	only new opcodes are callf and retf?
+    only new opcodes are callf and retf?
 
 */
 
@@ -1596,7 +1596,7 @@ CONS( 2000, popira,   0,           0,  xavix_cart_popira,popira,   xavix_cart_st
 CONS( 2003, taikodp,  0,           0,  xavix_i2c_taiko,  taikodp,  xavix_i2c_cart_state, init_xavix,    "Takara / SSD Company LTD",                     "Taiko De Popira (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*|MACHINE_IS_BIOS_ROOT*/ ) // inputs? are the drums analog?
 
 
-/* SuperXaviX(?) (XaviX 2000 type CPU) hardware titles (2nd XaviX generation?) 
+/* SuperXaviX(?) (XaviX 2000 type CPU) hardware titles (2nd XaviX generation?)
 
    these use the SSD 2000 NEC 85605-621 type CPU
 
@@ -1741,7 +1741,7 @@ ROM_START( dombikec )
 	ROM_LOAD( "xpbikeconcept.bin", 0x000000, 0x1000000, CRC(3447fce5) SHA1(c7e9e9cd789a17ac886ecf253f67753213cf8d21) )
 ROM_END
 
-// Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times. 
+// Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times.
 CONS( 2008, domfitad, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2008, dombikec, 0, 0, xavix2002_i2c_jmat, xavixp, xavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

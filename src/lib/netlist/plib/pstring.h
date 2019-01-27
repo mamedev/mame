@@ -24,7 +24,7 @@
 
 // enable this to use std::string instead of pstring globally.
 
-#define PSTRING_USE_STD_STRING	(0)
+#define PSTRING_USE_STD_STRING  (0)
 
 template <typename T>
 class pstring_const_iterator final

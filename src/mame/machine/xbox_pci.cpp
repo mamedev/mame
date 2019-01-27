@@ -158,7 +158,7 @@ void mcpx_isalpc_device::device_add_mconfig(machine_config &config)
 	/*
 	More devices are needed:
 	    82093 compatible I/O APIC
-        dual 8237 DMA controllers
+	    dual 8237 DMA controllers
 	*/
 }
 

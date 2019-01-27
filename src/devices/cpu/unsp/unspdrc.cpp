@@ -113,13 +113,13 @@ void unsp_device::code_flush_cache()
 		/* generate the entry point and out-of-cycles handlers */
 		static_generate_entry_point();
 		static_generate_nocode_handler();
-        static_generate_out_of_cycles();
+		static_generate_out_of_cycles();
 
-        static_generate_memory_accessor(false, "read", m_mem_read);
-        static_generate_memory_accessor(true, "write", m_mem_write);
-        static_generate_trigger_fiq();
-        static_generate_trigger_irq();
-        static_generate_check_interrupts();
+		static_generate_memory_accessor(false, "read", m_mem_read);
+		static_generate_memory_accessor(true, "write", m_mem_write);
+		static_generate_trigger_fiq();
+		static_generate_trigger_irq();
+		static_generate_check_interrupts();
 	}
 
 	catch (drcuml_block::abort_compilation &)

@@ -230,7 +230,7 @@ private:
 	virtual uint8_t extbus_r(offs_t offset) { return m_rgn[(offset) & (m_rgnlen - 1)]; }
 	virtual void extbus_w(offs_t offset, uint8_t data)
 	{
-		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);	
+		logerror("%s: write to external bus %06x %02x\n", machine().describe_context(), offset, data);
 	}
 
 
@@ -280,7 +280,7 @@ private:
 	DECLARE_WRITE8_MEMBER(mouse_7b01_w);
 	DECLARE_WRITE8_MEMBER(mouse_7b10_w);
 	DECLARE_WRITE8_MEMBER(mouse_7b11_w);
-	
+
 	DECLARE_READ8_MEMBER(adc_7b80_r);
 	DECLARE_WRITE8_MEMBER(adc_7b80_w);
 	DECLARE_READ8_MEMBER(adc_7b81_r);
@@ -891,7 +891,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi0_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ekara_multi1_r);
 
-//	void xavix_ekara(machine_config &config);
+//  void xavix_ekara(machine_config &config);
 
 protected:
 

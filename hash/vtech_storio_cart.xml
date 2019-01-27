@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="vtech_storio_cart" description="VTech Storio V.Reader Cartridges">
-	
+
 	<!-- These are NAND Flash ROMs containing a FAT16 filesystem -->
 	<!-- Some cartridges (PCB 35-115600-027-402) contains no ROM, but just some bridges between edge connector pins. -->
-   
+
 	<!--
 
 	Language:
@@ -32,7 +32,7 @@
 	       | 80-280600(US)   | Olivia
 	       | 80-280700(US)   | The Little Engine That Could
 	       | 80-280900(US)   | Dora and the Three Little Pigs
-          XX   | 80-280422(GER)  | Dora und die drei Schweinchen
+	  XX   | 80-280422(GER)  | Dora und die drei Schweinchen
 	       | 80-281000(US)   | Mickey Mouse Clubhouse
 	  XX   | 80-281004(GER)  | Micky Maus Wunderhaus
 	       | 80-281100(US)   | Disney Princess
@@ -40,9 +40,9 @@
 	       | 80-281200(US)   | Cars
 	       | 80-281300(US)   | Sesame Street The Happy Scientists
 	       | 80-281400(US)   | SpongeBob SquarePants Model Sponge
-	  XX   | 80-281404(GER)  | Spongebob Schwammkopf - Ein Schwamm will nach oben 
+	  XX   | 80-281404(GER)  | Spongebob Schwammkopf - Ein Schwamm will nach oben
 	       | 80-281500(US)   | Tangled
-          XX   | 80-281504(GER)  | Rapunzel - Neu verföhnt
+	  XX   | 80-281504(GER)  | Rapunzel - Neu verföhnt
 	       | 80-281600(US)   | Chuggington - Babysitter Brewster
 	       | 80-281700(US)   | Penguins of Madagascar - The Helmet
 	       | 80-281800(US)   | Kung Fu Panda 2

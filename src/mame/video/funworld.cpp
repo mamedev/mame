@@ -110,9 +110,9 @@ WRITE8_MEMBER(funworld_state::funworld_colorram_w)
 TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
 {
 	/*  - bits -
-		7654 3210
-		xxxx ----   tiles color.
-		---- xxxx   unused.
+	    7654 3210
+	    xxxx ----   tiles color.
+	    ---- xxxx   unused.
 	*/
 	int offs = tile_index;
 	int attr = m_videoram[offs] + (m_colorram[offs] << 8);

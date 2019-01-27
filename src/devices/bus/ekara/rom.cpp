@@ -122,5 +122,5 @@ void ekara_cart(device_slot_interface &device)
 {
 	device.option_add_internal("plain",       EKARA_ROM_PLAIN);
 	device.option_add_internal("rom_24lc04",  EKARA_ROM_I2C_24LC04);
-	device.option_add_internal("rom_24lc02",  EKARA_ROM_I2C_24LC02);	
+	device.option_add_internal("rom_24lc02",  EKARA_ROM_I2C_24LC02);
 }

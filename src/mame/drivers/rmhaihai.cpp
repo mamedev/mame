@@ -506,7 +506,7 @@ GFXDECODE_END
 void rmhaihai_state::rmhaihai(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 20000000/4);		/* 5 MHz ??? */
+	Z80(config, m_maincpu, 20000000/4);     /* 5 MHz ??? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &rmhaihai_state::rmhaihai_map);
 	m_maincpu->set_addrmap(AS_IO, &rmhaihai_state::rmhaihai_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(rmhaihai_state::irq0_line_hold));

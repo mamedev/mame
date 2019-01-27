@@ -368,8 +368,8 @@ void pachifev_state::pachifev(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 #if USE_MSM
-	msm5205_device &adpcm(MSM5205(config, "adpcm", XTAL(384'000)));	/* guess */
-	adpcm.vck_legacy_callback().set(FUNC(pachifev_state::pf_adpcm_int));	/* interrupt function */
+	msm5205_device &adpcm(MSM5205(config, "adpcm", XTAL(384'000))); /* guess */
+	adpcm.vck_legacy_callback().set(FUNC(pachifev_state::pf_adpcm_int));    /* interrupt function */
 	adpcm.set_prescaler_selector(msm5205_device::S48_4B);    /* 8kHz */
 	adpcm.add_route(ALL_OUTPUTS, "mono", 1.00);
 #endif

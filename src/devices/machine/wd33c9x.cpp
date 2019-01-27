@@ -869,10 +869,10 @@ void wd33c9x_base_device::step(bool timeout)
 				case DISC_SEL_ARBITRATION:
 					m_xfr_phase = xfr_phase;
 					break;
-					
+
 				case INIT_XFR_WAIT_REQ:
 					break;
-					
+
 				default:
 					if (m_xfr_phase != xfr_phase) {
 						fatalerror("%s: Unexpected phase change during state.\n", shortname());
@@ -888,7 +888,7 @@ void wd33c9x_base_device::step(bool timeout)
 					set_scsi_state(FINISHED);
 					m_regs[COMMAND_PHASE] = COMMAND_PHASE_DISCONNECTED;
 					break;
-					
+
 				case COMMAND_PHASE_COMMAND_COMPLETE:
 					if (m_regs[CONTROL] & CONTROL_EDI) {
 						set_scsi_state(FINISHED);
@@ -898,7 +898,7 @@ void wd33c9x_base_device::step(bool timeout)
 						m_regs[CONTROL] |= CONTROL_EDI;
 					}
 					break;
-					
+
 				default:
 					fatalerror("%s: Unhandled command phase during Select-and-Transfer disconnect.\n", shortname());
 					break;

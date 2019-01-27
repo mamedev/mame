@@ -2103,7 +2103,7 @@ void toaplan1_state::samesame(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::samesame_main_map);
 
-	Z180(config, m_audiocpu, XTAL(28'000'000)/8);	/* HD647180XOFS6 CPU */
+	Z180(config, m_audiocpu, XTAL(28'000'000)/8);   /* HD647180XOFS6 CPU */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::samesame_hd647180_mem_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::samesame_hd647180_io_map);
 
@@ -2205,10 +2205,10 @@ void toaplan1_state::outzonecv(machine_config &config)
 void toaplan1_state::vimana(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(10'000'000));	/* verified on pcb */
+	M68000(config, m_maincpu, XTAL(10'000'000));    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_main_map);
 
-	Z180(config, m_audiocpu, XTAL(28'000'000)/8);	/* HD647180XOFS6 CPU */
+	Z180(config, m_audiocpu, XTAL(28'000'000)/8);   /* HD647180XOFS6 CPU */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_hd647180_mem_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::vimana_hd647180_io_map);
 
@@ -2232,7 +2232,7 @@ void toaplan1_state::vimana(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);	/* verified on pcb */
+	YM3812(config, m_ymsnd, XTAL(28'000'000)/8);    /* verified on pcb */
 	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
 	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

@@ -934,10 +934,10 @@ void borntofi_state::machine_reset()
 void borntofi_state::borntofi(machine_config &config)
 {
 	/* basic machine hardware */
-	V20(config, m_maincpu, 16000000/2);		// D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
+	V20(config, m_maincpu, 16000000/2);     // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
 	m_maincpu->set_addrmap(AS_PROGRAM, &borntofi_state::main_map);
 
-	I8088(config, m_audiocpu, 18432000/3);	// 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
+	I8088(config, m_audiocpu, 18432000/3);  // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	m_audiocpu->set_addrmap(AS_PROGRAM, &borntofi_state::sound_map);
 
 	/* video hardware */
@@ -983,10 +983,10 @@ void borntofi_state::borntofi(machine_config &config)
 void fantland_state::wheelrun(machine_config &config)
 {
 	/* basic machine hardware */
-	V20(config, m_maincpu, XTAL(18'000'000)/2);		// D701080C-8 (V20)
+	V20(config, m_maincpu, XTAL(18'000'000)/2);     // D701080C-8 (V20)
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantland_state::wheelrun_map);
 
-	Z80(config, m_audiocpu, XTAL(18'000'000)/2);	// Z8400BB1 (Z80B)
+	Z80(config, m_audiocpu, XTAL(18'000'000)/2);    // Z8400BB1 (Z80B)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fantland_state::wheelrun_sound_map);
 	// IRQ by YM3526, NMI when soundlatch is written
 

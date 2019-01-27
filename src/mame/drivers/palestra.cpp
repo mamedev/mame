@@ -38,7 +38,7 @@
 
 #define MASTER_CLOCK    (4000000)
 #define V_TOTAL_PONG    315
-#define H_TOTAL_PONG    256		// tbc
+#define H_TOTAL_PONG    256     // tbc
 
 class palestra_state : public driver_device
 {

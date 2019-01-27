@@ -6,17 +6,17 @@
 
         Systems which run on the SPG243 SoC
 
-		die markings show
-		"SunPlus QL8041" ( known as Sunplus SPG240? )
-		JAKKS WWE
-		Fantastic 4
-		Justice League
-		Dora the Explorer
-		Mattel Classic Sports
+        die markings show
+        "SunPlus QL8041" ( known as Sunplus SPG240? )
+        JAKKS WWE
+        Fantastic 4
+        Justice League
+        Dora the Explorer
+        Mattel Classic Sports
 
-		"SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead
+        "SunPlus QL8041C" ( known as Sunplus SPG2?? ) see clickstart.cpp instead
 
-		"SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
+        "SunPlus PA7801" ( known as Sunplus SPG110? ) see spg110.cpp instead
 
     Status:
 
@@ -35,9 +35,9 @@
             Game seems unhappy with NVRAM, clears contents on each boot.
         rad_skat:
             Palette issues on the High Score screen.
-		rad_fb2:
-			sometimes when selecting QB training camp the sprites don't appear
-			controls are not properly mapped
+        rad_fb2:
+            sometimes when selecting QB training camp the sprites don't appear
+            controls are not properly mapped
         vii:
             When loading a cart from file manager, sometimes MAME will crash.
             The "MOTOR" option in the diagnostic menu does nothing when selected.
@@ -45,17 +45,17 @@
             On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys.
             - This is not a bug per se, as the games are played with the controller physically rotated 90 degrees.
 
-	Note:
-		Cricket, Skateboarder, Skannerz and Football 2 list a 32-bit checksum at the start of ROM.
-		This is the byte sum of the file, excluding the first 16 byte (where the checksum is stored)
+    Note:
+        Cricket, Skateboarder, Skannerz and Football 2 list a 32-bit checksum at the start of ROM.
+        This is the byte sum of the file, excluding the first 16 byte (where the checksum is stored)
 
-		Test Modes:
-		Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
-		WWE : press UP, BT1, BT2 together during startup logos
+        Test Modes:
+        Justice League : press UP, DOWN, LEFT, BT3 on the JAKKS logo in that order, quickly, to get test menu
+        WWE : press UP, BT1, BT2 together during startup logos
 
 
-	TODO:
-		Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
+    TODO:
+        Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
 
     Also on this hardware:
 

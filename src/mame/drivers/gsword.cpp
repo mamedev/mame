@@ -917,17 +917,17 @@ GFXDECODE_END
 void gsword_state::gsword(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	Z80(config, m_maincpu, XTAL(18'000'000)/6); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu1_map);
 	m_maincpu->set_addrmap(AS_IO, &gsword_state::cpu1_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gsword_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	Z80(config, m_subcpu, XTAL(18'000'000)/6);  /* verified on pcb */
 	m_subcpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu2_map);
 	m_subcpu->set_addrmap(AS_IO, &gsword_state::cpu2_io_map);
 	m_subcpu->set_periodic_int(FUNC(gsword_state::sound_interrupt), attotime::from_hz(4*60));
 
-	Z80(config, m_audiocpu, XTAL(18'000'000)/6);	/* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(18'000'000)/6);    /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gsword_state::cpu3_map);
 
 	upi41_cpu_device &mcu1(I8041(config, "mcu1", 12'000'000/2));        // clock unknown, using value from gladiatr
@@ -988,12 +988,12 @@ void gsword_state::gsword(machine_config &config)
 void josvolly_state::josvolly(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18000000/4);		/* ? */
+	Z80(config, m_maincpu, 18000000/4);     /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &josvolly_state::cpu1_map);
 	m_maincpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu1_io_map);
 	m_maincpu->set_periodic_int(FUNC(josvolly_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	Z80(config, m_audiocpu, 12000000/4);	/* ? */
+	Z80(config, m_audiocpu, 12000000/4);    /* ? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &josvolly_state::josvolly_cpu2_map);
 	m_audiocpu->set_addrmap(AS_IO, &josvolly_state::josvolly_cpu2_io_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(josvolly_state::irq0_line_assert));

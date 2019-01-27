@@ -545,7 +545,7 @@ void hnayayoi_state::machine_reset()
 void hnayayoi_state::hnayayoi(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 20000000/4);		/* 5 MHz ???? */
+	Z80(config, m_maincpu, 20000000/4);     /* 5 MHz ???? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::hnayayoi_map);
 	m_maincpu->set_addrmap(AS_IO, &hnayayoi_state::hnayayoi_io_map);
 

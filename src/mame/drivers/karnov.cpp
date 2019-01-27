@@ -769,10 +769,10 @@ void karnov_state::machine_reset()
 void karnov_state::karnov(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);	/* 10 MHz */
+	M68000(config, m_maincpu, 10000000);    /* 10 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_map);
 
-	M6502(config, m_audiocpu, 1500000);		/* Accurate */
+	M6502(config, m_audiocpu, 1500000);     /* Accurate */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &karnov_state::karnov_sound_map);
 
 	/* video hardware */

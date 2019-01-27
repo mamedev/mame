@@ -467,7 +467,7 @@ TIMER_CALLBACK_MEMBER(xavix_state::interrupt_gen)
 
 		m_screen->update_partial(m_screen->vpos());
 	}
-//	m_interrupt_timer->adjust(attotime::never, 0);
+//  m_interrupt_timer->adjust(attotime::never, 0);
 	m_interrupt_timer->adjust(m_screen->time_until_pos(m_posirq_y[0], m_posirq_x[0]), 0); // epo_dmon expects it to keep firing without being reloaded? check this doesn't break anything else!
 }
 
@@ -617,7 +617,7 @@ READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io0)
 READ8_MEMBER(xavix_i2c_jmat_state::read_extended_io1)
 {
 	LOG("%s: read_extended_io1\n", machine().describe_context());
-	
+
 	// reads this by reading the byte, then shifting right 4 times to place value into carry flag
 	return m_i2cmem->read_sda() << 3;
 	//return 0x00;

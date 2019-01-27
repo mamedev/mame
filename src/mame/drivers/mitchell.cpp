@@ -1164,7 +1164,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
 void mitchell_state::mgakuen(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(16'000'000)/2);	/* probably same clock as the other mitchell hardware games */
+	Z80(config, m_maincpu, XTAL(16'000'000)/2); /* probably same clock as the other mitchell hardware games */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mgakuen_map);
 	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mitchell_state::mitchell_irq), "screen", 0, 1);
@@ -1214,7 +1214,7 @@ void mitchell_state::pang(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.42);	/* verified on pcb */
+	screen.set_refresh_hz(57.42);   /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
@@ -1293,7 +1293,7 @@ void mitchell_state::spangbl(machine_config &config)
 
 	config.device_remove("oki");
 	MSM5205(config, m_msm, 400000); // clock and prescaler unknown
-	m_msm->vck_legacy_callback().set(FUNC(mitchell_state::spangbl_adpcm_int));	// controls music as well as ADCPM rate
+	m_msm->vck_legacy_callback().set(FUNC(mitchell_state::spangbl_adpcm_int));  // controls music as well as ADCPM rate
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
@@ -1321,7 +1321,7 @@ void mitchell_state::mstworld(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mitchell_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 6000000);	/* 6 MHz? */
+	Z80(config, m_audiocpu, 6000000);   /* 6 MHz? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mitchell_state::mstworld_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
@@ -1799,7 +1799,7 @@ ROM_END
 // Similar to "pangbold" but with data on a battery backed 256Kbit RAM (undumped), on a small sub-board with the Z84 and a PLD (also undumped, was protected).
 ROM_START( pangbp )
 	ROM_REGION( 2*0x50000, "maincpu", 0 )
-        ROM_LOAD( "pangbp_nvr.bin", 0x00000, 0x08000, NO_DUMP ) // Opcodes + data (?) on battery backed RAM (the battery was dead, so it's undumped)
+	ROM_LOAD( "pangbp_nvr.bin", 0x00000, 0x08000, NO_DUMP ) // Opcodes + data (?) on battery backed RAM (the battery was dead, so it's undumped)
 	ROM_LOAD( "pangbp_4.6l",    0x50000, 0x08000, CRC(01bc7ecf) SHA1(7f3e3cf5f5d03d1c2d1ad624627feb941aea7414) ) // Opcodes + data on ROM (almost the same as the first half of "4.6l" on "pangbold")
 	ROM_LOAD( "pangbp_2.3l",    0x60000, 0x20000, CRC(3f15bb61) SHA1(4f74ee25f32a201482840158b4d4c7aca1cda684) ) // Decrypted opcodes
 	ROM_LOAD( "pangbp_3.5l",    0x10000, 0x20000, CRC(ce6375e4) SHA1(fdd40d82553fcd4d2762ecfd898d0e3112dfde79) ) // Decrypted data

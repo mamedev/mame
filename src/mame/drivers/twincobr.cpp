@@ -652,10 +652,10 @@ GFXDECODE_END
 void twincobr_state::twincobr(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(28'000'000) / 4);	/* 7MHz - Main board Crystal is 28MHz */
+	M68000(config, m_maincpu, XTAL(28'000'000) / 4);    /* 7MHz - Main board Crystal is 28MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &twincobr_state::main_program_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'000'000)/8));	/* 3.5MHz */
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'000'000)/8));  /* 3.5MHz */
 	audiocpu.set_addrmap(AS_PROGRAM, &twincobr_state::sound_program_map);
 	audiocpu.set_addrmap(AS_IO, &twincobr_state::sound_io_map);
 

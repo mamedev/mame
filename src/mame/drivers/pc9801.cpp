@@ -2946,7 +2946,7 @@ void pc9801_state::init_pc9801vm_kanji()
 	uint8_t *chargen = memregion("chargen")->base();
 	uint8_t *raw_kanji = memregion("raw_kanji")->base();
 	uint8_t *kanji = memregion("kanji")->base();
-	
+
 	/* swap bits for 8x8 characters, discard 8x8 "graphics" characters */
 	/* TODO: should we keep and use the "graphics" characters? */
 	for( uint32_t i = 0; i < 0x100; i++ )
